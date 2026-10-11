@@ -174,19 +174,20 @@ nx_result_t nx_spi_endpoint_submit(const nx_spi_endpoint_t* endpoint,
 nx_result_t nx_spi_endpoint_start_admitted(const nx_spi_endpoint_t* endpoint,
                                            nx_spi_request_t* request);
 /**
- * \brief           Verify an asynchronous endpoint belongs to the serviced bus.
+ * \brief           Verify an endpoint belongs to the serviced bus.
  *
  * \param[in]       endpoint: Immutable endpoint identity kept alive by its
  *                  caller.
  *
- * \param[in]       port: Exact execution bus bound to an asynchronous adapter.
+ * \param[in]       port: Exact execution bus bound to an adapter.
  *
  * \return          True only when the provider proves matching controller state
  *                  and compatible bus methods; false for invalid/missing
  *                  methods.
  *
  * \note            Task/IRQ bounded cold identity check, no lookup or ownership
- *                  effects. An adapter checks this before borrowing a request.
+ *                  effects. An adapter checks this before hardware execution;
+ *                  asynchronous admission also checks before borrowing.
  */
 bool nx_spi_endpoint_on_port(const nx_spi_endpoint_t* endpoint,
                              const nx_spi_port_t* port);

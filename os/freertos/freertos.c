@@ -234,6 +234,10 @@ static void task_entry(void* argument) {
     void (*entry)(void*) = task->entry;
     void* context = task->context;
     SemaphoreHandle_t finished = task->finished;
+    /* The startup owner may discard only wrappers that have never entered.
+     * Reuse the consumed entry slot instead of adding a lifecycle flag.
+     */
+    task->entry = NULL;
     entry(context);
     /* No task/control/context access after publication. Join deletes externally
      * so static TCB/stack are not waiting for self-delete idle reclamation. */
@@ -284,8 +288,36 @@ nx_result_t nx_freertos_task_start(nx_freertos_task_t* task, const char* name,
     if (task->handle == NULL) {
         vSemaphoreDelete(task->finished);
         task->finished = NULL;
+        task->entry = NULL;
+        task->context = NULL;
         return NX_ERROR_IO;
     }
+    return NX_SUCCESS;
+}
+
+/** \brief Remove prestart candidate references before returning caller storage.
+ */
+nx_result_t
+nx_freertos_task_discard_before_scheduler(nx_freertos_task_t* task) {
+    if (!task_context_allowed() ||
+        xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (task == NULL || (uintptr_t)task % _Alignof(nx_freertos_task_t) != 0 ||
+        task->handle == NULL || task->finished == NULL || task->entry == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    /* The pinned single-core kernel may retain this TCB as its startup
+     * candidate. Prestart suspend reselects or clears that reference; deletion
+     * alone does not. The task has never run, so cleanup is synchronous.
+     */
+    vTaskSuspend(task->handle);
+    vTaskDelete(task->handle);
+    vSemaphoreDelete(task->finished);
+    task->handle = NULL;
+    task->finished = NULL;
+    task->entry = NULL;
+    task->context = NULL;
     return NX_SUCCESS;
 }
 

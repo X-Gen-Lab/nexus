@@ -120,6 +120,8 @@ immutable DMA domains. Silicon route support does not qualify PCB wiring.
 
 SPI and I2C controller identity is separate from each child endpoint:
 
+<!-- nexus-toml-fragment: endpoint tables extend a complete Board assembly. -->
+
 ```toml
 [spi.bus0]
 binding = "spi_flash"

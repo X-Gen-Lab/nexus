@@ -4,6 +4,11 @@ Nexus owns reusable embedded mechanisms. Applications, product roles, protocol
 register policy, workers, private PCB data, Flash reservations and recovery policy
 belong in external repositories. Public examples live in X-Gen-Lab/nexus-examples.
 
+Codex owns all platform maintenance domains under the checked agent-managed
+policy. Named people are not required. Preserve automated gates and independent
+agent review for high-risk changes; never invent GitHub CODEOWNERS accounts or
+claim remote branch protection from a local policy file.
+
 Read [the design contracts](docs/design/README.md),
 [delivery evidence](docs/delivery/README.md) and the relevant layer README before
 changing behavior. `docs/archive/` contains historical contracts and results.

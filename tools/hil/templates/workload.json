@@ -1,0 +1,600 @@
+{
+  "schema_version": 1,
+  "kind": "hil_workload",
+  "board": null,
+  "part": null,
+  "cases": [
+    {
+      "id": "station_binding",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "probe_serial": null,
+        "chip_uid_part": null,
+        "pcb_revision": null,
+        "oscillator_supply": null,
+        "wiring_inspection": null,
+        "firmware_readback": null
+      },
+      "instruments": {
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "supply_meter": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "serial_capture": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "reviewed_pcb": null,
+        "ground_voltage": null,
+        "outputs_disconnected": null
+      },
+      "limits": {
+        "identity_mismatches": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "clock_gpio_watchdog",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "clock_frequency": null,
+        "reset_cause": null,
+        "gpio_initial_safe_levels": null,
+        "watchdog_enable_feed_reset": null,
+        "supply_voltage": null
+      },
+      "instruments": {
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "calibrated_timer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "supply_meter": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "outputs_disconnected": null,
+        "irreversible_watchdog": null,
+        "reviewed_pin_load": null
+      },
+      "limits": {
+        "clock_error": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "ppm"
+        },
+        "watchdog_timeout": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "ms"
+        },
+        "reset_count": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "unsafe_outputs": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "uart_spi_dma",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "uart_tx_rx_wire": null,
+        "spi_cs_sck_data": null,
+        "dma_completion": null,
+        "cancel_tc_order": null,
+        "drain_settlement": null,
+        "buffer_loss_alignment": null
+      },
+      "instruments": {
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "reviewed_slave": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "reviewed_wire_routes": null,
+        "legal_dma_memory": null,
+        "borrow_preserved": null,
+        "no_unselected_stream_mode": null
+      },
+      "limits": {
+        "wire_completion_latency": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "us"
+        },
+        "dma_loss": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "i2c_electrical",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "scl_sda_waveform": null,
+        "rise_time_voltage": null,
+        "ack_nack_stop": null,
+        "repeated_start": null,
+        "timeout_recovery": null
+      },
+      "instruments": {
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "oscilloscope": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "reviewed_slave": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "reviewed_pullups": null,
+        "reviewed_voltage": null,
+        "isolated_fault_injection": null
+      },
+      "limits": {
+        "rise_time": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "ns"
+        },
+        "protocol_errors": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "adc_pwm_exti",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "adc_reference_samples": null,
+        "adc_samples_timeout": null,
+        "pwm_period_duty": null,
+        "pwm_shadow_safe_stop": null,
+        "exti_edge_loss_stop": null
+      },
+      "instruments": {
+        "reference_source": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "signal_generator": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "analog_limits": null,
+        "reviewed_timer_routes": null,
+        "outputs_disconnected": null,
+        "no_unselected_continuous_adc": null
+      },
+      "limits": {
+        "adc_error": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "counts"
+        },
+        "pwm_error": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "ns"
+        },
+        "exti_loss": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "flash_power_loss",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "erase_program_phase": null,
+        "voltage_power_cut": null,
+        "readback_after_reset": null,
+        "recovery_result": null,
+        "protected_regions_unchanged": null
+      },
+      "instruments": {
+        "power_interrupt": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "oscilloscope": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "external_erase_aligned_layout": null,
+        "firmware_regions_protected": null,
+        "isolated_supply": null,
+        "product_recovery_policy": null
+      },
+      "limits": {
+        "power_cut_cases": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "recovery_failures": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "concurrent_load",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "task_irq_load": null,
+        "wire_bytes_loss": null,
+        "service_timestamps": null,
+        "controller_isolation": null,
+        "monotonic_elapsed": null,
+        "borrow_settlement": null
+      },
+      "instruments": {
+        "serial_capture": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "calibrated_timer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "all_executors_progress": null,
+        "reviewed_irq_ceiling": null,
+        "borrow_preserved": null,
+        "only_selected_controllers": null
+      },
+      "limits": {
+        "duration": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "s"
+        },
+        "loss": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "service_interval": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "us"
+        }
+      }
+    },
+    {
+      "id": "m4f_context",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "r4_r11_expected_observed": null,
+        "s0_s31_expected_observed": null,
+        "fp_exception_control": null,
+        "preemption_nesting_load": null
+      },
+      "instruments": {
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "register_capture": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "selected_m4f_abi": null,
+        "reviewed_exception_load": null,
+        "outputs_disconnected": null
+      },
+      "limits": {
+        "context_mismatches": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "monotonic_deadline",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "calibrated_clock_ticks": null,
+        "deadline_return_timestamps": null,
+        "clock_monotonic_wrap": null,
+        "load_irq_priorities": null
+      },
+      "instruments": {
+        "calibrated_timer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "continuous_monotonic_domain": null,
+        "required_executor_running": null
+      },
+      "limits": {
+        "clock_error": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "ppm"
+        },
+        "deadline_lateness": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "us"
+        }
+      }
+    },
+    {
+      "id": "stack_peaks",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "complete_stack_inventory": null,
+        "capacity_used_bytes": null,
+        "msp_nested_peak": null,
+        "task_high_water_bytes": null
+      },
+      "instruments": {
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "stack_capture": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "stack_inventory_complete": null,
+        "watermark_without_live_corruption": null,
+        "reviewed_exception_nesting": null
+      },
+      "limits": {
+        "minimum_headroom": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "id": "lifecycle_endurance",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "iterations_admitted_settled": null,
+        "joined_observers": null,
+        "retained_borrows": null,
+        "stale_accesses": null,
+        "rejected_admission_effects": null
+      },
+      "instruments": {
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "lifecycle_capture": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "no_forced_borrow_reclaim": null,
+        "all_publishers_quiesced": null,
+        "required_executor_running": null
+      },
+      "limits": {
+        "iterations": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "retained_borrows": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "stale_accesses": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "tickless_timer",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "timer_port_phase_arm": null,
+        "before_after_monotonic": null,
+        "latched_observed_wake": null,
+        "deadline_restore_ticks": null,
+        "wake_current_waveform": null
+      },
+      "instruments": {
+        "calibrated_timer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "current_meter": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "reviewed_timer_port": null,
+        "continuous_clock": null,
+        "wake_sources_latched": null,
+        "no_unreviewed_deep_sleep": null
+      },
+      "limits": {
+        "wake_lateness": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "us"
+        },
+        "wake_loss": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "fail_stop",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "assert_trigger_safe_timestamps": null,
+        "overflow_trigger_safe_timestamps": null,
+        "expected_observed_outputs": null,
+        "reset_recovery_record": null
+      },
+      "instruments": {
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "outputs_disconnected": null,
+        "external_safe_output_policy": null,
+        "non_destructive_failure_fixture": null,
+        "reviewed_reset_recovery": null
+      },
+      "limits": {
+        "response_time": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "us"
+        },
+        "unsafe_outputs": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    }
+  ]
+}

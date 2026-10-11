@@ -201,9 +201,15 @@
           "unit"
         ],
         "properties": {
+          "minimum": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 18446744073709551615
+          },
           "maximum": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "maximum": 18446744073709551615
           },
           "unit": {
             "type": "string",

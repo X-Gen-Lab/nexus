@@ -43,6 +43,10 @@ typedef struct {
 /**
  * \brief           Task has its own TCB; stack is supplied with its actual word
  *                  count.
+ * \note            Control fields are adapter-owned. The caller
+ * zero-initializes storage before first use and does not modify live fields.
+ *                  Entry is consumed as the wrapper begins execution; context
+ *                  remains borrowed until successful join or prestart discard.
  */
 typedef struct {
     StaticTask_t control;
@@ -147,6 +151,23 @@ nx_result_t nx_freertos_task_start(nx_freertos_task_t* task, const char* name,
                                    StackType_t* stack, size_t stack_words,
                                    UBaseType_t priority, void (*entry)(void*),
                                    void* context);
+/**
+ * \brief           Discard one created task before its wrapper has executed
+ * \param[in,out]   task: Live caller-owned static task, unused by other callers
+ * \return          SUCCESS after synchronous kernel deletion and latch cleanup;
+ *                  INVALID for absent, incomplete or already entered control;
+ *                  CONTEXT for ISR, unprivileged, noncanonical masks or a
+ *                  running/suspended scheduler, without mutation
+ * \note            Single privileged startup lifecycle owner; scheduler state
+ *                  must be NOT_STARTED. The kernel candidate is first suspended
+ *                  to remove its retained TCB reference before deletion.
+ *                  No unmatched vTaskSuspendAll may remain during bootstrap:
+ *                  NOT_STARTED cannot reveal the kernel's private suspension
+ *                  nesting. This caller precondition applies before mutation.
+ * Success permits TCB, stack and context reuse after all external users are
+ * quiescent. This does not cancel or join an executed task.
+ */
+nx_result_t nx_freertos_task_discard_before_scheduler(nx_freertos_task_t* task);
 /**
  * \brief           Join a cooperatively returned task and reclaim kernel state
  * \param[in,out]   task: Started task, distinct from current task

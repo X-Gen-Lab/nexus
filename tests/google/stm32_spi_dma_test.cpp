@@ -163,6 +163,23 @@ TEST_F(Stm32SpiDma, WrongBusIdentityAndInvalidDomainsFailBeforeAdmission) {
     EXPECT_EQ(rx.CR & DMA_SxCR_EN, 0U);
 }
 
+TEST_F(Stm32SpiDma, PollingEndpointsProveSharedControllerWithoutDmaAlias) {
+    nx_stm32_spi_state_t other = {};
+    const nx_spi_port_t polling_bus = {&nx_stm32_spi_ops, &state.spi};
+    const nx_spi_port_t foreign_bus = {&nx_stm32_spi_ops, &other};
+    const nx_spi_port_t incompatible = {&nx_stm32_spi_dma_ops, &state.spi};
+    const nx_spi_endpoint_t first = {&nx_stm32_spi_endpoint_ops,
+                                     &device.endpoint};
+    nx_stm32_spi_endpoint_state_t second_state = device.endpoint;
+    second_state.cs_mask = 2U;
+    const nx_spi_endpoint_t second = {&nx_stm32_spi_endpoint_ops,
+                                      &second_state};
+    EXPECT_TRUE(nx_spi_endpoint_on_port(&first, &polling_bus));
+    EXPECT_TRUE(nx_spi_endpoint_on_port(&second, &polling_bus));
+    EXPECT_FALSE(nx_spi_endpoint_on_port(&first, &foreign_bus));
+    EXPECT_FALSE(nx_spi_endpoint_on_port(&first, &incompatible));
+}
+
 TEST_F(Stm32SpiDma, CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline) {
     request.base.deadline = NX_DEADLINE_NEVER;
     ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);

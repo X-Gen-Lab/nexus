@@ -34,6 +34,28 @@ extern "C" void nx_stm32_adc_model_barrier(void) {
 
 static bool s_hold_dma_enable;
 
+/** \brief Model EOC at the last programmed regular rank, without repairing it.
+ */
+extern "C" void nx_stm32_adc_model_poll(unsigned kind, void* raw) {
+    EXPECT_EQ(kind, 5U);
+    auto* state = static_cast<nx_stm32_adc_state_t*>(raw);
+    ADC_TypeDef* adc = state->registers;
+    (void)nx_native_clock_advance(1U);
+    if ((adc->CR2 & ADC_CR2_SWSTART) != 0U) {
+        unsigned rank =
+            (adc->CR1 & ADC_CR1_SCAN) != 0U ? (adc->SQR1 >> 20U) & 15U : 0U;
+        uint32_t sequence = rank < 6U    ? adc->SQR3
+                            : rank < 12U ? adc->SQR2
+                                         : adc->SQR1;
+        unsigned shift = rank < 6U    ? rank * 5U
+                         : rank < 12U ? (rank - 6U) * 5U
+                                      : (rank - 12U) * 5U;
+        adc->DR = 100U + ((sequence >> shift) & 31U) * 100U;
+        adc->CR2 &= ~static_cast<uint32_t>(ADC_CR2_SWSTART);
+        adc->SR |= ADC_SR_EOC;
+    }
+}
+
 /** \brief Retain EN to model a memory engine without a completed drain proof.
  */
 extern "C" void nx_stm32_dma_model_disable(void* raw, uint32_t mask) {
@@ -239,4 +261,27 @@ TEST_F(Stm32AdcStream, InvalidStreamClockBoundsRejectBeforeAdmission) {
     EXPECT_EQ(state.stream, nullptr);
     EXPECT_EQ(memory.CR & DMA_SxCR_EN, 0U);
     EXPECT_EQ(timer.CR1 & TIM_CR1_CEN, 0U);
+}
+
+TEST_F(Stm32AdcStream, StoppedMultiChannelStreamRestoresIndependentPollShots) {
+    ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
+    ASSERT_NE(adc.CR1 & ADC_CR1_SCAN, 0U);
+    ASSERT_NE(adc.SQR1 & ADC_SQR1_L, 0U);
+    ASSERT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
+    uint16_t shot[2] = {};
+    size_t count = 99U;
+    ASSERT_EQ(nx_adc_port_sample(&port, shot, 2U, 200U, &count), NX_SUCCESS);
+    EXPECT_EQ(count, 2U);
+    EXPECT_EQ(shot[0], 100U);
+    EXPECT_EQ(shot[1], 200U);
+    EXPECT_EQ(adc.CR1 & ADC_CR1_SCAN, 0U);
+    EXPECT_EQ(adc.SQR1 & ADC_SQR1_L, 0U);
+    EXPECT_EQ(adc.CR2, 0U);
+    EXPECT_FALSE(state.adc.active);
+    ASSERT_EQ(nx_stream_initialize(&stream, &slot, 1U), NX_SUCCESS);
+    ASSERT_EQ(nx_adc_port_stream_start(&port, &stream, 1000U), NX_SUCCESS);
+    EXPECT_NE(adc.CR1 & ADC_CR1_SCAN, 0U);
+    EXPECT_EQ(adc.SQR1 & ADC_SQR1_L, 1U << 20U);
+    EXPECT_EQ(adc.SQR3, 1U << 5U);
+    EXPECT_EQ(nx_adc_port_stream_stop(&port), NX_SUCCESS);
 }

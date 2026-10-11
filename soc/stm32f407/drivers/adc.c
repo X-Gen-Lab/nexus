@@ -74,6 +74,12 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
         return NX_ERROR_TIMEOUT;
     }
     port->active = true;
+    /* A stopped DMA scan leaves its rank count and SCAN configuration behind.
+     * Restore independent single-rank shots before enabling the converter.
+     */
+    port->registers->CR1 = 0U;
+    port->registers->SQR1 = 0U;
+    port->registers->SQR2 = 0U;
     port->registers->CR2 = ADC_CR2_ADON;
     nx_time_us_t stable = nx_deadline_after(nx_time_now_us(), 3U);
     while (!nx_deadline_expired(stable, nx_time_now_us())) {

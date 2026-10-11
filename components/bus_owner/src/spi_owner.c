@@ -17,7 +17,9 @@ static nx_result_t start(void* context, void* operation,
     if (executor->pending) {
         return NX_ERROR_BUSY;
     }
-    if (transfer->endpoint == NULL || transfer->length == 0 ||
+    if (transfer == NULL || transfer->endpoint == NULL ||
+        !nx_spi_endpoint_on_port(transfer->endpoint, executor->port) ||
+        transfer->length == 0 ||
         (transfer->tx == NULL && transfer->rx == NULL)) {
         return NX_ERROR_INVALID;
     }
@@ -61,7 +63,14 @@ static nx_result_t cancel(void* context) {
 
 /** \brief Select only the real polling provider, without a default worker. */
 nx_owner_executor_port_t
-nx_spi_owner_executor_port(nx_spi_owner_executor_t* executor) {
+nx_spi_owner_executor_port(nx_spi_owner_executor_t* executor,
+                           const nx_spi_port_t* binding) {
+    if (executor == NULL || binding == NULL || binding->ops == NULL ||
+        binding->context == NULL) {
+        nx_owner_executor_port_t invalid = {0};
+        return invalid;
+    }
+    *executor = (nx_spi_owner_executor_t){.port = binding};
     nx_owner_executor_port_t port = {executor, start, service, cancel, true};
     return port;
 }

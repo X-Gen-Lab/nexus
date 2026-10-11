@@ -64,8 +64,17 @@ TEST(DmaResource, ChannelSelectorsDoNotCreateSeparateStreams) {
     EXPECT_EQ(nx_dma_resources_validate(resources, 2U), NX_ERROR_BUSY);
     const nx_dma_resource_t independent[] = {{1U, 3U, 2U}, {2U, 3U, 2U}};
     EXPECT_EQ(nx_dma_resources_validate(independent, 2U), NX_SUCCESS);
-    const nx_dma_resource_t invalid = {1U, 8U, 0U};
+    const nx_dma_resource_t invalid = {0U, 8U, 0U};
     EXPECT_EQ(nx_dma_resources_validate(&invalid, 1U), NX_ERROR_INVALID);
+}
+
+TEST(DmaResource, OpaqueIdentitiesDoNotImposeOneSocTopology) {
+    const nx_dma_resource_t resources[] = {{3U, 31U, 255U}, {255U, 255U, 0U}};
+    EXPECT_EQ(nx_dma_resources_validate(resources, 2U), NX_SUCCESS);
+    const nx_dma_resource_t conflict[] = {{3U, 31U, 255U}, {3U, 31U, 0U}};
+    EXPECT_EQ(nx_dma_resources_validate(conflict, 2U), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_dma_resources_validate(nullptr, 0U), NX_SUCCESS);
+    EXPECT_EQ(nx_dma_resources_validate(nullptr, 1U), NX_ERROR_INVALID);
 }
 
 TEST(DmaDrain, CounterAndTransferCompleteNeverProveWireCompletion) {

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="10" failures="1" disabled="0" errors="0" time="0." timestamp="2026-10-11T15:28:57.064" name="AllTests">
+  <testsuite name="Stm32AdcStream" tests="10" failures="1" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T15:28:57.064">
+    <testcase name="StabilizationRequiresExplicitServiceBeforeFirstTrigger" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="113" status="run" result="completed" time="0." timestamp="2026-10-11T15:28:57.064" classname="Stm32AdcStream" />
+    <testcase name="ValidatesCompleteScanConversionBudgetBeforeAdmission" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="128" status="run" result="completed" time="0." timestamp="2026-10-11T15:28:57.064" classname="Stm32AdcStream" />
+    <testcase name="PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="137" status="run" result="completed" time="0." timestamp="2026-10-11T15:28:57.064" classname="Stm32AdcStream" />
+    <testcase name="RefusedDisableNeverPublishesMutableDmaMemory" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="171" status="run" result="completed" time="0." timestamp="2026-10-11T15:28:57.064" classname="Stm32AdcStream" />
+    <testcase name="MisalignedOrPartialScanBlocksRejectWithoutTimerEffects" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="190" status="run" result="completed" time="0." timestamp="2026-10-11T15:28:57.064" classname="Stm32AdcStream" />
+    <testcase name="WarmupStartsAfterPowerStoreBarrierCompletes" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="199" status="run" result="completed" time="0." timestamp="2026-10-11T15:28:57.064" classname="Stm32AdcStream" />
+    <testcase name="ObservedDmaFaultCannotBeReplacedByLateTransferComplete" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="214" status="run" result="completed" time="0." timestamp="2026-10-11T15:28:57.064" classname="Stm32AdcStream" />
+    <testcase name="BasicAdcInitializationCannotBypassStreamClockValidation" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="237" status="run" result="completed" time="0." timestamp="2026-10-11T15:28:57.064" classname="Stm32AdcStream" />
+    <testcase name="InvalidStreamClockBoundsRejectBeforeAdmission" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="250" status="run" result="completed" time="0." timestamp="2026-10-11T15:28:57.064" classname="Stm32AdcStream" />
+    <testcase name="StoppedMultiChannelStreamRestoresIndependentPollShots" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="267" status="run" result="completed" time="0." timestamp="2026-10-11T15:28:57.064" classname="Stm32AdcStream">
+      <failure message="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:277&#x0A;Expected equality of these values:&#x0A;  shot[1]&#x0A;    Which is: 100&#x0A;  200U&#x0A;    Which is: 200&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:277
+Expected equality of these values:
+  shot[1]
+    Which is: 100
+  200U
+    Which is: 200
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:278&#x0A;Expected equality of these values:&#x0A;  adc.CR1 &amp; (0x1UL &lt;&lt; (8U))&#x0A;    Which is: 256&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:278
+Expected equality of these values:
+  adc.CR1 & (0x1UL << (8U))
+    Which is: 256
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:279&#x0A;Expected equality of these values:&#x0A;  adc.SQR1 &amp; (0xFUL &lt;&lt; (20U))&#x0A;    Which is: 1048576&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:279
+Expected equality of these values:
+  adc.SQR1 & (0xFUL << (20U))
+    Which is: 1048576
+  0U
+    Which is: 0
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -17,10 +17,13 @@ extern "C" {
 /** \brief Observe power publication and advance the model APB completion time.
  */
 void nx_stm32_adc_model_barrier(void);
+/** \brief Advance software-shot hardware from the programmed scan registers. */
+void nx_stm32_adc_model_poll(unsigned kind, void* port);
 #ifdef __cplusplus
 }
 #endif
 
-#define nx_arch_dsb nx_stm32_adc_model_barrier
+#define nx_arch_dsb                  nx_stm32_adc_model_barrier
+#define NX_STM32_IO_POLL(kind, port) nx_stm32_adc_model_poll((kind), (port))
 
 #endif

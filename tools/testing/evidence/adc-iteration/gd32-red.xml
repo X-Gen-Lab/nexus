@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="13" failures="1" disabled="0" errors="0" time="0.015" timestamp="2026-10-11T15:27:31.467" name="AllTests">
+  <testsuite name="GD32ADCInitialize" tests="13" failures="1" disabled="0" skipped="0" errors="0" time="0.015" timestamp="2026-10-11T15:27:31.467">
+    <testcase name="StabilityDeadlineRollsBackPinsClocksAndCommonState" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="293" status="run" result="completed" time="0." timestamp="2026-10-11T15:27:31.467" classname="GD32ADCInitialize" />
+    <testcase name="ResetCalibrationDeadlineRollsBackWithoutOwner" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="297" status="run" result="completed" time="0." timestamp="2026-10-11T15:27:31.468" classname="GD32ADCInitialize" />
+    <testcase name="CalibrationDeadlineRollsBackWithoutOwner" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="301" status="run" result="completed" time="0." timestamp="2026-10-11T15:27:31.468" classname="GD32ADCInitialize" />
+    <testcase name="FrozenMonotonicClockFailsBoundedlyAndRollsBack" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="305" status="run" result="completed" time="0.006" timestamp="2026-10-11T15:27:31.468" classname="GD32ADCInitialize" />
+    <testcase name="FrozenResetCalibrationFailsBoundedlyAndRollsBack" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="310" status="run" result="completed" time="0.003" timestamp="2026-10-11T15:27:31.475" classname="GD32ADCInitialize" />
+    <testcase name="FrozenCalibrationFailsBoundedlyAndRollsBack" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="314" status="run" result="completed" time="0.003" timestamp="2026-10-11T15:27:31.478" classname="GD32ADCInitialize" />
+    <testcase name="SuccessfulColdStartOnlyConfiguresSelectedPins" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="318" status="run" result="completed" time="0." timestamp="2026-10-11T15:27:31.482" classname="GD32ADCInitialize" />
+    <testcase name="GatedPinsAreCapturedOnlyAfterClockObservation" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="339" status="run" result="completed" time="0." timestamp="2026-10-11T15:27:31.482" classname="GD32ADCInitialize" />
+    <testcase name="RollbackPreservesNeighborWritesAndUnrelatedClocks" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="352" status="run" result="completed" time="0." timestamp="2026-10-11T15:27:31.482" classname="GD32ADCInitialize" />
+    <testcase name="PreexpiredDeadlineHasNoSDKOrRegisterEffects" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="366" status="run" result="completed" time="0." timestamp="2026-10-11T15:27:31.482" classname="GD32ADCInitialize" />
+    <testcase name="ExistingADCClockRejectsSharedResetBeforeAnyEffect" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="377" status="run" result="completed" time="0." timestamp="2026-10-11T15:27:31.483" classname="GD32ADCInitialize" />
+    <testcase name="ISRAndMaskedAdmissionLeavePinsAndClocksUntouched" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="400" status="run" result="completed" time="0." timestamp="2026-10-11T15:27:31.483" classname="GD32ADCInitialize" />
+    <testcase name="FailedPollRecalibratesAfterPowerOffBeforeRetry" file="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp" line="413" status="run" result="completed" time="0." timestamp="2026-10-11T15:27:31.483" classname="GD32ADCInitialize">
+      <failure message="/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp:416&#x0A;Expected equality of these values:&#x0A;  s_reset_calibrations&#x0A;    Which is: 2&#x0A;  1U&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_adc_initialize_test.cpp:416
+Expected equality of these values:
+  s_reset_calibrations
+    Which is: 2
+  1U
+    Which is: 1
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

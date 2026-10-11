@@ -60,6 +60,8 @@ and network-disabled execution. `tools/evidence/candidate.py` additionally check
 actual source/config/ELF/BIN/map and all six qualification scopes. Mutable runner
 checks and workflow definitions do not establish those claims by themselves.
 
-Physical HIL is currently unexecuted. Named team assignments, GitHub protection,
-product deployments, signing and release promotion are external decisions;
-workflow files do not create those permissions or qualifications.
+Physical HIL is currently unexecuted. Codex owns platform maintenance through
+the checked agent-managed policy; named people are not required. GitHub
+protection, product deployments, signing and release promotion retain their
+separate actual states; workflow files do not establish remote permissions or
+physical qualifications.

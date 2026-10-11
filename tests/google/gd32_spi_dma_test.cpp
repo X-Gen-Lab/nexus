@@ -136,6 +136,22 @@ TEST_F(GD32SPIDMA, ProgramsExactIndependentDmaRoutesWithoutCopying) {
     EXPECT_EQ(SPI_CTL1(SPI4), SPI_CTL1_DMAREN | SPI_CTL1_DMATEN);
 }
 
+TEST_F(GD32SPIDMA, PollingEndpointsProveSharedControllerWithoutDmaAlias) {
+    nx_gd32_spi_state_t other = {};
+    const nx_spi_port_t polling_bus = {&nx_gd32_spi_ops, &state.spi};
+    const nx_spi_port_t foreign_bus = {&nx_gd32_spi_ops, &other};
+    const nx_spi_port_t incompatible = {&nx_gd32_spi_dma_ops, &state.spi};
+    const nx_spi_endpoint_t first = {&nx_gd32_spi_endpoint_ops,
+                                     &device.endpoint};
+    nx_gd32_spi_endpoint_state_t second_state = device.endpoint;
+    second_state.cs_mask = GPIO_PIN_5;
+    const nx_spi_endpoint_t second = {&nx_gd32_spi_endpoint_ops, &second_state};
+    EXPECT_TRUE(nx_spi_endpoint_on_port(&first, &polling_bus));
+    EXPECT_TRUE(nx_spi_endpoint_on_port(&second, &polling_bus));
+    EXPECT_FALSE(nx_spi_endpoint_on_port(&first, &foreign_bus));
+    EXPECT_FALSE(nx_spi_endpoint_on_port(&first, &incompatible));
+}
+
 TEST_F(GD32SPIDMA, BothDmaCompletionsRetainCsUntilIndependentWireIdle) {
     ASSERT_EQ(nx_spi_endpoint_submit(&endpoint, &request), NX_SUCCESS);
     SPI_STAT(SPI4) = SPI_STAT_TRANS;

@@ -66,7 +66,8 @@ encoder；实际单 region 编程要求本域内 privileged Thread、输入 PRIM
 相应单元已经 disabled，保留 CTRL、其他 region 与输入 RNR，不隐式启用。
 
 产品拥有 MPU/MAIR policy、SAU/IDAU、NSC veneers、安全启动、共享资源协议和
-恢复。CPU 机制不提供用户任务 MPU 隔离，也不把 range encode 当作安全验收。
+恢复。单独的 CPU MPU 编程机制不建立用户任务隔离；显式 restricted-task
+runtime 使用实际 FreeRTOS MPU port，软件与实板安全验收仍分别记录。
 
 ## FreeRTOS 软件合同
 
@@ -75,10 +76,13 @@ encoder；实际单 region 编程要求本域内 privileged Thread、输入 PRIM
 errata 837070 的 PRIMASK-preserving BASEPRI helpers 与 PendSV 处理，厂商
 源文件保持锁定内容。禁止为了省事将所有内核映射到 CM4F。
 
-Armv8-M 的 NTZ、Secure-only 和 standalone NonSecure 由显式事实选择，使用
-`configENABLE_TRUSTZONE=0` 的维护路径。没有 Secure task heap、双世界 task
-调用或 gateway；Secure 启动、IDAU/SAU 与 NonSecure coprocessor access 仍由
-外部工程负责。用户 MPU task gateway 未实现，API 和 task 均为特权合同。
+Armv8-M 的 NTZ、Secure-only 和 standalone NonSecure 默认路径由显式事实选择，
+使用 `configENABLE_TRUSTZONE=0`。可选 split profile 使用匹配的 Secure/NS 图像、
+实际 TZ-aware port 和调用者提供的 Secure context/Idle 存储，没有默认 Secure
+heap/pool。Secure 启动、IDAU/SAU 与 NonSecure coprocessor access 仍由外部工程
+负责。可选 MPU profile 提供 restricted task 与窄 delay/tick SVC；普通 API 保持
+privileged 合同。MPU-only 与 split-only 独立，MPU+split 当前拒绝。精确变体与
+已执行软件证据见 [OS 支持](os.md)，不代表物理隔离验收。
 
 M55/M85 使用实际 MVE-aware context port。`configENABLE_FPU` 在 FP 或 MVE
 存在时打开共享寄存器 bank 和 extended/lazy frame；integer-only MVE 不因此

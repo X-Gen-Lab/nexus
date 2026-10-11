@@ -1,0 +1,43 @@
+Running main() from gmock_main.cc
+[==========] Running 4 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from SPIPollingOwner
+[ RUN      ] SPIPollingOwner.RejectsForeignEndpointWithoutWireEffects
+/workspace/nexus/tests/google/spi_async_owner_test.cpp:104: Failure
+Mock function called more times than expected - returning default value.
+    Function call: transfer(0x7ffd8199746c, 0x7ffd8199746e, 2, 1000, 0x7ffd819973e8)
+          Returns: 0
+         Expected: to be never called
+           Actual: called once - over-saturated and active
+
+/workspace/nexus/tests/google/spi_async_owner_test.cpp:106: Failure
+Expected equality of these values:
+  bridge.start(bridge.context, &operation, 1000)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/spi_async_owner_test.cpp:107: Failure
+Value of: executor.pending
+  Actual: true
+Expected: false
+
+[  FAILED  ] SPIPollingOwner.RejectsForeignEndpointWithoutWireEffects (0 ms)
+[----------] 1 test from SPIPollingOwner (0 ms total)
+
+[----------] 3 tests from SPIAsyncOwner
+[ RUN      ] SPIAsyncOwner.RejectsWrongBusBeforeTouchingProviderOrPayload
+[       OK ] SPIAsyncOwner.RejectsWrongBusBeforeTouchingProviderOrPayload (0 ms)
+[ RUN      ] SPIAsyncOwner.RejectionDetachesPrivateBuffersAndPreservesReady
+[       OK ] SPIAsyncOwner.RejectionDetachesPrivateBuffersAndPreservesReady (0 ms)
+[ RUN      ] SPIAsyncOwner.CancellationCannotReleaseQuarantinedStorage
+[       OK ] SPIAsyncOwner.CancellationCannotReleaseQuarantinedStorage (0 ms)
+[----------] 3 tests from SPIAsyncOwner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] SPIPollingOwner.RejectsForeignEndpointWithoutWireEffects
+
+ 1 FAILED TEST

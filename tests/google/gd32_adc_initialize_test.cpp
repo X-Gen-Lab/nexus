@@ -46,6 +46,9 @@ bool s_isr;
 uint32_t s_mask;
 bool s_neighbor_write;
 bool s_gated_pins;
+unsigned s_reset_calibrations;
+unsigned s_calibrations;
+bool s_conversion_works;
 constexpr uint32_t kNeighborMask = 3U << 30U;
 } /* namespace */
 
@@ -115,11 +118,22 @@ extern "C" nx_time_us_t nx_time_now_us(void) {
             s_now = 500U;
         }
         if (s_fault != Fault::Reset && s_fault != Fault::ResetFrozen) {
+            if ((ADC_CTL1(ADC0) & ADC_CTL1_RSTCLB) != 0U) {
+                ++s_reset_calibrations;
+            }
             ADC_CTL1(ADC0) &= ~ADC_CTL1_RSTCLB;
         }
         if (s_fault != Fault::Calibration &&
             s_fault != Fault::CalibrationFrozen) {
+            if ((ADC_CTL1(ADC0) & ADC_CTL1_CLB) != 0U) {
+                ++s_calibrations;
+            }
             ADC_CTL1(ADC0) &= ~ADC_CTL1_CLB;
+        }
+        if ((ADC_CTL1(ADC0) & ADC_CTL1_SWRCST) != 0U && s_conversion_works) {
+            ADC_RDATA(ADC0) = 100U + (ADC_RSQ2(ADC0) & 31U);
+            ADC_STAT(ADC0) |= ADC_STAT_EOC;
+            ADC_CTL1(ADC0) &= ~ADC_CTL1_SWRCST;
         }
     }
     return ++s_now;
@@ -215,6 +229,9 @@ class GD32ADCInitialize : public ::testing::Test {
         s_mask = 0U;
         s_neighbor_write = false;
         s_gated_pins = false;
+        s_reset_calibrations = 0U;
+        s_calibrations = 0U;
+        s_conversion_works = false;
         for (unsigned i = 0U; i < 3U; ++i) {
             initial_mode[i] = UINT32_C(0x55555555);
             initial_pull[i] = UINT32_C(0xAAAAAAAA);
@@ -269,6 +286,18 @@ class GD32ADCInitialize : public ::testing::Test {
             nx_gd32_adc_initialize(&state, channels, 5U, 3300U, s_now + 100U),
             NX_SUCCESS);
         EXPECT_TRUE(state.initialized);
+    }
+
+    void PowerOffAfterFailedPoll() {
+        ASSERT_EQ(nx_gd32_adc_initialize(&state, channels, 5U, 3300U, 200U),
+                  NX_SUCCESS);
+        uint16_t samples[5] = {};
+        size_t count = 99U;
+        ASSERT_EQ(nx_gd32_adc_sample(&state, samples, 5U, s_now + 20U, &count),
+                  NX_ERROR_TIMEOUT);
+        EXPECT_EQ(count, 0U);
+        ASSERT_EQ(ADC_CTL1(ADC0) & ADC_CTL1_ADCON, 0U);
+        EXPECT_FALSE(state.active);
     }
 };
 
@@ -390,4 +419,67 @@ TEST_F(GD32ADCInitialize, ISRAndMaskedAdmissionLeavePinsAndClocksUntouched) {
               NX_ERROR_CONTEXT);
     EXPECT_EQ(s_mask, 1U);
     ExpectRestored();
+}
+
+TEST_F(GD32ADCInitialize, FailedPollRecalibratesAfterPowerOffBeforeRetry) {
+    PowerOffAfterFailedPoll();
+    ASSERT_EQ(s_reset_calibrations, 1U);
+    ASSERT_EQ(s_calibrations, 1U);
+    uint16_t samples[5] = {};
+    size_t count = 99U;
+    s_conversion_works = true;
+    ASSERT_EQ(nx_gd32_adc_sample(&state, samples, 5U, s_now + 100U, &count),
+              NX_SUCCESS);
+    EXPECT_EQ(count, 5U);
+    EXPECT_EQ(s_reset_calibrations, 2U);
+    EXPECT_EQ(s_calibrations, 2U);
+    for (size_t i = 0U; i < count; ++i) {
+        EXPECT_EQ(samples[i], 100U + channels[i]);
+    }
+}
+
+TEST_F(GD32ADCInitialize,
+       RetryResetCalibrationTimeoutPowersOffAndReleasesOwner) {
+    PowerOffAfterFailedPoll();
+    s_fault = Fault::Reset;
+    s_conversion_works = true;
+    uint16_t samples[5] = {};
+    size_t count = 99U;
+    EXPECT_EQ(nx_gd32_adc_sample(&state, samples, 5U, s_now + 100U, &count),
+              NX_ERROR_TIMEOUT);
+    EXPECT_EQ(count, 0U);
+    EXPECT_EQ(ADC_CTL1(ADC0), 0U);
+    EXPECT_FALSE(state.active);
+    EXPECT_TRUE(state.initialized);
+    s_fault = Fault::None;
+    ASSERT_EQ(nx_gd32_adc_sample(&state, samples, 5U, s_now + 100U, &count),
+              NX_SUCCESS);
+    EXPECT_EQ(count, 5U);
+}
+
+TEST_F(GD32ADCInitialize, RetryCalibrationTimeoutPowersOffAndRetainsBinding) {
+    PowerOffAfterFailedPoll();
+    s_fault = Fault::Calibration;
+    s_conversion_works = true;
+    uint16_t samples[5] = {};
+    size_t count = 99U;
+    EXPECT_EQ(nx_gd32_adc_sample(&state, samples, 5U, s_now + 100U, &count),
+              NX_ERROR_TIMEOUT);
+    EXPECT_EQ(count, 0U);
+    EXPECT_EQ(ADC_CTL1(ADC0), 0U);
+    EXPECT_FALSE(state.active);
+    EXPECT_TRUE(state.initialized);
+}
+
+TEST_F(GD32ADCInitialize, RetryFrozenClockFailsBoundedlyBeforeAnyConversion) {
+    PowerOffAfterFailedPoll();
+    s_fault = Fault::Frozen;
+    s_conversion_works = true;
+    uint16_t samples[5] = {};
+    size_t count = 99U;
+    EXPECT_EQ(nx_gd32_adc_sample(&state, samples, 5U, s_now + 100U, &count),
+              NX_ERROR_IO);
+    EXPECT_EQ(count, 0U);
+    EXPECT_EQ(ADC_CTL1(ADC0), 0U);
+    EXPECT_FALSE(state.active);
 }

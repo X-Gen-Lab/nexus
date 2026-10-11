@@ -78,6 +78,7 @@ enum class Operation {
     NotifyDestroy,
     TaskStart,
     TaskJoin,
+    TaskDiscard,
     QueueInit,
     QueueSend,
     QueueReceive,
@@ -254,6 +255,9 @@ TEST_P(FreeRTOSRejectedContextTest, RejectsBeforeKernelOrStorageEffects) {
         case Operation::TaskJoin:
             result = nx_freertos_task_join(&task, 1000);
             break;
+        case Operation::TaskDiscard:
+            result = nx_freertos_task_discard_before_scheduler(&task);
+            break;
         case Operation::QueueInit:
             result = nx_freertos_queue_init(&queue, bytes, sizeof bytes, 2,
                                             sizeof item);
@@ -333,10 +337,10 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values(Context::Masked, Context::Unprivileged, Context::Isr),
         ::testing::Values(Operation::NotifyInit, Operation::NotifyDestroy,
                           Operation::TaskStart, Operation::TaskJoin,
-                          Operation::QueueInit, Operation::QueueSend,
-                          Operation::QueueReceive, Operation::QueueDestroy,
-                          Operation::NotifyWait, Operation::NotifyWake,
-                          Operation::QueueSendUntil,
+                          Operation::TaskDiscard, Operation::QueueInit,
+                          Operation::QueueSend, Operation::QueueReceive,
+                          Operation::QueueDestroy, Operation::NotifyWait,
+                          Operation::NotifyWake, Operation::QueueSendUntil,
                           Operation::QueueReceiveUntil, Operation::DirectInit,
                           Operation::DirectDestroy, Operation::PermanentStart,
                           Operation::WaiterInit, Operation::WaiterDestroy,
@@ -874,6 +878,84 @@ TEST_F(FreeRTOSContextTest, FailedTaskCreateReleasesOnlyNewLatch) {
         NX_ERROR_IO);
     EXPECT_EQ(task.handle, nullptr);
     EXPECT_EQ(task.finished, nullptr);
+    EXPECT_EQ(task.entry, nullptr);
+    EXPECT_EQ(task.context, nullptr);
+}
+
+TEST_F(FreeRTOSContextTest, PrestartDiscardSuspendsThenDeletesBeforeReclaim) {
+    task.handle = task_handle;
+    task.finished = latch;
+    task.entry = entry;
+    task.context = &item;
+    EXPECT_CALL(calls, scheduler()).WillOnce(Return(taskSCHEDULER_NOT_STARTED));
+    {
+        ::testing::InSequence order;
+        EXPECT_CALL(calls, suspend(task_handle));
+        EXPECT_CALL(calls, delete_task(task_handle));
+        EXPECT_CALL(calls, delete_queue(latch)).WillOnce([&](QueueHandle_t) {
+            EXPECT_EQ(task.handle, task_handle);
+            EXPECT_EQ(task.finished, latch);
+            EXPECT_EQ(task.entry, entry);
+            EXPECT_EQ(task.context, &item);
+        });
+    }
+    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task), NX_SUCCESS);
+    EXPECT_EQ(task.handle, nullptr);
+    EXPECT_EQ(task.finished, nullptr);
+    EXPECT_EQ(task.entry, nullptr);
+    EXPECT_EQ(task.context, nullptr);
+}
+
+TEST_F(FreeRTOSContextTest, PrestartDiscardPreservesCanonicalBootstrapMask) {
+    task.handle = task_handle;
+    task.finished = latch;
+    task.entry = entry;
+    const auto masks = bootstrap_masks();
+    model_primask = masks.primask;
+    EXPECT_CALL(context, masks()).WillRepeatedly(Return(masks));
+    EXPECT_CALL(calls, scheduler())
+        .Times(2)
+        .WillRepeatedly(Return(taskSCHEDULER_NOT_STARTED));
+    {
+        ::testing::InSequence order;
+        EXPECT_CALL(calls, suspend(task_handle));
+        EXPECT_CALL(calls, delete_task(task_handle));
+        EXPECT_CALL(calls, delete_queue(latch));
+    }
+    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task), NX_SUCCESS);
+    EXPECT_EQ(model_primask, masks.primask);
+}
+
+TEST_F(FreeRTOSContextTest, DiscardRejectsRunningAndSuspendedWithoutMutation) {
+    task.handle = task_handle;
+    task.finished = latch;
+    task.entry = entry;
+    task.context = &item;
+    const auto before = task;
+    for (BaseType_t state : {taskSCHEDULER_RUNNING, taskSCHEDULER_SUSPENDED}) {
+        EXPECT_CALL(calls, scheduler()).WillOnce(Return(state));
+        EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task),
+                  NX_ERROR_CONTEXT);
+        EXPECT_EQ(std::memcmp(&task, &before, sizeof task), 0);
+    }
+}
+
+TEST_F(FreeRTOSContextTest, DiscardRejectsMalformedOrUnstartedObjects) {
+    EXPECT_CALL(calls, scheduler())
+        .Times(4)
+        .WillRepeatedly(Return(taskSCHEDULER_NOT_STARTED));
+    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(nullptr),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task),
+              NX_ERROR_INVALID);
+    task.handle = task_handle;
+    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task),
+              NX_ERROR_INVALID);
+    task.finished = latch;
+    EXPECT_EQ(nx_freertos_task_discard_before_scheduler(&task),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(task.handle, task_handle);
+    EXPECT_EQ(task.finished, latch);
 }
 
 TEST_F(FreeRTOSContextTest, JoinTimeoutRetainsEveryBorrowedResource) {

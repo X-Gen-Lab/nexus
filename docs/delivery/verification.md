@@ -44,5 +44,6 @@ RED 日志保存在 `tools/testing/evidence/`，GREEN 为真实框架执行。�
 
 所有物理时序、精度、波形、reset、掉电和长期负载项目尚未执行。FP/MVE context
 切换、IRQ latency、cache/DMA coherence、MPU/SAU 和安全世界协作也未进行实板
-验收；没有双世界 gateway 或用户 MPU task 集成的支持声明。实际 HIL 必须
+验收；可选 restricted MPU task 和 split runtime 的软件执行不能建立实板隔离
+资格。实际 HIL 必须
 记录 PCB、chip UID、probe／serial／power、station、预算和同一候选 image。

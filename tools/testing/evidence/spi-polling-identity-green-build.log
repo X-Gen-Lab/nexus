@@ -1,0 +1,4 @@
+[1/4] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/stm32_spi_dma_test.cpp.o
+[2/4] Linking CXX executable bin/nexus_stm32_spi_dma_test
+[3/4] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_spi_dma_test.dir/gd32_spi_dma_test.cpp.o
+[4/4] Linking CXX executable bin/nexus_gd32_spi_dma_test

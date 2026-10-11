@@ -88,6 +88,8 @@ Board 不复制 SDK、HAL、RTOS port 或链接器脚本。普通 GPIO 初始电
 
 外部 `nexus-examples` 或私有产品工程提供 `assembly.toml`，选择一个 Board package、OS 后端、时钟 profile、需要的资源和器件实例。以下最小示意没有声明任何外设实例：
 
+<!-- nexus-toml-fragment: external Board paths and clock profile must be supplied. -->
+
 ```toml
 schema = 2
 board_package = "./boards/example-board"

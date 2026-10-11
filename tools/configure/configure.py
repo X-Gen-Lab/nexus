@@ -404,13 +404,15 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail(f"Board binding {binding['id']} has no reviewed exact-part route")
         if "initial" in binding:
             integer(binding["initial"], 0, UINT32_MAX, "GPIO initial")
+        actual_mask = sum(1 << int(PIN.fullmatch(pin["pin"])[2])
+                          for pin in route["pins"])
         if "mask" in binding:
             integer(binding["mask"], 1, 65535, "GPIO mask")
-            actual_mask = sum(1 << int(PIN.fullmatch(pin["pin"])[2]) for pin in route["pins"])
             if binding["mask"] != actual_mask:
                 fail(f"GPIO binding {binding['id']} mask differs from its reviewed pins")
-            if binding.get("initial", 0) & ~binding["mask"]:
-                fail(f"GPIO initial sets unauthorized bits: {binding['id']}")
+        if (route["kind"] == "gpio" or "mask" in binding) and (
+                binding.get("initial", 0) & ~actual_mask):
+            fail(f"GPIO initial sets unauthorized bits: {binding['id']}")
         bindings[binding["id"]] = binding
     claims = {}
     claim_list = []

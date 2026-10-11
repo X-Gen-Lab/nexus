@@ -273,13 +273,13 @@ HIL或签名后的晋升使用同hashartifact，不重新构建一个名称相�
 
 ## 11. 十人的工作与review模型
 
-为Arch/SoC/Board、I/O/OS、components、build/evidence、product qualification五类领域安排实际primary和backup，可以由十人按五对覆盖。角色不是强制组织图；一个人可跨领域，但不能将无人负责的领域视为已获得review能力。
+当前维护模式由Codex负责Arch/SoC/Board、I/O/OS、components、build/evidence和平台qualification全部领域。十人配置作为工作领域与容量计划，不要求具体人员。角色文件验证路径、备用领域和自动门禁，不创建虚构GitHub账号。
 
-每个高风险领域至少培养一名替补。primary/backup名单需实际团队确认；本文不创建虚构reviewer、远程branch rule、credential或发布授权。
+维护责任已指派与远程branch rules、独立人工review、credential或发布授权分别记录。产品决策和私有资格仍属于外部产品仓库。
 
 ### 11.1 普通改动与高风险改动
 
-普通内部实现至少有一个独立domain reviewer。public API、依赖方向、IRQ/DMA/ownership、persistent format、安全和发布链改变，需要domain reviewer与消费者或跨层reviewer共同审查。作者不能自我批准。
+普通内部实现执行领域审查和自动门禁。public API、依赖方向、IRQ/DMA/ownership、persistent format、安全和发布链改变，还需独立agent或消费者跨层审查及实际失败路径证据。agent审查不声称独立人工批准；远程规则若要求人工review，仍按规则记录其真实状态。
 
 不要为所有PR开架构委员会。小ADR只用于真实跨层决策，记录问题、决定、tradeoff、接口和验收；纯机械重命名使用普通PR说明。review主要检查合同、失败路径、并发、资源/时序与维护成本，格式交给工具。
 

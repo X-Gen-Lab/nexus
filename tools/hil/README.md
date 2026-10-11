@@ -28,8 +28,9 @@ physical measurements before those capabilities can be qualified.
 
 The platform supplies tooling and generic measurement cases. Products own
 electrical limits, fixture wiring, erase regions, real workloads and release
-decisions. Unknown PCB routes remain unknown until reviewed. These commands do not
-operate probes, power boards, flash firmware or open serial devices.
+decisions. Unknown PCB routes remain unknown until reviewed. Preparation,
+admission and validation do not operate probes, power boards, flash firmware or
+open serial devices. Explicit acquisition execution is a separate station action.
 
 
 `measure.py plan` generates seven generic acquisition cases bound to an exact
@@ -116,10 +117,84 @@ The CLI refuses to overwrite input records, retained traces, context, workload,
 instrument or admitted tool/configuration artifacts. A successful result is
 `qualified_for_recorded_measurements` only: observed samples do not prove WCET,
 unobserved loading, electrical safety or product release. Neither preparation nor
-admission operates equipment. The platform does not supply an instrument adapter
-or claim physical measurements until a real station executes and retains them.
+admission operates equipment. A real station must execute its reviewed adapters
+and retain actual instrument bytes; software fixtures never establish physical
+measurements.
 
 Host-only measurement regressions run through the commit TDD gate. They mock the
 external admission service and retain real synthetic file hashes and parser
 inputs; the admission/resource suite separately links a real ARM ELF. Synthetic
 records test tooling and never establish qualification for the three boards.
+
+## Reviewed acquisition adapters
+
+`workloads.py plan` adds thirteen explicit acquisition protocols for station
+binding; clock/reset/GPIO/watchdog; UART/SPI/DMA; I2C; ADC/PWM/EXTI; Flash power
+loss; concurrent load; M4F context; time/deadlines; all task/MSP peaks; lifecycle
+endurance; tickless timer-port wake; and fail-stop/external safe outputs.
+`templates/workload.json` is an incomplete authoring template, not a reviewed
+station. Budgets, instrument identities, wiring and safety steps must come from
+the actual station owner. Missing selected controllers/modes stay
+`requires_selection`; unsupported CPU/backend cases stay `unsupported`.
+
+```sh
+python tools/hil/workloads.py plan \
+    --fixture tools/hil/fixtures/gd32f470_liangshan.json \
+    --resolved build/gd32-liangshan-baremetal/generated/resolved.json \
+    --report station/workload-plan.json
+```
+
+Supplying `--workload station/reviewed-workload.json` checks strict bindings,
+stimulation, raw observations, instrument bytes, safety actions and numeric
+limits. Endurance duration and power-cut cases need reviewed positive work
+lower bounds. A valid protocol remains `prepared_unbound` / `not_executed`:
+describing measurements does not execute them or qualify equipment.
+
+`acquire.py plan` rebuilds an existing admission and verifies a station-owned
+recipe without opening equipment. It is `prepared_bound` / `not_executed`;
+`prepare.py`, `measure.py plan` and `workloads.py plan` remain unbound until the
+station, wiring, artifact and reviewed limits are supplied.
+
+```sh
+python tools/hil/acquire.py plan --recipe station/acquisition.json \
+    --admission station/admission.json --output station/acquisition-plan.json
+```
+
+The strict schema-1 `hil_acquisition_recipe` supplies `admission_sha256`, a
+`workload` file identity, an absolute station-owned `station_lock`, and exactly
+six operations: `identify`, `flash`, `verify_flash`, `reset`, `serial`, `cleanup`.
+Each operation supplies a content-pinned executable `tool`, nonempty pinned
+`inputs`, an `arguments` array, integer `timeout_s` (1..3600) and
+`maximum_output_bytes` (1..16777216). Probe operations must bind the admitted
+tool. Review the actual adapter scripts and complete tool/configuration closure;
+input hashes do not sandbox arbitrary station scripts.
+
+Arguments use no shell. Whole arguments `{record}`, `{session}`, `{admission}`,
+`{elf}` and `{output}` are replaced with the fresh observation path, random public
+session token, unchanged admission, admitted ELF and attempt directory. Every
+adapter must receive the first three. Adapters read real probe or instrument
+facts and write a fresh `hil_adapter_observation` object with `schema_version`,
+`kind`, `operation`, `session` and nonempty `observations`. The identify adapter
+must report actual `part`, `chip_uid` and `probe_serial`; mismatches stop before
+flashing. No chip-ID register address or GD32 target is guessed by the runner.
+
+Only a connected, reviewed station may use the explicit operating command:
+
+```sh
+python tools/hil/acquire.py execute --recipe station/acquisition.json \
+    --admission station/admission.json --output station/fresh-attempt
+```
+
+The runner creates an exclusive station lock and a new attempt directory. It
+retains exact stdout/stderr bytes, actual argv/exit, timeout/output bounds,
+observation identities and unchanged admission/recipe inputs. Nonzero exit,
+missing or stale observation, identity change and output exhaustion stop later
+operations; cleanup is still attempted. Cleanup failure keeps the station lock
+as quarantine. Resolve it by inspecting equipment and the retained record, not
+by automatically deleting the lock or starting a retry over old evidence.
+
+A complete successful acquisition is `captured` / `executed_unqualified`:
+commands completed, but no physical test or measurement is automatically passed.
+Feed actual smoke, measurement and OS records to `admit.py`, `measure.py` and
+`os_acceptance.py` respectively. Host subprocess fixtures exercise failure and
+audit paths; they do not operate the three boards or establish physical support.

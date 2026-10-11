@@ -34,6 +34,14 @@ coordinator 的显式静态任务；裸机用同一 owner 进行 cooperative ser
 quiescence 和通知销毁。GoogleTest/GoogleMock 测试真实 BusOwner 和应用 shutdown 模块，
 mock 只替代外部 join/硬件 quiescence；覆盖阶段顺序、超时、错误、提前回收和重试。
 
+部分启动失败分别回收已取得的资源。Native 先关闭提交、保持 owner 排空并 join
+已运行任务。FreeRTOS 启动前使用 `nx_freertos_task_discard_before_scheduler`，先
+suspend 移除内核候选 TCB 引用，再同步删除任务和完成 latch。它要求特权启动
+上下文、NOT_STARTED、wrapper 尚未执行且没有未配对的 scheduler suspension；
+成功后才允许复用栈、TCB 和 context。运行中任务继续使用 cooperative stop/join。
+真实 POSIX kernel 回归验证逆序回收、回收存储毒化后复用、真实 scheduler 执行，
+以及 scheduler 结束后拒绝 discard 已执行 wrapper，不能替代 MCU 实板验证。
+
 Native 的显式 host 栈为三个 64 KiB buffer；应用预算相应独立增加。这是 host thread
 fixture 的资源，不是 MCU 栈成本。MCU 采用各 256 StackType_t word 的四任务参考预算，
 声明 8-byte 对齐，仍需实板测量运行峰值，不能从启动最低容量推导。

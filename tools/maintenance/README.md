@@ -13,22 +13,26 @@ python tools/maintenance/capabilities.py --write
 python -B -m unittest tools.testing.test_maintenance -v
 ```
 
-`ownership.py` validates `.github/maintainer-roles.json`: ten seats, unique named
-accounts, review paths, distinct backup roles and security/manufacturing/field
-interfaces. An empty `members` array is a valid template and a **pending** report.
-The strict command exits nonzero until all seats have real assignments. No real
-account names are currently provided; repository membership and branch rules
-remain unverified.
+`ownership.py` validates `.github/maintainer-roles.json`. The current
+`agent_managed` policy assigns maintenance to Codex across every review domain,
+including security, manufacturing and field interfaces. The ten seats describe
+the original capacity plan; they do not require named people. Empty `members`
+arrays are required in this mode. The strict check validates the responsible
+agent, complete paths, backup domains and mandatory automated gates.
 
 ```sh
 python tools/maintenance/ownership.py
 python tools/maintenance/ownership.py --require-assigned
 ```
 
-When the responsible team supplies actual GitHub usernames or team slugs, fill
-each role's `members` and mark `assignment_status` as `assigned`. Produce a file
-for review, verify every account has the required repository access, then commit
-the reviewed file as `.github/CODEOWNERS` using the normal checks:
+GitHub CODEOWNERS requires actual GitHub accounts or team slugs. Agent-managed
+maintenance does not invent an account for Codex and refuses CODEOWNERS output.
+Independent human review, repository access and branch rules remain separately
+unverified; an assigned maintenance policy does not establish these conditions.
+
+If named-account maintenance is selected later, remove `maintenance`, fill each
+role's `members` and mark `assignment_status` as `assigned`. Verify account
+access before installing a reviewed `.github/CODEOWNERS` through normal checks:
 
 ```sh
 python tools/maintenance/ownership.py --require-assigned \
@@ -37,14 +41,12 @@ python tools/maintenance/ownership.py --require-assigned \
 
 The generator refuses to write the active `.github/CODEOWNERS` directly. Broad
 patterns precede specific overrides because GitHub uses the last matching line.
-Each pattern names the accountable role and its backup reviewers. CODEOWNERS
-itself does not enforce review: repository administrators must configure and
-verify branch rules and required CI checks separately. Keep that state pending
-until confirmed by GitHub, never infer it from this local template.
+CODEOWNERS itself does not enforce review. Confirm branch rules and required CI
+checks through GitHub before reporting them as configured.
 
 `doctor`, `check` and Tool Contracts CI validate the generated capability text
-and report the assignment status. Pending real members do not block software
-development; use the strict check as the exit condition for team handover.
+and report the assignment status. `--require-assigned` passes for a complete
+agent-managed policy without requesting human accounts.
 
 The installed source SDK intentionally omits repository docs, named assignments
 and the main firmware host contract suite. `doctor` first verifies its file map,

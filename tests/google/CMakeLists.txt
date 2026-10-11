@@ -54,7 +54,7 @@ nexus_google_test(nexus_polymorphic_io_test SOURCES polymorphic_mock_test.cpp
 nexus_google_test(nexus_uart_owner_mock_test SOURCES uart_owner_test.cpp
     LIBRARIES Nexus::UARTOwner)
 nexus_google_test(nexus_spi_async_owner_mock_test SOURCES spi_async_owner_test.cpp
-    LIBRARIES Nexus::SPIAsyncOwner)
+    LIBRARIES Nexus::SPIAsyncOwner Nexus::SpiOwner)
 nexus_google_test(nexus_hardware_contract_test
     SOURCES dma_test.cpp stream_test.cpp wake_test.cpp
     LIBRARIES Nexus::IO Nexus::Arch)
@@ -334,6 +334,7 @@ include(arch_mpu.cmake)
 include(arch_security.cmake)
 include(arch_native_mechanism.cmake)
 include(freertos_context.cmake)
+include(freertos_prestart.cmake)
 include(os_wait.cmake)
 include(os_optional.cmake)
 include(os_secure.cmake)

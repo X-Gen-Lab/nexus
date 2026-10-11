@@ -223,9 +223,18 @@ nx_result_t nx_gd32_spi_stop(nx_gd32_spi_state_t* port) {
     return NX_SUCCESS;
 }
 
+/** \brief Prove a polling child's controller without asynchronous methods. */
+static bool on_port(const void* context, const nx_spi_port_t* binding) {
+    const nx_gd32_spi_endpoint_state_t* endpoint = context;
+    return endpoint != NULL && binding != NULL &&
+           binding->ops == &nx_gd32_spi_ops &&
+           endpoint->port == binding->context;
+}
+
 /** \brief One shared immutable method table for this execution mode. */
 const nx_spi_endpoint_ops_t nx_gd32_spi_endpoint_ops = {
     .transfer = nx_gd32_spi_endpoint_transfer,
+    .on_port = on_port,
 };
 
 /** \brief Reset only an idle initialized controller without replaying traffic.

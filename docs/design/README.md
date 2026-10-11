@@ -16,6 +16,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [Arch 与 CPU runtime 契约](arch-contracts.md) | 九核软件、原子操作、cache/MPU/SAU 和安全边界 |
 | [33项实施台账](next-generation-execution.csv) | 实现文件、证据入口、软件与物理状态分列 |
 | [本次 P0–P5 台账](factory-platform-execution.csv) | factory、TOML、TDD、多实例与 IRQ/DMA/block 实现 |
+| [60项完善台账](platform-refinement-execution.csv) | 本轮实现、软件执行、实板与外部阻塞分别记录；全部维护责任由Codex承担 |
 | [实际架构](../delivery/architecture.md) | 当前目录、公共 factory 和多态接口、依赖方向 |
 | [当前资格边界](../delivery/qualification.md) | 开发执行、clean软件候选、实板pending的区别 |
 
@@ -33,7 +34,8 @@ CPU runtime 不生成 SoC/Board/factory；配置示例与剩余条件见
 首发为启明STM32F407ZGT6、天空星STM32F407VET6和梁山派GD32F470ZGT6，裸机/
 FreeRTOS及Native模型。三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实
 Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应用/通信2、QA/HIL2、
-构建发布1；实际人员与branch protection另行配置。
+构建发布1；维护责任由Codex全部承担，无需实名人员。远程branch protection状态
+须通过GitHub独立核实，不能从本地角色文件推断。
 
 行为变更采用 RED → GREEN → REFACTOR；主机 GoogleTest/GoogleMock 测试真实生产
 provider、factory 与 owner，配置工具用 Python unittest。commit hook 和 CI 执行同一

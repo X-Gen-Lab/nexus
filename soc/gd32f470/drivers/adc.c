@@ -57,6 +57,32 @@ static nx_result_t wait_clear(uint32_t mask, nx_time_us_t deadline) {
     return NX_ERROR_IO;
 }
 
+/** \brief Every power-on needs stabilization and bounded calibration again. */
+static nx_result_t power_on(nx_time_us_t deadline) {
+    ADC_CTL1(ADC0) = ADC_CTL1_ADCON;
+    nx_gd32_peripheral_barrier();
+    (void)ADC_CTL1(ADC0);
+    nx_time_us_t stable = nx_deadline_after(nx_time_now_us(), 10u);
+    uint32_t polls = 0u;
+    while (!nx_deadline_expired(stable, nx_time_now_us())) {
+        if (++polls == 1000000u) {
+            return NX_ERROR_IO;
+        }
+        if (nx_deadline_expired(deadline, nx_time_now_us())) {
+            return NX_ERROR_TIMEOUT;
+        }
+    }
+    ADC_CTL1(ADC0) |= ADC_CTL1_RSTCLB;
+    nx_gd32_peripheral_barrier();
+    nx_result_t status = wait_clear(ADC_CTL1_RSTCLB, deadline);
+    if (status == NX_SUCCESS) {
+        ADC_CTL1(ADC0) |= ADC_CTL1_CLB;
+        nx_gd32_peripheral_barrier();
+        status = wait_clear(ADC_CTL1_CLB, deadline);
+    }
+    return status;
+}
+
 /** \brief           Bind reviewed channels after bounded ADC stabilization. */
 nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
                                    const uint8_t* channels, size_t count,
@@ -124,25 +150,7 @@ nx_result_t nx_gd32_adc_initialize(nx_gd32_adc_state_t* port,
     adc_deinit();
     adc_clock_config(ADC_ADCCK_PCLK2_DIV8);
     ADC_CTL0(ADC0) = 0u;
-    ADC_CTL1(ADC0) = ADC_CTL1_ADCON;
-    nx_time_us_t stable = nx_deadline_after(nx_time_now_us(), 10u);
-    uint32_t polls = 0u;
-    while (!nx_deadline_expired(stable, nx_time_now_us())) {
-        if (++polls == 1000000u) {
-            rollback(pins, added_clocks, common);
-            return NX_ERROR_IO;
-        }
-        if (nx_deadline_expired(deadline, nx_time_now_us())) {
-            rollback(pins, added_clocks, common);
-            return NX_ERROR_TIMEOUT;
-        }
-    }
-    ADC_CTL1(ADC0) |= ADC_CTL1_RSTCLB;
-    nx_result_t status = wait_clear(ADC_CTL1_RSTCLB, deadline);
-    if (status == NX_SUCCESS) {
-        ADC_CTL1(ADC0) |= ADC_CTL1_CLB;
-        status = wait_clear(ADC_CTL1_CLB, deadline);
-    }
+    nx_result_t status = power_on(deadline);
     if (status != NX_SUCCESS) {
         rollback(pins, added_clocks, common);
         return status;
@@ -186,19 +194,9 @@ nx_result_t nx_gd32_adc_sample(void* context, uint16_t* samples,
     port->active = true;
     nx_result_t status = NX_SUCCESS;
     if ((ADC_CTL1(ADC0) & ADC_CTL1_ADCON) == 0u) {
-        ADC_CTL1(ADC0) = ADC_CTL1_ADCON;
-        nx_time_us_t stable = nx_deadline_after(nx_time_now_us(), 10u);
-        for (uint32_t polls = 0u;
-             !nx_deadline_expired(stable, nx_time_now_us()); ++polls) {
-            if (nx_deadline_expired(deadline, nx_time_now_us()) ||
-                polls == 1000000u) {
-                ADC_CTL1(ADC0) = 0u;
-                port->active = false;
-                return NX_ERROR_TIMEOUT;
-            }
-        }
+        status = power_on(deadline);
     }
-    for (size_t i = 0u; i < port->channel_count; ++i) {
+    for (size_t i = 0u; status == NX_SUCCESS && i < port->channel_count; ++i) {
         if (nx_deadline_expired(deadline, nx_time_now_us())) {
             status = NX_ERROR_TIMEOUT;
             break;

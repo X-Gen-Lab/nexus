@@ -96,9 +96,10 @@ static void spi_owner_integration(void) {
     nx_owner_slot_t slots[1];
     nx_bus_owner_t owner;
     nx_clock_t clock = {clock_read, NULL};
-    CHECK(nx_bus_owner_init(&owner, slots, 1, guard,
-                            nx_spi_owner_executor_port(&executor), clock,
-                            NULL) == NX_SUCCESS);
+    CHECK(nx_bus_owner_init(
+              &owner, slots, 1, guard,
+              nx_spi_owner_executor_port(&executor, nx_native_spi_port), clock,
+              NULL) == NX_SUCCESS);
     uint8_t tx[4] = {1, 2, 3, 4};
     uint8_t rx[4] = {0};
     nx_spi_owner_operation_t operation = {nx_native_spi, tx, rx, sizeof(tx)};

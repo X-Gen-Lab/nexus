@@ -22,7 +22,9 @@ CPU 软件层另支持 M0／M0+／M3／M4／M7／M23／M33／M55／M85，统一�
 bounded saved-PRIMASK；可选 cache/MPU/SAU 有真实 CPU 算法，FPU/MVE 与安全
 状态决定精确 kernel port 和 ABI。没有新增 SoC/Board/factory，以上完整平台列表
 保持独立。编译、寄存器模型与真实 FP/MVE/cache/MPU/安全世界验收分别记录；
-没有双世界 gateway、用户 MPU task 集成或新增实板 HIL。范围和配置例子见
+可选 restricted MPU task 和 split Secure/NonSecure runtime 已有独立软件实现；
+窄 delay/tick SVC、Secure context lease 与调用者静态存储分别验证。默认仍为
+privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围和配置例子见
 [Cortex-M 软件支持](cortex-m.md) 与 [Arch 契约](../design/arch-contracts.md)。
 
 ## 首发模式

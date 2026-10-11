@@ -55,10 +55,63 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         capabilities.check_block(document, expected)
 
 
+class AgentMaintenanceTests(unittest.TestCase):
+    def setUp(self):
+        self.document = json.loads(
+            (ROOT / ".github/maintainer-roles.json").read_text())
+        self.document["assignment_status"] = "agent_managed"
+        self.document["maintenance"] = {
+            "mode": "agent_managed",
+            "owner": "codex",
+            "review_policy": "agent_review_and_automated_gates",
+            "required_checks": ["format", "comments", "tdd",
+                                "host-contracts", "arm-builds",
+                                "resource-budgets", "sdk-consumers",
+                                "evidence-identity"],
+        }
+        for role in self.document["roles"]:
+            role["members"] = []
+
+    def test_agent_responsibilities_do_not_require_named_people(self):
+        report = ownership.validate(self.document, require_assigned=True)
+        self.assertEqual(report["status"], "agent_managed")
+        self.assertEqual(report["responsible_agent"], "codex")
+        self.assertEqual(report["unassigned_roles"], [])
+        self.assertFalse(report["named_members_required"])
+        self.assertFalse(report["independent_human_review_verified"])
+        self.assertFalse(report["branch_protection_verified"])
+
+    def test_agent_policy_cannot_fabricate_codeowners(self):
+        with self.assertRaisesRegex(ValueError, "GitHub accounts"):
+            ownership.render(self.document)
+
+    def test_agent_policy_requires_real_execution_gate_names(self):
+        for mutation in ("missing-check", "duplicate-check", "unknown-owner",
+                         "human-account", "unknown-field"):
+            document = copy.deepcopy(self.document)
+            if mutation == "missing-check":
+                document["maintenance"]["required_checks"].remove("tdd")
+            elif mutation == "duplicate-check":
+                document["maintenance"]["required_checks"].append("tdd")
+            elif mutation == "unknown-owner":
+                document["maintenance"]["owner"] = "@fake-person"
+            elif mutation == "human-account":
+                document["roles"][0]["members"] = ["@fake-person"]
+            else:
+                document["maintenance"]["branch_protection_verified"] = True
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                ownership.validate(document, require_assigned=True)
+
+
 class ReviewOwnershipTests(unittest.TestCase):
     def setUp(self):
         path = ROOT / ".github/maintainer-roles.json"
         self.document = json.loads(path.read_text())
+        self.document.pop("maintenance", None)
+        self.document["assignment_status"] = (
+            "roles_defined_named_team_assignment_pending")
+        for role in self.document["roles"]:
+            role["members"] = []
 
     def test_template_is_valid_but_not_an_assigned_team(self):
         report = ownership.validate(self.document)

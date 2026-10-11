@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "kind": "hil_acquisition_development_tdd",
+  "scope": "Synthetic subprocess/fixture boundary execution only; no equipment operated, no candidate qualification",
+  "records": [
+    {
+      "path": "tools/testing/evidence/hil-acquire-red.log",
+      "sha256": "611d2ef7cfcf3aa379602b31c95c09749b09fa23e9ff928fe2cc4de855154030",
+      "size": 7646
+    },
+    {
+      "path": "tools/testing/evidence/hil-acquire-boundary-red.log",
+      "sha256": "218e5e84a406d02f26da143467a0ba231dc555a580b1404e5e9c63900d698080",
+      "size": 3834
+    },
+    {
+      "path": "tools/testing/evidence/hil-acquire-final-green.log",
+      "sha256": "3b0d25c28152f3f98ffafcc04f9aae703a9ea7da08644600e02709898526376b",
+      "size": 2172
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "unittest",
+        "tools.testing.test_hil_acquire",
+        "-v"
+      ],
+      "record": "hil-acquire-red.log",
+      "exit_code": 1,
+      "tests": 10,
+      "result": "1 failure and 6 errors; adapter unimplemented and station schema omitted lower bound"
+    },
+    {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "unittest",
+        "tools.testing.test_hil_acquire",
+        "-v"
+      ],
+      "record": "hil-acquire-boundary-red.log",
+      "exit_code": 1,
+      "tests": 12,
+      "result": "1 failure and 1 error: failed spawn execution status and changed lock ownership"
+    },
+    {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "unittest",
+        "tools.testing.test_hil_acquire",
+        "-v"
+      ],
+      "record": "hil-acquire-final-green.log",
+      "exit_code": 0,
+      "tests": 12
+    }
+  ],
+  "physical_status": "not_executed",
+  "qualifies_source_candidate": false
+}

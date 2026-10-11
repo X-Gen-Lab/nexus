@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "assignment_status": "roles_defined_named_team_assignment_pending",
+  "assignment_status": "agent_managed",
   "roles": [
     {
       "id": "technical-lead",
@@ -118,5 +118,20 @@
     "manufacturing": "industrial-apps",
     "field-maintenance": "quality-hil"
   },
-  "note": "Ten-person roles cover common Nexus contracts and the independent examples repository. Named members and branch protection remain pending; product policies and manufacturing inputs stay external."
+  "note": "Codex owns implementation, review, validation, dependency maintenance and delivery across these responsibility scopes. Seats describe the original capacity plan; named people are not required. Automated gates and agent review do not attest independent human review or GitHub branch-rule configuration. Product policies and manufacturing inputs stay external.",
+  "maintenance": {
+    "mode": "agent_managed",
+    "owner": "codex",
+    "review_policy": "agent_review_and_automated_gates",
+    "required_checks": [
+      "format",
+      "comments",
+      "tdd",
+      "host-contracts",
+      "arm-builds",
+      "resource-budgets",
+      "sdk-consumers",
+      "evidence-identity"
+    ]
+  }
 }

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Validate review assignments and explicitly prepare a CODEOWNERS file.
+"""Validate agent responsibility or named review assignments.
 
 Validation does not verify membership or enable GitHub branch protection.
-An unassigned role template is a pending report, never a configured review gate.
+Agent responsibility requires executable gates, not invented GitHub accounts.
 """
 
 import argparse
@@ -17,6 +17,8 @@ ACCOUNT = re.compile(
     r"(?:/[A-Za-z0-9][A-Za-z0-9_-]*)?\Z")
 ROLE = re.compile(r"[a-z][a-z0-9-]*\Z")
 REVIEW_PATH = re.compile(r"/[A-Za-z0-9_.*?/-]+\Z")
+AGENT_CHECKS = {"format", "comments", "tdd", "host-contracts", "arm-builds",
+                "resource-budgets", "sdk-consumers", "evidence-identity"}
 
 
 def fields(document, required, optional, context):
@@ -27,16 +29,33 @@ def fields(document, required, optional, context):
 
 
 def validate(document, require_assigned=False):
-    """Validate named seats, unique accounts, backups and review paths."""
+    """Validate explicit responsibility without claiming remote enforcement."""
     fields(document, {"schema_version", "assignment_status", "roles",
-                      "interfaces", "note"}, set(), "team")
+                      "interfaces", "note"}, {"maintenance"}, "team")
     if (type(document["schema_version"]) is not int
             or document["schema_version"] != 1):
         raise ValueError("Unsupported team schema")
-    statuses = {"roles_defined_named_team_assignment_pending", "assigned"}
+    statuses = {"roles_defined_named_team_assignment_pending", "assigned",
+                "agent_managed"}
     if (not isinstance(document["assignment_status"], str)
             or document["assignment_status"] not in statuses):
         raise ValueError("Unknown assignment status")
+    agent_managed = document["assignment_status"] == "agent_managed"
+    if agent_managed:
+        policy = document.get("maintenance")
+        fields(policy, {"mode", "owner", "review_policy", "required_checks"},
+               set(), "agent maintenance")
+        checks = policy["required_checks"]
+        if (policy["mode"] != "agent_managed" or policy["owner"] != "codex"
+                or policy["review_policy"] !=
+                "agent_review_and_automated_gates"
+                or not isinstance(checks, list)
+                or any(not isinstance(check, str) for check in checks)
+                or len(checks) != len(set(checks))
+                or set(checks) != AGENT_CHECKS):
+            raise ValueError("Invalid agent responsibility or execution gates")
+    elif "maintenance" in document:
+        raise ValueError("Agent policy requires agent_managed status")
     if not isinstance(document["note"], str) or not document["note"].strip():
         raise ValueError("Team requires an explicit limitations note")
     if not isinstance(document["roles"], list) or not document["roles"]:
@@ -69,6 +88,8 @@ def validate(document, require_assigned=False):
             paths.add(path)
         if role["members"] and len(role["members"]) != role["seats"]:
             raise ValueError("Named members must fill the declared seats")
+        if agent_managed and role["members"]:
+            raise ValueError("Agent responsibilities cannot invent named members")
         if not role["members"]:
             pending.append(identity)
         for account in role["members"]:
@@ -87,19 +108,27 @@ def validate(document, require_assigned=False):
     if any(not isinstance(value, str) or value not in ids
            for value in document["interfaces"].values()):
         raise ValueError("Interface references an unknown role")
-    if pending and (require_assigned
+    if not agent_managed and pending and (require_assigned
                     or document["assignment_status"] == "assigned"):
         raise ValueError("Team is unassigned: " + ", ".join(pending))
-    if not pending and document["assignment_status"] != "assigned":
+    if (not agent_managed and not pending
+            and document["assignment_status"] != "assigned"):
         raise ValueError("Named team must explicitly mark status assigned")
-    return {"status": "pending" if pending else "assigned", "seats": seats,
-            "unassigned_roles": pending, "github_access_verified": False,
-            "branch_protection_verified": False}
+    return {"status": "agent_managed" if agent_managed else
+            "pending" if pending else "assigned", "seats": seats,
+            "responsible_agent": "codex" if agent_managed else None,
+            "named_members_required": not agent_managed,
+            "unassigned_roles": [] if agent_managed else pending,
+            "github_access_verified": False,
+            "branch_protection_verified": False,
+            "independent_human_review_verified": False}
 
 
 def render(document):
     """Produce review ownership only after every seat has a named account."""
-    validate(document, require_assigned=True)
+    report = validate(document, require_assigned=True)
+    if report["status"] == "agent_managed":
+        raise ValueError("Agent policy has no GitHub accounts for CODEOWNERS")
     roles = {role["id"]: role for role in document["roles"]}
     paths = {}
     for role in document["roles"]:

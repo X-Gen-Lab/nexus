@@ -35,9 +35,11 @@ typedef struct {
 } nx_dma_memory_region_t;
 
 /**
- * \brief           Physical stream and request selector, without runtime pools.
+ * \brief           Opaque physical engine and request selector identities.
  *
- * \note            Two selectors on the same controller/stream conflict.
+ * \note            Controller zero is reserved as invalid. Other values have
+ *                  provider-defined meanings; the SoC validates its topology.
+ *                  Two selectors on the same controller/stream conflict.
  */
 typedef struct {
     uint8_t controller;
@@ -92,11 +94,12 @@ nx_result_t nx_dma_buffer_validate(const nx_dma_memory_region_t* regions,
  *
  * \param[in]       count: Resource count; zero allows a NULL list.
  *
- * \return          Success, INVALID for a controller/stream/selector outside
- *                  the maintained two-controller eight-stream hardware, BUSY
- *                  for a duplicate physical stream.
+ * \return          Success, INVALID for a NULL nonempty list or reserved zero
+ *                  controller, BUSY for a duplicate physical engine.
  *
- * \note            Cold configuration check; this is not a runtime allocator.
+ * \note            Cold conflict check; the selected SoC must validate all
+ *                  identities against its actual topology before using them.
+ *                  This helper does not infer silicon support or allocate.
  */
 nx_result_t nx_dma_resources_validate(const nx_dma_resource_t* resources,
                                       size_t count);

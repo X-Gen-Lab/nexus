@@ -17,6 +17,7 @@
 static nx_native_spi_state_t s_spi = {.fail_after = SIZE_MAX};
 static nx_native_spi_endpoint_state_t s_endpoint = {.port = &s_spi};
 const nx_spi_port_t g_nx_native_spi_port = {&nx_native_spi_ops, &s_spi};
+const nx_spi_port_t* const nx_native_spi_port = &g_nx_native_spi_port;
 const nx_spi_endpoint_t g_nx_native_spi = {&nx_native_spi_endpoint_ops,
                                            &s_endpoint};
 const nx_spi_endpoint_t* const nx_native_spi = &g_nx_native_spi;

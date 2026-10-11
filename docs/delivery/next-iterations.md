@@ -38,16 +38,15 @@ deadline、对齐/cache 与停止合同，再做一个真实 provider 垂直切�
 | QA/HIL | 2 | 软件故障、实际 station、时序／掉电／长期负载证据 |
 | 构建发布 | 1 | 唯一配置／CMake图、锁与 SDK、CI、候选／复现证据 |
 
-实际人员和 backup 通过 `.github/maintainer-roles.json` 与 PR 指派维护；角色模板
-不冒充已经完成实名安排或 GitHub branch protection。安全、制造和现场接口由对应
-角色承接，产品权限／流程留在外部应用仓库。
+维护责任由 Codex 全部承担，`.github/maintainer-roles.json` 使用
+`agent_managed` 策略。十人角色保留为领域与容量划分，不再要求实名账号；安全、
+制造和现场接口也由同一维护责任覆盖，产品权限／流程留在外部应用仓库。
 
-使用 `python tools/maintenance/ownership.py` 得到可解析的真实 pending 报告；
-团队交接使用 `--require-assigned`，任何未指派角色、非法账号、重复账号或缺失
-backup 均拒绝。实名齐备后生成 `CODEOWNERS.proposed`，复核账号仓库权限与路径
-覆盖，再通过 PR 安装；branch rules 与 required checks 必须在 GitHub 单独确认。
-具体命令见[维护工具](../../tools/maintenance/README.md)。当前实名与强制评审仍待
-负责人提供并配置，工具不会用假账号填满席位。
+`python tools/maintenance/ownership.py --require-assigned` 验证负责 agent、
+路径覆盖、备用领域和强制门禁。GoogleTest／GoogleMock、配置、ARM、预算、SDK
+和证据身份检查继续执行。该策略不生成虚构 CODEOWNERS，不声明独立人工评审；
+GitHub branch rules 与 required checks 的实际配置状态仍须远程核实。
+具体命令见[维护工具](../../tools/maintenance/README.md)。
 
 Issue 描述具体触发和可观察结果；PR 明确源／配置／依赖／工具与影响的合同。每次
 commit 自动检查 staged 内容和 Conventional Commit，CI 用同一整文件规范。

@@ -22,7 +22,7 @@ Board binding、实际 resolver 夹具和所选生产 ops 定义；它不建立�
 | I2C | I2C0/1 100 kHz polling；最多 8 条消息，每条 read/write 1–256 byte；任意消息可读，1/2/末三字节 ACK 时序；repeated START、NACK、仲裁、STOP；每实例独立线路，无 DMA/十位地址/任意 scan |
 | Flash | 全物理 1 MiB、256 个 4 KiB 独立 page、2-byte program；范围、erase alignment、1→0 与 pulse 验证；不预留产品分区 |
 | Watchdog | 真正 FWDGT enable/feed/reset cause；硬件 option 已启用可识别；enable 不可撤销，无产品健康策略 |
-| EXTI | 唯一 line、有界 queue、共享 vector 的静态 16-line 分派；同 vector priority 必须一致；overflow 可见，无 debounce/callback |
+| EXTI | 唯一 line、有界 queue、共享 vector 的静态 16-line 分派；同 vector priority 必须一致；当前受审 route 仅 PE3/EXTI3，通用分派不扩大 Board 接线支持；overflow 可见，无 debounce/callback |
 | PWM | 固定 TIMER2 CH0、PSC/ARR、CCR shadow；0/100% 明确，拒绝修改共享 period；停止先输出 inactive low；无 capture/break/dead-time |
 | ADC | ADC0 12-bit；polling 模式使用 480-cycle sample time；独立 block 模式使用 TIMER2 TRGO、DMA1 CH0 selector0、15-cycle sample time，每块稳定和校准后触发完整 scan；消费者借用期间不覆写 |
 

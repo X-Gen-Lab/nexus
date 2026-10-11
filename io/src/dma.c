@@ -52,8 +52,7 @@ nx_result_t nx_dma_resources_validate(const nx_dma_resource_t* resources,
         return NX_ERROR_INVALID;
     }
     for (size_t i = 0U; i < count; ++i) {
-        if (resources[i].controller == 0U || resources[i].controller > 2U ||
-            resources[i].stream > 7U || resources[i].channel > 7U) {
+        if (resources[i].controller == 0U) {
             return NX_ERROR_INVALID;
         }
         for (size_t j = 0U; j < i; ++j) {

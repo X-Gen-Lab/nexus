@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "build/adc-iteration/bin/nexus_stm32_adc_stream_test",
+    "--gtest_output=xml:tools/testing/evidence/adc-iteration/stm32-red.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T15:27:31.462371+00:00",
+  "ended_at": "2026-10-11T15:27:31.464904+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/adc-iteration/stm32-red.log"
+}

@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "command": [
+    "build/iteration-bus/bin/nexus_spi_async_owner_mock_test",
+    "--gtest_output=xml:build/iteration-bus/spi-owner-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

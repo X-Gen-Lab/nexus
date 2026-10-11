@@ -133,6 +133,27 @@ class ResolverTests(unittest.TestCase):
         self.mutate(self.board_path, lambda item: item["bindings"][0].update(initial=2))
         self.rejected("unauthorized")
 
+    def test_gpio_initial_unauthorized_without_explicit_mask_rejected(self):
+        def update(item):
+            binding = item["bindings"][0]
+            binding.pop("mask", None)
+            binding["initial"] = 2
+        self.mutate(self.board_path, update)
+        self.rejected("unauthorized")
+
+    def test_gpio_initial_authorized_without_explicit_mask_accepted(self):
+        def update(item):
+            binding = item["bindings"][0]
+            binding.pop("mask", None)
+            binding["initial"] = 1
+        self.mutate(self.board_path, update)
+        self.assertEqual(self.resolve()["part"], "NATIVE_MODEL")
+
+    def test_spi_builtin_cs_initial_is_not_a_gpio_bitmask(self):
+        result = gate.resolve(gate.ROOT /
+                              "tools/configure/assemblies/liangshan-baremetal.toml")
+        self.assertEqual(result["board_bindings"]["spi_flash"]["initial"], 1)
+
     def test_unknown_nested_pin_key_rejected(self):
         self.mutate(self.routes_path, lambda item: item["routes"][0]["pins"][0].update(auto=True))
         self.rejected("unknown")

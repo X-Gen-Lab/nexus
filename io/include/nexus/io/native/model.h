@@ -28,6 +28,7 @@ extern "C" {
 extern const nx_gpio_port_t* const nx_native_gpio;
 extern const nx_uart_port_t* const nx_native_uart;
 extern const nx_spi_endpoint_t* const nx_native_spi;
+extern const nx_spi_port_t* const nx_native_spi_port;
 extern const nx_i2c_port_t* const nx_native_i2c_port;
 extern const nx_i2c_endpoint_t* const nx_native_i2c;
 extern const nx_flash_port_t* const nx_native_flash;

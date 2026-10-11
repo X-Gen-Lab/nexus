@@ -140,9 +140,18 @@ nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
                                                            : NX_SUCCESS;
 }
 
+/** \brief Prove a polling child's controller without asynchronous methods. */
+static bool on_port(const void* context, const nx_spi_port_t* binding) {
+    const nx_stm32_spi_endpoint_state_t* endpoint = context;
+    return endpoint != NULL && binding != NULL &&
+           binding->ops == &nx_stm32_spi_ops &&
+           endpoint->port == binding->context;
+}
+
 /** \brief One shared immutable method table for this execution mode. */
 const nx_spi_endpoint_ops_t nx_stm32_spi_endpoint_ops = {
     .transfer = nx_stm32_spi_endpoint_transfer,
+    .on_port = on_port,
 };
 
 /** \brief Recover only an unborrowed controller after an observed wire idle. */

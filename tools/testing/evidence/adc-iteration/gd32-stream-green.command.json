@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "build/adc-iteration/bin/nexus_gd32_adc_stream_test",
+    "--gtest_output=xml:tools/testing/evidence/adc-iteration/gd32-stream-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T15:29:52.270550+00:00",
+  "ended_at": "2026-10-11T15:29:52.273187+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/adc-iteration/gd32-stream-green.log"
+}
