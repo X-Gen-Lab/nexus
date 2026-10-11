@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "g++",
+    "/workspace/nexus-multi-controller-iteration/gd-tests-google-i2c_multi_controller_test.cpp.o",
+    "/workspace/nexus-multi-controller-iteration/gd-soc-gd32f470-drivers-i2c_async.c.o",
+    "/workspace/nexus-multi-controller-iteration/gd-soc-common-i2c_v1_async.c.o",
+    "/workspace/nexus-multi-controller-iteration/gd-core-src-request.c.o",
+    "/workspace/nexus-multi-controller-iteration/gd-core-src-time.c.o",
+    "/workspace/nexus-multi-controller-iteration/gd-io-src-i2c.c.o",
+    "/workspace/nexus-multi-controller-iteration/gd-io-src-dma.c.o",
+    "/workspace/nexus-multi-controller-iteration/gd-io-src-wake.c.o",
+    "build/adc-iteration/lib/libgmock_main.a",
+    "build/adc-iteration/lib/libgmock.a",
+    "build/adc-iteration/lib/libgtest.a",
+    "-pthread",
+    "-o",
+    "/workspace/nexus-multi-controller-iteration/gd-i2c-test"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T18:51:40.292745+00:00",
+  "ended_at": "2026-10-11T18:51:40.402032+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-link.log"
+}

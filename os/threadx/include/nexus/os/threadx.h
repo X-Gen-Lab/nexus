@@ -110,7 +110,11 @@ nx_result_t nx_threadx_kernel_enter(void (*startup)(void*), void* context);
 /**
  * \brief           Product failure hook; default parks forever
  * \param[in]       reason: Context, permanent-entry or kernel-return failure
- * \note            Privileged current context. Product owns safe output/reset.
+ * \note            Actual fault context is not repaired or normalized; it may
+ *                  be masked, ISR or unprivileged. Do not assume a working
+ *                  kernel, clock, stack or permission to access a peripheral.
+ *                  The adapter observes the Core fault hook before this hook.
+ *                  Product owns separately reviewed safe output/reset actions.
  *                  Returning does not authorize cleanup; the adapter parks.
  */
 void nx_threadx_fail_stop(nx_result_t reason);

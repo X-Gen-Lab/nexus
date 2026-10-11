@@ -17,18 +17,28 @@
 #ifndef NX_STM32_DMA_DISABLE
 #define NX_STM32_DMA_DISABLE(stream, mask) ((stream)->CR &= ~(uint32_t)(mask))
 #endif
+#ifndef NX_STM32_UART_DMA_ACK
+#define NX_STM32_UART_DMA_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
+#endif
 
-/** \brief Stream7 terminal flags occupy the high status register at bit22. */
+/** \brief Exact selected stream6/7 flags use the retained high status bank. */
 static uint32_t flags(const nx_stm32_uart_dma_state_t* state) {
-    return (state->dma->HISR >> 22U) & 0x3DU;
+    return (state->dma->HISR >> (state->stream == 7U ? 22U : 16U)) & 0x3DU;
 }
 
 /** \brief Acknowledge only the selected stream; preserve unrelated channels. */
-static void acknowledge(nx_stm32_uart_dma_state_t* state) {
-    state->dma->HIFCR = 0x3DU << 22U;
+static void acknowledge_bits(nx_stm32_uart_dma_state_t* state,
+                             uint32_t observed) {
+    NX_STM32_UART_DMA_ACK(&state->dma->HIFCR,
+                          observed << (state->stream == 7U ? 22U : 16U));
 #ifndef NEXUS_STM32_MODEL
     NVIC_ClearPendingIRQ(state->dma_irq);
 #endif
+}
+
+/** \brief Cold/reset cleanup owns the complete stale flag group. */
+static void acknowledge(nx_stm32_uart_dma_state_t* state) {
+    acknowledge_bits(state, 0x3DU);
 }
 
 /** \brief Disable both request and memory engine before observing quiescence.
@@ -39,7 +49,8 @@ static void detach(nx_stm32_uart_dma_state_t* state) {
                                         DMA_SxCR_HTIE | DMA_SxCR_TEIE |
                                         DMA_SxCR_DMEIE);
     nx_arch_dsb();
-    acknowledge(state);
+    /* Completion W1C cannot erase an error arriving during withdrawal. */
+    acknowledge_bits(state, flags(state) & 0x30U);
 }
 
 /** \brief Reject alternate silicon routes before touching clocks or registers.
@@ -53,19 +64,34 @@ static nx_result_t initialize(nx_stm32_uart_dma_state_t* state,
     if (state->uart.profile == NX_UART_RX_BLOCKS && !blocks) {
         return NX_ERROR_UNSUPPORTED;
     }
-    if (state->stream != 7U || state->channel != 4U ||
-        state->dma_irq != DMA2_Stream7_IRQn || state->uart.irq != USART1_IRQn) {
+    bool primary = state->uart.irq == USART1_IRQn;
+    if ((!primary && state->uart.irq != USART2_IRQn) || state->channel != 4U ||
+        state->stream != (primary ? 7U : 6U) ||
+        state->dma_irq != (primary ? DMA2_Stream7_IRQn : DMA1_Stream6_IRQn) ||
+        clock_hz != (primary ? 84000000U : 42000000U)) {
         return NX_ERROR_UNSUPPORTED;
     }
 #ifndef NEXUS_STM32_MODEL
-    if (state->dma != DMA2 || state->tx != DMA2_Stream7 ||
-        state->uart.registers != USART1) {
+    if (state->dma != (primary ? DMA2 : DMA1) ||
+        state->tx != (primary ? DMA2_Stream7 : DMA1_Stream6) ||
+        state->uart.registers != (primary ? USART1 : USART2)) {
         return NX_ERROR_UNSUPPORTED;
     }
 #endif
-    if ((state->tx->CR & DMA_SxCR_EN) != 0U) {
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if ((state->tx->CR & DMA_SxCR_EN) != 0U ||
+        (state->uart.registers->CR1 & USART_CR1_UE) != 0U) {
         return NX_ERROR_BUSY;
     }
+#ifndef NEXUS_STM32_MODEL
+    /* A disabled engine can still belong to another retained IRQ publisher. */
+    unsigned vector = (unsigned)state->dma_irq;
+    if ((NVIC->ISER[vector / 32U] & (1UL << (vector % 32U))) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+#endif
     nx_result_t result = nx_stm32_uart_initialize(&state->uart, clock_hz);
     if (result != NX_SUCCESS) {
         return result;
@@ -237,19 +263,26 @@ void nx_stm32_uart_dma_irq(nx_stm32_uart_dma_state_t* state) {
         acknowledge(state);
         return;
     }
-    if (!state->aborting && !state->dma_complete) {
+    if (!state->aborting && (status & 0x0DU) != 0U) {
+        begin_drain(state, NX_ERROR_IO);
+        (void)nx_irq_wake_signal(uart->wake);
+    } else if (!state->aborting && !state->dma_complete) {
         if ((status & 0x0DU) != 0U || state->tx->NDTR != 0U) {
             begin_drain(state, NX_ERROR_IO);
         } else {
-            state->dma_complete = true;
             uart->drain_deadline = nx_deadline_after(
                 nx_time_now_us(), 20000000U / uart->baud + 100U);
             detach(state);
-            uart->registers->CR1 |= USART_CR1_TCIE;
+            if ((flags(state) & 0x0DU) != 0U) {
+                begin_drain(state, NX_ERROR_IO);
+            } else {
+                state->dma_complete = true;
+                uart->registers->CR1 |= USART_CR1_TCIE;
+            }
         }
         (void)nx_irq_wake_signal(uart->wake);
     } else {
-        acknowledge(state);
+        acknowledge_bits(state, flags(state) & 0x30U);
     }
 }
 
@@ -276,6 +309,9 @@ void nx_stm32_uart_dma_service(void* context) {
         return;
     }
     nx_time_us_t now = nx_time_now_us();
+    if (!state->aborting && (flags(state) & 0x0DU) != 0U) {
+        begin_drain(state, NX_ERROR_IO);
+    }
     if (!uart->tx_complete && !state->aborting &&
         nx_deadline_expired(request->base.deadline, now)) {
         begin_drain(state, NX_ERROR_TIMEOUT);
@@ -291,7 +327,11 @@ void nx_stm32_uart_dma_service(void* context) {
     };
     if (nx_dma_drain_check(&facts) == NX_SUCCESS) {
         uart->registers->CR1 &= ~(uint32_t)(USART_CR1_TCIE | USART_CR1_TXEIE);
-        acknowledge(state);
+        acknowledge_bits(state, flags(state) & 0x30U);
+        /* Actual EN/IRQ withdrawal precedes this final error observation. */
+        if (uart->terminal == NX_SUCCESS && (flags(state) & 0x0DU) != 0U) {
+            uart->terminal = NX_ERROR_IO;
+        }
         size_t transferred = state->dma_complete && uart->terminal == NX_SUCCESS
                                  ? request->length
                                  : 0U;

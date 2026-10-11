@@ -1,0 +1,11 @@
+schema = 2
+board = "native_reference"
+backend = "threadx"
+clock = "model"
+optimization = "Os"
+
+[os]
+tick_source = "host"
+tick_hz = 1000
+interrupt_mask = "none"
+syscall_priority = 0

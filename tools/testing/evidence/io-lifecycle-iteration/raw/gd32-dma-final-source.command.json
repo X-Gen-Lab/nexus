@@ -1,0 +1,26 @@
+{
+  "command": [
+    "/workspace/nexus/build/uart-iteration/bin/nexus_gd32_uart_dma_test",
+    "--gtest_filter=*",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lifecycle-tdd/gd32-dma-final-source.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0,
+  "source_sha256": {
+    "core/include/nexus/core/fault.h": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b",
+    "core/src/fault.c": "976a3af81cfefa6d7185b7328162825eb08fc4ae25042a543de1fc8369a8367f",
+    "os/freertos/hooks.c": "08f2b17edeb716fbdacce01b473537fca777e215a7c26569b1680daeabfa6298",
+    "os/freertos/include/FreeRTOSConfig.h": "a66625ab819e4a978092ee74faba38f13315aa2c032ab8bda83825370f18e428",
+    "tests/google/freertos_failstop_test.cpp": "61f5fa073588525ebcf5a22dfa271ff04b23d5981431dac715c22b216efa01ef",
+    "tests/google/failstop.cmake": "b19ddc57a9f6ad5a849e6bdd3812aff286ac4ff18022d0cabba85f70462b605e",
+    "os/freertos/CMakeLists.txt": "999f97ddf82ba9aad6548ed517a681a0606ddc5aad7fff89112e0dd60eb5032a",
+    "soc/stm32f407/drivers/uart_dma.c": "aac5943bb0a6e4b958934d7350fefa56468140bfa5907d6ce539918a9bced4d2",
+    "soc/gd32f470/drivers/uart_dma.c": "ada4692deda20e644b8d08581e0701ed280e8988ee9b42686f9afa2e89251acb",
+    "tests/google/stm32_uart_dma_model.h": "55c41e42e3001a762049a303e7b8cd0ef26613b9232d5769054ae7149cc38ed2",
+    "tests/google/gd32_uart_dma_model.h": "a30d28c49e3dc179f6e2f647f3c60f86cf53b8ace1cd3d17e76930bfbe94dde5",
+    "tests/google/stm32_uart_dma_test.cpp": "f59c28e518393527de6f669640661638dcdd18e140950b0deb4d334248187a31",
+    "tests/google/gd32_uart_dma_test.cpp": "7e2fb42e6fa770b10e8affaffb706e9d8fab7e4d251ba51db6050c002ede0e83"
+  }
+}

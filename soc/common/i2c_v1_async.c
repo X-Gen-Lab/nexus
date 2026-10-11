@@ -8,6 +8,9 @@
  */
 #include "i2c_v1_async.h"
 #include "nexus/arch/arch.h"
+#ifndef NX_I2C_V1_DMA_ACK
+#define NX_I2C_V1_DMA_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
+#endif
 
 /* The two SDK wrappers assert every layout and mask before using this
  * algorithm. There is no per-byte virtual register access in firmware. */
@@ -78,7 +81,7 @@ static bool engine_valid(const nx_i2c_v1_dma_engine_t* engine) {
 static void detach_engine(const nx_i2c_v1_dma_engine_t* engine) {
     NX_I2C_V1_DMA_DISABLE(engine->control, DMA_ENABLE | DMA_IRQS);
     nx_arch_dsb();
-    *engine->clear = DMA_FLAGS << engine->flag_shift;
+    NX_I2C_V1_DMA_ACK(engine->clear, DMA_FLAGS << engine->flag_shift);
 }
 
 /** \brief Only local master ownership and STOP establish local wire release. */
@@ -146,7 +149,7 @@ static void prepare_message(nx_i2c_v1_state_t* state) {
             &state->active->messages[state->message];
         const nx_i2c_v1_dma_engine_t* engine =
             message->read ? &state->dma->rx : &state->dma->tx;
-        *engine->clear = DMA_FLAGS << engine->flag_shift;
+        NX_I2C_V1_DMA_ACK(engine->clear, DMA_FLAGS << engine->flag_shift);
         *engine->peripheral = (uint32_t)(uintptr_t)&state->registers[DATA];
         *engine->memory = (uint32_t)(uintptr_t)message->data;
         *engine->count = (uint32_t)message->length;
@@ -426,7 +429,7 @@ void nx_i2c_v1_dma_irq(nx_i2c_v1_state_t* state, bool receive) {
         receive ? &state->dma->rx : &state->dma->tx;
     uint32_t flags = (*engine->flags >> engine->flag_shift) & DMA_FLAGS;
     if (state->active == NULL || state->phase == NX_I2C_V1_DRAIN) {
-        *engine->clear = DMA_FLAGS << engine->flag_shift;
+        NX_I2C_V1_DMA_ACK(engine->clear, DMA_FLAGS << engine->flag_shift);
         nx_arch_irq_restore(mask);
         return;
     }
@@ -435,7 +438,7 @@ void nx_i2c_v1_dma_irq(nx_i2c_v1_state_t* state, bool receive) {
         /* Peripheral terminal facts outrank an independent DMA TC. */
     } else if (state->phase !=
                (receive ? NX_I2C_V1_DMA_READ : NX_I2C_V1_DMA_WRITE)) {
-        *engine->clear = DMA_FLAGS << engine->flag_shift;
+        NX_I2C_V1_DMA_ACK(engine->clear, DMA_FLAGS << engine->flag_shift);
     } else if ((flags & DMA_ERRORS) != 0U) {
         begin_drain(state, NX_ERROR_IO);
     } else if ((flags & DMA_COMPLETE) != 0U) {

@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "item": "IO21-finite-secondary-DMA",
+  "reviewer": "/root/arch_runtime",
+  "method": "read-only route tuples, cold NVIC retention checks, selected ACK/detach/IRQ/service/stop and STM SPI reset portions; no edits/build/reruns",
+  "captured_at_utc": "2026-10-11T19:32:05.959427+00:00",
+  "status": "no new blocker in focused second-controller delta",
+  "source": [
+    {
+      "path": "soc/stm32f407/drivers/uart_dma.c",
+      "sha256": "aac5943bb0a6e4b958934d7350fefa56468140bfa5907d6ce539918a9bced4d2"
+    },
+    {
+      "path": "soc/gd32f470/drivers/uart_dma.c",
+      "sha256": "ada4692deda20e644b8d08581e0701ed280e8988ee9b42686f9afa2e89251acb"
+    },
+    {
+      "path": "soc/stm32f407/drivers/spi_dma.c",
+      "sha256": "49bee3167e8663fe0e90ec451cbc9552d89fdfdb312662fe23b62816c7873ca9"
+    },
+    {
+      "path": "soc/gd32f470/drivers/spi_dma.c",
+      "sha256": "93750f13a2c377aa9c68d22c005410cf479060afd67d89815656e66dbf9c396f"
+    },
+    {
+      "path": "soc/stm32f407/drivers/spi.c",
+      "sha256": "900a93cf28e9f85fe35063078609fac433a232ac7a1d12c13721e4e31a474d2b"
+    },
+    {
+      "path": "soc/stm32f407/private/stm32f407_dma.h",
+      "sha256": "9d34afa6b97aa4e71852cede594e96bdfd7ef9a4347d6f0d2d2df65f74dd94b7"
+    },
+    {
+      "path": "soc/gd32f470/private/gd32f470_dma.h",
+      "sha256": "7b8c3b160c6b851f70114fda40b261df1ea5b3461169c96f915f16e00bdb572e"
+    },
+    {
+      "path": "soc/gd32f470/private/gd32f470_spi_dma.h",
+      "sha256": "1c8fb7dff0745fd4f47dc00bcdb6d1c618a55a47addea0060abf9057141291e6"
+    }
+  ],
+  "checked": [
+    "STM UART retained DMA1 stream6 selector4/high status bank shift16 and USART2/APB1 tuple separate from primary DMA2 stream7 shift22",
+    "GD USART1 literal DMA0 channel6 selector4/INTF1 shift16 separate from USART0 literal DMA1 channel7 shift22",
+    "STM SPI2 DMA1 RXstream3 LISR/LIFCR shift22 and TXstream4 HISR/HIFCR shift0 use selector0",
+    "GD SPI0 literal DMA1 RXchannel2 INTF0/INTC0 shift16 and TXchannel5 INTF1/INTC1 shift6 use selector3, separate from SPI4 RX3/TX4 selector2",
+    "actual cold DMA NVIC enable checks precede full stale-group ACK and priority changes; idle EN alone is not proof that a retained publisher relinquished ownership",
+    "GD SPI cold underlying clock gate guard additionally prevents normal duplicate acquired controller; newest explicit DMA vector guard handles foreign idle publishers even if gate is not held",
+    "hot detach/ACK clears only completion/half bits0x30; errors0x0D persist and are observed after disable and before final success settlement",
+    "EN0 plus DMA source IRQ0 plus independent actual USART TC or SPI wire idle are required before memory settlement; failed drain retains quarantine",
+    "STM polling SPI2 reset uses APB1 SPI2 reset, preserving neighboring APB2 SPI1"
+  ],
+  "contracts": [
+    "trusted exact immutable startup tuples and outer shared clock/pin owners",
+    "single-CPU configurable IRQ/task serialization; no NMI/SMP mutation",
+    "borrowed request/buffers/endpoint kept alive until acquire-observed SETTLED; hardware drain failure retains",
+    "review is selected route/ACK/cold-publisher delta, not a complete new alias/wake/pin electrical audit"
+  ],
+  "execution": {
+    "reviewer_tests": 0,
+    "reviewer_arm": 0,
+    "physical_hil": "not_executed",
+    "owner_model_san_arm_counts": "not claimed as reviewer execution"
+  }
+}

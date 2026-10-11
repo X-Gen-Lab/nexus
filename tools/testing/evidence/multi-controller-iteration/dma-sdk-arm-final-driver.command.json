@@ -1,0 +1,12 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "/workspace/nexus-multi-controller-iteration/arm_dma.py",
+    "dma-arm-final"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:23:32.718854+00:00",
+  "ended_at": "2026-10-11T19:23:34.186665+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-sdk-arm-final-driver.log"
+}

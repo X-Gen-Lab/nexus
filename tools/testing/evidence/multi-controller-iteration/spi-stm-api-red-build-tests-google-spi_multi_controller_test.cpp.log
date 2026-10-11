@@ -1,0 +1,5 @@
+tests/google/spi_multi_controller_test.cpp: In member function ‘virtual void {anonymous}::SPIMultiple_SecondaryPollingRecoveryPulsesApb1AndPreservesPrimaryWire_Test::TestBody()’:
+tests/google/spi_multi_controller_test.cpp:276:8: error: suggest explicit braces to avoid ambiguous ‘else’ [-Werror=dangling-else]
+  276 |     if (resets.size() == 2U) EXPECT_EQ(resets[0], &RCC->APB1RSTR);
+      |        ^
+cc1plus: all warnings being treated as errors

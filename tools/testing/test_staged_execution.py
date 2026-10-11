@@ -10,6 +10,7 @@ import unittest
 from unittest.mock import patch
 
 from scripts.ci import tdd_gate
+from scripts.ci import io_lifecycle_matrix
 
 
 class StagedExecutionTests(unittest.TestCase):
@@ -67,6 +68,8 @@ class StagedExecutionTests(unittest.TestCase):
         output = io.StringIO()
         with patch.object(tdd_gate, "ROOT", self.root), \
                 patch.object(tdd_gate, "execute", side_effect=execute), \
+                patch.object(io_lifecycle_matrix, "capture"), \
+                patch.object(io_lifecycle_matrix, "audit", return_value={}), \
                 patch.dict("os.environ", {}, clear=True), \
                 redirect_stdout(output), redirect_stderr(output):
             result = tdd_gate.main(["--staged", "--all"])

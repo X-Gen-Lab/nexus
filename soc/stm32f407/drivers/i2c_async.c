@@ -73,15 +73,36 @@ _Static_assert(DMA_SxCR_TCIE == (UINT32_C(1) << 4U),
 _Static_assert(DMA_SxCR_MINC == (UINT32_C(1) << 10U),
                "I2C/DMA DMA_SxCR_MINC mask");
 
+/** \brief Cold publisher facts are selected by the exact retained controller.
+ */
+static bool first_controller(const nx_i2c_v1_state_t* state) {
+    return state->registers == (volatile uint32_t*)(uintptr_t)I2C1;
+}
+/** \brief No shared vector registry or per-byte interrupt indirection. */
+static IRQn_Type event_irq(const nx_i2c_v1_state_t* state) {
+    return first_controller(state) ? I2C1_EV_IRQn : I2C2_EV_IRQn;
+}
+/** \brief Error source belongs to the same retained controller identity. */
+static IRQn_Type error_irq(const nx_i2c_v1_state_t* state) {
+    return first_controller(state) ? I2C1_ER_IRQn : I2C2_ER_IRQn;
+}
+/** \brief DMA stream ownership and request selectors remain distinct facts. */
+static IRQn_Type dma_irq(const nx_i2c_v1_state_t* state, bool receive) {
+    if (first_controller(state)) {
+        return receive ? DMA1_Stream0_IRQn : DMA1_Stream6_IRQn;
+    }
+    return receive ? DMA1_Stream2_IRQn : DMA1_Stream7_IRQn;
+}
+
 /** \brief Clear only pending publishers owned by this selected controller. */
 static void acknowledge(void* context) {
     const nx_i2c_v1_state_t* state = context;
 #ifndef NEXUS_STM32_MODEL
-    NVIC_ClearPendingIRQ(I2C1_EV_IRQn);
-    NVIC_ClearPendingIRQ(I2C1_ER_IRQn);
+    NVIC_ClearPendingIRQ(event_irq(state));
+    NVIC_ClearPendingIRQ(error_irq(state));
     if (state->dma != NULL) {
-        NVIC_ClearPendingIRQ(DMA1_Stream0_IRQn);
-        NVIC_ClearPendingIRQ(DMA1_Stream6_IRQn);
+        NVIC_ClearPendingIRQ(dma_irq(state, true));
+        NVIC_ClearPendingIRQ(dma_irq(state, false));
     }
 #else
     (void)state;
@@ -92,11 +113,11 @@ static void acknowledge(void* context) {
 static void stop_irqs(void* context) {
     const nx_i2c_v1_state_t* state = context;
 #ifndef NEXUS_STM32_MODEL
-    NVIC_DisableIRQ(I2C1_EV_IRQn);
-    NVIC_DisableIRQ(I2C1_ER_IRQn);
+    NVIC_DisableIRQ(event_irq(state));
+    NVIC_DisableIRQ(error_irq(state));
     if (state->dma != NULL) {
-        NVIC_DisableIRQ(DMA1_Stream0_IRQn);
-        NVIC_DisableIRQ(DMA1_Stream6_IRQn);
+        NVIC_DisableIRQ(dma_irq(state, true));
+        NVIC_DisableIRQ(dma_irq(state, false));
     }
 #else
     (void)state;
@@ -110,16 +131,18 @@ static nx_result_t validate_wake(void* context, const nx_irq_wake_t* wake,
                                  uint8_t ceiling) {
     const nx_i2c_v1_state_t* state = context;
     nx_result_t result =
-        nx_stm32_irq_wake_validate(wake, I2C1_EV_IRQn, ceiling);
+        nx_stm32_irq_wake_validate(wake, event_irq(state), ceiling);
     if (result == NX_SUCCESS) {
-        result = nx_stm32_irq_wake_validate(wake, I2C1_ER_IRQn, ceiling);
+        result = nx_stm32_irq_wake_validate(wake, error_irq(state), ceiling);
     }
     if (result == NX_SUCCESS && state->dma != NULL) {
-        result = nx_stm32_irq_wake_validate(wake, DMA1_Stream0_IRQn, ceiling);
+        result =
+            nx_stm32_irq_wake_validate(wake, dma_irq(state, true), ceiling);
         if (result != NX_SUCCESS) {
             return result;
         }
-        result = nx_stm32_irq_wake_validate(wake, DMA1_Stream6_IRQn, ceiling);
+        result =
+            nx_stm32_irq_wake_validate(wake, dma_irq(state, false), ceiling);
         if (result != NX_SUCCESS) {
             return result;
         }
@@ -147,22 +170,37 @@ nx_result_t nx_stm32_i2c_async_initialize(nx_i2c_v1_state_t* state,
     if (state == NULL || priority > 15U) {
         return NX_ERROR_INVALID;
     }
-    if (state->registers != (volatile uint32_t*)I2C1 ||
+    if ((state->registers != (volatile uint32_t*)I2C1 &&
+         state->registers != (volatile uint32_t*)I2C2) ||
         state->peripheral_mhz != 42U) {
         return NX_ERROR_UNSUPPORTED;
     }
     bool known_lines = state->line_inputs == &GPIOB->IDR &&
-                       (state->line_mask == ((1U << 6U) | (1U << 7U)) ||
-                        state->line_mask == ((1U << 8U) | (1U << 9U)));
+                       (first_controller(state)
+                            ? (state->line_mask == ((1U << 6U) | (1U << 7U)) ||
+                               state->line_mask == ((1U << 8U) | (1U << 9U)))
+                            : state->line_mask == ((1U << 10U) | (1U << 11U)));
     if (!known_lines) {
         return NX_ERROR_UNSUPPORTED;
     }
     if (state->dma != NULL) {
-        const nx_i2c_v1_dma_t expected = NX_STM32_I2C1_DMA(NULL, 0U);
+        const nx_i2c_v1_dma_t expected =
+            first_controller(state)
+                ? (nx_i2c_v1_dma_t)NX_STM32_I2C1_DMA(NULL, 0U)
+                : (nx_i2c_v1_dma_t)NX_STM32_I2C2_DMA(NULL, 0U);
         if (!same_engine(&state->dma->tx, &expected.tx) ||
             !same_engine(&state->dma->rx, &expected.rx)) {
             return NX_ERROR_UNSUPPORTED;
         }
+    }
+    /* A second private object cannot reinitialize an already enabled
+     * controller. Exact clock/pin/vector ownership still belongs to static cold
+     * assembly. */
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if ((state->registers[0] & 1U) != 0U) {
+        return NX_ERROR_BUSY;
     }
     nx_result_t result = nx_i2c_v1_initialize(state);
     if (result != NX_SUCCESS) {
@@ -173,15 +211,15 @@ nx_result_t nx_stm32_i2c_async_initialize(nx_i2c_v1_state_t* state,
     state->validate_wake = validate_wake;
     acknowledge(state);
 #ifndef NEXUS_STM32_MODEL
-    NVIC_SetPriority(I2C1_EV_IRQn, priority);
-    NVIC_EnableIRQ(I2C1_EV_IRQn);
-    NVIC_SetPriority(I2C1_ER_IRQn, priority);
-    NVIC_EnableIRQ(I2C1_ER_IRQn);
+    NVIC_SetPriority(event_irq(state), priority);
+    NVIC_EnableIRQ(event_irq(state));
+    NVIC_SetPriority(error_irq(state), priority);
+    NVIC_EnableIRQ(error_irq(state));
     if (state->dma != NULL) {
-        NVIC_SetPriority(DMA1_Stream0_IRQn, priority);
-        NVIC_EnableIRQ(DMA1_Stream0_IRQn);
-        NVIC_SetPriority(DMA1_Stream6_IRQn, priority);
-        NVIC_EnableIRQ(DMA1_Stream6_IRQn);
+        NVIC_SetPriority(dma_irq(state, true), priority);
+        NVIC_EnableIRQ(dma_irq(state, true));
+        NVIC_SetPriority(dma_irq(state, false), priority);
+        NVIC_EnableIRQ(dma_irq(state, false));
     }
 #endif
     return NX_SUCCESS;

@@ -1,0 +1,5 @@
+#include "stm32f407_i2c_async.h"
+unsigned char state_size[sizeof(nx_i2c_v1_state_t)];
+unsigned char endpoint_size[sizeof(nx_i2c_v1_endpoint_t)];
+unsigned char dma_size[sizeof(nx_i2c_v1_dma_t)];
+unsigned char engine_size[sizeof(nx_i2c_v1_dma_engine_t)];

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="15" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T19:37:43.265" name="AllTests">
+  <testsuite name="GD32SPIDMA" tests="15" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T19:37:43.265">
+    <testcase name="ProgramsExactIndependentDmaRoutesWithoutCopying" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="121" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.265" classname="GD32SPIDMA" />
+    <testcase name="PollingEndpointsProveSharedControllerWithoutDmaAlias" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="139" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.265" classname="GD32SPIDMA" />
+    <testcase name="ExplicitSingleCellSpansProgramFixedDmaWithoutScratch" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="155" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.265" classname="GD32SPIDMA" />
+    <testcase name="ExplicitDiscardRejectsInvalidSpansBeforeAnyEffects" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="178" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.265" classname="GD32SPIDMA" />
+    <testcase name="BothDmaCompletionsRetainCsUntilIndependentWireIdle" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="198" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+    <testcase name="RejectedDomainsOverlapAndExpiredDeadlineHaveZeroEffects" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="216" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+    <testcase name="EndpointIdentityAndBusySecondChildCannotAcquireCs" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="233" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+    <testcase name="CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="254" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+    <testcase name="RefusedEngineDisableKeepsBorrowDespiteIdleWire" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="277" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+    <testcase name="DmaErrorRequiresExplicitIdleRecoveryAndNeverReplays" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="295" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+    <testcase name="WakeFollowsLatchedFactsAndLateIrqsNeverReplayCompletion" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="313" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+    <testcase name="ErrorWakeObservesLatchedDrainAfterRestoringIncomingMask" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="348" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+    <testcase name="BothActualIrqPrioritiesMustPermitKernelCallingWake" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="371" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+    <testcase name="FalseTransferCompleteCounterIsAnErrorAndCannotSettleSuccess" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="385" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+    <testcase name="CompletedMemoryWithUnboundedRequestStillHasBoundedDrain" file="/workspace/nexus/tests/google/gd32_spi_dma_test.cpp" line="397" status="run" result="completed" time="0." timestamp="2026-10-11T19:37:43.266" classname="GD32SPIDMA" />
+  </testsuite>
+</testsuites>

@@ -17,57 +17,138 @@
 #include "gd32f4xx_dma.h"
 #include "private/system.h"
 
-#ifndef NX_GD32_DMA_DISABLE
-#define NX_GD32_DMA_DISABLE(mask) (DMA_CH7CTL(DMA1) &= ~(uint32_t)(mask))
+#ifndef NX_GD32_UART_DMA_DISABLE
+#if defined(NX_GD32_DMA_DISABLE)
+/* Preserve the primary-route legacy test boundary; firmware has no branch. */
+#define NX_GD32_UART_DMA_DISABLE(control, mask)                                \
+    do {                                                                       \
+        if ((control) == &DMA_CH7CTL(DMA1)) {                                  \
+            NX_GD32_DMA_DISABLE(mask);                                         \
+        } else {                                                               \
+            *(control) &= ~(uint32_t)(mask);                                   \
+        }                                                                      \
+    } while (0)
+#else
+#define NX_GD32_UART_DMA_DISABLE(control, mask)                                \
+    (*(control) &= ~(uint32_t)(mask))
+#endif
+#endif
+#ifndef NX_GD32_UART_DMA_ACK
+#define NX_GD32_UART_DMA_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
 #endif
 
-/** \brief Channel7 terminal flags occupy the high status register at bit22. */
-static uint32_t flags(void) {
-    return (DMA_INTF1(DMA1) >> 22U) & 0x3DU;
+/** \brief Known immutable controller identity selects one physical DMA engine.
+ */
+static volatile uint32_t*
+engine_at(const nx_gd32_uart_controller_t* controller) {
+    return controller == &nx_gd32_usart0_controller ? &DMA_CH7CTL(DMA1)
+                                                    : &DMA_CH6CTL(DMA0);
+}
+/** \brief Direct register arithmetic uses the actual vendor channel layout. */
+static volatile uint32_t* engine(const nx_gd32_uart_dma_state_t* state) {
+    return engine_at(state->uart.controller);
+}
+/** \brief USART0 and USART1 use distinct retained DMA controller clocks. */
+static uint32_t dma_base(const nx_gd32_uart_dma_state_t* state) {
+    return state->uart.controller == &nx_gd32_usart0_controller ? DMA1 : DMA0;
+}
+/** \brief No vector registry or callback indirection exists in the hot path. */
+static IRQn_Type dma_irq_at(const nx_gd32_uart_controller_t* controller) {
+    return controller == &nx_gd32_usart0_controller ? DMA1_Channel7_IRQn
+                                                    : DMA0_Channel6_IRQn;
+}
+/** \brief Hot dispatch uses the same cold reviewed publisher identity. */
+static IRQn_Type dma_irq(const nx_gd32_uart_dma_state_t* state) {
+    return dma_irq_at(state->uart.controller);
+}
+/** \brief Both exact routes use the high status bank with distinct bit groups.
+ */
+static uint32_t flag_shift(const nx_gd32_uart_dma_state_t* state) {
+    return state->uart.controller == &nx_gd32_usart0_controller ? 22U : 16U;
+}
+#define TX_CONTROL(s)    (engine(s)[0])
+#define TX_COUNT(s)      (engine(s)[1])
+#define TX_PERIPHERAL(s) (engine(s)[2])
+#define TX_MEMORY(s)     (engine(s)[3])
+#define TX_FIFO(s)       (engine(s)[5])
+
+/** \brief Exact selected terminal group never consumes a neighbor's flags. */
+static uint32_t flags(const nx_gd32_uart_dma_state_t* state) {
+    return (DMA_INTF1(dma_base(state)) >> flag_shift(state)) & 0x3DU;
 }
 
 /** \brief Acknowledge only the selected channel; preserve unrelated channels.
  */
+static void acknowledge_bits(nx_gd32_uart_dma_state_t* state,
+                             uint32_t observed) {
+    NX_GD32_UART_DMA_ACK(&DMA_INTC1(dma_base(state)),
+                         observed << flag_shift(state));
+    NVIC_ClearPendingIRQ(dma_irq(state));
+}
+
+/** \brief Cold/reset cleanup owns the complete stale flag group. */
 static void acknowledge(nx_gd32_uart_dma_state_t* state) {
-    (void)state;
-    DMA_INTC1(DMA1) = 0x3DU << 22U;
-    NVIC_ClearPendingIRQ(DMA1_Channel7_IRQn);
+    acknowledge_bits(state, 0x3DU);
 }
 
 /** \brief Disable both request and memory engine before observing quiescence.
  */
 static void detach(nx_gd32_uart_dma_state_t* state) {
     USART_CTL2(state->uart.controller->registers) &= ~(uint32_t)USART_CTL2_DENT;
-    NX_GD32_DMA_DISABLE(DMA_CHXCTL_CHEN | DMA_CHXCTL_FTFIE | DMA_CHXCTL_HTFIE |
-                        DMA_CHXCTL_TAEIE | DMA_CHXCTL_SDEIE);
+    NX_GD32_UART_DMA_DISABLE(&TX_CONTROL(state),
+                             DMA_CHXCTL_CHEN | DMA_CHXCTL_FTFIE |
+                                 DMA_CHXCTL_HTFIE | DMA_CHXCTL_TAEIE |
+                                 DMA_CHXCTL_SDEIE);
     nx_gd32_peripheral_barrier();
-    acknowledge(state);
+    /* Completion W1C cannot erase an error arriving during withdrawal. */
+    acknowledge_bits(state, flags(state) & 0x30U);
 }
 
 /** \brief Initialize one exact route before any DMA borrower exists. */
-nx_result_t nx_gd32_uart_dma_initialize(nx_gd32_uart_dma_state_t* state,
-                                        uint32_t baud,
-                                        nx_uart_rx_profile_t profile,
-                                        void* storage, size_t capacity,
-                                        unsigned priority) {
-    if (state == NULL || state->regions == NULL || state->region_count == 0U) {
+nx_result_t
+nx_gd32_uart_dma_initialize_at(nx_gd32_uart_dma_state_t* state,
+                               const nx_gd32_uart_controller_t* controller,
+                               uint32_t baud, nx_uart_rx_profile_t profile,
+                               void* storage, size_t capacity,
+                               unsigned priority) {
+    if (state == NULL || state->regions == NULL || state->region_count == 0U ||
+        (controller != &nx_gd32_usart0_controller &&
+         controller != &nx_gd32_usart1_controller)) {
         return NX_ERROR_INVALID;
     }
-    if ((DMA_CH7CTL(DMA1) & DMA_CHXCTL_CHEN) != 0U) {
+    if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if ((*engine_at(controller) & DMA_CHXCTL_CHEN) != 0U) {
         return NX_ERROR_BUSY;
     }
-    nx_result_t result =
-        nx_gd32_uart_initialize_at(&state->uart, &nx_gd32_usart0_controller,
-                                   baud, profile, storage, capacity, priority);
+    /* Idle EN does not surrender an already enabled publisher's lease. */
+    unsigned vector = (unsigned)dma_irq_at(controller);
+    if ((NVIC->ISER[vector / 32U] & (1UL << (vector % 32U))) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    nx_result_t result = nx_gd32_uart_initialize_at(
+        &state->uart, controller, baud, profile, storage, capacity, priority);
     if (result != NX_SUCCESS) {
         return result;
     }
     state->dma_complete = false;
     state->aborting = false;
     acknowledge(state);
-    NVIC_SetPriority(DMA1_Channel7_IRQn, priority);
-    NVIC_EnableIRQ(DMA1_Channel7_IRQn);
+    NVIC_SetPriority(dma_irq(state), priority);
+    NVIC_EnableIRQ(dma_irq(state));
     return NX_SUCCESS;
+}
+
+/** \brief Preserve the reviewed primary-route initializer without new state. */
+nx_result_t nx_gd32_uart_dma_initialize(nx_gd32_uart_dma_state_t* state,
+                                        uint32_t baud,
+                                        nx_uart_rx_profile_t profile,
+                                        void* storage, size_t capacity,
+                                        unsigned priority) {
+    return nx_gd32_uart_dma_initialize_at(state, &nx_gd32_usart0_controller,
+                                          baud, profile, storage, capacity,
+                                          priority);
 }
 
 /** \brief Exact DMA-domain and controller checks, without stores or loans. */
@@ -90,7 +171,7 @@ static inline nx_result_t validate_tx(nx_gd32_uart_dma_state_t* state,
         return NX_ERROR_STATE;
     }
     if (state->uart.active != NULL ||
-        (DMA_CH7CTL(DMA1) & DMA_CHXCTL_CHEN) != 0U) {
+        (TX_CONTROL(state) & DMA_CHXCTL_CHEN) != 0U) {
         return NX_ERROR_BUSY;
     }
     return nx_deadline_expired(request->base.deadline, nx_time_now_us())
@@ -121,19 +202,19 @@ static nx_result_t start(nx_gd32_uart_dma_state_t* state,
     state->dma_complete = false;
     state->aborting = false;
     acknowledge(state);
-    DMA_CH7PADDR(DMA1) =
+    TX_PERIPHERAL(state) =
         (uint32_t)(uintptr_t)&USART_DATA(uart->controller->registers);
-    DMA_CH7M0ADDR(DMA1) = (uint32_t)(uintptr_t)request->data;
-    DMA_CH7CNT(DMA1) = (uint32_t)request->length;
-    DMA_CH7FCTL(DMA1) = 0U;
-    DMA_CH7CTL(DMA1) = (4U << 25U) | DMA_CHXCTL_MNAGA | (1U << 6U) |
-                       (1U << 17U) | DMA_CHXCTL_FTFIE | DMA_CHXCTL_TAEIE |
-                       DMA_CHXCTL_SDEIE;
+    TX_MEMORY(state) = (uint32_t)(uintptr_t)request->data;
+    TX_COUNT(state) = (uint32_t)request->length;
+    TX_FIFO(state) = 0U;
+    TX_CONTROL(state) = (4U << 25U) | DMA_CHXCTL_MNAGA | (1U << 6U) |
+                        (1U << 17U) | DMA_CHXCTL_FTFIE | DMA_CHXCTL_TAEIE |
+                        DMA_CHXCTL_SDEIE;
     USART_CTL0(uart->controller->registers) &=
         ~(uint32_t)(USART_CTL0_TBEIE | USART_CTL0_TCIE);
     USART_STAT0(uart->controller->registers) &= ~(uint32_t)USART_STAT0_TC;
     nx_gd32_peripheral_barrier();
-    DMA_CH7CTL(DMA1) |= DMA_CHXCTL_CHEN;
+    TX_CONTROL(state) |= DMA_CHXCTL_CHEN;
     USART_CTL2(uart->controller->registers) |= USART_CTL2_DENT;
     nx_gd32_critical_leave(saved);
     return NX_SUCCESS;
@@ -165,8 +246,8 @@ static void begin_drain(nx_gd32_uart_dma_state_t* state, nx_result_t terminal) {
     (void)nx_request_transition(&uart->active->base, NX_REQUEST_DRAINING);
     state->drain_deadline =
         nx_deadline_after(nx_time_now_us(), 20000000U / uart->baud + 100U);
-    bool untouched = (DMA_CH7CTL(DMA1) & DMA_CHXCTL_CHEN) == 0U &&
-                     DMA_CH7CNT(DMA1) == uart->active->length;
+    bool untouched = (TX_CONTROL(state) & DMA_CHXCTL_CHEN) == 0U &&
+                     TX_COUNT(state) == uart->active->length;
     uart->tc = untouched || (USART_STAT0(uart->controller->registers) &
                              USART_STAT0_TC) != 0U;
     if (!uart->tc) {
@@ -208,7 +289,7 @@ void nx_gd32_uart_dma_irq(nx_gd32_uart_dma_state_t* state) {
     if (state == NULL || !state->uart.initialized) {
         return;
     }
-    uint32_t status = flags();
+    uint32_t status = flags(state);
     if ((status & 0x2DU) == 0U) {
         return;
     }
@@ -217,20 +298,27 @@ void nx_gd32_uart_dma_irq(nx_gd32_uart_dma_state_t* state) {
         acknowledge(state);
         return;
     }
-    if (!state->aborting && !state->dma_complete) {
-        if ((status & 0x0DU) != 0U || DMA_CH7CNT(DMA1) != 0U) {
+    if (!state->aborting && (status & 0x0DU) != 0U) {
+        begin_drain(state, NX_ERROR_IO);
+        (void)nx_irq_wake_signal(uart->wake);
+    } else if (!state->aborting && !state->dma_complete) {
+        if ((status & 0x0DU) != 0U || TX_COUNT(state) != 0U) {
             begin_drain(state, NX_ERROR_IO);
         } else {
-            state->dma_complete = true;
             uart->tx_position = uart->active->length;
             detach(state);
-            state->drain_deadline = nx_deadline_after(
-                nx_time_now_us(), 20000000U / uart->baud + 100U);
-            USART_CTL0(uart->controller->registers) |= USART_CTL0_TCIE;
+            if ((flags(state) & 0x0DU) != 0U) {
+                begin_drain(state, NX_ERROR_IO);
+            } else {
+                state->dma_complete = true;
+                state->drain_deadline = nx_deadline_after(
+                    nx_time_now_us(), 20000000U / uart->baud + 100U);
+                USART_CTL0(uart->controller->registers) |= USART_CTL0_TCIE;
+            }
         }
         (void)nx_irq_wake_signal(uart->wake);
     } else {
-        acknowledge(state);
+        acknowledge_bits(state, flags(state) & 0x30U);
     }
 }
 
@@ -263,23 +351,30 @@ void nx_gd32_uart_dma_service(void* context) {
         return;
     }
     nx_time_us_t now = nx_time_now_us();
+    if (!state->aborting && (flags(state) & 0x0DU) != 0U) {
+        begin_drain(state, NX_ERROR_IO);
+    }
     if (!uart->tc && !state->aborting &&
         nx_deadline_expired(request->base.deadline, now)) {
         begin_drain(state, NX_ERROR_TIMEOUT);
     }
     nx_dma_drain_facts_t facts = {
         .length = request->length,
-        .remaining = DMA_CH7CNT(DMA1),
-        .engine_disabled = (DMA_CH7CTL(DMA1) & DMA_CHXCTL_CHEN) == 0U,
+        .remaining = TX_COUNT(state),
+        .engine_disabled = (TX_CONTROL(state) & DMA_CHXCTL_CHEN) == 0U,
         .irq_detached =
-            (DMA_CH7CTL(DMA1) & (DMA_CHXCTL_FTFIE | DMA_CHXCTL_HTFIE |
-                                 DMA_CHXCTL_TAEIE | DMA_CHXCTL_SDEIE)) == 0U,
+            (TX_CONTROL(state) & (DMA_CHXCTL_FTFIE | DMA_CHXCTL_HTFIE |
+                                  DMA_CHXCTL_TAEIE | DMA_CHXCTL_SDEIE)) == 0U,
         .peripheral_idle = uart->tc,
     };
     if (nx_dma_drain_check(&facts) == NX_SUCCESS) {
         USART_CTL0(uart->controller->registers) &=
             ~(uint32_t)(USART_CTL0_TCIE | USART_CTL0_TBEIE);
-        acknowledge(state);
+        acknowledge_bits(state, flags(state) & 0x30U);
+        /* Actual EN/IRQ withdrawal precedes this final error observation. */
+        if (uart->terminal == NX_SUCCESS && (flags(state) & 0x0DU) != 0U) {
+            uart->terminal = NX_ERROR_IO;
+        }
         size_t transferred = state->dma_complete && uart->terminal == NX_SUCCESS
                                  ? request->length
                                  : 0U;
@@ -325,11 +420,11 @@ nx_result_t nx_gd32_uart_dma_stop(void* context) {
         }
     }
     detach(state);
-    if ((DMA_CH7CTL(DMA1) & DMA_CHXCTL_CHEN) != 0U) {
+    if ((TX_CONTROL(state) & DMA_CHXCTL_CHEN) != 0U) {
         return NX_ERROR_BUSY;
     }
-    NVIC_DisableIRQ(DMA1_Channel7_IRQn);
-    NVIC_ClearPendingIRQ(DMA1_Channel7_IRQn);
+    NVIC_DisableIRQ(dma_irq(state));
+    NVIC_ClearPendingIRQ(dma_irq(state));
     return nx_gd32_uart_stop(&state->uart);
 }
 
@@ -347,7 +442,7 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
         return NX_ERROR_STATE;
     }
     nx_result_t result =
-        nx_gd32_irq_wake_validate(wake, DMA1_Channel7_IRQn, syscall_ceiling);
+        nx_gd32_irq_wake_validate(wake, dma_irq(state), syscall_ceiling);
     return result == NX_SUCCESS ? nx_gd32_uart_ops.attach_wake(
                                       &state->uart, wake, syscall_ceiling)
                                 : result;

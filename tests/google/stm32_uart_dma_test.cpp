@@ -19,6 +19,9 @@ extern "C" {
 #include <gtest/gtest.h>
 
 static bool s_hold_dma_enable;
+static bool s_error_at_disable;
+static bool s_error_at_ack;
+static DMA_TypeDef* s_dma;
 
 /** \brief Model an engine that refuses the disable write without faking drain.
  */
@@ -27,7 +30,22 @@ extern "C" void nx_stm32_dma_model_disable(void* raw, uint32_t mask) {
     if (s_hold_dma_enable) {
         mask &= ~static_cast<uint32_t>(DMA_SxCR_EN);
     }
+    if (s_error_at_disable) {
+        const_cast<uint32_t&>(s_dma->HISR) |= 1U << 25U;
+        s_error_at_disable = false;
+    }
     stream->CR &= ~mask;
+}
+
+/** \brief W1C clears only written flags, including the injected late fault. */
+extern "C" void nx_stm32_uart_dma_model_ack(volatile uint32_t* clear,
+                                            uint32_t mask) {
+    if (s_error_at_ack) {
+        const_cast<uint32_t&>(s_dma->HISR) |= 1U << 25U;
+        s_error_at_ack = false;
+    }
+    *clear = mask;
+    const_cast<uint32_t&>(s_dma->HISR) &= ~mask;
 }
 
 class Stm32UartDma : public testing::Test {
@@ -44,6 +62,9 @@ class Stm32UartDma : public testing::Test {
 
     void SetUp() override {
         s_hold_dma_enable = false;
+        s_error_at_disable = false;
+        s_error_at_ack = false;
+        s_dma = &dma;
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         region = {reinterpret_cast<uintptr_t>(payload), sizeof(payload),
                   NX_DMA_MEMORY_READ};
@@ -191,4 +212,33 @@ TEST_F(Stm32UartDma, BlockRxRequiresTheSeparateStreamProvider) {
     EXPECT_EQ(nx_stm32_uart_dma_initialize(&state, 84000000U),
               NX_ERROR_UNSUPPORTED);
     EXPECT_FALSE(state.uart.initialized);
+}
+
+TEST_F(Stm32UartDma, DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx) {
+    ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
+    tx.NDTR = 0U;
+    const_cast<uint32_t&>(dma.HISR) = 1U << 27U;
+    s_error_at_disable = true;
+    nx_stm32_uart_dma_irq(&state);
+    uart.SR |= USART_SR_TC;
+    nx_stm32_uart_dma_uart_irq(&state);
+    nx_uart_port_service(&port);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(request.base.transferred, 0U);
+    EXPECT_EQ(state.uart.active, nullptr);
+}
+TEST_F(Stm32UartDma, DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx) {
+    ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
+    tx.NDTR = 0U;
+    const_cast<uint32_t&>(dma.HISR) = 1U << 27U;
+    s_error_at_ack = true;
+    nx_stm32_uart_dma_irq(&state);
+    uart.SR |= USART_SR_TC;
+    nx_stm32_uart_dma_uart_irq(&state);
+    nx_uart_port_service(&port);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(request.base.transferred, 0U);
+    EXPECT_EQ(state.uart.active, nullptr);
 }

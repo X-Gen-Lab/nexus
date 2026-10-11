@@ -1,0 +1,26 @@
+
+
+
+
+
+
+
+
+
+
+/workspace/nexus/soc/gd32f470/drivers/uart.c:11:10: fatal error: private/system.h: No such file or directory
+   11 | #include "private/system.h"
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+Traceback (most recent call last):
+  File "/workspace/nexus-multi-controller-iteration/arm_dma.py", line 48, in <module>
+    current = compile_one(path, family + '-current-' + driver)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus-multi-controller-iteration/arm_dma.py", line 36, in compile_one
+    run(name, tool, *flags, *inc, *extra, '-MD', '-MF', deps, '-x', 'c', '-c', source, '-o', obj)
+  File "/workspace/nexus-multi-controller-iteration/arm_dma.py", line 18, in run
+    subprocess.run([sys.executable, str(external / 'run.py'), label + '-' + name, *map(str, argv)], cwd=root, check=True)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/workspace/nexus/.venv/bin/python', '/workspace/nexus-multi-controller-iteration/run.py', 'dma-arm-final-gd32f470-current-uart.c', '/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc', '-std=c11', '-mcpu=cortex-m4', '-mthumb', '-mfpu=fpv4-sp-d16', '-mfloat-abi=hard', '-Os', '-ffunction-sections', '-fdata-sections', '-Wall', '-Wextra', '-Werror', '-Wpedantic', '-Wconversion', '-Wshadow', '-Wstrict-prototypes', '-Wmissing-prototypes', '-Icore/include', '-Iarch/include', '-Iio/include', '-Iio/private', '-DGD32F470', '-Isoc/gd32f470/private', '-I/workspace/nexus-config-iteration-evidence/can-arm-matrix-final/gd32-both-freertos/nexus-sdk/generated', '-DHXTAL_VALUE=25000000', '-isystem', 'vendors/gigadevice/gd32f4xx/Firmware/CMSIS', '-isystem', 'vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include', '-isystem', 'vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include', '-MD', '-MF', '/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-arm-final/gd32f470-current-uart.c.d.raw', '-x', 'c', '-c', '/workspace/nexus/soc/gd32f470/drivers/uart.c', '-o', '/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-arm-final/gd32f470-current-uart.c.o']' returned non-zero exit status 1.

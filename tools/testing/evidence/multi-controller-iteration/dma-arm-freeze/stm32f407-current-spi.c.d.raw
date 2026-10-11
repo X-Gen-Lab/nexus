@@ -1,0 +1,28 @@
+/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-arm-freeze/stm32f407-current-spi.c.o: \
+ /workspace/nexus/soc/stm32f407/drivers/spi.c \
+ soc/stm32f407/private/stm32f407_provider.h io/include/nexus/io/adc.h \
+ core/include/nexus/core/time.h core/include/nexus/core/status.h \
+ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/stdbool.h \
+ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/stddef.h \
+ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/stdint.h \
+ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/stdint.h \
+ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/machine/_default_types.h \
+ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/features.h \
+ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/_newlib_version.h \
+ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/_intsup.h \
+ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/_stdint.h \
+ io/include/nexus/io/adc_observer.h io/include/nexus/io/stream.h \
+ io/include/nexus/io/wake.h io/include/nexus/io/exti.h \
+ io/include/nexus/io/flash.h io/include/nexus/io/gpio.h \
+ io/include/nexus/io/i2c.h core/include/nexus/core/request.h \
+ io/include/nexus/io/spi.h io/include/nexus/io/timer.h \
+ io/include/nexus/io/uart.h io/include/nexus/io/watchdog.h \
+ soc/stm32f407/private/stm32f407_system.h arch/include/nexus/arch/arch.h \
+ vendors/st/cmsis_device_f4/Include/stm32f407xx.h \
+ vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h \
+ vendors/arm/CMSIS_5/CMSIS/Core/Include/cmsis_version.h \
+ vendors/arm/CMSIS_5/CMSIS/Core/Include/cmsis_compiler.h \
+ vendors/arm/CMSIS_5/CMSIS/Core/Include/cmsis_gcc.h \
+ vendors/arm/CMSIS_5/CMSIS/Core/Include/mpu_armv7.h \
+ vendors/st/cmsis_device_f4/Include/system_stm32f4xx.h \
+ /workspace/nexus-config-iteration-evidence/can-arm-matrix-final/stm32-first-freertos/nexus-sdk/generated/nexus_config.h

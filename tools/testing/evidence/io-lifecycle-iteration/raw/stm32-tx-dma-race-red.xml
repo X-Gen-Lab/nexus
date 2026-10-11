@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="10" failures="2" disabled="0" errors="0" time="0." timestamp="2026-10-11T19:17:40.134" name="AllTests">
+  <testsuite name="Stm32UartDma" tests="10" failures="2" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T19:17:40.134">
+    <testcase name="DmaTransferCompleteCannotSettleUntilUartTc" file="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp" line="91" status="run" result="completed" time="0." timestamp="2026-10-11T19:17:40.134" classname="Stm32UartDma" />
+    <testcase name="CancellationCountsOnlyProvenWireBytesAndRetainsDrainBorrow" file="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp" line="114" status="run" result="completed" time="0." timestamp="2026-10-11T19:17:40.134" classname="Stm32UartDma" />
+    <testcase name="InvalidDomainRejectsWithoutBorrowOrRegisterWrites" file="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp" line="130" status="run" result="completed" time="0." timestamp="2026-10-11T19:17:40.134" classname="Stm32UartDma" />
+    <testcase name="ExpiredDrainQuarantinesUntilActualWireIdle" file="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp" line="140" status="run" result="completed" time="0." timestamp="2026-10-11T19:17:40.134" classname="Stm32UartDma" />
+    <testcase name="WireIdleCannotReleaseMemoryWhenEngineRefusesDisable" file="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp" line="155" status="run" result="completed" time="0." timestamp="2026-10-11T19:17:40.134" classname="Stm32UartDma" />
+    <testcase name="DmaCompletionBoundsWireDrainWithoutRequestDeadline" file="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp" line="174" status="run" result="completed" time="0." timestamp="2026-10-11T19:17:40.134" classname="Stm32UartDma" />
+    <testcase name="LateServiceWithWireAndEngineProofPreservesSuccess" file="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp" line="192" status="run" result="completed" time="0." timestamp="2026-10-11T19:17:40.134" classname="Stm32UartDma" />
+    <testcase name="BlockRxRequiresTheSeparateStreamProvider" file="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp" line="207" status="run" result="completed" time="0." timestamp="2026-10-11T19:17:40.134" classname="Stm32UartDma" />
+    <testcase name="DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx" file="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp" line="217" status="run" result="completed" time="0." timestamp="2026-10-11T19:17:40.134" classname="Stm32UartDma">
+      <failure message="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:227&#x0A;Expected equality of these values:&#x0A;  request.base.result&#x0A;    Which is: 0&#x0A;  NX_ERROR_IO&#x0A;    Which is: 6&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:227
+Expected equality of these values:
+  request.base.result
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:228&#x0A;Expected equality of these values:&#x0A;  request.base.transferred&#x0A;    Which is: 4&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:228
+Expected equality of these values:
+  request.base.transferred
+    Which is: 4
+  0U
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx" file="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp" line="231" status="run" result="completed" time="0." timestamp="2026-10-11T19:17:40.134" classname="Stm32UartDma">
+      <failure message="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:241&#x0A;Expected equality of these values:&#x0A;  request.base.result&#x0A;    Which is: 0&#x0A;  NX_ERROR_IO&#x0A;    Which is: 6&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:241
+Expected equality of these values:
+  request.base.result
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:242&#x0A;Expected equality of these values:&#x0A;  request.base.transferred&#x0A;    Which is: 4&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:242
+Expected equality of these values:
+  request.base.transferred
+    Which is: 4
+  0U
+    Which is: 0
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

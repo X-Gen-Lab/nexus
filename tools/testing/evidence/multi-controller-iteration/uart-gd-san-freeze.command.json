@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-multi-controller-iteration/gd-uart-san-test",
+    "--gtest_output=xml:tools/testing/evidence/multi-controller-iteration/gd-uart-san-freeze.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:32:30.773283+00:00",
+  "ended_at": "2026-10-11T19:32:30.788463+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/uart-gd-san-freeze.log"
+}

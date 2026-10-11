@@ -144,6 +144,10 @@ def main(arguments=None):
         output.mkdir(parents=True, exist_ok=True)
         summary = output / "execution.json"
         summary.unlink(missing_ok=True)
+        matrix_report = output / "io-property-report.json"
+        matrix_report.unlink(missing_ok=True)
+        matrix_snapshot = output / "io-property-inputs.json"
+        matrix_snapshot.unlink(missing_ok=True)
         python = sys.executable
         tool_results = []
         for suite in ("testing", "configure"):
@@ -162,6 +166,10 @@ def main(arguments=None):
         if (manifest.get("schema") != 1 or not manifest.get("executables")
                 or len(manifest["executables"]) != len(set(manifest["executables"]))):
             raise ValueError("Missing or duplicate GoogleTest executable plan")
+        # The catalogue consumes this runner's evidence, not another execution.
+        from scripts.ci import io_lifecycle_matrix
+        catalogue = ROOT / "tools/testing/io_lifecycle_matrix.json"
+        io_lifecycle_matrix.capture(ROOT, build, catalogue, matrix_snapshot)
         results = []
         for index, name in enumerate(manifest["executables"]):
             binary = Path(name)
@@ -191,6 +199,9 @@ def main(arguments=None):
             "scope": "Actual host execution; not proof of historical TDD order "
                      "or physical hardware qualification",
         }, indent=2) + "\n")
+        properties = io_lifecycle_matrix.audit(
+            ROOT, build, catalogue, matrix_snapshot, output)
+        matrix_report.write_text(json.dumps(properties, indent=2) + "\n")
         print(f"Executed {sum(r['passed'] for r in results)} GoogleTest cases; "
               f"evidence: {summary}")
         return 0

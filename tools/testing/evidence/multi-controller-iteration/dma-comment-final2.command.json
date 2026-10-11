@@ -1,0 +1,26 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "scripts/ci/comment_style.py",
+    "--files",
+    "soc/stm32f407/drivers/uart_dma.c",
+    "soc/gd32f470/drivers/uart_dma.c",
+    "soc/stm32f407/drivers/spi.c",
+    "soc/stm32f407/drivers/spi_dma.c",
+    "soc/gd32f470/drivers/spi_dma.c",
+    "soc/stm32f407/private/stm32f407_dma.h",
+    "soc/gd32f470/private/gd32f470_dma.h",
+    "soc/gd32f470/private/gd32f470_spi_dma.h",
+    "tests/contracts/dma_multi_controller/nexus_config.h",
+    "tests/google/uart_multi_controller_model.h",
+    "tests/google/uart_multi_controller_test.cpp",
+    "tests/google/spi_multi_controller_model.h",
+    "tests/google/spi_multi_controller_test.cpp",
+    "--json"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:24:50.690956+00:00",
+  "ended_at": "2026-10-11T19:24:50.807722+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-comment-final2.log"
+}

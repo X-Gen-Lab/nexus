@@ -116,7 +116,7 @@ target_include_directories(nx_freertos_hooks PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${kernel_root}/include"
     "${port_root}")
-target_link_libraries(nx_freertos_hooks PRIVATE nexus_os_wait
+target_link_libraries(nx_freertos_hooks PRIVATE nexus_os_wait nexus_arch
     nexus_owned_warnings nexus_build_options)
 
 add_library(nexus_os_freertos STATIC freertos.c)

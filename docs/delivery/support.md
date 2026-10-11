@@ -10,12 +10,21 @@
 |---|---|---|
 | STM32F407ZGT6 / 启明欣欣 V3.1 | Cortex-M4F；1 MiB Flash；主 SRAM 128 KiB、CCM 64 KiB；声明 clock/profile 与 reviewed routes | 实际 PCB 修订、晶振、供电、连续性、波形与负载 |
 | STM32F407VET6 / 天空星青春版 | Cortex-M4F；512 KiB Flash；主 SRAM 128 KiB、CCM 64 KiB；独立 Board 资源 | 相同类别的实际 PCB／电气／HIL 验收 |
-| GD32F470ZGT6 / 梁山派 | Cortex-M4F；1 MiB Flash；主 SRAM 192 KiB、ADDSRAM 256 KiB、TCM 64 KiB；25 MHz 声明输入、200 MHz profile | 未观察 PCB/晶振/电气；默认 linker 只用主 SRAM；USB 48 MHz 未承诺 |
+| GD32F470ZGT6 / 梁山派 | Cortex-M4F；1 MiB Flash；主 SRAM 192 KiB、ADDSRAM 256 KiB、TCM 64 KiB；25 MHz 声明输入、200 MHz profile；可选 USB 独立 48 MHz owner | 未观察 PCB/晶振/电气；默认 linker 只用主 SRAM；实际 USB clock/PHY 仍未测量 |
 | Native | Linux/POSIX 行为模型、实际线程与持久化文件故障模型 | 不构成 MCU 或电气资格 |
 
 裸机和锁定 FreeRTOS 均为显式选择的薄适配。启动只建立平台时钟／接口，不创建
 scheduler、产品任务或工作流。FreeRTOS POSIX host 运行验证软件生命周期，不能
 替代 Cortex-M4F IRQ ceiling、FPU context 与 stack high-water 的实板验证。
+
+ThreadX 是额外显式后端，锁定官方 Eclipse ThreadX 6.5.2.202603 release。当前
+配置维护三块 F407/F470 Board 的 Cortex-M4 GNU port，以及 Native Linux GNU。
+独立 CPU runtime 维护 M4 integer、M4F hard/softfp，BASEPRI 或 PRIMASK 政策；
+其他 Cortex-M ThreadX port 明确拒绝。生产 graph、真实 Linux 内核 task/queue/join
+与三板 ARM 链接分别验证，Linux 自身 pthread 栈与内部 host 分配不是 MCU 成本。
+ThreadX 不实现本项目 FreeRTOS 的 MPU、split-security 或 tickless 模式。详见
+[ThreadX 接入](../design/threadx.md)。平台启动不进入任何内核，产品显式进入内核；
+仍运行的 scheduler 不允许普通 I/O shutdown 关闭其 clock/Tick。
 
 CPU 软件层另支持 M0／M0+／M3／M4／M7／M23／M33／M55／M85，统一严格事实
 解析器选择 Core/Arch、原子操作和裸机/FreeRTOS runtime。M0/M0+ RMW 使用
@@ -40,6 +49,36 @@ privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围�
 | EXTI | selected line、共享 vector、caller-sized event queue、丢失／coalescing 可见；无 debounce 政策 |
 | PWM | 固定 timer/channel/base、CCR shadow、0/100%、safe inactive；公共 stop 可以 restart，平台 teardown 释放 owner |
 | ADC | reviewed channel、single-shot/低速 scan、有限及连续双缓冲定时触发 DMA blocks；显式 sample time/reference；只发布完整扫描；可选外部序列与软件观测时间记录 |
+| Classic CAN | 11/29-bit DATA/RTR、0–8 bytes、真实三邮箱、共享 filter domain、显式 abort/bus-off recovery；没有 CAN FD 或自动重发 |
+| USB FS device | internal PHY PIO、EP0 control IN/OUT64、EP1–3 bulk8/16/32/64、packet loan、SETUP epoch、reset/stop drain、独立 48 MHz owner；没有 Host/HS/DMA/ISO/class stack |
+
+USB 配置/factory 已在两 STM 封装与 GD470 的软件 Board 夹具执行真实 ARM 链接，
+默认参考 Board 不自动暴露 USB connector/VBUS 电气。`vbus_sensing=true` 缺少
+reviewed 电气时拒绝。PA11/PA12 AF10 的硅片路线不证明实际跳帽、供电、VBUS 或
+ESD；它与 CAN1/USART1 flow-control 的资源冲突必须拒绝。详见
+[USB packet 合同](../design/usb-device.md)。
+
+以下纵切片拥有独立生产机制和开发证据，最终配置、SDK 与完整镜像接入分别验收。
+不能将其中一项的模型通过记为整个平台或参考 PCB 通过。
+
+| 可选机制 | 精确范围与当前边界 |
+|---|---|
+| Raw Ethernet / MDIO / DP83848 | Native/ST/GD normal chained descriptor、RMII、14–1514-byte untagged Ethernet II、caller-owned RX loan；ETH/MDIO face 共用一个 MAC context；ST ZG/GD ZG 软件夹具已有 factory 与裸机/FreeRTOS ELF；无协议栈、PTP、checksum offload、VLAN、jumbo |
+| Input capture | STM TIM4 CH1 / GD TIMER3 CH0，PB6 AF2、16-bit modulo count、caller event ring；软件观测时间不是 edge aperture；装配接入独立验收 |
+| Complementary PWM / break | STM TIM1 / GD TIMER0，PA8/PB13/PB12 AF1；不可变精确 deadtime 与 BKIN，禁止自动重启；没有功率级安全资格 |
+| User I/O broker | 特权 kernel 调用的 scalar GPIO read/set-reset、真实 principal/pin/copy/unpin 窄端口；未实现 SVC/MPU/TZ userspace transport 或异步用户 DMA |
+| STM32G474RET6 / MB1367 | 初始 source-reviewed clock/startup/TIM2/GPIOA/LPUART1 纵切片；平台 facts、SDK、factory/backend 集成另行验收；不继承 F407/F470 其他外设 |
+
+参考 Board 默认不声明 Ethernet PHY/REFCLK/reset 接线。启明 ZG 可选 RMII 来源
+涉及 PG11/13/14，因此不授权 VE100 封装；天空星和梁山派无 reviewed PHY 路线。
+协议、电缆、PHY power/reset、产品 MAC 地址和恢复策略留在外部。详见
+[Ethernet](../design/ethernet.md)、[高级 timer](../design/timer-advanced.md)、
+[用户 I/O broker](../design/user-io-broker.md) 与 [G474](../design/stm32g474.md)。
+
+Ethernet 生成夹具保留精确 TX/RX descriptors 与 RX buffers，只接纳 STM 主 SRAM
+128 KiB 或 GD 主 SRAM192 KiB。四个 ZG ARM graph 的开发预算/retention 通过不
+授权 GD ADDSRAM/TCM、STM CCM、VE100 的 PG route 或某个产品 PHY。独立 cold
+review、clean-source SDK 与实板资格仍各自建立，参考默认镜像不选入 ETH/MDIO。
 
 有限 DMA 的精确首发路线如下，其他 controller／通道组合由 resolver 拒绝。
 
@@ -50,6 +89,11 @@ privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围�
 | SPI 全双工 DMA | SPI1；DMA2 RXstream0／TXstream3 channel3 | SPI4；DMA1 RXchannel3／TXchannel4 selector2 |
 | I2C 消息 DMA | I2C1；DMA1 RXstream0／TXstream6 channel1 | I2C0；DMA0 RXchannel0／TXchannel6 selector1 |
 | ADC 有限／连续 trigger blocks | ADC1；TIM3 TRGO；DMA2 stream4 channel0 | ADC0；TIMER2 TRGO；DMA1 channel0 selector0 |
+
+二号 I2C 的私有 IRQ/DMA provider 已有独立实例隔离与真实 SDK 编译证据，但当前
+配置首发表仍只自动装配首个 I2C controller。额外 controller 的 provider 存在不
+等于 resolver/factory 已开放所有路线。详见
+[多控制器所有权](../design/multiple-controllers.md)。
 
 SPI DMA 要求非空、不重叠的 TX／RX 实际访问跨度；固定地址方向只访问调用者的一字节。
 不分配 scratch 或隐式复制池。实际
@@ -91,8 +135,11 @@ Board 的 SPI4 PF6/7/8/9 有公开来源，外接 NOR 具体料号仍未知。
 ## 明确边界
 
 连续模式不能承诺任意 IRQ 延迟与消费者速度下无丢失。I2C 超出 256-byte 的 read、
-capture／advanced PWM、动态 clock／低功耗、CAN、USB、Ethernet 与安全启动／升级
-未作为本批实现。
+动态 clock、deep sleep/STOP、安全启动／升级及上述未维护模式明确不提供。
+FreeRTOS 可选 `lowpower_port="timebase"` 只在固定 F407/GD470 profile 使用浅 Sleep；
+要求 SysTick、tickless、single privileged、无 MPU。默认 `custom` 不新增 sleep
+机制；CPU-only runtime 缺少 SoC timebase 时拒绝该选择。实际相位、clock 连续性、
+wake latency 与功耗保持物理未执行，见[浅睡眠](../design/timebase-lowpower.md)。
 Unsupported 配置明确拒绝，不通过成功 stub 声称支持。
 
 Flash pulse 不能被 deadline 撤销；BUSY 未清不能释放责任。产品负责 Flash 执行

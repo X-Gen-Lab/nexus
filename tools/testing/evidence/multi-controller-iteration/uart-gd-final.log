@@ -1,0 +1,29 @@
+Running main() from gmock_main.cc
+[==========] Running 10 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 10 tests from UARTMultiple
+[ RUN      ] UARTMultiple.SecondaryColdInitPreservesPrimaryRegistersAndIrqs
+[       OK ] UARTMultiple.SecondaryColdInitPreservesPrimaryRegistersAndIrqs (0 ms)
+[ RUN      ] UARTMultiple.SeparateRequestsRequireTheirOwnDmaAndWireCompletion
+[       OK ] UARTMultiple.SeparateRequestsRequireTheirOwnDmaAndWireCompletion (0 ms)
+[ RUN      ] UARTMultiple.FailedSecondaryDrainRetainsOnlyItsExactBorrow
+[       OK ] UARTMultiple.FailedSecondaryDrainRetainsOnlyItsExactBorrow (0 ms)
+[ RUN      ] UARTMultiple.SecondaryStopPreservesPrimaryPublishersAndClock
+[       OK ] UARTMultiple.SecondaryStopPreservesPrimaryPublishersAndClock (0 ms)
+[ RUN      ] UARTMultiple.SecondaryIrqReceiveCannotWritePrimaryRing
+[       OK ] UARTMultiple.SecondaryIrqReceiveCannotWritePrimaryRing (0 ms)
+[ RUN      ] UARTMultiple.SelectedPublisherCeilingRejectsUnsafeSecondaryVector
+[       OK ] UARTMultiple.SelectedPublisherCeilingRejectsUnsafeSecondaryVector (0 ms)
+[ RUN      ] UARTMultiple.LivePhysicalControllerCannotBeAcquiredTwice
+[       OK ] UARTMultiple.LivePhysicalControllerCannotBeAcquiredTwice (0 ms)
+[ RUN      ] UARTMultiple.ContextAndSharedEngineConflictRejectBeforeAcquisition
+[       OK ] UARTMultiple.ContextAndSharedEngineConflictRejectBeforeAcquisition (0 ms)
+[ RUN      ] UARTMultiple.SecondaryCannotAcquireForeignColdControllerFacts
+[       OK ] UARTMultiple.SecondaryCannotAcquireForeignColdControllerFacts (0 ms)
+[ RUN      ] UARTMultiple.SecondaryAcknowledgesOnlyItsOwnHighStatusGroup
+[       OK ] UARTMultiple.SecondaryAcknowledgesOnlyItsOwnHighStatusGroup (0 ms)
+[----------] 10 tests from UARTMultiple (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 10 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 10 tests.

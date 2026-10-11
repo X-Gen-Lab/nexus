@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/cmake",
+    "--build",
+    "/workspace/nexus/build/uart-iteration",
+    "--target",
+    "nexus_stm32_uart_dma_test",
+    "nexus_gd32_uart_dma_test",
+    "--parallel",
+    "2"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

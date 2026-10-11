@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus/build/uart-iteration/bin/nexus_gd32_spi_dma_test",
+    "--gtest_filter=*",
+    "--gtest_list_tests"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

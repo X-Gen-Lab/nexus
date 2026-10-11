@@ -1,0 +1,6 @@
+#include "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-arm-final2/stm32f407-baseline-stm32f407_dma.h.raw"
+unsigned char uart_state_size[sizeof(nx_stm32_uart_state_t)];
+unsigned char uart_dma_state_size[sizeof(nx_stm32_uart_dma_state_t)];
+unsigned char spi_state_size[sizeof(nx_stm32_spi_state_t)];
+unsigned char spi_dma_state_size[sizeof(nx_stm32_spi_dma_state_t)];
+unsigned char spi_dma_endpoint_state_size[sizeof(nx_stm32_spi_dma_endpoint_state_t)];

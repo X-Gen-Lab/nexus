@@ -1,0 +1,86 @@
+[==========] Running 30 tests from 7 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from ThreadXOfficial
+[ RUN      ] ThreadXOfficial.ReallyRunsKernelThread
+[       OK ] ThreadXOfficial.ReallyRunsKernelThread (0 ms)
+[----------] 1 test from ThreadXOfficial (0 ms total)
+
+[----------] 3 tests from ThreadXAdapter
+[ RUN      ] ThreadXAdapter.LatchInitializesAndDestroys
+[       OK ] ThreadXAdapter.LatchInitializesAndDestroys (0 ms)
+[ RUN      ] ThreadXAdapter.OddByteItemsHaveExactFIFOAndNoOutputOnTimeout
+[       OK ] ThreadXAdapter.OddByteItemsHaveExactFIFOAndNoOutputOnTimeout (0 ms)
+[ RUN      ] ThreadXAdapter.InvalidCapacityIsRejectedBeforeKernelCreation
+[       OK ] ThreadXAdapter.InvalidCapacityIsRejectedBeforeKernelCreation (0 ms)
+[----------] 3 tests from ThreadXAdapter (0 ms total)
+
+[----------] 7 tests from ThreadXTasks
+[ RUN      ] ThreadXTasks.ReturnJoinDeletesBeforeStorageReuse
+[       OK ] ThreadXTasks.ReturnJoinDeletesBeforeStorageReuse (0 ms)
+[ RUN      ] ThreadXTasks.JoinTimeoutRetainsActualBlockedThread
+[       OK ] ThreadXTasks.JoinTimeoutRetainsActualBlockedThread (0 ms)
+[ RUN      ] ThreadXTasks.InvalidStackAndPriorityHaveNoLiveObjects
+[       OK ] ThreadXTasks.InvalidStackAndPriorityHaveNoLiveObjects (0 ms)
+[ RUN      ] ThreadXTasks.PrestartDiscardIsProvenActualKernelBootstrap
+[       OK ] ThreadXTasks.PrestartDiscardIsProvenActualKernelBootstrap (0 ms)
+[ RUN      ] ThreadXTasks.GoogleMockObservesOnlyExternalApplicationEntry
+[       OK ] ThreadXTasks.GoogleMockObservesOnlyExternalApplicationEntry (0 ms)
+[ RUN      ] ThreadXTasks.SelfJoinRejectsWithoutDeletingLiveThread
+[       OK ] ThreadXTasks.SelfJoinRejectsWithoutDeletingLiveThread (0 ms)
+[ RUN      ] ThreadXTasks.PermanentUsesNoCompletionLatchAndRunsRealKernel
+[       OK ] ThreadXTasks.PermanentUsesNoCompletionLatchAndRunsRealKernel (0 ms)
+[----------] 7 tests from ThreadXTasks (0 ms total)
+
+[----------] 8 tests from ThreadXClose
+[ RUN      ] ThreadXClose.CloseBroadcastsEveryBlockedSenderAndDrainsOriginal
+[       OK ] ThreadXClose.CloseBroadcastsEveryBlockedSenderAndDrainsOriginal (0 ms)
+[ RUN      ] ThreadXClose.CloseBroadcastsEveryBlockedReceiver
+[       OK ] ThreadXClose.CloseBroadcastsEveryBlockedReceiver (0 ms)
+[ RUN      ] ThreadXClose.OneWaiterCannotJoinTwoOperations
+[       OK ] ThreadXClose.OneWaiterCannotJoinTwoOperations (0 ms)
+[ RUN      ] ThreadXClose.ExplicitConcurrentBudgetRejectsWithoutBorrow
+[       OK ] ThreadXClose.ExplicitConcurrentBudgetRejectsWithoutBorrow (0 ms)
+[ RUN      ] ThreadXClose.PayloadArrivalWakesSleepingReceiver
+[       OK ] ThreadXClose.PayloadArrivalWakesSleepingReceiver (0 ms)
+[ RUN      ] ThreadXClose.FreedSpaceWakesSleepingSender
+[       OK ] ThreadXClose.FreedSpaceWakesSleepingSender (0 ms)
+[ RUN      ] ThreadXClose.DeadlineUnregistersWithoutChangingOutput
+[       OK ] ThreadXClose.DeadlineUnregistersWithoutChangingOutput (0 ms)
+[ RUN      ] ThreadXClose.CloseIsIdempotentAndRejectsFurtherSends
+[       OK ] ThreadXClose.CloseIsIdempotentAndRejectsFurtherSends (0 ms)
+[----------] 8 tests from ThreadXClose (1 ms total)
+
+[----------] 4 tests from ThreadXWait
+[ RUN      ] ThreadXWait.WakeBeforeWaitIsLatchedAndNeverIsRealInfinity
+[       OK ] ThreadXWait.WakeBeforeWaitIsLatchedAndNeverIsRealInfinity (0 ms)
+[ RUN      ] ThreadXWait.ExpiredBudgetWinsOverSaturatedUnrelatedHints
+[       OK ] ThreadXWait.ExpiredBudgetWinsOverSaturatedUnrelatedHints (0 ms)
+[ RUN      ] ThreadXWait.RealKernelBlockedWaitIsWokenByScheduledPublisher
+[       OK ] ThreadXWait.RealKernelBlockedWaitIsWokenByScheduledPublisher (1 ms)
+[ RUN      ] ThreadXWait.ActualManualMaskRejectsBeforeMutation
+[       OK ] ThreadXWait.ActualManualMaskRejectsBeforeMutation (0 ms)
+[----------] 4 tests from ThreadXWait (1 ms total)
+
+[----------] 2 tests from ThreadXQueue
+[ RUN      ] ThreadXQueue.LargeNonWordPayloadRetainsExactBytes
+[       OK ] ThreadXQueue.LargeNonWordPayloadRetainsExactBytes (0 ms)
+[ RUN      ] ThreadXQueue.PriorityZeroTimeslicedForeignCallerCannotBreakTaskGuard
+[       OK ] ThreadXQueue.PriorityZeroTimeslicedForeignCallerCannotBreakTaskGuard (0 ms)
+[----------] 2 tests from ThreadXQueue (0 ms total)
+
+[----------] 5 tests from ThreadXAdmission
+[ RUN      ] ThreadXAdmission.QueuePayloadCannotOverlapControl
+[       OK ] ThreadXAdmission.QueuePayloadCannotOverlapControl (0 ms)
+[ RUN      ] ThreadXAdmission.ClosablePayloadCannotOverlapOuterRegistry
+[       OK ] ThreadXAdmission.ClosablePayloadCannotOverlapOuterRegistry (0 ms)
+[ RUN      ] ThreadXAdmission.WrappedPayloadRangeHasNoKernelEffects
+[       OK ] ThreadXAdmission.WrappedPayloadRangeHasNoKernelEffects (0 ms)
+[ RUN      ] ThreadXAdmission.BorrowedNameCannotBeStackFillVictim
+[       OK ] ThreadXAdmission.BorrowedNameCannotBeStackFillVictim (0 ms)
+[ RUN      ] ThreadXAdmission.ContextCannotAliasKernelControl
+[       OK ] ThreadXAdmission.ContextCannotAliasKernelControl (0 ms)
+[----------] 5 tests from ThreadXAdmission (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 30 tests from 7 test suites ran. (4 ms total)
+[  PASSED  ] 30 tests.

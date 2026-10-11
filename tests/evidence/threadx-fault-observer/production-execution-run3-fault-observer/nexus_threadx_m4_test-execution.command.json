@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "command": [
+    "timeout",
+    "20",
+    "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_test",
+    "--gtest_filter=*",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-threadx-probe/evidence/production-execution-run3-fault-observer/nexus_threadx_m4_test.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

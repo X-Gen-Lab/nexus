@@ -1,0 +1,216 @@
+Running main() from gmock_main.cc
+[==========] Running 7 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 7 tests from I2CMultiple
+[ RUN      ] I2CMultiple.SecondaryColdInitLeavesPrimaryRegistersAndIrqsIntact
+tests/google/i2c_multi_controller_test.cpp:151: Failure
+Expected equality of these values:
+  nx_gd32_i2c_async_initialize(&states[1], 6U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] I2CMultiple.SecondaryColdInitLeavesPrimaryRegistersAndIrqsIntact (0 ms)
+[ RUN      ] I2CMultiple.DuplicateLiveControllerRefusesBeforePeerMutation
+tests/google/i2c_multi_controller_test.cpp:170: Failure
+Expected equality of these values:
+  nx_gd32_i2c_async_initialize(&duplicate, 3U)
+    Which is: 0
+  NX_ERROR_BUSY
+    Which is: 2
+
+tests/google/i2c_multi_controller_test.cpp:171: Failure
+Value of: duplicate.initialized
+  Actual: true
+Expected: false
+
+tests/google/i2c_multi_controller_test.cpp:173: Failure
+Expected equality of these values:
+  NVIC_GetPriority(I2C0_EV_IRQn)
+    Which is: 3
+  5U
+    Which is: 5
+
+[  FAILED  ] I2CMultiple.DuplicateLiveControllerRefusesBeforePeerMutation (0 ms)
+[ RUN      ] I2CMultiple.SecondaryCannotStealPrimaryDmaTupleOrLineRoute
+[       OK ] I2CMultiple.SecondaryCannotStealPrimaryDmaTupleOrLineRoute (0 ms)
+[ RUN      ] I2CMultiple.OneStopCannotWithdrawAnotherControllersPublishers
+tests/google/i2c_multi_controller_test.cpp:127: Failure
+Expected equality of these values:
+  nx_gd32_i2c_async_initialize(&states[1], 6U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/i2c_multi_controller_test.cpp:194: Failure
+Value of: enabled(I2C1_EV_IRQn)
+  Actual: false
+Expected: true
+
+tests/google/i2c_multi_controller_test.cpp:195: Failure
+Value of: enabled(I2C1_ER_IRQn)
+  Actual: false
+Expected: true
+
+tests/google/i2c_multi_controller_test.cpp:196: Failure
+Value of: enabled(DMA0_Channel2_IRQn)
+  Actual: false
+Expected: true
+
+tests/google/i2c_multi_controller_test.cpp:197: Failure
+Value of: enabled(DMA0_Channel7_IRQn)
+  Actual: false
+Expected: true
+
+tests/google/i2c_multi_controller_test.cpp:198: Failure
+Value of: states[1].initialized
+  Actual: false
+Expected: true
+
+tests/google/i2c_multi_controller_test.cpp:199: Failure
+Expected equality of these values:
+  ((volatile uint32_t*)(uintptr_t)((((uint32_t)0x40000000U) + 0x00005400U) + 0x00000400U))[0] & 1U
+    Which is: 0
+  1U
+    Which is: 1
+
+[  FAILED  ] I2CMultiple.OneStopCannotWithdrawAnotherControllersPublishers (0 ms)
+[ RUN      ] I2CMultiple.FiniteDmaCompletionPreservesPeerFlagsEngineAndBorrow
+tests/google/i2c_multi_controller_test.cpp:127: Failure
+Expected equality of these values:
+  nx_gd32_i2c_async_initialize(&states[1], 6U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/i2c_multi_controller_test.cpp:133: Failure
+Expected equality of these values:
+  nx_i2c_endpoint_submit(&devices[i], &requests[i])
+    Which is: 3
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/i2c_multi_controller_test.cpp:214: Failure
+Expected equality of these values:
+  *dma[1].rx.control & 1U
+    Which is: 0
+  1U
+    Which is: 1
+
+tests/google/i2c_multi_controller_test.cpp:215: Failure
+Expected equality of these values:
+  states[1].active
+    Which is: NULL
+  &requests[1]
+    Which is: 0x559ecbf041a0
+
+tests/google/i2c_multi_controller_test.cpp:217: Failure
+Expected equality of these values:
+  nx_request_state(&requests[1].base)
+    Which is: 0
+  NX_REQUEST_ACTIVE
+    Which is: 2
+
+tests/google/i2c_multi_controller_test.cpp:221: Failure
+Expected equality of these values:
+  states[1].active
+    Which is: NULL
+  &requests[1]
+    Which is: 0x559ecbf041a0
+
+[  FAILED  ] I2CMultiple.FiniteDmaCompletionPreservesPeerFlagsEngineAndBorrow (0 ms)
+[ RUN      ] I2CMultiple.FailedSecondaryDmaDrainRetainsItsBorrowOnly
+tests/google/i2c_multi_controller_test.cpp:127: Failure
+Expected equality of these values:
+  nx_gd32_i2c_async_initialize(&states[1], 6U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/i2c_multi_controller_test.cpp:133: Failure
+Expected equality of these values:
+  nx_i2c_endpoint_submit(&devices[i], &requests[i])
+    Which is: 3
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/i2c_multi_controller_test.cpp:230: Failure
+Expected equality of these values:
+  nx_i2c_port_cancel(&buses[1], &requests[1])
+    Which is: 3
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/i2c_multi_controller_test.cpp:234: Failure
+Expected equality of these values:
+  nx_request_state(&requests[1].base)
+    Which is: 0
+  NX_REQUEST_QUARANTINED
+    Which is: 5
+
+tests/google/i2c_multi_controller_test.cpp:235: Failure
+Expected equality of these values:
+  states[1].active
+    Which is: NULL
+  &requests[1]
+    Which is: 0x559ecbf041a0
+
+tests/google/i2c_multi_controller_test.cpp:242: Failure
+Expected equality of these values:
+  nx_request_state(&requests[1].base)
+    Which is: 0
+  NX_REQUEST_SETTLED
+    Which is: 4
+
+tests/google/i2c_multi_controller_test.cpp:243: Failure
+Expected equality of these values:
+  requests[1].base.result
+    Which is: 0
+  NX_ERROR_CANCELLED
+    Which is: 5
+
+[  FAILED  ] I2CMultiple.FailedSecondaryDmaDrainRetainsItsBorrowOnly (0 ms)
+[ RUN      ] I2CMultiple.SecondaryPublisherCeilingUsesActualSelectedDmaIrq
+tests/google/i2c_multi_controller_test.cpp:127: Failure
+Expected equality of these values:
+  nx_gd32_i2c_async_initialize(&states[1], 6U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/i2c_multi_controller_test.cpp:255: Failure
+Expected equality of these values:
+  nx_i2c_port_attach_wake(&buses[1], &sink, 5U)
+    Which is: 3
+  NX_ERROR_PERMISSION
+    Which is: 10
+
+tests/google/i2c_multi_controller_test.cpp:259: Failure
+Expected equality of these values:
+  nx_i2c_port_attach_wake(&buses[1], &sink, 5U)
+    Which is: 3
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/i2c_multi_controller_test.cpp:260: Failure
+Expected equality of these values:
+  states[1].wake
+    Which is: NULL
+  &sink
+    Which is: 0x7fffb93fd340
+
+[  FAILED  ] I2CMultiple.SecondaryPublisherCeilingUsesActualSelectedDmaIrq (0 ms)
+[----------] 7 tests from I2CMultiple (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 7 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+[  FAILED  ] 6 tests, listed below:
+[  FAILED  ] I2CMultiple.SecondaryColdInitLeavesPrimaryRegistersAndIrqsIntact
+[  FAILED  ] I2CMultiple.DuplicateLiveControllerRefusesBeforePeerMutation
+[  FAILED  ] I2CMultiple.OneStopCannotWithdrawAnotherControllersPublishers
+[  FAILED  ] I2CMultiple.FiniteDmaCompletionPreservesPeerFlagsEngineAndBorrow
+[  FAILED  ] I2CMultiple.FailedSecondaryDmaDrainRetainsItsBorrowOnly
+[  FAILED  ] I2CMultiple.SecondaryPublisherCeilingUsesActualSelectedDmaIrq
+
+ 6 FAILED TESTS

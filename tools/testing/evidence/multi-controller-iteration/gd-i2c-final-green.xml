@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="12" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T19:01:13.205" name="AllTests">
+  <testsuite name="I2CMultiple" tests="12" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T19:01:13.205">
+    <testcase name="SecondaryColdInitLeavesPrimaryRegistersAndIrqsIntact" file="tests/google/i2c_multi_controller_test.cpp" line="145" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="DuplicateLiveControllerRefusesBeforePeerMutation" file="tests/google/i2c_multi_controller_test.cpp" line="162" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="SecondaryCannotStealPrimaryDmaTupleOrLineRoute" file="tests/google/i2c_multi_controller_test.cpp" line="173" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="OneStopCannotWithdrawAnotherControllersPublishers" file="tests/google/i2c_multi_controller_test.cpp" line="184" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="StoppingOneInstancePreservesPendingPeerIrqs" file="tests/google/i2c_multi_controller_test.cpp" line="199" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="IrqOnlyInstancesHaveSeparateReceivePipelineAndNoDmaLease" file="tests/google/i2c_multi_controller_test.cpp" line="218" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="SecondaryRejectsChangedSelectorAndInterruptBitGroup" file="tests/google/i2c_multi_controller_test.cpp" line="252" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="NonselectedControllerCannotAcquireKnownLineOrDmaFacts" file="tests/google/i2c_multi_controller_test.cpp" line="262" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="IsrInitializationCannotMutateDisabledControllerOrIrqs" file="tests/google/i2c_multi_controller_test.cpp" line="270" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="FiniteDmaCompletionPreservesPeerFlagsEngineAndBorrow" file="tests/google/i2c_multi_controller_test.cpp" line="279" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="FailedSecondaryDmaDrainRetainsItsBorrowOnly" file="tests/google/i2c_multi_controller_test.cpp" line="302" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+    <testcase name="SecondaryPublisherCeilingUsesActualSelectedDmaIrq" file="tests/google/i2c_multi_controller_test.cpp" line="323" status="run" result="completed" time="0." timestamp="2026-10-11T19:01:13.205" classname="I2CMultiple" />
+  </testsuite>
+</testsuites>

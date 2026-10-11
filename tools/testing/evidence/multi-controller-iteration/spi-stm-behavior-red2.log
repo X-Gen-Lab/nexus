@@ -1,0 +1,130 @@
+Running main() from gmock_main.cc
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from SPIMultiple
+[ RUN      ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers
+tests/google/spi_multi_controller_test.cpp:185: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers (0 ms)
+[ RUN      ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers
+tests/google/spi_multi_controller_test.cpp:164: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/spi_multi_controller_test.cpp:192: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow
+tests/google/spi_multi_controller_test.cpp:164: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/spi_multi_controller_test.cpp:212: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow (0 ms)
+[ RUN      ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers
+tests/google/spi_multi_controller_test.cpp:164: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/spi_multi_controller_test.cpp:225: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement
+tests/google/spi_multi_controller_test.cpp:164: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/spi_multi_controller_test.cpp:243: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement (0 ms)
+[ RUN      ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers
+tests/google/spi_multi_controller_test.cpp:164: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/spi_multi_controller_test.cpp:251: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors
+tests/google/spi_multi_controller_test.cpp:164: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/spi_multi_controller_test.cpp:259: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors (0 ms)
+[ RUN      ] SPIMultiple.SecondaryPollingRecoveryPulsesApb1AndPreservesPrimaryWire
+tests/google/spi_multi_controller_test.cpp:275: Failure
+Expected equality of these values:
+  nx_stm32_spi_recover(&states[1].spi)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/spi_multi_controller_test.cpp:278: Failure
+Expected equality of these values:
+  resets[0]
+    Which is: 1
+  &((RCC_TypeDef *) ((0x40000000UL + 0x00020000UL) + 0x3800UL))->APB1RSTR
+    Which is: 1
+
+tests/google/spi_multi_controller_test.cpp:280: Failure
+Expected equality of these values:
+  (spis[0U]->SR)
+    Which is: 2
+  0x81U
+    Which is: 129
+
+[  FAILED  ] SPIMultiple.SecondaryPollingRecoveryPulsesApb1AndPreservesPrimaryWire (0 ms)
+[----------] 8 tests from SPIMultiple (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 8 tests, listed below:
+[  FAILED  ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers
+[  FAILED  ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers
+[  FAILED  ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow
+[  FAILED  ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers
+[  FAILED  ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement
+[  FAILED  ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers
+[  FAILED  ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors
+[  FAILED  ] SPIMultiple.SecondaryPollingRecoveryPulsesApb1AndPreservesPrimaryWire
+
+ 8 FAILED TESTS

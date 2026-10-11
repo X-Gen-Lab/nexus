@@ -7,6 +7,7 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/core/fault.h"
 #include "nexus/os/threadx.h"
 #include "nexus_config.h"
 #ifdef NEXUS_THREADX_M4_MODEL
@@ -44,6 +45,7 @@ void _tx_initialize_low_level(void);
 #if NEXUS_OS_EXTERNAL_TICK
 /** \brief Keep unsupported setup effects borrowed when a product hook fails. */
 static void setup_failed(nx_result_t reason) {
+    nx_fault_observe(NX_FAULT_THREADX_ADAPTER, reason, __FILE__, __LINE__);
     nx_threadx_fail_stop(reason);
     for (;;) {
     }

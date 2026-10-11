@@ -17,13 +17,16 @@ breathe_default_project = "nexus"
 breathe_domain_by_extension = {"h": "c"}
 nitpicky = True
 
-# External C/POSIX/FreeRTOS types and deliberate opaque provider tags have no
+# External C/POSIX/FreeRTOS/ThreadX types and deliberate opaque provider tags have no
 # definitions in the public-only Doxygen input. Keep other references strict.
+# ThreadX controls use its actual kernel typedefs; broker/clock state definitions
+# remain private. Public function, ownership and failure contracts stay indexed.
 _external_types = (
     "size_t uint8_t uint16_t uint32_t uint64_t int16_t int32_t int64_t uintptr_t "
     "pthread_t pthread_mutex_t pthread_cond_t "
     "QueueHandle_t SemaphoreHandle_t StackType_t StaticQueue_t TaskFunction_t "
     "StaticSemaphore_t StaticTask_t TaskHandle_t TickType_t UBaseType_t "
+    "TX_THREAD TX_SEMAPHORE UINT nx_clock_domain nx_user_io_broker nx_user_io_call "
     "nx_adc_port nx_exti_port nx_flash_port nx_gpio_port nx_i2c_endpoint "
     "nx_i2c_port nx_pwm_port nx_spi_endpoint nx_spi_port nx_uart_port "
     "nx_watchdog_port"

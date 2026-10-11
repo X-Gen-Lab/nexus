@@ -34,6 +34,32 @@
             (memory_regions), (memory_count)                                   \
     }
 
+/** \brief Independent second-controller DMA engines and selector tuple. */
+#define NX_GD32_I2C1_DMA(memory_regions, memory_count)                         \
+    {                                                                          \
+        {&DMA_CH7CTL(DMA0),                                                    \
+         &DMA_CH7CNT(DMA0),                                                    \
+         &DMA_CH7PADDR(DMA0),                                                  \
+         &DMA_CH7M0ADDR(DMA0),                                                 \
+         &DMA_CH7FCTL(DMA0),                                                   \
+         &DMA_INTF1(DMA0),                                                     \
+         &DMA_INTC1(DMA0),                                                     \
+         (7U << 25U) | (1U << 17U) | DMA_CHXCTL_MNAGA | (1U << 6U) |           \
+             DMA_CHXCTL_FTFIE | DMA_CHXCTL_TAEIE | DMA_CHXCTL_SDEIE,           \
+         22U},                                                                 \
+            {&DMA_CH2CTL(DMA0),                                                \
+             &DMA_CH2CNT(DMA0),                                                \
+             &DMA_CH2PADDR(DMA0),                                              \
+             &DMA_CH2M0ADDR(DMA0),                                             \
+             &DMA_CH2FCTL(DMA0),                                               \
+             &DMA_INTF0(DMA0),                                                 \
+             &DMA_INTC0(DMA0),                                                 \
+             (7U << 25U) | (1U << 17U) | DMA_CHXCTL_MNAGA | DMA_CHXCTL_FTFIE | \
+                 DMA_CHXCTL_TAEIE | DMA_CHXCTL_SDEIE,                          \
+             16U},                                                             \
+            (memory_regions), (memory_count)                                   \
+    }
+
 /** \brief Build-only aliases preserve typed assembly without runtime layers. */
 typedef nx_i2c_v1_state_t nx_gd32_i2c_async_state_t;
 typedef nx_i2c_v1_endpoint_t nx_gd32_i2c_async_endpoint_state_t;

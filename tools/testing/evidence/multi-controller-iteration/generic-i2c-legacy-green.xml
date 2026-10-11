@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="22" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T18:57:39.544" name="AllTests">
+  <testsuite name="I2CAsyncRegisters" tests="15" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T18:57:39.544">
+    <testcase name="OneByteNacksBeforeAddressClearAndWaitsStop" file="tests/google/i2c_async_register_test.cpp" line="130" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="FinalThreeWithdrawsAckBeforeNMinusTwo" file="tests/google/i2c_async_register_test.cpp" line="153" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="ThreeByteAddressDisablesBufferInterruptBeforeBtf" file="tests/google/i2c_async_register_test.cpp" line="176" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="TwoBytesUsePosAndNackBeforeAddressClear" file="tests/google/i2c_async_register_test.cpp" line="185" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="FourBytesConsumesOneThenFinalOneAndTwo" file="tests/google/i2c_async_register_test.cpp" line="201" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="TransmitTxeDoesNotConfirmWirePrefix" file="tests/google/i2c_async_register_test.cpp" line="219" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="CancelBeforeStartDrainsLateMasterWithoutRevokingLoan" file="tests/google/i2c_async_register_test.cpp" line="241" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="ArbitrationNeverInjectsStopIntoOtherMaster" file="tests/google/i2c_async_register_test.cpp" line="259" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="DrainTimeoutQuarantinesThenOnlyActualReleaseSettles" file="tests/google/i2c_async_register_test.cpp" line="272" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="ExpiredAdmissionAndForeignIdentityHaveNoEffects" file="tests/google/i2c_async_register_test.cpp" line="285" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="RepeatedStartKeepsOneLoanAndResetsReceiveWindow" file="tests/google/i2c_async_register_test.cpp" line="443" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="ReadWriteAliasesAndDescriptorWrapRejectBeforeMutation" file="tests/google/i2c_async_register_test.cpp" line="481" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="MaskedAdmissionAndAsyncPollingNeverTouchHardware" file="tests/google/i2c_async_register_test.cpp" line="503" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="CancelRequiresExplicitLocalRecoveryBeforeReuse" file="tests/google/i2c_async_register_test.cpp" line="518" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+    <testcase name="WakeFailureCannotUnlatchCompletionOrReleaseBorrow" file="tests/google/i2c_async_register_test.cpp" line="542" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CAsyncRegisters" />
+  </testsuite>
+  <testsuite name="I2CDmaRegisters" tests="7" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T18:57:39.544">
+    <testcase name="ReceiveLastIsBeforeAddressAndStopFollowsMemoryCompletion" file="tests/google/i2c_async_register_test.cpp" line="348" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CDmaRegisters" />
+    <testcase name="TxCounterZeroStillWaitsForBtf" file="tests/google/i2c_async_register_test.cpp" line="370" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CDmaRegisters" />
+    <testcase name="SimultaneousPeripheralNackOutranksDmaCompletion" file="tests/google/i2c_async_register_test.cpp" line="385" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CDmaRegisters" />
+    <testcase name="CounterNotZeroNeverReportsPayloadCompleted" file="tests/google/i2c_async_register_test.cpp" line="396" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CDmaRegisters" />
+    <testcase name="RefusedEngineDisableQuarantinesStorage" file="tests/google/i2c_async_register_test.cpp" line="409" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CDmaRegisters" />
+    <testcase name="AllDomainsValidateBeforeAdmissionOrMmio" file="tests/google/i2c_async_register_test.cpp" line="430" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CDmaRegisters" />
+    <testcase name="PeripheralErrorDuringStopDrainCannotPublishSuccess" file="tests/google/i2c_async_register_test.cpp" line="568" status="run" result="completed" time="0." timestamp="2026-10-11T18:57:39.544" classname="I2CDmaRegisters" />
+  </testsuite>
+</testsuites>

@@ -16,11 +16,11 @@ Static platform architecture
    * - Board
      - Reviewed package routes, clocks, safe levels, sources and unknowns.
    * - Typed I/O
-     - Fixed GPIO/UART/SPI/I2C/Flash/watchdog/EXTI/PWM/ADC contracts.
+     - Typed peripheral faces, borrowed requests and optional CAN/USB/Ethernet/timer mechanisms.
    * - Optional OS
      - Explicit wait/wake and per-object static task/queue storage.
    * - Optional components
-     - Narrow owner, sensor, protocol, storage and logging mechanisms.
+     - Narrow owners, sensors, protocols, storage, logging, PHY and kernel-invoked GPIO admission.
    * - External consumer
      - Product composition, workers, budgets, policy and recovery.
 
@@ -39,3 +39,21 @@ selected bounded owner adapter, with fixed slots and epochs. Client waiting
 does not take over hardware execution. Notification is a hint; the request
 predicate remains authoritative. Shutdown keeps the executor running until
 borrowed requests and future wake publishers have drained.
+
+FreeRTOS and ThreadX are explicit independent backend policies. ThreadX binds the
+real pinned Linux or Cortex-M4 GNU kernel port; it does not inherit every
+FreeRTOS CPU, MPU or split-security capability. The product enters a scheduler
+explicitly. Bootstrap reclamation is valid only in its proven prestart scope;
+an attempted scheduler return retains effects and fails stop. A running kernel
+continues to own its clocks and Tick after peripheral shutdown.
+
+USB owns exact endpoints, FIFO/event storage and a 48 MHz clock consumer.
+Ethernet owns exact descriptor arrays and RX loans; capture and complementary
+PWM own immutable timer/IRQ/break facts. Resource conflicts are rejected before
+effects. Chip routes, Board authorization, complete software composition and
+physical qualification remain separate.
+
+The optional user I/O broker handles bounded scalar GPIO calls from an
+integrating privileged kernel. Its trusted memory and identity ports do not
+create an implemented SVC, MPU or TrustZone userspace transport. Protocol stacks,
+product recovery, safe outputs and electrical policy remain external.

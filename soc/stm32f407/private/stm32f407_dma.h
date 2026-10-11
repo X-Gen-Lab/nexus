@@ -14,7 +14,8 @@
 /**
  * \brief           Exact caller-owned DMA TX instance; no stream allocator.
  *
- * \note            USART1 uses DMA2 stream7 channel4. Clock and pin resources
+ * \note            USART1 uses DMA2 stream7 channel4; USART2 uses DMA1 stream6
+ *                  channel4. Clock and pin resources
  *                  remain owned by the platform assembly. Buffer domains
  *                  exclude CPU-only CCM. RX uses the existing independent IRQ
  *                  ring.
@@ -35,7 +36,7 @@ typedef struct {
 typedef struct nx_stm32_spi_dma_endpoint_state
     nx_stm32_spi_dma_endpoint_state_t;
 
-/** \brief Exact SPI1 full-duplex DMA2 stream3 TX and stream0 RX storage. */
+/** \brief SPI1 DMA2 TX3/RX0 selector3 or SPI2 DMA1 TX4/RX3 selector0. */
 typedef struct {
     nx_stm32_spi_state_t spi;
     DMA_TypeDef* dma;
@@ -71,14 +72,15 @@ extern const nx_spi_ops_t nx_stm32_spi_dma_ops;
 extern const nx_spi_endpoint_ops_t nx_stm32_spi_dma_endpoint_ops;
 
 /**
- * \brief           Initialize one static SPI1 full-duplex DMA controller.
+ * \brief           Initialize one exact SPI1 or SPI2 full-duplex DMA
+ * controller.
  *
  * \param[in,out]   state: Exact pointers, clocks, domains and caller storage.
  *
  * \return          Success or INVALID/BUSY/UNSUPPORTED before buffer admission.
  *
- * \note            Assembly owns DMA2/SPI1 clocks and reviewed pin/CS
- *                  resources. Nonoverlapping TX/RX spans are complete buffers,
+ * \note            Assembly owns selected shared DMA and SPI clocks and
+ * reviewed pin/CS resources. Nonoverlapping TX/RX spans are complete buffers,
  *                  or explicit caller-owned single cells through submit_memory.
  */
 nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state);
@@ -89,15 +91,17 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state);
  *
  * \param[in,out]   state: Live exact controller kept through successful stop.
  *
- * \param[in]       receive: True for DMA2 stream0 RX; false for stream3 TX.
+ * \param[in]       receive: True for selected RX; false for selected TX.
  *
  * \note            DMA completion latches memory facts; task service proves
  *                  wire idle before withdrawing CS and publishing settlement.
+ * Fresh DMA errors survive completion W1C and are checked after actual EN/IRQ
+ * withdrawal. Quarantine retains all borrowed storage.
  */
 void nx_stm32_spi_dma_irq(nx_stm32_spi_dma_state_t* state, bool receive);
 
 /**
- * \brief           Initialize a static USART1 TX DMA and IRQ RX provider.
+ * \brief           Initialize exact USART1/USART2 TX DMA and IRQ RX storage.
  *
  * \param[in,out]   state: Fresh instance with reviewed pointers and fixed
  *                  route.
@@ -106,15 +110,14 @@ void nx_stm32_spi_dma_irq(nx_stm32_spi_dma_state_t* state, bool receive);
  *
  * \return          Success or INVALID/BUSY/UNSUPPORTED before TX admission.
  *
- * \note            Task-only; board assembly enables DMA2 and UART clocks
- *                  before calling. No DMA operation starts until a valid
- *                  request admits.
+ * \note            Task-only; assembly enables selected shared DMA and UART
+ * clocks before calling. No DMA operation starts until a valid request admits.
  */
 nx_result_t nx_stm32_uart_dma_initialize(nx_stm32_uart_dma_state_t* state,
                                          uint32_t clock_hz);
 /**
  * \brief           Initialize TX DMA for an explicit separate RX producer.
- * \param[in,out]   state: Same exact USART1/stream7 facts, BLOCKS profile.
+ * \param[in,out]   state: Same selected USART/stream facts, BLOCKS profile.
  * \param[in]       clock_hz: Exact USART peripheral clock.
  * \return          Same cold rejection contract as ordinary DMA init.
  * \note            This initializer provides no RX method or block loan itself.
@@ -127,7 +130,7 @@ nx_result_t nx_stm32_uart_dma_block_initialize(nx_stm32_uart_dma_state_t* state,
  *
  * \param[in,out]   state: Live fixed state kept through successful stop.
  *
- * \note            Generated DMA2 stream7 vector calls this exact instance; DMA
+ * \note            Generated selected DMA vector calls this exact instance; DMA
  *                  TC only enables independent UART TC drain observation.
  */
 void nx_stm32_uart_dma_irq(nx_stm32_uart_dma_state_t* state);
@@ -137,7 +140,8 @@ void nx_stm32_uart_dma_irq(nx_stm32_uart_dma_state_t* state);
  *
  * \param[in,out]   state: Same live state as the DMA vector.
  *
- * \note            Generated USART1 vector uses this mode-specific thunk.
+ * \note            Generated selected USART vector uses this mode-specific
+ * thunk.
  */
 void nx_stm32_uart_dma_uart_irq(nx_stm32_uart_dma_state_t* state);
 

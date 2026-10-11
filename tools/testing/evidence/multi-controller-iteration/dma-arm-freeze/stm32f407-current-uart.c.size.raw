@@ -1,0 +1,27 @@
+/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-arm-freeze/stm32f407-current-uart.c.o  :
+section                              size   addr
+.text                                   0      0
+.data                                   0      0
+.bss                                    0      0
+.text.begin_drain                      84      0
+.text.nx_stm32_uart_service           178      0
+.text.nx_stm32_uart_read_bytes        148      0
+.text.nx_stm32_uart_read_events       250      0
+.text.validate_tx                      94      0
+.text.start                           104      0
+.text.nx_stm32_uart_submit              6      0
+.text.nx_stm32_uart_start_admitted     36      0
+.text.nx_stm32_uart_cancel            100      0
+.text.nx_stm32_uart_stop              168      0
+.text.stm32_uart_attach_wake          176      0
+.text.nx_stm32_uart_initialize        204      0
+.text.nx_stm32_uart_tx_irq            136      0
+.text.nx_stm32_uart_irq               198      0
+.text.nx_stm32_uart_flow_configure    138      0
+.text.nx_stm32_uart_tx_validate         4      0
+.rodata.nx_stm32_uart_ops              40      0
+.comment                               71      0
+.ARM.attributes                        52      0
+Total                                2187
+
+

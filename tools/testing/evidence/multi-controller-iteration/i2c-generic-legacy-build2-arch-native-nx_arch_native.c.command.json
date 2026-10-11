@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "gcc",
+    "-D_POSIX_C_SOURCE=200809L",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wpedantic",
+    "-Wconversion",
+    "-Wshadow",
+    "-include",
+    "tests/google/i2c_async_register_model.h",
+    "-Icore/include",
+    "-Iarch/include",
+    "-Iio/include",
+    "-Iio/private",
+    "-Isoc/common",
+    "-I/workspace/nexus-multi-controller-iteration/config-stm",
+    "-std=c11",
+    "-Wstrict-prototypes",
+    "-Wmissing-prototypes",
+    "-c",
+    "arch/native/nx_arch_native.c",
+    "-o",
+    "/workspace/nexus-multi-controller-iteration/generic-legacy-arch-native-nx_arch_native.c.o"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T18:56:39.600619+00:00",
+  "ended_at": "2026-10-11T18:56:39.622855+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-arch-native-nx_arch_native.c.log"
+}

@@ -19,6 +19,8 @@ extern uint32_t g_gd32_model_mask;
 #include <sys/mman.h>
 
 static bool s_hold_dma;
+static bool s_error_at_disable;
+static bool s_error_at_ack;
 
 /** \brief Inject a DMA engine that refuses a disable without fabricating idle.
  */
@@ -26,7 +28,22 @@ extern "C" void nx_gd32_dma_model_disable(uint32_t mask) {
     if (s_hold_dma) {
         mask &= ~static_cast<uint32_t>(DMA_CHXCTL_CHEN);
     }
+    if (s_error_at_disable) {
+        DMA_INTF1(DMA1) |= DMA_INTF_TAEIF << 22U;
+        s_error_at_disable = false;
+    }
     DMA_CH7CTL(DMA1) &= ~mask;
+}
+
+/** \brief Apply actual W1C flags after a late terminal-error injection. */
+extern "C" void nx_gd32_uart_dma_model_ack(volatile uint32_t* clear,
+                                           uint32_t mask) {
+    if (s_error_at_ack) {
+        DMA_INTF1(DMA1) |= DMA_INTF_TAEIF << 22U;
+        s_error_at_ack = false;
+    }
+    *clear = mask;
+    DMA_INTF1(DMA1) &= ~mask;
 }
 
 /** \brief The general register model's optional race hook has no implicit UART.
@@ -54,6 +71,8 @@ class GD32UARTDMA : public ::testing::Test {
         g_gd32_model_isr = false;
         g_gd32_model_mask = 0;
         s_hold_dma = false;
+        s_error_at_disable = false;
+        s_error_at_ack = false;
         region = {reinterpret_cast<uintptr_t>(payload), sizeof(payload),
                   NX_DMA_MEMORY_READ};
         state.regions = &region;
@@ -191,4 +210,33 @@ TEST_F(GD32UARTDMA, AlreadyCompletedMemoryAndWireStaySuccessfulAtLateService) {
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(request.base.result, NX_SUCCESS);
     EXPECT_EQ(request.base.transferred, sizeof(payload));
+}
+
+TEST_F(GD32UARTDMA, DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx) {
+    ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
+    DMA_CH7CNT(DMA1) = 0U;
+    DMA_INTF1(DMA1) = DMA_INTF_FTFIF << 22U;
+    s_error_at_disable = true;
+    nx_gd32_uart_dma_irq(&state);
+    USART_STAT0(USART0) = USART_STAT0_TC;
+    nx_gd32_uart_dma_uart_irq(&state);
+    nx_uart_port_service(&port);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(request.base.transferred, 0U);
+    EXPECT_EQ(state.uart.active, nullptr);
+}
+TEST_F(GD32UARTDMA, DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx) {
+    ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
+    DMA_CH7CNT(DMA1) = 0U;
+    DMA_INTF1(DMA1) = DMA_INTF_FTFIF << 22U;
+    s_error_at_ack = true;
+    nx_gd32_uart_dma_irq(&state);
+    USART_STAT0(USART0) = USART_STAT0_TC;
+    nx_gd32_uart_dma_uart_irq(&state);
+    nx_uart_port_service(&port);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_IO);
+    EXPECT_EQ(request.base.transferred, 0U);
+    EXPECT_EQ(state.uart.active, nullptr);
 }

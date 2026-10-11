@@ -1,0 +1,48 @@
+from pathlib import Path
+import hashlib
+import json
+import sys
+sys.path.insert(0, '/workspace/nexus')
+from scripts.ci.tdd_gate import environment, execute, discovered_count, validate_google_report
+from scripts.validation.junit import prepare_report
+ROOT=Path('/workspace/nexus')
+OUT=Path('/workspace/nexus-threadx-probe/evidence/production-execution-run5-fault-observer')
+OUT.mkdir(exist_ok=False)
+
+def identity(p):
+ p=Path(p)
+ raw=p.read_bytes()
+ return {'path':str(p),'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)}
+files=list((ROOT/'os/threadx').rglob('*'))+list((ROOT/'tests/contracts/os_threadx_runtime').rglob('*'))+list((ROOT/'tests/google').glob('threadx_*_test.cpp'))+[ROOT/'tools/testing/test_threadx_linux_overlay.py',ROOT/'tests/google/threadx.cmake',ROOT/'os/CMakeLists.txt',ROOT/'cmake/platform/Runtime.cmake',ROOT/'tools/configure/threadx.py',ROOT/'tools/configure/kernel.py',ROOT/'tools/configure/cpu.py',ROOT/'tools/configure/runtime.py',ROOT/'tools/configure/metadata.py',ROOT/'tools/configure/test_backend_metadata.py',ROOT/'dependencies/platform-compatibility.json',ROOT/'dependencies/threadx.lock.json',ROOT/'tools/maintenance/threadx_lock.py',ROOT/'core/include/nexus/core/fault.h',ROOT/'core/src/fault.c']
+files=sorted(p for p in files if p.is_file() and '__pycache__' not in p.parts)
+before=[identity(p) for p in files]
+env=environment()
+execute(['cmake','--build','/workspace/nexus-threadx-probe/integration-build','--parallel','1'],env,OUT/'build.log')
+results=[]
+for target in ['nexus_threadx_kernel_test','nexus_threadx_bootstrap_test','nexus_threadx_m4_test','nexus_threadx_irq_test','nexus_threadx_m4_primask_test','nexus_threadx_irq_primask_test','nexus_threadx_m4_external_test','nexus_threadx_linux_port_test']:
+ binary=Path('/workspace/nexus-threadx-probe/integration-build')/target
+ listing=execute(['timeout','20',str(binary),'--gtest_filter=*','--gtest_list_tests'],env,OUT/(target+'-discovery.log'))
+ count=discovered_count(listing)
+ expected=[]
+ suite=None
+ for line in listing.splitlines():
+  name=line.split('#',1)[0].rstrip()
+  if name and not name[0].isspace() and name.endswith('.'):suite=name[:-1]
+  elif suite is not None and name.startswith('  ') and name.strip(): expected.append((suite,name.strip()))
+ report=OUT/(target+'.xml')
+ start=prepare_report(report)
+ execute(['timeout','20',str(binary),'--gtest_filter=*','--gtest_repeat=1','--gtest_also_run_disabled_tests','--gtest_output=xml:'+str(report)],env,OUT/(target+'-execution.log'))
+ result=validate_google_report(report,not_before_ns=start,expected_cases=count)
+ if sorted(expected)!=sorted((x['classname'],x['name']) for x in result['cases']):raise ValueError('Fresh case identities differ from actual discovery')
+ results.append({'target':target,'scope':'real-official-kernel' if target in ('nexus_threadx_kernel_test','nexus_threadx_bootstrap_test') else 'production-mechanism-mocked-external-boundary','binary':identity(binary),'discovery':identity(OUT/(target+'-discovery.log')),'execution':identity(OUT/(target+'-execution.log')),'report':identity(report),'validation':result})
+env['NEXUS_THREADX_SOURCE']='/workspace/nexus/ext/threadx'
+env['PYTHONPATH']=str(ROOT/'tools/configure')
+execute([str(ROOT/'.venv/bin/python'),'-B','-m','unittest','tools.configure.test_threadx','tools.configure.test_lowpower_integration','tools.configure.test_backend_metadata','-v'],env,OUT/'configuration.log')
+execute([str(ROOT/'.venv/bin/python'),'-B','-m','unittest','tools.testing.test_threadx_linux_overlay','-v'],env,OUT/'tools.log')
+execute([str(ROOT/'.venv/bin/python'),'scripts/tools/format.py','--check','--files',*[str(p) for p in files if p.suffix in ('.c','.h','.cpp')]],env,OUT/'format.log')
+execute([str(ROOT/'.venv/bin/python'),'scripts/ci/comment_style.py','--files',*[str(p) for p in files if p.suffix in ('.c','.h','.cpp')],'--json'],env,OUT/'comments.log')
+after=[identity(p) for p in files]
+if before!=after:raise ValueError('Owned source changed during actual execution')
+manifest={'schema':1,'kind':'development-threadx-kernel-execution','qualification':'dirty-source-development-only','physical':'not_executed','wallclock_step':'not_executed','kernel':{'commit':'93387b0a60382a29579bbad5045c68328e3751df','source_root':'/workspace/nexus/ext/threadx','license':identity('/workspace/nexus/ext/threadx/LICENSE.txt')},'source_before':before,'source_after':after,'fixtures':[identity('/workspace/nexus-threadx-probe/integration-fixture/CMakeLists.txt'),identity('/workspace/nexus-threadx-probe/integration-build/compile_commands.json')],'suites':results,'tools':{'source_override':'actual root ext/threadx pinned official checkout; dirty source execution is development only','log':identity(OUT/'tools.log')},'commands':[identity(p) for p in sorted(OUT.glob('*.command.json'))],'owned_styles':[identity(OUT/'format.log'),identity(OUT/'comments.log')],'passed':sum(x['validation']['passed'] for x in results)}
+(OUT/'manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
+print('actual fresh Google cases',manifest['passed'])

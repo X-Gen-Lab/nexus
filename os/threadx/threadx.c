@@ -10,6 +10,7 @@
 #include "nexus/os/threadx.h"
 #include "nexus/arch/arch.h"
 #include "nexus/arch/atomic.h"
+#include "nexus/core/fault.h"
 #include "tx_initialize.h"
 #include <limits.h>
 #include <string.h>
@@ -61,6 +62,7 @@ __attribute__((weak)) void nx_threadx_fail_stop(nx_result_t reason) {
 
 /** \brief A returning hook does not grant reclamation. */
 static void fail_stop(nx_result_t reason) {
+    nx_fault_observe(NX_FAULT_THREADX_ADAPTER, reason, __FILE__, __LINE__);
     nx_threadx_fail_stop(reason);
     for (;;) {
     }

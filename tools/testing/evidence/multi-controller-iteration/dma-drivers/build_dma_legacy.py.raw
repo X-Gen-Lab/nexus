@@ -1,0 +1,37 @@
+"""Fresh maintained SPI and UART RX suites with actual provider C sources."""
+from pathlib import Path
+import subprocess
+import sys
+root = Path('/workspace/nexus')
+out = Path('/workspace/nexus-multi-controller-iteration')
+mode, kind, label = sys.argv[1:]
+family = 'stm32f407' if mode == 'stm' else 'gd32f470'
+base = ['-D_POSIX_C_SOURCE=200809L', '-Wall', '-Wextra', '-Werror', '-Wpedantic', '-Wconversion', '-Wshadow']
+inc = ['-Icore/include', '-Iarch/include', '-Iio/include', '-Iio/private', '-Isoc/' + family, '-Isoc/' + family + '/private', '-I' + str(out / ('config-stm' if mode == 'stm' else 'config-gd'))]
+model = ('stm32_dma_model.h' if kind == 'spi_dma' else 'stm32_uart_receive_model.h') if mode == 'stm' else ('gd32_spi_dma_model.h' if kind == 'spi_dma' else 'gd32_uart_receive_model.h')
+forced = ['-include', 'tests/google/' + model]
+if mode == 'stm':
+    base += ['-DNEXUS_STM32_MODEL', '-DSTM32F407xx']
+    inc += ['-isystem', 'vendors/st/cmsis_device_f4/Include', '-isystem', 'vendors/arm/CMSIS_5/CMSIS/Core/Include']
+else:
+    base += ['-DGD32F470', '-DHXTAL_VALUE=25000000']
+    inc += ['-Itests/contracts/gd32_model', '-isystem', 'vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include', '-isystem', 'vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include']
+google = ['-isystem', 'build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include', '-isystem', 'build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include']
+sources = ['tests/google/' + ('stm32_' if mode == 'stm' else 'gd32_') + kind + '_test.cpp', 'core/src/request.c', 'core/src/time.c', 'io/src/dma.c', 'io/src/wake.c']
+if kind == 'spi_dma':
+    sources += ['io/src/spi.c', 'soc/' + family + '/drivers/spi.c', 'soc/' + family + '/drivers/spi_dma.c']
+    if mode == 'stm': sources += ['soc/stm32f407/drivers/gpio.c', 'io/src/gpio.c']
+else:
+    sources += ['io/src/gpio.c', 'io/src/uart.c', 'io/src/uart_rs485.c', 'io/src/stream.c', 'soc/' + family + '/drivers/uart.c', 'soc/' + family + '/drivers/uart_dma.c', 'soc/' + family + '/drivers/uart_receive.c']
+if mode == 'stm': sources += ['arch/native/nx_arch_native.c', 'io/native/time.c']
+else: sources += ['tests/contracts/gd32_model/model.c']
+objects = []
+for source in sources:
+    cpp = source.endswith('.cpp')
+    flags = base + (forced if mode == 'stm' or not cpp else [])
+    lang = ['-std=c++17', *google] if cpp else ['-std=c11', '-Wstrict-prototypes', '-Wmissing-prototypes', '-Wno-int-to-pointer-cast']
+    obj = out / (mode + '-' + kind + '-legacy-' + source.replace('/', '-') + '.o')
+    subprocess.run([sys.executable, str(out / 'run.py'), label + '-' + source.replace('/', '-'), 'g++' if cpp else 'gcc', *flags, *inc, *lang, '-c', source, '-o', str(obj)], cwd=root, check=True)
+    objects.append(str(obj))
+libs = ['build/adc-iteration/lib/libgmock_main.a', 'build/adc-iteration/lib/libgmock.a', 'build/adc-iteration/lib/libgtest.a']
+subprocess.run([sys.executable, str(out / 'run.py'), label + '-link', 'g++', *objects, *libs, '-pthread', '-o', str(out / (mode + '-' + kind + '-legacy-test'))], cwd=root, check=True)

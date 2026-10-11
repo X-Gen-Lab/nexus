@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/workspace/nexus/build/uart-iteration/bin/nexus_stm32_uart_dma_test",
+    "--gtest_filter=*",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lifecycle-tdd/stm32-tx-dma-race-red.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1,
+  "sources": {
+    "soc/stm32f407/drivers/uart_dma.c": "f4889988185ea454ba66bd186f3fd8686097e1f66282a658ec01a23cb3d1c97d",
+    "tests/google/stm32_uart_dma_test.cpp": "f59c28e518393527de6f669640661638dcdd18e140950b0deb4d334248187a31"
+  }
+}

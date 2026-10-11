@@ -1,6 +1,6 @@
 /**
  * \file            gd32f470_spi_dma.h
- * \brief           Private fixed SPI4 finite full-duplex DMA storage
+ * \brief           Private SPI4/SPI0 finite full-duplex DMA storage
  * \author          Nexus Team
  */
 #ifndef NEXUS_GD32F470_SPI_DMA_H
@@ -12,10 +12,11 @@
 typedef struct nx_gd32_spi_dma_endpoint_state nx_gd32_spi_dma_endpoint_state_t;
 
 /**
- * \brief           Exact SPI4 DMA1 channel3 RX / channel4 TX selector2 state.
+ * \brief           SPI4 DMA1 RX3/TX4 selector2 or SPI0 RX2/TX5 selector3.
  * \note            Board owns reviewed AF/CS and shared DMA1 clock. Immutable
  *                  regions exclude CPU-only TCM. Request, endpoint and buffers
- *                  remain borrowed until both engines and the wire drain.
+ *                  remain borrowed until both engines and the wire drain. Fresh
+ * errors remain latched through completion W1C and final withdrawal.
  */
 typedef struct {
     nx_gd32_spi_state_t spi;
@@ -64,6 +65,25 @@ nx_result_t nx_gd32_spi_dma_initialize(
     nx_gd32_spi_dma_state_t* state, nx_gd32_spi_dma_endpoint_state_t* endpoint,
     uint32_t cs_gpio, uint32_t cs_mask, uint32_t maximum_hz, unsigned mode,
     unsigned priority);
+/**
+ * \brief           Select SPI4 or SPI0 with their exact finite DMA routes.
+ * \param[in,out]   state: Fresh caller-owned state with immutable DMA domains.
+ * \param[in,out]   endpoint: First cold addressed child, retained until stop.
+ * \param[in]       controller: Exact maintained readonly SPI controller.
+ * \param[in]       cs_gpio: Reviewed chip-select output GPIO register base.
+ * \param[in]       cs_mask: Reviewed positive 16-bit chip-select mask.
+ * \param[in]       maximum_hz: Positive maximum divided APB2 wire frequency.
+ * \param[in]       mode: SPI mode zero through three.
+ * \param[in]       priority: Unshifted priority for both DMA publishers.
+ * \return          Success or INVALID/CONTEXT/BUSY before request admission.
+ * \note            SPI4 uses DMA1 channel3 RX/channel4 TX selector2; SPI0 uses
+ *                  DMA1 channel2 RX/channel5 TX selector3. Assembly owns shared
+ *                  DMA1 clock and reviewed pins/CS. No hidden scalar buffers.
+ */
+nx_result_t nx_gd32_spi_dma_initialize_at(
+    nx_gd32_spi_dma_state_t* state, nx_gd32_spi_dma_endpoint_state_t* endpoint,
+    const nx_gd32_spi_controller_t* controller, uint32_t cs_gpio,
+    uint32_t cs_mask, uint32_t maximum_hz, unsigned mode, unsigned priority);
 /**
  * \brief           Latch one exact DMA terminal source without settling in IRQ.
  * \param[in,out]   state: Same static state retained by both generated vectors.

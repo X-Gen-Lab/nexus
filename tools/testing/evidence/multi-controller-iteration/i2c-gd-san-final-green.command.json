@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-multi-controller-iteration/gd-i2c-san-test",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-san-final-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:02:57.353300+00:00",
+  "ended_at": "2026-10-11T19:02:57.365595+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-green.log"
+}

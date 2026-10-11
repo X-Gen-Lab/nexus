@@ -6,9 +6,9 @@
 |---|---|---|
 | `core/` | 中性结果、绝对 monotonic deadline、caller-owned request 状态 | C11；无 Board、RTOS、SDK |
 | `arch/` | 编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot | 无 SDK／OS；原语编译与整平台资格分别记录 |
-| `soc/stm32f407/`、`soc/gd32f470/` | 精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage |
+| `soc/stm32f407/`、`soc/gd32f470/` | 精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；G474 初始纵切片另行接入 |
 | `boards/<board>/board.json` | 精确型号、已审 route、晶振声明、safe initial、来源与未知 PCB 项 | 只读资源包；不创建产品任务 |
-| `io/` | 九类 I/O 的 typed 多态合同、共享操作表、DMA/stream/wake 机制 | 公共头不含厂商类型；Native 是行为模型 |
+| `io/` | typed 多态合同、共享操作表、DMA/stream/wake；可选 CAN、USB、Ethernet 与高级 timer 合同 | 公共头不含厂商类型；Native 是行为模型 |
 | `os/` | 可选 wait/wake、按对象静态 task/stack/TCB/queue 适配 | driver 不依赖 OS；不创建应用 worker |
 | `components/` | 显式选入的 owner、BMP280、Modbus、Storage、Log 等通用机制 | 通过窄端口访问设备、时间与外部政策 |
 | `tools/`、`cmake/` | 严格输入解析、单份生成结果、源码 SDK、ELF/资格/HIL 工具 | CMake 是代码依赖唯一权威 |
@@ -85,6 +85,15 @@ memory/clock/IRQ 资源、设备 provider、安全策略及最终固件仍由外
 port 经解析器选择，不能靠 CMake cache 推断或覆盖。硬件与产品 qualification
 仍独立；单区域 MPU/SAU 机制不提供用户 task 隔离或双世界 gateway。
 
+ThreadX 是独立的真实内核后端，选入锁定的 Eclipse ThreadX Linux GNU 或 Cortex-M4
+GNU port，不复用 FreeRTOS 的配置字段。首批维护三块 F407/F470 Board、Native Linux
+及明确的 M4 integer/M4F CPU runtime；其余 Cortex-M port 拒绝。产品通过
+`nx_threadx_kernel_enter()` 进入实际内核，只有真实 `tx_application_define` 回调
+允许启动前创建与回收任务。启动尝试后的异常返回保留全部效果并 fail-stop，不能
+回到启动前回收。Linux 使用实际 pthread 与 CLOCK_MONOTONIC kernel timer，但
+调用者 stack 参数不是实际 host pthread 栈预算。详见
+[ThreadX 接入](../design/threadx.md)。
+
 当前恢复 factory＋多态接口骨架，生成阶段完成实例构造。每类接口 face 只有
 `const ops*` 和 `context*`；face 与操作表只读，provider 可变状态及按实例选择的
 buffer 独立静态存储。方法接收自己的 context，不通过操作表地址推断实例。
@@ -94,8 +103,11 @@ buffer 独立静态存储。方法接收自己的 context，不通过操作表�
 取得对象与 `nx_platform_start()`、请求借用和停止分别执行。静态句柄不是可撤销
 session，停机前仍必须结清调用者、IRQ、owner 与通知发布者。
 
-factory ID 当前按类命名并以 `uint16_t` 表达；C typedef 不阻止把另一个类的数值
-传入。ID 只属于当前 assembly，不作为跨版本持久化编号。start/stop 由外部单一
+factory 默认 ID 按类命名并以 `uint16_t` 表达；C typedef 不阻止把另一个类的数值
+传入。可显式选择按类 struct reference，防止正常调用混用 ID，或选入只读能力查询；
+两者仍返回同一静态对象，不增加运行时注册或构造。能力查询描述已选择的有限模式，
+不代替当前状态、PCB 电气或请求 admission。ID 只属于当前 assembly，不作为跨版本
+持久化编号。start/stop 由外部单一
 执行者串行调用，没有隐藏平台锁；公共 I/O 不统一检查全局 started 状态，启动
 失败后的业务退出与清理推进由调用合同约束。stop 可先撤回部分实例再返回 BUSY，
 不得把 BUSY 解释成恢复完整运行状态。
@@ -124,7 +136,27 @@ SPI/I2C controller factory 返回真实控制器，device factory 返回 CS/addr
 | ADC trigger blocks | 精确 timer/DMA；每块停机；显式 service 稳定／校准与 rearm；块间间隙 |
 | 多 producer owner | 外部按容量提供 slot/storage；唯一 admission；slot/epoch 防止旧取消命中新请求 |
 | OS wait/wake | sequence/predicate 防 lost wake；通知是提示，client 不 service hardware |
-| shutdown | 拒绝 producer→保持 executor drain→结清 borrow/通知发布者→join→逆序释放接口→停 clock |
+| shutdown | 拒绝 producer→保持 executor drain→结清 borrow/通知发布者→join→逆序释放接口；仍运行的内核保留 clock/Tick，产品决定 park 或 reset |
+
+CAN 使用真实三邮箱和共享 filter domain；USB FS 使用显式 endpoint/FIFO/event
+容量、PIO packet loan 和独立 48 MHz owner；Ethernet 使用 caller-sized normal
+descriptor ring、RX loan 和 MDIO 窄端口。它们没有内置协议栈或产品工作者。
+timer capture 与 complementary PWM 分离普通 PWM，拥有精确 timer/IRQ/break
+资源。SoC 实现、配置可选择路线、Board 授权和实板测量分别核验，不能从公共类型
+的存在推断某个参考 PCB 已完整接入。具体范围见[支持说明](support.md)。
+
+可选 `UserIoBroker` 只实现被特权 kernel gateway 调用的 scalar GPIO read/set-reset
+admission。调用者提供真实 principal、memory pin/copy/unpin 与有界策略；用户消息
+不能选择指针、MMIO 或信任身份。release 失败保留 mapping，cleanup 不重放 GPIO。
+目前没有接通 SVC/MPU/TrustZone userspace 纵切片，也没有异步用户 DMA transport。
+这是一套通用所有权机制，不建立产品隔离或电气安全资格。
+
+FreeRTOS 的 `lowpower_port = "timebase"` 显式选入 F407/GD470 私有浅 Sleep 定时器
+适配；默认 `custom` 保持应用端口或弱 NULL 行为。所选实际 getter 验证固定 PLL、
+timebase 与 IRQ 状态，不修复未知配置。共享 timer 保留 monotonic overflow，额外
+compare channel 只提供 wake alarm；源撤回失败保留 loan 并 fail-stop。没有动态
+clock、STOP/deep sleep 或默认低功耗 worker。软件量化相位模型不等于实测功耗和
+时序。详见[浅睡眠合同](../design/timebase-lowpower.md)。
 
 UART `REJECTED` 不借用 request 或 buffer；`ACCEPTED` 借用到 acquire-observed
 `SETTLED`。provider 先 detach，再 release-publish，之后不能读取 request。取消与

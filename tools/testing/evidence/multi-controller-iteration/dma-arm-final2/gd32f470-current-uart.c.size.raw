@@ -1,0 +1,35 @@
+/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-arm-final2/gd32f470-current-uart.c.o  :
+section                             size   addr
+.text                                  0      0
+.data                                  0      0
+.bss                                   0      0
+.text.NVIC_ClearPendingIRQ            24      0
+.text.configure                       62      0
+.text.enqueue                        118      0
+.text.start                           38      0
+.text.nx_gd32_critical_enter           8      0
+.text.nx_gd32_critical_leave           4      0
+.text.validate                        94      0
+.text.nx_gd32_uart_submit             50      0
+.text.nx_gd32_uart_read_events       192      0
+.text.nx_gd32_uart_read_bytes        162      0
+.text.nx_gd32_uart_cancel             92      0
+.text.nx_gd32_uart_start_admitted     64      0
+.text.gd32_uart_attach_wake          172      0
+.text.nx_gd32_uart_stop              168      0
+.text.nx_gd32_uart_service           320      0
+.text.nx_gd32_uart_initialize_at     308      0
+.text.nx_gd32_uart_initialize         88      0
+.text.nx_gd32_uart_tx_irq            158      0
+.text.nx_gd32_uart_irq               142      0
+.text.nx_gd32_uart_flow_configure    152      0
+.text.nx_gd32_uart_tx_validate         4      0
+.rodata.nx_gd32_uart_ops              40      0
+.rodata.nx_gd32_usart1_controller     20      0
+.rodata.nx_gd32_usart0_controller     20      0
+.rodata                                6      0
+.comment                              71      0
+.ARM.attributes                       52      0
+Total                               2629
+
+

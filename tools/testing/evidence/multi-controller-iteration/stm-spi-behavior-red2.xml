@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="8" failures="8" disabled="0" errors="0" time="0." timestamp="2026-10-11T19:12:11.855" name="AllTests">
+  <testsuite name="SPIMultiple" tests="8" failures="8" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T19:12:11.855">
+    <testcase name="SecondaryColdInitPreservesPrimaryConfigAndPublishers" file="tests/google/spi_multi_controller_test.cpp" line="181" status="run" result="completed" time="0." timestamp="2026-10-11T19:12:11.855" classname="SPIMultiple">
+      <failure message="tests/google/spi_multi_controller_test.cpp:185&#x0A;Expected equality of these values:&#x0A;  Initialize(1U)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:185
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers" file="tests/google/spi_multi_controller_test.cpp" line="191" status="run" result="completed" time="0." timestamp="2026-10-11T19:12:11.855" classname="SPIMultiple">
+      <failure message="tests/google/spi_multi_controller_test.cpp:164&#x0A;Expected equality of these values:&#x0A;  Initialize(1U)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:164
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/spi_multi_controller_test.cpp:192&#x0A;Expected: Both() doesn&apos;t generate new fatal failures in the current thread.&#x0A;  Actual: it does.&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:192
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+]]></failure>
+    </testcase>
+    <testcase name="SecondaryWireBusyCannotReleaseItsCsOrBorrow" file="tests/google/spi_multi_controller_test.cpp" line="211" status="run" result="completed" time="0." timestamp="2026-10-11T19:12:11.855" classname="SPIMultiple">
+      <failure message="tests/google/spi_multi_controller_test.cpp:164&#x0A;Expected equality of these values:&#x0A;  Initialize(1U)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:164
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/spi_multi_controller_test.cpp:212&#x0A;Expected: Both() doesn&apos;t generate new fatal failures in the current thread.&#x0A;  Actual: it does.&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:212
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+]]></failure>
+    </testcase>
+    <testcase name="RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers" file="tests/google/spi_multi_controller_test.cpp" line="224" status="run" result="completed" time="0." timestamp="2026-10-11T19:12:11.855" classname="SPIMultiple">
+      <failure message="tests/google/spi_multi_controller_test.cpp:164&#x0A;Expected equality of these values:&#x0A;  Initialize(1U)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:164
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/spi_multi_controller_test.cpp:225&#x0A;Expected: Both() doesn&apos;t generate new fatal failures in the current thread.&#x0A;  Actual: it does.&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:225
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+]]></failure>
+    </testcase>
+    <testcase name="SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement" file="tests/google/spi_multi_controller_test.cpp" line="242" status="run" result="completed" time="0." timestamp="2026-10-11T19:12:11.855" classname="SPIMultiple">
+      <failure message="tests/google/spi_multi_controller_test.cpp:164&#x0A;Expected equality of these values:&#x0A;  Initialize(1U)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:164
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/spi_multi_controller_test.cpp:243&#x0A;Expected: Both() doesn&apos;t generate new fatal failures in the current thread.&#x0A;  Actual: it does.&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:243
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+]]></failure>
+    </testcase>
+    <testcase name="SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers" file="tests/google/spi_multi_controller_test.cpp" line="250" status="run" result="completed" time="0." timestamp="2026-10-11T19:12:11.855" classname="SPIMultiple">
+      <failure message="tests/google/spi_multi_controller_test.cpp:164&#x0A;Expected equality of these values:&#x0A;  Initialize(1U)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:164
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/spi_multi_controller_test.cpp:251&#x0A;Expected: Both() doesn&apos;t generate new fatal failures in the current thread.&#x0A;  Actual: it does.&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:251
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+]]></failure>
+    </testcase>
+    <testcase name="SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors" file="tests/google/spi_multi_controller_test.cpp" line="258" status="run" result="completed" time="0." timestamp="2026-10-11T19:12:11.856" classname="SPIMultiple">
+      <failure message="tests/google/spi_multi_controller_test.cpp:164&#x0A;Expected equality of these values:&#x0A;  Initialize(1U)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:164
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/spi_multi_controller_test.cpp:259&#x0A;Expected: Both() doesn&apos;t generate new fatal failures in the current thread.&#x0A;  Actual: it does.&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:259
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+]]></failure>
+    </testcase>
+    <testcase name="SecondaryPollingRecoveryPulsesApb1AndPreservesPrimaryWire" file="tests/google/spi_multi_controller_test.cpp" line="269" status="run" result="completed" time="0." timestamp="2026-10-11T19:12:11.856" classname="SPIMultiple">
+      <failure message="tests/google/spi_multi_controller_test.cpp:275&#x0A;Expected equality of these values:&#x0A;  nx_stm32_spi_recover(&amp;states[1].spi)&#x0A;    Which is: 6&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:275
+Expected equality of these values:
+  nx_stm32_spi_recover(&states[1].spi)
+    Which is: 6
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/spi_multi_controller_test.cpp:278&#x0A;Expected equality of these values:&#x0A;  resets[0]&#x0A;    Which is: 1&#x0A;  &amp;((RCC_TypeDef *) ((0x40000000UL + 0x00020000UL) + 0x3800UL))-&gt;APB1RSTR&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:278
+Expected equality of these values:
+  resets[0]
+    Which is: 1
+  &((RCC_TypeDef *) ((0x40000000UL + 0x00020000UL) + 0x3800UL))->APB1RSTR
+    Which is: 1
+]]></failure>
+      <failure message="tests/google/spi_multi_controller_test.cpp:280&#x0A;Expected equality of these values:&#x0A;  (spis[0U]-&gt;SR)&#x0A;    Which is: 2&#x0A;  0x81U&#x0A;    Which is: 129&#x0A;" type=""><![CDATA[tests/google/spi_multi_controller_test.cpp:280
+Expected equality of these values:
+  (spis[0U]->SR)
+    Which is: 2
+  0x81U
+    Which is: 129
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

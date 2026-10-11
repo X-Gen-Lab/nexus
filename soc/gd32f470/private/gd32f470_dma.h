@@ -46,6 +46,26 @@ nx_result_t nx_gd32_uart_dma_initialize(nx_gd32_uart_dma_state_t* state,
                                         void* storage, size_t capacity,
                                         unsigned priority);
 /**
+ * \brief           Select an exact USART0 or USART1 finite TX DMA binding.
+ * \param[in,out]   state: Zero-initialized storage with immutable DMA domains.
+ * \param[in]       controller: One maintained readonly controller identity.
+ * \param[in]       baud: Positive supported 8N1 baud.
+ * \param[in]       profile: Independent IRQ receive representation.
+ * \param[in,out]   storage: Caller-owned receive ring until successful stop.
+ * \param[in]       capacity: Receive ring capacity in selected profile units.
+ * \param[in]       priority: Unshifted UART and DMA publisher priority.
+ * \return          Success or INVALID/CONTEXT/BUSY without request admission.
+ * \note            USART0 uses DMA1 channel7; USART1 uses DMA0 channel6,
+ *                  both selector4. Assembly owns the selected DMA clock and
+ *                  pins. No RX DMA or continuous receive support is implied.
+ */
+nx_result_t
+nx_gd32_uart_dma_initialize_at(nx_gd32_uart_dma_state_t* state,
+                               const nx_gd32_uart_controller_t* controller,
+                               uint32_t baud, nx_uart_rx_profile_t profile,
+                               void* storage, size_t capacity,
+                               unsigned priority);
+/**
  * \brief           Observe selected DMA memory terminal facts without waiting.
  * \param[in,out]   state: Exact generated state kept through successful stop.
  * \note            DMA completion does not establish UART wire completion.

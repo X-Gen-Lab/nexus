@@ -1,0 +1,31 @@
+Running main() from gmock_main.cc
+[==========] Running 11 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 11 tests from SPIMultiple
+[ RUN      ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers
+[       OK ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers (0 ms)
+[ RUN      ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers
+[       OK ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow
+[       OK ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow (0 ms)
+[ RUN      ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers
+[       OK ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement
+[       OK ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement (0 ms)
+[ RUN      ] SPIMultiple.DuplicateColdObjectCannotStealLivePhysicalPublishers
+[       OK ] SPIMultiple.DuplicateColdObjectCannotStealLivePhysicalPublishers (0 ms)
+[ RUN      ] SPIMultiple.NewReceiveErrorAtDisableCannotBecomeSuccessfulCompletion
+[       OK ] SPIMultiple.NewReceiveErrorAtDisableCannotBecomeSuccessfulCompletion (0 ms)
+[ RUN      ] SPIMultiple.NewTransmitErrorBeforeW1cCannotBecomeSuccessfulCompletion
+[       OK ] SPIMultiple.NewTransmitErrorBeforeW1cCannotBecomeSuccessfulCompletion (0 ms)
+[ RUN      ] SPIMultiple.ErrorAfterMemoryCompletionIsRecheckedBeforeSettlement
+[       OK ] SPIMultiple.ErrorAfterMemoryCompletionIsRecheckedBeforeSettlement (0 ms)
+[ RUN      ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers
+[       OK ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors
+[       OK ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors (0 ms)
+[----------] 11 tests from SPIMultiple (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 11 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 11 tests.

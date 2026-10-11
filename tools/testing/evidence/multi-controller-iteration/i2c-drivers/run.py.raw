@@ -1,0 +1,32 @@
+"""Run focused multi-controller commands while retaining original output and actual status."""
+from datetime import datetime, timezone
+from pathlib import Path
+import json
+import os
+import subprocess
+import sys
+
+root = Path('/workspace/nexus')
+evidence = root / 'tools/testing/evidence/multi-controller-iteration'
+evidence.mkdir(exist_ok=True)
+os.chdir(root)
+os.environ['PATH'] = str(root / '.venv/bin') + os.pathsep + os.environ['PATH']
+for name in list(os.environ):
+    if name.startswith(('GTEST_', 'CTEST_')):
+        del os.environ[name]
+name, *argv = sys.argv[1:]
+log = evidence / (name + '.log')
+record = evidence / (name + '.command.json')
+if log.exists() or record.exists():
+    raise SystemExit('Evidence output already exists')
+started = datetime.now(timezone.utc).isoformat()
+with log.open('xb') as stream:
+    result = subprocess.run(argv, stdout=stream, stderr=subprocess.STDOUT,
+                            check=False)
+record.write_text(json.dumps({'argv': argv, 'cwd': str(root),
+                             'started_at': started,
+                             'ended_at': datetime.now(timezone.utc).isoformat(),
+                             'exit_code': result.returncode,
+                             'log': str(log)}, indent=2) + '\n')
+print(log.read_text())
+raise SystemExit(result.returncode)

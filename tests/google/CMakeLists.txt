@@ -138,7 +138,7 @@ target_sources(nexus_stm32_uart_dma_test PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart_dma.c")
 
 target_compile_options(nexus_stm32_uart_dma_test PRIVATE
-    "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_dma_model.h")
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/stm32_uart_dma_model.h")
 
 # The host model compiles production register algorithms for two GD controllers.
 set(gd_multi_root "${NEXUS_SOURCE_DIR}/soc/gd32f470")
@@ -461,3 +461,9 @@ include(threadx.cmake)
 include(ethernet.cmake)
 
 include(ethernet_factory.cmake)
+
+include(i2c_multi_controller.cmake)
+
+include(dma_multi_controller.cmake)
+
+include(failstop.cmake)

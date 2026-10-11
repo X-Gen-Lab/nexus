@@ -1,0 +1,31 @@
+/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-arm-final/stm32f407-baseline-uart_dma.c.o  :
+section                                    size   addr
+.text                                         0      0
+.data                                         0      0
+.bss                                          0      0
+.text.read_bytes                             10      0
+.text.read_events                            10      0
+.text.validate_tx                           140      0
+.text.attach_wake                           136      0
+.text.acknowledge                            44      0
+.text.initialize                            212      0
+.text.detach                                 38      0
+.text.begin_drain                           108      0
+.text.nx_stm32_uart_dma_cancel               98      0
+.text.start                                 176      0
+.text.nx_stm32_uart_dma_submit                6      0
+.text.nx_stm32_uart_dma_start_admitted       36      0
+.text.nx_stm32_uart_dma_service             290      0
+.text.nx_stm32_uart_dma_stop                156      0
+.text.nx_stm32_uart_dma_initialize            6      0
+.text.nx_stm32_uart_dma_block_initialize      6      0
+.text.nx_stm32_uart_dma_irq                 144      0
+.text.nx_stm32_uart_dma_uart_irq              8      0
+.text.nx_stm32_uart_dma_tx_validate           4      0
+.rodata.nx_stm32_uart_dma_ops                40      0
+.rodata                                       6      0
+.comment                                     71      0
+.ARM.attributes                              52      0
+Total                                      1797
+
+

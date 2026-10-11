@@ -11,6 +11,28 @@
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))
 #endif
+#ifndef NX_STM32_SPI_RESET
+#define NX_STM32_SPI_RESET(reset, mask, active)                                \
+    do {                                                                       \
+        if (active) {                                                          \
+            *(reset) |= (uint32_t)(mask);                                      \
+        } else {                                                               \
+            *(reset) &= ~(uint32_t)(mask);                                     \
+        }                                                                      \
+    } while (0)
+#endif
+
+/** \brief Pulse only the retained controller's actual APB reset domain. */
+static void reset_controller(nx_stm32_spi_state_t* port) {
+    bool second = port->registers == SPI2;
+    volatile uint32_t* reset =
+        second ? &port->rcc->APB1RSTR : &port->rcc->APB2RSTR;
+    uint32_t mask = second ? RCC_APB1RSTR_SPI2RST : RCC_APB2RSTR_SPI1RST;
+    NX_STM32_SPI_RESET(reset, mask, true);
+    nx_arch_dsb();
+    NX_STM32_SPI_RESET(reset, mask, false);
+    nx_arch_dsb();
+}
 
 /** \brief Poll one hardware state against the shared absolute deadline. */
 static nx_result_t wait_status(nx_stm32_spi_state_t* port, uint32_t mask,
@@ -38,10 +60,7 @@ static nx_result_t wait_status(nx_stm32_spi_state_t* port, uint32_t mask,
 static void abort_controller(nx_stm32_spi_state_t* port) {
     port->registers->CR2 = 0U;
     port->registers->CR1 &= ~(uint32_t)SPI_CR1_SPE;
-    port->rcc->APB2RSTR |= RCC_APB2RSTR_SPI1RST;
-    nx_arch_dsb();
-    port->rcc->APB2RSTR &= ~(uint32_t)RCC_APB2RSTR_SPI1RST;
-    nx_arch_dsb();
+    reset_controller(port);
     port->fault = true;
 }
 
@@ -168,10 +187,7 @@ nx_result_t nx_stm32_spi_recover(void* context) {
     }
     port->registers->CR2 = 0U;
     port->registers->CR1 &= ~(uint32_t)SPI_CR1_SPE;
-    port->rcc->APB2RSTR |= RCC_APB2RSTR_SPI1RST;
-    nx_arch_dsb();
-    port->rcc->APB2RSTR &= ~(uint32_t)RCC_APB2RSTR_SPI1RST;
-    nx_arch_dsb();
+    reset_controller(port);
     if ((port->registers->SR & (SPI_SR_BSY | SPI_SR_MODF | SPI_SR_OVR)) != 0U) {
         return NX_ERROR_IO;
     }

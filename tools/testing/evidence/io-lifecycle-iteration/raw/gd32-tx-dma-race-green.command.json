@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/workspace/nexus/build/uart-iteration/bin/nexus_gd32_uart_dma_test",
+    "--gtest_filter=*",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lifecycle-tdd/gd32-tx-dma-race-green.xml"
+  ],
+  "exit_code": 0,
+  "sources": {
+    "soc/gd32f470/drivers/uart_dma.c": "ae6b3d64d6f6716b8772473291d0ea822718d1571d71ac44ef65d40f90a72175",
+    "tests/google/gd32_uart_dma_test.cpp": "7e2fb42e6fa770b10e8affaffb706e9d8fab7e4d251ba51db6050c002ede0e83"
+  }
+}

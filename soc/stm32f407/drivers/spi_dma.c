@@ -18,13 +18,51 @@
 #define NX_STM32_DMA_DISABLE(stream, mask) ((stream)->CR &= ~(uint32_t)(mask))
 #endif
 
+#ifndef NX_STM32_SPI_DMA_ACK
+#define NX_STM32_SPI_DMA_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
+#endif
+
+/** \brief Selected register identity determines the immutable reviewed route.
+ */
+static bool primary(const nx_stm32_spi_dma_state_t* state) {
+    return state->spi.registers != SPI2;
+}
+/** \brief Each selected engine's vector is independent of DMA request
+ * selectors. */
+static IRQn_Type dma_irq(const nx_stm32_spi_dma_state_t* state, bool receive) {
+    if (primary(state))
+        return receive ? DMA2_Stream0_IRQn : DMA2_Stream3_IRQn;
+    return receive ? DMA1_Stream3_IRQn : DMA1_Stream4_IRQn;
+}
+/** \brief The second pair straddles low and high status banks. */
+static uint32_t flag_shift(const nx_stm32_spi_dma_state_t* state,
+                           bool receive) {
+    if (primary(state))
+        return receive ? 0U : 22U;
+    return receive ? 22U : 0U;
+}
+/** \brief Observe only the exact engine's retained terminal group. */
+static uint32_t flags(const nx_stm32_spi_dma_state_t* state, bool receive) {
+    uint32_t bank =
+        primary(state) || receive ? state->dma->LISR : state->dma->HISR;
+    return (bank >> flag_shift(state, receive)) & 0x3DU;
+}
+
 /** \brief W1C only the maintained SPI streams and preserve UART/ADC neighbours.
  */
-static void acknowledge(nx_stm32_spi_dma_state_t* state, bool receive) {
-    state->dma->LIFCR = receive ? 0x3DU : 0x3DU << 22U;
+static void acknowledge_bits(nx_stm32_spi_dma_state_t* state, bool receive,
+                             uint32_t observed) {
+    volatile uint32_t* clear =
+        primary(state) || receive ? &state->dma->LIFCR : &state->dma->HIFCR;
+    NX_STM32_SPI_DMA_ACK(clear, observed << flag_shift(state, receive));
 #ifndef NEXUS_STM32_MODEL
-    NVIC_ClearPendingIRQ(receive ? DMA2_Stream0_IRQn : DMA2_Stream3_IRQn);
+    NVIC_ClearPendingIRQ(dma_irq(state, receive));
 #endif
+}
+
+/** \brief Cold/reset cleanup owns the selected stale flag group. */
+static void acknowledge(nx_stm32_spi_dma_state_t* state, bool receive) {
+    acknowledge_bits(state, receive, 0x3DU);
 }
 
 /** \brief Withdraw DMA requests before disabling their memory engines. */
@@ -35,7 +73,8 @@ static void detach(nx_stm32_spi_dma_state_t* state, bool receive) {
     NX_STM32_DMA_DISABLE(stream, DMA_SxCR_EN | DMA_SxCR_TCIE | DMA_SxCR_HTIE |
                                      DMA_SxCR_TEIE | DMA_SxCR_DMEIE);
     nx_arch_dsb();
-    acknowledge(state, receive);
+    /* Preserve errors first observed after the IRQ terminal snapshot. */
+    acknowledge_bits(state, receive, flags(state, receive) & 0x30U);
 }
 
 /** \brief Refuse alternate controller routes before acquiring any request. */
@@ -51,8 +90,12 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
         return NX_ERROR_CONTEXT;
     }
 #ifndef NEXUS_STM32_MODEL
-    if (state->spi.registers != SPI1 || state->dma != DMA2 ||
-        state->tx != DMA2_Stream3 || state->rx != DMA2_Stream0) {
+    bool first = state->spi.registers == SPI1;
+    if ((!first && state->spi.registers != SPI2) || state->spi.rcc != RCC ||
+        state->spi.clock_hz != (first ? 84000000U : 42000000U) ||
+        state->dma != (first ? DMA2 : DMA1) ||
+        state->tx != (first ? DMA2_Stream3 : DMA1_Stream4) ||
+        state->rx != (first ? DMA2_Stream0 : DMA1_Stream3)) {
         return NX_ERROR_UNSUPPORTED;
     }
 #endif
@@ -61,6 +104,15 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
         (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
         return NX_ERROR_BUSY;
     }
+#ifndef NEXUS_STM32_MODEL
+    /* An idle peripheral still has an owner while its vectors are retained. */
+    unsigned rx_vector = (unsigned)dma_irq(state, true);
+    unsigned tx_vector = (unsigned)dma_irq(state, false);
+    if ((NVIC->ISER[rx_vector / 32U] & (1UL << (rx_vector % 32U))) != 0U ||
+        (NVIC->ISER[tx_vector / 32U] & (1UL << (tx_vector % 32U))) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+#endif
     state->initialized = true;
     state->stopping = false;
     state->draining = false;
@@ -68,10 +120,10 @@ nx_result_t nx_stm32_spi_dma_initialize(nx_stm32_spi_dma_state_t* state) {
     acknowledge(state, false);
     acknowledge(state, true);
 #ifndef NEXUS_STM32_MODEL
-    NVIC_SetPriority(DMA2_Stream0_IRQn, 5U);
-    NVIC_SetPriority(DMA2_Stream3_IRQn, 5U);
-    NVIC_EnableIRQ(DMA2_Stream0_IRQn);
-    NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+    NVIC_SetPriority(dma_irq(state, true), 5U);
+    NVIC_SetPriority(dma_irq(state, false), 5U);
+    NVIC_EnableIRQ(dma_irq(state, true));
+    NVIC_EnableIRQ(dma_irq(state, false));
 #endif
     return NX_SUCCESS;
 }
@@ -157,9 +209,9 @@ static void program(nx_stm32_spi_dma_state_t* state, bool receive,
     uint8_t fixed = receive ? NX_SPI_MEMORY_RX_FIXED : NX_SPI_MEMORY_TX_FIXED;
     uint32_t increment =
         (state->memory_flags & fixed) != 0U ? 0U : DMA_SxCR_MINC;
-    stream->CR = (3U << DMA_SxCR_CHSEL_Pos) | increment | DMA_SxCR_PL_1 |
-                 DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE |
-                 (receive ? 0U : DMA_SxCR_DIR_0);
+    stream->CR = ((primary(state) ? 3U : 0U) << DMA_SxCR_CHSEL_Pos) |
+                 increment | DMA_SxCR_PL_1 | DMA_SxCR_TCIE | DMA_SxCR_TEIE |
+                 DMA_SxCR_DMEIE | (receive ? 0U : DMA_SxCR_DIR_0);
 }
 
 /** \brief One admission gates both DMA engines and the entire selected CS
@@ -286,12 +338,16 @@ void nx_stm32_spi_dma_irq(nx_stm32_spi_dma_state_t* state, bool receive) {
     if (state == NULL || !state->initialized) {
         return;
     }
-    uint32_t status = (state->dma->LISR >> (receive ? 0U : 22U)) & 0x3DU;
+    uint32_t status = flags(state, receive);
     if ((status & 0x2DU) == 0U) {
         return;
     }
     if (state->active == NULL || state->draining) {
-        acknowledge(state, receive);
+        if (state->active == NULL) {
+            acknowledge(state, receive);
+        } else {
+            acknowledge_bits(state, receive, status & 0x30U);
+        }
         return;
     }
     DMA_Stream_TypeDef* stream = receive ? state->rx : state->tx;
@@ -299,7 +355,9 @@ void nx_stm32_spi_dma_irq(nx_stm32_spi_dma_state_t* state, bool receive) {
         begin_drain(state, NX_ERROR_IO);
     } else {
         detach(state, receive);
-        if (receive) {
+        if ((flags(state, receive) & 0x0DU) != 0U) {
+            begin_drain(state, NX_ERROR_IO);
+        } else if (receive) {
             state->rx_complete = true;
         } else {
             state->tx_complete = true;
@@ -325,6 +383,10 @@ static void service(void* context) {
         return;
     }
     nx_time_us_t now = nx_time_now_us();
+    if (!state->draining &&
+        ((flags(state, true) | flags(state, false)) & 0x0DU) != 0U) {
+        begin_drain(state, NX_ERROR_IO);
+    }
     uint32_t status = state->spi.registers->SR;
     if (!state->draining && (status & (SPI_SR_OVR | SPI_SR_MODF)) != 0U) {
         begin_drain(state, NX_ERROR_IO);
@@ -357,6 +419,11 @@ static void service(void* context) {
         nx_arch_dsb();
         nx_stm32_spi_endpoint_state_t* endpoint = &state->endpoint->endpoint;
         (void)nx_stm32_gpio_write(endpoint->cs, endpoint->cs_mask, 0U);
+        /* Both engines are actually disabled; do not erase a late error. */
+        if (state->terminal == NX_SUCCESS &&
+            ((flags(state, true) | flags(state, false)) & 0x0DU) != 0U) {
+            state->terminal = NX_ERROR_IO;
+        }
         nx_result_t result = state->terminal;
         size_t count = result == NX_SUCCESS ? request->length : 0U;
         state->spi.fault = result == NX_ERROR_IO;
@@ -405,10 +472,10 @@ static nx_result_t stop(void* context) {
         return NX_ERROR_BUSY;
     }
 #ifndef NEXUS_STM32_MODEL
-    NVIC_DisableIRQ(DMA2_Stream0_IRQn);
-    NVIC_DisableIRQ(DMA2_Stream3_IRQn);
-    NVIC_ClearPendingIRQ(DMA2_Stream0_IRQn);
-    NVIC_ClearPendingIRQ(DMA2_Stream3_IRQn);
+    NVIC_DisableIRQ(dma_irq(state, true));
+    NVIC_DisableIRQ(dma_irq(state, false));
+    NVIC_ClearPendingIRQ(dma_irq(state, true));
+    NVIC_ClearPendingIRQ(dma_irq(state, false));
 #endif
     state->wake = NULL;
     state->initialized = false;
@@ -436,10 +503,10 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     if (!state->initialized) {
         return NX_ERROR_STATE;
     }
-    nx_result_t result =
-        nx_stm32_irq_wake_validate(wake, DMA2_Stream3_IRQn, syscall_ceiling);
+    nx_result_t result = nx_stm32_irq_wake_validate(wake, dma_irq(state, false),
+                                                    syscall_ceiling);
     if (result == NX_SUCCESS) {
-        result = nx_stm32_irq_wake_validate(wake, DMA2_Stream0_IRQn,
+        result = nx_stm32_irq_wake_validate(wake, dma_irq(state, true),
                                             syscall_ceiling);
     }
     if (result == NX_SUCCESS) {

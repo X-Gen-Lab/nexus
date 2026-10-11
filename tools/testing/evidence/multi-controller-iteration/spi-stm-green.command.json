@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-multi-controller-iteration/stm-spi-test",
+    "--gtest_output=xml:tools/testing/evidence/multi-controller-iteration/stm-spi-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:16:22.270558+00:00",
+  "ended_at": "2026-10-11T19:16:22.273270+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/spi-stm-green.log"
+}

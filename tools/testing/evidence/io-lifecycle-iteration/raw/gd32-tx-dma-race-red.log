@@ -1,0 +1,60 @@
+Running main() from gmock_main.cc
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from GD32UARTDMA
+[ RUN      ] GD32UARTDMA.DmaCompletionRetainsBorrowUntilIndependentWireIdle
+[       OK ] GD32UARTDMA.DmaCompletionRetainsBorrowUntilIndependentWireIdle (0 ms)
+[ RUN      ] GD32UARTDMA.RejectedDomainHasNoMemoryBorrowOrHardwareEffects
+[       OK ] GD32UARTDMA.RejectedDomainHasNoMemoryBorrowOrHardwareEffects (0 ms)
+[ RUN      ] GD32UARTDMA.CancellationCannotReleaseMemoryWhenEngineStillOwnsIt
+[       OK ] GD32UARTDMA.CancellationCannotReleaseMemoryWhenEngineStillOwnsIt (0 ms)
+[ RUN      ] GD32UARTDMA.LateDmaIRQCannotReachSettledRequest
+[       OK ] GD32UARTDMA.LateDmaIRQCannotReachSettledRequest (0 ms)
+[ RUN      ] GD32UARTDMA.NeverDeadlineStillBoundsMissingWireCompletionAfterDma
+[       OK ] GD32UARTDMA.NeverDeadlineStillBoundsMissingWireCompletionAfterDma (0 ms)
+[ RUN      ] GD32UARTDMA.NeverDeadlineStillBoundsRefusedEngineDisableAfterDma
+[       OK ] GD32UARTDMA.NeverDeadlineStillBoundsRefusedEngineDisableAfterDma (0 ms)
+[ RUN      ] GD32UARTDMA.AlreadyCompletedMemoryAndWireStaySuccessfulAtLateService
+[       OK ] GD32UARTDMA.AlreadyCompletedMemoryAndWireStaySuccessfulAtLateService (0 ms)
+[ RUN      ] GD32UARTDMA.DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx
+/workspace/nexus/tests/google/gd32_uart_dma_test.cpp:225: Failure
+Expected equality of these values:
+  request.base.result
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+
+/workspace/nexus/tests/google/gd32_uart_dma_test.cpp:226: Failure
+Expected equality of these values:
+  request.base.transferred
+    Which is: 4
+  0U
+    Which is: 0
+
+[  FAILED  ] GD32UARTDMA.DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx (0 ms)
+[ RUN      ] GD32UARTDMA.DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx
+/workspace/nexus/tests/google/gd32_uart_dma_test.cpp:239: Failure
+Expected equality of these values:
+  request.base.result
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+
+/workspace/nexus/tests/google/gd32_uart_dma_test.cpp:240: Failure
+Expected equality of these values:
+  request.base.transferred
+    Which is: 4
+  0U
+    Which is: 0
+
+[  FAILED  ] GD32UARTDMA.DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx (0 ms)
+[----------] 9 tests from GD32UARTDMA (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 9 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 7 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] GD32UARTDMA.DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx
+[  FAILED  ] GD32UARTDMA.DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx
+
+ 2 FAILED TESTS

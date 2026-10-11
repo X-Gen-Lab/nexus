@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-multi-controller-iteration/stm-uart-test",
+    "--gtest_output=xml:tools/testing/evidence/multi-controller-iteration/stm-uart-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:07:45.284725+00:00",
+  "ended_at": "2026-10-11T19:07:45.287439+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/uart-stm-green.log"
+}

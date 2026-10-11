@@ -118,7 +118,13 @@ extern "C" {
  *                  state
  * \param[in]       file: Source file diagnostic, not transmitted automatically
  * \param[in]       line: Source line diagnostic
- * \note            Application may override weak fail-stop to record/reset.
+ * \note            The default observes before a terminal park. A strong
+ *                  override must remain non-returning and explicitly invoke
+ *                  nx_fault_observe if it retains that observation contract.
+ *                  Calling contexts and masks are not normalized. Preserve
+ *                  stronger incoming masks; the kernel ceiling does not prove
+ *                  DMA, NMI or peripheral quiescence, or product safe outputs.
+ *                  No functioning kernel, transport or stack may be assumed.
  */
 void nx_freertos_assert_failed(const char* file, unsigned line);
 #define configASSERT(expression)                                               \

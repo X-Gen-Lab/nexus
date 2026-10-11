@@ -17,6 +17,33 @@ HIL 三个 fixture 和 station template 位于 `tools/hil/fixtures/`。空 stati
 Board/PCB/芯片／probe／image/config、失效工具文件或不完整预算会被准入拒绝。
 准备工装不等于已经刷写、串口测试、测量波形或完成掉电试验。
 
+本轮新增 ThreadX、USB FS、浅睡眠 timebase、Ethernet、高级 timer、G474 和
+user I/O broker 的证据各自绑定独立 source scope。ThreadX 的真实 Linux 内核
+执行不同于 IRQ/libc 边界模型；三板 BASEPRI/PRIMASK ELF 和缺少 external Tick 的
+精准负链接不同于 MCU 运行。安装 SDK 的 retention-only 永久任务程序只建立链接；
+有限退出的真实 Linux kernel consumer 另外建立运行证据。不能从链接程序的存在
+推断已运行 scheduler，也不能从两个 host case 推断完整 MCU backend 资格。
+
+USB 的 packet/clock/factory 模型与软件 Board ELF 不提供 VBUS、connector、PHY、
+enumeration 或 flush 周期的物理证明。浅 Sleep 的 1 MHz timer 模型只建立被执行
+的量化相位合同，真实 clock/PLL/wake/IRQ/catch-up/功耗要用同一镜像测量。Ethernet
+descriptor OWN/loan、capture/break 与 caller memory pin 的软件模型同样不能
+建立电气、吞吐、边沿孔径、功率级安全或 MPU/TZ userspace 隔离。公共 API、模式
+配置、SoC provider、reviewed Board route、最终候选与物理执行是不同退出条件。
+
+可返回任务只有真实 kernel detach 后才归还存储；prestart discard 只属于已证明
+的启动前 scope。scheduler 启动尝试后返回是 retaining fail-stop，不能将内核
+返回值解释为从未启动，或撤销可能已经运行的任务、DMA、时钟和外部效果。
+停止 I/O 后仍运行的内核继续保留 clock/Tick；产品 reset、设备 safe outputs 和
+完整 scheduler-stop port 是外部责任。平台不做自动故障恢复或安全认证声明。
+
+Core 的 `nx_fault_observe` 是无默认状态的 best-effort 观察窄端口。FreeRTOS 和
+ThreadX 在 retaining fail-stop 路径提供实际 domain/reason/静态源码位置，然后仍
+保留全部借用。故障上下文可能已 masked、ISR、unprivileged 或 stack 损坏，观察者
+不能假定工作中的 kernel/clock/transport，也不能释放借用、加 OS lock 或重放
+请求。hook 返回仍继续停机；fault log、外部 safe output 与受控 reset 分别验收，
+不能由 host death test 推断实板异常处理和安全输出已经运行。
+
 最终候选包应保留准确原始命令、退出码、JUnit／model／预算与 binary 身份，支持
 再次校验。给当前源码补一份介绍文档不会继承过去的测试资格；源码或产物变化需
 重新执行适用检查。普通 CI 与 source SDK workflow 也不自动完成产品 promotion。

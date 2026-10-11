@@ -1,0 +1,2830 @@
+{
+  "schema": 1,
+  "scope": "Explicit bounded UART/SPI/I2C/ADC provider lifecycle and fault sequences for maintained STM32F407/GD32F470 and Native models. This catalogue is reviewed coverage, never universal semantic or physical proof.",
+  "properties": [
+    {
+      "id": "stm32f407.uart.dma-tx.DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_dma_test",
+      "case": "Stm32UartDma.DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
+      "test_source": "tests/google/stm32_uart_dma_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,0U)",
+        "EXPECT_EQ(state.uart.active,nullptr)"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_stm32_uart_dma_irq(",
+        "nx_stm32_uart_dma_uart_irq(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "Error arriving during DMA disable must settle IO with zero invented wire bytes.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_dma_test",
+      "case": "Stm32UartDma.DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx",
+      "test_source": "tests/google/stm32_uart_dma_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,0U)",
+        "EXPECT_EQ(state.uart.active,nullptr)"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_stm32_uart_dma_irq(",
+        "nx_stm32_uart_dma_uart_irq(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "W1C cannot erase a new terminal error and replace it with successful completion.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.WireIdleCannotReleaseMemoryWhenEngineRefusesDisable",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_dma_test",
+      "case": "Stm32UartDma.WireIdleCannotReleaseMemoryWhenEngineRefusesDisable",
+      "test_source": "tests/google/stm32_uart_dma_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_cancel(&port,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "ASSERT_EQ(nx_native_clock_advance(899U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.uart.active,&request)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)"
+      ],
+      "calls": [
+        "nx_native_clock_advance(",
+        "nx_request_state(",
+        "nx_stm32_uart_dma_uart_irq(",
+        "nx_uart_port_cancel(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "Cancellation retains accepted memory through DRAINING/QUARANTINED until actual engine disable.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.dma-tx.LateServiceWithWireAndEngineProofPreservesSuccess",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_stm32_uart_dma_test",
+      "case": "Stm32UartDma.LateServiceWithWireAndEngineProofPreservesSuccess",
+      "test_source": "tests/google/stm32_uart_dma_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_clock_advance(300U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_SUCCESS)",
+        "EXPECT_EQ(request.base.transferred,sizeof(payload))"
+      ],
+      "calls": [
+        "nx_native_clock_advance(",
+        "nx_request_state(",
+        "nx_stm32_uart_dma_irq(",
+        "nx_stm32_uart_dma_uart_irq(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "A proven completed memory and wire transfer stays successful when serviced later.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-idle.RefusedDisableRetainsLoanUntilARealServiceRetryDrains",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_EQ(stream.outstanding,1U)",
+        "EXPECT_EQ(nx_uart_port_rx_stop(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(block.length,2U)",
+        "EXPECT_EQ(block.data,payload[0])"
+      ],
+      "calls": [
+        "nx_stm32_uart_receive_irq(",
+        "nx_stream_acquire(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_rx_stop(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Refused receive-engine disable keeps DMA target FILLING until readback-proved retry.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-idle.TransferErrorAbortsUnreliablePrefixAndLatchesLoss",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FREE)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(receive.CR&DMA_SxCR_EN,0U)",
+        "EXPECT_EQ(nx_uart_port_rx_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_stm32_uart_receive_dma_irq(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_rx_stop(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Unreliable partial DMA data stays unpublished; observed loss is counted.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-idle.PendingIdleThenDmaFlagCannotPublishSameBufferTwice",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_READY)",
+        "EXPECT_EQ(stream.outstanding,1U)",
+        "EXPECT_EQ(stream.producer,1U)"
+      ],
+      "calls": [
+        "nx_stm32_uart_receive_dma_irq(",
+        "nx_stm32_uart_receive_irq(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "Coincident IDLE/completion facts cannot publish one block twice.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-idle.StopClosesTransmitAdmissionWhileConsumerLoanExists",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&block),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_stop(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_uart_tx_prepare(&request,&byte,1U,1000U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_uart_port_submit(&port,&request),NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_READY)",
+        "ASSERT_EQ(nx_stream_release(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(nx_uart_port_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_request_initialize(",
+        "nx_request_state(",
+        "nx_stm32_uart_receive_irq(",
+        "nx_stream_acquire(",
+        "nx_stream_release(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_stop(",
+        "nx_uart_port_submit(",
+        "nx_uart_tx_prepare("
+      ],
+      "invariant": "Admission closes while held consumer storage still prevents complete stop.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-idle.ErrorArrivingDuringIdleDisableIsObservedBeforeDataClearsIt",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.ErrorArrivingDuringIdleDisableIsObservedBeforeDataClearsIt",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FREE)"
+      ],
+      "calls": [
+        "nx_stm32_uart_receive_irq(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "A new UART error remains authoritative through actual SR/DR clearing.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-idle.RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_uart_port_rx_start(&port,&stream),NX_ERROR_EXHAUSTED)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(state.stream,nullptr)",
+        "EXPECT_EQ(state.producer.stream,nullptr)",
+        "EXPECT_EQ(state.fill[0].data,nullptr)"
+      ],
+      "calls": [
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "Exhausted epoch rejection leaves no retained stream/payload references.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-idle.ObservedOverrunInFiniteGapIsRecordedBeforeRearmClearsStatus",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.ObservedOverrunInFiniteGapIsRecordedBeforeRearmClearsStatus",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(slots[1].state,NX_STREAM_SLOT_FILLING)"
+      ],
+      "calls": [
+        "nx_stm32_uart_receive_dma_irq(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Finite reception gap records observed overrun before clearing status.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-continuous.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-continuous",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&borrowed),NX_SUCCESS)",
+        "EXPECT_EQ(receive.CR&DMA_SxCR_EN,0U)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_BORROWED)",
+        "EXPECT_EQ(borrowed.data,payload[0])",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&full),NX_SUCCESS)",
+        "EXPECT_EQ(full.data,payload[1])",
+        "EXPECT_EQ(full.length,8U)",
+        "EXPECT_EQ(nx_uart_port_rx_stop(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_stream_release(&stream,&borrowed),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stream_release(&stream,&full),NX_SUCCESS)",
+        "EXPECT_EQ(nx_uart_port_rx_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_stm32_uart_receive_dma_irq(",
+        "nx_stream_acquire(",
+        "nx_stream_release(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_rx_stop("
+      ],
+      "invariant": "No free target stops DMA instead of wrapping into BORROWED consumer memory.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-continuous.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-continuous",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_CALL(hardware,Target(0U,address(payload[2])))",
+        "EXPECT_EQ(stream.outstanding,3U)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_EQ(slots[1].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_EQ(slots[2].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(receive.CR&DMA_SxCR_EN,0U)"
+      ],
+      "calls": [
+        "nx_stm32_uart_receive_dma_irq(",
+        "nx_stream_acquire(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Target write refusal retains hardware loans and cannot publish old target.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-continuous.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-continuous",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_CALL(hardware,Target(0U,address(payload[2])))",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(receive.CR&DMA_SxCR_EN,0U)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FREE)"
+      ],
+      "calls": [
+        "nx_stm32_uart_receive_dma_irq(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "Bank switch during target update rejects unproved publication.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-continuous.ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-continuous",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(receive.CR&DMA_SxCR_EN,0U)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)"
+      ],
+      "calls": [
+        "nx_stm32_uart_receive_dma_irq(",
+        "nx_stream_acquire(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "W1C of observed completion preserves a new terminal error.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.rx-dma-continuous.ContinuousWrongAddressStoreFailsExactReplacementProof",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "rx-dma-continuous",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.ContinuousWrongAddressStoreFailsExactReplacementProof",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_CALL(hardware,Target(0U,address(payload[2])))",
+        "EXPECT_EQ(receive.CR&DMA_SxCR_EN,0U)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)"
+      ],
+      "calls": [
+        "nx_stm32_uart_receive_dma_irq(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "Exact replacement addresses must match both actual hardware banks.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.dma-duplex.DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "dma-duplex",
+      "target": "nexus_stm32_uart_receive_test",
+      "case": "Stm32UartReceive.DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan",
+      "test_source": "tests/google/stm32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/stm32f407/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_stop(&port),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stm32_uart_duplex_initialize(&state,84000000U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_tx_prepare(&request,tx,sizeof(tx),1000U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "EXPECT_NE(transmit.CR&DMA_SxCR_EN,0U)",
+        "EXPECT_NE(receive.CR&DMA_SxCR_EN,0U)",
+        "EXPECT_NE(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_NE(receive.CR&DMA_SxCR_EN,0U)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_SUCCESS)",
+        "EXPECT_EQ(request.base.transferred,sizeof(tx))",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_NE(receive.CR&DMA_SxCR_EN,0U)"
+      ],
+      "calls": [
+        "nx_request_initialize(",
+        "nx_request_state(",
+        "nx_stm32_uart_dma_irq(",
+        "nx_stm32_uart_duplex_initialize(",
+        "nx_stm32_uart_duplex_irq(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_service(",
+        "nx_uart_port_stop(",
+        "nx_uart_port_submit(",
+        "nx_uart_tx_prepare("
+      ],
+      "invariant": "TX DMA completion requires independent wire TC while receive loan remains active.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.spi.short-poll.PollingEndpointsProveSharedControllerWithoutDmaAlias",
+      "family": "stm32f407",
+      "peripheral": "spi",
+      "mode": "short-poll",
+      "target": "nexus_stm32_spi_dma_test",
+      "case": "Stm32SpiDma.PollingEndpointsProveSharedControllerWithoutDmaAlias",
+      "test_source": "tests/google/stm32_spi_dma_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/spi.c",
+        "soc/stm32f407/drivers/spi_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_dma_model.h"
+      ],
+      "assertions": [
+        "EXPECT_TRUE(nx_spi_endpoint_on_port(&first,&polling_bus))",
+        "EXPECT_TRUE(nx_spi_endpoint_on_port(&second,&polling_bus))",
+        "EXPECT_FALSE(nx_spi_endpoint_on_port(&first,&foreign_bus))",
+        "EXPECT_FALSE(nx_spi_endpoint_on_port(&first,&incompatible))"
+      ],
+      "calls": [
+        "nx_spi_endpoint_on_port("
+      ],
+      "invariant": "Polling endpoints reject foreign controller identity without DMA state aliasing.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.spi.dma.CancelledPartialDmaRetainsCsAndNeverInventsWireByteCount",
+      "family": "stm32f407",
+      "peripheral": "spi",
+      "mode": "dma",
+      "target": "nexus_stm32_spi_dma_test",
+      "case": "Stm32SpiDma.CancelledPartialDmaRetainsCsAndNeverInventsWireByteCount",
+      "test_source": "tests/google/stm32_spi_dma_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/spi.c",
+        "soc/stm32f407/drivers/spi_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_spi_endpoint_submit(&endpoint,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_spi_port_cancel(&bus,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "EXPECT_EQ(gpio.BSRR,1U<<16U)",
+        "ASSERT_EQ(nx_native_clock_advance(899U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(nx_spi_port_stop(&bus),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_CANCELLED)",
+        "EXPECT_EQ(request.base.transferred,0U)",
+        "EXPECT_EQ(gpio.BSRR,1U)"
+      ],
+      "calls": [
+        "nx_native_clock_advance(",
+        "nx_request_state(",
+        "nx_spi_endpoint_submit(",
+        "nx_spi_port_cancel(",
+        "nx_spi_port_service(",
+        "nx_spi_port_stop("
+      ],
+      "invariant": "Partial cancellation preserves CS and request borrow, counting only proven wire completion.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.spi.dma.RefusedEngineDisableRetainsBorrowEvenWhenWireIsIdle",
+      "family": "stm32f407",
+      "peripheral": "spi",
+      "mode": "dma",
+      "target": "nexus_stm32_spi_dma_test",
+      "case": "Stm32SpiDma.RefusedEngineDisableRetainsBorrowEvenWhenWireIsIdle",
+      "test_source": "tests/google/stm32_spi_dma_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/spi.c",
+        "soc/stm32f407/drivers/spi_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_spi_endpoint_submit(&endpoint,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_spi_port_cancel(&bus,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "EXPECT_EQ(gpio.BSRR,1U<<16U)",
+        "ASSERT_EQ(nx_native_clock_advance(899U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)"
+      ],
+      "calls": [
+        "nx_native_clock_advance(",
+        "nx_request_state(",
+        "nx_spi_endpoint_submit(",
+        "nx_spi_port_cancel(",
+        "nx_spi_port_service("
+      ],
+      "invariant": "Wire idle alone never revokes a running DMA engine loan.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.spi.dma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline",
+      "family": "stm32f407",
+      "peripheral": "spi",
+      "mode": "dma",
+      "target": "nexus_stm32_spi_dma_test",
+      "case": "Stm32SpiDma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline",
+      "test_source": "tests/google/stm32_spi_dma_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/spi.c",
+        "soc/stm32f407/drivers/spi_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_spi_endpoint_submit(&endpoint,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_clock_advance(201U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.active,&request)",
+        "EXPECT_EQ(gpio.BSRR,1U<<16U)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,0U)"
+      ],
+      "calls": [
+        "nx_native_clock_advance(",
+        "nx_request_state(",
+        "nx_spi_endpoint_submit(",
+        "nx_spi_port_service("
+      ],
+      "invariant": "Unbounded request deadline still has bounded post-DMA drain/quarantine.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.i2c.poll-messages.ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
+      "family": "stm32f407",
+      "peripheral": "i2c",
+      "mode": "poll-messages",
+      "target": "nexus_stm32_i2c_register_test",
+      "case": "I2CRegisters.ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
+      "test_source": "tests/google/i2c_register_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/i2c.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(transact({{data,256,true}},1),NX_ERROR_TIMEOUT)",
+        "EXPECT_EQ(transferred,0U)",
+        "EXPECT_EQ(control(&state),before)",
+        "EXPECT_EQ(model_starts,0U)"
+      ],
+      "calls": [
+        "transact("
+      ],
+      "invariant": "Expired polling admission leaves address, transfer output and hardware unchanged.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.i2c.poll-messages.DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
+      "family": "stm32f407",
+      "peripheral": "i2c",
+      "mode": "poll-messages",
+      "target": "nexus_stm32_i2c_register_test",
+      "case": "I2CRegisters.DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
+      "test_source": "tests/google/i2c_register_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/i2c.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_CALL(boundary,Call(0,true))",
+        "EXPECT_EQ(transact({{data,length,true}},40),NX_ERROR_TIMEOUT)",
+        "EXPECT_EQ(transferred,model_stall_after)",
+        "EXPECT_EQ(data[i],static_cast<uint8_t>(i+1))",
+        "EXPECT_EQ(data[model_stall_after],0xCCU)",
+        "EXPECT_FALSE(state.active)",
+        "ASSERT_EQ(nx_i2c_port_recover(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_i2c_port_recover("
+      ],
+      "invariant": "Polling timeout reports only completed read prefix.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.i2c.poll-messages.StopBitClearWithoutMasterReleaseCannotReportSuccess",
+      "family": "stm32f407",
+      "peripheral": "i2c",
+      "mode": "poll-messages",
+      "target": "nexus_stm32_i2c_register_test",
+      "case": "I2CRegisters.StopBitClearWithoutMasterReleaseCannotReportSuccess",
+      "test_source": "tests/google/i2c_register_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/i2c.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_CALL(boundary,Call(0,true))",
+        "EXPECT_NE(transact({{data,4,true}},40),NX_SUCCESS)",
+        "EXPECT_EQ(transferred,4U)",
+        "EXPECT_FALSE(state.active)"
+      ],
+      "calls": [
+        "transact("
+      ],
+      "invariant": "Cleared STOP without local-master release does not report success.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.i2c.irq-messages.DrainTimeoutQuarantinesThenOnlyActualReleaseSettles",
+      "family": "stm32f407",
+      "peripheral": "i2c",
+      "mode": "irq-messages",
+      "target": "nexus_stm32_i2c_async_test",
+      "case": "I2CAsyncRegisters.DrainTimeoutQuarantinesThenOnlyActualReleaseSettles",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/stm32f407/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_i2c_port_cancel(&bus,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.active,&request)",
+        "EXPECT_EQ(nx_i2c_port_stop(&bus),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(state.active,nullptr)"
+      ],
+      "calls": [
+        "nx_i2c_port_cancel(",
+        "nx_i2c_port_service(",
+        "nx_i2c_port_stop(",
+        "nx_request_state("
+      ],
+      "invariant": "Drain timeout retains descriptor until actual local-master release.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.i2c.irq-messages.CancelRequiresExplicitLocalRecoveryBeforeReuse",
+      "family": "stm32f407",
+      "peripheral": "i2c",
+      "mode": "irq-messages",
+      "target": "nexus_stm32_i2c_async_test",
+      "case": "I2CAsyncRegisters.CancelRequiresExplicitLocalRecoveryBeforeReuse",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/stm32f407/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_i2c_port_cancel(&bus,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "ASSERT_EQ(nx_i2c_request_prepare(&request,&message,1U,2000U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_i2c_endpoint_submit(&endpoint,&request),NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_READY)",
+        "EXPECT_EQ(nx_i2c_port_recover(&bus),NX_SUCCESS)",
+        "EXPECT_EQ(state.faulted,false)",
+        "EXPECT_EQ(nx_i2c_endpoint_submit(&endpoint,&request),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_i2c_endpoint_submit(",
+        "nx_i2c_port_cancel(",
+        "nx_i2c_port_recover(",
+        "nx_i2c_request_prepare(",
+        "nx_request_state("
+      ],
+      "invariant": "Cancelled transaction remains faulted until explicit verified recovery.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.i2c.irq-messages.WakeFailureCannotUnlatchCompletionOrReleaseBorrow",
+      "family": "stm32f407",
+      "peripheral": "i2c",
+      "mode": "irq-messages",
+      "target": "nexus_stm32_i2c_async_test",
+      "case": "I2CAsyncRegisters.WakeFailureCannotUnlatchCompletionOrReleaseBorrow",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/stm32f407/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_i2c_port_attach_wake(&bus,&wake,0U),NX_SUCCESS)",
+        "EXPECT_CALL(observer,notify())",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "EXPECT_EQ(nx_i2c_port_attach_wake(&bus,nullptr,0U),NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_SUCCESS)",
+        "EXPECT_EQ(bytes[0],0x44U)",
+        "EXPECT_EQ(nx_i2c_port_stop(&bus),NX_SUCCESS)",
+        "EXPECT_EQ(state.wake,nullptr)"
+      ],
+      "calls": [
+        "nx_i2c_port_attach_wake(",
+        "nx_i2c_port_stop(",
+        "nx_i2c_v1_irq(",
+        "nx_request_state("
+      ],
+      "invariant": "Failed wake is a hint failure and cannot erase latched request completion.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.i2c.dma-messages.RefusedEngineDisableQuarantinesStorage",
+      "family": "stm32f407",
+      "peripheral": "i2c",
+      "mode": "dma-messages",
+      "target": "nexus_stm32_i2c_async_test",
+      "case": "I2CDmaRegisters.RefusedEngineDisableQuarantinesStorage",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/stm32f407/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.active,&request)",
+        "EXPECT_NE(*dma.rx.control&1U,0U)",
+        "EXPECT_EQ(nx_i2c_port_recover(&bus),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,0U)"
+      ],
+      "calls": [
+        "nx_i2c_port_recover(",
+        "nx_i2c_port_service(",
+        "nx_request_state("
+      ],
+      "invariant": "Refused DMA disable retains transfer storage, then settles only after physical-model drain.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.i2c.dma-messages.CounterNotZeroNeverReportsPayloadCompleted",
+      "family": "stm32f407",
+      "peripheral": "i2c",
+      "mode": "dma-messages",
+      "target": "nexus_stm32_i2c_async_test",
+      "case": "I2CDmaRegisters.CounterNotZeroNeverReportsPayloadCompleted",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/stm32f407/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,0U)"
+      ],
+      "calls": [
+        "nx_i2c_v1_dma_irq(",
+        "nx_request_state("
+      ],
+      "invariant": "False DMA completion with remaining units cannot report payload success.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.i2c.dma-messages.PeripheralErrorDuringStopDrainCannotPublishSuccess",
+      "family": "stm32f407",
+      "peripheral": "i2c",
+      "mode": "dma-messages",
+      "target": "nexus_stm32_i2c_async_test",
+      "case": "I2CDmaRegisters.PeripheralErrorDuringStopDrainCannotPublishSuccess",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/stm32f407/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,3U)"
+      ],
+      "calls": [
+        "nx_request_state("
+      ],
+      "invariant": "Peripheral error during STOP drain outranks earlier completion facts.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.adc.trigger-dma.RefusedDisableNeverPublishesMutableDmaMemory",
+      "family": "stm32f407",
+      "peripheral": "adc",
+      "mode": "trigger-dma",
+      "target": "nexus_stm32_adc_stream_test",
+      "case": "Stm32AdcStream.RefusedDisableNeverPublishesMutableDmaMemory",
+      "test_source": "tests/google/stm32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/adc.c",
+        "soc/stm32f407/drivers/adc_stream.c",
+        "soc/stm32f407/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_adc_port_stream_start(&port,&stream,1000U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_clock_advance(3U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_adc_port_stream_service(&port),NX_SUCCESS)",
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(slot.state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(state.stream,&stream)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(slot.state,NX_STREAM_SLOT_FREE)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_adc_port_stream_start(",
+        "nx_adc_port_stream_stop(",
+        "nx_native_clock_advance(",
+        "nx_stm32_adc_stream_irq(",
+        "nx_stream_acquire("
+      ],
+      "invariant": "Stopped acquisition keeps producer target borrowed until engine drain is proved.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.adc.trigger-dma.ObservedDmaFaultCannotBeReplacedByLateTransferComplete",
+      "family": "stm32f407",
+      "peripheral": "adc",
+      "mode": "trigger-dma",
+      "target": "nexus_stm32_adc_stream_test",
+      "case": "Stm32AdcStream.ObservedDmaFaultCannotBeReplacedByLateTransferComplete",
+      "test_source": "tests/google/stm32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/adc.c",
+        "soc/stm32f407/drivers/adc_stream.c",
+        "soc/stm32f407/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_adc_port_stream_start(&port,&stream,1000U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_clock_advance(3U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_adc_port_stream_service(&port),NX_SUCCESS)",
+        "ASSERT_TRUE(state.fault)",
+        "ASSERT_EQ(slot.state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_TRUE(state.fault)",
+        "EXPECT_EQ(slot.state,NX_STREAM_SLOT_FREE)",
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_IO)",
+        "EXPECT_EQ(timer.CR1&TIM_CR1_CEN,0U)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_adc_port_stream_start(",
+        "nx_adc_port_stream_stop(",
+        "nx_native_clock_advance(",
+        "nx_stm32_adc_stream_irq(",
+        "nx_stream_acquire("
+      ],
+      "invariant": "Observed DMA fault never becomes a later completed sample block.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.adc.trigger-dma-continuous.HeldConsumerForcesStopAndExplicitWarmResume",
+      "family": "stm32f407",
+      "peripheral": "adc",
+      "mode": "trigger-dma-continuous",
+      "target": "nexus_stm32_adc_stream_test",
+      "case": "Stm32AdcContinuous.HeldConsumerForcesStopAndExplicitWarmResume",
+      "test_source": "tests/google/stm32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/adc.c",
+        "soc/stm32f407/drivers/adc_stream.c",
+        "soc/stm32f407/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_stream_acquire(&stream,&held),NX_SUCCESS)",
+        "EXPECT_EQ(timer.CR1&TIM_CR1_CEN,0U)",
+        "EXPECT_EQ(memory.CR&DMA_SxCR_EN,0U)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_BORROWED)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "ASSERT_EQ(nx_stream_release(&stream,&held),NX_SUCCESS)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_native_clock_advance(3U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_SUCCESS)",
+        "EXPECT_NE(timer.CR1&TIM_CR1_CEN,0U)",
+        "EXPECT_EQ(nx_stream_acquire(&stream,&completed),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_adc_port_stream_stop(",
+        "nx_native_clock_advance(",
+        "nx_stream_acquire(",
+        "nx_stream_release("
+      ],
+      "invariant": "Consumer delay stops acquisition before overwriting any borrowed block.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.adc.trigger-dma-continuous.RefusedTargetWriteRetainsSpareUntilProvedDrain",
+      "family": "stm32f407",
+      "peripheral": "adc",
+      "mode": "trigger-dma-continuous",
+      "target": "nexus_stm32_adc_stream_test",
+      "case": "Stm32AdcContinuous.RefusedTargetWriteRetainsSpareUntilProvedDrain",
+      "test_source": "tests/google/stm32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/adc.c",
+        "soc/stm32f407/drivers/adc_stream.c",
+        "soc/stm32f407/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(state.posted.pending,3U)",
+        "EXPECT_EQ(stream.outstanding,3U)",
+        "EXPECT_TRUE(state.base.filling)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_IO)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_adc_port_stream_stop(",
+        "nx_stream_acquire("
+      ],
+      "invariant": "Refused address replacement retains old, active and spare loans until proved stop.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.adc.trigger-dma-continuous.NewErrorAtCompletionAcknowledgementCannotDisappear",
+      "family": "stm32f407",
+      "peripheral": "adc",
+      "mode": "trigger-dma-continuous",
+      "target": "nexus_stm32_adc_stream_test",
+      "case": "Stm32AdcContinuous.NewErrorAtCompletionAcknowledgementCannotDisappear",
+      "test_source": "tests/google/stm32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/adc.c",
+        "soc/stm32f407/drivers/adc_stream.c",
+        "soc/stm32f407/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_IO)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_adc_port_stream_stop(",
+        "nx_stream_acquire("
+      ],
+      "invariant": "Acknowledgement cannot erase a terminal error arriving after initial status.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.adc.trigger-dma-continuous.EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
+      "family": "stm32f407",
+      "peripheral": "adc",
+      "mode": "trigger-dma-continuous",
+      "target": "nexus_stm32_adc_stream_test",
+      "case": "Stm32AdcContinuous.EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
+      "test_source": "tests/google/stm32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/adc.c",
+        "soc/stm32f407/drivers/adc_stream.c",
+        "soc/stm32f407/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/stm32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_EXHAUSTED)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_adc_port_stream_stop(",
+        "nx_stream_acquire("
+      ],
+      "invariant": "Epoch exhaustion halts stream rather than recycling consumer-owned memory.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.dma-tx.DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_gd32_uart_dma_test",
+      "case": "GD32UARTDMA.DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
+      "test_source": "tests/google/gd32_uart_dma_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,0U)",
+        "EXPECT_EQ(state.uart.active,nullptr)"
+      ],
+      "calls": [
+        "nx_gd32_uart_dma_irq(",
+        "nx_gd32_uart_dma_uart_irq(",
+        "nx_request_state(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "Error arriving during DMA disable must settle IO with zero invented wire bytes.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.dma-tx.DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_gd32_uart_dma_test",
+      "case": "GD32UARTDMA.DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx",
+      "test_source": "tests/google/gd32_uart_dma_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,0U)",
+        "EXPECT_EQ(state.uart.active,nullptr)"
+      ],
+      "calls": [
+        "nx_gd32_uart_dma_irq(",
+        "nx_gd32_uart_dma_uart_irq(",
+        "nx_request_state(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "W1C cannot erase a new terminal error and replace it with successful completion.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.dma-tx.CancellationCannotReleaseMemoryWhenEngineStillOwnsIt",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_gd32_uart_dma_test",
+      "case": "GD32UARTDMA.CancellationCannotReleaseMemoryWhenEngineStillOwnsIt",
+      "test_source": "tests/google/gd32_uart_dma_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_cancel(&port,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.uart.active,&request)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_CANCELLED)",
+        "EXPECT_EQ(request.base.transferred,0U)"
+      ],
+      "calls": [
+        "nx_gd32_uart_dma_uart_irq(",
+        "nx_request_state(",
+        "nx_uart_port_cancel(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "Cancellation retains accepted memory through DRAINING/QUARANTINED until actual engine disable.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.dma-tx.AlreadyCompletedMemoryAndWireStaySuccessfulAtLateService",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "dma-tx",
+      "target": "nexus_gd32_uart_dma_test",
+      "case": "GD32UARTDMA.AlreadyCompletedMemoryAndWireStaySuccessfulAtLateService",
+      "test_source": "tests/google/gd32_uart_dma_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_SUCCESS)",
+        "EXPECT_EQ(request.base.transferred,sizeof(payload))"
+      ],
+      "calls": [
+        "nx_gd32_uart_dma_irq(",
+        "nx_gd32_uart_dma_uart_irq(",
+        "nx_request_state(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "A proven completed memory and wire transfer stays successful when serviced later.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-idle.RefusedDisableRetainsLoanUntilARealServiceRetryDrains",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_EQ(stream.outstanding,1U)",
+        "EXPECT_EQ(nx_uart_port_rx_stop(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(block.length,2U)",
+        "EXPECT_EQ(block.data,payload[0])"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_irq(",
+        "nx_stream_acquire(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_rx_stop(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Refused receive-engine disable keeps DMA target FILLING until readback-proved retry.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-idle.TransferErrorAbortsUnreliablePrefixAndLatchesLoss",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FREE)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(DMA_CH2CTL(DMA1)&DMA_CHXCTL_CHEN,0U)",
+        "EXPECT_EQ(nx_uart_port_rx_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_dma_irq(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_rx_stop(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Unreliable partial DMA data stays unpublished; observed loss is counted.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-idle.PendingIdleThenDmaFlagCannotPublishSameBufferTwice",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_READY)",
+        "EXPECT_EQ(stream.outstanding,1U)",
+        "EXPECT_EQ(stream.producer,1U)"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_dma_irq(",
+        "nx_gd32_uart_receive_irq(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "Coincident IDLE/completion facts cannot publish one block twice.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-idle.StopClosesTransmitAdmissionWhileConsumerLoanExists",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&block),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_stop(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_uart_tx_prepare(&request,&byte,1U,1000U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_uart_port_submit(&port,&request),NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_READY)",
+        "ASSERT_EQ(nx_stream_release(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(nx_uart_port_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_irq(",
+        "nx_request_initialize(",
+        "nx_request_state(",
+        "nx_stream_acquire(",
+        "nx_stream_release(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_stop(",
+        "nx_uart_port_submit(",
+        "nx_uart_tx_prepare("
+      ],
+      "invariant": "Admission closes while held consumer storage still prevents complete stop.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-idle.ErrorArrivingDuringIdleDisableIsObservedBeforeDataClearsIt",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.ErrorArrivingDuringIdleDisableIsObservedBeforeDataClearsIt",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FREE)"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_irq(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "A new UART error remains authoritative through actual SR/DR clearing.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-idle.RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_uart_port_rx_start(&port,&stream),NX_ERROR_EXHAUSTED)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(state.stream,nullptr)",
+        "EXPECT_EQ(state.producer.stream,nullptr)",
+        "EXPECT_EQ(state.fill[0].data,nullptr)"
+      ],
+      "calls": [
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "Exhausted epoch rejection leaves no retained stream/payload references.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-idle.ObservedOverrunInFiniteGapIsRecordedBeforeRearmClearsStatus",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-idle",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.ObservedOverrunInFiniteGapIsRecordedBeforeRearmClearsStatus",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(slots[1].state,NX_STREAM_SLOT_FILLING)"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_dma_irq(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Finite reception gap records observed overrun before clearing status.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-continuous.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-continuous",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&borrowed),NX_SUCCESS)",
+        "EXPECT_EQ(DMA_CH2CTL(DMA1)&DMA_CHXCTL_CHEN,0U)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_BORROWED)",
+        "EXPECT_EQ(borrowed.data,payload[0])",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&full),NX_SUCCESS)",
+        "EXPECT_EQ(full.data,payload[1])",
+        "EXPECT_EQ(full.length,8U)",
+        "EXPECT_EQ(nx_uart_port_rx_stop(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_stream_release(&stream,&borrowed),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stream_release(&stream,&full),NX_SUCCESS)",
+        "EXPECT_EQ(nx_uart_port_rx_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_dma_irq(",
+        "nx_stream_acquire(",
+        "nx_stream_release(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_rx_stop("
+      ],
+      "invariant": "No free target stops DMA instead of wrapping into BORROWED consumer memory.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-continuous.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-continuous",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_CALL(hardware,Target(0U,address(payload[2])))",
+        "EXPECT_EQ(stream.outstanding,3U)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_EQ(slots[1].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_EQ(slots[2].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(DMA_CH2CTL(DMA1)&DMA_CHXCTL_CHEN,0U)"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_dma_irq(",
+        "nx_stream_acquire(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_service("
+      ],
+      "invariant": "Target write refusal retains hardware loans and cannot publish old target.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-continuous.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-continuous",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_CALL(hardware,Target(0U,address(payload[2])))",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(DMA_CH2CTL(DMA1)&DMA_CHXCTL_CHEN,0U)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FREE)"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_dma_irq(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "Bank switch during target update rejects unproved publication.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-continuous.ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-continuous",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_EQ(DMA_CH2CTL(DMA1)&DMA_CHXCTL_CHEN,0U)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_dma_irq(",
+        "nx_stream_acquire(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "W1C of observed completion preserves a new terminal error.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.rx-dma-continuous.ContinuousWrongAddressStoreFailsExactReplacementProof",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "rx-dma-continuous",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.ContinuousWrongAddressStoreFailsExactReplacementProof",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "EXPECT_CALL(hardware,Target(0U,address(payload[2])))",
+        "EXPECT_EQ(DMA_CH2CTL(DMA1)&DMA_CHXCTL_CHEN,0U)",
+        "EXPECT_EQ(stream.outstanding,0U)",
+        "EXPECT_EQ(stream.losses,1U)"
+      ],
+      "calls": [
+        "nx_gd32_uart_receive_dma_irq(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "Exact replacement addresses must match both actual hardware banks.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.dma-duplex.DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "dma-duplex",
+      "target": "nexus_gd32_uart_receive_test",
+      "case": "Gd32UartReceive.DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan",
+      "test_source": "tests/google/gd32_uart_receive_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_dma.c",
+        "core/src/request.c",
+        "soc/gd32f470/drivers/uart_receive.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_uart_receive_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_stop(&port),NX_SUCCESS)",
+        "ASSERT_EQ(nx_gd32_uart_duplex_initialize(&state,115200U,5U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_tx_prepare(&request,tx,sizeof(tx),1000U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "EXPECT_NE(DMA_CH7CTL(DMA1)&DMA_CHXCTL_CHEN,0U)",
+        "EXPECT_NE(DMA_CH2CTL(DMA1)&DMA_CHXCTL_CHEN,0U)",
+        "EXPECT_NE(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_NE(DMA_CH2CTL(DMA1)&DMA_CHXCTL_CHEN,0U)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_SUCCESS)",
+        "EXPECT_EQ(request.base.transferred,sizeof(tx))",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_NE(DMA_CH2CTL(DMA1)&DMA_CHXCTL_CHEN,0U)"
+      ],
+      "calls": [
+        "nx_gd32_uart_dma_irq(",
+        "nx_gd32_uart_duplex_initialize(",
+        "nx_gd32_uart_duplex_irq(",
+        "nx_request_initialize(",
+        "nx_request_state(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_service(",
+        "nx_uart_port_stop(",
+        "nx_uart_port_submit(",
+        "nx_uart_tx_prepare("
+      ],
+      "invariant": "TX DMA completion requires independent wire TC while receive loan remains active.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.spi.short-poll.PollingEndpointsProveSharedControllerWithoutDmaAlias",
+      "family": "gd32f470",
+      "peripheral": "spi",
+      "mode": "short-poll",
+      "target": "nexus_gd32_spi_dma_test",
+      "case": "GD32SPIDMA.PollingEndpointsProveSharedControllerWithoutDmaAlias",
+      "test_source": "tests/google/gd32_spi_dma_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/spi.c",
+        "soc/gd32f470/drivers/spi_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_spi_dma_model.h"
+      ],
+      "assertions": [
+        "EXPECT_TRUE(nx_spi_endpoint_on_port(&first,&polling_bus))",
+        "EXPECT_TRUE(nx_spi_endpoint_on_port(&second,&polling_bus))",
+        "EXPECT_FALSE(nx_spi_endpoint_on_port(&first,&foreign_bus))",
+        "EXPECT_FALSE(nx_spi_endpoint_on_port(&first,&incompatible))"
+      ],
+      "calls": [
+        "nx_spi_endpoint_on_port("
+      ],
+      "invariant": "Polling endpoints reject foreign controller identity without DMA state aliasing.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.spi.dma.CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains",
+      "family": "gd32f470",
+      "peripheral": "spi",
+      "mode": "dma",
+      "target": "nexus_gd32_spi_dma_test",
+      "case": "GD32SPIDMA.CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains",
+      "test_source": "tests/google/gd32_spi_dma_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/spi.c",
+        "soc/gd32f470/drivers/spi_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_spi_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_spi_endpoint_submit(&endpoint,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_spi_port_cancel(&bus,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(nx_spi_port_stop(&bus),NX_ERROR_BUSY)",
+        "EXPECT_EQ(state.active,&request)",
+        "EXPECT_EQ(GPIO_BOP(GPIOF),GPIO_PIN_6<<16U)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_CANCELLED)",
+        "EXPECT_EQ(request.base.transferred,0U)",
+        "EXPECT_EQ(nx_spi_port_stop(&bus),NX_SUCCESS)",
+        "EXPECT_EQ(NVIC->ISER[1]&((1U<<27U)|(1U<<28U)),0U)"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_spi_endpoint_submit(",
+        "nx_spi_port_cancel(",
+        "nx_spi_port_service(",
+        "nx_spi_port_stop("
+      ],
+      "invariant": "Partial cancellation preserves CS and request borrow, counting only proven wire completion.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.spi.dma.RefusedEngineDisableKeepsBorrowDespiteIdleWire",
+      "family": "gd32f470",
+      "peripheral": "spi",
+      "mode": "dma",
+      "target": "nexus_gd32_spi_dma_test",
+      "case": "GD32SPIDMA.RefusedEngineDisableKeepsBorrowDespiteIdleWire",
+      "test_source": "tests/google/gd32_spi_dma_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/spi.c",
+        "soc/gd32f470/drivers/spi_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_spi_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_spi_endpoint_submit(&endpoint,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_spi_port_cancel(&bus,&request),NX_SUCCESS)",
+        "EXPECT_EQ(state.active,&request)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(GPIO_BOP(GPIOF),GPIO_PIN_6<<16U)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_CANCELLED)"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_spi_endpoint_submit(",
+        "nx_spi_port_cancel(",
+        "nx_spi_port_service("
+      ],
+      "invariant": "Wire idle alone never revokes a running DMA engine loan.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.spi.dma.CompletedMemoryWithUnboundedRequestStillHasBoundedDrain",
+      "family": "gd32f470",
+      "peripheral": "spi",
+      "mode": "dma",
+      "target": "nexus_gd32_spi_dma_test",
+      "case": "GD32SPIDMA.CompletedMemoryWithUnboundedRequestStillHasBoundedDrain",
+      "test_source": "tests/google/gd32_spi_dma_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/spi.c",
+        "soc/gd32f470/drivers/spi_dma.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_spi_dma_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_spi_endpoint_submit(&endpoint,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.active,&request)",
+        "EXPECT_EQ(GPIO_BOP(GPIOF),GPIO_PIN_6<<16U)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,0U)"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_spi_endpoint_submit(",
+        "nx_spi_port_service("
+      ],
+      "invariant": "Unbounded request deadline still has bounded post-DMA drain/quarantine.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.i2c.poll-messages.ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
+      "family": "gd32f470",
+      "peripheral": "i2c",
+      "mode": "poll-messages",
+      "target": "nexus_gd32_i2c_register_test",
+      "case": "I2CRegisters.ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
+      "test_source": "tests/google/i2c_register_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/i2c.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(transact({{data,256,true}},1),NX_ERROR_TIMEOUT)",
+        "EXPECT_EQ(transferred,0U)",
+        "EXPECT_EQ(control(&state),before)",
+        "EXPECT_EQ(model_starts,0U)"
+      ],
+      "calls": [
+        "transact("
+      ],
+      "invariant": "Expired polling admission leaves address, transfer output and hardware unchanged.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.i2c.poll-messages.DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
+      "family": "gd32f470",
+      "peripheral": "i2c",
+      "mode": "poll-messages",
+      "target": "nexus_gd32_i2c_register_test",
+      "case": "I2CRegisters.DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
+      "test_source": "tests/google/i2c_register_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/i2c.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_CALL(boundary,Call(0,true))",
+        "EXPECT_EQ(transact({{data,length,true}},40),NX_ERROR_TIMEOUT)",
+        "EXPECT_EQ(transferred,model_stall_after)",
+        "EXPECT_EQ(data[i],static_cast<uint8_t>(i+1))",
+        "EXPECT_EQ(data[model_stall_after],0xCCU)",
+        "EXPECT_FALSE(state.active)",
+        "ASSERT_EQ(nx_i2c_port_recover(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_i2c_port_recover("
+      ],
+      "invariant": "Polling timeout reports only completed read prefix.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.i2c.poll-messages.StopBitClearWithoutMasterReleaseCannotReportSuccess",
+      "family": "gd32f470",
+      "peripheral": "i2c",
+      "mode": "poll-messages",
+      "target": "nexus_gd32_i2c_register_test",
+      "case": "I2CRegisters.StopBitClearWithoutMasterReleaseCannotReportSuccess",
+      "test_source": "tests/google/i2c_register_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/i2c.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_CALL(boundary,Call(0,true))",
+        "EXPECT_NE(transact({{data,4,true}},40),NX_SUCCESS)",
+        "EXPECT_EQ(transferred,4U)",
+        "EXPECT_FALSE(state.active)"
+      ],
+      "calls": [
+        "transact("
+      ],
+      "invariant": "Cleared STOP without local-master release does not report success.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.i2c.irq-messages.DrainTimeoutQuarantinesThenOnlyActualReleaseSettles",
+      "family": "gd32f470",
+      "peripheral": "i2c",
+      "mode": "irq-messages",
+      "target": "nexus_gd32_i2c_async_test",
+      "case": "I2CAsyncRegisters.DrainTimeoutQuarantinesThenOnlyActualReleaseSettles",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/gd32f470/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_i2c_port_cancel(&bus,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.active,&request)",
+        "EXPECT_EQ(nx_i2c_port_stop(&bus),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(state.active,nullptr)"
+      ],
+      "calls": [
+        "nx_i2c_port_cancel(",
+        "nx_i2c_port_service(",
+        "nx_i2c_port_stop(",
+        "nx_request_state("
+      ],
+      "invariant": "Drain timeout retains descriptor until actual local-master release.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.i2c.irq-messages.CancelRequiresExplicitLocalRecoveryBeforeReuse",
+      "family": "gd32f470",
+      "peripheral": "i2c",
+      "mode": "irq-messages",
+      "target": "nexus_gd32_i2c_async_test",
+      "case": "I2CAsyncRegisters.CancelRequiresExplicitLocalRecoveryBeforeReuse",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/gd32f470/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_i2c_port_cancel(&bus,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "ASSERT_EQ(nx_i2c_request_prepare(&request,&message,1U,2000U),NX_SUCCESS)",
+        "EXPECT_EQ(nx_i2c_endpoint_submit(&endpoint,&request),NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_READY)",
+        "EXPECT_EQ(nx_i2c_port_recover(&bus),NX_SUCCESS)",
+        "EXPECT_EQ(state.faulted,false)",
+        "EXPECT_EQ(nx_i2c_endpoint_submit(&endpoint,&request),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_i2c_endpoint_submit(",
+        "nx_i2c_port_cancel(",
+        "nx_i2c_port_recover(",
+        "nx_i2c_request_prepare(",
+        "nx_request_state("
+      ],
+      "invariant": "Cancelled transaction remains faulted until explicit verified recovery.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.i2c.irq-messages.WakeFailureCannotUnlatchCompletionOrReleaseBorrow",
+      "family": "gd32f470",
+      "peripheral": "i2c",
+      "mode": "irq-messages",
+      "target": "nexus_gd32_i2c_async_test",
+      "case": "I2CAsyncRegisters.WakeFailureCannotUnlatchCompletionOrReleaseBorrow",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/gd32f470/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_i2c_port_attach_wake(&bus,&wake,0U),NX_SUCCESS)",
+        "EXPECT_CALL(observer,notify())",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "EXPECT_EQ(nx_i2c_port_attach_wake(&bus,nullptr,0U),NX_ERROR_STATE)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_SUCCESS)",
+        "EXPECT_EQ(bytes[0],0x44U)",
+        "EXPECT_EQ(nx_i2c_port_stop(&bus),NX_SUCCESS)",
+        "EXPECT_EQ(state.wake,nullptr)"
+      ],
+      "calls": [
+        "nx_i2c_port_attach_wake(",
+        "nx_i2c_port_stop(",
+        "nx_i2c_v1_irq(",
+        "nx_request_state("
+      ],
+      "invariant": "Failed wake is a hint failure and cannot erase latched request completion.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.i2c.dma-messages.RefusedEngineDisableQuarantinesStorage",
+      "family": "gd32f470",
+      "peripheral": "i2c",
+      "mode": "dma-messages",
+      "target": "nexus_gd32_i2c_async_test",
+      "case": "I2CDmaRegisters.RefusedEngineDisableQuarantinesStorage",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/gd32f470/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_DRAINING)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.active,&request)",
+        "EXPECT_NE(*dma.rx.control&1U,0U)",
+        "EXPECT_EQ(nx_i2c_port_recover(&bus),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,0U)"
+      ],
+      "calls": [
+        "nx_i2c_port_recover(",
+        "nx_i2c_port_service(",
+        "nx_request_state("
+      ],
+      "invariant": "Refused DMA disable retains transfer storage, then settles only after physical-model drain.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.i2c.dma-messages.CounterNotZeroNeverReportsPayloadCompleted",
+      "family": "gd32f470",
+      "peripheral": "i2c",
+      "mode": "dma-messages",
+      "target": "nexus_gd32_i2c_async_test",
+      "case": "I2CDmaRegisters.CounterNotZeroNeverReportsPayloadCompleted",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/gd32f470/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,0U)"
+      ],
+      "calls": [
+        "nx_i2c_v1_dma_irq(",
+        "nx_request_state("
+      ],
+      "invariant": "False DMA completion with remaining units cannot report payload success.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.i2c.dma-messages.PeripheralErrorDuringStopDrainCannotPublishSuccess",
+      "family": "gd32f470",
+      "peripheral": "i2c",
+      "mode": "dma-messages",
+      "target": "nexus_gd32_i2c_async_test",
+      "case": "I2CDmaRegisters.PeripheralErrorDuringStopDrainCannotPublishSuccess",
+      "test_source": "tests/google/i2c_async_register_test.cpp",
+      "production_sources": [
+        "soc/common/i2c_v1_async.c",
+        "soc/gd32f470/drivers/i2c_async.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "tests/google/i2c_async_register_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_IO)",
+        "EXPECT_EQ(request.base.transferred,3U)"
+      ],
+      "calls": [
+        "nx_request_state("
+      ],
+      "invariant": "Peripheral error during STOP drain outranks earlier completion facts.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.adc.trigger-dma.StopRetainsProducerUntilEngineStopsAndLateIRQIsHarmless",
+      "family": "gd32f470",
+      "peripheral": "adc",
+      "mode": "trigger-dma",
+      "target": "nexus_gd32_adc_stream_test",
+      "case": "GD32ADCStream.StopRetainsProducerUntilEngineStopsAndLateIRQIsHarmless",
+      "test_source": "tests/google/gd32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/adc.c",
+        "soc/gd32f470/drivers/adc_stream.c",
+        "soc/gd32f470/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_adc_port_stream_start(&port,&stream,1000),NX_SUCCESS)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FILLING)",
+        "EXPECT_EQ(TIMER_CTL0(TIMER2)&TIMER_CTL0_CEN,0U)",
+        "EXPECT_EQ(ADC_CTL1(ADC0)&ADC_CTL1_ETMRC,0U)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FREE)",
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_STATE)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_adc_port_stream_start(",
+        "nx_adc_port_stream_stop(",
+        "nx_stream_acquire("
+      ],
+      "invariant": "Stopped acquisition keeps producer target borrowed until engine drain is proved.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.adc.trigger-dma.DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss",
+      "family": "gd32f470",
+      "peripheral": "adc",
+      "mode": "trigger-dma",
+      "target": "nexus_gd32_adc_stream_test",
+      "case": "GD32ADCStream.DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss",
+      "test_source": "tests/google/gd32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/adc.c",
+        "soc/gd32f470/drivers/adc_stream.c",
+        "soc/gd32f470/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_adc_port_stream_start(&port,&stream,1000),NX_SUCCESS)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_FREE)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_IO)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(block.lost_blocks,1U)",
+        "EXPECT_EQ(block.flags,NX_STREAM_BOUNDARY_TRIGGER|NX_STREAM_BOUNDARY_LOSS)",
+        "EXPECT_EQ(nx_stream_release(&stream,&block),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_adc_port_stream_start(",
+        "nx_gd32_adc_stream_irq(",
+        "nx_stream_acquire(",
+        "nx_stream_release("
+      ],
+      "invariant": "Observed DMA fault never becomes a later completed sample block.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.adc.trigger-dma-continuous.StarvationStopsAndNeverOverwritesBorrowedBlock",
+      "family": "gd32f470",
+      "peripheral": "adc",
+      "mode": "trigger-dma-continuous",
+      "target": "nexus_gd32_adc_stream_test",
+      "case": "GD32ADCContinuous.StarvationStopsAndNeverOverwritesBorrowedBlock",
+      "test_source": "tests/google/gd32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/adc.c",
+        "soc/gd32f470/drivers/adc_stream.c",
+        "soc/gd32f470/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_stream_acquire(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(TIMER_CTL0(TIMER2)&TIMER_CTL0_CEN,0U)",
+        "EXPECT_EQ(DMA_CH0CTL(DMA1)&DMA_CHXCTL_CHEN,0U)",
+        "EXPECT_EQ(slots[0].state,NX_STREAM_SLOT_BORROWED)",
+        "EXPECT_EQ(stream.losses,1U)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_stream_release(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_SUCCESS)",
+        "EXPECT_NE(TIMER_CTL0(TIMER2)&TIMER_CTL0_CEN,0U)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_stream_acquire(",
+        "nx_stream_release("
+      ],
+      "invariant": "Consumer delay stops acquisition before overwriting any borrowed block.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.adc.trigger-dma-continuous.RefusedAddressWriteAndDrainRetainThreeLoans",
+      "family": "gd32f470",
+      "peripheral": "adc",
+      "mode": "trigger-dma-continuous",
+      "target": "nexus_gd32_adc_stream_test",
+      "case": "GD32ADCContinuous.RefusedAddressWriteAndDrainRetainThreeLoans",
+      "test_source": "tests/google/gd32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/adc.c",
+        "soc/gd32f470/drivers/adc_stream.c",
+        "soc/gd32f470/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(stream.outstanding,3U)",
+        "EXPECT_TRUE(state.base.filling)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_IO)",
+        "EXPECT_EQ(stream.outstanding,0U)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_stream_acquire("
+      ],
+      "invariant": "Refused address replacement retains old, active and spare loans until proved stop.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.adc.trigger-dma-continuous.ErrorBeforeW1cCompletionStoreRemainsAuthoritative",
+      "family": "gd32f470",
+      "peripheral": "adc",
+      "mode": "trigger-dma-continuous",
+      "target": "nexus_gd32_adc_stream_test",
+      "case": "GD32ADCContinuous.ErrorBeforeW1cCompletionStoreRemainsAuthoritative",
+      "test_source": "tests/google/gd32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/adc.c",
+        "soc/gd32f470/drivers/adc_stream.c",
+        "soc/gd32f470/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_IO)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_stream_acquire("
+      ],
+      "invariant": "Acknowledgement cannot erase a terminal error arriving after initial status.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.adc.trigger-dma-continuous.EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
+      "family": "gd32f470",
+      "peripheral": "adc",
+      "mode": "trigger-dma-continuous",
+      "target": "nexus_gd32_adc_stream_test",
+      "case": "GD32ADCContinuous.EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
+      "test_source": "tests/google/gd32_adc_stream_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/adc.c",
+        "soc/gd32f470/drivers/adc_stream.c",
+        "soc/gd32f470/drivers/adc_continuous.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "tests/google/gd32_adc_stream_model.h"
+      ],
+      "assertions": [
+        "EXPECT_EQ(nx_stream_acquire(&stream,&block),NX_ERROR_EMPTY)",
+        "EXPECT_EQ(nx_adc_port_stream_service(&port),NX_ERROR_EXHAUSTED)",
+        "EXPECT_EQ(stream.outstanding,0U)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_service(",
+        "nx_stream_acquire("
+      ],
+      "invariant": "Epoch exhaustion halts stream rather than recycling consumer-owned memory.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "stm32f407.uart.irq-blocks.StopPublishesErrorPrefixAndJoinsConsumerLoan",
+      "family": "stm32f407",
+      "peripheral": "uart",
+      "mode": "irq-blocks",
+      "target": "nexus_stm32_uart_stream_test",
+      "case": "Stm32UartStreamFacts.StopPublishesErrorPrefixAndJoinsConsumerLoan",
+      "test_source": "tests/google/stm32_uart_stream_test.cpp",
+      "production_sources": [
+        "soc/stm32f407/drivers/uart.c",
+        "soc/stm32f407/drivers/uart_stream.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [],
+      "assertions": [
+        "EXPECT_EQ(nx_uart_port_rx_stop(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(block.length,1U)",
+        "EXPECT_EQ(block.data[0],11U)",
+        "EXPECT_NE(block.flags&NX_STREAM_BOUNDARY_ERROR,0U)",
+        "EXPECT_EQ(state.stream,&stream)",
+        "ASSERT_EQ(nx_stream_release(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(nx_uart_port_rx_stop(&port),NX_SUCCESS)",
+        "EXPECT_EQ(state.stream,nullptr)"
+      ],
+      "calls": [
+        "nx_stream_acquire(",
+        "nx_stream_release(",
+        "nx_uart_port_rx_stop("
+      ],
+      "invariant": "IRQ block stop retains consumer until explicit release, without fabricating an error byte.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.irq-blocks.FailedResetRetainsTxAndRxLoanUntilProvedDrain",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "irq-blocks",
+      "target": "nexus_gd32_uart_stream_test",
+      "case": "GD32UARTStream.FailedResetRetainsTxAndRxLoanUntilProvedDrain",
+      "test_source": "tests/google/gd32_uart_stream_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_stream.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_tx_prepare(&request,&data,1U,1000U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_uart_port_stop(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.uart.active,&request)",
+        "EXPECT_EQ(state.stream,&stream)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(block.data[0],8U)",
+        "EXPECT_EQ(nx_uart_port_stop(&port),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(state.uart.active,nullptr)",
+        "EXPECT_EQ(USART_CTL0(USART0)&USART_CTL0_RBNEIE,0U)",
+        "EXPECT_EQ(nx_uart_port_stop(&port),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_stream_release(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(nx_uart_port_stop(&port),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_request_initialize(",
+        "nx_request_state(",
+        "nx_stream_acquire(",
+        "nx_stream_release(",
+        "nx_uart_port_rx_start(",
+        "nx_uart_port_service(",
+        "nx_uart_port_stop(",
+        "nx_uart_port_submit(",
+        "nx_uart_tx_prepare("
+      ],
+      "invariant": "Failed shared USART reset keeps accepted TX and RX loans owned.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "gd32f470.uart.irq-blocks.ErrorOnlyNeverCreatesAStaleByteAndMarksValidPrefix",
+      "family": "gd32f470",
+      "peripheral": "uart",
+      "mode": "irq-blocks",
+      "target": "nexus_gd32_uart_stream_test",
+      "case": "GD32UARTStream.ErrorOnlyNeverCreatesAStaleByteAndMarksValidPrefix",
+      "test_source": "tests/google/gd32_uart_stream_test.cpp",
+      "production_sources": [
+        "soc/gd32f470/drivers/uart.c",
+        "soc/gd32f470/drivers/uart_stream.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&block),NX_SUCCESS)",
+        "EXPECT_EQ(block.length,1U)",
+        "EXPECT_EQ(block.data[0],42U)",
+        "EXPECT_NE(block.flags&NX_STREAM_BOUNDARY_IDLE,0U)",
+        "EXPECT_NE(block.flags&NX_STREAM_BOUNDARY_ERROR,0U)",
+        "EXPECT_NE(block.flags&NX_STREAM_BOUNDARY_LOSS,0U)"
+      ],
+      "calls": [
+        "nx_stream_acquire(",
+        "nx_uart_port_rx_start("
+      ],
+      "invariant": "Error-only IRQ never adds a stale data byte to the valid prefix.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "native.uart.simulated-async.NativeUartThirtyTwoCancelDeadlineDrainHistories",
+      "family": "native",
+      "peripheral": "uart",
+      "mode": "simulated-async",
+      "target": "nexus_io_state_machine_test",
+      "case": "IOProviderSequences.NativeUartThirtyTwoCancelDeadlineDrainHistories",
+      "test_source": "tests/google/io_state_machine_test.cpp",
+      "production_sources": [
+        "io/native/uart.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/provider.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_native_clock_configure(true,0U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_uart_configure_instance(&state,&config),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_tx_prepare(&request,bytes,4U,100U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_request_slot_bind(&slot,&request.base,&epoch),NX_SUCCESS)",
+        "ASSERT_EQ(nx_request_observer_bind(&observer,&slot,epoch),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_submit(&uart,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_cancel(&uart,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(nx_uart_port_stop(&uart),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_uart_tx_prepare(&request,bytes,4U,100U),NX_ERROR_STATE)",
+        "ASSERT_EQ(nx_request_observer_sample(&observer,nx_time_now_us(),&out),NX_SUCCESS)",
+        "EXPECT_TRUE(out.settled)",
+        "EXPECT_EQ(out.result,expected)",
+        "EXPECT_EQ(out.transferred,steps==5U?4U:steps)",
+        "ASSERT_EQ(nx_request_observer_sample(&observer,nx_time_now_us(),&out),NX_SUCCESS)",
+        "EXPECT_EQ(out.result,expected)",
+        "ASSERT_EQ(nx_request_slot_release(&slot,epoch),NX_SUCCESS)",
+        "EXPECT_EQ(nx_uart_port_stop(&uart),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_native_clock_advance(",
+        "nx_native_clock_configure(",
+        "nx_native_uart_configure_instance(",
+        "nx_native_uart_model_fault(",
+        "nx_native_uart_model_irq_step(",
+        "nx_request_initialize(",
+        "nx_request_observer_bind(",
+        "nx_request_observer_detach(",
+        "nx_request_observer_sample(",
+        "nx_request_settle(",
+        "nx_request_slot_bind(",
+        "nx_request_slot_release(",
+        "nx_request_state(",
+        "nx_time_now_us(",
+        "nx_uart_port_cancel(",
+        "nx_uart_port_service(",
+        "nx_uart_port_stop(",
+        "nx_uart_port_submit(",
+        "nx_uart_tx_prepare("
+      ],
+      "invariant": "32 modeled histories combine partial/completed TX, cancellation, deadline, refused drain, duplicate settlement and slot lifetime.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "native.spi.simulated-async.NativeSpiSixteenCancelDeadlineDrainHistories",
+      "family": "native",
+      "peripheral": "spi",
+      "mode": "simulated-async",
+      "target": "nexus_io_state_machine_test",
+      "case": "IOProviderSequences.NativeSpiSixteenCancelDeadlineDrainHistories",
+      "test_source": "tests/google/io_state_machine_test.cpp",
+      "production_sources": [
+        "io/native/spi.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [
+        "io/native/provider.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_native_clock_configure(true,0U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_spi_port_configure_instance(&controller),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_spi_configure_instance(&endpoint,&controller,nullptr,0U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_spi_request_prepare(&request,tx,rx,3U,100U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_spi_endpoint_submit(&device,&request),NX_SUCCESS)",
+        "ASSERT_EQ(nx_spi_port_cancel(&bus,&request),NX_SUCCESS)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(nx_spi_port_stop(&bus),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_spi_request_prepare(&request,tx,rx,3U,100U),NX_ERROR_STATE)",
+        "ASSERT_EQ(nx_request_result(&request.base,&result,&count),NX_SUCCESS)",
+        "EXPECT_EQ(result,(scenario&1U)!=0U?NX_SUCCESS:(scenario&4U)!=0U?NX_ERROR_TIMEOUT:NX_ERROR_CANCELLED)",
+        "EXPECT_EQ(count,steps==4U?3U:1U)",
+        "ASSERT_EQ(nx_request_result(&request.base,&result,&count),NX_SUCCESS)",
+        "EXPECT_EQ(count,steps==4U?3U:1U)",
+        "EXPECT_FALSE(nx_native_spi_model_cs_active(&device))",
+        "EXPECT_EQ(nx_spi_port_stop(&bus),NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_native_clock_advance(",
+        "nx_native_clock_configure(",
+        "nx_native_spi_configure_instance(",
+        "nx_native_spi_model_async_configure(",
+        "nx_native_spi_model_cs_active(",
+        "nx_native_spi_model_drain_hold(",
+        "nx_native_spi_model_irq_step(",
+        "nx_native_spi_port_configure_instance(",
+        "nx_request_initialize(",
+        "nx_request_result(",
+        "nx_request_settle(",
+        "nx_request_state(",
+        "nx_spi_endpoint_submit(",
+        "nx_spi_port_cancel(",
+        "nx_spi_port_service(",
+        "nx_spi_port_stop(",
+        "nx_spi_request_prepare("
+      ],
+      "invariant": "16 modeled histories combine partial/completed SPI, deadline, cancellation and quarantine retry.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "native.adc.simulated-async.NativeAdcConsumerDelayStopAndOutOfOrderReleaseHistories",
+      "family": "native",
+      "peripheral": "adc",
+      "mode": "simulated-async",
+      "target": "nexus_io_state_machine_test",
+      "case": "IOProviderSequences.NativeAdcConsumerDelayStopAndOutOfOrderReleaseHistories",
+      "test_source": "tests/google/io_state_machine_test.cpp",
+      "production_sources": [
+        "io/native/adc.c",
+        "io/src/stream.c"
+      ],
+      "model_sources": [
+        "io/native/provider.h"
+      ],
+      "assertions": [
+        "ASSERT_EQ(nx_native_clock_configure(true,0U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_adc_configure_instance(&state,samples,2U,12U,3300U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stream_initialize(&stream,slots,2U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_adc_port_stream_start(&adc,&stream,1000U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_native_adc_model_trigger(&adc),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stream_acquire(&stream,&loans[index]),NX_SUCCESS)",
+        "EXPECT_EQ(nx_native_adc_model_trigger(&adc),NX_ERROR_OVERFLOW)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&adc),NX_ERROR_BUSY)",
+        "ASSERT_EQ(nx_stream_observe(&stream,&out),NX_SUCCESS)",
+        "EXPECT_TRUE(out.stopping)",
+        "EXPECT_EQ(out.outstanding,2U)",
+        "ASSERT_EQ(nx_stream_release(&stream,&loans[first]),NX_SUCCESS)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&adc),NX_ERROR_BUSY)",
+        "EXPECT_EQ(nx_stream_release(&stream,&loans[first]),NX_ERROR_STATE)",
+        "ASSERT_EQ(nx_stream_release(&stream,&loans[1U-first]),NX_SUCCESS)",
+        "EXPECT_EQ(nx_adc_port_stream_stop(&adc),NX_SUCCESS)",
+        "EXPECT_EQ(nx_native_adc_model_trigger(&adc),NX_ERROR_STATE)",
+        "ASSERT_EQ(nx_stream_observe(&stream,&out),NX_SUCCESS)",
+        "EXPECT_EQ(out.outstanding,0U)",
+        "EXPECT_EQ(out.free_blocks,2U)"
+      ],
+      "calls": [
+        "nx_adc_port_stream_start(",
+        "nx_adc_port_stream_stop(",
+        "nx_native_adc_configure_instance(",
+        "nx_native_adc_model_trigger(",
+        "nx_native_clock_configure(",
+        "nx_stream_acquire(",
+        "nx_stream_initialize(",
+        "nx_stream_observe(",
+        "nx_stream_release("
+      ],
+      "invariant": "Four bounded consumer release-order histories retain both stream loans through stop.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "common.uart.opt-in-rs485.FailedDirectionWithdrawalQuarantinesUntilActualRetry",
+      "family": "common",
+      "peripheral": "uart",
+      "mode": "opt-in-rs485",
+      "target": "nexus_uart_rs485_test",
+      "case": "UartRs485.FailedDirectionWithdrawalQuarantinesUntilActualRetry",
+      "test_source": "tests/google/uart_rs485_test.cpp",
+      "production_sources": [
+        "io/src/uart_rs485.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "EXPECT_CALL(hardware,Write(0U,8U))",
+        "EXPECT_TRUE(de)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_QUARANTINED)",
+        "EXPECT_EQ(state.active,&request)",
+        "EXPECT_EQ(state.inner.data,nullptr)",
+        "EXPECT_CALL(hardware,Write(0U,8U))",
+        "EXPECT_FALSE(de)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_SUCCESS)"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_uart_port_service(",
+        "nx_uart_port_submit("
+      ],
+      "invariant": "Failed DE withdrawal retains outer borrow and direction responsibility until verified retry.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    },
+    {
+      "id": "common.uart.opt-in-rs485.SetupConsumesAbsoluteDeadlineAndDoesNotStartExpiredTransfer",
+      "family": "common",
+      "peripheral": "uart",
+      "mode": "opt-in-rs485",
+      "target": "nexus_uart_rs485_test",
+      "case": "UartRs485.SetupConsumesAbsoluteDeadlineAndDoesNotStartExpiredTransfer",
+      "test_source": "tests/google/uart_rs485_test.cpp",
+      "production_sources": [
+        "io/src/uart_rs485.c",
+        "core/src/request.c"
+      ],
+      "model_sources": [],
+      "assertions": [
+        "ASSERT_EQ(nx_uart_tx_prepare(&request,payload,sizeof(payload),105U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
+        "EXPECT_CALL(hardware,Start(testing::_))",
+        "EXPECT_FALSE(de)",
+        "EXPECT_EQ(nx_request_state(&request.base),NX_REQUEST_SETTLED)",
+        "EXPECT_EQ(request.base.result,NX_ERROR_TIMEOUT)"
+      ],
+      "calls": [
+        "nx_request_state(",
+        "nx_uart_port_submit(",
+        "nx_uart_tx_prepare("
+      ],
+      "invariant": "Setup time consumes the same absolute request deadline and cannot start an expired transport.",
+      "limitations": "Bounded real C provider execution with external register/clock model; no physical DMA, waveform, WCET or exhaustive interleaving proof."
+    }
+  ],
+  "unproven": [
+    {
+      "scope": "physical",
+      "reason": "No connected boards: DMA/USART/SPI/I2C waveforms, electrical effects, IRQ WCET, cache interactions and HIL fault timing are not executed."
+    },
+    {
+      "scope": "continuous duplex combinations",
+      "reason": "Finite duplex TX/RX independence and continuous RX rotate/drain are covered separately; every simultaneous TX cancellation/RX wrap ordering is not exhaustive."
+    },
+    {
+      "scope": "non-streaming IO",
+      "reason": "GPIO/EXTI/PWM/watchdog/Flash/CAN/USB/Ethernet own distinct maintained suites; this finite request/block catalogue does not claim their complete lifecycle coverage."
+    },
+    {
+      "scope": "IRQ-byte-event TX per MCU",
+      "reason": "Byte/event IRQ receive and base UART tests exist; not every byte-ring profile and secondary-controller cancellation history is represented here."
+    },
+    {
+      "scope": "configuration legality",
+      "reason": "Strict mode/resource conflict and authored-limit tests execute through existing configure suite; this Google catalogue does not infer Python case execution from source names or expand reviewed Board routes."
+    },
+    {
+      "scope": "formal interleavings",
+      "reason": "Selected bounded register fault windows and Native histories are examples, not proof against every timing, ABA bank wrap or concurrent unsupported caller."
+    },
+    {
+      "scope": "test framework",
+      "reason": "Only ordinary reviewed TEST/TEST_F bodies are indexed; parameterized/typed/death-only aggregate properties need explicit review rather than automatic name inference."
+    }
+  ],
+  "contract_sources": [
+    "tools/configure/providers/common.py",
+    "core/include/nexus/core/request.h",
+    "io/include/nexus/io/stream.h",
+    "io/include/nexus/io/uart.h",
+    "io/include/nexus/io/spi.h",
+    "io/include/nexus/io/i2c.h",
+    "io/include/nexus/io/adc.h"
+  ]
+}

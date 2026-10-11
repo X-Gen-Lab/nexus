@@ -1,0 +1,26 @@
+tests/google/uart_multi_controller_test.cpp:162:1: error: embedding a directive within macro arguments is not portable [-Werror]
+  162 | #if defined(NX_DMA_MULTI_STM32)
+      | ^
+tests/google/uart_multi_controller_test.cpp:164:1: error: embedding a directive within macro arguments is not portable [-Werror]
+  164 | #else
+      | ^
+tests/google/uart_multi_controller_test.cpp:166:1: error: embedding a directive within macro arguments is not portable [-Werror]
+  166 | #endif
+      | ^
+tests/google/uart_multi_controller_test.cpp: In member function ‘virtual void {anonymous}::UARTMultiple_SecondaryStopPreservesPrimaryPublishersAndClock_Test::TestBody()’:
+tests/google/uart_multi_controller_test.cpp:213:5: error: ‘NVIC_SetPendingIRQ’ was not declared in this scope; did you mean ‘NVIC_ClearPendingIRQ’?
+  213 |     NVIC_SetPendingIRQ(TXIRQ0);
+      |     ^~~~~~~~~~~~~~~~~~
+      |     NVIC_ClearPendingIRQ
+In file included from build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/internal/gmock-internal-utils.h:51,
+                 from build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock-actions.h:146,
+                 from build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock.h:56,
+                 from tests/google/uart_multi_controller_test.cpp:47:
+tests/google/uart_multi_controller_test.cpp:220:15: error: ‘NVIC_GetPendingIRQ’ was not declared in this scope; did you mean ‘NVIC_ClearPendingIRQ’?
+  220 |     EXPECT_EQ(NVIC_GetPendingIRQ(TXIRQ0), 1U);
+      |               ^~~~~~~~~~~~~~~~~~
+tests/google/uart_multi_controller_test.cpp:221:15: error: ‘NVIC_GetPendingIRQ’ was not declared in this scope; did you mean ‘NVIC_ClearPendingIRQ’?
+  221 |     EXPECT_EQ(NVIC_GetPendingIRQ(TXIRQ1), 0U);
+      |               ^~~~~~~~~~~~~~~~~~
+cc1plus: all warnings being treated as errors

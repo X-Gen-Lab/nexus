@@ -1,0 +1,33 @@
+Running main() from gmock_main.cc
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from SPIMultiple
+[ RUN      ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers
+[       OK ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers (0 ms)
+[ RUN      ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers
+[       OK ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow
+[       OK ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow (0 ms)
+[ RUN      ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers
+[       OK ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement
+[       OK ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement (0 ms)
+[ RUN      ] SPIMultiple.DuplicateColdObjectCannotStealLivePhysicalPublishers
+[       OK ] SPIMultiple.DuplicateColdObjectCannotStealLivePhysicalPublishers (0 ms)
+[ RUN      ] SPIMultiple.NewReceiveErrorAtDisableCannotBecomeSuccessfulCompletion
+[       OK ] SPIMultiple.NewReceiveErrorAtDisableCannotBecomeSuccessfulCompletion (0 ms)
+[ RUN      ] SPIMultiple.NewTransmitErrorBeforeW1cCannotBecomeSuccessfulCompletion
+[       OK ] SPIMultiple.NewTransmitErrorBeforeW1cCannotBecomeSuccessfulCompletion (0 ms)
+[ RUN      ] SPIMultiple.ErrorAfterMemoryCompletionIsRecheckedBeforeSettlement
+[       OK ] SPIMultiple.ErrorAfterMemoryCompletionIsRecheckedBeforeSettlement (0 ms)
+[ RUN      ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers
+[       OK ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors
+[       OK ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors (0 ms)
+[ RUN      ] SPIMultiple.SecondaryPollingRecoveryPulsesApb1AndPreservesPrimaryWire
+[       OK ] SPIMultiple.SecondaryPollingRecoveryPulsesApb1AndPreservesPrimaryWire (0 ms)
+[----------] 12 tests from SPIMultiple (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 12 tests.

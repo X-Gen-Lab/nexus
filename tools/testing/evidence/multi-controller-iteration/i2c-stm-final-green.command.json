@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-multi-controller-iteration/stm-i2c-test",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-final-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:01:13.203152+00:00",
+  "ended_at": "2026-10-11T19:01:13.205770+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-green.log"
+}

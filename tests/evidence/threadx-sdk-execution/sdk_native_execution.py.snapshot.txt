@@ -1,0 +1,27 @@
+from pathlib import Path
+import hashlib,json,sys
+sys.path.insert(0,'/workspace/nexus')
+from scripts.ci.tdd_gate import environment,execute,discovered_count,validate_google_report
+from scripts.validation.junit import prepare_report
+P=Path('/workspace/nexus-threadx-probe');O=P/'evidence/sdk-native-execution-run1';O.mkdir(exist_ok=False)
+R=P/'sdk-native';B=P/'sdk-native-build-run1';S=P/'sdk-native-package-run2/share/nexus/src'
+def identity(p):
+ p=Path(p);b=p.read_bytes();return {'path':str(p),'sha256':hashlib.sha256(b).hexdigest(),'bytes':len(b)}
+original=identity(S/'.nexus-source-sdk.json');env=environment()
+execute(['cmake','-S',str(R),'-B',str(B),'-G','Ninja','-DCMAKE_PREFIX_PATH='+str(P/'sdk-native-package-run2'),'-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON','-DNEXUS_ASSEMBLY_FILE='+str(R/'threadx.toml')],env,O/'configure.log')
+execute(['cmake','--build',str(B),'--target','installed_threadx_execution','--parallel','1'],env,O/'build.log')
+binary=B/'bin/installed_threadx_execution'
+listing=execute(['timeout','20',str(binary),'--gtest_filter=*','--gtest_list_tests'],env,O/'discovery.log');count=discovered_count(listing)
+report=O/'results.xml';started=prepare_report(report)
+execute(['timeout','20',str(binary),'--gtest_filter=*','--gtest_repeat=1','--gtest_also_run_disabled_tests','--gtest_output=xml:'+str(report)],env,O/'execution.log')
+checked=validate_google_report(report,not_before_ns=started,expected_cases=count)
+expected=[];suite=None
+for line in listing.splitlines():
+ name=line.split('#',1)[0].rstrip()
+ if name and not name[0].isspace() and name.endswith('.'):suite=name[:-1]
+ elif suite is not None and name.startswith('  ') and name.strip():expected.append((suite,name.strip()))
+if sorted(expected)!=sorted((x['classname'],x['name']) for x in checked['cases']):raise ValueError('Case identities changed')
+execute([sys.executable,'-B',str(S/'cmake/package/package_source_sdk.py'),'--verify',str(S)],env,O/'verified-sdk.log')
+if original!=identity(S/'.nexus-source-sdk.json'):raise ValueError('Installed SDK identity changed')
+manifest={'schema':1,'kind':'installed-sdk-real-threadx-native-execution','qualification':'unsigned-dirty-development-fixture-only','physical':'not_executed','scope':'actual-official-Linux-kernel-public-installed-SDK-product-main','process_exit':'full-host-process-reset-after-Google-report-no-live-kernel-platform-stop','sdk':original,'binary':identity(binary),'database':identity(B/'compile_commands.json'),'test_validation':checked,'discovery':identity(O/'discovery.log'),'report':identity(report),'source':[identity(p) for p in sorted(R.iterdir()) if p.is_file()],'commands':[identity(p) for p in sorted(O.glob('*.command.json'))]}
+(O/'manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n');print('actual installed SDK kernel cases',checked['passed'])

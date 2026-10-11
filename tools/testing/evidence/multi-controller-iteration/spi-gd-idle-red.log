@@ -1,0 +1,70 @@
+Running main() from gmock_main.cc
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from SPIMultiple
+[ RUN      ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers
+[       OK ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers (0 ms)
+[ RUN      ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers
+[       OK ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow
+[       OK ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow (0 ms)
+[ RUN      ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers
+[       OK ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement
+[       OK ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement (0 ms)
+[ RUN      ] SPIMultiple.IdleForeignPublisherRejectsBeforeControllerAcquisition
+tests/google/spi_multi_controller_test.cpp:281: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 0
+  NX_ERROR_BUSY
+    Which is: 2
+
+tests/google/spi_multi_controller_test.cpp:282: Failure
+Value of: states[1].initialized
+  Actual: true
+Expected: false
+
+tests/google/spi_multi_controller_test.cpp:283: Failure
+Expected equality of these values:
+  (*(volatile uint32_t *)(uint32_t)((spis[1U]) + 0x00000000U))
+    Which is: 820
+  0U
+    Which is: 0
+
+tests/google/spi_multi_controller_test.cpp:284: Failure
+Expected equality of these values:
+  *rx_flags[1]
+    Which is: 0
+  0x08U << rx_shifts[1]
+    Which is: 524288
+
+tests/google/spi_multi_controller_test.cpp:285: Failure
+Expected equality of these values:
+  NVIC_GetPriority(DMA1_Channel2_IRQn)
+    Which is: 6
+  9U
+    Which is: 9
+
+[  FAILED  ] SPIMultiple.IdleForeignPublisherRejectsBeforeControllerAcquisition (0 ms)
+[ RUN      ] SPIMultiple.DuplicateColdObjectCannotStealLivePhysicalPublishers
+[       OK ] SPIMultiple.DuplicateColdObjectCannotStealLivePhysicalPublishers (0 ms)
+[ RUN      ] SPIMultiple.NewReceiveErrorAtDisableCannotBecomeSuccessfulCompletion
+[       OK ] SPIMultiple.NewReceiveErrorAtDisableCannotBecomeSuccessfulCompletion (0 ms)
+[ RUN      ] SPIMultiple.NewTransmitErrorBeforeW1cCannotBecomeSuccessfulCompletion
+[       OK ] SPIMultiple.NewTransmitErrorBeforeW1cCannotBecomeSuccessfulCompletion (0 ms)
+[ RUN      ] SPIMultiple.ErrorAfterMemoryCompletionIsRecheckedBeforeSettlement
+[       OK ] SPIMultiple.ErrorAfterMemoryCompletionIsRecheckedBeforeSettlement (0 ms)
+[ RUN      ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers
+[       OK ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors
+[       OK ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors (0 ms)
+[----------] 12 tests from SPIMultiple (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 11 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] SPIMultiple.IdleForeignPublisherRejectsBeforeControllerAcquisition
+
+ 1 FAILED TEST

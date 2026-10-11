@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/cmake",
+    "--build",
+    "/workspace/nexus/build/uart-iteration",
+    "--target",
+    "nexus_freertos_failstop_test",
+    "--parallel",
+    "2"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}
