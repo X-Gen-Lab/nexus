@@ -1,0 +1,29 @@
+[1/5] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/exti.c.o
+[2/5] Building C object CMakeFiles/native.dir/workspace/nexus/io/native/uart.c.o
+[3/5] Linking C static library libnative.a
+[4/5] Building CXX object CMakeFiles/native_instances.dir/workspace/nexus/tests/google/native_instances_test.cpp.o
+FAILED: [code=1] CMakeFiles/native_instances.dir/workspace/nexus/tests/google/native_instances_test.cpp.o 
+/usr/bin/g++  -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus/io/include -I/workspace/nexus/io/native -isystem /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest  -MD -MT CMakeFiles/native_instances.dir/workspace/nexus/tests/google/native_instances_test.cpp.o -MF CMakeFiles/native_instances.dir/workspace/nexus/tests/google/native_instances_test.cpp.o.d -o CMakeFiles/native_instances.dir/workspace/nexus/tests/google/native_instances_test.cpp.o -c /workspace/nexus/tests/google/native_instances_test.cpp
+/workspace/nexus/tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_PublicModelHelpersSelectOnlyTheirNativeFace_Test::TestBody()’:
+/workspace/nexus/tests/google/native_instances_test.cpp:83:5: error: ‘nx_native_gpio_model_input’ was not declared in this scope; did you mean ‘nx_native_gpio_input’?
+   83 |     nx_native_gpio_model_input(&native, 2);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_gpio_input
+In file included from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/internal/gmock-internal-utils.h:51,
+                 from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock-actions.h:146,
+                 from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock.h:56,
+                 from /workspace/nexus/tests/google/native_instances_test.cpp:15:
+/workspace/nexus/tests/google/native_instances_test.cpp:85:15: error: ‘nx_native_gpio_model_output’ was not declared in this scope; did you mean ‘nx_native_gpio_output’?
+   85 |     EXPECT_EQ(nx_native_gpio_model_output(&native), 1u);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/native_instances_test.cpp:86:15: error: ‘nx_native_gpio_model_output’ was not declared in this scope; did you mean ‘nx_native_gpio_output’?
+   86 |     EXPECT_EQ(nx_native_gpio_model_output(&alternate_api), 0u);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/native_instances_test.cpp:90:15: error: ‘nx_native_spi_model_configure’ was not declared in this scope; did you mean ‘nx_native_spi_configure’?
+   90 |     EXPECT_EQ(nx_native_spi_model_configure(nullptr, nullptr, 0),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/native_instances_test.cpp:92:15: error: ‘nx_native_uart_model_configure’ was not declared in this scope; did you mean ‘nx_native_uart_configure’?
+   92 |     EXPECT_EQ(nx_native_uart_model_configure(nullptr, nullptr),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ninja: build stopped: subcommand failed.

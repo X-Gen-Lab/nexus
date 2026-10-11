@@ -1,0 +1,27 @@
+Running main() from gmock_main.cc
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from Stm32AdcStream
+[ RUN      ] Stm32AdcStream.StabilizationRequiresExplicitServiceBeforeFirstTrigger
+[       OK ] Stm32AdcStream.StabilizationRequiresExplicitServiceBeforeFirstTrigger (0 ms)
+[ RUN      ] Stm32AdcStream.ValidatesCompleteScanConversionBudgetBeforeAdmission
+[       OK ] Stm32AdcStream.ValidatesCompleteScanConversionBudgetBeforeAdmission (0 ms)
+[ RUN      ] Stm32AdcStream.PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume
+[       OK ] Stm32AdcStream.PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume (0 ms)
+[ RUN      ] Stm32AdcStream.RefusedDisableNeverPublishesMutableDmaMemory
+[       OK ] Stm32AdcStream.RefusedDisableNeverPublishesMutableDmaMemory (0 ms)
+[ RUN      ] Stm32AdcStream.MisalignedOrPartialScanBlocksRejectWithoutTimerEffects
+[       OK ] Stm32AdcStream.MisalignedOrPartialScanBlocksRejectWithoutTimerEffects (0 ms)
+[ RUN      ] Stm32AdcStream.WarmupStartsAfterPowerStoreBarrierCompletes
+[       OK ] Stm32AdcStream.WarmupStartsAfterPowerStoreBarrierCompletes (0 ms)
+[ RUN      ] Stm32AdcStream.ObservedDmaFaultCannotBeReplacedByLateTransferComplete
+[       OK ] Stm32AdcStream.ObservedDmaFaultCannotBeReplacedByLateTransferComplete (0 ms)
+[ RUN      ] Stm32AdcStream.BasicAdcInitializationCannotBypassStreamClockValidation
+[       OK ] Stm32AdcStream.BasicAdcInitializationCannotBypassStreamClockValidation (0 ms)
+[ RUN      ] Stm32AdcStream.InvalidStreamClockBoundsRejectBeforeAdmission
+[       OK ] Stm32AdcStream.InvalidStreamClockBoundsRejectBeforeAdmission (0 ms)
+[----------] 9 tests from Stm32AdcStream (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 9 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 9 tests.

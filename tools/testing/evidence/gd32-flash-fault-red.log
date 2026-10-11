@@ -1,0 +1,22 @@
+Running main() from gmock_main.cc
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from GD32FlashFault
+[ RUN      ] GD32FlashFault.RelockFailureCannotReleaseOrReacquireController
+/workspace/nexus/tests/google/gd32_flash_fault_test.cpp:72: Failure
+Expected equality of these values:
+  nx_flash_port_program(&port, 0U, &word, sizeof(word), (18446744073709551615UL))
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+
+[  FAILED  ] GD32FlashFault.RelockFailureCannotReleaseOrReacquireController (0 ms)
+[----------] 1 test from GD32FlashFault (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] GD32FlashFault.RelockFailureCannotReleaseOrReacquireController
+
+ 1 FAILED TEST

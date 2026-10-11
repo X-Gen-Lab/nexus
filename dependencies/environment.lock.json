@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "tools": {"cmake": "3.31.6", "ninja": "1.13.2", "clang-format": "14.0.6", "pre-commit": "4.3.0"},
+  "python": {"minimum": "3.11", "qualified_local": "3.12.14"},
+  "native_compiler": {"id": "GNU", "version": "14.2.0"},
+  "arm_compiler": {"id": "GNU", "version": "14.3.1", "distribution": "14.3.rel1", "archive_lock": "dependencies/toolchains.lock.json"},
+  "qualified_oci": {
+    "origin": "observed local OCI artifact; no published registry digest",
+    "manifest_digest": "sha256:e936b188b9e30cf37ce109a5407019c91fe2dbc62fb10afceb3f2abbfc823ac8",
+    "config_digest": "sha256:a1ba03c16d424aef88dad6e5b2ead2892734a0bf909dedc23d8855fa4861fbe0",
+    "platform": "linux/amd64",
+    "python": "3.12.15",
+    "git": "2.47.3",
+    "native_compiler": "GNU 14.2.0 Debian 14.2.0-19",
+    "formal_build_network": "none",
+    "preparation_network": "allowed before sealing",
+    "recipe_reproducible": false
+  },
+  "arm_toolchain_tree": {"sha256": "44d2fe14e401730074302ad87bdef9762a6cfe12de4bebc6853d181fd51c74fd", "files": 7190, "bytes": 1106755364},
+  "scope": "Pinned tools and measured artifacts; mutable host runner checks do not establish reproducibility"
+}

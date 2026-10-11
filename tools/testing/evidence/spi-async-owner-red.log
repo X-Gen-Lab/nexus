@@ -1,0 +1,4 @@
+tests/google/spi_async_owner_test.cpp:9:10: fatal error: nexus/components/spi_async_owner.h: No such file or directory
+    9 | #include "nexus/components/spi_async_owner.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.

@@ -1,0 +1,17 @@
++ binary --gtest_filter=*
+F
+======================================================================
+FAIL: test_command_and_actual_exit_are_recorded_alongside_raw_log (tools.testing.test_google_report.GateBoundaryTests.test_command_and_actual_exit_are_recorded_alongside_raw_log)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/mock.py", line 1396, in patched
+    return func(*newargs, **newkeywargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/testing/test_google_report.py", line 93, in test_command_and_actual_exit_are_recorded_alongside_raw_log
+    self.assertTrue(record.is_file())
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

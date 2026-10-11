@@ -5,7 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+
+## Next-generation platform refactor (unreleased)
+
+Static typed I/O and caller-owned requests replace HAL factories, runtime
+registries, universal pools and Kconfig assembly. Core/Arch/SoC/Board/OS/component
+boundaries, one strict JSON resolution bundle, explicit firmware targets and
+private vendor compilation now form the maintained platform. STM32F407ZG/VE and
+GD32F470ZG have exact part inputs, production providers and software-only advanced
+mode fixtures. External examples consume a locked independent source SDK.
+
+Commit hooks retain the existing style. Host/model/sanitizer, six ARM assemblies,
+component/advanced-mode link checks, resource budgets, strict source consumption,
+HIL admission tooling and offline artifact evidence have distinct qualification
+scopes. Physical execution remains unexecuted until boards are connected. See
+[delivery](docs/delivery/README.md) for current scope and evidence.
+
+## Pre-refactor working history (superseded)
 
 ### Added
 

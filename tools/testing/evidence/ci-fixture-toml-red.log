@@ -1,0 +1,14 @@
+test_advanced_fixture_loop_uses_the_authored_toml_set (__main__.WorkflowContracts.test_advanced_fixture_loop_uses_the_authored_toml_set) ... FAIL
+
+======================================================================
+FAIL: test_advanced_fixture_loop_uses_the_authored_toml_set (__main__.WorkflowContracts.test_advanced_fixture_loop_uses_the_authored_toml_set)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/.github/workflows/test_platform_ci.py", line 93, in test_advanced_fixture_loop_uses_the_authored_toml_set
+    self.assertIn('"$fixture"/*.toml', commands)
+AssertionError: '"$fixture"/*.toml' not found in '\n\nfixture="tests/contracts/${FAMILY}_assembly"\ncount=0\nfor assembly in "$fixture"/*.json; do\n  name="$(basename "$assembly" .json)"\n  output="build/controller-routes/$FAMILY/$name"\n  .venv/bin/cmake -S "$fixture" -B "$output" -G Ninja \\\n    -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/cmake/toolchains/arm-gcc.cmake" \\\n    -DNEXUS_SOURCE_ROOT="$GITHUB_WORKSPACE" \\\n    -DNEXUS_ASSEMBLY_FILE="$GITHUB_WORKSPACE/$assembly"\n  .venv/bin/cmake --build "$output" --parallel 4\n  count=$((count + 1))\ndone\ntest "$count" -gt 0\n\n'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.006s
+
+FAILED (failures=1)

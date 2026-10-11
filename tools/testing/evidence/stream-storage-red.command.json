@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "command": [
+    "build/native-debug/bin/nexus_stream_storage_test"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1,
+  "recording": "retroactive from root actual tool result"
+}

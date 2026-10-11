@@ -1,0 +1,63 @@
+name: Tool Contracts
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  tooling:
+    name: Configuration, evidence and SDK failure boundaries
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-build
+        with:
+          preset: native-debug
+          arm: 'true'
+      - name: Use the installed CLI tools for real consumer builds
+        run: echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+      - name: Execute configuration rejection and atomic generation
+        run: >-
+          .venv/bin/python -B tools/testing/run_tool_tests.py --suite configure
+          --report build/quality/tools-configure.json
+      - name: Check derived capability text and report review assignment gaps
+        run: |
+          .venv/bin/python tools/maintenance/capabilities.py --check
+          .venv/bin/python tools/maintenance/ownership.py
+      - name: Execute tamper, budget, HIL and relocated SDK boundaries
+        run: |
+          mkdir -p build/quality
+          .venv/bin/python -m unittest discover -s tests/contracts -p 'test_*.py' -v             2>&1 | tee build/quality/tool-contracts.log
+        env:
+          NEXUS_ARM_GCC: arm-none-eabi-gcc
+      - name: Execute commit and analyzer orchestration boundaries
+        run: |
+          .venv/bin/python -B -m unittest discover -s scripts/ci -p 'test_*.py' -v
+          .venv/bin/python .github/workflows/test_platform_ci.py
+      - name: Execute Google report admission and station preparation boundaries
+        run: |
+          .venv/bin/python -B tools/testing/run_tool_tests.py --suite testing --report build/quality/tools-testing.json
+          .venv/bin/python -B -m tools.hil.prepare --help
+      - name: Preserve executed tool evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: tool-contracts
+          path: |
+            build/quality/tool-contracts.log
+            build/quality/tools-configure.json
+            build/quality/tools-testing.json
+          if-no-files-found: error
+      # A station template with no probe/serial binding is rejected. These
+      # software tests do not open a production station or establish board HIL.

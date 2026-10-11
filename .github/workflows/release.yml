@@ -1,120 +1,54 @@
-name: Release
+name: Source SDK Delivery Checks
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Release version (e.g., v1.0.0)'
-        required: true
-        type: string
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  create-release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      version: ${{ steps.get_version.outputs.version }}
-
+  platform:
+    uses: ./.github/workflows/build-matrix.yml
+  contracts:
+    uses: ./.github/workflows/enterprise-tools.yml
+  source-sdk:
+    needs: [platform, contracts]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-
-      - name: Get version
-        id: get_version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Generate changelog
-        run: |
-          if [ -f CHANGELOG.md ]; then
-            sed -n "/## \[${{ steps.get_version.outputs.version }}\]/,/## \[/p" CHANGELOG.md | head -n -1 > release_notes.md
-          else
-            echo "Release ${{ steps.get_version.outputs.version }}" > release_notes.md
-          fi
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
+          submodules: false
+      - uses: ./.github/actions/setup-build
         with:
-          tag_name: ${{ steps.get_version.outputs.version }}
-          name: Release ${{ steps.get_version.outputs.version }}
-          body_path: release_notes.md
-          draft: false
-          prerelease: false
-
-  build-release:
-    name: Build ${{ matrix.name }}
-    needs: create-release
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Windows MSVC
-            os: windows-latest
-            preset: windows-msvc-release
-            artifact: nexus-windows-msvc
-          - name: Linux GCC
-            os: ubuntu-latest
-            preset: linux-gcc-release
-            artifact: nexus-linux-gcc
-          - name: macOS Clang
-            os: macos-latest
-            preset: macos-clang-release
-            artifact: nexus-macos-clang
-          - name: ARM Cortex-M4
-            os: ubuntu-latest
-            preset: cross-arm-release
-            artifact: nexus-arm-cortex-m4
-
-    steps:
-      - uses: actions/checkout@v4
+          preset: native-debug
+          arm: 'true'
+      - name: Package only the clean checked-out source and locked dependencies
+        run: >-
+          .venv/bin/python cmake/package/package_source_sdk.py
+          --source "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/nexus-source-sdk"
+      - name: Verify the installed source and exported CMake package byte identities
+        run: >-
+          .venv/bin/python cmake/package/package_source_sdk.py
+          --verify "$RUNNER_TEMP/nexus-source-sdk/share/nexus/src"
+      - name: Execute strict consumers against this exact installed prefix
+        run: >-
+          .venv/bin/python cmake/package/verify_consumers.py
+          --prefix "$RUNNER_TEMP/nexus-source-sdk"
+          --output "$RUNNER_TEMP/nexus-sdk-consumers"
+      - name: Retain the verified source SDK
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          os: ${{ matrix.os }}
-          preset: ${{ matrix.preset }}
-
-      - name: Configure
-        run: cmake --preset ${{ matrix.preset }}
-
-      - name: Build
-        run: cmake --build --preset ${{ matrix.preset }} --parallel
-
-      - name: Package
-        shell: bash
-        run: |
-          mkdir -p release/${{ matrix.artifact }}
-          cp -r build/${{ matrix.preset }}/bin/* release/${{ matrix.artifact }}/ 2>/dev/null || true
-          cp -r build/${{ matrix.preset }}/lib/* release/${{ matrix.artifact }}/ 2>/dev/null || true
-          cp README.md LICENSE release/${{ matrix.artifact }}/
-
-      - name: Create Archive
-        shell: bash
-        run: |
-          cd release
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            7z a ${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.zip ${{ matrix.artifact }}
-            echo "ASSET_PATH=release/${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.zip" >> $GITHUB_ENV
-          else
-            tar czf ${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.tar.gz ${{ matrix.artifact }}
-            echo "ASSET_PATH=release/${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.tar.gz" >> $GITHUB_ENV
-          fi
-
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ needs.create-release.outputs.version }}
-          files: ${{ env.ASSET_PATH }}
+          name: nexus-source-sdk-${{ github.sha }}
+          path: ${{ runner.temp }}/nexus-source-sdk/
+          if-no-files-found: error
+          retention-days: 14
+      # This workflow verifies source consumption and the nine software builds.
+      # tools/evidence/candidate.py separately requires actual offline rebuild,
+      # matching qualification artifacts and explicit unexecuted hardware status.
+      # It does not create tags, releases or promote a production artifact.

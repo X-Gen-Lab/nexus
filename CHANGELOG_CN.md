@@ -5,7 +5,20 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 项目遵循 [语义化版本](https://semver.org/lang/zh-CN/spec/v2.0.0.html)。
 
-## [未发布]
+
+## 下一代平台破坏性重构（未发布）
+
+静态 typed I/O、调用者持有请求和显式所有权取代 factory、运行时注册、全类型池
+与 Kconfig 装配。物理目录统一为 Core/Arch/SoC/Board/IO/OS/Components；
+严格 JSON 解析产生唯一配置 bundle，CMake 维护目标依赖，厂商 SDK 私有编译。
+首发三块 STM32F407ZG/VE、GD32F470ZG 板卡区分已审接线与软件外设 fixture。
+产品示例独立消费固定源码 SDK。
+
+提交检查保持原有排版与注释风格。Host/模型/Sanitizer、六组 ARM、公共组件和
+高级模式链接、资源预算、正式源码消费、HIL 工具和离线构建证据分别验收。
+实板未接入，不把软件通过记作物理资格。详见[当前交付](docs/delivery/README.md)。
+
+## 重构前历史（已被替代）
 
 ### 新增
 

@@ -1,0 +1,1006 @@
+tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_GPIOBindingsAndAlternateProviderRemainIndependent_Test::TestBody()’:
+tests/google/native_instances_test.cpp:40:5: error: ‘nx_native_gpio_state_t’ was not declared in this scope; did you mean ‘nx_native_gpio_output’?
+   40 |     nx_native_gpio_state_t first = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_gpio_output
+tests/google/native_instances_test.cpp:41:27: error: expected ‘;’ before ‘second’
+   41 |     nx_native_gpio_state_t second = {};
+      |                           ^~~~~~~
+      |                           ;
+tests/google/native_instances_test.cpp:42:26: error: variable ‘const nx_gpio_port_t first_api’ has initializer but incomplete type
+   42 |     const nx_gpio_port_t first_api = {&nx_native_gpio_ops, &first};
+      |                          ^~~~~~~~~
+tests/google/native_instances_test.cpp:42:40: error: ‘nx_native_gpio_ops’ was not declared in this scope; did you mean ‘nx_native_gpio_output’?
+   42 |     const nx_gpio_port_t first_api = {&nx_native_gpio_ops, &first};
+      |                                        ^~~~~~~~~~~~~~~~~~
+      |                                        nx_native_gpio_output
+tests/google/native_instances_test.cpp:42:61: error: ‘first’ was not declared in this scope
+   42 |     const nx_gpio_port_t first_api = {&nx_native_gpio_ops, &first};
+      |                                                             ^~~~~
+tests/google/native_instances_test.cpp:43:26: error: variable ‘const nx_gpio_port_t second_api’ has initializer but incomplete type
+   43 |     const nx_gpio_port_t second_api = {&nx_native_gpio_ops, &second};
+      |                          ^~~~~~~~~~
+tests/google/native_instances_test.cpp:43:62: error: ‘second’ was not declared in this scope
+   43 |     const nx_gpio_port_t second_api = {&nx_native_gpio_ops, &second};
+      |                                                              ^~~~~~
+In file included from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/internal/gmock-internal-utils.h:51,
+                 from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock-actions.h:146,
+                 from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock.h:56,
+                 from tests/google/native_instances_test.cpp:15:
+tests/google/native_instances_test.cpp:44:15: error: ‘nx_native_gpio_configure_instance’ was not declared in this scope; did you mean ‘nx_native_gpio_configure’?
+   44 |     ASSERT_EQ(nx_native_gpio_configure_instance(&first, 3, 1), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:44:5: note: in expansion of macro ‘ASSERT_EQ’
+   44 |     ASSERT_EQ(nx_native_gpio_configure_instance(&first, 3, 1), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:45:15: error: ‘nx_native_gpio_configure_instance’ was not declared in this scope; did you mean ‘nx_native_gpio_configure’?
+   45 |     ASSERT_EQ(nx_native_gpio_configure_instance(&second, 12, 8), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:45:5: note: in expansion of macro ‘ASSERT_EQ’
+   45 |     ASSERT_EQ(nx_native_gpio_configure_instance(&second, 12, 8), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:48:15: error: ‘nx_native_gpio_output_instance’ was not declared in this scope; did you mean ‘nx_native_gpio_output’?
+   48 |     EXPECT_EQ(nx_native_gpio_output_instance(&first), 2u);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:144:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  144 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_NONFATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1885:3: note: in expansion of macro ‘EXPECT_PRED_FORMAT2’
+ 1885 |   EXPECT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:48:5: note: in expansion of macro ‘EXPECT_EQ’
+   48 |     EXPECT_EQ(nx_native_gpio_output_instance(&first), 2u);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:49:15: error: ‘nx_native_gpio_output_instance’ was not declared in this scope; did you mean ‘nx_native_gpio_output’?
+   49 |     EXPECT_EQ(nx_native_gpio_output_instance(&second), 8u);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:144:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  144 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_NONFATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1885:3: note: in expansion of macro ‘EXPECT_PRED_FORMAT2’
+ 1885 |   EXPECT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:49:5: note: in expansion of macro ‘EXPECT_EQ’
+   49 |     EXPECT_EQ(nx_native_gpio_output_instance(&second), 8u);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:52:11: error: ‘nx_gpio_ops_t’ does not name a type; did you mean ‘nx_gpio_port_t’?
+   52 |     const nx_gpio_ops_t alternate_ops = {alternate_write, nullptr, nullptr};
+      |           ^~~~~~~~~~~~~
+      |           nx_gpio_port_t
+tests/google/native_instances_test.cpp:53:26: error: variable ‘const nx_gpio_port_t alternate_api’ has initializer but incomplete type
+   53 |     const nx_gpio_port_t alternate_api = {&alternate_ops, &alternate};
+      |                          ^~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:53:44: error: ‘alternate_ops’ was not declared in this scope; did you mean ‘alternate’?
+   53 |     const nx_gpio_port_t alternate_api = {&alternate_ops, &alternate};
+      |                                            ^~~~~~~~~~~~~
+      |                                            alternate
+tests/google/native_instances_test.cpp:56:15: error: ‘nx_native_gpio_output_instance’ was not declared in this scope; did you mean ‘nx_native_gpio_output’?
+   56 |     EXPECT_EQ(nx_native_gpio_output_instance(&first), 2u);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:144:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  144 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_NONFATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1885:3: note: in expansion of macro ‘EXPECT_PRED_FORMAT2’
+ 1885 |   EXPECT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:56:5: note: in expansion of macro ‘EXPECT_EQ’
+   56 |     EXPECT_EQ(nx_native_gpio_output_instance(&first), 2u);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_UARTInterruptsAndBorrowSettlementStayOnTheirInstance_Test::TestBody()’:
+tests/google/native_instances_test.cpp:60:5: error: ‘nx_native_uart_state_t’ was not declared in this scope; did you mean ‘nx_native_uart_fault’?
+   60 |     nx_native_uart_state_t first = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_uart_fault
+tests/google/native_instances_test.cpp:61:27: error: expected ‘;’ before ‘second’
+   61 |     nx_native_uart_state_t second = {};
+      |                           ^~~~~~~
+      |                           ;
+tests/google/native_instances_test.cpp:62:26: error: variable ‘const nx_uart_port_t first_api’ has initializer but incomplete type
+   62 |     const nx_uart_port_t first_api = {&nx_native_uart_ops, &first};
+      |                          ^~~~~~~~~
+tests/google/native_instances_test.cpp:62:40: error: ‘nx_native_uart_ops’ was not declared in this scope; did you mean ‘nx_native_uart’?
+   62 |     const nx_uart_port_t first_api = {&nx_native_uart_ops, &first};
+      |                                        ^~~~~~~~~~~~~~~~~~
+      |                                        nx_native_uart
+tests/google/native_instances_test.cpp:62:61: error: ‘first’ was not declared in this scope
+   62 |     const nx_uart_port_t first_api = {&nx_native_uart_ops, &first};
+      |                                                             ^~~~~
+tests/google/native_instances_test.cpp:63:26: error: variable ‘const nx_uart_port_t second_api’ has initializer but incomplete type
+   63 |     const nx_uart_port_t second_api = {&nx_native_uart_ops, &second};
+      |                          ^~~~~~~~~~
+tests/google/native_instances_test.cpp:63:62: error: ‘second’ was not declared in this scope
+   63 |     const nx_uart_port_t second_api = {&nx_native_uart_ops, &second};
+      |                                                              ^~~~~~
+tests/google/native_instances_test.cpp:72:15: error: ‘nx_native_uart_configure_instance’ was not declared in this scope; did you mean ‘nx_native_uart_configure’?
+   72 |     ASSERT_EQ(nx_native_uart_configure_instance(&first, &first_config),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:72:5: note: in expansion of macro ‘ASSERT_EQ’
+   72 |     ASSERT_EQ(nx_native_uart_configure_instance(&first, &first_config),
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:74:15: error: ‘nx_native_uart_configure_instance’ was not declared in this scope; did you mean ‘nx_native_uart_configure’?
+   74 |     ASSERT_EQ(nx_native_uart_configure_instance(&second, &second_config),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:74:5: note: in expansion of macro ‘ASSERT_EQ’
+   74 |     ASSERT_EQ(nx_native_uart_configure_instance(&second, &second_config),
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:88:5: error: ‘nx_native_uart_irq_step_instance’ was not declared in this scope; did you mean ‘nx_native_uart_irq_step’?
+   88 |     nx_native_uart_irq_step_instance(&first);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_uart_irq_step
+tests/google/native_instances_test.cpp:94:15: error: ‘nx_native_uart_transmitted_instance’ was not declared in this scope; did you mean ‘nx_native_uart_transmitted’?
+   94 |     EXPECT_EQ(nx_native_uart_transmitted_instance(&second), 0u);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:144:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  144 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_NONFATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1885:3: note: in expansion of macro ‘EXPECT_PRED_FORMAT2’
+ 1885 |   EXPECT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:94:5: note: in expansion of macro ‘EXPECT_EQ’
+   94 |     EXPECT_EQ(nx_native_uart_transmitted_instance(&second), 0u);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:95:15: error: ‘nx_native_uart_configure_instance’ was not declared in this scope; did you mean ‘nx_native_uart_configure’?
+   95 |     EXPECT_EQ(nx_native_uart_configure_instance(&second, &second_config),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:144:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  144 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_NONFATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1885:3: note: in expansion of macro ‘EXPECT_PRED_FORMAT2’
+ 1885 |   EXPECT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:95:5: note: in expansion of macro ‘EXPECT_EQ’
+   95 |     EXPECT_EQ(nx_native_uart_configure_instance(&second, &second_config),
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:97:15: error: ‘nx_native_uart_receive_instance’ was not declared in this scope; did you mean ‘nx_native_uart_receive’?
+   97 |     ASSERT_EQ(nx_native_uart_receive_instance(&first, 3, 0), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:97:5: note: in expansion of macro ‘ASSERT_EQ’
+   97 |     ASSERT_EQ(nx_native_uart_receive_instance(&first, 3, 0), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:98:15: error: ‘nx_native_uart_receive_instance’ was not declared in this scope; did you mean ‘nx_native_uart_receive’?
+   98 |     ASSERT_EQ(nx_native_uart_receive_instance(&second, 7, 0), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:98:5: note: in expansion of macro ‘ASSERT_EQ’
+   98 |     ASSERT_EQ(nx_native_uart_receive_instance(&second, 7, 0), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_SPIEndpointsShareArbitrationAndKeepDeviceMemory_Test::TestBody()’:
+tests/google/native_instances_test.cpp:113:5: error: ‘nx_native_spi_state_t’ was not declared in this scope; did you mean ‘nx_native_spi_fault’?
+  113 |     nx_native_spi_state_t bus = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_spi_fault
+tests/google/native_instances_test.cpp:114:26: error: expected ‘;’ before ‘other_bus’
+  114 |     nx_native_spi_state_t other_bus = {};
+      |                          ^~~~~~~~~~
+      |                          ;
+tests/google/native_instances_test.cpp:115:5: error: ‘nx_native_spi_endpoint_state_t’ was not declared in this scope
+  115 |     nx_native_spi_endpoint_state_t first = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:116:35: error: expected ‘;’ before ‘second’
+  116 |     nx_native_spi_endpoint_state_t second = {};
+      |                                   ^~~~~~~
+      |                                   ;
+tests/google/native_instances_test.cpp:117:35: error: expected ‘;’ before ‘third’
+  117 |     nx_native_spi_endpoint_state_t third = {};
+      |                                   ^~~~~~
+      |                                   ;
+tests/google/native_instances_test.cpp:118:25: error: variable ‘const nx_spi_port_t bus_api’ has initializer but incomplete type
+  118 |     const nx_spi_port_t bus_api = {&nx_native_spi_ops, &bus};
+      |                         ^~~~~~~
+tests/google/native_instances_test.cpp:118:37: error: ‘nx_native_spi_ops’ was not declared in this scope; did you mean ‘nx_native_spi’?
+  118 |     const nx_spi_port_t bus_api = {&nx_native_spi_ops, &bus};
+      |                                     ^~~~~~~~~~~~~~~~~
+      |                                     nx_native_spi
+tests/google/native_instances_test.cpp:118:57: error: ‘bus’ was not declared in this scope
+  118 |     const nx_spi_port_t bus_api = {&nx_native_spi_ops, &bus};
+      |                                                         ^~~
+tests/google/native_instances_test.cpp:119:29: error: variable ‘const nx_spi_endpoint_t first_api’ has initializer but incomplete type
+  119 |     const nx_spi_endpoint_t first_api = {&nx_native_spi_endpoint_ops, &first};
+      |                             ^~~~~~~~~
+tests/google/native_instances_test.cpp:119:43: error: ‘nx_native_spi_endpoint_ops’ was not declared in this scope
+  119 |     const nx_spi_endpoint_t first_api = {&nx_native_spi_endpoint_ops, &first};
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:119:72: error: ‘first’ was not declared in this scope
+  119 |     const nx_spi_endpoint_t first_api = {&nx_native_spi_endpoint_ops, &first};
+      |                                                                        ^~~~~
+tests/google/native_instances_test.cpp:120:29: error: variable ‘const nx_spi_endpoint_t second_api’ has initializer but incomplete type
+  120 |     const nx_spi_endpoint_t second_api = {&nx_native_spi_endpoint_ops,
+      |                             ^~~~~~~~~~
+tests/google/native_instances_test.cpp:121:44: error: ‘second’ was not declared in this scope
+  121 |                                           &second};
+      |                                            ^~~~~~
+tests/google/native_instances_test.cpp:122:29: error: variable ‘const nx_spi_endpoint_t third_api’ has initializer but incomplete type
+  122 |     const nx_spi_endpoint_t third_api = {&nx_native_spi_endpoint_ops, &third};
+      |                             ^~~~~~~~~
+tests/google/native_instances_test.cpp:122:72: error: ‘third’ was not declared in this scope
+  122 |     const nx_spi_endpoint_t third_api = {&nx_native_spi_endpoint_ops, &third};
+      |                                                                        ^~~~~
+tests/google/native_instances_test.cpp:126:15: error: ‘nx_native_spi_port_configure_instance’ was not declared in this scope
+  126 |     ASSERT_EQ(nx_native_spi_port_configure_instance(&bus), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:126:5: note: in expansion of macro ‘ASSERT_EQ’
+  126 |     ASSERT_EQ(nx_native_spi_port_configure_instance(&bus), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:127:54: error: ‘other_bus’ was not declared in this scope
+  127 |     ASSERT_EQ(nx_native_spi_port_configure_instance(&other_bus), NX_SUCCESS);
+      |                                                      ^~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:127:5: note: in expansion of macro ‘ASSERT_EQ’
+  127 |     ASSERT_EQ(nx_native_spi_port_configure_instance(&other_bus), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:127:15: error: ‘nx_native_spi_port_configure_instance’ was not declared in this scope
+  127 |     ASSERT_EQ(nx_native_spi_port_configure_instance(&other_bus), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:127:5: note: in expansion of macro ‘ASSERT_EQ’
+  127 |     ASSERT_EQ(nx_native_spi_port_configure_instance(&other_bus), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:128:15: error: ‘nx_native_spi_configure_instance’ was not declared in this scope; did you mean ‘nx_native_spi_configure’?
+  128 |     ASSERT_EQ(nx_native_spi_configure_instance(&first, &bus, first_memory, 2),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:128:5: note: in expansion of macro ‘ASSERT_EQ’
+  128 |     ASSERT_EQ(nx_native_spi_configure_instance(&first, &bus, first_memory, 2),
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:130:15: error: ‘nx_native_spi_configure_instance’ was not declared in this scope; did you mean ‘nx_native_spi_configure’?
+  130 |     ASSERT_EQ(nx_native_spi_configure_instance(&second, &bus, second_memory,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:130:5: note: in expansion of macro ‘ASSERT_EQ’
+  130 |     ASSERT_EQ(nx_native_spi_configure_instance(&second, &bus, second_memory,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:132:57: error: ‘other_bus’ was not declared in this scope
+  132 |     ASSERT_EQ(nx_native_spi_configure_instance(&third, &other_bus,
+      |                                                         ^~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:132:5: note: in expansion of macro ‘ASSERT_EQ’
+  132 |     ASSERT_EQ(nx_native_spi_configure_instance(&third, &other_bus,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:132:15: error: ‘nx_native_spi_configure_instance’ was not declared in this scope; did you mean ‘nx_native_spi_configure’?
+  132 |     ASSERT_EQ(nx_native_spi_configure_instance(&third, &other_bus,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:132:5: note: in expansion of macro ‘ASSERT_EQ’
+  132 |     ASSERT_EQ(nx_native_spi_configure_instance(&third, &other_bus,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:143:5: error: ‘nx_native_spi_fault_instance’ was not declared in this scope; did you mean ‘nx_native_spi_fault’?
+  143 |     nx_native_spi_fault_instance(&bus, SIZE_MAX, true);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_spi_fault
+tests/google/native_instances_test.cpp:151:15: error: ‘nx_spi_port_recover’ was not declared in this scope; did you mean ‘nx_i2c_port_recover’?
+  151 |     EXPECT_EQ(nx_spi_port_recover(&bus_api), NX_ERROR_BUSY);
+      |               ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:144:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  144 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_NONFATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1885:3: note: in expansion of macro ‘EXPECT_PRED_FORMAT2’
+ 1885 |   EXPECT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:151:5: note: in expansion of macro ‘EXPECT_EQ’
+  151 |     EXPECT_EQ(nx_spi_port_recover(&bus_api), NX_ERROR_BUSY);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:153:15: error: ‘nx_spi_port_recover’ was not declared in this scope; did you mean ‘nx_i2c_port_recover’?
+  153 |     EXPECT_EQ(nx_spi_port_recover(&bus_api), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:144:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  144 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_NONFATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1885:3: note: in expansion of macro ‘EXPECT_PRED_FORMAT2’
+ 1885 |   EXPECT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:153:5: note: in expansion of macro ‘EXPECT_EQ’
+  153 |     EXPECT_EQ(nx_spi_port_recover(&bus_api), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_I2CEndpointCursorAndFaultsHaveExplicitControllerScope_Test::TestBody()’:
+tests/google/native_instances_test.cpp:157:5: error: ‘nx_native_i2c_state_t’ was not declared in this scope; did you mean ‘nx_native_i2c_fault’?
+  157 |     nx_native_i2c_state_t bus = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_i2c_fault
+tests/google/native_instances_test.cpp:158:26: error: expected ‘;’ before ‘other_bus’
+  158 |     nx_native_i2c_state_t other_bus = {};
+      |                          ^~~~~~~~~~
+      |                          ;
+tests/google/native_instances_test.cpp:159:5: error: ‘nx_native_i2c_endpoint_state_t’ was not declared in this scope
+  159 |     nx_native_i2c_endpoint_state_t first = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:160:35: error: expected ‘;’ before ‘second’
+  160 |     nx_native_i2c_endpoint_state_t second = {};
+      |                                   ^~~~~~~
+      |                                   ;
+tests/google/native_instances_test.cpp:161:35: error: expected ‘;’ before ‘third’
+  161 |     nx_native_i2c_endpoint_state_t third = {};
+      |                                   ^~~~~~
+      |                                   ;
+tests/google/native_instances_test.cpp:162:25: error: variable ‘const nx_i2c_port_t bus_api’ has initializer but incomplete type
+  162 |     const nx_i2c_port_t bus_api = {&nx_native_i2c_ops, &bus};
+      |                         ^~~~~~~
+tests/google/native_instances_test.cpp:162:37: error: ‘nx_native_i2c_ops’ was not declared in this scope; did you mean ‘nx_native_i2c_port’?
+  162 |     const nx_i2c_port_t bus_api = {&nx_native_i2c_ops, &bus};
+      |                                     ^~~~~~~~~~~~~~~~~
+      |                                     nx_native_i2c_port
+tests/google/native_instances_test.cpp:162:57: error: ‘bus’ was not declared in this scope
+  162 |     const nx_i2c_port_t bus_api = {&nx_native_i2c_ops, &bus};
+      |                                                         ^~~
+tests/google/native_instances_test.cpp:163:29: error: variable ‘const nx_i2c_endpoint_t first_api’ has initializer but incomplete type
+  163 |     const nx_i2c_endpoint_t first_api = {&nx_native_i2c_endpoint_ops, &first};
+      |                             ^~~~~~~~~
+tests/google/native_instances_test.cpp:163:43: error: ‘nx_native_i2c_endpoint_ops’ was not declared in this scope; did you mean ‘nx_native_i2c_port’?
+  163 |     const nx_i2c_endpoint_t first_api = {&nx_native_i2c_endpoint_ops, &first};
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                           nx_native_i2c_port
+tests/google/native_instances_test.cpp:163:72: error: ‘first’ was not declared in this scope
+  163 |     const nx_i2c_endpoint_t first_api = {&nx_native_i2c_endpoint_ops, &first};
+      |                                                                        ^~~~~
+tests/google/native_instances_test.cpp:164:29: error: variable ‘const nx_i2c_endpoint_t second_api’ has initializer but incomplete type
+  164 |     const nx_i2c_endpoint_t second_api = {&nx_native_i2c_endpoint_ops,
+      |                             ^~~~~~~~~~
+tests/google/native_instances_test.cpp:165:44: error: ‘second’ was not declared in this scope
+  165 |                                           &second};
+      |                                            ^~~~~~
+tests/google/native_instances_test.cpp:166:29: error: variable ‘const nx_i2c_endpoint_t third_api’ has initializer but incomplete type
+  166 |     const nx_i2c_endpoint_t third_api = {&nx_native_i2c_endpoint_ops, &third};
+      |                             ^~~~~~~~~
+tests/google/native_instances_test.cpp:166:72: error: ‘third’ was not declared in this scope
+  166 |     const nx_i2c_endpoint_t third_api = {&nx_native_i2c_endpoint_ops, &third};
+      |                                                                        ^~~~~
+tests/google/native_instances_test.cpp:170:15: error: ‘nx_native_i2c_port_configure_instance’ was not declared in this scope
+  170 |     ASSERT_EQ(nx_native_i2c_port_configure_instance(&bus), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:170:5: note: in expansion of macro ‘ASSERT_EQ’
+  170 |     ASSERT_EQ(nx_native_i2c_port_configure_instance(&bus), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:171:54: error: ‘other_bus’ was not declared in this scope
+  171 |     ASSERT_EQ(nx_native_i2c_port_configure_instance(&other_bus), NX_SUCCESS);
+      |                                                      ^~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:171:5: note: in expansion of macro ‘ASSERT_EQ’
+  171 |     ASSERT_EQ(nx_native_i2c_port_configure_instance(&other_bus), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:171:15: error: ‘nx_native_i2c_port_configure_instance’ was not declared in this scope
+  171 |     ASSERT_EQ(nx_native_i2c_port_configure_instance(&other_bus), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:171:5: note: in expansion of macro ‘ASSERT_EQ’
+  171 |     ASSERT_EQ(nx_native_i2c_port_configure_instance(&other_bus), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:172:15: error: ‘nx_native_i2c_configure_instance’ was not declared in this scope; did you mean ‘nx_native_i2c_configure’?
+  172 |     ASSERT_EQ(nx_native_i2c_configure_instance(&first, &bus, first_memory, 2,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:172:5: note: in expansion of macro ‘ASSERT_EQ’
+  172 |     ASSERT_EQ(nx_native_i2c_configure_instance(&first, &bus, first_memory, 2,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:174:15: error: ‘nx_native_i2c_configure_instance’ was not declared in this scope; did you mean ‘nx_native_i2c_configure’?
+  174 |     ASSERT_EQ(nx_native_i2c_configure_instance(&second, &bus, second_memory,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:174:5: note: in expansion of macro ‘ASSERT_EQ’
+  174 |     ASSERT_EQ(nx_native_i2c_configure_instance(&second, &bus, second_memory,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:176:57: error: ‘other_bus’ was not declared in this scope
+  176 |     ASSERT_EQ(nx_native_i2c_configure_instance(&third, &other_bus, third_memory,
+      |                                                         ^~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:176:5: note: in expansion of macro ‘ASSERT_EQ’
+  176 |     ASSERT_EQ(nx_native_i2c_configure_instance(&third, &other_bus, third_memory,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:176:15: error: ‘nx_native_i2c_configure_instance’ was not declared in this scope; did you mean ‘nx_native_i2c_configure’?
+  176 |     ASSERT_EQ(nx_native_i2c_configure_instance(&third, &other_bus, third_memory,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:176:5: note: in expansion of macro ‘ASSERT_EQ’
+  176 |     ASSERT_EQ(nx_native_i2c_configure_instance(&third, &other_bus, third_memory,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:188:5: error: ‘nx_native_i2c_fault_instance’ was not declared in this scope; did you mean ‘nx_native_i2c_fault’?
+  188 |     nx_native_i2c_fault_instance(&bus, NX_ERROR_NACK, false);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_i2c_fault
+tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_FlashProgramAndFaultsDoNotCrossInstanceMemory_Test::TestBody()’:
+tests/google/native_instances_test.cpp:200:5: error: ‘nx_native_flash_state_t’ was not declared in this scope; did you mean ‘nx_native_flash_fault’?
+  200 |     nx_native_flash_state_t first = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_flash_fault
+tests/google/native_instances_test.cpp:201:28: error: expected ‘;’ before ‘second’
+  201 |     nx_native_flash_state_t second = {};
+      |                            ^~~~~~~
+      |                            ;
+tests/google/native_instances_test.cpp:202:27: error: variable ‘const nx_flash_port_t first_api’ has initializer but incomplete type
+  202 |     const nx_flash_port_t first_api = {&nx_native_flash_ops, &first};
+      |                           ^~~~~~~~~
+tests/google/native_instances_test.cpp:202:41: error: ‘nx_native_flash_ops’ was not declared in this scope; did you mean ‘nx_native_flash’?
+  202 |     const nx_flash_port_t first_api = {&nx_native_flash_ops, &first};
+      |                                         ^~~~~~~~~~~~~~~~~~~
+      |                                         nx_native_flash
+tests/google/native_instances_test.cpp:202:63: error: ‘first’ was not declared in this scope
+  202 |     const nx_flash_port_t first_api = {&nx_native_flash_ops, &first};
+      |                                                               ^~~~~
+tests/google/native_instances_test.cpp:203:27: error: variable ‘const nx_flash_port_t second_api’ has initializer but incomplete type
+  203 |     const nx_flash_port_t second_api = {&nx_native_flash_ops, &second};
+      |                           ^~~~~~~~~~
+tests/google/native_instances_test.cpp:203:64: error: ‘second’ was not declared in this scope
+  203 |     const nx_flash_port_t second_api = {&nx_native_flash_ops, &second};
+      |                                                                ^~~~~~
+tests/google/native_instances_test.cpp:208:15: error: ‘nx_native_flash_configure_instance’ was not declared in this scope; did you mean ‘nx_native_flash_configure’?
+  208 |     ASSERT_EQ(nx_native_flash_configure_instance(&first, first_memory,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:208:5: note: in expansion of macro ‘ASSERT_EQ’
+  208 |     ASSERT_EQ(nx_native_flash_configure_instance(&first, first_memory,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:210:15: error: ‘nx_native_flash_configure_instance’ was not declared in this scope; did you mean ‘nx_native_flash_configure’?
+  210 |     ASSERT_EQ(nx_native_flash_configure_instance(&second, second_memory,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:210:5: note: in expansion of macro ‘ASSERT_EQ’
+  210 |     ASSERT_EQ(nx_native_flash_configure_instance(&second, second_memory,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:213:5: error: ‘nx_native_flash_fault_instance’ was not declared in this scope; did you mean ‘nx_native_flash_fault’?
+  213 |     nx_native_flash_fault_instance(&first, 0);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_flash_fault
+tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_EXTIQueuesAndStopAreIndependent_Test::TestBody()’:
+tests/google/native_instances_test.cpp:223:5: error: ‘nx_native_exti_state_t’ was not declared in this scope; did you mean ‘nx_native_exti_emit’?
+  223 |     nx_native_exti_state_t first = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_exti_emit
+tests/google/native_instances_test.cpp:224:27: error: expected ‘;’ before ‘second’
+  224 |     nx_native_exti_state_t second = {};
+      |                           ^~~~~~~
+      |                           ;
+tests/google/native_instances_test.cpp:225:26: error: variable ‘const nx_exti_port_t first_api’ has initializer but incomplete type
+  225 |     const nx_exti_port_t first_api = {&nx_native_exti_ops, &first};
+      |                          ^~~~~~~~~
+tests/google/native_instances_test.cpp:225:40: error: ‘nx_native_exti_ops’ was not declared in this scope; did you mean ‘nx_native_exti_emit’?
+  225 |     const nx_exti_port_t first_api = {&nx_native_exti_ops, &first};
+      |                                        ^~~~~~~~~~~~~~~~~~
+      |                                        nx_native_exti_emit
+tests/google/native_instances_test.cpp:225:61: error: ‘first’ was not declared in this scope
+  225 |     const nx_exti_port_t first_api = {&nx_native_exti_ops, &first};
+      |                                                             ^~~~~
+tests/google/native_instances_test.cpp:226:26: error: variable ‘const nx_exti_port_t second_api’ has initializer but incomplete type
+  226 |     const nx_exti_port_t second_api = {&nx_native_exti_ops, &second};
+      |                          ^~~~~~~~~~
+tests/google/native_instances_test.cpp:226:62: error: ‘second’ was not declared in this scope
+  226 |     const nx_exti_port_t second_api = {&nx_native_exti_ops, &second};
+      |                                                              ^~~~~~
+tests/google/native_instances_test.cpp:229:15: error: ‘nx_native_exti_configure_instance’ was not declared in this scope; did you mean ‘nx_native_exti_configure’?
+  229 |     ASSERT_EQ(nx_native_exti_configure_instance(&first, 1, NX_EXTI_RISING,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:229:5: note: in expansion of macro ‘ASSERT_EQ’
+  229 |     ASSERT_EQ(nx_native_exti_configure_instance(&first, 1, NX_EXTI_RISING,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:232:15: error: ‘nx_native_exti_configure_instance’ was not declared in this scope; did you mean ‘nx_native_exti_configure’?
+  232 |     ASSERT_EQ(nx_native_exti_configure_instance(&second, 2, NX_EXTI_BOTH,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:232:5: note: in expansion of macro ‘ASSERT_EQ’
+  232 |     ASSERT_EQ(nx_native_exti_configure_instance(&second, 2, NX_EXTI_BOTH,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:235:15: error: ‘nx_native_exti_emit_instance’ was not declared in this scope; did you mean ‘nx_native_exti_emit’?
+  235 |     ASSERT_EQ(nx_native_exti_emit_instance(&first, 1, NX_EXTI_RISING),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:235:5: note: in expansion of macro ‘ASSERT_EQ’
+  235 |     ASSERT_EQ(nx_native_exti_emit_instance(&first, 1, NX_EXTI_RISING),
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:237:15: error: ‘nx_native_exti_emit_instance’ was not declared in this scope; did you mean ‘nx_native_exti_emit’?
+  237 |     EXPECT_EQ(nx_native_exti_emit_instance(&first, 1, NX_EXTI_RISING),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:144:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  144 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_NONFATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1885:3: note: in expansion of macro ‘EXPECT_PRED_FORMAT2’
+ 1885 |   EXPECT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:237:5: note: in expansion of macro ‘EXPECT_EQ’
+  237 |     EXPECT_EQ(nx_native_exti_emit_instance(&first, 1, NX_EXTI_RISING),
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:239:15: error: ‘nx_native_exti_emit_instance’ was not declared in this scope; did you mean ‘nx_native_exti_emit’?
+  239 |     ASSERT_EQ(nx_native_exti_emit_instance(&second, 2, NX_EXTI_FALLING),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:239:5: note: in expansion of macro ‘ASSERT_EQ’
+  239 |     ASSERT_EQ(nx_native_exti_emit_instance(&second, 2, NX_EXTI_FALLING),
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_PWMBasesAndADCSequencesAreIndependent_Test::TestBody()’:
+tests/google/native_instances_test.cpp:250:5: error: ‘nx_native_pwm_state_t’ was not declared in this scope; did you mean ‘nx_pwm_state_t’?
+  250 |     nx_native_pwm_state_t first_pwm = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~
+      |     nx_pwm_state_t
+tests/google/native_instances_test.cpp:251:26: error: expected ‘;’ before ‘second_pwm’
+  251 |     nx_native_pwm_state_t second_pwm = {};
+      |                          ^~~~~~~~~~~
+      |                          ;
+tests/google/native_instances_test.cpp:252:25: error: variable ‘const nx_pwm_port_t first_pwm_api’ has initializer but incomplete type
+  252 |     const nx_pwm_port_t first_pwm_api = {&nx_native_pwm_ops, &first_pwm};
+      |                         ^~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:252:43: error: ‘nx_native_pwm_ops’ was not declared in this scope; did you mean ‘nx_native_pwm’?
+  252 |     const nx_pwm_port_t first_pwm_api = {&nx_native_pwm_ops, &first_pwm};
+      |                                           ^~~~~~~~~~~~~~~~~
+      |                                           nx_native_pwm
+tests/google/native_instances_test.cpp:252:63: error: ‘first_pwm’ was not declared in this scope
+  252 |     const nx_pwm_port_t first_pwm_api = {&nx_native_pwm_ops, &first_pwm};
+      |                                                               ^~~~~~~~~
+tests/google/native_instances_test.cpp:253:25: error: variable ‘const nx_pwm_port_t second_pwm_api’ has initializer but incomplete type
+  253 |     const nx_pwm_port_t second_pwm_api = {&nx_native_pwm_ops, &second_pwm};
+      |                         ^~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:253:64: error: ‘second_pwm’ was not declared in this scope
+  253 |     const nx_pwm_port_t second_pwm_api = {&nx_native_pwm_ops, &second_pwm};
+      |                                                                ^~~~~~~~~~
+tests/google/native_instances_test.cpp:254:15: error: ‘nx_native_pwm_configure_instance’ was not declared in this scope; did you mean ‘nx_native_pwm_configure’?
+  254 |     ASSERT_EQ(nx_native_pwm_configure_instance(&first_pwm, 1000, 10),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:254:5: note: in expansion of macro ‘ASSERT_EQ’
+  254 |     ASSERT_EQ(nx_native_pwm_configure_instance(&first_pwm, 1000, 10),
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:256:15: error: ‘nx_native_pwm_configure_instance’ was not declared in this scope; did you mean ‘nx_native_pwm_configure’?
+  256 |     ASSERT_EQ(nx_native_pwm_configure_instance(&second_pwm, 2000, 20),
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:256:5: note: in expansion of macro ‘ASSERT_EQ’
+  256 |     ASSERT_EQ(nx_native_pwm_configure_instance(&second_pwm, 2000, 20),
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:265:5: error: ‘nx_native_adc_state_t’ was not declared in this scope; did you mean ‘nx_native_adc_fault’?
+  265 |     nx_native_adc_state_t first_adc = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_adc_fault
+tests/google/native_instances_test.cpp:266:26: error: expected ‘;’ before ‘second_adc’
+  266 |     nx_native_adc_state_t second_adc = {};
+      |                          ^~~~~~~~~~~
+      |                          ;
+tests/google/native_instances_test.cpp:267:25: error: variable ‘const nx_adc_port_t first_adc_api’ has initializer but incomplete type
+  267 |     const nx_adc_port_t first_adc_api = {&nx_native_adc_ops, &first_adc};
+      |                         ^~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:267:43: error: ‘nx_native_adc_ops’ was not declared in this scope; did you mean ‘nx_native_adc’?
+  267 |     const nx_adc_port_t first_adc_api = {&nx_native_adc_ops, &first_adc};
+      |                                           ^~~~~~~~~~~~~~~~~
+      |                                           nx_native_adc
+tests/google/native_instances_test.cpp:267:63: error: ‘first_adc’ was not declared in this scope
+  267 |     const nx_adc_port_t first_adc_api = {&nx_native_adc_ops, &first_adc};
+      |                                                               ^~~~~~~~~
+tests/google/native_instances_test.cpp:268:25: error: variable ‘const nx_adc_port_t second_adc_api’ has initializer but incomplete type
+  268 |     const nx_adc_port_t second_adc_api = {&nx_native_adc_ops, &second_adc};
+      |                         ^~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:268:64: error: ‘second_adc’ was not declared in this scope
+  268 |     const nx_adc_port_t second_adc_api = {&nx_native_adc_ops, &second_adc};
+      |                                                                ^~~~~~~~~~
+tests/google/native_instances_test.cpp:271:15: error: ‘nx_native_adc_configure_instance’ was not declared in this scope; did you mean ‘nx_native_adc_configure’?
+  271 |     ASSERT_EQ(nx_native_adc_configure_instance(&first_adc, first_samples, 2,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:271:5: note: in expansion of macro ‘ASSERT_EQ’
+  271 |     ASSERT_EQ(nx_native_adc_configure_instance(&first_adc, first_samples, 2,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:273:15: error: ‘nx_native_adc_configure_instance’ was not declared in this scope; did you mean ‘nx_native_adc_configure’?
+  273 |     ASSERT_EQ(nx_native_adc_configure_instance(&second_adc, second_samples, 2,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:273:5: note: in expansion of macro ‘ASSERT_EQ’
+  273 |     ASSERT_EQ(nx_native_adc_configure_instance(&second_adc, second_samples, 2,
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:275:5: error: ‘nx_native_adc_fault_instance’ was not declared in this scope; did you mean ‘nx_native_adc_fault’?
+  275 |     nx_native_adc_fault_instance(&first_adc, 1);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_adc_fault
+tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_WatchdogEffectsRemainInstanceLocal_Test::TestBody()’:
+tests/google/native_instances_test.cpp:288:5: error: ‘nx_native_watchdog_state_t’ was not declared in this scope; did you mean ‘nx_native_watchdog_boot’?
+  288 |     nx_native_watchdog_state_t first = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_watchdog_boot
+tests/google/native_instances_test.cpp:289:31: error: expected ‘;’ before ‘second’
+  289 |     nx_native_watchdog_state_t second = {};
+      |                               ^~~~~~~
+      |                               ;
+tests/google/native_instances_test.cpp:290:30: error: variable ‘const nx_watchdog_port_t first_api’ has initializer but incomplete type
+  290 |     const nx_watchdog_port_t first_api = {&nx_native_watchdog_ops, &first};
+      |                              ^~~~~~~~~
+tests/google/native_instances_test.cpp:290:44: error: ‘nx_native_watchdog_ops’ was not declared in this scope; did you mean ‘nx_native_watchdog_boot’?
+  290 |     const nx_watchdog_port_t first_api = {&nx_native_watchdog_ops, &first};
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~
+      |                                            nx_native_watchdog_boot
+tests/google/native_instances_test.cpp:290:69: error: ‘first’ was not declared in this scope
+  290 |     const nx_watchdog_port_t first_api = {&nx_native_watchdog_ops, &first};
+      |                                                                     ^~~~~
+tests/google/native_instances_test.cpp:291:30: error: variable ‘const nx_watchdog_port_t second_api’ has initializer but incomplete type
+  291 |     const nx_watchdog_port_t second_api = {&nx_native_watchdog_ops, &second};
+      |                              ^~~~~~~~~~
+tests/google/native_instances_test.cpp:291:70: error: ‘second’ was not declared in this scope
+  291 |     const nx_watchdog_port_t second_api = {&nx_native_watchdog_ops, &second};
+      |                                                                      ^~~~~~
+tests/google/native_instances_test.cpp:292:5: error: ‘nx_native_watchdog_boot_instance’ was not declared in this scope; did you mean ‘nx_native_watchdog_boot’?
+  292 |     nx_native_watchdog_boot_instance(&first, NX_RESET_PIN);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |     nx_native_watchdog_boot
+In file included from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest-printers.h:122,
+                 from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest-matchers.h:49,
+                 from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/internal/gtest-death-test-internal.h:47,
+                 from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest-death-test.h:43,
+                 from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:64:
+tests/google/native_instances_test.cpp:300:17: error: ‘nx_native_watchdog_expired_instance’ was not declared in this scope; did you mean ‘nx_native_watchdog_expired’?
+  300 |     EXPECT_TRUE(nx_native_watchdog_expired_instance(&first));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/internal/gtest-internal.h:1453:38: note: in definition of macro ‘GTEST_TEST_BOOLEAN_’
+ 1453 |           ::testing::AssertionResult(expression))                     \
+      |                                      ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1823:32: note: in expansion of macro ‘GTEST_EXPECT_TRUE’
+ 1823 | #define EXPECT_TRUE(condition) GTEST_EXPECT_TRUE(condition)
+      |                                ^~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:300:5: note: in expansion of macro ‘EXPECT_TRUE’
+  300 |     EXPECT_TRUE(nx_native_watchdog_expired_instance(&first));
+      |     ^~~~~~~~~~~
+tests/google/native_instances_test.cpp:301:18: error: ‘nx_native_watchdog_expired_instance’ was not declared in this scope; did you mean ‘nx_native_watchdog_expired’?
+  301 |     EXPECT_FALSE(nx_native_watchdog_expired_instance(&second));
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/internal/gtest-internal.h:1453:38: note: in definition of macro ‘GTEST_TEST_BOOLEAN_’
+ 1453 |           ::testing::AssertionResult(expression))                     \
+      |                                      ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1827:33: note: in expansion of macro ‘GTEST_EXPECT_FALSE’
+ 1827 | #define EXPECT_FALSE(condition) GTEST_EXPECT_FALSE(condition)
+      |                                 ^~~~~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:301:5: note: in expansion of macro ‘EXPECT_FALSE’
+  301 |     EXPECT_FALSE(nx_native_watchdog_expired_instance(&second));
+      |     ^~~~~~~~~~~~

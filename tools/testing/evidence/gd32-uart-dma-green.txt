@@ -1,0 +1,23 @@
+Running main() from gmock_main.cc
+[==========] Running 7 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 7 tests from GD32UARTDMA
+[ RUN      ] GD32UARTDMA.DmaCompletionRetainsBorrowUntilIndependentWireIdle
+[       OK ] GD32UARTDMA.DmaCompletionRetainsBorrowUntilIndependentWireIdle (0 ms)
+[ RUN      ] GD32UARTDMA.RejectedDomainHasNoMemoryBorrowOrHardwareEffects
+[       OK ] GD32UARTDMA.RejectedDomainHasNoMemoryBorrowOrHardwareEffects (0 ms)
+[ RUN      ] GD32UARTDMA.CancellationCannotReleaseMemoryWhenEngineStillOwnsIt
+[       OK ] GD32UARTDMA.CancellationCannotReleaseMemoryWhenEngineStillOwnsIt (0 ms)
+[ RUN      ] GD32UARTDMA.LateDmaIRQCannotReachSettledRequest
+[       OK ] GD32UARTDMA.LateDmaIRQCannotReachSettledRequest (0 ms)
+[ RUN      ] GD32UARTDMA.NeverDeadlineStillBoundsMissingWireCompletionAfterDma
+[       OK ] GD32UARTDMA.NeverDeadlineStillBoundsMissingWireCompletionAfterDma (0 ms)
+[ RUN      ] GD32UARTDMA.NeverDeadlineStillBoundsRefusedEngineDisableAfterDma
+[       OK ] GD32UARTDMA.NeverDeadlineStillBoundsRefusedEngineDisableAfterDma (0 ms)
+[ RUN      ] GD32UARTDMA.AlreadyCompletedMemoryAndWireStaySuccessfulAtLateService
+[       OK ] GD32UARTDMA.AlreadyCompletedMemoryAndWireStaySuccessfulAtLateService (0 ms)
+[----------] 7 tests from GD32UARTDMA (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 7 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 7 tests.

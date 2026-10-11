@@ -1,0 +1,27 @@
+schema = 2
+board = "gd32f470_liangshan"
+backend = "freertos"
+clock = "hxtal25-pll200"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[gpio.led0]
+binding = "status_led"
+mode = "output"
+
+[uart.uart0]
+binding = "console"
+mode = "irq"
+baud = 115200
+
+[uart.uart0.rx]
+format = "events"
+capacity = 32
+
+[uart.uart0.irq]
+priority = 5

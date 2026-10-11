@@ -1,0 +1,15 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from UARTOwnerContract
+[ RUN      ] UARTOwnerContract.RejectsIncompleteProviderBeforeAdvertisingExecutor
+[       OK ] UARTOwnerContract.RejectsIncompleteProviderBeforeAdvertisingExecutor (0 ms)
+[ RUN      ] UARTOwnerContract.RejectedSubmissionRetainsNeitherBorrowNorPayload
+[       OK ] UARTOwnerContract.RejectedSubmissionRetainsNeitherBorrowNorPayload (0 ms)
+[ RUN      ] UARTOwnerContract.QuarantineRetainsPayloadUntilProviderDrainProof
+[       OK ] UARTOwnerContract.QuarantineRetainsPayloadUntilProviderDrainProof (0 ms)
+[----------] 3 tests from UARTOwnerContract (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 3 tests.

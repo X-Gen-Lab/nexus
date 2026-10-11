@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nexus hil-station",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "station_id",
+    "board",
+    "part",
+    "pcb_revision",
+    "chip_uid",
+    "probe",
+    "serial",
+    "power",
+    "outputs_disconnected",
+    "budgets"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "hil_station"
+    },
+    "station_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+    },
+    "board": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+    },
+    "part": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+    },
+    "pcb_revision": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+    },
+    "chip_uid": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+    },
+    "probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "serial",
+        "interface",
+        "transport",
+        "tool",
+        "interface_config",
+        "target_config"
+      ],
+      "properties": {
+        "serial": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+        },
+        "interface": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+        },
+        "transport": {
+          "const": "swd"
+        },
+        "tool": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256",
+            "size"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "interface_config": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256",
+            "size"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "target_config": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256",
+            "size"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "serial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "baudrate",
+        "electrical_mode",
+        "wiring_checked",
+        "ground_connected"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^/dev/serial/by-id/.+"
+        },
+        "baudrate": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "electrical_mode": {
+          "const": "ttl_3v3"
+        },
+        "wiring_checked": {
+          "const": true
+        },
+        "ground_connected": {
+          "const": true
+        }
+      }
+    },
+    "power": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "voltage_mv"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+        },
+        "voltage_mv": {
+          "type": "integer",
+          "minimum": 2700,
+          "maximum": 3600
+        }
+      }
+    },
+    "outputs_disconnected": {
+      "const": true
+    },
+    "budgets": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "maximum",
+          "unit"
+        ],
+        "properties": {
+          "maximum": {
+            "type": "number",
+            "minimum": 0
+          },
+          "unit": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+test_all_skipped_does_not_establish_execution (__main__.CTestAdmission.test_all_skipped_does_not_establish_execution) ... ok
+test_failed_ctest_cannot_reuse_stale_success (__main__.CTestAdmission.test_failed_ctest_cannot_reuse_stale_success) ... ok
+test_real_success_requires_fresh_test_execution (__main__.CTestAdmission.test_real_success_requires_fresh_test_execution) ... ok
+test_zero_tests_fail (__main__.CTestAdmission.test_zero_tests_fail) ... ok
+test_actions_initializer_uses_recursive_pinned_gitlinks (__main__.WorkflowContracts.test_actions_initializer_uses_recursive_pinned_gitlinks) ... ok
+test_actual_workflows_and_shell_blocks_parse (__main__.WorkflowContracts.test_actual_workflows_and_shell_blocks_parse) ... ok
+test_advanced_fixture_loop_uses_the_authored_toml_set (__main__.WorkflowContracts.test_advanced_fixture_loop_uses_the_authored_toml_set) ... ok
+test_each_arm_link_retains_an_unbound_hil_work_plan (__main__.WorkflowContracts.test_each_arm_link_retains_an_unbound_hil_work_plan) ... ok
+test_each_native_build_executes_unfiltered_google_contract_gate (__main__.WorkflowContracts.test_each_native_build_executes_unfiltered_google_contract_gate) ... ok
+test_six_selected_board_backend_link_profiles_have_actual_presets (__main__.WorkflowContracts.test_six_selected_board_backend_link_profiles_have_actual_presets) ... ok
+test_tooling_runs_google_report_and_hil_preparation_boundaries (__main__.WorkflowContracts.test_tooling_runs_google_report_and_hil_preparation_boundaries) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 1.010s
+
+OK

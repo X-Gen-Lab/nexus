@@ -1,0 +1,9 @@
+test_late_staged_source_change_rejects_new_summary (tools.testing.test_staged_execution.StagedExecutionTests.test_late_staged_source_change_rejects_new_summary) ... ok
+test_late_unstaged_source_change_rejects_new_summary (tools.testing.test_staged_execution.StagedExecutionTests.test_late_unstaged_source_change_rejects_new_summary) ... ok
+test_late_untracked_source_rejects_new_summary (tools.testing.test_staged_execution.StagedExecutionTests.test_late_untracked_source_rejects_new_summary) ... ok
+test_unchanged_real_index_can_accept_completed_tests (tools.testing.test_staged_execution.StagedExecutionTests.test_unchanged_real_index_can_accept_completed_tests) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.064s
+
+OK

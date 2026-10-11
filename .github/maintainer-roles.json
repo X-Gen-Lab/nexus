@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "assignment_status": "roles_defined_named_team_assignment_pending",
+  "roles": [
+    {
+      "id": "technical-lead",
+      "seats": 1,
+      "scope": [
+        "architecture",
+        "common-platform-requirements",
+        "support-policy"
+      ],
+      "backup_role": "core-interfaces",
+      "review_paths": [
+        "/**",
+        "/docs/design/",
+        "/docs/delivery/"
+      ],
+      "members": []
+    },
+    {
+      "id": "core-interfaces",
+      "seats": 2,
+      "scope": [
+        "core",
+        "io",
+        "os",
+        "components/storage",
+        "ownership-and-lifecycle-contracts"
+      ],
+      "backup_role": "bsp-ports",
+      "review_paths": [
+        "/core/",
+        "/io/",
+        "/os/",
+        "/components/storage/"
+      ],
+      "members": []
+    },
+    {
+      "id": "bsp-ports",
+      "seats": 2,
+      "scope": [
+        "arch",
+        "soc",
+        "boards",
+        "tools/configure/routes-and-bindings"
+      ],
+      "backup_role": "core-interfaces",
+      "review_paths": [
+        "/arch/",
+        "/soc/",
+        "/boards/"
+      ],
+      "members": []
+    },
+    {
+      "id": "industrial-apps",
+      "seats": 2,
+      "scope": [
+        "components",
+        "device-adapter-contracts",
+        "X-Gen-Lab/nexus-examples: reference applications and external composition"
+      ],
+      "backup_role": "bsp-ports",
+      "review_paths": [
+        "/components/"
+      ],
+      "members": []
+    },
+    {
+      "id": "quality-hil",
+      "seats": 2,
+      "scope": [
+        "tests/contracts",
+        "tools/hil",
+        "fault-injection",
+        "field-regressions"
+      ],
+      "backup_role": "build-release",
+      "review_paths": [
+        "/tests/",
+        "/tools/hil/"
+      ],
+      "members": []
+    },
+    {
+      "id": "build-release",
+      "seats": 1,
+      "scope": [
+        "cmake",
+        "tools/configure",
+        "tools/dev",
+        "tools/evidence",
+        "tools/measurement",
+        ".github/workflows",
+        "artifact-provenance"
+      ],
+      "backup_role": "quality-hil",
+      "review_paths": [
+        "/cmake/",
+        "/CMakeLists.txt",
+        "/CMakePresets.json",
+        "/tools/configure/",
+        "/tools/dev/",
+        "/tools/evidence/",
+        "/tools/measurement/",
+        "/tools/maintenance/",
+        "/.github/",
+        "/scripts/",
+        "/dependencies/"
+      ],
+      "members": []
+    }
+  ],
+  "interfaces": {
+    "security": "core-interfaces",
+    "manufacturing": "industrial-apps",
+    "field-maintenance": "quality-hil"
+  },
+  "note": "Ten-person roles cover common Nexus contracts and the independent examples repository. Named members and branch protection remain pending; product policies and manufacturing inputs stay external."
+}

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "command": [
+    ".venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tests.contracts.test_junit",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

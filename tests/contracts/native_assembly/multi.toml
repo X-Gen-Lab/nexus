@@ -1,0 +1,109 @@
+schema = 2
+board_package = "multi_board"
+backend = "native"
+clock = "model"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+
+[gpio.led_a]
+binding = "led0"
+mode = "output"
+
+[gpio.led_b]
+binding = "led1"
+mode = "output"
+
+[uart.link_a]
+binding = "uart0"
+mode = "irq"
+baud = 115200
+[uart.link_a.rx]
+format = "events"
+capacity = 4
+[uart.link_a.irq]
+priority = 5
+
+[uart.link_b]
+binding = "uart1"
+mode = "irq"
+baud = 115200
+[uart.link_b.rx]
+format = "events"
+capacity = 4
+[uart.link_b.irq]
+priority = 5
+
+[spi.bus_spi_a]
+binding = "spi0"
+mode = "short-poll"
+
+[spi.bus_spi_b]
+binding = "spi1"
+mode = "short-poll"
+
+[spi_device.sensor_spi_a]
+controller = "bus_spi_a"
+model_bytes = 64
+
+[spi_device.sensor_spi_b]
+controller = "bus_spi_a"
+model_bytes = 64
+
+[spi_device.sensor_spi_c]
+controller = "bus_spi_b"
+model_bytes = 64
+
+[i2c.bus_i2c_a]
+binding = "i2c0"
+mode = "poll-messages"
+
+[i2c.bus_i2c_b]
+binding = "i2c1"
+mode = "poll-messages"
+
+[i2c_device.sensor_i2c_a]
+controller = "bus_i2c_a"
+model_bytes = 64
+address = 80
+
+[i2c_device.sensor_i2c_b]
+controller = "bus_i2c_a"
+model_bytes = 64
+address = 81
+
+[i2c_device.sensor_i2c_c]
+controller = "bus_i2c_b"
+model_bytes = 64
+address = 80
+
+[flash.flash0]
+binding = "flash0"
+mode = "poll-byte"
+
+[watchdog.watchdog0]
+binding = "watchdog0"
+mode = "independent"
+
+[exti.exti0]
+binding = "exti0"
+mode = "edge-event"
+edge = "both"
+event_capacity = 4
+[exti.exti0.irq]
+priority = 5
+
+[pwm.pwm0]
+binding = "pwm0"
+mode = "fixed-pwm"
+period_ticks = 1000
+duty_ticks = 0
+tick_hz = 1000000
+
+[adc.adc0]
+binding = "adc0"
+mode = "low-rate-scan"
+channels = [8, 9]
+sample_times = [7, 7]
+reference_mv = 3300

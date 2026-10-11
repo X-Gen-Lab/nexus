@@ -1,0 +1,15 @@
+test_fixture_freshness_is_independent_of_filesystem_clock_lag (tests.contracts.test_junit.JunitEvidenceContracts.test_fixture_freshness_is_independent_of_filesystem_clock_lag) ... FAIL
+
+======================================================================
+FAIL: test_fixture_freshness_is_independent_of_filesystem_clock_lag (tests.contracts.test_junit.JunitEvidenceContracts.test_fixture_freshness_is_independent_of_filesystem_clock_lag)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_junit.py", line 43, in test_fixture_freshness_is_independent_of_filesystem_clock_lag
+    self.assertEqual(fresh.returncode, 0, fresh.stderr)
+AssertionError: 1 != 0 : JUnit rejected: JUnit report predates this test execution
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.060s
+
+FAILED (failures=1)

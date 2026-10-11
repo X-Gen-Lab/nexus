@@ -1,0 +1,23 @@
+E
+======================================================================
+ERROR: test_gd32_uart_blocks_use_selected_controller_without_generated_ring (test_toml.TomlConfigurationTests.test_gd32_uart_blocks_use_selected_controller_without_generated_ring)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 397, in test_gd32_uart_blocks_use_selected_controller_without_generated_ring
+    gate.configure(self.assembly, output)
+  File "/workspace/nexus/tools/configure/configure.py", line 906, in configure
+    result = resolve_ir(assembly, root, input_paths=input_paths)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 787, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 521, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/configure.py", line 173, in fail
+    raise ConfigurationError(message)
+configure.ConfigurationError: Unsupported mode irq-blocks for uart1
+
+----------------------------------------------------------------------
+Ran 1 test in 0.010s
+
+FAILED (errors=1)

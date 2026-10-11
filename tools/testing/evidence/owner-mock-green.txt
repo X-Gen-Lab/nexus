@@ -1,0 +1,19 @@
+Running main() from gmock_main.cc
+[==========] Running 5 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 5 tests from OwnerTest
+[ RUN      ] OwnerTest.CancellationRetainsStorageUntilHardwareDrain
+[       OK ] OwnerTest.CancellationRetainsStorageUntilHardwareDrain (0 ms)
+[ RUN      ] OwnerTest.FullQueueRejectsWithoutBorrowOrExecutorEffects
+[       OK ] OwnerTest.FullQueueRejectsWithoutBorrowOrExecutorEffects (0 ms)
+[ RUN      ] OwnerTest.ExpiredQueueSettlesWithoutTouchingHardware
+[       OK ] OwnerTest.ExpiredQueueSettlesWithoutTouchingHardware (0 ms)
+[ RUN      ] OwnerTest.FailedStartSettlesAndDetachesRejectedHardwareLoan
+[       OK ] OwnerTest.FailedStartSettlesAndDetachesRejectedHardwareLoan (0 ms)
+[ RUN      ] OwnerTest.StaleCancellationCannotTargetReusedSlot
+[       OK ] OwnerTest.StaleCancellationCannotTargetReusedSlot (0 ms)
+[----------] 5 tests from OwnerTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 5 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 5 tests.

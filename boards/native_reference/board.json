@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "native-reference",
+  "soc": "NATIVE_MODEL",
+  "soc_family": "native",
+  "source_revision": "native-model-v1",
+  "physical_pcb_revision": null,
+  "clocks": {"hse_hz": 1000000},
+  "bindings": [
+    {"id": "led0", "controller": "GPIOA", "route": "gpio-pa0", "initial": 0, "mask": 1},
+    {"id": "uart0", "controller": "UART0", "route": "uart0"},
+    {"id": "spi0", "controller": "SPI0", "route": "spi0"}
+  ],
+  "reserved_resources": [],
+  "unknowns": ["Host model does not qualify physical clock, memory or electrical behavior"],
+  "provenance": ["Maintained host model"]
+}

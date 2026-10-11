@@ -1,0 +1,29 @@
+schema = 2
+board_package = "zg_board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+libc_heap_bytes = 0
+
+[exti.edge5]
+binding = "edge5"
+mode = "edge-event"
+edge = "both"
+event_capacity = 4
+
+[exti.edge5.irq]
+priority = 5
+
+[exti.edge6]
+binding = "edge6"
+mode = "edge-event"
+edge = "rising"
+event_capacity = 4
+
+[exti.edge6.irq]
+priority = 5

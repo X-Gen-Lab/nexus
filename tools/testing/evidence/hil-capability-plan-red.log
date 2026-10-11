@@ -1,0 +1,33 @@
+test_three_station_plans_retain_dma_stream_and_wake_measurements (tests.contracts.test_hil_prepare.HilPreparationTests.test_three_station_plans_retain_dma_stream_and_wake_measurements) ... 
+  test_three_station_plans_retain_dma_stream_and_wake_measurements (tests.contracts.test_hil_prepare.HilPreparationTests.test_three_station_plans_retain_dma_stream_and_wake_measurements) (board='stm32f407zg-qiming-v31') ... FAIL
+  test_three_station_plans_retain_dma_stream_and_wake_measurements (tests.contracts.test_hil_prepare.HilPreparationTests.test_three_station_plans_retain_dma_stream_and_wake_measurements) (board='stm32f407ve-sky-qingchun') ... FAIL
+  test_three_station_plans_retain_dma_stream_and_wake_measurements (tests.contracts.test_hil_prepare.HilPreparationTests.test_three_station_plans_retain_dma_stream_and_wake_measurements) (board='gd32f470zg-liangshan') ... FAIL
+
+======================================================================
+FAIL: test_three_station_plans_retain_dma_stream_and_wake_measurements (tests.contracts.test_hil_prepare.HilPreparationTests.test_three_station_plans_retain_dma_stream_and_wake_measurements) (board='stm32f407zg-qiming-v31')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 76, in test_three_station_plans_retain_dma_stream_and_wake_measurements
+    self.assertLessEqual(required,
+AssertionError: {'uart_rx_block', 'irq_executor_wake', 'multi_controller_isolation', 'adc_trigger_block', 'dma_memory_domain'} not less than or equal to {'irq_preemption', 'pwm_period_duty', 'exti_edge_overflow', 'i2c_stop_recovery', 'iwdg_reset_cause', 'flash_power_loss', 'adc_single_scan', 'uart_wire_tc_cancel', 'spi_dma_cs', 'control_jitter'}
+
+======================================================================
+FAIL: test_three_station_plans_retain_dma_stream_and_wake_measurements (tests.contracts.test_hil_prepare.HilPreparationTests.test_three_station_plans_retain_dma_stream_and_wake_measurements) (board='stm32f407ve-sky-qingchun')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 76, in test_three_station_plans_retain_dma_stream_and_wake_measurements
+    self.assertLessEqual(required,
+AssertionError: {'uart_rx_block', 'irq_executor_wake', 'multi_controller_isolation', 'adc_trigger_block', 'dma_memory_domain'} not less than or equal to {'irq_preemption', 'pwm_period_duty', 'exti_edge_overflow', 'i2c_stop_recovery', 'iwdg_reset_cause', 'flash_power_loss', 'adc_single_scan', 'uart_wire_tc_cancel', 'spi_dma_cs', 'control_jitter'}
+
+======================================================================
+FAIL: test_three_station_plans_retain_dma_stream_and_wake_measurements (tests.contracts.test_hil_prepare.HilPreparationTests.test_three_station_plans_retain_dma_stream_and_wake_measurements) (board='gd32f470zg-liangshan')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 76, in test_three_station_plans_retain_dma_stream_and_wake_measurements
+    self.assertLessEqual(required,
+AssertionError: {'uart_rx_block', 'irq_executor_wake', 'multi_controller_isolation', 'adc_trigger_block', 'dma_memory_domain'} not less than or equal to {'irq_preemption', 'pwm_period_duty', 'exti_edge_overflow', 'i2c_stop_recovery', 'iwdg_reset_cause', 'flash_power_loss', 'adc_single_scan', 'uart_wire_tc_cancel', 'spi_dma_cs', 'control_jitter'}
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=3)

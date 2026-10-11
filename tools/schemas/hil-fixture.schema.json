@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nexus hil-fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "hil_fixture"
+    },
+    "board": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "part": {
+      "enum": [
+        "STM32F407ZGT6",
+        "STM32F407VET6",
+        "GD32F470ZGT6"
+      ]
+    },
+    "transport": {
+      "const": "swd"
+    },
+    "probe_interfaces": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      },
+      "uniqueItems": true
+    },
+    "serial": {
+      "type": "object",
+      "required": [
+        "controller",
+        "tx",
+        "rx",
+        "baudrate",
+        "electrical_mode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "controller": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "tx": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "rx": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "baudrate": {
+          "const": 115200
+        },
+        "electrical_mode": {
+          "const": "ttl_3v3"
+        }
+      }
+    },
+    "required_tests": {
+      "const": [
+        "probe_identity",
+        "flash_readback",
+        "reset",
+        "uart_echo"
+      ]
+    },
+    "physical_status": {
+      "const": "not_executed"
+    },
+    "pending_qualification": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "fixture",
+          "budget",
+          "unit"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+          },
+          "fixture": {
+            "type": "string",
+            "minLength": 1
+          },
+          "budget": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "unit": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "board",
+    "part",
+    "transport",
+    "probe_interfaces",
+    "serial",
+    "required_tests",
+    "physical_status",
+    "pending_qualification"
+  ]
+}

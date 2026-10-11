@@ -1,0 +1,50 @@
+Running main() from gmock_main.cc
+[==========] Running 4 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 4 tests from StreamStorage
+[ RUN      ] StreamStorage.RejectsPayloadInsideStreamControlBeforeMutation
+/workspace/nexus/tests/google/stream_storage_test.cpp:27: Failure
+Expected equality of these values:
+  nx_stream_initialize(&stream, &slot, 1U)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+[  FAILED  ] StreamStorage.RejectsPayloadInsideStreamControlBeforeMutation (0 ms)
+[ RUN      ] StreamStorage.RejectsPayloadInsideSlotMetadataBeforeMutation
+/workspace/nexus/tests/google/stream_storage_test.cpp:37: Failure
+Expected equality of these values:
+  nx_stream_initialize(&stream, &slot, 1U)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+[  FAILED  ] StreamStorage.RejectsPayloadInsideSlotMetadataBeforeMutation (0 ms)
+[ RUN      ] StreamStorage.RejectsControlAndSlotArrayOverlap
+/workspace/nexus/tests/google/stream_storage_test.cpp:51: Failure
+Expected equality of these values:
+  nx_stream_initialize(stream, slots, 1U)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/stream_storage_test.cpp:52: Failure
+Expected equality of these values:
+  std::memcmp(metadata, original, sizeof(metadata))
+    Which is: 36
+  0
+
+[  FAILED  ] StreamStorage.RejectsControlAndSlotArrayOverlap (0 ms)
+[ RUN      ] StreamStorage.ValidAdjacentBlocksKeepIndependentLoans
+[       OK ] StreamStorage.ValidAdjacentBlocksKeepIndependentLoans (0 ms)
+[----------] 4 tests from StreamStorage (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+[  FAILED  ] 3 tests, listed below:
+[  FAILED  ] StreamStorage.RejectsPayloadInsideStreamControlBeforeMutation
+[  FAILED  ] StreamStorage.RejectsPayloadInsideSlotMetadataBeforeMutation
+[  FAILED  ] StreamStorage.RejectsControlAndSlotArrayOverlap
+
+ 3 FAILED TESTS

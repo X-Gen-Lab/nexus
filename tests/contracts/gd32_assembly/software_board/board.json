@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "id": "gd32f470zg-controller-link-fixture",
+  "soc": "GD32F470ZGT6",
+  "soc_family": "gd32f470",
+  "source_revision": "software-fixture-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 25000000
+  },
+  "bindings": [
+    {
+      "id": "spi0",
+      "controller": "SPI4",
+      "route": "spi4-pf6-pf9",
+      "initial": 64
+    },
+    {
+      "id": "i2c0",
+      "controller": "I2C0",
+      "route": "i2c0-pb6-pb7"
+    },
+    {
+      "id": "flash0",
+      "controller": "FMC",
+      "route": "physical-flash"
+    },
+    {
+      "id": "watchdog0",
+      "controller": "FWDGT",
+      "route": "independent-watchdog"
+    },
+    {
+      "id": "edge3",
+      "controller": "EXTI3",
+      "route": "exti3-pe3"
+    },
+    {
+      "id": "pwm0",
+      "controller": "TIMER2",
+      "route": "timer2-pa6",
+      "initial": 0,
+      "mask": 64
+    },
+    {
+      "id": "adc0",
+      "controller": "ADC0",
+      "route": "adc0-pa0"
+    },
+    {
+      "id": "adc_scan",
+      "controller": "ADC0",
+      "route": "adc0-pa0-pa1"
+    },
+    {
+      "id": "uart0",
+      "controller": "USART0",
+      "route": "usart0-pa9-pa10"
+    },
+    {
+      "id": "uart1",
+      "controller": "USART1",
+      "route": "usart1-pa2-pa3"
+    },
+    {
+      "id": "spi1",
+      "controller": "SPI0",
+      "route": "spi0-pa5-pa7"
+    },
+    {
+      "id": "i2c1",
+      "controller": "I2C1",
+      "route": "i2c1-pb10-pb11"
+    },
+    {
+      "id": "cs1",
+      "controller": "GPIOB",
+      "route": "gpiob0",
+      "initial": 1,
+      "mask": 1
+    },
+    {
+      "id": "cs2",
+      "controller": "GPIOB",
+      "route": "gpiob1",
+      "initial": 2,
+      "mask": 2
+    }
+  ],
+  "reserved_resources": [
+    "TIMER1",
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Development-only compile/link fixture; not a physical PCB package.",
+    "External pull-ups, devices, analog input and electrical wiring are unmeasured.",
+    "Ineligible for physical HIL and product promotion."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
+      "scope": "Reviewed silicon package/controller routes; no PCB wiring qualification."
+    }
+  ]
+}

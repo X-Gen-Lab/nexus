@@ -1,0 +1,24 @@
+$ build/native-debug/bin/nexus_stm32_spi_dma_test --gtest_output=xml:build/quality/stm32-spi-dma-green.xml
+Running main() from gmock_main.cc
+[==========] Running 6 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 6 tests from Stm32SpiDma
+[ RUN      ] Stm32SpiDma.BothDmaCompletionsKeepCsAndBorrowUntilSpiIsIdle
+[       OK ] Stm32SpiDma.BothDmaCompletionsKeepCsAndBorrowUntilSpiIsIdle (0 ms)
+[ RUN      ] Stm32SpiDma.CancelledPartialDmaRetainsCsAndNeverInventsWireByteCount
+[       OK ] Stm32SpiDma.CancelledPartialDmaRetainsCsAndNeverInventsWireByteCount (0 ms)
+[ RUN      ] Stm32SpiDma.RefusedEngineDisableRetainsBorrowEvenWhenWireIsIdle
+[       OK ] Stm32SpiDma.RefusedEngineDisableRetainsBorrowEvenWhenWireIsIdle (0 ms)
+[ RUN      ] Stm32SpiDma.WrongBusIdentityAndInvalidDomainsFailBeforeAdmission
+[       OK ] Stm32SpiDma.WrongBusIdentityAndInvalidDomainsFailBeforeAdmission (0 ms)
+[ RUN      ] Stm32SpiDma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline
+[       OK ] Stm32SpiDma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline (0 ms)
+[ RUN      ] Stm32SpiDma.LateServiceWithRealCompletionProofPreservesSuccess
+[       OK ] Stm32SpiDma.LateServiceWithRealCompletionProofPreservesSuccess (0 ms)
+[----------] 6 tests from Stm32SpiDma (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 6 tests.
+
+exit_code=0
