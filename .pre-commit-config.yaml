@@ -21,6 +21,6 @@ repos:
         entry: python scripts/ci/tdd_gate.py --staged
         language: python
         stages: [pre-commit]
-        pass_filenames: true
+        pass_filenames: false
         always_run: true
         require_serial: true

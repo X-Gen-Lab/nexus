@@ -79,7 +79,8 @@ overflow and instance isolation where the changed contract requires them.
 offline GoogleTest/GoogleMock targets and executes every discovered case with fresh
 reports. The commit hook runs this gate for behavioral changes, rejects differing
 unstaged/untracked behavior before and after execution, and requires an unchanged
-Git index tree. CI executes the gate independently of
+Git index tree. The hook reads the complete staged index, including deletions,
+and runs once per commit without filename batching. CI executes the gate independently of
 local hooks. Do not disable cases, filters, shards or hooks to create acceptance
 evidence. Record RED/GREEN commands and the failure reason in the change review;
 automation verifies real execution, not the historical order of developer work.

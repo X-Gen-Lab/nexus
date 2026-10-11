@@ -41,7 +41,7 @@ class StagedExecutionTests(unittest.TestCase):
         return subprocess.run(["git", *arguments], cwd=self.root,
                               capture_output=True, text=True, check=True)
 
-    def pipeline(self, mutation):
+    def pipeline(self, mutation, arguments=None):
         def execute(command, _environment, _log):
             if "--report" in command:
                 report = Path(command[command.index("--report") + 1])
@@ -72,7 +72,8 @@ class StagedExecutionTests(unittest.TestCase):
                 patch.object(io_lifecycle_matrix, "audit", return_value={}), \
                 patch.dict("os.environ", {}, clear=True), \
                 redirect_stdout(output), redirect_stderr(output):
-            result = tdd_gate.main(["--staged", "--all"])
+            result = tdd_gate.main(arguments if arguments is not None
+                                   else ["--staged", "--all"])
         return result, output.getvalue()
 
     def assert_rejected(self, mutation):
@@ -88,6 +89,46 @@ class StagedExecutionTests(unittest.TestCase):
         self.assertEqual(result, 0, output)
         summary = self.build / "tdd" / "execution.json"
         self.assertEqual(json.loads(summary.read_text())["passed"], 1)
+
+    def assert_index_executed(self, arguments):
+        result, output = self.pipeline(lambda: None, arguments)
+        self.assertEqual(result, 0, output)
+        summary = self.build / "tdd" / "execution.json"
+        self.assertTrue(summary.is_file(), output)
+        self.assertEqual(json.loads(summary.read_text())["passed"], 1)
+
+    def commit_initial_index(self):
+        self.git("-c", "user.name=Gate fixture", "-c",
+                 "user.email=gate@example.invalid", "commit", "-qm",
+                 "test: initialize staged execution fixture")
+
+    def test_staged_source_executes_without_supplied_filenames(self):
+        self.assert_index_executed(["--staged"])
+
+    def test_supplied_docs_subset_cannot_hide_staged_source(self):
+        self.assert_index_executed(["--staged", "README.md"])
+
+    def test_staged_source_deletion_still_requires_execution(self):
+        self.commit_initial_index()
+        self.git("rm", "core/state.c")
+        self.assert_index_executed(["--staged"])
+
+    def test_index_filename_with_newline_remains_one_source_path(self):
+        self.commit_initial_index()
+        source = self.root / "core" / "line\nbreak.c"
+        source.write_text("int unusual;\n")
+        self.git("add", "--", "core/line\nbreak.c")
+        self.assert_index_executed(["--staged"])
+
+    def test_docs_only_real_index_skips_despite_supplied_source_argument(self):
+        self.commit_initial_index()
+        (self.root / "README.md").write_text("Documentation only\n")
+        self.git("add", "README.md")
+        result, output = self.pipeline(lambda: None,
+                                       ["--staged", "core/state.c"])
+        self.assertEqual(result, 0, output)
+        self.assertIn("No staged behavioral changes", output)
+        self.assertFalse((self.build / "tdd" / "execution.json").exists())
 
     def test_late_unstaged_source_change_rejects_new_summary(self):
         self.assert_rejected(lambda: (self.root / "core" / "state.c")

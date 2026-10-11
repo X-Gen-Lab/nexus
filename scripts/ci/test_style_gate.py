@@ -108,7 +108,7 @@ class StyleGateTests(unittest.TestCase):
         self.assertEqual(matches[0]["entry"], "python scripts/ci/tdd_gate.py --staged")
         self.assertEqual(matches[0]["stages"], ["pre-commit"])
         self.assertTrue(matches[0]["always_run"])
-        self.assertTrue(matches[0]["pass_filenames"])
+        self.assertFalse(matches[0]["pass_filenames"])
         self.assertTrue((ROOT / "scripts/ci/tdd_gate.py").is_file())
 
     def test_authored_toml_is_checked_by_staged_text_gate(self):

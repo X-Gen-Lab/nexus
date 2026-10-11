@@ -1,0 +1,65 @@
+FF...FFF.F
+======================================================================
+FAIL: test_docs_only_real_index_skips_despite_supplied_source_argument (tools.testing.test_staged_execution.StagedExecutionTests.test_docs_only_real_index_skips_despite_supplied_source_argument)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 130, in test_docs_only_real_index_skips_despite_supplied_source_argument
+    self.assertIn("No staged behavioral changes", output)
+AssertionError: 'No staged behavioral changes' not found in 'Executed 1 GoogleTest cases; evidence: /tmp/tmpko7cr0wx/build/native-debug/tdd/execution.json\n'
+
+======================================================================
+FAIL: test_index_filename_with_newline_remains_one_source_path (tools.testing.test_staged_execution.StagedExecutionTests.test_index_filename_with_newline_remains_one_source_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 121, in test_index_filename_with_newline_remains_one_source_path
+    self.assert_index_executed(["--staged"])
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 97, in assert_index_executed
+    self.assertTrue(summary.is_file(), output)
+AssertionError: False is not true : No staged behavioral changes require the GoogleTest gate
+
+
+======================================================================
+FAIL: test_staged_source_deletion_still_requires_execution (tools.testing.test_staged_execution.StagedExecutionTests.test_staged_source_deletion_still_requires_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 114, in test_staged_source_deletion_still_requires_execution
+    self.assert_index_executed(["--staged"])
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 97, in assert_index_executed
+    self.assertTrue(summary.is_file(), output)
+AssertionError: False is not true : No staged behavioral changes require the GoogleTest gate
+
+
+======================================================================
+FAIL: test_staged_source_executes_without_supplied_filenames (tools.testing.test_staged_execution.StagedExecutionTests.test_staged_source_executes_without_supplied_filenames)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 106, in test_staged_source_executes_without_supplied_filenames
+    self.assert_index_executed(["--staged"])
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 97, in assert_index_executed
+    self.assertTrue(summary.is_file(), output)
+AssertionError: False is not true : No staged behavioral changes require the GoogleTest gate
+
+
+======================================================================
+FAIL: test_supplied_docs_subset_cannot_hide_staged_source (tools.testing.test_staged_execution.StagedExecutionTests.test_supplied_docs_subset_cannot_hide_staged_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 109, in test_supplied_docs_subset_cannot_hide_staged_source
+    self.assert_index_executed(["--staged", "README.md"])
+  File "/workspace/nexus/tools/testing/test_staged_execution.py", line 97, in assert_index_executed
+    self.assertTrue(summary.is_file(), output)
+AssertionError: False is not true : No staged behavioral changes require the GoogleTest gate
+
+
+======================================================================
+FAIL: test_real_repository_configures_tdd_hook_without_bypass (scripts.ci.test_style_gate.StyleGateTests.test_real_repository_configures_tdd_hook_without_bypass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 111, in test_real_repository_configures_tdd_hook_without_bypass
+    self.assertFalse(matches[0]["pass_filenames"])
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.117s
+
+FAILED (failures=6)

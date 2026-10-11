@@ -72,6 +72,15 @@ def staged_tree(root):
     return result.stdout.strip()
 
 
+def staged_paths(root):
+    """Use the complete real index delta, including deletions and odd names."""
+    result = subprocess.run(
+        ["git", "diff", "--cached", "--name-only", "-z"], cwd=root,
+        capture_output=True, check=True,
+    )
+    return [os.fsdecode(name) for name in result.stdout.split(b"\0") if name]
+
+
 def environment():
     """Clean child test settings without changing the gate's commit index."""
     result = {key: value for key, value in os.environ.items()
@@ -128,7 +137,8 @@ def main(arguments=None):
     args = parser.parse_args(arguments)
     try:
         env = environment()
-        if args.staged and not args.all and not any(map(relevant, args.paths)):
+        if (args.staged and not args.all
+                and not any(map(relevant, staged_paths(ROOT)))):
             print("No staged behavioral changes require the GoogleTest gate")
             return 0
         if args.staged:
