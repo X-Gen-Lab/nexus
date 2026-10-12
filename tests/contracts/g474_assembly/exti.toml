@@ -1,0 +1,32 @@
+schema = 2
+board_package = "exti_board"
+backend = "baremetal"
+clock = "hse24-pll170"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[exti.edge0]
+binding = "edge0"
+mode = "edge-event"
+edge = "both"
+event_capacity = 3
+[exti.edge0.irq]
+priority = 5
+calls_os = false
+
+[exti.edge1]
+binding = "edge1"
+mode = "edge-event"
+edge = "falling"
+event_capacity = 2
+[exti.edge1.irq]
+priority = 6
+calls_os = false

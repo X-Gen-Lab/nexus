@@ -1,4 +1,4 @@
-"""Source-reviewed G474 GPIO/LPUART byte-mode capability contract."""
+"""Source-reviewed G474 GPIO, LPUART bytes and exact EXTI line contracts."""
 from types import MappingProxyType
 from .. import common, descriptor
 
@@ -30,7 +30,7 @@ CLOCK_PROFILES = MappingProxyType({
 LIMITS = MappingProxyType({"uart_baud": (2594, 1000000)})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
-    ("uart", "irq-bytes"): "uart"})
+    ("uart", "irq-bytes"): "uart", ("exti", "edge-event"): "exti"})
 
 
 def mode_implementation(kind, mode):
@@ -70,6 +70,20 @@ def validate_selection(selection, route):
                                  "GPIO initial")
         if mask != 32 or initial & ~mask:
             common.fail("GPIO mask/initial differs from the reviewed PA5 route")
+    elif kind == "exti":
+        controller = route["controller"]
+        if controller not in {"EXTI0", "EXTI1"}:
+            common.fail("Only independent G474 EXTI0/1 vectors are maintained")
+        pin = "PA" + controller[-1]
+        if tuple((item["pin"], item["function"], item["af"])
+                 for item in route["pins"]) != ((pin, "input", 0),):
+            common.fail("G474 EXTI requires its exact GPIOA input route")
+        if selection.get("edge") not in {"rising", "falling", "both"}:
+            common.fail("G474 EXTI requires an explicit raw edge selection")
+        common.integer(selection.get("event_capacity"), 1, 4096,
+                       "G474 EXTI event capacity")
+        common.integer(selection.get("irq_priority"), 0, 15,
+                       "G474 EXTI IRQ priority")
 
 
 def validate_dma(route, mode, normalize):

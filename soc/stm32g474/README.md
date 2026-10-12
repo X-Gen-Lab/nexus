@@ -2,8 +2,9 @@
 
 This provider implements a deliberately narrow STM32G474RET6 baseline: the
 Cortex-M4F startup, one fixed 170 MHz clock transaction, independent TIM2 time,
-authorized GPIOA pins and LPUART1 IRQ bytes. It uses the public typed GPIO/UART
-faces with caller-owned private contexts and byte rings. Instances share readonly
+authorized GPIOA pins, LPUART1 IRQ bytes and exact PA0/PA1 EXTI events. It uses
+the public typed GPIO/UART/EXTI faces with caller-owned private contexts and
+bounded storage. Instances share readonly
 operations tables; the IRQ moves at most one byte in each direction and records
 hardware facts. There is no allocator, worker, runtime registry or DMA fallback.
 
@@ -41,6 +42,28 @@ precede SETTLED. Failed wire drain preserves QUARANTINED storage. Cold stop also
 joins captured notification callbacks and observes UE/TEACK/REACK/NVIC withdrawal
 before returning ring/wake ownership. Notification is a hint; predicates remain
 authoritative. No RX event/block or DMA mode is advertised.
+
+EXTI `edge-event` selects PA0/EXTI0 (IRQ6) or PA1/EXTI1 (IRQ7), with independent
+vectors and priorities. These are exact silicon routes in a software fixture;
+they do not add NUCLEO button wiring or claim inspected connector access. The
+caller explicitly supplies raw rising/falling/both edges and 1..4096 event
+slots. A generated factory owns exactly that storage; no maximum pool exists.
+Read has one task consumer. Each IRQ acknowledges its own W1C pending bit and
+latches at most one timestamped, coalesced fact. Both-edge direction comes from
+the sampled GPIO level, not a complete edge history. Full storage preserves
+older facts, then exposes one loss boundary before any later accepted facts.
+New edges can reassert pending immediately after acknowledgement; the handler
+does not poll or misclassify that reassertion as a hardware fault.
+
+Cold EXTI admission rejects live interrupt/event/trigger/pending state and the
+selected live NVIC vector before global effects. Platform acquires the shared
+SYSCFG gate once, preserves any preexisting gate, and holds GPIO leases through
+complete stop. Each line preserves/restores its own four-bit mux field. Stop
+attempts independent line-source and vector withdrawal; a refused readback keeps
+event storage, wake target and mux recovery responsibility. An active wake
+publisher must join before stop can release it. Kernel notifications validate
+the actual vector priority against the generated policy. External bias, debounce,
+edge-rate budget and safe input wiring remain Board/product responsibilities.
 
 ## SDK and evidence
 

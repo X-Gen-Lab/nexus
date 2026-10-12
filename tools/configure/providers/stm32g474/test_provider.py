@@ -63,9 +63,9 @@ class G474ProviderTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.provider.CLOCK_PROFILES["hse24-pll170"]["core_hz"] = 168000000
 
-    def test_uart_bytes_and_gpio_are_the_entire_initial_mode_set(self):
+    def test_uart_gpio_and_exact_exti_are_the_maintained_mode_set(self):
         for kind, mode in (("gpio", "input"), ("gpio", "output"),
-                           ("uart", "irq-bytes")):
+                           ("uart", "irq-bytes"), ("exti", "edge-event")):
             self.assertEqual(self.provider.mode_implementation(kind, mode), kind)
         for kind, mode in (("uart", "irq-byte-event"), ("uart", "irq-blocks"),
                            ("uart", "dma-tx"), ("spi", "short-poll"),

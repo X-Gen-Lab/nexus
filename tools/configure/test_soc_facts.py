@@ -46,7 +46,7 @@ class PackagePinContractTests(unittest.TestCase):
         self.assertEqual(gate.validate_soc(soc, "NATIVE_MODEL")["package"],
                          soc["variants"]["NATIVE_MODEL"]["package"])
 
-    def test_g474_package_inventory_is_complete_without_opening_new_modes(self):
+    def test_g474_package_inventory_does_not_expand_reviewed_controller_modes(self):
         soc = self.facts("stm32g474")
         pins = soc["variants"]["STM32G474RET6"]["pins"]
         # DS12288 Rev6 Table2 lists52 GPIOs for Rx/LQFP64. Table12 and
@@ -55,8 +55,14 @@ class PackagePinContractTests(unittest.TestCase):
         self.assertEqual({f"P{port}{pin}" for port in "ABC"
                           for pin in range(16)} | {"PD2", "PF0", "PF1", "PG10"},
                          set(pins))
-        self.assertEqual(set(soc["controllers"]), {"GPIOA", "LPUART1"})
+        self.assertEqual(set(soc["controllers"]),
+                         {"GPIOA", "LPUART1", "EXTI0", "EXTI1"})
         self.assertEqual(soc["controllers"]["LPUART1"]["modes"], ["irq-bytes"])
+        for line in (0, 1):
+            self.assertEqual(soc["controllers"][f"EXTI{line}"]["modes"],
+                             ["edge-event"])
+            self.assertEqual(soc["controllers"][f"EXTI{line}"]["pins"],
+                             [f"PA{line}"])
 
 
 class ImportedDependencyContractTests(unittest.TestCase):

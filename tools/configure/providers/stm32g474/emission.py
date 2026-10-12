@@ -37,8 +37,16 @@ def _uart(result):
     return any(item.kind == "uart" for item in result.controllers)
 
 
+def _exti(result):
+    return any(item.kind == "exti" for item in result.controllers)
+
+
 def state_declarations(result):
-    return ['static uint32_t s_nx_platform_uart_clocks_added;'] if _uart(result) else []
+    source = (['static uint32_t s_nx_platform_uart_clocks_added;']
+              if _uart(result) else [])
+    if _exti(result):
+        source += ['static uint32_t s_nx_platform_syscfg_clock_added;']
+    return source
 
 
 def start_system(result):
@@ -57,13 +65,28 @@ def start_system(result):
 
 
 def start_resources(result):
-    if not _uart(result):
-        return []
-    return ['    s_nx_platform_uart_clocks_added = ~NX_G474_READ(&RCC->APB1ENR2) & RCC_APB1ENR2_LPUART1EN;']
+    source = (['    s_nx_platform_uart_clocks_added = ~NX_G474_READ(&RCC->APB1ENR2) & RCC_APB1ENR2_LPUART1EN;']
+              if _uart(result) else [])
+    if _exti(result):
+        source += ['    s_nx_platform_syscfg_clock_added = ~NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_SYSCFGEN;',
+                   '    NX_G474_WRITE(&RCC->APB2ENR, NX_G474_READ(&RCC->APB2ENR) | RCC_APB2ENR_SYSCFGEN);',
+                   '    nx_arch_dsb();',
+                   '    if ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_SYSCFGEN) == 0u) {',
+                   '        result.primary = NX_ERROR_IO;',
+                   '        result.cleanup = nx_platform_stop();',
+                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+                   '        return result;', '    }']
+    return source
 
 
 def stop_system(result):
     source = gpio_phase.release(result)
+    if _exti(result):
+        source += ['    if (s_nx_platform_syscfg_clock_added != 0u) {',
+                   '        NX_G474_WRITE(&RCC->APB2ENR, NX_G474_READ(&RCC->APB2ENR) & ~s_nx_platform_syscfg_clock_added);',
+                   '        nx_arch_dsb();',
+                   '        if ((NX_G474_READ(&RCC->APB2ENR) & s_nx_platform_syscfg_clock_added) != 0u) { return NX_ERROR_IO; }',
+                   '        s_nx_platform_syscfg_clock_added = 0u;', '    }']
     if _uart(result):
         source += ['    if (s_nx_platform_started) {',
                    '        NX_G474_WRITE(&RCC->APB1ENR2, NX_G474_READ(&RCC->APB1ENR2) & ~s_nx_platform_uart_clocks_added);',

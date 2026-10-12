@@ -461,6 +461,7 @@ include(usb_factory.cmake)
 include(clock_domain.cmake)
 
 include(g474.cmake)
+include(g474_exti.cmake)
 
 include(g474_factory.cmake)
 

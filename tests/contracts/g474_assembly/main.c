@@ -20,6 +20,9 @@ static void task_entry(void* context) {
 static nx_uart_tx_request_t s_request;
 static uint8_t s_data[2] = {0x12U, 0x34U};
 #endif
+#ifdef NX_G474_EXTI_FIXTURE
+static nx_exti_event_t s_events[2];
+#endif
 int main(void) {
     nx_platform_start_result_t start = nx_platform_start();
     if (start.primary != NX_SUCCESS) {
@@ -35,6 +38,14 @@ int main(void) {
     (void)nx_uart_port_submit(console, &s_request);
     (void)nx_uart_port_cancel(console, &s_request);
     nx_uart_port_service(console);
+#endif
+#ifdef NX_G474_EXTI_FIXTURE
+    const nx_exti_port_t* edge0 = nx_factory_exti(NX_EXTI_ID_EDGE0);
+    const nx_exti_port_t* edge1 = nx_factory_exti(NX_EXTI_ID_EDGE1);
+    size_t count = 0U;
+    (void)nx_exti_port_attach_wake(edge0, NULL, 0U);
+    (void)nx_exti_port_read(edge0, s_events, 2U, &count);
+    (void)nx_exti_port_read(edge1, s_events, 2U, &count);
 #endif
 #ifdef NX_G474_FREERTOS_FIXTURE
     /* Retain the real static kernel graph. This ELF is not executed by HIL. */

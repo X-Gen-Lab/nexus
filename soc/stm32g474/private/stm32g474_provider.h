@@ -1,6 +1,6 @@
 /**
  * \file            stm32g474_provider.h
- * \brief           Private allocation-free GPIO and LPUART1 IRQ-byte bindings
+ * \brief           Private static GPIO, LPUART1 bytes and exact EXTI bindings
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-11
@@ -8,6 +8,7 @@
  */
 #ifndef NX_STM32G474_PROVIDER_H
 #define NX_STM32G474_PROVIDER_H
+#include "nexus/io/exti.h"
 #include "nexus/io/gpio.h"
 #include "nexus/io/uart.h"
 #include "stm32g474_system.h"
@@ -44,6 +45,45 @@ typedef struct {
     bool initialized;
     bool retained;
 } nx_stm32g474_uart_state_t;
+/** \brief Exact PA0/PA1 line state; storage and wake outlive successful stop.
+ */
+typedef struct {
+    EXTI_TypeDef* registers;
+    SYSCFG_TypeDef* mux;
+    GPIO_TypeDef* gpio;
+    nx_exti_event_t* storage;
+    const nx_irq_wake_t* wake;
+    size_t capacity;
+    size_t head;
+    size_t tail;
+    size_t count;
+    nx_irq_policy_t irq_policy;
+    nx_exti_edge_t edge;
+    uint16_t wake_publishers;
+    uint8_t line;
+    uint8_t priority;
+    uint8_t saved_mux;
+    bool initialized;
+    bool retained;
+    bool closing;
+    bool loss;
+} nx_stm32g474_exti_state_t;
+extern const nx_exti_ops_t nx_stm32g474_exti_ops;
+/**
+ * \brief Acquire PA0 or PA1 input and its independent EXTI vector.
+ * \param[in,out] port: Exact static state and nonoverlapping event storage.
+ * \return SUCCESS or error; retained means stop must complete before reuse.
+ * \note Privileged unmasked task only. Platform owns GPIO/SYSCFG gates and
+ *       original GPIO lease. No pull or debounce policy is inferred.
+ */
+nx_result_t nx_stm32g474_exti_initialize(nx_stm32g474_exti_state_t* port);
+/**
+ * \brief Acknowledge one selected line and latch at most one coalesced fact.
+ * \param[in,out] port: Live exact vector instance, storage and borrowed wake.
+ * \note Pending may reassert during acknowledgement. This bounded handler
+ *       never polls; edges can coalesce and must meet the caller's IRQ budget.
+ */
+void nx_stm32g474_exti_irq(nx_stm32g474_exti_state_t* port);
 extern const nx_gpio_ops_t nx_stm32g474_gpio_ops;
 extern const nx_uart_ops_t nx_stm32g474_uart_ops;
 /** \brief Cold owner configures authorized pins after acquiring clocks. */

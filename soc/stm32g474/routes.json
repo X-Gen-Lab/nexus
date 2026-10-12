@@ -44,6 +44,44 @@
         "irq-bytes"
       ],
       "source": "DS12288 Rev6 alternate-function table PA2/PA3 AF12 LPUART1; official G474 CMSIS IRQ91. UM2505 Rev7 source-reviewed MB1367 VCP bridge choice; actual fitting/electrical path unknown."
+    },
+    {
+      "id": "exti0-pa0",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "EXTI0",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "DS12288 Rev6 LQFP64 PA0/PA1 inventory; RM0440 Rev9 sections10.2.3 and15.3-15.5, GPIOA EXTICR mux0 and EXTI0/1. Official CMSIS independent IRQ6/7. Silicon route only; no Board wiring or physical qualification asserted."
+    },
+    {
+      "id": "exti1-pa1",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "EXTI1",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "DS12288 Rev6 LQFP64 PA0/PA1 inventory; RM0440 Rev9 sections10.2.3 and15.3-15.5, GPIOA EXTICR mux0 and EXTI0/1. Official CMSIS independent IRQ6/7. Silicon route only; no Board wiring or physical qualification asserted."
     }
   ]
 }

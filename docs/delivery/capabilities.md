@@ -103,6 +103,8 @@ python tools/maintenance/capabilities.py --write
 | stm32f407 | USART1 | uart | rx-dma-continuous | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31` | `tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml` | `soc/stm32f407/drivers/uart_receive.c` |
 | stm32f407 | USART1 | uart | rx-dma-idle | `usart1-pa9-pa10` | `stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31` | `tests/contracts/stm32_assembly/zg-rx-dma-idle.toml` | `soc/stm32f407/drivers/uart_receive.c` |
 | stm32f407 | USART2 | uart | dma-tx | `usart2-pa2-pa3` | — | `tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg.toml` | `soc/stm32f407/drivers/uart_dma.c` |
+| stm32g474 | EXTI0 | exti | edge-event | `exti0-pa0` | — | `tests/contracts/g474_assembly/exti-freertos.toml`, `tests/contracts/g474_assembly/exti.toml` | `soc/stm32g474/drivers/exti.c` |
+| stm32g474 | EXTI1 | exti | edge-event | `exti1-pa1` | — | `tests/contracts/g474_assembly/exti-freertos.toml`, `tests/contracts/g474_assembly/exti.toml` | `soc/stm32g474/drivers/exti.c` |
 | stm32g474 | GPIOA | gpio | input | `gpio-pa5` | `stm32g474re-hse24-reference` | — | — |
 | stm32g474 | GPIOA | gpio | output | `gpio-pa5` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/io-freertos.toml`, `tests/contracts/g474_assembly/io.toml` | `soc/stm32g474/drivers/gpio.c` |
 | stm32g474 | LPUART1 | uart | irq-bytes | `lpuart1-pa2-pa3` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/io-freertos.toml`, `tests/contracts/g474_assembly/io.toml` | `soc/stm32g474/drivers/uart.c` |

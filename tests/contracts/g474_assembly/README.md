@@ -6,7 +6,7 @@ dependency. `empty.toml` selects no peripheral. `io.toml` selects GPIOA PA5 and
 LPUART1 PA2/PA3 with a 64-byte reception ring. Both select the reviewed
 `hse24-pll170` profile, independent TIM2 timebase and explicit memory budgets.
 
-The four authored inputs explicitly select `baremetal` or `freertos` and use
+The six authored inputs explicitly select `baremetal` or `freertos` and use
 separate build directories. The fixture consumes the generated selection to
 retain selected I/O operations in `g474_assembly.elf`, without a second selection
 switch. The FreeRTOS fixture retains the actual static
@@ -35,3 +35,12 @@ does not prove a populated 24 MHz crystal, solder-bridge routing, MCU marking,
 UART connector or electrical timing on a particular PCB. Physical execution,
 waveforms, interrupt latency, DMA, power, stack peaks and HIL remain unexecuted.
 This G474 vertical does not add ThreadX support.
+
+`exti.toml` and `exti-freertos.toml` use the separate `exti_board` software-only
+fixture. They select PA0/EXTI0 and PA1/EXTI1 with independent IRQ6/7 and exact
+three/two-event storage. This does not assign a NUCLEO button or unknown PCB
+connection. The actual generated factory and common EXTI read/wake face are
+retained in both ELF files; unselected GPIO and LPUART providers are omitted.
+`nexus_g474_exti_test` compiles the same production provider and generated
+factory against external MMIO/NVIC models, including pending reassertion, loss
+ordering, wake lifetime, cold admission and retryable failed cleanup.

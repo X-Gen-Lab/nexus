@@ -385,6 +385,36 @@
         "PA2",
         "PA3"
       ]
+    },
+    "EXTI0": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI0_IRQn"
+      ],
+      "irq_numbers": [
+        6
+      ],
+      "pins": [
+        "PA0"
+      ]
+    },
+    "EXTI1": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI1_IRQn"
+      ],
+      "irq_numbers": [
+        7
+      ],
+      "pins": [
+        "PA1"
+      ]
     }
   },
   "reserved_resources": [

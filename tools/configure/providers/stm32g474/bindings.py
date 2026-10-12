@@ -3,7 +3,7 @@ from ..common import controller_ir, fail, kernel_policy_constant
 
 
 def constructor(item, result, board_bindings, routes, devices):
-    """Construct only the exact GPIOA/byte LPUART implementation."""
+    """Construct exact GPIOA, byte LPUART or independent PA0/PA1 EXTI state."""
     del board_bindings, routes, devices
     from . import validate_selection
     item = controller_ir(item, "stm32g474")
@@ -45,6 +45,27 @@ def constructor(item, result, board_bindings, routes, devices):
                         r"/** \brief One selected controller, at most one TX/RX byte. */",
                         f"void LPUART1_IRQHandler(void) {{ nx_stm32g474_uart_irq(&{state}); }}"]
         stop = f"nx_uart_port_stop(&s_nx_face_{name})"
+    elif item.kind == "exti":
+        options = item.options
+        irq = result["irq"]
+        line = int(item.controller[-1])
+        definitions += [f"static nx_exti_event_t s_nx_events_{name}[{options.event_capacity}];",
+                        f"static nx_result_t prepare_{name}(void) {{",
+                        f"    if ({state}.retained || {state}.initialized || {state}.wake != NULL || {state}.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
+                        f"    {state}.registers = EXTI;",
+                        f"    {state}.mux = SYSCFG;",
+                        f"    {state}.gpio = GPIOA;",
+                        f"    {state}.storage = s_nx_events_{name};",
+                        f"    {state}.capacity = {options.event_capacity}u;",
+                        f"    {state}.line = {line}u;",
+                        f"    {state}.priority = {options.irq.priority}u;",
+                        f"    {state}.edge = NX_EXTI_{options.edge.upper()};",
+                        f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
+                        f"    return nx_stm32g474_exti_initialize(&{state});",
+                        "}", f"void EXTI{line}_IRQHandler(void);",
+                        r"/** \brief One selected line, one bounded coalesced edge fact. */",
+                        f"void EXTI{line}_IRQHandler(void) {{ nx_stm32g474_exti_irq(&{state}); }}"]
+        stop = f"nx_exti_port_stop(&s_nx_face_{name})"
     else:
         raise ValueError("Unmaintained G474 constructor")
     return {"definitions": definitions, "initialize": f"prepare_{name}()",

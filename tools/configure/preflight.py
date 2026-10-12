@@ -92,6 +92,15 @@ def selected(result):
         if any(item.kind == "uart" for item in result.controllers):
             source += _reject("(NX_G474_READ(&RCC->APB1ENR2) & "
                               "RCC_APB1ENR2_LPUART1EN) != 0u")
+        for item in result.controllers:
+            if item.kind == "exti":
+                line = int(item.controller.removeprefix("EXTI"))
+                source += _reject(
+                    "((NX_G474_READ(&EXTI->IMR1) | "
+                    "NX_G474_READ(&EXTI->EMR1) | "
+                    "NX_G474_READ(&EXTI->RTSR1) | "
+                    "NX_G474_READ(&EXTI->FTSR1) | "
+                    f"NX_G474_READ(&EXTI->PR1)) & {1 << line}u) != 0u")
     else:
         clocks = set()
         for item in result.controllers:
