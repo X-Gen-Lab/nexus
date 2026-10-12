@@ -54,6 +54,11 @@ bool nx_arch_irq_is_masked(void) {
 
 /** \brief           Synchronous modeled peripheral writes are complete. */
 void nx_arch_dsb(void) {
+    if ((TIMER_SWEVG(TIMER1) & TIMER_SWEVG_UPG) != 0U) {
+        TIMER_INTF(TIMER1) |= TIMER_INTF_UPIF;
+        TIMER_CNT(TIMER1) = 0U;
+        TIMER_SWEVG(TIMER1) = 0U;
+    }
 }
 
 /** \brief           Model instruction synchronization without CPU timing. */

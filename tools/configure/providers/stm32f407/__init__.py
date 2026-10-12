@@ -1,6 +1,6 @@
 """Maintained stm32f407 capability and static assembly contract."""
 from types import MappingProxyType
-from .. import common
+from .. import common, descriptor, hardware
 
 CPU_ABI = MappingProxyType({'arch': 'cortex-m4', 'fpu': 'fpv4-sp-d16', 'float_abi': 'hard'})
 ENUM_ABI = 'short-enums'
@@ -15,7 +15,7 @@ CPU_FEATURES = MappingProxyType({
 })
 PREFIX = 'stm32'
 MODEL = False
-FACT_REFERENCES = "references.json"
+FACT_REFERENCES = descriptor.maintained("stm32f407").references
 ETH_CONTROLLER = 'ETH'
 USB_CONTROLLER = 'OTG_FS'
 CAN_CONTROLLERS = ('CAN1', 'CAN2')
@@ -35,19 +35,7 @@ LIMITS = MappingProxyType({
 })
 ADC_CHANNEL_SEQUENCES = ((0,), (0, 1))
 SPI_REQUIRES_ENDPOINT = True
-_FIXED_DMA = MappingProxyType({('USART1', 'dma-tx'): ('DMA2:stream7:channel4',),
- ('USART1', 'rx-dma-idle'): ('DMA2:stream2:channel4',),
- ('USART1', 'dma-duplex'): ('DMA2:stream7:channel4', 'DMA2:stream2:channel4'),
- ('USART1', 'rx-dma-continuous'): ('DMA2:stream2:channel4',),
- ('USART1', 'dma-duplex-continuous'): ('DMA2:stream7:channel4',
-                                       'DMA2:stream2:channel4'),
- ('SPI1', 'dma'): ('DMA2:stream3:channel3', 'DMA2:stream0:channel3'),
- ('ADC1', 'trigger-dma'): ('DMA2:stream4:channel0',),
- ('ADC1', 'trigger-dma-continuous'): ('DMA2:stream4:channel0',),
- ('I2C1', 'dma-messages'): ('DMA1:stream0:channel1', 'DMA1:stream6:channel1'),
- ('USART2', 'dma-tx'): ('DMA1:stream6:channel4',),
- ('SPI2', 'dma'): ('DMA1:stream4:channel0', 'DMA1:stream3:channel0'),
- ('I2C2', 'dma-messages'): ('DMA1:stream2:channel7', 'DMA1:stream7:channel7')})
+_FIXED_DMA = hardware.fixed_dma("stm32f407")
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('timer_capture', 'edge-capture'): 'timer_capture',

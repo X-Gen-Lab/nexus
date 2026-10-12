@@ -12,13 +12,19 @@ from tools.configure import configure as gate, fact_references
 
 
 class FactReferenceContractTests(unittest.TestCase):
+    def test_g474_cannot_omit_its_exact_official_reference_index(self):
+        soc = gate.load(gate.ROOT / "soc/stm32g474/soc.json")
+        soc.pop("references", None)
+        with self.assertRaisesRegex(ValueError, "references"):
+            gate.validate_soc(soc, "STM32G474RET6")
+
     def references(self, family="stm32f407"):
         package = gate.ROOT / "soc" / family
         return (json.loads((package / "references.json").read_text()),
                 json.loads((package / "soc.json").read_text())["variants"])
 
     def test_pin_source_keeps_errata_and_hardware_limits_explicit(self):
-        for family in ("stm32f407", "gd32f470"):
+        for family in ("stm32f407", "gd32f470", "stm32g474"):
             with self.subTest(family=family):
                 data, variants = self.references(family)
                 before = copy.deepcopy(data)

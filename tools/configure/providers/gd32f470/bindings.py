@@ -4,6 +4,7 @@ try:
 except ImportError:
     from emission import dma_regions
 from ..common import controller_ir, mode_traits
+from .. import hardware
 try:
     from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers
 except ImportError:
@@ -157,14 +158,18 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                          "/** \\brief Fixed generated UART controller dispatch. */",
                          f"void {vector}(void) {{ nx_gd32_{irq_implementation}_irq(&s_nx_port_{name}); }}"]
         if receive:
-            declarations += ["void DMA1_Channel2_IRQHandler(void);",
+            port_binding = hardware.maintained("gd32f470", item.controller)
+            vector = hardware.dma_vector("gd32f470", port_binding.dma("rx-dma-idle")[0])
+            declarations += [f"void {vector}_IRQHandler(void);",
                              "/** \\brief Exact selected GD DMA RX publisher. */",
-                             f"void DMA1_Channel2_IRQHandler(void) {{ nx_gd32_uart_receive_dma_irq(&s_nx_port_{name}); }}"]
+                             f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_receive_dma_irq(&s_nx_port_{name}); }}"]
         dma_state = f"s_nx_port_{name}" + (".transmit" if receive else "")
         if dma:
-            declarations += ["void DMA1_Channel7_IRQHandler(void);",
+            port_binding = hardware.maintained("gd32f470", item.controller)
+            vector = hardware.dma_vector("gd32f470", port_binding.dma("dma-tx")[0])
+            declarations += [f"void {vector}_IRQHandler(void);",
                              "/** \\brief Exact GD USART0 TX DMA terminal observation. */",
-                             f"void DMA1_Channel7_IRQHandler(void) {{ nx_gd32_uart_dma_irq(&{dma_state}); }}"]
+                             f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_dma_irq(&{dma_state}); }}"]
         initialize = f"prepare_{name}()"
         stop = [f"stop_{name}()"]
     elif kind == "spi":
@@ -226,10 +231,12 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                            f"nx_gd32_spi_stop(&s_nx_port_{name})")
         declarations += released(name, pins, stop_expression, cs_pins)
         if dma:
-            for channel, receive in ((3, "true"), (4, "false")):
-                declarations += [f"void DMA1_Channel{channel}_IRQHandler(void);",
+            tx, rx = hardware.maintained("gd32f470", item.controller).dma(item.mode)
+            for path, receive in ((rx, "true"), (tx, "false")):
+                vector = hardware.dma_vector("gd32f470", path)
+                declarations += [f"void {vector}_IRQHandler(void);",
                                  "/** \\brief Exact selected GD SPI DMA terminal observation. */",
-                                 f"void DMA1_Channel{channel}_IRQHandler(void) {{ nx_gd32_spi_dma_irq(&s_nx_port_{name}, {receive}); }}"]
+                                 f"void {vector}_IRQHandler(void) {{ nx_gd32_spi_dma_irq(&s_nx_port_{name}, {receive}); }}"]
         initialize = f"prepare_{name}()"
         stop = [f"stop_{name}()"]
     elif kind == "i2c" and mode_traits(kind, item.mode).irq:
@@ -259,15 +266,17 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         call = f"nx_gd32_i2c_async_initialize(&s_nx_port_{name}, {item.options.irq.priority}u)"
         declarations += prepared(name, [(pin, 2, 1, True, None) for pin in item["pins"]], call, before=before)
         declarations += released(name, item["pins"], f"nx_i2c_port_stop(&s_nx_face_{name})")
-        for vector in ("I2C0_EV", "I2C0_ER"):
+        port_binding = hardware.maintained("gd32f470", item.controller)
+        for vector, _ in port_binding.irqs:
             declarations += [f"void {vector}_IRQHandler(void);",
                              r"/** \brief Selected finite I2C message publisher. */",
                              f"void {vector}_IRQHandler(void) {{ nx_i2c_v1_irq(&s_nx_port_{name}); }}"]
         if dma:
-            for channel, receive in ((0, "true"), (6, "false")):
-                declarations += [f"void DMA0_Channel{channel}_IRQHandler(void);",
+            for path, receive in zip(port_binding.dma(item.mode), ("true", "false")):
+                vector = hardware.dma_vector("gd32f470", path)
+                declarations += [f"void {vector}_IRQHandler(void);",
                                  r"/** \brief Selected I2C DMA boundary publisher. */",
-                                 f"void DMA0_Channel{channel}_IRQHandler(void) {{ nx_i2c_v1_dma_irq(&s_nx_port_{name}, {receive}); }}"]
+                                 f"void {vector}_IRQHandler(void) {{ nx_i2c_v1_dma_irq(&s_nx_port_{name}, {receive}); }}"]
         initialize = f"prepare_{name}()"
         stop = [f"stop_{name}()"]
     elif kind == "i2c":
@@ -363,6 +372,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         arguments = (f"&s_nx_port_{name}, s_nx_adc_channels_{name}, {len(channels)}u, "
                      f"{reference}u, nx_deadline_after(nx_time_now_us(), {timeout * 1000}u)")
         if stream:
+            path = hardware.maintained("gd32f470", item.controller).dma(item.mode)[0]
+            vector = hardware.dma_vector("gd32f470", path)
             region_lines, region_count = dma_regions(name, result)
             declarations += region_lines
             if continuous:
@@ -373,9 +384,9 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                              f"    {stream_state}.regions = s_nx_dma_regions_{name};",
                              f"    {stream_state}.region_count = {region_count}u;",
                              f"    return {call};", "}",
-                             "void DMA1_Channel0_IRQHandler(void);",
+                             f"void {vector}_IRQHandler(void);",
                              "/** \\brief Exact GD ADC DMA block terminal observation. */",
-                             f"void DMA1_Channel0_IRQHandler(void) {{ nx_gd32_adc_{'continuous' if continuous else 'stream'}_irq(&s_nx_port_{name}); }}"]
+                             f"void {vector}_IRQHandler(void) {{ nx_gd32_adc_{'continuous' if continuous else 'stream'}_irq(&s_nx_port_{name}); }}"]
             if continuous:
                 prepare = declarations.index(f"static nx_result_t prepare_{name}(void) {{")
                 declarations.insert(prepare + 1, f"    s_nx_port_{name}.sample_times = s_nx_adc_samples_{name};")

@@ -31,6 +31,7 @@ bool hold_hse;
 bool hold_hsi;
 bool hold_pll;
 bool hold_switch;
+bool update_observed;
 
 class Stm32System : public testing::Test {
   protected:
@@ -56,12 +57,24 @@ class Stm32System : public testing::Test {
         irq_enabled = irq_pending = irq_active = false;
         refuse_irq_disable = false;
         hold_hse = hold_hsi = hold_pll = hold_switch = false;
+        update_observed = false;
         hardware_port = &hardware_mock;
         EXPECT_CALL(hardware_mock, Write(testing::_, testing::_))
             .Times(testing::AnyNumber());
         ON_CALL(hardware_mock, Write(testing::_, testing::_))
-            .WillByDefault(
-                [](volatile uint32_t* reg, uint32_t value) { *reg = value; });
+            .WillByDefault([](volatile uint32_t* reg, uint32_t value) {
+                auto* hardware_timer = g_nx_stm32_system.timer;
+                if (reg == &hardware_timer->SR) {
+                    *reg &= value;
+                } else {
+                    *reg = value;
+                }
+                if (reg == &hardware_timer->EGR && (value & TIM_EGR_UG) != 0U) {
+                    update_observed = true;
+                    hardware_timer->SR |= TIM_SR_UIF;
+                    hardware_timer->CNT = 0U;
+                }
+            });
     }
     void TearDown() override {
         testing::Mock::VerifyAndClearExpectations(&hardware_mock);
@@ -87,6 +100,73 @@ TEST_F(Stm32System, ExactClockAndIndependentTimerHaveOneLiveEpoch) {
     timer.CNT = 5U;
     EXPECT_EQ(5U, nx_stm32_system_now(&g_nx_stm32_system));
     ASSERT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+}
+
+TEST_F(Stm32System, SoftwareUpdateIsClearedBeforePublishingAZeroEpoch) {
+    ASSERT_EQ(0, Start().primary);
+    EXPECT_TRUE(update_observed);
+    EXPECT_EQ(0U, timer.SR & TIM_SR_UIF);
+    EXPECT_EQ(0U, timer.CNT);
+    EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+    EXPECT_TRUE(g_nx_stm32_system.started);
+}
+
+TEST_F(Stm32System, RefusedInitialUpdateClearCannotPublishLiveTime) {
+    EXPECT_CALL(hardware_mock, Write(&timer.SR, 0U))
+        .WillRepeatedly([](volatile uint32_t*, uint32_t) {});
+    auto result = Start();
+    EXPECT_NE(0, result.primary);
+    EXPECT_EQ(0, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_FALSE(irq_enabled);
+    EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+    EXPECT_EQ(0U, timer.CR1 & TIM_CR1_CEN);
+    EXPECT_EQ(0U, timer.DIER);
+    EXPECT_EQ(0U, rcc.APB1ENR & RCC_APB1ENR_TIM2EN);
+}
+
+TEST_F(Stm32System, RefusedSoftwareUpdateCannotReuseAnOldUpdateFlag) {
+    timer.SR = TIM_SR_UIF;
+    EXPECT_CALL(hardware_mock, Write(&timer.EGR, TIM_EGR_UG))
+        .WillRepeatedly([](volatile uint32_t*, uint32_t) {});
+    auto result = Start();
+    EXPECT_NE(0, result.primary);
+    EXPECT_EQ(0, result.cleanup);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_FALSE(irq_enabled);
+    EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+}
+
+TEST_F(Stm32System, RefusedInitialCounterZeroCannotPublishLiveTime) {
+    EXPECT_CALL(hardware_mock, Write(&timer.CNT, 0U))
+        .WillRepeatedly([](volatile uint32_t* reg, uint32_t) { *reg = 37U; });
+    auto result = Start();
+    EXPECT_NE(0, result.primary);
+    EXPECT_EQ(0, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_FALSE(irq_enabled);
+    EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+    EXPECT_EQ(0U, timer.CR1 & TIM_CR1_CEN);
+}
+
+TEST_F(Stm32System, CounterFailureRetainsObservedCleanupResponsibility) {
+    EXPECT_CALL(hardware_mock, Write(&timer.CNT, 0U))
+        .WillRepeatedly([](volatile uint32_t* reg, uint32_t) { *reg = 37U; });
+    EXPECT_CALL(hardware_mock, Write(&rcc.APB1ENR, testing::_))
+        .WillRepeatedly([](volatile uint32_t* reg, uint32_t value) {
+            if ((*reg & RCC_APB1ENR_TIM2EN) != 0U)
+                value |= RCC_APB1ENR_TIM2EN;
+            *reg = value;
+        });
+    auto result = Start();
+    EXPECT_NE(0, result.primary);
+    EXPECT_NE(0, result.cleanup);
+    EXPECT_NE(0U, result.remaining_effects);
+    EXPECT_NE(0U, rcc.APB1ENR & RCC_APB1ENR_TIM2EN);
+    EXPECT_FALSE(g_nx_stm32_system.started);
     EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
 }
 

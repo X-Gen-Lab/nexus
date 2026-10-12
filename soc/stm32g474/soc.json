@@ -402,5 +402,6 @@
     "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
     "https://github.com/STMicroelectronics/cmsis-device-g4/tree/626ee412334a5ed2e5b320af5a8d77d69f03a558",
     "DS12288 Rev6 November2021; Table12 Section4.10 LQFP64 column; Figure7 p50; Table2 p16 independently confirm52 package GPIOs. PDF SHA256 b018e20dbe34b63a43e49365518b186ef0e0e8e899deeabc1c9f53a3a10c1add. PG10 shares NRST and option-byte/electrical restrictions; inventory does not open new Board routes or provider modes."
-  ]
+  ],
+  "references": "references.json"
 }

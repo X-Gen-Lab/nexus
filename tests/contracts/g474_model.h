@@ -32,6 +32,9 @@ typedef struct {
     bool hold_uart_off;
     bool hold_irq_on;
     bool hold_irq_off;
+    bool hold_timer_count;
+    bool hold_timer_gate_off;
+    bool timer_update_observed;
     bool boost_delayed;
     bool unsafe_order;
     volatile uint32_t* ignore_write;

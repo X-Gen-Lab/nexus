@@ -15,6 +15,9 @@
 #ifndef NX_GD32_TIMEBASE_ACK
 #define NX_GD32_TIMEBASE_ACK(value) (TIMER_INTF(TIMER1) = (value))
 #endif
+#ifndef NX_GD32_TIMEBASE_WRITE
+#define NX_GD32_TIMEBASE_WRITE(reg, value) (*(reg) = (uint32_t)(value))
+#endif
 
 static volatile uint32_t s_epoch;
 static bool s_clock_owned;
@@ -23,6 +26,25 @@ static volatile bool s_timer_live;
 
 int nx_gd32_clock_start(void);
 int nx_gd32_clock_stop(void);
+
+/** \brief Observe each initial timer field before publishing a live source.
+ */
+static bool timer_write_checked(volatile uint32_t* reg, uint32_t value,
+                                uint32_t mask) {
+    NX_GD32_TIMEBASE_WRITE(reg, value);
+    nx_arch_dsb();
+    return (*reg & mask) == (value & mask);
+}
+
+/** \brief Bound the update shadow acknowledgement without a running timer.
+ */
+static bool timer_update_ready(void) {
+    for (uint32_t polls = 0U; polls < 1000000U; ++polls) {
+        if ((TIMER_INTF(TIMER1) & TIMER_INTF_UPIF) != 0U)
+            return true;
+    }
+    return false;
+}
 
 /** \brief           Check all external interrupt and DMA resources at stop. */
 static bool external_resources_idle(void) {
@@ -79,9 +101,10 @@ static int stop_timer(void) {
      */
     s_timer_live = false;
     NVIC_DisableIRQ(TIMER1_IRQn);
-    TIMER_CTL0(TIMER1) &= ~TIMER_CTL0_CEN;
-    TIMER_DMAINTEN(TIMER1) = 0u;
-    TIMER_INTF(TIMER1) = 0u;
+    NX_GD32_TIMEBASE_WRITE(&TIMER_CTL0(TIMER1),
+                           TIMER_CTL0(TIMER1) & ~TIMER_CTL0_CEN);
+    NX_GD32_TIMEBASE_WRITE(&TIMER_DMAINTEN(TIMER1), 0u);
+    NX_GD32_TIMEBASE_WRITE(&TIMER_INTF(TIMER1), 0u);
     NVIC_ClearPendingIRQ(TIMER1_IRQn);
     nx_gd32_peripheral_barrier();
     if ((TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) != 0u ||
@@ -140,26 +163,33 @@ int nx_gd32_soc_start(void) {
     rcu_periph_clock_enable(RCU_TIMER1);
     rcu_periph_clock_sleep_enable(RCU_TIMER1_SLP);
     timer_deinit(TIMER1);
-    TIMER_PSC(TIMER1) = 99u;
-    TIMER_CAR(TIMER1) = UINT32_MAX;
-    TIMER_CNT(TIMER1) = 0u;
-    TIMER_SWEVG(TIMER1) = TIMER_SWEVG_UPG;
-    TIMER_INTF(TIMER1) = 0u;
-    TIMER_DMAINTEN(TIMER1) = TIMER_DMAINTEN_UPIE;
+    NX_GD32_TIMEBASE_WRITE(&TIMER_PSC(TIMER1), 99u);
+    NX_GD32_TIMEBASE_WRITE(&TIMER_CAR(TIMER1), UINT32_MAX);
+    if (!timer_write_checked(&TIMER_INTF(TIMER1), 0U, UINT32_MAX))
+        goto timer_failure;
+    NX_GD32_TIMEBASE_WRITE(&TIMER_SWEVG(TIMER1), TIMER_SWEVG_UPG);
+    nx_arch_dsb();
+    if (!timer_update_ready() ||
+        !timer_write_checked(&TIMER_INTF(TIMER1), 0U, UINT32_MAX) ||
+        !timer_write_checked(&TIMER_CNT(TIMER1), 0U, UINT32_MAX))
+        goto timer_failure;
+    NX_GD32_TIMEBASE_WRITE(&TIMER_DMAINTEN(TIMER1), TIMER_DMAINTEN_UPIE);
     s_epoch = 0u;
     NVIC_ClearPendingIRQ(TIMER1_IRQn);
     NVIC_SetPriority(TIMER1_IRQn, 5u);
     NVIC_EnableIRQ(TIMER1_IRQn);
-    TIMER_CTL0(TIMER1) = TIMER_CTL0_CEN;
+    NX_GD32_TIMEBASE_WRITE(&TIMER_CTL0(TIMER1), TIMER_CTL0_CEN);
     nx_gd32_peripheral_barrier();
     if ((TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) == 0u ||
         TIMER_PSC(TIMER1) != 99u || TIMER_CAR(TIMER1) != UINT32_MAX ||
         (RCU_APB1EN & RCU_APB1EN_TIMER1EN) == 0u) {
-        (void)nx_gd32_soc_stop();
-        return -3;
+        goto timer_failure;
     }
     s_timer_live = true;
     return 0;
+timer_failure:
+    (void)nx_gd32_soc_stop();
+    return -3;
 }
 
 /** \brief           Stop only after all external execution owners are quiet. */

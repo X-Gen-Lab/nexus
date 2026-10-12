@@ -3,7 +3,7 @@
  * \brief           Static EXTI line dispatch with bounded observable event loss
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-10-09
+ * \date            2026-10-12
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_provider.h"
@@ -17,6 +17,18 @@
 #define NX_STM32_NVIC_CLEAR(irq)   NVIC_ClearPendingIRQ(irq)
 #endif
 
+#ifndef NX_STM32_EXTI_READ
+#define NX_STM32_EXTI_READ(reg)         (*(reg))
+#define NX_STM32_EXTI_WRITE(reg, value) (*(reg) = (uint32_t)(value))
+#endif
+
+static bool exti_write_checked(volatile uint32_t* reg, uint32_t value,
+                               uint32_t mask) {
+    NX_STM32_EXTI_WRITE(reg, value);
+    nx_arch_dsb();
+    return (NX_STM32_EXTI_READ(reg) & mask) == (value & mask);
+}
+
 /** \brief Configure one exclusive line, leaving other shared-vector lines
  * intact. */
 nx_result_t nx_stm32_exti_initialize(nx_stm32_exti_state_t* port,
@@ -29,25 +41,49 @@ nx_result_t nx_stm32_exti_initialize(nx_stm32_exti_state_t* port,
     }
     uint32_t bit = 1U << port->line;
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    if (port->initialized || (port->registers->IMR & bit) != 0U) {
+    if (port->initialized || ((NX_STM32_EXTI_READ(&port->registers->IMR) |
+                               NX_STM32_EXTI_READ(&port->registers->EMR) |
+                               NX_STM32_EXTI_READ(&port->registers->PR)) &
+                              bit) != 0U) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
-    unsigned offset = (port->line % 4U) * 4U;
-    mux->EXTICR[port->line / 4U] =
-        (mux->EXTICR[port->line / 4U] & ~(15U << offset)) |
-        ((uint32_t)gpio_index << offset);
-    port->registers->RTSR = (port->registers->RTSR & ~bit) |
-                            ((port->edge & NX_EXTI_RISING) != 0 ? bit : 0U);
-    port->registers->FTSR = (port->registers->FTSR & ~bit) |
-                            ((port->edge & NX_EXTI_FALLING) != 0 ? bit : 0U);
-    NX_STM32_CLEAR_FLAGS(port->registers->PR, bit);
-    port->head = 0U;
-    port->tail = 0U;
-    port->count = 0U;
+    /* Initialized denotes retained cleanup storage after the first attempt;
+     * only a SUCCESS result authorizes the caller to publish READY. */
+    port->head = port->tail = port->count = 0U;
     port->loss = 0U;
     port->initialized = true;
-    port->registers->IMR |= bit;
+    unsigned offset = (port->line % 4U) * 4U;
+    volatile uint32_t* selection = &mux->EXTICR[port->line / 4U];
+    uint32_t rising = (port->edge & NX_EXTI_RISING) != 0 ? bit : 0U;
+    uint32_t falling = (port->edge & NX_EXTI_FALLING) != 0 ? bit : 0U;
+    bool valid =
+        exti_write_checked(selection,
+                           (NX_STM32_EXTI_READ(selection) & ~(15U << offset)) |
+                               ((uint32_t)gpio_index << offset),
+                           15U << offset);
+    valid = exti_write_checked(
+                &port->registers->RTSR,
+                (NX_STM32_EXTI_READ(&port->registers->RTSR) & ~bit) | rising,
+                bit) &&
+            valid;
+    valid = exti_write_checked(
+                &port->registers->FTSR,
+                (NX_STM32_EXTI_READ(&port->registers->FTSR) & ~bit) | falling,
+                bit) &&
+            valid;
+    NX_STM32_CLEAR_FLAGS(port->registers->PR, bit);
+    nx_arch_dsb();
+    if (!valid || (NX_STM32_EXTI_READ(&port->registers->PR) & bit) != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_IO;
+    }
+    if (!exti_write_checked(&port->registers->IMR,
+                            NX_STM32_EXTI_READ(&port->registers->IMR) | bit,
+                            bit)) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_IO;
+    }
     nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }
@@ -142,22 +178,54 @@ nx_result_t nx_stm32_exti_stop(void* context) {
     if (nx_arch_in_isr()) {
         return NX_ERROR_CONTEXT;
     }
+    if (!port->initialized)
+        return NX_SUCCESS;
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    uint32_t bit = 1U << port->line;
-    port->registers->IMR &= ~bit;
-    NX_STM32_CLEAR_FLAGS(port->registers->PR, bit);
-    nx_arch_dsb();
-    port->wake = NULL;
-    port->initialized = false;
     IRQn_Type irq = port->line <= 4U
                         ? (IRQn_Type)((int)EXTI0_IRQn + (int)port->line)
                         : (port->line <= 9U ? EXTI9_5_IRQn : EXTI15_10_IRQn);
+    unsigned word = (unsigned)irq / 32U;
+    uint32_t irq_bit = 1U << ((unsigned)irq % 32U);
+    if ((NVIC->IABR[word] & irq_bit) != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_BUSY;
+    }
+    uint32_t bit = 1U << port->line;
+    NX_STM32_EXTI_WRITE(&port->registers->IMR,
+                        NX_STM32_EXTI_READ(&port->registers->IMR) & ~bit);
+    NX_STM32_EXTI_WRITE(&port->registers->RTSR,
+                        NX_STM32_EXTI_READ(&port->registers->RTSR) & ~bit);
+    NX_STM32_EXTI_WRITE(&port->registers->FTSR,
+                        NX_STM32_EXTI_READ(&port->registers->FTSR) & ~bit);
+    NX_STM32_CLEAR_FLAGS(port->registers->PR, bit);
+    nx_arch_dsb();
+    if (((NX_STM32_EXTI_READ(&port->registers->IMR) |
+          NX_STM32_EXTI_READ(&port->registers->RTSR) |
+          NX_STM32_EXTI_READ(&port->registers->FTSR) |
+          NX_STM32_EXTI_READ(&port->registers->PR)) &
+         bit) != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_IO;
+    }
     uint32_t vector_mask =
         port->line <= 4U ? bit : (port->line <= 9U ? 0x3E0U : 0xFC00U);
-    if ((port->registers->IMR & vector_mask) == 0U) {
+    bool shared =
+        (NX_STM32_EXTI_READ(&port->registers->IMR) & vector_mask) != 0U;
+    if (!shared) {
         NX_STM32_NVIC_DISABLE(irq);
         NX_STM32_NVIC_CLEAR(irq);
+        nx_arch_dsb();
+        nx_arch_isb();
     }
+    if ((NVIC->IABR[word] & irq_bit) != 0U ||
+        (!shared && ((NVIC->ISER[word] | NVIC->ISPR[word]) & irq_bit) != 0U)) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_IO;
+    }
+    /* Release only after source and vector withdrawal were observed. Other
+     * shared-domain faces/states still outlive the generated dispatch array. */
+    port->wake = NULL;
+    port->initialized = false;
     nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }

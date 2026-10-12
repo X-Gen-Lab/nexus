@@ -26,6 +26,7 @@ try:
     from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES, declared_modules
     from tools.maintenance import cmsis_device_lock, stm32g4_lock, threadx_lock
     from tools.configure.metadata import parse_json, snapshot
+    from tools.configure.providers import descriptor as provider_descriptors
 except ImportError as error:
     # Missing verifier modules are an incomplete SDK, including after an
     # attacker rehashes the payload map. Never accept a reduced checker graph.
@@ -289,6 +290,11 @@ for _review in cmsis_device_lock.REVIEWED_DEVICES.values():
     REQUIRED_FILES += (_review["lock_name"],)
     REQUIRED_FILES += tuple(_review["directory"] + "/" + name
                             for name in sorted(_review["files"]))
+REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
+for _descriptor in provider_descriptors.families():
+    REQUIRED_FILES += _descriptor.configuration_modules + _descriptor.fact_files
+REQUIRED_FILES += ("tools/configure/providers/descriptor.py",
+                   "tools/configure/providers/hardware.py")
 REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")

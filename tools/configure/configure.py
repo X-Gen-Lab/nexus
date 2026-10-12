@@ -21,7 +21,7 @@ try:
     from . import cpu as cpu_profiles
     from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references
     from .ir import thaw
-    from .providers import maintained
+    from .providers import descriptor, maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                    mode_traits, route_dma, validate_clock_profiles,
                                    resolve_interrupts, sequence,
@@ -40,7 +40,7 @@ except ImportError:
     import factory
     import memory as memory_regions
     from ir import thaw
-    from providers import maintained
+    from providers import descriptor, maintained
     from providers.common import (ConfigurationError, cpu_abi, fail, integer,
                                    mode_traits, route_dma, validate_clock_profiles,
                                   resolve_interrupts, sequence,
@@ -807,16 +807,14 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 imported_dependency_identity(root, lock, read))
             inputs.append(contained_file(root, lock))
         else:
-            device_key = {"stm32f407": "cmsis_device_f4",
-                          "stm32g474": "cmsis_device_g4"}.get(family)
-            if device_key is None:
+            dependencies = descriptor.maintained(family).git_dependencies
+            if not dependencies:
                 fail("SoC has no maintained Git source dependency contract")
-            obj(lock, {"cmsis_core", device_key}, (), "SoC source lock")
+            obj(lock, {key for key, _ in dependencies}, (), "SoC source lock")
             if any(not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}", value)
                    for value in lock.values()):
                 fail("SDK Git dependencies require exact commit identities")
-            for key, path in {"cmsis_core": "vendors/arm/CMSIS_5",
-                              device_key: "vendors/st/" + device_key}.items():
+            for key, path in dependencies:
                 source_dependencies.append(dependency_identity(root, path, lock[key]))
     if backend == "freertos":
         source_dependencies.append(dependency_identity(root, "ext/freertos"))
@@ -931,6 +929,9 @@ def generate(result, output):
               *metadata.header_lines(thaw(result["platform_metadata"]))]
     cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
              f'set(NEXUS_EXACT_PART "{result["part"]}")',
+             'set(NEXUS_PROVIDER_CONFIG_MODULES "' + ';'.join(
+                 descriptor.maintained(result["soc_family"]).configuration_modules)
+             + '")',
              *cpu_profiles.selection_lines(profile),
              *kernel.selection_lines(policy),
              *memory_regions.selection_lines(result),

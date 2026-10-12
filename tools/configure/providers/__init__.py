@@ -1,14 +1,18 @@
 """Explicit maintained SoC contracts; no discovery or runtime plugins."""
-from . import native, stm32f407, gd32f470, stm32g474
+from importlib import import_module
+from types import MappingProxyType
+
+from . import descriptor
 from .common import fail
 
-_PROVIDERS = {"native": native, "stm32f407": stm32f407,
-              "gd32f470": gd32f470, "stm32g474": stm32g474}
+_DESCRIPTORS = MappingProxyType({item.family: item
+                                for item in descriptor.families()})
 
 
 def maintained(family):
     """Reject a family until its capability and emission contract is maintained."""
-    provider = _PROVIDERS.get(family)
-    if provider is None:
+    if family not in _DESCRIPTORS:
         fail(f"Unmaintained SoC provider: {family}")
-    return provider
+    # Only the selected exact family participates in the configuration import
+    # graph. Python caches the explicit module; no filesystem discovery occurs.
+    return import_module("." + family, __name__)

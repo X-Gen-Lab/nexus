@@ -1,6 +1,6 @@
 """Source-reviewed G474 GPIO/LPUART byte-mode capability contract."""
 from types import MappingProxyType
-from .. import common
+from .. import common, descriptor
 
 
 CPU_ABI = MappingProxyType({
@@ -16,6 +16,7 @@ CPU_FEATURES = MappingProxyType({
     "sau": False, "mve": "none", "dsp": True})
 PREFIX = "stm32g474"
 MODEL = False
+FACT_REFERENCES = descriptor.maintained("stm32g474").references
 CAN_CONTROLLERS = ()
 ETH_CONTROLLER = None
 USB_CONTROLLER = None

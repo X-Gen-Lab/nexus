@@ -4,12 +4,16 @@ This module executes only at configuration time. Selected instances retain
 their existing provider layout and readonly operations tables. It emits no
 runtime registry, allocator, worker or dispatch layer.
 """
+from types import MappingProxyType
+
 try:
     from .emission import dma_regions
     from .providers.common import fail, mode_traits
+    from .providers import hardware
 except ImportError:
     from emission import dma_regions
     from providers.common import fail, mode_traits
+    from providers import hardware
 
 
 # Assertions for the maintained SDK cold constructors, not Board wiring.
@@ -19,20 +23,16 @@ PAIRS = {
     "gd32": {"uart": ("USART0", "USART1"), "spi": ("SPI4", "SPI0"),
              "i2c": ("I2C0", "I2C1")},
 }
-DMA_FACTS = {
-    "stm32": {"USART1": ((2, 7, 4),), "USART2": ((1, 6, 4),),
-              "SPI1": ((2, 3, 3), (2, 0, 3)), "SPI2": ((1, 4, 0), (1, 3, 0)),
-              "I2C1": ((1, 0, 1), (1, 6, 1)), "I2C2": ((1, 2, 7), (1, 7, 7))},
-    "gd32": {"USART0": ((1, 7, 4),), "USART1": ((0, 6, 4),),
-             "SPI4": ((1, 4, 2), (1, 3, 2)), "SPI0": ((1, 5, 3), (1, 2, 3)),
-             "I2C0": ((0, 0, 1), (0, 6, 1)), "I2C1": ((0, 2, 7), (0, 7, 7))},
-}
-UART_IRQS = {"stm32": {"USART1": 37, "USART2": 38},
-             "gd32": {"USART0": 37, "USART1": 38}}
-DMA_IRQS = {"stm32": {1: (11, 12, 13, 14, 15, 16, 17, 47),
-                      2: (56, 57, 58, 59, 60, 68, 69, 70)},
-            "gd32": {0: (11, 12, 13, 14, 15, 16, 17, 47),
-                     1: (56, 57, 58, 59, 60, 68, 69, 70)}}
+_FAMILIES = MappingProxyType({"stm32": "stm32f407", "gd32": "gd32f470"})
+DMA_FACTS = MappingProxyType({
+    prefix: MappingProxyType({
+        port.controller: port.dma("dma-tx" if port.kind == "uart" else
+                                  "dma" if prefix == "stm32" and port.kind == "spi"
+                                  else "dma-full-duplex" if port.kind == "spi"
+                                  else "dma-messages")
+        for port in hardware.bindings(family)
+        if port.kind in {"uart", "spi", "i2c"}})
+    for prefix, family in _FAMILIES.items()})
 
 
 def validate_soc(soc, provider):
@@ -84,8 +84,7 @@ def _check(lines, expression):
 
 def _gate(item, prefix):
     controller = item.controller
-    apb2 = (controller in {"USART1", "SPI1"} if prefix == "stm32" else
-            controller in {"USART0", "SPI0", "SPI4"})
+    apb2 = hardware.maintained(_FAMILIES[prefix], controller).apb == 2
     register = ("RCC->APB2ENR" if apb2 else "RCC->APB1ENR") if prefix == "stm32" else (
         "RCU_APB2EN" if apb2 else "RCU_APB1EN")
     bit = (f"RCC_APB{'2' if apb2 else '1'}ENR_{controller}EN" if prefix == "stm32" else
@@ -108,13 +107,12 @@ def _pins(item, result):
 def _vectors(item, prefix):
     result = []
     controller = item.controller
-    if item.kind == "uart":
-        result.append((controller, UART_IRQS[prefix][controller],
-                       f"nx_{prefix}_uart_dma_uart_irq"))
-    elif item.kind == "i2c":
-        base = 31 if controller == PAIRS[prefix]["i2c"][0] else 33
-        result += [(controller + "_EV", base, "nx_i2c_v1_irq"),
-                   (controller + "_ER", base + 1, "nx_i2c_v1_irq")]
+    family = _FAMILIES[prefix]
+    port = hardware.maintained(family, controller)
+    for vector, irq in port.irqs:
+        method = (f"nx_{prefix}_uart_dma_uart_irq" if item.kind == "uart"
+                  else "nx_i2c_v1_irq")
+        result.append((vector, irq, method))
     if mode_traits(item.kind, item.mode).dma:
         for index, (dma, stream, _) in enumerate(DMA_FACTS[prefix][controller]):
             receive = (index == 1 if item.kind == "spi" else index == 0)
@@ -123,7 +121,7 @@ def _vectors(item, prefix):
                       f"nx_{prefix}_spi_dma_irq" + arguments if item.kind == "spi" else
                       "nx_i2c_v1_dma_irq" + arguments)
             vector = f"DMA{dma}_{'Stream' if prefix == 'stm32' else 'Channel'}{stream}"
-            result.append((vector, DMA_IRQS[prefix][dma][stream], method))
+            result.append((vector, hardware.dma_irq(family, dma, stream), method))
     return result
 
 

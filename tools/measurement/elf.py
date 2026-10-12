@@ -10,15 +10,21 @@ from tools.evidence.common import EvidenceError
 class Elf32:
     """Read actual program headers, sections and defined symbols; no size guess."""
 
-    def __init__(self, data: bytes):
+    def __init__(self, data: bytes, *, float_abi: str = "hard"):
+        if not isinstance(float_abi, str) or float_abi not in {"hard", "soft"}:
+            raise EvidenceError("explicit hard or soft ELF float ABI required")
         self.data = data
         header = self.unpack("<16sHHIIIIIHHHHHH", 0)
         if (header[0][:7] != b"\x7fELF\x01\x01\x01" or header[1] != 2 or
                 header[2] != 40 or header[3] != 1 or header[8] != 52):
             raise EvidenceError("expected little-endian ARM ELF32 executable")
         self.entry = header[4]
-        if not self.entry & 1 or header[7] & 0x600 != 0x400:
-            raise EvidenceError("Thumb entry and hard-float ABI required")
+        expected_float = 0x400 if float_abi == "hard" else 0x200
+        if not self.entry & 1 or header[7] & 0x600 != expected_float:
+            message = ("Thumb entry and hard-float ABI required"
+                       if float_abi == "hard" else
+                       "Thumb entry and soft-float ABI required")
+            raise EvidenceError(message)
         if (header[9] != 32 or header[11] != 40 or not header[10] or
                 not header[12] or header[13] >= header[12]):
             raise EvidenceError("invalid ELF program/section table")

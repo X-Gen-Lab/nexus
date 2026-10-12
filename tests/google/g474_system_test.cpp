@@ -18,6 +18,7 @@ class G474System : public testing::Test {
 TEST_F(G474System, Exact170MHzProfileUsesBoostFlashAndDelayedAhbSwitch) {
     auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8);
     ASSERT_EQ(NX_SUCCESS, result.primary);
+    EXPECT_TRUE(g_g474_model.timer_update_observed);
     EXPECT_EQ(NX_SUCCESS, result.cleanup);
     EXPECT_TRUE(g_g474_model.boost_delayed);
     EXPECT_FALSE(g_g474_model.unsafe_order);
@@ -34,6 +35,62 @@ TEST_F(G474System, Exact170MHzProfileUsesBoostFlashAndDelayedAhbSwitch) {
     EXPECT_EQ(UINT32_MAX, g_g474_model.timer.ARR);
     EXPECT_TRUE(g_g474_model.irq_enabled[28]);
     EXPECT_TRUE(g_nx_stm32g474_system.started);
+}
+TEST_F(G474System, SoftwareUpdateIsClearedBeforePublishingAZeroEpoch) {
+    auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U);
+    ASSERT_EQ(NX_SUCCESS, result.primary);
+    EXPECT_EQ(0U, g_g474_model.timer.SR & TIM_SR_UIF);
+    EXPECT_EQ(0U, g_g474_model.timer.CNT);
+    EXPECT_EQ(0U, nx_stm32g474_system_now(&g_nx_stm32g474_system));
+    EXPECT_TRUE(g_nx_stm32g474_system.started);
+}
+TEST_F(G474System, RefusedInitialUpdateClearCannotPublishLiveTime) {
+    g_g474_model.ignore_write = &g_g474_model.timer.SR;
+    auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U);
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_FALSE(g_nx_stm32g474_system.started);
+    EXPECT_FALSE(g_g474_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(0U, nx_stm32g474_system_now(&g_nx_stm32g474_system));
+    EXPECT_EQ(0U, g_g474_model.timer.CR1 & TIM_CR1_CEN);
+    EXPECT_EQ(0U, g_g474_model.timer.DIER);
+    EXPECT_EQ(0U, g_g474_model.rcc.APB1ENR1 & RCC_APB1ENR1_TIM2EN);
+}
+TEST_F(G474System, RefusedSoftwareUpdateCannotReuseAnOldUpdateFlag) {
+    g_g474_model.timer.SR = TIM_SR_UIF;
+    g_g474_model.ignore_write = &g_g474_model.timer.EGR;
+    auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 3U);
+    EXPECT_EQ(NX_ERROR_TIMEOUT, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_FALSE(g_nx_stm32g474_system.started);
+    EXPECT_FALSE(g_g474_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(0U, nx_stm32g474_system_now(&g_nx_stm32g474_system));
+}
+TEST_F(G474System, RefusedInitialCounterZeroCannotPublishLiveTime) {
+    g_g474_model.hold_timer_count = true;
+    auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U);
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_FALSE(g_nx_stm32g474_system.started);
+    EXPECT_FALSE(g_g474_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(0U, nx_stm32g474_system_now(&g_nx_stm32g474_system));
+    EXPECT_EQ(0U, g_g474_model.timer.CR1 & TIM_CR1_CEN);
+}
+TEST_F(G474System, CounterFailureRetainsObservedCleanupResponsibility) {
+    g_g474_model.hold_timer_count = true;
+    g_g474_model.hold_timer_gate_off = true;
+    auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U);
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_ERROR_IO, result.cleanup);
+    EXPECT_NE(0U, result.remaining_effects);
+    EXPECT_NE(0U, g_g474_model.rcc.APB1ENR1 & RCC_APB1ENR1_TIM2EN);
+    EXPECT_FALSE(g_nx_stm32g474_system.started);
+    EXPECT_EQ(0U, nx_stm32g474_system_now(&g_nx_stm32g474_system));
+    g_g474_model.hold_timer_gate_off = false;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8U));
+    EXPECT_EQ(0U, g_nx_stm32g474_system.remaining_effects);
 }
 TEST_F(G474System, HseFailureRollsBackAllOwnedFields) {
     auto old_pll = g_g474_model.rcc.PLLCFGR;

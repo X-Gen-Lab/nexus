@@ -28,8 +28,13 @@ class ClockPort {
     MOCK_METHOD(int, Start, ());
     MOCK_METHOD(int, Stop, ());
     MOCK_METHOD(nx_result_t, Preflight, ());
+    MOCK_METHOD(void, TimerWrite, (volatile uint32_t * reg, uint32_t value));
 };
 ClockPort* clock_port;
+bool hold_timer_count;
+bool hold_timer_update_clear;
+bool hold_timer_gate_drop;
+bool update_observed;
 
 class Gd32Timebase : public testing::Test {
     void* registers = MAP_FAILED;
@@ -50,13 +55,39 @@ class Gd32Timebase : public testing::Test {
         g_gd32_model_mask = 0U;
         g_gd32_model_isr = false;
         clock_port = &clock_mock;
+        hold_timer_count = false;
+        hold_timer_update_clear = false;
+        hold_timer_gate_drop = false;
+        update_observed = false;
         ON_CALL(clock_mock, Start()).WillByDefault(testing::Return(0));
         ON_CALL(clock_mock, Stop()).WillByDefault(testing::Return(0));
         ON_CALL(clock_mock, Preflight())
             .WillByDefault(testing::Return(NX_SUCCESS));
+        EXPECT_CALL(clock_mock, TimerWrite(testing::_, testing::_))
+            .Times(testing::AnyNumber());
+        ON_CALL(clock_mock, TimerWrite(testing::_, testing::_))
+            .WillByDefault([](volatile uint32_t* reg, uint32_t value) {
+                if (reg == &TIMER_INTF(TIMER1)) {
+                    if (!hold_timer_update_clear || value != 0U)
+                        *reg &= value;
+                } else if (reg == &TIMER_CNT(TIMER1) && hold_timer_count) {
+                    *reg = 37U;
+                } else {
+                    *reg = value;
+                }
+                if (reg == &TIMER_SWEVG(TIMER1) &&
+                    (value & TIMER_SWEVG_UPG) != 0U) {
+                    update_observed = true;
+                    TIMER_INTF(TIMER1) |= TIMER_INTF_UPIF;
+                    TIMER_CNT(TIMER1) = hold_timer_count ? 37U : 0U;
+                }
+            });
     }
     void TearDown() override {
         testing::Mock::VerifyAndClearExpectations(&clock_mock);
+        hold_timer_count = false;
+        hold_timer_update_clear = false;
+        hold_timer_gate_drop = false;
         g_gd32_model_nvic = {};
         g_gd32_model_scb = {};
         g_gd32_model_systick = {};
@@ -95,6 +126,56 @@ TEST_F(Gd32Timebase, FailedClockStartupNeverPublishesLiveTime) {
     TIMER_CNT(TIMER1) = 41U;
     EXPECT_NE(0, nx_gd32_soc_start());
     EXPECT_EQ(0U, nx_gd32_now_us());
+}
+
+TEST_F(Gd32Timebase, SoftwareUpdateIsClearedBeforePublishingAZeroEpoch) {
+    ASSERT_EQ(0, nx_gd32_soc_start());
+    EXPECT_TRUE(update_observed);
+    EXPECT_EQ(0U, TIMER_INTF(TIMER1) & TIMER_INTF_UPIF);
+    EXPECT_EQ(0U, TIMER_CNT(TIMER1));
+    EXPECT_EQ(0U, nx_gd32_now_us());
+    EXPECT_NE(0U, TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN);
+}
+
+TEST_F(Gd32Timebase, RefusedInitialUpdateClearCannotPublishLiveTime) {
+    hold_timer_update_clear = true;
+    EXPECT_NE(0, nx_gd32_soc_start());
+    EXPECT_EQ(0U, nx_gd32_now_us());
+    EXPECT_EQ(0U, TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN);
+    EXPECT_EQ(0U, TIMER_DMAINTEN(TIMER1));
+    EXPECT_EQ(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+}
+
+TEST_F(Gd32Timebase, RefusedSoftwareUpdateCannotPublishAClockEpoch) {
+    EXPECT_CALL(clock_mock, TimerWrite(&TIMER_SWEVG(TIMER1), TIMER_SWEVG_UPG))
+        .WillRepeatedly([](volatile uint32_t*, uint32_t) {});
+    EXPECT_NE(0, nx_gd32_soc_start());
+    EXPECT_EQ(0U, nx_gd32_now_us());
+    EXPECT_EQ(0U, TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN);
+    EXPECT_EQ(0U, TIMER_DMAINTEN(TIMER1));
+    EXPECT_EQ(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+}
+
+TEST_F(Gd32Timebase, RefusedInitialCounterZeroCannotPublishLiveTime) {
+    hold_timer_count = true;
+    EXPECT_NE(0, nx_gd32_soc_start());
+    EXPECT_EQ(0U, nx_gd32_now_us());
+    EXPECT_EQ(0U, TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN);
+    EXPECT_EQ(0U, TIMER_DMAINTEN(TIMER1));
+    EXPECT_EQ(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+}
+
+TEST_F(Gd32Timebase, CounterFailureRetainsObservedCleanupResponsibility) {
+    hold_timer_count = true;
+    hold_timer_gate_drop = true;
+    EXPECT_NE(0, nx_gd32_soc_start());
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+    EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+    EXPECT_EQ(0U, nx_gd32_now_us());
+    hold_timer_gate_drop = false;
+    ASSERT_EQ(0, nx_gd32_soc_stop());
+    EXPECT_EQ(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+    EXPECT_EQ(NX_SUCCESS, nx_gd32_soc_preflight());
 }
 
 TEST_F(Gd32Timebase, SuccessfulDomainEndsBeforeStaleCounterCanBeObserved) {
@@ -203,6 +284,12 @@ extern "C" int nx_gd32_clock_stop(void) {
 extern "C" nx_result_t nx_gd32_clock_preflight(void) {
     return clock_port->Preflight();
 }
+/** \brief Model update-event counter reset and W0C at the external MMIO port.
+ */
+extern "C" void nx_gd32_timebase_model_write(volatile uint32_t* reg,
+                                             uint32_t value) {
+    clock_port->TimerWrite(reg, value);
+}
 /** \brief Decode the official SDK run-clock acquisition encoding. */
 extern "C" void rcu_periph_clock_enable(rcu_periph_enum peripheral) {
     REG32(RCU + ((uint32_t)peripheral >> 6U)) |=
@@ -210,6 +297,8 @@ extern "C" void rcu_periph_clock_enable(rcu_periph_enum peripheral) {
 }
 /** \brief Release only the requested modeled run-clock bit. */
 extern "C" void rcu_periph_clock_disable(rcu_periph_enum peripheral) {
+    if (peripheral == RCU_TIMER1 && hold_timer_gate_drop)
+        return;
     REG32(RCU + ((uint32_t)peripheral >> 6U)) &=
         ~(UINT32_C(1) << ((uint32_t)peripheral & 31U));
 }

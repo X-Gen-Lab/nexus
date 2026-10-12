@@ -69,6 +69,13 @@ void nx_g474_model_write(volatile uint32_t* reg, uint32_t value) {
     g_g474_model.writes++;
     if (reg == g_g474_model.ignore_write)
         return;
+    if (reg == &g_g474_model.timer.CNT && g_g474_model.hold_timer_count) {
+        *reg = 37U;
+        return;
+    }
+    if (reg == &g_g474_model.rcc.APB1ENR1 && g_g474_model.hold_timer_gate_off &&
+        (*reg & RCC_APB1ENR1_TIM2EN) != 0U)
+        value |= RCC_APB1ENR1_TIM2EN;
     if (reg == &g_g474_model.rcc.CFGR) {
         value = (value & ~(uint32_t)RCC_CFGR_SWS) | (*reg & RCC_CFGR_SWS);
         if ((value & RCC_CFGR_SWS) == RCC_CFGR_SWS_PLL &&
@@ -78,6 +85,11 @@ void nx_g474_model_write(volatile uint32_t* reg, uint32_t value) {
     if (reg == &g_g474_model.timer.SR) {
         *reg &= value;
         return;
+    }
+    if (reg == &g_g474_model.timer.EGR && (value & TIM_EGR_UG) != 0U) {
+        g_g474_model.timer_update_observed = true;
+        g_g474_model.timer.SR |= TIM_SR_UIF;
+        g_g474_model.timer.CNT = g_g474_model.hold_timer_count ? 37U : 0U;
     }
     if (reg == &g_g474_model.gpio.BSRR) {
         g_g474_model.gpio.ODR |= value & 0xffffU;

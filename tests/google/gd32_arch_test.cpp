@@ -67,6 +67,11 @@ extern "C" bool nx_arch_is_privileged(void) {
 /** \brief CPU completion ordering remains distinct from peripheral readback. */
 extern "C" void nx_arch_dsb(void) {
     s_boundary->CompleteWrites();
+    if ((TIMER_SWEVG(TIMER1) & TIMER_SWEVG_UPG) != 0U) {
+        TIMER_INTF(TIMER1) |= TIMER_INTF_UPIF;
+        TIMER_CNT(TIMER1) = 0U;
+        TIMER_SWEVG(TIMER1) = 0U;
+    }
 }
 
 /** \brief Instruction synchronization follows completed peripheral writes. */
@@ -234,7 +239,7 @@ TEST_F(GD32Arch, PendingWrapSamplingPreservesFlagUntilTheOwnedHandler) {
         .WillOnce(::testing::Return(NX_SUCCESS));
     EXPECT_CALL(boundary, ClockStart()).WillOnce(::testing::Return(0));
     EXPECT_CALL(boundary, ClockStop()).WillOnce(::testing::Return(0));
-    EXPECT_CALL(boundary, CompleteWrites()).Times(2);
+    EXPECT_CALL(boundary, CompleteWrites()).Times(6);
     EXPECT_CALL(boundary, SynchronizeInstructions()).Times(2);
     EXPECT_CALL(boundary, Save())
         .Times(5)

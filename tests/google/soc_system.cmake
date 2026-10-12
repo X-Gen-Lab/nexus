@@ -15,7 +15,8 @@ target_include_directories(nexus_gd32_timebase_contract_test SYSTEM PRIVATE
 target_compile_definitions(nexus_gd32_timebase_contract_test PRIVATE
     GD32F470 HXTAL_VALUE=25000000)
 target_compile_options(nexus_gd32_timebase_contract_test PRIVATE
-    -Wno-int-to-pointer-cast)
+    -Wno-int-to-pointer-cast
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/gd32_timebase_model.h")
 
 nexus_google_test(nexus_stm32_system_transaction_test
     SOURCES stm32_system_transaction_test.cpp

@@ -12,6 +12,7 @@
 
 nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;
+nx_stm32_io_nvic_model_t g_nx_stm32_io_nvic;
 static RCC_TypeDef s_rcc;
 static EXTI_TypeDef s_exti;
 static SYSCFG_TypeDef s_mux;
@@ -40,10 +41,6 @@ static unsigned s_clock_failure;
 #define I2C1 (&s_i2c)
 #undef GPIOB
 #define GPIOB (&s_gpiob)
-#undef NVIC_SetPriority
-#define NVIC_SetPriority(irq, priority) ((void)(irq), (void)(priority))
-#undef NVIC_EnableIRQ
-#define NVIC_EnableIRQ(irq) ((void)(irq))
 #undef NVIC_ClearPendingIRQ
 #define NVIC_ClearPendingIRQ(irq) nx_stm32_model_nvic_clear((int)(irq))
 
@@ -83,6 +80,9 @@ bool nx_arch_irq_is_masked(void) {
 /** \brief Model barrier only; physical ordering is covered separately. */
 void nx_arch_dsb(void) {
 }
+/** \brief CPU instruction synchronization is a separate host-only leaf. */
+void nx_arch_isb(void) {
+}
 /** \brief Model electrical facts use one deterministic observation time. */
 nx_time_us_t nx_time_now_us(void) {
     return 1U;
@@ -91,11 +91,13 @@ nx_time_us_t nx_time_now_us(void) {
 void nx_stm32_model_nvic_disable(int irq) {
     assert(irq == (int)EXTI9_5_IRQn);
     ++s_disable;
+    NVIC->ISER[(unsigned)irq / 32U] &= ~(1U << ((unsigned)irq % 32U));
 }
 /** \brief Record pending acknowledgement while preserving other lines. */
 void nx_stm32_model_nvic_clear(int irq) {
     assert(irq == (int)EXTI9_5_IRQn);
     ++s_clear;
+    NVIC->ISPR[(unsigned)irq / 32U] &= ~(1U << ((unsigned)irq % 32U));
 }
 
 /** \brief Force a late line conflict after GPIO/clock acquisition. */
@@ -116,15 +118,25 @@ static void exti_rollback_test(void) {
     assert(s_rcc.APB2ENR == RCC_APB2ENR_USART1EN);
     assert(s_exti.IMR == (1U << 6U));
     s_exti.IMR = 0U;
+    /* A real edge can become pending immediately after source publication. */
+    NVIC->pending_on_enable = 1U;
     assert(prepare_edge5() == NX_SUCCESS);
+    assert(NVIC_GetEnableIRQ(EXTI9_5_IRQn) == 1U);
+    assert(NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 1U);
+    NVIC->pending_on_enable = 0U;
     assert(prepare_edge6() == NX_SUCCESS);
+    assert(NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 1U);
     s_exti.PR = (1U << 5U) | (1U << 6U);
     EXTI9_5_IRQHandler();
     assert(s_nx_port_edge5.count == 1U && s_nx_port_edge6.count == 1U);
     s_disable = 0U;
     s_clear = 0U;
     assert(stop_edge6() == NX_SUCCESS && s_disable == 0U);
+    assert(NVIC_GetEnableIRQ(EXTI9_5_IRQn) == 1U &&
+           NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 1U);
     assert(stop_edge5() == NX_SUCCESS && s_disable == 1U && s_clear == 1U);
+    assert(NVIC_GetEnableIRQ(EXTI9_5_IRQn) == 0U &&
+           NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 0U);
 }
 
 /** \brief Preserve a conflicting live timer and restore the acquired pin. */

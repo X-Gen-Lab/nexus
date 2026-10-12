@@ -4,6 +4,7 @@ try:
 except ImportError:
     from emission import dma_regions
 from ..common import controller_ir, mode_traits
+from .. import hardware
 try:
     from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers
 except ImportError:
@@ -137,20 +138,23 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             if dma:
                 body.append(f"    {endpoint}.dma = &s_nx_port_{name};")
         if dma:
+            tx, rx = hardware.maintained("stm32f407", item.controller).dma(item.mode)
+            tx_vector = hardware.dma_vector("stm32f407", tx)
+            rx_vector = hardware.dma_vector("stm32f407", rx)
             region_lines, region_count = dma_regions(name, result, include_flash=True)
             declarations += region_lines
-            body += [f"    s_nx_port_{name}.dma = DMA2;",
-                     f"    s_nx_port_{name}.tx = DMA2_Stream3;",
-                     f"    s_nx_port_{name}.rx = DMA2_Stream0;",
+            body += [f"    s_nx_port_{name}.dma = DMA{tx[0]};",
+                     f"    s_nx_port_{name}.tx = {tx_vector};",
+                     f"    s_nx_port_{name}.rx = {rx_vector};",
                      f"    s_nx_port_{name}.regions = s_nx_dma_regions_{name};",
                      f"    s_nx_port_{name}.region_count = {region_count}u;"]
             _check(body, f"nx_stm32_spi_dma_initialize(&s_nx_port_{name})")
-            body += [f"    NVIC_SetPriority(DMA2_Stream3_IRQn, {item.options.irq.priority}u);",
-                     f"    NVIC_SetPriority(DMA2_Stream0_IRQn, {item.options.irq.priority}u);"]
-            for stream, receive in ((3, "false"), (0, "true")):
-                declarations += [f"void DMA2_Stream{stream}_IRQHandler(void);",
+            body += [f"    NVIC_SetPriority({tx_vector}_IRQn, {item.options.irq.priority}u);",
+                     f"    NVIC_SetPriority({rx_vector}_IRQn, {item.options.irq.priority}u);"]
+            for vector, receive in ((tx_vector, "false"), (rx_vector, "true")):
+                declarations += [f"void {vector}_IRQHandler(void);",
                                  "/** \\brief Exact selected SPI DMA terminal observation. */",
-                                 f"void DMA2_Stream{stream}_IRQHandler(void) {{ nx_stm32_spi_dma_irq(&s_nx_port_{name}, {receive}); }}"]
+                                 f"void {vector}_IRQHandler(void) {{ nx_stm32_spi_dma_irq(&s_nx_port_{name}, {receive}); }}"]
         stop_name = f"stop_{name}"
         stop_body = [f"static nx_result_t {stop_name}(void) {{"]
         if dma:
@@ -207,15 +211,17 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         declarations += _release(item["pins"])
         declarations += ["    RCC->APB1ENR &= ~(uint32_t)RCC_APB1ENR_I2C1EN;",
                          "    nx_arch_dsb();", "    return NX_SUCCESS;", "}"]
-        for vector in ("I2C1_EV", "I2C1_ER"):
+        port_binding = hardware.maintained("stm32f407", item.controller)
+        for vector, _ in port_binding.irqs:
             declarations += [f"void {vector}_IRQHandler(void);",
                              r"/** \brief Selected finite I2C message publisher. */",
                              f"void {vector}_IRQHandler(void) {{ nx_i2c_v1_irq(&s_nx_port_{name}); }}"]
         if dma:
-            for channel, receive in ((0, "true"), (6, "false")):
-                declarations += [f"void DMA1_Stream{channel}_IRQHandler(void);",
+            for path, receive in zip(port_binding.dma(item.mode), ("true", "false")):
+                vector = hardware.dma_vector("stm32f407", path)
+                declarations += [f"void {vector}_IRQHandler(void);",
                                  r"/** \brief Selected I2C DMA boundary publisher. */",
-                                 f"void DMA1_Stream{channel}_IRQHandler(void) {{ nx_i2c_v1_dma_irq(&s_nx_port_{name}, {receive}); }}"]
+                                 f"void {vector}_IRQHandler(void) {{ nx_i2c_v1_dma_irq(&s_nx_port_{name}, {receive}); }}"]
         stop = [f"stop_{name}()"]
     elif kind == "i2c":
         if item["controller"] != "I2C1" or item.get("max_hz", 100000) != 100000:
@@ -312,10 +318,24 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                  f"    s_nx_port_{name}.storage = s_nx_events_{name};",
                  f"    s_nx_port_{name}.capacity = {capacity}u;", f"    s_nx_port_{name}.line = {line}u;",
                  f"    s_nx_port_{name}.edge = {edge};"]
-        _check(body, f"nx_stm32_exti_initialize(&s_nx_port_{name}, SYSCFG, {ord(pin['pin'][1]) - ord('A')}u)")
-        body += [f"    NVIC_SetPriority({irq}, {priority}u);",
-                 f"    NVIC_ClearPendingIRQ({irq});", f"    NVIC_EnableIRQ({irq});"]
+        body += [f"    status = nx_stm32_exti_initialize(&s_nx_port_{name}, SYSCFG, {ord(pin['pin'][1]) - ord('A')}u);",
+                 "    if (status != NX_SUCCESS) {",
+                 f"        if (s_nx_port_{name}.initialized) {{ return status; }}",
+                 "        goto rollback;", "    }",
+                 # Cold preflight already rejected foreign pending state.
+                 # Once armed, a new edge or selected peer owns the hint.
+                 # Publication must neither clear nor reject that pending bit.
+                 "    nx_arch_dsb();", "    nx_arch_isb();",
+                 f"    NVIC_SetPriority({irq}, {priority}u);",
+                 f"    NVIC_EnableIRQ({irq});",
+                 "    nx_arch_dsb();", "    nx_arch_isb();",
+                 f"    if (NVIC_GetPriority({irq}) != {priority}u ||",
+                 f"            NVIC_GetEnableIRQ({irq}) == 0u ||",
+                 f"            NVIC_GetActive({irq}) != 0u) {{",
+                 "        return NX_ERROR_IO;", "    }"]
         declarations += [f"static nx_result_t stop_{name}(void) {{",
+                         f"    bool owned = s_nx_port_{name}.initialized;",
+                         f"    if (!owned) {{ return NX_SUCCESS; }}",
                          f"    nx_result_t status = nx_exti_port_stop(&s_nx_face_{name});",
                          "    if (status != NX_SUCCESS) { return status; }"] + _release(item["pins"]) + [
                          "    return NX_SUCCESS;", "}"]
@@ -399,29 +419,31 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                  f"    {adc}.channel_count = {len(channels)}u;", f"    {adc}.reference_mv = {reference}u;"]
         if stream:
             clock_bits["APB1ENR"] = "RCC_APB1ENR_TIM3EN"
+            path = hardware.maintained("stm32f407", item.controller).dma(item.mode)[0]
+            vector = hardware.dma_vector("stm32f407", path)
             region_lines, region_count = dma_regions(name, result)
             declarations += region_lines
             body += ["    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;", "    nx_arch_dsb();",
                      f"    {stream_state}.timer = TIM3;",
-                     f"    {stream_state}.dma = DMA2;",
-                     f"    {stream_state}.memory = DMA2_Stream4;",
+                     f"    {stream_state}.dma = DMA{path[0]};",
+                     f"    {stream_state}.memory = {vector};",
                      f"    {stream_state}.regions = s_nx_dma_regions_{name};",
                      f"    {stream_state}.region_count = {region_count}u;",
                      f"    {stream_state}.timer_clock_hz = 84000000u;",
                      f"    {stream_state}.adc_clock_hz = 21000000u;"]
             _check(body, f"nx_stm32_adc_{'continuous' if continuous else 'stream'}_initialize(&s_nx_port_{name})")
-            body.append(f"    NVIC_SetPriority(DMA2_Stream4_IRQn, {item.options.irq.priority}u);")
-            declarations += ["void DMA2_Stream4_IRQHandler(void);",
+            body.append(f"    NVIC_SetPriority({vector}_IRQn, {item.options.irq.priority}u);")
+            declarations += [f"void {vector}_IRQHandler(void);",
                              "/** \\brief Exact ADC DMA block terminal observation. */",
-                             f"void DMA2_Stream4_IRQHandler(void) {{ nx_stm32_adc_{'continuous' if continuous else 'stream'}_irq(&s_nx_port_{name}); }}"]
+                             f"void {vector}_IRQHandler(void) {{ nx_stm32_adc_{'continuous' if continuous else 'stream'}_irq(&s_nx_port_{name}); }}"]
         else:
             _check(body, f"nx_stm32_adc_initialize(&s_nx_port_{name})")
         stop_body = [f"static nx_result_t stop_{name}(void) {{"]
         if stream:
             stop_body += [f"    nx_result_t stopped = nx_adc_port_stream_stop(&s_nx_face_{name});",
                           "    if (stopped != NX_SUCCESS) { return stopped; }",
-                          "    NVIC_DisableIRQ(DMA2_Stream4_IRQn);",
-                          "    NVIC_ClearPendingIRQ(DMA2_Stream4_IRQn);"]
+                          f"    NVIC_DisableIRQ({vector}_IRQn);",
+                          f"    NVIC_ClearPendingIRQ({vector}_IRQn);"]
         stop_body += [f"    if ({adc}.active) {{ return NX_ERROR_BUSY; }}",
                       "    ADC1->CR2 = 0u;", f"    {adc}.initialized = false;"]
         if stream:
@@ -461,7 +483,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     body.append("}")
     return {"definitions": declarations + body,
             "initialize": f"prepare_{name}()", "stop": stop,
-            "extra_headers": []}
+            "extra_headers": [], "retain_on_failed_init": kind == "exti"}
 
 
 def shared_irq_definitions(selections):
@@ -593,32 +615,38 @@ def _uart_constructor(item, result):
             name, result, include_flash=traits.tx_dma)
         position = definitions.index(f"static nx_result_t prepare_{name}(void) {{")
         definitions[position:position] = region_lines
-        prefix = [f"    {dma_state}.dma = DMA2;",
+        port_binding = hardware.maintained("stm32f407", item.controller)
+        path = port_binding.dma(item.mode)[0]
+        prefix = [f"    {dma_state}.dma = DMA{path[0]};",
                   f"    {dma_state}.regions = s_nx_dma_regions_{name};",
                   f"    {dma_state}.region_count = {region_count}u;"]
         if receive_uart:
-            prefix += [f"    s_nx_port_{name}.receive = DMA2_Stream2;",
+            rx = port_binding.dma("rx-dma-idle")[0]
+            rx_vector = hardware.dma_vector("stm32f407", rx)
+            prefix += [f"    s_nx_port_{name}.receive = {rx_vector};",
                        f"    s_nx_port_{name}.continuous = {'true' if traits.continuous else 'false'};"]
         if dma_uart:
-            prefix += [f"    {dma_state}.tx = DMA2_Stream7;",
-                       f"    {dma_state}.dma_irq = DMA2_Stream7_IRQn;",
-                       f"    {dma_state}.stream = 7u;",
-                       f"    {dma_state}.channel = 4u;"]
+            tx = port_binding.dma("dma-tx")[0]
+            tx_vector = hardware.dma_vector("stm32f407", tx)
+            prefix += [f"    {dma_state}.tx = {tx_vector};",
+                       f"    {dma_state}.dma_irq = {tx_vector}_IRQn;",
+                       f"    {dma_state}.stream = {tx[1]}u;",
+                       f"    {dma_state}.channel = {tx[2]}u;"]
         position += len(region_lines) + 1
         definitions[position:position] = prefix
         priority_line = definitions.index(
             f"    NVIC_SetPriority({uart_state}.irq, {item.options.irq.priority}u);")
         priorities = []
         if receive_uart:
-            priorities.append(f"    NVIC_SetPriority(DMA2_Stream2_IRQn, {item.options.irq.priority}u);")
-            definitions += ["void DMA2_Stream2_IRQHandler(void);",
+            priorities.append(f"    NVIC_SetPriority({rx_vector}_IRQn, {item.options.irq.priority}u);")
+            definitions += [f"void {rx_vector}_IRQHandler(void);",
                             "/** \\brief Exact selected DMA receive publisher. */",
-                            f"void DMA2_Stream2_IRQHandler(void) {{ nx_stm32_uart_receive_dma_irq(&s_nx_port_{name}); }}"]
+                            f"void {rx_vector}_IRQHandler(void) {{ nx_stm32_uart_receive_dma_irq(&s_nx_port_{name}); }}"]
         if dma_uart:
             priorities.append(f"    NVIC_SetPriority({dma_state}.dma_irq, {item.options.irq.priority}u);")
-            definitions += ["void DMA2_Stream7_IRQHandler(void);",
+            definitions += [f"void {tx_vector}_IRQHandler(void);",
                             "/** \\brief Exact selected DMA TX observation. */",
-                            f"void DMA2_Stream7_IRQHandler(void) {{ nx_stm32_uart_dma_irq(&{dma_state}); }}"]
+                            f"void {tx_vector}_IRQHandler(void) {{ nx_stm32_uart_dma_irq(&{dma_state}); }}"]
         definitions[priority_line + 1:priority_line + 1] = priorities
     return {"definitions": definitions, "initialize": init,
             "stop": [f"stop_{name}()"]}

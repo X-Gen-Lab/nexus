@@ -31,18 +31,9 @@ function(nexus_resolve_assembly)
         "${NEXUS_SOURCE_DIR}/tools/configure/bindings.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/providers/__init__.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/providers/common.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/native/__init__.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/native/bindings.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/native/emission.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32f407/__init__.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32f407/bindings.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32f407/emission.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/gd32f470/__init__.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/gd32f470/bindings.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/gd32f470/emission.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/__init__.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/bindings.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/emission.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/descriptor.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/providers/hardware.py"
+        "${NEXUS_SOURCE_DIR}/tools/maintenance/source_catalogue.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/emission.py")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
@@ -53,6 +44,12 @@ function(nexus_resolve_assembly)
         message(FATAL_ERROR "Configuration rejected: ${output}${error}")
     endif()
     include("${bundle}/selection.cmake")
+    # Python integration inputs are projected from explicit family contracts.
+    # Driver/startup translation units remain owned by normal CMake targets.
+    foreach(module IN LISTS NEXUS_PROVIDER_CONFIG_MODULES)
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+            "${NEXUS_SOURCE_DIR}/${module}")
+    endforeach()
     foreach(value NEXUS_SOC_FAMILY NEXUS_EXACT_PART NEXUS_BACKEND
                   NEXUS_CPU_ARCH NEXUS_CPU_FPU NEXUS_FLOAT_ABI NEXUS_ENUM_ABI
                   NEXUS_ARCH_HAS_DWT_CYCCNT NEXUS_IRQ_PRIORITY_BITS

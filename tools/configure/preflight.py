@@ -8,8 +8,10 @@ import re
 
 try:
     from .providers.common import fail
+    from .providers import hardware
 except ImportError:
     from providers.common import fail
+    from providers import hardware
 
 
 def _reject(condition):
@@ -21,9 +23,7 @@ def _clock(controller, family):
     """Name a maintained exclusive gate, not an inferred silicon topology."""
     stm = family == "stm32f407"
     if controller.startswith(("USART", "SPI", "I2C")):
-        second = controller in {"USART1", "SPI1"} if stm else (
-            controller in {"USART0", "SPI0", "SPI4"})
-        bus = 2 if second else 1
+        bus = hardware.maintained(family, controller).apb
     elif re.fullmatch(r"TIM[1349]", controller) and stm:
         bus = 2 if controller in {"TIM1", "TIM9"} else 1
     elif re.fullmatch(r"TIMER[0238]", controller) and not stm:

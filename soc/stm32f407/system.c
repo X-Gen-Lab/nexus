@@ -309,10 +309,23 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
                    system->rcc->APB1RSTR & ~(uint32_t)RCC_APB1RSTR_TIM2RST);
     bool valid = write_checked(&system->timer->CR1, 0U, UINT32_MAX) &&
                  write_checked(&system->timer->PSC, 83U, UINT32_MAX) &&
-                 write_checked(&system->timer->ARR, UINT32_MAX, UINT32_MAX);
+                 write_checked(&system->timer->ARR, UINT32_MAX, UINT32_MAX) &&
+                 write_checked(&system->timer->SR, 0U, UINT32_MAX);
+    if (!valid) {
+        result.primary = -6;
+        goto rollback;
+    }
+    /* Observe a fresh update event before accepting the prescaler shadow.
+     * An old UIF or a refused UG cannot establish this new time epoch. */
     NX_STM32_WRITE(&system->timer->EGR, TIM_EGR_UG);
-    NX_STM32_WRITE(&system->timer->SR, 0U);
-    NX_STM32_WRITE(&system->timer->CNT, 0U);
+    nx_arch_dsb();
+    if (!wait_bits(system, &system->timer->SR, TIM_SR_UIF, TIM_SR_UIF,
+                   poll_limit) ||
+        !write_checked(&system->timer->SR, 0U, UINT32_MAX) ||
+        !write_checked(&system->timer->CNT, 0U, UINT32_MAX)) {
+        result.primary = -6;
+        goto rollback;
+    }
     system->overflow_us = 0U;
     valid = write_checked(&system->timer->DIER, TIM_DIER_UIE, UINT32_MAX) &&
             write_checked(&system->timer->CR1, TIM_CR1_CEN, UINT32_MAX) &&

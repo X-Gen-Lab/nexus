@@ -189,6 +189,13 @@ extern "C" bool nx_arch_irq_is_masked(void) {
 extern "C" void nx_arch_isb(void) {
 }
 extern "C" void nx_arch_dsb(void) {
+#ifdef NX_TIMEBASE_GD_MODEL
+    if ((TIMER_SWEVG(TIMER1) & TIMER_SWEVG_UPG) != 0U) {
+        TIMER_INTF(TIMER1) |= TIMER_INTF_UPIF;
+        TIMER_CNT(TIMER1) = 0U;
+        TIMER_SWEVG(TIMER1) = 0U;
+    }
+#endif
     if ((SysTick->CTRL & 1U) != 0U && SysTick->VAL == 0U)
         SysTick->VAL = SysTick->LOAD;
 }

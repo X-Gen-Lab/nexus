@@ -170,10 +170,16 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
     return metrics, violations
 
 
-def measure(elf_path: Path, resolved_path: Path, budget_path: Path) -> dict:
+def measure(elf_path: Path, resolved_path: Path, budget_path: Path, *,
+            float_abi: str = "hard") -> dict:
     resolved, config = resolved_identity(resolved_path)
+    cpu = resolved.get("cpu")
+    if float_abi == "soft" and (not isinstance(cpu, dict) or
+            cpu.get("float_abi") != "soft"):
+        raise EvidenceError("explicit resource ABI differs from resolved CPU")
     input_files = resolved_input_files(resolved_path, resolved)
-    metrics, violations = measure_data(Elf32(regular_file(elf_path).read_bytes()),
+    metrics, violations = measure_data(Elf32(regular_file(elf_path).read_bytes(),
+                                           float_abi=float_abi),
                                        resolved, load_json(budget_path))
     return {"schema_version": 1, "kind": "elf_resource_budget",
             "status": "failed" if violations else "passed",

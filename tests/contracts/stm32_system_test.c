@@ -67,6 +67,11 @@ void nx_arch_isb(void) {
 void nx_stm32_model_poll(void* raw) {
     nx_stm32_system_t* system = raw;
     ++s_polls;
+    if ((system->timer->EGR & TIM_EGR_UG) != 0U) {
+        system->timer->SR |= TIM_SR_UIF;
+        system->timer->CNT = 0U;
+        system->timer->EGR = 0U;
+    }
     RCC_TypeDef* rcc = system->rcc;
     if ((rcc->CR & RCC_CR_HSION) != 0U && s_fault != 4U) {
         rcc->CR |= RCC_CR_HSIRDY;

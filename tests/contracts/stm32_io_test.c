@@ -13,6 +13,7 @@
 
 nx_stm32_system_t g_nx_stm32_system;
 GPIO_TypeDef g_nx_stm32_gpioa_model;
+nx_stm32_io_nvic_model_t g_nx_stm32_io_nvic;
 static nx_time_us_t s_time;
 static uint32_t s_mask;
 static unsigned s_fault;
@@ -34,12 +35,14 @@ uint32_t nx_stm32_model_gpio_clock_read(const volatile uint32_t* reg) {
 void nx_stm32_model_nvic_disable(int irq) {
     ++s_nvic_disable;
     s_nvic_irq = irq;
+    NVIC->ISER[(unsigned)irq / 32U] &= ~(1U << ((unsigned)irq % 32U));
 }
 
 /** \brief Record vector pending acknowledgement without invoking host MMIO. */
 void nx_stm32_model_nvic_clear(int irq) {
     ++s_nvic_clear;
     assert(irq == s_nvic_irq);
+    NVIC->ISPR[(unsigned)irq / 32U] &= ~(1U << ((unsigned)irq % 32U));
 }
 
 /** \brief Model one finite microsecond clock step per hardware poll. */
@@ -610,9 +613,21 @@ static void exti_test(void) {
     assert(output[1].flags == NX_EXTI_EVENT_LOSS);
     s_nvic_disable = 0U;
     s_nvic_clear = 0U;
+    NVIC_EnableIRQ(EXTI9_5_IRQn);
+    const unsigned vector = (unsigned)EXTI9_5_IRQn;
+    const uint32_t vector_bit = 1U << (vector % 32U);
+    NVIC->ISPR[vector / 32U] = vector_bit;
+    NVIC->IABR[vector / 32U] = vector_bit;
+    uint32_t shared_mask = registers.IMR;
+    assert(nx_exti_port_stop(&port_api) == NX_ERROR_BUSY);
+    assert(port.initialized && registers.IMR == shared_mask);
+    assert(s_nvic_disable == 0U && s_nvic_clear == 0U);
+    NVIC->IABR[vector / 32U] = 0U;
     assert(nx_exti_port_stop(&port_api) == NX_SUCCESS);
     assert(s_nvic_disable == 0U && s_nvic_clear == 0U);
     assert((registers.IMR & (1U << 6U)) != 0U);
+    assert(NVIC_GetEnableIRQ(EXTI9_5_IRQn) == 1U &&
+           NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 1U);
     registers.PR |= 1U << 5U;
     nx_stm32_exti_dispatch(ports, 1U, 0x3E0U);
     assert(port.count == 0U);
@@ -621,6 +636,8 @@ static void exti_test(void) {
     assert(nx_exti_port_stop(&duplicate_api) == NX_SUCCESS);
     assert(s_nvic_disable == 1U && s_nvic_clear == 1U &&
            s_nvic_irq == (int)EXTI9_5_IRQn);
+    assert(NVIC_GetEnableIRQ(EXTI9_5_IRQn) == 0U &&
+           NVIC_GetPendingIRQ(EXTI9_5_IRQn) == 0U);
 }
 
 /** \brief Verify zero/full duty, fixed shared period, idle pin and ADC faults.

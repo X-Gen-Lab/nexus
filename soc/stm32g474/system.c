@@ -218,10 +218,25 @@ nx_stm32g474_start_result_t nx_stm32g474_system_start(nx_stm32g474_system_t* s,
     NX_G474_WRITE(&s->rcc->APB1RSTR1, NX_G474_READ(&s->rcc->APB1RSTR1) &
                                           ~(uint32_t)RCC_APB1RSTR1_TIM2RST);
     bool valid = write_checked(&s->timer->PSC, 169U, UINT32_MAX) &&
-                 write_checked(&s->timer->ARR, UINT32_MAX, UINT32_MAX);
+                 write_checked(&s->timer->ARR, UINT32_MAX, UINT32_MAX) &&
+                 write_checked(&s->timer->SR, 0U, UINT32_MAX);
+    if (!valid) {
+        r.primary = NX_ERROR_IO;
+        goto rollback;
+    }
+    /* A fresh UIF transition proves UG transferred the timer shadow fields.
+     * Clear and observe the zero counter before publishing any IRQ source. */
     NX_G474_WRITE(&s->timer->EGR, TIM_EGR_UG);
-    NX_G474_WRITE(&s->timer->SR, 0U);
-    NX_G474_WRITE(&s->timer->CNT, 0U);
+    nx_arch_dsb();
+    if (!wait_bits(s, &s->timer->SR, TIM_SR_UIF, TIM_SR_UIF, limit)) {
+        r.primary = NX_ERROR_TIMEOUT;
+        goto rollback;
+    }
+    if (!write_checked(&s->timer->SR, 0U, UINT32_MAX) ||
+        !write_checked(&s->timer->CNT, 0U, UINT32_MAX)) {
+        r.primary = NX_ERROR_IO;
+        goto rollback;
+    }
     s->overflow_us = 0U;
     valid = write_checked(&s->timer->DIER, TIM_DIER_UIE, UINT32_MAX) && valid;
     valid = write_checked(&s->timer->CR1, TIM_CR1_CEN, UINT32_MAX) && valid;

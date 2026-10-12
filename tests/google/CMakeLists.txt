@@ -478,3 +478,4 @@ include(dma_multi_controller.cmake)
 
 include(soc_system.cmake)
 include(gd32_exti.cmake)
+include(stm32_exti.cmake)

@@ -1,6 +1,6 @@
 """Maintained gd32f470 capability and static assembly contract."""
 from types import MappingProxyType
-from .. import common
+from .. import common, descriptor, hardware
 
 CPU_ABI = MappingProxyType({'arch': 'cortex-m4', 'fpu': 'fpv4-sp-d16', 'float_abi': 'hard'})
 ENUM_ABI = 'short-enums'
@@ -15,8 +15,8 @@ CPU_FEATURES = MappingProxyType({
 })
 PREFIX = 'gd32'
 MODEL = False
-FACT_REFERENCES = "references.json"
-SOURCE_IMPORT_LOCK = "vendors/gigadevice/gd32f4xx/source.lock.json"
+FACT_REFERENCES = descriptor.maintained("gd32f470").references
+SOURCE_IMPORT_LOCK = descriptor.maintained("gd32f470").import_lock
 ETH_CONTROLLER = 'ENET'
 USB_CONTROLLER = 'USBFS'
 CAN_CONTROLLERS = ('CAN0', 'CAN1')
@@ -36,20 +36,7 @@ LIMITS = MappingProxyType({
 })
 ADC_CHANNEL_SEQUENCES = ((0,), (0, 1))
 SPI_REQUIRES_ENDPOINT = True
-_FIXED_DMA = MappingProxyType({('USART0', 'dma-tx'): ('DMA1:stream7:channel4',),
- ('USART0', 'rx-dma-idle'): ('DMA1:stream2:channel4',),
- ('USART0', 'dma-duplex'): ('DMA1:stream7:channel4', 'DMA1:stream2:channel4'),
- ('USART0', 'rx-dma-continuous'): ('DMA1:stream2:channel4',),
- ('USART0', 'dma-duplex-continuous'): ('DMA1:stream7:channel4',
-                                       'DMA1:stream2:channel4'),
- ('SPI4', 'dma-full-duplex'): ('DMA1:stream4:channel2',
-                               'DMA1:stream3:channel2'),
- ('ADC0', 'trigger-dma'): ('DMA1:stream0:channel0',),
- ('ADC0', 'trigger-dma-continuous'): ('DMA1:stream0:channel0',),
- ('I2C0', 'dma-messages'): ('DMA0:stream0:channel1', 'DMA0:stream6:channel1'),
- ('USART1', 'dma-tx'): ('DMA0:stream6:channel4',),
- ('SPI0', 'dma-full-duplex'): ('DMA1:stream5:channel3', 'DMA1:stream2:channel3'),
- ('I2C1', 'dma-messages'): ('DMA0:stream2:channel7', 'DMA0:stream7:channel7')})
+_FIXED_DMA = hardware.fixed_dma("gd32f470")
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('timer_capture', 'edge-capture'): 'timer_capture',
