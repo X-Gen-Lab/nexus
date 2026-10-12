@@ -61,7 +61,9 @@ profile. `backend` is `native`, `baremetal`, `freertos` or explicitly selected
 `threadx`; Native cannot qualify MCU execution. ThreadX has its own maintained
 Native/M4 subset, strict profile and bootstrap contract; it does not inherit
 FreeRTOS CPU coverage. See [ThreadX integration](../../docs/design/threadx.md). Optional `optimization` is `O2`, `Os`, `O3`, or a corresponding
-`-lto` profile. Optional `abi` asserts the selected CPU facts. Optional `components`
+`-lto` profile. Explicit `Og` and `O0` support source stepping; neither accepts an
+`-lto` suffix. `native-step-debug.toml` selects `Og`; the ordinary Native debug
+assembly retains its production-oriented `Os` choice. Optional `abi` asserts the selected CPU facts. Optional `components`
 selects explicitly mapped CMake targets.
 
 Tables select only the required instances. Each kind table contains instance
@@ -162,7 +164,9 @@ resources. Schema completion does not establish a chip or PCB capability.
 `ir.py` defines frozen `ControllerIR`, `EndpointIR`, `MemoryBudgetIR`,
 `CpuProfileIR`, `InterruptProfileIR` and `ConfigurationIR`. Controller options use
 frozen GPIO, UART, SPI, I2C,
-EXTI, PWM and ADC records. IRQ priority and kernel-call intent are a nested record;
+EXTI, PWM and ADC records. SPI and I2C endpoints also hold frozen mode/speed/CS
+and address/model decisions; USB endpoints retain their bounded packet plan.
+IRQ priority and kernel-call intent are a nested record;
 ADC channel and sample sequences are tuples. Constructor emitters consume these
 named decisions directly; reviewed hardware facts retain an immutable Mapping
 projection. This does not make C factory ID aliases nominal strong types.
@@ -172,7 +176,9 @@ The schema-1 JSON reader remains for explicit legacy contract fixtures and
 migration measurements. Maintained assemblies and source-SDK examples use TOML;
 JSON is never consulted as a fallback for a failed TOML assembly.
 
-`providers/` has an explicit maintained map for Native, STM32F407 and GD32F470.
+`providers/` has an explicit maintained map for Native, STM32F407, GD32F470,
+STM32G474, STM32H743 and STM32U575. The latter three retain their documented
+narrow reference scopes.
 Each family package owns its implemented mode map, CPU/enum ABI, numerical limits,
 fixed DMA/trigger routes, IRQ sharing and built-in CS rules. Its `bindings.py`
 owns constructors, rollback and fixed IRQ wiring; `emission.py` owns system and
@@ -289,12 +295,32 @@ dispatch; the default assembly does not generate them.
 The bundle contains `resolved.json`, `nexus_config.h`, `nexus_bindings.h`,
 `nexus_factory.h`, `nexus_factory_strong.h`, `bindings.c`, `selection.cmake`, `memory.ld`,
 `resource-budget.json`, declared input navigation and an ownership sentinel.
+`configuration_code_paths.json` registers the maintained Python generation
+inputs with CMake. `generator-identity.json` separately binds their source bytes;
+the configuration digest describes resolved decisions, rather than a compiler,
+toolchain, environment or generator version. Configuration code is snapshotted
+before resolution and checked after resolution and emission. When the family is
+not yet known, the initial snapshot covers every explicitly maintained family;
+the published identity retains the selected family closure from that snapshot.
+Source SDK verification remains complete and independent of these sidecars.
+
 Every authored and fact input is hash-bound. CMake reads the resolver's exact
 input paths for reconfiguration, including external packages; it never reparses
 TOML. The resolved digest is embedded in MCU ELF. MSP and heap reservations have
 explicit symbols and intervals; the stack is counted once.
 
-A rejected reconfiguration invalidates the prior owned bundle before parsing.
+A nonblocking OS file lock admits one writer per output. Inputs, source fact
+packages and symlink paths are protected before any withdrawal; an ownership
+marker never authorizes deleting Board, SoC or other input facts. After these
+safety checks, the previous owned bundle moves to a private sibling before
+resolution. The public output is absent until atomic publication. Failed
+generation removes private output; an interrupted process leaves a bounded
+owned pending/previous pair for recovery under the same lock. Stable lock files
+remain in the build directory so two writers cannot lock different inodes.
+Successful generation preserves each byte-identical file's timestamp. Changing
+only a budget therefore preserves unrelated factory headers. No old output is
+used as a configuration or validation cache.
+
 Generation failures leave no usable partial output. Duplicate TOML tables/JSON
 keys, bool-as-number, overflow, unsafe C identifiers, exact-part/ABI/pin conflicts,
 invalid addresses, unknown drivers and changed input bytes fail closed. DMA
@@ -315,3 +341,11 @@ behavior. GoogleTest/GoogleMock exercise compiled generated factories and provid
 lifecycle behavior. ARM link fixtures under `tests/contracts/{stm32,gd32}_assembly`
 qualify selected software routes; physical hardware status remains unexecuted
 until an attached station performs HIL.
+
+`assemblies/catalogue.json` explicitly lists maintained public and Native
+references. `python -B tools/configure/matrix.py --check` checks authoring,
+resolver, factory, provider modes, component target selection and every listed
+assembly. `--output path.json` emits the derived software support matrix with
+exact selections and `physical_status = not_executed`. Adding an assembly
+requires a catalogue entry; a private integration fixture does not become a
+public Board route or physical qualification through this check.

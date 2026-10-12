@@ -575,6 +575,8 @@
     "optimization": {
       "type": "string",
       "enum": [
+        "O0",
+        "Og",
         "O2",
         "Os",
         "O3",

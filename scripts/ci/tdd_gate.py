@@ -13,16 +13,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from scripts.validation.junit import prepare_report, validate_junit
-
-RELEVANT_PREFIXES = (
-    "core/", "arch/", "soc/", "boards/", "io/", "os/", "components/",
-    "tests/", "cmake/", "tools/", "scripts/",
-    "dependencies/googletest", "dependencies/source/googletest",
-)
-RELEVANT_FILES = {
-    "CMakeLists.txt", "CMakePresets.json", ".pre-commit-config.yaml",
-    "scripts/ci/tdd_gate.py",
-}
+from tools.dev.change_paths import behavioral
+from tools.dev.presets import binary_directory
+from tools.dev import process
 
 
 def validate_google_report(report, *, not_before_ns=None, expected_cases=None):
@@ -43,7 +36,7 @@ def validate_google_report(report, *, not_before_ns=None, expected_cases=None):
 
 def relevant(name):
     """Keep documentation-only commits fast while exercising behavior changes."""
-    return name in RELEVANT_FILES or name.startswith(RELEVANT_PREFIXES)
+    return behavioral(name)
 
 
 def check_staged_snapshot(root):
@@ -95,7 +88,7 @@ def environment():
                                check=True)
         for name in local.stdout.splitlines():
             result.pop(name, None)
-    return result
+    return process.execution_environment(result)
 
 
 def checked_binary(name, build):
@@ -111,13 +104,12 @@ def checked_binary(name, build):
 def execute(command, env, log):
     """Record the real subprocess result without accepting console success text."""
     print("+ " + " ".join(map(str, command)), flush=True)
-    result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True,
-                            text=True, check=False)
-    log.write_text(result.stdout + result.stderr)
-    log.with_suffix(".command.json").write_text(json.dumps({
-        "schema": 1, "command": list(map(str, command)), "cwd": str(ROOT),
-        "exit_code": result.returncode,
-    }, indent=2) + "\n")
+    default_timeout = 60 if log.stem.startswith("discovery-") else 1800
+    if log.stem.startswith("execution-"):
+        default_timeout = 300
+    result = process.run(command, cwd=ROOT, env=env, log=log,
+                         stage=log.stem,
+                         timeout=process.command_timeout(env, default_timeout))
     if result.returncode:
         raise ValueError(f"Command failed ({result.returncode}); see {log}")
     return result.stdout
@@ -154,12 +146,12 @@ def main(arguments=None):
         if args.staged:
             initial_tree = staged_tree(ROOT)
             check_staged_snapshot(ROOT)
-        presets = json.loads((ROOT / "CMakePresets.json").read_text())
-        preset = next((item for item in presets["configurePresets"]
-                       if item["name"] == args.preset), None)
-        if preset is None or not args.preset.startswith("native-"):
+        if args.preset not in ("native-debug", "native-release", "native-asan",
+                               "native-tsan", "native-step-debug"):
             raise ValueError("TDD contracts require a maintained Native preset")
-        build = Path(preset["binaryDir"].replace("${sourceDir}", str(ROOT)))
+        build = binary_directory(ROOT, args.preset)
+        if not build.is_relative_to(ROOT.resolve()):
+            raise ValueError("Native build directory is outside the checkout")
         output = build / "tdd"
         output.mkdir(parents=True, exist_ok=True)
         summary = output / "execution.json"

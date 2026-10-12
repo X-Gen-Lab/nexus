@@ -8,20 +8,21 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import shutil
 import sys
-import tempfile
 import tomllib
 from types import MappingProxyType
 
 try:
-    from . import cpu, kernel, metadata, factory
+    from . import cpu, kernel, metadata, factory, bundle, dependencies, sdk
     from .ir import freeze
 except ImportError:
     import cpu
     import kernel
     import metadata
     import factory
+    import bundle
+    import dependencies
+    import sdk
     from ir import freeze
 
 
@@ -66,6 +67,7 @@ def resolve(assembly):
     """Return immutable validated input identities and CPU contracts."""
     try:
         assembly = _path(assembly)
+        sdk.verify(ROOT)
         policy_path = _path(ROOT / metadata.POLICY)
         policy_bytes, _ = metadata.snapshot(policy_path)
         platform_metadata = metadata.policy_contract(
@@ -91,7 +93,7 @@ def resolve(assembly):
             raise RuntimeError("CPU clock_hz must be a positive uint32 fact")
         if choices["backend"] not in {"baremetal", "freertos", "threadx"}:
             raise RuntimeError("Unsupported runtime backend")
-        if choices["optimization"] not in {"O2", "Os", "O3"}:
+        if choices["optimization"] not in {"O0", "Og", "O2", "Os", "O3"}:
             raise RuntimeError("Unsupported runtime optimization")
         profile = cpu.resolve(facts["cpu"], facts["irq"], choices["backend"])
         policy = kernel.resolve(choices.get("os"), profile, hz)
@@ -126,8 +128,7 @@ def resolve(assembly):
 
 
 def configure(assembly, output):
-    """Invalidate only owned output, then publish one complete fresh bundle."""
-    temporary = None
+    """Withdraw old output before resolution; preserve unchanged output times."""
     try:
         assembly, output = _path(assembly), _path(output)
         if output == assembly or output in assembly.parents:
@@ -146,44 +147,42 @@ def configure(assembly, output):
         policy_source = _path(ROOT / metadata.POLICY)
         if output == policy_source or output in policy_source.parents:
             raise RuntimeError("Runtime output must not replace platform metadata")
-        if output.exists():
-            marker = output / ".nexus-runtime-bundle"
-            if not output.is_dir() or not marker.is_file() or marker.is_symlink():
-                raise RuntimeError("Existing runtime output is not an owned bundle")
-            shutil.rmtree(output)
-        result = resolve(assembly)
-        for source in result.inputs.values():
-            if output == Path(source) or output in Path(source).parents:
-                raise RuntimeError("Runtime output must not replace input facts or their parent")
-        output.parent.mkdir(parents=True, exist_ok=True)
-        temporary = Path(tempfile.mkdtemp(prefix=".nexus-runtime-", dir=output.parent))
-        emitted = cpu.emit_profile(result.profile, temporary,
+        inputs = [assembly, ROOT, policy_source]
+        if isinstance(relative, str):
+            inputs.append(source)
+        def fail(message):
+            raise RuntimeError(message)
+        with bundle.transaction(output, ".nexus-runtime-bundle",
+                                inputs=inputs, fail=fail) as temporary:
+            code_paths, code_identity = dependencies.snapshot(
+                mode="runtime", sdk=sdk.installed(ROOT))
+            result = resolve(assembly)
+            dependencies.verify(code_paths, code_identity)
+            emitted = cpu.emit_profile(result.profile, temporary,
                                    clock_hz=result.clock_hz,
                                    optimization=result.optimization,
                                    inputhash=result.input_sha256,
                                    kernel_profile=result.kernel,
                                    platform_metadata=result.platform_metadata)
-        if emitted["configuration_sha256"] != result.configuration_sha256:
-            raise RuntimeError("Resolved runtime identity changed during emission")
-        with (temporary / "selection.cmake").open("a", encoding="utf-8") as stream:
-            stream.write('set(NEXUS_SOC_FAMILY "cpu-runtime")\n')
-        (temporary / "input_paths.json").write_text(
-            json.dumps(dict(result.inputs), indent=2, sort_keys=True) + "\n",
-            encoding="utf-8")
-        (temporary / ".nexus-runtime-bundle").write_text(
-            "Nexus authored CPU runtime bundle\n", encoding="utf-8")
-        for source, snapshot in result.snapshots.items():
-            if _path(source).read_bytes() != snapshot:
-                raise RuntimeError("Runtime inputs changed during generation")
-        os.replace(temporary, output)
+            if emitted["configuration_sha256"] != result.configuration_sha256:
+                raise RuntimeError("Resolved runtime identity changed during emission")
+            with (temporary / "selection.cmake").open("a", encoding="utf-8") as stream:
+                stream.write('set(NEXUS_SOC_FAMILY "cpu-runtime")\n')
+            (temporary / "input_paths.json").write_text(
+                json.dumps(dict(result.inputs), indent=2, sort_keys=True) + "\n",
+                encoding="utf-8")
+            (temporary / ".nexus-runtime-bundle").write_text(
+                "Nexus authored CPU runtime bundle\n", encoding="utf-8")
+            dependencies.emit(temporary, code_paths, code_identity)
+            for source, snapshot in result.snapshots.items():
+                if _path(source).read_bytes() != snapshot:
+                    raise RuntimeError("Runtime inputs changed during generation")
+            dependencies.verify(code_paths, code_identity)
         return result
     except (OSError, ValueError, TypeError, KeyError) as error:
         if isinstance(error, RuntimeError):
             raise
         raise RuntimeError(str(error)) from error
-    finally:
-        if temporary is not None and temporary.exists():
-            shutil.rmtree(temporary)
 
 
 def main(argv=None):

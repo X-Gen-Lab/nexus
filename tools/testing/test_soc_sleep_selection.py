@@ -18,7 +18,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SocSleepSelectionTests(unittest.TestCase):
-    def configure_properties(self, family, selected):
+    def configure_properties(self, family, selected, *, lto=True,
+                             launcher="scope-launcher;--contract"):
         """Keep the checked SDK variable inside the port's child scope only."""
         with tempfile.TemporaryDirectory(prefix="nexus-sleep-cmake-") as name:
             source = Path(name)
@@ -32,6 +33,11 @@ class SocSleepSelectionTests(unittest.TestCase):
 set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")
 set(NEXUS_CONFIG_DIR "{generated.as_posix()}")
 set(Python3_EXECUTABLE "{Path(sys.executable).as_posix()}")
+include("{(ROOT / 'cmake/platform/TargetPolicy.cmake').as_posix()}")
+add_library(Nexus::Config ALIAS nexus_build_options)
+set_target_properties(nexus_build_options PROPERTIES
+    NEXUS_LTO_REQUIRED {"ON" if lto else "OFF"}
+    NEXUS_COMPILER_LAUNCHER "{launcher}")
 add_subdirectory("{(ROOT / 'soc' / family).as_posix()}" provider)
 ''', encoding="utf-8")
             selection = (
@@ -47,6 +53,9 @@ add_library(nexus_clock_domain INTERFACE)
 add_library(Nexus::ClockDomain ALIAS nexus_clock_domain)
 add_library(nexus_build_options INTERFACE)
 add_library(nexus_owned_warnings INTERFACE)
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION {"OFF" if lto else "ON"})
+set(CMAKE_C_COMPILER_LAUNCHER parent-launcher)
+set(CMAKE_CXX_COMPILER_LAUNCHER parent-cxx-launcher)
 if(DEFINED NEXUS_SOURCE_DIR)
     message(FATAL_ERROR "External caller unexpectedly has SDK variable")
 endif()
@@ -79,7 +88,8 @@ if(TARGET selected_sleep)
     file(APPEND "${{CMAKE_BINARY_DIR}}/properties.txt" "selected=TRUE\n")
     foreach(property SOURCES INCLUDE_DIRECTORIES
             INTERFACE_INCLUDE_DIRECTORIES COMPILE_DEFINITIONS LINK_LIBRARIES
-            EXCLUDE_FROM_ALL)
+            EXCLUDE_FROM_ALL INTERPROCEDURAL_OPTIMIZATION
+            C_COMPILER_LAUNCHER CXX_COMPILER_LAUNCHER)
         get_target_property(value selected_sleep "${{property}}")
         file(APPEND "${{CMAKE_BINARY_DIR}}/properties.txt" "${{property}}=${{value}}\n")
     endforeach()
@@ -91,7 +101,8 @@ endif()
             if cmake is None:
                 cmake = str(ROOT / ".venv" / "bin" / "cmake")
             process = subprocess.run(
-                [cmake, "-S", str(source), "-B", str(source / "build")],
+                [cmake, "-S", str(source), "-B", str(source / "build"),
+                 "-G", "Ninja"],
                 capture_output=True, text=True, check=False, timeout=60,
             )
             self.assertEqual(process.returncode, 0,
@@ -138,6 +149,11 @@ endif()
             "nexus_owned_warnings",
         })
         self.assertEqual(properties["EXCLUDE_FROM_ALL"], "TRUE")
+        self.assertEqual(properties["INTERPROCEDURAL_OPTIMIZATION"], "ON")
+        self.assertEqual(properties["C_COMPILER_LAUNCHER"],
+                         "scope-launcher;--contract")
+        self.assertEqual(properties["CXX_COMPILER_LAUNCHER"],
+                         "scope-launcher;--contract")
         for path in private_imports | sdk_imports:
             self.assertTrue(Path(path).is_dir(), path)
 
@@ -154,6 +170,20 @@ endif()
     def test_gd32_default_declares_no_automatic_sleep_target(self):
         properties = self.configure_properties("gd32f470", False)
         self.assertEqual(properties, {"sleep_sources": "", "selected": "FALSE"})
+
+    def test_stm32_selected_policy_withdraws_parent_ipo_and_launcher(self):
+        properties = self.configure_properties("stm32f407", True,
+                                               lto=False, launcher="")
+        self.assertEqual(properties["INTERPROCEDURAL_OPTIMIZATION"], "OFF")
+        self.assertEqual(properties["C_COMPILER_LAUNCHER"], "")
+        self.assertEqual(properties["CXX_COMPILER_LAUNCHER"], "")
+
+    def test_gd32_selected_policy_withdraws_parent_ipo_and_launcher(self):
+        properties = self.configure_properties("gd32f470", True,
+                                               lto=False, launcher="")
+        self.assertEqual(properties["INTERPROCEDURAL_OPTIMIZATION"], "OFF")
+        self.assertEqual(properties["C_COMPILER_LAUNCHER"], "")
+        self.assertEqual(properties["CXX_COMPILER_LAUNCHER"], "")
 
 
 if __name__ == "__main__":

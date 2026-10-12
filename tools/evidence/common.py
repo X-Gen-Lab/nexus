@@ -107,6 +107,24 @@ def verify_file_identity(identity: dict[str, Any]) -> Path:
     return file
 
 
+def separate_outputs(outputs: list[Path], inputs: list[Path] = (),
+                     input_trees: list[Path] = ()) -> None:
+    """Reject aliases and input-tree writes before any output mutation."""
+    selected = []
+    protected = {Path(path).resolve() for path in inputs}
+    trees = [Path(path).resolve() for path in input_trees]
+    for output in outputs:
+        output = Path(output).absolute()
+        if any(path.is_symlink() for path in [output, *output.parents]):
+            raise EvidenceError("output path cannot contain symlinks")
+        canonical = output.resolve()
+        if (canonical in protected or canonical in selected or
+                any(canonical == tree or tree in canonical.parents
+                    for tree in trees)):
+            raise EvidenceError("outputs cannot replace inputs or each other")
+        selected.append(canonical)
+
+
 def atomic_json(path: str | Path, value: dict[str, Any]) -> None:
     destination = Path(path).absolute()
     destination.parent.mkdir(parents=True, exist_ok=True)

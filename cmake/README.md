@@ -1,6 +1,6 @@
 # Source SDK and static firmware composition
 
-One assembly JSON selects SoC/Board, backend, typed instances and budgets.
+One authored TOML assembly selects SoC/Board, backend, typed instances and budgets.
 `NEXUS_ASSEMBLY_FILE` is the sole configuration input. CMake targets own code
 and component dependencies; generated `selection.cmake` selects those targets.
 The atomic resolved bundle also contains bindings, memory layout and identity.
@@ -8,7 +8,7 @@ The atomic resolved bundle also contains bindings, memory layout and identity.
 ```cmake
 cmake_minimum_required(VERSION 3.31)
 project(firmware C ASM)
-set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.json")
+set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
 set(NEXUS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "" FORCE)
 add_subdirectory(external/nexus nexus-owned)

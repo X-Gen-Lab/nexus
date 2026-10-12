@@ -137,7 +137,7 @@ def _endpoint_faces(item, result, prefix):
         endpoint = "s_nx_endpoint_" + (name if index == 0 else child)
         implementation = "spi_dma" if item.kind == "spi" else "i2c_async"
         if index:
-            initializer = (f" = {{ .port = &s_nx_port_{name}, .address = {device['address']}u }}"
+            initializer = (f" = {{ .port = &s_nx_port_{name}, .address = {device.options.address}u }}"
                            if item.kind == "i2c" else "")
             declarations.append(f"static nx_{prefix}_{implementation}_endpoint_state_t {endpoint}{initializer};")
         operations = (f"nx_{prefix}_spi_dma_endpoint_ops" if item.kind == "spi" else
@@ -152,8 +152,8 @@ def _endpoint_faces(item, result, prefix):
                 fail("Paired SPI requires one explicit reviewed CS per child")
             wire = pins[0]["pin"]
             mask = 1 << int(wire[2:])
-            mode = device.get("mode", 0)
-            rate = device.get("max_hz", item.options.max_hz)
+            mode = device.options.mode
+            rate = device.options.max_hz
             if prefix == "stm32":
                 cs = "s_nx_cs_" + child
                 declarations.append(f"static nx_stm32_gpio_state_t {cs};")
@@ -283,7 +283,7 @@ def constructor(item, result, prefix):
             device = children[0]
             wire = (result["routes"][result["board_bindings"][device["cs_binding"]]["route"]]["pins"][0]["pin"]
                     if "cs_binding" in device else next(pin["pin"] for pin in item["pins"] if pin["function"] == "cs"))
-            _check(body, f"nx_gd32_spi_dma_initialize_at(&{state}, &s_nx_endpoint_{name}, &nx_gd32_{controller.lower()}_controller, GPIO{wire[1]}, {1 << int(wire[2:])}u, {device.get('max_hz', item.options.max_hz)}u, {device.get('mode', 0)}u, {item.options.irq.priority}u)")
+            _check(body, f"nx_gd32_spi_dma_initialize_at(&{state}, &s_nx_endpoint_{name}, &nx_gd32_{controller.lower()}_controller, GPIO{wire[1]}, {1 << int(wire[2:])}u, {device.options.max_hz}u, {device.options.mode}u, {item.options.irq.priority}u)")
             body += [f"    s_nx_pair_constructed_{name} = true;"]
             body += endpoint_assignments
     # Providers have no failure return after their first MMIO effect. Preserve

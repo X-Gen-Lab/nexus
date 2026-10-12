@@ -179,7 +179,7 @@ def editor_schema():
     properties = schema["properties"]
     properties["schema"] = {"const": 2}
     properties["backend"]["enum"] = ["native", "baremetal", "freertos", "threadx"]
-    properties["optimization"]["enum"] = ["O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"]
+    properties["optimization"]["enum"] = ["O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"]
     properties["components"] = {"type": "array", "items": {"type": "string"}, "uniqueItems": True}
     properties["abi"] = record({"arch", "fpu", "float_abi"}, {"arch", "fpu", "float_abi"})
     properties["memory"] = record(MEMORY_FIELDS, {"main_stack_bytes"})

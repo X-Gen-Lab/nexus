@@ -1,0 +1,2 @@
+# Workflow YAML validation dependency, included in the offline wheel closure.
+PyYAML==6.0.3

@@ -207,8 +207,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             wire = cs_pin["pin"]
             cs_gpio = f"GPIO{wire[1]}"
             cs_mask = 1 << int(wire[2:])
-            maximum = child.get("max_hz", item.options.max_hz)
-            mode = child.get("mode", 0)
+            maximum = child.options.max_hz
+            mode = child.options.mode
             endpoint = f"s_nx_endpoint_{name}" if index == 0 else f"s_nx_endpoint_{child_name}"
             if index:
                 declarations.append(f"static nx_gd32_{implementation}_endpoint_state_t {endpoint};")

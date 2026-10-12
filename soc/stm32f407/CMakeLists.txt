@@ -105,6 +105,7 @@ function(nexus_add_stm32f407_sleep target)
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../.." ABSOLUTE)
     add_library(${target} STATIC EXCLUDE_FROM_ALL
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/sleep.c")
+    nexus_apply_target_policy(${target})
     target_link_libraries(${target} PRIVATE Nexus::ClockDomain Nexus::Arch
         nexus_build_options nexus_owned_warnings)
     target_include_directories(${target} PRIVATE

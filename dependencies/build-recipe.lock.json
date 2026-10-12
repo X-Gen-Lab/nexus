@@ -1,0 +1,19 @@
+{
+  "apt_packages": {
+    "binutils": "2.44-3",
+    "g++": "4:14.2.0-1",
+    "gcc": "4:14.2.0-1",
+    "git": "1:2.47.3-0+deb13u1",
+    "make": "4.4.1-2"
+  },
+  "base_image": "python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1",
+  "debian_suite": "trixie",
+  "frontend": "docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e",
+  "kind": "nexus_build_recipe",
+  "observed_image_config_id": "sha256:a1ba03c16d424aef88dad6e5b2ead2892734a0bf909dedc23d8855fa4861fbe0",
+  "python_requirements_sha256": "7901ddc7fc82d051f70d1df686b447fc28bb9175a38f42aa9f8a64796862603b",
+  "recipe_reproducible": false,
+  "schema_version": 1,
+  "scope": "declared fixed recipe inputs; reconstruction of the observed OCI bytes is unverified",
+  "snapshot_at": "20261012T000000Z"
+}

@@ -203,16 +203,18 @@ class ProviderContractTests(unittest.TestCase):
     def test_rejected_family_invalidates_previous_bundle(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            package = root / "board"
+            package.mkdir()
             board = gate.load(gate.ROOT / "boards/native_reference/board.json")
-            (root / "board.json").write_text(json.dumps(board))
+            (package / "board.json").write_text(json.dumps(board))
             assembly = root / "assembly.toml"
-            assembly.write_text('schema=2\nboard_package="."\n'
+            assembly.write_text('schema=2\nboard_package="board"\n'
                                 'backend="native"\nclock="model"\n'
                                 '[memory]\nmain_stack_bytes=2048\n')
             output = root / "bundle"
             gate.configure(assembly, output)
             board["soc_family"] = "unmaintained"
-            (root / "board.json").write_text(json.dumps(board))
+            (package / "board.json").write_text(json.dumps(board))
             with self.assertRaisesRegex(gate.ConfigurationError,
                                         "Unmaintained SoC provider"):
                 gate.configure(assembly, output)

@@ -43,12 +43,12 @@ def constructor(item, result, board_bindings, routes, devices):
                        f"    nx_result_t status = nx_native_{kind}_port_configure_instance({state});",
                        "    if (status != NX_SUCCESS) { return status; }"]
         for device in devices:
-            if device["controller"] != item["id"]:
+            if device.controller != item.id:
                 continue
-            child = symbol(device["id"])
-            memory = f"s_nx_model_{child}" if "model_bytes" in device else "NULL"
-            size = device.get("model_bytes", 0)
-            address = f", {device['address']}u" if kind == "i2c" else ""
+            child = symbol(device.id)
+            memory = f"s_nx_model_{child}" if device.options.model_bytes is not None else "NULL"
+            size = device.options.model_bytes or 0
+            address = f", {device.options.address}u" if kind == "i2c" else ""
             definitions += [f"    status = nx_native_{kind}_configure_instance(",
                             f"        &s_nx_endpoint_{child}, {state}, {memory}, {size}u{address});",
                             "    if (status != NX_SUCCESS) { return status; }"]

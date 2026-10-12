@@ -26,6 +26,7 @@ class StagedExecutionTests(unittest.TestCase):
         (self.root / "core").mkdir()
         (self.root / "core" / "state.c").write_text("int state;\n")
         (self.root / "CMakePresets.json").write_text(json.dumps({
+            "version": 6,
             "configurePresets": [{
                 "name": "native-debug",
                 "binaryDir": "${sourceDir}/build/native-debug",

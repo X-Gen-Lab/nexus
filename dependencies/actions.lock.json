@@ -52,14 +52,6 @@
       "release_url": "https://github.com/actions/deploy-pages/releases/tag/v5.0.1"
     },
     {
-      "repository": "dorny/paths-filter",
-      "previous_ref": "v3",
-      "ref": "v4.0.3",
-      "sha": "ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d",
-      "url": "https://github.com/dorny/paths-filter/commit/ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d",
-      "release_url": "https://github.com/dorny/paths-filter/releases/tag/v4.0.3"
-    },
-    {
       "repository": "hendrikmuhs/ccache-action",
       "previous_ref": "v1.2",
       "ref": "v1.2.24",

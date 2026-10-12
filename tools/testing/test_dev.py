@@ -60,6 +60,8 @@ class DeveloperCommandTests(unittest.TestCase):
     def test_doctor_reports_python_and_locked_tool_versions(self):
         output = io.StringIO()
         with patch.object(dev.subprocess, "run", side_effect=self.probe), \
+                patch.object(dev, "executable", side_effect=lambda name: name), \
+                patch.object(dev, "execute", return_value=0), \
                 redirect_stdout(output), redirect_stderr(io.StringIO()):
             result = dev.main(["doctor"])
         self.assertEqual(result, 0)

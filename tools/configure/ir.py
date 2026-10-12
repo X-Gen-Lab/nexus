@@ -378,22 +378,45 @@ class ControllerIR(Record):
 
 
 @dataclass(frozen=True)
+class SpiEndpointOptions:
+    mode: int
+    max_hz: int
+    cs_binding: str | None
+    model_bytes: int | None
+
+
+@dataclass(frozen=True)
+class I2cEndpointOptions:
+    address: int
+    model_bytes: int | None
+
+
+@dataclass(frozen=True)
 class EndpointIR(Record):
     id: str
     controller: str
     driver: str
     kind: str
-    options: UsbEndpointOptions | None
+    options: SpiEndpointOptions | I2cEndpointOptions | UsbEndpointOptions
     values: Mapping
 
     @classmethod
     def create(cls, values, controllers):
-        kind = next(item.kind for item in controllers
-                    if item.id == values["controller"])
-        options = (UsbEndpointOptions(values["endpoint_index"], *(values[key]
-                   for key in ("number", "direction", "transfer", "max_packet",
-                               "fifo_start", "fifo_words")))
-                   if kind == "usb_device" else None)
+        controller = next(item for item in controllers
+                          if item.id == values["controller"])
+        kind = controller.kind
+        if kind == "spi":
+            options = SpiEndpointOptions(values.get("mode", 0),
+                values.get("max_hz", controller.options.max_hz),
+                values.get("cs_binding"), values.get("model_bytes"))
+        elif kind == "i2c":
+            options = I2cEndpointOptions(values["address"], values.get("model_bytes"))
+        elif kind == "usb_device":
+            options = UsbEndpointOptions(values["endpoint_index"], *(values[key]
+                for key in ("number", "direction", "transfer", "max_packet",
+                            "fifo_start", "fifo_words")))
+        else:
+            raise ValueError(f"Unmaintained endpoint decision: {kind}")
         return cls(values["id"], values["controller"], values["driver"],
                    kind, options, freeze(values))
 

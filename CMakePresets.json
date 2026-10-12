@@ -113,6 +113,185 @@
                 "NEXUS_BUILD_TESTS": "OFF"
             },
             "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-nucleo-h743-baremetal-empty",
+            "displayName": "NUCLEO H743 baremetal empty software reference",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-nucleo-h743-baremetal-empty",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/nucleo-h743-baremetal-empty.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-nucleo-h743-baremetal-uart",
+            "displayName": "NUCLEO H743 baremetal uart software reference",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-nucleo-h743-baremetal-uart",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/nucleo-h743-baremetal-uart.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-nucleo-h743-freertos-empty",
+            "displayName": "NUCLEO H743 freertos empty software reference",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-nucleo-h743-freertos-empty",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/nucleo-h743-freertos-empty.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-nucleo-h743-freertos-uart",
+            "displayName": "NUCLEO H743 freertos uart software reference",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-nucleo-h743-freertos-uart",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/nucleo-h743-freertos-uart.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-nucleo-u575-baremetal-empty",
+            "displayName": "NUCLEO U575 baremetal empty software reference",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-nucleo-u575-baremetal-empty",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/nucleo-u575-baremetal-empty.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-nucleo-u575-baremetal-uart",
+            "displayName": "NUCLEO U575 baremetal uart software reference",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-nucleo-u575-baremetal-uart",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/nucleo-u575-baremetal-uart.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-nucleo-u575-freertos-empty",
+            "displayName": "NUCLEO U575 freertos empty software reference",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-nucleo-u575-freertos-empty",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/nucleo-u575-freertos-empty.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-nucleo-u575-freertos-uart",
+            "displayName": "NUCLEO U575 freertos uart software reference",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-nucleo-u575-freertos-uart",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/nucleo-u575-freertos-uart.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-empty",
+            "displayName": "G474 baremetal empty software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-baremetal-empty",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/empty.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-io",
+            "displayName": "G474 baremetal io software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-baremetal-io",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/io.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-exti",
+            "displayName": "G474 baremetal exti software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-baremetal-exti",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/exti.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-empty",
+            "displayName": "G474 freertos empty software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-freertos-empty",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/empty-freertos.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-io",
+            "displayName": "G474 freertos io software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-freertos-io",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/io-freertos.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-exti",
+            "displayName": "G474 freertos exti software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-freertos-exti",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/exti-freertos.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "native-step-debug",
+            "displayName": "Native single-step debug (Og and debug symbols)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/native-step-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native-step-debug.toml",
+                "NEXUS_BUILD_TESTS": "ON"
+            }
         }
     ],
     "buildPresets": [
@@ -155,6 +334,66 @@
         {
             "name": "gd32-liangshan-freertos",
             "configurePreset": "gd32-liangshan-freertos"
+        },
+        {
+            "name": "stm32-nucleo-h743-baremetal-empty",
+            "configurePreset": "stm32-nucleo-h743-baremetal-empty"
+        },
+        {
+            "name": "stm32-nucleo-h743-baremetal-uart",
+            "configurePreset": "stm32-nucleo-h743-baremetal-uart"
+        },
+        {
+            "name": "stm32-nucleo-h743-freertos-empty",
+            "configurePreset": "stm32-nucleo-h743-freertos-empty"
+        },
+        {
+            "name": "stm32-nucleo-h743-freertos-uart",
+            "configurePreset": "stm32-nucleo-h743-freertos-uart"
+        },
+        {
+            "name": "stm32-nucleo-u575-baremetal-empty",
+            "configurePreset": "stm32-nucleo-u575-baremetal-empty"
+        },
+        {
+            "name": "stm32-nucleo-u575-baremetal-uart",
+            "configurePreset": "stm32-nucleo-u575-baremetal-uart"
+        },
+        {
+            "name": "stm32-nucleo-u575-freertos-empty",
+            "configurePreset": "stm32-nucleo-u575-freertos-empty"
+        },
+        {
+            "name": "stm32-nucleo-u575-freertos-uart",
+            "configurePreset": "stm32-nucleo-u575-freertos-uart"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-empty",
+            "configurePreset": "fixture-stm32-g474-baremetal-empty"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-io",
+            "configurePreset": "fixture-stm32-g474-baremetal-io"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-exti",
+            "configurePreset": "fixture-stm32-g474-baremetal-exti"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-empty",
+            "configurePreset": "fixture-stm32-g474-freertos-empty"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-io",
+            "configurePreset": "fixture-stm32-g474-freertos-io"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-exti",
+            "configurePreset": "fixture-stm32-g474-freertos-exti"
+        },
+        {
+            "name": "native-step-debug",
+            "configurePreset": "native-step-debug"
         }
     ],
     "testPresets": [
@@ -191,6 +430,16 @@
         {
             "name": "native-tsan",
             "configurePreset": "native-tsan",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error"
+            }
+        },
+        {
+            "name": "native-step-debug",
+            "configurePreset": "native-step-debug",
             "output": {
                 "outputOnFailure": true
             },

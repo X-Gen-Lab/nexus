@@ -54,22 +54,19 @@ function(nexus_add_runtime)
         message(FATAL_ERROR "CPU runtime rejected:\n${runtime_output}${runtime_error}")
     endif()
     include("${NEXUS_CONFIG_DIR}/selection.cmake")
-    file(READ "${NEXUS_CONFIG_DIR}/input_paths.json" runtime_inputs)
-    foreach(input assembly cpu_facts)
-        string(JSON runtime_input GET "${runtime_inputs}" "${input}")
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-            "${runtime_input}")
+    # Both authored/fact inputs and generation code come from the resolver's
+    # exact sidecars. No runtime factory or translation-unit graph is emitted.
+    foreach(sidecar input_paths configuration_code_paths)
+        file(READ "${NEXUS_CONFIG_DIR}/${sidecar}.json" runtime_inputs)
+        string(JSON input_count LENGTH "${runtime_inputs}")
+        math(EXPR input_last "${input_count} - 1")
+        foreach(index RANGE 0 ${input_last})
+            string(JSON name MEMBER "${runtime_inputs}" ${index})
+            string(JSON path GET "${runtime_inputs}" "${name}")
+            set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+                "${path}")
+        endforeach()
     endforeach()
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${NEXUS_SOURCE_DIR}/tools/configure/runtime.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/cpu.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/kernel.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/ir.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/threadx.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/lowpower.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/metadata.py"
-        "${NEXUS_SOURCE_DIR}/dependencies/platform-compatibility.json"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/common.py")
     include("${NEXUS_SOURCE_DIR}/cmake/platform/Options.cmake")
     foreach(layer core arch io os components)
         add_subdirectory("${NEXUS_SOURCE_DIR}/${layer}"

@@ -27,68 +27,14 @@ jobs:
       workflows: ${{ steps.filter.outputs.workflows }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
-        id: filter
         with:
-          filters: |
-            code:
-              - 'core/**'
-              - 'io/**'
-              - 'os/**'
-              - 'components/**'
-              - 'tools/**'
-              - 'hal/**'
-              - 'osal/**'
-              - 'framework/**'
-              - 'services/**'
-              - 'arch/**'
-              - 'boards/**'
-              - 'soc/**'
-              - 'runtime/**'
-              - 'platforms/**'
-              - 'tests/**'
-              - '**/CMakeLists.txt'
-              - 'cmake/**'
-              - 'CMake*Presets.json'
-              - 'scripts/**'
-              - '**/Kconfig*'
-              - '**/Kconfig*/**'
-              - '.config'
-              - '.config.*'
-              - '**/.config'
-              - '**/.config.*'
-              - 'configs/**'
-              - '**/*defconfig'
-              - 'dependencies/**'
-              - 'deps/**'
-              - 'third_party/**'
-              - 'ext/**'
-              - 'vendors/**'
-              - 'nexus.lock'
-              - '.gitmodules'
-              - '**/requirements*.txt'
-              - '**/pyproject.toml'
-              - '**/poetry.lock'
-              - '**/uv.lock'
-              - '.clang-format*'
-              - '.clang-tidy*'
-              - '.clangd'
-              - '.editorconfig'
-              - '.pre-commit-config.yaml'
-              - '.kiro/steering/comment-standards.md'
-              - 'docs/sphinx/development/coding_standards.rst'
-              - 'CONTRIBUTING.md'
-              - 'CONTRIBUTING_CN.md'
-            docs:
-              - 'docs/**'
-              - '**.md'
-              - 'Doxyfile'
-              - 'Doxyfile.*'
-            workflows:
-              - '.github/workflows/**'
-              - '.github/actions/**'
-              - '.github/dependabot.yml'
-              - '.github/dependabot.yaml'
+          fetch-depth: 0
+      - name: Classify actual Git changes
+        id: filter
+        env:
+          NEXUS_CHANGE_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          NEXUS_CHANGE_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python3 tools/dev/change_paths.py --github-output "$GITHUB_OUTPUT"
 
   build-test:
     name: Build & Test

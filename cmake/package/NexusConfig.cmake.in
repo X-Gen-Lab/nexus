@@ -8,9 +8,10 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" -B
 if(NOT _nexus_sdk_result EQUAL 0)
     message(FATAL_ERROR "Installed Nexus source SDK identity rejected:\n${_nexus_sdk_output}${_nexus_sdk_error}")
 endif()
-file(READ "${_nexus_sdk_source}/.nexus-source-sdk.json" _nexus_sdk_identity)
-string(JSON _nexus_sdk_publishable GET "${_nexus_sdk_identity}" publishable)
-string(JSON _nexus_sdk_revision GET "${_nexus_sdk_identity}" source_revision)
+# Consume the result of this actual complete verification, not a second read
+# of the mutable manifest. Every new find_package call verifies bytes again.
+string(JSON _nexus_sdk_publishable GET "${_nexus_sdk_output}" publishable)
+string(JSON _nexus_sdk_revision GET "${_nexus_sdk_output}" source_revision)
 if(NOT _nexus_sdk_publishable AND NOT NEXUS_ALLOW_SOURCE_SDK_FIXTURE)
     message(FATAL_ERROR "This source SDK is a nonpublishable development fixture; explicitly set NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON for a development consumer")
 endif()

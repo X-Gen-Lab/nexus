@@ -16,6 +16,17 @@ import package_source_sdk as source_sdk
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_build_policy_and_tool_module_closure_is_required(self):
+        required = {"cmake/platform/TargetPolicy.cmake",
+                    "tools/configure/bundle.py", "tools/configure/dependencies.py",
+                    "tools/configure/contracts.py", "tools/configure/matrix.py",
+                    "tools/dev/dev.py", "tools/dev/presets.py", "tools/dev/process.py",
+                    "tools/dev/change_paths.py", "tools/dev/cache.py",
+                    "tools/dev/dependencies.py", "tools/dev/qualification.py",
+                    "tools/evidence/store.py", "tools/evidence/environment.py",
+                    "tools/evidence/recipe.py"}
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)))
+
     def test_metadata_and_memory_generation_are_required_sdk_payload(self):
         required = {"dependencies/platform-compatibility.json",
                     "tools/configure/metadata.py", "tools/configure/memory.py"}
@@ -289,6 +300,67 @@ class SourceSDKTests(unittest.TestCase):
     def verify(self):
         return self.run_process([sys.executable, "-B", str(self.sdk / "cmake/package/package_source_sdk.py"),
                          "--verify", str(self.sdk)])
+
+    def standalone_resolver_commands(self):
+        directory = self.directory / "standalone resolver boundary"
+        directory.mkdir(exist_ok=True)
+        soc = json.loads((self.sdk / "soc/native/soc.json").read_text())
+        (directory / "cpu.json").write_text(json.dumps({
+            "schema_version": 1, "cpu": soc["cpu"], "irq": soc["irq"],
+            "clock_hz": 1000000}) + "\n")
+        runtime = directory / "runtime.toml"
+        runtime.write_text('schema_version=1\ncpu_facts="cpu.json"\n'
+                           'backend="baremetal"\noptimization="Os"\n')
+        return {
+            "platform": [sys.executable, "-B", str(self.sdk / "tools/configure/configure.py"),
+                "--assembly", str(self.sdk / "tools/configure/assemblies/native-empty.toml"),
+                "--output", str(directory / "platform-generated")],
+            "runtime": [sys.executable, "-B", str(self.sdk / "tools/configure/runtime.py"),
+                "--assembly", str(runtime), "--output", str(directory / "runtime-generated")],
+            "cpu": [sys.executable, "-B", str(self.sdk / "tools/configure/cpu.py"),
+                "--facts", str(directory / "cpu.json"), "--backend", "baremetal",
+                "--output", str(directory / "cpu-generated")],
+        }
+
+    def test_standalone_resolvers_reject_source_byte_tamper(self):
+        commands = self.standalone_resolver_commands()
+        for command in commands.values():
+            self.run_ok(command)
+        target = self.sdk / "io/src/gpio.c"
+        original = target.read_bytes()
+        try:
+            target.write_bytes(original + b"\n/* Source SDK payload tamper. */\n")
+            for name, command in commands.items():
+                with self.subTest(boundary=name):
+                    rejected = self.run_process(command)
+                    self.assertNotEqual(rejected.returncode, 0)
+                    self.assertIn("Source SDK file identity changed: io/src/gpio.c",
+                                  rejected.stderr)
+                    self.assertFalse(Path(command[-1]).exists())
+        finally:
+            target.write_bytes(original)
+
+    def test_standalone_resolvers_reject_rehashed_required_module_omission(self):
+        import hashlib
+        commands = self.standalone_resolver_commands()
+        target = self.sdk / "tools/dev/cache.py"
+        manifest = self.sdk / ".nexus-source-sdk.json"
+        original, original_manifest = target.read_bytes(), manifest.read_bytes()
+        try:
+            target.unlink()
+            value = json.loads(original_manifest)
+            del value["files_sha256"]["tools/dev/cache.py"]
+            value["snapshot_sha256"] = hashlib.sha256(json.dumps(
+                value["files_sha256"], sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+            manifest.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
+            for name, command in commands.items():
+                with self.subTest(boundary=name):
+                    rejected = self.run_process(command)
+                    self.assertNotEqual(rejected.returncode, 0)
+                    self.assertIn("missing required sources/licenses", rejected.stderr)
+        finally:
+            target.write_bytes(original)
+            manifest.write_bytes(original_manifest)
 
     def test_cli_summary_cannot_be_confused_with_complete_manifest(self):
         result = self.verify()
@@ -619,7 +691,14 @@ class SourceSDKTests(unittest.TestCase):
         old_identity = identity.read_bytes()
         for name in ("arch/CMakeLists.txt", "os/wait.c",
                      "components/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
-                     "tools/measurement/resources.py", "tools/evidence/common.py"):
+                     "tools/measurement/resources.py", "tools/evidence/common.py",
+                     "cmake/platform/TargetPolicy.cmake",
+                     "tools/configure/bundle.py", "tools/configure/dependencies.py",
+                     "tools/configure/contracts.py", "tools/dev/dev.py",
+                     "tools/dev/presets.py", "tools/dev/process.py",
+                     "tools/dev/cache.py", "tools/dev/dependencies.py",
+                     "tools/dev/qualification.py", "tools/evidence/store.py",
+                     "tools/evidence/environment.py", "tools/evidence/recipe.py"):
             with self.subTest(name=name):
                 target = self.sdk / name
                 old_source = target.read_bytes()

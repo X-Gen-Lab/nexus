@@ -129,8 +129,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                      f"    s_nx_cs_{child_name}.mask = {bit}u;",
                      f"    s_nx_cs_{child_name}.output = true;"]
             _check(body, f"nx_stm32_gpio_initialize(&s_nx_cs_{child_name}, {bit}u)")
-            mode = child.get("mode", 0)
-            maximum = child.get("max_hz", item.options.max_hz)
+            mode = child.options.mode
+            maximum = child.options.max_hz
             if not isinstance(mode, int) or isinstance(mode, bool) or not 0 <= mode <= 3:
                 raise ValueError("SPI mode must be 0 through 3")
             minimum, upper = LIMITS["spi_hz"]
@@ -259,7 +259,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                  f"    s_nx_port_{name}.rate_hz = 100000u;"]
         for index, child in enumerate(children):
             child_name = _symbol(child["id"])
-            address = child["address"]
+            address = child.options.address
             if not 8 <= address <= 119:
                 raise ValueError("Reserved I2C addresses are not maintained")
             endpoint = f"s_nx_endpoint_{name}" if index == 0 else f"s_nx_endpoint_{child_name}"

@@ -69,7 +69,7 @@ class RuntimeAssemblyTests(unittest.TestCase):
 
     def test_backend_optimization_and_schema_are_explicit(self):
         original = self.assembly.read_text()
-        for old, new in (('"baremetal"', '"automatic"'), ('"Os"', '"O0"'),
+        for old, new in (('"baremetal"', '"automatic"'), ('"Os"', '"O4"'),
                          ('schema_version = 1', 'schema_version = 2')):
             with self.subTest(new=new):
                 self.assembly.write_text(original.replace(old, new))

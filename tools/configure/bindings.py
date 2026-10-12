@@ -99,11 +99,10 @@ def emit(result):
         retained_initialization.append(construction.get("retain_on_failed_init", False))
         stop.extend((len(initialize), expression)
                     for expression in construction["stop"])
-    for device in result["devices"]:
-        controller = next(item for item in selections if item["id"] == device["controller"])
-        kind = controller["kind"]
+    for device in result.devices:
+        kind = device.kind
         class_name = "usb_endpoint" if kind == "usb_device" else kind + "_device"
-        header.append(f'extern const {interface_type(class_name, "endpoint")}* const nx_device_{symbol(device["id"])};')
+        header.append(f'extern const {interface_type(class_name, "endpoint")}* const nx_device_{symbol(device.id)};')
     source.extend(provider.shared_irqs(result))
     # All constructor arrays precede their shared cold lease functions.
     # Reuse those static slots directly; no pointer registry is emitted.

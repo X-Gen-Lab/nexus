@@ -112,8 +112,10 @@ class GateBoundaryTests(unittest.TestCase):
                 self.assertTrue(relevant(name))
         self.assertFalse(relevant("docs/manual.md"))
 
-    @patch("scripts.ci.tdd_gate.subprocess.run")
+    @patch("scripts.ci.tdd_gate.process.run")
     def test_command_and_actual_exit_are_recorded_alongside_raw_log(self, run):
+        # The shared executor owns logging. Verify delegation and propagation;
+        # real output, receipts and retry retention run in test_build_workflow.
         run.return_value = type("Result", (), {
             "stdout": "actual output\n", "stderr": "", "returncode": 0
         })()
@@ -121,11 +123,9 @@ class GateBoundaryTests(unittest.TestCase):
             log = Path(directory) / "execution.txt"
             self.assertEqual(execute(["binary", "--gtest_filter=*"], {}, log),
                              "actual output\n")
-            record = log.with_suffix(".command.json")
-            self.assertTrue(record.is_file())
-            metadata = json.loads(record.read_text())
-            self.assertEqual(metadata["command"], ["binary", "--gtest_filter=*"])
-            self.assertEqual(metadata["exit_code"], 0)
+            self.assertEqual(run.call_args.args[0],
+                             ["binary", "--gtest_filter=*"])
+            self.assertEqual(run.call_args.kwargs["log"], log)
 
     def test_discovery_uses_framework_cases_not_banner(self):
         output = ("Running main() from gmock_main.cc\n"

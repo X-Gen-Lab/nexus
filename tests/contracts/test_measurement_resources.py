@@ -58,6 +58,25 @@ class ResourceValidationTests(unittest.TestCase):
             self.assertEqual(report["status"], "failed")
             self.assertEqual(report["violations"][0]["metric"], "msp")
 
+    def test_generated_budget_cannot_raise_resolved_limits(self):
+        with tempfile.TemporaryDirectory() as directory:
+            elf, resolved, budget = link_fixture(Path(directory), budget_contract={
+                "main_stack_bytes": 1024, "libc_heap_bytes": 64,
+                "static_ram_bytes": 4096, "flash_load_bytes": 4096})
+            original = json.loads(budget.read_text())
+            self.assertEqual(measure(elf, resolved, budget)["status"], "passed")
+            for field in ("msp_max", "heap_max", "flash_loaded_max",
+                          "flash_footprint_max", "ram_reserved_max"):
+                with self.subTest(field=field):
+                    changed = json.loads(json.dumps(original))
+                    if field == "ram_reserved_max":
+                        changed[field]["sram"] += 4096
+                    else:
+                        changed[field] += 4096
+                    atomic_json(budget, changed)
+                    with self.assertRaisesRegex(EvidenceError, "resolved"):
+                        measure(elf, resolved, budget)
+
     def test_stale_configuration_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             elf, resolved, budget = link_fixture(Path(directory))

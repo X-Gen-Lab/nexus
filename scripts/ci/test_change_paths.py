@@ -1,105 +1,30 @@
-"""Exercise CI path policy and required jobs using the workflow's actual rules.
+"""Execute the single hook/CI path policy and required-job decisions."""
 
-This stdlib-only test evaluator supports the positive literal, * and ** globs
-currently used in ci.yml. It is not a replacement for, or an execution test of,
-dorny/paths-filter. Complex/negative syntax fails instead of guessing semantics.
-Deletion paths are classified just like additions, as in the action's unqualified
-rules; tests check the gate decisions for docs-only and mixed changes as well.
-"""
-
-import ast
-import re
 import unittest
 from pathlib import Path
 
-from check_required_jobs import check_required_jobs, required_jobs
-
+from scripts.ci.check_required_jobs import check_required_jobs, required_jobs
+from tools.dev.change_paths import classify as classify_paths, behavioral
 
 WORKFLOW = Path(__file__).resolve().parents[2] / ".github/workflows/ci.yml"
 
 
-def read_filters(contents):
-    """Read the existing inline filters block without a YAML runtime dependency."""
-    lines = contents.splitlines()
-    starts = [index for index, line in enumerate(lines) if line.strip() == "filters: |"]
-    if len(starts) != 1:
-        raise ValueError("one inline workflow filter block required")
-    start = starts[0]
-    indent = len(lines[start]) - len(lines[start].lstrip())
-    filters = {}
-    current = None
-    for line in lines[start + 1:]:
-        if not line.strip():
-            continue
-        if len(line) - len(line.lstrip()) <= indent:
-            break
-        stripped = line.strip()
-        if re.fullmatch(r"[a-z]+:", stripped):
-            current = stripped[:-1]
-            if current in filters:
-                raise ValueError("duplicate filter")
-            filters[current] = []
-        elif stripped.startswith("- ") and current is not None:
-            pattern = ast.literal_eval(stripped[2:])
-            compile_glob(pattern)  # Reject unsupported rules even without matches.
-            filters[current].append(pattern)
-        else:
-            raise ValueError("unsupported filter structure")
-    if set(filters) != {"code", "docs", "workflows"} or not all(filters.values()):
-        raise ValueError("three nonempty CI filters required")
-    return filters
-
-
-def compile_glob(pattern):
-    if (not isinstance(pattern, str) or not pattern
-            or not re.fullmatch(r"[A-Za-z0-9_./*+-]+", pattern)
-            or "***" in pattern or pattern.startswith("/")
-            or any(part in ("", ".", "..") for part in pattern.split("/"))):
-        raise ValueError("unsupported positive glob syntax")
-    # The workflow's **.md matches Markdown at every depth. Other globstars
-    # occupy complete path segments; embedded globstars are outside this subset.
-    if pattern != "**.md" and any("**" in part and part != "**" for part in pattern.split("/")):
-        raise ValueError("unsupported embedded globstar")
-    expression = []
-    index = 0
-    while index < len(pattern):
-        if pattern[index:index + 3] == "**/":
-            expression.append(r"(?:[^/]+/)*")
-            index += 3
-        elif pattern[index:index + 2] == "**":
-            # Literal directory/** also covers that changed gitlink itself.
-            # **/Kconfig*/** requires a descendant of the wildcard directory.
-            directory = pattern[:index - 1].rsplit("/", 1)[-1]
-            if (index == len(pattern) - 2 and index > 0 and pattern[index - 1] == "/"
-                    and "*" not in directory):
-                expression.pop()
-                expression.append(r"(?:/.*)?")
-            else:
-                expression.append(r".*")
-            index += 2
-        elif pattern[index] == "*":
-            expression.append(r"[^/]*")
-            index += 1
-        else:
-            expression.append(re.escape(pattern[index]))
-            index += 1
-    return re.compile("".join(expression))
-
-
-def classify(filters, changes):
-    # Paths alone are relevant: no action qualifier excludes deletions.
-    return {name: str(any(compile_glob(pattern).fullmatch(path)
-                         for _, path in changes for pattern in patterns)).lower()
-            for name, patterns in filters.items()}
+def classify(changes):
+    return {name: str(value).lower()
+            for name, value in classify_paths(path for _, path in changes).items()}
 
 
 class ChangePathsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.filters = read_filters(WORKFLOW.read_text(encoding="utf-8"))
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        if "tools/dev/change_paths.py --github-output" not in workflow:
+            raise AssertionError("CI must execute the shared path policy")
+        if "dorny/paths-filter" in workflow:
+            raise AssertionError("CI cannot retain a competing path policy")
 
     def decisions(self, changes):
-        return required_jobs(classify(self.filters, changes), "pull_request")
+        return required_jobs(classify(changes), "pull_request")
 
     def test_production_sources_and_runtime_boundaries_require_builds(self):
         paths = (
@@ -150,7 +75,7 @@ class ChangePathsTests(unittest.TestCase):
             for changes in ([("deleted", path)],
                             [("modified", "README.md"), ("deleted", path)]):
                 with self.subTest(changes=changes):
-                    outputs = classify(self.filters, changes)
+                    outputs = classify(changes)
                     decisions = required_jobs(outputs, "pull_request")
                     self.assertTrue(decisions["build-test"])
                     needs = {"changes": {"result": "success", "outputs": outputs}}
@@ -164,7 +89,7 @@ class ChangePathsTests(unittest.TestCase):
                         [("deleted", "docs/guide/old.rst")],
                         [("modified", "docs/guide/new.rst"), ("modified", "CHANGELOG.md")]):
             with self.subTest(changes=changes):
-                outputs = classify(self.filters, changes)
+                outputs = classify(changes)
                 self.assertEqual(required_jobs(outputs, "pull_request"),
                                  {"build-test": False, "code-quality": True, "tool-contracts": False, "docs": True})
                 needs = {"changes": {"result": "success", "outputs": outputs},
@@ -182,12 +107,21 @@ class ChangePathsTests(unittest.TestCase):
                 self.assertTrue(decisions["build-test"])
                 self.assertTrue(decisions["code-quality"])
 
-    def test_unsupported_filter_syntax_fails_instead_of_approximating(self):
-        for pattern in ("!docs/**", "*.{c,h}", "src/[ab].c", "src/?.c", "@(src|inc)/**",
-                        "src***", "src**file.c", "../src/**", "/src/**"):
-            with self.subTest(pattern=pattern):
+    def test_invalid_repository_paths_fail_instead_of_approximating(self):
+        for path in ("", "../src/file.c", "/src/file.c", "src/../file.c",
+                     "src//file.c", "src/./file.c", "src/file\0.c"):
+            with self.subTest(path=path):
                 with self.assertRaises(ValueError):
-                    compile_glob(pattern)
+                    classify_paths([path])
+
+    def test_hook_matches_ci_even_for_unknown_inputs_and_documentation(self):
+        for path in ("new-submodule", "ext/freertos", "vendors/new_sdk",
+                     "dependencies/new.lock.json", "tools/configure/README.md",
+                     ".github/workflows/ci.yml", "docs/guide/new.rst"):
+            with self.subTest(path=path):
+                outputs = classify_paths([path])
+                self.assertEqual(behavioral(path),
+                                 outputs["code"] or outputs["workflows"])
 
 
 if __name__ == "__main__":

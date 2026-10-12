@@ -58,15 +58,15 @@ Backend and application startup
 order remains explicit in consumer code.
 
 Every MCU firmware produces ELF, BIN, map and a checked resource report. The ELF
-contains the configuration digest and the real startup vector. Default MCU ABI
-is Cortex-M4F, FPv4-SP-D16, hard float and short enums; consumers inherit those
-flags through Nexus targets. C++ consumers should use their declared embedded
+contains the configuration digest and the real startup vector. The selected CPU
+facts determine the instruction set, optional FPU, float ABI and enum ABI;
+consumers inherit those flags through Nexus targets. C++ consumers use their declared embedded
 runtime policy, such as `-fno-exceptions -fno-rtti` for the tested source SDK path.
 
 The maintained boundary test is `tests/contracts/test_source_sdk.py`. It packages
 the real checkout, relocates into a path with spaces, verifies byte tamper and
 identity rejection, executes independent Native C/C++ consumers and links both
-STM32F407 and GD32F470 C/C++ consumers with actual startup/linker/resource gates.
+maintained MCU C/C++ consumers with actual startup/linker/resource gates.
 Those software checks do not establish physical Board qualification.
 
 Release automation verifies an existing publishable installed prefix with the

@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "formal": true,
+  "stages": [
+    {
+      "name": "reproduction",
+      "checker": "reproduce",
+      "args": [
+        "--spec",
+        "{root}/build/qualification-inputs/reproduce.json",
+        "--report",
+        "{output}/reproduction.json"
+      ],
+      "timeout_s": 14400
+    },
+    {
+      "name": "seal",
+      "checker": "candidate_seal",
+      "args": [
+        "--manifest",
+        "{root}/build/qualification-inputs/candidate-manifest.json",
+        "--output",
+        "{output}/candidate"
+      ]
+    },
+    {
+      "name": "verify",
+      "checker": "candidate_verify",
+      "args": [
+        "--candidate",
+        "{output}/candidate/candidate.json"
+      ]
+    }
+  ]
+}

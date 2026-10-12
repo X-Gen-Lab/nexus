@@ -19,13 +19,14 @@ import tempfile
 from types import MappingProxyType
 
 try:
-    from . import kernel, metadata, factory
+    from . import kernel, metadata, factory, sdk
     from .ir import CpuProfileIR, freeze, thaw
     from .providers.common import fail, integer
 except ImportError:
     import kernel
     import metadata
     import factory
+    import sdk
     from ir import CpuProfileIR, freeze, thaw
     from providers.common import fail, integer
 
@@ -279,7 +280,7 @@ def emit_profile(profile, output, *, clock_hz, optimization="Os", inputhash,
         thaw(platform_metadata), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
     integer(clock_hz, 1, context="CPU clock Hz")
     if (not isinstance(optimization, str) or
-            optimization not in {"O2", "Os", "O3"}):
+            optimization not in {"O0", "Og", "O2", "Os", "O3"}):
         fail("Unsupported CPU runtime optimization")
     if (not isinstance(inputhash, str) or
             not re.fullmatch(r"[0-9a-f]{64}", inputhash)):
@@ -353,7 +354,7 @@ def main(argv=None):
     parser.add_argument("--backend", choices=("baremetal", "freertos", "threadx"),
                         required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--optimization", choices=("O2", "Os", "O3"),
+    parser.add_argument("--optimization", choices=("O0", "Og", "O2", "Os", "O3"),
                         default="Os")
     args = parser.parse_args(argv)
     temporary = None
@@ -365,6 +366,7 @@ def main(argv=None):
         if output == policy_path or output in policy_path.parents:
             fail("CPU output must not replace platform metadata")
         invalidate(output)
+        sdk.verify(ROOT)
         policy_bytes, _ = metadata.snapshot(policy_path)
         platform_metadata = metadata.policy_contract(
             metadata.parse_json(policy_bytes),

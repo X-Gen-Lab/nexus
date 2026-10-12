@@ -10,7 +10,7 @@ from tools.evidence.common import atomic_json, digest
 from tools.evidence.identity import canonical_digest
 
 
-def link_fixture(root: Path):
+def link_fixture(root: Path, *, budget_contract=None):
     compiler = os.environ.get("NEXUS_ARM_GCC") or shutil.which("arm-none-eabi-gcc")
     if not compiler:
         raise unittest.SkipTest("real ARM compiler unavailable; ELF qualification not performed")
@@ -23,6 +23,9 @@ def link_fixture(root: Path):
         "memory": [{"id": "sram", "origin": 0x20000000, "size": 0x10000,
                     "linker": True}, {"id": "ccm", "origin": 0x10000000,
                     "size": 0x10000, "linker": False}]}
+    if budget_contract is not None:
+        resolved["layout"] = dict(resolved["flash"])
+        resolved["memory_budgets"] = dict(budget_contract)
     config_path = root / "resolved.json"
     root.joinpath("image.c").write_text('''
 typedef unsigned int u32;

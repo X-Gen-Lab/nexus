@@ -5,20 +5,21 @@ CMake remains the authority for source targets. This tool never discovers source
 code, creates workers, selects application policy, or invents a hardware route.
 """
 import argparse
+from contextlib import contextmanager
 from functools import lru_cache
 import hashlib
 import importlib.util
 import json
-import os
 from pathlib import Path
 import re
-import shutil
 import subprocess
 import sys
-import tempfile
+import tomllib
 
 try:
     from . import cpu as cpu_profiles
+    from . import bundle, dependencies, sdk
+    from .contracts import COMPONENTS
     from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
     from .ir import thaw
     from .providers import descriptor, maintained
@@ -28,6 +29,10 @@ try:
                                    validate_selection)
 except ImportError:
     import cpu as cpu_profiles
+    import bundle
+    import dependencies
+    import sdk
+    from contracts import COMPONENTS
     import kernel
     import can
     import threadx
@@ -53,9 +58,18 @@ UINT32_MAX = (1 << 32) - 1
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = physical_facts.GPIO_PIN
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
-         "timer", "pwm", "adc", "can", "usb_device", "eth",
+         "pwm", "adc", "can", "usb_device", "eth",
          "timer_capture", "advanced_pwm"}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
+
+
+@contextmanager
+def error_context(context):
+    """Attach the authored instance while retaining the precise field failure."""
+    try:
+        yield
+    except ConfigurationError as error:
+        raise ConfigurationError(f"{context}: {error}") from error
 
 
 def c_identity(value):
@@ -71,11 +85,7 @@ def dependency_identity(root, relative, expected=None):
     """Validate checkout commits, or the verified installed SDK identities."""
     manifest = root / ".nexus-source-sdk.json"
     if manifest.is_file():
-        records = load(manifest)["dependencies"]
-        record = next((item for item in records if item["path"] == relative), None)
-        if record is None:
-            fail(f"Installed SDK has no source identity: {relative}")
-        commit = record["commit"]
+        return sdk_dependency_identity(sdk.verify(root), relative, expected)
     else:
         checkout = root / relative
         if not (checkout / ".git").exists():
@@ -92,6 +102,18 @@ def dependency_identity(root, relative, expected=None):
             fail(f"SDK dependency differs from the locked Gitlink: {relative}")
         if git(checkout, "status", "--porcelain", "--untracked-files=normal"):
             fail(f"SDK dependency has unrecorded changes: {relative}")
+    if expected is not None and commit != expected:
+        fail(f"SDK source lock contradicts actual dependency: {relative}")
+    return {"path": relative, "commit": commit}
+
+
+def sdk_dependency_identity(verified, relative, expected=None):
+    """Consume only the caller's complete verification from this resolution."""
+    record = next((item for item in verified["dependencies"]
+                   if item["path"] == relative), None)
+    if record is None:
+        fail(f"Installed SDK has no source identity: {relative}")
+    commit = record["commit"]
     if expected is not None and commit != expected:
         fail(f"SDK source lock contradicts actual dependency: {relative}")
     return {"path": relative, "commit": commit}
@@ -150,8 +172,11 @@ def load(path, snapshots=None):
     contents = path.read_bytes()
     if snapshots is not None:
         snapshots[path] = contents
-    return json.loads(contents.decode("utf-8"), object_pairs_hook=pairs,
-                      parse_constant=lambda value: fail(f"Invalid number {value}"))
+    try:
+        return json.loads(contents.decode("utf-8"), object_pairs_hook=pairs,
+                          parse_constant=lambda value: fail(f"Invalid number {value}"))
+    except (ValueError, UnicodeDecodeError) as error:
+        raise ConfigurationError(f"{path}: {error}") from error
 
 
 def obj(value, required, optional=(), context="object"):
@@ -332,59 +357,8 @@ def load_assembly(path, root=ROOT, snapshots=None):
     fail("Assembly must use authored TOML (.toml)")
 
 
-def resolve(assembly_path, root=ROOT, *, input_paths=None):
-    """Validate all input facts before producing the sole resolved decision."""
-    root = root.resolve()
-    if assembly_path.is_symlink():
-        fail("Assembly must not be a symlink")
-    snapshots = {}
-    read = lambda path: load(path, snapshots)
-    assembly_path = assembly_path.resolve()
-    policy_path = contained_file(root, metadata.POLICY)
-    platform_metadata = metadata.policy_contract(
-        read(policy_path), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
-    assembly_input = load_assembly(assembly_path, root, snapshots)
-    assembly = obj(assembly_input,
-                   {"schema_version", "board_package", "backend", "clock_profile",
-                    "controllers", "devices", "memory_budgets", "layout"},
-                   {"abi", "optimization", "components", "os", "factory", "can_domain"}, "assembly")
-    integer(assembly["schema_version"], 1, 1, "assembly schema")
-    factory_options = obj(assembly.get("factory", {}), (),
-                          {"capabilities"}, "factory policy")
-    if ("capabilities" in factory_options and
-            type(factory_options["capabilities"]) is not bool):
-        fail("Factory capabilities must be boolean")
-    board_name = text(assembly["board_package"], "Board package")
-    board_dir = (assembly_path.parent / board_name).resolve()
-    if Path(assembly_path.parent / board_name).is_symlink():
-        fail("Board package must not be a symlink")
-    board_path = board_dir / "board.json"
-    board = obj(read(board_path),
-                {"schema_version", "id", "soc", "soc_family", "source_revision",
-                 "physical_pcb_revision", "clocks", "bindings",
-                 "reserved_resources", "unknowns", "provenance"},
-                {"inputs"}, "Board")
-    integer(board["schema_version"], 1, 1, "Board schema")
-    identity(board["id"], "Board id")
-    family = identity(board["soc_family"], "SoC family")
-    provider = maintained(family)
-    part = identity(board["soc"], "exact part")
-    soc_dir = root / "soc" / family
-    if soc_dir.is_symlink() or not soc_dir.resolve().is_relative_to(root / "soc"):
-        fail("SoC package escapes owned source")
-    soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
-    soc, routes_doc = read(soc_path), read(routes_path)
-    variant = validate_soc(soc, part)
-    reference_path = None
-    references = None
-    if "references" in soc:
-        reference_path = contained_file(soc_dir, soc["references"])
-        references = fact_references.validate(read(reference_path),
-                                             soc["variants"])
-    if soc["id"] != family:
-        fail("Board SoC family differs from the package identity")
-    obj(routes_doc, {"schema_version", "routes"}, (), "routes")
-    integer(routes_doc["schema_version"], 1, 1, "routes schema")
+def resolve_routes(routes_doc, soc, part, provider):
+    """Validate reviewed route facts before selecting instances."""
     routes = {}
     for route in sequence(routes_doc["routes"], "routes"):
         obj(route, {"id", "variants", "controller", "kind", "pins", "modes",
@@ -445,6 +419,130 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             text(pin["function"], "pin function")
         text(route["source"], "route source")
         routes[route["id"]] = route
+    return routes
+
+
+def resolve_bindings(board, routes, part):
+    """Validate Board electrical bindings and materialize safe masks."""
+    bindings = {}
+    for binding in sequence(board["bindings"], "Board bindings"):
+        obj(binding, {"id", "controller", "route"}, {"initial", "mask"}, "binding")
+        identity(binding["id"], "binding id")
+        if binding["id"] in bindings:
+            fail(f"Duplicate Board binding: {binding['id']}")
+        route = routes.get(binding["route"])
+        if not route or part not in route["variants"] or route["controller"] != binding["controller"]:
+            fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+        if "initial" in binding:
+            integer(binding["initial"], 0, UINT32_MAX, "GPIO initial")
+        actual_mask = sum(1 << int(PIN.fullmatch(pin["pin"])[2])
+                          for pin in route["pins"])
+        if "mask" in binding:
+            integer(binding["mask"], 1, 65535, "GPIO mask")
+            if binding["mask"] != actual_mask:
+                fail(f"GPIO binding {binding['id']} mask differs from its reviewed pins")
+        if (route["kind"] == "gpio" or "mask" in binding) and (
+                binding.get("initial", 0) & ~actual_mask):
+            fail(f"GPIO initial sets unauthorized bits: {binding['id']}")
+        if route["kind"] == "gpio":
+            binding = {**binding, "mask": actual_mask}
+        bindings[binding["id"]] = binding
+    return bindings
+
+
+def bind_input_identities(inputs, root, snapshots, input_paths):
+    """Seal authored/fact input bytes and their navigation atomically."""
+    records = []
+    for path in sorted(set(inputs), key=lambda value: value.as_posix()):
+        label = (path.relative_to(root).as_posix() if path.is_relative_to(root)
+                 else "external/" + path.name)
+        contents = snapshots.get(path, path.read_bytes())
+        expected = hashlib.sha256(contents).hexdigest()
+        if file_digest(path) != expected:
+            fail(f"Input changed during resolution: {label}")
+        records.append({"path": label, "sha256": expected})
+        if input_paths is not None:
+            input_paths[label] = str(path)
+    if len({record["path"] for record in records}) != len(records):
+        fail("Declared input identity labels collide")
+    return records
+
+
+def resolve_components(assembly):
+    """Validate component intent; CMake chooses its source targets."""
+    components = sequence(assembly.get("components", []), "components")
+    for component in components:
+        text(component, "component")
+    unique(components, "components")
+    for component in components:
+        if component not in COMPONENTS:
+            fail(f"Unknown maintained component: {component}")
+    if any(device["driver"] == "bmp280" for device in assembly["devices"]):
+        if "bmp280-spi" not in components:
+            fail("BMP280 SPI device requires the maintained bmp280-spi component")
+    return components
+
+
+def resolve(assembly_path, root=ROOT, *, input_paths=None):
+    """Validate all input facts before producing the sole resolved decision."""
+    root = root.resolve()
+    verified_sdk = sdk.verify(root)
+
+    def source_dependency(relative, expected=None):
+        return (sdk_dependency_identity(verified_sdk, relative, expected)
+                if verified_sdk is not None else
+                dependency_identity(root, relative, expected))
+    if assembly_path.is_symlink():
+        fail("Assembly must not be a symlink")
+    snapshots = {}
+    read = lambda path: load(path, snapshots)
+    assembly_path = assembly_path.resolve()
+    policy_path = contained_file(root, metadata.POLICY)
+    platform_metadata = metadata.policy_contract(
+        read(policy_path), expected_factory_epoch=factory.FACTORY_ABI_EPOCH)
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+    assembly = obj(assembly_input,
+                   {"schema_version", "board_package", "backend", "clock_profile",
+                    "controllers", "devices", "memory_budgets", "layout"},
+                   {"abi", "optimization", "components", "os", "factory", "can_domain"}, "assembly")
+    integer(assembly["schema_version"], 1, 1, "assembly schema")
+    factory_options = obj(assembly.get("factory", {}), (),
+                          {"capabilities"}, "factory policy")
+    if ("capabilities" in factory_options and
+            type(factory_options["capabilities"]) is not bool):
+        fail("Factory capabilities must be boolean")
+    board_name = text(assembly["board_package"], "Board package")
+    board_dir = (assembly_path.parent / board_name).resolve()
+    if Path(assembly_path.parent / board_name).is_symlink():
+        fail("Board package must not be a symlink")
+    board_path = board_dir / "board.json"
+    board = obj(read(board_path),
+                {"schema_version", "id", "soc", "soc_family", "source_revision",
+                 "physical_pcb_revision", "clocks", "bindings",
+                 "reserved_resources", "unknowns", "provenance"},
+                {"inputs"}, "Board")
+    integer(board["schema_version"], 1, 1, "Board schema")
+    identity(board["id"], "Board id")
+    family = identity(board["soc_family"], "SoC family")
+    provider = maintained(family)
+    part = identity(board["soc"], "exact part")
+    soc_dir = root / "soc" / family
+    if soc_dir.is_symlink() or not soc_dir.resolve().is_relative_to(root / "soc"):
+        fail("SoC package escapes owned source")
+    soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
+    soc, routes_doc = read(soc_path), read(routes_path)
+    variant = validate_soc(soc, part)
+    reference_path = None
+    references = None
+    if "references" in soc:
+        reference_path = contained_file(soc_dir, soc["references"])
+        references = fact_references.validate(read(reference_path),
+                                             soc["variants"])
+    if soc["id"] != family:
+        fail("Board SoC family differs from the package identity")
+    obj(routes_doc, {"schema_version", "routes"}, (), "routes")
+    integer(routes_doc["schema_version"], 1, 1, "routes schema")
+    routes = resolve_routes(routes_doc, soc, part, provider)
     text(board["source_revision"], "Board source revision")
     if board["physical_pcb_revision"] is not None:
         text(board["physical_pcb_revision"], "physical PCB revision")
@@ -493,7 +591,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     if "abi" in assembly and assembly["abi"] != cpu_abi(soc["cpu"]):
         fail("Assembly ABI contradicts the selected SoC")
     optimization = assembly.get("optimization", "Os")
-    if optimization not in {"O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
+    if optimization not in {"O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
         fail(f"Unsupported optimization profile: {optimization}")
     budgets = obj(assembly["memory_budgets"], {"main_stack_bytes"},
                   {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes", "regions"},
@@ -513,29 +611,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         fail("Flash budget exceeds exact physical density")
     selected_memory = memory_regions.select(
         variant["memory"], budgets, family, part, obj=obj, integer=integer, fail=fail)
-    bindings = {}
-    for binding in sequence(board["bindings"], "Board bindings"):
-        obj(binding, {"id", "controller", "route"}, {"initial", "mask"}, "binding")
-        identity(binding["id"], "binding id")
-        if binding["id"] in bindings:
-            fail(f"Duplicate Board binding: {binding['id']}")
-        route = routes.get(binding["route"])
-        if not route or part not in route["variants"] or route["controller"] != binding["controller"]:
-            fail(f"Board binding {binding['id']} has no reviewed exact-part route")
-        if "initial" in binding:
-            integer(binding["initial"], 0, UINT32_MAX, "GPIO initial")
-        actual_mask = sum(1 << int(PIN.fullmatch(pin["pin"])[2])
-                          for pin in route["pins"])
-        if "mask" in binding:
-            integer(binding["mask"], 1, 65535, "GPIO mask")
-            if binding["mask"] != actual_mask:
-                fail(f"GPIO binding {binding['id']} mask differs from its reviewed pins")
-        if (route["kind"] == "gpio" or "mask" in binding) and (
-                binding.get("initial", 0) & ~actual_mask):
-            fail(f"GPIO initial sets unauthorized bits: {binding['id']}")
-        if route["kind"] == "gpio":
-            binding = {**binding, "mask": actual_mask}
-        bindings[binding["id"]] = binding
+    bindings = resolve_bindings(board, routes, part)
     claims = {}
     claim_list = []
 
@@ -582,91 +658,98 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     instance_ids = []
     irq_owners = {}
     for selection in sequence(assembly["controllers"], "selected controllers"):
-        obj(selection, {"id", "binding", "mode"},
-            {"irq_priority", "rx_capacity", "baud", "max_hz", "event_capacity",
-             "period_ticks", "duty_ticks", "channels", "sample_cycles",
-             "timeout_ms", "calls_os", "rx_profile", "sample_times",
-             "reference_mv", "tick_hz", "edge", "authored_kind", "operation",
-             "bitrate", "timing", "drain_timeout_us", "poll_limit",
-             "fifo_order", "rx_fifo_words", "vbus_sensing", "clock_timeout_us",
-             "tx_count", "rx_count", "rx_storage_bytes", "address", "init_timeout_us",
-             "filter", "exclusive", "deadtime_ticks", "break_active_high", "idle_high",
-             "idle_complement_high"}, "controller selection")
-        name = identity(selection["id"], "instance id")
-        c_identity(name)
-        instance_ids.append(name)
-        binding = bindings.get(selection["binding"])
-        if binding is None:
-            fail(f"Unknown Board binding: {selection['binding']}")
-        route = routes[binding["route"]]
-        hardware = soc["controllers"][route["controller"]]
-        authored_kind = selection.pop("authored_kind", route["kind"])
-        if authored_kind != route["kind"]:
-            fail("Authored kind differs from Board binding kind")
-        mode = text(selection["mode"], "controller mode")
-        if mode not in route["modes"]:
-            fail(f"Unsupported mode {mode} for {selection['binding']}")
-        validate_selection(selection, route, provider, ram["size"])
-        for numeric in {"rx_capacity", "baud", "max_hz", "event_capacity",
-                        "period_ticks", "sample_cycles", "timeout_ms"} & selection.keys():
-            integer(selection[numeric], 1, context=numeric)
-        if "duty_ticks" in selection:
-            integer(selection["duty_ticks"], 0, context="duty ticks")
-            if selection["duty_ticks"] > selection.get("period_ticks", 0):
-                fail("PWM duty exceeds period")
-        if "irq_priority" in selection:
-            integer(selection["irq_priority"], 0,
-                    irq_profile["maximum_priority"], "IRQ priority")
-        if route["kind"] == "spi" and mode == "short-poll" and ({"irq_priority", "calls_os"} & selection.keys()):
-            fail("Polling SPI has no IRQ options")
-        if route["kind"] == "spi" and mode_traits("spi", mode).dma and "irq_priority" not in selection:
-            fail("DMA SPI requires an explicit IRQ priority")
-        if "calls_os" in selection and type(selection["calls_os"]) is not bool:
-            fail("calls_os must be boolean")
-        if selection.get("calls_os", False) and (
-                kernel_profile is None or host or
-                kernel_profile.kernel_policy == "none" or
-                selection.get("irq_priority", 0) < irq_profile["syscall_priority"]):
-            fail("OS-calling ISR violates the selected kernel syscall ceiling")
-        if selection.get("max_hz", 0) > hardware.get("max_hz", UINT32_MAX):
-            fail("Controller speed exceeds maintained limit")
-        traits = mode_traits(route["kind"], mode)
-        if traits.dma and not route_dma(route, mode):
-            fail("DMA mode has no reviewed DMA route")
-        if traits.dma:
-            provider.validate_dma(route, mode, normalize_resource)
-        if route["kind"] != "gpio":
-            claim("controller:" + route["controller"], name, mode, route["id"])
-        for pin in route["pins"]:
-            claim("pin:" + pin["pin"], name, mode, route["id"])
-        if traits.irq:
-            for irq in hardware["irq"]:
-                key = normalize_resource("irq:" + irq)
-                priority = selection.get("irq_priority")
-                previous = irq_owners.get(key)
-                shared = provider.shares_irq(route["kind"], key)
-                if previous and shared and previous[0] == "exti":
-                    if previous[1] != priority:
-                        fail(f"Shared EXTI vector {key} requires identical priorities")
-                    record = next(record for record in claim_list if record["key"] == key)
-                    record["owner"] += ";" + name
-                    record["mode"] = "static-exti-dispatch"
-                else:
-                    claim(key, name, mode, route["id"])
-                    irq_owners[key] = (route["kind"], priority)
+        location = (selection.get("id", "<unknown>") if isinstance(selection, dict)
+                    else "<invalid>")
+        binding = selection.get("binding") if isinstance(selection, dict) else None
+        mode = selection.get("mode") if isinstance(selection, dict) else None
+        context = f"controller {location} binding {binding} mode {mode}"
+        with error_context(context):
+            obj(selection, {"id", "binding", "mode"},
+                {"irq_priority", "rx_capacity", "baud", "max_hz", "event_capacity",
+                 "period_ticks", "duty_ticks", "channels", "sample_cycles",
+                 "timeout_ms", "calls_os", "rx_profile", "sample_times",
+                 "reference_mv", "tick_hz", "edge", "authored_kind", "operation",
+                 "bitrate", "timing", "drain_timeout_us", "poll_limit",
+                 "fifo_order", "rx_fifo_words", "vbus_sensing", "clock_timeout_us",
+                 "tx_count", "rx_count", "rx_storage_bytes", "address", "init_timeout_us",
+                 "filter", "exclusive", "deadtime_ticks", "break_active_high", "idle_high",
+                 "idle_complement_high"}, "controller selection")
+            name = identity(selection["id"], "instance id")
+            c_identity(name)
+            instance_ids.append(name)
+            binding = bindings.get(selection["binding"])
+            if binding is None:
+                fail(f"Unknown Board binding: {selection['binding']}")
+            route = routes[binding["route"]]
+            hardware = soc["controllers"][route["controller"]]
+            authored_kind = selection.pop("authored_kind", route["kind"])
+            if authored_kind != route["kind"]:
+                fail("Authored kind differs from Board binding kind")
+            mode = text(selection["mode"], "controller mode")
+            if mode not in route["modes"]:
+                fail(f"Unsupported mode {mode} for {selection['binding']}; "
+                     f"allowed: {', '.join(route['modes'])}")
+            validate_selection(selection, route, provider, ram["size"])
+            for numeric in {"rx_capacity", "baud", "max_hz", "event_capacity",
+                            "period_ticks", "sample_cycles", "timeout_ms"} & selection.keys():
+                integer(selection[numeric], 1, context=numeric)
+            if "duty_ticks" in selection:
+                integer(selection["duty_ticks"], 0, context="duty ticks")
+                if selection["duty_ticks"] > selection.get("period_ticks", 0):
+                    fail("PWM duty exceeds period")
+            if "irq_priority" in selection:
+                integer(selection["irq_priority"], 0,
+                        irq_profile["maximum_priority"], "IRQ priority")
+            if route["kind"] == "spi" and mode == "short-poll" and ({"irq_priority", "calls_os"} & selection.keys()):
+                fail("Polling SPI has no IRQ options")
+            if route["kind"] == "spi" and mode_traits("spi", mode).dma and "irq_priority" not in selection:
+                fail("DMA SPI requires an explicit IRQ priority")
+            if "calls_os" in selection and type(selection["calls_os"]) is not bool:
+                fail("calls_os must be boolean")
+            if selection.get("calls_os", False) and (
+                    kernel_profile is None or host or
+                    kernel_profile.kernel_policy == "none" or
+                    selection.get("irq_priority", 0) < irq_profile["syscall_priority"]):
+                fail("OS-calling ISR violates the selected kernel syscall ceiling")
+            if selection.get("max_hz", 0) > hardware.get("max_hz", UINT32_MAX):
+                fail("Controller speed exceeds maintained limit")
+            traits = mode_traits(route["kind"], mode)
+            if traits.dma and not route_dma(route, mode):
+                fail("DMA mode has no reviewed DMA route")
+            if traits.dma:
+                provider.validate_dma(route, mode, normalize_resource)
+            if route["kind"] != "gpio":
+                claim("controller:" + route["controller"], name, mode, route["id"])
+            for pin in route["pins"]:
+                claim("pin:" + pin["pin"], name, mode, route["id"])
+            if traits.irq:
+                for irq in hardware["irq"]:
+                    key = normalize_resource("irq:" + irq)
+                    priority = selection.get("irq_priority")
+                    previous = irq_owners.get(key)
+                    shared = provider.shares_irq(route["kind"], key)
+                    if previous and shared and previous[0] == "exti":
+                        if previous[1] != priority:
+                            fail(f"Shared EXTI vector {key} requires identical priorities")
+                        record = next(record for record in claim_list if record["key"] == key)
+                        record["owner"] += ";" + name
+                        record["mode"] = "static-exti-dispatch"
+                    else:
+                        claim(key, name, mode, route["id"])
+                        irq_owners[key] = (route["kind"], priority)
 
-        for resource in hardware.get("resources", []) + route.get("resources", []) + route.get("mode_resources", {}).get(mode, []):
-            claim(resource, name, mode, route["id"])
-        if traits.dma:
-            for dma in route_dma(route, mode):
-                claim("dma:" + dma, name, mode, route["id"])
-                claim(provider.dma_irq(dma), name, mode, route["id"])
-        selected.append({**selection, "controller": route["controller"],
-                         "kind": route["kind"], "route": route["id"],
-                         "pins": route["pins"], "initial": binding.get("initial", 0),
-                         "mask": binding.get("mask", 0),
-                         **({"dma": route_dma(route, mode)} if traits.dma else {}),
-                         **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
+            for resource in hardware.get("resources", []) + route.get("resources", []) + route.get("mode_resources", {}).get(mode, []):
+                claim(resource, name, mode, route["id"])
+            if traits.dma:
+                for dma in route_dma(route, mode):
+                    claim("dma:" + dma, name, mode, route["id"])
+                    claim(provider.dma_irq(dma), name, mode, route["id"])
+            selected.append({**selection, "controller": route["controller"],
+                             "kind": route["kind"], "route": route["id"],
+                             "pins": route["pins"], "initial": binding.get("initial", 0),
+                             "mask": binding.get("mask", 0),
+                             **({"dma": route_dma(route, mode)} if traits.dma else {}),
+                             **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
     unique(instance_ids, "controller instance IDs")
     unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
     can_domain = can.resolve_domain(assembly.get("can_domain"), selected,
@@ -675,81 +758,85 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     addresses = set()
     chip_selects = set()
     for device in sequence(assembly["devices"], "devices"):
-        obj(device, {"id", "controller", "driver"}, {"cs_binding", "address",
-            "mode", "max_hz", "authored_kind", "model_bytes", "number",
-            "direction", "transfer", "max_packet", "fifo_words"}, "device")
-        device_ids.append(identity(device["id"], "device ID"))
-        c_identity(device["id"])
-        controller = next((item for item in selected if item["id"] == device["controller"]), None)
-        if controller is None or controller["kind"] not in {"spi", "i2c", "usb_device"}:
-            fail("Device references no selected SPI/I2C/USB controller")
-        authored_kind = device.pop("authored_kind", controller["kind"])
-        if authored_kind != controller["kind"]:
-            fail("Authored device kind differs from controller binding kind")
-        if controller["kind"] == "usb_device":
-            validated = usb_device.endpoint(device)
-            device.clear()
-            device.update(validated)
-            continue
-        model_fields = {"model_bytes"} if provider.MODEL else set()
-        if "model_bytes" in device:
-            if not provider.MODEL:
-                fail("model_bytes is only valid for an explicit Native device model")
-            integer(device["model_bytes"], 1, 256, "Native device model_bytes")
-        if controller["kind"] == "spi":
-            obj(device, {"id", "controller", "driver"},
-                {"cs_binding", "mode", "max_hz"} | model_fields, "SPI device")
-        else:
-            obj(device, {"id", "controller", "driver", "address"}, model_fields,
-                "I2C device")
-            if provider.MODEL and "model_bytes" not in device:
-                fail("Native I2C device requires explicit model_bytes")
-        if device["driver"] not in {"spi-endpoint", "i2c-endpoint", "bmp280"}:
-            fail(f"Unknown maintained device driver: {device['driver']}")
-        if device["driver"] == "bmp280" and controller["kind"] != "spi":
-            fail("BMP280 currently requires its maintained SPI transport")
-        if device["driver"] == "spi-endpoint" and controller["kind"] != "spi":
-            fail("SPI endpoint driver is not an I2C transport")
-        if device["driver"] == "i2c-endpoint" and controller["kind"] != "i2c":
-            fail("I2C endpoint driver is not a SPI transport")
-        if "mode" in device:
-            integer(device["mode"], 0, 3, "SPI endpoint mode")
-        if "max_hz" in device:
-            integer(device["max_hz"], 1, context="device speed")
-            if device["max_hz"] > controller.get("max_hz", 1000000):
-                fail("Device speed exceeds its selected controller budget")
-        if controller["kind"] == "spi":
-            speed = device.get("max_hz", controller.get("max_hz", 1000000))
-            limit = soc["controllers"][controller["controller"]].get("max_hz")
-            if not provider.MODEL and (limit is None or speed < (limit + 127) // 128):
-                fail("SPI endpoint speed cannot be realized by the reviewed clock divider")
-            builtin_cs = provider.builtin_cs(controller)
-            if "cs_binding" not in device and not builtin_cs:
-                fail("SPI child requires a CS binding")
-            if "cs_binding" in device:
-                binding = bindings.get(device["cs_binding"])
-                if not binding or routes[binding["route"]]["kind"] != "gpio":
-                    fail("SPI child CS lacks reviewed GPIO wiring")
-                cs_pins = routes[binding["route"]]["pins"]
-                if len(cs_pins) != 1 or binding.get("initial") != 1 << int(cs_pins[0]["pin"][2:]):
-                    fail("Active-low SPI CS must be one reviewed pin initially high")
-                for pin in cs_pins:
-                    if pin["pin"] in chip_selects:
-                        fail("Duplicate SPI chip select")
-                    chip_selects.add(pin["pin"])
-                    claim("pin:" + pin["pin"], device["id"], "cs", binding["route"])
-            elif not provider.MODEL:
-                for pin in controller["pins"]:
-                    if pin["function"] == "cs":
+        location = (device.get("id", "<unknown>") if isinstance(device, dict)
+                    else "<invalid>")
+        context = f"endpoint {location}"
+        with error_context(context):
+            obj(device, {"id", "controller", "driver"}, {"cs_binding", "address",
+                "mode", "max_hz", "authored_kind", "model_bytes", "number",
+                "direction", "transfer", "max_packet", "fifo_words"}, "device")
+            device_ids.append(identity(device["id"], "device ID"))
+            c_identity(device["id"])
+            controller = next((item for item in selected if item["id"] == device["controller"]), None)
+            if controller is None or controller["kind"] not in {"spi", "i2c", "usb_device"}:
+                fail("Device references no selected SPI/I2C/USB controller")
+            authored_kind = device.pop("authored_kind", controller["kind"])
+            if authored_kind != controller["kind"]:
+                fail("Authored device kind differs from controller binding kind")
+            if controller["kind"] == "usb_device":
+                validated = usb_device.endpoint(device)
+                device.clear()
+                device.update(validated)
+                continue
+            model_fields = {"model_bytes"} if provider.MODEL else set()
+            if "model_bytes" in device:
+                if not provider.MODEL:
+                    fail("model_bytes is only valid for an explicit Native device model")
+                integer(device["model_bytes"], 1, 256, "Native device model_bytes")
+            if controller["kind"] == "spi":
+                obj(device, {"id", "controller", "driver"},
+                    {"cs_binding", "mode", "max_hz"} | model_fields, "SPI device")
+            else:
+                obj(device, {"id", "controller", "driver", "address"}, model_fields,
+                    "I2C device")
+                if provider.MODEL and "model_bytes" not in device:
+                    fail("Native I2C device requires explicit model_bytes")
+            if device["driver"] not in {"spi-endpoint", "i2c-endpoint", "bmp280"}:
+                fail(f"Unknown maintained device driver: {device['driver']}")
+            if device["driver"] == "bmp280" and controller["kind"] != "spi":
+                fail("BMP280 currently requires its maintained SPI transport")
+            if device["driver"] == "spi-endpoint" and controller["kind"] != "spi":
+                fail("SPI endpoint driver is not an I2C transport")
+            if device["driver"] == "i2c-endpoint" and controller["kind"] != "i2c":
+                fail("I2C endpoint driver is not a SPI transport")
+            if "mode" in device:
+                integer(device["mode"], 0, 3, "SPI endpoint mode")
+            if "max_hz" in device:
+                integer(device["max_hz"], 1, context="device speed")
+                if device["max_hz"] > controller.get("max_hz", 1000000):
+                    fail("Device speed exceeds its selected controller budget")
+            if controller["kind"] == "spi":
+                speed = device.get("max_hz", controller.get("max_hz", 1000000))
+                limit = soc["controllers"][controller["controller"]].get("max_hz")
+                if not provider.MODEL and (limit is None or speed < (limit + 127) // 128):
+                    fail("SPI endpoint speed cannot be realized by the reviewed clock divider")
+                builtin_cs = provider.builtin_cs(controller)
+                if "cs_binding" not in device and not builtin_cs:
+                    fail("SPI child requires a CS binding")
+                if "cs_binding" in device:
+                    binding = bindings.get(device["cs_binding"])
+                    if not binding or routes[binding["route"]]["kind"] != "gpio":
+                        fail("SPI child CS lacks reviewed GPIO wiring")
+                    cs_pins = routes[binding["route"]]["pins"]
+                    if len(cs_pins) != 1 or binding.get("initial") != 1 << int(cs_pins[0]["pin"][2:]):
+                        fail("Active-low SPI CS must be one reviewed pin initially high")
+                    for pin in cs_pins:
                         if pin["pin"] in chip_selects:
                             fail("Duplicate SPI chip select")
                         chip_selects.add(pin["pin"])
-        else:
-            integer(device["address"], 8, 119, "7-bit I2C address")
-            key = (controller["id"], device["address"])
-            if key in addresses:
-                fail("Duplicate I2C address on one bus")
-            addresses.add(key)
+                        claim("pin:" + pin["pin"], device["id"], "cs", binding["route"])
+                elif not provider.MODEL:
+                    for pin in controller["pins"]:
+                        if pin["function"] == "cs":
+                            if pin["pin"] in chip_selects:
+                                fail("Duplicate SPI chip select")
+                            chip_selects.add(pin["pin"])
+            else:
+                integer(device["address"], 8, 119, "7-bit I2C address")
+                key = (controller["id"], device["address"])
+                if key in addresses:
+                    fail("Duplicate I2C address on one bus")
+                addresses.add(key)
     unique(device_ids + instance_ids, "assembly instance IDs")
     unique([c_id(name).upper() for name in device_ids + instance_ids], "generated C identifiers")
     usb_device.complete_plan(selected, assembly["devices"], claim)
@@ -814,39 +901,16 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                    for value in lock.values()):
                 fail("SDK Git dependencies require exact commit identities")
             for key, path in dependencies:
-                source_dependencies.append(dependency_identity(root, path, lock[key]))
+                source_dependencies.append(source_dependency(path, lock[key]))
     if backend == "freertos":
-        source_dependencies.append(dependency_identity(root, "ext/freertos"))
+        source_dependencies.append(source_dependency("ext/freertos"))
     elif backend == "threadx":
-        source_dependencies.append(dependency_identity(root, "ext/threadx"))
+        source_dependencies.append(source_dependency("ext/threadx"))
     manifest = root / ".nexus-source-sdk.json"
     if manifest.is_file():
         inputs.append(manifest)
-    records = []
-    for path in sorted(set(inputs), key=lambda value: value.as_posix()):
-        label = (path.relative_to(root).as_posix() if path.is_relative_to(root)
-                 else "external/" + path.name)
-        contents = snapshots.get(path, path.read_bytes())
-        expected = hashlib.sha256(contents).hexdigest()
-        if file_digest(path) != expected:
-            fail(f"Input changed during resolution: {label}")
-        records.append({"path": label, "sha256": expected})
-        if input_paths is not None:
-            input_paths[label] = str(path)
-    if len({record["path"] for record in records}) != len(records):
-        fail("Declared input identity labels collide")
-    components = sequence(assembly.get("components", []), "components")
-    for component in components:
-        text(component, "component")
-    unique(components, "components")
-    maintained_components = {"owner-observer", "bus-owner", "spi-owner", "spi-async-owner", "uart-owner", "bmp280", "bmp280-spi",
-                             "log", "storage", "flash-storage", "modbus-rtu"}
-    for component in components:
-        if component not in maintained_components:
-            fail(f"Unknown maintained component: {component}")
-    if any(device["driver"] == "bmp280" for device in assembly["devices"]):
-        if "bmp280-spi" not in components:
-            fail("BMP280 SPI device requires the maintained bmp280-spi component")
+    records = bind_input_identities(inputs, root, snapshots, input_paths)
+    components = resolve_components(assembly)
     result = {"schema_version": 1, "platform_metadata": platform_metadata,
               "board": board["id"], "soc_family": family,
               "part": part, "package": variant["package"], "backend": backend,
@@ -903,8 +967,11 @@ def resolve_ir(assembly_path, root=ROOT, *, input_paths=None):
         from .ir import ConfigurationIR
     except ImportError:
         from ir import ConfigurationIR
-    return ConfigurationIR.from_validated(
-        resolve(assembly_path, root, input_paths=input_paths))
+    try:
+        return ConfigurationIR.from_validated(
+            resolve(assembly_path, root, input_paths=input_paths))
+    except ConfigurationError as error:
+        raise ConfigurationError(f"{assembly_path}: {error}") from error
 
 
 def generate(result, output):
@@ -912,9 +979,15 @@ def generate(result, output):
     write = lambda name, data: (output / name).write_text(data, encoding="utf-8")
     write("resolved.json", json.dumps(result.to_dict() if hasattr(result, "to_dict")
                                       else result, indent=2, sort_keys=True) + "\n")
-    profile = cpu_profiles.CpuProfileIR.from_validated(result["cpu_profile"])
-    policy = (kernel.from_validated(result["kernel_profile"])
-              if result.get("kernel_profile") is not None else None)
+    # Compatibility fixtures enter through one adapter; normal generation uses
+    # the already validated immutable CPU/kernel/instance decisions directly.
+    try:
+        from .ir import ConfigurationIR
+    except ImportError:
+        from ir import ConfigurationIR
+    if not isinstance(result, ConfigurationIR):
+        result = ConfigurationIR.from_validated(result)
+    profile, policy = result.cpu_profile, result.kernel
     header = ["/* Generated from the sole resolved configuration. */",
               "#ifndef NEXUS_CONFIG_H", "#define NEXUS_CONFIG_H",
               f'#define NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}"',
@@ -922,7 +995,7 @@ def generate(result, output):
               f'#define NEXUS_CORE_HZ {result["clock"]["core_hz"]}u',
               f'#define NEXUS_CLOCK_INPUT_HZ {result["clock"]["input_hz"]}u',
               f'#define NEXUS_CLOCK_SOURCE_{result["clock"]["source"].upper()} 1',
-              f'#define NEXUS_MAIN_STACK_BYTES {result["memory_budgets"]["main_stack_bytes"]}u',
+              f'#define NEXUS_MAIN_STACK_BYTES {result.memory_budget.main_stack_bytes}u',
               f'#define NEXUS_BACKEND_{result["backend"].upper()} 1',
               *cpu_profiles.header_lines(profile), *kernel.header_lines(policy),
               *memory_regions.header_lines(result),
@@ -944,15 +1017,18 @@ def generate(result, output):
              f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',
              'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item['kind'] for item in result['controllers']})) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result['components']) + '")']
-    for selection in result["controllers"]:
-        prefix = "NEXUS_" + c_id(selection["id"]).upper()
+    for selection in result.controllers:
+        prefix = "NEXUS_" + c_id(selection.id).upper()
         header.append(f"#define {prefix}_SELECTED 1")
-        if selection["kind"] == "gpio":
-            mask = selection["mask"] or sum(1 << int(pin["pin"][2:]) for pin in selection["pins"])
+        if selection.kind == "gpio":
+            mask = selection.options.mask
             header.append(f"#define {prefix}_MASK {mask}u")
+        irq = getattr(selection.options, "irq", None)
         for field in ("rx_capacity", "baud", "irq_priority", "event_capacity"):
-            if field in selection:
-                header.append(f"#define {prefix}_{field.upper()} {selection[field]}u")
+            value = (irq.priority if irq is not None else None) if (
+                field == "irq_priority") else getattr(selection.options, field, None)
+            if value is not None:
+                header.append(f"#define {prefix}_{field.upper()} {value}u")
     header.extend(["#endif", ""])
     write("nexus_config.h", "\n".join(header))
     write("selection.cmake", "\n".join(cmake) + "\n")
@@ -971,49 +1047,72 @@ def generate(result, output):
     bindings_source += "\n" + factory_source
     write("nexus_bindings.h", bindings_header)
     write("bindings.c", bindings_source)
-    ram = next(region for region in result["memory"] if region["linker"])
-    flash = result["layout"]
-    stack = result["memory_budgets"]["main_stack_bytes"]
-    heap = result["memory_budgets"].get("libc_heap_bytes", 0)
     write("memory.ld", memory_regions.linker(result))
-    write("resource-budget.json", json.dumps({"schema_version": 1,
-          "flash_loaded_max": result["memory_budgets"].get("flash_load_bytes", flash["size"]),
-          "flash_footprint_max": result["memory_budgets"].get("flash_load_bytes", flash["size"]),
-          "ram_reserved_max": memory_regions.budget_limits(result),
-          "msp_max": stack, "heap_max": heap}, indent=2, sort_keys=True) + "\n")
+    write("resource-budget.json", json.dumps(memory_regions.resource_budget(result),
+                                            indent=2, sort_keys=True) + "\n")
     write(".nexus-config-bundle", result["configuration_sha256"] + "\n")
 
 
-def configure(assembly, output, root=ROOT):
-    output = output.absolute()
-    if output.is_symlink() or output == root.resolve() or output == output.parent:
-        fail("Unsafe configuration output directory")
-    policy_source = (root / metadata.POLICY).resolve()
-    if output.resolve() == policy_source or output.resolve() in policy_source.parents:
-        fail("Configuration output must not replace platform metadata")
-    if output.exists():
-        if not output.is_dir() or not (output / ".nexus-config-bundle").is_file():
-            fail("Existing output is not an owned configuration bundle")
-        # Invalidate before parsing; a rejected reconfiguration cannot reuse old
-        # successful headers or selection files, including after process failure.
-        shutil.rmtree(output)
-    input_paths = {}
-    result = resolve_ir(assembly, root, input_paths=input_paths)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    temporary = Path(tempfile.mkdtemp(prefix=".nexus-config-", dir=output.parent))
+def protected_inputs(assembly, root):
+    """Read only path selectors before withdrawing an owned public bundle.
+
+    Malformed authored bytes still invalidate previous output. This preflight
+    makes no selection decisions and never replaces normal strict resolution.
+    """
+    assembly = Path(assembly).absolute()
+    paths = [assembly, root.resolve(), ROOT, root / metadata.POLICY]
     try:
+        content = assembly.read_text(encoding="utf-8")
+        raw = (tomllib.loads(content) if assembly.suffix == ".toml" else
+               json.loads(content))
+    except (OSError, ValueError):
+        return paths
+    if not isinstance(raw, dict):
+        return paths
+    package = raw.get("board_package")
+    if isinstance(raw.get("board"), str):
+        package = str(root / "boards" / raw["board"])
+    if isinstance(package, str):
+        directory = (assembly.parent / package).resolve()
+        paths.append(directory)
+        try:
+            board = json.loads((directory / "board.json").read_text(encoding="utf-8"))
+            family = board.get("soc_family")
+            if isinstance(family, str):
+                paths.append(root / "soc" / family)
+        except (OSError, ValueError, AttributeError):
+            pass
+    if isinstance(raw.get("layout"), str):
+        paths.append(assembly.parent / raw["layout"])
+    return paths
+
+
+def configure(assembly, output, root=ROOT):
+    inputs = protected_inputs(assembly, root)
+    packages = [root / name for name in ("soc", "boards", "dependencies", "vendors", "ext")]
+    packages.extend(ROOT / name for name in (
+        "tools/configure", "tools/maintenance", "scripts/ci"))
+    packages.extend(path for path in inputs if Path(path).is_dir() and
+                    Path(path).resolve() not in {root.resolve(), ROOT.resolve()})
+    with bundle.transaction(output, ".nexus-config-bundle",
+                            inputs=inputs, packages=packages, fail=fail) as temporary:
+        initial_code_paths, initial_code_identity = dependencies.snapshot(
+            mode="platform", sdk=sdk.installed(root))
+        input_paths = {}
+        result = resolve_ir(assembly, root, input_paths=input_paths)
+        dependencies.verify(initial_code_paths, initial_code_identity)
+        code_paths, code_identity = dependencies.selected(
+            initial_code_paths, initial_code_identity, family=result.soc_family)
         generate(result, temporary)
         (temporary / "input_paths.json").write_text(
             json.dumps(input_paths, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        dependencies.emit(temporary, code_paths, code_identity)
         # Publish only if every snapshotted authored or package input still
         # matches the resolved identity, including compatibility metadata.
         for record in result["inputs"]:
             if file_digest(Path(input_paths[record["path"]])) != record["sha256"]:
                 fail(f"Input changed during generation: {record['path']}")
-        os.replace(temporary, output)
-    except BaseException:
-        shutil.rmtree(temporary, ignore_errors=True)
-        raise
+        dependencies.verify(initial_code_paths, initial_code_identity)
     return result.to_dict()
 
 

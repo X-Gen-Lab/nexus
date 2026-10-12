@@ -15,18 +15,17 @@ from scripts.ci.tdd_gate import (
     checked_binary, environment, validate_google_report,
 )
 from scripts.validation.junit import prepare_report, validate_junit
+from tools.dev.presets import binary_directory
+from tools.dev import process
 
 
 def execute(command, env, log):
     """Retain actual commands, output and exit codes for this CI execution."""
     print("+ " + " ".join(map(str, command)), flush=True)
-    result = subprocess.run(command, cwd=ROOT, env=env, capture_output=True,
-                            text=True, check=False)
-    log.write_text(result.stdout + result.stderr)
-    log.with_suffix(".command.json").write_text(json.dumps({
-        "schema": 1, "command": list(map(str, command)), "cwd": str(ROOT),
-        "exit_code": result.returncode,
-    }, indent=2) + "\n")
+    result = process.run(command, cwd=ROOT, env=env, log=log,
+                         stage=log.stem, timeout=process.command_timeout(
+                             env, 60 if log.stem.startswith("discovery-")
+                             else 1800))
     if result.returncode:
         raise ValueError(f"Command failed ({result.returncode}); see {log}")
     return result.stdout
@@ -49,13 +48,7 @@ def discovered_cases(output):
 
 def selected_build(preset):
     """Use the maintained configure preset without accepting CTest filters."""
-    presets = json.loads((ROOT / "CMakePresets.json").read_text())
-    selected = next((item for item in presets["configurePresets"]
-                     if item["name"] == preset), None)
-    if selected is None:
-        raise ValueError("Missing maintained Native configure preset")
-    build = Path(selected["binaryDir"].replace("${sourceDir}", str(ROOT)))
-    build = build.resolve()
+    build = binary_directory(ROOT, preset)
     if not build.is_relative_to(ROOT.resolve()):
         raise ValueError("Native build directory is outside the checkout")
     return build

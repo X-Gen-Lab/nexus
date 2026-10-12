@@ -14,6 +14,7 @@ from tools.evidence.common import (EvidenceError, atomic_json, fields,
     file_identity, identifier, load_json, regular_file)
 from tools.evidence.identity import resolved_identity, resolved_input_files
 from tools.measurement.elf import Elf32, interval_bytes, intervals_union
+from tools.configure.memory import resource_budget
 
 
 def integer(value, name: str, *, minimum: int = 0) -> int:
@@ -141,6 +142,13 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
     """Recompute the same physical allocation from live or sealed inputs."""
     flash, memory = memory_contract(resolved)
     validate_budget(budget, memory)
+    if "memory_budgets" in resolved:
+        try:
+            expected = resource_budget(resolved)
+        except (KeyError, TypeError, StopIteration, ValueError) as error:
+            raise EvidenceError("invalid resolved memory budget contract") from error
+        if budget != expected:
+            raise EvidenceError("resource budget differs from the resolved memory contract")
     configuration_sha256 = "".join(f"{elf.symbol(f'__nx_resolved_sha256_{i}'):08x}"
                                     for i in range(8))
     if configuration_sha256 != resolved["configuration_sha256"]:

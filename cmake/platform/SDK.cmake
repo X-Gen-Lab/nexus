@@ -1,4 +1,6 @@
 # Source SDK only: the consumer owns one assembly and its toolchain/ABI.
+# Parent variables and cache entries cannot establish byte verification.
+# Every consumption boundary rechecks the complete source snapshot.
 if(EXISTS "${NEXUS_SOURCE_DIR}/.nexus-source-sdk.json")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_DIR}/cmake/package/package_source_sdk.py"

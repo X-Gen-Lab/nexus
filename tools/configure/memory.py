@@ -41,6 +41,21 @@ def budget_limits(result):
             for region in result["memory"]}
 
 
+def resource_budget(result):
+    """Project the sole resolved reservation and memory-limit contract.
+
+    Generation and ELF verification share this pure projection. The emitted
+    budget is a derived input; editing it cannot widen authored allowances.
+    """
+    budgets = result["memory_budgets"]
+    flash_limit = budgets.get("flash_load_bytes", result["layout"]["size"])
+    return {"schema_version": 1, "flash_loaded_max": flash_limit,
+            "flash_footprint_max": flash_limit,
+            "ram_reserved_max": budget_limits(result),
+            "msp_max": budgets["main_stack_bytes"],
+            "heap_max": budgets.get("libc_heap_bytes", 0)}
+
+
 def selections(result):
     selected = {region["id"] for region in result["memory"] if region["linker"]}
     return [("NEXUS_MEMORY_" + name.upper(), int(name in selected))

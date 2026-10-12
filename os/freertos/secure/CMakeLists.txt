@@ -9,12 +9,14 @@ endif()
 # static archive extraction must not depend on a Secure caller using a gateway.
 add_library(nx_freertos_secure_port OBJECT
     "${secure_port}/secure_context_port.c")
+nexus_apply_target_policy(nx_freertos_secure_port)
 target_include_directories(nx_freertos_secure_port PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/config")
 target_include_directories(nx_freertos_secure_port SYSTEM PRIVATE "${secure_port}")
 target_link_libraries(nx_freertos_secure_port PRIVATE nexus_build_options)
 
 add_library(nexus_secure_context OBJECT context.c init.c)
+nexus_apply_target_policy(nexus_secure_context)
 target_sources(nexus_secure_context INTERFACE
     $<TARGET_OBJECTS:nx_freertos_secure_port>)
 target_include_directories(nexus_secure_context PUBLIC

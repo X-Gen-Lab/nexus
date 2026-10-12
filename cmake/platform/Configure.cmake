@@ -10,34 +10,6 @@ function(nexus_resolve_assembly)
     get_filename_component(assembly "${NEXUS_ASSEMBLY_FILE}" ABSOLUTE
         BASE_DIR "${CMAKE_SOURCE_DIR}")
     set(bundle "${NEXUS_BINARY_DIR}/generated")
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/cpu.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/kernel.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/memory.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/can.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/usb_device.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/ethernet.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/timer_advanced.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/secondary_controllers.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/threadx.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/lowpower.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/metadata.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/fact_references.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/clocks.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/physical_facts.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/preflight.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/gpio_phase.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/authored.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/ir.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/factory.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/bindings.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/__init__.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/common.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/descriptor.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/providers/hardware.py"
-        "${NEXUS_SOURCE_DIR}/tools/maintenance/source_catalogue.py"
-        "${NEXUS_SOURCE_DIR}/tools/configure/emission.py")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
         --source-root "${NEXUS_SOURCE_DIR}" --assembly "${assembly}"
@@ -47,11 +19,15 @@ function(nexus_resolve_assembly)
         message(FATAL_ERROR "Configuration rejected: ${output}${error}")
     endif()
     include("${bundle}/selection.cmake")
-    # Python integration inputs are projected from explicit family contracts.
-    # Driver/startup translation units remain owned by normal CMake targets.
-    foreach(module IN LISTS NEXUS_PROVIDER_CONFIG_MODULES)
-        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-            "${NEXUS_SOURCE_DIR}/${module}")
+    # Register the resolver's exact configuration-code contract. This tracks
+    # Python generation inputs only; CMake still owns production source targets.
+    file(READ "${bundle}/configuration_code_paths.json" configuration_code)
+    string(JSON code_count LENGTH "${configuration_code}")
+    math(EXPR code_last "${code_count} - 1")
+    foreach(index RANGE 0 ${code_last})
+        string(JSON name MEMBER "${configuration_code}" ${index})
+        string(JSON path GET "${configuration_code}" "${name}")
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${path}")
     endforeach()
     foreach(value NEXUS_SOC_FAMILY NEXUS_EXACT_PART NEXUS_BACKEND
                   NEXUS_CPU_ARCH NEXUS_CPU_FPU NEXUS_FLOAT_ABI NEXUS_ENUM_ABI

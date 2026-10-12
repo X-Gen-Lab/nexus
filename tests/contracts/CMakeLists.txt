@@ -4,6 +4,11 @@ add_test(NAME contract_configuration_rejection
         -s "${NEXUS_SOURCE_DIR}/tools/configure" -p "test_*.py")
 set_tests_properties(contract_configuration_rejection PROPERTIES
     WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}")
+add_test(NAME contract_build_system
+    COMMAND "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_DIR}/tests/contracts/test_build_system.py")
+set_tests_properties(contract_build_system PROPERTIES
+    WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" TIMEOUT 300)
 add_test(NAME contract_m7_integer_overlay
     COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_DIR}/os/freertos/test_m7_integer_overlay.py")

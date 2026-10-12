@@ -22,15 +22,15 @@ runs:
       shell: bash
       run: |
         python scripts/setup/install_dev_tools.py --skip-hooks
-        .venv/bin/python -m pip install -r requirements.txt
+        .venv/bin/python -m pip install --require-hashes \
+          -r dependencies/python-tools-linux-cp311.txt
         echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
     - name: Initialize selected vendor and scheduler sources
       shell: bash
       run: |
-        git submodule update --init --recursive \
-          ext/freertos ext/threadx vendors/arm/CMSIS_5 \
-          vendors/st/cmsis_device_f4 vendors/st/cmsis_device_g4 \
-          vendors/st/cmsis_device_h7 vendors/st/cmsis_device_u5
+        .venv/bin/python tools/dev/dependencies.py prepare \
+          --scope preset --preset "${{ inputs.preset }}" --allow-network \
+          --report build/setup-dependencies.json
     - name: Install the locked ARM compiler
       if: inputs.arm == 'true'
       shell: bash

@@ -1,0 +1,950 @@
+{
+  "schema_version": 1,
+  "formal": true,
+  "stages": [
+    {
+      "name": "testing",
+      "checker": "tool_tests",
+      "args": [
+        "--suite",
+        "testing",
+        "--report",
+        "{output}/tool-tests.json"
+      ]
+    },
+    {
+      "name": "configure",
+      "checker": "tool_tests",
+      "args": [
+        "--suite",
+        "configure",
+        "--report",
+        "{output}/configure-tests.json"
+      ]
+    },
+    {
+      "name": "configure-native-debug",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "native-debug"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "build-native-debug",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "native-debug"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "native_contracts-native-debug",
+      "checker": "native_contracts",
+      "args": [
+        "--preset",
+        "native-debug"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "configure-native-release",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "native-release"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "build-native-release",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "native-release"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "native_contracts-native-release",
+      "checker": "native_contracts",
+      "args": [
+        "--preset",
+        "native-release"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "configure-native-asan",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "native-asan"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "build-native-asan",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "native-asan"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "native_contracts-native-asan",
+      "checker": "native_contracts",
+      "args": [
+        "--preset",
+        "native-asan"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "configure-native-tsan",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "native-tsan"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "build-native-tsan",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "native-tsan"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "native_contracts-native-tsan",
+      "checker": "native_contracts",
+      "args": [
+        "--preset",
+        "native-tsan"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "arch_compile",
+      "checker": "arch_compile",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/arch_compile"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "cortex_runtime",
+      "checker": "cortex_runtime",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/cortex_runtime"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "cache_control_compile",
+      "checker": "cache_control_compile",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/cache_control_compile"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "os_profiles",
+      "checker": "os_profiles",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/os_profiles"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "os_threadx",
+      "checker": "os_threadx",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/os_threadx"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "stm32_memory",
+      "checker": "stm32_memory",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/stm32_memory"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "gd32_memory",
+      "checker": "gd32_memory",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/gd32_memory"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "stm32h743",
+      "checker": "stm32h743",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/stm32h743"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "stm32u575",
+      "checker": "stm32u575",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/stm32u575"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "u575_trustzone",
+      "checker": "u575_trustzone",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/u575_trustzone"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "source-sdk",
+      "checker": "source_sdk",
+      "args": [
+        "--source",
+        "{root}",
+        "--output",
+        "{output}/sdk"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "sdk-consumers",
+      "checker": "sdk_consumers",
+      "args": [
+        "--prefix",
+        "{output}/sdk",
+        "--output",
+        "{output}/sdk-consumers"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "source-sdk-boundaries",
+      "checker": "sdk_boundary_tests",
+      "args": [],
+      "timeout_s": 7200
+    },
+    {
+      "name": "build-artifact-boundaries",
+      "checker": "build_artifact_tests",
+      "args": [],
+      "timeout_s": 7200
+    },
+    {
+      "name": "tidy",
+      "checker": "quality_tools",
+      "args": [
+        "tidy",
+        "--root",
+        "{root}",
+        "--build-dir",
+        "{root}/build/native-debug",
+        "--tool",
+        "clang-tidy",
+        "--report",
+        "{output}/tidy.json"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "cppcheck",
+      "checker": "quality_tools",
+      "args": [
+        "cppcheck",
+        "--root",
+        "{root}",
+        "--build-dir",
+        "{root}/build/native-debug",
+        "--tool",
+        "cppcheck",
+        "--report",
+        "{output}/cppcheck.json"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "providers-stm32_assembly",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/stm32_assembly",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/ve-adc-scan.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/ve-adc.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/ve-blocks.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/ve-dma.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/ve-exti.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/ve-flash.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/ve-i2c.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/ve-pwm.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/ve-spi.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/ve-watchdog.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-adc-continuous.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-adc-scan.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-adc.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-blocks.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-dma-duplex.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-dma.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-exti.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-flash.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-i2c-dma.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-i2c-irq.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-i2c.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-pwm.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-rx-dma-idle.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-spi.toml",
+        "--fixture",
+        "{root}/tests/contracts/stm32_assembly/zg-watchdog.toml"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "providers-gd32_assembly",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/gd32_assembly",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/adc-continuous.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/adc-scan.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/adc.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/blocks.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/dma-duplex-continuous.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/dma-duplex.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/dma.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/exti.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/flash.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/i2c-dma.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/i2c-irq.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/i2c.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/multi.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/pwm.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/rx-dma-continuous.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/rx-dma-idle.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/spi.toml",
+        "--fixture",
+        "{root}/tests/contracts/gd32_assembly/watchdog.toml"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "providers-can_assembly",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/can_assembly",
+        "--fixture",
+        "{root}/tests/contracts/can_assembly/gd32-both.toml",
+        "--fixture",
+        "{root}/tests/contracts/can_assembly/gd32-first.toml",
+        "--fixture",
+        "{root}/tests/contracts/can_assembly/stm32-both.toml",
+        "--fixture",
+        "{root}/tests/contracts/can_assembly/stm32-first.toml"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "providers-usb_assembly",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/usb_assembly",
+        "--fixture",
+        "{root}/tests/contracts/usb_assembly/gd32-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/usb_assembly/gd32.toml",
+        "--fixture",
+        "{root}/tests/contracts/usb_assembly/stm32-ve-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/usb_assembly/stm32-ve.toml",
+        "--fixture",
+        "{root}/tests/contracts/usb_assembly/stm32-zg-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/usb_assembly/stm32-zg.toml"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "providers-ethernet_assembly",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/ethernet_assembly",
+        "--fixture",
+        "{root}/tests/contracts/ethernet_assembly/gd32-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/ethernet_assembly/gd32.toml",
+        "--fixture",
+        "{root}/tests/contracts/ethernet_assembly/stm32-zg-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/ethernet_assembly/stm32-zg.toml"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "providers-timer_assembly",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/timer_assembly",
+        "--fixture",
+        "{root}/tests/contracts/timer_assembly/gd32-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/timer_assembly/gd32.toml",
+        "--fixture",
+        "{root}/tests/contracts/timer_assembly/stm32-ve-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/timer_assembly/stm32-ve.toml",
+        "--fixture",
+        "{root}/tests/contracts/timer_assembly/stm32-zg-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/timer_assembly/stm32-zg.toml"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "providers-g474_assembly",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/g474_assembly",
+        "--fixture",
+        "{root}/tests/contracts/g474_assembly/empty-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/g474_assembly/empty.toml",
+        "--fixture",
+        "{root}/tests/contracts/g474_assembly/exti-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/g474_assembly/exti.toml",
+        "--fixture",
+        "{root}/tests/contracts/g474_assembly/io-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/g474_assembly/io.toml"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "providers-h743_assembly",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/h743_assembly",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/dma-cache-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/dma-cache.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/dma-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/dma.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/dma32-cache-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/dma32-cache.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/dma32-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/dma32.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/empty-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/empty.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/io-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/io.toml"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "providers-u575_assembly",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/u575_assembly",
+        "--fixture",
+        "{root}/tests/contracts/u575_assembly/empty-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/u575_assembly/empty.toml",
+        "--fixture",
+        "{root}/tests/contracts/u575_assembly/io-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/u575_assembly/io.toml"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "providers-multi_controller_assembly",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/multi_controller_assembly",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/gd32-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/gd32-i2c-pair-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/gd32-i2c-pair.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/gd32.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-ve.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml",
+        "--fixture",
+        "{root}/tests/contracts/multi_controller_assembly/stm32-zg.toml"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "configure-stm32-qiming-baremetal",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "stm32-qiming-baremetal"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-stm32-qiming-baremetal",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "stm32-qiming-baremetal",
+        "--target",
+        "nexus_firmware"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "hil-prepare-stm32-qiming-baremetal",
+      "checker": "hil_prepare",
+      "args": [
+        "--fixture",
+        "{root}/tools/hil/fixtures/stm32f407_qiming_v31.json",
+        "--resolved",
+        "{root}/build/stm32-qiming-baremetal/generated/resolved.json",
+        "--report",
+        "{output}/hil/stm32-qiming-baremetal.json"
+      ]
+    },
+    {
+      "name": "configure-stm32-qiming-freertos",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "stm32-qiming-freertos"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-stm32-qiming-freertos",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "stm32-qiming-freertos",
+        "--target",
+        "nexus_firmware"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "hil-prepare-stm32-qiming-freertos",
+      "checker": "hil_prepare",
+      "args": [
+        "--fixture",
+        "{root}/tools/hil/fixtures/stm32f407_qiming_v31.json",
+        "--resolved",
+        "{root}/build/stm32-qiming-freertos/generated/resolved.json",
+        "--report",
+        "{output}/hil/stm32-qiming-freertos.json"
+      ]
+    },
+    {
+      "name": "configure-stm32-sky-baremetal",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "stm32-sky-baremetal"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-stm32-sky-baremetal",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "stm32-sky-baremetal",
+        "--target",
+        "nexus_firmware"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "hil-prepare-stm32-sky-baremetal",
+      "checker": "hil_prepare",
+      "args": [
+        "--fixture",
+        "{root}/tools/hil/fixtures/stm32f407ve_sky_qingchun.json",
+        "--resolved",
+        "{root}/build/stm32-sky-baremetal/generated/resolved.json",
+        "--report",
+        "{output}/hil/stm32-sky-baremetal.json"
+      ]
+    },
+    {
+      "name": "configure-stm32-sky-freertos",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "stm32-sky-freertos"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-stm32-sky-freertos",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "stm32-sky-freertos",
+        "--target",
+        "nexus_firmware"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "hil-prepare-stm32-sky-freertos",
+      "checker": "hil_prepare",
+      "args": [
+        "--fixture",
+        "{root}/tools/hil/fixtures/stm32f407ve_sky_qingchun.json",
+        "--resolved",
+        "{root}/build/stm32-sky-freertos/generated/resolved.json",
+        "--report",
+        "{output}/hil/stm32-sky-freertos.json"
+      ]
+    },
+    {
+      "name": "configure-gd32-liangshan-baremetal",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "gd32-liangshan-baremetal"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-gd32-liangshan-baremetal",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "gd32-liangshan-baremetal",
+        "--target",
+        "nexus_firmware"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "hil-prepare-gd32-liangshan-baremetal",
+      "checker": "hil_prepare",
+      "args": [
+        "--fixture",
+        "{root}/tools/hil/fixtures/gd32f470_liangshan.json",
+        "--resolved",
+        "{root}/build/gd32-liangshan-baremetal/generated/resolved.json",
+        "--report",
+        "{output}/hil/gd32-liangshan-baremetal.json"
+      ]
+    },
+    {
+      "name": "configure-gd32-liangshan-freertos",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "gd32-liangshan-freertos"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-gd32-liangshan-freertos",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "gd32-liangshan-freertos",
+        "--target",
+        "nexus_firmware"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "hil-prepare-gd32-liangshan-freertos",
+      "checker": "hil_prepare",
+      "args": [
+        "--fixture",
+        "{root}/tools/hil/fixtures/gd32f470_liangshan.json",
+        "--resolved",
+        "{root}/build/gd32-liangshan-freertos/generated/resolved.json",
+        "--report",
+        "{output}/hil/gd32-liangshan-freertos.json"
+      ]
+    },
+    {
+      "name": "configure-stm32-nucleo-h743-baremetal-uart",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "stm32-nucleo-h743-baremetal-uart"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-stm32-nucleo-h743-baremetal-uart",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "stm32-nucleo-h743-baremetal-uart",
+        "--target",
+        "nexus_firmware"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "hil-prepare-stm32-nucleo-h743-baremetal-uart",
+      "checker": "hil_prepare",
+      "args": [
+        "--fixture",
+        "{root}/tools/hil/fixtures/stm32h743_nucleo_zi2.json",
+        "--resolved",
+        "{root}/build/stm32-nucleo-h743-baremetal-uart/generated/resolved.json",
+        "--report",
+        "{output}/hil/stm32-nucleo-h743-baremetal-uart.json"
+      ]
+    },
+    {
+      "name": "configure-stm32-nucleo-h743-freertos-uart",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "stm32-nucleo-h743-freertos-uart"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-stm32-nucleo-h743-freertos-uart",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "stm32-nucleo-h743-freertos-uart",
+        "--target",
+        "nexus_firmware"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "hil-prepare-stm32-nucleo-h743-freertos-uart",
+      "checker": "hil_prepare",
+      "args": [
+        "--fixture",
+        "{root}/tools/hil/fixtures/stm32h743_nucleo_zi2.json",
+        "--resolved",
+        "{root}/build/stm32-nucleo-h743-freertos-uart/generated/resolved.json",
+        "--report",
+        "{output}/hil/stm32-nucleo-h743-freertos-uart.json"
+      ]
+    },
+    {
+      "name": "configure-stm32-nucleo-u575-baremetal-uart",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "stm32-nucleo-u575-baremetal-uart"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-stm32-nucleo-u575-baremetal-uart",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "stm32-nucleo-u575-baremetal-uart",
+        "--target",
+        "nexus_firmware"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "hil-prepare-stm32-nucleo-u575-baremetal-uart",
+      "checker": "hil_prepare",
+      "args": [
+        "--fixture",
+        "{root}/tools/hil/fixtures/stm32u575_nucleo_zi_q.json",
+        "--resolved",
+        "{root}/build/stm32-nucleo-u575-baremetal-uart/generated/resolved.json",
+        "--report",
+        "{output}/hil/stm32-nucleo-u575-baremetal-uart.json"
+      ]
+    },
+    {
+      "name": "configure-stm32-nucleo-u575-freertos-uart",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "stm32-nucleo-u575-freertos-uart"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-stm32-nucleo-u575-freertos-uart",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "stm32-nucleo-u575-freertos-uart",
+        "--target",
+        "nexus_firmware"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "hil-prepare-stm32-nucleo-u575-freertos-uart",
+      "checker": "hil_prepare",
+      "args": [
+        "--fixture",
+        "{root}/tools/hil/fixtures/stm32u575_nucleo_zi_q.json",
+        "--resolved",
+        "{root}/build/stm32-nucleo-u575-freertos-uart/generated/resolved.json",
+        "--report",
+        "{output}/hil/stm32-nucleo-u575-freertos-uart.json"
+      ]
+    }
+  ]
+}

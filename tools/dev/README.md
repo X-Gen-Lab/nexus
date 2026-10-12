@@ -1,0 +1,98 @@
+# Development commands and execution boundaries
+
+`dev.py` forwards configure/build/test to CMake and CTest. CMake targets remain
+the only software dependency graph. Native arguments and actual failures pass
+through. The default build parallelism is two; set `NEXUS_BUILD_JOBS` or pass
+CMake's explicit `--parallel` to select a different finite budget.
+
+```sh
+python tools/dev/dev.py doctor --target arm
+python tools/dev/dev.py configure --preset stm32-nucleo-h743-baremetal-uart
+python tools/dev/dev.py build --preset stm32-nucleo-h743-baremetal-uart
+python tools/dev/dev.py test --preset native-debug -R Request
+python tools/dev/dev.py check --preset native-debug
+python tools/dev/dev.py configure --preset native-step-debug
+```
+
+`native-debug` retains size optimization and debug symbols. `native-step-debug`
+uses `Og` for interactive stepping. `fixture-stm32-g474-*` names are software
+fixtures; they do not certify their routes or hardware. Public H743/U575 presets
+retain the fixed clock/cache/security settings in their authored TOML files.
+
+`test` is a development execution. Filters and preset filters are recorded as
+`focused-development`; an unfiltered preset remains `preset-development`.
+Neither is software qualification. `check` and the commit hook execute the
+maintained complete contract gate. The gate strips GoogleTest filters/shards,
+discovers every case, executes the complete plan and verifies fresh reports.
+
+Successful `configure` and `build` automatically capture
+`<binaryDir>/quality/configure-provenance.json` or `build-provenance.json` from
+this invocation's independent attempt receipt. A later concurrent command cannot
+replace this association; expected argv and working directory are checked.
+Explicit configure `-B` overrides are honored.
+Records bind source, compiler/configuration/lock bytes, raw execution and observed
+outputs. The compile database is labeled as a plan; an incremental build does not
+claim every object was rebuilt. Identity capture is metadata, never qualification.
+Capture failure returns an error and retains a separate failure report under
+`build/quality/developer-provenance-failures/` alongside the actual command receipt.
+
+`doctor --target tools|native|arm|candidate` rejects missing tools required by
+the selected target. `tools` is the default informational compiler diagnosis.
+Candidate diagnosis checks availability, not the complete toolchain tree,
+source SDK, independent builds or software qualification.
+
+Dependency preparation and qualification use explicit maintained checkers:
+
+```sh
+python tools/dev/dev.py prepare --scope arm --family stm32h743
+python tools/dev/dev.py prepare --preset stm32-nucleo-h743-baremetal-uart
+python tools/dev/dev.py qualify --plan /path/plan.json --output /new/output
+python tools/dev/dev.py candidate --plan /path/plan.json --output /new/output
+```
+
+Preparation checks first and requires `--allow-network` for initialization that
+needs network access. Candidate plans must end with the owned candidate verifier.
+These commands delegate to `dependencies.py` and `qualification.py`; they do not
+establish a second build graph. Cache commands delegate to `cache.py`.
+
+`presets.py` supplies one checked metadata reader for developer/TDD/Native CI
+paths. It handles literal includes, schema-7 `$penv` include paths, same-kind
+inheritance with CMake's earlier-parent precedence, and implicit user-to-project
+includes. Configure/build/test preset names resolve to their actual configure
+name. Common path/environment macros and boolean/equality/list/composite
+conditions are supported.
+Build/test generator macros and configure environments follow the selected
+configure preset; `inheritConfigureEnvironment = false` is respected.
+Cycles, duplicates, illegal file inheritance and unsupported macros/conditions
+fail explicitly. Regex conditions and field
+`${fileDir}` are deliberately rejected by this reader; CMake still validates
+and executes the complete preset schema. A real CMake regression compares
+included/inherited/user preset cache values with the metadata result.
+
+`process.py` applies finite deadlines. Set `NEXUS_COMMAND_TIMEOUT` in seconds to
+select an explicit budget. On maintained Linux, timeout/cancellation withdraws
+the actual owned descendant tree, including nested runner sessions. Linux first
+stops the owned group/tree, confirms a stable stopped set within a finite budget,
+then kills and observes terminal states. Cleanup never executes a child TERM
+handler that could fork and exit. Identities include kernel start times. POSIX systems
+without Linux `/proc` use process-group withdrawal, and Windows uses `taskkill`.
+Linux is the maintained integration-test host for nested-session cleanup.
+Repeated cancellation cannot interrupt withdrawal or receipt publication.
+Timeout/cancellation/launch failure return 124/130/127. Outstanding uninterruptible
+kernel processes remain explicit identities with `withdrawal_complete = false`;
+they cannot establish success. Receipts also retain the
+actual child return code, command, working directory, timing and raw output hashes.
+Complete withdrawal also requires a stable inspected frozen tree; merely stopping
+the identities discovered before the inspection deadline is insufficient.
+Each logged invocation records its start before launching a child. An interrupted
+nested runner retains a `running` receipt; it cannot qualify as completed.
+Each invocation creates a new `<stem>.attempts/<identity>/` directory with
+stdout, stderr and a receipt. The conventional log is a latest-result view;
+retries retain the original failed attempt. Developer logs use
+`build/quality/developer-command.*`; contract runners retain stage-specific logs.
+
+`change_paths.py` is the single commit/CI classification policy. Gitlinks,
+dependency locks, tool changes and unknown non-document inputs require behavior
+execution. Ordinary Markdown/RST and `docs/` changes are documentation; explicit
+coding-policy documents also require behavior checks. Git diffs include additions,
+deletions and both rename sides. CI runs this same policy on the actual Git diff.

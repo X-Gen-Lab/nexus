@@ -22,6 +22,7 @@ class TDDMatrixIntegrationTests(unittest.TestCase):
         self.binary.parent.mkdir(parents=True)
         self.binary.write_bytes(b"gate orchestration fixture")
         (self.root / "CMakePresets.json").write_text(json.dumps({
+            "version": 6,
             "configurePresets": [{"name": "native-debug",
                                   "binaryDir": "${sourceDir}/build/native-debug"}]
         }))
