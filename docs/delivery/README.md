@@ -16,7 +16,11 @@
 | [软件证据](verification.md) | 实际执行与尚待 clean-source 封存的区别 |
 | [SoC 基线执行记录](soc-refinement-verification.md) | 已封存基线的精确源码、执行结果与物理未执行边界 |
 | [SoC 扩展执行记录](soc-extensions-verification.md) | G474 EXTI、H743 Cache/DMA、U575 双域参考及后续验收状态 |
-| [SoC 扩展结果索引](soc-extensions-results.json) | 固定源码、完整 CI、八个离线候选、原始证据和归档摘要 |
+| [SoC 扩展结果索引](soc-extensions-results.json) | 历史 SoC 固定源码、完整 CI、离线候选和归档摘要 |
+| [构建系统契约](../design/build-system.md) | 单一配置权威、CMake 目标图、执行及工具边界 |
+| [构建系统执行记录](build-system-verification.md) | `cc6a065c` 的完整软件 gates、精确候选及失败尝试 |
+| [构建系统结果索引](build-system-results.json) | 当前源码与真实 CI、SDK、候选归档的字节身份 |
+| [48 项构建实施台账](../design/build-system-execution.csv) | 原始退出条件、实现与精确软件证据 |
 | [迁移手册](migration.md) | 旧 API、配置、对象与外部应用迁移 |
 | [安全与生命周期审查](security-review.md) | 扫描范围、测试工装修复与借用／恢复限制 |
 | [后续迭代](next-iterations.md) | 实板验收、测量驱动的扩展与团队流程 |
@@ -32,19 +36,25 @@ timebase 参考装配。G474 另有 selected EXTI，H743 另有固定 Cache 配�
 TX DMA，U575 另有独立无 OS 的同步双域参考；这些纵切片不代表全外设或完整
 安全域接入，物理 HIL 全部未执行。
 
-本轮固定源码 `98270512` 已完成全部 Native 契约、工具和配置测试、121 个 ARM
+历史 SoC 扩展基线固定源码 `98270512` 已完成全部 Native 契约、工具和配置测试、121 个 ARM
 镜像、104 个 CPU runtime 变体、SDK 独立消费及完整 GitHub CI。八个 H743/U575
 公开参考配置分别完成两次独立断网构建，ELF/BIN 逐字节一致，并封存为无签名软件
 候选；具体范围和原始证据见结果索引。后续文档提交只记录该源码，不继承为新的
 代码执行资格。实板未接入，物理 HIL 均为 `not_executed`；运行态交接、DVFS 和
 深 STOP 连续计时尚未实现，55 项原始退出条件保持不变。
 
+本次构建系统交付绑定 `cc6a065c`，完整结果单独记录在构建结果索引，不能继承
+上面的历史 SoC 执行身份。八个当前候选使用 H743 HSI64／Cache off 和 U575
+MSIS4／TZEN=0 的 empty／UART、裸机／FreeRTOS 参考组合；这不扩大实板支持。
+72 阶段软件总计划未作为一次完整 plan invocation 执行，OCI recipe 重建、
+CP311 离线安装和物理 HIL 仍未执行。后续文档提交只记录其精确代码源码。
+
 `docs/archive/` 保留历史设计、结果和旧 Sphinx 教程，不能继承为当前支持或验收。
 当前公共 API 文档只从现有公开 include 树生成；代码格式和反斜杠 Doxygen 风格保持
 根 `.clang-format`、`.editorconfig` 与现有规范。
 
 行为变更遵循 TDD。GoogleTest／GoogleMock 只进入 host 测试目标，生产固件保持
-C11。commit hooks 实际执行配置工具和全部 GoogleTest 契约，拒绝未完成、过滤或
-跳过的报告。执行结果证明当前合同；真实 RED→GREEN 过程由 PR 和原始日志记录。
+C11。commit hooks 实际执行完整 testing／configure／ci／workflows 四域工具测试
+和全部 GoogleTest 契约，拒绝未完成、过滤或跳过的报告。执行结果证明当前合同；真实 RED→GREEN 过程由 PR 和原始日志记录。
 
 - [SoC refinement and physical acceptance](../design/soc-refinement.md)

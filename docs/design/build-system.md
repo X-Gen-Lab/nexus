@@ -39,9 +39,11 @@ and policy defects require real small consumer builds and artifact observations.
 Firmware stays C11 and contains no host test runtime. Normal commit hooks and
 independent review apply to this maintenance work.
 
-The following support matrix records the current maintenance environment and
-declared locks. It is not a qualification of the changed platform source. Final
-whole-source gates and clean-source candidates require their own fresh evidence.
+The following support matrix records observed host tools and declared locks.
+The final clean-source software gates and eight exact offline candidates are
+recorded in the [execution record](../delivery/build-system-verification.md).
+Host observations retain their own scope; source qualification uses the recorded
+code commit and never follows a later documentation HEAD automatically.
 
 | Host or execution path | Maintained boundary | Current evidence |
 | --- | --- | --- |
@@ -75,11 +77,15 @@ explicitly rejected; other generators have no implied acceptance. C11 remains
 the firmware language. Native test targets enable C++17 without linking that
 test runtime into firmware.
 
-The Linux x86_64 CP312 offline tool closure contains 14 hash-locked wheels.
-A fresh CP312 virtual environment completed a real `--no-index --require-hashes`
-installation. CP311 wheels were downloaded and checked against their lock;
-CP311 installation was not executed. The minimum Python version and the CP311
-wheel inventory do not substitute for that missing installation result.
+The Linux x86_64 CP312 offline tool closure contains 15 hash-locked wheels,
+including the Setuptools build backend required by isolated local pre-commit
+preparation. A fresh CP312 virtual environment completed an actual
+`--no-index --require-hashes` installation and real isolated hook initialization.
+The complete isolated tool domains retain their actual recorded source scopes;
+the final ordinary commit gate separately executes the current source. CP311
+wheel bytes were checked against their 15-wheel lock; CP311 installation was
+not executed. The minimum Python version and wheel inventory do not substitute
+for that missing installation result.
 
 The recorded OCI artifact uses Python 3.12.15 and Git 2.47.3, distinct from the
 current host versions. Its manifest is
@@ -99,31 +105,41 @@ Reconstruction of the observed OCI bytes has not executed successfully:
 recipe inputs therefore remain separate acceptance states.
 
 The execution ledger keeps all 48 requested requirements and exit conditions
-unchanged. Its paths identify implementation and actual development evidence.
-`implemented_pending_final_gate` records an outstanding aggregate gate;
-`implemented_fixture_verified_full_plan_pending` records implemented orchestration
-whose complete maintained software plan has not yet run. An owner suite or a
-small consumer fixture is not whole-platform qualification.
+unchanged. Its updated paths bind the implementation, original RED/GREEN
+records and the final-source software gates in the
+[execution record](../delivery/build-system-verification.md) and
+[result index](../delivery/build-system-results.json). Historical measurements
+retain their source and exact selections instead of inheriting a later HEAD.
 
-Automatic developer provenance binds the unique command-attempt receipt and
-checks the expected command and working directory. The concurrent association
-regression passes. BLD-43 and BLD-48 retain `implemented_pending_final_gate`
-until the aggregate clean-source checks execute. A shared latest-report name
-cannot establish that association.
+Automatic developer provenance binds a unique immutable command-attempt receipt
+and checks its command and working directory. Complete current contracts and
+actual candidate plan execution establish this association; a shared latest
+report name cannot substitute for an exact attempt.
 
-BLD-18 retains complete SDK byte checks at each consumption boundary after
-measurement; it introduces no parent marker or persistent verification bypass.
-BLD-31 measures declared and actually compiled units separately and retains
-common static libraries without speculative source splitting. Their
-`decision_verified` state records these measured decisions. BLD-42 explicitly
-uses `declared_recipe_verified_reconstruction_unverified`. BLD-40 covers actual
-CP312 offline installation, while BLD-41 covers actual toolchain/OCI transport.
-BLD-44 covers verified durable archive navigation, package restoration and
-survival of original-name removal; off-site storage or a published release is
-not established by local hard-link adoption.
+BLD-18 retains full SDK byte checks at each consumption boundary after
+measurement, with no parent marker or persistent verification bypass. BLD-31
+retains common static libraries after measuring declared versus actually
+compiled units and exact selected-image costs. Their `decision_verified` states
+record measured choices rather than speculative source splitting.
 
-The current matrix observations are retained in
+BLD-38 records actual fixed-checker candidate plans and genuine failed-checker
+execution. The original orchestration exit condition remains unchanged. The
+maintained 72-stage software plan did not run through one complete plan
+invocation; individually executed full gates are recorded separately. BLD-39
+validates dependency-upgrade evidence contracts, without claiming an actual
+vendor dependency upgrade.
+
+BLD-40 covers actual CP312 offline installation and isolated hook preparation;
+CP311 installation remains unexecuted. BLD-41 covers actual whole-toolchain and
+OCI transport and verified reuse of the same bytes. BLD-42 remains
+`declared_recipe_verified_reconstruction_unverified`, with
+`recipe_reproducible=false`. BLD-44 covers actual new-source archived proof and
+independent archive-only verification. Local archive retention and a durable
+hard-link name do not establish off-site storage, publication or a release.
+
+The host observations retain their recorded source scopes in
 `/workspace/nexus-build-maintenance-20261012/documentation/host-tool-support-observations.json`.
-The ledger's configuration, target, workflow, delivery and transport reports
-retain their raw executions, failure attempts and source scopes. Physical HIL
+Current locked closure and final-source receipts are indexed in the delivery
+result index. The ledger's configuration, target, workflow, delivery and transport
+reports retain their raw executions, failure attempts and source scopes. Physical HIL
 remains `not_executed` throughout this build-system maintenance work.
