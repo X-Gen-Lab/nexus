@@ -62,6 +62,7 @@ def emit(result):
     source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
     source.extend(provider.state_declarations(result))
     initialize = []
+    retained_initialization = []
     stop = []
     for item in selections:
         name = symbol(item.id)
@@ -86,6 +87,7 @@ def emit(result):
         source.extend(construction["definitions"])
         header.extend(construction.get("exports", ()))
         initialize.append(construction["initialize"])
+        retained_initialization.append(construction.get("retain_on_failed_init", False))
         stop.extend((len(initialize), expression)
                     for expression in construction["stop"])
     for device in result["devices"]:
@@ -115,7 +117,8 @@ def emit(result):
     source.append("    s_nx_platform_started = true;")
     source.extend(provider.start_resources(result))
     for index, expression in enumerate(initialize):
-        if (selections[index].kind in {"can", "usb_device", "eth", "timer_capture", "advanced_pwm"} or
+        if (retained_initialization[index] or
+                selections[index].kind in {"can", "usb_device", "eth", "timer_capture", "advanced_pwm"} or
                 provider.PREFIX == "stm32g474" or
                 secondary_controllers.applies(selections[index], result, provider.PREFIX)):
             # Cold failure may retain live hardware; include that instance

@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import configure as gate, memory
+from tools.configure import configure as gate, emission, memory
 
 
 class MemoryRegionConfigurationTests(unittest.TestCase):
@@ -97,8 +97,58 @@ class MemoryRegionConfigurationTests(unittest.TestCase):
                     gate.resolve_ir(self.authored(f'[memory.regions.{name}]\n'
                                                   'limit_bytes=128\n'))
         with self.assertRaisesRegex(ValueError, "region"):
-            gate.resolve_ir(self.authored('[memory.regions.ccm]\nlimit_bytes=128\n',
-                                         board="stm32f407_qiming_v31"))
+            gate.resolve_ir(self.authored('[memory.regions.ccm]\nlimit_bytes=128\n'))
+
+    def test_f407_ccm_has_explicit_budget_and_remains_cpu_only(self):
+        for board in ("stm32f407_qiming_v31", "stm32f407ve_sky_qingchun"):
+            with self.subTest(board=board):
+                path = self.authored('[memory.regions.ccm]\nlimit_bytes=128\n',
+                                     board=board)
+                output = self.root / board
+                gate.configure(path, output)
+                ir = gate.resolve_ir(path)
+                domains = {item["id"]: item for item in ir["memory"]}
+                self.assertTrue(domains["ccm"]["linker"])
+                self.assertFalse(domains["ccm"]["dma"])
+                declarations, count = emission.dma_regions("selected", ir,
+                                                         include_flash=True)
+                self.assertEqual(count, 2)
+                self.assertNotIn("0x10000000", "\n".join(declarations))
+                budget = json.loads((output / "resource-budget.json").read_text())
+                self.assertEqual(budget["ram_reserved_max"],
+                                 {"sram": 4096, "ccm": 128})
+                self.assertIn("#define NEXUS_MEMORY_CCM 1",
+                              (output / "nexus_config.h").read_text())
+                self.assertIn("set(NEXUS_MEMORY_CCM 1)",
+                              (output / "selection.cmake").read_text())
+                source = (output / "memory.ld").read_text()
+                self.assertIn("CCM (rw)", source)
+                self.assertIn("__nx_ccm_data_load", source)
+                self.assertIn("__nx_ccm_noinit_end", source)
+                self.assertLess(source.index(".nx_ccm_noinit"),
+                                source.index("_sbss ="))
+
+    def test_ccm_invalid_limits_are_rejected_without_selecting_other_ram(self):
+        for value in ("0", "true", "3", "65540"):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(ValueError, "region"):
+                    gate.resolve_ir(self.authored('[memory.regions.ccm]\n'
+                        f'limit_bytes={value}\n', board="stm32f407_qiming_v31"))
+
+    def test_region_boot_bounds_are_derived_from_physical_domains(self):
+        cases = (("gd32f470_liangshan", "addsram"),
+                 ("gd32f470_liangshan", "tcm"),
+                 ("stm32f407_qiming_v31", "ccm"))
+        for board, name in cases:
+            with self.subTest(board=board, region=name):
+                path = self.authored(f'[memory.regions.{name}]\nlimit_bytes=128\n',
+                                     board=board)
+                ir = gate.resolve_ir(path)
+                source = memory.linker(ir)
+                self.assertIn(f"__nx_{name}_region_start = ORIGIN({name.upper()});",
+                              source)
+                self.assertIn(f"__nx_{name}_region_end = ORIGIN({name.upper()}) + "
+                              f"LENGTH({name.upper()});", source)
 
     def test_region_contract_rejects_unknown_fields_and_non_table_values(self):
         for content in ('regions=4\n',

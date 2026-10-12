@@ -312,9 +312,13 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         priority = _integer(item.options.irq.priority, 0, 15,
                             "EXTI requires explicit IRQ priority")
         declarations.append(f"static nx_exti_event_t s_nx_events_{name}[{capacity}];")
-        initialize = (f"nx_gd32_exti_initialize(&s_nx_port_{name}, 3u, 4u, {edge}, "
+        initialize = (f"nx_gd32_exti_initialize(&s_nx_port_{name}, "
+                      f"&s_nx_exti_domain, 3u, 4u, {edge}, "
                       f"s_nx_events_{name}, {capacity}u, {priority}u)")
-        stop = [f"nx_exti_port_stop(&s_nx_face_{name})"]
+        # Admission can publish ownership before a terminal enable observation
+        # fails. Cold rejection owns nothing; retained failure needs real stop.
+        stop = [f"s_nx_port_{name}.initialized ? "
+                f"nx_exti_port_stop(&s_nx_face_{name}) : NX_SUCCESS"]
     elif kind == "pwm":
         if item["controller"] != "TIMER2":
             raise ValueError("GD32 maintains TIMER2 channel 0 only")
@@ -383,7 +387,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     else:
         raise ValueError(f"No maintained GD32 constructor for {kind}")
     return {"definitions": declarations, "initialize": initialize,
-            "stop": stop, "extra_headers": extra_headers}
+            "stop": stop, "extra_headers": extra_headers,
+            "retain_on_failed_init": kind == "exti"}
 
 
 def constructor(item, result, board_bindings, routes, devices):

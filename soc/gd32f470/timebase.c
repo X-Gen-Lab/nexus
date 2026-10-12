@@ -18,13 +18,17 @@
 
 static volatile uint32_t s_epoch;
 static bool s_clock_owned;
-static bool s_timer_owned;
+static volatile bool s_timer_owned;
+static volatile bool s_timer_live;
 
 int nx_gd32_clock_start(void);
 int nx_gd32_clock_stop(void);
 
 /** \brief           Check all external interrupt and DMA resources at stop. */
 static bool external_resources_idle(void) {
+    /* Cold stop already requires every OS consumer joined. CTRL is a
+     * read-clear register: this defensive enabled check consumes COUNTFLAG,
+     * and is not a strict no-effect probe of a running scheduler. */
     if ((SysTick->CTRL & SysTick_CTRL_ENABLE_Msk) != 0u ||
         (SCB->ICSR & (SCB_ICSR_PENDSTSET_Msk | SCB_ICSR_PENDSVSET_Msk)) != 0u) {
         return false;
@@ -39,9 +43,14 @@ static bool external_resources_idle(void) {
         }
     }
     if ((USART_CTL0(USART0) & USART_CTL0_UEN) != 0u ||
+        (USART_CTL0(USART1) & USART_CTL0_UEN) != 0u ||
+        (SPI_CTL0(SPI0) & SPI_CTL0_SPIEN) != 0u ||
         (SPI_CTL0(SPI4) & SPI_CTL0_SPIEN) != 0u ||
         (I2C_CTL0(I2C0) & I2C_CTL0_I2CEN) != 0u ||
+        (I2C_CTL0(I2C1) & I2C_CTL0_I2CEN) != 0u ||
+        (TIMER_CTL0(TIMER0) & TIMER_CTL0_CEN) != 0u ||
         (TIMER_CTL0(TIMER2) & TIMER_CTL0_CEN) != 0u ||
+        (TIMER_CTL0(TIMER3) & TIMER_CTL0_CEN) != 0u ||
         (ADC_CTL1(ADC0) & ADC_CTL1_ADCON) != 0u ||
         (FMC_STAT & FMC_STAT_BUSY) != 0u) {
         return false;
@@ -65,6 +74,10 @@ static int stop_timer(void) {
     if ((NVIC->IABR[bank] & bit) != 0u) {
         return -1;
     }
+    /* No consumer may retain deadlines beyond clock withdrawal. End the live
+     * epoch before interrupt or timer access is removed, even if cleanup fails.
+     */
+    s_timer_live = false;
     NVIC_DisableIRQ(TIMER1_IRQn);
     TIMER_CTL0(TIMER1) &= ~TIMER_CTL0_CEN;
     TIMER_DMAINTEN(TIMER1) = 0u;
@@ -86,10 +99,34 @@ static int stop_timer(void) {
     return 0;
 }
 
+/** \brief Inspect the cold clock and known execution owners without writes. */
+nx_result_t nx_gd32_soc_preflight(void) {
+    if (!nx_arch_is_privileged() || nx_gd32_in_isr() || nx_gd32_irq_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (s_clock_owned || s_timer_owned || s_timer_live) {
+        return NX_ERROR_BUSY;
+    }
+    nx_result_t clock = nx_gd32_clock_preflight();
+    if (clock != NX_SUCCESS) {
+        return clock;
+    }
+    uint32_t bank = (uint32_t)TIMER1_IRQn / 32u;
+    uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32u);
+    if ((TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) != 0u ||
+        TIMER_DMAINTEN(TIMER1) != 0u ||
+        (RCU_APB1EN & RCU_APB1EN_TIMER1EN) != 0u ||
+        ((NVIC->ISER[bank] | NVIC->ISPR[bank] | NVIC->IABR[bank]) & bit) !=
+            0u ||
+        !external_resources_idle()) {
+        return NX_ERROR_BUSY;
+    }
+    return NX_SUCCESS;
+}
+
 /** \brief           Start the fixed clock and timer with explicit rollback. */
 int nx_gd32_soc_start(void) {
-    if (nx_gd32_in_isr() || nx_gd32_irq_masked() || s_clock_owned ||
-        s_timer_owned) {
+    if (nx_gd32_soc_preflight() != NX_SUCCESS) {
         return -1;
     }
     s_clock_owned = true;
@@ -121,6 +158,7 @@ int nx_gd32_soc_start(void) {
         (void)nx_gd32_soc_stop();
         return -3;
     }
+    s_timer_live = true;
     return 0;
 }
 
@@ -146,6 +184,9 @@ int nx_gd32_soc_stop(void) {
 
 /** \brief           Sample pending wrap without stealing the ISR's flag. */
 uint64_t nx_gd32_now_us(void) {
+    if (!s_timer_live) {
+        return 0u;
+    }
     uint32_t saved = nx_gd32_critical_enter();
     uint32_t epoch = s_epoch;
     uint32_t count = TIMER_CNT(TIMER1);
@@ -160,14 +201,21 @@ uint64_t nx_gd32_now_us(void) {
 
 /** \brief           Extend the hardware's 32-bit counter once per wrap. */
 void TIMER1_IRQHandler(void) {
+    if (!s_timer_owned) {
+        return;
+    }
     uint32_t saved = nx_gd32_critical_enter();
     if ((TIMER_INTF(TIMER1) & TIMER_INTF_UPIF) != 0u) {
-        ++s_epoch;
+        if (s_timer_live) {
+            ++s_epoch;
+        }
         /* W0C ones preserve compare flags arriving after this UPIF read. */
         NX_GD32_TIMEBASE_ACK(~(uint32_t)TIMER_INTF_UPIF);
     }
 #if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
-    nx_gd32_lowpower_alarm_irq();
+    if (s_timer_live) {
+        nx_gd32_lowpower_alarm_irq();
+    }
 #endif
     nx_gd32_critical_leave(saved);
 }

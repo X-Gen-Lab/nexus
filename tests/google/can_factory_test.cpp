@@ -18,9 +18,11 @@ extern "C" {
 #include "gd32f4xx_can.h"
 #endif
 }
+#include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <vector>
 
 using testing::_;
 using testing::NiceMock;
@@ -28,6 +30,7 @@ using testing::Return;
 
 class CanAssemblyPorts {
   public:
+    MOCK_METHOD(nx_result_t, Preflight, ());
     MOCK_METHOD(int, Start, ());
     MOCK_METHOD(int, Stop, ());
     MOCK_METHOD(nx_result_t, EnableClock, (unsigned));
@@ -40,6 +43,11 @@ static CanAssemblyPorts* s_ports;
 #ifdef NX_CAN_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
+NVIC_Type g_nx_can_factory_nvic;
+}
+/** \brief Observe the separately tested system's read-only cold boundary. */
+extern "C" nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t*) {
+    return s_ports->Preflight();
 }
 extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
     return NX_SUCCESS;
@@ -77,6 +85,13 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* gpio, uint8_t pin,
     return s_ports->Configure(index, pin);
 }
 #else
+extern "C" {
+NVIC_Type g_gd32_model_nvic;
+}
+/** \brief Model only the external system admission result. */
+extern "C" nx_result_t nx_gd32_soc_preflight(void) {
+    return s_ports->Preflight();
+}
 extern "C" int nx_gd32_soc_start(void) {
     return s_ports->Start();
 }
@@ -116,6 +131,8 @@ class CanFactory : public testing::Test {
 
     void SetUp() override {
         s_ports = &ports;
+        ON_CALL(ports, Preflight()).WillByDefault(Return(NX_SUCCESS));
+        std::memset(NVIC, 0, sizeof(*NVIC));
         ON_CALL(ports, EnableClock(_)).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(ports, Configure(_, _)).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(ports, Capture(_, _)).WillByDefault(Return(0x123U));
@@ -158,6 +175,54 @@ class CanFactory : public testing::Test {
     }
 };
 
+TEST_F(CanFactory, BasePreflightRejectsBeforeClockPinAndControllerEffects) {
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_CALL(ports, Preflight()).WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_CALL(ports, Start()).Times(0);
+    EXPECT_CALL(ports, Stop()).Times(0);
+    EXPECT_CALL(ports, EnableClock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Capture(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    const nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+    EXPECT_FALSE(first_state->snapshot.started);
+    EXPECT_FALSE(second_state->snapshot.started);
+    testing::Mock::VerifyAndClearExpectations(&ports);
+}
+TEST_F(CanFactory, SelectedForeignPendingIrqRejectsBeforeClockOrPinEffects) {
+#ifdef NX_CAN_FACTORY_STM32
+    const unsigned irq = static_cast<unsigned>(CAN1_TX_IRQn);
+#else
+    const unsigned irq = static_cast<unsigned>(CAN0_TX_IRQn);
+#endif
+    const unsigned word = irq / 32U;
+    const uint32_t bit = 1U << (irq % 32U);
+    NVIC->ISPR[word] = bit;
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_CALL(ports, Preflight()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, Start()).Times(0);
+    EXPECT_CALL(ports, Stop()).Times(0);
+    EXPECT_CALL(ports, EnableClock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Capture(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    const nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(bit, NVIC->ISPR[word]);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+    EXPECT_FALSE(first_state->snapshot.started);
+    EXPECT_FALSE(second_state->snapshot.started);
+    NVIC->ISPR[word] = 0U;
+    testing::Mock::VerifyAndClearExpectations(&ports);
+}
 TEST_F(CanFactory, PureLookupPreservesSeparateIdentityBeforeStartup) {
     EXPECT_CALL(ports, Start()).Times(0);
     EXPECT_EQ(nx_factory_can(NX_CAN_ID_BUS0), first);

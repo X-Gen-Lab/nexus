@@ -113,6 +113,14 @@ jobs:
         run: >-
           .venv/bin/python scripts/ci/os_resources.py
           --output build/os-resources
+      - name: Verify F407 default and selected CCM startup images
+        run: >-
+          .venv/bin/python scripts/ci/stm32_memory.py
+          --output build/stm32-memory
+      - name: Verify GD default and optional RAM startup images
+        run: >-
+          .venv/bin/python scripts/ci/gd32_memory.py
+          --output build/gd32-memory
       - name: Bind the upload to observed execution identity
         if: always()
         uses: ./.github/actions/record-identity
@@ -128,6 +136,8 @@ jobs:
             build/os-profiles/
             build/os-wait-cost/
             build/os-resources/
+            build/stm32-memory/
+            build/gd32-memory/
           tools: |
             python=python3
             compiler=arm-none-eabi-gcc
@@ -142,6 +152,8 @@ jobs:
             build/os-profiles/
             build/os-wait-cost/
             build/os-resources/
+            build/stm32-memory/
+            build/gd32-memory/
             build/job-identities/arch/
           retention-days: 30
           include-hidden-files: true

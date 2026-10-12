@@ -11,6 +11,13 @@
 #include "nexus/arch/arch.h"
 #include "nexus/core/status.h"
 #include "stm32g474xx.h"
+#ifndef NX_G474_IRQ_AVAILABLE
+/* System and generated cold code share one hardware admission boundary. */
+#define NX_G474_IRQ_AVAILABLE(irq)                                             \
+    (NVIC_GetEnableIRQ((IRQn_Type)(irq)) == 0U &&                              \
+     NVIC_GetPendingIRQ((IRQn_Type)(irq)) == 0U &&                             \
+     NVIC_GetActive((IRQn_Type)(irq)) == 0U)
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,7 +30,7 @@ typedef struct nx_stm32g474_system {
     TIM_TypeDef* timer;
     uint64_t overflow_us;
     uint32_t core_hz;
-    uint32_t remaining_effects;
+    volatile uint32_t remaining_effects;
     uint32_t reset_cause;
     uint32_t saved_pll;
     uint32_t saved_flash;
@@ -31,7 +38,7 @@ typedef struct nx_stm32g474_system {
     uint32_t saved_boost;
     bool owned_power_clock;
     bool power_snapshotted;
-    bool started;
+    volatile bool started;
 } nx_stm32g474_system_t;
 typedef struct {
     nx_result_t primary;
@@ -39,6 +46,13 @@ typedef struct {
     uint32_t remaining_effects;
 } nx_stm32g474_start_result_t;
 extern nx_stm32g474_system_t g_nx_stm32g474_system;
+/**
+ * \brief Read-only reset-like clock, Flash and reserved TIM2 admission.
+ * \param[in] system: Static privileged cold context with no external owners.
+ * \return SUCCESS or INVALID/CONTEXT/BUSY before any hardware changes.
+ * \note Unknown running profiles and bootloader handoff are not adopted.
+ */
+nx_result_t nx_stm32g474_system_preflight(const nx_stm32g474_system_t* system);
 /**
  * \brief Select only HSE24/PLLM6/N85/R2 with a bounded boot transaction.
  * \param[in,out] system: Static privileged bootstrap context; no consumers.

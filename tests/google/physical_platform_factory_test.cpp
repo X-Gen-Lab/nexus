@@ -29,6 +29,7 @@ using testing::NiceMock;
 using testing::Return;
 class PhysicalSystemPorts {
   public:
+    MOCK_METHOD(nx_result_t, Preflight, ());
     MOCK_METHOD(int, Start, ());
     MOCK_METHOD(int, Stop, ());
 };
@@ -57,6 +58,9 @@ extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
     ++s_identities;
     return NX_SUCCESS;
 }
+extern "C" nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t*) {
+    return s_system->Preflight();
+}
 extern "C" nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t*,
                                                          uint32_t) {
     ++s_starts;
@@ -70,6 +74,9 @@ extern "C" int nx_stm32_system_stop(nx_stm32_system_t*, uint32_t) {
 extern "C" {
 NVIC_Type g_gd32_model_nvic;
 SCB_Type g_gd32_model_scb;
+}
+extern "C" nx_result_t nx_gd32_soc_preflight(void) {
+    return s_system->Preflight();
 }
 extern "C" int nx_gd32_soc_start(void) {
     ++s_starts;
@@ -114,6 +121,7 @@ class PhysicalPlatformFactory : public testing::TestWithParam<bool> {
         s_system = &system;
         s_privileged = true;
         s_starts = s_stops = s_identities = s_writes = 0U;
+        ON_CALL(system, Preflight()).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(system, Start()).WillByDefault(Return(0));
         ON_CALL(system, Stop()).WillByDefault(Return(0));
 #ifdef NX_PHYSICAL_FACTORY_STM32
@@ -201,6 +209,19 @@ TEST_P(PhysicalPlatformFactory, IncomingMaskRejectsAndRemainsSaved) {
     nx_arch_irq_restore(saved);
     EXPECT_EQ(s_starts, 0U);
     EXPECT_EQ(s_stops, 0U);
+    EXPECT_EQ(register_snapshot(), before);
+}
+
+TEST_P(PhysicalPlatformFactory, BasePreflightRejectsBeforeAnyOuterLease) {
+    const auto before = register_snapshot();
+    EXPECT_CALL(system, Preflight()).WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_CALL(system, Start()).Times(0);
+    const auto result = start();
+    EXPECT_EQ(result.primary, NX_ERROR_BUSY);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_EQ(s_starts, 0U);
+    EXPECT_EQ(s_writes, 0U);
     EXPECT_EQ(register_snapshot(), before);
 }
 

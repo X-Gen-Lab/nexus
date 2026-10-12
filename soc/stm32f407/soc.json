@@ -755,5 +755,6 @@
       "CAN2"
     ],
     "filter_banks": 28
-  }
+  },
+  "references": "references.json"
 }

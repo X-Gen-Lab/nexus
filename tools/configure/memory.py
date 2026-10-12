@@ -11,8 +11,10 @@ def select(regions, budgets, family, part, *, obj, integer, fail):
                       budgets.get("regions", {}), dict) else (),
                   "memory regions")
     available = {item["id"]: item for item in regions}
-    maintained = {"addsram", "tcm"} if (
-        family == "gd32f470" and part == "GD32F470ZGT6") else set()
+    maintained = ({"addsram", "tcm"} if (
+        family == "gd32f470" and part == "GD32F470ZGT6") else
+        {"ccm"} if family == "stm32f407" and part in {
+            "STM32F407VET6", "STM32F407ZGT6"} else set())
     for name, choice in choices.items():
         if name not in maintained or name not in available:
             fail(f"Unsupported optional memory region: {name}")
@@ -42,7 +44,7 @@ def budget_limits(result):
 def selections(result):
     selected = {region["id"] for region in result["memory"] if region["linker"]}
     return [("NEXUS_MEMORY_" + name.upper(), int(name in selected))
-            for name in ("addsram", "tcm")]
+            for name in ("addsram", "tcm", "ccm")]
 
 
 def header_lines(result):
@@ -72,6 +74,9 @@ def _extra_sections(regions):
                          f'    ASSERT(SIZEOF({section}) == 0, '
                          '"memory region is not selected")']
             continue
+        sections += [f"    __nx_{name}_region_start = ORIGIN({name.upper()});",
+                     f"    __nx_{name}_region_end = ORIGIN({name.upper()}) + "
+                     f"LENGTH({name.upper()});"]
         for kind in ("data", "bss", "noinit"):
             section = f".nx_{name}_{kind}"
             # NOINIT must precede .bss* wildcards, without being cleared by BSS.

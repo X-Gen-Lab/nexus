@@ -42,7 +42,7 @@ flash_load_limit_bytes = 65536
     def copy_soc_package(self, family):
         package = self.root / "soc" / family
         package.mkdir(parents=True, exist_ok=True)
-        for filename in ("soc.json", "routes.json"):
+        for filename in ("soc.json", "routes.json", "references.json"):
             shutil.copyfile(gate.ROOT / "soc" / family / filename,
                             package / filename)
         if family == "gd32f470":

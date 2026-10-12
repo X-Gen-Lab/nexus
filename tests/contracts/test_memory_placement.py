@@ -8,7 +8,7 @@ import re
 
 
 ROOT = Path(__file__).resolve().parents[2]
-REGIONS = ("ADDSRAM", "TCM")
+REGIONS = ("ADDSRAM", "TCM", "CCM")
 KINDS = ("DATA", "BSS", "NOINIT")
 
 
@@ -19,7 +19,8 @@ class MemoryPlacementTests(unittest.TestCase):
             flag = int(selected)
             (directory / "nexus_config.h").write_text(
                 f"#define NEXUS_MEMORY_ADDSRAM {flag}\n"
-                f"#define NEXUS_MEMORY_TCM {flag}\n")
+                f"#define NEXUS_MEMORY_TCM {flag}\n"
+                f"#define NEXUS_MEMORY_CCM {flag}\n")
             input_file = directory / "placement.c"
             input_file.write_text('#include "nexus/core/memory.h"\n' + source)
             return subprocess.run([compiler, "-std=c11", "-Wall", "-Wextra",
@@ -89,7 +90,8 @@ class MemoryPlacementTests(unittest.TestCase):
                             directory = Path(temporary)
                             (directory / "nexus_config.h").write_text(
                                 "#define NEXUS_MEMORY_ADDSRAM 1\n"
-                                "#define NEXUS_MEMORY_TCM 1\n")
+                                "#define NEXUS_MEMORY_TCM 1\n"
+                                "#define NEXUS_MEMORY_CCM 1\n")
                             initializer = " = 7" if kind == "DATA" else ""
                             source = directory / "gc.c"
                             source.write_text(

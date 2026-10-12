@@ -449,22 +449,26 @@ static void watchdog_cases(bool late_failure) {
 /** \brief           Verify duplicate/shared line conflicts, loss and stop
  * drain. */
 static void exti_cases(void) {
-    nx_gd32_exti_state_t port;
+    nx_gd32_exti_state_t port = {0};
+    nx_gd32_exti_state_t other = {0};
+    nx_gd32_exti_state_t a = {0};
+    nx_gd32_exti_state_t b = {0};
+    nx_gd32_exti_state_t* const selected[] = {&port, &other, &a, &b};
+    const nx_gd32_exti_domain_t domain = {selected, 4u};
     const nx_exti_port_t port_api = {&nx_gd32_exti_ops, &port};
     (void)port_api;
     nx_exti_event_t queue[1];
-    CHECK(nx_gd32_exti_initialize(&port, 3u, 4u, NX_EXTI_BOTH, queue, 1u, 5u) ==
-          NX_SUCCESS);
-    nx_gd32_exti_state_t other;
+    CHECK(nx_gd32_exti_initialize(&port, &domain, 3u, 4u, NX_EXTI_BOTH, queue,
+                                  1u, 5u) == NX_SUCCESS);
     const nx_exti_port_t other_api = {&nx_gd32_exti_ops, &other};
     (void)other_api;
-    CHECK(nx_gd32_exti_initialize(&other, 3u, 0u, NX_EXTI_RISING, queue, 1u,
-                                  5u) == NX_ERROR_BUSY);
+    CHECK(nx_gd32_exti_initialize(&other, &domain, 3u, 0u, NX_EXTI_RISING,
+                                  queue, 1u, 5u) == NX_ERROR_BUSY);
     GPIO_ISTAT(GPIOE) = 8u;
     EXTI_PD = 8u;
-    EXTI3_IRQHandler();
+    nx_gd32_exti_dispatch(&domain, 8u);
     EXTI_PD = 8u;
-    EXTI3_IRQHandler();
+    nx_gd32_exti_dispatch(&domain, 8u);
     nx_exti_event_t output[2];
     size_t count;
     CHECK(nx_exti_port_read(&port_api, output, 2u, &count) == NX_SUCCESS);
@@ -473,24 +477,22 @@ static void exti_cases(void) {
     CHECK((output[1].flags & NX_EXTI_EVENT_LOSS) != 0u);
     CHECK(nx_exti_port_stop(&port_api) == NX_SUCCESS);
     EXTI_PD = 8u;
-    EXTI3_IRQHandler();
+    nx_gd32_exti_dispatch(&domain, 8u);
     CHECK(!port.initialized && port.count == 0u);
-    nx_gd32_exti_state_t a;
     const nx_exti_port_t a_api = {&nx_gd32_exti_ops, &a};
     (void)a_api;
-    nx_gd32_exti_state_t b;
     const nx_exti_port_t b_api = {&nx_gd32_exti_ops, &b};
     (void)b_api;
     nx_exti_event_t qa[1];
     nx_exti_event_t qb[1];
-    CHECK(nx_gd32_exti_initialize(&a, 5u, 0u, NX_EXTI_RISING, qa, 1u, 5u) ==
-          NX_SUCCESS);
-    CHECK(nx_gd32_exti_initialize(&b, 7u, 1u, NX_EXTI_FALLING, qb, 1u, 6u) ==
-          NX_ERROR_BUSY);
-    CHECK(nx_gd32_exti_initialize(&b, 7u, 1u, NX_EXTI_FALLING, qb, 1u, 5u) ==
-          NX_SUCCESS);
+    CHECK(nx_gd32_exti_initialize(&a, &domain, 5u, 0u, NX_EXTI_RISING, qa, 1u,
+                                  5u) == NX_SUCCESS);
+    CHECK(nx_gd32_exti_initialize(&b, &domain, 7u, 1u, NX_EXTI_FALLING, qb, 1u,
+                                  6u) == NX_ERROR_BUSY);
+    CHECK(nx_gd32_exti_initialize(&b, &domain, 7u, 1u, NX_EXTI_FALLING, qb, 1u,
+                                  5u) == NX_SUCCESS);
     EXTI_PD = (1u << 5) | (1u << 7);
-    EXTI5_9_IRQHandler();
+    nx_gd32_exti_dispatch(&domain, 0x3E0u);
     CHECK(a.count == 1u && b.count == 1u &&
           qa[0].timestamp_us == qb[0].timestamp_us);
     CHECK(nx_exti_port_stop(&a_api) == NX_SUCCESS);

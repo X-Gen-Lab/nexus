@@ -42,9 +42,15 @@ typedef struct {
  *
  * \return          Microseconds since domain initialization.
  *
- * \note            Callable in task/IRQ; no OS, allocation or wait. Provider
- *                  clock changes invalidate existing deadlines. UINT64_MAX is
- *                  reserved; clock exhaustion requires controlled restart.
+ * \note            Physical providers require successful platform startup and
+ *                  a privileged task/configurable IRQ; NMI/HardFault callers
+ *                  are unsupported. No OS, allocation or wait. Physical clocks
+ *                  return zero outside a successfully started live epoch; zero
+ *                  alone cannot prove readiness. Startup status is
+ * authoritative. All consumers join before clock withdrawal. Stop/restart or a
+ * clock change invalidates every old deadline, even if a new epoch has the same
+ * numerical value. UINT64_MAX is reserved; clock exhaustion requires controlled
+ * restart.
  */
 nx_time_us_t nx_time_now_us(void);
 /**

@@ -2,13 +2,14 @@
 from . import bindings
 from ..common import mode_traits
 try:
-    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers
+    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers, preflight
 except ImportError:
     import can
     import usb_device
     import ethernet
     import timer_advanced
     import secondary_controllers
+    import preflight
 
 
 def implementation(item):
@@ -155,7 +156,7 @@ def stop_system(result):
 def start_system(result):
     selections = result.controllers
     dma_clock = has_dma(result)
-    source = []
+    source = preflight.emit(result)
     gpio_clock_mask = _gpio_clock_mask(result)
     if dma_clock:
         source.append('    s_nx_platform_dma_clocks_added = 0u;')

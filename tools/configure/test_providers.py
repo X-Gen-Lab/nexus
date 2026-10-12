@@ -11,6 +11,17 @@ import configure as gate
 
 
 class ProviderContractTests(unittest.TestCase):
+    def test_unselected_mode_cannot_invent_a_software_capability(self):
+        for family in ("native", "stm32f407", "gd32f470", "stm32g474"):
+            with self.subTest(family=family):
+                soc = gate.load(gate.ROOT / "soc" / family / "soc.json")
+                part = next(iter(soc["variants"]))
+                controller = next(item for item in soc["controllers"].values()
+                                  if item["kind"] == "gpio")
+                controller["modes"].append("invented-unselected-mode")
+                with self.assertRaisesRegex(ValueError, "provider mode|mode"):
+                    gate.validate_soc(soc, part)
+
     def test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile(self):
         for family, part, profile in (
                 ('stm32f407', 'STM32F407ZGT6', 'hse8-pll168'),

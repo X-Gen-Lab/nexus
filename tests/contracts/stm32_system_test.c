@@ -44,6 +44,24 @@ nx_arch_irq_state_t nx_arch_irq_save(void) {
 void nx_arch_irq_restore(nx_arch_irq_state_t old) {
     s_mask = old.value;
 }
+/** \brief Model a privileged boot owner without a running exception. */
+bool nx_arch_is_privileged(void) {
+    return true;
+}
+/** \brief Invoke cold clock paths only in modeled Thread mode. */
+bool nx_arch_in_isr(void) {
+    return false;
+}
+/** \brief Expose the incoming mask to read-only cold admission. */
+bool nx_arch_irq_is_masked(void) {
+    return s_mask != 0U;
+}
+/** \brief Register model writes are synchronous, not physical bus timing. */
+void nx_arch_dsb(void) {
+}
+/** \brief The host clock fixture has no Cortex-M pipeline. */
+void nx_arch_isb(void) {
+}
 
 /** \brief Advance only hardware phases permitted by the injected fault. */
 void nx_stm32_model_poll(void* raw) {
@@ -53,8 +71,14 @@ void nx_stm32_model_poll(void* raw) {
     if ((rcc->CR & RCC_CR_HSION) != 0U && s_fault != 4U) {
         rcc->CR |= RCC_CR_HSIRDY;
     }
+    if (s_fault == 4U) {
+        rcc->CR &= ~(uint32_t)RCC_CR_HSIRDY;
+    }
     if ((rcc->CR & RCC_CR_HSEON) != 0U && s_fault != 1U && s_fault != 4U) {
         rcc->CR |= RCC_CR_HSERDY;
+    }
+    if ((rcc->CR & RCC_CR_HSEON) == 0U) {
+        rcc->CR &= ~(uint32_t)RCC_CR_HSERDY;
     }
     if ((rcc->CR & RCC_CR_PLLON) != 0U && s_fault != 2U) {
         rcc->CR |= RCC_CR_PLLRDY;
@@ -74,6 +98,7 @@ static nx_stm32_system_t fresh(unsigned fault) {
     memset(&s_flash, 0, sizeof(s_flash));
     memset(&s_power, 0, sizeof(s_power));
     memset(&s_timer, 0, sizeof(s_timer));
+    s_rcc.CR = RCC_CR_HSION | RCC_CR_HSIRDY;
     s_fault = fault;
     s_polls = 0U;
     s_mask = 0U;

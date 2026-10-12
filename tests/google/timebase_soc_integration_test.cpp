@@ -179,6 +179,10 @@ extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t) {
 extern "C" bool nx_arch_in_isr(void) {
     return false;
 }
+/** \brief Supply a privileged owner for the private hardware binding. */
+extern "C" bool nx_arch_is_privileged(void) {
+    return true;
+}
 extern "C" bool nx_arch_irq_is_masked(void) {
     return false;
 }
@@ -230,6 +234,10 @@ extern "C" void nx_freertos_assert_failed(const char*, unsigned) {
     throw std::runtime_error("retained integrated timer fault");
 }
 #ifdef NX_TIMEBASE_GD_MODEL
+/** \brief Model the independent clock component's read-only cold admission. */
+extern "C" nx_result_t nx_gd32_clock_preflight(void) {
+    return NX_SUCCESS;
+}
 extern "C" int nx_gd32_clock_start(void) {
     return 0;
 }

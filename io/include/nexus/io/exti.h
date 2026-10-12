@@ -85,8 +85,14 @@ nx_result_t nx_exti_port_read(const nx_exti_port_t* port,
  *
  * \param[in,out]   port: Execution owner; consumer/writers must quiesce first.
  *
- * \return          Success proves no remaining accesses to event storage; BUSY
- *                  retains it. Shared vectors preserve other maintained lines.
+ * \return          Success proves no remaining accesses to event storage;
+ *                  BUSY or IO retains storage, wake targets and cleanup
+ *                  responsibility. Shared vectors preserve other lines.
+ *
+ * \note            Failed withdrawal may already have disabled part of the
+ *                  source. Retry and observe success before reclaiming event
+ *                  or wake storage. Face and state remain live while a shared
+ *                  dispatch domain still refers to them.
  */
 nx_result_t nx_exti_port_stop(const nx_exti_port_t* port);
 /**

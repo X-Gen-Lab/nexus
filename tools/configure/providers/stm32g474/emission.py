@@ -1,4 +1,8 @@
 """Fixed G474 clock lifecycle and a single selected-mask GPIOA cold lease."""
+try:
+    from ... import preflight
+except ImportError:
+    import preflight
 
 
 def implementation(item):
@@ -78,14 +82,7 @@ def state_declarations(result):
 
 
 def start_system(result):
-    source = ['    if (!nx_arch_is_privileged()) { result.primary = NX_ERROR_CONTEXT; return result; }']
-    if _uart(result):
-        # A foreign enabled serial port must be rejected before changing its
-        # peripheral clock domain, acquiring pins or creating rollback effects.
-        # Clock-off state follows the explicit reset-like bootstrap contract.
-        source += ['    if ((NX_G474_READ(&RCC->APB1ENR2) & RCC_APB1ENR2_LPUART1EN) != 0u && (NX_G474_READ(&LPUART1->CR1) != 0u || NX_G474_READ(&LPUART1->CR3) != 0u)) {',
-                   '        result.primary = NX_ERROR_BUSY; return result;',
-                   '    }']
+    source = preflight.emit(result)
     return source + ['    result.primary = nx_stm32g474_validate_identity();',
             '    if (result.primary != NX_SUCCESS) { return result; }',
             '    nx_stm32g474_start_result_t system = nx_stm32g474_system_start(&g_nx_stm32g474_system, 1000000u);',

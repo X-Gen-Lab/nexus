@@ -24,8 +24,13 @@ typedef struct {
     uint64_t overflow_us;
     uint32_t reset_cause;
     uint32_t core_hz;
-    uint32_t remaining_effects;
-    bool started;
+    volatile uint32_t remaining_effects;
+    uint32_t saved_pll;
+    uint32_t saved_flash;
+    uint32_t saved_power;
+    bool owned_power_clock;
+    bool power_snapshotted;
+    volatile bool started;
 } nx_stm32_system_t;
 
 typedef struct {
@@ -33,6 +38,17 @@ typedef struct {
     int cleanup;
     uint32_t remaining_effects;
 } nx_stm32_start_result_t;
+
+/**
+ * \brief           Inspect reset-like clocks and an unowned TIM2 without
+ * writes. \param[in]       system: Static register-bound context, no external
+ * owners. \return          SUCCESS or INVALID/CONTEXT/BUSY before acquisition.
+ * \note            Privileged Thread mode with all incoming masks clear.
+ *                  GPIO/CCM and an existing PWR interface clock may be shared.
+ *                  Unknown live clocks, bootloader handoff and foreign timer
+ *                  owners are not adopted. No scheduler or IRQ is changed.
+ */
+nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system);
 
 /**
  * \brief           Establish HSE8/PLL168 and TIM2 at 1 MHz.
@@ -57,7 +73,11 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
  *
  * \param[in]       poll_limit: Nonzero maximum polls per phase.
  *
- * \return          Zero after cleanup; failure retains clock effects.
+ * \return          Zero after owned PLL/Flash/PWR/timer fields are restored;
+ *                  failure retains the exact cleanup responsibility.
+ * \note            Unrelated power fields and pre-existing PWR gates survive.
+ *                  Consumers join before withdrawal; the live time epoch ends
+ *                  before any timer/IRQ reference is removed.
  */
 int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit);
 

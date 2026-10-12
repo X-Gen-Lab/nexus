@@ -20,10 +20,10 @@
  *                  promised. BSS/NOINIT reject nonzero initializers. Storage
  *                  is word aligned and subject to explicit ELF budgets.
  *                  Unselected use is a compile error. TCM is CPU-only data:
- *                  never DMA or executable storage. ADDSRAM DMA still requires
- *                  provider address, alignment and ownership validation.
- *                  Ordinary storage, the main MSP and unselected images keep
- *                  their existing layout.
+ *                  never DMA or executable storage. CCM is also CPU-only data;
+ *                  placement never grants bus-master access. ADDSRAM DMA
+ * requires provider address, alignment and ownership validation. Ordinary
+ * storage, the main MSP and unselected images keep their existing layout.
  */
 #if !defined(__GNUC__) && !defined(__clang__)
 #error                                                                         \
@@ -57,6 +57,17 @@
     _Pragma("GCC error \"TCM memory region is not selected\"")
 #define NX_MEMORY_TCM_BSS    NX_MEMORY_TCM_DATA
 #define NX_MEMORY_TCM_NOINIT NX_MEMORY_TCM_DATA
+#endif
+
+#if defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM == 1
+#define NX_MEMORY_CCM_DATA   NX_CORE_MEMORY_ATTRIBUTE(".nx_ccm_data")
+#define NX_MEMORY_CCM_BSS    NX_CORE_MEMORY_ATTRIBUTE(".bss.nx_ccm")
+#define NX_MEMORY_CCM_NOINIT NX_CORE_MEMORY_ATTRIBUTE(".bss.nx_ccm_noinit")
+#else
+#define NX_MEMORY_CCM_DATA                                                     \
+    _Pragma("GCC error \"CCM memory region is not selected\"")
+#define NX_MEMORY_CCM_BSS    NX_MEMORY_CCM_DATA
+#define NX_MEMORY_CCM_NOINIT NX_MEMORY_CCM_DATA
 #endif
 
 #endif

@@ -7,7 +7,11 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/core/time.h"
+#include "nexus_config.h"
 #include "stm32f407_system.h"
+#if defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM
+#include "memory_init.h"
+#endif
 #if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
 #include "stm32f407_lowpower.h"
 #endif
@@ -36,7 +40,9 @@ void TIM2_IRQHandler(void) {
 #endif
     nx_stm32_system_timer_irq(&g_nx_stm32_system);
 #if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
-    nx_stm32_lowpower_alarm_irq();
+    if (g_nx_stm32_system.started) {
+        nx_stm32_lowpower_alarm_irq();
+    }
     nx_arch_irq_restore(saved);
 #endif
 }
@@ -47,6 +53,99 @@ void TIM2_IRQHandler(void) {
 
 #define NX_STM32_EFFECT_CLOCK 1U
 #define NX_STM32_EFFECT_TIMER 2U
+#ifndef NX_STM32_WRITE
+#define NX_STM32_WRITE(reg, value) (*(reg) = (uint32_t)(value))
+#endif
+#ifndef NX_STM32_IRQ_AVAILABLE
+#ifdef NEXUS_STM32_MODEL
+#define NX_STM32_IRQ_AVAILABLE(irq) ((void)(irq), true)
+#else
+#define NX_STM32_IRQ_AVAILABLE(irq)                                            \
+    (NVIC_GetEnableIRQ(irq) == 0U && NVIC_GetPendingIRQ(irq) == 0U &&          \
+     NVIC_GetActive(irq) == 0U)
+#endif
+#endif
+#ifndef NX_STM32_IRQ_CONTROL
+/** \brief Observe reserved vector withdrawal before releasing its
+ * responsibility.
+ */
+static int timer_irq_control(IRQn_Type irq, bool enabled) {
+#ifndef NEXUS_STM32_MODEL
+    if (enabled) {
+        NVIC_SetPriority(irq, 0U);
+        NVIC_ClearPendingIRQ(irq);
+        NVIC_EnableIRQ(irq);
+    } else {
+        NVIC_DisableIRQ(irq);
+        NVIC_ClearPendingIRQ(irq);
+    }
+    nx_arch_dsb();
+    nx_arch_isb();
+    if (NVIC_GetEnableIRQ(irq) != (enabled ? 1U : 0U) ||
+        (!enabled &&
+         (NVIC_GetPendingIRQ(irq) != 0U || NVIC_GetActive(irq) != 0U))) {
+        return -1;
+    }
+#else
+    (void)irq;
+    (void)enabled;
+#endif
+    return 0;
+}
+#define NX_STM32_IRQ_CONTROL(irq, enabled) timer_irq_control(irq, enabled)
+#endif
+
+/** \brief A critical write is established only after a barrier and readback. */
+static bool write_checked(volatile uint32_t* reg, uint32_t value,
+                          uint32_t mask) {
+    NX_STM32_WRITE(reg, value);
+    nx_arch_dsb();
+    return (*reg & mask) == (value & mask);
+}
+
+/** \brief Check cold ownership before any global clock or Flash change. */
+nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (system == NULL || system->rcc == NULL || system->flash == NULL ||
+        system->power == NULL || system->timer == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    uint32_t clock = system->rcc->CR;
+    uint32_t bus_mask = (uint32_t)(RCC_CFGR_SW | RCC_CFGR_SWS | RCC_CFGR_HPRE |
+                                   RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2);
+    if (system->started || system->remaining_effects != 0U ||
+        (clock & (RCC_CR_HSION | RCC_CR_HSIRDY)) !=
+            (RCC_CR_HSION | RCC_CR_HSIRDY) ||
+        (clock & (RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON |
+                  RCC_CR_PLLRDY | RCC_CR_PLLI2SON | RCC_CR_PLLI2SRDY)) != 0U ||
+        (system->rcc->CFGR & bus_mask) != 0U ||
+        (system->rcc->SSCGR & RCC_SSCGR_SSCGEN) != 0U ||
+        (system->rcc->APB1ENR & RCC_APB1ENR_TIM2EN) != 0U ||
+        system->timer->CR1 != 0U || system->timer->DIER != 0U ||
+        (system->flash->SR & FLASH_SR_BSY) != 0U ||
+        !NX_STM32_IRQ_AVAILABLE(TIM2_IRQn)) {
+        return NX_ERROR_BUSY;
+    }
+    return NX_SUCCESS;
+}
+
+#if defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM
+#ifndef NX_STM32_BOOT_FAILURE
+/** \brief Fail before constructors without observing initialized global RAM. */
+static _Noreturn void boot_failure(uint32_t reason) {
+    volatile uint32_t retained_reason = reason;
+    (void)nx_arch_irq_save();
+    for (;;) {
+        (void)retained_reason;
+        __NOP();
+    }
+}
+#define NX_STM32_BOOT_FAILURE(reason) boot_failure(reason)
+#endif
+#endif
 
 /** \brief Wait for one hardware condition within an explicit boot poll bound.
  */
@@ -63,23 +162,48 @@ static bool wait_bits(nx_stm32_system_t* system, volatile uint32_t* reg,
 
 /** \brief Restore HSI only after its ready and source status are observed. */
 static int restore_hsi(nx_stm32_system_t* system, uint32_t limit) {
-    system->rcc->CR |= RCC_CR_HSION;
+    NX_STM32_WRITE(&system->rcc->CR, system->rcc->CR | RCC_CR_HSION);
     if (!wait_bits(system, &system->rcc->CR, RCC_CR_HSIRDY, RCC_CR_HSIRDY,
                    limit)) {
         return -1;
     }
-    system->rcc->CFGR &= ~(uint32_t)RCC_CFGR_SW;
+    NX_STM32_WRITE(&system->rcc->CFGR,
+                   system->rcc->CFGR & ~(uint32_t)RCC_CFGR_SW);
     if (!wait_bits(system, &system->rcc->CFGR, RCC_CFGR_SWS, 0U, limit)) {
         return -1;
     }
-    system->rcc->CR &= ~(uint32_t)(RCC_CR_PLLON | RCC_CR_HSEON);
-    if (!wait_bits(system, &system->rcc->CR, RCC_CR_PLLRDY, 0U, limit)) {
+    NX_STM32_WRITE(&system->rcc->CR,
+                   system->rcc->CR & ~(uint32_t)(RCC_CR_PLLON | RCC_CR_HSEON));
+    if (!wait_bits(system, &system->rcc->CR, RCC_CR_PLLRDY | RCC_CR_HSERDY, 0U,
+                   limit)) {
         return -1;
     }
-    system->rcc->CFGR = 0U;
-    system->flash->ACR = FLASH_ACR_ICEN | FLASH_ACR_DCEN;
+    if (!write_checked(
+            &system->rcc->CFGR,
+            system->rcc->CFGR &
+                ~(uint32_t)(RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2),
+            RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2)) {
+        return -1;
+    }
     system->core_hz = 16000000U;
-    system->remaining_effects = 0U;
+    if (!write_checked(&system->rcc->PLLCFGR, system->saved_pll, UINT32_MAX) ||
+        !write_checked(&system->flash->ACR, system->saved_flash, UINT32_MAX)) {
+        return -1;
+    }
+    if (system->power_snapshotted &&
+        !write_checked(&system->power->CR,
+                       (system->power->CR & ~(uint32_t)PWR_CR_VOS) |
+                           system->saved_power,
+                       PWR_CR_VOS)) {
+        return -1;
+    }
+    if (system->owned_power_clock &&
+        !write_checked(&system->rcc->APB1ENR,
+                       system->rcc->APB1ENR & ~(uint32_t)RCC_APB1ENR_PWREN,
+                       RCC_APB1ENR_PWREN)) {
+        return -1;
+    }
+    system->remaining_effects &= ~NX_STM32_EFFECT_CLOCK;
     return 0;
 }
 
@@ -97,68 +221,111 @@ void SystemInit(void) {
     SCB->VTOR = FLASH_BASE;
     NVIC_SetPriorityGrouping(3U);
 #endif
+#if defined(NEXUS_MEMORY_CCM) && NEXUS_MEMORY_CCM
+    /* Official ST startup has not copied DATA or cleared BSS yet. The plan
+     * comes only from linker symbols/Flash and uses the internal SRAM stack. */
+    RCC->AHB1ENR |= RCC_AHB1ENR_CCMDATARAMEN;
+    nx_arch_dsb();
+    if ((RCC->AHB1ENR & RCC_AHB1ENR_CCMDATARAMEN) == 0U) {
+        NX_STM32_BOOT_FAILURE(1U);
+    }
+    if (!nx_stm32_memory_boot()) {
+        NX_STM32_BOOT_FAILURE(2U);
+    }
+    nx_arch_dsb();
+#endif
 }
 
 /** \brief Establish the one supported fixed clock profile and TIM2 source. */
 nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
                                               uint32_t poll_limit) {
     nx_stm32_start_result_t result = {0, 0, 0U};
-    if (system == NULL || system->rcc == NULL || system->flash == NULL ||
-        system->power == NULL || system->timer == NULL || poll_limit == 0U ||
-        system->started || system->remaining_effects != 0U) {
+    if (poll_limit == 0U || nx_stm32_system_preflight(system) != NX_SUCCESS) {
         result.primary = -2;
         return result;
     }
     system->reset_cause = system->rcc->CSR;
-    system->rcc->APB1ENR |= RCC_APB1ENR_PWREN;
-    system->power->CR |= PWR_CR_VOS;
-    system->flash->ACR = FLASH_ACR_LATENCY_5WS | FLASH_ACR_ICEN |
-                         FLASH_ACR_DCEN | FLASH_ACR_PRFTEN;
+    system->saved_pll = system->rcc->PLLCFGR;
+    system->saved_flash = system->flash->ACR;
+    system->owned_power_clock =
+        (system->rcc->APB1ENR & RCC_APB1ENR_PWREN) == 0U;
+    system->power_snapshotted = false;
     system->remaining_effects = NX_STM32_EFFECT_CLOCK;
-    system->rcc->CR |= RCC_CR_HSEON;
+    if (!write_checked(&system->rcc->APB1ENR,
+                       system->rcc->APB1ENR | RCC_APB1ENR_PWREN,
+                       RCC_APB1ENR_PWREN)) {
+        result.primary = -6;
+        goto rollback;
+    }
+    system->saved_power = system->power->CR & PWR_CR_VOS;
+    system->power_snapshotted = true;
+    if (!write_checked(&system->power->CR, system->power->CR | PWR_CR_VOS,
+                       PWR_CR_VOS) ||
+        !write_checked(&system->flash->ACR,
+                       FLASH_ACR_LATENCY_5WS | FLASH_ACR_ICEN | FLASH_ACR_DCEN |
+                           FLASH_ACR_PRFTEN,
+                       FLASH_ACR_LATENCY | FLASH_ACR_ICEN | FLASH_ACR_DCEN |
+                           FLASH_ACR_PRFTEN)) {
+        result.primary = -6;
+        goto rollback;
+    }
+    NX_STM32_WRITE(&system->rcc->CR, system->rcc->CR | RCC_CR_HSEON);
     if (!wait_bits(system, &system->rcc->CR, RCC_CR_HSERDY, RCC_CR_HSERDY,
                    poll_limit)) {
         result.primary = -3;
         goto rollback;
     }
-    system->rcc->PLLCFGR =
-        8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U);
-    system->rcc->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
-    system->rcc->CR |= RCC_CR_PLLON;
+    if (!write_checked(&system->rcc->PLLCFGR,
+                       8U | (336U << 6U) | RCC_PLLCFGR_PLLSRC_HSE | (7U << 24U),
+                       UINT32_MAX) ||
+        !write_checked(&system->rcc->CFGR,
+                       RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2,
+                       RCC_CFGR_HPRE | RCC_CFGR_PPRE1 | RCC_CFGR_PPRE2)) {
+        result.primary = -6;
+        goto rollback;
+    }
+    NX_STM32_WRITE(&system->rcc->CR, system->rcc->CR | RCC_CR_PLLON);
     if (!wait_bits(system, &system->rcc->CR, RCC_CR_PLLRDY, RCC_CR_PLLRDY,
                    poll_limit)) {
         result.primary = -4;
         goto rollback;
     }
-    system->rcc->CFGR |= RCC_CFGR_SW_PLL;
+    NX_STM32_WRITE(&system->rcc->CFGR, system->rcc->CFGR | RCC_CFGR_SW_PLL);
     if (!wait_bits(system, &system->rcc->CFGR, RCC_CFGR_SWS, RCC_CFGR_SWS_PLL,
                    poll_limit)) {
         result.primary = -5;
         goto rollback;
     }
-    system->rcc->APB1ENR |= RCC_APB1ENR_TIM2EN;
-    system->rcc->APB1RSTR |= RCC_APB1RSTR_TIM2RST;
-    system->rcc->APB1RSTR &= ~(uint32_t)RCC_APB1RSTR_TIM2RST;
-    system->timer->CR1 = 0U;
-    system->timer->PSC = 83U;
-    system->timer->ARR = UINT32_MAX;
-    system->timer->EGR = TIM_EGR_UG;
-    system->timer->SR = 0U;
-    system->timer->CNT = 0U;
-    system->overflow_us = 0U;
-    system->timer->DIER = TIM_DIER_UIE;
-#ifndef NEXUS_STM32_MODEL
-    NVIC_SetPriority(TIM2_IRQn, 0U);
-    NVIC_ClearPendingIRQ(TIM2_IRQn);
-    NVIC_EnableIRQ(TIM2_IRQn);
-#endif
-    system->timer->CR1 = TIM_CR1_CEN;
-    system->core_hz = 168000000U;
     system->remaining_effects |= NX_STM32_EFFECT_TIMER;
+    if (!write_checked(&system->rcc->APB1ENR,
+                       system->rcc->APB1ENR | RCC_APB1ENR_TIM2EN,
+                       RCC_APB1ENR_TIM2EN)) {
+        result.primary = -6;
+        goto rollback;
+    }
+    NX_STM32_WRITE(&system->rcc->APB1RSTR,
+                   system->rcc->APB1RSTR | RCC_APB1RSTR_TIM2RST);
+    NX_STM32_WRITE(&system->rcc->APB1RSTR,
+                   system->rcc->APB1RSTR & ~(uint32_t)RCC_APB1RSTR_TIM2RST);
+    bool valid = write_checked(&system->timer->CR1, 0U, UINT32_MAX) &&
+                 write_checked(&system->timer->PSC, 83U, UINT32_MAX) &&
+                 write_checked(&system->timer->ARR, UINT32_MAX, UINT32_MAX);
+    NX_STM32_WRITE(&system->timer->EGR, TIM_EGR_UG);
+    NX_STM32_WRITE(&system->timer->SR, 0U);
+    NX_STM32_WRITE(&system->timer->CNT, 0U);
+    system->overflow_us = 0U;
+    valid = write_checked(&system->timer->DIER, TIM_DIER_UIE, UINT32_MAX) &&
+            write_checked(&system->timer->CR1, TIM_CR1_CEN, UINT32_MAX) &&
+            valid;
+    if (!valid || NX_STM32_IRQ_CONTROL(TIM2_IRQn, true) != 0) {
+        result.primary = -6;
+        goto rollback;
+    }
+    system->core_hz = 168000000U;
     system->started = true;
     return result;
 rollback:
-    result.cleanup = restore_hsi(system, poll_limit);
+    result.cleanup = nx_stm32_system_stop(system, poll_limit);
     result.remaining_effects = system->remaining_effects;
     return result;
 }
@@ -166,7 +333,7 @@ rollback:
 /** \brief Stop timer access before attempting clock cleanup. */
 int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit) {
     if (system == NULL || system->rcc == NULL || system->timer == NULL ||
-        system->flash == NULL || poll_limit == 0U) {
+        system->flash == NULL || system->power == NULL || poll_limit == 0U) {
         return -2;
     }
 #if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
@@ -174,24 +341,36 @@ int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit) {
         return -1;
     }
 #endif
-#ifndef NEXUS_STM32_MODEL
-    NVIC_DisableIRQ(TIM2_IRQn);
-    NVIC_ClearPendingIRQ(TIM2_IRQn);
-#endif
-    system->timer->DIER = 0U;
-    system->timer->CR1 = 0U;
-    system->rcc->APB1ENR &= ~(uint32_t)RCC_APB1ENR_TIM2EN;
-    system->started = false;
-    system->remaining_effects &= ~NX_STM32_EFFECT_TIMER;
-    return restore_hsi(system, poll_limit);
+    if ((system->remaining_effects & NX_STM32_EFFECT_TIMER) != 0U) {
+        system->started = false;
+        if (NX_STM32_IRQ_CONTROL(TIM2_IRQn, false) != 0 ||
+            !write_checked(&system->timer->DIER, 0U, UINT32_MAX) ||
+            !write_checked(&system->timer->CR1, 0U, UINT32_MAX) ||
+            !write_checked(&system->rcc->APB1ENR,
+                           system->rcc->APB1ENR & ~(uint32_t)RCC_APB1ENR_TIM2EN,
+                           RCC_APB1ENR_TIM2EN)) {
+            return -1;
+        }
+        system->remaining_effects &= ~NX_STM32_EFFECT_TIMER;
+    }
+    if ((system->remaining_effects & NX_STM32_EFFECT_CLOCK) != 0U) {
+        return restore_hsi(system, poll_limit);
+    }
+    return 0;
 }
 
 /** \brief Count a hardware overflow once, clearing only the update source. */
 void nx_stm32_system_timer_irq(nx_stm32_system_t* system) {
-    if (system != NULL && system->started &&
+    if (system != NULL &&
+        (system->started ||
+         (system->remaining_effects & NX_STM32_EFFECT_TIMER) != 0U) &&
         (system->timer->SR & TIM_SR_UIF) != 0U) {
         NX_STM32_TIMEBASE_ACK(system, ~(uint32_t)TIM_SR_UIF);
-        system->overflow_us += (UINT64_C(1) << 32U);
+        /* Retained IRQs still acknowledge their level source during failed
+         * withdrawal; that does not make a withdrawn epoch valid again. */
+        if (system->started) {
+            system->overflow_us += (UINT64_C(1) << 32U);
+        }
     }
 }
 

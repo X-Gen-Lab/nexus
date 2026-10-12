@@ -140,9 +140,17 @@ typedef struct {
     nx_watchdog_state_t state;
     bool initialized;
 } nx_gd32_watchdog_state_t;
+typedef struct nx_gd32_exti_state nx_gd32_exti_state_t;
+/** \brief Immutable selected states; all storage outlives every domain owner.
+ */
 typedef struct {
+    nx_gd32_exti_state_t* const* ports;
+    size_t count;
+} nx_gd32_exti_domain_t;
+struct nx_gd32_exti_state {
     nx_exti_event_t* events;
     const nx_irq_wake_t* wake;
+    const nx_gd32_exti_domain_t* domain;
     size_t capacity;
     size_t head;
     size_t count;
@@ -151,7 +159,7 @@ typedef struct {
     uint8_t gpio_index;
     nx_exti_edge_t edges;
     bool initialized;
-} nx_gd32_exti_state_t;
+};
 typedef struct {
     nx_pwm_state_t state;
     bool initialized;
@@ -258,7 +266,10 @@ nx_result_t nx_gd32_flash_initialize(nx_gd32_flash_state_t* port);
 nx_result_t nx_gd32_watchdog_initialize(nx_gd32_watchdog_state_t* port);
 /**
  * \brief           Bind a unique EXTI line and caller-budgeted event queue.
- * \param[out]      port: Fresh storage, kept alive until successful stop.
+ * \param[in,out]   port: Fresh zeroed member of the selected domain.
+ * \param[in]       domain: Immutable exact selected array, one through 16
+ *                  distinct states. All member storage remains alive until
+ *                  every domain owner successfully stops.
  * \param[in]       line: Reviewed GPIO/EXTI line 0 through 15.
  * \param[in]       gpio_index: GPIO port A=0 through I=8.
  * \param[in]       edges: Rising, falling or both edges.
@@ -267,11 +278,24 @@ nx_result_t nx_gd32_watchdog_initialize(nx_gd32_watchdog_state_t* port);
  * \param[in]       priority: Reviewed shared-vector priority 0 through 15.
  * \return          Success or INVALID/BUSY/CONTEXT. Shared priorities must
  * match.
+ * \note            Cold serialized assembly only. External clock-gated owners
+ *                  must be quiescent; hardware checks do not discover them.
  */
-nx_result_t nx_gd32_exti_initialize(nx_gd32_exti_state_t* port, unsigned line,
-                                    unsigned gpio_index, nx_exti_edge_t edges,
+nx_result_t nx_gd32_exti_initialize(nx_gd32_exti_state_t* port,
+                                    const nx_gd32_exti_domain_t* domain,
+                                    unsigned line, unsigned gpio_index,
+                                    nx_exti_edge_t edges,
                                     nx_exti_event_t* events, size_t capacity,
                                     unsigned priority);
+/**
+ * \brief           Dispatch only selected active line states in array order.
+ * \param[in]       domain: Successfully validated immutable selected domain.
+ * \param[in]       vector_mask: Exact silicon lines for the invoking vector.
+ * \note            IRQ-only; generated wiring owns the vector. Hardware facts
+ *                  are bounded by count and queue capacity, with no registry.
+ */
+void nx_gd32_exti_dispatch(const nx_gd32_exti_domain_t* domain,
+                           uint32_t vector_mask);
 /**
  * \brief           Bind TIMER2 channel0 PA6 AF2, fixed up-counting PWM base.
  * \param[out]      port: Fresh single-writer storage.

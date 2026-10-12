@@ -34,6 +34,7 @@ void DMA0_Channel2_IRQHandler(void);
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <vector>
 
 #ifdef NX_I2C_PAIR_STM32
 #define GATE        RCC->APB1ENR
@@ -77,6 +78,7 @@ bool g_gd32_model_isr;
 namespace {
 class ClockPort {
   public:
+    MOCK_METHOD(nx_result_t, Preflight, ());
     MOCK_METHOD(int, Start, ());
     MOCK_METHOD(int, Stop, ());
 };
@@ -137,6 +139,7 @@ class I2CPairFactory : public testing::Test {
         refused_register = nullptr;
         writes = 0U;
         clock_port = &clocks;
+        ON_CALL(clocks, Preflight()).WillByDefault(testing::Return(NX_SUCCESS));
         ON_CALL(clocks, Start()).WillByDefault(testing::Return(0));
         ON_CALL(clocks, Stop()).WillByDefault(testing::Return(0));
         LINES = 0xFFFFU;
@@ -275,6 +278,21 @@ TEST_F(I2CPairFactory, ColdStopRejectsWithoutReferencesOrHardwareEffects) {
             std::_Exit(rejected && untouched ? 0 : 23);
         },
         testing::ExitedWithCode(0), "");
+}
+
+TEST_F(I2CPairFactory, BasePreflightRejectsBeforeEitherControllerLease) {
+    const auto* first = static_cast<const uint8_t*>(mmio);
+    const std::vector<uint8_t> before(first, first + 0x80000U);
+    EXPECT_CALL(clocks, Preflight()).WillOnce(testing::Return(NX_ERROR_BUSY));
+    EXPECT_CALL(clocks, Start()).Times(0);
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(0U, writes);
+    EXPECT_EQ(0, std::memcmp(before.data(), mmio, before.size()));
+    EXPECT_FALSE(states[0]->initialized);
+    EXPECT_FALSE(states[1]->initialized);
 }
 
 TEST_F(I2CPairFactory, BothControllersUseExactPinsClockAndPublisherTuples) {
@@ -645,6 +663,11 @@ nx_stm32_system_t g_nx_stm32_system;
 extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
     return NX_SUCCESS;
 }
+/** \brief The actual generated admission calls this external clock boundary.
+ */
+extern "C" nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t*) {
+    return clock_port->Preflight();
+}
 /** \brief Observe entry into the independently tested system-clock subsystem.
  */
 extern "C" nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t*,
@@ -663,6 +686,10 @@ extern "C" void rcu_periph_reset_enable(rcu_periph_reset_enum) {
 /** \brief No selected paired-controller operation authorizes a GPIO reset. */
 extern "C" void rcu_periph_reset_disable(rcu_periph_reset_enum) {
     ADD_FAILURE() << "No paired I2C GPIO reset was acquired";
+}
+/** \brief Reject before any generated pin or controller acquisition. */
+extern "C" nx_result_t nx_gd32_soc_preflight(void) {
+    return clock_port->Preflight();
 }
 /** \brief Observe the separately tested clock subsystem startup boundary. */
 extern "C" int nx_gd32_soc_start(void) {

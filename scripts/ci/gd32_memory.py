@@ -57,6 +57,11 @@ def validate_layout(elf, resolved, budget, selected):
         raise ValueError("Unused placement storage survived actual section GC")
     sections = {item["name"]: item for item in elf.sections}
     for region in ("addsram", "tcm"):
+        origin, capacity, _ = FACTS[region]
+        if region in selected and (
+                elf.symbol(f"__nx_{region}_region_start") != origin or
+                elf.symbol(f"__nx_{region}_region_end") != origin + capacity):
+            raise ValueError("Reset region bounds differ from silicon: " + region)
         for kind, size, section_kind in (("data", 4, 1), ("bss", 16, 8),
                                         ("noinit", 16, 8)):
             name = f".nx_{region}_{kind}"

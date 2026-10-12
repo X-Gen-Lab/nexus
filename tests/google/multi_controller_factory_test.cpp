@@ -67,6 +67,7 @@ using testing::NiceMock;
 using testing::Return;
 class MultipleAssemblyPorts {
   public:
+    MOCK_METHOD(nx_result_t, Preflight, ());
     MOCK_METHOD(int, Start, ());
     MOCK_METHOD(int, Stop, ());
     MOCK_METHOD(nx_result_t, Clock, (unsigned));
@@ -218,6 +219,9 @@ nx_stm32_system_t g_nx_stm32_system;
 extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
     return NX_SUCCESS;
 }
+extern "C" nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t*) {
+    return s_ports->Preflight();
+}
 extern "C" nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t*,
                                                          uint32_t) {
     return {s_ports->Start(), 0, 0U};
@@ -249,6 +253,9 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* port, uint8_t pin,
     return configure_pin(port_index(port), pin, mode, af, pull, drain);
 }
 #else
+extern "C" nx_result_t nx_gd32_soc_preflight(void) {
+    return s_ports->Preflight();
+}
 extern "C" int nx_gd32_soc_start(void) {
     return s_ports->Start();
 }
@@ -462,6 +469,7 @@ class MultipleFactory : public testing::Test {
         s_hold = s_writes = 0U;
         s_privileged = true;
         s_now = 100U;
+        ON_CALL(ports, Preflight()).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(ports, Start()).WillByDefault(Return(0));
         ON_CALL(ports, Stop()).WillByDefault(Return(0));
         ON_CALL(ports, Clock(_)).WillByDefault(Return(NX_SUCCESS));
@@ -520,6 +528,23 @@ class MultipleFactory : public testing::Test {
         s_ports = nullptr;
     }
 };
+
+TEST_F(MultipleFactory, BasePreflightRejectsBeforeAllFiveControllerLeases) {
+    EXPECT_CALL(ports, Preflight()).WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_CALL(ports, Start()).Times(0);
+    EXPECT_CALL(ports, Clock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _, _)).Times(0);
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(0U, s_writes);
+    for (unsigned index = 0U; index < 2U; ++index) {
+        EXPECT_FALSE(uart_states[index]->uart.initialized);
+        EXPECT_FALSE(spi_states[index]->initialized);
+    }
+    EXPECT_FALSE(i2c_state->initialized);
+}
 
 TEST_F(MultipleFactory, LookupBindsFiveDistinctControllersWithoutEffects) {
     EXPECT_EQ(s_writes, 0U);

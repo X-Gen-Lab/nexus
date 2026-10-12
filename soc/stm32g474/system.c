@@ -12,12 +12,6 @@
 nx_stm32g474_system_t g_nx_stm32g474_system = {
     .rcc = RCC, .flash = FLASH, .power = PWR, .timer = TIM2};
 #endif
-#ifndef NX_G474_IRQ_AVAILABLE
-#define NX_G474_IRQ_AVAILABLE(irq)                                             \
-    (NVIC_GetEnableIRQ((IRQn_Type)(irq)) == 0U &&                              \
-     NVIC_GetPendingIRQ((IRQn_Type)(irq)) == 0U &&                             \
-     NVIC_GetActive((IRQn_Type)(irq)) == 0U)
-#endif
 #ifndef NX_G474_FLASH_KIB
 #define NX_G474_FLASH_KIB()     (*(volatile const uint16_t*)FLASHSIZE_BASE)
 #define NX_G474_DEVICE_ID()     (DBGMCU->IDCODE)
@@ -100,22 +94,15 @@ nx_result_t nx_stm32g474_validate_identity(void) {
         return NX_ERROR_IO;
     return NX_SUCCESS;
 }
-nx_stm32g474_start_result_t nx_stm32g474_system_start(nx_stm32g474_system_t* s,
-                                                      uint32_t limit) {
-    nx_stm32g474_start_result_t r = {NX_SUCCESS, NX_SUCCESS, 0U};
-    if (!task_context()) {
-        r.primary = NX_ERROR_CONTEXT;
-        return r;
-    }
+/** \brief Inspect cold prerequisites before any clock or Flash writes. */
+nx_result_t nx_stm32g474_system_preflight(const nx_stm32g474_system_t* s) {
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
     if (s == NULL || s->rcc == NULL || s->flash == NULL || s->power == NULL ||
-        s->timer == NULL || limit == 0U) {
-        r.primary = NX_ERROR_INVALID;
-        return r;
-    }
-    if (s->started || s->remaining_effects != 0U) {
-        r.primary = NX_ERROR_BUSY;
-        return r;
-    }
+        s->timer == NULL)
+        return NX_ERROR_INVALID;
+    if (s->started || s->remaining_effects != 0U)
+        return NX_ERROR_BUSY;
     uint32_t cr = NX_G474_READ(&s->rcc->CR);
     uint32_t cfgr = NX_G474_READ(&s->rcc->CFGR);
     if ((cr & (RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON |
@@ -126,10 +113,23 @@ nx_stm32g474_start_result_t nx_stm32g474_system_start(nx_stm32g474_system_t* s,
         (NX_G474_READ(&s->rcc->APB1ENR1) & RCC_APB1ENR1_TIM2EN) != 0U ||
         NX_G474_READ(&s->timer->CR1) != 0U ||
         NX_G474_READ(&s->timer->DIER) != 0U ||
-        !NX_G474_IRQ_AVAILABLE(TIM2_IRQn)) {
-        r.primary = NX_ERROR_BUSY;
+        (NX_G474_READ(&s->flash->SR) & FLASH_SR_BSY) != 0U ||
+        !NX_G474_IRQ_AVAILABLE(TIM2_IRQn))
+        return NX_ERROR_BUSY;
+    return NX_SUCCESS;
+}
+nx_stm32g474_start_result_t nx_stm32g474_system_start(nx_stm32g474_system_t* s,
+                                                      uint32_t limit) {
+    nx_stm32g474_start_result_t r = {NX_SUCCESS, NX_SUCCESS, 0U};
+    r.primary = nx_stm32g474_system_preflight(s);
+    if (r.primary != NX_SUCCESS)
+        return r;
+    if (limit == 0U) {
+        r.primary = NX_ERROR_INVALID;
         return r;
     }
+    uint32_t cr = NX_G474_READ(&s->rcc->CR);
+    uint32_t cfgr = NX_G474_READ(&s->rcc->CFGR);
     r.primary = nx_stm32g474_validate_identity();
     if (r.primary != NX_SUCCESS)
         return r;
@@ -229,10 +229,10 @@ nx_stm32g474_start_result_t nx_stm32g474_system_start(nx_stm32g474_system_t* s,
         r.primary = NX_ERROR_IO;
         goto rollback;
     }
-    s->started = true;
     r.primary = NX_G474_IRQ_CONTROL(TIM2_IRQn, true, 0U);
     if (r.primary != NX_SUCCESS)
         goto rollback;
+    s->started = true;
     return r;
 rollback:
     r.cleanup = nx_stm32g474_system_stop(s, limit);
@@ -246,6 +246,7 @@ nx_result_t nx_stm32g474_system_stop(nx_stm32g474_system_t* s, uint32_t limit) {
         s->timer == NULL || limit == 0U)
         return NX_ERROR_INVALID;
     if ((s->remaining_effects & NX_STM32G474_EFFECT_TIMER) != 0U) {
+        s->started = false;
         nx_result_t irq = NX_G474_IRQ_CONTROL(TIM2_IRQn, false, 0U);
         if (irq != NX_SUCCESS)
             return irq;
@@ -266,10 +267,13 @@ nx_result_t nx_stm32g474_system_stop(nx_stm32g474_system_t* s, uint32_t limit) {
     return NX_SUCCESS;
 }
 void nx_stm32g474_system_timer_irq(nx_stm32g474_system_t* s) {
-    if (s != NULL && s->started &&
+    if (s != NULL &&
+        (s->started ||
+         (s->remaining_effects & NX_STM32G474_EFFECT_TIMER) != 0U) &&
         (NX_G474_READ(&s->timer->SR) & TIM_SR_UIF) != 0U) {
         NX_G474_WRITE(&s->timer->SR, ~(uint32_t)TIM_SR_UIF);
-        s->overflow_us += (UINT64_C(1) << 32U);
+        if (s->started)
+            s->overflow_us += (UINT64_C(1) << 32U);
     }
 }
 uint64_t nx_stm32g474_system_now(nx_stm32g474_system_t* s) {

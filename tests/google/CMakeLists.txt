@@ -422,6 +422,7 @@ include(os_secure.cmake)
 include(freertos_mpu.cmake)
 include(gd32_arch.cmake)
 include(gd32_memory.cmake)
+include(stm32_memory.cmake)
 
 # GD32 tests replace the CPU boundary coherently; no partial Native Arch model.
 foreach(gd_target nexus_gd32_multi_test nexus_gd32_uart_dma_test
@@ -474,3 +475,6 @@ include(failstop.cmake)
 include(ethernet_factory.cmake)
 
 include(dma_multi_controller.cmake)
+
+include(soc_system.cmake)
+include(gd32_exti.cmake)

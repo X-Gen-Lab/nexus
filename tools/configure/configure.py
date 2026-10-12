@@ -19,7 +19,7 @@ import tempfile
 
 try:
     from . import cpu as cpu_profiles
-    from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers
+    from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references
     from .ir import thaw
     from .providers import maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
@@ -35,6 +35,7 @@ except ImportError:
     import ethernet
     import timer_advanced
     import secondary_controllers
+    import fact_references
     import metadata
     import factory
     import memory as memory_regions
@@ -209,13 +210,17 @@ def contained_file(package, name):
 
 def validate_soc(soc, part):
     obj(soc, {"schema_version", "id", "variants", "cpu", "irq", "clock_profiles",
-              "controllers"}, {"provenance", "source_lock", "reserved_resources", "can_domain"},
+              "controllers"}, {"provenance", "source_lock", "reserved_resources",
+                               "can_domain", "references"},
         "SoC")
     integer(soc["schema_version"], 1, 1, "SoC schema")
     identity(soc["id"], "SoC id")
     if not isinstance(soc["variants"], dict) or part not in soc["variants"]:
         fail(f"Unmaintained exact part: {part}")
     provider = maintained(soc["id"])
+    reference = getattr(provider, "FACT_REFERENCES", None)
+    if reference is not None and soc.get("references") != reference:
+        fail("SoC references differ from the maintained source index")
     # Review every physical package, including unselected variants referenced by
     # route facts. A controller pad is not evidence that a package bonds it out.
     for exact, package in soc["variants"].items():
@@ -290,6 +295,8 @@ def validate_soc(soc, part):
                 text(value, f"{name}.{field}")
         if not controller["modes"]:
             fail(f"Controller {name} has no maintained mode")
+        for mode in controller["modes"]:
+            provider.mode_implementation(controller["kind"], mode)
         for resource in sequence(controller.get("resources", []),
                                  f"{name}.resources"):
             validate_resource_fact(resource, provider, "SoC resource")
@@ -368,6 +375,12 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     soc_path, routes_path = soc_dir / "soc.json", soc_dir / "routes.json"
     soc, routes_doc = read(soc_path), read(routes_path)
     variant = validate_soc(soc, part)
+    reference_path = None
+    references = None
+    if "references" in soc:
+        reference_path = contained_file(soc_dir, soc["references"])
+        references = fact_references.validate(read(reference_path),
+                                             soc["variants"])
     if soc["id"] != family:
         fail("Board SoC family differs from the package identity")
     obj(routes_doc, {"schema_version", "routes"}, (), "routes")
@@ -749,6 +762,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail("SPI requires at least one reviewed CS endpoint")
     layout = variant["flash"].copy()
     inputs = [assembly_path, board_path, soc_path, routes_path, policy_path]
+    if reference_path is not None:
+        inputs.append(reference_path)
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
         inputs.append(contained_file(board_dir, name))
     if assembly["layout"] is not None:
@@ -856,6 +871,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
               "physical_qualified": False,
               "enum_abi": provider.ENUM_ABI}
     result["factory"] = {"capabilities": factory_options.get("capabilities", False)}
+    if references is not None:
+        result["fact_references"] = references
     result["configuration_sha256"] = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     return result

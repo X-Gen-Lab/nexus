@@ -46,6 +46,18 @@ class PackagePinContractTests(unittest.TestCase):
         self.assertEqual(gate.validate_soc(soc, "NATIVE_MODEL")["package"],
                          soc["variants"]["NATIVE_MODEL"]["package"])
 
+    def test_g474_package_inventory_is_complete_without_opening_new_modes(self):
+        soc = self.facts("stm32g474")
+        pins = soc["variants"]["STM32G474RET6"]["pins"]
+        # DS12288 Rev6 Table2 lists52 GPIOs for Rx/LQFP64. Table12 and
+        # independent Figure7 agree on A/B/C16 each plus D2/F0/F1/G10.
+        self.assertEqual(len(pins), 52)
+        self.assertEqual({f"P{port}{pin}" for port in "ABC"
+                          for pin in range(16)} | {"PD2", "PF0", "PF1", "PG10"},
+                         set(pins))
+        self.assertEqual(set(soc["controllers"]), {"GPIOA", "LPUART1"})
+        self.assertEqual(soc["controllers"]["LPUART1"]["modes"], ["irq-bytes"])
+
 
 class ImportedDependencyContractTests(unittest.TestCase):
     def setUp(self):
@@ -54,6 +66,7 @@ class ImportedDependencyContractTests(unittest.TestCase):
         self.root = Path(temporary.name)
         for relative in ("dependencies/platform-compatibility.json",
                          "soc/gd32f470/soc.json", "soc/gd32f470/routes.json",
+                         "soc/gd32f470/references.json",
                          "boards/gd32f470_liangshan/board.json"):
             destination = self.root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)

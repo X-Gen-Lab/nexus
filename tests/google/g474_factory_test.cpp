@@ -68,6 +68,26 @@ TEST_F(G474Factory, LookupIsPureStaticIdentityBeforeAnyHardwareAccess) {
     EXPECT_EQ(NX_ERROR_INVALID, nx_gpio_port_write(gpio, 1U << 5U, 0U));
 }
 
+TEST_F(G474Factory, PendingSelectedIrqRejectsBeforeClockOrPinWrites) {
+    g_g474_model.irq_pending[LPUART1_IRQn] = true;
+    auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(0U, g_g474_model.writes);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_TRUE(g_g474_model.irq_pending[LPUART1_IRQn]);
+    g_g474_model.irq_pending[LPUART1_IRQn] = false;
+}
+
+TEST_F(G474Factory, ActiveSelectedIrqRejectsBeforeAnyClockChange) {
+    g_g474_model.irq_active[LPUART1_IRQn] = true;
+    auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(0U, g_g474_model.writes);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_TRUE(g_g474_model.irq_active[LPUART1_IRQn]);
+    g_g474_model.irq_active[LPUART1_IRQn] = false;
+}
+
 TEST_F(G474Factory, ActualStartupBinds170MHzClockTimebasePinsAndIrq) {
     Start();
     EXPECT_EQ(170000000U, g_nx_stm32g474_system.core_hz);

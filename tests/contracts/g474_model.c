@@ -145,7 +145,9 @@ nx_result_t nx_g474_model_irq_control(int irq, bool enabled, uint8_t priority) {
         g_g474_model.irq_enabled[irq] = true;
         g_g474_model.priority[irq] = priority;
     }
-    if (!enabled && !g_g474_model.hold_irq_off)
+    if (!enabled && !g_g474_model.hold_irq_off) {
         g_g474_model.irq_enabled[irq] = false;
+        g_g474_model.irq_pending[irq] = false;
+    }
     return g_g474_model.irq_enabled[irq] == enabled ? NX_SUCCESS : NX_ERROR_IO;
 }

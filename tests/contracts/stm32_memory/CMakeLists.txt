@@ -1,0 +1,22 @@
+# Consume one real exact F407 assembly through the production platform graph.
+cmake_minimum_required(VERSION 3.31)
+project(nexus_stm32_memory_contract LANGUAGES C ASM)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(NOT NEXUS_ASSEMBLY_FILE)
+    message(FATAL_ERROR "Select exactly one F407 memory fixture TOML")
+endif()
+get_filename_component(nexus_source "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host framework in firmware" FORCE)
+set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Consumer owns its fixture" FORCE)
+add_subdirectory("${nexus_source}" nexus EXCLUDE_FROM_ALL)
+get_target_property(memory_soc Nexus::Platform NEXUS_SOC_FAMILY)
+if(NOT memory_soc STREQUAL "stm32f407")
+    message(FATAL_ERROR "Memory fixture requires an exact F407 VE/ZG SoC")
+endif()
+nexus_add_firmware(nexus_stm32_memory SOURCES main.c)
+
+# Deliberately bypass the public placement macro to exercise the linker gate.
+option(STM32_MEMORY_INJECT "Test-only live unselected CCM section" OFF)
+if(STM32_MEMORY_INJECT)
+    target_sources(nexus_stm32_memory PRIVATE unselected.c)
+endif()

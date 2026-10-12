@@ -23,11 +23,13 @@ extern "C" {
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <vector>
 using testing::_;
 using testing::NiceMock;
 using testing::Return;
 class EthernetAssemblyPorts {
   public:
+    MOCK_METHOD(nx_result_t, Preflight, ());
     MOCK_METHOD(int, Start, ());
     MOCK_METHOD(int, Stop, ());
     MOCK_METHOD(nx_result_t, Clock, (unsigned));
@@ -73,6 +75,11 @@ extern "C" void nx_eth_factory_register_write(volatile uint32_t* address,
 #ifdef NX_ETH_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
+NVIC_Type g_nx_eth_factory_nvic;
+}
+/** \brief A separately tested system supplies this cold admission result. */
+extern "C" nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t*) {
+    return s_ports->Preflight();
 }
 extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
     return NX_SUCCESS;
@@ -115,6 +122,13 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* port, uint8_t pin,
     return result;
 }
 #else
+extern "C" {
+NVIC_Type g_gd32_model_nvic;
+}
+/** \brief Model only the external SoC's read-only preflight port. */
+extern "C" nx_result_t nx_gd32_soc_preflight(void) {
+    return s_ports->Preflight();
+}
 extern "C" int nx_gd32_soc_start(void) {
     return s_ports->Start();
 }
@@ -248,6 +262,8 @@ class EthernetFactory : public testing::Test {
     }
     void SetUp() override {
         s_ports = &ports;
+        ON_CALL(ports, Preflight()).WillByDefault(Return(NX_SUCCESS));
+        std::memset(NVIC, 0, sizeof(*NVIC));
         s_now = 100U;
         s_hold_reset = s_hold_engine = s_hold_restore = false;
         s_hold_clock = s_hold_mux = false;
@@ -358,6 +374,25 @@ TEST_F(EthernetFactory, PairedCapabilitiesDescribeBusMasterAndPollingMdio) {
     EXPECT_EQ(4U, eth->buffer_alignment);
     EXPECT_EQ(NX_FACTORY_CAP_POLLING, mdio->features);
 }
+TEST_F(EthernetFactory,
+       BasePreflightRejectsBeforeClockPinAndControllerEffects) {
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_CALL(ports, Preflight()).WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_CALL(ports, Start()).Times(0);
+    EXPECT_CALL(ports, Stop()).Times(0);
+    EXPECT_CALL(ports, Clock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    EXPECT_CALL(ports, Interrupt(_)).Times(0);
+    EXPECT_CALL(ports, Memory(_, _, _, _, _, _)).Times(0);
+    const nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+    testing::Mock::VerifyAndClearExpectations(&ports);
+}
 TEST_F(EthernetFactory, RefusedMacClockWithdrawalRetainsPlatformUntilReadback) {
     Start();
     s_hold_clock = true;
@@ -380,12 +415,33 @@ TEST_F(EthernetFactory,
     EXPECT_EQ(NX_SUCCESS, Stop());
     EXPECT_EQ(0U, mux() & 0x00800000U);
 }
-TEST_F(EthernetFactory, ForeignMacClockAndRmiiSelectionSurviveOwnedShutdown) {
+TEST_F(EthernetFactory, ForeignMacClockRejectsWithoutAnyEffects) {
     ahb() |= 0x02000000U;
+    mux() |= 0x00800000U;
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_CALL(ports, Preflight()).WillOnce(Return(NX_SUCCESS));
+    EXPECT_CALL(ports, Start()).Times(0);
+    EXPECT_CALL(ports, Stop()).Times(0);
+    EXPECT_CALL(ports, Clock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    EXPECT_CALL(ports, Interrupt(_)).Times(0);
+    EXPECT_CALL(ports, Memory(_, _, _, _, _, _)).Times(0);
+    const nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+    EXPECT_EQ(0x02000000U, ahb() & 0x0e000000U);
+    EXPECT_EQ(0x00800000U, mux() & 0x00800000U);
+    testing::Mock::VerifyAndClearExpectations(&ports);
+}
+TEST_F(EthernetFactory, ExistingRmiiSelectionSurvivesOwnedShutdown) {
     mux() |= 0x00800000U;
     Start();
     EXPECT_EQ(NX_SUCCESS, Stop());
-    EXPECT_EQ(0x02000000U, ahb() & 0x0e000000U);
+    EXPECT_EQ(0U, ahb() & 0x0e000000U);
     EXPECT_EQ(0x00800000U, mux() & 0x00800000U);
 }
 TEST_F(EthernetFactory, FailedPartialPinConfigurationRestoresAcquiredPads) {

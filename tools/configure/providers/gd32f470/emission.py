@@ -2,13 +2,14 @@
 from . import bindings
 from ..common import mode_traits
 try:
-    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers
+    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers, preflight
 except ImportError:
     import can
     import usb_device
     import ethernet
     import timer_advanced
     import secondary_controllers
+    import preflight
 
 
 def implementation(item):
@@ -33,7 +34,8 @@ def operations(item):
 def includes(result):
     selections = result.controllers
     source = []
-    source += ['#include "gd32f470_provider.h"', '#include "gd32f4xx.h"']
+    source += ['#include "gd32f470_provider.h"', '#include "gd32f4xx.h"',
+               '#include "system.h"']
     if any(item["kind"] == "uart" and item["mode"] == "dma-tx" for item in selections):
         source.append('#include "gd32f470_dma.h"')
     if any(item["kind"] == "spi" and item["mode"] == "dma-full-duplex" for item in selections):
@@ -106,8 +108,30 @@ def state_declarations(result):
 
 
 def shared_irqs(result):
-    del result
-    return []
+    selected = sorted((item for item in result.controllers
+                       if item.kind == "exti"),
+                      key=lambda item: int(item["pins"][0]["pin"][2:]))
+    if not selected:
+        return []
+    pointers = ", ".join("&s_nx_port_" + item.id.replace("-", "_")
+                         for item in selected)
+    source = ["static nx_gd32_exti_state_t* const s_nx_exti_ports[] = {",
+              "    " + pointers, "};",
+              "static const nx_gd32_exti_domain_t s_nx_exti_domain = "
+              f"{{ s_nx_exti_ports, {len(selected)}u }};"]
+    vectors = {}
+    for item in selected:
+        line = int(item["pins"][0]["pin"][2:])
+        vector = (f"EXTI{line}" if line < 5 else
+                  "EXTI5_9" if line < 10 else "EXTI10_15")
+        vectors[vector] = vectors.get(vector, 0) | (1 << line)
+    for vector, mask in vectors.items():
+        source += [f"void {vector}_IRQHandler(void);",
+                   r"/** \brief Dispatch only exact selected EXTI domain members. */",
+                   f"void {vector}_IRQHandler(void) {{",
+                   f"    nx_gd32_exti_dispatch(&s_nx_exti_domain, {mask}u);",
+                   "}"]
+    return source
 
 
 def stop_system(result):
@@ -132,7 +156,7 @@ def stop_system(result):
 
 def start_system(result):
     dma_clock = has_dma(result)
-    source = []
+    source = preflight.emit(result)
     if result.get("can_domain") is not None:
         source.append("    s_nx_can_gpio_clocks_added = 0u;")
     if dma_clock:

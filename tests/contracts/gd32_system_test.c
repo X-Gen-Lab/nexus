@@ -42,6 +42,10 @@ void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
 bool nx_arch_in_isr(void) {
     return g_gd32_model_isr;
 }
+/** \brief Supply a privileged owner at the external CPU boundary. */
+bool nx_arch_is_privileged(void) {
+    return true;
+}
 
 /** \brief           Query the injected incoming CPU mask. */
 bool nx_arch_irq_is_masked(void) {
@@ -85,9 +89,13 @@ void nx_gd32_model_clock_poll(void) {
     }
     if ((PMU_CTL & PMU_CTL_HDEN) != 0u && s_fault != 4u) {
         PMU_CS |= PMU_CS_HDRF;
+    } else if ((PMU_CTL & PMU_CTL_HDEN) == 0u) {
+        PMU_CS &= ~(uint32_t)PMU_CS_HDRF;
     }
     if ((PMU_CTL & PMU_CTL_HDS) != 0u && s_fault != 5u) {
         PMU_CS |= PMU_CS_HDSRF;
+    } else if ((PMU_CTL & PMU_CTL_HDS) == 0u) {
+        PMU_CS &= ~(uint32_t)PMU_CS_HDSRF;
     }
     if ((RCU_CFG0 & RCU_CFG0_SCS) == RCU_CKSYSSRC_PLLP && s_fault != 3u) {
         RCU_CFG0 = (RCU_CFG0 & ~(uint32_t)RCU_CFG0_SCSS) | RCU_SCSS_PLLP;

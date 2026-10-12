@@ -18,8 +18,20 @@
  */
 int nx_gd32_soc_start(void);
 /**
+ * \brief           Read-only reset-like clock and reserved timer admission.
+ * \return          SUCCESS or CONTEXT/BUSY before any global clock writes.
+ * \note            No external IO, scheduler or DMA owners may be live. GPIO
+ *                  and selected extra-memory gates are not controller owners.
+ *                  Unknown running profiles and bootloader handoff are
+ * rejected.
+ */
+nx_result_t nx_gd32_soc_preflight(void);
+/**
  * \brief           Stop after external IO owners and interrupts are quiescent.
  * \return          Zero when clocks are released; negative if effects remain.
+ * \note            A running scheduler is unsupported. The defensive SysTick
+ *                  CTRL read clears COUNTFLAG; it does not promise a strict
+ *                  no-effect rejection for a violated consumer-join contract.
  */
 int nx_gd32_soc_stop(void);
 /**
@@ -27,8 +39,14 @@ int nx_gd32_soc_stop(void);
  *
  * \return          Microseconds in the fixed boot clock domain.
  *
- * \note            Overflow IRQ must run at least once per 2^32 us.
- *                  Clock changes and suspend are unsupported.
+ * \note            Privileged task/configurable IRQ only, never NMI/HardFault.
+ *                  Returns zero before successful start, after failed start or
+ *                  after timebase withdrawal. Zero does not prove readiness;
+ *                  the caller observes successful platform startup first.
+ *                  Overflow IRQ must run at least once per 2^32 us.
+ *                  Stop/restart creates a new epoch; outstanding deadlines and
+ *                  borrowers must already be joined before clock withdrawal.
+ *                  Clock changes and deep suspend are unsupported.
  */
 uint64_t nx_gd32_now_us(void);
 /**
@@ -68,9 +86,22 @@ static inline void nx_gd32_peripheral_barrier(void) {
     nx_arch_isb();
 }
 
+/**
+ * \brief           Check the reset-like IRC16M bootstrap without writes.
+ * \return          SUCCESS or CONTEXT/BUSY for unavailable clock ownership.
+ * \note            Requires unused PLL/HXTAL, default bus dividers and idle
+ * FMC.
+ */
+nx_result_t nx_gd32_clock_preflight(void);
 /** \brief Configure the fixed 25 MHz crystal profile; task startup only. */
 int nx_gd32_clock_start(void);
-/** \brief Return to the safe IRC16M profile; failures retain clock effects. */
+/**
+ * \brief           Return to IRC16M then restore acquired PLL/Flash/PMU fields.
+ * \return          Zero only after owned fields/gates are restored and
+ * observed. \note            Unrelated PMU fields and pre-existing interface
+ * clocks are preserved. Failed source switching retains the live PLL; failed
+ * restoration retains cleanup responsibility.
+ */
 int nx_gd32_clock_stop(void);
 /** \brief Fixed TIMER1 overflow vector; owned solely by the monotonic clock. */
 void TIMER1_IRQHandler(void);

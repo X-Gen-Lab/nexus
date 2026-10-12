@@ -15,6 +15,7 @@ CPU_FEATURES = MappingProxyType({
 })
 PREFIX = 'stm32'
 MODEL = False
+FACT_REFERENCES = "references.json"
 ETH_CONTROLLER = 'ETH'
 USB_CONTROLLER = 'OTG_FS'
 CAN_CONTROLLERS = ('CAN1', 'CAN2')

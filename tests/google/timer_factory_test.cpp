@@ -28,6 +28,7 @@ void TIMER0_BRK_TIMER8_IRQHandler(void);
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <vector>
 
 #ifdef NX_TIMER_FACTORY_STM32
 #define CAP_CR1     TIM4->CR1
@@ -76,6 +77,7 @@ using testing::NiceMock;
 using testing::Return;
 class TimerAssemblyPorts {
   public:
+    MOCK_METHOD(nx_result_t, Preflight, ());
     MOCK_METHOD(int, Start, ());
     MOCK_METHOD(int, Stop, ());
     MOCK_METHOD(nx_result_t, Clock, (unsigned));
@@ -207,6 +209,10 @@ extern "C" bool nx_timer_factory_is_privileged(void) {
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
 }
+/** \brief Observe only the independently tested system admission boundary. */
+extern "C" nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t*) {
+    return s_ports->Preflight();
+}
 extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
     return NX_SUCCESS;
 }
@@ -241,6 +247,10 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* port, uint8_t pin,
     return configure_pin(port_index(port), pin, mode, af, pull, drain);
 }
 #else
+/** \brief Keep generated admission observable without simulating clocks. */
+extern "C" nx_result_t nx_gd32_soc_preflight(void) {
+    return s_ports->Preflight();
+}
 extern "C" int nx_gd32_soc_start(void) {
     return s_ports->Start();
 }
@@ -296,6 +306,7 @@ class TimerFactory : public testing::Test {
                  MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(mapping, reinterpret_cast<void*>(UINT32_C(0x40000000)));
         ON_CALL(ports, Start()).WillByDefault(Return(0));
+        ON_CALL(ports, Preflight()).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(ports, Stop()).WillByDefault(Return(0));
         ON_CALL(ports, Clock(_)).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(ports, Configure(_, _, _)).WillByDefault(Return(NX_SUCCESS));
@@ -336,6 +347,23 @@ class TimerFactory : public testing::Test {
     }
 };
 
+TEST_F(TimerFactory, BasePreflightRejectsBeforeClockPinAndControllerEffects) {
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x30000U);
+    EXPECT_CALL(ports, Preflight()).WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_CALL(ports, Start()).Times(0);
+    EXPECT_CALL(ports, Stop()).Times(0);
+    EXPECT_CALL(ports, Clock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _)).Times(0);
+    const nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x30000U));
+    EXPECT_EQ(0U, s_writes);
+    testing::Mock::VerifyAndClearExpectations(&ports);
+}
 TEST_F(TimerFactory, LookupIsPureBeforeAnyClockOrPinEffects) {
     EXPECT_EQ(s_writes, 0U);
     EXPECT_EQ(capture->config, nullptr);
@@ -571,15 +599,32 @@ TEST_F(TimerFactory, RefusedOwnedClockReleaseRetainsStopAndPreventsRestart) {
     s_refused = nullptr;
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
 }
-TEST_F(TimerFactory, PreexistingClockAndUnrelatedGpioFieldsArePreserved) {
-    CAP_GATE |= 4U;
-    ADV_GATE |= 1U;
+TEST_F(TimerFactory, ForeignExclusiveTimerGatesRejectWithoutEffects) {
+    for (bool capture_gate : {true, false}) {
+        CAP_GATE = capture_gate ? 4U : 0U;
+        ADV_GATE = capture_gate ? 0U : 1U;
+        GPIO_GATE |= 3U;
+        gpio(0U, 0U) = 1U << 26U;
+        const auto* bytes = static_cast<const uint8_t*>(mapping);
+        const std::vector<uint8_t> before(bytes, bytes + 0x30000U);
+        const NVIC_Type before_nvic = g_nx_timer_factory_nvic;
+        EXPECT_CALL(ports, Start()).Times(0);
+        EXPECT_CALL(ports, Clock(_)).Times(0);
+        EXPECT_CALL(ports, Configure(_, _, _)).Times(0);
+        EXPECT_EQ(nx_platform_start().primary, NX_ERROR_BUSY);
+        EXPECT_EQ(std::memcmp(bytes, before.data(), before.size()), 0);
+        EXPECT_EQ(std::memcmp(&g_nx_timer_factory_nvic, &before_nvic,
+                              sizeof(before_nvic)),
+                  0);
+        EXPECT_EQ(s_writes, 0U);
+        EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&ports));
+    }
+}
+TEST_F(TimerFactory, SharedGpioClockAndUnrelatedFieldsArePreserved) {
     GPIO_GATE |= 3U;
     gpio(0U, 0U) = 1U << 26U;
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
     ASSERT_EQ(nx_platform_stop(), NX_SUCCESS);
-    EXPECT_NE(CAP_GATE & 4U, 0U);
-    EXPECT_NE(ADV_GATE & 1U, 0U);
     EXPECT_EQ(GPIO_GATE & 3U, 3U);
     EXPECT_EQ(gpio(0U, 0U) & (3U << 26U), 1U << 26U);
 }

@@ -36,6 +36,8 @@ typedef struct {
     bool unsafe_order;
     volatile uint32_t* ignore_write;
     bool irq_enabled[102];
+    bool irq_pending[102];
+    bool irq_active[102];
     uint8_t priority[102];
     uint8_t group;
     uint16_t flash_kib;
@@ -59,11 +61,13 @@ void nx_g474_model_boost_delay(void* system);
 nx_result_t nx_g474_model_irq_control(int irq, bool enabled, uint8_t priority);
 nx_arch_irq_state_t nx_g474_model_irq_save(void);
 void nx_g474_model_irq_restore(nx_arch_irq_state_t previous);
-#define nx_arch_irq_save()          nx_g474_model_irq_save()
-#define nx_arch_irq_restore(saved)  nx_g474_model_irq_restore(saved)
-#define nx_arch_is_privileged()     nx_g474_model_privileged()
-#define NX_G474_MODEL               1
-#define NX_G474_IRQ_AVAILABLE(irq)  (!g_g474_model.irq_enabled[(irq)])
+#define nx_arch_irq_save()         nx_g474_model_irq_save()
+#define nx_arch_irq_restore(saved) nx_g474_model_irq_restore(saved)
+#define nx_arch_is_privileged()    nx_g474_model_privileged()
+#define NX_G474_MODEL              1
+#define NX_G474_IRQ_AVAILABLE(irq)                                             \
+    (!g_g474_model.irq_enabled[(irq)] && !g_g474_model.irq_pending[(irq)] &&   \
+     !g_g474_model.irq_active[(irq)])
 #define NX_G474_GPIOA               (&g_g474_model.gpio)
 #define NX_G474_READ(reg)           nx_g474_model_read(reg)
 #define NX_G474_WRITE(reg, value)   nx_g474_model_write((reg), (value))

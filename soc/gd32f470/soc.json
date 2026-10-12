@@ -771,5 +771,6 @@
     ],
     "filter_banks": 28
   },
-  "source_lock": "vendors/gigadevice/gd32f4xx/source.lock.json"
+  "source_lock": "vendors/gigadevice/gd32f4xx/source.lock.json",
+  "references": "references.json"
 }

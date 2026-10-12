@@ -21,9 +21,11 @@ extern "C" {
 #endif
 }
 #include <array>
+#include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <vector>
 
 using testing::_;
 using testing::NiceMock;
@@ -31,6 +33,7 @@ using testing::Return;
 
 class UsbAssemblyPorts {
   public:
+    MOCK_METHOD(nx_result_t, Preflight, ());
     MOCK_METHOD(int, Start, ());
     MOCK_METHOD(int, Stop, ());
     MOCK_METHOD(nx_result_t, EnableClock, (unsigned));
@@ -58,6 +61,12 @@ extern "C" void nx_usb_factory_register_write(volatile uint32_t* address,
 #ifdef NX_USB_FACTORY_STM32
 extern "C" {
 nx_stm32_system_t g_nx_stm32_system;
+NVIC_Type g_nx_usb_factory_nvic;
+}
+/** \brief Observe the external cold system admission, not its implementation.
+ */
+extern "C" nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t*) {
+    return s_ports->Preflight();
 }
 extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
     return NX_SUCCESS;
@@ -95,6 +104,13 @@ extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef*, uint8_t pin,
     return result;
 }
 #else
+extern "C" {
+NVIC_Type g_gd32_model_nvic;
+}
+/** \brief A separately tested SoC supplies this read-only admission result. */
+extern "C" nx_result_t nx_gd32_soc_preflight(void) {
+    return s_ports->Preflight();
+}
 extern "C" int nx_gd32_soc_start(void) {
     return s_ports->Start();
 }
@@ -166,6 +182,8 @@ class UsbFactory : public testing::Test {
 
     void SetUp() override {
         s_ports = &ports;
+        ON_CALL(ports, Preflight()).WillByDefault(Return(NX_SUCCESS));
+        std::memset(NVIC, 0, sizeof(*NVIC));
         s_hold_restore = s_hold_clock_stop = s_hold_gpio_stop = false;
         s_pins.fill(0x123U);
         ON_CALL(ports, EnableClock(_)).WillByDefault(Return(NX_SUCCESS));
@@ -227,6 +245,25 @@ class UsbFactory : public testing::Test {
     }
 };
 
+TEST_F(UsbFactory, BasePreflightRejectsBeforeClockPinAndControllerEffects) {
+    const auto* bytes = static_cast<const uint8_t*>(clocks);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_CALL(ports, Preflight()).WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_CALL(ports, Start()).Times(0);
+    EXPECT_CALL(ports, Stop()).Times(0);
+    EXPECT_CALL(ports, EnableClock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
+    EXPECT_CALL(ports, Capture(_, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    const nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
+    EXPECT_FALSE(state->snapshot.started);
+    EXPECT_FALSE(state->clock_retained);
+    testing::Mock::VerifyAndClearExpectations(&ports);
+}
 TEST_F(UsbFactory, PureFactoryDoesNotStartAndControllerIsNotAnEndpoint) {
     EXPECT_CALL(ports, Start()).Times(0);
     EXPECT_EQ(nx_factory_usb_device(NX_USB_DEVICE_ID_FS), face);

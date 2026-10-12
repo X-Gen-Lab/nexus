@@ -2,8 +2,18 @@
 
 This package implements fixed typed C ports for **STM32F407VET6** (LQFP100,
 512 KiB Flash) and **STM32F407ZGT6** (LQFP144, 1 MiB Flash). Main SRAM is
-128 KiB; the separate 64 KiB CCM domain is described but excluded from the
-initial linker and DMA policy. No product Flash partition is reserved.
+128 KiB; the separate 64 KiB CPU-only CCM domain is selected explicitly with
+`[memory.regions.ccm]`. `NX_MEMORY_CCM_DATA`, `NX_MEMORY_CCM_BSS` and
+`NX_MEMORY_CCM_NOINIT` use the generated linker and startup initialization plan;
+`NEXUS_MEMORY_CCM` exposes the selected domain. Default assemblies do not add
+CCM initialization storage or placement. CCM remains excluded from every DMA
+domain. No product Flash partition is reserved.
+
+The pre-main-RAM startup enables and observes the selected CCM clock, then
+validates the complete generated initialization plan before its first write.
+It uses Flash constants and the cold local stack without libc/global/heap
+dependencies. `.noinit` means no startup copy/clear, not measured physical
+retention through reset or loss of supply.
 
 `system.c` establishes the reviewed 8 MHz HSE / 168 MHz PLL profile, APB1
 42 MHz and APB2 84 MHz. Reserved TIM2 runs at 1 MHz, with an overflow IRQ to

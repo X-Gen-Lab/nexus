@@ -135,3 +135,36 @@ TEST_F(G474System, PowerSnapshotsRequireObservedInterfaceClock) {
     EXPECT_EQ(power, g_g474_model.power.CR1);
     EXPECT_EQ(boost, g_g474_model.power.CR5);
 }
+
+TEST_F(G474System, BusyFlashRejectsBeforeClockOrLatencyWrites) {
+    g_g474_model.flash.SR = FLASH_SR_BSY;
+    auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8);
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(0U, g_g474_model.writes);
+    EXPECT_EQ(0U, g_nx_stm32g474_system.remaining_effects);
+}
+
+TEST_F(G474System, FailedWithdrawalRetainsOwnerButDoesNotExposeLiveTime) {
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32g474_system_start(&g_nx_stm32g474_system, 8).primary);
+    g_g474_model.timer.CNT = 13U;
+    g_g474_model.hold_irq_off = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
+    EXPECT_NE(0U, g_nx_stm32g474_system.remaining_effects);
+    EXPECT_EQ(0U, nx_stm32g474_system_now(&g_nx_stm32g474_system));
+    g_g474_model.hold_irq_off = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
+}
+
+TEST_F(G474System, RetainedOverflowIrqStillAcknowledgesItsOwnedLevelSource) {
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32g474_system_start(&g_nx_stm32g474_system, 8).primary);
+    g_g474_model.hold_irq_off = true;
+    ASSERT_EQ(NX_ERROR_IO, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
+    g_g474_model.timer.SR = TIM_SR_UIF;
+    nx_stm32g474_system_timer_irq(&g_nx_stm32g474_system);
+    EXPECT_EQ(0U, g_g474_model.timer.SR & TIM_SR_UIF);
+    EXPECT_EQ(0U, nx_stm32g474_system_now(&g_nx_stm32g474_system));
+    g_g474_model.hold_irq_off = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
+}

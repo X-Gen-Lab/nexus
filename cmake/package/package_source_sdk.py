@@ -228,6 +228,8 @@ for _family in ("stm32f407", "gd32f470"):
         "can", "dma", "eth", "i2c_async", "lowpower", "provider", "sleep",
         "timer_advanced", "uart_receive", "usb_clock", "usb_device"))
 REQUIRED_FILES += (
+    "tools/configure/fact_references.py", "tools/configure/preflight.py",
+    "soc/stm32f407/references.json", "soc/gd32f470/references.json",
     "soc/stm32f407/private/stm32f407_system.h",
     "soc/stm32f407/private/stm32f407_stream.h",
     "soc/gd32f470/timebase.c", "soc/gd32f470/private/system.h",

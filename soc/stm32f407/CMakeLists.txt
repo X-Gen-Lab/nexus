@@ -90,7 +90,11 @@ set(NEXUS_SYSTEM_PRIVATE_INCLUDES
     "${CMAKE_CURRENT_SOURCE_DIR}/private" "${stm32_device}/Include"
     "${stm32_cmsis}" PARENT_SCOPE)
 set(NEXUS_SYSTEM_COMPILE_DEFINITIONS STM32F407xx PARENT_SCOPE)
-set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c" PARENT_SCOPE)
+set(stm32_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/system.c")
+if(NEXUS_MEMORY_CCM)
+    list(APPEND stm32_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/memory_init.c")
+endif()
+set(NEXUS_SYSTEM_SOURCE ${stm32_system_sources} PARENT_SCOPE)
 
 # Fixed clock profile sleep is an explicitly selected caller-owned component.
 function(nexus_add_stm32f407_sleep target)

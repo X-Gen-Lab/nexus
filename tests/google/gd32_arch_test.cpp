@@ -29,10 +29,12 @@ class GD32Boundary {
     MOCK_METHOD(void, Restore, (uint32_t));
     MOCK_METHOD(bool, InISR, ());
     MOCK_METHOD(bool, Masked, ());
+    MOCK_METHOD(bool, Privileged, ());
     MOCK_METHOD(void, CompleteWrites, ());
     MOCK_METHOD(void, SynchronizeInstructions, ());
     MOCK_METHOD(int, ClockStart, ());
     MOCK_METHOD(int, ClockStop, ());
+    MOCK_METHOD(nx_result_t, ClockPreflight, ());
 };
 GD32Boundary* s_boundary;
 } /* namespace */
@@ -57,6 +59,11 @@ extern "C" bool nx_arch_irq_is_masked(void) {
     return s_boundary->Masked();
 }
 
+/** \brief Privilege admission is supplied by the selected Arch boundary. */
+extern "C" bool nx_arch_is_privileged(void) {
+    return s_boundary->Privileged();
+}
+
 /** \brief CPU completion ordering remains distinct from peripheral readback. */
 extern "C" void nx_arch_dsb(void) {
     s_boundary->CompleteWrites();
@@ -75,6 +82,11 @@ extern "C" int nx_gd32_clock_start(void) {
 /** \brief Clock release is a separate SoC boundary. */
 extern "C" int nx_gd32_clock_stop(void) {
     return s_boundary->ClockStop();
+}
+
+/** \brief Cold clock inspection is separate from acquiring clock effects. */
+extern "C" nx_result_t nx_gd32_clock_preflight(void) {
+    return s_boundary->ClockPreflight();
 }
 
 /** \brief Model only the selected clock-enable register effect. */
@@ -125,6 +137,12 @@ class GD32Arch : public ::testing::Test {
         g_gd32_model_mask = 0U;
         g_gd32_model_isr = false;
         s_boundary = &boundary;
+        EXPECT_CALL(boundary, Privileged())
+            .Times(::testing::AnyNumber())
+            .WillRepeatedly(::testing::Return(true));
+        EXPECT_CALL(boundary, ClockPreflight())
+            .Times(::testing::AnyNumber())
+            .WillRepeatedly(::testing::Return(NX_SUCCESS));
     }
 
     void TearDown() override {
@@ -206,10 +224,27 @@ TEST_F(GD32Arch, StopRejectsArchMaskBeforeReleasingSoCResources) {
 }
 
 TEST_F(GD32Arch, PendingWrapSamplingPreservesFlagUntilTheOwnedHandler) {
+    EXPECT_CALL(boundary, InISR())
+        .Times(2)
+        .WillRepeatedly(::testing::Return(false));
+    EXPECT_CALL(boundary, Masked())
+        .Times(2)
+        .WillRepeatedly(::testing::Return(false));
+    EXPECT_CALL(boundary, ClockPreflight())
+        .WillOnce(::testing::Return(NX_SUCCESS));
+    EXPECT_CALL(boundary, ClockStart()).WillOnce(::testing::Return(0));
+    EXPECT_CALL(boundary, ClockStop()).WillOnce(::testing::Return(0));
+    EXPECT_CALL(boundary, CompleteWrites()).Times(2);
+    EXPECT_CALL(boundary, SynchronizeInstructions()).Times(2);
     EXPECT_CALL(boundary, Save())
         .Times(5)
         .WillRepeatedly(::testing::Return(nx_arch_irq_state_t{1U}));
     EXPECT_CALL(boundary, Restore(1U)).Times(5);
+    /* Sampling and IRQ extension require a real acquired timer epoch. The
+     * dormant domain never reads a stale counter or enters a critical section.
+     */
+    EXPECT_EQ(nx_gd32_now_us(), 0U);
+    ASSERT_EQ(nx_gd32_soc_start(), 0);
     TIMER_CNT(TIMER1) = 7U;
     TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
     const uint64_t expected = (UINT64_C(1) << 32U) + 7U;
@@ -221,4 +256,6 @@ TEST_F(GD32Arch, PendingWrapSamplingPreservesFlagUntilTheOwnedHandler) {
     TIMER1_IRQHandler();
     EXPECT_EQ(nx_gd32_now_us(), expected);
     EXPECT_EQ(g_gd32_model_mask, 0U);
+    ASSERT_EQ(nx_gd32_soc_stop(), 0);
+    EXPECT_EQ(nx_gd32_now_us(), 0U);
 }
