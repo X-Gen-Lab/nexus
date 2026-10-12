@@ -8,6 +8,7 @@
  */
 extern "C" {
 #include "gd32f4xx.h"
+#include "nexus/core/fault.h"
 #include "private/system.h"
 }
 #include <cstring>
@@ -29,12 +30,19 @@ class ClockPort {
     MOCK_METHOD(int, Stop, ());
     MOCK_METHOD(nx_result_t, Preflight, ());
     MOCK_METHOD(void, TimerWrite, (volatile uint32_t * reg, uint32_t value));
+    MOCK_METHOD(void, DisableIrq, (unsigned irq));
+    MOCK_METHOD(void, Observe,
+                (nx_fault_domain_t domain, nx_result_t reason, const char* file,
+                 unsigned line));
 };
+struct ParkSignal {};
 ClockPort* clock_port;
 bool hold_timer_count;
 bool hold_timer_update_clear;
 bool hold_timer_gate_drop;
 bool update_observed;
+bool hold_irq_disable;
+void (*before_save)(void);
 
 class Gd32Timebase : public testing::Test {
     void* registers = MAP_FAILED;
@@ -59,10 +67,26 @@ class Gd32Timebase : public testing::Test {
         hold_timer_update_clear = false;
         hold_timer_gate_drop = false;
         update_observed = false;
+        hold_irq_disable = false;
+        before_save = nullptr;
         ON_CALL(clock_mock, Start()).WillByDefault(testing::Return(0));
         ON_CALL(clock_mock, Stop()).WillByDefault(testing::Return(0));
         ON_CALL(clock_mock, Preflight())
             .WillByDefault(testing::Return(NX_SUCCESS));
+        EXPECT_CALL(clock_mock, DisableIrq(testing::_))
+            .Times(testing::AnyNumber());
+        ON_CALL(clock_mock, DisableIrq(testing::_))
+            .WillByDefault([](unsigned irq) {
+                if (!hold_irq_disable)
+                    NVIC->ISER[irq / 32U] &= ~(UINT32_C(1) << (irq % 32U));
+            });
+        EXPECT_CALL(clock_mock,
+                    Observe(testing::_, testing::_, testing::_, testing::_))
+            .Times(0);
+        ON_CALL(clock_mock,
+                Observe(testing::_, testing::_, testing::_, testing::_))
+            .WillByDefault([](nx_fault_domain_t, nx_result_t, const char*,
+                              unsigned) { throw ParkSignal{}; });
         EXPECT_CALL(clock_mock, TimerWrite(testing::_, testing::_))
             .Times(testing::AnyNumber());
         ON_CALL(clock_mock, TimerWrite(testing::_, testing::_))
@@ -88,6 +112,8 @@ class Gd32Timebase : public testing::Test {
         hold_timer_count = false;
         hold_timer_update_clear = false;
         hold_timer_gate_drop = false;
+        hold_irq_disable = false;
+        before_save = nullptr;
         g_gd32_model_nvic = {};
         g_gd32_model_scb = {};
         g_gd32_model_systick = {};
@@ -219,6 +245,162 @@ TEST_F(Gd32Timebase, RestartCreatesAnIndependentZeroEpoch) {
     EXPECT_EQ(3U, nx_gd32_now_us());
 }
 
+TEST_F(Gd32Timebase, RuntimeAckFailureEndsTimeUntilObservedStopAndRestart) {
+    ASSERT_EQ(0, nx_gd32_soc_start());
+    EXPECT_EQ(NX_SUCCESS, nx_gd32_timebase_error());
+    TIMER_CNT(TIMER1) = 59U;
+    TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
+    EXPECT_CALL(clock_mock,
+                TimerWrite(&TIMER_INTF(TIMER1), ~(uint32_t)TIMER_INTF_UPIF))
+        .WillOnce([](volatile uint32_t*, uint32_t) {});
+    EXPECT_CALL(clock_mock, TimerWrite(&TIMER_DMAINTEN(TIMER1), 0U)).Times(1);
+    EXPECT_CALL(clock_mock, TimerWrite(&TIMER_CTL0(TIMER1), 0U)).Times(1);
+    EXPECT_CALL(clock_mock, DisableIrq((unsigned)TIMER1_IRQn)).Times(1);
+    g_gd32_model_isr = true;
+    TIMER1_IRQHandler();
+    g_gd32_model_isr = false;
+    EXPECT_EQ(0U, nx_gd32_now_us());
+    EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
+    EXPECT_EQ(0U, TIMER_DMAINTEN(TIMER1));
+    EXPECT_EQ(0U, TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN);
+    uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32U);
+    EXPECT_EQ(0U, NVIC->ISER[(uint32_t)TIMER1_IRQn / 32U] & bit);
+    EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+    EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&clock_mock));
+    ASSERT_EQ(0, nx_gd32_soc_stop());
+    EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
+    EXPECT_EQ(NX_SUCCESS, nx_gd32_soc_preflight());
+    ASSERT_EQ(0, nx_gd32_soc_start());
+    EXPECT_EQ(NX_SUCCESS, nx_gd32_timebase_error());
+    TIMER_CNT(TIMER1) = 3U;
+    EXPECT_EQ(3U, nx_gd32_now_us());
+}
+
+TEST_F(Gd32Timebase, UnisolatedAckFailureObservesFaultWithMasksAndOwnersHeld) {
+    for (bool refuse_irq : {false, true}) {
+        SCOPED_TRACE(refuse_irq ? "NVIC disable refused" : "DIER zero refused");
+        ASSERT_EQ(0, nx_gd32_soc_start());
+        TIMER_CNT(TIMER1) = 61U;
+        TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
+        EXPECT_CALL(clock_mock,
+                    TimerWrite(&TIMER_INTF(TIMER1), ~(uint32_t)TIMER_INTF_UPIF))
+            .WillOnce([](volatile uint32_t*, uint32_t) {});
+        hold_irq_disable = refuse_irq;
+        if (!refuse_irq) {
+            EXPECT_CALL(clock_mock, TimerWrite(&TIMER_DMAINTEN(TIMER1), 0U))
+                .WillOnce([](volatile uint32_t*, uint32_t) {});
+        } else {
+            EXPECT_CALL(clock_mock, TimerWrite(&TIMER_DMAINTEN(TIMER1), 0U))
+                .Times(1);
+        }
+        EXPECT_CALL(clock_mock, TimerWrite(&TIMER_CTL0(TIMER1), 0U)).Times(1);
+        EXPECT_CALL(clock_mock, DisableIrq((unsigned)TIMER1_IRQn)).Times(1);
+        EXPECT_CALL(clock_mock, Observe(NX_FAULT_PLATFORM, NX_ERROR_IO,
+                                        testing::_, testing::_))
+            .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
+                         unsigned line) {
+                EXPECT_EQ(1U, g_gd32_model_mask);
+                EXPECT_TRUE(g_gd32_model_isr);
+                EXPECT_NE(nullptr, file);
+                EXPECT_GT(line, 0U);
+                EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
+                EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+                throw ParkSignal{};
+            });
+        g_gd32_model_isr = true;
+        EXPECT_THROW(TIMER1_IRQHandler(), ParkSignal);
+        EXPECT_EQ(1U, g_gd32_model_mask);
+        EXPECT_EQ(0U, nx_gd32_now_us());
+        EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
+        EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&clock_mock));
+        g_gd32_model_isr = false;
+        g_gd32_model_mask = 0U;
+        hold_irq_disable = false;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+        ASSERT_EQ(0, nx_gd32_soc_stop());
+        EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
+        EXPECT_EQ(NX_SUCCESS, nx_gd32_soc_preflight());
+    }
+}
+
+TEST_F(Gd32Timebase, RefusedCounterIsolationRetainsTerminalOwnership) {
+    ASSERT_EQ(0, nx_gd32_soc_start());
+    TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
+    EXPECT_CALL(clock_mock,
+                TimerWrite(&TIMER_INTF(TIMER1), ~(uint32_t)TIMER_INTF_UPIF))
+        .WillOnce([](volatile uint32_t*, uint32_t) {});
+    EXPECT_CALL(clock_mock, TimerWrite(&TIMER_DMAINTEN(TIMER1), 0U)).Times(1);
+    EXPECT_CALL(clock_mock, TimerWrite(&TIMER_CTL0(TIMER1), 0U))
+        .WillOnce([](volatile uint32_t*, uint32_t) {});
+    EXPECT_CALL(clock_mock, DisableIrq((unsigned)TIMER1_IRQn)).Times(1);
+    EXPECT_CALL(clock_mock,
+                Observe(NX_FAULT_PLATFORM, NX_ERROR_IO, testing::_, testing::_))
+        .WillOnce([](nx_fault_domain_t, nx_result_t, const char*, unsigned) {
+            EXPECT_EQ(1U, g_gd32_model_mask);
+            EXPECT_TRUE(g_gd32_model_isr);
+            throw ParkSignal{};
+        });
+    g_gd32_model_isr = true;
+    EXPECT_THROW(TIMER1_IRQHandler(), ParkSignal);
+    EXPECT_EQ(1U, g_gd32_model_mask);
+    EXPECT_EQ(0U, TIMER_DMAINTEN(TIMER1));
+    EXPECT_NE(0U, TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN);
+    uint32_t bank = (uint32_t)TIMER1_IRQn / 32U;
+    uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32U);
+    EXPECT_EQ(0U, NVIC->ISER[bank] & bit);
+    EXPECT_EQ(0U, nx_gd32_now_us());
+    EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
+    EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+}
+
+TEST_F(Gd32Timebase, AckFailureBeforeSnapshotMaskCannotPublishStaleTime) {
+    ASSERT_EQ(0, nx_gd32_soc_start());
+    TIMER_CNT(TIMER1) = 67U;
+    EXPECT_CALL(clock_mock,
+                TimerWrite(&TIMER_INTF(TIMER1), ~(uint32_t)TIMER_INTF_UPIF))
+        .WillOnce([](volatile uint32_t*, uint32_t) {});
+    before_save = [] {
+        EXPECT_EQ(0U, g_gd32_model_mask);
+        TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
+        g_gd32_model_isr = true;
+        TIMER1_IRQHandler();
+        g_gd32_model_isr = false;
+    };
+    EXPECT_EQ(0U, nx_gd32_now_us());
+    EXPECT_EQ(nullptr, before_save);
+    EXPECT_EQ(0U, g_gd32_model_mask);
+    EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+}
+
+TEST_F(Gd32Timebase, StaleReadsAfterAckFailurePreserveIncomingMasks) {
+    ASSERT_EQ(0, nx_gd32_soc_start());
+    TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
+    EXPECT_CALL(clock_mock,
+                TimerWrite(&TIMER_INTF(TIMER1), ~(uint32_t)TIMER_INTF_UPIF))
+        .WillOnce([](volatile uint32_t*, uint32_t) {});
+    g_gd32_model_isr = true;
+    TIMER1_IRQHandler();
+    g_gd32_model_isr = false;
+    for (uint32_t mask : {0U, 1U}) {
+        g_gd32_model_mask = mask;
+        TIMER_CNT(TIMER1) = 71U;
+        EXPECT_EQ(0U, nx_gd32_now_us());
+        EXPECT_EQ(mask, g_gd32_model_mask);
+    }
+    g_gd32_model_mask = 0U;
+    ASSERT_EQ(0, nx_gd32_soc_stop());
+    EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
+    for (uint32_t mask : {0U, 1U}) {
+        g_gd32_model_mask = mask;
+        TIMER_CNT(TIMER1) = 73U;
+        TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
+        EXPECT_EQ(0U, nx_gd32_now_us());
+        EXPECT_EQ(mask, g_gd32_model_mask);
+    }
+}
+
 TEST_F(Gd32Timebase, ForeignReservedTimerRejectsBeforeClockMutation) {
     TIMER_CTL0(TIMER1) = TIMER_CTL0_CEN;
     EXPECT_CALL(clock_mock, Start()).Times(0);
@@ -246,6 +428,11 @@ TEST_F(Gd32Timebase, SecondaryPollingControllersPreventClockWithdrawal) {
 
 /** \brief Save the incoming external CPU mask for a bounded snapshot. */
 extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {
+    if (g_gd32_model_mask == 0U && before_save != nullptr) {
+        void (*inject)(void) = before_save;
+        before_save = nullptr;
+        inject();
+    }
     nx_arch_irq_state_t previous = {g_gd32_model_mask};
     g_gd32_model_mask = 1U;
     return previous;
@@ -289,6 +476,15 @@ extern "C" nx_result_t nx_gd32_clock_preflight(void) {
 extern "C" void nx_gd32_timebase_model_write(volatile uint32_t* reg,
                                              uint32_t value) {
     clock_port->TimerWrite(reg, value);
+}
+/** \brief Model refused NVIC withdrawal through the external IRQ port. */
+extern "C" void nx_gd32_timebase_model_disable_irq(unsigned irq) {
+    clock_port->DisableIrq(irq);
+}
+/** \brief Observe terminal faults without mocking the production IRQ path. */
+extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
+                                 const char* file, unsigned line) {
+    clock_port->Observe(domain, reason, file, line);
 }
 /** \brief Decode the official SDK run-clock acquisition encoding. */
 extern "C" void rcu_periph_clock_enable(rcu_periph_enum peripheral) {

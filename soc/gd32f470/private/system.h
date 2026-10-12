@@ -41,7 +41,8 @@ int nx_gd32_soc_stop(void);
  *
  * \note            Privileged task/configurable IRQ only, never NMI/HardFault.
  *                  Returns zero before successful start, after failed start or
- *                  after timebase withdrawal. Zero does not prove readiness;
+ *                  after withdrawal or observed overflow-ACK failure. Zero
+ *                  does not prove readiness;
  *                  the caller observes successful platform startup first.
  *                  Overflow IRQ must run at least once per 2^32 us.
  *                  Stop/restart creates a new epoch; outstanding deadlines and
@@ -49,6 +50,20 @@ int nx_gd32_soc_stop(void);
  *                  Clock changes and deep suspend are unsupported.
  */
 uint64_t nx_gd32_now_us(void);
+/**
+ * \brief           Read the latched runtime overflow acknowledgement fault.
+ * \return          SUCCESS or IO, independent of startup readiness.
+ * \note            Stop preserves this diagnostic; a newly admitted start
+ *                  resets it independently of subsequent startup readiness.
+ *                  Failure invalidates old timestamps and deadlines, retains
+ *                  timer/clock ownership and attempts DIER/CEN/NVIC isolation
+ *                  once. Confirmed isolation permits ordinary task stop retry;
+ *                  optional low-power owners retain their busy/drain contract.
+ *                  Unconfirmed isolation keeps the IRQ mask, observes the
+ *                  terminal PLATFORM/IO fault and parks. No old deadline or
+ *                  elapsed-time continuity is recovered by stop/restart.
+ */
+nx_result_t nx_gd32_timebase_error(void);
 /**
  * \brief           Save and mask interrupts preserving the incoming PRIMASK.
  * \return          Incoming mask to restore with nx_gd32_critical_leave.

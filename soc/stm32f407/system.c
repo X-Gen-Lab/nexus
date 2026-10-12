@@ -6,6 +6,7 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/core/fault.h"
 #include "nexus/core/time.h"
 #include "nexus_config.h"
 #include "stm32f407_system.h"
@@ -94,6 +95,34 @@ static int timer_irq_control(IRQn_Type irq, bool enabled) {
 }
 #define NX_STM32_IRQ_CONTROL(irq, enabled) timer_irq_control(irq, enabled)
 #endif
+
+#ifndef NX_STM32_IRQ_ISOLATE
+/** \brief Isolate this active reserved handler, retaining its ownership. */
+static int timer_irq_isolate(IRQn_Type irq) {
+#ifndef NEXUS_STM32_MODEL
+    NVIC_DisableIRQ(irq);
+    NVIC_ClearPendingIRQ(irq);
+    nx_arch_dsb();
+    nx_arch_isb();
+    /* The caller is this vector: its own ACTIVE bit must remain set until
+     * exception return. Task withdrawal still requires ACTIVE to clear. */
+    if (NVIC_GetEnableIRQ(irq) != 0U || NVIC_GetPendingIRQ(irq) != 0U)
+        return -1;
+#else
+    (void)irq;
+#endif
+    return 0;
+}
+#define NX_STM32_IRQ_ISOLATE(irq) timer_irq_isolate(irq)
+#endif
+
+/** \brief Preserve masks and effects when an IRQ source cannot be isolated. */
+static _Noreturn void timer_park(void) {
+    (void)nx_arch_irq_save();
+    nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
+    for (;;) {
+    }
+}
 
 /** \brief A critical write is established only after a barrier and readback. */
 static bool write_checked(volatile uint32_t* reg, uint32_t value,
@@ -244,6 +273,7 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
         result.primary = -2;
         return result;
     }
+    system->timer_error = NX_SUCCESS;
     system->reset_cause = system->rcc->CSR;
     system->saved_pll = system->rcc->PLLCFGR;
     system->saved_flash = system->flash->ACR;
@@ -378,7 +408,25 @@ void nx_stm32_system_timer_irq(nx_stm32_system_t* system) {
         (system->started ||
          (system->remaining_effects & NX_STM32_EFFECT_TIMER) != 0U) &&
         (system->timer->SR & TIM_SR_UIF) != 0U) {
+        if (system->timer_error != NX_SUCCESS)
+            return;
         NX_STM32_TIMEBASE_ACK(system, ~(uint32_t)TIM_SR_UIF);
+        nx_arch_dsb();
+        if ((system->timer->SR & TIM_SR_UIF) != 0U) {
+            /* An unconfirmed wrap invalidates all old deadlines. Retain the
+             * timer and clock until task cleanup; never count this IRQ twice.
+             */
+            system->started = false;
+            system->timer_error = NX_ERROR_IO;
+            bool source_off =
+                write_checked(&system->timer->DIER, 0U, UINT32_MAX);
+            bool counter_off =
+                write_checked(&system->timer->CR1, 0U, TIM_CR1_CEN);
+            bool vector_off = NX_STM32_IRQ_ISOLATE(TIM2_IRQn) == 0;
+            if (!source_off || !counter_off || !vector_off)
+                timer_park();
+            return;
+        }
         /* Retained IRQs still acknowledge their level source during failed
          * withdrawal; that does not make a withdrawn epoch valid again. */
         if (system->started) {
@@ -393,6 +441,11 @@ uint64_t nx_stm32_system_now(nx_stm32_system_t* system) {
         return 0U;
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
+    /* A legal timer IRQ may have ended this epoch before exclusion. */
+    if (!system->started) {
+        nx_arch_irq_restore(mask);
+        return 0U;
+    }
     uint64_t high = system->overflow_us;
     uint32_t count = system->timer->CNT;
     if ((system->timer->SR & TIM_SR_UIF) != 0U) {

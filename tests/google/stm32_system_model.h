@@ -27,4 +27,8 @@ int nx_stm32_system_model_irq_control(int irq, bool enabled);
     nx_stm32_system_model_irq_available((int)(irq))
 #define NX_STM32_IRQ_CONTROL(irq, enabled)                                     \
     nx_stm32_system_model_irq_control((int)(irq), (enabled))
+#define NX_STM32_IRQ_ISOLATE(irq)                                              \
+    nx_stm32_system_model_irq_control((int)(irq), false)
+#define NX_STM32_TIMEBASE_ACK(system, value)                                   \
+    nx_stm32_system_model_write(&(system)->timer->SR, (uint32_t)(value))
 #endif /* NX_STM32_SYSTEM_MODEL_H */

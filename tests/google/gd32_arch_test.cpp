@@ -239,7 +239,8 @@ TEST_F(GD32Arch, PendingWrapSamplingPreservesFlagUntilTheOwnedHandler) {
         .WillOnce(::testing::Return(NX_SUCCESS));
     EXPECT_CALL(boundary, ClockStart()).WillOnce(::testing::Return(0));
     EXPECT_CALL(boundary, ClockStop()).WillOnce(::testing::Return(0));
-    EXPECT_CALL(boundary, CompleteWrites()).Times(6);
+    /* Six bootstrap barriers plus the observed runtime W0C acknowledgement. */
+    EXPECT_CALL(boundary, CompleteWrites()).Times(7);
     EXPECT_CALL(boundary, SynchronizeInstructions()).Times(2);
     EXPECT_CALL(boundary, Save())
         .Times(5)

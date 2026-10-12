@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 extern "C" {
+#include "nexus/core/fault.h"
 #include "stm32f407_system.h"
 }
 #include <gmock/gmock.h>
@@ -18,7 +19,10 @@ namespace {
 class HardwarePort {
   public:
     MOCK_METHOD(void, Write, (volatile uint32_t * reg, uint32_t value));
+    MOCK_METHOD(void, Fault,
+                (nx_fault_domain_t, nx_result_t, const char*, unsigned));
 };
+struct ParkSignal {};
 HardwarePort* hardware_port;
 uint32_t mask;
 bool privileged = true;
@@ -32,6 +36,7 @@ bool hold_hsi;
 bool hold_pll;
 bool hold_switch;
 bool update_observed;
+void (*before_save)();
 
 class Stm32System : public testing::Test {
   protected:
@@ -58,6 +63,7 @@ class Stm32System : public testing::Test {
         refuse_irq_disable = false;
         hold_hse = hold_hsi = hold_pll = hold_switch = false;
         update_observed = false;
+        before_save = nullptr;
         hardware_port = &hardware_mock;
         EXPECT_CALL(hardware_mock, Write(testing::_, testing::_))
             .Times(testing::AnyNumber());
@@ -80,6 +86,8 @@ class Stm32System : public testing::Test {
         testing::Mock::VerifyAndClearExpectations(&hardware_mock);
         hold_hse = hold_hsi = hold_pll = hold_switch = false;
         refuse_irq_disable = false;
+        before_save = nullptr;
+        irq_active = false;
         mask = 0U;
         handler = false;
         privileged = true;
@@ -283,6 +291,120 @@ TEST_F(Stm32System, RetainedTimerStillAcknowledgesOverflowWithoutLiveEpoch) {
     EXPECT_NE(0U, g_nx_stm32_system.remaining_effects);
 }
 
+TEST_F(Stm32System, FailedOverflowAckInvalidatesTimeWithoutCountingAgain) {
+    ASSERT_EQ(0, Start().primary);
+    timer.SR = TIM_SR_UIF;
+    timer.CNT = 7U;
+    irq_active = true;
+    EXPECT_CALL(hardware_mock, Write(&timer.SR, ~(uint32_t)TIM_SR_UIF))
+        .WillRepeatedly([](volatile uint32_t*, uint32_t) {});
+    nx_stm32_system_timer_irq(&g_nx_stm32_system);
+    EXPECT_EQ(0U, g_nx_stm32_system.overflow_us);
+    EXPECT_EQ(NX_ERROR_IO, g_nx_stm32_system.timer_error);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_NE(0U, g_nx_stm32_system.remaining_effects & 2U);
+    EXPECT_EQ(0U, timer.DIER);
+    EXPECT_EQ(0U, timer.CR1 & TIM_CR1_CEN);
+    EXPECT_FALSE(irq_enabled);
+    EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+    nx_stm32_system_timer_irq(&g_nx_stm32_system);
+    EXPECT_EQ(0U, g_nx_stm32_system.overflow_us);
+    irq_active = false;
+    ASSERT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_EQ(NX_ERROR_IO, g_nx_stm32_system.timer_error);
+    ASSERT_EQ(0, Start().primary);
+    EXPECT_EQ(NX_SUCCESS, g_nx_stm32_system.timer_error);
+}
+
+TEST_F(Stm32System, UnisolatableAckFaultRetainsMaskBeforeTerminalObservation) {
+    ASSERT_EQ(0, Start().primary);
+    timer.SR = TIM_SR_UIF;
+    EXPECT_CALL(hardware_mock, Write(&timer.SR, ~(uint32_t)TIM_SR_UIF))
+        .WillRepeatedly([](volatile uint32_t*, uint32_t) {});
+    EXPECT_CALL(hardware_mock, Write(&timer.DIER, 0U))
+        .WillRepeatedly([](volatile uint32_t*, uint32_t) {});
+    EXPECT_CALL(hardware_mock,
+                Fault(NX_FAULT_PLATFORM, NX_ERROR_IO, testing::_, testing::_))
+        .WillOnce([](nx_fault_domain_t, nx_result_t, const char*, unsigned) {
+            EXPECT_EQ(1U, mask);
+            throw ParkSignal{};
+        });
+    EXPECT_THROW(nx_stm32_system_timer_irq(&g_nx_stm32_system), ParkSignal);
+    EXPECT_EQ(1U, mask);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_NE(0U, g_nx_stm32_system.remaining_effects & 2U);
+    EXPECT_EQ(0U, g_nx_stm32_system.overflow_us);
+}
+
+TEST_F(Stm32System, RefusedCounterIsolationRetainsTerminalOwnership) {
+    ASSERT_EQ(0, Start().primary);
+    timer.SR = TIM_SR_UIF;
+    irq_active = true;
+    EXPECT_CALL(hardware_mock, Write(&timer.SR, ~(uint32_t)TIM_SR_UIF))
+        .WillOnce([](volatile uint32_t*, uint32_t) {});
+    EXPECT_CALL(hardware_mock, Write(&timer.DIER, 0U)).Times(1);
+    EXPECT_CALL(hardware_mock, Write(&timer.CR1, 0U))
+        .WillOnce([](volatile uint32_t*, uint32_t) {});
+    EXPECT_CALL(hardware_mock,
+                Fault(NX_FAULT_PLATFORM, NX_ERROR_IO, testing::_, testing::_))
+        .WillOnce([](nx_fault_domain_t, nx_result_t, const char*, unsigned) {
+            EXPECT_EQ(1U, mask);
+            throw ParkSignal{};
+        });
+    EXPECT_THROW(nx_stm32_system_timer_irq(&g_nx_stm32_system), ParkSignal);
+    EXPECT_EQ(1U, mask);
+    EXPECT_EQ(0U, timer.DIER);
+    EXPECT_NE(0U, timer.CR1 & TIM_CR1_CEN);
+    EXPECT_FALSE(irq_enabled);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_EQ(NX_ERROR_IO, g_nx_stm32_system.timer_error);
+    EXPECT_NE(0U, g_nx_stm32_system.remaining_effects & 2U);
+    EXPECT_EQ(0U, g_nx_stm32_system.overflow_us);
+}
+
+TEST_F(Stm32System, RefusedVectorIsolationRetainsTerminalOwnership) {
+    ASSERT_EQ(0, Start().primary);
+    timer.SR = TIM_SR_UIF;
+    irq_active = true;
+    refuse_irq_disable = true;
+    EXPECT_CALL(hardware_mock, Write(&timer.SR, ~(uint32_t)TIM_SR_UIF))
+        .WillOnce([](volatile uint32_t*, uint32_t) {});
+    EXPECT_CALL(hardware_mock, Write(&timer.DIER, 0U)).Times(1);
+    EXPECT_CALL(hardware_mock, Write(&timer.CR1, 0U)).Times(1);
+    EXPECT_CALL(hardware_mock,
+                Fault(NX_FAULT_PLATFORM, NX_ERROR_IO, testing::_, testing::_))
+        .WillOnce([](nx_fault_domain_t, nx_result_t, const char*, unsigned) {
+            EXPECT_EQ(1U, mask);
+            throw ParkSignal{};
+        });
+    EXPECT_THROW(nx_stm32_system_timer_irq(&g_nx_stm32_system), ParkSignal);
+    EXPECT_EQ(1U, mask);
+    EXPECT_EQ(0U, timer.DIER);
+    EXPECT_EQ(0U, timer.CR1 & TIM_CR1_CEN);
+    EXPECT_TRUE(irq_enabled);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_EQ(NX_ERROR_IO, g_nx_stm32_system.timer_error);
+    EXPECT_NE(0U, g_nx_stm32_system.remaining_effects & 2U);
+    EXPECT_EQ(0U, g_nx_stm32_system.overflow_us);
+}
+
+TEST_F(Stm32System, FaultBeforeIrqSaveCannotEscapeAsAStaleTimeSnapshot) {
+    ASSERT_EQ(0, Start().primary);
+    timer.SR = TIM_SR_UIF;
+    timer.CNT = 7U;
+    EXPECT_CALL(hardware_mock, Write(&timer.SR, ~(uint32_t)TIM_SR_UIF))
+        .WillRepeatedly([](volatile uint32_t*, uint32_t) {});
+    before_save = []() {
+        irq_active = true;
+        nx_stm32_system_timer_irq(&g_nx_stm32_system);
+        irq_active = false;
+    };
+    EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+    EXPECT_EQ(0U, mask);
+    EXPECT_EQ(NX_ERROR_IO, g_nx_stm32_system.timer_error);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+}
+
 /** \brief Advance only external hardware readiness and source acknowledgement.
  */
 extern "C" void nx_stm32_system_model_poll(void* raw) {
@@ -328,6 +450,11 @@ extern "C" int nx_stm32_system_model_irq_control(int, bool enabled) {
 
 /** \brief Save the injected incoming CPU mask for one short metadata span. */
 extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {
+    if (before_save != nullptr && mask == 0U) {
+        auto callback = before_save;
+        before_save = nullptr;
+        callback();
+    }
     nx_arch_irq_state_t previous = {mask};
     mask = 1U;
     return previous;
@@ -353,4 +480,10 @@ extern "C" void nx_arch_dsb(void) {
 }
 /** \brief The host model has no Cortex-M instruction pipeline. */
 extern "C" void nx_arch_isb(void) {
+}
+
+/** \brief The host-only observer stops before the retained terminal loop. */
+extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
+                                 const char* file, unsigned line) {
+    hardware_port->Fault(domain, reason, file, line);
 }

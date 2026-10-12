@@ -36,6 +36,9 @@ typedef struct nx_stm32g474_system {
     uint32_t saved_flash;
     uint32_t saved_power;
     uint32_t saved_boost;
+    /** \brief Sticky runtime IO fault; admitted start resets it, stop retains.
+     */
+    volatile nx_result_t timer_error;
     bool owned_power_clock;
     bool power_snapshotted;
     volatile bool started;
@@ -75,12 +78,21 @@ nx_result_t nx_stm32g474_system_stop(nx_stm32g474_system_t* system,
 /**
  * \brief Snapshot independent 1MHz TIM2 with one pending wrap correction.
  * \param[in,out] system: Live context, privileged task/configurable IRQ.
- * \return Extended microseconds; zero before successful startup.
+ * \return Extended microseconds; zero outside a successfully started epoch.
  * \note No NMI/HardFault, dynamic clock or deep-sleep continuity contract.
- *       Overflow IRQ must run at least once every 2^32 microseconds.
+ *       Overflow IRQ must run at least once every 2^32 microseconds. Observed
+ *       acknowledgement failure ends the epoch and invalidates old deadlines.
+ *       Cleanup/restart never recovers its elapsed time; zero is not readiness.
  */
 uint64_t nx_stm32g474_system_now(nx_stm32g474_system_t* system);
-/** \brief Bounded reserved-vector overflow handler; no kernel calls. */
+/**
+ * \brief Bounded reserved-vector overflow handler; no kernel calls.
+ * \param[in,out] system: Static context bound to the reserved vector.
+ * \note Confirm W0C before extension. Failure latches IO and attempts each
+ *       DIER/CEN/NVIC isolation once; timer/clock ownership remains retained.
+ *       Observed isolation permits ordinary task cleanup only. Unobserved
+ *       isolation retains the IRQ mask, observes a terminal fault and parks.
+ */
 void nx_stm32g474_system_timer_irq(nx_stm32g474_system_t* system);
 /** \brief Verify observed category3 silicon and512KiB; not package identity. */
 nx_result_t nx_stm32g474_validate_identity(void);

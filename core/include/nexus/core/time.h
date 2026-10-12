@@ -50,7 +50,11 @@ typedef struct {
  * authoritative. All consumers join before clock withdrawal. Stop/restart or a
  * clock change invalidates every old deadline, even if a new epoch has the same
  * numerical value. UINT64_MAX is reserved; clock exhaustion requires controlled
- * restart.
+ * restart. An observed hardware overflow acknowledgement failure also ends
+ * the live epoch: zero must not be used as valid elapsed time or permission to
+ * reclaim borrowers. Confirmed source isolation permits ordinary cleanup only;
+ * it does not recover old deadlines. Private diagnostics distinguish faults
+ * from successful readiness; products own recovery and any low-power join.
  */
 nx_time_us_t nx_time_now_us(void);
 /**

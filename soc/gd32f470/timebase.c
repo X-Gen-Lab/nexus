@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "gd32f4xx.h"
+#include "nexus/core/fault.h"
 #include "private/system.h"
 #if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
 #include "private/gd32f470_lowpower.h"
@@ -23,6 +24,7 @@ static volatile uint32_t s_epoch;
 static bool s_clock_owned;
 static volatile bool s_timer_owned;
 static volatile bool s_timer_live;
+static volatile nx_result_t s_timer_error;
 
 int nx_gd32_clock_start(void);
 int nx_gd32_clock_stop(void);
@@ -44,6 +46,29 @@ static bool timer_update_ready(void) {
             return true;
     }
     return false;
+}
+
+/** \brief Isolate the active timer without releasing its clock or storage. */
+static bool isolate_timer_irq(void) {
+    NX_GD32_TIMEBASE_WRITE(&TIMER_DMAINTEN(TIMER1), 0U);
+    NX_GD32_TIMEBASE_WRITE(&TIMER_CTL0(TIMER1),
+                           TIMER_CTL0(TIMER1) & ~(uint32_t)TIMER_CTL0_CEN);
+    NVIC_DisableIRQ(TIMER1_IRQn);
+    NVIC_ClearPendingIRQ(TIMER1_IRQn);
+    nx_gd32_peripheral_barrier();
+    uint32_t bank = (uint32_t)TIMER1_IRQn / 32U;
+    uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32U);
+    /* Own ACTIVE stays set until return; task stop still checks every owner. */
+    return TIMER_DMAINTEN(TIMER1) == 0U &&
+           (TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) == 0U &&
+           ((NVIC->ISER[bank] | NVIC->ISPR[bank]) & bit) == 0U;
+}
+
+/** \brief Retain the current mask and effects on unisolated source failure. */
+static _Noreturn void timer_park(void) {
+    nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
+    for (;;) {
+    }
 }
 
 /** \brief           Check all external interrupt and DMA resources at stop. */
@@ -152,6 +177,7 @@ int nx_gd32_soc_start(void) {
     if (nx_gd32_soc_preflight() != NX_SUCCESS) {
         return -1;
     }
+    s_timer_error = NX_SUCCESS;
     s_clock_owned = true;
     if (nx_gd32_clock_start() != 0) {
         if (nx_gd32_clock_stop() == 0) {
@@ -218,6 +244,10 @@ uint64_t nx_gd32_now_us(void) {
         return 0u;
     }
     uint32_t saved = nx_gd32_critical_enter();
+    if (!s_timer_live) {
+        nx_gd32_critical_leave(saved);
+        return 0U;
+    }
     uint32_t epoch = s_epoch;
     uint32_t count = TIMER_CNT(TIMER1);
     if ((TIMER_INTF(TIMER1) & TIMER_INTF_UPIF) != 0u) {
@@ -229,18 +259,32 @@ uint64_t nx_gd32_now_us(void) {
     return value;
 }
 
+/** \brief Read the runtime diagnostic without implying a live time domain. */
+nx_result_t nx_gd32_timebase_error(void) {
+    return s_timer_error;
+}
+
 /** \brief           Extend the hardware's 32-bit counter once per wrap. */
 void TIMER1_IRQHandler(void) {
-    if (!s_timer_owned) {
+    if (!s_timer_owned || s_timer_error != NX_SUCCESS) {
         return;
     }
     uint32_t saved = nx_gd32_critical_enter();
     if ((TIMER_INTF(TIMER1) & TIMER_INTF_UPIF) != 0u) {
+        /* W0C ones preserve compare flags arriving after this UPIF read. */
+        NX_GD32_TIMEBASE_ACK(~(uint32_t)TIMER_INTF_UPIF);
+        nx_arch_dsb();
+        if ((TIMER_INTF(TIMER1) & TIMER_INTF_UPIF) != 0U) {
+            s_timer_live = false;
+            s_timer_error = NX_ERROR_IO;
+            if (!isolate_timer_irq())
+                timer_park();
+            nx_gd32_critical_leave(saved);
+            return;
+        }
         if (s_timer_live) {
             ++s_epoch;
         }
-        /* W0C ones preserve compare flags arriving after this UPIF read. */
-        NX_GD32_TIMEBASE_ACK(~(uint32_t)TIMER_INTF_UPIF);
     }
 #if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
     if (s_timer_live) {

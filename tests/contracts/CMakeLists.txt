@@ -77,7 +77,8 @@ nexus_behavior_test(contract_gd32_io SOURCES gd32_io_test.c
     DEFINITIONS GD32F470 HXTAL_VALUE=25000000)
 # SDK address macros are uint32_t by design; the host model interprets those
 # addresses. This host-only diagnostic differs from the unchanged ARM gate.
-target_compile_options(contract_gd32_io PRIVATE -Wno-int-to-pointer-cast)
+target_compile_options(contract_gd32_io PRIVATE -Wno-int-to-pointer-cast
+    -include "${CMAKE_CURRENT_SOURCE_DIR}/gd32_model/io_w1c.h")
 target_include_directories(contract_gd32_io SYSTEM PRIVATE
     "${gd32_vendor_root}/CMSIS/GD/GD32F4xx/Include"
     "${gd32_vendor_root}/GD32F4xx_standard_peripheral/Include")

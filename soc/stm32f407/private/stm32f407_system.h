@@ -28,6 +28,9 @@ typedef struct {
     uint32_t saved_pll;
     uint32_t saved_flash;
     uint32_t saved_power;
+    /** \brief Sticky runtime IO fault; admitted start resets it, stop retains.
+     */
+    volatile nx_result_t timer_error;
     bool owned_power_clock;
     bool power_snapshotted;
     volatile bool started;
@@ -86,11 +89,13 @@ int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit);
  *
  * \param[in,out]   system: Started context; no dynamic reclocking.
  *
- * \return          Monotonic microseconds, or zero before start.
+ * \return          Monotonic microseconds, or zero outside a live epoch.
  *
  * \details         Task/configurable IRQ uses short PRIMASK exclusion.
  *                  TIM2 IRQ must run once per 2^32 microseconds.
- *                  NMI/HardFault callers are unsupported.
+ *                  NMI/HardFault callers are unsupported. An observed overflow
+ *                  acknowledgement fault ends the epoch; old deadlines cannot
+ *                  be recovered by cleanup or restart. Zero is not readiness.
  */
 uint64_t nx_stm32_system_now(nx_stm32_system_t* system);
 
@@ -98,6 +103,12 @@ uint64_t nx_stm32_system_now(nx_stm32_system_t* system);
  * \brief           Handle the reserved TIM2 overflow interrupt.
  *
  * \param[in,out]   system: Static context bound to the vector.
+ * \note            Confirm W0C before extending time. Failure latches IO and
+ *                  withdraws DIER/CEN/NVIC once while retaining ownership.
+ *                  Observed isolation returns for ordinary task cleanup, not
+ *                  time recovery. Unobserved isolation retains the IRQ mask,
+ *                  observes the terminal platform fault and parks. Optional
+ *                  low-power owners retain their existing busy/drain contract.
  */
 void nx_stm32_system_timer_irq(nx_stm32_system_t* system);
 
@@ -105,7 +116,10 @@ void nx_stm32_system_timer_irq(nx_stm32_system_t* system);
  * \brief           Set CPU state before data/bss initialization.
  *
  * \details         Official startup calls this before RAM initialization.
- *                  It only writes CPU/RCC registers and enables the FPU.
+ *                  CPU/RCC setup precedes main DATA/BSS and constructors. An
+ *                  explicitly selected CCM domain uses its validated linker
+ *                  plan and cold local stack for copy/clear; clock or plan
+ *                  refusal parks before ordinary RAM initialization.
  */
 void SystemInit(void);
 

@@ -24,6 +24,12 @@ static void critical_observe(bool entering) {
     }
 }
 nx_arch_irq_state_t nx_g474_model_irq_save(void) {
+    if (g_g474_model.before_irq_save != NULL && !nx_arch_irq_is_masked()) {
+        void (*callback)(void*) = g_g474_model.before_irq_save;
+        void* context = g_g474_model.before_irq_context;
+        g_g474_model.before_irq_save = NULL;
+        callback(context);
+    }
     nx_arch_irq_state_t previous = nx_arch_irq_save();
     if (previous.value == 0U)
         critical_observe(true);
@@ -68,6 +74,12 @@ uint32_t nx_g474_model_read(volatile uint32_t* reg) {
 void nx_g474_model_write(volatile uint32_t* reg, uint32_t value) {
     g_g474_model.writes++;
     if (reg == g_g474_model.ignore_write)
+        return;
+    if (reg == &g_g474_model.timer.SR && value != 0U &&
+        (value & TIM_SR_UIF) == 0U && g_g474_model.hold_timer_ack)
+        return;
+    if (reg == &g_g474_model.timer.DIER && value == 0U &&
+        g_g474_model.hold_timer_source_off)
         return;
     if (reg == &g_g474_model.timer.CNT && g_g474_model.hold_timer_count) {
         *reg = 37U;

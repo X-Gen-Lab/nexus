@@ -6,6 +6,7 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/core/fault.h"
 #include "nexus/core/time.h"
 #include "stm32g474_system.h"
 #ifndef NX_G474_MODEL
@@ -17,6 +18,14 @@ nx_stm32g474_system_t g_nx_stm32g474_system = {
 #define NX_G474_DEVICE_ID()     (DBGMCU->IDCODE)
 #define NX_G474_FLASH_OPTIONS() (FLASH->OPTR)
 #endif
+/** \brief Preserve masks and effects when an IRQ source cannot be isolated. */
+static _Noreturn void timer_park(void) {
+    (void)nx_arch_irq_save();
+    nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
+    for (;;) {
+    }
+}
+
 static bool task_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
@@ -133,6 +142,7 @@ nx_stm32g474_start_result_t nx_stm32g474_system_start(nx_stm32g474_system_t* s,
     r.primary = nx_stm32g474_validate_identity();
     if (r.primary != NX_SUCCESS)
         return r;
+    s->timer_error = NX_SUCCESS;
     s->saved_pll = NX_G474_READ(&s->rcc->PLLCFGR);
     s->saved_flash = NX_G474_READ(&s->flash->ACR);
     s->power_snapshotted = false;
@@ -286,7 +296,23 @@ void nx_stm32g474_system_timer_irq(nx_stm32g474_system_t* s) {
         (s->started ||
          (s->remaining_effects & NX_STM32G474_EFFECT_TIMER) != 0U) &&
         (NX_G474_READ(&s->timer->SR) & TIM_SR_UIF) != 0U) {
+        if (s->timer_error != NX_SUCCESS)
+            return;
         NX_G474_WRITE(&s->timer->SR, ~(uint32_t)TIM_SR_UIF);
+        nx_arch_dsb();
+        if ((NX_G474_READ(&s->timer->SR) & TIM_SR_UIF) != 0U) {
+            s->started = false;
+            s->timer_error = NX_ERROR_IO;
+            /* Attempt each withdrawal once, even when an earlier readback
+             * fails. The current handler's ACTIVE bit is not a foreign owner.
+             */
+            bool source_off = write_checked(&s->timer->DIER, 0U, UINT32_MAX);
+            bool counter_off = write_checked(&s->timer->CR1, 0U, TIM_CR1_CEN);
+            nx_result_t vector_off = NX_G474_IRQ_CONTROL(TIM2_IRQn, false, 0U);
+            if (!source_off || !counter_off || vector_off != NX_SUCCESS)
+                timer_park();
+            return;
+        }
         if (s->started)
             s->overflow_us += (UINT64_C(1) << 32U);
     }
@@ -295,6 +321,10 @@ uint64_t nx_stm32g474_system_now(nx_stm32g474_system_t* s) {
     if (s == NULL || !s->started || !nx_arch_is_privileged())
         return 0U;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!s->started) {
+        nx_arch_irq_restore(guard);
+        return 0U;
+    }
     uint64_t high = s->overflow_us;
     uint32_t count = NX_G474_READ(&s->timer->CNT);
     if ((NX_G474_READ(&s->timer->SR) & TIM_SR_UIF) != 0U) {

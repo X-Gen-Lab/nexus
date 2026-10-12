@@ -35,6 +35,8 @@ typedef struct {
     bool hold_timer_count;
     bool hold_timer_gate_off;
     bool timer_update_observed;
+    bool hold_timer_ack;
+    bool hold_timer_source_off;
     bool boost_delayed;
     bool unsafe_order;
     volatile uint32_t* ignore_write;
@@ -52,6 +54,8 @@ typedef struct {
     void (*critical_observer)(void* context, bool entering);
     void* critical_context;
     bool observing_critical;
+    void (*before_irq_save)(void* context);
+    void* before_irq_context;
 } nx_g474_model_t;
 extern nx_g474_model_t g_g474_model;
 void nx_g474_model_reset(void);
