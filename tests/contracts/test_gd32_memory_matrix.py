@@ -6,7 +6,7 @@ import sys
 import tempfile
 import unittest
 
-from scripts.ci import gd32_memory
+from scripts.ci import gd32_memory, memory_budget
 
 
 class MemoryMatrixTests(unittest.TestCase):
@@ -79,7 +79,7 @@ class MemoryMatrixTests(unittest.TestCase):
     def test_real_expected_nonzero_keeps_raw_diagnostics(self):
         with tempfile.TemporaryDirectory() as temporary:
             recorder = gd32_memory.arch_compile.Recorder(Path(temporary))
-            record = gd32_memory.rejected(recorder,
+            record = memory_budget.rejected(recorder,
                 [sys.executable, '-c',
                  'import sys; print("expected refusal"); sys.exit(1)'],
                 'actual-negative', 'expected refusal')
@@ -91,7 +91,7 @@ class MemoryMatrixTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             recorder = gd32_memory.arch_compile.Recorder(Path(temporary))
             with self.assertRaisesRegex(ValueError, 'different reason'):
-                gd32_memory.rejected(recorder, [sys.executable, '-c',
+                memory_budget.rejected(recorder, [sys.executable, '-c',
                     'import sys; print("unrelated error"); sys.exit(1)'],
                     'wrong-negative', 'expected refusal')
 
@@ -99,7 +99,7 @@ class MemoryMatrixTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             recorder = gd32_memory.arch_compile.Recorder(Path(temporary))
             with self.assertRaisesRegex(ValueError, 'unexpectedly accepted'):
-                gd32_memory.rejected(recorder, [sys.executable, '-c',
+                memory_budget.rejected(recorder, [sys.executable, '-c',
                     'print("expected refusal")'], 'false-negative',
                     'expected refusal')
 
