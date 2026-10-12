@@ -257,3 +257,98 @@ Host arrival/close timestamps never establish MCU cycles, IRQ latency or UART TC
 timing. Waveform, clock, Flash power-loss and OS context collectors need their
 actual station instruments and reviewed workload protocol. The real PTY tests
 exercise POSIX software mechanics only; no first-party board has been operated.
+
+## SoC-specific acceptance
+
+`soc_acceptance.py` covers SOC-37–55 from the
+[SoC execution ledger](../../docs/design/soc-refinement-execution.csv). Its nineteen
+cases specify hardware, stimulation, raw observations, invariant assertions,
+metric units, safety actions and physical exits. Planning does not operate
+instruments, fill numeric limits or establish station readiness.
+
+```sh
+python tools/hil/soc_acceptance.py plan \
+    --fixture tools/hil/fixtures/gd32f470_liangshan.json \
+    --resolved build/gd32-liangshan-baremetal/generated/resolved.json \
+    --output station/soc-plan.json
+python tools/hil/soc_acceptance.py template --case SOC-43 \
+    --fixture tools/hil/fixtures/gd32f470_liangshan.json \
+    --resolved build/gd32-liangshan-baremetal/generated/resolved.json \
+    --output station/soc-uart-template.json
+```
+
+A template contains a `protocol` object to copy into station-owned storage. Bind
+actual selected controller IDs, required instrument file identities, reviewed
+stimulation, observations, isolation/recovery descriptions and every metric's
+`minimum`, `maximum` and `unit`. Null instruments/limits deliberately fail
+validation. Discrete work counts require integer limits and positive work lower
+bounds; invariant failure counts require both bounds zero. Scope follows the
+resolved selected modes, not every mode named in a case description. Tickless
+acceptance requires an explicit FreeRTOS tickless selection. G474's software
+reference still cannot admit a physical station.
+
+After normal `admit.py` admission and reviewed `workloads.py` authoring, a
+station-owned serial/instrument operation receives the absolute SoC protocol
+path as a whole argument. Pin that protocol and every instrument/calibration
+identity in its recipe `inputs`. Other operations keep the existing ordered
+`identify`, `flash`, `verify_flash`, `reset`, `serial`, `cleanup` contract.
+
+```sh
+python tools/hil/soc_acceptance.py capture \
+    --protocol station/soc-uart-protocol.json \
+    --recipe station/acquisition.json --admission station/admission.json \
+    --output station/fresh-soc-attempt
+python tools/hil/soc_acceptance.py validate \
+    --admission station/admission.json --raw station/soc-record.json \
+    --output station/soc-validation.json
+```
+
+Capture reuses the existing exclusive station lock, content-pinned no-shell argv,
+timeout/output bounds and cleanup/quarantine. It produces `soc-capture.json`;
+`captured` means `executed_unqualified`. Commit checks never call equipment.
+A station needs its real waveform, bus-peer and power-interruption adapters;
+this tooling does not manufacture their physical observations.
+
+The serial adapter's `hil_adapter_observation.observations.soc` must contain a
+strict schema-1 `soc_hil_observation`: `case_id`, `protocol_sha256`, `context`,
+`observations` and `traces`. The three latter fields retain file identities of
+bytes actually produced during that operation. A context/trace assembled later
+without that captured manifest is rejected. Validation also replays observed
+part/UID/probe identity and the exact reviewed argv/instrument closure.
+
+The context is schema-1 `soc_hil_context` with `case_id`, `session`,
+`protocol_sha256`, `admission_sha256`, observed positive `cpu_clock_hz`, `load`,
+`executor`, `mode_scope`, `time_resolution_s` and `methods`. `mode_scope` exactly
+maps protocol controller IDs to `{kind, mode}`. Every metric's method records a
+reviewed `instrument` role, acquisition `method`, positive `resolution` in that
+metric's unit and positive `window_s`. Wall-clock resolution is at most 1 ms;
+windows and duration cannot exceed the actual serial acquisition plus that
+resolution. IRQ latency additionally needs observed `irq_priorities`; stack peak
+needs `stack_capacity_bytes`, and samples cannot exceed it.
+
+Each schema-1 `soc_hil_trace` records `case_id`, `metric`, `unit`, `session`,
+`protocol_sha256`, `context_sha256`, canonical `observations_sha256` and 1–100000
+contiguous `{sequence, value}` samples. Finite samples must satisfy every reviewed
+limit. No reported pass flag or aggregate substitutes for these bytes.
+
+The schema-1 `physical_soc_hil` record has `case_id`, `started_utc`,
+`finished_utc`, `station_id`, `board`, `part`, `chip_uid`, `admission_sha256`,
+`elf_sha256`, `resolved_sha256`, and file identities `protocol`, `capture`,
+`context`, `observations`, `traces`. Observation/trace maps exactly match the case
+catalog and captured serial manifest. Times must fit the actual captured interval
+and be at most 24 hours old. Failed, skipped, overlapping, unstarted or quarantined
+operations, changed raw streams, wrong sessions and stale inputs fail.
+
+SOC-52 also requires `flash_region = {layout, start, size, recovery_policy}`.
+`layout` pins a station/product-authored schema-1 `product_flash_test_layout`
+with `board`, `part`, `test_region = {start, size}` and nonempty `protected_regions`
+entries `{id, start, size}`. The region must match that external layout, exact
+physical erase boundaries and density. It must avoid protected ranges and every
+actual firmware LOAD; all firmware LOAD bytes must be protected. The product
+owns recovery and safe power-cut policy. No default partition is reserved.
+
+Successful validation is `qualified_for_recorded_soc_case`, limited to that case,
+selected modes, admitted equipment and recorded conditions. It does not prove
+WCET, unobserved loading, electrical safety or product release. All current
+physical SoC cases remain `not_executed`; synthetic parser/subprocess tests prove
+tooling behavior only.

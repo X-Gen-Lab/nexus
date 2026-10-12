@@ -60,3 +60,5 @@ provider、factory 与 owner，配置工具用 Python unittest。commit hook 和
 预算与物理 HIL 分别建立证据，方法表开销由实际 linked image 测量。
 
 - [Source compatibility and SDK versions](source-compatibility.md)
+
+- [SoC refinement and 55-item ledger](soc-refinement.md)

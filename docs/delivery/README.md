@@ -38,3 +38,5 @@ component，复用 Core/Arch/I/O face 与选定裸机/FreeRTOS adapter。运行�
 行为变更遵循 TDD。GoogleTest／GoogleMock 只进入 host 测试目标，生产固件保持
 C11。commit hooks 实际执行配置工具和全部 GoogleTest 契约，拒绝未完成、过滤或
 跳过的报告。执行结果证明当前合同；真实 RED→GREEN 过程由 PR 和原始日志记录。
+
+- [SoC refinement and physical acceptance](../design/soc-refinement.md)
