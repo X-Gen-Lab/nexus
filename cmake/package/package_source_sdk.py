@@ -24,7 +24,7 @@ SOURCE_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(SOURCE_ROOT))
 try:
     from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES, declared_modules
-    from tools.maintenance import stm32g4_lock, threadx_lock
+    from tools.maintenance import cmsis_device_lock, stm32g4_lock, threadx_lock
     from tools.configure.metadata import parse_json, snapshot
 except ImportError as error:
     # Missing verifier modules are an incomplete SDK, including after an
@@ -284,6 +284,11 @@ REQUIRED_FILES += tuple("components/storage/src/" + name + ".c" for name in (
 REQUIRED_FILES += tuple("components/storage/include/nexus/components/" + name
                         + ".h" for name in (
     "storage", "flash_storage", "file_flash"))
+REQUIRED_FILES += ("tools/maintenance/cmsis_device_lock.py",)
+for _review in cmsis_device_lock.REVIEWED_DEVICES.values():
+    REQUIRED_FILES += (_review["lock_name"],)
+    REQUIRED_FILES += tuple(_review["directory"] + "/" + name
+                            for name in sorted(_review["files"]))
 REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
@@ -357,6 +362,17 @@ def dependency_entries(root, dependency):
         if not names.issubset(entries):
             raise SDKError("G4 committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
+    else:
+        for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
+            if dependency != review["directory"]:
+                continue
+            raw, _ = snapshot(root / review["lock_name"])
+            lock = parse_json(raw)
+            names = cmsis_device_lock.contract(lock)
+            if lock["selected_part"] != part or not names.issubset(entries):
+                raise SDKError("Reviewed device committed source graph is incomplete")
+            entries = {name: entries[name] for name in names}
+            break
     return entries
 
 
@@ -474,6 +490,9 @@ def prepare(source, output, development_fixture=False):
     threadx_lock.verify(source / "ext/threadx", source / "dependencies/threadx.lock.json", "linux")
     stm32g4_lock.verify(source / "vendors/st/cmsis_device_g4",
                        source / "dependencies/stm32g4.lock.json")
+    for review in cmsis_device_lock.REVIEWED_DEVICES.values():
+        cmsis_device_lock.verify(source / review["directory"],
+                                 source / review["lock_name"])
     sys.path.insert(0, str(source / "scripts/ci"))
     from vendor_import_identity import reviewed_import
     imports = [reviewed_import(source / "vendors/gigadevice/gd32f4xx", source)]
@@ -604,6 +623,14 @@ def verify(root):
     stm32g4_lock.verify(root / "vendors/st/cmsis_device_g4",
                        root / "dependencies/stm32g4.lock.json",
                        packaged_commit=g4["commit"])
+    for review in cmsis_device_lock.REVIEWED_DEVICES.values():
+        matching = [record for record in records
+                    if record["path"] == review["directory"]]
+        if len(matching) != 1:
+            raise SDKError("Source SDK lacks its exact reviewed device dependency")
+        cmsis_device_lock.verify(root / review["directory"],
+                                 root / review["lock_name"],
+                                 packaged_commit=matching[0]["commit"])
     sys.path.insert(0, str(root / "scripts/ci"))
     from vendor_import_identity import validate_import_record
     imports = identity["reviewed_imports"]

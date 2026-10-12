@@ -8,7 +8,7 @@ import unittest
 import subprocess
 import sys
 from tools.maintenance import dependency_proposals as proposals
-from tools.maintenance import source_catalogue
+from tools.maintenance import cmsis_device_lock, source_catalogue
 import shutil
 import os
 
@@ -245,6 +245,21 @@ class DependencyInventoryGitTests(unittest.TestCase):
             for item in dependencies).encode())
         for item in dependencies:
             checkout = self.root / item.path
+            review = next((review for review in
+                           cmsis_device_lock.REVIEWED_DEVICES.values()
+                           if review["directory"] == item.path), None)
+            if review is not None:
+                # Fixed device pins use real local official Git objects. A
+                # fabricated fixture commit must never relax the source lock.
+                checkout.parent.mkdir(parents=True, exist_ok=True)
+                self.git(self.root, "clone", "--quiet", "--shared",
+                         str(ROOT / item.path), str(checkout))
+                self.git(checkout, "remote", "set-url", "origin", item.origin)
+                self.git(checkout, "checkout", "--quiet", "--detach",
+                         review["commit"])
+                self.write(self.root / item.source_lock,
+                           (ROOT / item.source_lock).read_bytes())
+                continue
             checkout.mkdir(parents=True)
             self.git(checkout, "init", "--quiet")
             self.git(checkout, "remote", "add", "origin", item.origin)
@@ -314,6 +329,57 @@ class DependencyInventoryGitTests(unittest.TestCase):
                         for name in self.g4_lock["files"])
         self.assertEqual(observed, required)
         self.assertFalse(result["software_qualified"])
+
+    def test_reviewed_device_gitlinks_keep_exact_official_source_identities(self):
+        result = proposals.inventory(self.root)
+        self.assertEqual(len([record for record in result["dependencies"]
+                              if record.get("path")]),
+                         len(source_catalogue.SOURCE_DEPENDENCIES))
+        for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
+            with self.subTest(part=part):
+                record = next(record for record in result["dependencies"]
+                              if record.get("path") == review["directory"])
+                self.assertEqual(record["revision"], review["commit"])
+                self.assertEqual(record["upstream_url"], review["origin"])
+                observed = {Path(item["path"]).relative_to(self.root).as_posix()
+                            for item in record["identities"]}
+                expected = {".gitmodules", review["lock_name"]}
+                expected.update(review["directory"] + "/" + name
+                                for name in review["files"])
+                self.assertEqual(observed, expected)
+        self.assertFalse(result["source_dirty"])
+        self.assertFalse(result["software_qualified"])
+
+    def test_reviewed_device_inventory_rejects_rehashed_omission_and_foreign_origin(self):
+        for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
+            with self.subTest(part=part):
+                path = self.root / review["lock_name"]
+                original = path.read_bytes()
+                changed = json.loads(original)
+                del changed["files"][next(name for name in review["files"]
+                                          if name.endswith("xx.h"))]
+                path.write_text(json.dumps(changed))
+                with self.assertRaises(ValueError):
+                    proposals.inventory(self.root)
+                path.write_bytes(original)
+                checkout = self.root / review["directory"]
+                self.git(checkout, "remote", "set-url", "origin",
+                         "https://example.com/foreign-device.git")
+                with self.assertRaises(ValueError):
+                    proposals.inventory(self.root)
+                self.git(checkout, "remote", "set-url", "origin", review["origin"])
+                self.assertFalse(proposals.inventory(self.root)["source_dirty"])
+
+    def test_reviewed_device_inventory_requires_committed_gitlinks(self):
+        for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
+            with self.subTest(part=part):
+                self.git(self.root, "rm", "--cached", review["directory"])
+                self.commit(self.root, "actual parent without device Gitlink")
+                with self.assertRaisesRegex(ValueError, "Missing committed source Gitlink"):
+                    proposals.inventory(self.root)
+                self.git(self.root, "add", review["directory"])
+                self.commit(self.root, "restore exact official device Gitlink")
+                self.assertFalse(proposals.inventory(self.root)["source_dirty"])
 
     def test_g4_uncommitted_gitlink_foreign_origin_and_rehashed_omission_reject(self):
         path = self.root / "dependencies/stm32g4.lock.json"

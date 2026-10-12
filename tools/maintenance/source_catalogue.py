@@ -30,6 +30,12 @@ SOURCE_DEPENDENCIES = (
     SourceDependency("stm32g4_cmsis", "vendors/st/cmsis_device_g4",
                      "https://github.com/STMicroelectronics/cmsis-device-g4.git", "LICENSE.md",
                      "dependencies/stm32g4.lock.json"),
+    SourceDependency("stm32h7_cmsis", "vendors/st/cmsis_device_h7",
+                     "https://github.com/STMicroelectronics/cmsis-device-h7.git", "LICENSE.md",
+                     "dependencies/stm32h7.lock.json"),
+    SourceDependency("stm32u5_cmsis", "vendors/st/cmsis_device_u5",
+                     "https://github.com/STMicroelectronics/cmsis-device-u5.git", "LICENSE.md",
+                     "dependencies/stm32u5.lock.json"),
 )
 
 

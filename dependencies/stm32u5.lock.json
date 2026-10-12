@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-reviewed-device-source",
+  "repository": "https://github.com/STMicroelectronics/cmsis-device-u5.git",
+  "commit": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",
+  "selected_part": "STM32U575ZIT6Q",
+  "files": {
+    "Include/stm32u575xx.h": {
+      "bytes": 1992290,
+      "sha256": "854b9a7b5534b1bce610ece61cd975e5380010bb398ce3c4b6d1768c00232c77"
+    },
+    "Include/stm32u5xx.h": {
+      "bytes": 10767,
+      "sha256": "e14c30935b33e903dd293e84632f5b3c374bf5b6554182f188dba3a798ee7bc5"
+    },
+    "Include/system_stm32u5xx.h": {
+      "bytes": 2713,
+      "sha256": "73675e7a1dfd4a6378f08f6dce3ec072d6244f70365276ef52704144559b289e"
+    },
+    "LICENSE.md": {
+      "bytes": 11347,
+      "sha256": "fdb37bec600bb3784d8c5fffdddf225f9d4ee8cc225320a01394f5da01e7efc1"
+    },
+    "Source/Templates/gcc/startup_stm32u575xx.s": {
+      "bytes": 17395,
+      "sha256": "70e9034f2243394d0c7b815ca59c6ce3363a120e25efbcdf13bcda59d356b197"
+    }
+  },
+  "license": {
+    "path": "LICENSE.md",
+    "expression": "Apache-2.0"
+  }
+}

@@ -26,7 +26,7 @@ from tools.configure.metadata import (  # noqa: E402
 from tools.maintenance.source_catalogue import (  # noqa: E402
     SOURCE_DEPENDENCIES, declared_modules,
 )
-from tools.maintenance import stm32g4_lock, threadx_lock  # noqa: E402
+from tools.maintenance import cmsis_device_lock, stm32g4_lock, threadx_lock  # noqa: E402
 
 GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
          "board_arm", "resource_budgets", "installed_sdk",
@@ -95,6 +95,9 @@ def inventory(root=ROOT):
                 threadx_lock.verify(checkout, lock_path, "linux")
             elif name == "stm32g4_cmsis":
                 stm32g4_lock.verify(checkout, lock_path)
+            elif any(review["directory"] == path for review in
+                     cmsis_device_lock.REVIEWED_DEVICES.values()):
+                cmsis_device_lock.verify(checkout, lock_path)
             else:
                 raise ValueError("Source lock validator requires catalogue review")
             if locked["commit"] != entry[2]:

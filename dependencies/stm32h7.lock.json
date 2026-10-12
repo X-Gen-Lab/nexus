@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "nexus-reviewed-device-source",
+  "repository": "https://github.com/STMicroelectronics/cmsis-device-h7.git",
+  "commit": "8f922cdc7cc6de2344e75ddd657889f4ff761790",
+  "selected_part": "STM32H743ZIT6",
+  "files": {
+    "Include/stm32h743xx.h": {
+      "bytes": 2098465,
+      "sha256": "9a4ea0860707868a1cc562140ba214d535fb5a64fde91b451b2767276eef7e03"
+    },
+    "Include/stm32h7xx.h": {
+      "bytes": 11834,
+      "sha256": "99ac7d4598e20d9bd74e0e001f0e63c2a8eb0a3584242d9e442be31ceb616cb9"
+    },
+    "Include/system_stm32h7xx.h": {
+      "bytes": 2422,
+      "sha256": "e0f13c2971d34bda571aed454880b3608093cd9a5f7420a763e8c2bda34e826a"
+    },
+    "LICENSE.md": {
+      "bytes": 11348,
+      "sha256": "49d37f1f2e5c1f9fc9da194b44ffbfa41f966b7cf446fbab4d1e2b0c1e3d20df"
+    },
+    "Source/Templates/gcc/startup_stm32h743xx.s": {
+      "bytes": 29344,
+      "sha256": "e12e1466be79e9f368b5759575510ff90de067540ca1d975b20ac717d4fec8e5"
+    }
+  },
+  "license": {
+    "path": "LICENSE.md",
+    "expression": "Apache-2.0"
+  }
+}

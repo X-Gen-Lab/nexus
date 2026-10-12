@@ -17,3 +17,11 @@
 [submodule "vendors/st/cmsis_device_g4"]
 	path = vendors/st/cmsis_device_g4
 	url = https://github.com/STMicroelectronics/cmsis-device-g4.git
+
+[submodule "vendors/st/cmsis_device_h7"]
+	path = vendors/st/cmsis_device_h7
+	url = https://github.com/STMicroelectronics/cmsis-device-h7.git
+
+[submodule "vendors/st/cmsis_device_u5"]
+	path = vendors/st/cmsis_device_u5
+	url = https://github.com/STMicroelectronics/cmsis-device-u5.git
