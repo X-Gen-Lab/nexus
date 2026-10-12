@@ -46,8 +46,9 @@ queues and observers actually withdraw their references.
 
 The exact implementations and configured limits remain authoritative:
 
-- UART: `soc/*/drivers/uart*.c`; G474 is IRQ bytes only. The F407 and G474
-  wire-drain allowance is `20000000 / baud + 100` microseconds. GD IRQ uses its
+- UART: `soc/*/drivers/uart*.c`; G474, H743 and U575 are IRQ bytes only. The F407,
+  G474, H743 and U575 wire-drain allowance is `20000000 / baud + 100`
+  microseconds. GD IRQ uses its
   reviewed reset-abort protocol; it is not assigned the ST wire-drain formula.
 - SPI: `soc/*/drivers/spi*.c`; the finite DMA drain allowance is 200 microseconds.
 - I2C: `soc/common/i2c_v1_async.c` and the SoC wrappers; V1 async drain allowance
@@ -66,6 +67,15 @@ backend, clock, memory layout and capacities. A source instruction count,
 object-file size or different-capacity image cannot establish an equivalent
 whole-image saving. Report Flash, static RAM, reservations and caller storage
 separately. Disassembly is real tool output, not a cycle measurement.
+
+`tools/measurement/soc_costs.py` observes actual linked functions and ELF resource
+costs with complete raw command receipts and input/tool hashes. Its comparison
+rejects changed routes, bindings, claims, backend or capacity profiles rather than
+silently attributing their cost to an implementation improvement. The empty versus
+selected and baremetal versus FreeRTOS dimensions remain useful selection-cost
+reports, but are not same-profile regression comparisons. The
+[SoC execution record](../delivery/soc-refinement-verification.md) identifies the
+source scope of completed observations and pending final baselines.
 
 For changed interrupt/concurrency behavior, GoogleTest/GoogleMock calls the real
 production source with external register/CPU ports modeled. Record actual RED,

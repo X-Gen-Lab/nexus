@@ -19,6 +19,12 @@ confirm the Board profile and own LED/console policy. See
 `system.c` supplies the pre-RAM CPU-only `SystemInit`, checked clock startup and
 rollback, reserved TIM2 handler and the single time domain. The generated cold
 assembly owns clock gates, pin admission, startup ordering and partial rollback.
+It validates every selected pin before the first change and retains one
+`uint16_t` original state per selected pin with validity/gate ownership until
+complete Platform release. Driver GPIO stop establishes its declared idle;
+Platform release subsequently restores the original input/analog lease. A
+failed restore readback retains only unfinished leases for ordinary cleanup
+retry. This storage is separate from any constructor's temporary local snapshot.
 Before system stop, every peripheral and OS consumer must already have joined.
 Clock changes and deep-sleep continuity are excluded from this first profile.
 

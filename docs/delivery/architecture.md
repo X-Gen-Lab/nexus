@@ -6,7 +6,7 @@
 |---|---|---|
 | `core/` | 中性结果、绝对 monotonic deadline、caller-owned request 状态 | C11；无 Board、RTOS、SDK |
 | `arch/` | 编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot | 无 SDK／OS；原语编译与整平台资格分别记录 |
-| `soc/stm32f407/`、`soc/gd32f470/`、`soc/stm32g474/` | 精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；各家族只开放已维护模式 |
+| `soc/<family>/` | F407、F470、G474、H743、U575 的精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；各家族只开放已维护模式 |
 | `boards/<board>/board.json` | 精确型号、已审 route、晶振声明、safe initial、来源与未知 PCB 项 | 只读资源包；不创建产品任务 |
 | `io/` | typed 多态合同、共享操作表、DMA/stream/wake；可选 CAN、USB、Ethernet 与高级 timer 合同 | 公共头不含厂商类型；Native 是行为模型 |
 | `os/` | 可选 wait/wake、按对象静态 task/stack/TCB/queue 适配 | driver 不依赖 OS；不创建应用 worker |
@@ -32,6 +32,15 @@ G474 的 HSE24/170 MHz 参考配置已经通过真实生成 factory、时钟／G
 1 kHz Tick 对应 reload169999。启动先拒绝被占用的 LPUART 控制寄存器，再改动
 系统时钟；失败构造对象进入逆序清理，撤销失败仍保留时钟／引脚／状态责任。
 这些是独立开发证据，未建立参考 PCB、实板时序或 ThreadX G474 支持。
+
+H743 与 U575 分别增加 M7／M33 的具体 SoC 装配。H743 维护 HSI64、LDO、
+Cache off、TIM2、PB0 与 USART3 PD8/PD9；U575 维护外部已确认的 TZEN=0、
+SWAP_BANK=0、MSIS4 MHz、Cache off、TIM2、PC7 与 USART1 PA9/PA10。
+两者都只开放 GPIO／IRQ UART 字节与裸机／FreeRTOS，不从芯片事实自动派生
+DMA、cache、安全域或全外设支持。H743 在主 RAM 可写前执行独立的有界电源
+入口；U575 不改变 option bytes 或安全归属。精确范围见
+[SoC 完善合同](../design/soc-refinement.md)，实际结果见
+[本轮执行记录](soc-refinement-verification.md)。
 
 Board 不复制 SoC 驱动。GD32 的 I2C/PWM/ADC/EXTI route、STM32 的高级控制器 route
 可以在明确标为软件测试夹具的外部 Board 包中编译／链接；这不意味着三块参考 PCB
@@ -72,6 +81,13 @@ constructor/rollback/IRQ 和系统时钟生成。公共 resolver 保留 schema�
 和 mode 拒绝，不继承 Native 或 Cortex-M4 默认值。普通 Board 复用已有实现，
 不复制驱动；文档矩阵不能反向决定配置。
 
+不可变 family descriptor 统一配置入口、依赖身份和 SDK 必需 payload；controller
+descriptor 复用精确寄存器基址、IRQ、DMA 和引脚绑定事实，生产 C 的 SDK 静态
+断言仍独立核对。`clock.source`／`input_hz` 表达 HSE、HSI 或 MSIS 等真实来源；
+旧 `hse_hz` 只在解析入口归一化，不为内部振荡器虚构外部晶振。复杂芯片用
+`dma_engines` 分别表达实际可达性，不用一个布尔值掩盖不同 DMA master 的差异。
+这些是构建期事实，不新增运行时 registry、查询层或第二份源码图。
+
 CMake 中 `Nexus::Platform` 导出配置、typed factory 和不可变接口；SDK headers 和
 provider storage 只对实现与生成 binding TU 可见。公共消费路径没有厂商 SDK ABI。
 外部 firmware 通过 `nexus_add_firmware()` 显式装入 startup/system/linker 和资源校验。
@@ -80,8 +96,9 @@ provider storage 只对实现与生成 binding TU 可见。公共消费路径没
 
 CPU 原语、特权、中断屏蔽和 FreeRTOS 启动合同见
 [Cortex-M 架构接入](cortex-m.md)。Arch 按编译期目标选择实现，不使用运行时
-CPU factory；设备 typed factory 与共享多态方法表保持。完整 MCU 平台目前仍为
-F407／F470，九核 CPU 软件层的模型/编译不替代具体 SoC 集成或物理验证。
+CPU factory；设备 typed factory 与共享多态方法表保持。F407／F470 的首发模式
+和 G474／H743／U575 的有限纵切片分别维护，九核 CPU 软件层的模型/编译不替代
+具体 SoC 集成或物理验证。
 
 独立 CPU runtime 读取外部 `runtime.toml` 与显式 `cpu.json`，复用同一冻结
 `CpuProfileIR` 和生产 CMake targets。`nexus_add_runtime(ASSEMBLY ...)` 导出
@@ -119,6 +136,25 @@ factory 默认 ID 按类命名并以 `uint16_t` 表达；C typedef 不阻止把�
 执行者串行调用，没有隐藏平台锁；公共 I/O 不统一检查全局 started 状态，启动
 失败后的业务退出与清理推进由调用合同约束。stop 可先撤回部分实例再返回 BUSY，
 不得把 BUSY 解释成恢复完整运行状态。
+
+冷启动先拒绝可观察到的外部 owner。GPIO 装配先观察全部选中 bank 的 gate，
+再检查全部选中 pin 的 mode/lock，最后才保存租约并修改 pin；不能先改一个
+bank 再因另一个 bank 冲突而假称未产生效果。控制器路线和 endpoint CS 都属于
+同一次检查。共享 bank 的未选中 pin 保持外部所有权。
+
+驱动自己的 GPIO stop 保持声明的 safe idle。完整 Platform stop 只有在所有
+IRQ／DMA／调用者引用排空后，才恢复原来的选中 pin 租约并释放 gate；恢复读回
+失败仍保留对应清理责任。因此完整 Platform 释放不承诺持续主动驱动产品安全
+电平。产品需要持续驱动时，应保留平台 owner，或先按外部电源／安全策略退出。
+这是资源所有权边界，不是平台内置的产品停机政策。
+
+timebase 只在成功启动后发布有效 epoch。启动先排除旧 UIF，再观察 UG 产生的
+新更新；运行期 ACK 拒绝时不累加 epoch，而是使时间失效并有界撤回中断源。
+无论中断源隔离是否成功，都保留终止路径的中断屏蔽并调用故障观察端口；观察者
+返回后仍停机，不以无效零时间继续运行 deadline consumer，也不释放 request
+或低功耗借用。产品可提供独立审查的非返回恢复；正常 stop/restart 或清理重试
+不能恢复这条终止路径。读取在同一掩码区内再次确认 epoch 有效，避免 IRQ 在
+读取入口间隙使时间失效。旧 deadline 不能跨停机、失败或重启继续使用。
 
 SPI/I2C controller factory 返回真实控制器，device factory 返回 CS/address
 端点。一个 controller 仲裁所有子端点；恢复属于 controller，不借用第一个端点
@@ -212,6 +248,8 @@ TDD 按 Red→Green→Refactor 实施，新增行为先保留失败证据。comm
 测试并验证全量发现的用例、未过滤的新 XML 和返回码；机械门禁只能证明当前执行，
 不能证明所有开发者的历史编辑顺序。代码格式与反斜线 Doxygen 沿用既有规则。
 
-本轮 factory/TOML/多态迁移是新源码，不能继承此前候选的资格。开发日志位于外部
-实施证据目录；最终 clean-source、SDK、离线双构建和新候选须按新 HEAD 重新执行。
-三板实物尚未接入，物理结果保持 `not_executed`。
+本轮 factory/TOML/多态和 SoC 迭代不能继承此前候选的资格。
+[本轮执行记录](soc-refinement-verification.md) 绑定实际 code revision 的完整
+主机门禁、ARM 矩阵、安装 SDK 和外部示例；原始日志位于独立证据归档。后续
+文档提交不替换该 code 身份。离线双构建和新候选仍有独立退出条件；全部实板
+尚未接入，物理结果保持 `not_executed`。

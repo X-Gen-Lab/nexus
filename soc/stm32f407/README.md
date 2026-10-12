@@ -95,12 +95,22 @@ Construction is a cold task operation with no other writers of the selected
 controllers. GPIO levels and reviewed AF fields are installed explicitly.
 Advanced constructors capture only affected pin fields and clock bits on the
 startup stack; a later acquisition failure restores those fields before the
-outer platform rolls back its earlier interfaces. Existing enabled channels
-or EXTI lines are rejected before pin changes. Shutdown drains interfaces in
-reverse order, preserves declared CS/PWM inactive levels, releases other
-controller pins to inputs and disables only the last EXTI vector owner. An
-enabled IWDG remains an explicit irreversible effect and prevents a clean
-platform shutdown. These are ownership guarantees, not physical timing proof.
+outer platform rolls back its earlier interfaces. Those local snapshots are
+separate from the generated Platform lease: one persistent `uint16_t` per
+selected pin plus validity and gate ownership. All selected pin modes/locks are
+checked before the first pin change; retained lease storage is sized by the
+actual assembly, with alignment accounted in the linked ELF.
+
+Existing enabled channels or EXTI lines are rejected before pin changes.
+Shutdown drains interfaces in reverse order and first establishes declared
+driver CS/PWM inactive levels. Complete Platform release then restores the
+selected original pin fields/latches and releases added gates only after
+observed restoration. Failed restoration retains the exact unfinished lease;
+it does not repeat restoration of already released pins. Thus complete Platform
+release does not promise sustained product safe-output drive. Only the last
+EXTI vector owner disables that vector. An enabled IWDG remains an explicit
+irreversible effect and prevents a clean platform shutdown. These are ownership
+guarantees, not physical timing proof.
 
 `tests/contracts/stm32_model` compiles the real production providers against
 controlled official register structs and explicit model event hooks. It tests

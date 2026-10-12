@@ -47,7 +47,7 @@ CPU runtime 不生成 SoC/Board/factory；ThreadX 另有明确的 Native/M4 子�
 [九核支持说明](../delivery/cortex-m.md)。这不扩大完整平台的芯片/板卡范围。
 
 首发为启明STM32F407ZGT6、天空星STM32F407VET6和梁山派GD32F470ZGT6，裸机/
-FreeRTOS、显式 ThreadX 及Native模型。新增模式和 G474 纵切片按各文档的配置、
+FreeRTOS、显式 ThreadX 及Native模型。新增模式和 G474／H743／U575 纵切片按各文档的配置、
 完整镜像与 SDK 退出条件验收，不从公共类型推断全芯片接入。
 三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实
 Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应用/通信2、QA/HIL2、

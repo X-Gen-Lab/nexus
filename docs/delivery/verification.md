@@ -15,12 +15,26 @@
 | 工具门禁 | `tools/testing/run_tool_tests.py --suite testing`；`tests/contracts/test_*.py`；`scripts/ci/` | 实际负路径、暂存区稳定、报告身份和执行退出码 |
 | STM／GD 寄存器模型 | `tests/google/*dma*`、`*uart_stream*`、`*adc_stream*`、`gd32_multi_test.cpp` 与已有 C contracts | 真实生产 TU；内存／线上排空、EN 拒绝关闭、迟到 IRQ、借用／隔离、校准／稳定 |
 | 三板基础配置 | 六个 ARM presets | 实际 startup／vector／provider 链接、ELF／BIN／map 和预算 |
+| H743／U575 参考纵切片 | `scripts/ci/stm32h743.py`、`scripts/ci/stm32u575.py` | 各自 empty／selected × 裸机／FreeRTOS，实际 vector／资源／保留；H743 另查 pre-RAM 电源入口，不证明 MCU 实际运行 |
+| 可选 RAM 放置 | `scripts/ci/stm32_memory.py`、`scripts/ci/gd32_memory.py` | F407 CCM、GD ADDSRAM／TCM 的链接和初始化域；不证明掉电／reset retention |
 | 高级 controller 夹具 | `tests/contracts/{stm32,gd32}_assembly/*.toml` | 九类、DMA、块接收／触发、多控制器实际 ARM 链接；明确是软件 Board |
 | 最小资源矩阵 | `tools/measurement/compare.py` | 三板 60 个 O2／Os／O3 ± LTO 镜像；18 empty GC 检查；实际 face／ops 存储成本 |
 | 外部示例 | 独立 `X-Gen-Lab/nexus-examples` | 精确 pin 后 Native 运行与六个 ARM 配置；产品实现留在外部 |
 | 源码 SDK | `cmake/package/package_source_sdk.py`、`verify_consumers.py` | 干净版本、source closure/identity、移动路径 C／C++ Native 和 Runtime consumer、STM／GD 固件链接 |
 | 离线复现／候选 | `tools/evidence/reproduce.py`、`candidate.py`、`proof.py` | 两次独立 network-none 构建，相同源码／配置／工具／ELF 身份及必需 scope |
 | HIL | `tools/hil/prepare.py`、`admit.py`、三板 fixture 与 station template | 工装已准备；未连接设备，所有物理结果 `not_executed` |
+
+本轮 SoC 的逐批 canonical commit、实际门禁和最终源码待验项见
+[SoC 执行记录](soc-refinement-verification.md)。版本化 datasheet／manual／errata
+索引只建立来源；实际 silicon revision 和各 mode 的 workaround 适用性单独验收。
+`soc_costs.py` 保存真实 ELF／反汇编／工具调用与可比 profile，不将不同 backend、
+route 或容量的大小差解释为同配置优化，也不把指令数量当作测得 cycles。
+
+`tools/hil/soc_acceptance.py` 对 SOC-37–55 提供十九项 plan/capture/validate
+合同。plan 只产生 `prepared_unbound`；参考 G474/H743/U575 即使改名或重新计算
+metadata hash，也不能跳过 reference-only admission。真实 station 与工具输入、
+协议、仪器、连续非空 samples 和 reviewed limits 一起决定结果。物理 Flash
+掉电还需外部产品提供擦除对齐且避开全部 firmware LOAD 的显式测试布局。
 
 开发执行目录 `build/controller-routes-factory/` 与
 `build/minimal-factory-resources/` 保留独立 attempt 和原始命令，不覆盖旧运行。资源

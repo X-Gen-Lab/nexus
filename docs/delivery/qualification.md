@@ -18,11 +18,18 @@ Board/PCB/芯片／probe／image/config、失效工具文件或不完整预算�
 准备工装不等于已经刷写、串口测试、测量波形或完成掉电试验。
 
 本轮新增 ThreadX、USB FS、浅睡眠 timebase、Ethernet、高级 timer、G474 和
-user I/O broker 的证据各自绑定独立 source scope。ThreadX 的真实 Linux 内核
+user I/O broker，以及 H743／U575 GPIO/UART 参考装配的证据各自绑定独立 source
+scope。ThreadX 的真实 Linux 内核
 执行不同于 IRQ/libc 边界模型；三板 BASEPRI/PRIMASK ELF 和缺少 external Tick 的
 精准负链接不同于 MCU 运行。安装 SDK 的 retention-only 永久任务程序只建立链接；
 有限退出的真实 Linux kernel consumer 另外建立运行证据。不能从链接程序的存在
 推断已运行 scheduler，也不能从两个 host case 推断完整 MCU backend 资格。
+
+H743/U575 分别固定 HSI64／MSIS4 MHz 和 Cache off；U575 只接纳外部已建立的
+TZEN=0／SWAP_BANK=0。模型和 ELF 不会观察实际供电、option bytes 或 silicon
+revision。per-engine DMA 可达性 facts 也不建立 DMA provider、cache coherency
+或安全域隔离。SDK 必须实际用当前完整 source closure 构建 H743/U575 的公共
+consumer；只加入两个 CMSIS dependency 的旧包资格不能继承为新增平台资格。
 
 G474 已有真实 typed factory 主机执行、system/provider 回归和四个显式 TOML
 ARM 镜像（empty／selected × 裸机／FreeRTOS）。镜像预算、操作表保留、未选

@@ -4,7 +4,9 @@ Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。
 同一不可变 CPU profile 解析器驱动 Core、Arch、原子操作及裸机/FreeRTOS
 运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU 均显式声明。
 选择某个内核不生成新 SoC、Board、向量表、启动、驱动、链接布局或 typed factory。
-当前完整 SoC 仍为 STM32F407/GD32F470，参考 Board 仍为三板，实板 HIL 未执行。
+STM32F407/GD32F470 三板维护首发模式；G474、H743、U575 另有精确
+GPIO／IRQ UART／timebase 参考装配。选择 CPU 本身不建立这些 SoC 机制，
+也不扩大它们的外设范围。全部实板 HIL 未执行。
 
 详细所有权、上下文与拒绝语义见 [Arch 契约](../design/arch-contracts.md)，
 OS 生命周期见 [OS 适配](../../os/README.md)，精确整平台范围见
@@ -203,7 +205,9 @@ python scripts/ci/cortex_runtime.py --compiler arm-none-eabi-gcc \
     --output build/cortex-runtime
 ```
 
-这些门禁分别建立 CPU primitive、CPU runtime、完整 F407/F470 平台和实板证据。
+这些命令建立实际执行范围内的 CPU primitive／runtime 软件证据。具体
+F407/F470 平台、G474/H743/U575 参考装配与物理 station 有各自门禁；
+编译命令不建立实板证据。
 可选 feature 组合按实际执行范围记录，单个组合通过不继承给所有可能组合。
 当前开发执行目录为 `/workspace/nexus-all-cortex-evidence`；最终通过数与源码身份
 由实际报告核对，不引用之前版本的 counts。

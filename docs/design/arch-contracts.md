@@ -141,5 +141,7 @@ SAU MMIO 返回 absent-hardware 结果，纯 encoder 仍可使用。模型不执
 
 本轮执行证据由当前源码重新生成；正式 clean-source SDK、离线双构建和 candidate
 封存还须遵循 [qualification](../delivery/qualification.md)。旧 HEAD 的通过数、
-candidate 或硬件状态不能继承。当前整平台仍限已集成的 F407/F470 三板，没有
-新增真实芯片/Board，也没有实板 HIL。软件模型或成功编译不提升产品 release。
+candidate 或硬件状态不能继承。F407/F470 三板维护首发模式，G474/H743/U575
+参考装配另行维护具体 startup、timebase、GPIO 和 IRQ UART；它们不由 CPU
+profile 自动生成，也不建立 DMA/cache/security 全功能支持。全部实板 HIL
+未执行。软件模型或成功编译不提升产品 release。

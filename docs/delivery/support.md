@@ -11,12 +11,22 @@
 | STM32F407ZGT6 / 启明欣欣 V3.1 | Cortex-M4F；1 MiB Flash；主 SRAM 128 KiB、CCM 64 KiB；声明 clock/profile 与 reviewed routes | 实际 PCB 修订、晶振、供电、连续性、波形与负载 |
 | STM32F407VET6 / 天空星青春版 | Cortex-M4F；512 KiB Flash；主 SRAM 128 KiB、CCM 64 KiB；独立 Board 资源 | 相同类别的实际 PCB／电气／HIL 验收 |
 | GD32F470ZGT6 / 梁山派 | Cortex-M4F；1 MiB Flash；主 SRAM 192 KiB、ADDSRAM 256 KiB、TCM 64 KiB；25 MHz 声明输入、200 MHz profile；可选 USB 独立 48 MHz owner | 未观察 PCB/晶振/电气；默认 linker 只用主 SRAM；实际 USB clock/PHY 仍未测量 |
-| STM32G474RET6 / MB1367 来源参考配置 | Cortex-M4F；512 KiB Flash；128 KiB 连续 CPU SRAM alias；HSE24/170 MHz、独立 TIM2；GPIOA PA5、LPUART1 PA2/PA3 IRQ bytes；生成 factory 和裸机/FreeRTOS ELF | 实际 PCB／晶振／焊桥未观察；未授权 DMA；独立 SDK／clean-source／实板资格 |
+| STM32G474RET6 / MB1367 来源参考配置 | Cortex-M4F；512 KiB Flash；128 KiB 连续 CPU SRAM alias；HSE24/170 MHz、独立 TIM2；GPIOA PA5、LPUART1 PA2/PA3 IRQ bytes；生成 factory 和裸机/FreeRTOS ELF | 实际 PCB／晶振／焊桥未观察；未授权 DMA；软件报告与实际 PCB／电气验收分开 |
+| STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置 | Cortex-M7F；2 MiB Flash；默认 AXI SRAM 512 KiB；pre-RAM LDO、HSI64、TIM2；PB0 GPIO、USART3 PD8/PD9 IRQ bytes；裸机／FreeRTOS 静态装配 | PCB／供电／硅片修订／焊桥未观察；Cache 关闭；未实现 DMA、其他 RAM 放置或运行状态接管；最终软件资格独立记录 |
+| STM32U575ZIT6Q / NUCLEO-U575ZI-Q 来源参考配置 | Cortex-M33F；2 MiB Flash；默认 SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；PC7 GPIO、USART1 PA9/PA10 IRQ bytes；裸机／FreeRTOS 静态装配 | PCB／SMPS／硅片修订／option bytes 未观察；Cache 关闭；未实现 DMA、TZEN=1、安全归属或其他 RAM 放置；最终软件资格独立记录 |
 | Native | Linux/POSIX 行为模型、实际线程与持久化文件故障模型 | 不构成 MCU 或电气资格 |
 
 裸机和锁定 FreeRTOS 均为显式选择的薄适配。启动只建立平台时钟／接口，不创建
 scheduler、产品任务或工作流。FreeRTOS POSIX host 运行验证软件生命周期，不能
-替代 Cortex-M4F IRQ ceiling、FPU context 与 stack high-water 的实板验证。
+替代对应 MCU 的 IRQ ceiling、FPU context 与 stack high-water 实板验证。
+
+H743 使用官方 Cortex-M7 启动与有界 LDO 电源入口，在 ACTVOSRDY 前禁止 RAM
+写入；仅接纳固定 HSI64、Cache off 的冷状态。U575 使用官方 Cortex-M33 启动，
+仅维护 TZEN=0 单地址状态；启动后读取 option register 不能使 TZEN=1 启动变成
+合法单状态启动。两者都不修改 option bytes，不自动接管 bootloader、DMA 或既有
+clock/IRQ owner。原始 CMSIS Device H7/U5 源码、许可和版本固定在 source lock。
+精确入口见 [H743](../../soc/stm32h743/README.md) 与
+[U575](../../soc/stm32u575/README.md)。
 
 ThreadX 是额外显式后端，锁定官方 Eclipse ThreadX 6.5.2.202603 release。当前
 配置维护三块 F407/F470 Board 的 Cortex-M4 GNU port，以及 Native Linux GNU。
@@ -30,8 +40,9 @@ ThreadX 不实现本项目 FreeRTOS 的 MPU、split-security 或 tickless 模式
 CPU 软件层另支持 M0／M0+／M3／M4／M7／M23／M33／M55／M85，统一严格事实
 解析器选择 Core/Arch、原子操作和裸机/FreeRTOS runtime。M0/M0+ RMW 使用
 bounded saved-PRIMASK；可选 cache/MPU/SAU 有真实 CPU 算法，FPU/MVE 与安全
-状态决定精确 kernel port 和 ABI。没有新增 SoC/Board/factory，以上完整平台列表
-保持独立。编译、寄存器模型与真实 FP/MVE/cache/MPU/安全世界验收分别记录；
+状态决定精确 kernel port 和 ABI。CPU-only runtime 自身不生成 SoC/Board/factory；
+上述 H743/U575 纵切片分别拥有独立装配与验收。编译、寄存器模型与真实
+FP/MVE/cache/MPU/安全世界验收分别记录；
 可选 restricted MPU task 和 split Secure/NonSecure runtime 已有独立软件实现；
 窄 delay/tick SVC、Secure context lease 与调用者静态存储分别验证。默认仍为
 privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围和配置例子见
@@ -39,8 +50,9 @@ privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围�
 
 ## 首发模式
 
-以下完整外设表对应 F407/F470 首发实现。G474 仅开放上表的 GPIO／LPUART 字节
-纵切片，不从芯片型号或通用接口推断其他外设、DMA、ThreadX 或低功耗模式。
+以下完整外设表对应 F407/F470 首发实现。G474、H743、U575 仅开放上表的
+GPIO／IRQ UART 字节纵切片，不从芯片型号或通用接口推断其他外设、DMA、
+ThreadX 或低功耗模式。
 
 | 接口 | 已实现模式与限制 |
 |---|---|
@@ -81,8 +93,10 @@ ESD；它与 CAN1/USART1 flow-control 的资源冲突必须拒绝。详见
 G474 已执行真实 generated factory 主机合同、独立 system/provider 回归，以及
 四个 empty／selected × 裸机／FreeRTOS ARM 镜像的预算、操作表保留、未选驱动
 裁剪和向量字节检查。它们使用 reviewed Board 资料与锁定的官方 CMSIS，不能
-证明某块实物的 MCU、X3 晶振或 VCP／LD2 焊桥。新增 SDK 与候选仍需按最终
-clean source 验收，不能继承此前 F407/F470 候选的资格。
+证明某块实物的 MCU、X3 晶振或 VCP／LD2 焊桥。当前精确 code revision 的
+clean-source SDK、ARM 与 H743/U575 独立启动审查见
+[SoC 执行记录](soc-refinement-verification.md)。离线复现与候选封存仍有独立
+退出条件，不能继承此前 F407/F470 候选的资格。
 
 Ethernet 生成夹具保留精确 TX/RX descriptors 与 RX buffers，只接纳 STM 主 SRAM
 128 KiB 或 GD 主 SRAM192 KiB。四个 ZG ARM graph 的开发预算/retention 通过不

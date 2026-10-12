@@ -22,7 +22,7 @@ Board binding、实际 resolver 夹具和所选生产 ops 定义；它不建立�
 | I2C | I2C0/1 100 kHz polling/IRQ/DMA messages；最多 8 条消息，每条 read/write 1–256 byte；任意消息可读，1/2/末三字节 ACK 时序；repeated START、NACK、仲裁、STOP；每实例独立线路，无十位地址/任意 scan |
 | Flash | 全物理 1 MiB、256 个 4 KiB 独立 page、2-byte program；范围、erase alignment、1→0 与 pulse 验证；不预留产品分区 |
 | Watchdog | 真正 FWDGT enable/feed/reset cause；硬件 option 已启用可识别；enable 不可撤销，无产品健康策略 |
-| EXTI | 唯一 line、有界 queue、共享 vector 的静态 16-line 分派；同 vector priority 必须一致；当前受审 route 仅 PE3/EXTI3，通用分派不扩大 Board 接线支持；overflow 可见，无 debounce/callback |
+| EXTI | 唯一 line、有界 queue、共享 vector 只遍历生成的选中 line；同 vector priority 必须一致；当前受审 route 仅 PE3/EXTI3，分派不扩大 Board 接线支持；overflow 可见，无 debounce/callback |
 | PWM | 固定 TIMER2 CH0、PSC/ARR、CCR shadow；0/100% 明确，拒绝修改共享 period；停止先输出 inactive low；capture 和 advanced PWM 使用独立受审 controller/mode |
 | ADC | ADC0 12-bit；polling 模式使用 480-cycle sample time；独立 block 模式使用 TIMER2 TRGO、DMA1 CH0 selector0、15-cycle sample time，每块稳定和校准后触发完整 scan；独立 continuous DMA 双缓冲模式，消费者借用期间不覆写 |
 | CAN | CAN0/1 Classic CAN IRQ、三邮箱与共享 filter domain；无 CAN FD |
@@ -66,9 +66,13 @@ ADC 冷启动独占 ADC0/1/2 的共享 reset 与时钟分频域；任一 ADC clo
 该检查不建立 ADC1/2 支持。初始化先启用并观察 GPIO clock，再保存实际选择
 引脚的 mode/pull。稳定等待、reset 校准或校准失败时，关闭 ADC0、恢复共享
 配置和所选引脚字段，仅释放本次新增的 GPIO clock，保留相邻引脚及其他
-时钟变化；失败不发布实例，也不要求调用方 stop。快照只占冷启动栈，不
-增加运行时实例存储或依赖 Nexus GPIO provider。block rearm 使用已有所有权，
-不再次执行冷启动或恢复仍持有的引脚。
+时钟变化；失败不发布实例，也不要求调用方 stop。这份 ADC 私有局部回滚快照
+只占冷启动栈，不扩大 ADC 实例状态；它与 Platform 的持久引脚租约不同。
+生成装配为每个选中 pin 保留一个 `uint16_t` 原状态及有效性／gate 责任，直到
+完整停止时恢复并观察成功。ADC-only 装配也需链接 Nexus GPIO 文件中的私有
+capture/restore helper；这不要求创建公开 GPIO 接口实例或额外 GPIO provider
+状态。实际总存储与对齐以所选 ELF 为准。block rearm 使用已有所有权，不再次
+执行冷启动或恢复仍持有的引脚。
 
 有限 ADC `trigger-dma` 使用正常 DMA 而非覆盖消费者的循环缓冲。固定 ADC 时钟为
 12.5 MHz，每个通道需要 15 个采样周期和 12 个转换周期；请求频率同时受
