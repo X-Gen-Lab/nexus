@@ -44,6 +44,9 @@ typedef struct {
     uint32_t reads;
     uint32_t writes;
     uint32_t transmitted;
+    void (*critical_observer)(void* context, bool entering);
+    void* critical_context;
+    bool observing_critical;
 } nx_g474_model_t;
 extern nx_g474_model_t g_g474_model;
 void nx_g474_model_reset(void);
@@ -54,6 +57,10 @@ void nx_g474_model_system_poll(void* system);
 void nx_g474_model_uart_poll(void* port);
 void nx_g474_model_boost_delay(void* system);
 nx_result_t nx_g474_model_irq_control(int irq, bool enabled, uint8_t priority);
+nx_arch_irq_state_t nx_g474_model_irq_save(void);
+void nx_g474_model_irq_restore(nx_arch_irq_state_t previous);
+#define nx_arch_irq_save()          nx_g474_model_irq_save()
+#define nx_arch_irq_restore(saved)  nx_g474_model_irq_restore(saved)
 #define nx_arch_is_privileged()     nx_g474_model_privileged()
 #define NX_G474_MODEL               1
 #define NX_G474_IRQ_AVAILABLE(irq)  (!g_g474_model.irq_enabled[(irq)])

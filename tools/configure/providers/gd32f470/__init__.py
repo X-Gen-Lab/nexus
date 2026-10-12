@@ -15,6 +15,7 @@ CPU_FEATURES = MappingProxyType({
 })
 PREFIX = 'gd32'
 MODEL = False
+SOURCE_IMPORT_LOCK = "vendors/gigadevice/gd32f4xx/source.lock.json"
 ETH_CONTROLLER = 'ENET'
 USB_CONTROLLER = 'USBFS'
 CAN_CONTROLLERS = ('CAN0', 'CAN1')

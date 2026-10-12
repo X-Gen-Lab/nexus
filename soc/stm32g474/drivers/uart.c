@@ -3,7 +3,7 @@
  * \brief           G474 LPUART IRQ bytes,real TC and explicit caller ring
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-10-11
+ * \date            2026-10-12
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32g474_provider.h"
@@ -227,7 +227,8 @@ void nx_stm32g474_uart_irq(nx_stm32g474_uart_state_t* p) {
             loss(p);
         else {
             ((uint8_t*)p->rx_storage)[p->rx_head] = byte;
-            p->rx_head = (p->rx_head + 1U) % p->rx_capacity;
+            if (++p->rx_head == p->rx_capacity)
+                p->rx_head = 0U;
             p->rx_count++;
         }
     } else if (errors != 0U)
@@ -261,16 +262,28 @@ static nx_result_t read_bytes(void* context, uint8_t* output, size_t capacity,
         nx_arch_irq_restore(guard);
         return NX_ERROR_STATE;
     }
+    nx_arch_irq_restore(guard);
     size_t copied = 0U;
-    while (copied < capacity && p->rx_count != 0U) {
-        output[copied++] = ((uint8_t*)p->rx_storage)[p->rx_tail];
-        p->rx_tail = (p->rx_tail + 1U) % p->rx_capacity;
+    while (copied < capacity) {
+        guard = nx_arch_irq_save();
+        if (p->rx_count == 0U) {
+            nx_arch_irq_restore(guard);
+            break;
+        }
+        /* One ring byte and its cursors per critical section. Output memory
+         * is caller-owned; copying it does not need to delay hardware IRQs. */
+        uint8_t byte = ((uint8_t*)p->rx_storage)[p->rx_tail];
+        if (++p->rx_tail == p->rx_capacity)
+            p->rx_tail = 0U;
         p->rx_count--;
+        nx_arch_irq_restore(guard);
+        output[copied++] = byte;
     }
+    guard = nx_arch_irq_save();
     bool lost = p->rx_loss != 0U;
     p->rx_loss = 0U;
-    *count = copied;
     nx_arch_irq_restore(guard);
+    *count = copied;
     return lost ? NX_ERROR_OVERFLOW
                 : (copied != 0U ? NX_SUCCESS : NX_ERROR_EMPTY);
 }

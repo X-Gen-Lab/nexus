@@ -9,8 +9,31 @@
 #include "g474_model.h"
 #include "stm32g474_provider.h"
 #include <string.h>
+#undef nx_arch_irq_save
+#undef nx_arch_irq_restore
 nx_g474_model_t g_g474_model;
 nx_stm32g474_system_t g_nx_stm32g474_system;
+/** \brief Observe real exclusion boundaries without replacing their semantics.
+ */
+static void critical_observe(bool entering) {
+    if (g_g474_model.critical_observer != NULL &&
+        !g_g474_model.observing_critical) {
+        g_g474_model.observing_critical = true;
+        g_g474_model.critical_observer(g_g474_model.critical_context, entering);
+        g_g474_model.observing_critical = false;
+    }
+}
+nx_arch_irq_state_t nx_g474_model_irq_save(void) {
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
+    if (previous.value == 0U)
+        critical_observe(true);
+    return previous;
+}
+void nx_g474_model_irq_restore(nx_arch_irq_state_t previous) {
+    nx_arch_irq_restore(previous);
+    if (previous.value == 0U)
+        critical_observe(false);
+}
 void nx_g474_model_reset(void) {
     memset(&g_g474_model, 0, sizeof(g_g474_model));
     memset(&g_nx_stm32g474_system, 0, sizeof(g_nx_stm32g474_system));

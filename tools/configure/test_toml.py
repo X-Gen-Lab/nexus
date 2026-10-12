@@ -39,6 +39,20 @@ flash_load_limit_bytes = 65536
         self.assembly.write_text(self.contents + extra, encoding="utf-8")
         return gate.resolve_ir(self.assembly, self.root)
 
+    def copy_soc_package(self, family):
+        package = self.root / "soc" / family
+        package.mkdir(parents=True, exist_ok=True)
+        for filename in ("soc.json", "routes.json"):
+            shutil.copyfile(gate.ROOT / "soc" / family / filename,
+                            package / filename)
+        if family == "gd32f470":
+            vendor = "vendors/gigadevice/gd32f4xx"
+            if not (self.root / vendor).exists():
+                # Keep the real locked import in this isolated fact root. A
+                # copied capability file cannot replace dependency verification.
+                shutil.copytree(gate.ROOT / vendor, self.root / vendor)
+        return package
+
     def test_minimal_board_id_resolves_to_typed_ir(self):
         ir = self.resolve()
         self.assertEqual(ir.board, "native-reference")
@@ -417,10 +431,7 @@ model_bytes=128
                           real_dependency(gate.ROOT, relative, expected)):
             for family, fixture, controller in cases:
                 with self.subTest(provider=(family, controller)):
-                    package = self.root / "soc" / family
-                    package.mkdir(parents=True, exist_ok=True)
-                    for filename in ("soc.json", "routes.json"):
-                        shutil.copyfile(gate.ROOT / "soc" / family / filename, package / filename)
+                    package = self.copy_soc_package(family)
                     source = gate.ROOT / "tests/contracts" / fixture
                     normalized = gate.load_assembly(source)
                     normalized["board_package"] = str(source.parent / normalized["board_package"])
@@ -467,10 +478,7 @@ model_bytes=128
             for family, fixture in (("stm32f407", "stm32_assembly/zg-blocks.toml"),
                                     ("gd32f470", "gd32_assembly/blocks.toml")):
                 with self.subTest(family=family):
-                    package = self.root / "soc" / family
-                    package.mkdir(parents=True, exist_ok=True)
-                    for filename in ("soc.json", "routes.json"):
-                        shutil.copyfile(gate.ROOT / "soc" / family / filename, package / filename)
+                    package = self.copy_soc_package(family)
                     source = gate.ROOT / "tests/contracts" / fixture
                     normalized = gate.load_assembly(source)
                     normalized["board_package"] = str(source.parent / normalized["board_package"])

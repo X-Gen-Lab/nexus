@@ -5,7 +5,9 @@ CMake remains the authority for source targets. This tool never discovers source
 code, creates workers, selects application policy, or invents a hardware route.
 """
 import argparse
+from functools import lru_cache
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -90,6 +92,36 @@ def dependency_identity(root, relative, expected=None):
     if expected is not None and commit != expected:
         fail(f"SDK source lock contradicts actual dependency: {relative}")
     return {"path": relative, "commit": commit}
+
+
+@lru_cache(maxsize=1)
+def vendor_source_verifier():
+    """Reuse the owned import verifier; installed SDKs ship the same script."""
+    script = ROOT / "scripts/ci/verify_vendor_source.py"
+    spec = importlib.util.spec_from_file_location("nexus_vendor_source", script)
+    if spec is None or spec.loader is None:
+        fail("Imported SDK verifier is unavailable")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.verify
+
+
+def imported_dependency_identity(root, relative, read):
+    """Bind the verified import, without inventing an upstream Git commit."""
+    lock_path = contained_file(root, relative)
+    lock = read(lock_path)
+    if lock_path.name != "source.lock.json":
+        fail("Imported SDK requires its reviewed source.lock.json")
+    for key in ("vendor", "package", "version"):
+        text(lock.get(key), "Imported SDK " + key)
+    try:
+        verified = vendor_source_verifier()(lock_path.parent)
+    except (OSError, ValueError, TypeError) as error:
+        fail(str(error))
+    return {"kind": "vendor-source-import",
+            "path": lock_path.parent.relative_to(root).as_posix(),
+            "lock_sha256": file_digest(lock_path),
+            **verified}
 
 
 def validate_resource_fact(value, provider, context):
@@ -183,6 +215,20 @@ def validate_soc(soc, part):
     identity(soc["id"], "SoC id")
     if not isinstance(soc["variants"], dict) or part not in soc["variants"]:
         fail(f"Unmaintained exact part: {part}")
+    provider = maintained(soc["id"])
+    # Review every physical package, including unselected variants referenced by
+    # route facts. A controller pad is not evidence that a package bonds it out.
+    for exact, package in soc["variants"].items():
+        identity(exact, "variant")
+        if not isinstance(package, dict):
+            fail("Physical variant must be an object")
+        if provider.MODEL and "pins" not in package:
+            continue
+        pins = package.get("pins")
+        if (not isinstance(pins, list) or not pins or
+                any(not isinstance(pin, str) or not PIN.fullmatch(pin)
+                    for pin in pins) or len(set(pins)) != len(pins)):
+            fail(f"Complete unique GPIO package pins required: {exact}")
     variant = obj(soc["variants"][part], {"package", "flash", "memory"},
                   {"pins"}, "variant")
     text(variant["package"], "package")
@@ -212,7 +258,6 @@ def validate_soc(soc, part):
     cpu = obj(soc["cpu"], cpu_profiles.CPU_FIELDS,
               cpu_profiles.CPU_OPTIONAL_FIELDS,
               "CPU facts")
-    provider = maintained(soc["id"])
     if cpu_abi(cpu) != provider.CPU_ABI:
         fail(f"Unsupported CPU/FPU ABI: {cpu}")
     if (type(cpu["dwt_cyccnt"]) is not bool or
@@ -741,6 +786,10 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     if "source_lock" in soc:
         lock = soc["source_lock"]
         if isinstance(lock, str):
+            if lock != getattr(provider, "SOURCE_IMPORT_LOCK", None):
+                fail("SoC source import lock differs from maintained provider")
+            source_dependencies.append(
+                imported_dependency_identity(root, lock, read))
             inputs.append(contained_file(root, lock))
         else:
             device_key = {"stm32f407": "cmsis_device_f4",

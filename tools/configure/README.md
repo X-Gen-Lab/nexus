@@ -57,8 +57,10 @@ calls_os = false
 package uses the explicit alternative `board_package = "path/to/package"`;
 relative paths are relative to the authored file. Exactly one of these fields is
 required. `clock` must match the Board oscillator and the maintained SoC clock
-profile. `backend` is `native`, `baremetal` or `freertos`; Native cannot qualify
-MCU execution. Optional `optimization` is `O2`, `Os`, `O3`, or a corresponding
+profile. `backend` is `native`, `baremetal`, `freertos` or explicitly selected
+`threadx`; Native cannot qualify MCU execution. ThreadX has its own maintained
+Native/M4 subset, strict profile and bootstrap contract; it does not inherit
+FreeRTOS CPU coverage. See [ThreadX integration](../../docs/design/threadx.md). Optional `optimization` is `O2`, `Os`, `O3`, or a corresponding
 `-lto` profile. Optional `abi` asserts the selected CPU facts. Optional `components`
 selects explicitly mapped CMake targets.
 
@@ -86,23 +88,32 @@ Implemented MCU modes are selected explicitly:
 
 | Controller | Modes and exact sources |
 | --- | --- |
-| STM USART1 | `irq` bytes/events; `dma-tx` DMA2 stream7/channel4 with IRQ RX ring; `irq-blocks` TX IRQ and caller-owned IRQ RX blocks |
-| GD USART0 | `irq` bytes/events; `dma-tx` DMA1 channel7/selector4 with IRQ RX ring; `irq-blocks` TX IRQ and caller-owned IRQ RX blocks |
-| GD USART1 | `irq` bytes/events; `irq-blocks`; TX DMA is not maintained on this route |
-| STM SPI1 | `short-poll`; `dma` finite full-duplex DMA2 stream3 TX/stream0 RX, selector3 |
-| GD SPI4 | `short-poll`; `dma-full-duplex` finite DMA1 channel4 TX/channel3 RX, selector2 |
-| GD SPI0 | `short-poll` |
-| STM ADC1 | `single-shot`/`low-rate-scan`; `trigger-dma` TIM3 TRGO and DMA2 stream4/channel0 |
-| GD ADC0 | `single-shot`/`low-rate-scan` fixed encoding7; `trigger-dma` TIMER2 TRGO and DMA1 channel0/selector0, fixed encoding1 (15 sample cycles) |
+| STM USART1 / GD USART0 | IRQ bytes/events, `dma-tx`, `irq-blocks`, `rx-dma-idle`, `dma-duplex`, `rx-dma-continuous`, `dma-duplex-continuous` |
+| STM USART2 | Finite `dma-tx` on its reviewed route |
+| GD USART1 | IRQ bytes/events, `irq-blocks`, finite `dma-tx` |
+| STM SPI1 / SPI2 | SPI1 `short-poll`; both controllers finite `dma` |
+| GD SPI0 / SPI4 | `short-poll` and finite `dma-full-duplex` |
+| STM I2C1 / I2C2 | I2C1 `poll-messages`; both controllers `irq-messages` / `dma-messages` |
+| GD I2C0 / I2C1 | `poll-messages`, `irq-messages`, `dma-messages` |
+| STM ADC1 / GD ADC0 | `single-shot`, `low-rate-scan`, finite `trigger-dma`, separate `trigger-dma-continuous` |
+| STM CAN1/2 / GD CAN0/1 | `classic-irq`, shared filter domain |
+| STM OTG FS / GD USBFS | `device-fs`, PIO endpoints and explicit USB48 clock owner |
+| STM ETH / GD ENET | `raw-rmii`, MDIO and descriptor/RX loans |
+| STM TIM4 / GD TIMER3 | `edge-capture` |
+| STM TIM1 / GD TIMER0 | `complementary-pwm`, deadtime and break |
+| G474 GPIOA / LPUART1 | Narrow GPIO and `irq-bytes` baseline; no DMA fallback |
 
-UART blocks requires `mode = "irq-blocks"` and `rx.format = "blocks"`.
-`rx.capacity` is rejected: `nx_uart_port_rx_start` supplies the exact caller-owned
-stream. `dma-tx` with RX blocks is rejected because those are different
-implemented providers. An ADC `trigger-dma` table includes a nested `irq`
-priority; `nx_adc_port_stream_start` supplies the runtime trigger frequency and
-caller-owned blocks. The generator reserves no ADC block pool. Both ADC
-providers stop after each complete block; explicit service resumes the next
-free block, so these modes include gaps and do not promise continuous capture.
+Exact routes, source and software fixture coverage are maintained in the
+[derived capability matrix](../../docs/delivery/capabilities.md). A SoC mode
+alone does not install a PCB connector, transceiver or external device.
+
+UART `irq-blocks` requires `rx.format = "blocks"`; `rx.capacity` is rejected
+because `nx_uart_port_rx_start` supplies caller-owned stream storage. TX DMA with
+IRQ blocks is rejected: explicit duplex modes select a different provider.
+Finite RX/ADC modes include rearm gaps. Continuous modes use distinct
+caller-loan/replacement contracts, stop on backpressure and never overwrite a
+consumer. The generator reserves no block pool. Mode-specific IRQ and DMA
+resources remain mandatory.
 
 DMA conflict checks use the physical controller and stream/channel, independent
 of the request selector. Selected fixed providers validate the complete exact
@@ -115,7 +126,7 @@ Boards too; a Board may restate that reservation without releasing it.
 STM DMA2 and GD DMA1 clocks are shared platform-owned
 resources; shutdown retains them until every selected request and block loan
 drains. `mode_resources` in reviewed route facts reserves TIM3/TIMER2 only for
-`trigger-dma`, rejecting simultaneous PWM use. CPU-only CCM/TCM is excluded from
+`trigger-dma` and `trigger-dma-continuous`, rejecting simultaneous PWM use. CPU-only CCM/TCM is excluded from
 immutable DMA domains. Silicon route support does not qualify PCB wiring.
 
 SPI and I2C controller identity is separate from each child endpoint:
@@ -191,7 +202,9 @@ The resolver accepts CPU software profiles for Cortex-M0, M0+, M3, M4, M7,
 M23, M33, M55 and M85. It produces one immutable ABI, compiler flag list,
 Arch capability set and IRQ/kernel-port decision. Hardware capability, software
 component support and physical qualification remain separate: the full assembly
-providers still support Native, STM32F407 and GD32F470 only.
+providers support Native, STM32F407, GD32F470 and the narrow STM32G474
+GPIO/LPUART baseline. This does not establish all-peripheral or physical
+qualification for G474.
 
 The required `cpu.dsp` fact is a strict boolean. M33 can include or omit DSP;
 `false` emits `-mcpu=cortex-m33+nodsp`, while `true` enables its reviewed DSP

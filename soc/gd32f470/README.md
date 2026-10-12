@@ -14,17 +14,22 @@ Board binding、实际 resolver 夹具和所选生产 ops 定义；它不建立�
 
 | Provider | 首发实现与边界 |
 |---|---|
-| Clock/startup | 25 MHz HXTAL、200 MHz SYSCLK、APB1 50 MHz/APB2 100 MHz；有界稳定等待与保留责任的回滚；无 USB 48 MHz/动态切换 |
+| Clock/startup | 25 MHz HXTAL、200 MHz SYSCLK、APB1 50 MHz/APB2 100 MHz；有界稳定等待与保留责任的回滚；USB FS 显式取得独立 USB48/PLLSAI owner，默认时钟不启用；无动态切换 |
 | Time | 独占 TIMER1，1 MHz、64-bit overflow 延伸；IRQ 必须在 2^32 微秒内服务；时钟域只能在启动时建立 |
 | GPIO | 授权 mask，单次 BOP set/reset；初值先写 latch，再改变 mode；toggle 要求单一串行 writer |
-| UART | USART0/1 IRQ、8N1；USART0 可选 DMA1 CH7 selector4 有限 TX；真正 TC；byte/event RX 或可选 IRQ block RX，独立容量，无复制池 |
-| SPI | SPI0/4 的 8-bit MSB first、最多 256-byte polling；SPI4 可选 DMA1 CH3 RX/CH4 TX selector2 有限全双工；端点独立 CS/mode/rate |
-| I2C | I2C0/1 100 kHz polling；最多 8 条消息，每条 read/write 1–256 byte；任意消息可读，1/2/末三字节 ACK 时序；repeated START、NACK、仲裁、STOP；每实例独立线路，无 DMA/十位地址/任意 scan |
+| UART | USART0/1 IRQ、8N1 与有限 TX DMA；USART0 另有 RX DMA/IDLE、有限/连续双向 DMA 和连续 RX blocks；真正 TC、独立容量、显式 loss，无复制池 |
+| SPI | SPI0/4 的 8-bit MSB first、最多 256-byte polling；两控制器各有受审有限全双工 DMA；端点独立 CS/mode/rate |
+| I2C | I2C0/1 100 kHz polling/IRQ/DMA messages；最多 8 条消息，每条 read/write 1–256 byte；任意消息可读，1/2/末三字节 ACK 时序；repeated START、NACK、仲裁、STOP；每实例独立线路，无十位地址/任意 scan |
 | Flash | 全物理 1 MiB、256 个 4 KiB 独立 page、2-byte program；范围、erase alignment、1→0 与 pulse 验证；不预留产品分区 |
 | Watchdog | 真正 FWDGT enable/feed/reset cause；硬件 option 已启用可识别；enable 不可撤销，无产品健康策略 |
 | EXTI | 唯一 line、有界 queue、共享 vector 的静态 16-line 分派；同 vector priority 必须一致；当前受审 route 仅 PE3/EXTI3，通用分派不扩大 Board 接线支持；overflow 可见，无 debounce/callback |
-| PWM | 固定 TIMER2 CH0、PSC/ARR、CCR shadow；0/100% 明确，拒绝修改共享 period；停止先输出 inactive low；无 capture/break/dead-time |
-| ADC | ADC0 12-bit；polling 模式使用 480-cycle sample time；独立 block 模式使用 TIMER2 TRGO、DMA1 CH0 selector0、15-cycle sample time，每块稳定和校准后触发完整 scan；消费者借用期间不覆写 |
+| PWM | 固定 TIMER2 CH0、PSC/ARR、CCR shadow；0/100% 明确，拒绝修改共享 period；停止先输出 inactive low；capture 和 advanced PWM 使用独立受审 controller/mode |
+| ADC | ADC0 12-bit；polling 模式使用 480-cycle sample time；独立 block 模式使用 TIMER2 TRGO、DMA1 CH0 selector0、15-cycle sample time，每块稳定和校准后触发完整 scan；独立 continuous DMA 双缓冲模式，消费者借用期间不覆写 |
+| CAN | CAN0/1 Classic CAN IRQ、三邮箱与共享 filter domain；无 CAN FD |
+| USB | USBFS device PIO endpoints、独立 48 MHz owner；无 Host/HS/DMA/class stack |
+| Ethernet | Raw RMII frame/MDIO、caller descriptor 与 RX loan；产品网络协议外置 |
+| Timer capture | 受审 TIMER3 edge-capture 与有界事件 |
+| Advanced PWM | 受审 TIMER0 complementary outputs/deadtime/break，实际电气安全由外部验收 |
 
 UART 正常完成以 TC 为准。GD32 的取消／传输超时通过 USART reset 终止当前
 wire interval，会截断帧并生成 RX loss；未观察到 TC 的 reset abort 返回保守
@@ -39,8 +44,10 @@ SETTLED 是 provider 对 request 的最后访问；旧 IRQ 不持有请求引用
 block metadata 空间。冷启动不分配 RX 环，也不打开 RX IRQ；应用通过 rx_start
 提供精确 caller-owned block array。IRQ 只向当前 FILLING block 写一个 byte，
 满块或 IDLE 发布，error-only 不生成旧 DATA 的伪字节；消费者保持 READY/BORROWED
-时不会被覆盖，储存不足锁存 LOSS，下一有效块带可见标记。RX block 属于逐字节
-IRQ 接收，不宣称 DMA 环形接收或硬件时间戳。stop 先关闭 RX/error IRQ，再发布
+时不会被覆盖，储存不足锁存 LOSS，下一有效块带可见标记。上述 `irq-blocks` 属于逐字节
+IRQ 接收，不宣称 DMA 接收或硬件时间戳。独立 `rx-dma-idle`、`dma-duplex`、
+`rx-dma-continuous` 和 `dma-duplex-continuous` 具有各自静态 provider；continuous
+使用真实双缓冲和 caller replacement，保留 READY/BORROWED，耗尽则停止并报告 loss。stop 先关闭 RX/error IRQ，再发布
 最后有效 prefix，保留全部消费者 loan 并返回 BUSY，直到消费者 drain/release。
 独立 TX 服务与真正 TC 契约保持；TX reset 对 RX 造成的间隙也进入 LOSS。
 
@@ -63,7 +70,7 @@ ADC 冷启动独占 ADC0/1/2 的共享 reset 与时钟分频域；任一 ADC clo
 增加运行时实例存储或依赖 Nexus GPIO provider。block rearm 使用已有所有权，
 不再次执行冷启动或恢复仍持有的引脚。
 
-ADC block 模式使用正常 DMA 而非覆盖消费者的循环缓冲。固定 ADC 时钟为
+有限 ADC `trigger-dma` 使用正常 DMA 而非覆盖消费者的循环缓冲。固定 ADC 时钟为
 12.5 MHz，每个通道需要 15 个采样周期和 12 个转换周期；请求频率同时受
 完整 scan 时间和 100 MHz TIMER2 的精确 PSC/ARR 整数分频约束。块容量必须
 是完整 scan 字节数的倍数，且最多 65535 个 uint16_t 样本；启动前逐个检查
@@ -77,7 +84,9 @@ GD 校准因子有效至下一次 ADC power-off，每次 rearm 都重新执行�
 消费者释放后通过 service 显式接纳下一块，不建立后台任务。块间存在采集
 间隔；没有 FREE 块时停止触发，不猜测间隔内错过的 trigger 数。真实 DMA
 错误丢弃不完整块并记录一次可观察的块损失。stop 保留 READY/BORROWED，
-直到消费和释放完成才收回 ADC、TIMER2 与配置存储。
+直到消费和释放完成才收回 ADC、TIMER2 与配置存储。独立
+`trigger-dma-continuous` 使用双缓冲 loan 与替换合同；replacement/service 必须
+继续推进，耗尽停止采集，不能覆盖消费者或补造精确丢样数。
 
 SPI/I2C/ADC polling 不被描述为低 CPU 异步。I2C 错误后的 reset 仅结清本
 controller，不代表外部线路已恢复；recover 必须观察 bus idle 且配置线路均
@@ -107,7 +116,8 @@ UM §2.3.4 明确给出 F470 独立 4 KiB page erase，provider 使用锁定 SDK
 Table 2-1 的 ZG 条目给出 1 MiB Flash、512 KiB SRAM；UM §1.3.2 与存储图
 给出 112+16+64 KiB 主 SRAM、64 KiB CPU-only TCM，其余 256 KiB ADDSRAM
 位于 0x20030000。UM 总线矩阵允许 DMA 访问主 SRAM 与 ADDSRAM，TCM 不允许。
-默认 linker 仅使用 192 KiB 主 SRAM；ADDSRAM/TCM 是事实声明，不冒充已分配区域。
+默认 linker 仅使用 192 KiB 主 SRAM；ADDSRAM/TCM 可通过显式 memory 选择分配；linker、启动初始化和独立预算
+保持同源，未选择区域拒绝 placement。TCM 始终不能作为 DMA buffer。
 默认 Board 的接线依据见 `boards/gd32f470_liangshan`。I2C/EXTI/PWM/ADC 的
 SoC route 不代表默认板上已资格化的 connector 或外部器件。
 

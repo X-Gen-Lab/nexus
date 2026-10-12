@@ -10,7 +10,24 @@
 #include "stm32g474_provider.h"
 #include <array>
 #include <cstring>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+class CriticalBoundary {
+  public:
+    MOCK_METHOD(void, Enter, (size_t queued));
+    MOCK_METHOD(void, Leave, (size_t queued));
+};
+struct CriticalObservation {
+    CriticalBoundary* boundary;
+    nx_stm32g474_uart_state_t* state;
+};
+void ObserveCritical(void* context, bool entering) {
+    auto* observation = static_cast<CriticalObservation*>(context);
+    if (entering)
+        observation->boundary->Enter(observation->state->rx_count);
+    else
+        observation->boundary->Leave(observation->state->rx_count);
+}
 class G474Provider : public testing::Test {
   protected:
     USART_TypeDef registers{};
@@ -161,6 +178,139 @@ TEST_F(G474Provider, RingOverflowPreservesOlderBytesAndReportsLoss) {
     EXPECT_EQ(NX_ERROR_EMPTY,
               nx_uart_port_read_bytes(&port, output, 2, &count));
     EXPECT_EQ(0U, count);
+}
+TEST_F(G474Provider, ReadRestoresIncomingMaskAfterAtMostOneByte) {
+    uint8_t storage[5]{};
+    state.rx_storage = storage;
+    state.rx_capacity = sizeof(storage);
+    Start();
+    for (uint8_t byte = 1; byte <= sizeof(storage); ++byte)
+        Byte(byte);
+    testing::StrictMock<CriticalBoundary> boundary;
+    CriticalObservation observation{&boundary, &state};
+    size_t entering_count = 0;
+    size_t pops = 0;
+    EXPECT_CALL(boundary, Enter(testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly([&](size_t queued) {
+            EXPECT_TRUE(nx_arch_irq_is_masked());
+            entering_count = queued;
+        });
+    EXPECT_CALL(boundary, Leave(testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly([&](size_t queued) {
+            EXPECT_FALSE(nx_arch_irq_is_masked());
+            ASSERT_LE(queued, entering_count);
+            EXPECT_LE(entering_count - queued, 1U);
+            pops += entering_count - queued;
+        });
+    g_g474_model.critical_observer = ObserveCritical;
+    g_g474_model.critical_context = &observation;
+    uint8_t output[5]{};
+    size_t count = 99;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_uart_port_read_bytes(&port, output, sizeof(output), &count));
+    g_g474_model.critical_observer = nullptr;
+    EXPECT_EQ(5U, count);
+    EXPECT_EQ(5U, pops);
+    EXPECT_EQ((std::array<uint8_t, 5>{1, 2, 3, 4, 5}),
+              (std::array<uint8_t, 5>{output[0], output[1], output[2],
+                                      output[3], output[4]}));
+}
+TEST_F(G474Provider, IrqBetweenReadBytesPreservesNonPowerOfTwoOrder) {
+    uint8_t storage[3]{};
+    state.rx_storage = storage;
+    state.rx_capacity = sizeof(storage);
+    Start();
+    Byte(1);
+    Byte(2);
+    testing::StrictMock<CriticalBoundary> boundary;
+    CriticalObservation observation{&boundary, &state};
+    size_t entering_count = 0;
+    bool injected = false;
+    EXPECT_CALL(boundary, Enter(testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly([&](size_t queued) { entering_count = queued; });
+    EXPECT_CALL(boundary, Leave(testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly([&](size_t queued) {
+            if (!injected && queued < entering_count) {
+                injected = true;
+                Byte(3);
+                Byte(4);
+            }
+        });
+    g_g474_model.critical_observer = ObserveCritical;
+    g_g474_model.critical_context = &observation;
+    uint8_t output[4]{};
+    size_t count = 99;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_uart_port_read_bytes(&port, output, sizeof(output), &count));
+    g_g474_model.critical_observer = nullptr;
+    EXPECT_TRUE(injected);
+    EXPECT_EQ(4U, count);
+    EXPECT_EQ(
+        (std::array<uint8_t, 4>{1, 2, 3, 4}),
+        (std::array<uint8_t, 4>{output[0], output[1], output[2], output[3]}));
+    EXPECT_EQ(1U, state.rx_head);
+    EXPECT_EQ(state.rx_head, state.rx_tail);
+}
+TEST_F(G474Provider, LossBetweenReadBytesDoesNotReplaceOlderPayload) {
+    uint8_t storage[3]{};
+    state.rx_storage = storage;
+    state.rx_capacity = sizeof(storage);
+    Start();
+    Byte(1);
+    Byte(2);
+    Byte(3);
+    testing::StrictMock<CriticalBoundary> boundary;
+    CriticalObservation observation{&boundary, &state};
+    size_t entering_count = 0;
+    bool injected = false;
+    EXPECT_CALL(boundary, Enter(testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly([&](size_t queued) { entering_count = queued; });
+    EXPECT_CALL(boundary, Leave(testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly([&](size_t queued) {
+            if (!injected && queued < entering_count) {
+                injected = true;
+                Byte(4);
+                Byte(5);
+                Byte(6, USART_ISR_FE);
+            }
+        });
+    g_g474_model.critical_observer = ObserveCritical;
+    g_g474_model.critical_context = &observation;
+    uint8_t output[4]{};
+    size_t count = 99;
+    EXPECT_EQ(NX_ERROR_OVERFLOW,
+              nx_uart_port_read_bytes(&port, output, sizeof(output), &count));
+    g_g474_model.critical_observer = nullptr;
+    EXPECT_TRUE(injected);
+    EXPECT_EQ(4U, count);
+    EXPECT_EQ(
+        (std::array<uint8_t, 4>{1, 2, 3, 4}),
+        (std::array<uint8_t, 4>{output[0], output[1], output[2], output[3]}));
+    EXPECT_EQ(0U, state.rx_loss);
+    EXPECT_EQ(NX_ERROR_EMPTY,
+              nx_uart_port_read_bytes(&port, output, sizeof(output), &count));
+}
+TEST_F(G474Provider, OneByteCapacityWrapsWithoutPowerOfTwoAssumption) {
+    state.rx_capacity = 1;
+    Start();
+    for (uint8_t value = 1; value <= 8; ++value) {
+        Byte(value);
+        Byte(99);
+        uint8_t output = 0;
+        size_t count = 0;
+        EXPECT_EQ(NX_ERROR_OVERFLOW,
+                  nx_uart_port_read_bytes(&port, &output, 1, &count));
+        EXPECT_EQ(1U, count);
+        EXPECT_EQ(value, output);
+        EXPECT_EQ(0U, state.rx_head);
+        EXPECT_EQ(0U, state.rx_tail);
+    }
 }
 TEST_F(G474Provider, CorruptByteIsDiscardedWithObservableAggregateLoss) {
     Start();
