@@ -3,11 +3,15 @@
 import copy
 import json
 from pathlib import Path
+import tempfile
 import unittest
 
-from tools.evidence.common import EvidenceError
-from tools.hil.admit import validate_fixture, validate_station
+from tools.evidence.common import EvidenceError, atomic_json, file_identity
+from tools.evidence.identity import canonical_digest
+from tools.hil.admit import validate_fixture, validate_raw, validate_station
+from tools.hil.prepare import preparation_plan
 from tools.testing import test_hil_workloads
+from tests.contracts import test_hil_admission
 
 
 class HilPlatformExtensionTests(unittest.TestCase):
@@ -157,6 +161,161 @@ class HilPlatformExtensionTests(unittest.TestCase):
         self.fixture.resolved["backend"] = "threadx"
         with self.assertRaises(EvidenceError):
             self.fixture.plan()
+
+
+class HilReferenceAdmissionTests(unittest.TestCase):
+    REFERENCES = (
+        ("stm32g474re_hse24_reference", "stm32g474re-hse24-reference",
+         "STM32G474RET6"),
+        ("stm32h743_nucleo_zi2", "stm32h743-nucleo-zi2", "STM32H743ZIT6"),
+        ("stm32u575_nucleo_zi_q", "stm32u575-nucleo-zi-q", "STM32U575ZIT6Q"),
+    )
+
+    def references(self):
+        for name, board, part in self.REFERENCES:
+            path = Path("tools/hil/fixtures", name + ".json")
+            yield name, board, part, json.loads(path.read_text())
+
+    def test_reference_identity_matches_current_exact_board_facts(self):
+        for name, board, part, fixture in self.references():
+            with self.subTest(board=board):
+                facts = json.loads(Path("boards", name, "board.json").read_text())
+                self.assertEqual((fixture["board"], fixture["part"]),
+                                 (board, part))
+                self.assertEqual((facts["id"], facts["soc"]), (board, part))
+                self.assertIsNone(facts["physical_pcb_revision"])
+                validate_fixture(fixture)
+
+    def test_reference_preparation_retains_unbound_scope_and_null_budgets(self):
+        for _, board, part, fixture in self.references():
+            with self.subTest(board=board):
+                serial = fixture["serial"]
+                resolved = {
+                    "board": board, "part": part, "backend": "baremetal",
+                    "controllers": [{
+                        "id": "console", "kind": "uart", "mode": "irq-bytes",
+                        "controller": serial["controller"], "baud": 115200,
+                        "pins": [{"function": key, "pin": serial[key]}
+                                 for key in ("tx", "rx")]}],
+                }
+                report = preparation_plan(fixture, resolved)
+                self.assertEqual(report["status"], "prepared_unbound")
+                self.assertEqual(report["physical_status"], "not_executed")
+                self.assertNotIn("station_id", report)
+                self.assertEqual(fixture["scope"], "software_reference")
+                for case in report["pending_qualification"]:
+                    self.assertIsNone(case["budget"])
+                    self.assertEqual(case["status"], "not_executed")
+
+    def test_reference_scope_cannot_be_deleted_to_promote_a_fixture(self):
+        for _, board, _, fixture in self.references():
+            fixture.pop("scope")
+            with self.subTest(board=board), self.assertRaises(EvidenceError):
+                validate_fixture(fixture)
+
+    def test_reference_board_cannot_be_promoted_by_substituting_a_part(self):
+        for _, board, _, fixture in self.references():
+            fixture.pop("scope")
+            fixture["part"] = "STM32F407ZGT6"
+            with self.subTest(board=board), self.assertRaises(EvidenceError):
+                validate_fixture(fixture)
+
+    def test_reference_part_cannot_be_relabelled_as_another_board(self):
+        for _, _, part, fixture in self.references():
+            fixture["board"] = "source-relabelled-board"
+            with self.subTest(part=part), self.assertRaises(EvidenceError):
+                validate_fixture(fixture)
+
+    def test_direct_station_validation_cannot_bypass_reference_scope(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory, "synthetic-observation.txt")
+            path.write_text("Synthetic admission input; no equipment operated.\n")
+            identity = file_identity(path)
+            for _, board, part, fixture in self.references():
+                station = {
+                    "schema_version": 1, "kind": "hil_station",
+                    "station_id": "synthetic-station", "board": board,
+                    "part": part, "pcb_revision": "synthetic-pcb",
+                    "chip_uid": "synthetic-uid", "outputs_disconnected": True,
+                    "probe": {
+                        "serial": "synthetic-probe", "transport": "swd",
+                        "interface": fixture["probe_interfaces"][0],
+                        "tool": identity, "interface_config": identity,
+                        "target_config": identity},
+                    "serial": {
+                        "path": "/dev/serial/by-id/synthetic-input",
+                        "baudrate": 115200, "electrical_mode": "ttl_3v3",
+                        "wiring_checked": True, "ground_connected": True},
+                    "power": {"source": "synthetic-supply", "voltage_mv": 3300},
+                    "budgets": {"latency": {"maximum": 100, "unit": "us"}},
+                }
+                # Establish that the external station fields reach admission.
+                control = copy.deepcopy(fixture)
+                control.pop("scope")
+                control.update(board="synthetic-f407", part="STM32F407ZGT6")
+                baseline = dict(station, board=control["board"],
+                                part=control["part"])
+                validate_station(baseline, control)
+                fixture.pop("scope")
+                with self.subTest(board=board), self.assertRaises(EvidenceError):
+                    validate_station(station, fixture)
+
+
+class HilReferenceRawValidationTests(unittest.TestCase):
+    REFERENCES = HilReferenceAdmissionTests.REFERENCES
+
+    def references(self):
+        return HilReferenceAdmissionTests.references(self)
+
+    def setUp(self):
+        self.fixture = test_hil_admission.HilAdmissionTests()
+        self.fixture.setUp()
+        self.addCleanup(self.fixture.doCleanups)
+
+    def changed_admission(self, baseline, fixture):
+        admission = copy.deepcopy(baseline)
+        admission.update(board=fixture["board"], part=fixture["part"])
+        return admission
+
+    def baseline(self):
+        admission, _ = self.fixture.prepared()
+        report = validate_raw(self.fixture.raw_record(admission), admission)
+        self.assertEqual(report["physical_status"],
+                         "qualified_for_recorded_scope")
+        return admission
+
+    def assert_raw_rejected(self, admission):
+        raw = self.fixture.raw_record(admission)
+        self.assertEqual(raw["admission_sha256"], canonical_digest(admission))
+        with self.assertRaises(EvidenceError):
+            validate_raw(raw, admission)
+
+    def test_direct_raw_validator_rejects_real_software_reference_fixtures(self):
+        baseline = self.baseline()
+        for name, board, _, fixture in self.references():
+            admission = self.changed_admission(baseline, fixture)
+            admission["fixture"] = file_identity(Path(
+                "tools/hil/fixtures", name + ".json"))
+            with self.subTest(board=board):
+                self.assert_raw_rejected(admission)
+
+    def test_direct_raw_validator_rejects_rehashed_scope_deletion(self):
+        baseline = self.baseline()
+        for name, board, _, fixture in self.references():
+            admission = self.changed_admission(baseline, fixture)
+            fixture.pop("scope")
+            path = self.fixture.root / (name + ".json")
+            atomic_json(path, fixture)
+            admission["fixture"] = file_identity(path)
+            with self.subTest(board=board):
+                self.assert_raw_rejected(admission)
+
+    def test_direct_raw_validator_rejects_admission_only_board_part_relabel(self):
+        baseline = self.baseline()
+        for _, board, _, fixture in self.references():
+            admission = self.changed_admission(baseline, fixture)
+            with self.subTest(board=board):
+                self.assert_raw_rejected(admission)
 
 
 if __name__ == "__main__":

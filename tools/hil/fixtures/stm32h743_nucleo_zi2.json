@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "kind": "hil_fixture",
+  "scope": "software_reference",
+  "board": "stm32h743-nucleo-zi2",
+  "part": "STM32H743ZIT6",
+  "transport": "swd",
+  "probe_interfaces": [
+    "external-reviewed"
+  ],
+  "serial": {
+    "controller": "USART3",
+    "tx": "PD8",
+    "rx": "PD9",
+    "baudrate": 115200,
+    "electrical_mode": "ttl_3v3"
+  },
+  "required_tests": [
+    "probe_identity",
+    "flash_readback",
+    "reset",
+    "uart_echo"
+  ],
+  "physical_status": "not_executed",
+  "pending_qualification": [
+    {
+      "id": "physical_board_review",
+      "fixture": "Software reference only. Review actual NUCLEO-H743ZI2 MB1364 PCB revision, regulator fitting, SB39/SB47 LED and SB19/SB12 VCP bridges, probe and UID before any separately reviewed physical fixture. No station exists.",
+      "budget": null,
+      "unit": "count"
+    },
+    {
+      "id": "clock_uart_gpio",
+      "fixture": "Future observed HSI64 timebase, LED1 PB0 and USART3 PD8/PD9 capture. Clock accuracy, power entry and actual electrical behavior are unqualified. DMA, cache, PLL changes, STOP and running-state handoff are unsupported.",
+      "budget": null,
+      "unit": "us"
+    }
+  ]
+}

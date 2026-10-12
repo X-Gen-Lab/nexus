@@ -1,10 +1,38 @@
 """Cold assembly rejects observed foreign resources before clock effects."""
 import unittest
 
-from tools.configure import bindings, configure as gate
+from tools.configure import bindings, configure as gate, preflight
+
+
+class AdmissionInput(dict):
+    """Minimal already-resolved input for projection boundary tests."""
+
+    __getattr__ = dict.__getitem__
 
 
 class ColdPreflightGenerationTests(unittest.TestCase):
+    def test_new_families_project_only_exact_cold_uart_pin_and_irq_boundaries(self):
+        for family, controller, pins, hook, gate_bit, mux in (
+                ("stm32h743", "USART3", ("PD8", "PD9"), "H743",
+                 "RCC_APB1LENR_USART3EN", "RCC_D2CCIP2R_USART28SEL"),
+                ("stm32u575", "USART1", ("PA9", "PA10"), "U575",
+                 "RCC_APB2ENR_USART1EN", "RCC_CCIPR1_USART1SEL")):
+            item = AdmissionInput(id="console", kind="uart", controller=controller,
+                                  pins=[{"pin": pin} for pin in pins])
+            result = AdmissionInput(soc_family=family, controllers=(item,),
+                claims=[{"key": "irq:" + controller, "owner": "console"}])
+            with self.subTest(family=family):
+                source = "\n".join(preflight.emit(result))
+                self.assertIn(f"nx_{family}_system_preflight(&g_nx_{family}_system)", source)
+                self.assertIn(gate_bit, source)
+                self.assertIn(mux, source)
+                self.assertIn(f"NX_{hook}_IRQ_AVAILABLE((IRQn_Type){controller}_IRQn)", source)
+                self.assertIn("LCKR", source)
+                self.assertIn("MODER", source)
+                self.assertNotIn("NVIC->ISER", source)
+                self.assertNotIn("WRITE", source)
+                self.assertNotIn("DMA", source)
+
     def start(self, relative):
         result = gate.resolve_ir(gate.ROOT / relative)
         source = bindings.emit(result)[1]

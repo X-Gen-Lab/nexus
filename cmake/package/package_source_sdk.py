@@ -292,9 +292,11 @@ for _review in cmsis_device_lock.REVIEWED_DEVICES.values():
                             for name in sorted(_review["files"]))
 REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
 for _descriptor in provider_descriptors.families():
-    REQUIRED_FILES += _descriptor.configuration_modules + _descriptor.fact_files
+    REQUIRED_FILES += (_descriptor.configuration_modules + _descriptor.fact_files
+                       + _descriptor.owned_payload)
 REQUIRED_FILES += ("tools/configure/providers/descriptor.py",
-                   "tools/configure/providers/hardware.py")
+                   "tools/configure/providers/hardware.py",
+                   "tools/configure/clocks.py", "tools/configure/physical_facts.py")
 REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")
@@ -332,6 +334,27 @@ def regular(root, name):
     if not path.is_file():
         raise SDKError(f"Missing source SDK file: {name}")
     return path
+
+
+def filesystem_identity(path):
+    value = path.stat()
+    return (value.st_dev, value.st_ino, value.st_mode, value.st_size,
+            value.st_mtime_ns, value.st_ctime_ns)
+
+
+def stable_file(root, name):
+    """Bind content to one unchanged regular file throughout verification."""
+    path = regular(root, name)
+
+    def filesystem():
+        return filesystem_identity(regular(root, name))
+
+    before = filesystem()
+    data = path.read_bytes()
+    after = filesystem()
+    if before != after or len(data) != after[3]:
+        raise SDKError("Source SDK input changed during read: " + name)
+    return data, (digest(data), after)
 
 
 def git(root, *args):
@@ -566,7 +589,11 @@ def verify(root):
     root = root.absolute()
     if root.is_symlink() or not root.is_dir() or root.resolve() != root:
         raise SDKError("Installed source SDK root must be a regular directory")
-    identity = json.loads(regular(root, MANIFEST).read_text(), object_pairs_hook=object_pairs)
+    directories = {root, *(path for path in root.rglob("*") if path.is_dir())}
+    directory_identity = {path: filesystem_identity(path) for path in directories}
+    raw_identity, first_identity = stable_file(root, MANIFEST)
+    checked = {(root, MANIFEST): first_identity}
+    identity = json.loads(raw_identity, object_pairs_hook=object_pairs)
     fields = {"schema", "kind", "source_revision", "source_tree", "publishable", "source_dirty",
               "files_sha256", "dependencies", "reviewed_imports", "toolchains_lock_sha256", "snapshot_sha256",
               "package_files_sha256"}
@@ -584,7 +611,9 @@ def verify(root):
     for name, expected in files.items():
         if not isinstance(expected, str) or not HEX64.fullmatch(expected):
             raise SDKError("Invalid source SDK file digest")
-        if digest(regular(root, name).read_bytes()) != expected:
+        _, actual_file = stable_file(root, name)
+        checked[root, name] = actual_file
+        if actual_file[0] != expected:
             raise SDKError(f"Source SDK file identity changed: {name}")
     actual = {path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file() or path.is_symlink()}
     if actual != set(files) | {MANIFEST}:
@@ -598,12 +627,19 @@ def verify(root):
     if root.parts[-3:] != ("share", "nexus", "src"):
         raise SDKError("Relocate the complete installed SDK prefix, not its source subtree")
     prefix = root.parents[2]
+    directory_identity.update((path, filesystem_identity(path)) for path in (
+        prefix, prefix / "share", prefix / "share/nexus", prefix / "lib",
+        prefix / "lib/cmake", prefix / "lib/cmake/Nexus"))
     package_files = identity["package_files_sha256"]
     expected_exports = {"lib/cmake/Nexus/NexusConfig.cmake", "lib/cmake/Nexus/NexusConfigVersion.cmake"}
     if not isinstance(package_files, dict) or set(package_files) != expected_exports:
         raise SDKError("Source SDK requires its exported CMake package identity")
     for name, expected in package_files.items():
-        if not isinstance(expected, str) or not HEX64.fullmatch(expected) or digest(regular(prefix, name).read_bytes()) != expected:
+        if not isinstance(expected, str) or not HEX64.fullmatch(expected):
+            raise SDKError("Exported CMake package identity changed")
+        _, exported = stable_file(prefix, name)
+        checked[prefix, name] = exported
+        if exported[0] != expected:
             raise SDKError("Exported CMake package identity changed")
     records = identity["dependencies"]
     if not isinstance(records, list) or not records:
@@ -648,6 +684,31 @@ def verify(root):
     imported = root / record["path"]
     notices = {item["path"]: regular(imported, item["path"]).read_bytes() for item in record.get("notices", [])}
     validate_import_record(record, regular(imported, "source.lock.json").read_bytes(), notices, identity["source_revision"])
+    # An external verifier can take time. Reject late rewrites, same-content
+    # replacements, chmod and file-set changes rather than returning an old
+    # proof for the current SDK. Every hash and filesystem identity is retained.
+    for (directory, name), first in checked.items():
+        try:
+            _, final = stable_file(directory, name)
+        except (SDKError, OSError) as error:
+            raise SDKError("Source SDK changed during verification: " + name) from error
+        if final != first:
+            raise SDKError("Source SDK changed during verification: " + name)
+    final_files = {path.relative_to(root).as_posix() for path in root.rglob("*")
+                   if path.is_file() or path.is_symlink()}
+    if final_files != actual:
+        raise SDKError("Source SDK file set changed during verification")
+    # Close the final content sweep as well: a file checked early in that sweep
+    # may have changed while a later file was being read. This is an observed
+    # stability window; callers still need an immutable SDK during actual use.
+    for (directory, name), (_, first_filesystem) in checked.items():
+        if filesystem_identity(regular(directory, name)) != first_filesystem:
+            raise SDKError("Source SDK input changed during closing proof: " + name)
+    final_directories = {root, *(path for path in root.rglob("*") if path.is_dir())}
+    if final_directories != directories or any(
+            filesystem_identity(path) != first
+            for path, first in directory_identity.items()):
+        raise SDKError("Source SDK directories changed during verification")
     return identity
 
 

@@ -33,6 +33,7 @@ class FamilyDescriptor:
     git_modules: tuple = ()
     import_lock: str | None = None
     references: str | None = None
+    owned_payload: tuple = ()
 
     @property
     def git_dependencies(self):
@@ -69,6 +70,24 @@ _DESCRIPTORS = MappingProxyType({
     "stm32g474": FamilyDescriptor("stm32g474", (
         ("cmsis_core", "cmsis5"),
         ("cmsis_device_g4", "stm32g4_cmsis")), references="references.json"),
+    "stm32h743": FamilyDescriptor("stm32h743", (
+        ("cmsis_core", "cmsis5"),
+        ("cmsis_device_h7", "stm32h7_cmsis")), owned_payload=(
+            "soc/stm32h743/CMakeLists.txt", "soc/stm32h743/system.c",
+            "soc/stm32h743/drivers/gpio.c", "soc/stm32h743/drivers/uart.c",
+            "soc/stm32h743/private/stm32h743_system.h",
+            "soc/stm32h743/private/stm32h743_provider.h",
+            "soc/stm32h743/power_boot.S",
+            "soc/stm32h743/private/boot_registers.h",
+            "boards/stm32h743_nucleo_zi2/board.json")),
+    "stm32u575": FamilyDescriptor("stm32u575", (
+        ("cmsis_core", "cmsis5"),
+        ("cmsis_device_u5", "stm32u5_cmsis")), owned_payload=(
+            "soc/stm32u575/CMakeLists.txt", "soc/stm32u575/system.c",
+            "soc/stm32u575/drivers/gpio.c", "soc/stm32u575/drivers/uart.c",
+            "soc/stm32u575/private/stm32u575_system.h",
+            "soc/stm32u575/private/stm32u575_provider.h",
+            "boards/stm32u575_nucleo_zi_q/board.json")),
 })
 
 

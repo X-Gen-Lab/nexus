@@ -19,7 +19,7 @@ import tempfile
 
 try:
     from . import cpu as cpu_profiles
-    from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references
+    from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
     from .ir import thaw
     from .providers import descriptor, maintained
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
@@ -36,6 +36,8 @@ except ImportError:
     import timer_advanced
     import secondary_controllers
     import fact_references
+    import clocks
+    import physical_facts
     import metadata
     import factory
     import memory as memory_regions
@@ -49,7 +51,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[2]
 UINT32_MAX = (1 << 32) - 1
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
-PIN = re.compile(r"P([A-K])([0-9]|1[0-5])")
+PIN = physical_facts.GPIO_PIN
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
          "timer", "pwm", "adc", "can", "usb_device", "eth",
          "timer_capture", "advanced_pwm"}
@@ -230,12 +232,10 @@ def validate_soc(soc, part):
         if provider.MODEL and "pins" not in package:
             continue
         pins = package.get("pins")
-        if (not isinstance(pins, list) or not pins or
-                any(not isinstance(pin, str) or not PIN.fullmatch(pin)
-                    for pin in pins) or len(set(pins)) != len(pins)):
-            fail(f"Complete unique GPIO package pins required: {exact}")
+        physical_facts.package_pins(pins, package.get("pad_conditions", {}),
+                                    getattr(provider, "CONDITIONAL_PACKAGE_PADS", ()))
     variant = obj(soc["variants"][part], {"package", "flash", "memory"},
-                  {"pins"}, "variant")
+                  {"pins", "pad_conditions"}, "variant")
     text(variant["package"], "package")
     flash = obj(variant["flash"], {"origin", "size", "erase_blocks"}, (),
                 "physical Flash")
@@ -250,10 +250,13 @@ def validate_soc(soc, part):
     unique([region.get("id") for region in memory], "memory IDs")
     ranges = [(flash["origin"], flash["origin"] + flash["size"], "Flash")]
     for region in memory:
-        obj(region, {"id", "origin", "size", "dma", "linker"}, (), "memory")
+        obj(region, {"id", "origin", "size", "linker"},
+            {"dma", "dma_engines"}, "memory")
         identity(region["id"], "memory id")
-        if type(region["dma"]) is not bool or type(region["linker"]) is not bool:
-            fail("Memory DMA/linker facts must be boolean")
+        physical_facts.memory_access(region,
+                                     getattr(provider, "DMA_MEMORY_ENGINES", ()))
+        if type(region["linker"]) is not bool:
+            fail("Memory linker facts must be boolean")
         start, end = address_range(region["origin"], region["size"], region["id"])
         if any(start < old_end and old_start < end for old_start, old_end, _ in ranges):
             fail(f"Overlapping physical memory domain: {region['id']}")
@@ -309,10 +312,7 @@ def validate_soc(soc, part):
         fail("Clock profiles are required")
     for name, profile in soc["clock_profiles"].items():
         identity(name, "clock profile")
-        obj(profile, {"hse_hz", "core_hz"},
-            {"apb1_hz", "apb2_hz", "timebase", "flash_wait_states"}, name)
-        integer(profile["hse_hz"], 1, context="HSE Hz")
-        integer(profile["core_hz"], 1, context="core Hz")
+        clocks.normalize(profile)
     validate_clock_profiles(soc, provider)
     return variant
 
@@ -448,8 +448,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     text(board["source_revision"], "Board source revision")
     if board["physical_pcb_revision"] is not None:
         text(board["physical_pcb_revision"], "physical PCB revision")
-    obj(board["clocks"], {"hse_hz"}, {"lse_hz"}, "Board clocks")
-    integer(board["clocks"]["hse_hz"], 1, context="Board HSE")
+    clocks.validate_board(board["clocks"])
     for value in sequence(board["unknowns"], "unknowns"):
         text(value, "unknown condition")
     for value in sequence(board["provenance"], "provenance"):
@@ -480,8 +479,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     clock = soc["clock_profiles"].get(assembly["clock_profile"])
     if clock is None:
         fail(f"Unknown clock profile: {assembly['clock_profile']}")
-    if clock["hse_hz"] != board["clocks"]["hse_hz"]:
-        fail("Clock profile does not match the Board oscillator")
+    clock = clocks.normalize(clock)
+    clocks.match_board(clock, board["clocks"])
     if "os" in assembly and not isinstance(assembly["os"], dict):
         fail("OS policy: expected object")
     kernel_profile = kernel.resolve(assembly.get("os"), cpu_profile,
@@ -921,12 +920,15 @@ def generate(result, output):
               f'#define NEXUS_CONFIG_SHA256 "{result["configuration_sha256"]}"',
               f'#define NEXUS_EXACT_PART "{result["part"]}"',
               f'#define NEXUS_CORE_HZ {result["clock"]["core_hz"]}u',
-              f'#define NEXUS_HSE_HZ {result["clock"]["hse_hz"]}u',
+              f'#define NEXUS_CLOCK_INPUT_HZ {result["clock"]["input_hz"]}u',
+              f'#define NEXUS_CLOCK_SOURCE_{result["clock"]["source"].upper()} 1',
               f'#define NEXUS_MAIN_STACK_BYTES {result["memory_budgets"]["main_stack_bytes"]}u',
               f'#define NEXUS_BACKEND_{result["backend"].upper()} 1',
               *cpu_profiles.header_lines(profile), *kernel.header_lines(policy),
               *memory_regions.header_lines(result),
               *metadata.header_lines(thaw(result["platform_metadata"]))]
+    if result["clock"]["source"] == "hse":
+        header.insert(7, f'#define NEXUS_HSE_HZ {result["clock"]["input_hz"]}u')
     cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
              f'set(NEXUS_EXACT_PART "{result["part"]}")',
              'set(NEXUS_PROVIDER_CONFIG_MODULES "' + ';'.join(

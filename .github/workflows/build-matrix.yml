@@ -121,6 +121,28 @@ jobs:
         run: >-
           .venv/bin/python scripts/ci/gd32_memory.py
           --output build/gd32-memory
+      - name: Verify H743 reference startup and selected ARM assemblies
+        run: >-
+          .venv/bin/python scripts/ci/stm32h743.py
+          --root "$GITHUB_WORKSPACE"
+          --compiler arm-none-eabi-gcc
+          --output build/stm32h743
+          --parallel 2
+      - name: Test H743 startup and image rejection boundaries
+        run: >-
+          .venv/bin/python -m unittest discover
+          -s tests/contracts/h743_assembly -p 'test_*.py' -v
+      - name: Verify U575 reference startup and selected ARM assemblies
+        run: >-
+          .venv/bin/python scripts/ci/stm32u575.py
+          --root "$GITHUB_WORKSPACE"
+          --compiler arm-none-eabi-gcc
+          --output build/stm32u575
+          --parallel 2
+      - name: Test U575 startup and image rejection boundaries
+        run: >-
+          .venv/bin/python -m unittest discover
+          -s tests/contracts/u575_assembly -p 'test_*.py' -v
       - name: Bind the upload to observed execution identity
         if: always()
         uses: ./.github/actions/record-identity
@@ -138,6 +160,8 @@ jobs:
             build/os-resources/
             build/stm32-memory/
             build/gd32-memory/
+            build/stm32h743/
+            build/stm32u575/
           tools: |
             python=python3
             compiler=arm-none-eabi-gcc
@@ -154,6 +178,8 @@ jobs:
             build/os-resources/
             build/stm32-memory/
             build/gd32-memory/
+            build/stm32h743/
+            build/stm32u575/
             build/job-identities/arch/
           retention-days: 30
           include-hidden-files: true

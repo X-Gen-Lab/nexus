@@ -89,6 +89,96 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
     return source, build, arguments
 
 
+def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
+                            *, fixture=False, expected_revision=None):
+    """Prepare explicit H743/U575 public consumers, with actual kernel use."""
+    choices = {
+        "h743": ("stm32h743_nucleo_zi2", "hsi64-fixed-cache-off", "uart3", 0),
+        "u575": ("stm32u575_nucleo_zi_q", "msis4", "uart1", 7),
+    }
+    if family not in choices or backend not in {"baremetal", "freertos"}:
+        raise ValueError("Unreviewed modern consumer family/backend")
+    board, clock, uart, pin = choices[family]
+    prefix = Path(prefix)
+    sdk = prefix / "share/nexus/src"
+    source = directory / (family + " " + backend + " source")
+    build = directory / (family + " " + backend + " build")
+    source.mkdir()
+    run_checked(["git", "init", "--quiet", str(source)])
+    kernel = " LIBRARIES Nexus::OSFreeRTOS" if backend == "freertos" else ""
+    (source / "CMakeLists.txt").write_text(
+        'cmake_minimum_required(VERSION 3.31)\n'
+        'project(installed_modern_consumer LANGUAGES C ASM)\n'
+        'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+        'find_package(Nexus 1.0.0 EXACT CONFIG REQUIRED)\n'
+        f'nexus_add_firmware(installed_modern SOURCES main.c{kernel})\n'
+        'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
+        'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
+        'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
+        'file(WRITE "${CMAKE_BINARY_DIR}/resolved-config.txt" "${config_root}")\n')
+    assembly = source / "assembly.toml"
+    assembly.write_text(
+        f'schema = 2\nboard_package = "{sdk}/boards/{board}"\n'
+        f'backend = "{backend}"\nclock = "{clock}"\n'
+        '[factory]\ncapabilities = true\n'
+        '[memory]\nmain_stack_bytes = 2048\nlibc_heap_bytes = 0\n'
+        'static_ram_limit_bytes = 16384\nflash_load_limit_bytes = 65536\n'
+        '[gpio.led]\nbinding = "led0"\nmode = "output"\n'
+        f'[uart.console]\nbinding = "{uart}"\n'
+        'mode = "irq-bytes"\nbaud = 115200\n'
+        '[uart.console.rx]\nformat = "bytes"\ncapacity = 64\n'
+        '[uart.console.irq]\npriority = 5\ncalls_os = false\n')
+    code = (
+        '#include "nexus_bindings.h"\n#include "nexus_factory.h"\n'
+        '#if __has_include("stm32h7xx.h") || __has_include("stm32u5xx.h")\n'
+        '#error Vendor SDK leaked into the product\n#endif\n'
+        '#if __has_include("stm32h743_provider.h") || '
+        '__has_include("stm32u575_provider.h")\n'
+        '#error Provider implementation leaked into the product\n#endif\n'
+        'static nx_uart_tx_request_t request;\n'
+        'static uint8_t data[2] = {0x12U, 0x34U};\n')
+    if backend == "freertos":
+        code += (
+            '#include "nexus/os/freertos.h"\n'
+            'static nx_freertos_task_t task;\n'
+            '_Alignas(8) static StackType_t task_stack[128];\n'
+            'static void task_entry(void* context) {\n'
+            '    (void)context;\n    for (;;) {}\n}\n')
+    code += (
+        'int main(void) {\n'
+        '    nx_platform_start_result_t start = nx_platform_start();\n'
+        '    if (start.primary != NX_SUCCESS) return (int)start.primary;\n'
+        '    const nx_gpio_port_t* led = nx_factory_gpio(NX_GPIO_ID_LED);\n'
+        '    const nx_uart_port_t* console = nx_factory_uart(NX_UART_ID_CONSOLE);\n'
+        '    nx_request_initialize(&request.base);\n'
+        f'    (void)nx_gpio_port_write(led, 1U << {pin}U, 0U);\n'
+        '    (void)nx_uart_tx_prepare(&request, data, sizeof(data),\n'
+        '        nx_deadline_after(nx_time_now_us(), 1000U));\n'
+        '    (void)nx_uart_port_submit(console, &request);\n'
+        '    (void)nx_uart_port_cancel(console, &request);\n'
+        '    nx_uart_port_service(console);\n')
+    if backend == "freertos":
+        code += (
+            '    /* Link the actual kernel; software qualification never runs it. */\n'
+            '    (void)nx_freertos_task_start(&task, "sdk", task_stack, 128U, 1U,\n'
+            '                                 task_entry, NULL);\n'
+            '    vTaskStartScheduler();\n    for (;;) {}\n}\n')
+    else:
+        code += '    return (int)nx_platform_stop();\n}\n'
+    (source / "main.c").write_text(code)
+    arguments = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
+                 "-DCMAKE_BUILD_TYPE=Release",
+                 f"-DNexus_DIR={prefix / 'lib/cmake/Nexus'}",
+                 "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF",
+                 f"-DNEXUS_ASSEMBLY_FILE={assembly}",
+                 f"-DCMAKE_TOOLCHAIN_FILE={sdk / 'cmake/toolchains/arm-gcc.cmake'}"]
+    if fixture:
+        arguments.append("-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON")
+    if expected_revision:
+        arguments.append("-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision)
+    return source, build, arguments
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prefix", required=True, type=Path)
@@ -149,6 +239,33 @@ def main(argv=None):
             else:
                 for application in ("installed_c", "installed_cpp"):
                     run_checked([str(build / "bin" / application)])
+        for family in ("h743", "u575"):
+            for backend in ("baremetal", "freertos"):
+                source, build, command = prepare_modern_consumer(
+                    prefix, output, family, backend, run_checked,
+                    expected_revision=identity["source_revision"])
+                run_checked(command)
+                run_checked(["cmake", "--build", str(build), "--parallel", "2",
+                             "--target", "installed_modern"])
+                commands = json.loads((build / "compile_commands.json").read_text())
+                products = [entry for entry in commands
+                            if Path(entry["file"]).resolve() == source / "main.c"]
+                if len(products) != 1 or any(value in products[0]["command"]
+                        for value in ("/vendors/", "/soc/", "-DSTM32H743", "-DSTM32U575")):
+                    raise ValueError("Modern consumer private inputs leaked into product")
+                image = build / "bin/installed_modern.elf"
+                resources = json.loads(
+                    (build / "bin/installed_modern.resources.json").read_text())
+                if resources["status"] != "passed" or image.stat().st_size == 0:
+                    raise ValueError("Modern consumer linked resource binding failed")
+                config = Path((build / "resolved-config.txt").read_text())
+                retention_path = build / "provider-retention.json"
+                run_checked([sys.executable, "-B",
+                    str(sdk / "tools/measurement/retention.py"),
+                    "--elf", str(image), "--bindings", str(config / "bindings.c"),
+                    "--output", str(retention_path)])
+                if json.loads(retention_path.read_text())["status"] != "passed":
+                    raise ValueError("Modern consumer provider retention failed")
         report["status"] = "passed"
     except (OSError, ValueError, subprocess.TimeoutExpired, KeyError) as error:
         report["error"] = str(error)

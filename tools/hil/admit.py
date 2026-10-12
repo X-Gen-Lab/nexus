@@ -18,6 +18,14 @@ from tools.evidence.identity import check_identity, resolved_identity
 from tools.measurement.resources import measure
 
 
+# Physical promotion requires a reviewed tooling change, not fixture editing.
+SOFTWARE_REFERENCE_TARGETS = (
+    ("stm32g474re-hse24-reference", "STM32G474RET6"),
+    ("stm32h743-nucleo-zi2", "STM32H743ZIT6"),
+    ("stm32u575-nucleo-zi-q", "STM32U575ZIT6Q"),
+)
+
+
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise EvidenceError(message)
@@ -37,9 +45,13 @@ def validate_fixture(fixture: dict) -> None:
     if "scope" in fixture:
         require(fixture["scope"] == "software_reference",
                 "unknown preparation fixture scope")
-    if fixture["part"] == "STM32G474RET6":
+    target = fixture["board"], fixture["part"]
+    if any(target[0] == board or target[1] == part
+           for board, part in SOFTWARE_REFERENCE_TARGETS):
+        require(target in SOFTWARE_REFERENCE_TARGETS,
+                "software-reference Board/part identity cannot be relabelled")
         require(fixture.get("scope") == "software_reference",
-                "G474 currently has only a software-reference HIL fixture")
+                "target currently has only a software-reference HIL fixture")
     require(fixture["required_tests"] == ["probe_identity", "flash_readback",
             "reset", "uart_echo"], "required physical checks cannot be weakened")
     require(isinstance(fixture["probe_interfaces"], list) and
@@ -76,6 +88,7 @@ def validate_fixture(fixture: dict) -> None:
 
 
 def validate_station(station: dict, fixture: dict) -> None:
+    validate_fixture(fixture)
     require(fixture.get("scope") != "software_reference",
             "software-reference fixture cannot admit a physical station")
     reject_secret_fields(station)
@@ -200,6 +213,12 @@ def validate_raw(raw: dict, admission: dict, *, maximum_age_s: int = 86400,
             "physical report stale or future-dated")
     for key in ("station", "fixture", "elf", "resolved", "resources"):
         verify_file_identity(admission[key])
+    # A caller can rehash edited metadata without ever passing admission.
+    # Rebuild the actual fixture/station/firmware policy at this public boundary.
+    rebuilt = admit(*(Path(admission[key]["path"]) for key in
+                      ("station", "fixture", "elf", "resolved", "resources")))
+    require(all(admission.get(key) == value for key, value in rebuilt.items()),
+            "raw physical admission differs from revalidated artifacts")
     for key in ("station_id", "board", "part", "chip_uid"):
         require(raw[key] == admission[key], "raw physical identity mismatch: " + key)
     require(raw["elf_sha256"] == admission["elf"]["sha256"] and

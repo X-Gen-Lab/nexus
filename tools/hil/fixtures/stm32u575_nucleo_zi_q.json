@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "kind": "hil_fixture",
+  "scope": "software_reference",
+  "board": "stm32u575-nucleo-zi-q",
+  "part": "STM32U575ZIT6Q",
+  "transport": "swd",
+  "probe_interfaces": [
+    "external-reviewed"
+  ],
+  "serial": {
+    "controller": "USART1",
+    "tx": "PA9",
+    "rx": "PA10",
+    "baudrate": 115200,
+    "electrical_mode": "ttl_3v3"
+  },
+  "required_tests": [
+    "probe_identity",
+    "flash_readback",
+    "reset",
+    "uart_echo"
+  ],
+  "physical_status": "not_executed",
+  "pending_qualification": [
+    {
+      "id": "physical_board_review",
+      "fixture": "Software reference only. Review actual NUCLEO-U575ZI-Q MB1549 PCB revision, supply/SMPS fitting, PC7 LD1 SB21/SB23 and USART1 VCP SB32/SB34/SB24/SB26/SB31/SB33 bridges, probe and UID before any separately reviewed physical fixture. No station exists.",
+      "budget": null,
+      "unit": "count"
+    },
+    {
+      "id": "clock_uart_gpio",
+      "fixture": "Future observed TZEN0 and SWAP_BANK0 preboot state, MSIS4MHz timebase, PC7 GPIO and USART1 PA9/PA10 capture. Do not modify option bytes. Actual supply, clock accuracy and ES0499 receive-noise behavior are unqualified; DMA, cache, TrustZone and deep STOP are unsupported.",
+      "budget": null,
+      "unit": "us"
+    }
+  ]
+}

@@ -335,8 +335,7 @@ class HilMeasurementTests(unittest.TestCase):
                 validate_measurements(raw, admission)
 
     def test_extreme_smoke_metrics_raise_evidence_errors(self):
-        admission, _ = self.record()
-        admission["required_tests"] = self.fixture.fixture["required_tests"]
+        admission, _ = self.fixture.prepared()
         raw = self.fixture.raw_record(admission)
         raw["metrics"] = {
             name: {"value": 2000 if name == "throughput" else 1,

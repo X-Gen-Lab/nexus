@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "cmake/package"))
@@ -411,6 +412,55 @@ class SourceSDKTests(unittest.TestCase):
             self.assertNotIn(str(ROOT) + "/", command)
             self.assertNotIn("-DSTM32F407", command)
             self.assertNotIn("-DGD32F470", command)
+
+    def modern_consumer(self, family, board, backend):
+        source, build, arguments = consumer_gate.prepare_modern_consumer(
+            self.prefix, self.directory, family, backend, self.run_ok,
+            fixture=True)
+        self.assertIn(str(self.sdk / "boards" / board),
+                      (source / "assembly.toml").read_text())
+        self.run_ok(arguments)
+        self.assertEqual((build / "resolved-sdk.txt").read_text(), str(self.sdk))
+        self.run_ok(["cmake", "--build", str(build), "--parallel", "2",
+                     "--target", "installed_modern"])
+        image = build / "bin/installed_modern.elf"
+        resources = json.loads(
+            (build / "bin/installed_modern.resources.json").read_text())
+        self.assertEqual(resources["status"], "passed")
+        self.assertGreater(image.stat().st_size, 0)
+        config = Path((build / "resolved-config.txt").read_text())
+        self.run_ok([sys.executable, "-B",
+            str(self.sdk / "tools/measurement/retention.py"),
+            "--elf", str(image), "--bindings", str(config / "bindings.c"),
+            "--output", str(build / "provider-retention.json")])
+        retention = json.loads((build / "provider-retention.json").read_text())
+        self.assertEqual(retention["status"], "passed")
+        commands = json.loads((build / "compile_commands.json").read_text())
+        products = [entry for entry in commands
+                    if Path(entry["file"]).resolve() == source / "main.c"]
+        self.assertEqual(len(products), 1)
+        for entry in commands:
+            self.assertNotIn(str(ROOT) + "/", entry["command"])
+        for private in ("/vendors/", "/soc/", "-DSTM32H743", "-DSTM32U575"):
+            self.assertNotIn(private, products[0]["command"])
+        # The SDK must supply the selected original vector table, exactly once.
+        part = "stm32h743xx" if family == "h743" else "stm32u575xx"
+        startup = [entry for entry in commands
+                   if Path(entry["file"]).name == f"startup_{part}.s"]
+        self.assertEqual(len(startup), 1)
+        self.assertTrue(Path(startup[0]["file"]).is_relative_to(self.sdk))
+
+    @unittest.skipUnless(shutil.which("arm-none-eabi-gcc"), "ARM GNU toolchain unavailable: no ARM execution claim")
+    def test_relocated_h743_selected_baremetal_and_freertos_consumers_link(self):
+        for backend in ("baremetal", "freertos"):
+            with self.subTest(backend=backend):
+                self.modern_consumer("h743", "stm32h743_nucleo_zi2", backend)
+
+    @unittest.skipUnless(shutil.which("arm-none-eabi-gcc"), "ARM GNU toolchain unavailable: no ARM execution claim")
+    def test_relocated_u575_selected_baremetal_and_freertos_consumers_link(self):
+        for backend in ("baremetal", "freertos"):
+            with self.subTest(backend=backend):
+                self.modern_consumer("u575", "stm32u575_nucleo_zi_q", backend)
 
     def threadx_consumer(self, name, board, clock, *, arm):
         source, build, arguments = consumer_gate.prepare_consumer(
@@ -818,6 +868,205 @@ class SourceSDKTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
         finally:
             source.write_bytes(old_source)
+
+    def rehash_manifest_file(self, manifest, file, data):
+        file.write_bytes(data)
+        manifest["files_sha256"][file.relative_to(self.sdk).as_posix()] = (
+            source_sdk.digest(data))
+        manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+            manifest["files_sha256"], sort_keys=True,
+            separators=(",", ":")).encode())
+        (self.sdk / source_sdk.MANIFEST).write_text(json.dumps(manifest) + "\n")
+
+    def test_rehashed_modern_soc_owned_firmware_omissions_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        names = ["soc/stm32h743/power_boot.S",
+                 "soc/stm32h743/private/boot_registers.h"]
+        for family, board in (("stm32h743", "stm32h743_nucleo_zi2"),
+                              ("stm32u575", "stm32u575_nucleo_zi_q")):
+            names += [f"soc/{family}/" + name for name in (
+                "CMakeLists.txt", "system.c", "drivers/gpio.c", "drivers/uart.c",
+                f"private/{family}_system.h", f"private/{family}_provider.h",
+                "soc.json", "routes.json")]
+            names.append(f"boards/{board}/board.json")
+        for name in names:
+            with self.subTest(name=name):
+                file = self.sdk / name
+                old_source = file.read_bytes()
+                try:
+                    file.unlink()
+                    manifest = json.loads(old_identity)
+                    manifest["files_sha256"].pop(name)
+                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                        manifest["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode())
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    result = self.verify()
+                    self.assertNotEqual(result.returncode, 0,
+                                        "Rehashed actual firmware omission accepted")
+                    self.assertIn("missing required sources/licenses", result.stderr)
+                finally:
+                    file.write_bytes(old_source)
+                    identity.write_bytes(old_identity)
+
+    def test_rehashed_modern_device_source_notice_lock_omissions_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        names = ["tools/maintenance/cmsis_device_lock.py"]
+        for review in source_sdk.cmsis_device_lock.REVIEWED_DEVICES.values():
+            names += [review["directory"] + "/" + name
+                      for name in sorted(review["files"])]
+            names.append(review["lock_name"])
+        for name in names:
+            with self.subTest(name=name):
+                file = self.sdk / name
+                old_source = file.read_bytes()
+                try:
+                    file.unlink()
+                    manifest = json.loads(old_identity)
+                    manifest["files_sha256"].pop(name)
+                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                        manifest["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode())
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    self.assertNotEqual(self.verify().returncode, 0,
+                                        "Rehashed original device input omission accepted")
+                finally:
+                    file.write_bytes(old_source)
+                    identity.write_bytes(old_identity)
+
+    def test_rehashed_modern_device_wrong_commit_changed_source_and_reduced_lock_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        for review in source_sdk.cmsis_device_lock.REVIEWED_DEVICES.values():
+            with self.subTest(part=review["directory"]):
+                source = self.sdk / review["directory"] / "LICENSE.md"
+                lock = self.sdk / review["lock_name"]
+                old_source, old_lock = source.read_bytes(), lock.read_bytes()
+                try:
+                    manifest = json.loads(old_identity)
+                    next(record for record in manifest["dependencies"]
+                         if record["path"] == review["directory"])["commit"] = "a" * 40
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    self.assertNotEqual(self.verify().returncode, 0,
+                                        "Wrong reviewed device commit accepted")
+                    self.rehash_manifest_file(json.loads(old_identity), source,
+                        old_source + b"\n/* unreviewed original notice */\n")
+                    self.assertNotEqual(self.verify().returncode, 0,
+                                        "Rehashed changed original notice accepted")
+                    source.write_bytes(old_source)
+                    reduced = {**json.loads(old_lock), "files": {}}
+                    self.rehash_manifest_file(json.loads(old_identity), lock,
+                                              json.dumps(reduced).encode())
+                    self.assertNotEqual(self.verify().returncode, 0,
+                                        "Rehashed reduced reviewed graph accepted")
+                finally:
+                    source.write_bytes(old_source)
+                    lock.write_bytes(old_lock)
+                    identity.write_bytes(old_identity)
+
+    def test_installed_modern_device_cli_is_readonly_and_requires_complete_sdk(self):
+        before = {p.relative_to(self.sdk).as_posix()
+                  for p in self.sdk.rglob("*") if p.is_file()}
+        for review in source_sdk.cmsis_device_lock.REVIEWED_DEVICES.values():
+            with self.subTest(part=review["directory"]):
+                command = [sys.executable,
+                    str(self.sdk / "tools/maintenance/cmsis_device_lock.py"),
+                    "--source", str(self.sdk / review["directory"]),
+                    "--lock", str(self.sdk / review["lock_name"])]
+                result = self.run_process(command)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                report = json.loads(result.stdout)
+                self.assertEqual(report["verified_files"], 5)
+                self.assertEqual(report["source_kind"], "installed_source_sdk")
+                source = self.sdk / "core/src/request.c"
+                old_source = source.read_bytes()
+                try:
+                    source.write_bytes(b"corrupted unrelated SDK owner source")
+                    self.assertNotEqual(self.run_process(command).returncode, 0,
+                                        "Device CLI ignored complete SDK proof")
+                finally:
+                    source.write_bytes(old_source)
+        after = {p.relative_to(self.sdk).as_posix()
+                 for p in self.sdk.rglob("*") if p.is_file()}
+        self.assertEqual(after, before)
+
+    def test_sdk_manifest_sources_exports_and_file_set_stay_unchanged_during_verify(self):
+        # Inject at the external vendor-verifier boundary after the SDK has
+        # read all hashes. The actual SDK verification runs without a fake map.
+        external = source_sdk.threadx_lock.verify
+        paths = (self.sdk / source_sdk.MANIFEST,
+                 self.sdk / "core/src/request.c",
+                 self.prefix / "lib/cmake/Nexus/NexusConfig.cmake")
+        for file in paths:
+            old = file.read_bytes()
+            old_mode = file.stat().st_mode
+            for change in ("rewrite-identical", "changed-bytes", "changed-mode"):
+                with self.subTest(file=str(file), change=change):
+                    def mutate(*args, **kwargs):
+                        result = external(*args, **kwargs)
+                        if change == "rewrite-identical":
+                            replacement = file.with_name(file.name + ".replacement")
+                            replacement.write_bytes(old)
+                            replacement.replace(file)
+                        elif change == "changed-bytes":
+                            file.write_bytes(old + b"\n")
+                        else:
+                            file.chmod(old_mode ^ 0o100)
+                        return result
+                    try:
+                        with mock.patch.object(source_sdk.threadx_lock, "verify",
+                                               side_effect=mutate):
+                            with self.assertRaisesRegex(ValueError, "changed during"):
+                                source_sdk.verify(self.sdk)
+                    finally:
+                        file.write_bytes(old)
+                        file.chmod(old_mode)
+        extra = self.sdk / "late-added.c"
+        def add_file(*args, **kwargs):
+            result = external(*args, **kwargs)
+            extra.write_text("int late_added;\n")
+            return result
+        try:
+            with mock.patch.object(source_sdk.threadx_lock, "verify",
+                                   side_effect=add_file):
+                with self.assertRaisesRegex(ValueError, "changed during"):
+                    source_sdk.verify(self.sdk)
+        finally:
+            extra.unlink(missing_ok=True)
+
+    def test_final_file_read_cannot_hide_a_late_change_to_an_earlier_checked_input(self):
+        last_export = self.prefix / "lib/cmake/Nexus/NexusConfigVersion.cmake"
+        real_read = Path.read_bytes
+        for target in (self.sdk / source_sdk.MANIFEST,
+                       self.sdk / "core/src/request.c",
+                       self.prefix / "lib/cmake/Nexus/NexusConfig.cmake"):
+            with self.subTest(target=str(target)):
+                old = target.read_bytes()
+                calls = 0
+
+                def read_file(path):
+                    nonlocal calls
+                    data = real_read(path)
+                    if path == last_export:
+                        calls += 1
+                        if calls == 2:
+                            # The final content-read sweep has already passed
+                            # this earlier file. Same bytes still change inode.
+                            replacement = target.with_name(target.name + ".replacement")
+                            replacement.write_bytes(old)
+                            replacement.replace(target)
+                    return data
+
+                try:
+                    with mock.patch.object(Path, "read_bytes", new=read_file):
+                        with self.assertRaisesRegex(ValueError, "changed during"):
+                            source_sdk.verify(self.sdk)
+                    self.assertEqual(calls, 2,
+                                     "Filesystem injection did not reach final read")
+                finally:
+                    target.write_bytes(old)
 
     def test_git_checkout_inside_sdk_cannot_bypass_whole_manifest(self):
         for family, dependency, lock_name, extra in (

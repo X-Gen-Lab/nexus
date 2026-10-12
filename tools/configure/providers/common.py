@@ -111,11 +111,12 @@ def validate_clock_profiles(soc, provider):
     actual = soc["clock_profiles"]
     if set(actual) != set(supported):
         fail("Clock profile identity differs from the fixed cold implementation")
+    try:
+        from .. import clocks
+    except ImportError:
+        import clocks
     for name, expected in supported.items():
-        facts = actual[name]
-        if (set(facts) != set(expected) or
-                any(type(value) is not int for value in facts.values()) or
-                facts != expected):
+        if clocks.normalize(actual[name]) != clocks.normalize(expected):
             fail(f"Clock profile differs from the fixed cold implementation: {name}")
 
 

@@ -33,11 +33,22 @@ admission and validation do not operate probes, power boards, flash firmware or
 open serial devices. Explicit acquisition execution is a separate station action.
 
 The three maintained first-release PCB fixtures still need observed PCB revisions
-and equipment. `stm32g474re_hse24_reference.json` supplies only the software
-reference's part and console facts. Its `software_reference` scope is mandatory
-for STM32G474RET6 and station admission rejects it; deleting the scope cannot
-promote it into a physical fixture. A future station needs a separately reviewed
-physical fixture and a corresponding tooling change, not a copied plan.
+and equipment. The G474 HSE24, NUCLEO-H743ZI2 and NUCLEO-U575ZI-Q fixtures supply
+only software-reference part and console facts. Tooling pins their exact
+Board/part pairs and requires `software_reference`; deleting scope, substituting
+a part or relabelling a Board cannot promote them. Station admission rejects all
+three references, including direct validation of an edited fixture. The public
+raw validator rebuilds admission from its actual artifacts before qualification;
+rehashing edited metadata cannot bypass reference scope or station identity.
+A future station needs a separately reviewed physical fixture and a corresponding
+tooling change. All budgets remain null and all physical cases `not_executed`.
+
+The H743 reference is HSI64 with caches off, PB0 GPIO and USART3 PD8/PD9 IRQ bytes.
+The U575 reference is TZEN0/SWAP_BANK0, MSIS4MHz, PC7 GPIO and USART1 PA9/PA10 IRQ
+bytes. Review actual PCB revision, supply/regulator fitting and solder bridges;
+source defaults do not observe these facts. U575 preboot option state must be
+observed without modifying option bytes. DMA, cache, TrustZone, dynamic clocks,
+deep STOP and running-state handoff are outside these reference fixtures.
 
 
 `measure.py plan` generates seven generic acquisition cases bound to an exact
