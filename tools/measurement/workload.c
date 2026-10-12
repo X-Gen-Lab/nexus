@@ -32,7 +32,9 @@ int main(void) {
         NX_SUCCESS) {
         return 4;
     }
-#if defined(NEXUS_UART1_SELECTED)
+#if defined(NEXUS_UART3_SELECTED)
+    const nx_uart_port_t* uart = nx_binding_uart3;
+#elif defined(NEXUS_UART1_SELECTED)
     const nx_uart_port_t* uart = nx_binding_uart1;
 #else
     const nx_uart_port_t* uart = nx_binding_uart0;

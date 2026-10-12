@@ -7,6 +7,36 @@ import cortex_runtime as gate
 
 
 class RuntimeAuditTests(unittest.TestCase):
+    def test_permission_observation_is_retained_by_every_runtime(self):
+        for backend in ('baremetal', 'freertos'):
+            self.assertIn('nx_arch_nonsecure_check',
+                          gate.required_symbols(backend))
+
+    def test_cold_cache_control_is_retained_by_every_runtime(self):
+        for backend in ('baremetal', 'freertos'):
+            self.assertLessEqual({'nx_arch_cache_cold_enable',
+                                  'nx_arch_cache_cold_disable'},
+                                 gate.required_symbols(backend))
+
+    def test_nonsecure_permission_requires_actual_secure_instruction_path(self):
+        secure = {'facts': {'cpu': {'security': 'secure'}}}
+        nonsecure = {'facts': {'cpu': {'security': 'nonsecure'}}}
+        single = {'facts': {'cpu': {'security': 'single'}}}
+        evidence = (
+            '08000100 <nx_arch_nonsecure_check>:\n'
+            ' 8000100: f000 f80e bl 8000120 <cmse_check_address_range>\n'
+            '08000120 <cmse_check_address_range>:\n'
+            ' 8000120: e841 f080 ttat r0, r1\n')
+        gate.check_nonsecure_boundary(secure, evidence)
+        for bad in ('', evidence.replace('ttat', 'nop'),
+                    evidence.replace('bl 8000120', 'nop 8000120')):
+            with self.assertRaisesRegex(ValueError, 'CMSE'):
+                gate.check_nonsecure_boundary(secure, bad)
+        for variant in (single, nonsecure):
+            gate.check_nonsecure_boundary(variant, '')
+            with self.assertRaisesRegex(ValueError, 'CMSE'):
+                gate.check_nonsecure_boundary(variant, evidence)
+
     def test_runtime_retains_new_sleep_and_static_service_bodies(self):
         sleep = {'nx_arch_wait_for_interrupt', 'nx_arch_idle_if_unchanged'}
         services = {
@@ -110,8 +140,10 @@ class RuntimeAuditTests(unittest.TestCase):
             names = ('core/src/request.c', 'core/src/time.c',
                      'arch/cortex_m/nx_arch_cortex_m.c',
                      'arch/cortex_m/nx_arch_cache.c',
+                     'arch/cortex_m/nx_arch_cache_control.c',
                      'arch/cortex_m/nx_arch_mpu.c',
                      'arch/cortex_m/nx_arch_security.c',
+                     'arch/cortex_m/nx_arch_nonsecure.c',
                      'arch/cortex_m/nx_arch_sleep.c', 'os/wait.c')
             sources = [root / name for name in names] + [
                 build / 'nexus-runtime/os/freertos/m7-integer-port/port.c']

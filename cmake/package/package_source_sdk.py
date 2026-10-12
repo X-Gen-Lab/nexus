@@ -51,6 +51,12 @@ REQUIRED_FILES = (
     "arch/include/nexus/arch/security.h", "arch/cortex_m/private/mechanisms.h",
     "arch/cortex_m/nx_arch_cache.c", "arch/cortex_m/nx_arch_mpu.c",
     "arch/cortex_m/nx_arch_security.c",
+    "arch/include/nexus/arch/cache_control.h",
+    "arch/cortex_m/nx_arch_cache_control.c",
+    "arch/cortex_m/private/cache_control.h",
+    "arch/include/nexus/arch/nonsecure.h",
+    "arch/cortex_m/nx_arch_nonsecure.c",
+    "arch/cortex_m/private/nonsecure.h",
     "arch/include/nexus/arch/sleep.h", "arch/cortex_m/nx_arch_sleep.c",
     "arch/cortex_m/private/sleep.h",
     "core/include/nexus/core/memory.h",
@@ -252,11 +258,19 @@ for _component, _include, _private in (
 # locked files; no additional MCU headers or unreviewed SDK unit is selected.
 REQUIRED_FILES += tuple("soc/stm32g474/" + name for name in (
     "CMakeLists.txt", "system.c", "drivers/gpio.c", "drivers/uart.c",
+    "drivers/exti.c",
     "private/stm32g474_system.h", "private/stm32g474_provider.h",
     "soc.json", "routes.json"))
 REQUIRED_FILES += ("boards/stm32g474re_hse24_reference/board.json",)
 REQUIRED_FILES += tuple("tools/configure/providers/stm32g474/" + name for name in (
     "__init__.py", "bindings.py", "emission.py"))
+# Public measurement references are part of the supported SDK input surface.
+# A rehashed omission must not turn a complete SDK into a reduced profile set.
+REQUIRED_FILES += tuple(
+    f"tools/configure/assemblies/nucleo-{chip}-{backend}-{mode}.toml"
+    for chip in ("h743", "u575")
+    for backend in ("baremetal", "freertos")
+    for mode in ("empty", "uart"))
 # These shared inputs are opened by the default target graph even when no
 # optional device is selected. Keep its exported components and actual resource
 # observers complete as well; a rehashed map alone cannot prove their presence.

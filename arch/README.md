@@ -4,9 +4,10 @@
 privilege, ordering barriers and an optional already-enabled DWT cycle snapshot.
 It does not call I/O, OS or vendor SDK code. One compile-time Cortex-M primitive
 implementation covers M0/M0+/M3/M4/M7/M23/M33/M55/M85, including ARMv8.1-M
-Mainline compiler profiles. The maintained full SoC/platform targets remain
-STM32F407 and GD32F470
-Cortex-M4F. The separate CPU runtime assembly selects Core/Arch and optional OS
+Mainline compiler profiles. STM32F407 and GD32F470 maintain the initial platform
+scope; G474, H743 and U575 provide explicit reference slices described in the
+[support matrix](../docs/delivery/support.md). CPU support does not extend those
+SoC or Board slices. The separate CPU runtime assembly selects Core/Arch and optional OS
 software for all nine cores without creating a SoC, Board, startup or factory.
 See [CPU contracts](../docs/design/arch-contracts.md) and the
 [runtime assembly example](../docs/delivery/cortex-m.md).
@@ -52,6 +53,16 @@ timer, clock continuity, physical power behavior or wake latency.
 instruction synchronization. Every range must own complete reviewed 32-byte
 lines, fit the CPU address space and be quiescent across CPU/DMA/security users.
 The functions do not round ranges, enable caches or flush unrelated dirty lines.
+`cache_control.h` separately owns cold M7 transitions. The caller supplies one
+zero-initialized control object, masks configurable interrupts and excludes DMA
+and all other memory users. Trusted reset or a prior successful owned
+clean/disable establishes cold state; clear CCR bits alone cannot prove that
+foreign dirty lines are absent. Enable rejects pre-existing caches; disable cleans
+every reviewed data set/way and changes CCR in a leaf that cannot dirty its own
+stack. Failed partial changes retain cache/CSSELR recovery responsibility.
+Actual instruction audits verify addresses, loops and barriers at O0/Os/O2.
+Other CPU profiles remain unsupported by this cold-control API; their range
+maintenance capability does not imply a reviewed global cache transition.
 `mpu.h` retains distinct v7-format and v8 base/limit/MAIR encoders. Single-region
 programming requires an already masked privileged Thread and disabled MPU;
 actual TYPE bounds and fields are checked before writes. CTRL and incoming RNR
@@ -64,6 +75,14 @@ region, while SAU is disabled and the privileged Thread has PRIMASK set. No API
 changes SAU CTRL/ALLNS, another region, Secure gateways or another world's alias.
 NonSecure and single-domain images return unsupported without SAU MMIO. IDAU,
 overlap rules, memory permissions and gateway policy stay outside these mechanisms.
+
+`nonsecure.h` supplies an instantaneous Secure Thread observation of a complete
+span using the actual CMSE NonSecure unprivileged read or read/write check.
+It needs no programmable SAU when an IDAU establishes attribution. Native,
+single-state and NonSecure images return unsupported without crossing domains.
+Success does not pin, copy, authenticate, exclude MMIO or freeze mappings, DMA
+and bus firewall policy. SoC and gateway owners must separately establish these
+conditions before accessing memory or performing an operation.
 
 `features.h` reports immutable reviewed cache/MPU/DWT/security/SAU capabilities,
 not enabled state or hardware qualification. Native exposes the same APIs with

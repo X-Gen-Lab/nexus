@@ -101,6 +101,10 @@ jobs:
           --root "$GITHUB_WORKSPACE"
           --compiler arm-none-eabi-gcc
           --output build/cortex-runtime
+      - name: Audit actual M7 cache withdrawal instructions and addresses
+        run: >-
+          .venv/bin/python scripts/ci/cache_control_compile.py
+          --output build/cache-control
       - name: Verify explicit kernel profiles and missing hook rejection
         run: >-
           .venv/bin/python scripts/ci/os_profiles.py
@@ -154,6 +158,7 @@ jobs:
           require-dependencies: 'true'
           artifacts: |
             build/arch-compiler/
+            build/cache-control/
             build/cortex-runtime/
             build/os-profiles/
             build/os-wait-cost/
@@ -172,6 +177,7 @@ jobs:
           name: cortex-m-primitive-compiler
           path: |
             build/arch-compiler/
+            build/cache-control/
             build/cortex-runtime/
             build/os-profiles/
             build/os-wait-cost/
@@ -389,6 +395,8 @@ jobs:
           - ethernet_assembly
           - timer_assembly
           - g474_assembly
+          - h743_assembly
+          - u575_assembly
           - multi_controller_assembly
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

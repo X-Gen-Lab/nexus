@@ -8,7 +8,9 @@ else()
 endif()
 add_library(nexus_arch STATIC "${nexus_arch_port}/nx_arch_${nexus_arch_port}.c")
 target_sources(nexus_arch PRIVATE cortex_m/nx_arch_cache.c
+    cortex_m/nx_arch_cache_control.c
     cortex_m/nx_arch_mpu.c cortex_m/nx_arch_security.c
+    cortex_m/nx_arch_nonsecure.c
     cortex_m/nx_arch_sleep.c)
 target_include_directories(nexus_arch PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(nexus_arch PUBLIC nexus_abi_options
@@ -41,3 +43,8 @@ if(nexus_arch_port STREQUAL "native" AND NOT WIN32)
     target_link_libraries(nexus_arch PRIVATE Threads::Threads)
 endif()
 add_library(Nexus::Arch ALIAS nexus_arch)
+if(NEXUS_CPU_ARCH STREQUAL "cortex-m7")
+    target_compile_definitions(nexus_arch PRIVATE NEXUS_ARCH_CACHE_CONTROL_M7=1)
+else()
+    target_compile_definitions(nexus_arch PRIVATE NEXUS_ARCH_CACHE_CONTROL_M7=0)
+endif()

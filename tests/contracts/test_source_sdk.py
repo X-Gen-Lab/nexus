@@ -639,6 +639,40 @@ class SourceSDKTests(unittest.TestCase):
                     target.write_bytes(old_source)
                     identity.write_bytes(old_identity)
 
+    def test_rehashed_soc_extensions_and_reference_omissions_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        names = ["soc/stm32g474/drivers/exti.c"]
+        for mechanism in ("cache_control", "nonsecure"):
+            names += [f"arch/include/nexus/arch/{mechanism}.h",
+                      f"arch/cortex_m/nx_arch_{mechanism}.c",
+                      f"arch/cortex_m/private/{mechanism}.h"]
+        names += [f"tools/configure/assemblies/nucleo-{chip}-{backend}-{mode}.toml"
+                  for chip in ("h743", "u575")
+                  for backend in ("baremetal", "freertos")
+                  for mode in ("empty", "uart")]
+        self.assertEqual(self.verify().returncode, 0)
+        for name in names:
+            with self.subTest(name=name):
+                target = self.sdk / name
+                old_source = target.read_bytes()
+                try:
+                    target.unlink()
+                    manifest = json.loads(old_identity)
+                    manifest["files_sha256"].pop(name)
+                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                        manifest["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode())
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    result = self.verify()
+                    self.assertNotEqual(result.returncode, 0,
+                                        "Rehashed extension omission accepted: " + name)
+                    self.assertIn("missing required sources/licenses", result.stderr)
+                finally:
+                    target.write_bytes(old_source)
+                    identity.write_bytes(old_identity)
+        self.assertEqual(self.verify().returncode, 0)
+
     def test_rehashed_secondary_controller_generator_omission_rejects(self):
         name = "tools/configure/secondary_controllers.py"
         target = self.sdk / name

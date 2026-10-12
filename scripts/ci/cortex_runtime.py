@@ -27,6 +27,8 @@ ARCH_MECHANISMS = frozenset({
     'nx_arch_mpu_v8_attribute_set', 'nx_arch_features',
     'nx_arch_security_state', 'nx_arch_sau_encode', 'nx_arch_sau_write',
     'nx_arch_sau_clear',
+    'nx_arch_nonsecure_check',
+    'nx_arch_cache_cold_enable', 'nx_arch_cache_cold_disable',
     'nx_arch_wait_for_interrupt', 'nx_arch_idle_if_unchanged',
 })
 CORE_SYMBOLS = frozenset({
@@ -139,6 +141,26 @@ def function_body(text: str, name: str) -> str:
     if not match:
         raise ValueError(f'Retained function body missing: {name}')
     return match.group(1).lower()
+
+
+def check_nonsecure_boundary(variant: dict, text: str) -> None:
+    """Require a retained real CMSE path only in a Secure compiler image."""
+    secure = variant['facts']['cpu']['security'] == 'secure'
+    instruction = re.search(r'\bttat\b', text.lower()) is not None
+    helper = '<cmse_check_address_range>:' in text
+    if not secure:
+        if instruction or helper:
+            raise ValueError('Unexpected cross-world CMSE permission path')
+        return
+    try:
+        body = function_body(text, 'nx_arch_nonsecure_check')
+        helper_body = function_body(text, 'cmse_check_address_range')
+    except ValueError as error:
+        raise ValueError('Missing retained CMSE permission body') from error
+    if (not re.search(r'\b(?:bl|b\.w)\s+[^\n]*'
+                      r'<cmse_check_address_range>', body) or
+            not re.search(r'\bttat\b', helper_body)):
+        raise ValueError('Missing actual CMSE permission instruction path')
 
 
 def check_m7_integer_errata(variant: dict, text: str) -> None:
@@ -382,8 +404,10 @@ def compiled_objects(root: Path, build: Path, variant: dict) -> list[dict]:
     required = {'core/src/request.c', 'core/src/time.c',
                 'arch/cortex_m/nx_arch_cortex_m.c',
                 'arch/cortex_m/nx_arch_cache.c',
+                'arch/cortex_m/nx_arch_cache_control.c',
                 'arch/cortex_m/nx_arch_mpu.c',
                 'arch/cortex_m/nx_arch_security.c',
+                'arch/cortex_m/nx_arch_nonsecure.c',
                 'arch/cortex_m/nx_arch_sleep.c', 'os/wait.c'}
     sources = set()
     generated_port = build / 'nexus-runtime/os/freertos/m7-integer-port/port.c'
@@ -411,6 +435,17 @@ def execute_variant(root: Path, recorder, selected_tools, variant: dict) -> dict
     ninja = shutil.which('ninja')
     if cmake is None or ninja is None:
         raise ValueError('Actual CMake and Ninja tools are required')
+    cmse_dependencies = {}
+    if variant['facts']['cpu']['security'] == 'secure':
+        for name in ('include/arm_cmse.h', 'libgcc.a'):
+            actual = recorder.execute(
+                [selected_tools['gcc'], *variant['profile']['compile_options'],
+                 '-print-file-name=' + name],
+                variant['name'] + '-' + Path(name).name, nonempty=True).strip()
+            path = Path(actual)
+            if not path.is_absolute() or not path.is_file():
+                raise ValueError('Missing selected CMSE compiler dependency')
+            cmse_dependencies[name] = compiler_gate.digest(path.resolve())
     recorder.execute([
         cmake, '-S', str(root / 'tests/contracts/cortex_runtime'), '-B',
         str(build), '-G', 'Ninja',
@@ -436,6 +471,7 @@ def execute_variant(root: Path, recorder, selected_tools, variant: dict) -> dict
     text = recorder.execute([selected_tools['objdump'], '-d', str(elf)],
                             variant['name'] + '-disassembly', nonempty=True)
     check_probes(variant, text)
+    check_nonsecure_boundary(variant, text)
     if variant['backend'] == 'freertos':
         check_kernel_context(variant, text)
         check_coprocessor_initialization(variant, text)
@@ -457,6 +493,7 @@ def execute_variant(root: Path, recorder, selected_tools, variant: dict) -> dict
             'map': compiler_gate.digest(build / 'nexus_cortex_runtime.map'),
             'database': compiler_gate.digest(build / 'compile_commands.json'),
             'compiled_objects': objects,
+            'cmse_dependencies': cmse_dependencies,
             'retained_api_count': len(required_symbols(variant['backend'])),
             'kernel_port': variant['profile']['irq']['kernel_port']}
 

@@ -178,6 +178,7 @@ class WorkflowContracts(unittest.TestCase):
         self.assertEqual(selected, {
             'stm32_assembly', 'gd32_assembly', 'can_assembly', 'usb_assembly',
             'ethernet_assembly', 'timer_assembly', 'g474_assembly',
+            'h743_assembly', 'u575_assembly',
             'multi_controller_assembly'})
         for name in selected:
             self.assertTrue(list((ROOT / 'tests/contracts' / name).glob('*.toml')))
@@ -197,6 +198,17 @@ class WorkflowContracts(unittest.TestCase):
         evidence = [step for step in job['steps']
                     if step.get('name') == 'Preserve compiler evidence'][0]
         self.assertIn('build/cortex-runtime/', evidence['with']['path'])
+
+    def test_cold_cache_instruction_gate_runs_and_preserves_actual_evidence(self):
+        job = workflow('build-matrix.yml')['jobs']['arch']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        self.assertEqual(commands.count('scripts/ci/cache_control_compile.py'), 1)
+        self.assertIn('--output build/cache-control', commands)
+        for name in ('Preserve compiler evidence',
+                     'Bind the upload to observed execution identity'):
+            step = next(item for item in job['steps'] if item.get('name') == name)
+            values = '\n'.join(str(value) for value in step['with'].values())
+            self.assertIn('build/cache-control/', values)
 
     def test_os_cost_and_profile_gates_retain_actual_execution_artifacts(self):
         job = workflow('build-matrix.yml')['jobs']['arch']

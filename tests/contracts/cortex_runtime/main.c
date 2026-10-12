@@ -15,7 +15,9 @@
 #include "nexus/arch/arch.h"
 #include "nexus/arch/atomic.h"
 #include "nexus/arch/cache.h"
+#include "nexus/arch/cache_control.h"
 #include "nexus/arch/mpu.h"
+#include "nexus/arch/nonsecure.h"
 #include "nexus/arch/security.h"
 #include "nexus/arch/sleep.h"
 #include "nexus/core/request.h"
@@ -113,10 +115,16 @@ void _start(void) {
     nx_arch_features_t features = nx_arch_features();
     result_sink += features.dcache_line_bytes;
     result_sink += (uint32_t)nx_arch_security_state();
+    result_sink += (uint32_t)nx_arch_nonsecure_check(
+        (const void*)0x20000000u, 32u, NX_ARCH_NONSECURE_READ);
     result_sink += (uint32_t)nx_arch_dcache_clean(0x20000000u, 32u);
     result_sink += (uint32_t)nx_arch_dcache_invalidate(0x20000000u, 32u);
     result_sink += (uint32_t)nx_arch_dcache_clean_invalidate(0x20000000u, 32u);
     result_sink += (uint32_t)nx_arch_instruction_sync(0x20000000u, 32u);
+    nx_arch_cache_control_t cache_control = {0};
+    result_sink += (uint32_t)nx_arch_cache_cold_enable(
+        &cache_control, NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION);
+    result_sink += (uint32_t)nx_arch_cache_cold_disable(&cache_control);
     nx_arch_mpu_v7_region_t v7 = {0};
     nx_arch_mpu_v7_encoding_t v7_words;
     nx_arch_mpu_v8_region_t v8 = {0};
