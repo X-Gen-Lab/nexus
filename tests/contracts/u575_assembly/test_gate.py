@@ -69,7 +69,7 @@ class U575ReferenceGateTests(unittest.TestCase):
 
     def test_cpu_boolean_and_count_types_cannot_use_numeric_equality(self):
         for field, value in (("dsp", 1), ("dwt_cyccnt", 0),
-                             ("sau", 0), ("mpu_regions", 16.0),
+                             ("sau", 0), ("mpu_regions", 8.0),
                              ("icache_line_bytes", False)):
             profile = copy.deepcopy(self.profile)
             profile["cpu"][field] = value

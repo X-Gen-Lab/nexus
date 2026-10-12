@@ -11,7 +11,7 @@ EXTERNAL_IRQ_COUNT = 126
 DWT_CYCCNT = False
 FREERTOS_PORT = "GCC/ARM_CM33_NTZ/non_secure"
 CPU_FEATURES = MappingProxyType({
-    "dwt_cyccnt": False, "mpu_version": 8, "mpu_regions": 16,
+    "dwt_cyccnt": False, "mpu_version": 8, "mpu_regions": 8,
     "icache_line_bytes": 0, "dcache_line_bytes": 0, "security": "single",
     "sau": False, "mve": "none", "dsp": True})
 PREFIX = "stm32u575"

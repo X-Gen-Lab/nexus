@@ -147,6 +147,19 @@ jobs:
         run: >-
           .venv/bin/python -m unittest discover
           -s tests/contracts/u575_assembly -p 'test_*.py' -v
+      - name: Link and inspect the U575 Secure and NonSecure image pair
+        run: >-
+          .venv/bin/python scripts/ci/u575_trustzone.py
+          --root "$GITHUB_WORKSPACE"
+          --compiler arm-none-eabi-gcc
+          --output build/u575-trustzone
+          --parallel 2
+      - name: Reject mutations of the actual U575 pair and compiler ABI
+        run: >-
+          .venv/bin/python -m unittest discover
+          -s tests/contracts/u575_trustzone -p 'test_*.py' -v
+        env:
+          NEXUS_U575_PAIR_BUILD: build/u575-trustzone
       - name: Bind the upload to observed execution identity
         if: always()
         uses: ./.github/actions/record-identity
@@ -167,6 +180,7 @@ jobs:
             build/gd32-memory/
             build/stm32h743/
             build/stm32u575/
+            build/u575-trustzone/
           tools: |
             python=python3
             compiler=arm-none-eabi-gcc
@@ -186,6 +200,7 @@ jobs:
             build/gd32-memory/
             build/stm32h743/
             build/stm32u575/
+            build/u575-trustzone/
             build/job-identities/arch/
           retention-days: 30
           include-hidden-files: true

@@ -245,6 +245,22 @@ class WorkflowContracts(unittest.TestCase):
                        if 'scripts/ci/native_contracts.py' in step.get('run', ''))
         self.assertEqual(execute['env']['TSAN_OPTIONS'], 'halt_on_error=1')
 
+    def test_u575_pair_links_both_images_and_mutates_actual_elfs(self):
+        job = workflow('build-matrix.yml')['jobs']['arch']
+        steps = job['steps']
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertEqual(commands.count('scripts/ci/u575_trustzone.py'), 1)
+        self.assertIn('--output build/u575-trustzone', commands)
+        mutation = next(step for step in steps if
+                        'tests/contracts/u575_trustzone' in step.get('run', ''))
+        self.assertEqual(mutation['env']['NEXUS_U575_PAIR_BUILD'],
+                         'build/u575-trustzone')
+        self.assertIn("-p 'test_*.py'", mutation['run'])
+        for name in ('Preserve compiler evidence',
+                     'Bind the upload to observed execution identity'):
+            step = next(item for item in steps if item.get('name') == name)
+            values = '\n'.join(str(value) for value in step['with'].values())
+            self.assertIn('build/u575-trustzone/', values)
 
     def test_optional_os_security_has_actual_link_gates_and_artifacts(self):
         job = workflow('build-matrix.yml')['jobs']['os-security']

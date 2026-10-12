@@ -264,6 +264,10 @@ REQUIRED_FILES += tuple("soc/stm32g474/" + name for name in (
 REQUIRED_FILES += ("boards/stm32g474re_hse24_reference/board.json",)
 REQUIRED_FILES += tuple("tools/configure/providers/stm32g474/" + name for name in (
     "__init__.py", "bindings.py", "emission.py"))
+# The standalone Secure mechanism includes its complete private hardware port.
+REQUIRED_FILES += tuple("soc/stm32u575/" + name for name in (
+    "security.c", "private/stm32u575_security.h",
+    "private/stm32u575_security_hw.h"))
 # Public measurement references are part of the supported SDK input surface.
 # A rehashed omission must not turn a complete SDK into a reduced profile set.
 REQUIRED_FILES += tuple(

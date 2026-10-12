@@ -642,7 +642,12 @@ class SourceSDKTests(unittest.TestCase):
     def test_rehashed_soc_extensions_and_reference_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
-        names = ["soc/stm32g474/drivers/exti.c"]
+        names = ["soc/stm32g474/drivers/exti.c",
+                 "soc/stm32h743/drivers/uart_dma.c",
+                 "soc/stm32h743/private/stm32h743_dma.h",
+                 "soc/stm32u575/security.c",
+                 "soc/stm32u575/private/stm32u575_security.h",
+                 "soc/stm32u575/private/stm32u575_security_hw.h"]
         for mechanism in ("cache_control", "nonsecure"):
             names += [f"arch/include/nexus/arch/{mechanism}.h",
                       f"arch/cortex_m/nx_arch_{mechanism}.c",

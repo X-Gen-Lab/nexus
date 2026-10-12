@@ -41,7 +41,7 @@ class U575ProviderTests(unittest.TestCase):
         self.assertEqual(self.provider.CPU_ABI, {"arch": "cortex-m33",
             "fpu": "fpv5-sp-d16", "float_abi": "hard"})
         self.assertEqual(self.provider.EXTERNAL_IRQ_COUNT, 126)
-        self.assertEqual(self.provider.CPU_FEATURES["mpu_regions"], 16)
+        self.assertEqual(self.provider.CPU_FEATURES["mpu_regions"], 8)
         self.assertEqual(self.provider.CPU_FEATURES["icache_line_bytes"], 0)
         self.assertEqual(self.provider.CPU_FEATURES["security"], "single")
         self.assertFalse(self.provider.DWT_CYCCNT)

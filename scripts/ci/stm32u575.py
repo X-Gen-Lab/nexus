@@ -57,7 +57,7 @@ def validate_profile(resolved):
         raise EvidenceError("exact U575 part/Board/backend required")
     expected_cpu = {"arch": "cortex-m33", "fpu": "fpv5-sp-d16",
         "float_abi": "hard", "dsp": True, "dwt_cyccnt": False,
-        "mpu_version": 8, "mpu_regions": 16, "icache_line_bytes": 0,
+        "mpu_version": 8, "mpu_regions": 8, "icache_line_bytes": 0,
         "dcache_line_bytes": 0, "security": "single", "sau": False,
         "mve": "none"}
     expected_clock = {"source": "msis", "input_hz": 4000000,
