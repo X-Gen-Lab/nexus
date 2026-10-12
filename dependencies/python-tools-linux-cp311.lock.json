@@ -4,7 +4,8 @@
     "cmake": "3.31.6",
     "ninja": "1.13.2",
     "pre-commit": "4.3.0",
-    "pyyaml": "6.0.3"
+    "pyyaml": "6.0.3",
+    "setuptools": "84.0.0"
   },
   "kind": "offline_python_wheels",
   "schema_version": 1,
@@ -100,6 +101,13 @@
       "sha256": "b8bb0864c5a28024fac8a632c443c87c5aa6f215c0b126c449ae1a150412f31d",
       "size": 806638,
       "version": "6.0.3"
+    },
+    {
+      "filename": "setuptools-84.0.0-py3-none-any.whl",
+      "name": "setuptools",
+      "sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670",
+      "size": 818216,
+      "version": "84.0.0"
     },
     {
       "filename": "virtualenv-21.14.7-py3-none-any.whl",

@@ -32,6 +32,35 @@ class ThreadXGateTest(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     self.gate().check_rejection(code, diagnostic, elf)
 
+    def test_expected_link_accepts_companion_outputs_and_ninja_metadata(self):
+        output = ('FAILED: [code=1] bin/nexus_threadx_runtime.elf '
+                  'bin/nexus_threadx_runtime.bin bin/nexus_threadx_runtime.map '
+                  'bin/nexus_threadx_runtime.resources.json '
+                  '/tmp/threadx/build/bin/nexus_threadx_runtime.bin '
+                  '/tmp/threadx/build/bin/nexus_threadx_runtime.map '
+                  '/tmp/threadx/build/bin/nexus_threadx_runtime.resources.json\n'
+                  "undefined reference to `nx_threadx_external_tick_setup'\n")
+        self.gate().check_rejection(1, output, False)
+        self.gate().check_rejection(1, output.replace('\n', '\r\n'), False)
+
+    def test_expected_link_rejects_other_target_and_unrelated_symbol_context(self):
+        target = 'bin/nexus_threadx_runtime.elf'
+        symbol = "undefined reference to `nx_threadx_external_tick_setup'\n"
+        invalid = (
+            'FAILED: bin/unrelated_nexus_threadx_runtime.elf\n' + symbol,
+            'FAILED: ' + target + '.tmp\n' + symbol,
+            'FAILED: bin/another.elf\nld ' + target + '\n' + symbol,
+            'FAILED: ' + target + '\n' + symbol.replace(
+                'nx_threadx_external_tick_setup', 'nx_threadx_external_tick_setup_other'),
+            'FAILED: ' + target + '\nother diagnostic\n'
+            'FAILED: bin/another.elf\n' + symbol,
+            symbol + 'FAILED: ' + target + '\nother diagnostic\n',
+            'FAILED: [code=2] ' + target + '\n' + symbol,
+        )
+        for diagnostic in invalid:
+            with self.subTest(diagnostic=diagnostic), self.assertRaises(ValueError):
+                self.gate().check_rejection(1, diagnostic, False)
+
     def symbols(self):
         names = self.gate().REQUIRED_SYMBOLS
         return '\n'.join('08000100 T ' + name for name in sorted(names))

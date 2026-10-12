@@ -24,6 +24,10 @@ retain the fixed clock/cache/security settings in their authored TOML files.
 Neither is software qualification. `check` and the commit hook execute the
 maintained complete contract gate. The gate strips GoogleTest filters/shards,
 discovers every case, executes the complete plan and verifies fresh reports.
+The shared `run_tool_tests.py` runner executes four complete domains: `testing`,
+`configure`, `ci` and `workflows`. The commit gate, enterprise CI and software
+plan use this same discovery and reject empty, incomplete or skipped execution.
+Each domain writes a fresh report only after its actual full suite passes.
 
 Successful `configure` and `build` automatically capture
 `<binaryDir>/quality/configure-provenance.json` or `build-provenance.json` from
@@ -54,6 +58,18 @@ Preparation checks first and requires `--allow-network` for initialization that
 needs network access. Candidate plans must end with the owned candidate verifier.
 These commands delegate to `dependencies.py` and `qualification.py`; they do not
 establish a second build graph. Cache commands delegate to `cache.py`.
+
+Preset preparation records the assembly/Board bytes and every selected recursive
+Gitlink. Native models require all seven catalogue roots and their nested sources
+(nine initialized modules in the current checkout). ARM preparation requires CMSIS,
+the chosen STM32 family when applicable, and the selected scheduler closure.
+CI's ARM identity binds this receipt to the explicit matrix preset and every
+uploaded resolved configuration. It rechecks current pins, nested sources and
+dirty files before and after capture, and uploads the original receipt.
+`dependencies_complete` continues to describe the whole repository; a verified
+subset is recorded separately as `selected_dependencies_complete`. Uninitialized
+unselected sources are observed rather than declared verified. Default Native/SDK
+identity still requires complete repository dependencies.
 
 `presets.py` supplies one checked metadata reader for developer/TDD/Native CI
 paths. It handles literal includes, schema-7 `$penv` include paths, same-kind

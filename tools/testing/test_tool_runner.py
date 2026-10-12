@@ -3,16 +3,27 @@
 from contextlib import redirect_stderr
 import io
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
-from tools.testing.run_tool_tests import execute
+from tools.testing.run_tool_tests import execute, ROOT
 
 
 class ToolRunnerTests(unittest.TestCase):
     def run_fixture(self, tests):
-        with patch("unittest.defaultTestLoader.discover", return_value=tests), \
+        with patch("unittest.TestLoader.discover", return_value=tests), \
                 redirect_stderr(io.StringIO()):
             return execute("testing")
+
+    def test_ci_and_workflows_discover_their_real_maintained_directories(self):
+        for scope, directory in (("ci", "scripts/ci"),
+                                 ("workflows", ".github/workflows")):
+            tests = unittest.TestSuite([unittest.FunctionTestCase(lambda: None)])
+            with patch("unittest.TestLoader.discover", return_value=tests) as discover, \
+                    redirect_stderr(io.StringIO()):
+                result = execute(scope)
+            self.assertEqual(result["executed"], 1)
+            self.assertEqual(Path(discover.call_args.args[0]), ROOT / directory)
 
     def test_actual_execution_reports_nonzero_count(self):
         fixture = unittest.TestSuite([unittest.FunctionTestCase(lambda: None)])

@@ -86,6 +86,18 @@ class TDDMatrixIntegrationTests(unittest.TestCase):
         report = self.build / "tdd/io-property-report.json"
         self.assertEqual(json.loads(report.read_text())["formal_proof"], False)
 
+    def test_gate_runs_all_four_maintained_tool_domains(self):
+        scopes = []
+
+        def execute(command, environment, log):
+            if "--suite" in command:
+                scopes.append(command[command.index("--suite") + 1])
+            return self.execute(command, environment, log)
+
+        status, output, _, _ = self.run_gate(execute=execute)
+        self.assertEqual(status, 0, output)
+        self.assertEqual(scopes, ["testing", "configure", "ci", "workflows"])
+
     def test_capture_failure_stops_before_discovery(self):
         status, output, before, after = self.run_gate(
             capture=ValueError("missing actual compiled context"))

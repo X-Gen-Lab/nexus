@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -24,6 +25,8 @@ from tools.evidence.identity import (
 )
 from tools.evidence.reproduce import run_logged
 from tools.configure import metadata
+from tools.dev import dependencies
+from tools.maintenance.source_catalogue import declared_modules
 
 
 def _contained(root: Path, path: Path) -> Path:
@@ -104,9 +107,38 @@ def _inventory(root: Path, artifacts: list[Path], output: Path) -> tuple:
     return selected, missing
 
 
+def _selected_dependencies(root: Path, path: Path) -> dict:
+    """A receipt selects a closure; current Git and authored bytes verify it."""
+    path = regular_file(_contained(root, path))
+    receipt = load_json(path)
+    if (type(receipt.get('schema_version')) is not int or
+            receipt.get('schema_version') != 1 or
+            receipt.get('kind') != 'dependency_preparation' or
+            receipt.get('status') != 'verified' or
+            type(receipt.get('network_authorized')) is not bool or
+            not isinstance(receipt.get('preset'), str)):
+        raise EvidenceError('invalid selected dependency preparation receipt')
+    declared_modules(regular_file(root / '.gitmodules').read_bytes())
+    observed = dependencies.prepare_preset(root, receipt['preset'])
+    expected_keys = set(observed)
+    if set(receipt) != expected_keys:
+        raise EvidenceError('selected dependency receipt schema mismatch')
+    for name in expected_keys - {'network_authorized'}:
+        if receipt[name] != observed[name]:
+            raise EvidenceError('selected dependency receipt changed: ' + name)
+    return {'validation': 'verified', 'receipt': file_identity(path),
+            'scope': observed['scope'], 'family': observed['family'],
+            'backend': observed['backend'], 'preset': observed['preset'],
+            'assembly': observed['assembly'], 'board': observed['board'],
+            'submodules': observed['submodules'],
+            'recursive_submodules': observed['recursive_submodules']}
+
+
 def capture(*, root: Path, job: str, result: str, expected_commit: str,
             artifacts: list[Path], tools: dict[str, str], output: Path,
-            require_dependencies: bool = True) -> dict:
+            require_dependencies: bool = True,
+            dependency_preparation: Path | None = None,
+            expected_preset: str | None = None) -> dict:
     root = root.resolve()
     identifier(job, 'CI job')
     if result not in {'success', 'failure', 'cancelled'}:
@@ -118,9 +150,24 @@ def capture(*, root: Path, job: str, result: str, expected_commit: str,
         raise EvidenceError('event SHA differs from actual checkout')
     complete = not any(line.startswith(('-', '+', 'U'))
                        for line in source['submodules'])
+    dependency_scope = None
+    selected_complete = complete
+    if dependency_preparation is not None:
+        try:
+            dependency_scope = _selected_dependencies(root,
+                                                      dependency_preparation)
+            if not expected_preset or dependency_scope['preset'] != expected_preset:
+                raise EvidenceError('preparation preset differs from expected job preset')
+            selected_complete = True
+        except (EvidenceError, OSError, ValueError, subprocess.SubprocessError) as error:
+            if result == 'success':
+                raise EvidenceError('selected dependency validation failed: '
+                                    + str(error)) from error
+            dependency_scope = {'validation': 'invalid', 'error': str(error)}
+            selected_complete = False
     if result == 'success' and source['dirty']:
         raise EvidenceError('dirty checkout cannot seal a successful CI job')
-    if result == 'success' and require_dependencies and not complete:
+    if result == 'success' and require_dependencies and not selected_complete:
         raise EvidenceError('source dependencies are missing or changed')
     output = _contained(root, output)
     if output.exists():
@@ -169,6 +216,13 @@ def capture(*, root: Path, job: str, result: str, expected_commit: str,
             configuration = {'artifact': selected[path],
                              'validation': 'invalid', 'error': str(error)}
         configurations.append(configuration)
+    if result == 'success' and dependency_scope is not None:
+        if not configurations:
+            raise EvidenceError('selected scope requires an actual resolved configuration')
+        for configuration in configurations:
+            files = [item['file'] for item in configuration.get('inputs', [])]
+            if any(dependency_scope[name] not in files for name in ('assembly', 'board')):
+                raise EvidenceError('configuration differs from selected assembly/Board scope')
     if observe_git_source(root) != source:
         raise EvidenceError('checkout changed during CI identity capture')
     if _inventory(root, artifacts, output) != (selected, missing):
@@ -180,6 +234,9 @@ def capture(*, root: Path, job: str, result: str, expected_commit: str,
     for configuration in configurations:
         for item in configuration.get('inputs', []):
             verify_file_identity(item['file'])
+    if dependency_scope and dependency_scope['validation'] == 'verified':
+        if _selected_dependencies(root, dependency_preparation) != dependency_scope:
+            raise EvidenceError('selected source closure changed during capture')
     locks = sorted((root / 'dependencies').glob('*.lock.json'))
     if (root / 'nexus.lock').is_file():
         locks.append(root / 'nexus.lock')
@@ -188,6 +245,8 @@ def capture(*, root: Path, job: str, result: str, expected_commit: str,
         'job_result': result, 'source': source,
         'dependencies_complete': complete,
         'dependencies_required': require_dependencies,
+        'selected_dependencies_complete': selected_complete,
+        'dependency_scope': dependency_scope,
         'locks': [file_identity(path) for path in locks],
         'tools': observed_tools, 'configurations': configurations,
         'artifacts': list(selected.values()), 'missing_artifacts': missing,
@@ -212,6 +271,8 @@ def main(arguments=None):
     parser.add_argument('--artifact', action='append', type=Path, required=True)
     parser.add_argument('--tool', action='append', required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--dependency-preparation', type=Path)
+    parser.add_argument('--expected-preset')
     parser.add_argument('--observe-uninitialized-dependencies',
                         action='store_true')
     args = parser.parse_args(arguments)
@@ -225,6 +286,8 @@ def main(arguments=None):
         capture(root=args.root, job=args.job, result=args.result,
                 expected_commit=args.expected_commit,
                 artifacts=args.artifact, tools=tools, output=args.output,
+                dependency_preparation=args.dependency_preparation,
+                expected_preset=args.expected_preset,
                 require_dependencies=not args.observe_uninitialized_dependencies)
         return 0
     except (EvidenceError, OSError) as error:

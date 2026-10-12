@@ -16,6 +16,7 @@ from scripts.validation.junit import prepare_report, validate_junit
 from tools.dev.change_paths import behavioral
 from tools.dev.presets import binary_directory
 from tools.dev import process
+from tools.testing.run_tool_tests import SUITES as TOOL_SUITES
 
 
 def validate_google_report(report, *, not_before_ns=None, expected_cases=None):
@@ -162,7 +163,7 @@ def main(arguments=None):
         matrix_snapshot.unlink(missing_ok=True)
         python = sys.executable
         tool_results = []
-        for suite in ("testing", "configure"):
+        for suite in TOOL_SUITES:
             tool_report = output / f"tools-{suite}.json"
             tool_report.unlink(missing_ok=True)
             execute([python, "-B", "tools/testing/run_tool_tests.py", "--suite",

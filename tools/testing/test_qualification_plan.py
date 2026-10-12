@@ -37,6 +37,20 @@ class QualificationPlanTests(unittest.TestCase):
         self.assertTrue(any(stage["checker"] == "sdk_consumers"
                             for stage in self.stages))
 
+    def test_all_four_tool_domains_share_the_fixed_complete_runner(self):
+        selected = [stage for stage in self.stages
+                    if stage["checker"] == "tool_tests"]
+        self.assertEqual(CHECKERS["tool_tests"],
+                         ("tools/testing/run_tool_tests.py",))
+        self.assertEqual([stage["args"][1] for stage in selected],
+                         ["testing", "configure", "ci", "workflows"])
+        for stage in selected:
+            self.assertEqual(stage["args"][0], "--suite")
+            self.assertEqual(stage["args"][2], "--report")
+            self.assertEqual(len(stage["args"]), 4)
+            self.assertTrue(stage["args"][3].startswith("{output}/"))
+        validate_plan(self.plan)
+
     def test_actual_arm_artifact_recovery_boundaries_have_a_fixed_full_runner(self):
         self.assertEqual(CHECKERS.get("build_artifact_tests"),
                          ("tests/contracts/test_build_artifacts.py",))

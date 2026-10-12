@@ -23,6 +23,26 @@
       ]
     },
     {
+      "name": "ci-tools",
+      "checker": "tool_tests",
+      "args": [
+        "--suite",
+        "ci",
+        "--report",
+        "{output}/ci-tests.json"
+      ]
+    },
+    {
+      "name": "workflow-tools",
+      "checker": "tool_tests",
+      "args": [
+        "--suite",
+        "workflows",
+        "--report",
+        "{output}/workflow-tests.json"
+      ]
+    },
+    {
       "name": "configure-native-debug",
       "checker": "configure",
       "args": [

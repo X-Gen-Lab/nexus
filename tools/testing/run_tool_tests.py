@@ -9,13 +9,16 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
+SUITES = {"testing": "tools/testing", "configure": "tools/configure",
+          "ci": "scripts/ci", "workflows": ".github/workflows"}
 
 
 def execute(suite):
     """Return actual runner counts; loading or skipping tests is not a pass."""
-    tests = unittest.defaultTestLoader.discover(
-        str(ROOT / "tools" / suite), pattern="test_*.py"
-    )
+    if suite not in SUITES:
+        raise ValueError("Unknown maintained tool scope")
+    tests = unittest.TestLoader().discover(str(ROOT / SUITES[suite]),
+                                          pattern="test_*.py")
     expected = tests.countTestCases()
     if expected == 0:
         raise ValueError("Tool suite discovers zero tests")
@@ -33,7 +36,7 @@ def execute(suite):
 
 def main(arguments=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=("testing", "configure"), required=True)
+    parser.add_argument("--suite", choices=tuple(SUITES), required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args(arguments)
     args.report.unlink(missing_ok=True)

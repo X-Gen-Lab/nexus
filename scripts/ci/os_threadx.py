@@ -59,11 +59,19 @@ def write_inputs(root, directory, row):
 
 
 def check_rejection(returncode, diagnostic, elf_exists):
-    if (returncode != 1 or elf_exists or
-            not re.search(r'^FAILED:.*nexus_threadx_runtime\.elf\s*$',
-                          diagnostic, re.MULTILINE) or
-            not re.search(r'undefined reference to[^\n]*nx_threadx_external_tick_setup',
-                          diagnostic)):
+    # Ninja prints all edge outputs, including relative/absolute byproduct
+    # aliases. Identify the complete ELF token, then bind the missing hook to
+    # this single failed edge rather than another command's diagnostic.
+    lines = diagnostic.splitlines()
+    failed = [(index, line) for index, line in enumerate(lines)
+              if line.startswith('FAILED:')]
+    match = (re.fullmatch(r'FAILED:\s*(?:\[code=(\d+)\]\s+)?(.+)',
+                          failed[0][1]) if len(failed) == 1 else None)
+    if (returncode != 1 or elf_exists or match is None or
+            match[1] not in (None, '1') or
+            'bin/nexus_threadx_runtime.elf' not in match[2].split() or
+            not re.search(r'undefined reference to[^\n]*\bnx_threadx_external_tick_setup\b',
+                          '\n'.join(lines[failed[0][0] + 1:]))):
         raise ValueError('Expected precise external Tick ELF link rejection')
 
 
@@ -98,8 +106,9 @@ def source_inputs(root):
                  'dependencies/platform-compatibility.json',
                  'tools/maintenance/threadx_lock.py',
                  'cmake/platform/Configure.cmake', 'cmake/platform/Options.cmake',
-                 'cmake/platform/Firmware.cmake', 'cmake/toolchains/arm-gcc.cmake',
-                 'scripts/ci/os_threadx.py'):
+                 'cmake/platform/Firmware.cmake', 'cmake/platform/TargetPolicy.cmake',
+                 'cmake/platform/SDK.cmake', 'cmake/toolchains/arm-gcc.cmake',
+                 'scripts/ci/os_threadx.py', 'scripts/ci/arch_compile.py'):
         if (root / name).is_file():
             paths.add(root / name)
     return [compiler_gate.digest(path) for path in sorted(paths)]

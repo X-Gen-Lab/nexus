@@ -149,6 +149,17 @@ class InstallDevToolsTests(unittest.TestCase):
         self.assertFalse(any("pip" in call for call in self.calls))
         self.assertIn("skipping pip", output)
 
+    def test_matching_outer_tools_still_prime_isolated_hook_dependencies(self):
+        self.create_venv(self.root / ".venv")
+        result, created, _, error = self.invoke()
+        self.assertEqual((result, created, error), (0, 0, ""))
+        python, _ = INSTALLER.venv_paths(self.root / ".venv")
+        self.assertIn([
+            str(python), "-I", "-m", "pre_commit", "install", "--install-hooks",
+            "--hook-type", "pre-commit", "--hook-type", "commit-msg",
+        ], self.calls)
+        self.assertFalse(any("pip" in call for call in self.calls))
+
     def test_skip_hooks_requires_no_git_and_still_checks_binaries(self):
         result, _, output, error = self.invoke(["--skip-hooks"])
         self.assertEqual((result, error), (0, ""))

@@ -367,7 +367,10 @@ jobs:
           expected-commit: ${{ github.sha }}
           output: build/job-identities/arm-${{ matrix.preset }}
           require-dependencies: 'true'
+          dependency-preparation: build/setup-dependencies.json
+          dependency-preset: ${{ matrix.preset }}
           artifacts: |
+            build/setup-dependencies.json
             build/${{ matrix.preset }}/bin/
             build/${{ matrix.preset }}/generated/
             build/${{ matrix.preset }}/compile_commands.json
@@ -383,6 +386,7 @@ jobs:
         with:
           name: software-${{ matrix.preset }}
           path: |
+            build/setup-dependencies.json
             build/${{ matrix.preset }}/bin/
             build/${{ matrix.preset }}/generated/
             build/${{ matrix.preset }}/compile_commands.json

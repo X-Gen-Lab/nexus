@@ -12,6 +12,15 @@ python tools/dev/dev.py doctor
 
 The installer preserves existing hooks using pre-commit's migration and rejects
 an explicit `core.hooksPath`. CI uses `--skip-hooks` and executes the same checks.
+Normal setup uses `install --install-hooks` to prepare the isolated Python
+environments before the first commit, including when the outer tools already
+match their pins. The TDD environment declares exact pre-commit, clang-format
+and PyYAML versions for its four complete tool suites and real hook fixtures.
+The contract checks these pins against the development and workflow locks.
+Offline setup may use `PIP_NO_INDEX=1` and `PIP_FIND_LINKS` pointing to the checked
+wheel export; this also applies when pre-commit prepares its isolated environment.
+The export includes `dependencies/hook-build-tools.txt` for the local hook's
+isolated build backend, in addition to the runtime tool requirements.
 The root `.clang-format` and `.editorconfig` remain authoritative. Versions are
 locked in `dependencies/development-tools.txt` and `environment-tools.txt`.
 

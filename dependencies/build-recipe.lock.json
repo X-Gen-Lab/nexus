@@ -11,7 +11,7 @@
   "frontend": "docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e",
   "kind": "nexus_build_recipe",
   "observed_image_config_id": "sha256:a1ba03c16d424aef88dad6e5b2ead2892734a0bf909dedc23d8855fa4861fbe0",
-  "python_requirements_sha256": "7901ddc7fc82d051f70d1df686b447fc28bb9175a38f42aa9f8a64796862603b",
+  "python_requirements_sha256": "0c2b01c2ccbe113e21acffb28174805411b454a57849409700c3594a507130f0",
   "recipe_reproducible": false,
   "schema_version": 1,
   "scope": "declared fixed recipe inputs; reconstruction of the observed OCI bytes is unverified",

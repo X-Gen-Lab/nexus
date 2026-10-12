@@ -226,6 +226,34 @@ class BuildDeliveryTests(unittest.TestCase):
         with self.assertRaises(EvidenceError):
             dependencies.required_submodules("arm", "unknown", "baremetal")
 
+    def test_wheel_vendor_metadata_is_not_another_top_level_distribution(self):
+        wheel = self.wheel()
+        with zipfile.ZipFile(wheel, "a") as archive:
+            archive.writestr("fixture/vendor/helper-2.0.dist-info/METADATA",
+                             "Name: helper\nVersion: 2.0\n")
+        lock = dependencies.wheel_lock(self.root / "wheels", "fixture==1.0\n",
+                                       target="fixture")
+        self.assertEqual(len(lock["wheels"]), 1)
+
+    def test_wheel_top_level_dist_info_must_match_distribution_identity(self):
+        wheel = self.root / "wheels/fixture-1.0-py3-none-any.whl"
+        wheel.parent.mkdir()
+        with zipfile.ZipFile(wheel, "w") as archive:
+            archive.writestr("other-1.0.dist-info/METADATA",
+                             "Name: fixture\nVersion: 1.0\n")
+        with self.assertRaises(EvidenceError):
+            dependencies.wheel_lock(self.root / "wheels", "fixture==1.0\n",
+                                    target="fixture")
+
+    def test_wheel_duplicate_top_level_metadata_is_rejected(self):
+        wheel = self.wheel()
+        with zipfile.ZipFile(wheel, "a") as archive:
+            archive.writestr("other-1.0.dist-info/METADATA",
+                             "Name: other\nVersion: 1.0\n")
+        with self.assertRaises(EvidenceError):
+            dependencies.wheel_lock(self.root / "wheels", "fixture==1.0\n",
+                                    target="fixture")
+
     def test_wheel_bundle_requires_exact_full_closure(self):
         wheel = self.wheel()
         lock = dependencies.wheel_lock(self.root / "wheels", "fixture==1.0\n", target="fixture")

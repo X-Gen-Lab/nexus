@@ -44,8 +44,8 @@ jobs:
           NEXUS_ARM_GCC: arm-none-eabi-gcc
       - name: Execute commit and analyzer orchestration boundaries
         run: |
-          .venv/bin/python -B -m unittest discover -s scripts/ci -p 'test_*.py' -v
-          .venv/bin/python .github/workflows/test_platform_ci.py
+          .venv/bin/python -B tools/testing/run_tool_tests.py --suite ci --report build/quality/tools-ci.json
+          .venv/bin/python -B tools/testing/run_tool_tests.py --suite workflows --report build/quality/tools-workflows.json
       - name: Execute Google report admission and station preparation boundaries
         run: |
           .venv/bin/python -B tools/testing/run_tool_tests.py --suite testing --report build/quality/tools-testing.json
@@ -63,6 +63,8 @@ jobs:
             build/quality/tool-contracts.log
             build/quality/tools-configure.json
             build/quality/tools-testing.json
+            build/quality/tools-ci.json
+            build/quality/tools-workflows.json
           tools: |
             python=python3
             cmake=cmake
@@ -76,6 +78,8 @@ jobs:
             build/quality/tool-contracts.log
             build/quality/tools-configure.json
             build/quality/tools-testing.json
+            build/quality/tools-ci.json
+            build/quality/tools-workflows.json
             build/job-identities/tooling/
           retention-days: 30
           include-hidden-files: true

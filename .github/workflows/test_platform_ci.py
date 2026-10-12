@@ -127,7 +127,11 @@ class WorkflowContracts(unittest.TestCase):
         action = yaml.load((ROOT / '.github/actions/setup-build/action.yml').read_text(),
                            Loader=yaml.BaseLoader)
         commands = '\n'.join(s.get('run', '') for s in action['runs']['steps'])
-        self.assertIn('git submodule update --init --recursive', commands)
+        self.assertIn('tools/dev/dependencies.py prepare', commands)
+        self.assertIn('--scope preset --preset', commands)
+        self.assertIn('--allow-network', commands)
+        from tools.dev import dependencies
+        self.assertTrue(dependencies.required_submodules('native'))
         self.assertIn('scripts/ci/install_arm_toolchain.py', commands)
         self.assertNotIn('apt-get', commands)
 
@@ -139,15 +143,16 @@ class WorkflowContracts(unittest.TestCase):
         action = yaml.load((ROOT / '.github/actions/setup-build/action.yml')
                            .read_text(), Loader=yaml.BaseLoader)
         commands = [step['run'].strip() for step in action['runs']['steps']
-                    if step.get('run', '').strip().startswith(
-                        'git submodule update')]
+                    if 'tools/dev/dependencies.py prepare' in step.get('run', '')]
         self.assertEqual(len(commands), 1)
         arguments = shlex.split(commands[0].replace('\\\n', ' '))
-        self.assertEqual(arguments[:5],
-                         ['git', 'submodule', 'update', '--init', '--recursive'])
-        # Source identity observes every gitlink, including SDKs unused by the
-        # selected target. Future declared dependencies must join this closure.
-        self.assertEqual(set(arguments[5:]), expected)
+        self.assertIn('--scope', arguments)
+        self.assertIn('preset', arguments)
+        self.assertIn('--report', arguments)
+        from tools.dev import dependencies
+        # Native models require every declared dependency; an ARM job binds its
+        # explicitly selected recursive closure through the preparation receipt.
+        self.assertEqual(set(dependencies.required_submodules('native')), expected)
 
     def test_native_executes_complete_ctest_and_google_plan_once(self):
         native = workflow('build-matrix.yml')['jobs']['native']
@@ -295,7 +300,9 @@ class WorkflowContracts(unittest.TestCase):
                           .read_text(), Loader=yaml.BaseLoader)
         initialization = '\n'.join(step.get('run', '')
                                    for step in setup['runs']['steps'])
-        self.assertIn(' ext/threadx', initialization)
+        self.assertIn('tools/dev/dependencies.py prepare', initialization)
+        from tools.dev import dependencies
+        self.assertIn('ext/threadx', dependencies.required_submodules('native'))
 
 
 class CTestAdmission(unittest.TestCase):
@@ -304,7 +311,11 @@ class CTestAdmission(unittest.TestCase):
         self.assertIsNotNone(shutil.which('ctest'))
         with tempfile.TemporaryDirectory(prefix='nexus real ctest ') as temporary:
             root = Path(temporary)
-            for relative in ('tools/dev/dev.py', 'scripts/validation/junit.py'):
+            for relative in ('tools/dev/dev.py', 'tools/dev/process.py',
+                             'tools/dev/presets.py', 'tools/dev/provenance.py',
+                             'tools/dev/qualification.py',
+                             'tools/evidence/common.py', 'tools/evidence/identity.py',
+                             'scripts/validation/junit.py'):
                 output = root / relative
                 output.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(ROOT / relative, output)

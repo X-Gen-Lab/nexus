@@ -69,13 +69,34 @@ def prepare(root: Path, scope: str, *, family: str | None = None,
         if status.returncode or status.stdout:
             raise EvidenceError("dependency source is dirty: " + module)
         records.append({"path": module, "commit": result.stdout.split()[0]})
+    recursive = subprocess.run(
+        ["git", "-C", str(root), "submodule", "status", "--recursive", "--",
+         *selected], capture_output=True, text=True, timeout=30, check=True)
+    closure = []
+    for line in recursive.stdout.splitlines():
+        match = re.fullmatch(r" ([0-9a-f]{40}|[0-9a-f]{64}) ([^\r\n]+?)(?: \(.+\))?", line)
+        if match is None:
+            raise EvidenceError("selected recursive dependency is missing or changed")
+        commit, path = match.groups()
+        if not any(path == module or path.startswith(module + "/") for module in selected):
+            raise EvidenceError("recursive dependency escaped selected source closure")
+        status = subprocess.run(["git", "-C", str(root / path), "status",
+                                 "--porcelain", "--untracked-files=all"],
+                                capture_output=True, text=True, timeout=30,
+                                check=True)
+        if status.stdout:
+            raise EvidenceError("recursive dependency source is dirty: " + path)
+        closure.append({"path": path, "commit": commit})
+    if not set(selected).issubset({item["path"] for item in closure}):
+        raise EvidenceError("selected recursive source closure is incomplete")
     return {"schema_version": 1, "kind": "dependency_preparation",
             "scope": scope, "family": family, "backend": backend,
             "network_authorized": allow_network, "submodules": records,
+            "recursive_submodules": closure,
             "status": "verified"}
 
 
-def prepare_preset(root: Path, preset: str, *, allow_network: bool = False) -> dict:
+def preset_selection(root: Path, preset: str) -> dict:
     """Use the maintained preset resolver; source selection remains TOML-owned."""
     from tools.dev.presets import selected_configure
     from tools.evidence.common import identifier
@@ -99,21 +120,28 @@ def prepare_preset(root: Path, preset: str, *, allow_network: bool = False) -> d
         directory = Path(package)
         if not directory.is_absolute():
             directory = path.parent / directory
-        facts = load_json(directory.resolve() / "board.json")
+        board_path = directory.resolve() / "board.json"
     else:
         board = identifier(authored.get("board"), "assembly Board")
-        facts = load_json(root / "boards" / board / "board.json")
+        board_path = root / "boards" / board / "board.json"
+    facts = load_json(board_path)
     family = facts.get("soc_family")
     backend = authored.get("backend")
     if family == "native":
         scope = "native"
     else:
         scope = "arm"
-    result = prepare(root, scope, family=family, backend=backend,
-                     allow_network=allow_network)
-    result["preset"] = preset
-    result["assembly"] = file_identity(path)
-    return result
+    required_submodules(scope, family, backend)
+    return {"scope": scope, "family": family, "backend": backend,
+            "preset": preset, "assembly": file_identity(path),
+            "board": file_identity(board_path)}
+
+
+def prepare_preset(root: Path, preset: str, *, allow_network: bool = False) -> dict:
+    selection = preset_selection(root, preset)
+    return {**prepare(root, selection["scope"], family=selection["family"],
+                     backend=selection["backend"], allow_network=allow_network),
+            **selection}
 
 
 def _requirements(text: str) -> dict[str, str]:
@@ -147,9 +175,16 @@ def wheel_lock(directory: Path, requirements: str, *, target: str) -> dict:
         try:
             with zipfile.ZipFile(path) as archive:
                 metadata = [entry for entry in archive.namelist()
-                            if entry.endswith(".dist-info/METADATA")]
+                            if len(entry.split("/")) == 2 and
+                            entry.endswith(".dist-info/METADATA")]
                 if len(metadata) != 1:
                     raise EvidenceError("wheel must contain one metadata record")
+                info_directory = metadata[0].split("/")[0].removesuffix(".dist-info")
+                info_name, separator, info_version = info_directory.rpartition("-")
+                if (not separator or
+                        re.sub(r"[-_.]+", "-", info_name).lower() != name or
+                        info_version != pieces[1]):
+                    raise EvidenceError("wheel top-level metadata directory differs from identity")
                 record = email.parser.BytesParser().parsebytes(archive.read(metadata[0]))
                 normalized = re.sub(r"[-_.]+", "-", record.get("Name", "")).lower()
                 if normalized != name or record.get("Version") != pieces[1]:

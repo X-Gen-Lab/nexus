@@ -16,9 +16,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 try:
-    from . import arch_compile
+    from . import arch_compile, memory_budget
 except ImportError:
     import arch_compile
+    import memory_budget
 from tools.measurement.elf import Elf32
 from tools.measurement.resources import measure_data
 
@@ -114,9 +115,12 @@ def preprocessing_command(entry):
 
 
 def source_inputs(root):
-    inputs = [root / "CMakeLists.txt", Path(__file__).resolve()]
+    inputs = [root / "CMakeLists.txt", Path(__file__).resolve(),
+              root / "scripts/ci/memory_budget.py",
+              root / "scripts/ci/arch_compile.py"]
     for directory in ("arch", "core", "io", "os", "soc/gd32f470",
                       "boards/gd32f470_liangshan", "cmake", "tools/configure",
+                      "tools/measurement", "tools/evidence",
                       "tests/contracts/gd32_memory"):
         inputs.extend(path for path in (root / directory).rglob("*")
             if path.is_file() and path.suffix in {
@@ -130,24 +134,7 @@ def verify_inputs(inputs):
             raise ValueError("Memory matrix source changed: " + identity["path"])
 
 
-def rejected(recorder, argv, label, diagnostic):
-    """Retain genuine nonzero output and reject a failure for the wrong reason."""
-    try:
-        recorder.execute(argv, label)
-    except ValueError:
-        record = recorder.commands[-1]
-        if record.get("returncode") != 1:
-            raise
-        output = "\n".join(Path(record[key]["path"]).read_text()
-                           for key in ("stdout", "stderr"))
-        if diagnostic not in output:
-            raise ValueError("Negative execution failed for a different reason")
-        record["expected_rejection"] = diagnostic
-        return record
-    raise ValueError("Negative execution unexpectedly accepted unsupported storage")
-
-
-def run(root, compiler, output):
+def run(root, compiler, output, parallel=2):
     root, output = root.resolve(), output.resolve()
     if output.exists() and any(output.iterdir()):
         raise ValueError("Memory matrix output must be fresh")
@@ -179,7 +166,7 @@ def run(root, compiler, output):
                 "-DNEXUS_ASSEMBLY_FILE=" + str(fixture / (variant + ".toml"))],
                 variant + "-configure")
             recorder.execute([tools["cmake"], "--build", str(build), "--target",
-                "nexus_gd32_memory", "--parallel", "2"], variant + "-build")
+                "nexus_gd32_memory", "--parallel", str(parallel)], variant + "-build")
             elf_path = build / "bin/nexus_gd32_memory.elf"
             generated = build / "nexus/generated"
             resolved_path = generated / "resolved.json"
@@ -222,20 +209,20 @@ def run(root, compiler, output):
             bad_budget = output / (region + "-too-small-budget.json")
             bad_budget.write_text(json.dumps(budget, indent=2) + "\n")
             result_path = output / (region + "-budget-rejected.json")
-            rejected(recorder, [tools["python"], "-B",
+            memory_budget.rejected(recorder, [tools["python"], "-B",
                 str(root / "tools/measurement/resources.py"), "--elf",
                 str(both / "bin/nexus_gd32_memory.elf"), "--resolved",
                 str(both / "nexus/generated/resolved.json"), "--budget",
                 str(bad_budget), "--report", str(result_path)],
                 region + "-budget-refusal", "ELF budget: failed")
             bad = json.loads(result_path.read_text())
-            if bad["status"] != "failed" or not any(
-                    item == {"metric": "ram." + region, "actual": 36,
-                             "maximum": 35} for item in bad["violations"]):
-                raise ValueError("Wrong actual per-domain budget rejection")
-            negatives.append({"kind": "budget", "region": region,
+            memory_budget.check_budget_tamper(bad)
+            negatives.append({"kind": "budget_tamper", "region": region,
                               "report": arch_compile.digest(result_path),
                               "budget": arch_compile.digest(bad_budget)})
+            negatives.append(memory_budget.execute_budget_overflow(root, recorder, tools,
+                fixture, fixture / "both.toml", output, region,
+                "nexus_gd32_memory", parallel))
             build = output / (region + "-unselected")
             recorder.execute([tools["cmake"], "-S", str(fixture), "-B", str(build),
                 "-G", "Ninja", "-DCMAKE_MAKE_PROGRAM=" + tools["ninja"],
@@ -243,8 +230,8 @@ def run(root, compiler, output):
                 "-DPython3_EXECUTABLE=" + tools["python"],
                 "-DNEXUS_ASSEMBLY_FILE=" + str(fixture / "default.toml"),
                 "-DGD32_MEMORY_INJECT=" + region.upper()], region + "-unselected-configure")
-            rejection = rejected(recorder, [tools["cmake"], "--build", str(build),
-                "--target", "nexus_gd32_memory", "--parallel", "2"],
+            rejection = memory_budget.rejected(recorder, [tools["cmake"], "--build", str(build),
+                "--target", "nexus_gd32_memory", "--parallel", str(parallel)],
                 region + "-unselected-link", "memory region is not selected")
             negatives.append({"kind": "unselected_linker_section", "region": region,
                               "command": rejection})
@@ -270,12 +257,13 @@ def main():
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--compiler", default="arm-none-eabi-gcc")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--parallel", type=int, choices=(1, 2), default=2)
     args = parser.parse_args()
     compiler = shutil.which(args.compiler)
     if compiler:
         os.environ["PATH"] = str(Path(compiler).parent) + os.pathsep + os.environ.get("PATH", "")
     os.chdir(args.root)
-    return run(args.root, args.compiler, args.output)
+    return run(args.root, args.compiler, args.output, args.parallel)
 
 
 if __name__ == "__main__":

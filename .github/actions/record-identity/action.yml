@@ -23,6 +23,12 @@ inputs:
   require-dependencies:
     description: Require all locked source dependencies for successful jobs
     default: 'true'
+  dependency-preparation:
+    description: Optional verified preset preparation receipt selecting the job closure
+    default: ''
+  dependency-preset:
+    description: Expected job preset bound to the selected preparation and configuration
+    default: ''
 
 runs:
   using: composite
@@ -37,6 +43,8 @@ runs:
         NEXUS_IDENTITY_TOOLS: ${{ inputs.tools }}
         NEXUS_IDENTITY_OUTPUT: ${{ inputs.output }}
         NEXUS_IDENTITY_DEPENDENCIES: ${{ inputs.require-dependencies }}
+        NEXUS_IDENTITY_PREPARATION: ${{ inputs.dependency-preparation }}
+        NEXUS_IDENTITY_PRESET: ${{ inputs.dependency-preset }}
       run: |
         python3 - <<'PY'
         import os
@@ -62,5 +70,9 @@ runs:
             arguments.append('--observe-uninitialized-dependencies')
         elif dependencies != 'true':
             raise SystemExit('invalid identity dependency policy')
+        preparation = os.environ['NEXUS_IDENTITY_PREPARATION'].strip()
+        if preparation:
+            arguments.extend(['--dependency-preparation', preparation,
+                              '--expected-preset', required('PRESET')])
         raise SystemExit(subprocess.call(arguments))
         PY

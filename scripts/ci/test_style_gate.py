@@ -235,6 +235,18 @@ class StyleGateTests(unittest.TestCase):
         self.assertFalse(matches[0]["pass_filenames"])
         self.assertTrue((ROOT / "scripts/ci/tdd_gate.py").is_file())
 
+    def test_tdd_isolation_contains_the_complete_locked_tool_closure(self):
+        configuration = yaml.safe_load((ROOT / ".pre-commit-config.yaml").read_text())
+        hook = next(hook for repo in configuration["repos"]
+                    for hook in repo["hooks"] if hook["id"] == "nexus-tdd-gate")
+        pins = gate.locked_versions(ROOT)
+        workflow = (ROOT / "dependencies/workflow-tools.txt").read_text()
+        expected = [name + "==" + version for name, version in pins.items()]
+        expected += [line.strip() for line in workflow.splitlines()
+                     if line.strip() and not line.startswith("#")]
+        self.assertEqual(hook["language"], "python")
+        self.assertEqual(hook.get("additional_dependencies"), expected)
+
     def test_authored_toml_is_checked_by_staged_text_gate(self):
         (self.root / "assembly.toml").write_bytes(b"schema = 2\r\n")
         self.git("add", "assembly.toml")

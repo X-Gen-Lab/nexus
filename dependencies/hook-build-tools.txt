@@ -1,0 +1,3 @@
+# PEP 517 backend for pre-commit local placeholder packages.
+# Keep build isolation enabled; this exact wheel is in the offline tool bundle.
+setuptools==84.0.0

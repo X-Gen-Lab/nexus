@@ -20,6 +20,10 @@ repos:
         name: Nexus GoogleTest and GoogleMock contract execution
         entry: python scripts/ci/tdd_gate.py --staged
         language: python
+        additional_dependencies:
+          - pre-commit==4.3.0
+          - clang-format==14.0.6
+          - PyYAML==6.0.3
         stages: [pre-commit]
         pass_filenames: false
         always_run: true
