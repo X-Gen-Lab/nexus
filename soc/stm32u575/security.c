@@ -134,7 +134,7 @@ nx_result_t nx_stm32u575_tz_preflight(const nx_stm32u575_tz_t* owner,
         return NX_ERROR_UNSUPPORTED;
     }
     const uint32_t regions =
-        (nx_tz_read(&MPU_NS->TYPE) & MPU_TYPE_DREGION_Msk) >>
+        (nx_tz_read(&MPU_NS->TYPE) & (uint32_t)MPU_TYPE_DREGION_Msk) >>
         MPU_TYPE_DREGION_Pos;
     if ((nx_tz_read(&SAU->TYPE) & 0xFFU) != 8U ||
         (regions != 8U && regions != 16U)) {
@@ -220,8 +220,9 @@ static bool nx_tz_regions(const nx_stm32u575_tz_layout_t* p) {
             return false;
         }
     }
-    const uint32_t count = (nx_tz_read(&MPU_NS->TYPE) & MPU_TYPE_DREGION_Msk) >>
-                           MPU_TYPE_DREGION_Pos;
+    const uint32_t count =
+        (nx_tz_read(&MPU_NS->TYPE) & (uint32_t)MPU_TYPE_DREGION_Msk) >>
+        MPU_TYPE_DREGION_Pos;
     for (uint32_t i = 0U; i < count; ++i) {
         const uint32_t base = i < 2U ? bases[i] | (i == 0U ? 6U : 3U) : 0U;
         const uint32_t limit =

@@ -82,9 +82,10 @@ nx_result_t nx_stm32u575_system_preflight(const nx_stm32u575_system_t* s) {
     uint32_t ranges = NX_U575_READ(&s->rcc->ICSCR1);
     uint32_t range =
         (ranges & RCC_ICSCR1_MSIRGSEL) == 0U
-            ? (NX_U575_READ(&s->rcc->CSR) & RCC_CSR_MSISSRANGE) >>
+            ? (NX_U575_READ(&s->rcc->CSR) & (uint32_t)RCC_CSR_MSISSRANGE) >>
                   RCC_CSR_MSISSRANGE_Pos
-            : (ranges & RCC_ICSCR1_MSISRANGE) >> RCC_ICSCR1_MSISRANGE_Pos;
+            : (ranges & (uint32_t)RCC_ICSCR1_MSISRANGE) >>
+                  RCC_ICSCR1_MSISRANGE_Pos;
     if ((cr & (RCC_CR_MSISON | RCC_CR_MSISRDY)) !=
             (RCC_CR_MSISON | RCC_CR_MSISRDY) ||
         range != 4U ||
