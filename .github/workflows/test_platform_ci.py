@@ -1,8 +1,10 @@
 """Exercise workflow syntax and the real CTest admission used by the CLI."""
+import configparser
 import json
 import os
 from pathlib import Path
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -129,6 +131,24 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('scripts/ci/install_arm_toolchain.py', commands)
         self.assertNotIn('apt-get', commands)
 
+    def test_actions_initializer_covers_every_declared_gitlink(self):
+        modules = configparser.ConfigParser()
+        modules.read(ROOT / '.gitmodules')
+        expected = {modules[section]['path'] for section in modules.sections()}
+        self.assertTrue(expected)
+        action = yaml.load((ROOT / '.github/actions/setup-build/action.yml')
+                           .read_text(), Loader=yaml.BaseLoader)
+        commands = [step['run'].strip() for step in action['runs']['steps']
+                    if step.get('run', '').strip().startswith(
+                        'git submodule update')]
+        self.assertEqual(len(commands), 1)
+        arguments = shlex.split(commands[0].replace('\\\n', ' '))
+        self.assertEqual(arguments[:5],
+                         ['git', 'submodule', 'update', '--init', '--recursive'])
+        # Source identity observes every gitlink, including SDKs unused by the
+        # selected target. Future declared dependencies must join this closure.
+        self.assertEqual(set(arguments[5:]), expected)
+
     def test_native_executes_complete_ctest_and_google_plan_once(self):
         native = workflow('build-matrix.yml')['jobs']['native']
         commands = '\n'.join(step.get('run', '') for step in native['steps'])
@@ -224,6 +244,7 @@ class WorkflowContracts(unittest.TestCase):
         execute = next(step for step in native['steps']
                        if 'scripts/ci/native_contracts.py' in step.get('run', ''))
         self.assertEqual(execute['env']['TSAN_OPTIONS'], 'halt_on_error=1')
+
 
     def test_optional_os_security_has_actual_link_gates_and_artifacts(self):
         job = workflow('build-matrix.yml')['jobs']['os-security']
