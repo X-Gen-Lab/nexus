@@ -83,9 +83,12 @@ def _extra_sections(regions):
             inputs = _inputs(name, kind)
             qualifier = "" if kind == "data" else " (NOLOAD)"
             load = "" if kind == "data" else f" AT(ADDR({section}))"
+            # Output alignment also constrains AT> FLASH; aligning only the
+            # location counter leaves byte-only initializers at an odd LMA.
+            alignment = " ALIGN(4)" if kind == "data" else ""
             target = f" > {name.upper()}" + (" AT> FLASH" if kind == "data" else "")
             phdr = f" :{name}_" + ("data" if kind == "data" else "ram")
-            sections += [f"    {section}{qualifier} :{load} {{",
+            sections += [f"    {section}{qualifier} :{load}{alignment} {{",
                          f"        . = ALIGN(4); __nx_{name}_{kind}_start = .;",
                          f"        {inputs}",
                          f"        . = ALIGN(4); __nx_{name}_{kind}_end = .;",
@@ -148,7 +151,7 @@ SECTIONS {{
     .fini_array : {{ PROVIDE_HIDDEN(__fini_array_start = .); KEEP(*(SORT(.fini_array.*))) KEEP(*(.fini_array*)) PROVIDE_HIDDEN(__fini_array_end = .); }} > FLASH :flash
 {extra_sections}
     _sidata = LOADADDR(.data);
-    .data : {{ . = ALIGN(4); _sdata = .; *(.data*) . = ALIGN(4); _edata = .; }} > RAM AT> FLASH :data
+    .data : ALIGN(4) {{ . = ALIGN(4); _sdata = .; *(.data*) . = ALIGN(4); _edata = .; }} > RAM AT> FLASH :data
     .bss (NOLOAD) : AT(ADDR(.bss)) {{ . = ALIGN(4); _sbss = .; *(.bss*) *(COMMON) . = ALIGN(4); _ebss = .; }} > RAM :ram
     .reserved (NOLOAD) : AT(ADDR(.reserved)) {{ . = ALIGN(8); __heap_start = .; __nx_heap_start = .; . += _Min_Heap_Size; __heap_end = .; __nx_heap_end = .; }} > RAM :ram
     .msp __nx_msp_start (NOLOAD) : AT(__nx_msp_start) {{ . += _Min_Stack_Size; }} > RAM :stack

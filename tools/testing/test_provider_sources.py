@@ -132,26 +132,30 @@ add_subdirectory("{(ROOT / 'soc' / family).as_posix()}" soc)
                     expected.add("timebase.c")
                 self.assertEqual(provider, expected)
 
-    def test_gd32_adc_uses_vendor_gpio_without_an_unreferenced_provider(self):
-        for mode in ("single-shot", "low-rate-scan", "trigger-dma"):
+    def test_gd32_adc_retains_platform_pin_helpers(self):
+        for mode in ("single-shot", "low-rate-scan", "trigger-dma",
+                     "trigger-dma-continuous"):
             with self.subTest(mode=mode):
                 provider, sdk = self.configure_sources(
                     "gd32f470", [("adc", mode)])
-                expected = {"timebase.c", "adc.c"}
-                if mode == "trigger-dma":
+                # GPIO compilation supplies the lease, not a GPIO selection.
+                expected = {"timebase.c", "adc.c", "gpio.c"}
+                if mode in ("trigger-dma", "trigger-dma-continuous"):
                     expected.add("adc_stream.c")
+                if mode == "trigger-dma-continuous":
+                    expected.add("adc_continuous.c")
                 self.assertEqual(provider, expected)
                 self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
                                        "gd32f4xx_timer", "gd32f4xx_gpio",
                                        "gd32f4xx_adc"})
 
-    def test_gd32_exti_and_pwm_use_sdk_pins_without_gpio_provider(self):
+    def test_gd32_exti_and_pwm_retain_platform_pin_helpers(self):
         for kind, mode, source in (("exti", "edge-event", "exti.c"),
                                    ("pwm", "fixed-pwm", "timer.c")):
             with self.subTest(kind=kind):
                 provider, sdk = self.configure_sources(
                     "gd32f470", [(kind, mode)])
-                self.assertEqual(provider, {"timebase.c", source})
+                self.assertEqual(provider, {"timebase.c", source, "gpio.c"})
                 self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
                                        "gd32f4xx_timer", "gd32f4xx_gpio"})
 
@@ -166,12 +170,16 @@ add_subdirectory("{(ROOT / 'soc' / family).as_posix()}" soc)
     def test_pinless_devices_do_not_compile_gpio(self):
         for family in ("stm32f407", "gd32f470"):
             with self.subTest(family=family):
-                provider, _ = self.configure_sources(
+                provider, sdk = self.configure_sources(
                     family, [("flash", "poll-word"),
                              ("watchdog", "independent")])
                 expected = {"flash.c", "watchdog.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
+                    self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
+                                           "gd32f4xx_timer", "gd32f4xx_fwdgt"})
+                else:
+                    self.assertEqual(sdk, set())
                 self.assertEqual(provider, expected)
 
     def test_multiple_instances_share_one_compilation_unit(self):
