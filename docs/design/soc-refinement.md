@@ -37,8 +37,10 @@ These are source-reviewed Board references. Their physical PCB revisions,
 silicon revisions, solder bridges, electrical connections and option bytes have
 not been observed. Reference-only HIL admission fails closed; selecting a
 matching chip name cannot promote a reference into a qualified physical Board.
-The [execution record](../delivery/soc-refinement-verification.md) distinguishes
-normal commit gates, development ARM observations and final qualification.
+The [extension execution record](../delivery/soc-extensions-verification.md)
+distinguishes normal commit gates, development ARM observations and final
+qualification. The [earlier baseline](../delivery/soc-refinement-verification.md)
+retains its original source identity and evidence.
 Reference software status in the ledger records bounded host/ARM evidence; it
 does not establish a clean candidate, physical acceptance or every original
 exit condition.

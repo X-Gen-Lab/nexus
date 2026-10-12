@@ -25,15 +25,19 @@ scope。ThreadX 的真实 Linux 内核
 有限退出的真实 Linux kernel consumer 另外建立运行证据。不能从链接程序的存在
 推断已运行 scheduler，也不能从两个 host case 推断完整 MCU backend 资格。
 
-H743/U575 分别固定 HSI64／MSIS4 MHz 和 Cache off；U575 只接纳外部已建立的
-TZEN=0／SWAP_BANK=0。模型和 ELF 不会观察实际供电、option bytes 或 silicon
-revision。per-engine DMA 可达性 facts 也不建立 DMA provider、cache coherency
-或安全域隔离。SDK 必须实际用当前完整 source closure 构建 H743/U575 的公共
-consumer；只加入两个 CMSIS dependency 的旧包资格不能继承为新增平台资格。
+八个公开单镜像候选配置使用 H743 HSI64／Cache off 和 U575 MSIS4 MHz／
+TZEN=0／SWAP_BANK=0。H743 的 HSI32／Cache on 固定配置及有限 TX DMA、U575
+独立 TZEN=1 双域参考另有各自软件与 ARM 证据，不属于这八个候选配置。
+模型和 ELF 不会观察实际供电、option bytes 或 silicon revision；per-engine
+DMA facts 本身也不建立实际 cache coherence 或安全域隔离。SDK 必须实际用
+当前完整 source closure 构建 H743/U575 公共 consumer；只加入 CMSIS dependency
+的旧包资格不能继承为新增平台资格。精确结果见
+[SoC 扩展执行记录](soc-extensions-verification.md)。
 
-G474 已有真实 typed factory 主机执行、system/provider 回归和四个显式 TOML
-ARM 镜像（empty／selected × 裸机／FreeRTOS）。镜像预算、操作表保留、未选
-GPIO／UART 裁剪及实际向量字节分别检查；SysTick 的 170 MHz／1 kHz／reload169999
+G474 已有真实 typed factory 主机执行、system/provider/EXTI 回归及显式 TOML
+ARM 镜像（empty／selected／EXTI fixture × 裸机／FreeRTOS）。EXTI fixture 的
+PA0/PA1 是软件接线夹具，未获得 PCB 电气资格。镜像预算、操作表保留、未选
+外设裁剪及实际向量字节分别检查；SysTick 的 170 MHz／1 kHz／reload169999
 是编译配置与链接证明，不是时间精度测量。主机 sanitizer 只检查被执行的软件
 路径。参考配置的晶振／PCB／焊桥、硬件时序、同最终 clean HEAD 的 SDK／离线
 复现与新候选有各自退出条件，不能据此把 G474 的其他外设或 ThreadX 记为支持。

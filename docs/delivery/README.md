@@ -16,6 +16,7 @@
 | [软件证据](verification.md) | 实际执行与尚待 clean-source 封存的区别 |
 | [SoC 基线执行记录](soc-refinement-verification.md) | 已封存基线的精确源码、执行结果与物理未执行边界 |
 | [SoC 扩展执行记录](soc-extensions-verification.md) | G474 EXTI、H743 Cache/DMA、U575 双域参考及后续验收状态 |
+| [SoC 扩展结果索引](soc-extensions-results.json) | 固定源码、完整 CI、八个离线候选、原始证据和归档摘要 |
 | [迁移手册](migration.md) | 旧 API、配置、对象与外部应用迁移 |
 | [安全与生命周期审查](security-review.md) | 扫描范围、测试工装修复与借用／恢复限制 |
 | [后续迭代](next-iterations.md) | 实板验收、测量驱动的扩展与团队流程 |
@@ -31,10 +32,12 @@ timebase 参考装配。G474 另有 selected EXTI，H743 另有固定 Cache 配�
 TX DMA，U575 另有独立无 OS 的同步双域参考；这些纵切片不代表全外设或完整
 安全域接入，物理 HIL 全部未执行。
 
-截至本轮开发验证，已有生产 `.c` 的 Native/寄存器故障模型、真实 ARM 编译与链接、
-三板资源矩阵、外部应用开发构建、工具负路径与 HIL 准入工装。开发执行结果不自动
-变成最终候选资格：clean HEAD、源码 SDK 独立消费、正式离线双构建与候选封存以
-各自新生成的证据为准。硬件未接入，所有物理资格仍为 `not_executed`。
+本轮固定源码 `98270512` 已完成全部 Native 契约、工具和配置测试、121 个 ARM
+镜像、104 个 CPU runtime 变体、SDK 独立消费及完整 GitHub CI。八个 H743/U575
+公开参考配置分别完成两次独立断网构建，ELF/BIN 逐字节一致，并封存为无签名软件
+候选；具体范围和原始证据见结果索引。后续文档提交只记录该源码，不继承为新的
+代码执行资格。实板未接入，物理 HIL 均为 `not_executed`；运行态交接、DVFS 和
+深 STOP 连续计时尚未实现，55 项原始退出条件保持不变。
 
 `docs/archive/` 保留历史设计、结果和旧 Sphinx 教程，不能继承为当前支持或验收。
 当前公共 API 文档只从现有公开 include 树生成；代码格式和反斜杠 Doxygen 风格保持

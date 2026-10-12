@@ -19,13 +19,15 @@
 | 可选 RAM 放置 | `scripts/ci/stm32_memory.py`、`scripts/ci/gd32_memory.py` | F407 CCM、GD ADDSRAM／TCM 的链接和初始化域；不证明掉电／reset retention |
 | 高级 controller 夹具 | `tests/contracts/{stm32,gd32}_assembly/*.toml` | 九类、DMA、块接收／触发、多控制器实际 ARM 链接；明确是软件 Board |
 | 最小资源矩阵 | `tools/measurement/compare.py` | 三板 60 个 O2／Os／O3 ± LTO 镜像；18 empty GC 检查；实际 face／ops 存储成本 |
-| 外部示例 | 独立 `X-Gen-Lab/nexus-examples` | 精确 pin 后 Native 运行与六个 ARM 配置；产品实现留在外部 |
+| 外部示例 | 独立 `X-Gen-Lab/nexus-examples` | 精确 pin 后 Native 运行与十个 ARM 配置、二十个 ELF；产品实现留在外部 |
 | 源码 SDK | `cmake/package/package_source_sdk.py`、`verify_consumers.py` | 干净版本、source closure/identity、移动路径 C／C++ Native 和 Runtime consumer、STM／GD 固件链接 |
 | 离线复现／候选 | `tools/evidence/reproduce.py`、`candidate.py`、`proof.py` | 两次独立 network-none 构建，相同源码／配置／工具／ELF 身份及必需 scope |
 | HIL | `tools/hil/prepare.py`、`admit.py`、三板 fixture 与 station template | 工装已准备；未连接设备，所有物理结果 `not_executed` |
 
-本轮 SoC 的逐批 canonical commit、实际门禁和最终源码待验项见
-[SoC 执行记录](soc-refinement-verification.md)。版本化 datasheet／manual／errata
+本轮 SoC 的 canonical commit、实际完整门禁、离线候选与剩余验收范围见
+[SoC 扩展执行记录](soc-extensions-verification.md)；
+[早期基线记录](soc-refinement-verification.md) 保留原版本证据。
+版本化 datasheet／manual／errata
 索引只建立来源；实际 silicon revision 和各 mode 的 workaround 适用性单独验收。
 `soc_costs.py` 保存真实 ELF／反汇编／工具调用与可比 profile，不将不同 backend、
 route 或容量的大小差解释为同配置优化，也不把指令数量当作测得 cycles。
