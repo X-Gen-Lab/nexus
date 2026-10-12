@@ -11,10 +11,12 @@ extern "C" {
 #include "nexus/core/fault.h"
 #include "private/system.h"
 }
+#include <csignal>
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
+#include <unistd.h>
 
 NVIC_Type g_gd32_model_nvic{};
 SCB_Type g_gd32_model_scb{};
@@ -36,6 +38,10 @@ class ClockPort {
                  unsigned line));
 };
 struct ParkSignal {};
+volatile std::sig_atomic_t returning_fault_seen;
+void AlarmAfterReturningFault(int) {
+    _exit(returning_fault_seen == 1 ? 42 : 92);
+}
 ClockPort* clock_port;
 bool hold_timer_count;
 bool hold_timer_update_clear;
@@ -108,6 +114,8 @@ class Gd32Timebase : public testing::Test {
             });
     }
     void TearDown() override {
+        /* Host fixture reset after observer interception is not recovery from
+         * the production non-returning terminal path. */
         testing::Mock::VerifyAndClearExpectations(&clock_mock);
         hold_timer_count = false;
         hold_timer_update_clear = false;
@@ -245,7 +253,7 @@ TEST_F(Gd32Timebase, RestartCreatesAnIndependentZeroEpoch) {
     EXPECT_EQ(3U, nx_gd32_now_us());
 }
 
-TEST_F(Gd32Timebase, RuntimeAckFailureEndsTimeUntilObservedStopAndRestart) {
+TEST_F(Gd32Timebase, IsolatedAckFailureStillObservesTerminalOwnership) {
     ASSERT_EQ(0, nx_gd32_soc_start());
     EXPECT_EQ(NX_SUCCESS, nx_gd32_timebase_error());
     TIMER_CNT(TIMER1) = 59U;
@@ -257,7 +265,10 @@ TEST_F(Gd32Timebase, RuntimeAckFailureEndsTimeUntilObservedStopAndRestart) {
     EXPECT_CALL(clock_mock, TimerWrite(&TIMER_CTL0(TIMER1), 0U)).Times(1);
     EXPECT_CALL(clock_mock, DisableIrq((unsigned)TIMER1_IRQn)).Times(1);
     g_gd32_model_isr = true;
-    TIMER1_IRQHandler();
+    EXPECT_CALL(clock_mock,
+                Observe(NX_FAULT_PLATFORM, NX_ERROR_IO, testing::_, testing::_))
+        .Times(1);
+    EXPECT_THROW(TIMER1_IRQHandler(), ParkSignal);
     g_gd32_model_isr = false;
     EXPECT_EQ(0U, nx_gd32_now_us());
     EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
@@ -266,15 +277,7 @@ TEST_F(Gd32Timebase, RuntimeAckFailureEndsTimeUntilObservedStopAndRestart) {
     uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32U);
     EXPECT_EQ(0U, NVIC->ISER[(uint32_t)TIMER1_IRQn / 32U] & bit);
     EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
-    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
-    EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&clock_mock));
-    ASSERT_EQ(0, nx_gd32_soc_stop());
-    EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
-    EXPECT_EQ(NX_SUCCESS, nx_gd32_soc_preflight());
-    ASSERT_EQ(0, nx_gd32_soc_start());
-    EXPECT_EQ(NX_SUCCESS, nx_gd32_timebase_error());
-    TIMER_CNT(TIMER1) = 3U;
-    EXPECT_EQ(3U, nx_gd32_now_us());
+    EXPECT_EQ(1U, g_gd32_model_mask);
 }
 
 TEST_F(Gd32Timebase, UnisolatedAckFailureObservesFaultWithMasksAndOwnersHeld) {
@@ -314,6 +317,8 @@ TEST_F(Gd32Timebase, UnisolatedAckFailureObservesFaultWithMasksAndOwnersHeld) {
         EXPECT_EQ(0U, nx_gd32_now_us());
         EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
         EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&clock_mock));
+        /* Reinitialize the intercepted host fixture for the next variant;
+         * a real terminal observer cannot return to perform this cleanup. */
         g_gd32_model_isr = false;
         g_gd32_model_mask = 0U;
         hold_irq_disable = false;
@@ -367,38 +372,50 @@ TEST_F(Gd32Timebase, AckFailureBeforeSnapshotMaskCannotPublishStaleTime) {
         TIMER1_IRQHandler();
         g_gd32_model_isr = false;
     };
-    EXPECT_EQ(0U, nx_gd32_now_us());
+    EXPECT_CALL(clock_mock,
+                Observe(NX_FAULT_PLATFORM, NX_ERROR_IO, testing::_, testing::_))
+        .Times(1);
+    EXPECT_THROW(nx_gd32_now_us(), ParkSignal);
     EXPECT_EQ(nullptr, before_save);
-    EXPECT_EQ(0U, g_gd32_model_mask);
+    EXPECT_EQ(1U, g_gd32_model_mask);
     EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
-    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_gd32_soc_preflight());
 }
 
-TEST_F(Gd32Timebase, StaleReadsAfterAckFailurePreserveIncomingMasks) {
-    ASSERT_EQ(0, nx_gd32_soc_start());
-    TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
-    EXPECT_CALL(clock_mock,
-                TimerWrite(&TIMER_INTF(TIMER1), ~(uint32_t)TIMER_INTF_UPIF))
-        .WillOnce([](volatile uint32_t*, uint32_t) {});
-    g_gd32_model_isr = true;
-    TIMER1_IRQHandler();
-    g_gd32_model_isr = false;
-    for (uint32_t mask : {0U, 1U}) {
-        g_gd32_model_mask = mask;
-        TIMER_CNT(TIMER1) = 71U;
-        EXPECT_EQ(0U, nx_gd32_now_us());
-        EXPECT_EQ(mask, g_gd32_model_mask);
-    }
-    g_gd32_model_mask = 0U;
-    ASSERT_EQ(0, nx_gd32_soc_stop());
-    EXPECT_EQ(NX_ERROR_IO, nx_gd32_timebase_error());
-    for (uint32_t mask : {0U, 1U}) {
-        g_gd32_model_mask = mask;
-        TIMER_CNT(TIMER1) = 73U;
-        TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
-        EXPECT_EQ(0U, nx_gd32_now_us());
-        EXPECT_EQ(mask, g_gd32_model_mask);
-    }
+TEST_F(Gd32Timebase, ReturningObserverCannotResumeIsolatedTimerProgress) {
+    EXPECT_EXIT(
+        {
+            if (nx_gd32_soc_start() != 0)
+                _exit(90);
+            TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
+            EXPECT_CALL(clock_mock, TimerWrite(&TIMER_INTF(TIMER1),
+                                               ~(uint32_t)TIMER_INTF_UPIF))
+                .WillOnce([](volatile uint32_t*, uint32_t) {});
+            returning_fault_seen = 0;
+            EXPECT_CALL(clock_mock, Observe(NX_FAULT_PLATFORM, NX_ERROR_IO,
+                                            testing::_, testing::_))
+                .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
+                             unsigned line) {
+                    uint32_t bank = (uint32_t)TIMER1_IRQn / 32U;
+                    uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32U);
+                    returning_fault_seen =
+                        file != nullptr && line != 0U &&
+                                g_gd32_model_mask == 1U &&
+                                nx_gd32_timebase_error() == NX_ERROR_IO &&
+                                (RCU_APB1EN & RCU_APB1EN_TIMER1EN) != 0U &&
+                                TIMER_DMAINTEN(TIMER1) == 0U &&
+                                (TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) == 0U &&
+                                (NVIC->ISER[bank] & bit) == 0U
+                            ? 1
+                            : -1;
+                });
+            g_gd32_model_isr = true;
+            std::signal(SIGALRM, AlarmAfterReturningFault);
+            alarm(1U);
+            TIMER1_IRQHandler();
+            _exit(99);
+        },
+        testing::ExitedWithCode(42), "");
 }
 
 TEST_F(Gd32Timebase, ForeignReservedTimerRejectsBeforeClockMutation) {

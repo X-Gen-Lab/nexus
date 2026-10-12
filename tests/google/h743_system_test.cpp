@@ -137,31 +137,13 @@ TEST_F(H743System, StaleUpdateFlagCannotProveRefusedPrescalerDelivery) {
     EXPECT_FALSE(g_h743_model.irq_enabled[TIM2_IRQn]);
 }
 
-TEST_F(H743System, RefusedOverflowAckInvalidatesEpochWithoutCountingTwice) {
-    ASSERT_EQ(Start().primary, NX_SUCCESS);
-    g_h743_model.timer.SR = TIM_SR_UIF;
-    g_h743_model.ignore_write = &g_h743_model.timer.SR;
-    nx_stm32h743_system_timer_irq(&g_nx_stm32h743_system);
-    nx_stm32h743_system_timer_irq(&g_nx_stm32h743_system);
-    EXPECT_EQ(g_nx_stm32h743_system.overflow_us, 0U);
-    EXPECT_EQ(g_nx_stm32h743_system.timer_error, NX_ERROR_IO);
-    EXPECT_FALSE(g_nx_stm32h743_system.started);
-    EXPECT_FALSE(g_h743_model.irq_enabled[TIM2_IRQn]);
-    EXPECT_EQ(g_h743_model.timer.DIER, 0U);
-    EXPECT_EQ(g_h743_model.timer.CR1, 0U);
-    EXPECT_EQ(nx_stm32h743_system_now(&g_nx_stm32h743_system), 0U);
-    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U),
-              NX_ERROR_IO);
-    g_h743_model.ignore_write = nullptr;
-    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U), NX_SUCCESS);
-}
 namespace {
 volatile std::sig_atomic_t s_fault_observed;
 bool s_fault_exit;
 void AlarmAfterReturningFault(int) {
     _exit(s_fault_observed == 1 ? 42 : 92);
 }
-void PrepareTimerFault(bool exit_observer) {
+void PrepareTimerFault(bool exit_observer, bool refuse_irq = false) {
     nx_h743_model_reset();
     if (nx_stm32h743_system_start(&g_nx_stm32h743_system, 8U).primary !=
         NX_SUCCESS)
@@ -170,7 +152,8 @@ void PrepareTimerFault(bool exit_observer) {
     s_fault_exit = exit_observer;
     g_h743_model.timer.SR = TIM_SR_UIF;
     g_h743_model.ignore_write = &g_h743_model.timer.SR;
-    g_h743_model.hold_irq_off = true;
+    g_h743_model.hold_irq_off = refuse_irq;
+    g_h743_model.irq_active[TIM2_IRQn] = true;
 }
 } /* namespace */
 extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
@@ -179,13 +162,17 @@ extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
         domain == NX_FAULT_PLATFORM && reason == NX_ERROR_IO &&
         file != nullptr && line != 0U && nx_arch_irq_is_masked() &&
         !g_nx_stm32h743_system.started &&
+        g_nx_stm32h743_system.overflow_us == 0U &&
         g_nx_stm32h743_system.timer_error == NX_ERROR_IO &&
-        g_nx_stm32h743_system.remaining_effects == NX_STM32H743_EFFECT_TIMER;
+        g_nx_stm32h743_system.remaining_effects == NX_STM32H743_EFFECT_TIMER &&
+        g_h743_model.timer.DIER == 0U &&
+        (g_h743_model.timer.CR1 & TIM_CR1_CEN) == 0U &&
+        g_h743_model.irq_enabled[TIM2_IRQn] == g_h743_model.hold_irq_off;
     s_fault_observed = valid ? 1 : -1;
     if (s_fault_exit)
         _exit(valid ? 42 : 91);
 }
-TEST_F(H743System, UnisolatedTimerFaultOffersMaskedNonreturningObservation) {
+TEST_F(H743System, IsolatedTimerFaultStillOffersMaskedTerminalObservation) {
     EXPECT_EXIT(
         {
             PrepareTimerFault(true);
@@ -194,7 +181,16 @@ TEST_F(H743System, UnisolatedTimerFaultOffersMaskedNonreturningObservation) {
         },
         testing::ExitedWithCode(42), "");
 }
-TEST_F(H743System, ReturningObserverCannotResumeUnisolatedTimerProgress) {
+TEST_F(H743System, UnisolatedTimerFaultOffersMaskedNonreturningObservation) {
+    EXPECT_EXIT(
+        {
+            PrepareTimerFault(true, true);
+            nx_stm32h743_system_timer_irq(&g_nx_stm32h743_system);
+            _exit(99);
+        },
+        testing::ExitedWithCode(42), "");
+}
+TEST_F(H743System, ReturningObserverCannotResumeIsolatedTimerProgress) {
     EXPECT_EXIT(
         {
             PrepareTimerFault(false);
@@ -205,17 +201,27 @@ TEST_F(H743System, ReturningObserverCannotResumeUnisolatedTimerProgress) {
         },
         testing::ExitedWithCode(42), "");
 }
-
-TEST_F(H743System, FaultBeforeSnapshotMaskCannotPublishInvalidatedEpoch) {
-    ASSERT_EQ(Start().primary, NX_SUCCESS);
-    g_h743_model.timer.SR = TIM_SR_UIF;
-    g_h743_model.ignore_write = &g_h743_model.timer.SR;
-    g_h743_model.before_irq_save = [](void*) {
-        EXPECT_FALSE(nx_arch_irq_is_masked());
-        nx_stm32h743_system_timer_irq(&g_nx_stm32h743_system);
-    };
-    EXPECT_EQ(nx_stm32h743_system_now(&g_nx_stm32h743_system), 0U);
-    EXPECT_FALSE(g_nx_stm32h743_system.started);
-    EXPECT_EQ(g_nx_stm32h743_system.timer_error, NX_ERROR_IO);
-    EXPECT_FALSE(nx_arch_irq_is_masked());
+TEST_F(H743System, ReturningObserverCannotResumeUnisolatedTimerProgress) {
+    EXPECT_EXIT(
+        {
+            PrepareTimerFault(false, true);
+            std::signal(SIGALRM, AlarmAfterReturningFault);
+            alarm(1U);
+            nx_stm32h743_system_timer_irq(&g_nx_stm32h743_system);
+            _exit(99);
+        },
+        testing::ExitedWithCode(42), "");
+}
+TEST_F(H743System, FaultBeforeSnapshotMaskCannotResumeDeadlineConsumer) {
+    EXPECT_EXIT(
+        {
+            PrepareTimerFault(true);
+            g_h743_model.before_irq_save = [](void*) {
+                g_h743_model.before_irq_save = nullptr;
+                nx_stm32h743_system_timer_irq(&g_nx_stm32h743_system);
+            };
+            (void)nx_stm32h743_system_now(&g_nx_stm32h743_system);
+            _exit(99);
+        },
+        testing::ExitedWithCode(42), "");
 }

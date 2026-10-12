@@ -153,42 +153,13 @@ TEST_F(U575System, PreRamSetupTouchesCpuWithoutClockOrContextState) {
     EXPECT_EQ(123U, g_nx_stm32u575_system.core_hz);
     EXPECT_EQ(0U, g_u575_model.writes);
 }
-TEST_F(U575System, RefusedRuntimeAckInvalidatesEpochWithoutCountingTwice) {
-    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_system_start(system, 8U).primary);
-    g_u575_model.timer.SR = TIM_SR_UIF;
-    g_u575_model.ignore_write = &g_u575_model.timer.SR;
-    nx_stm32u575_system_timer_irq(system);
-    nx_stm32u575_system_timer_irq(system);
-    EXPECT_EQ(0U, system->overflow_us);
-    EXPECT_EQ(NX_ERROR_IO, system->timer_error);
-    EXPECT_FALSE(system->started);
-    EXPECT_EQ(NX_STM32U575_EFFECT_TIMER, system->remaining_effects);
-    EXPECT_EQ(0U, g_u575_model.timer.CR1);
-    EXPECT_EQ(0U, g_u575_model.timer.DIER);
-    EXPECT_FALSE(g_u575_model.irq_enabled[45]);
-    EXPECT_EQ(0U, nx_stm32u575_system_now(system));
-    EXPECT_EQ(NX_ERROR_IO, nx_stm32u575_system_stop(system, 8U));
-    g_u575_model.ignore_write = nullptr;
-    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_system_stop(system, 8U));
-}
-TEST_F(U575System, AckFaultBeforeSnapshotMaskCannotPublishStaleTime) {
-    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_system_start(system, 8U).primary);
-    g_u575_model.timer.SR = TIM_SR_UIF;
-    g_u575_model.ignore_write = &g_u575_model.timer.SR;
-    g_u575_model.before_irq_save = [] {
-        g_u575_model.before_irq_save = nullptr;
-        nx_stm32u575_system_timer_irq(&g_nx_stm32u575_system);
-    };
-    EXPECT_EQ(0U, nx_stm32u575_system_now(system));
-    EXPECT_FALSE(system->started);
-    EXPECT_EQ(0U, system->overflow_us);
-}
-static volatile std::sig_atomic_t s_fault_observed;
-static bool s_fault_exit;
-static void AlarmAfterReturningFault(int) {
+namespace {
+volatile std::sig_atomic_t s_fault_observed;
+bool s_fault_exit;
+void AlarmAfterReturningFault(int) {
     _exit(s_fault_observed == 1 ? 42 : 92);
 }
-static void PrepareTimerFault(bool exit_observer) {
+void PrepareTimerFault(bool exit_observer, bool refuse_irq = false) {
     nx_u575_model_reset();
     if (nx_stm32u575_system_start(&g_nx_stm32u575_system, 8U).primary !=
         NX_SUCCESS)
@@ -197,21 +168,27 @@ static void PrepareTimerFault(bool exit_observer) {
     s_fault_exit = exit_observer;
     g_u575_model.timer.SR = TIM_SR_UIF;
     g_u575_model.ignore_write = &g_u575_model.timer.SR;
-    g_u575_model.hold_irq_off = true;
+    g_u575_model.hold_irq_off = refuse_irq;
+    g_u575_model.irq_active[TIM2_IRQn] = true;
 }
+} /* namespace */
 extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
                                  const char* file, unsigned line) {
-    bool valid =
+    const bool valid =
         domain == NX_FAULT_PLATFORM && reason == NX_ERROR_IO &&
         file != nullptr && line != 0U && nx_arch_irq_is_masked() &&
         !g_nx_stm32u575_system.started &&
+        g_nx_stm32u575_system.overflow_us == 0U &&
         g_nx_stm32u575_system.timer_error == NX_ERROR_IO &&
-        g_nx_stm32u575_system.remaining_effects == NX_STM32U575_EFFECT_TIMER;
+        g_nx_stm32u575_system.remaining_effects == NX_STM32U575_EFFECT_TIMER &&
+        g_u575_model.timer.DIER == 0U &&
+        (g_u575_model.timer.CR1 & TIM_CR1_CEN) == 0U &&
+        g_u575_model.irq_enabled[TIM2_IRQn] == g_u575_model.hold_irq_off;
     s_fault_observed = valid ? 1 : -1;
     if (s_fault_exit)
         _exit(valid ? 42 : 91);
 }
-TEST_F(U575System, UnisolatedTimerFaultOffersMaskedNonreturningObservation) {
+TEST_F(U575System, IsolatedTimerFaultStillOffersMaskedTerminalObservation) {
     EXPECT_EXIT(
         {
             PrepareTimerFault(true);
@@ -220,13 +197,46 @@ TEST_F(U575System, UnisolatedTimerFaultOffersMaskedNonreturningObservation) {
         },
         testing::ExitedWithCode(42), "");
 }
-TEST_F(U575System, ReturningObserverCannotResumeUnisolatedTimerProgress) {
+TEST_F(U575System, UnisolatedTimerFaultOffersMaskedNonreturningObservation) {
+    EXPECT_EXIT(
+        {
+            PrepareTimerFault(true, true);
+            nx_stm32u575_system_timer_irq(&g_nx_stm32u575_system);
+            _exit(99);
+        },
+        testing::ExitedWithCode(42), "");
+}
+TEST_F(U575System, ReturningObserverCannotResumeIsolatedTimerProgress) {
     EXPECT_EXIT(
         {
             PrepareTimerFault(false);
             std::signal(SIGALRM, AlarmAfterReturningFault);
             alarm(1U);
             nx_stm32u575_system_timer_irq(&g_nx_stm32u575_system);
+            _exit(99);
+        },
+        testing::ExitedWithCode(42), "");
+}
+TEST_F(U575System, ReturningObserverCannotResumeUnisolatedTimerProgress) {
+    EXPECT_EXIT(
+        {
+            PrepareTimerFault(false, true);
+            std::signal(SIGALRM, AlarmAfterReturningFault);
+            alarm(1U);
+            nx_stm32u575_system_timer_irq(&g_nx_stm32u575_system);
+            _exit(99);
+        },
+        testing::ExitedWithCode(42), "");
+}
+TEST_F(U575System, FaultBeforeSnapshotMaskCannotResumeDeadlineConsumer) {
+    EXPECT_EXIT(
+        {
+            PrepareTimerFault(true);
+            g_u575_model.before_irq_save = [] {
+                g_u575_model.before_irq_save = nullptr;
+                nx_stm32u575_system_timer_irq(&g_nx_stm32u575_system);
+            };
+            (void)nx_stm32u575_system_now(&g_nx_stm32u575_system);
             _exit(99);
         },
         testing::ExitedWithCode(42), "");

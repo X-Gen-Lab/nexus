@@ -28,7 +28,7 @@ typedef struct {
     uint32_t saved_pll;
     uint32_t saved_flash;
     uint32_t saved_power;
-    /** \brief Sticky runtime IO fault; admitted start resets it, stop retains.
+    /** \brief Terminal IO diagnostic; never permission to resume or reclaim.
      */
     volatile nx_result_t timer_error;
     bool owned_power_clock;
@@ -105,10 +105,11 @@ uint64_t nx_stm32_system_now(nx_stm32_system_t* system);
  * \param[in,out]   system: Static context bound to the vector.
  * \note            Confirm W0C before extending time. Failure latches IO and
  *                  withdraws DIER/CEN/NVIC once while retaining ownership.
- *                  Observed isolation returns for ordinary task cleanup, not
- *                  time recovery. Unobserved isolation retains the IRQ mask,
- *                  observes the terminal platform fault and parks. Optional
- *                  low-power owners retain their existing busy/drain contract.
+ *                  The lost time domain is always terminal: after the bounded
+ *                  withdrawal attempt, retain the IRQ mask and every owner,
+ *                  observe the platform fault and park if the observer returns.
+ *                  Isolation never permits old deadline consumers to resume;
+ *                  no request or optional low-power loan is released.
  */
 void nx_stm32_system_timer_irq(nx_stm32_system_t* system);
 

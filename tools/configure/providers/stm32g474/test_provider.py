@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import unittest
 
+from tools.configure import bindings, configure
 from tools.configure.ir import ControllerIR
 from tools.configure.providers.common import (ConfigurationError,
                                               validate_clock_profiles)
@@ -180,25 +181,38 @@ class G474ProviderTests(unittest.TestCase):
             self.assertNotIn("xTaskCreate", source)
 
     def test_empty_profile_retains_no_io_lease_or_provider_source(self):
-        result = Result()
+        result = configure.resolve_ir(
+            ROOT / "tests/contracts/g474_assembly/empty.toml")
         self.assertEqual(self.provider.state_declarations(result), [])
         self.assertEqual(self.provider.start_resources(result), [])
         self.assertEqual(self.provider.shared_irqs(result), [])
         self.assertNotIn("gpioa", "\n".join(self.provider.stop_system(result)))
 
     def test_gpio_mask_snapshot_precedes_any_pin_effect_and_has_readback(self):
-        result = Result(gpio(), uart())
-        source = "\n".join(self.provider.start_resources(result))
-        self.assertLess(source.index("s_nx_gpioa_lease.mode"),
-                        source.index("s_nx_gpioa_lease.captured = true"))
+        result = configure.resolve_ir(
+            ROOT / "tests/contracts/g474_assembly/io.toml")
+        source = bindings.emit(result)[1]
         self.assertIn("NX_G474_READ(&GPIOA->MODER)", source)
         self.assertIn("NX_G474_READ(&RCC->AHB2ENR)", source)
-        self.assertLess(source.index("nx_stm32g474_gpio_clock_enable(0u)"),
-                        source.index("s_nx_gpioa_lease.mode"))
-        cleanup = "\n".join(self.provider.stop_system(result))
-        self.assertLess(cleanup.index("restore_gpioa"),
-                        cleanup.index("s_nx_platform_gpio_clocks_added"))
-        self.assertIn("s_nx_platform_uart_clocks_added", cleanup)
+        acquire = source[source.index("nx_platform_pins_acquire(void)"):
+                         source.index("nx_platform_pins_release(void)")]
+        self.assertLess(acquire.index("NX_G474_WRITE(&RCC->AHB2ENR"),
+                        acquire.index("nx_platform_pins_admit(false)"))
+        self.assertLess(acquire.index("nx_platform_pins_admit(false)"),
+                        acquire.index("nx_platform_pin_capture("))
+        self.assertLess(acquire.index("nx_platform_pin_capture("),
+                        acquire.index("s_nx_platform_pins_captured = true"))
+        start = source[source.index("nx_platform_start_result_t "
+                                    "nx_platform_start(void)"):]
+        self.assertLess(start.index("nx_platform_pins_acquire()"),
+                        start.index("nx_stm32g474_system_start("))
+        self.assertLess(start.index("nx_platform_pins_acquire()"),
+                        start.index("prepare_"))
+        release = source[source.index("nx_platform_pins_release(void)"):
+                         source.index("nx_result_t nx_platform_stop(void)")]
+        self.assertLess(release.index("nx_platform_pin_restore("),
+                        release.index("nx_platform_gpio_clocks_release()"))
+        self.assertIn("return NX_ERROR_IO;", release)
 
     def test_gpios_and_uart_use_real_readonly_tables_without_forwarders(self):
         for values in (gpio(), uart()):

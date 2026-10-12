@@ -69,8 +69,9 @@ uint64_t nx_stm32u575_system_now(nx_stm32u575_system_t* system);
  * \brief Observe overflow acknowledgement before counting the wrap.
  * \note Refused ACK invalidates time and retains timer cleanup ownership.
  *       Finite source withdrawal is attempted without polling or kernel calls.
- *       Unobserved isolation saves a terminal mask, observes a fault and parks;
- *       a returning fault observer cannot authorize subsequent progress.
+ *       Always retain a terminal mask, observe the fault and park, including
+ *       successful isolation. A returning observer cannot resume old deadline
+ *       consumers or authorize reclamation of any retained loan.
  */
 void nx_stm32u575_system_timer_irq(nx_stm32u575_system_t* system);
 /** \brief Observe density and TZEN0; package/PCB identity remains external. */

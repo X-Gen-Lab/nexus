@@ -7,10 +7,12 @@ runtime registry, allocator, worker or dispatch layer.
 from types import MappingProxyType
 
 try:
+    from .gpio_phase import withdraw_pin
     from .emission import dma_regions
     from .providers.common import fail, mode_traits
     from .providers import hardware
 except ImportError:
+    from gpio_phase import withdraw_pin
     from emission import dma_regions
     from providers.common import fail, mode_traits
     from providers import hardware
@@ -322,8 +324,9 @@ def constructor(item, result, prefix):
                  f"        if (({odr} & {bit}u) == 0u) {{ return NX_ERROR_IO; }}", "    }"]
     for index, pin in reversed(list(enumerate(pins))):
         wire, bit = pin["pin"], 1 << index
-        stop += [f"    if ((s_nx_pair_pin_leases_{name} & {bit}u) != 0u) {{",
-                 f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {int(wire[2:])}u, s_nx_pair_pin_saved_{name}[{index}]);",
+        stop += [f"    if ((s_nx_pair_pin_leases_{name} & {bit}u) != 0u) {{"]
+        stop += withdraw_pin(prefix, wire)
+        stop += [f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {int(wire[2:])}u, s_nx_pair_pin_saved_{name}[{index}]);",
                  f"        if (nx_{prefix}_pin_capture(GPIO{wire[1]}, {int(wire[2:])}u) != s_nx_pair_pin_saved_{name}[{index}]) {{ return NX_ERROR_IO; }}",
                  f"        s_nx_pair_pin_leases_{name} &= (uint16_t)~{bit}u;", "    }"]
     stop += [f"    if (s_nx_pair_clock_added_{name} != 0u) {{",
@@ -337,7 +340,11 @@ def constructor(item, result, prefix):
         definitions += [f"void {vector}_IRQHandler(void);",
                         "/** \\brief Dispatch the exact independently owned controller. */",
                         f"void {vector}_IRQHandler(void) {{ {callback}(&{state}{',' + extra if extra else ''}); }}"]
-    return {"definitions": definitions, "initialize": f"prepare_{name}()", "stop": [f"stop_{name}()"]}
+    return {"definitions": definitions, "initialize": f"prepare_{name}()",
+            "stop": [f"stop_{name}()"],
+            "pin_snapshots": {pin["pin"]:
+                              f"s_nx_pair_pin_saved_{name}[{index}]"
+                              for index, pin in enumerate(pins)}}
 
 
 def _gpio_mask(result, prefix):

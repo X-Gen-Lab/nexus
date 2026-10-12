@@ -2,7 +2,7 @@
 from . import bindings
 from ..common import mode_traits
 try:
-    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers, preflight
+    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers, preflight, gpio_phase
 except ImportError:
     import can
     import usb_device
@@ -10,6 +10,7 @@ except ImportError:
     import timer_advanced
     import secondary_controllers
     import preflight
+    import gpio_phase
 
 
 def implementation(item):
@@ -77,16 +78,6 @@ def instance_declarations(item, result):
     return source
 
 
-def _gpio_clock_mask(result):
-    selections = result.controllers
-    pins = [pin["pin"] for item in selections for pin in item["pins"]]
-    for device in result["devices"]:
-        if "cs_binding" in device:
-            binding = result["board_bindings"][device["cs_binding"]]
-            pins.extend(pin["pin"] for pin in result["routes"][binding["route"]]["pins"])
-    return sum(1 << index for index in {ord(pin[1]) - ord("A") for pin in pins})
-
-
 def has_dma(result):
     return any(mode_traits(item.kind, item.mode).dma
                for item in result.controllers)
@@ -103,9 +94,6 @@ def state_declarations(result):
     source = []
     if has_dma(result):
         source.append("static uint32_t s_nx_platform_dma_clocks_added;")
-    gpio_mask = _gpio_clock_mask(result)
-    if gpio_mask:
-        source.append('static uint32_t s_nx_platform_gpio_clocks_added;')
     if any(item["kind"] == "exti" for item in selections):
         source.append('static uint32_t s_nx_platform_syscfg_clock_added;')
     source.extend(can.state_declarations(result, "stm32"))
@@ -126,16 +114,7 @@ def stop_system(result):
     source.extend(ethernet.stop_system(result, "stm32"))
     source.extend(timer_advanced.stop_system(result, "stm32"))
     source.extend(secondary_controllers.stop_system(result, "stm32"))
-    gpio_clock_mask = _gpio_clock_mask(result)
-    if gpio_clock_mask:
-        source += ['    if (s_nx_platform_started) {',
-                   '        NX_PLATFORM_REGISTER_WRITE(RCC->AHB1ENR,',
-                   '            RCC->AHB1ENR & ~s_nx_platform_gpio_clocks_added);',
-                   '        nx_arch_dsb();',
-                   '        if ((RCC->AHB1ENR & s_nx_platform_gpio_clocks_added) != 0u) {',
-                   '            return NX_ERROR_IO;', '        }',
-                   '        s_nx_platform_gpio_clocks_added = 0u;',
-                   '    }']
+    source += gpio_phase.release(result)
     if any(item["kind"] == "exti" for item in selections):
         source += ['    if (s_nx_platform_started) { RCC->APB2ENR &= ~s_nx_platform_syscfg_clock_added; }']
     if dma_clock:
@@ -157,21 +136,20 @@ def start_system(result):
     selections = result.controllers
     dma_clock = has_dma(result)
     source = preflight.emit(result)
-    gpio_clock_mask = _gpio_clock_mask(result)
     if dma_clock:
         source.append('    s_nx_platform_dma_clocks_added = 0u;')
-    if gpio_clock_mask:
-        source.append('    s_nx_platform_gpio_clocks_added = 0u;')
     if any(item["kind"] == "exti" for item in selections):
         source.append('    s_nx_platform_syscfg_clock_added = 0u;')
     source += [f'    result.primary = nx_stm32_validate_identity({result["flash"]["size"]}u);',
                '    if (result.primary != NX_SUCCESS) { return result; }']
+    source += gpio_phase.acquire(result)
     source += ['    nx_stm32_start_result_t system = nx_stm32_system_start(&g_nx_stm32_system, 1000000u);',
                '    if (system.primary != 0) {',
                '        result.primary = NX_ERROR_IO;',
                '        result.cleanup = system.cleanup == 0 ? NX_SUCCESS : NX_ERROR_IO;',
-               '        result.remaining_effects = system.remaining_effects;',
-               '        s_nx_platform_started = result.remaining_effects != 0u;',
+               '        result.remaining_effects = system.remaining_effects;']
+    source += gpio_phase.abort(result)
+    source += ['        s_nx_platform_started = result.remaining_effects != 0u;',
                '        return result;', '    }']
     return source
 
@@ -186,9 +164,6 @@ def start_resources(result):
         source += [f'    s_nx_platform_dma_clocks_added = ~RCC->AHB1ENR & ({mask});',
                    f'    RCC->AHB1ENR |= ({mask});',
                    '    (void)RCC->AHB1ENR;', '    nx_arch_dsb();']
-    gpio_clock_mask = _gpio_clock_mask(result)
-    if gpio_clock_mask:
-        source.append(f'    s_nx_platform_gpio_clocks_added = ~RCC->AHB1ENR & {gpio_clock_mask}u;')
     if any(item["kind"] == "exti" for item in selections):
         source.append('    s_nx_platform_syscfg_clock_added = ~RCC->APB2ENR & RCC_APB2ENR_SYSCFGEN;')
     return source

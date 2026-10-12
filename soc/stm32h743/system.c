@@ -45,7 +45,7 @@ static bool wait_update(nx_stm32h743_system_t* s, uint32_t limit) {
     }
     return false;
 }
-/** \brief An unisolated timebase cannot authorize any subsequent progress. */
+/** \brief A lost time domain cannot authorize subsequent deadline progress. */
 static _Noreturn void timer_park(void) {
     (void)nx_arch_irq_save();
     nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
@@ -210,12 +210,11 @@ void nx_stm32h743_system_timer_irq(nx_stm32h743_system_t* s) {
             s->timer_error = NX_ERROR_IO;
             s->started = false;
             s->remaining_effects |= NX_STM32H743_EFFECT_TIMER;
-            bool source_off = write_checked(&s->timer->DIER, 0U, UINT32_MAX);
-            bool counter_off = write_checked(&s->timer->CR1, 0U, UINT32_MAX);
-            nx_result_t irq = NX_H743_IRQ_CONTROL(TIM2_IRQn, false, 0U);
-            if (!source_off || !counter_off || irq != NX_SUCCESS)
-                timer_park();
-            return;
+            (void)write_checked(&s->timer->DIER, 0U, UINT32_MAX);
+            (void)write_checked(&s->timer->CR1, 0U, UINT32_MAX);
+            (void)NX_H743_IRQ_CONTROL(TIM2_IRQn, false, 0U);
+            /* Source isolation does not make old consumer deadlines usable. */
+            timer_park();
         }
         if (s->started)
             s->overflow_us += (UINT64_C(1) << 32U);

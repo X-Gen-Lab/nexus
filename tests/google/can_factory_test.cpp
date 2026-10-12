@@ -286,15 +286,37 @@ TEST_F(CanFactory, FailedSecondStartupIsIncludedInReverseCleanup) {
     EXPECT_FALSE(second_state->snapshot.started);
     testing::Mock::VerifyAndClearExpectations(&ports);
 }
-TEST_F(CanFactory, FirstPinFailureHasNoDomainOrUncapturedPinRelease) {
-    EXPECT_CALL(ports, EnableClock(0U)).WillOnce(Return(NX_ERROR_IO));
-    EXPECT_CALL(ports, Capture(_, _)).Times(0);
+TEST_F(CanFactory, FirstControllerClockFailureReleasesUnchangedGlobalLeases) {
+    const auto* bytes = static_cast<const uint8_t*>(mapping);
+    const std::vector<uint8_t> before(bytes, bytes + 0x80000U);
+    EXPECT_CALL(ports, EnableClock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _)).Times(0);
     EXPECT_CALL(ports, Restore(_, _, _)).Times(0);
+    {
+        testing::InSequence sequence;
+        /* Capture all selected pins before a controller can mutate them. */
+        EXPECT_CALL(ports, Capture(0U, 11U)).WillOnce(Return(0x123U));
+        EXPECT_CALL(ports, Capture(0U, 12U)).WillOnce(Return(0x123U));
+        EXPECT_CALL(ports, Capture(1U, 12U)).WillOnce(Return(0x123U));
+        EXPECT_CALL(ports, Capture(1U, 13U)).WillOnce(Return(0x123U));
+        EXPECT_CALL(ports, Start()).WillOnce(Return(0));
+        EXPECT_CALL(ports, EnableClock(0U)).WillOnce(Return(NX_ERROR_IO));
+        /* Unchanged global leases need comparison, without a restore write. */
+        EXPECT_CALL(ports, Capture(1U, 13U)).WillOnce(Return(0x123U));
+        EXPECT_CALL(ports, Capture(1U, 12U)).WillOnce(Return(0x123U));
+        EXPECT_CALL(ports, Capture(0U, 12U)).WillOnce(Return(0x123U));
+        EXPECT_CALL(ports, Capture(0U, 11U)).WillOnce(Return(0x123U));
+        EXPECT_CALL(ports, Stop()).WillOnce(Return(0));
+    }
     nx_platform_start_result_t result = nx_platform_start();
     EXPECT_EQ(result.primary, NX_ERROR_IO);
     EXPECT_EQ(result.cleanup, NX_SUCCESS);
     EXPECT_EQ(result.remaining_effects, 0U);
     EXPECT_EQ(first_state->domain->active_mask, 0U);
+    EXPECT_FALSE(first_state->domain->configured);
+    EXPECT_FALSE(first_state->snapshot.started);
+    EXPECT_FALSE(second_state->snapshot.started);
+    EXPECT_EQ(before, std::vector<uint8_t>(bytes, bytes + 0x80000U));
 }
 TEST_F(CanFactory, SecondPinFailureRestoresOnlyTheCapturedLeases) {
     EXPECT_CALL(ports, Configure(0U, 11U)).WillOnce(Return(NX_SUCCESS));

@@ -31,9 +31,12 @@ Prescaler update starts with an observed W0C clear of stale UIF. Only a new UIF
 after UG, followed by another observed clear, can publish the time domain.
 Overflow IRQs count only acknowledged flags. ACK failure
 invalidates the live epoch, records `timer_error`, retains TIM2 responsibility
-and attempts finite DIER/CEN/NVIC withdrawal. If withdrawal cannot be observed,
-the CPU masks IRQs, calls the existing bounded fault observer and parks; a
-returning observer cannot authorize progress or release any I/O loan. A clock
+and attempts finite DIER/CEN/NVIC withdrawal. The lost deadline domain is always
+terminal, including successful source isolation: the CPU masks IRQs, calls the
+existing bounded fault observer and parks if it returns. No invalid zero time
+resumes a deadline consumer or releases an I/O loan. Normal stop/restart is not
+recovery from this terminal path; products own separately reviewed non-returning
+recovery. A clock
 snapshot checks epoch validity under the same saved mask as both counter words.
 Zero alone does not prove readiness, and old deadlines cannot be reused after
 invalidation. This supplies neither a generic public health manager nor a

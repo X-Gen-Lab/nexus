@@ -2,7 +2,7 @@
 from . import bindings
 from ..common import mode_traits
 try:
-    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers, preflight
+    from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers, preflight, gpio_phase
 except ImportError:
     import can
     import usb_device
@@ -10,6 +10,7 @@ except ImportError:
     import timer_advanced
     import secondary_controllers
     import preflight
+    import gpio_phase
 
 
 def implementation(item):
@@ -36,6 +37,8 @@ def includes(result):
     source = []
     source += ['#include "gd32f470_provider.h"', '#include "gd32f4xx.h"',
                '#include "system.h"']
+    if gpio_phase.applies(result):
+        source += ['#include "gd32f4xx_gpio.h"', '#include "gd32f4xx_rcu.h"']
     if any(item["kind"] == "uart" and item["mode"] == "dma-tx" for item in selections):
         source.append('#include "gd32f470_dma.h"')
     if any(item["kind"] == "spi" and item["mode"] == "dma-full-duplex" for item in selections):
@@ -141,6 +144,7 @@ def stop_system(result):
     source.extend(timer_advanced.stop_system(result, "gd32"))
     source.extend(secondary_controllers.stop_system(result, "gd32"))
     source.extend(usb_device.stop_system(result, "gd32"))
+    source += gpio_phase.release(result)
     if dma_clock:
         source += ['    if (s_nx_platform_started) {',
                    '        NX_PLATFORM_REGISTER_WRITE(RCU_AHB1EN,',
@@ -161,11 +165,13 @@ def start_system(result):
         source.append("    s_nx_can_gpio_clocks_added = 0u;")
     if dma_clock:
         source.append('    s_nx_platform_dma_clocks_added = 0u;')
+    source += gpio_phase.acquire(result)
     source += ['    if (nx_gd32_soc_start() != 0) {',
                '        result.primary = NX_ERROR_IO;',
                '        result.cleanup = nx_gd32_soc_stop() == 0 ? NX_SUCCESS : NX_ERROR_IO;',
-               '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
-               '        s_nx_platform_started = result.remaining_effects != 0u;',
+               '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;']
+    source += gpio_phase.abort(result)
+    source += ['        s_nx_platform_started = result.remaining_effects != 0u;',
                '        return result;', '    }']
     return source
 

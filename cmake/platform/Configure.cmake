@@ -27,6 +27,7 @@ function(nexus_resolve_assembly)
         "${NEXUS_SOURCE_DIR}/tools/configure/clocks.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/physical_facts.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/preflight.py"
+        "${NEXUS_SOURCE_DIR}/tools/configure/gpio_phase.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/authored.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/ir.py"
         "${NEXUS_SOURCE_DIR}/tools/configure/factory.py"

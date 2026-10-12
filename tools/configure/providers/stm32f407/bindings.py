@@ -1,8 +1,10 @@
 """Reviewed STM32 fixed construction, never a runtime resource allocator."""
 try:
     from ...emission import dma_regions
+    from ...gpio_phase import rollback_pin, withdraw_pin
 except ImportError:
     from emission import dma_regions
+    from gpio_phase import rollback_pin, withdraw_pin
 from ..common import controller_ir, mode_traits
 from .. import hardware
 try:
@@ -43,8 +45,13 @@ def _capture(lines, name):
 
 
 def _release(pins):
-    return [f"    (void)nx_stm32_pin_configure(GPIO{pin['pin'][1]}, "
-            f"{pin['pin'][2:]}u, 0u, 0u, 0u, false);" for pin in pins]
+    lines = []
+    for pin in pins:
+        wire = pin["pin"]
+        lines += withdraw_pin("stm32", wire, indent=4)
+        lines += [f"    (void)nx_stm32_pin_configure(GPIO{wire[1]}, "
+                  f"{wire[2:]}u, 0u, 0u, 0u, false);"]
+    return lines
 
 
 def _endpoint_face(kind, name, state, implementation=None):
@@ -461,7 +468,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         pins = list(dict.fromkeys(captured))
         mask = sum(1 << (ord(pin[1]) - ord("A")) for pin in
                    {name[:2] for name in pins})
-        locals_ = [f"    uint32_t saved_ahb1 = RCC->AHB1ENR & {mask}u;",
+        locals_ = ["    uint32_t retained_gpio_clocks = 0u;",
+                   f"    uint32_t saved_ahb1 = RCC->AHB1ENR & {mask}u;",
                    f"    uint32_t saved_apb1 = RCC->APB1ENR & {clock_bits['APB1ENR']};",
                    f"    uint32_t saved_apb2 = RCC->APB2ENR & {clock_bits['APB2ENR']};"]
         for pin in pins:
@@ -473,12 +481,12 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         body[2:2] = locals_
         body += ["rollback:"] + rollback_extra
         for pin in reversed(pins):
-            body += [f"    if (captured_{pin}) {{",
-                     f"        nx_stm32_pin_restore(GPIO{pin[1]}, {pin[2:]}u, saved_{pin});",
-                     "    }"]
+            body += [f"    if (captured_{pin}) {{"]
+            body += rollback_pin("stm32", pin, f"saved_{pin}")
+            body += ["    }"]
         body += [f"    RCC->APB1ENR = (RCC->APB1ENR & ~(uint32_t)({clock_bits['APB1ENR']})) | saved_apb1;",
                  f"    RCC->APB2ENR = (RCC->APB2ENR & ~(uint32_t)({clock_bits['APB2ENR']})) | saved_apb2;",
-                 f"    RCC->AHB1ENR = (RCC->AHB1ENR & ~{mask}u) | saved_ahb1;",
+                 f"    RCC->AHB1ENR = (RCC->AHB1ENR & ~{mask}u) | saved_ahb1 | retained_gpio_clocks;",
                  "    nx_arch_dsb();", "    return status;"]
     body.append("}")
     return {"definitions": declarations + body,
@@ -532,11 +540,12 @@ def _gpio_constructor(item):
         number = pin["pin"][2:]
         definitions.append(f'    uint16_t saved_{number} = nx_stm32_pin_capture(GPIO{port}, {number}u);')
     definitions += [f'    nx_result_t status = nx_stm32_gpio_initialize(&s_nx_port_{name}, {initial}u);',
-               '    if (status != NX_SUCCESS) {']
+               '    if (status != NX_SUCCESS) {',
+               '        uint32_t retained_gpio_clocks = 0u;']
     for pin in item["pins"]:
         number = pin["pin"][2:]
-        definitions.append(f'        nx_stm32_pin_restore(GPIO{port}, {number}u, saved_{number});')
-    definitions += [f'        RCC->AHB1ENR = (RCC->AHB1ENR & ~{1 << index}u) | saved_clock;',
+        definitions += rollback_pin("stm32", pin["pin"], f"saved_{number}")
+    definitions += [f'        RCC->AHB1ENR = (RCC->AHB1ENR & ~{1 << index}u) | saved_clock | retained_gpio_clocks;',
                '        nx_arch_dsb();', '    }', '    return status;', '}']
     init = f'prepare_{name}()'
     return {"definitions": definitions, "initialize": init,
@@ -584,16 +593,21 @@ def _uart_constructor(item, result):
                '    nx_result_t pins = nx_stm32_uart1_pins_prepare();',
                f'    nx_result_t uart = pins == NX_SUCCESS ? nx_stm32_{implementation}_initialize(&s_nx_port_{name}, 84000000u) : pins;',
                '    if (uart != NX_SUCCESS) {',
-               '        nx_stm32_pin_restore(GPIOA, 9u, saved_tx);',
-               '        nx_stm32_pin_restore(GPIOA, 10u, saved_rx);',
+               '        uint32_t retained_gpio_clocks = 0u;']
+    definitions += rollback_pin("stm32", "PA9", "saved_tx")
+    definitions += rollback_pin("stm32", "PA10", "saved_rx")
+    definitions += [
                '        RCC->APB2ENR = (RCC->APB2ENR & ~(uint32_t)RCC_APB2ENR_USART1EN) | saved_uart_clock;',
-               '        RCC->AHB1ENR = (RCC->AHB1ENR & ~(uint32_t)RCC_AHB1ENR_GPIOAEN) | saved_clock;',
+               '        RCC->AHB1ENR = (RCC->AHB1ENR & ~(uint32_t)RCC_AHB1ENR_GPIOAEN) | saved_clock | retained_gpio_clocks;',
                '        nx_arch_dsb();', '        return uart;', '    }',
                f'    NVIC_SetPriority({uart_state}.irq, {item.options.irq.priority}u);',
                '    return NX_SUCCESS;', '}',
                f'static nx_result_t stop_{name}(void) {{',
                f'    nx_result_t status = nx_uart_port_stop(&s_nx_face_{name});',
-               '    if (status != NX_SUCCESS) { return status; }',
+               '    if (status != NX_SUCCESS) { return status; }']
+    definitions += withdraw_pin("stm32", "PA9", indent=4)
+    definitions += withdraw_pin("stm32", "PA10", indent=4)
+    definitions += [
                '    (void)nx_stm32_pin_configure(GPIOA, 9u, 0u, 0u, 0u, false);',
                '    (void)nx_stm32_pin_configure(GPIOA, 10u, 0u, 0u, 0u, false);',
                '    RCC->APB2ENR &= ~(uint32_t)RCC_APB2ENR_USART1EN;',

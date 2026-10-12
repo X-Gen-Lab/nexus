@@ -3,12 +3,13 @@ try:
     from .providers import maintained
     from .ir import ConfigurationIR
     from .factory import interface_type, public_header
-    from . import secondary_controllers
+    from . import secondary_controllers, gpio_phase
 except ImportError:
     from providers import maintained
     from ir import ConfigurationIR
     from factory import interface_type, public_header
     import secondary_controllers
+    import gpio_phase
 
 
 def symbol(name):
@@ -42,8 +43,11 @@ def emit(result):
                ' * all ports remain unusable; preserve contexts until cleanup.',
                ' */', 'nx_platform_start_result_t nx_platform_start(void);',
                '/** \\brief Stop after direct writers/IRQ consumers quiesce.',
-               ' * \\return SUCCESS after drain; BUSY retains all storage and clock.',
+               ' * \\return SUCCESS after drain and release. BUSY or IO retains',
+               ' * incomplete leases; preserve all contexts and retry cleanup.',
                ' * The owner must continue service before retrying BUSY.',
+               ' * Complete release restores the selected original pin states;',
+               ' * retain ownership if the product requires continued idle drive.',
                ' */', 'nx_result_t nx_platform_stop(void);']
     source = ['/**', ' * \\file            bindings.c',
               ' * \\brief           Generated fixed typed hardware construction.',
@@ -64,6 +68,7 @@ def emit(result):
     initialize = []
     retained_initialization = []
     stop = []
+    pin_snapshots = {}
     for item in selections:
         name = symbol(item.id)
         exported_type = interface_type(item.kind, "port")
@@ -86,6 +91,10 @@ def emit(result):
                                             result["routes"], result.devices)
         source.extend(construction["definitions"])
         header.extend(construction.get("exports", ()))
+        if gpio_phase.applies(result):
+            gpio_phase.add_snapshots(result, item,
+                                     construction.get("pin_snapshots", {}),
+                                     pin_snapshots)
         initialize.append(construction["initialize"])
         retained_initialization.append(construction.get("retain_on_failed_init", False))
         stop.extend((len(initialize), expression)
@@ -96,6 +105,9 @@ def emit(result):
         class_name = "usb_endpoint" if kind == "usb_device" else kind + "_device"
         header.append(f'extern const {interface_type(class_name, "endpoint")}* const nx_device_{symbol(device["id"])};')
     source.extend(provider.shared_irqs(result))
+    # All constructor arrays precede their shared cold lease functions.
+    # Reuse those static slots directly; no pointer registry is emitted.
+    source.extend(gpio_phase.declarations(result, pin_snapshots))
     source += ['/** \\brief Stop only the initialized selected interfaces. */',
                'nx_result_t nx_platform_stop(void) {',
                f'    if ({context_guard}) {{ return NX_ERROR_CONTEXT; }}']

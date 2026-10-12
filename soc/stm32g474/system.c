@@ -18,7 +18,7 @@ nx_stm32g474_system_t g_nx_stm32g474_system = {
 #define NX_G474_DEVICE_ID()     (DBGMCU->IDCODE)
 #define NX_G474_FLASH_OPTIONS() (FLASH->OPTR)
 #endif
-/** \brief Preserve masks and effects when an IRQ source cannot be isolated. */
+/** \brief Retain masks and effects after loss of the monotonic time domain. */
 static _Noreturn void timer_park(void) {
     (void)nx_arch_irq_save();
     nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
@@ -306,12 +306,11 @@ void nx_stm32g474_system_timer_irq(nx_stm32g474_system_t* s) {
             /* Attempt each withdrawal once, even when an earlier readback
              * fails. The current handler's ACTIVE bit is not a foreign owner.
              */
-            bool source_off = write_checked(&s->timer->DIER, 0U, UINT32_MAX);
-            bool counter_off = write_checked(&s->timer->CR1, 0U, TIM_CR1_CEN);
-            nx_result_t vector_off = NX_G474_IRQ_CONTROL(TIM2_IRQn, false, 0U);
-            if (!source_off || !counter_off || vector_off != NX_SUCCESS)
-                timer_park();
-            return;
+            (void)write_checked(&s->timer->DIER, 0U, UINT32_MAX);
+            (void)write_checked(&s->timer->CR1, 0U, TIM_CR1_CEN);
+            (void)NX_G474_IRQ_CONTROL(TIM2_IRQn, false, 0U);
+            /* Source isolation does not make old consumer deadlines usable. */
+            timer_park();
         }
         if (s->started)
             s->overflow_us += (UINT64_C(1) << 32U);

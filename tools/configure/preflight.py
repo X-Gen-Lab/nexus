@@ -7,11 +7,13 @@ and outside-assembly owners retain the explicit reset-like admission contract.
 import re
 
 try:
-    from .providers.common import fail
+    from .providers.common import fail, owned_claims
     from .providers import hardware
+    from . import gpio_phase
 except ImportError:
-    from providers.common import fail
+    from providers.common import fail, owned_claims
     from providers import hardware
+    import gpio_phase
 
 
 def _reject(condition, indent=4):
@@ -85,8 +87,7 @@ def selected(result):
         fail("No maintained selected cold preflight: " + family)
     source = []
     owners = {item.id for item in result.controllers}
-    claims = [item for item in result["claims"]
-              if owners.intersection(item["owner"].split(";"))]
+    claims = tuple(owned_claims(result, owners))
     if family == "stm32g474":
         if any(item.kind == "uart" for item in result.controllers):
             source += _reject("(NX_G474_READ(&RCC->APB1ENR2) & "
@@ -151,7 +152,7 @@ def selected(result):
         control = (f"{dma}_Stream{lane}->CR" if family == "stm32f407" else
                    f"DMA_CHCTL({dma}, DMA_CH{lane})")
         source += _reject(f"({control} & 1u) != 0u")
-    return source
+    return source + gpio_phase.preflight(result)
 
 
 def emit(result):

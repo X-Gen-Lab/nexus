@@ -1,4 +1,7 @@
 """Cold assembly rejects observed foreign resources before clock effects."""
+import json
+from pathlib import Path
+import tempfile
 import unittest
 
 from tools.configure import bindings, configure as gate, preflight
@@ -11,6 +14,24 @@ class AdmissionInput(dict):
 
 
 class ColdPreflightGenerationTests(unittest.TestCase):
+    def test_kernel_owner_name_does_not_become_external_controller_irq(self):
+        for backend, identity in (("freertos", "freertos"),
+                                  ("threadx", "threadx")):
+            with self.subTest(backend=backend), tempfile.TemporaryDirectory() as directory:
+                data = gate.load_assembly(
+                    gate.ROOT / "tools/configure/assemblies/qiming-baremetal.toml")
+                data["backend"] = backend
+                data["controllers"][1]["id"] = identity
+                if backend == "threadx":
+                    data["os"] = {"tick_source": "systick"}
+                path = Path(directory) / "assembly.json"
+                path.write_text(json.dumps(data))
+                result = gate.resolve_ir(path)
+                source = "\n".join(preflight.selected(result))
+                self.assertIn("USART1_IRQn", source)
+                for system_exception in ("SysTick_IRQn", "PendSV_IRQn", "SVC_IRQn"):
+                    self.assertNotIn(system_exception, source)
+
     def test_new_families_project_only_exact_cold_uart_pin_and_irq_boundaries(self):
         for family, controller, pins, hook, gate_bit, mux in (
                 ("stm32h743", "USART3", ("PD8", "PD9"), "H743",

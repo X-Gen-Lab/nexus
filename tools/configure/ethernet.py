@@ -4,8 +4,10 @@ The MAC bus-master domain is distinct from stream-DMA controller routes. PHY
 presence, reset, clock, negotiation and network policy remain external facts.
 """
 try:
+    from .gpio_phase import withdraw_pin
     from .providers.common import fail, integer, kernel_policy_constant
 except ImportError:
+    from gpio_phase import withdraw_pin
     from providers.common import fail, integer, kernel_policy_constant
 
 
@@ -94,8 +96,9 @@ def constructor(item, result, prefix):
              "    if (status != NX_SUCCESS) { return status; }"]
     for index, pin in reversed(list(enumerate(pins))):
         wire = pin["pin"]
-        lines += [f"    if ((s_nx_eth_pin_leases_{name} & {1 << index}u) != 0u) {{",
-                  f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {wire[2:]}u, s_nx_eth_pin_snapshots_{name}[{index}]);",
+        lines += [f"    if ((s_nx_eth_pin_leases_{name} & {1 << index}u) != 0u) {{"]
+        lines += withdraw_pin(prefix, wire)
+        lines += [f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {wire[2:]}u, s_nx_eth_pin_snapshots_{name}[{index}]);",
                   f"        if (nx_{prefix}_pin_capture(GPIO{wire[1]}, {wire[2:]}u) != s_nx_eth_pin_snapshots_{name}[{index}]) {{",
                   "            return NX_ERROR_IO;", "        }",
                   f"        s_nx_eth_pin_leases_{name} &= (uint16_t)~{1 << index}u;", "    }"]
@@ -139,6 +142,9 @@ def constructor(item, result, prefix):
               f"void {'ETH' if stm else 'ENET'}_IRQHandler(void) {{ nx_eth_mac_irq(&{state}); }}"]
     return {"definitions": lines, "initialize": f"prepare_{name}()",
             "stop": [f"stop_{name}()"],
+            "pin_snapshots": {pin["pin"]:
+                              f"s_nx_eth_pin_snapshots_{name}[{index}]"
+                              for index, pin in enumerate(pins)},
             "exports": [f"extern const nx_mdio_port_t* const nx_binding_{name}_mdio;"]}
 
 

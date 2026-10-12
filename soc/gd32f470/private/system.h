@@ -57,11 +57,12 @@ uint64_t nx_gd32_now_us(void);
  *                  resets it independently of subsequent startup readiness.
  *                  Failure invalidates old timestamps and deadlines, retains
  *                  timer/clock ownership and attempts DIER/CEN/NVIC isolation
- *                  once. Confirmed isolation permits ordinary task stop retry;
- *                  optional low-power owners retain their busy/drain contract.
- *                  Unconfirmed isolation keeps the IRQ mask, observes the
- *                  terminal PLATFORM/IO fault and parks. No old deadline or
- *                  elapsed-time continuity is recovered by stop/restart.
+ *                  once. The lost time domain is always terminal, including
+ *                  confirmed isolation: keep the IRQ mask and all owners,
+ *                  observe PLATFORM/IO and park if the observer returns.
+ *                  No old deadline consumer resumes; request and optional
+ *                  low-power loans remain retained. Ordinary stop/restart does
+ *                  not recover this terminal domain or authorize reclamation.
  */
 nx_result_t nx_gd32_timebase_error(void);
 /**

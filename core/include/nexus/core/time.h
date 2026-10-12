@@ -50,11 +50,14 @@ typedef struct {
  * authoritative. All consumers join before clock withdrawal. Stop/restart or a
  * clock change invalidates every old deadline, even if a new epoch has the same
  * numerical value. UINT64_MAX is reserved; clock exhaustion requires controlled
- * restart. An observed hardware overflow acknowledgement failure also ends
- * the live epoch: zero must not be used as valid elapsed time or permission to
- * reclaim borrowers. Confirmed source isolation permits ordinary cleanup only;
- * it does not recover old deadlines. Private diagnostics distinguish faults
- * from successful readiness; products own recovery and any low-power join.
+ * restart. An observed hardware overflow acknowledgement failure ends the live
+ * epoch and is terminal, even when finite source isolation succeeds. The
+ * provider retains ownership, masks interrupts, calls nx_fault_observe and
+ * parks if the observer returns. It never resumes deadline consumers with
+ * invalid zero time. Observation neither releases loans nor proves safe
+ * outputs; products own separately reviewed non-returning recovery. Ordinary
+ * shutdown still requires every consumer and optional low-power owner joined
+ * first.
  */
 nx_time_us_t nx_time_now_us(void);
 /**

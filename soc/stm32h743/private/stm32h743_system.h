@@ -70,9 +70,10 @@ nx_result_t nx_stm32h743_system_stop(nx_stm32h743_system_t* system,
 uint64_t nx_stm32h743_system_now(nx_stm32h743_system_t* system);
 /**
  * \brief Count only after observed W0C acknowledgement; no kernel call.
- * \note Failed ACK invalidates time and retains cleanup. Failed finite IRQ
- *       withdrawal masks IRQs, observes the terminal fault and parks; a
- *       returning observer never permits progress or loan reclamation.
+ * \note Failed ACK invalidates time and retains all owners. Attempt finite
+ *       source withdrawal once, then mask IRQs, observe the terminal fault and
+ *       park even when isolation succeeded. A returning observer never permits
+ *       old deadline consumers to resume or reclaim loans.
  */
 void nx_stm32h743_system_timer_irq(nx_stm32h743_system_t* system);
 /** \brief Check device group/density; PCB, package and revision stay external.

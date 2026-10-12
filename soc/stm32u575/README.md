@@ -35,11 +35,13 @@ budget, then observes UIF cleared before publishing a usable time domain.
 A masked snapshot corrects one pending wrap and restores the incoming mask;
 epoch validity is checked inside that same exclusion. The IRQ must execute at
 least once every2^32 microseconds. A refused runtime UIF acknowledgement records
-`timer_error=NX_ERROR_IO`, invalidates time (`now=0`), and retains timer cleanup
-ownership without incrementing the overflow count. Finite ISR actions withdraw
-DIER, CEN and NVIC. If their withdrawal cannot be observed, the source preserves
-a terminal interrupt mask, calls the platform fault observer and parks even if
-the observer returns. A product may supply a nonreturning recovery observer.
+`timer_error=NX_ERROR_IO`, invalidates time and retains timer ownership without
+incrementing the overflow count. Finite ISR actions attempt DIER, CEN and NVIC
+withdrawal once. The lost deadline domain is always terminal, including
+successful isolation: preserve the terminal interrupt mask, call the platform
+fault observer and park if it returns. Invalid zero time never resumes deadline
+consumers. A product may supply separately reviewed non-returning recovery;
+normal stop/restart does not resume this terminal path.
 No ISR polling, kernel calls or borrow release is authorized by this failure.
 Stop observes timer,
 IRQ and added gate withdrawal before releasing effects. Timing accuracy and

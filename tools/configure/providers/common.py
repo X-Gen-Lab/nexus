@@ -14,6 +14,13 @@ def fail(message):
     raise ConfigurationError(message)
 
 
+def owned_claims(result, owners):
+    """Instance names never acquire Board/SoC reservations or kernel claims."""
+    return (claim for claim in result["claims"]
+            if claim.get("mode") not in {"reserved", "kernel"} and
+            owners.intersection(claim["owner"].split(";")))
+
+
 @dataclass(frozen=True)
 class ModeTraits:
     """Execution shape only; provider mode tables still establish support."""

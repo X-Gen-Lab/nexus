@@ -113,4 +113,55 @@ foreach(multi_family stm32 gd32)
         target_compile_options(${multi_vendor} PRIVATE -Wno-int-to-pointer-cast)
         target_sources(${multi_target} PRIVATE $<TARGET_OBJECTS:${multi_vendor}>)
     endif()
+
+    # Exercise legacy single-controller cold failure through the public entry.
+    if(multi_family STREQUAL "stm32")
+        set(single_input "${NEXUS_SOURCE_DIR}/tests/contracts/stm32_assembly/zg-spi.toml")
+    else()
+        set(single_input "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_assembly/spi.toml")
+    endif()
+    set(single_bundle "${CMAKE_CURRENT_BINARY_DIR}/single-spi-factory-${multi_family}")
+    execute_process(COMMAND "${Python3_EXECUTABLE}" -B
+        "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
+        --source-root "${NEXUS_SOURCE_DIR}" --assembly "${single_input}"
+        --output "${single_bundle}" RESULT_VARIABLE single_generated
+        OUTPUT_VARIABLE single_output ERROR_VARIABLE single_error)
+    if(NOT single_generated EQUAL 0)
+        message(FATAL_ERROR "Single-SPI factory rejected: ${single_output}${single_error}")
+    endif()
+    file(READ "${single_bundle}/input_paths.json" single_inputs)
+    string(JSON single_count LENGTH "${single_inputs}")
+    math(EXPR single_last "${single_count} - 1")
+    foreach(index RANGE 0 ${single_last})
+        string(JSON label MEMBER "${single_inputs}" ${index})
+        string(JSON input_path GET "${single_inputs}" "${label}")
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input_path}")
+    endforeach()
+    set(single_target "nexus_${multi_family}_single_spi_factory_test")
+    nexus_google_test(${single_target} SOURCES single_spi_factory_test.cpp
+        "${single_bundle}/bindings.c"
+        "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/spi.c"
+        LIBRARIES Nexus::IO Nexus::Arch
+        INCLUDES "${single_bundle}" "${NEXUS_SOURCE_DIR}/soc/${multi_soc}"
+            "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/private"
+            "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
+    target_sources(${single_target} PRIVATE $<TARGET_OBJECTS:${multi_gpio}>)
+    target_compile_options(${single_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/multi_controller_factory_model.h"
+        "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
+    target_compile_definitions(${single_target} PRIVATE
+        _init=nx_single_spi_fixture_init _fini=nx_single_spi_fixture_fini)
+    target_include_directories(${single_target} SYSTEM PRIVATE
+        "${multi_gd}/CMSIS/GD/GD32F4xx/Include"
+        "${multi_gd}/GD32F4xx_standard_peripheral/Include")
+    if(multi_family STREQUAL "stm32")
+        target_include_directories(${single_target} SYSTEM PRIVATE
+            "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+        target_compile_definitions(${single_target} PRIVATE
+            STM32F407xx NX_MULTI_FACTORY_STM32)
+    else()
+        target_compile_definitions(${single_target} PRIVATE
+            GD32F470 HXTAL_VALUE=25000000)
+        target_sources(${single_target} PRIVATE $<TARGET_OBJECTS:${multi_vendor}>)
+    endif()
 endforeach()

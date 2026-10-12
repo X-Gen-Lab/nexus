@@ -5,8 +5,10 @@ The emitted C calls the real common controller directly; no runtime registry,
 forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
 try:
+    from .gpio_phase import withdraw_pin
     from .providers.common import fail, integer, sequence, kernel_policy_constant
 except ImportError:
+    from gpio_phase import withdraw_pin
     from providers.common import fail, integer, sequence, kernel_policy_constant
 
 FILTER_FIELDS = {"controller", "bank", "id", "mask", "format", "fifo",
@@ -152,8 +154,9 @@ def constructor(item, result, prefix):
              "    if (status != NX_SUCCESS) { return status; }"]
     for index, pin in reversed(list(enumerate(pins))):
         wire = pin['pin']
-        lines += [f"    if ((s_nx_can_pin_leases_{name} & {1 << index}u) != 0u) {{",
-                  f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {wire[2:]}u, s_nx_can_pin_snapshots_{name}[{index}]);",
+        lines += [f"    if ((s_nx_can_pin_leases_{name} & {1 << index}u) != 0u) {{"]
+        lines += withdraw_pin(prefix, wire)
+        lines += [f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {wire[2:]}u, s_nx_can_pin_snapshots_{name}[{index}]);",
                   f"        s_nx_can_pin_leases_{name} &= (uint8_t)~{1 << index}u;", "    }"]
     lines += ["    return NX_SUCCESS;", "}", f"static nx_result_t prepare_{name}(void) {{",
               "    nx_result_t status;"]
@@ -190,7 +193,10 @@ def constructor(item, result, prefix):
                   "/** \\brief Dispatch the exact selected classic CAN hardware source. */",
                   f"void {vector}_IRQHandler(void) {{ nx_can_controller_irq(&{state}); }}"]
     return {"definitions": lines, "initialize": f"prepare_{name}()",
-            "stop": [f"stop_{name}()"]}
+            "stop": [f"stop_{name}()"],
+            "pin_snapshots": {pin["pin"]:
+                              f"s_nx_can_pin_snapshots_{name}[{index}]"
+                              for index, pin in enumerate(pins)}}
 
 
 def stop_domain(result, prefix):

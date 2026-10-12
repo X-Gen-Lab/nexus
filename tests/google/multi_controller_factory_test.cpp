@@ -86,6 +86,13 @@ static bool s_gpio_restore_refused;
 static volatile uint32_t* s_held_engine;
 static nx_time_us_t s_now;
 static unsigned s_writes;
+static unsigned s_captures;
+static unsigned s_configures;
+static unsigned s_restores;
+static unsigned s_gpio_writes;
+static unsigned s_refused_pin_port;
+static unsigned s_refused_pin_number;
+static unsigned s_pin_restores[9][16];
 static bool s_privileged;
 
 extern "C" bool nx_multi_factory_is_privileged(void) {
@@ -100,6 +107,7 @@ static volatile uint32_t& gpio(unsigned port, unsigned offset) {
 }
 /** \brief Pack only selected-pin state, using the public cold port contract. */
 static uint16_t capture_pin(unsigned port, unsigned pin) {
+    ++s_captures;
     uint32_t shift = pin * 2U;
     uint32_t value =
         ((gpio(port, 0U) >> shift) & 3U) |
@@ -114,6 +122,7 @@ static uint16_t capture_pin(unsigned port, unsigned pin) {
  */
 static nx_result_t configure_pin(unsigned port, unsigned pin, uint8_t mode,
                                  uint8_t af, uint8_t pull, bool drain) {
+    ++s_configures;
     if (port > 8U || pin > 15U || af > 15U || pull > 2U)
         return NX_ERROR_INVALID;
     nx_result_t status = s_ports->Configure(port, pin, mode);
@@ -133,8 +142,11 @@ static nx_result_t configure_pin(unsigned port, unsigned pin, uint8_t mode,
 }
 /** \brief Restore selected original fields; refusal keeps the actual facts. */
 static void restore_pin(unsigned port, unsigned pin, uint16_t saved) {
+    ++s_restores;
+    ++s_pin_restores[port][pin];
     s_ports->Restore(port, pin);
-    if (s_restore_refused)
+    if (s_restore_refused ||
+        (port == s_refused_pin_port && pin == s_refused_pin_number))
         return;
     uint32_t shift = pin * 2U;
     uint32_t af_shift = pin % 8U * 4U;
@@ -156,6 +168,9 @@ static void restore_pin(unsigned port, unsigned pin, uint16_t saved) {
 extern "C" void nx_multi_factory_write(volatile uint32_t* address,
                                        uint32_t value) {
     ++s_writes;
+    if (reinterpret_cast<uintptr_t>(address) >= UINT32_C(0x40020000) &&
+        reinterpret_cast<uintptr_t>(address) < UINT32_C(0x40022400))
+        ++s_gpio_writes;
     if (address == s_refused) {
         bool command = false;
         for (unsigned bank = 0U; bank < 8U; ++bank)
@@ -467,6 +482,10 @@ class MultipleFactory : public testing::Test {
         s_priority_refused = nullptr;
         s_restore_refused = s_gpio_restore_refused = false;
         s_hold = s_writes = 0U;
+        s_captures = s_configures = s_restores = s_gpio_writes = 0U;
+        s_refused_pin_port = 9U;
+        s_refused_pin_number = 16U;
+        std::memset(s_pin_restores, 0, sizeof(s_pin_restores));
         s_privileged = true;
         s_now = 100U;
         ON_CALL(ports, Preflight()).WillByDefault(Return(NX_SUCCESS));
@@ -509,6 +528,8 @@ class MultipleFactory : public testing::Test {
         s_refused = s_held_engine = nullptr;
         s_priority_refused = nullptr;
         s_restore_refused = s_gpio_restore_refused = false;
+        s_refused_pin_port = 9U;
+        s_refused_pin_number = 16U;
         s_privileged = true;
         std::memset(NVIC->IABR, 0, sizeof(NVIC->IABR));
         for (unsigned index = 0U; index < 2U; ++index) {
@@ -561,6 +582,106 @@ TEST_F(MultipleFactory, LookupBindsFiveDistinctControllersWithoutEffects) {
     EXPECT_TRUE(nx_i2c_endpoint_on_port(sensor, i2c));
     EXPECT_EQ(s_writes, 0U);
 }
+TEST_F(MultipleFactory, PoweredForeignControllerPinRejectsBeforeEveryLease) {
+    GPIO_GATE = 1U;
+    gpio(0U, 0U) = 2U << 18U;
+    EXPECT_CALL(ports, Start()).Times(0);
+    EXPECT_CALL(ports, Clock(_)).Times(0);
+    EXPECT_CALL(ports, Configure(_, _, _)).Times(0);
+    EXPECT_CALL(ports, Restore(_, _)).Times(0);
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(0U, s_writes);
+    EXPECT_EQ(0U, s_captures);
+    EXPECT_EQ(2U << 18U, gpio(0U, 0U));
+    (void)testing::Mock::VerifyAndClearExpectations(&ports);
+}
+TEST_F(MultipleFactory, PoweredHiddenCsLockRejectsBeforeEveryController) {
+    const unsigned port = secondary_cs_port();
+    const uint32_t mask = secondary_cs_mask();
+    GPIO_GATE = 1U << port;
+    gpio(port, 28U) = (1U << 16U) | mask;
+    EXPECT_CALL(ports, Start()).Times(0);
+    EXPECT_CALL(ports, Clock(_)).Times(0);
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(0U, s_captures);
+    EXPECT_EQ(0U, s_configures);
+    EXPECT_EQ(0U, s_restores);
+    EXPECT_EQ(0U, s_gpio_writes);
+    EXPECT_EQ((1U << 16U) | mask, gpio(port, 28U));
+    (void)testing::Mock::VerifyAndClearExpectations(&ports);
+}
+TEST_F(MultipleFactory,
+       UnpoweredLaterHiddenCsRejectsBeforeCaptureOrPinEffects) {
+    const unsigned port = secondary_cs_port();
+    const uint32_t mask = secondary_cs_mask();
+    unsigned pin = 0U;
+    while ((mask & (1U << pin)) == 0U)
+        ++pin;
+    for (bool locked : {false, true}) {
+        gpio(port, 0U) = locked ? 0U : 2U << (pin * 2U);
+        gpio(port, 28U) = locked ? (1U << 16U) | mask : 0U;
+        GPIO_GATE = 1U << 2U;
+        s_captures = s_configures = s_restores = s_gpio_writes = 0U;
+        /* No initializer has obtained a pin lease to restore. */
+        s_restore_refused = true;
+        const auto result = nx_platform_start();
+        EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+        EXPECT_EQ(NX_SUCCESS, result.cleanup);
+        EXPECT_EQ(0U, result.remaining_effects);
+        EXPECT_EQ(0U, s_captures);
+        EXPECT_EQ(0U, s_configures);
+        EXPECT_EQ(0U, s_restores);
+        EXPECT_EQ(0U, s_gpio_writes);
+        EXPECT_EQ(1U << 2U, GPIO_GATE);
+        EXPECT_EQ(locked ? 0U : 2U << (pin * 2U), gpio(port, 0U));
+        s_restore_refused = false;
+        ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
+    }
+    gpio(port, 0U) = gpio(port, 28U) = 0U;
+}
+TEST_F(MultipleFactory, LegalAnalogPinsKeepUnselectedMuxAndSharedClockOwners) {
+    GPIO_GATE = (1U << 0U) | (1U << 2U);
+    gpio(0U, 0U) = UINT32_MAX;
+    gpio(0U, 36U) = 9U << 24U;
+    gpio(0U, 20U) = 1U << 14U;
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(UINT32_MAX, gpio(0U, 0U));
+    EXPECT_EQ(9U << 24U, gpio(0U, 36U));
+    EXPECT_EQ(1U << 14U, gpio(0U, 20U));
+    EXPECT_EQ((1U << 0U) | (1U << 2U), GPIO_GATE);
+}
+TEST_F(MultipleFactory, RejectedPinGateWithdrawalRetainsOnlyAddedGateRetry) {
+    const unsigned port = secondary_cs_port();
+    gpio(port, 28U) = (1U << 16U) | secondary_cs_mask();
+    GPIO_GATE = 1U << 2U;
+    s_gpio_restore_refused = true;
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_ERROR_IO, result.cleanup);
+    EXPECT_NE(0U, result.remaining_effects);
+    EXPECT_EQ(0U, s_captures);
+    EXPECT_EQ(0U, s_configures);
+    EXPECT_EQ(0U, s_restores);
+    EXPECT_EQ(0U, s_gpio_writes);
+    EXPECT_EQ(NX_ERROR_STATE, nx_platform_start().primary);
+    EXPECT_EQ(NX_ERROR_IO, nx_platform_stop());
+    s_gpio_restore_refused = false;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(1U << 2U, GPIO_GATE);
+    EXPECT_EQ(0U, s_captures);
+    EXPECT_EQ(0U, s_configures);
+    EXPECT_EQ(0U, s_restores);
+    EXPECT_EQ(0U, s_gpio_writes);
+    gpio(port, 28U) = 0U;
+}
+
 TEST_F(MultipleFactory, ActualGeneratedStartupAcquiresEachSelectedPublisher) {
     nx_platform_start_result_t result = nx_platform_start();
     ASSERT_EQ(result.primary, NX_SUCCESS);
@@ -744,6 +865,82 @@ TEST_F(MultipleFactory, RefusedOriginalPinRestoreDoesNotAdmitRestart) {
     EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
     s_restore_refused = false;
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+TEST_F(MultipleFactory, PinDriveWithdrawsBeforeRestoringOriginalLatchAndMux) {
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    const unsigned cs_port = secondary_cs_port();
+    const uint32_t cs_mask = secondary_cs_mask();
+    EXPECT_NE(0U, gpio(cs_port, 20U) & cs_mask);
+    EXPECT_CALL(ports, Restore(_, _))
+        .WillRepeatedly([cs_port, cs_mask](unsigned port, unsigned pin) {
+            SCOPED_TRACE(testing::Message()
+                         << "port=" << port << " pin=" << pin);
+            const uint32_t mode = (gpio(port, 0U) >> (pin * 2U)) & 3U;
+            EXPECT_TRUE(mode == 0U || mode == 3U);
+            if (port == cs_port && (1U << pin) == cs_mask) {
+                EXPECT_NE(0U, gpio(port, 20U) & cs_mask);
+            }
+        });
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(0U, gpio(cs_port, 20U) & cs_mask);
+}
+TEST_F(MultipleFactory, RefusedCsDriveWithdrawalRetainsLatchPinAndGate) {
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    const unsigned port = secondary_cs_port();
+    const uint32_t mask = secondary_cs_mask();
+    unsigned pin = 0U;
+    while ((mask & (1U << pin)) == 0U)
+        ++pin;
+    s_refused = &gpio(port, 0U);
+    s_hold = 3U << (pin * 2U);
+    EXPECT_CALL(ports, Restore(_, _)).Times(testing::AnyNumber());
+    EXPECT_CALL(ports, Restore(port, pin)).Times(0);
+    EXPECT_EQ(NX_ERROR_IO, nx_platform_stop());
+    EXPECT_EQ(NX_ERROR_STATE, nx_platform_start().primary);
+    EXPECT_EQ(1U, (gpio(port, 0U) >> (pin * 2U)) & 3U);
+    EXPECT_NE(0U, gpio(port, 20U) & mask);
+    EXPECT_NE(0U, GPIO_GATE & (1U << port));
+    (void)testing::Mock::VerifyAndClearExpectations(&ports);
+    s_refused = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(0U, gpio(port, 0U) & (3U << (pin * 2U)));
+    EXPECT_EQ(0U, gpio(port, 20U) & mask);
+    EXPECT_EQ(0U, GPIO_GATE);
+}
+TEST_F(MultipleFactory, FailedSinglePinReadbackRetriesOnlyItsRetainedLease) {
+    gpio(0U, 0U) = UINT32_MAX;
+    GPIO_GATE = 1U << 2U;
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    s_refused_pin_port = 0U;
+    s_refused_pin_number = 9U;
+    EXPECT_EQ(NX_ERROR_IO, nx_platform_stop());
+    EXPECT_EQ(NX_ERROR_STATE, nx_platform_start().primary);
+    EXPECT_NE(0U, GPIO_GATE & 1U);
+    EXPECT_EQ(3U, (gpio(0U, 0U) >> 18U) & 3U);
+    EXPECT_EQ(3U, (gpio(0U, 0U) >> 20U) & 3U);
+    EXPECT_EQ(1U, s_pin_restores[0][9]);
+    EXPECT_EQ(1U, s_pin_restores[0][10]);
+    unsigned completed[9][16];
+    std::memcpy(completed, s_pin_restores, sizeof(completed));
+    std::memset(s_pin_restores, 0, sizeof(s_pin_restores));
+    s_refused_pin_port = 9U;
+    s_refused_pin_number = 16U;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(UINT32_MAX, gpio(0U, 0U));
+    EXPECT_EQ(1U << 2U, GPIO_GATE);
+    for (unsigned port = 0U; port < 9U; ++port) {
+        for (unsigned pin = 0U; pin < 16U; ++pin) {
+            SCOPED_TRACE(testing::Message()
+                         << "port=" << port << " pin=" << pin);
+            if (port == 0U && pin == 9U)
+                EXPECT_EQ(1U, s_pin_restores[port][pin]);
+            else if (completed[port][pin] != 0U)
+                EXPECT_EQ(0U, s_pin_restores[port][pin]);
+            else
+                EXPECT_LE(s_pin_restores[port][pin], 1U);
+        }
+    }
+    EXPECT_EQ(NX_SUCCESS, nx_platform_start().primary);
 }
 TEST_F(MultipleFactory, RefusedOwnedDmaClockReleaseRetainsItsMarker) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);

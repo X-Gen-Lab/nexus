@@ -64,7 +64,7 @@ static bool isolate_timer_irq(void) {
            ((NVIC->ISER[bank] | NVIC->ISPR[bank]) & bit) == 0U;
 }
 
-/** \brief Retain the current mask and effects on unisolated source failure. */
+/** \brief Retain the current mask and effects after loss of the time domain. */
 static _Noreturn void timer_park(void) {
     nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
     for (;;) {
@@ -277,10 +277,11 @@ void TIMER1_IRQHandler(void) {
         if ((TIMER_INTF(TIMER1) & TIMER_INTF_UPIF) != 0U) {
             s_timer_live = false;
             s_timer_error = NX_ERROR_IO;
-            if (!isolate_timer_irq())
-                timer_park();
-            nx_gd32_critical_leave(saved);
-            return;
+            (void)isolate_timer_irq();
+            /* Even observed isolation cannot revive consumer deadlines. Keep
+             * the saved global mask, clock and storage through terminal park.
+             */
+            timer_park();
         }
         if (s_timer_live) {
             ++s_epoch;

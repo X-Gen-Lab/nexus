@@ -36,7 +36,7 @@ typedef struct nx_stm32g474_system {
     uint32_t saved_flash;
     uint32_t saved_power;
     uint32_t saved_boost;
-    /** \brief Sticky runtime IO fault; admitted start resets it, stop retains.
+    /** \brief Terminal IO diagnostic; never permission to resume or reclaim.
      */
     volatile nx_result_t timer_error;
     bool owned_power_clock;
@@ -90,8 +90,9 @@ uint64_t nx_stm32g474_system_now(nx_stm32g474_system_t* system);
  * \param[in,out] system: Static context bound to the reserved vector.
  * \note Confirm W0C before extension. Failure latches IO and attempts each
  *       DIER/CEN/NVIC isolation once; timer/clock ownership remains retained.
- *       Observed isolation permits ordinary task cleanup only. Unobserved
- *       isolation retains the IRQ mask, observes a terminal fault and parks.
+ *       The lost time domain is always terminal, including observed isolation.
+ *       Retain the IRQ mask and every owner, observe the platform fault and
+ *       park if the observer returns. No old deadline consumer resumes.
  */
 void nx_stm32g474_system_timer_irq(nx_stm32g474_system_t* system);
 /** \brief Verify observed category3 silicon and512KiB; not package identity. */

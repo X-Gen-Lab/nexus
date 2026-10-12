@@ -230,6 +230,7 @@ for _family in ("stm32f407", "gd32f470"):
         "timer_advanced", "uart_receive", "usb_clock", "usb_device"))
 REQUIRED_FILES += (
     "tools/configure/fact_references.py", "tools/configure/preflight.py",
+    "tools/configure/gpio_phase.py",
     "soc/stm32f407/references.json", "soc/gd32f470/references.json",
     "soc/stm32f407/private/stm32f407_system.h",
     "soc/stm32f407/private/stm32f407_stream.h",

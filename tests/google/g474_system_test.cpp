@@ -9,8 +9,10 @@
 #include "g474_model.h"
 #include "nexus/core/fault.h"
 #include "stm32g474_system.h"
+#include <csignal>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <unistd.h>
 namespace {
 class FaultPort {
   public:
@@ -18,6 +20,10 @@ class FaultPort {
                 (nx_fault_domain_t, nx_result_t, const char*, unsigned));
 };
 struct ParkSignal {};
+volatile std::sig_atomic_t returning_fault_seen;
+void AlarmAfterReturningFault(int) {
+    _exit(returning_fault_seen == 1 ? 42 : 92);
+}
 FaultPort* fault_port;
 } /* namespace */
 class G474System : public testing::Test {
@@ -248,14 +254,24 @@ TEST_F(G474System, RetainedOverflowIrqStillAcknowledgesItsOwnedLevelSource) {
     EXPECT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
 }
 
-TEST_F(G474System, FailedOverflowAckInvalidatesTimeWithoutCountingAgain) {
+TEST_F(G474System, IsolatedAckFaultStillObservesTerminalOwnership) {
     ASSERT_EQ(NX_SUCCESS,
               nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U).primary);
     g_g474_model.timer.SR = TIM_SR_UIF;
     g_g474_model.timer.CNT = 7U;
     g_g474_model.irq_active[TIM2_IRQn] = true;
     g_g474_model.hold_timer_ack = true;
-    nx_stm32g474_system_timer_irq(&g_nx_stm32g474_system);
+    EXPECT_CALL(fault_mock,
+                Observe(NX_FAULT_PLATFORM, NX_ERROR_IO, testing::_, testing::_))
+        .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
+                     unsigned line) {
+            EXPECT_NE(nullptr, file);
+            EXPECT_NE(0U, line);
+            EXPECT_TRUE(nx_arch_irq_is_masked());
+            throw ParkSignal{};
+        });
+    EXPECT_THROW(nx_stm32g474_system_timer_irq(&g_nx_stm32g474_system),
+                 ParkSignal);
     EXPECT_EQ(0U, g_nx_stm32g474_system.overflow_us);
     EXPECT_EQ(NX_ERROR_IO, g_nx_stm32g474_system.timer_error);
     EXPECT_FALSE(g_nx_stm32g474_system.started);
@@ -265,14 +281,42 @@ TEST_F(G474System, FailedOverflowAckInvalidatesTimeWithoutCountingAgain) {
     EXPECT_EQ(0U, g_g474_model.timer.CR1 & TIM_CR1_CEN);
     EXPECT_FALSE(g_g474_model.irq_enabled[TIM2_IRQn]);
     EXPECT_EQ(0U, nx_stm32g474_system_now(&g_nx_stm32g474_system));
-    nx_stm32g474_system_timer_irq(&g_nx_stm32g474_system);
-    EXPECT_EQ(0U, g_nx_stm32g474_system.overflow_us);
-    g_g474_model.irq_active[TIM2_IRQn] = false;
-    ASSERT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8U));
-    EXPECT_EQ(NX_ERROR_IO, g_nx_stm32g474_system.timer_error);
-    ASSERT_EQ(NX_SUCCESS,
-              nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U).primary);
-    EXPECT_EQ(NX_SUCCESS, g_nx_stm32g474_system.timer_error);
+    EXPECT_TRUE(nx_arch_irq_is_masked());
+}
+
+TEST_F(G474System, ReturningObserverCannotResumeIsolatedTimerProgress) {
+    EXPECT_EXIT(
+        {
+            if (nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U).primary !=
+                NX_SUCCESS)
+                _exit(90);
+            g_g474_model.timer.SR = TIM_SR_UIF;
+            g_g474_model.hold_timer_ack = true;
+            returning_fault_seen = 0;
+            EXPECT_CALL(fault_mock, Observe(NX_FAULT_PLATFORM, NX_ERROR_IO,
+                                            testing::_, testing::_))
+                .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
+                             unsigned line) {
+                    returning_fault_seen =
+                        file != nullptr && line != 0U &&
+                                nx_arch_irq_is_masked() &&
+                                !g_g474_model.irq_enabled[TIM2_IRQn] &&
+                                g_nx_stm32g474_system.timer_error ==
+                                    NX_ERROR_IO &&
+                                !g_nx_stm32g474_system.started &&
+                                g_nx_stm32g474_system.remaining_effects != 0U &&
+                                g_nx_stm32g474_system.overflow_us == 0U &&
+                                g_g474_model.timer.DIER == 0U &&
+                                (g_g474_model.timer.CR1 & TIM_CR1_CEN) == 0U
+                            ? 1
+                            : -1;
+                });
+            std::signal(SIGALRM, AlarmAfterReturningFault);
+            alarm(1U);
+            nx_stm32g474_system_timer_irq(&g_nx_stm32g474_system);
+            _exit(99);
+        },
+        testing::ExitedWithCode(42), "");
 }
 
 TEST_F(G474System, UnisolatableAckFaultRetainsMaskBeforeTerminalObservation) {
@@ -359,8 +403,17 @@ TEST_F(G474System, FaultBeforeIrqSaveCannotEscapeAsAStaleTimeSnapshot) {
         nx_stm32g474_system_timer_irq(&g_nx_stm32g474_system);
         g_g474_model.irq_active[TIM2_IRQn] = false;
     };
-    EXPECT_EQ(0U, nx_stm32g474_system_now(&g_nx_stm32g474_system));
-    EXPECT_FALSE(nx_arch_irq_is_masked());
+    EXPECT_CALL(fault_mock,
+                Observe(NX_FAULT_PLATFORM, NX_ERROR_IO, testing::_, testing::_))
+        .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
+                     unsigned line) {
+            EXPECT_NE(nullptr, file);
+            EXPECT_NE(0U, line);
+            EXPECT_TRUE(nx_arch_irq_is_masked());
+            throw ParkSignal{};
+        });
+    EXPECT_THROW(nx_stm32g474_system_now(&g_nx_stm32g474_system), ParkSignal);
+    EXPECT_TRUE(nx_arch_irq_is_masked());
     EXPECT_EQ(NX_ERROR_IO, g_nx_stm32g474_system.timer_error);
     EXPECT_FALSE(g_nx_stm32g474_system.started);
 }

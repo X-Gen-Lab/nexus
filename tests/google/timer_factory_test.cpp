@@ -93,6 +93,7 @@ static uint32_t s_hold;
 static volatile uint8_t* s_priority_refused;
 static bool s_restore_refused;
 static bool s_gpio_restore_refused;
+static bool s_output_withdraw_refused;
 static bool s_privileged;
 static nx_time_us_t s_now;
 static unsigned s_writes;
@@ -167,6 +168,9 @@ extern "C" void nx_timer_factory_write(volatile uint32_t* address,
     }
     if (s_gpio_restore_refused && address == &GPIO_GATE && (value & 3U) == 0U)
         value |= *address & 3U;
+    if (s_output_withdraw_refused && address == &gpio(1U, 0U) &&
+        ((value >> 26U) & 3U) == 3U)
+        value = (value & ~(3U << 26U)) | (*address & (3U << 26U));
     if (address == &NVIC->ISER[0])
         *address |= value;
     else if (address == &NVIC->ICER[0]) {
@@ -295,6 +299,7 @@ class TimerFactory : public testing::Test {
         s_hold = 0U;
         s_priority_refused = nullptr;
         s_restore_refused = s_gpio_restore_refused = false;
+        s_output_withdraw_refused = false;
         s_privileged = true;
         s_now = 100U;
         s_writes = 0U;
@@ -330,6 +335,7 @@ class TimerFactory : public testing::Test {
         s_privileged = true;
         s_priority_refused = nullptr;
         s_restore_refused = s_gpio_restore_refused = false;
+        s_output_withdraw_refused = false;
         NVIC->IABR[0] = 0U;
         if (capture->count != 0U) {
             nx_timer_capture_event_t event{};
@@ -588,6 +594,77 @@ TEST_F(TimerFactory, RefusedOriginalPinRestoreRetainsColdLease) {
     EXPECT_NE(ADV_GATE & 1U, 0U);
     s_restore_refused = false;
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+TEST_F(TimerFactory, PinDriveWithdrawsBeforeOriginalLatchAndMuxRestore) {
+    gpio(0U, 20U) = 1U << 8U;
+    gpio(1U, 20U) = 1U << 13U;
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_start(power));
+    EXPECT_CALL(ports, Restore(_, _))
+        .WillRepeatedly([](unsigned port, unsigned pin) {
+            SCOPED_TRACE(testing::Message()
+                         << "port=" << port << " pin=" << pin);
+            const uint32_t mode = (gpio(port, 0U) >> (pin * 2U)) & 3U;
+            EXPECT_TRUE(mode == 0U || mode == 3U);
+            if ((port == 0U && pin == 8U) || (port == 1U && pin == 13U)) {
+                EXPECT_EQ(0U, gpio(port, 20U) & (1U << pin));
+            }
+        });
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(1U << 8U, gpio(0U, 20U));
+    EXPECT_EQ(1U << 13U, gpio(1U, 20U));
+}
+TEST_F(TimerFactory, SafeIdleSelectionNeverRemuxesAnActiveAlternateFunction) {
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_start(power));
+    EXPECT_CALL(ports, Configure(_, _, _))
+        .Times(testing::AnyNumber())
+        .WillRepeatedly([](unsigned port, unsigned pin, uint8_t mode) {
+            if (mode == 1U) {
+                EXPECT_NE(2U, (gpio(port, 0U) >> (pin * 2U)) & 3U);
+            }
+            return NX_SUCCESS;
+        });
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(0U, gpio(0U, 0U));
+    EXPECT_EQ(0U, gpio(1U, 0U));
+}
+TEST_F(TimerFactory, RefusedSafeModeWriteRetainsTheEntireOutputGroup) {
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_start(power));
+    s_refused = &gpio(1U, 0U);
+    s_hold = 3U << 26U;
+    EXPECT_CALL(ports, Restore(_, _)).Times(testing::AnyNumber());
+    EXPECT_CALL(ports, Restore(0U, 8U)).Times(0);
+    EXPECT_CALL(ports, Restore(1U, 12U)).Times(0);
+    EXPECT_CALL(ports, Restore(1U, 13U)).Times(0);
+    EXPECT_EQ(NX_ERROR_IO, nx_platform_stop());
+    EXPECT_EQ(NX_ERROR_STATE, nx_platform_start().primary);
+    EXPECT_NE(0U, GPIO_GATE & 3U);
+    EXPECT_NE(0U, ADV_GATE & 1U);
+    (void)testing::Mock::VerifyAndClearExpectations(&ports);
+    s_refused = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+}
+TEST_F(TimerFactory, RefusedOutputWithdrawalRetainsSafeLatchAndPinLease) {
+    gpio(0U, 20U) = 1U << 8U;
+    gpio(1U, 20U) = 1U << 13U;
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    ASSERT_EQ(NX_SUCCESS, nx_advanced_pwm_start(power));
+    s_output_withdraw_refused = true;
+    EXPECT_CALL(ports, Restore(_, _)).Times(testing::AnyNumber());
+    EXPECT_CALL(ports, Restore(1U, 13U)).Times(0);
+    EXPECT_EQ(NX_ERROR_IO, nx_platform_stop());
+    EXPECT_EQ(NX_ERROR_STATE, nx_platform_start().primary);
+    EXPECT_EQ(0U, gpio(1U, 20U) & (1U << 13U));
+    EXPECT_NE(0U, GPIO_GATE & 2U);
+    EXPECT_NE(0U, ADV_GATE & 1U);
+    (void)testing::Mock::VerifyAndClearExpectations(&ports);
+    s_output_withdraw_refused = false;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(1U << 13U, gpio(1U, 20U));
+    EXPECT_EQ(0U, gpio(1U, 0U) & (3U << 26U));
+    EXPECT_EQ(0U, GPIO_GATE);
 }
 TEST_F(TimerFactory, RefusedOwnedClockReleaseRetainsStopAndPreventsRestart) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);

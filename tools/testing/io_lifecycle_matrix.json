@@ -3256,12 +3256,12 @@
       "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
     },
     {
-      "id": "stm32f407.can.classic-irq.FirstPinFailureHasNoDomainOrUncapturedPinRelease",
+      "id": "stm32f407.can.classic-irq.FirstControllerClockFailureReleasesUnchangedGlobalLeases",
       "family": "stm32f407",
       "peripheral": "can",
       "mode": "classic-irq",
       "target": "nexus_stm32_can_factory_test",
-      "case": "CanFactory.FirstPinFailureHasNoDomainOrUncapturedPinRelease",
+      "case": "CanFactory.FirstControllerClockFailureReleasesUnchangedGlobalLeases",
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
         "soc/stm32f407/drivers/can.c",
@@ -3275,12 +3275,18 @@
         "EXPECT_EQ(result.primary,NX_ERROR_IO)",
         "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
         "EXPECT_EQ(result.remaining_effects,0U)",
-        "EXPECT_EQ(first_state->domain->active_mask,0U)"
+        "EXPECT_EQ(first_state->domain->active_mask,0U)",
+        "EXPECT_CALL(ports,Configure(_,_)).Times(0)",
+        "EXPECT_CALL(ports,Restore(_,_,_)).Times(0)",
+        "EXPECT_FALSE(first_state->domain->configured)",
+        "EXPECT_FALSE(first_state->snapshot.started)",
+        "EXPECT_FALSE(second_state->snapshot.started)",
+        "EXPECT_EQ(before,std::vector<uint8_t>(bytes,bytes+0x80000U))"
       ],
       "calls": [
         "nx_platform_start("
       ],
-      "invariant": "Failure before pin capture has no filter-domain effects and no uncaptured lease release.",
+      "invariant": "All selected pins are captured before controller admission; a first controller clock failure releases unchanged global leases by reverse comparison, with no pin configuration or restore writes, filter-domain ownership or residual MMIO effects.",
       "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
     },
     {
@@ -3482,12 +3488,12 @@
       "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
     },
     {
-      "id": "gd32f470.can.classic-irq.FirstPinFailureHasNoDomainOrUncapturedPinRelease",
+      "id": "gd32f470.can.classic-irq.FirstControllerClockFailureReleasesUnchangedGlobalLeases",
       "family": "gd32f470",
       "peripheral": "can",
       "mode": "classic-irq",
       "target": "nexus_gd32_can_factory_test",
-      "case": "CanFactory.FirstPinFailureHasNoDomainOrUncapturedPinRelease",
+      "case": "CanFactory.FirstControllerClockFailureReleasesUnchangedGlobalLeases",
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
         "soc/gd32f470/drivers/can.c",
@@ -3501,12 +3507,18 @@
         "EXPECT_EQ(result.primary,NX_ERROR_IO)",
         "EXPECT_EQ(result.cleanup,NX_SUCCESS)",
         "EXPECT_EQ(result.remaining_effects,0U)",
-        "EXPECT_EQ(first_state->domain->active_mask,0U)"
+        "EXPECT_EQ(first_state->domain->active_mask,0U)",
+        "EXPECT_CALL(ports,Configure(_,_)).Times(0)",
+        "EXPECT_CALL(ports,Restore(_,_,_)).Times(0)",
+        "EXPECT_FALSE(first_state->domain->configured)",
+        "EXPECT_FALSE(first_state->snapshot.started)",
+        "EXPECT_FALSE(second_state->snapshot.started)",
+        "EXPECT_EQ(before,std::vector<uint8_t>(bytes,bytes+0x80000U))"
       ],
       "calls": [
         "nx_platform_start("
       ],
-      "invariant": "Failure before pin capture has no filter-domain effects and no uncaptured lease release.",
+      "invariant": "All selected pins are captured before controller admission; a first controller clock failure releases unchanged global leases by reverse comparison, with no pin configuration or restore writes, filter-domain ownership or residual MMIO effects.",
       "limitations": "Reviewed bounded production C execution with explicit external MMIO/clock/CPU leaves and the target selected compile branch; no physical bus/waveform/safe-output/IRQ WCET, exhaustive interleaving or complete configuration proof."
     },
     {

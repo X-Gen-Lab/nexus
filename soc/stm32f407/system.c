@@ -116,7 +116,7 @@ static int timer_irq_isolate(IRQn_Type irq) {
 #define NX_STM32_IRQ_ISOLATE(irq) timer_irq_isolate(irq)
 #endif
 
-/** \brief Preserve masks and effects when an IRQ source cannot be isolated. */
+/** \brief Retain masks and effects after loss of the monotonic time domain. */
 static _Noreturn void timer_park(void) {
     (void)nx_arch_irq_save();
     nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
@@ -414,18 +414,16 @@ void nx_stm32_system_timer_irq(nx_stm32_system_t* system) {
         nx_arch_dsb();
         if ((system->timer->SR & TIM_SR_UIF) != 0U) {
             /* An unconfirmed wrap invalidates all old deadlines. Retain the
-             * timer and clock until task cleanup; never count this IRQ twice.
+             * timer and clock through terminal observation; never count twice.
              */
             system->started = false;
             system->timer_error = NX_ERROR_IO;
-            bool source_off =
-                write_checked(&system->timer->DIER, 0U, UINT32_MAX);
-            bool counter_off =
-                write_checked(&system->timer->CR1, 0U, TIM_CR1_CEN);
-            bool vector_off = NX_STM32_IRQ_ISOLATE(TIM2_IRQn) == 0;
-            if (!source_off || !counter_off || !vector_off)
-                timer_park();
-            return;
+            (void)write_checked(&system->timer->DIER, 0U, UINT32_MAX);
+            (void)write_checked(&system->timer->CR1, 0U, TIM_CR1_CEN);
+            (void)NX_STM32_IRQ_ISOLATE(TIM2_IRQn);
+            /* Isolation cannot recover deadlines already held by consumers.
+             * Always observe the lost domain and retain terminal ownership. */
+            timer_park();
         }
         /* Retained IRQs still acknowledge their level source during failed
          * withdrawal; that does not make a withdrawn epoch valid again. */

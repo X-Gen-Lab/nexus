@@ -15,6 +15,7 @@ extern "C" {
 #else
 #include "gd32f470_provider.h"
 #include "gd32f4xx_gpio.h"
+#include "gd32f4xx_rcu.h"
 #endif
 nx_platform_start_result_t nx_empty_platform_start(void);
 nx_result_t nx_empty_platform_stop(void);
@@ -39,8 +40,29 @@ static unsigned s_starts;
 static unsigned s_stops;
 static unsigned s_identities;
 static unsigned s_writes;
+static bool s_refuse_selected_gpio_mode;
 static constexpr size_t MMIO_BYTES = 0x80000U;
 static constexpr uintptr_t MMIO_BASE = UINT32_C(0x40000000);
+#ifdef NX_PHYSICAL_FACTORY_STM32
+static constexpr unsigned SELECTED_GPIO = 4U;
+static constexpr unsigned SELECTED_PIN = 3U;
+#else
+static constexpr unsigned SELECTED_GPIO = 3U;
+static constexpr unsigned SELECTED_PIN = 7U;
+#endif
+/** \brief Inspect the same physical GPIO layout through both official SDKs. */
+static volatile uint32_t& selected_gpio(unsigned offset) {
+    return *reinterpret_cast<volatile uint32_t*>(
+        UINT32_C(0x40020000) + SELECTED_GPIO * 0x400U + offset);
+}
+/** \brief GPIO gate is shared; its prior owners survive every phase. */
+static volatile uint32_t& selected_gpio_gate(void) {
+#ifdef NX_PHYSICAL_FACTORY_STM32
+    return RCC->AHB1ENR;
+#else
+    return RCU_AHB1EN;
+#endif
+}
 
 extern "C" bool nx_physical_factory_is_privileged(void) {
     return s_privileged;
@@ -48,7 +70,8 @@ extern "C" bool nx_physical_factory_is_privileged(void) {
 extern "C" void nx_physical_factory_write(volatile uint32_t* reg,
                                           uint32_t value) {
     ++s_writes;
-    *reg = value;
+    if (!s_refuse_selected_gpio_mode || reg != &selected_gpio(0U))
+        *reg = value;
 }
 #ifdef NX_PHYSICAL_FACTORY_STM32
 extern "C" {
@@ -121,6 +144,7 @@ class PhysicalPlatformFactory : public testing::TestWithParam<bool> {
         s_system = &system;
         s_privileged = true;
         s_starts = s_stops = s_identities = s_writes = 0U;
+        s_refuse_selected_gpio_mode = false;
         ON_CALL(system, Preflight()).WillByDefault(Return(NX_SUCCESS));
         ON_CALL(system, Start()).WillByDefault(Return(0));
         ON_CALL(system, Stop()).WillByDefault(Return(0));
@@ -136,6 +160,7 @@ class PhysicalPlatformFactory : public testing::TestWithParam<bool> {
             return;
         }
         s_privileged = true;
+        s_refuse_selected_gpio_mode = false;
         ON_CALL(system, Stop()).WillByDefault(Return(0));
         EXPECT_EQ(stop(), NX_SUCCESS);
         s_system = nullptr;
@@ -241,6 +266,95 @@ TEST_P(PhysicalPlatformFactory, PrivilegedOwnerCanRestartActualSelectedGraph) {
     EXPECT_EQ(stop(), NX_SUCCESS);
     EXPECT_EQ(s_starts, 2U);
     EXPECT_EQ(s_stops, 2U);
+}
+
+TEST_P(PhysicalPlatformFactory, PoweredForeignOutputOrAfRejectsWithoutEffects) {
+    for (uint32_t mode : {1U, 2U}) {
+        selected_gpio_gate() = 1U << SELECTED_GPIO;
+        selected_gpio(0U) = mode << (SELECTED_PIN * 2U);
+        const auto before = register_snapshot();
+        s_starts = s_writes = 0U;
+        const auto result = start();
+        EXPECT_EQ(GetParam() ? NX_ERROR_BUSY : NX_SUCCESS, result.primary);
+        EXPECT_EQ(NX_SUCCESS, result.cleanup);
+        EXPECT_EQ(0U, result.remaining_effects);
+        EXPECT_EQ(GetParam() ? 0U : 1U, s_starts);
+        EXPECT_EQ(0U, s_writes);
+        EXPECT_EQ(before, register_snapshot());
+        ASSERT_EQ(NX_SUCCESS, stop());
+    }
+}
+
+TEST_P(PhysicalPlatformFactory, PoweredSelectedLockRejectsWithoutStealingPin) {
+    selected_gpio_gate() = 1U << SELECTED_GPIO;
+    selected_gpio(28U) = (1U << 16U) | (1U << SELECTED_PIN);
+    const auto before = register_snapshot();
+    const auto result = start();
+    EXPECT_EQ(GetParam() ? NX_ERROR_BUSY : NX_SUCCESS, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(GetParam() ? 0U : 1U, s_starts);
+    EXPECT_EQ(0U, s_writes);
+    EXPECT_EQ(before, register_snapshot());
+}
+
+TEST_P(PhysicalPlatformFactory, UnpoweredForeignPinOnlyRollsBackAddedGate) {
+    for (bool locked : {false, true}) {
+        selected_gpio_gate() = 1U << 2U;
+        selected_gpio(0U) = locked ? 0U : 2U << (SELECTED_PIN * 2U);
+        selected_gpio(28U) = locked ? (1U << 16U) | (1U << SELECTED_PIN) : 0U;
+        const auto before = register_snapshot();
+        const auto result = start();
+        EXPECT_EQ(GetParam() ? NX_ERROR_BUSY : NX_SUCCESS, result.primary);
+        EXPECT_EQ(NX_SUCCESS, result.cleanup);
+        EXPECT_EQ(0U, result.remaining_effects);
+        EXPECT_EQ(1U << 2U, selected_gpio_gate());
+        EXPECT_EQ(before, register_snapshot());
+        ASSERT_EQ(NX_SUCCESS, stop());
+    }
+}
+
+TEST_P(PhysicalPlatformFactory,
+       ResetInputAndAnalogPreserveSharedNeighborFields) {
+    for (uint32_t mode : {0U, 3U}) {
+        selected_gpio_gate() = (1U << SELECTED_GPIO) | (1U << 2U);
+        selected_gpio(0U) = (mode << (SELECTED_PIN * 2U)) | (2U << 30U);
+        selected_gpio(4U) = 1U << 15U;
+        selected_gpio(8U) = 3U << 30U;
+        selected_gpio(12U) = 2U << 30U;
+        selected_gpio(20U) = 1U << 15U;
+        selected_gpio(36U) = 7U << 28U;
+        const uint32_t fields[] = {selected_gpio(0U),  selected_gpio(4U),
+                                   selected_gpio(8U),  selected_gpio(12U),
+                                   selected_gpio(20U), selected_gpio(36U)};
+        ASSERT_EQ(NX_SUCCESS, start().primary);
+        ASSERT_EQ(NX_SUCCESS, stop());
+        EXPECT_EQ(fields[0], selected_gpio(0U));
+        EXPECT_EQ(fields[1], selected_gpio(4U));
+        EXPECT_EQ(fields[2], selected_gpio(8U));
+        EXPECT_EQ(fields[3], selected_gpio(12U));
+        EXPECT_EQ(fields[4], selected_gpio(20U));
+        EXPECT_EQ(fields[5], selected_gpio(36U));
+        EXPECT_EQ((1U << SELECTED_GPIO) | (1U << 2U), selected_gpio_gate());
+    }
+}
+TEST_P(PhysicalPlatformFactory,
+       FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry) {
+    selected_gpio(0U) = 3U << (SELECTED_PIN * 2U);
+    selected_gpio_gate() = 1U << 2U;
+    ASSERT_EQ(NX_SUCCESS, start().primary);
+    s_refuse_selected_gpio_mode = true;
+    EXPECT_EQ(GetParam() ? NX_ERROR_IO : NX_SUCCESS, stop());
+    if (GetParam()) {
+        EXPECT_EQ(NX_ERROR_STATE, start().primary);
+        EXPECT_NE(0U, selected_gpio_gate() & (1U << SELECTED_GPIO));
+    } else {
+        EXPECT_EQ(1U << 2U, selected_gpio_gate());
+    }
+    s_refuse_selected_gpio_mode = false;
+    EXPECT_EQ(NX_SUCCESS, stop());
+    EXPECT_EQ(3U << (SELECTED_PIN * 2U), selected_gpio(0U));
+    EXPECT_EQ(1U << 2U, selected_gpio_gate());
 }
 
 INSTANTIATE_TEST_SUITE_P(EmptyAndGPIO, PhysicalPlatformFactory,

@@ -1,8 +1,10 @@
 """Reviewed GD32 fixed construction with no dynamic controller discovery."""
 try:
     from ...emission import dma_regions
+    from ...gpio_phase import rollback_pin, withdraw_pin
 except ImportError:
     from emission import dma_regions
+    from gpio_phase import rollback_pin, withdraw_pin
 from ..common import controller_ir, mode_traits
 from .. import hardware
 try:
@@ -52,6 +54,7 @@ def prepared(name, pins, initialize, after=(), before=()):
                for port in {pin[1] for pin in unique_pins})
     lines = [f"static nx_result_t prepare_{name}(void) {{",
              "    nx_result_t status = NX_SUCCESS;",
+             "    uint32_t retained_gpio_clocks = 0u;",
              f"    uint32_t saved_clocks = RCU_AHB1EN & {mask}u;"]
     for pin in unique_pins:
         lines += [f"    uint16_t saved_{pin} = 0u;", f"    bool captured_{pin} = false;"]
@@ -72,8 +75,10 @@ def prepared(name, pins, initialize, after=(), before=()):
     lines += list(after)
     lines += ["    return NX_SUCCESS;", "rollback:"]
     for wire in reversed(unique_pins):
-        lines += [f"    if (captured_{wire}) {{ nx_gd32_pin_restore(GPIO{wire[1]}, {wire[2:]}u, saved_{wire}); }}"]
-    lines += [f"    RCU_AHB1EN = (RCU_AHB1EN & ~{mask}u) | saved_clocks;",
+        lines += [f"    if (captured_{wire}) {{"]
+        lines += rollback_pin("gd32", wire, f"saved_{wire}")
+        lines += ["    }"]
+    lines += [f"    RCU_AHB1EN = (RCU_AHB1EN & ~{mask}u) | saved_clocks | retained_gpio_clocks;",
               "    nx_arch_dsb();", "    return status;", "}"]
     return lines
 
@@ -87,6 +92,7 @@ def released(name, pins, stop, cs_pins=()):
         lines.append(f"    GPIO_BOP(GPIO{wire[1]}) = {1 << int(wire[2:])}u;")
     for pin in pins:
         wire = pin["pin"]
+        lines += withdraw_pin("gd32", wire, indent=4)
         lines.append(f"    (void)nx_gd32_pin_configure(GPIO{wire[1]}, {wire[2:]}u, 0u, 0u, 0u, false);")
     return lines + ["    return NX_SUCCESS;", "}"]
 

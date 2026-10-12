@@ -87,6 +87,69 @@ TEST_F(G474Factory, ActiveSelectedIrqRejectsBeforeAnyClockChange) {
     EXPECT_TRUE(g_g474_model.irq_active[LPUART1_IRQn]);
     g_g474_model.irq_active[LPUART1_IRQn] = false;
 }
+TEST_F(G474Factory, PoweredForeignModeAndLockRejectBeforeClockWrites) {
+    for (bool locked : {false, true}) {
+        RCC->AHB2ENR = RCC_AHB2ENR_GPIOAEN;
+        GPIOA->MODER = locked ? 0U : 2U << 6U;
+        GPIOA->LCKR = locked ? (1U << 16U) | (1U << 3U) : 0U;
+        const auto result = nx_platform_start();
+        EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+        EXPECT_EQ(NX_SUCCESS, result.cleanup);
+        EXPECT_EQ(0U, result.remaining_effects);
+        EXPECT_EQ(0U, g_g474_model.writes);
+        EXPECT_FALSE(g_nx_stm32g474_system.started);
+        ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
+        g_g474_model.writes = 0U;
+    }
+    GPIOA->MODER = GPIOA->LCKR = 0U;
+}
+TEST_F(G474Factory, UnpoweredLaterUartPinRejectsWithoutRestoringUntouchedLed) {
+    GPIOA->MODER = 2U << 6U;
+    g_g474_model.ignore_write = &GPIOA->MODER;
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(2U << 6U, GPIOA->MODER);
+    EXPECT_EQ(0U, GPIOA->ODR);
+    EXPECT_EQ(0U, GPIOA->AFR[0]);
+    EXPECT_EQ(0U, RCC->AHB2ENR & RCC_AHB2ENR_GPIOAEN);
+    EXPECT_FALSE(g_nx_stm32g474_system.started);
+    g_g474_model.ignore_write = nullptr;
+}
+TEST_F(G474Factory, LegalAnalogSelectedPinsRestoreNeighborAndSharedGate) {
+    GPIOA->MODER = UINT32_MAX;
+    GPIOA->AFR[1] = 7U << 24U;
+    GPIOA->ODR = 1U << 14U;
+    RCC->AHB2ENR = RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN;
+    Start();
+    ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(UINT32_MAX, GPIOA->MODER);
+    EXPECT_EQ(7U << 24U, GPIOA->AFR[1]);
+    EXPECT_EQ(1U << 14U, GPIOA->ODR);
+    EXPECT_EQ(RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN, RCC->AHB2ENR);
+}
+TEST_F(G474Factory, FailedOriginalMuxReadbackRetainsOwnedGateUntilRetry) {
+    GPIOA->MODER = UINT32_MAX;
+    GPIOA->AFR[1] = 7U << 24U;
+    RCC->AHB2ENR = RCC_AHB2ENR_GPIOBEN;
+    Start();
+    g_g474_model.ignore_write = &GPIOA->AFR[0];
+    EXPECT_EQ(NX_ERROR_IO, nx_platform_stop());
+    EXPECT_EQ(NX_ERROR_STATE, nx_platform_start().primary);
+    EXPECT_TRUE(g_nx_stm32g474_system.started);
+    EXPECT_EQ(RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOBEN, RCC->AHB2ENR);
+    EXPECT_EQ(UINT32_MAX, GPIOA->MODER);
+    EXPECT_NE(0U, GPIOA->AFR[0]);
+    EXPECT_EQ(7U << 24U, GPIOA->AFR[1]);
+    g_g474_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(0U, GPIOA->AFR[0]);
+    EXPECT_EQ(UINT32_MAX, GPIOA->MODER);
+    EXPECT_EQ(RCC_AHB2ENR_GPIOBEN, RCC->AHB2ENR);
+    EXPECT_FALSE(g_nx_stm32g474_system.started);
+    Start();
+}
 
 TEST_F(G474Factory, ActualStartupBinds170MHzClockTimebasePinsAndIrq) {
     Start();
@@ -217,13 +280,23 @@ TEST_F(G474Factory, FailedUartAcknowledgementRollsBackPinsAndOwnedGates) {
 }
 
 TEST_F(G474Factory, FailedPeripheralRollbackRetainsClockPinsAndResponsibility) {
-    g_g474_model.ignore_write = &GPIOA->MODER;
+    g_g474_model.hold_uart_on = true;
+    /* Refuse mode writes only after real pin effects exist. Refusing the
+     * first mode write leaves the original pin state already restored. */
+    g_g474_model.critical_observer = [](void*, bool entering) {
+        if (entering && ((GPIOA->MODER >> 10U) & 3U) == 1U &&
+            ((GPIOA->MODER >> 4U) & 3U) == 2U)
+            g_g474_model.ignore_write = &GPIOA->MODER;
+    };
     const auto result = nx_platform_start();
     EXPECT_NE(NX_SUCCESS, result.primary);
     EXPECT_NE(NX_SUCCESS, result.cleanup);
     EXPECT_NE(0U, result.remaining_effects);
     EXPECT_TRUE(g_nx_stm32g474_system.started);
     EXPECT_NE(0U, RCC->AHB2ENR & RCC_AHB2ENR_GPIOAEN);
+    EXPECT_EQ(NX_ERROR_STATE, nx_platform_start().primary);
+    g_g474_model.critical_observer = nullptr;
+    g_g474_model.hold_uart_on = false;
     g_g474_model.ignore_write = nullptr;
     EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
     EXPECT_EQ(0U, GPIOA->MODER);

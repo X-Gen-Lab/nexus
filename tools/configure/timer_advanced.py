@@ -4,8 +4,10 @@ Idle levels are explicit assembly policy, not a claim about an output stage or
 physical break circuit. Capture ring storage remains supplied by the caller.
 """
 try:
+    from .gpio_phase import withdraw_pin
     from .providers.common import fail, integer
 except ImportError:
+    from gpio_phase import withdraw_pin
     from providers.common import fail, integer
 
 
@@ -138,19 +140,26 @@ def constructor(item, result, prefix):
             value = (1 << number) if high else (1 << (number + 16))
             bop = f"GPIO{wire[1]}->BSRR" if stm else f"GPIO_BOP(GPIO{wire[1]})"
             odr = f"GPIO{wire[1]}->ODR" if stm else f"GPIO_OCTL(GPIO{wire[1]})"
+            mode = f"GPIO{wire[1]}->MODER" if stm else f"GPIO_CTL(GPIO{wire[1]})"
+            mode_mask = 3 << (number * 2)
+            output_mode = 1 << (number * 2)
+            # Keep the owned AF/electrical fields until GPIO drive is observed.
+            # Changing AF first could connect a different active peripheral.
             lines += [f"    if ((s_nx_timer_pin_leases_{name} & {1 << index}u) != 0u) {{",
                       f"        NX_PLATFORM_REGISTER_WRITE({bop}, {value}u);", "        nx_arch_dsb();",
                       f"        if (({odr} & {1 << number}u) != {1 << number if high else 0}u) {{ return NX_ERROR_IO; }}",
-                      f"        status = nx_{prefix}_pin_configure(GPIO{wire[1]}, {number}u, 1u, 0u, 0u, false);",
-                      "        if (status != NX_SUCCESS) { return status; }",
+                      f"        NX_PLATFORM_REGISTER_WRITE({mode}, ({mode} & ~{mode_mask}u) | {output_mode}u);",
+                      "        nx_arch_dsb();",
+                      f"        if (({mode} & {mode_mask}u) != {output_mode}u) {{ return NX_ERROR_IO; }}",
                       f"        if (({odr} & {1 << number}u) != {1 << number if high else 0}u) {{ return NX_ERROR_IO; }}",
                       "    }"]
     for index, pin in reversed(list(enumerate(item["pins"]))):
         wire = pin["pin"]
         number = int(wire[2:])
         lease = 1 << index
-        lines += [f"    if ((s_nx_timer_pin_leases_{name} & {lease}u) != 0u) {{",
-                  f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {number}u, s_nx_timer_pin_saved_{name}[{index}]);",
+        lines += [f"    if ((s_nx_timer_pin_leases_{name} & {lease}u) != 0u) {{"]
+        lines += withdraw_pin(prefix, wire)
+        lines += [f"        nx_{prefix}_pin_restore(GPIO{wire[1]}, {number}u, s_nx_timer_pin_saved_{name}[{index}]);",
                   f"        if (nx_{prefix}_pin_capture(GPIO{wire[1]}, {number}u) != s_nx_timer_pin_saved_{name}[{index}]) {{ return NX_ERROR_IO; }}",
                   f"        s_nx_timer_pin_leases_{name} &= (uint8_t)~{lease}u;", "    }"]
     lines += [f"    if (s_nx_timer_clock_added_{name} != 0u) {{",
@@ -190,7 +199,11 @@ def constructor(item, result, prefix):
               "    return NX_SUCCESS;", "}", f"void {vector}_IRQHandler(void);",
               "/** \\brief Bounded dispatch from the exclusively leased vector. */",
               f"void {vector}_IRQHandler(void) {{ nx_{prefix}_{kind}_irq(&{state}); }}"]
-    return {"definitions": lines, "initialize": f"prepare_{name}()", "stop": [f"stop_{name}()"]}
+    return {"definitions": lines, "initialize": f"prepare_{name}()",
+            "stop": [f"stop_{name}()"],
+            "pin_snapshots": {pin["pin"]:
+                              f"s_nx_timer_pin_saved_{name}[{index}]"
+                              for index, pin in enumerate(item["pins"])}}
 
 
 def _gpio_mask(result):
