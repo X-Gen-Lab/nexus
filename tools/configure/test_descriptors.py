@@ -11,6 +11,12 @@ except ImportError:
 
 
 class DescriptorBoundaryTests(unittest.TestCase):
+    def test_h743_dma_configuration_binds_private_provider_payload(self):
+        payload = descriptor.maintained("stm32h743").owned_payload
+        for name in ("soc/stm32h743/drivers/uart_dma.c",
+                     "soc/stm32h743/private/stm32h743_dma.h"):
+            self.assertIn(name, payload)
+
     def test_native_configuration_does_not_import_unselected_physical_families(self):
         run = subprocess.run([sys.executable, "-B", "-c",
             "import sys; from tools.configure.providers import maintained; "

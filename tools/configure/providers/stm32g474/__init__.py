@@ -78,7 +78,8 @@ def validate_selection(selection, route):
         if tuple((item["pin"], item["function"], item["af"])
                  for item in route["pins"]) != ((pin, "input", 0),):
             common.fail("G474 EXTI requires its exact GPIOA input route")
-        if selection.get("edge") not in {"rising", "falling", "both"}:
+        if (type(selection.get("edge")) is not str or
+                selection["edge"] not in {"rising", "falling", "both"}):
             common.fail("G474 EXTI requires an explicit raw edge selection")
         common.integer(selection.get("event_capacity"), 1, 4096,
                        "G474 EXTI event capacity")

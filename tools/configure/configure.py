@@ -929,6 +929,9 @@ def generate(result, output):
               *metadata.header_lines(thaw(result["platform_metadata"]))]
     if result["clock"]["source"] == "hse":
         header.insert(7, f'#define NEXUS_HSE_HZ {result["clock"]["input_hz"]}u')
+    if result["soc_family"] == "stm32h743":
+        cache_mask = maintained("stm32h743").cache_mask(result["clock_profile"])
+        header.append(f'#define NEXUS_SOC_CACHE_MASK {cache_mask}u')
     cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
              f'set(NEXUS_EXACT_PART "{result["part"]}")',
              'set(NEXUS_PROVIDER_CONFIG_MODULES "' + ';'.join(

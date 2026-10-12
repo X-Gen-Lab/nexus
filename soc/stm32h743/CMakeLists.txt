@@ -1,4 +1,4 @@
-# Exact H743 Cache-off software reference; official SDK stays private.
+# Exact H743 software reference; official SDK stays private.
 set(h7_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7")
 set(h7_cmsis "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
 set(h7_lock "${NEXUS_SOURCE_DIR}/dependencies/stm32h7.lock.json")
@@ -27,6 +27,9 @@ if(h7_gpio_modes OR h7_uart_modes)
 endif()
 if(h7_uart_modes)
     list(APPEND h7_sources drivers/uart.c)
+    if("dma-tx" IN_LIST h7_uart_modes)
+        list(APPEND h7_sources drivers/uart_dma.c)
+    endif()
 endif()
 if(h7_sources)
     add_library(nexus_soc_stm32h743 STATIC ${h7_sources})

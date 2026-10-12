@@ -32,6 +32,8 @@ void nx_h743_model_reset(void) {
     g_h743_model.flash_kib = 2048;
     g_h743_model.device_id = 0x450;
     g_h743_model.group = 3U;
+    g_h743_model.actual_core_hz = 64000000U;
+    g_h743_model.cache_context_valid = true;
     g_nx_stm32h743_system.rcc = &g_h743_model.rcc;
     g_nx_stm32h743_system.flash = &g_h743_model.flash;
     g_nx_stm32h743_system.power = &g_h743_model.power;
@@ -59,6 +61,16 @@ void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
     }
     if (reg == g_h743_model.ignore_write)
         return;
+    if (reg == &g_h743_model.rcc.CR) {
+        const uint32_t readonly = RCC_CR_HSIRDY | RCC_CR_HSIDIVF;
+        const uint32_t previous = *reg;
+        *reg = (value & ~readonly) | (previous & readonly);
+        if ((previous & RCC_CR_HSIDIV) != (value & RCC_CR_HSIDIV)) {
+            *reg &= ~(uint32_t)RCC_CR_HSIDIVF;
+            ++g_h743_model.divider_writes;
+        }
+        return;
+    }
     if (reg == &g_h743_model.timer.EGR && (value & TIM_EGR_UG) != 0U)
         g_h743_model.timer.SR |= TIM_SR_UIF;
     if (reg == &g_h743_model.timer.SR) {
@@ -102,6 +114,50 @@ void nx_h743_model_uart_poll(void* context) {
         port->registers->ISR |= USART_ISR_TEACK | USART_ISR_REACK;
     if (!on && !g_h743_model.hold_uart_off)
         port->registers->ISR &= ~(uint32_t)(USART_ISR_TEACK | USART_ISR_REACK);
+}
+void nx_h743_model_system_poll(void* system) {
+    (void)system;
+    if (g_h743_model.divider_writes == 0U)
+        return;
+    ++g_h743_model.divider_polls;
+    const uint32_t divider = g_h743_model.rcc.CR & RCC_CR_HSIDIV;
+    if ((divider == RCC_CR_HSIDIV_2 && g_h743_model.hold_divider_ready) ||
+        (divider == RCC_CR_HSIDIV_1 && g_h743_model.hold_divider_restore))
+        return;
+    g_h743_model.rcc.CR |= RCC_CR_HSIDIVF;
+    g_h743_model.actual_core_hz = 64000000U >> (divider >> RCC_CR_HSIDIV_Pos);
+}
+nx_arch_cache_control_result_t
+nx_h743_model_cache_enable(nx_arch_cache_control_t* control, uint32_t mask) {
+    ++g_h743_model.cache_enable_calls;
+    g_h743_model.cache_context_valid &= nx_arch_irq_is_masked();
+    if (g_h743_model.cache_selector_failure) {
+        control->saved_selector = 1U;
+        control->selector_pending = true;
+        return NX_ARCH_CACHE_IO;
+    }
+    if (g_h743_model.cache_enable_result == NX_ARCH_CACHE_INVALID ||
+        g_h743_model.cache_enable_result == NX_ARCH_CACHE_CONTEXT ||
+        g_h743_model.cache_enable_result == NX_ARCH_CACHE_UNSUPPORTED ||
+        g_h743_model.cache_enable_result == NX_ARCH_CACHE_STATE)
+        return g_h743_model.cache_enable_result;
+    control->owned_mask = mask;
+    if ((mask & NX_ARCH_CACHE_DATA) != 0U)
+        g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
+    if ((mask & NX_ARCH_CACHE_INSTRUCTION) != 0U)
+        g_h743_model.core->CCR |= SCB_CCR_IC_Msk;
+    return g_h743_model.cache_enable_result;
+}
+nx_arch_cache_control_result_t
+nx_h743_model_cache_disable(nx_arch_cache_control_t* control) {
+    ++g_h743_model.cache_disable_calls;
+    g_h743_model.cache_context_valid &= nx_arch_irq_is_masked();
+    g_h743_model.cache_disable_core_hz = g_h743_model.actual_core_hz;
+    if (g_h743_model.cache_disable_result != NX_ARCH_CACHE_OK)
+        return g_h743_model.cache_disable_result;
+    g_h743_model.core->CCR &= ~(uint32_t)(SCB_CCR_DC_Msk | SCB_CCR_IC_Msk);
+    std::memset(control, 0, sizeof(*control));
+    return NX_ARCH_CACHE_OK;
 }
 static void critical_observe(bool entering) {
     if (g_h743_model.critical_observer != nullptr &&

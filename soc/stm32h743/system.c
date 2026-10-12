@@ -20,6 +20,11 @@ _Static_assert(PWR_CR3_LDOEN == NX_H743_BOOT_LDO &&
                    PWR_CSR1_ACTVOSRDY == NX_H743_BOOT_READY,
                "Actual SDK supply/ready bits differ from pre-RAM assembly");
 #ifndef NX_H743_MODEL
+/* The optional control uses the pointer-to-epoch alignment gap. Keep the
+ * default profile free of cache storage and bound the selected ARM layout. */
+_Static_assert(sizeof(nx_stm32h743_system_t) ==
+                   (NX_H743_CACHE_CONTROL_ENABLED ? 56U : 48U),
+               "H743 selected system state exceeds its reviewed ARM budget");
 nx_stm32h743_system_t g_nx_stm32h743_system = {
     .rcc = RCC, .flash = FLASH, .power = PWR, .timer = TIM2, .core = SCB};
 #endif
@@ -45,6 +50,37 @@ static bool wait_update(nx_stm32h743_system_t* s, uint32_t limit) {
     }
     return false;
 }
+/** \brief A latched divider is not proof of its propagated clock frequency. */
+static nx_result_t wait_divider(nx_stm32h743_system_t* s, uint32_t divider,
+                                uint32_t limit) {
+    while (limit-- != 0U) {
+        NX_H743_SYSTEM_POLL(s);
+        const uint32_t cr = NX_H743_READ(&s->rcc->CR);
+        if ((cr &
+             (RCC_CR_HSION | RCC_CR_HSIRDY | RCC_CR_HSIDIV | RCC_CR_HSIDIVF)) ==
+            (RCC_CR_HSION | RCC_CR_HSIRDY | divider | RCC_CR_HSIDIVF))
+            return NX_SUCCESS;
+    }
+    return NX_ERROR_TIMEOUT;
+}
+#if NX_H743_CACHE_CONTROL_ENABLED
+static nx_result_t cache_result(nx_arch_cache_control_result_t result) {
+    switch (result) {
+        case NX_ARCH_CACHE_OK:
+            return NX_SUCCESS;
+        case NX_ARCH_CACHE_INVALID:
+            return NX_ERROR_INVALID;
+        case NX_ARCH_CACHE_CONTEXT:
+            return NX_ERROR_CONTEXT;
+        case NX_ARCH_CACHE_UNSUPPORTED:
+            return NX_ERROR_UNSUPPORTED;
+        case NX_ARCH_CACHE_STATE:
+            return NX_ERROR_BUSY;
+        default:
+            return NX_ERROR_IO;
+    }
+}
+#endif
 /** \brief A lost time domain cannot authorize subsequent deadline progress. */
 static _Noreturn void timer_park(void) {
     (void)nx_arch_irq_save();
@@ -60,6 +96,10 @@ nx_result_t nx_stm32h743_system_preflight(const nx_stm32h743_system_t* s) {
         return NX_ERROR_INVALID;
     if (s->started || s->remaining_effects != 0U)
         return NX_ERROR_BUSY;
+#if NX_H743_CACHE_CONTROL_ENABLED
+    if (s->cache.owned_mask != 0U || s->cache.selector_pending)
+        return NX_ERROR_BUSY;
+#endif
     /* Never adopt a clock/cache/power state whose owner cannot be withdrawn.
      * The assembly power entry has already permitted initialized RAM use. */
     uint32_t cr = NX_H743_READ(&s->rcc->CR);
@@ -91,19 +131,62 @@ nx_result_t nx_stm32h743_system_preflight(const nx_stm32h743_system_t* s) {
     return NX_SUCCESS;
 }
 nx_stm32h743_start_result_t nx_stm32h743_system_start(nx_stm32h743_system_t* s,
+                                                      uint32_t core_hz,
+                                                      uint32_t cache_mask,
                                                       uint32_t limit) {
     nx_stm32h743_start_result_t r = {NX_SUCCESS, NX_SUCCESS, 0U};
-    if (limit == 0U) {
+    if (limit == 0U || (core_hz != 64000000U && core_hz != 32000000U) ||
+        (cache_mask != 0U &&
+         cache_mask != (NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION))) {
         r.primary = NX_ERROR_INVALID;
         return r;
     }
+#ifndef NX_H743_MODEL
+    if (core_hz != NEXUS_CORE_HZ || cache_mask != NEXUS_SOC_CACHE_MASK) {
+        r.primary = NX_ERROR_INVALID;
+        return r;
+    }
+#endif
     r.primary = nx_stm32h743_system_preflight(s);
     if (r.primary != NX_SUCCESS)
         return r;
-    s->remaining_effects = NX_STM32H743_EFFECT_TIMER;
     s->timer_error = NX_SUCCESS;
     s->core_hz = 64000000U;
     s->reset_cause = NX_H743_READ(&s->rcc->RSR);
+    if (core_hz == 32000000U) {
+        s->remaining_effects = NX_STM32H743_EFFECT_DIVIDER;
+        NX_H743_WRITE(&s->rcc->CR,
+                      (NX_H743_READ(&s->rcc->CR) & ~(uint32_t)RCC_CR_HSIDIV) |
+                          RCC_CR_HSIDIV_2);
+        nx_arch_dsb();
+        const uint32_t divider = NX_H743_READ(&s->rcc->CR) & RCC_CR_HSIDIV;
+        if (divider != RCC_CR_HSIDIV_2) {
+            /* The exclusively owned register never accepted DIV2. Reset DIV1
+             * has HSIDIVF=0, so it must not require an invented transition. */
+            if (divider == RCC_CR_HSIDIV_1)
+                s->remaining_effects &= ~NX_STM32H743_EFFECT_DIVIDER;
+            r.primary = NX_ERROR_IO;
+            goto rollback;
+        }
+        r.primary = wait_divider(s, RCC_CR_HSIDIV_2, limit);
+        if (r.primary != NX_SUCCESS)
+            goto rollback;
+        s->core_hz = core_hz;
+    }
+#if NX_H743_CACHE_CONTROL_ENABLED
+    if (cache_mask != 0U) {
+        s->remaining_effects |= NX_STM32H743_EFFECT_CACHE;
+        nx_arch_irq_state_t saved = nx_arch_irq_save();
+        r.primary = cache_result(NX_H743_CACHE_ENABLE(&s->cache, cache_mask));
+        nx_arch_irq_restore(saved);
+        if (r.primary != NX_SUCCESS) {
+            if (s->cache.owned_mask == 0U && !s->cache.selector_pending)
+                s->remaining_effects &= ~NX_STM32H743_EFFECT_CACHE;
+            goto rollback;
+        }
+    }
+#endif
+    s->remaining_effects |= NX_STM32H743_EFFECT_TIMER;
     if (!write_checked(&s->rcc->APB1LENR,
                        NX_H743_READ(&s->rcc->APB1LENR) | RCC_APB1LENR_TIM2EN,
                        RCC_APB1LENR_TIM2EN)) {
@@ -118,7 +201,7 @@ nx_stm32h743_start_result_t nx_stm32h743_system_start(nx_stm32h743_system_t* s,
                        NX_H743_READ(&s->rcc->APB1LRSTR) &
                            ~(uint32_t)RCC_APB1LRSTR_TIM2RST,
                        RCC_APB1LRSTR_TIM2RST) ||
-        !write_checked(&s->timer->PSC, 63U, UINT32_MAX) ||
+        !write_checked(&s->timer->PSC, core_hz / 1000000U - 1U, UINT32_MAX) ||
         !write_checked(&s->timer->ARR, UINT32_MAX, UINT32_MAX) ||
         !write_checked(&s->timer->SR, 0U, UINT32_MAX)) {
         r.primary = NX_ERROR_IO;
@@ -176,6 +259,29 @@ nx_result_t nx_stm32h743_system_stop(nx_stm32h743_system_t* s, uint32_t limit) {
                            RCC_APB1LENR_TIM2EN))
             return NX_ERROR_IO;
         s->remaining_effects &= ~NX_STM32H743_EFFECT_TIMER;
+    }
+#if NX_H743_CACHE_CONTROL_ENABLED
+    if ((s->remaining_effects & NX_STM32H743_EFFECT_CACHE) != 0U) {
+        nx_arch_irq_state_t saved = nx_arch_irq_save();
+        nx_result_t cache = cache_result(NX_H743_CACHE_DISABLE(&s->cache));
+        nx_arch_irq_restore(saved);
+        if (cache != NX_SUCCESS)
+            return cache;
+        s->remaining_effects &= ~NX_STM32H743_EFFECT_CACHE;
+    }
+#endif
+    if ((s->remaining_effects & NX_STM32H743_EFFECT_DIVIDER) != 0U) {
+        uint32_t cr = NX_H743_READ(&s->rcc->CR);
+        if ((cr & (RCC_CR_PLL1ON | RCC_CR_PLL2ON | RCC_CR_PLL3ON)) != 0U)
+            return NX_ERROR_BUSY;
+        if (!write_checked(&s->rcc->CR, cr & ~(uint32_t)RCC_CR_HSIDIV,
+                           RCC_CR_HSIDIV))
+            return NX_ERROR_IO;
+        nx_result_t clock = wait_divider(s, RCC_CR_HSIDIV_1, limit);
+        if (clock != NX_SUCCESS)
+            return clock;
+        s->core_hz = 64000000U;
+        s->remaining_effects &= ~NX_STM32H743_EFFECT_DIVIDER;
     }
     return NX_SUCCESS;
 }

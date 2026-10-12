@@ -18,8 +18,8 @@ class H743System : public testing::Test {
     void SetUp() override {
         nx_h743_model_reset();
     }
-    nx_stm32h743_start_result_t Start() {
-        return nx_stm32h743_system_start(&g_nx_stm32h743_system, 8U);
+    nx_stm32h743_start_result_t Start(uint32_t hz = 64000000U) {
+        return nx_stm32h743_system_start(&g_nx_stm32h743_system, hz, 0U, 8U);
     }
 };
 TEST_F(H743System, Hsi64EstablishesIndependentOneMhzTimer) {
@@ -97,8 +97,10 @@ TEST_F(H743System, IdentityRequiresTwoMibAndCorrectGroup) {
     EXPECT_EQ(nx_stm32h743_validate_identity(), NX_ERROR_IO);
 }
 TEST_F(H743System, InvalidPollAndUnprivilegedCallerHaveNoEffects) {
-    EXPECT_EQ(nx_stm32h743_system_start(&g_nx_stm32h743_system, 0U).primary,
-              NX_ERROR_INVALID);
+    EXPECT_EQ(
+        nx_stm32h743_system_start(&g_nx_stm32h743_system, 64000000U, 0U, 0U)
+            .primary,
+        NX_ERROR_INVALID);
     g_h743_model.privileged = false;
     EXPECT_EQ(Start().primary, NX_ERROR_CONTEXT);
     EXPECT_EQ(g_h743_model.writes, 0U);
@@ -145,8 +147,8 @@ void AlarmAfterReturningFault(int) {
 }
 void PrepareTimerFault(bool exit_observer, bool refuse_irq = false) {
     nx_h743_model_reset();
-    if (nx_stm32h743_system_start(&g_nx_stm32h743_system, 8U).primary !=
-        NX_SUCCESS)
+    if (nx_stm32h743_system_start(&g_nx_stm32h743_system, 64000000U, 0U, 8U)
+            .primary != NX_SUCCESS)
         _exit(90);
     s_fault_observed = 0;
     s_fault_exit = exit_observer;
@@ -224,4 +226,233 @@ TEST_F(H743System, FaultBeforeSnapshotMaskCannotResumeDeadlineConsumer) {
             _exit(99);
         },
         testing::ExitedWithCode(42), "");
+}
+
+TEST_F(H743System, Hsi32PublishesOnlyAfterDividerActuallyPropagates) {
+    ASSERT_EQ(Start(32000000U).primary, NX_SUCCESS);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 32000000U);
+    EXPECT_EQ(g_nx_stm32h743_system.core_hz, 32000000U);
+    EXPECT_EQ(g_h743_model.timer.PSC, 31U);
+    EXPECT_EQ(g_h743_model.rcc.CR & (RCC_CR_HSIDIV | RCC_CR_HSIDIVF),
+              RCC_CR_HSIDIV_2 | RCC_CR_HSIDIVF);
+    EXPECT_EQ(g_h743_model.flash.ACR, FLASH_ACR_LATENCY_7WS);
+    EXPECT_EQ(g_h743_model.power.CR3, PWR_CR3_LDOEN);
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U), NX_SUCCESS);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
+    EXPECT_EQ(g_h743_model.rcc.CR & RCC_CR_HSIDIV, RCC_CR_HSIDIV_1);
+    EXPECT_EQ(g_nx_stm32h743_system.remaining_effects, 0U);
+}
+TEST_F(H743System, UnsupportedFrequencyRejectsBeforeAnyHardwareWrite) {
+    for (uint32_t hz : {0U, 16000000U, 48000000U, UINT32_MAX}) {
+        EXPECT_EQ(Start(hz).primary, NX_ERROR_INVALID);
+        EXPECT_EQ(g_h743_model.writes, 0U);
+        EXPECT_EQ(g_nx_stm32h743_system.remaining_effects, 0U);
+    }
+}
+TEST_F(H743System, WrittenDividerWithoutReadyFlagCannotStartTimeOrIrq) {
+    g_h743_model.hold_divider_ready = true;
+    const auto result = Start(32000000U);
+    EXPECT_EQ(result.primary, NX_ERROR_TIMEOUT);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_FALSE(g_nx_stm32h743_system.started);
+    EXPECT_FALSE(g_h743_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(g_h743_model.timer.CR1, 0U);
+    EXPECT_EQ(g_h743_model.rcc.APB1LENR & RCC_APB1LENR_TIM2EN, 0U);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
+    EXPECT_GE(g_h743_model.divider_polls, 8U);
+}
+TEST_F(H743System, RefusedDividerWriteCannotBeReportedAsClockAdmission) {
+    g_h743_model.ignore_write = &g_h743_model.rcc.CR;
+    const auto result = Start(32000000U);
+    EXPECT_EQ(result.primary, NX_ERROR_IO);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_EQ(g_h743_model.divider_writes, 0U);
+    EXPECT_FALSE(g_h743_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(g_h743_model.timer.CR1, 0U);
+}
+TEST_F(H743System, TimerFailureRollsBackOnlyOwnedDividerAfterTimerWithdrawal) {
+    g_h743_model.ignore_write = &g_h743_model.timer.EGR;
+    const auto result = Start(32000000U);
+    EXPECT_EQ(result.primary, NX_ERROR_TIMEOUT);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
+    EXPECT_EQ(g_h743_model.divider_writes, 2U);
+    EXPECT_FALSE(g_h743_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(g_h743_model.rcc.APB1LENR & RCC_APB1LENR_TIM2EN, 0U);
+}
+TEST_F(H743System, ClockRestoreFailureRetainsResponsibilityUntilActualReady) {
+    ASSERT_EQ(Start(32000000U).primary, NX_SUCCESS);
+    g_h743_model.hold_divider_restore = true;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U),
+              NX_ERROR_TIMEOUT);
+    EXPECT_FALSE(g_nx_stm32h743_system.started);
+    EXPECT_EQ(g_nx_stm32h743_system.remaining_effects,
+              NX_STM32H743_EFFECT_DIVIDER);
+    EXPECT_FALSE(g_h743_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(g_h743_model.rcc.APB1LENR & RCC_APB1LENR_TIM2EN, 0U);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 32000000U);
+    EXPECT_EQ(Start().primary, NX_ERROR_BUSY);
+    g_h743_model.hold_divider_restore = false;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U), NX_SUCCESS);
+    EXPECT_EQ(g_nx_stm32h743_system.remaining_effects, 0U);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
+}
+TEST_F(H743System, FailedTimerWithdrawalDoesNotRestoreClockUnderLiveTimer) {
+    ASSERT_EQ(Start(32000000U).primary, NX_SUCCESS);
+    g_h743_model.hold_irq_off = true;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U),
+              NX_ERROR_IO);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 32000000U);
+    EXPECT_EQ(g_h743_model.divider_writes, 1U);
+    g_h743_model.hold_irq_off = false;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U), NX_SUCCESS);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
+}
+
+TEST_F(H743System, CacheProfileOwnsBothCachesUntilTimerIsWithdrawn) {
+    const uint32_t mask = NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION;
+    ASSERT_EQ(
+        nx_stm32h743_system_start(&g_nx_stm32h743_system, 32000000U, mask, 8U)
+            .primary,
+        NX_SUCCESS);
+    EXPECT_EQ(g_h743_model.core->CCR & (SCB_CCR_DC_Msk | SCB_CCR_IC_Msk),
+              SCB_CCR_DC_Msk | SCB_CCR_IC_Msk);
+    EXPECT_EQ(g_h743_model.cache_enable_calls, 1U);
+    EXPECT_TRUE(g_h743_model.cache_context_valid);
+    EXPECT_FALSE(nx_arch_irq_is_masked());
+    g_h743_model.hold_irq_off = true;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U),
+              NX_ERROR_IO);
+    EXPECT_EQ(g_h743_model.cache_disable_calls, 0U);
+    g_h743_model.hold_irq_off = false;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U), NX_SUCCESS);
+    EXPECT_EQ(g_h743_model.cache_disable_core_hz, 32000000U);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
+    EXPECT_EQ(g_h743_model.cache_disable_calls, 1U);
+    EXPECT_EQ(g_h743_model.core->CCR & (SCB_CCR_DC_Msk | SCB_CCR_IC_Msk), 0U);
+    EXPECT_TRUE(g_h743_model.cache_context_valid);
+    EXPECT_FALSE(nx_arch_irq_is_masked());
+}
+TEST_F(H743System, CacheEnableFailureRollsBackOwnedCpuStateBeforeClock) {
+    const uint32_t mask = NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION;
+    g_h743_model.cache_enable_result = NX_ARCH_CACHE_IO;
+    const auto result =
+        nx_stm32h743_system_start(&g_nx_stm32h743_system, 32000000U, mask, 8U);
+    EXPECT_EQ(result.primary, NX_ERROR_IO);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_EQ(g_h743_model.cache_disable_core_hz, 32000000U);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
+    EXPECT_FALSE(g_h743_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(g_h743_model.timer.CR1, 0U);
+    EXPECT_FALSE(nx_arch_irq_is_masked());
+}
+TEST_F(H743System, FailedCacheRollbackRetainsOwnersAndDefersClockRestoration) {
+    const uint32_t mask = NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION;
+    g_h743_model.cache_enable_result = NX_ARCH_CACHE_IO;
+    g_h743_model.cache_disable_result = NX_ARCH_CACHE_IO;
+    const auto result =
+        nx_stm32h743_system_start(&g_nx_stm32h743_system, 32000000U, mask, 8U);
+    EXPECT_EQ(result.primary, NX_ERROR_IO);
+    EXPECT_EQ(result.cleanup, NX_ERROR_IO);
+    EXPECT_EQ(result.remaining_effects,
+              NX_STM32H743_EFFECT_DIVIDER | NX_STM32H743_EFFECT_CACHE);
+    EXPECT_EQ(g_nx_stm32h743_system.cache.owned_mask, mask);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 32000000U);
+    EXPECT_NE(g_h743_model.core->CCR & SCB_CCR_DC_Msk, 0U);
+    EXPECT_FALSE(g_nx_stm32h743_system.started);
+    EXPECT_FALSE(nx_arch_irq_is_masked());
+    g_h743_model.cache_disable_result = NX_ARCH_CACHE_OK;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U), NX_SUCCESS);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
+    EXPECT_EQ(g_nx_stm32h743_system.remaining_effects, 0U);
+}
+TEST_F(H743System, CacheOffNeverInvokesColdCacheControl) {
+    ASSERT_EQ(Start(32000000U).primary, NX_SUCCESS);
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U), NX_SUCCESS);
+    EXPECT_EQ(g_h743_model.cache_enable_calls, 0U);
+    EXPECT_EQ(g_h743_model.cache_disable_calls, 0U);
+}
+TEST_F(H743System, CacheAdmissionRejectionDoesNotInventCleanupOwnership) {
+    const uint32_t mask = NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION;
+    g_h743_model.cache_enable_result = NX_ARCH_CACHE_STATE;
+    const auto result =
+        nx_stm32h743_system_start(&g_nx_stm32h743_system, 32000000U, mask, 8U);
+    EXPECT_EQ(result.primary, NX_ERROR_BUSY);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_EQ(g_h743_model.cache_disable_calls, 0U);
+    EXPECT_EQ(g_nx_stm32h743_system.cache.owned_mask, 0U);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
+}
+TEST_F(H743System, StaleCacheResponsibilityCannotEnterAnotherColdEpoch) {
+    g_nx_stm32h743_system.cache.selector_pending = true;
+    EXPECT_EQ(Start().primary, NX_ERROR_BUSY);
+    EXPECT_EQ(g_h743_model.writes, 0U);
+    EXPECT_EQ(g_h743_model.cache_enable_calls, 0U);
+    g_nx_stm32h743_system.cache.selector_pending = false;
+    g_nx_stm32h743_system.cache.owned_mask = NX_ARCH_CACHE_DATA;
+    EXPECT_EQ(Start().primary, NX_ERROR_BUSY);
+    EXPECT_EQ(g_h743_model.writes, 0U);
+}
+TEST_F(H743System, DividerRestorationRefusalRetainsOnlyDividerResponsibility) {
+    ASSERT_EQ(Start(32000000U).primary, NX_SUCCESS);
+    g_h743_model.ignore_write = &g_h743_model.rcc.CR;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U),
+              NX_ERROR_IO);
+    EXPECT_EQ(g_nx_stm32h743_system.remaining_effects,
+              NX_STM32H743_EFFECT_DIVIDER);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 32000000U);
+    g_h743_model.ignore_write = nullptr;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U), NX_SUCCESS);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
+}
+TEST_F(H743System, DividerStartAndRollbackTimeoutsPreserveBothFailureReasons) {
+    g_h743_model.hold_divider_ready = true;
+    g_h743_model.hold_divider_restore = true;
+    const auto result = Start(32000000U);
+    EXPECT_EQ(result.primary, NX_ERROR_TIMEOUT);
+    EXPECT_EQ(result.cleanup, NX_ERROR_TIMEOUT);
+    EXPECT_EQ(result.remaining_effects, NX_STM32H743_EFFECT_DIVIDER);
+    EXPECT_FALSE(g_nx_stm32h743_system.started);
+    EXPECT_FALSE(g_h743_model.irq_enabled[TIM2_IRQn]);
+    g_h743_model.hold_divider_restore = false;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U), NX_SUCCESS);
+    EXPECT_EQ(g_nx_stm32h743_system.remaining_effects, 0U);
+}
+TEST_F(H743System, UnknownCacheCombinationRejectsWithoutHardwareEffects) {
+    for (uint32_t mask :
+         {NX_ARCH_CACHE_DATA, NX_ARCH_CACHE_INSTRUCTION, 4U, UINT32_MAX}) {
+        EXPECT_EQ(nx_stm32h743_system_start(&g_nx_stm32h743_system, 64000000U,
+                                            mask, 8U)
+                      .primary,
+                  NX_ERROR_INVALID);
+        EXPECT_EQ(g_h743_model.writes, 0U);
+        EXPECT_EQ(g_h743_model.cache_enable_calls, 0U);
+    }
+}
+TEST_F(H743System, SelectorOnlyRollbackFailureKeepsCpuAndClockResponsibility) {
+    const uint32_t mask = NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION;
+    g_h743_model.cache_selector_failure = true;
+    g_h743_model.cache_disable_result = NX_ARCH_CACHE_IO;
+    const auto result =
+        nx_stm32h743_system_start(&g_nx_stm32h743_system, 32000000U, mask, 8U);
+    EXPECT_EQ(result.primary, NX_ERROR_IO);
+    EXPECT_EQ(result.cleanup, NX_ERROR_IO);
+    EXPECT_EQ(result.remaining_effects,
+              NX_STM32H743_EFFECT_DIVIDER | NX_STM32H743_EFFECT_CACHE);
+    EXPECT_EQ(g_nx_stm32h743_system.cache.owned_mask, 0U);
+    EXPECT_TRUE(g_nx_stm32h743_system.cache.selector_pending);
+    EXPECT_EQ(g_nx_stm32h743_system.cache.saved_selector, 1U);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 32000000U);
+    EXPECT_EQ(g_h743_model.core->CCR & (SCB_CCR_DC_Msk | SCB_CCR_IC_Msk), 0U);
+    EXPECT_EQ(g_h743_model.cache_disable_calls, 1U);
+    g_h743_model.cache_disable_result = NX_ARCH_CACHE_OK;
+    EXPECT_EQ(nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U), NX_SUCCESS);
+    EXPECT_FALSE(g_nx_stm32h743_system.cache.selector_pending);
+    EXPECT_EQ(g_nx_stm32h743_system.remaining_effects, 0U);
+    EXPECT_EQ(g_h743_model.actual_core_hz, 64000000U);
 }

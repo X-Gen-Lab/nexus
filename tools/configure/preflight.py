@@ -61,6 +61,16 @@ def _modern_selected(result):
                               f"RCC_{gate_register}_{uart}EN) != 0u")
             source += _reject(f"(NX_{hook}_READ(&RCC->{mux_register}) & {mux}) != 0u")
             source += _reject(f"!NX_{hook}_IRQ_AVAILABLE((IRQn_Type){uart}_IRQn)")
+            if h7 and item.get("mode") == "dma-tx":
+                source += _reject(
+                    "!NX_H743_IRQ_AVAILABLE(DMA1_Stream0_IRQn)")
+                source.append(
+                    "    if ((NX_H743_READ(&RCC->AHB1ENR) & "
+                    "RCC_AHB1ENR_DMA1EN) != 0u) {")
+                source += _reject(
+                    "NX_H743_READ(&DMA1_Stream0->CR) != 0u || "
+                    "NX_H743_READ(&DMAMUX1_Channel0->CCR) != 0u", indent=8)
+                source.append("    }")
         for pin in item["pins"]:
             name = pin["pin"]
             pads.setdefault(name[1], set()).add(int(name[2:]))

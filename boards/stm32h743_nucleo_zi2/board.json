@@ -28,8 +28,7 @@
     "Software reference only; actual PCB revision, regulator fitting and solder bridges uninspected",
     "LED1 PB0 requires SB39 ON and SB47 OFF; alternative PA5 fitting is a different reference route",
     "USART3 PD8/PD9 ST-LINK VCP requires reviewed SB19/SB12 path; actual electrical path unknown",
-    "No physical HIL has executed; power entry, clock accuracy, serial traffic and safe GPIO levels unqualified",
-    "Only HSI64 Cache-off GPIOB PB0/USART3 IRQ bytes are implemented; DMA, dynamic PLL, STOP and bootloader handoff are excluded"
+    "No physical HIL has executed; power entry, clock accuracy, DMA/cache coherence, serial traffic and safe GPIO levels unqualified"
   ],
   "provenance": [
     {

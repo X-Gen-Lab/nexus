@@ -41,9 +41,15 @@
         }
       ],
       "modes": [
-        "irq-bytes"
+        "irq-bytes",
+        "dma-tx"
       ],
-      "source": "DS12110 Rev11 alternate-function table PD8/PD9 AF7 USART3; actual CMSIS IRQ39; UM2407 Rev6 VCP default SB19/SB12 ON. Physical fitting unknown."
+      "source": "DS12110 Rev11 alternate-function table PD8/PD9 AF7 USART3; actual CMSIS IRQ39; UM2407 Rev6 VCP default SB19/SB12 ON. Physical fitting unknown. RM0433 DMA1 stream0/DMAMUX1 channel0, USART3_TX request46; official ST H7 HAL v1.11.5 DMA request table.",
+      "mode_dma": {
+        "dma-tx": [
+          "DMA1:stream0:channel46"
+        ]
+      }
     }
   ]
 }

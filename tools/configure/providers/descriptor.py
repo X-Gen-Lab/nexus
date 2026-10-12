@@ -75,6 +75,8 @@ _DESCRIPTORS = MappingProxyType({
         ("cmsis_device_h7", "stm32h7_cmsis")), owned_payload=(
             "soc/stm32h743/CMakeLists.txt", "soc/stm32h743/system.c",
             "soc/stm32h743/drivers/gpio.c", "soc/stm32h743/drivers/uart.c",
+            "soc/stm32h743/drivers/uart_dma.c",
+            "soc/stm32h743/private/stm32h743_dma.h",
             "soc/stm32h743/private/stm32h743_system.h",
             "soc/stm32h743/private/stm32h743_provider.h",
             "soc/stm32h743/power_boot.S",

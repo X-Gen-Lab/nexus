@@ -57,9 +57,9 @@ nx_result_t nx_stm32h743_gpio_clock_enable(unsigned port_index);
 /** \brief Source-reviewed PD8/PD9 AF7; caller owns Board bridge choice. */
 nx_result_t nx_stm32h743_usart3_pins_prepare(void);
 /**
- * \brief Configure explicit byte ring,8N1,PCLK64/PRESC1; no FIFO/DMA.
+ * \brief Configure explicit byte ring,8N1,PCLK/PRESC1; no FIFO/DMA.
  * \param[in,out] port: Exact static instance with unused hardware and ring.
- * \param[in] clock_hz: Verified64MHz APB1 fixed profile.
+ * \param[in] clock_hz: Verified 32MHz or 64MHz APB1 fixed profile.
  * \param[in] poll_limit: Nonzero bounded transmitter/receiver ACK budget.
  * \return Success or error; retained/closing expose failed hardware cleanup.
  * \note Privileged single task owner; IRQ only moves one TX and one RX byte.
@@ -70,6 +70,11 @@ nx_result_t nx_stm32h743_uart_initialize(nx_stm32h743_uart_state_t* port,
                                          uint32_t poll_limit);
 /** \brief Move at most one byte each direction and latch TC/error facts. */
 void nx_stm32h743_uart_irq(nx_stm32h743_uart_state_t* port);
+/** \brief Private bounded RX path shared by IRQ-byte and DMA TX providers. */
+void nx_stm32h743_uart_receive_irq(nx_stm32h743_uart_state_t* port,
+                                   uint32_t status);
+/** \brief Publish an IRQ hint while accounting for a retained wake observer. */
+void nx_stm32h743_uart_signal(nx_stm32h743_uart_state_t* port);
 #ifndef NX_H743_UART_POLL
 #define NX_H743_UART_POLL(port) ((void)(port))
 #endif

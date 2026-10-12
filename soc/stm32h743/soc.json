@@ -275,7 +275,28 @@
     "external_count": 150
   },
   "clock_profiles": {
+    "hsi32-fixed-cache-off": {
+      "source": "hsi",
+      "input_hz": 64000000,
+      "core_hz": 32000000,
+      "apb1_hz": 32000000,
+      "apb2_hz": 32000000
+    },
+    "hsi32-fixed-cache-on": {
+      "source": "hsi",
+      "input_hz": 64000000,
+      "core_hz": 32000000,
+      "apb1_hz": 32000000,
+      "apb2_hz": 32000000
+    },
     "hsi64-fixed-cache-off": {
+      "source": "hsi",
+      "input_hz": 64000000,
+      "core_hz": 64000000,
+      "apb1_hz": 64000000,
+      "apb2_hz": 64000000
+    },
+    "hsi64-fixed-cache-on": {
       "source": "hsi",
       "input_hz": 64000000,
       "core_hz": 64000000,
@@ -298,7 +319,8 @@
     "USART3": {
       "kind": "uart",
       "modes": [
-        "irq-bytes"
+        "irq-bytes",
+        "dma-tx"
       ],
       "irq": [
         "USART3_IRQn"

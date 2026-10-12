@@ -24,6 +24,27 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"nx_stm32h743_gpio_stop(&{state}, {item.options.initial}u)"
     elif item.kind == "uart":
         options = item.options
+        dma = item.mode == "dma-tx"
+        owner = state
+        if dma:
+            state += ".uart"
+        clock = result["clock"]["apb1_hz"]
+        divisor = (clock + options.baud // 2) // options.baud
+        if not 16 <= divisor <= 0xffff:
+            fail("USART baud is not representable by the selected APB1 clock")
+        if dma:
+            try:
+                from ...emission import dma_regions
+            except ImportError:
+                from emission import dma_regions
+            # Reachability does not authorize unselected, uninitialized RAM.
+            memory = [region for region in result["memory"]
+                      if region["id"] == "axi-sram" and region["linker"]]
+            region_lines, region_count = dma_regions(name, {"memory": memory},
+                                                       engine="DMA1")
+            if region_count != 1:
+                fail("H743 DMA requires selected initialized AXI SRAM")
+            definitions += region_lines
         capacity = options.rx_capacity
         if type(capacity) is not int or not 1 <= capacity <= 4096:
             raise ValueError("H743 USART3 requires an explicit bounded byte ring")
@@ -40,10 +61,24 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
                         "    nx_result_t status = nx_stm32h743_usart3_pins_prepare();",
                         "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_stm32h743_uart_initialize(&{state}, 64000000u, 1000000u);",
-                        "}", "void USART3_IRQHandler(void);",
+                        ]
+        if dma:
+            definitions += [f"    {owner}.dma = DMA1;",
+                            f"    {owner}.tx = DMA1_Stream0;",
+                            f"    {owner}.mux = DMAMUX1_Channel0;",
+                            f"    {owner}.regions = s_nx_dma_regions_{name};",
+                            f"    {owner}.region_count = {region_count}u;",
+                            f"    return nx_stm32h743_uart_dma_initialize(&{owner}, {clock}u, 1000000u);"]
+        else:
+            definitions += [f"    return nx_stm32h743_uart_initialize(&{state}, {clock}u, 1000000u);"]
+        handler = "uart_dma_uart" if dma else "uart"
+        definitions += ["}", "void USART3_IRQHandler(void);",
                         r"/** \brief One selected controller, at most one TX/RX byte. */",
-                        f"void USART3_IRQHandler(void) {{ nx_stm32h743_uart_irq(&{state}); }}"]
+                        f"void USART3_IRQHandler(void) {{ nx_stm32h743_{handler}_irq(&{owner}); }}"]
+        if dma:
+            definitions += ["void DMA1_Stream0_IRQHandler(void);",
+                            r"/** \brief Selected DMA1 stream0 terminal observation. */",
+                            f"void DMA1_Stream0_IRQHandler(void) {{ nx_stm32h743_uart_dma_irq(&{owner}); }}"]
         stop = f"nx_uart_port_stop(&s_nx_face_{name})"
     else:
         raise ValueError("Unmaintained H743 constructor")

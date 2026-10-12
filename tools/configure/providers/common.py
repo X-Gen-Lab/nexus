@@ -250,7 +250,8 @@ def validate_selection(selection, route, provider, ram_size):
     elif kind == "exti":
         if not {"edge", "event_capacity", "irq_priority"}.issubset(selection):
             fail("EXTI requires edge, event capacity and IRQ priority")
-        if selection["edge"] not in {"rising", "falling", "both"}:
+        if (type(selection["edge"]) is not str or
+                selection["edge"] not in {"rising", "falling", "both"}):
             fail("Unsupported EXTI edge")
         integer(selection["event_capacity"], 1, min(4096, ram_size // 24), "EXTI event capacity")
     elif kind == "pwm":

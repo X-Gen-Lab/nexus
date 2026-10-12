@@ -15,11 +15,12 @@ def operations(item):
 
 
 def includes(result):
-    del result
-    return ['#include "stm32h743_provider.h"', 'void _init(void);',
-            'void _fini(void);',
-            r'/** \brief C runtime hooks; constructors use .init_array. */',
-            'void _init(void) {}', 'void _fini(void) {}']
+    source = ['#include "stm32h743_provider.h"']
+    if _dma(result):
+        source.append('#include "stm32h743_dma.h"')
+    return source + ['void _init(void);', 'void _fini(void);',
+                    r'/** \brief C runtime hooks; constructors use .init_array. */',
+                    'void _init(void) {}', 'void _fini(void) {}']
 
 
 def instance_declarations(item, result):
@@ -51,8 +52,15 @@ def _uart(result):
     return any(item.kind == "uart" for item in result.controllers)
 
 
+def _dma(result):
+    return any(item.kind == "uart" and item.mode == "dma-tx"
+               for item in result.controllers)
+
+
 def state_declarations(result):
     source = []
+    if _dma(result):
+        source.append('static uint32_t s_nx_dma_clocks_added;')
     if _ports(result):
         source.append('static uint32_t s_nx_gpio_clocks_added;')
     if _uart(result):
@@ -89,10 +97,12 @@ def state_declarations(result):
 
 
 def start_system(result):
+    from . import cache_mask
+    cache = f'{cache_mask(result["clock_profile"])}u'
     return preflight.emit(result) + [
         '    result.primary = nx_stm32h743_validate_identity();',
         '    if (result.primary != NX_SUCCESS) { return result; }',
-        '    nx_stm32h743_start_result_t system = nx_stm32h743_system_start(&g_nx_stm32h743_system, 1000000u);',
+        f'    nx_stm32h743_start_result_t system = nx_stm32h743_system_start(&g_nx_stm32h743_system, {result["clock"]["core_hz"]}u, {cache}, 1000000u);',
         '    if (system.primary != NX_SUCCESS) {',
         '        result.primary = system.primary;',
         '        result.cleanup = system.cleanup;',
@@ -109,6 +119,17 @@ def start_resources(result):
     source = [f'    s_nx_gpio_clocks_added = ~NX_H743_READ(&RCC->AHB4ENR) & ({gates});']
     if _uart(result):
         source += ['    s_nx_uart_clocks_added = ~NX_H743_READ(&RCC->APB1LENR) & RCC_APB1LENR_USART3EN;']
+    if _dma(result):
+        source += ['    s_nx_dma_clocks_added = ~NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN;',
+                   '    NX_H743_WRITE(&RCC->AHB1ENR, NX_H743_READ(&RCC->AHB1ENR) | RCC_AHB1ENR_DMA1EN);',
+                   '    nx_arch_dsb();',
+                   '    const bool dma_clock_ready = (NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u;',
+                   '    if (!dma_clock_ready || NX_H743_READ(&DMA1_Stream0->CR) != 0u ||',
+                   '        NX_H743_READ(&DMAMUX1_Channel0->CCR) != 0u || !NX_H743_IRQ_AVAILABLE(DMA1_Stream0_IRQn)) {',
+                   '        result.primary = dma_clock_ready ? NX_ERROR_BUSY : NX_ERROR_IO;',
+                   '        result.cleanup = nx_platform_stop();',
+                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+                   '        return result;', '    }']
     # Complete admission for every bank before taking any reversible pin lease.
     for bank, _ in ports:
         source += [f'    result.primary = nx_stm32h743_gpio_clock_enable({ord(bank) - ord("A")}u);',
@@ -152,6 +173,11 @@ def stop_system(result):
         for bank, _ in reversed(_ports(result)):
             source += [f'        nx_result_t restored_{bank.lower()} = restore_gpio{bank.lower()}();',
                        f'        if (restored_{bank.lower()} != NX_SUCCESS) {{ return restored_{bank.lower()}; }}']
+        if _dma(result):
+            source += ['        NX_H743_WRITE(&RCC->AHB1ENR, NX_H743_READ(&RCC->AHB1ENR) & ~s_nx_dma_clocks_added);',
+                       '        nx_arch_dsb();',
+                       '        if ((NX_H743_READ(&RCC->AHB1ENR) & s_nx_dma_clocks_added) != 0u) { return NX_ERROR_IO; }',
+                       '        s_nx_dma_clocks_added = 0u;']
         if _uart(result):
             source += ['        NX_H743_WRITE(&RCC->APB1LENR, NX_H743_READ(&RCC->APB1LENR) & ~s_nx_uart_clocks_added);',
                        '        nx_arch_dsb();',

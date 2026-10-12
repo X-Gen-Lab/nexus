@@ -14,6 +14,14 @@ class AdmissionInput(dict):
 
 
 class ColdPreflightGenerationTests(unittest.TestCase):
+    def test_h743_dma_rejects_live_lane_mux_and_vector_before_system_start(self):
+        source = self.start("tests/contracts/h743_assembly/dma.toml")
+        before = source[:source.index("nx_stm32h743_system_start")]
+        for resource in ("DMA1_Stream0_IRQn", "RCC_AHB1ENR_DMA1EN",
+                         "DMA1_Stream0->CR", "DMAMUX1_Channel0->CCR"):
+            self.assertIn(resource, before)
+        self.assertNotIn("NX_H743_WRITE", before)
+
     def test_kernel_owner_name_does_not_become_external_controller_irq(self):
         for backend, identity in (("freertos", "freertos"),
                                   ("threadx", "threadx")):

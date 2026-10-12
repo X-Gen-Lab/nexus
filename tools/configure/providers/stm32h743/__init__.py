@@ -20,18 +20,26 @@ CAN_CONTROLLERS = ()
 ETH_CONTROLLER = None
 USB_CONTROLLER = None
 SPI_REQUIRES_ENDPOINT = False
-DMA_VECTOR = None
-DMA_TOPOLOGY = (frozenset(), range(0), range(0))
+DMA_VECTOR = "Stream"
+DMA_TOPOLOGY = (frozenset((1,)), range(1), range(46, 47))
 DMA_MEMORY_ENGINES = ("DMA1", "DMA2", "BDMA", "MDMA")
 CONDITIONAL_PACKAGE_PADS = ("PC2_C", "PC3_C")
 CLOCK_PROFILES = MappingProxyType({
-    "hsi64-fixed-cache-off": MappingProxyType({
-        "source": "hsi", "input_hz": 64000000, "core_hz": 64000000,
-        "apb1_hz": 64000000, "apb2_hz": 64000000})})
+    f"hsi{mhz}-fixed-cache-{cache}": MappingProxyType({
+        "source": "hsi", "input_hz": 64000000, "core_hz": mhz * 1000000,
+        "apb1_hz": mhz * 1000000, "apb2_hz": mhz * 1000000})
+    for mhz in (32, 64) for cache in ("off", "on")})
 LIMITS = MappingProxyType({"uart_baud": (977, 1000000)})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
-    ("uart", "irq-bytes"): "uart"})
+    ("uart", "irq-bytes"): "uart", ("uart", "dma-tx"): "uart_dma"})
+
+
+def cache_mask(profile):
+    """One exact selected profile establishes compile-time cache ownership."""
+    if profile not in CLOCK_PROFILES:
+        common.fail(f"Unmaintained H743 clock/cache profile: {profile}")
+    return 3 if profile.endswith("-cache-on") else 0
 
 
 def mode_implementation(kind, mode):
@@ -74,8 +82,10 @@ def validate_selection(selection, route):
 
 
 def validate_dma(route, mode, normalize):
-    del route, mode, normalize
-    common.fail("H743 DMA provider is unimplemented")
+    expected = (("DMA1:stream0:channel46",)
+                if route["controller"] == "USART3" and mode == "dma-tx"
+                else None)
+    common.validate_dma(route, mode, expected, "stm32h743", normalize)
 
 
 def validate_dma_resource(resource):

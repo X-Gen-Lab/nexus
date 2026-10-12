@@ -221,6 +221,29 @@ void nx_stm32h743_uart_irq(nx_stm32h743_uart_state_t* p) {
         if (!loaded)
             observe_tc(p, now);
     }
+    nx_arch_irq_restore(guard);
+    nx_stm32h743_uart_receive_irq(p, status);
+}
+
+void nx_stm32h743_uart_signal(nx_stm32h743_uart_state_t* p) {
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    const nx_irq_wake_t* wake = p->wake;
+    if (wake != NULL && p->wake_publishers != UINT16_MAX)
+        p->wake_publishers++;
+    else
+        wake = NULL;
+    nx_arch_irq_restore(guard);
+    (void)nx_irq_wake_signal(wake);
+    if (wake != NULL) {
+        guard = nx_arch_irq_save();
+        p->wake_publishers--;
+        nx_arch_irq_restore(guard);
+    }
+}
+
+void nx_stm32h743_uart_receive_irq(nx_stm32h743_uart_state_t* p,
+                                   uint32_t status) {
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
     uint32_t errors = status & RX_ERRORS;
     if ((status & USART_ISR_RXNE_RXFNE) != 0U) {
         uint8_t byte = (uint8_t)NX_H743_READ(&p->registers->RDR);
@@ -236,18 +259,8 @@ void nx_stm32h743_uart_irq(nx_stm32h743_uart_state_t* p) {
         loss(p);
     if (errors != 0U)
         NX_H743_WRITE(&p->registers->ICR, errors);
-    const nx_irq_wake_t* wake = p->wake;
-    if (wake != NULL && p->wake_publishers != UINT16_MAX)
-        p->wake_publishers++;
-    else
-        wake = NULL;
     nx_arch_irq_restore(guard);
-    (void)nx_irq_wake_signal(wake);
-    if (wake != NULL) {
-        guard = nx_arch_irq_save();
-        p->wake_publishers--;
-        nx_arch_irq_restore(guard);
-    }
+    nx_stm32h743_uart_signal(p);
 }
 static nx_result_t read_bytes(void* context, uint8_t* output, size_t capacity,
                               size_t* count) {
@@ -363,7 +376,8 @@ nx_result_t nx_stm32h743_uart_initialize(nx_stm32h743_uart_state_t* p,
     if (p == NULL || p->registers == NULL || p->baud == 0U || limit == 0U ||
         !span(p->rx_storage, p->rx_capacity))
         return NX_ERROR_INVALID;
-    if (p->profile != NX_UART_RX_BYTES || clock != 64000000U)
+    if (p->profile != NX_UART_RX_BYTES ||
+        (clock != 64000000U && clock != 32000000U))
         return NX_ERROR_UNSUPPORTED;
     if (p->irq != USART3_IRQn)
         return NX_ERROR_UNSUPPORTED;

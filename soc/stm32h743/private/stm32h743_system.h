@@ -6,18 +6,36 @@
 #ifndef NX_STM32H743_SYSTEM_H
 #define NX_STM32H743_SYSTEM_H
 #include "nexus/arch/arch.h"
+#include "nexus/arch/cache_control.h"
 #include "nexus/core/status.h"
 #include "stm32h743xx.h"
+#ifdef NX_H743_MODEL
+#define NX_H743_CACHE_CONTROL_ENABLED 1
+#else
+#include "nexus_config.h"
+#ifndef NEXUS_SOC_CACHE_MASK
+#error "H743 requires the generated exact cache selection"
+#endif
+#if NEXUS_SOC_CACHE_MASK != 0U && NEXUS_SOC_CACHE_MASK != 3U
+#error "H743 cache selection must be off or both reviewed caches"
+#endif
+#define NX_H743_CACHE_CONTROL_ENABLED (NEXUS_SOC_CACHE_MASK != 0U)
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define NX_STM32H743_EFFECT_TIMER 1U
+#define NX_STM32H743_EFFECT_TIMER   1U
+#define NX_STM32H743_EFFECT_DIVIDER 2U
+#define NX_STM32H743_EFFECT_CACHE   4U
 typedef struct nx_stm32h743_system {
     RCC_TypeDef* rcc;
     FLASH_TypeDef* flash;
     PWR_TypeDef* power;
     TIM_TypeDef* timer;
     SCB_Type* core;
+#if NX_H743_CACHE_CONTROL_ENABLED
+    nx_arch_cache_control_t cache;
+#endif
     uint64_t overflow_us;
     uint32_t core_hz;
     uint32_t reset_cause;
@@ -39,21 +57,30 @@ extern nx_stm32h743_system_t g_nx_stm32h743_system;
  */
 nx_result_t nx_stm32h743_system_preflight(const nx_stm32h743_system_t* system);
 /**
- * \brief           Establish the one 1MHz TIM2 on the fixed HSI64 profile.
+ * \brief           Establish one 1MHz TIM2 on an explicit cold HSI profile.
  * \param[in,out]   system: Cold privileged task context; consumers quiescent.
+ * \param[in]       core_hz: Exactly 64000000 or 32000000, selected at assembly.
+ * \param[in]       cache_mask: Zero, or DATA and INSTRUCTION together.
  * \param[in]       poll_limit: Positive bounded hardware observation budget.
- * \return          Primary/cleanup result and retained timer responsibility.
+ * \return          Primary/cleanup result and retained hardware responsibility.
  * \note            HSI64 and LDO are reset boot prerequisites, not runtime
- *                  acquisitions. Poll counts are not measured elapsed time.
+ *                  acquisitions. The HSI32 profile owns DIV2 until withdrawal.
+ *                  Only observed divider propagation permits timer start.
+ *                  Poll counts are not measured elapsed time. No running-state
+ *                  frequency transition or deadline migration is supplied.
  */
 nx_stm32h743_start_result_t
-nx_stm32h743_system_start(nx_stm32h743_system_t* system, uint32_t poll_limit);
+nx_stm32h743_system_start(nx_stm32h743_system_t* system, uint32_t core_hz,
+                          uint32_t cache_mask, uint32_t poll_limit);
 /**
- * \brief           Withdraw reserved TIM2/IRQ after all consumers have joined.
+ * \brief           Withdraw TIM2/IRQ, owned caches and then the HSI divider.
  * \param[in,out]   system: Exclusive owner; no scheduler or device consumers.
  * \param[in]       poll_limit: Positive bounded hardware observation budget.
  * \return          Success after readback; failures retain effects for retry.
  * \note            HSI/LDO and boot Flash latency remain required CPU state.
+ *                  All DMA and CPU users have joined before cache withdrawal.
+ *                  Failed cache cleanup retains its context and divider;
+ *                  no clock restoration proceeds under unknown cache state.
  */
 nx_result_t nx_stm32h743_system_stop(nx_stm32h743_system_t* system,
                                      uint32_t poll_limit);
@@ -93,6 +120,13 @@ void TIM2_IRQHandler(void);
 
 #ifndef NX_H743_READ
 #define NX_H743_READ(reg) (*(reg))
+#endif
+#ifndef NX_H743_CACHE_ENABLE
+#define NX_H743_CACHE_ENABLE(control, mask)                                    \
+    nx_arch_cache_cold_enable((control), (mask))
+#endif
+#ifndef NX_H743_CACHE_DISABLE
+#define NX_H743_CACHE_DISABLE(control) nx_arch_cache_cold_disable(control)
 #endif
 #ifndef NX_H743_WRITE
 #define NX_H743_WRITE(reg, value) (*(reg) = (uint32_t)(value))

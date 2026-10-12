@@ -18,7 +18,11 @@ static void task_entry(void* context) {
 #endif
 #ifdef NX_H743_IO_FIXTURE
 static nx_uart_tx_request_t s_request;
+#ifdef NX_H743_DMA_FIXTURE
+_Alignas(32) static uint8_t s_data[32] = {0x12U, 0x34U};
+#else
 static uint8_t s_data[2] = {0x12U, 0x34U};
+#endif
 #endif
 int main(void) {
     nx_platform_start_result_t start = nx_platform_start();
