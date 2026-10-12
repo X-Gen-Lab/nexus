@@ -8,8 +8,8 @@
  */
 #include "nexus/core/fault.h"
 #include "stm32u575_system.h"
+#include "terminal_watchdog.h"
 #include "u575_model.h"
-#include <csignal>
 #include <gtest/gtest.h>
 #include <unistd.h>
 class U575System : public testing::Test {
@@ -154,17 +154,12 @@ TEST_F(U575System, PreRamSetupTouchesCpuWithoutClockOrContextState) {
     EXPECT_EQ(0U, g_u575_model.writes);
 }
 namespace {
-volatile std::sig_atomic_t s_fault_observed;
 bool s_fault_exit;
-void AlarmAfterReturningFault(int) {
-    _exit(s_fault_observed == 1 ? 42 : 92);
-}
 void PrepareTimerFault(bool exit_observer, bool refuse_irq = false) {
     nx_u575_model_reset();
     if (nx_stm32u575_system_start(&g_nx_stm32u575_system, 8U).primary !=
         NX_SUCCESS)
         _exit(90);
-    s_fault_observed = 0;
     s_fault_exit = exit_observer;
     g_u575_model.timer.SR = TIM_SR_UIF;
     g_u575_model.ignore_write = &g_u575_model.timer.SR;
@@ -184,9 +179,9 @@ extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
         g_u575_model.timer.DIER == 0U &&
         (g_u575_model.timer.CR1 & TIM_CR1_CEN) == 0U &&
         g_u575_model.irq_enabled[TIM2_IRQn] == g_u575_model.hold_irq_off;
-    s_fault_observed = valid ? 1 : -1;
     if (s_fault_exit)
         _exit(valid ? 42 : 91);
+    nexus_test::RecordTerminalObservation(valid);
 }
 TEST_F(U575System, IsolatedTimerFaultStillOffersMaskedTerminalObservation) {
     EXPECT_EXIT(
@@ -207,26 +202,18 @@ TEST_F(U575System, UnisolatedTimerFaultOffersMaskedNonreturningObservation) {
         testing::ExitedWithCode(42), "");
 }
 TEST_F(U575System, ReturningObserverCannotResumeIsolatedTimerProgress) {
-    EXPECT_EXIT(
-        {
-            PrepareTimerFault(false);
-            std::signal(SIGALRM, AlarmAfterReturningFault);
-            alarm(1U);
-            nx_stm32u575_system_timer_irq(&g_nx_stm32u575_system);
-            _exit(99);
-        },
-        testing::ExitedWithCode(42), "");
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        PrepareTimerFault(false);
+        nx_stm32u575_system_timer_irq(&g_nx_stm32u575_system);
+        _exit(99);
+    }));
 }
 TEST_F(U575System, ReturningObserverCannotResumeUnisolatedTimerProgress) {
-    EXPECT_EXIT(
-        {
-            PrepareTimerFault(false, true);
-            std::signal(SIGALRM, AlarmAfterReturningFault);
-            alarm(1U);
-            nx_stm32u575_system_timer_irq(&g_nx_stm32u575_system);
-            _exit(99);
-        },
-        testing::ExitedWithCode(42), "");
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        PrepareTimerFault(false, true);
+        nx_stm32u575_system_timer_irq(&g_nx_stm32u575_system);
+        _exit(99);
+    }));
 }
 TEST_F(U575System, FaultBeforeSnapshotMaskCannotResumeDeadlineConsumer) {
     EXPECT_EXIT(

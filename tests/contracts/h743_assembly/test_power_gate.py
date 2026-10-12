@@ -255,6 +255,7 @@ class StartupClosure(unittest.TestCase):
         command = [compiler, '-mcpu=cortex-m7', '-mthumb', '-mfpu=fpv5-d16',
             '-mfloat-abi=hard', '-fshort-enums', '-Os', '-ffunction-sections',
             '-fdata-sections', '-DNEXUS_ARCH_HAS_DWT_CYCCNT=1', '-DSTM32H743xx',
+            '-I' + str(generated),
             '-I' + str(ROOT / 'soc/stm32h743/private'),
             '-I' + str(ROOT / 'core/include'), '-I' + str(ROOT / 'arch/include'),
             '-I' + str(ROOT / 'vendors/st/cmsis_device_h7/Include'),

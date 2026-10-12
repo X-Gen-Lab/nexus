@@ -228,7 +228,7 @@ extern "C" void nx_gd32_model_clock_poll(void) {
         PMU_CS &= ~PMU_CS_HDSRF;
     if (!hold_switch)
         RCU_CFG0 = (RCU_CFG0 & ~(uint32_t)RCU_CFG0_SCSS) |
-                   ((RCU_CFG0 & RCU_CFG0_SCS) << 2U);
+                   ((RCU_CFG0 & (uint32_t)RCU_CFG0_SCS) << 2U);
 }
 /** \brief Decode observed clock selection and bus dividers, not owned state.
  */

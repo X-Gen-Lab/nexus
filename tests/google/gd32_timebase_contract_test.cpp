@@ -11,7 +11,7 @@ extern "C" {
 #include "nexus/core/fault.h"
 #include "private/system.h"
 }
-#include <csignal>
+#include "terminal_watchdog.h"
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -38,10 +38,6 @@ class ClockPort {
                  unsigned line));
 };
 struct ParkSignal {};
-volatile std::sig_atomic_t returning_fault_seen;
-void AlarmAfterReturningFault(int) {
-    _exit(returning_fault_seen == 1 ? 42 : 92);
-}
 ClockPort* clock_port;
 bool hold_timer_count;
 bool hold_timer_update_clear;
@@ -383,39 +379,32 @@ TEST_F(Gd32Timebase, AckFailureBeforeSnapshotMaskCannotPublishStaleTime) {
 }
 
 TEST_F(Gd32Timebase, ReturningObserverCannotResumeIsolatedTimerProgress) {
-    EXPECT_EXIT(
-        {
-            if (nx_gd32_soc_start() != 0)
-                _exit(90);
-            TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
-            EXPECT_CALL(clock_mock, TimerWrite(&TIMER_INTF(TIMER1),
-                                               ~(uint32_t)TIMER_INTF_UPIF))
-                .WillOnce([](volatile uint32_t*, uint32_t) {});
-            returning_fault_seen = 0;
-            EXPECT_CALL(clock_mock, Observe(NX_FAULT_PLATFORM, NX_ERROR_IO,
-                                            testing::_, testing::_))
-                .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
-                             unsigned line) {
-                    uint32_t bank = (uint32_t)TIMER1_IRQn / 32U;
-                    uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32U);
-                    returning_fault_seen =
-                        file != nullptr && line != 0U &&
-                                g_gd32_model_mask == 1U &&
-                                nx_gd32_timebase_error() == NX_ERROR_IO &&
-                                (RCU_APB1EN & RCU_APB1EN_TIMER1EN) != 0U &&
-                                TIMER_DMAINTEN(TIMER1) == 0U &&
-                                (TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) == 0U &&
-                                (NVIC->ISER[bank] & bit) == 0U
-                            ? 1
-                            : -1;
-                });
-            g_gd32_model_isr = true;
-            std::signal(SIGALRM, AlarmAfterReturningFault);
-            alarm(1U);
-            TIMER1_IRQHandler();
-            _exit(99);
-        },
-        testing::ExitedWithCode(42), "");
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        if (nx_gd32_soc_start() != 0)
+            _exit(90);
+        TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
+        EXPECT_CALL(clock_mock,
+                    TimerWrite(&TIMER_INTF(TIMER1), ~(uint32_t)TIMER_INTF_UPIF))
+            .WillOnce([](volatile uint32_t*, uint32_t) {});
+        EXPECT_CALL(clock_mock, Observe(NX_FAULT_PLATFORM, NX_ERROR_IO,
+                                        testing::_, testing::_))
+            .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
+                         unsigned line) {
+                uint32_t bank = (uint32_t)TIMER1_IRQn / 32U;
+                uint32_t bit = UINT32_C(1) << ((uint32_t)TIMER1_IRQn % 32U);
+                const bool valid =
+                    file != nullptr && line != 0U && g_gd32_model_mask == 1U &&
+                    nx_gd32_timebase_error() == NX_ERROR_IO &&
+                    (RCU_APB1EN & RCU_APB1EN_TIMER1EN) != 0U &&
+                    TIMER_DMAINTEN(TIMER1) == 0U &&
+                    (TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN) == 0U &&
+                    (NVIC->ISER[bank] & bit) == 0U;
+                nexus_test::RecordTerminalObservation(valid);
+            });
+        g_gd32_model_isr = true;
+        TIMER1_IRQHandler();
+        _exit(99);
+    }));
 }
 
 TEST_F(Gd32Timebase, ForeignReservedTimerRejectsBeforeClockMutation) {

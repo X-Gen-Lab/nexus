@@ -5,7 +5,7 @@
 | 层与目录 | 拥有的责任 | 依赖边界 |
 |---|---|---|
 | `core/` | 中性结果、绝对 monotonic deadline、caller-owned request 状态 | C11；无 Board、RTOS、SDK |
-| `arch/` | 编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot | 无 SDK／OS；原语编译与整平台资格分别记录 |
+| `arch/` | 编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot；显式选入的 Cache／MPU／SAU 与 Secure CMSE 权限观察 | 无 SDK／OS／SoC 政策；原语编译与整平台资格分别记录 |
 | `soc/<family>/` | F407、F470、G474、H743、U575 的精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；各家族只开放已维护模式 |
 | `boards/<board>/board.json` | 精确型号、已审 route、晶振声明、safe initial、来源与未知 PCB 项 | 只读资源包；不创建产品任务 |
 | `io/` | typed 多态合同、共享操作表、DMA/stream/wake；可选 CAN、USB、Ethernet 与高级 timer 合同 | 公共头不含厂商类型；Native 是行为模型 |
@@ -25,22 +25,27 @@ CMake 从同一 resolved 结果读取选中的 controller kind/mode，仅查询�
 按组合补齐。STM 空配置不编译外设驱动；GD 保留 system/timebase 所需的基础
 SDK 源码。最终 section GC 继续消除未引用函数，编译裁剪与镜像裁剪分别验证。
 
-G474 的 HSE24/170 MHz 参考配置已经通过真实生成 factory、时钟／GPIO／LPUART
-算法的主机执行，以及 empty／selected × 裸机／FreeRTOS 四个 ARM graph。
+G474 的 HSE24/170 MHz 参考配置维护真实生成 factory、时钟／GPIO／LPUART／EXTI
+算法，以及 empty／GPIO-UART／selected-EXTI 的裸机／FreeRTOS ARM 夹具。
+PA0/PA1 EXTI 使用独立 caller-sized event ring，并拥有自己的中断源撤回责任。
 空配置没有 GPIO／UART provider；选中 LPUART 的 IRQ91 和系统 TIM2 的 IRQ28
 实际绑定到向量字节。FreeRTOS 保留真实 SVC／PendSV／SysTick，170 MHz 时钟和
 1 kHz Tick 对应 reload169999。启动先拒绝被占用的 LPUART 控制寄存器，再改动
 系统时钟；失败构造对象进入逆序清理，撤销失败仍保留时钟／引脚／状态责任。
 这些是独立开发证据，未建立参考 PCB、实板时序或 ThreadX G474 支持。
 
-H743 与 U575 分别增加 M7／M33 的具体 SoC 装配。H743 维护 HSI64、LDO、
-Cache off、TIM2、PB0 与 USART3 PD8/PD9；U575 维护外部已确认的 TZEN=0、
+H743 与 U575 分别增加 M7／M33 的具体 SoC 装配。H743 维护 LDO、固定
+HSI32／HSI64 × Cache off/on、TIM2、PB0 与 USART3 PD8/PD9；UART RX 仍为
+IRQ bytes，TX 可选 IRQ 或有限 DMA。U575 默认 Platform 维护外部已确认的 TZEN=0、
 SWAP_BANK=0、MSIS4 MHz、Cache off、TIM2、PC7 与 USART1 PA9/PA10。
-两者都只开放 GPIO／IRQ UART 字节与裸机／FreeRTOS，不从芯片事实自动派生
-DMA、cache、安全域或全外设支持。H743 在主 RAM 可写前执行独立的有界电源
-入口；U575 不改变 option bytes 或安全归属。精确范围见
-[SoC 完善合同](../design/soc-refinement.md)，实际结果见
-[本轮执行记录](soc-refinement-verification.md)。
+这两类 Platform 均维护裸机／FreeRTOS，不从芯片事实自动派生其他外设支持。
+H743 在主 RAM 可写前执行独立的有界电源入口。U575 另有无 OS 的 TZEN=1
+双域参考：两个 Runtime 镜像、冷归属 owner 与同步 CMSE GPIO gateway，独立于
+TZEN=0 factory。两条 U575 路径都不修改 option bytes，双域参考要求外部预先
+完成其启动配置。精确范围见 [SoC 完善合同](../design/soc-refinement.md) 与
+[U575 双域合同](../design/u575-trustzone-contract.md)；
+[初次执行记录](soc-refinement-verification.md) 保留历史资格，
+[扩展执行记录](soc-extensions-verification.md) 单独记录后续证据。
 
 Board 不复制 SoC 驱动。GD32 的 I2C/PWM/ADC/EXTI route、STM32 的高级控制器 route
 可以在明确标为软件测试夹具的外部 Board 包中编译／链接；这不意味着三块参考 PCB
@@ -108,7 +113,9 @@ FreeRTOS adapter；安装包用 `find_package(Nexus REQUIRED COMPONENTS Runtime)
 memory/clock/IRQ 资源、设备 provider、安全策略及最终固件仍由外部工程实现。
 九核的 FPU/MVE/cache/MPU/DWT/security/SAU 都是显式事实，合法组合和精确 kernel
 port 经解析器选择，不能靠 CMake cache 推断或覆盖。硬件与产品 qualification
-仍独立；单区域 MPU/SAU 机制不提供用户 task 隔离或双世界 gateway。
+仍独立；单区域 MPU/SAU 机制自身不提供用户 task 隔离或双世界 gateway。
+U575 双域参考显式组合独立 SoC 归属 owner 和外部镜像分区，并不是 Runtime
+或默认 Platform 自动生成的能力。
 
 ThreadX 是独立的真实内核后端，选入锁定的 Eclipse ThreadX Linux GNU 或 Cortex-M4
 GNU port，不复用 FreeRTOS 的配置字段。首批维护三块 F407/F470 Board、Native Linux
@@ -141,6 +148,14 @@ factory 默认 ID 按类命名并以 `uint16_t` 表达；C typedef 不阻止把�
 再检查全部选中 pin 的 mode/lock，最后才保存租约并修改 pin；不能先改一个
 bank 再因另一个 bank 冲突而假称未产生效果。控制器路线和 endpoint CS 都属于
 同一次检查。共享 bank 的未选中 pin 保持外部所有权。
+
+H743 从可信复位或已成功完成自有 clean/disable 的冷状态建立固定时钟和 Cache
+配置，不能仅凭 CCR 关闭位认领未知 bootloader 状态。Arch 冷 Cache 控制对象
+保留已取得的 I/D Cache 与 selector 恢复责任；当前机制只维护 M7。所选 TX DMA
+仅访问 AXI SRAM，Cache on 时要求完整 32-byte line 的独占借用。提交先取得
+PREPARING 借用，再在长中断屏蔽区外 clean；取消不得在准备结束前发布 SETTLED。
+平台停止先排空 provider，再撤回 TIM2、clean/disable Cache，最后恢复 HSI
+divider。任何未清理效果继续由原 owner 持有；这些是冷生命周期，不是运行中变频。
 
 驱动自己的 GPIO stop 保持声明的 safe idle。完整 Platform stop 只有在所有
 IRQ／DMA／调用者引用排空后，才恢复原来的选中 pin 租约并释放 gate；恢复读回
@@ -192,8 +207,11 @@ timer capture 与 complementary PWM 分离普通 PWM，拥有精确 timer/IRQ/br
 可选 `UserIoBroker` 只实现被特权 kernel gateway 调用的 scalar GPIO read/set-reset
 admission。调用者提供真实 principal、memory pin/copy/unpin 与有界策略；用户消息
 不能选择指针、MMIO 或信任身份。release 失败保留 mapping，cleanup 不重放 GPIO。
-目前没有接通 SVC/MPU/TrustZone userspace 纵切片，也没有异步用户 DMA transport。
-这是一套通用所有权机制，不建立产品隔离或电气安全资格。
+U575 独立无 OS 参考通过真实 SG 接入一个固定 NonSecure-world principal，保留
+并屏蔽 NS 中断，在静态归属和无并发 master 的前提下同步 pin/copy；输出跨度
+预验证成功后才允许 GPIO 效果。CMSE 范围检查只是权限观察，不独自保证借用。
+没有通用 SVC、多任务 userspace 或异步用户 DMA transport；软件模型和 ARM
+指令／布局门禁不建立物理隔离或电气安全资格。
 
 FreeRTOS 的 `lowpower_port = "timebase"` 显式选入 F407/GD470 私有浅 Sleep 定时器
 适配；默认 `custom` 保持应用端口或弱 NULL 行为。所选实际 getter 验证固定 PLL、
@@ -249,7 +267,8 @@ TDD 按 Red→Green→Refactor 实施，新增行为先保留失败证据。comm
 不能证明所有开发者的历史编辑顺序。代码格式与反斜线 Doxygen 沿用既有规则。
 
 本轮 factory/TOML/多态和 SoC 迭代不能继承此前候选的资格。
-[本轮执行记录](soc-refinement-verification.md) 绑定实际 code revision 的完整
-主机门禁、ARM 矩阵、安装 SDK 和外部示例；原始日志位于独立证据归档。后续
-文档提交不替换该 code 身份。离线双构建和新候选仍有独立退出条件；全部实板
+[初次 SoC 执行记录](soc-refinement-verification.md) 绑定其历史 code revision，
+不覆盖后续扩展；[扩展执行记录](soc-extensions-verification.md) 独立绑定对应
+源码、执行结果和原始证据。主机门禁、ARM 矩阵、安装 SDK、外部示例与离线
+复现各自核验，文档提交不替换被测 code 身份。新候选仍有独立退出条件；全部实板
 尚未接入，物理结果保持 `not_executed`。

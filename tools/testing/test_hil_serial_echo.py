@@ -70,8 +70,6 @@ class HilSerialEchoTests(unittest.TestCase):
         def run():
             try:
                 while not self.stop.is_set():
-                    if mode == "noise":
-                        os.write(self.master, b"stale")
                     ready = select.select([self.master], [], [], 0.002)[0]
                     if not ready:
                         continue
@@ -207,7 +205,7 @@ class HilSerialEchoTests(unittest.TestCase):
         self.assertEqual((self.retained() / "tx.bin").read_bytes(), b"")
 
     def test_raw_bound_retains_the_actual_overflow_byte_before_failure(self):
-        self.emulator("noise")
+        os.write(self.master, b"123456789")
         with patch("tools.hil.serial_echo.MAXIMUM_STREAM_BYTES", 8):
             with self.assertRaisesRegex(EvidenceError, "capture bound"):
                 self.capture()
@@ -270,9 +268,39 @@ class HilSerialEchoTests(unittest.TestCase):
         self.assertTrue((self.retained() / "rx.bin").read_bytes())
 
     def test_continuous_prechallenge_noise_never_sends_challenge(self):
-        self.emulator("noise")
-        with self.assertRaisesRegex(EvidenceError, "deadline"):
-            self.capture(timeout_s=0.04)
+        # A host thread may pause longer than the quiet interval. Model the
+        # clock and serial syscalls so noise actually remains continuous.
+        clock = 0.0
+        ready_descriptor = None
+        samples = 0
+
+        def ready(readers, writers, errors, timeout):
+            nonlocal clock, ready_descriptor
+            self.assertFalse(writers, "challenge attempted before quiet drain")
+            self.assertFalse(errors)
+            self.assertEqual(len(readers), 1)
+            self.assertGreater(timeout, 0)
+            ready_descriptor = readers[0]
+            clock = round(clock + min(timeout, 0.002), 6)
+            return readers, [], []
+
+        def noise(descriptor, size):
+            nonlocal samples
+            self.assertEqual(descriptor, ready_descriptor)
+            self.assertGreaterEqual(size, len(b"stale"))
+            samples += 1
+            self.assertLessEqual(samples, 100, "drain did not obey deadline")
+            return b"stale"
+
+        with (patch("tools.hil.serial_echo.time.monotonic",
+                    side_effect=lambda: clock),
+              patch("tools.hil.serial_echo.select.select", side_effect=ready),
+              patch("tools.hil.serial_echo.os.read", side_effect=noise)):
+            with self.assertRaisesRegex(
+                    EvidenceError,
+                    "deadline expired (before quiet drain|during drain)"):
+                self.capture(timeout_s=0.04)
+        self.assertGreater(samples, 1)
         self.assertEqual((self.retained() / "tx.bin").read_bytes(), b"")
         self.assertTrue((self.retained() / "drain.bin").read_bytes())
         self.assertFalse(self.record.exists())

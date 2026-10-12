@@ -339,12 +339,172 @@ class RequiredAnalysisTests(unittest.TestCase):
             "while index < len(argv):\n"
             " if argv[index] == '-isystem': index += 2; continue\n"
             " if argv[index].startswith('-isystem'): index += 1; continue\n"
+            " if argv[index] == '-include': index += 2; continue\n"
+            " if argv[index].startswith('-include'): index += 1; continue\n"
+            " if argv[index] in ('-I', '-D', '-U', '-o', '-x'):\n"
+            "  imported.extend(argv[index:index + 2]); index += 2; continue\n"
             " imported.append(argv[index]); index += 1\n"
+            # Simplecpp 2.13 pushes --include files onto a LIFO stack. The
+            # production wrapper must preserve GNU's original include order.
+            " forced = [arg.split('=', 1)[1] for arg in sys.argv if arg.startswith('--include=')]\n"
+            " imported[1:1] = [part for header in reversed(forced) for part in ('-include', header)]\n"
             "result = subprocess.run(imported, cwd=entry['directory'])\n"
             f"with open({str(self.analyzer_log)!r}, 'a') as log: log.write(json.dumps(entry) + '\\n')\n"
             "sys.exit(result.returncode)\n")
         tool.chmod(0o700)
         return str(tool)
+
+    def test_cppcheck_forced_headers_preserve_order_cwd_and_duplicate_context(self):
+        self.source.write_text(
+            '#if VALUE != EXPECTED || ORDER != 2\n'
+            '#error "forced header context lost"\n'
+            '#endif\nint sample(void) { return VALUE; }\n')
+        entries = []
+        for label, value in [('first', 17), ('second', 23)]:
+            directory = self.root / ('working ' + label)
+            directory.mkdir()
+            (directory / 'first header.h').write_text(
+                f'#define VALUE {value}\n#define ORDER 1\n')
+            (directory / 'second header.h').write_text(
+                '#if ORDER != 1\n#error "forced include order changed"\n'
+                '#endif\n#undef ORDER\n#define ORDER 2\n')
+            argv = ['cc', f'-DEXPECTED={value}', '-includefirst header.h',
+                    '-include', 'second header.h', '-std=c11',
+                    '-c', str(self.source), '-o', str(directory / 'sample.o')]
+            real = subprocess.run(argv, cwd=directory, capture_output=True,
+                                  text=True, timeout=30)
+            self.assertEqual(real.returncode, 0, real.stdout + real.stderr)
+            entries.append({'directory': str(directory),
+                            'file': str(self.source), 'arguments': argv})
+        (self.build / 'compile_commands.json').write_text(json.dumps(entries))
+        self.assertEqual(run('cppcheck', self.root, self.build,
+                             self.cppcheck_importer_fixture(), self.report), 0,
+                         self.report.read_text())
+        self.assertEqual(json.loads((self.build / 'compile_commands.json').read_text()), entries)
+
+    def test_cppcheck_forced_header_uses_actual_compiler_search_order(self):
+        regular = self.root / 'regular headers'
+        system = self.root / 'system headers'
+        regular.mkdir(); system.mkdir()
+        (regular / 'context.h').write_text('#define VALUE 17\n')
+        (system / 'context.h').write_text('#error "wrong include priority"\n')
+        self.source.write_text(
+            '#if VALUE != 17\n#error "forced header missing"\n'
+            '#endif\nint sample(void) { return VALUE; }\n')
+        argv = ['cc', '-isystem', str(system), '-I', str(regular),
+                '-include', 'context.h', '-std=c11', '-c', str(self.source),
+                '-o', str(self.root / 'sample.o')]
+        real = subprocess.run(argv, cwd=self.root, capture_output=True,
+                              text=True, timeout=30)
+        self.assertEqual(real.returncode, 0, real.stdout + real.stderr)
+        (self.build / 'compile_commands.json').write_text(json.dumps([
+            {'directory': str(self.root), 'file': str(self.source),
+             'command': shlex.join(argv)}]))
+        self.assertEqual(run('cppcheck', self.root, self.build,
+                             self.cppcheck_importer_fixture(), self.report), 0,
+                         self.report.read_text())
+
+    def test_cppcheck_forced_header_diagnostic_is_retained(self):
+        header = self.root / 'owned.h'
+        header.write_text('#ifndef __GNUC__\n#error "compiler identity lost"\n'
+                          '#endif\n#define OWNED_ENABLED 1\n')
+        self.source.write_text(
+            '#ifdef OWNED_ENABLED\n#error "owned diagnostic retained"\n'
+            '#endif\nint sample(void) { return 0; }\n')
+        (self.build / 'compile_commands.json').write_text(json.dumps([
+            {'directory': str(self.root), 'file': str(self.source),
+             'arguments': ['cc', '-include' + str(header),
+                           '-c', str(self.source)]}]))
+        self.assertEqual(run('cppcheck', self.root, self.build,
+                             self.cppcheck_importer_fixture(), self.report), 1)
+        self.assertIn('owned diagnostic retained', self.report.read_text())
+
+    def test_cppcheck_forced_header_keeps_nested_macro_include_and_relative_search(self):
+        headers = self.root / 'relative headers'
+        headers.mkdir()
+        (headers / 'entry.h').write_text(
+            '#define NESTED_HEADER "nested.h"\n#include NESTED_HEADER\n')
+        (headers / 'nested.h').write_text('#define VALUE 41\n')
+        self.source.write_text(
+            '#if VALUE != 41\n#error "nested forced dependency lost"\n'
+            '#endif\nint sample(void) { return VALUE; }\n')
+        (self.build / 'compile_commands.json').write_text(json.dumps([
+            {'directory': str(self.root), 'file': str(self.source),
+             'arguments': ['cc', '-Irelative headers', '-includeentry.h',
+                           '-c', str(self.source)]}]))
+        self.assertEqual(run('cppcheck', self.root, self.build,
+                             self.cppcheck_importer_fixture(), self.report), 0,
+                         self.report.read_text())
+
+    def test_cppcheck_unprojected_preprocessor_forms_fail_closed(self):
+        for flags in (['-imacros', 'macros.h'], ['-imacrosmacros.h'],
+                      ['-include-pch', 'cache.pch'],
+                      ['-Xpreprocessor', '-include', '-Xpreprocessor', 'forced.h'],
+                      ['-Wp,-include,forced.h']):
+            with self.subTest(flags=flags):
+                entry = {'directory': str(self.root), 'file': str(self.source),
+                         'arguments': ['cc', *flags, '-c', str(self.source)]}
+                with self.assertRaisesRegex(ValueError, 'explicit analyzer projection'):
+                    quality_tools.cppcheck_compilation_entry(entry)
+
+    def test_cppcheck_forced_include_option_values_are_not_reparsed(self):
+        argv = ['cc', '-D', 'OPAQUE=-includecontext.h', '-U', 'IGNORED',
+                '-includeactual.h', '-c', str(self.source)]
+        entry = {'directory': str(self.root), 'file': str(self.source),
+                 'arguments': argv}
+        original = json.loads(json.dumps(entry))
+        normal, headers = quality_tools.forced_include_arguments(entry)
+        self.assertEqual(headers, ['actual.h'])
+        self.assertEqual(normal, argv[:5] + argv[6:])
+        self.assertEqual(entry, original)
+
+    def test_cppcheck_forced_header_preserves_system_path_option_value(self):
+        headers = self.root / '-includeheaders'
+        headers.mkdir()
+        (headers / 'entry.h').write_text('#define VALUE 17\n')
+        self.source.write_text(
+            '#if VALUE != 17\n#error "system option value reparsed"\n'
+            '#endif\nint sample(void) { return VALUE; }\n')
+        argv = ['cc', '-isystem', '-includeheaders', '-include', 'entry.h',
+                '-c', str(self.source), '-o', str(self.root / 'sample.o')]
+        real = subprocess.run(argv, cwd=self.root, capture_output=True,
+                              text=True, timeout=30)
+        self.assertEqual(real.returncode, 0, real.stdout + real.stderr)
+        (self.build / 'compile_commands.json').write_text(json.dumps([
+            {'directory': str(self.root), 'file': str(self.source),
+             'arguments': argv}]))
+        self.assertEqual(run('cppcheck', self.root, self.build,
+                             self.cppcheck_importer_fixture(), self.report), 0,
+                         self.report.read_text())
+
+    def test_cppcheck_implicit_precompiled_header_sidecar_fails_closed(self):
+        import io
+        header = self.root / 'forced.h'
+        header.write_text('#define VALUE 17\n')
+        sidecar = self.root / 'forced.h.gch'
+        entry = {'directory': str(self.root), 'file': str(self.source),
+                 'arguments': ['cc', '-includeforced.h', '-c', str(self.source)]}
+        for directory in (False, True):
+            with self.subTest(directory=directory):
+                if directory:
+                    sidecar.mkdir()
+                else:
+                    sidecar.write_bytes(b'opaque PCH candidate')
+                with self.assertRaisesRegex(ValueError, 'precompiled'):
+                    quality_tools.observed_forced_includes(entry, self.build,
+                                                          io.StringIO())
+                if directory:
+                    sidecar.rmdir()
+                else:
+                    sidecar.unlink()
+
+    def test_cppcheck_precompiled_header_flags_fail_closed(self):
+        for flag in ('-fpch-preprocess', '-fpch-deps'):
+            with self.subTest(flag=flag):
+                entry = {'directory': str(self.root), 'file': str(self.source),
+                         'arguments': ['cc', flag, '-c', str(self.source)]}
+                with self.assertRaisesRegex(ValueError, 'explicit analyzer projection'):
+                    quality_tools.cppcheck_compilation_entry(entry)
 
     def test_cppcheck_restores_each_actual_system_header_context(self):
         self.assertIsNotNone(shutil.which('cc'), 'Real compiler required')

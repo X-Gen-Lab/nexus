@@ -4,6 +4,7 @@ import importlib
 import json
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -254,7 +255,7 @@ class CpuProfileTests(unittest.TestCase):
                  "irq": irq("cortex-m55"), "clock_hz": 100000000}))
             marker = path / ".nexus-cpu-bundle"
             marker.write_text("Nexus CPU runtime bundle\n")
-            command = [str(Path(gate.ROOT / ".venv/bin/python")), "-B",
+            command = [sys.executable, "-B",
                        str(gate.ROOT / "tools/configure/cpu.py"),
                        "--facts", str(source), "--backend", "baremetal",
                        "--output", str(path)]
@@ -281,7 +282,7 @@ class CpuProfileTests(unittest.TestCase):
             source.write_text(json.dumps(
                 {"schema_version": 1, "cpu": facts("cortex-m55"),
                  "irq": irq("cortex-m55"), "clock_hz": 100000000}))
-            command = [str(Path(gate.ROOT / ".venv/bin/python")), "-B",
+            command = [sys.executable, "-B",
                        str(gate.ROOT / "tools/configure/cpu.py"),
                        "--facts", str(alias / "cpu.json"), "--backend",
                        "baremetal", "--output", str(path / "bundle")]
@@ -302,7 +303,7 @@ class CpuProfileTests(unittest.TestCase):
                         "irq": irq("cortex-m55"), "clock_hz": 100000000}
             source.write_text(json.dumps(document))
             output = path / "bundle"
-            command = [str(Path(gate.ROOT / ".venv/bin/python")), "-B",
+            command = [sys.executable, "-B",
                        str(gate.ROOT / "tools/configure/cpu.py"),
                        "--facts", str(source), "--backend", "baremetal",
                        "--output", str(output)]

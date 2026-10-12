@@ -9,7 +9,7 @@
 #include "h743_model.h"
 #include "nexus/core/fault.h"
 #include "stm32h743_system.h"
-#include <csignal>
+#include "terminal_watchdog.h"
 #include <gtest/gtest.h>
 #include <unistd.h>
 
@@ -140,17 +140,12 @@ TEST_F(H743System, StaleUpdateFlagCannotProveRefusedPrescalerDelivery) {
 }
 
 namespace {
-volatile std::sig_atomic_t s_fault_observed;
 bool s_fault_exit;
-void AlarmAfterReturningFault(int) {
-    _exit(s_fault_observed == 1 ? 42 : 92);
-}
 void PrepareTimerFault(bool exit_observer, bool refuse_irq = false) {
     nx_h743_model_reset();
     if (nx_stm32h743_system_start(&g_nx_stm32h743_system, 64000000U, 0U, 8U)
             .primary != NX_SUCCESS)
         _exit(90);
-    s_fault_observed = 0;
     s_fault_exit = exit_observer;
     g_h743_model.timer.SR = TIM_SR_UIF;
     g_h743_model.ignore_write = &g_h743_model.timer.SR;
@@ -170,9 +165,9 @@ extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
         g_h743_model.timer.DIER == 0U &&
         (g_h743_model.timer.CR1 & TIM_CR1_CEN) == 0U &&
         g_h743_model.irq_enabled[TIM2_IRQn] == g_h743_model.hold_irq_off;
-    s_fault_observed = valid ? 1 : -1;
     if (s_fault_exit)
         _exit(valid ? 42 : 91);
+    nexus_test::RecordTerminalObservation(valid);
 }
 TEST_F(H743System, IsolatedTimerFaultStillOffersMaskedTerminalObservation) {
     EXPECT_EXIT(
@@ -193,26 +188,18 @@ TEST_F(H743System, UnisolatedTimerFaultOffersMaskedNonreturningObservation) {
         testing::ExitedWithCode(42), "");
 }
 TEST_F(H743System, ReturningObserverCannotResumeIsolatedTimerProgress) {
-    EXPECT_EXIT(
-        {
-            PrepareTimerFault(false);
-            std::signal(SIGALRM, AlarmAfterReturningFault);
-            alarm(1U);
-            nx_stm32h743_system_timer_irq(&g_nx_stm32h743_system);
-            _exit(99);
-        },
-        testing::ExitedWithCode(42), "");
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        PrepareTimerFault(false);
+        nx_stm32h743_system_timer_irq(&g_nx_stm32h743_system);
+        _exit(99);
+    }));
 }
 TEST_F(H743System, ReturningObserverCannotResumeUnisolatedTimerProgress) {
-    EXPECT_EXIT(
-        {
-            PrepareTimerFault(false, true);
-            std::signal(SIGALRM, AlarmAfterReturningFault);
-            alarm(1U);
-            nx_stm32h743_system_timer_irq(&g_nx_stm32h743_system);
-            _exit(99);
-        },
-        testing::ExitedWithCode(42), "");
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        PrepareTimerFault(false, true);
+        nx_stm32h743_system_timer_irq(&g_nx_stm32h743_system);
+        _exit(99);
+    }));
 }
 TEST_F(H743System, FaultBeforeSnapshotMaskCannotResumeDeadlineConsumer) {
     EXPECT_EXIT(

@@ -18,18 +18,20 @@ complete a physical exit condition.
 STM32F407VET6/ZGT6 and GD32F470ZGT6 maintain reviewed fixed clock, startup,
 monotonic timer and selected controller modes. The
 [derived capability matrix](../delivery/capabilities.md) enumerates exact facts,
-routes, selected production sources and software fixtures. STM32G474RET6 remains
-an explicit GPIO/LPUART vertical slice. The selected non-M4 references are
-STM32H743ZIT6 / NUCLEO-H743ZI2 and STM32U575ZIT6Q / NUCLEO-U575ZI-Q. They add
-startup, fixed-clock admission, monotonic time, GPIO and IRQ-byte UART only.
-CPU ABI/runtime support for other Cortex-M profiles does not imply a full SoC,
-Board or peripheral implementation.
+routes, selected production sources and software fixtures. STM32G474RET6 maintains
+GPIO/LPUART plus selected EXTI edge events. The non-M4 references are
+STM32H743ZIT6 / NUCLEO-H743ZI2 and STM32U575ZIT6Q / NUCLEO-U575ZI-Q. H743 adds
+fixed clock/cache profiles and finite UART DMA transmission. U575 keeps its
+single-state platform and an independent synchronous dual-world software
+reference separate. CPU ABI/runtime support for other Cortex-M profiles does
+not imply a full SoC, Board or peripheral implementation.
 
 | Reference | Maintained execution contract | Explicitly excluded |
 |---|---|---|
-| G474 / MB1367 | HSE24 / 170 MHz, TIM2, PA5 GPIO, LPUART1 PA2/PA3; baremetal or FreeRTOS | Other controllers, DMA and ThreadX |
-| H743 / NUCLEO-H743ZI2 | Bounded pre-RAM LDO entry, HSI64, Cache off, TIM2, PB0 GPIO, USART3 PD8/PD9; baremetal or FreeRTOS | Other supply/clock profiles, DMA/cache ownership, optional RAM placement, live-state handoff |
-| U575 / NUCLEO-U575ZI-Q | Externally established TZEN=0 and SWAP_BANK=0, MSIS4 MHz, Cache off, TIM2, PC7 GPIO, USART1 PA9/PA10; baremetal or FreeRTOS | TZEN=1, option-byte changes, security attribution, DMA, optional RAM placement, live-state handoff |
+| G474 / MB1367 | HSE 24 / 170 MHz, TIM2, PA5 GPIO, LPUART1 PA2/PA3, selected PA0/PA1 EXTI edge events; baremetal or FreeRTOS | Other controllers, DMA and ThreadX; EXTI fixture wiring is not an observed Board route |
+| H743 / NUCLEO-H743ZI2 | Bounded pre-RAM LDO entry; HSI 32/64 MHz with Cache off/on; TIM2, PB0 GPIO, USART3 PD8/PD9 IRQ bytes or finite DMA TX; baremetal or FreeRTOS | Other supply/PLL profiles, DMA RX/other engines, optional RAM placement, running-state handoff and runtime reclocking |
+| U575 / NUCLEO-U575ZI-Q, platform | Externally established TZEN=0 and SWAP_BANK=0, MSIS 4 MHz, Cache off, TIM2, PC7 GPIO, USART1 PA9/PA10; baremetal or FreeRTOS | Option-byte changes, DMA, optional RAM placement and running-state handoff; this assembly has no TrustZone transport |
+| U575, separate dual-world reference | Explicit TZEN=1 cold-owner contract, Secure/NS Runtime images, SAU/MPU/RAM attribution, actual CMSE entry and copied synchronous GPIO access from one unprivileged NS Thread | General dual-world factory, NS RTOS/task identities, asynchronous loans, cross-domain DMA, product loader authentication and physical isolation qualification |
 
 These are source-reviewed Board references. Their physical PCB revisions,
 silicon revisions, solder bridges, electrical connections and option bytes have
@@ -37,6 +39,33 @@ not been observed. Reference-only HIL admission fails closed; selecting a
 matching chip name cannot promote a reference into a qualified physical Board.
 The [execution record](../delivery/soc-refinement-verification.md) distinguishes
 normal commit gates, development ARM observations and final qualification.
+Reference software status in the ledger records bounded host/ARM evidence; it
+does not establish a clean candidate, physical acceptance or every original
+exit condition.
+
+The [G474 contract](stm32g474.md) describes independent EXTI0/PA0 and EXTI1/PA1
+rings, pending-bit acknowledgement, mux/gate ownership and source withdrawal.
+Its test Board is an explicit software fixture, with no inferred connector,
+button or electrical bias. The [H743 contract](../../soc/stm32h743/README.md)
+defines all four HSI 32/64 MHz and Cache off/on combinations. Fixed cold profile
+selection does not implement a running frequency transition.
+
+H743 USART3 DMA TX owns DMA1 Stream0, DMAMUX1 Channel0 request 46 and its separate
+vector; RX remains IRQ bytes. Cache-on buffers occupy exclusively owned complete
+32-byte lines in selected AXI SRAM, with no outward rounding or hidden bounce
+buffer. Cache cleaning follows borrow admission, runs outside the long interrupt
+mask, and cannot settle storage while preparation is active. DMA completion,
+wire TC and source withdrawal remain distinct. Failed withdrawal quarantines the
+loan; the provider must drain before cache and timer shutdown.
+
+The [U575 dual-world contract](u575-trustzone-contract.md) is an independent
+no-OS integration fixture. Its cold owner observes provisioned option bytes,
+checks actual physical permissions, clears future shared RAM, then configures
+and seals attribution. A real SG gateway authenticates the NS world rather than
+an untrusted task identity, checks CMSE permissions and copies a bounded request
+through the existing GPIO broker. The layout and GPIO grant belong to the
+reference fixture, not to reusable platform policy. No option-byte programming,
+RTOS isolation, general factory integration or asynchronous transport is claimed.
 
 Clock bootstrap uses finite poll work bounds before the final clock exists;
 polls are not measured elapsed milliseconds. Cleanup must distinguish remaining
@@ -104,9 +133,11 @@ Per-item status and evidence entry points remain in the CSV.
 | 26 | Public I/O, private cross-chip controller algorithms and SoC SDK assertions retain their dependency boundaries. No forwarding-only runtime layer or generic mutable registry is added. |
 
 F407 CCM is CPU-only and rejected as a DMA buffer. H743 memory facts describe
-DMA1/DMA2, BDMA and MDMA separately; MDMA reachability to TCM does not authorize a
-driver, cache protocol or linker placement. U575 GPDMA/LPDMA facts likewise do not
-implement linked-list engines or security-domain admission. Legacy `dma` facts
+DMA1/DMA2, BDMA and MDMA separately. The implemented USART3 DMA1 TX lane admits
+selected AXI SRAM only; MDMA reachability to TCM does not authorize a driver,
+cache protocol or linker placement. U575 GPDMA/LPDMA facts do not implement
+linked-list engines or security-crossing DMA. Its synchronous CPU gateway does
+not authorize DMA buffers or asynchronous storage loans. Legacy `dma` facts
 and explicit `dma_engines` are alternative authored forms; contradictory inputs
 are rejected rather than repaired.
 
@@ -172,21 +203,37 @@ the first non-M4 target decision; it does not complete every conditional feature
 
 | Item | Delivered subset or remaining implementation |
 |---|---|
-| 28 | Exact H743 HSI64 and U575 MSIS4 MHz references; no alternate oscillator/PLL profile or electrical clock qualification. |
-| 29 | G474 remains GPIO/LPUART. Additional controller modes are not implemented. |
-| 30 | Exact H743ZI and U575ZIQ inventories and the routes above. Other packages/controllers/routes require their own facts, ownership, models and budgets. |
-| 31 | M7/H743 and M33/U575 startup/time/GPIO/UART references. A complete peripheral set and actual MCU execution are not established. |
-| 32 | Per-engine reachability facts only. H7/U5 DMA providers, cache ownership and security-domain transfers are not implemented. |
-| 33 | Unknown running state is rejected. Bootloader-to-platform clock, IRQ, DMA, cache and RAM handoff is not implemented. |
-| 34 | Fixed boot profiles only. No running frequency transition, consumer reclocking or deadline-domain conversion. |
-| 35 | Existing F407/F470 shallow Sleep only. No deep-STOP continuous RTC/LPTIM domain or wake restoration. |
-| 36 | U575 single-state reference and existing privileged scalar broker only. No U575 userspace SVC/MPU/TrustZone transport or isolation qualification. |
+| 28 | H743 HSI 32/64 MHz with Cache off/on, plus the U575 MSIS 4 MHz reference. Other oscillator/PLL/supply profiles and electrical qualification remain outside the implemented subset. |
+| 29 | G474 GPIO/LPUART and selected PA0/PA1 EXTI edge events, including generated ownership and software fixtures. Other peripheral modes and physical edge acceptance remain open. |
+| 30 | Exact H743ZI/U575ZIQ inventories and finite routes, plus the G474 EXTI fixture. Other packages/controllers/routes require their own facts, ownership, models and budgets; actual Board wiring remains unobserved. |
+| 31 | Selected M7/H743 and M33/U575 startup/time/GPIO/UART and backend references. A complete peripheral set, every OS mode and actual MCU execution are not established. |
+| 32 | H743 fixed cache ownership and finite USART3 DMA1 TX, plus U575 CPU-domain permission/attribution mechanisms. DMA RX/block streams, other H7 routes/engines, U5 DMA and security-crossing DMA remain unimplemented; physical coherency is unverified. |
+| 33 | Not implemented. Unknown running state is rejected; bootloader-to-platform clock, IRQ, DMA, cache, RAM and live-owner handoff is absent. The U575 cold world transition does not implement this feature. |
+| 34 | Not implemented. H743's four profiles are cold configurations, with no running frequency transition, consumer reclocking or deadline-domain conversion. |
+| 35 | Not implemented. Existing F407/F470 shallow Sleep does not supply a deep-STOP continuous RTC/LPTIM domain, retention proof or wake restoration. |
+| 36 | Partial synchronous U575 reference only: Secure/NS images, cold attribution owner, single unprivileged NS Thread and copied GPIO gateway. No dual-world platform factory, NS RTOS, multitask identity, mutable address space, asynchronous borrow/drain or HIL isolation qualification. |
 
 Implementing rejection of an unsupported configuration is a valid defensive
 contract; it is not implementation of the rejected feature. Additional features
 need exact controller/mode ownership and acceptance evidence before these ledger
 entries can close. Current first-release devices retain their declared fixed
 profiles.
+
+The remaining software work for SOC-33–35 requires coordinated ownership rather
+than another profile label. Running-state handoff needs an exact outgoing and
+incoming image/resource contract, validated stack/vector/FP/IRQ/cache/RAM state,
+and a reviewed terminal transfer. External products retain loader authentication,
+partition and recovery policy. Dynamic frequency changes need actual consumer
+quiescence, ordered electrical changes, bounded rollback, OS timing adaptation
+and an explicit continuous time contract. Deep STOP additionally needs an exact
+RTC/LPTIM reference, wake/retention admission, elapsed-time reconstruction and
+consumer restoration; ordinary shallow-sleep preparation does not establish it.
+
+SOC-36 still needs a separately reviewed dual-world configuration/factory path,
+trusted OS task identity and mutable-map/copy-fault contracts before general
+userspace support. Async and DMA extensions must preserve borrow, cancel, drain
+and final-publication rules across the security boundary. These are additional
+mechanisms, not consequences of the current synchronous GPIO reference.
 
 Physical equipment is currently disconnected. SOC-37–55 have executable tooling
 and station-binding obligations; their physical exit status remains

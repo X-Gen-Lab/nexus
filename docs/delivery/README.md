@@ -14,7 +14,8 @@
 | [支持范围](support.md) | F407/F470 首发模式、G474/H743/U575 参考纵切片与精确未知项 |
 | [派生能力矩阵](capabilities.md) | facts/routes、参考 Board、软件夹具和生产定义的一致性 |
 | [软件证据](verification.md) | 实际执行与尚待 clean-source 封存的区别 |
-| [本轮 SoC 执行记录](soc-refinement-verification.md) | 55项完善的提交门禁、最终源码验证与物理未执行边界 |
+| [SoC 基线执行记录](soc-refinement-verification.md) | 已封存基线的精确源码、执行结果与物理未执行边界 |
+| [SoC 扩展执行记录](soc-extensions-verification.md) | G474 EXTI、H743 Cache/DMA、U575 双域参考及后续验收状态 |
 | [迁移手册](migration.md) | 旧 API、配置、对象与外部应用迁移 |
 | [安全与生命周期审查](security-review.md) | 扫描范围、测试工装修复与借用／恢复限制 |
 | [后续迭代](next-iterations.md) | 实板验收、测量驱动的扩展与团队流程 |
@@ -26,7 +27,9 @@ CPU 软件层覆盖 M0/M0+/M3/M4/M7/M23/M33/M55/M85。外部工程可通过一�
 component，复用 Core/Arch/I/O face 与选定裸机/FreeRTOS adapter。运行时装配
 不生成 SoC、Board、启动或 factory，具体硬件、产品任务和安全策略仍由外部工程
 负责。F407/F470 三板维护首发模式，G474/H743/U575 增加精确 GPIO／IRQ UART／
-timebase 参考装配；这些纵切片不代表全外设或完整安全域接入，物理 HIL 全部未执行。
+timebase 参考装配。G474 另有 selected EXTI，H743 另有固定 Cache 配置与有限
+TX DMA，U575 另有独立无 OS 的同步双域参考；这些纵切片不代表全外设或完整
+安全域接入，物理 HIL 全部未执行。
 
 截至本轮开发验证，已有生产 `.c` 的 Native/寄存器故障模型、真实 ARM 编译与链接、
 三板资源矩阵、外部应用开发构建、工具负路径与 HIL 准入工装。开发执行结果不自动

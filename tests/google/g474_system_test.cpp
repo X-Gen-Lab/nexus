@@ -9,7 +9,7 @@
 #include "g474_model.h"
 #include "nexus/core/fault.h"
 #include "stm32g474_system.h"
-#include <csignal>
+#include "terminal_watchdog.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
@@ -20,10 +20,6 @@ class FaultPort {
                 (nx_fault_domain_t, nx_result_t, const char*, unsigned));
 };
 struct ParkSignal {};
-volatile std::sig_atomic_t returning_fault_seen;
-void AlarmAfterReturningFault(int) {
-    _exit(returning_fault_seen == 1 ? 42 : 92);
-}
 FaultPort* fault_port;
 } /* namespace */
 class G474System : public testing::Test {
@@ -284,39 +280,101 @@ TEST_F(G474System, IsolatedAckFaultStillObservesTerminalOwnership) {
     EXPECT_TRUE(nx_arch_irq_is_masked());
 }
 
+TEST(TerminalWatchdog, MissingObserverEvidenceCannotPassAsPark) {
+    EXPECT_FALSE(nexus_test::ObserveTerminal([] {
+        for (;;) {
+            pause();
+        }
+    }));
+}
+TEST(TerminalWatchdog, InvalidObserverEvidenceCannotPassAsPark) {
+    EXPECT_FALSE(nexus_test::ObserveTerminal([] {
+        nexus_test::RecordTerminalObservation(false);
+        for (;;) {
+            pause();
+        }
+    }));
+}
+TEST(TerminalWatchdog, EvidenceFollowedByReturnCannotPassAsPark) {
+    EXPECT_FALSE(nexus_test::ObserveTerminal(
+        [] { nexus_test::RecordTerminalObservation(true); }));
+}
+TEST(TerminalWatchdog, DuplicateEvidenceCannotPassAsPark) {
+    EXPECT_FALSE(nexus_test::ObserveTerminal([] {
+        nexus_test::RecordTerminalObservation(true);
+        nexus_test::RecordTerminalObservation(true);
+        for (;;) {
+            pause();
+        }
+    }));
+}
+
+TEST(TerminalWatchdog, ChildGoogleFailureBeforeEvidenceCannotPassAsPark) {
+    EXPECT_FALSE(nexus_test::ObserveTerminal([] {
+        EXPECT_EQ(1, 2);
+        nexus_test::RecordTerminalObservation(true);
+        for (;;) {
+            pause();
+        }
+    }));
+}
+TEST(TerminalWatchdog, ExtraMockCallAfterEvidenceCannotPassAsPark) {
+    EXPECT_FALSE(nexus_test::ObserveTerminal([] {
+        testing::MockFunction<void()> observer;
+        EXPECT_CALL(observer, Call()).WillOnce([] {
+            nexus_test::RecordTerminalObservation(true);
+        });
+        observer.Call();
+        observer.Call();
+        for (;;) {
+            pause();
+        }
+    }));
+}
+
+TEST(TerminalWatchdog, CallbackExceptionCannotEscapeChildIsolation) {
+    int escaped[2];
+    ASSERT_EQ(0, pipe(escaped));
+    bool observed = true;
+    try {
+        observed = nexus_test::ObserveTerminal([] { throw 7; });
+    } catch (...) {
+        if (write(escaped[1], "x", 1) != 1)
+            _exit(95);
+        _exit(96);
+    }
+    close(escaped[1]);
+    char marker;
+    EXPECT_EQ(0, read(escaped[0], &marker, sizeof(marker)));
+    close(escaped[0]);
+    EXPECT_FALSE(observed);
+}
+
 TEST_F(G474System, ReturningObserverCannotResumeIsolatedTimerProgress) {
-    EXPECT_EXIT(
-        {
-            if (nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U).primary !=
-                NX_SUCCESS)
-                _exit(90);
-            g_g474_model.timer.SR = TIM_SR_UIF;
-            g_g474_model.hold_timer_ack = true;
-            returning_fault_seen = 0;
-            EXPECT_CALL(fault_mock, Observe(NX_FAULT_PLATFORM, NX_ERROR_IO,
-                                            testing::_, testing::_))
-                .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
-                             unsigned line) {
-                    returning_fault_seen =
-                        file != nullptr && line != 0U &&
-                                nx_arch_irq_is_masked() &&
-                                !g_g474_model.irq_enabled[TIM2_IRQn] &&
-                                g_nx_stm32g474_system.timer_error ==
-                                    NX_ERROR_IO &&
-                                !g_nx_stm32g474_system.started &&
-                                g_nx_stm32g474_system.remaining_effects != 0U &&
-                                g_nx_stm32g474_system.overflow_us == 0U &&
-                                g_g474_model.timer.DIER == 0U &&
-                                (g_g474_model.timer.CR1 & TIM_CR1_CEN) == 0U
-                            ? 1
-                            : -1;
-                });
-            std::signal(SIGALRM, AlarmAfterReturningFault);
-            alarm(1U);
-            nx_stm32g474_system_timer_irq(&g_nx_stm32g474_system);
-            _exit(99);
-        },
-        testing::ExitedWithCode(42), "");
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        if (nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U).primary !=
+            NX_SUCCESS)
+            _exit(90);
+        g_g474_model.timer.SR = TIM_SR_UIF;
+        g_g474_model.hold_timer_ack = true;
+        EXPECT_CALL(fault_mock, Observe(NX_FAULT_PLATFORM, NX_ERROR_IO,
+                                        testing::_, testing::_))
+            .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
+                         unsigned line) {
+                const bool valid =
+                    file != nullptr && line != 0U && nx_arch_irq_is_masked() &&
+                    !g_g474_model.irq_enabled[TIM2_IRQn] &&
+                    g_nx_stm32g474_system.timer_error == NX_ERROR_IO &&
+                    !g_nx_stm32g474_system.started &&
+                    g_nx_stm32g474_system.remaining_effects != 0U &&
+                    g_nx_stm32g474_system.overflow_us == 0U &&
+                    g_g474_model.timer.DIER == 0U &&
+                    (g_g474_model.timer.CR1 & TIM_CR1_CEN) == 0U;
+                nexus_test::RecordTerminalObservation(valid);
+            });
+        nx_stm32g474_system_timer_irq(&g_nx_stm32g474_system);
+        _exit(99);
+    }));
 }
 
 TEST_F(G474System, UnisolatableAckFaultRetainsMaskBeforeTerminalObservation) {

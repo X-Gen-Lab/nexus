@@ -236,12 +236,118 @@ def compilation_entry(entry: dict) -> dict:
 
 
 INCLUDE_ARGUMENT_OPTIONS = {
-    "-I", "-D", "-U", "-include", "-imacros", "-iquote", "-idirafter",
+    "-I", "-D", "-U", "-include", "-imacros", "-iquote", "-idirafter", "-isystem",
     "-x", "-o", "-MF", "-MT", "-MQ", "-MJ", "--sysroot", "-isysroot",
     "-iprefix", "-iwithprefix", "-iwithprefixbefore", "-B", "-Xclang",
     "-Xpreprocessor", "-Xassembler", "-Xlinker", "-target", "--target",
 }
 EXTERNAL_HEADER_SUFFIXES = {".h", ".hh", ".hpp", ".hxx", ".inc", ".inl", ".tpp"}
+
+
+def forced_include_arguments(entry: dict) -> tuple[list[str], list[str]]:
+    """Separate GNU forced includes without consuming other option values."""
+    argv = compilation_arguments(entry)
+    normal = []
+    headers = []
+    index = 0
+    while index < len(argv):
+        argument = argv[index]
+        if (argument.startswith(("-imacros", "-include-pch", "-fpch-", "-Wp,")) or
+                argument in {"-Xpreprocessor", "-Xclang"}):
+            raise ValueError("macro-only, precompiled or forwarded preprocessing needs an explicit analyzer projection")
+        if argument == "-include":
+            if index + 1 >= len(argv) or not argv[index + 1]:
+                raise ValueError("missing forced include file")
+            headers.append(argv[index + 1])
+            index += 2
+        elif argument.startswith("-include"):
+            headers.append(argument[len("-include"):])
+            index += 1
+        else:
+            normal.append(argument)
+            index += 1
+            if argument in INCLUDE_ARGUMENT_OPTIONS and index < len(argv):
+                normal.append(argv[index])
+                index += 1
+    return normal, headers
+
+
+def observed_forced_includes(entry: dict, directory: Path, output) -> list[str]:
+    """Resolve -include using its actual working directory and compiler search.
+
+    Cppcheck 2.13 ignores both forms of -include in compile_commands.json.
+    Its explicit --include option needs the same files in the same order;
+    macros alone cannot replace declarations or nested header dependencies.
+    Preserve symlink spelling because it can determine nested quote searches.
+    """
+    _, headers = forced_include_arguments(entry)
+    if not headers:
+        return []
+    cwd = Path(entry["directory"])
+    search = None
+    observed = []
+    for name in headers:
+        candidate = cwd / name
+        if candidate.with_name(candidate.name + ".gch").exists():
+            raise ValueError("implicit precompiled forced include needs an explicit analyzer projection")
+        if not candidate.is_file():
+            if Path(name).is_absolute():
+                raise ValueError("forced include file is missing: " + name)
+            if search is None:
+                _, query = compiler_query(entry)
+                query = [argument for argument in query if argument != "-dM"]
+                query.insert(-1, "-v")
+                output.write("Compiler include search invocation: " + json.dumps(query) + "\n")
+                output.flush()
+                result = subprocess.run(query, cwd=cwd, input=b"",
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE, timeout=30)
+                output.write("Compiler include search exit code: " + str(result.returncode) + "\n")
+                output.write("Compiler include search diagnostic: " + result.stderr.decode("utf-8", errors="replace") + "\n")
+                if result.returncode:
+                    raise ValueError("compiler forced include search query failed")
+                search = []
+                active = False
+                finished = False
+                for line in result.stderr.decode("utf-8", errors="strict").splitlines():
+                    if line in ('#include "..." search starts here:',
+                                '#include <...> search starts here:'):
+                        active = True
+                    elif active and line == "End of search list.":
+                        finished = True
+                        break
+                    elif active:
+                        if not line.startswith(" ") or line.endswith(" (framework directory)"):
+                            raise ValueError("unsupported compiler include search entry")
+                        search.append(cwd / line.strip())
+                if not finished:
+                    raise ValueError("compiler include search list is incomplete")
+            candidate = None
+            for include_directory in search:
+                found = include_directory / name
+                if found.with_name(found.name + ".gch").exists():
+                    raise ValueError("implicit precompiled forced include needs an explicit analyzer projection")
+                if found.is_file():
+                    candidate = found
+                    break
+            if candidate is None:
+                raise ValueError("forced include was not found in observed compiler search: " + name)
+        observed.append({"argument": name, "path": str(candidate.absolute()),
+                         "sha256": hashlib.sha256(candidate.read_bytes()).hexdigest()})
+    output.write("Observed forced includes: " + json.dumps(observed) + "\n")
+    # Simplecpp 2.13 stacks multiple --include files in reverse order. One
+    # wrapper with ordinary includes preserves the compiler order on every
+    # invocation, including repeated headers and their declarations.
+    if any(any(character in header["path"] for character in '\\"\r\n')
+           for header in observed):
+        raise ValueError("forced include path cannot be represented literally")
+    wrapper = directory / "forced-includes.h"
+    wrapper.write_text("".join('#include "' + header["path"] + '"\n'
+                               for header in observed), encoding="utf-8")
+    output.write("Forced include wrapper: " + json.dumps({
+        "path": str(wrapper), "sha256": hashlib.sha256(wrapper.read_bytes()).hexdigest(),
+        "contents": wrapper.read_text(encoding="utf-8")}) + "\n")
+    return ["--include=" + str(wrapper)]
 
 
 def system_include_arguments(entry: dict) -> tuple[list[str], list[str]]:
@@ -282,6 +388,10 @@ def cppcheck_compilation_entry(entry: dict) -> dict:
     Original compiler queries and reported source entries are never rewritten.
     Sysroot-prefixed directories require explicit expansion rather than guessing.
     """
+    argv, forced = forced_include_arguments(entry)
+    if forced:
+        entry = {**compilation_entry(entry), "arguments": argv}
+        entry.pop("command", None)
     normal, systems = system_include_arguments(entry)
     if not systems:
         return compilation_entry(entry)
@@ -401,13 +511,14 @@ def run(kind: str, root: Path, build: Path, tool: str, report: Path) -> int:
                         output.write(f"Predefined source entry {index}: " + json.dumps(entry) + "\n")
                         output.write(f"Cppcheck source projection {index}: " + json.dumps(projected) + "\n")
                         observed = predefines(entry, output)
+                        forced = observed_forced_includes(entry, directory, output)
                         external = external_system_headers(root, entry)
                         output.write("External system header exclusions: " + json.dumps(external) + "\n")
                         output.write("External header ownership rule: exact header files in this configuration's SYSTEM paths under vendors/ or ext/ only; owned headers and implementation files remain checked.\n")
                         exclusions = sorted({path for header in external for path in
                                              (header["path"], header["canonical_path"])})
                         invocations.append([tool, "--project=" + str(directory / "compile_commands.json"),
-                                            *observed, "--enable=warning,performance,portability",
+                                            *observed, *forced, "--enable=warning,performance,portability",
                                             "--check-level=exhaustive",
                                             "--error-exitcode=2", "--xml", "--xml-version=2",
                                             "--suppress=missingIncludeSystem",

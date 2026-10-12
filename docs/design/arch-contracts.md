@@ -93,6 +93,21 @@ Invalidate 可以丢弃 dirty data，调用者明确承担这一后果。DMA rec
 排空后的维护由具体 provider/产品协调；cache 操作本身不证明 DMA idle，也不
 结束 request/buffer 借用。工作量随 complete line 数量增加，不能笼统称为 O(1)。
 
+`cache_control.h` 单独提供 reviewed M7 的冷 Cache 启停；其他 CPU profile
+明确返回 UNSUPPORTED，不能从范围维护能力推断全局启停支持。调用者提供零初始化、
+独占且不复制的控制对象，要求特权 Thread、PRIMASK=1、BASEPRI/FAULTMASK=0，
+并排除 DMA、NMI/HardFault 和其他使用相关内存的执行者。可信复位或此前成功完成
+自有 clean/disable 才能建立已知干净的冷状态；CCR 位为零不证明外来 dirty line
+不存在，不允许认领未知 bootloader 状态。内存属性、执行与一致性政策属于调用者。
+
+实现先核对 M7 身份和维护的实际 set/way 几何，再取得所选 I/D Cache 责任，
+保存并恢复 CSSELR；失败读回不能报告成功。部分失败保留 owned mask 或 selector
+恢复责任，必须保留同一对象并重试 disable，不能根据当前 CCR 重新认领外来状态。
+disable 只在所有 provider/DMA 排空后执行；D-cache 全 set/way clean 到 CCR
+关闭使用无 stack/call 的 leaf，并保留 DSB/ISB，避免最后 clean 后重新产生局部
+dirty line。工作量随实际 set 数量增加，不承诺固定延迟。该机制不改变输入 mask，
+不自动发现设备或分配存储，也不建立 DMA 一致性的完整系统合同。
+
 ## MPU 编码与单区域编程
 
 `mpu.h` 保留独立 v7 size/subregion 格式与 v8 base/limit/MAIR 格式。纯 encoder
@@ -128,6 +143,21 @@ IDAU、重叠规则、Secure boot、NSC veneers、双世界 gateway、共享资�
 FreeRTOS kernel 编译不代表已支持成对世界 context、Secure task gateway 或用户
 MPU task 隔离。这些项目没有本轮物理验收证据。
 
+## NonSecure 内存权限观察
+
+`nonsecure.h` 只在 Secure 特权 Thread 中观察完整跨度的 NonSecure 非特权
+read 或 read/write 权限，使用真实 CMSE 指令并同时检查安全归属和 NS MPU。
+检查不解引用指针；拒绝空指针、零长度、地址溢出和非法 access，相邻合法区域
+也可能被保守拒绝。Native、single-state 和 NonSecure image 返回 UNSUPPORTED。
+该机制不要求存在可编程 SAU；固定 IDAU 也可以建立供检查的归属。
+
+成功只是当时的权限观察，不 pin/copy/borrow，不鉴别 gateway 调用者，不证明
+RAM、DMA 可达性、对象生命周期、总线防火墙或实际访问不会 fault，也不屏蔽
+中断或冻结另一世界。集成者必须排除 MMIO、阻止归属和映射变化，并单独复制输入
+快照、在不可逆效果前验证输出。U575 的独立同步双域参考显式提供这些 owner
+前提；它不是任意用户地址空间、异步 DMA 或 NS RTOS 的通用 transport。具体
+边界见 [U575 双域合同](u575-trustzone-contract.md)。
+
 ## 验证与可支持性
 
 GoogleTest/GoogleMock 在窄指令/MMIO 边界替换硬件，运行生产 C 算法，覆盖非法
@@ -142,6 +172,9 @@ SAU MMIO 返回 absent-hardware 结果，纯 encoder 仍可使用。模型不执
 本轮执行证据由当前源码重新生成；正式 clean-source SDK、离线双构建和 candidate
 封存还须遵循 [qualification](../delivery/qualification.md)。旧 HEAD 的通过数、
 candidate 或硬件状态不能继承。F407/F470 三板维护首发模式，G474/H743/U575
-参考装配另行维护具体 startup、timebase、GPIO 和 IRQ UART；它们不由 CPU
-profile 自动生成，也不建立 DMA/cache/security 全功能支持。全部实板 HIL
+参考装配另行维护具体 startup、timebase、GPIO 和 IRQ UART；G474 增加 selected
+EXTI，H743 增加固定 Cache 配置和有限 TX DMA，U575 另有独立无 OS 的同步双域
+参考。它们不由 CPU profile 自动生成，也不建立 DMA/cache/security 全功能支持。
+M7 冷 Cache 另有真实 leaf 指令门禁，U575 双域另有实际 SG／BLXNS、双 ELF
+地址和 LOAD 映射门禁；这些结果仍不能证明芯片物理隔离或一致性。全部实板 HIL
 未执行。软件模型或成功编译不提升产品 release。

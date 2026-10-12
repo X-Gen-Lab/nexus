@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -57,9 +58,7 @@ class StyleGateTests(unittest.TestCase):
         (self.root / ".gitignore").write_text(".venv/\nbuild/\n")
         (self.root / "src").mkdir()
         (self.root / "src/main.c").write_bytes(GOOD)
-        if not (ROOT / ".venv").is_dir():
-            self.fail("Install locked development tools before running integration tests")
-        os.symlink(ROOT / ".venv", self.root / ".venv", target_is_directory=True)
+        os.symlink(sys.prefix, self.root / ".venv", target_is_directory=True)
         self.baseline = {
             "schema_version": 1, "source_revision": gate.BOOTSTRAP_SOURCE,
             "formatter_version": "14.0.6", "format": {},
@@ -85,9 +84,8 @@ class StyleGateTests(unittest.TestCase):
         (self.root / gate.BASELINE_PATH).write_text(json.dumps(self.baseline) + "\n")
 
     def install_hooks(self):
-        python = ROOT / (".venv/Scripts/python.exe" if os.name == "nt" else ".venv/bin/python")
         result = subprocess.run(
-            [str(python), "-m", "pre_commit", "install", "--hook-type", "pre-commit",
+            [sys.executable, "-m", "pre_commit", "install", "--hook-type", "pre-commit",
              "--hook-type", "commit-msg"], cwd=self.root, capture_output=True,
         )
         self.assertEqual(result.returncode, 0, result.stderr.decode("utf-8", "replace"))
@@ -96,9 +94,6 @@ class StyleGateTests(unittest.TestCase):
         return gate.run_checks(self.root, list(files), all_files=full)
 
     def staged_check(self, *files, full=False):
-        python = ROOT / (
-            ".venv/Scripts/python.exe" if os.name == "nt" else ".venv/bin/python"
-        )
         report = self.root / "build/quality/staged-style.json"
         environment = {
             key: value for key, value in os.environ.items()
@@ -107,7 +102,7 @@ class StyleGateTests(unittest.TestCase):
         if full:
             environment["NEXUS_STYLE_FULL"] = "1"
         result = subprocess.run(
-            [str(python), "scripts/ci/style_gate.py", "--staged",
+            [sys.executable, "scripts/ci/style_gate.py", "--staged",
              "--report", str(report), *files],
             cwd=self.root, capture_output=True, env=environment,
         )

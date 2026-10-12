@@ -23,7 +23,9 @@ Production C asserts the exact assembly addresses/bits against the fixed SDK.
 writes. It sets the explicit FPU/vector/grouping ABI without initialized globals.
 Runtime start accepts only cold HSI64, undivided buses, ready LDO, conservative
 reset Flash latency 7WS and Cache off. It rejects unknown running states before
-mutation. No running-clock, bootloader, cache, scheduler or alternate supply
+mutation. Trusted reset or a prior successful owned clean/disable must establish
+known-clean caches; clear CCR bits alone cannot prove foreign dirty lines are
+absent. No running-clock, bootloader, cache, scheduler or alternate supply
 state is silently adopted. Runtime owns reserved TIM2/IRQ; failure preserves
 cleanup responsibility for retry. HSI/LDO/Flash are boot prerequisites and are
 not withdrawn when runtime stops.

@@ -11,9 +11,10 @@
 | STM32F407ZGT6 / 启明欣欣 V3.1 | Cortex-M4F；1 MiB Flash；主 SRAM 128 KiB、CCM 64 KiB；声明 clock/profile 与 reviewed routes | 实际 PCB 修订、晶振、供电、连续性、波形与负载 |
 | STM32F407VET6 / 天空星青春版 | Cortex-M4F；512 KiB Flash；主 SRAM 128 KiB、CCM 64 KiB；独立 Board 资源 | 相同类别的实际 PCB／电气／HIL 验收 |
 | GD32F470ZGT6 / 梁山派 | Cortex-M4F；1 MiB Flash；主 SRAM 192 KiB、ADDSRAM 256 KiB、TCM 64 KiB；25 MHz 声明输入、200 MHz profile；可选 USB 独立 48 MHz owner | 未观察 PCB/晶振/电气；默认 linker 只用主 SRAM；实际 USB clock/PHY 仍未测量 |
-| STM32G474RET6 / MB1367 来源参考配置 | Cortex-M4F；512 KiB Flash；128 KiB 连续 CPU SRAM alias；HSE24/170 MHz、独立 TIM2；GPIOA PA5、LPUART1 PA2/PA3 IRQ bytes；生成 factory 和裸机/FreeRTOS ELF | 实际 PCB／晶振／焊桥未观察；未授权 DMA；软件报告与实际 PCB／电气验收分开 |
-| STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置 | Cortex-M7F；2 MiB Flash；默认 AXI SRAM 512 KiB；pre-RAM LDO、HSI64、TIM2；PB0 GPIO、USART3 PD8/PD9 IRQ bytes；裸机／FreeRTOS 静态装配 | PCB／供电／硅片修订／焊桥未观察；Cache 关闭；未实现 DMA、其他 RAM 放置或运行状态接管；最终软件资格独立记录 |
-| STM32U575ZIT6Q / NUCLEO-U575ZI-Q 来源参考配置 | Cortex-M33F；2 MiB Flash；默认 SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；PC7 GPIO、USART1 PA9/PA10 IRQ bytes；裸机／FreeRTOS 静态装配 | PCB／SMPS／硅片修订／option bytes 未观察；Cache 关闭；未实现 DMA、TZEN=1、安全归属或其他 RAM 放置；最终软件资格独立记录 |
+| STM32G474RET6 / MB1367 来源参考配置 | Cortex-M4F；512 KiB Flash；128 KiB 连续 CPU SRAM alias；HSE24/170 MHz、独立 TIM2；GPIOA PA5、LPUART1 PA2/PA3 IRQ bytes；另有 PA0/PA1 selected EXTI 软件夹具；生成 factory 和裸机/FreeRTOS ELF | 实际 PCB／晶振／焊桥／EXTI 接线未观察；未授权 DMA；软件报告与实际 PCB／电气验收分开 |
+| STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置 | Cortex-M7F；2 MiB Flash；默认 AXI SRAM 512 KiB；pre-RAM LDO、固定 HSI32／HSI64 × Cache off/on、TIM2；PB0 GPIO、USART3 PD8/PD9 IRQ bytes 或有限 TX DMA；裸机／FreeRTOS 静态装配 | PCB／供电／硅片修订／焊桥／Cache 一致性未观察；RX 仍为 IRQ bytes；未实现 RX DMA、其他 RAM 放置或运行状态接管；最终软件资格独立记录 |
+| STM32U575ZIT6Q / NUCLEO-U575ZI-Q 单状态参考配置 | Cortex-M33F；2 MiB Flash；默认 SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；PC7 GPIO、USART1 PA9/PA10 IRQ bytes；裸机／FreeRTOS 静态装配 | PCB／SMPS／硅片修订／option bytes 未观察；Cache 关闭；此 Platform 配置未开放 DMA、双域 factory 或其他 RAM 放置；最终软件资格独立记录 |
+| STM32U575 独立 TZEN=1 双域参考 | 外部预先配置 option bytes；两个 Runtime 镜像、冷启动 SAU／MPU／SRAM 归属 owner、真实 CMSE SG；单一非特权 NonSecure Thread 通过同步复制消息访问受限 PC7 GPIO | 未执行实板隔离验收；无 OS、通用双域 factory、NS 任务身份、异步借用／跨域 DMA 或产品镜像认证；不改变上列 TZEN=0 默认装配 |
 | Native | Linux/POSIX 行为模型、实际线程与持久化文件故障模型 | 不构成 MCU 或电气资格 |
 
 裸机和锁定 FreeRTOS 均为显式选择的薄适配。启动只建立平台时钟／接口，不创建
@@ -21,10 +22,13 @@ scheduler、产品任务或工作流。FreeRTOS POSIX host 运行验证软件生
 替代对应 MCU 的 IRQ ceiling、FPU context 与 stack high-water 实板验证。
 
 H743 使用官方 Cortex-M7 启动与有界 LDO 电源入口，在 ACTVOSRDY 前禁止 RAM
-写入；仅接纳固定 HSI64、Cache off 的冷状态。U575 使用官方 Cortex-M33 启动，
-仅维护 TZEN=0 单地址状态；启动后读取 option register 不能使 TZEN=1 启动变成
-合法单状态启动。两者都不修改 option bytes，不自动接管 bootloader、DMA 或既有
-clock/IRQ owner。原始 CMSIS Device H7/U5 源码、许可和版本固定在 source lock。
+写入；从 HSI64、Cache off 的可信冷状态建立所选固定时钟与 Cache 配置。Cache
+关闭位本身不能证明外来 dirty 数据已经清理；要求可信复位或此前成功完成自有
+clean/disable。U575 默认 Platform 使用官方 Cortex-M33 启动并维护 TZEN=0
+单地址状态；独立 TZEN=1 参考有自己的入口和安全归属 owner。启动后读取 option
+register 不能使不匹配的启动变成合法状态。两者都不修改 option bytes，不自动
+接管 bootloader、DMA 或既有 clock/IRQ owner。原始 CMSIS Device H7/U5 源码、
+许可和版本固定在 source lock。
 精确入口见 [H743](../../soc/stm32h743/README.md) 与
 [U575](../../soc/stm32u575/README.md)。
 
@@ -43,6 +47,8 @@ bounded saved-PRIMASK；可选 cache/MPU/SAU 有真实 CPU 算法，FPU/MVE 与�
 状态决定精确 kernel port 和 ABI。CPU-only runtime 自身不生成 SoC/Board/factory；
 上述 H743/U575 纵切片分别拥有独立装配与验收。编译、寄存器模型与真实
 FP/MVE/cache/MPU/安全世界验收分别记录；
+`cache.h` 的范围维护与仅 M7 维护的冷 Cache 启停分别提供；CMSE 范围权限观察
+本身不建立用户内存 pin、复制或 transport。
 可选 restricted MPU task 和 split Secure/NonSecure runtime 已有独立软件实现；
 窄 delay/tick SVC、Secure context lease 与调用者静态存储分别验证。默认仍为
 privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围和配置例子见
@@ -50,8 +56,9 @@ privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围�
 
 ## 首发模式
 
-以下完整外设表对应 F407/F470 首发实现。G474、H743、U575 仅开放上表的
-GPIO／IRQ UART 字节纵切片，不从芯片型号或通用接口推断其他外设、DMA、
+以下完整外设表对应 F407/F470 首发实现。G474 另维护 selected EXTI，H743
+另维护固定 Cache 配置和有限 UART TX DMA；U575 默认装配仍为 GPIO／IRQ UART，
+双域同步 GPIO 参考单独维护。不从芯片型号或通用接口推断其他外设、DMA、
 ThreadX 或低功耗模式。
 
 | 接口 | 已实现模式与限制 |
@@ -82,7 +89,7 @@ ESD；它与 CAN1/USART1 flow-control 的资源冲突必须拒绝。详见
 | Raw Ethernet / MDIO / DP83848 | Native/ST/GD normal chained descriptor、RMII、14–1514-byte untagged Ethernet II、caller-owned RX loan；ETH/MDIO face 共用一个 MAC context；ST ZG/GD ZG 软件夹具已有 factory 与裸机/FreeRTOS ELF；无协议栈、PTP、checksum offload、VLAN、jumbo |
 | Input capture | STM TIM4 CH1 / GD TIMER3 CH0，PB6 AF2、16-bit modulo count、caller event ring；软件观测时间不是 edge aperture；装配接入独立验收 |
 | Complementary PWM / break | STM TIM1 / GD TIMER0，PA8/PB13/PB12 AF1；不可变精确 deadtime 与 BKIN，禁止自动重启；没有功率级安全资格 |
-| User I/O broker | 特权 kernel 调用的 scalar GPIO read/set-reset、真实 principal/pin/copy/unpin 窄端口；未实现 SVC/MPU/TZ userspace transport 或异步用户 DMA |
+| User I/O broker | 特权 kernel 调用的 scalar GPIO read/set-reset、真实 principal/pin/copy/unpin 窄端口；U575 独立无 OS 参考接入同步 CMSE gateway；无通用 SVC、多任务 userspace transport 或异步用户 DMA |
 
 参考 Board 默认不声明 Ethernet PHY/REFCLK/reset 接线。启明 ZG 可选 RMII 来源
 涉及 PG11/13/14，因此不授权 VE100 封装；天空星和梁山派无 reviewed PHY 路线。
@@ -90,13 +97,22 @@ ESD；它与 CAN1/USART1 flow-control 的资源冲突必须拒绝。详见
 [Ethernet](../design/ethernet.md)、[高级 timer](../design/timer-advanced.md)、
 [用户 I/O broker](../design/user-io-broker.md) 与 [G474](../design/stm32g474.md)。
 
-G474 已执行真实 generated factory 主机合同、独立 system/provider 回归，以及
-四个 empty／selected × 裸机／FreeRTOS ARM 镜像的预算、操作表保留、未选驱动
-裁剪和向量字节检查。它们使用 reviewed Board 资料与锁定的官方 CMSIS，不能
-证明某块实物的 MCU、X3 晶振或 VCP／LD2 焊桥。当前精确 code revision 的
-clean-source SDK、ARM 与 H743/U575 独立启动审查见
-[SoC 执行记录](soc-refinement-verification.md)。离线复现与候选封存仍有独立
+G474 维护真实 generated factory 主机合同、独立 system/provider 回归，以及
+empty／GPIO-UART／selected-EXTI 的裸机／FreeRTOS ARM 夹具；门禁检查预算、
+操作表保留、未选驱动裁剪和向量字节。它们使用 reviewed Board 资料与锁定的
+官方 CMSIS，不能证明某块实物的 MCU、X3 晶振或 VCP／LD2 焊桥。
+[初次 SoC 执行记录](soc-refinement-verification.md) 保留其历史 code revision；
+[扩展执行记录](soc-extensions-verification.md) 单独绑定后续扩展的源码和证据。
+离线复现与候选封存仍有独立
 退出条件，不能继承此前 F407/F470 候选的资格。
+
+H743 的有限 TX DMA 仅维护 USART3、DMA1 Stream0、DMAMUX1 channel0/request46
+和 AXI SRAM 可达域。Cache on 要求完整 32-byte cache line 的调用者所有权，
+clean 后才启动 DMA；准备和 drain 未完成都不能解除借用。Cache 生命周期在
+平台启停时固定，全部 provider 排空后才能撤回系统时基并 clean/disable Cache。
+不开放 RX DMA、其他 DMA engine、可选 RAM 布局或运行中变频。独立 U575 双域
+参考的分区、固定 principal 和同步借用前提见
+[TrustZone 合同](../design/u575-trustzone-contract.md)。
 
 Ethernet 生成夹具保留精确 TX/RX descriptors 与 RX buffers，只接纳 STM 主 SRAM
 128 KiB 或 GD 主 SRAM192 KiB。四个 ZG ARM graph 的开发预算/retention 通过不

@@ -10,7 +10,7 @@ extern "C" {
 #include "nexus/core/fault.h"
 #include "stm32f407_system.h"
 }
-#include <csignal>
+#include "terminal_watchdog.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
@@ -25,10 +25,6 @@ class HardwarePort {
                 (nx_fault_domain_t, nx_result_t, const char*, unsigned));
 };
 struct ParkSignal {};
-volatile std::sig_atomic_t returning_fault_seen;
-void AlarmAfterReturningFault(int) {
-    _exit(returning_fault_seen == 1 ? 42 : 92);
-}
 HardwarePort* hardware_port;
 uint32_t mask;
 bool privileged = true;
@@ -328,37 +324,30 @@ TEST_F(Stm32System, IsolatedAckFaultStillObservesTerminalOwnership) {
 }
 
 TEST_F(Stm32System, ReturningObserverCannotResumeIsolatedTimerProgress) {
-    EXPECT_EXIT(
-        {
-            if (Start().primary != 0)
-                _exit(90);
-            timer.SR = TIM_SR_UIF;
-            EXPECT_CALL(hardware_mock, Write(&timer.SR, ~(uint32_t)TIM_SR_UIF))
-                .WillOnce([](volatile uint32_t*, uint32_t) {});
-            returning_fault_seen = 0;
-            EXPECT_CALL(hardware_mock, Fault(NX_FAULT_PLATFORM, NX_ERROR_IO,
-                                             testing::_, testing::_))
-                .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
-                             unsigned line) {
-                    returning_fault_seen =
-                        file != nullptr && line != 0U && mask == 1U &&
-                                !irq_enabled &&
-                                g_nx_stm32_system.timer_error == NX_ERROR_IO &&
-                                !g_nx_stm32_system.started &&
-                                g_nx_stm32_system.remaining_effects != 0U &&
-                                g_nx_stm32_system.overflow_us == 0U &&
-                                g_nx_stm32_system.timer->DIER == 0U &&
-                                (g_nx_stm32_system.timer->CR1 & TIM_CR1_CEN) ==
-                                    0U
-                            ? 1
-                            : -1;
-                });
-            std::signal(SIGALRM, AlarmAfterReturningFault);
-            alarm(1U);
-            nx_stm32_system_timer_irq(&g_nx_stm32_system);
-            _exit(99);
-        },
-        testing::ExitedWithCode(42), "");
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        if (Start().primary != 0)
+            _exit(90);
+        timer.SR = TIM_SR_UIF;
+        EXPECT_CALL(hardware_mock, Write(&timer.SR, ~(uint32_t)TIM_SR_UIF))
+            .WillOnce([](volatile uint32_t*, uint32_t) {});
+        EXPECT_CALL(hardware_mock, Fault(NX_FAULT_PLATFORM, NX_ERROR_IO,
+                                         testing::_, testing::_))
+            .WillOnce([](nx_fault_domain_t, nx_result_t, const char* file,
+                         unsigned line) {
+                const bool valid =
+                    file != nullptr && line != 0U && mask == 1U &&
+                    !irq_enabled &&
+                    g_nx_stm32_system.timer_error == NX_ERROR_IO &&
+                    !g_nx_stm32_system.started &&
+                    g_nx_stm32_system.remaining_effects != 0U &&
+                    g_nx_stm32_system.overflow_us == 0U &&
+                    g_nx_stm32_system.timer->DIER == 0U &&
+                    (g_nx_stm32_system.timer->CR1 & TIM_CR1_CEN) == 0U;
+                nexus_test::RecordTerminalObservation(valid);
+            });
+        nx_stm32_system_timer_irq(&g_nx_stm32_system);
+        _exit(99);
+    }));
 }
 
 TEST_F(Stm32System, UnisolatableAckFaultRetainsMaskBeforeTerminalObservation) {
@@ -478,7 +467,7 @@ extern "C" void nx_stm32_system_model_poll(void* raw) {
         rcc->CR &= ~(uint32_t)RCC_CR_PLLRDY;
     if (!hold_switch)
         rcc->CFGR = (rcc->CFGR & ~(uint32_t)RCC_CFGR_SWS) |
-                    ((rcc->CFGR & RCC_CFGR_SW) << 2U);
+                    ((rcc->CFGR & (uint32_t)RCC_CFGR_SW) << 2U);
 }
 
 /** \brief GoogleMock observes writes at the hardware port, not inside logic. */

@@ -5,8 +5,9 @@ Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。
 运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU 均显式声明。
 选择某个内核不生成新 SoC、Board、向量表、启动、驱动、链接布局或 typed factory。
 STM32F407/GD32F470 三板维护首发模式；G474、H743、U575 另有精确
-GPIO／IRQ UART／timebase 参考装配。选择 CPU 本身不建立这些 SoC 机制，
-也不扩大它们的外设范围。全部实板 HIL 未执行。
+GPIO／IRQ UART／timebase 参考装配，G474 增加 selected EXTI，H743 增加固定
+Cache 配置和有限 UART TX DMA；U575 另有独立无 OS 的同步双域 GPIO 参考。
+选择 CPU 本身不建立这些 SoC 机制，也不扩大它们的外设范围。全部实板 HIL 未执行。
 
 详细所有权、上下文与拒绝语义见 [Arch 契约](../design/arch-contracts.md)，
 OS 生命周期见 [OS 适配](../../os/README.md)，精确整平台范围见
@@ -61,15 +62,28 @@ saved-PRIMASK exclusion，不静默链接 libatomic；其他核使用 compiler l
 RMW，exclusive retry 不等于固定 cycles。request/buffer/notify 生命周期仍由
 owner 保证，atomic publication 不自动回收对象。
 
-Cache 操作只维护独占的完整 32-byte lines，不 rounding、不 enable；所有相关
+`cache.h` 只维护独占的完整 32-byte lines，不 rounding、不 enable；所有相关
 cache 在写入前完成 capability/enabled 检查。DMA receive 前置/排空后的维护、
-可达地址和 buffer loan 由 provider/产品负责。MPU v7/v8 与 SAU 使用不同精确
+可达地址和 buffer loan 由 provider/产品负责。`cache_control.h` 独立维护 M7
+冷启停，其他核明确拒绝。调用者提供自有控制对象并排除其他内存使用者；可信复位
+或此前成功完成自有 clean/disable 是前提，CCR=0 不能证明外来 dirty 状态干净。
+实现校验实际 set/way 几何，失败保留 cache/selector 恢复责任；stack-free leaf
+完成全量 clean 后关闭 D-cache。它不属于运行中的普通范围维护或 DMA drain。
+
+MPU v7/v8 与 SAU 使用不同精确
 encoder；实际单 region 编程要求本域内 privileged Thread、输入 PRIMASK=1，
 相应单元已经 disabled，保留 CTRL、其他 region 与输入 RNR，不隐式启用。
 
 产品拥有 MPU/MAIR policy、SAU/IDAU、NSC veneers、安全启动、共享资源协议和
 恢复。单独的 CPU MPU 编程机制不建立用户任务隔离；显式 restricted-task
 runtime 使用实际 FreeRTOS MPU port，软件与实板安全验收仍分别记录。
+
+`nonsecure.h` 提供 Secure 特权 Thread 的完整跨度 CMSE 权限观察，按 NS
+非特权 read/read-write 校验归属和 MPU；其他 image 明确拒绝。观察不复制或 pin
+内存，不鉴别调用者、不排除 MMIO／DMA，也不冻结映射。U575 独立双域参考通过
+冷归属 owner、固定 world principal 和同步输入快照／输出预验证补齐有限 gateway
+前提，不接入 NS RTOS 或异步用户 DMA；见
+[U575 双域合同](../design/u575-trustzone-contract.md)。
 
 ## FreeRTOS 软件合同
 
@@ -201,6 +215,8 @@ python scripts/ci/tdd_gate.py --all --preset native-debug
 python -B -m unittest discover -s scripts/ci -p 'test_*.py'
 python scripts/ci/arch_compile.py --compiler arm-none-eabi-gcc \
     --output build/arch-compiler
+python scripts/ci/cache_control_compile.py --compiler arm-none-eabi-gcc \
+    --output build/cache-control-compiler
 python scripts/ci/cortex_runtime.py --compiler arm-none-eabi-gcc \
     --output build/cortex-runtime
 ```

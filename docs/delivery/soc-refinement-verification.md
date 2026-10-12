@@ -1,5 +1,9 @@
 # SoC refinement execution record
 
+This is the historical `3728b334` baseline. Later functionality and execution
+status are recorded separately in [SoC extensions](soc-extensions-verification.md).
+The hashes and counts below do not qualify those later changes.
+
 This record covers the [55-item SoC ledger](../design/soc-refinement-execution.csv).
 It distinguishes implemented mechanisms from the exact source and execution
 scope of each result. Subsequent source changes do not inherit earlier results.
@@ -38,7 +42,7 @@ within their declared scopes. This run did **not** qualify H743/U575 firmware.
 Its raw command receipts and consumer artifacts are recorded in
 `nexus-soc-qualification-20261012/sdk-dependency-boundaries-v2/`.
 
-## Final-source qualification
+## Baseline source qualification
 
 The implementation qualification source is
 `3728b334b02eb2eb70bcf5d4caafbb9746837dd3`, tree
