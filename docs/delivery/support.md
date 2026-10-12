@@ -99,9 +99,9 @@ review、clean-source SDK 与实板资格仍各自建立，参考默认镜像不
 | I2C 消息 DMA | I2C1；DMA1 RXstream0／TXstream6 channel1 | I2C0；DMA0 RXchannel0／TXchannel6 selector1 |
 | ADC 有限／连续 trigger blocks | ADC1；TIM3 TRGO；DMA2 stream4 channel0 | ADC0；TIMER2 TRGO；DMA1 channel0 selector0 |
 
-二号 I2C 的私有 IRQ/DMA provider 已有独立实例隔离与真实 SDK 编译证据，但当前
-配置首发表仍只自动装配首个 I2C controller。额外 controller 的 provider 存在不
-等于 resolver/factory 已开放所有路线。详见
+已审查的软件 Board 配置支持 STM32F407 I2C1/I2C2 与 GD32F470 I2C0/I2C1 的
+IRQ/DMA 装配及 typed factory；双控制器夹具已有独立实例隔离与真实 SDK 链接证据。
+参考 Board 只开放明确声明的 binding；其他硅片路线与实际接线需单独审查。详见
 [多控制器所有权](../design/multiple-controllers.md)。
 
 SPI DMA 要求非空、不重叠的 TX／RX 实际访问跨度；固定地址方向只访问调用者的一字节。
