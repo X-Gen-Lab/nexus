@@ -5,10 +5,12 @@ Native uses POSIX threads; FreeRTOS uses explicit static TCB, stack and queue
 storage selected by the caller. No universal maximum pool, hidden worker,
 default timer daemon or device dependency on OS.
 
-Notifications are hints: arm/recheck the authoritative request predicate.
-Kernel ISR operations validate the selected syscall ceiling. A returning task
-parks until another task completes deletion/join; reclaim its TCB/stack only
-after the join contract says observers are gone. Applications own scheduler
+Notifications are hints: arm/recheck the authoritative request predicate. Kernel
+ISR operations validate the selected syscall ceiling. Native task return ends the
+pthread; FreeRTOS wrappers publish completion and suspend until external deletion;
+ThreadX wrappers enter the kernel completion path. The one external lifecycle
+owner must successfully join before reclaiming wrapper, TCB or stack storage.
+Completion hints alone do not prove kernel detachment. Applications own scheduler
 start, workers, queue depth, fairness and shutdown progress.
 
 The real FreeRTOS POSIX scheduler fixture validates host task/queue lifecycle.

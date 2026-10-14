@@ -1,8 +1,10 @@
 # OS backend integration
 
-Nexus maintains Native, Baremetal and the reviewed FreeRTOS ports. An additional
-RTOS is conditional on an actual integration requirement and a reviewed kernel
-license, version, port and resource budget. This document and the executable
+Nexus maintains Native, Baremetal, the reviewed FreeRTOS ports and the explicit
+Native/M4 ThreadX subset. ThreadX has its own license, static-task lifecycle and
+masking contract; it does not inherit the nine-core FreeRTOS port scope. An
+additional RTOS is conditional on an actual integration requirement and a reviewed
+kernel license, version, port and resource budget. This document and the executable
 probe prepare that work; they do not claim RTX, Zephyr or another kernel is
 supported. Applications continue to own task topology, storage and shutdown.
 

@@ -1,0 +1,140 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 0cde957a56914468a60aba8beff69e25052b87e057f36501491c70f3cd130560\n"
+
+msgid "Configuration, development and evidence tools"
+msgstr "配置、开发与证据工具"
+
+msgid ""
+"Tools preserve actual process exits and input identities. A prepared plan is"
+" not execution evidence; a model pass is not physical qualification. Run "
+"maintained commands from the repository root with the selected tools on "
+"`PATH`."
+msgstr ""
+"工具保留真实进程退出码与输入身份。准备计划不是执行证据；模型通过不是物理资格。从仓库根目录运行维护命令，并将所选工具放在 `PATH` 上。"
+
+msgid ""
+"Use the [fixed source checkout guide](../../guides/source-checkout.md) "
+"before executing these tools; a default-branch clone may not contain the "
+"documented entry."
+msgstr ""
+"执行这些工具前使用[固定源码取得指南](../../guides/source-checkout.md)；默认分支克隆可能没有文档中的入口。"
+
+msgid "Entry"
+msgstr "入口"
+
+msgid "Task"
+msgstr "任务"
+
+msgid "Success does not establish"
+msgstr "成功不建立以下结论"
+
+msgid "`tools/dev/dev.py configure/build/test`"
+msgstr "`tools/dev/dev.py configure/build/test`"
+
+msgid "Explicit CMake/CTest preset path"
+msgstr "显式 CMake／CTest 预设路径"
+
+msgid "Other presets, skipped tests or HIL"
+msgstr "其他预设、跳过测试或 HIL"
+
+msgid "`tools/dev/dev.py doctor/check`"
+msgstr "`tools/dev/dev.py doctor/check`"
+
+msgid "Tool availability and repository checks"
+msgstr "工具可用性与仓库检查"
+
+msgid "A platform candidate"
+msgstr "平台候选"
+
+msgid "`tools/configure/configure.py`"
+msgstr "`tools/configure/configure.py`"
+
+msgid "init/list-bindings/check/explain/generate"
+msgstr "init/list-bindings/check/explain/generate"
+
+msgid "PCB electrical truth"
+msgstr "PCB 电气事实"
+
+msgid "`scripts/ci/tdd_gate.py`"
+msgstr "`scripts/ci/tdd_gate.py`"
+
+msgid "Actual full tool and GoogleTest/GoogleMock execution"
+msgstr "实际完整工具与 GoogleTest／GoogleMock 执行"
+
+msgid "Historical RED order or HIL"
+msgstr "历史 RED 顺序或 HIL"
+
+msgid "`cmake/package/package_source_sdk.py`"
+msgstr "`cmake/package/package_source_sdk.py`"
+
+msgid "Package or verify exact source bytes"
+msgstr "打包或验证精确源码字节"
+
+msgid "MCU execution or release promotion"
+msgstr "MCU 执行或发行升级"
+
+msgid "`cmake/package/verify_consumers.py`"
+msgstr "`cmake/package/verify_consumers.py`"
+
+msgid "Relocated public consumer compile/run/link"
+msgstr "搬移后公共消费工程编译／运行／链接"
+
+msgid "Hardware timing"
+msgstr "硬件时序"
+
+msgid "`tools/measurement/`"
+msgstr "`tools/measurement/`"
+
+msgid "Actual ELF resource, layout and retention checks"
+msgstr "实际 ELF 资源、布局与保留检查"
+
+msgid "Measured stack peaks or WCET"
+msgstr "实测栈峰值或 WCET"
+
+msgid "`tools/hil/`"
+msgstr "`tools/hil/`"
+
+msgid ""
+"Preparation, admission, capture and raw validation by distinct commands"
+msgstr "通过不同命令完成准备、准入、采集与原始记录验证"
+
+msgid "Physical cases never executed"
+msgstr "从未执行的物理用例"
+
+msgid "`tools/evidence/`"
+msgstr "`tools/evidence/`"
+
+msgid "Bind executed scope, environment and actual artifact bytes"
+msgstr "绑定执行范围、环境和实际产物字节"
+
+msgid "Product signature or safety certification"
+msgstr "产品签名或安全认证"
+
+msgid ""
+"Use [the SDK tutorial](../../tutorials/source-sdk.md), [assembly "
+"reference](assembly.md), [TDD workflow](../../development/workflow.md) and "
+"[performance/HIL guide](../../guides/performance-hil.md) for complete tasks."
+" Detailed flags come from each maintained CLI `--help`; do not maintain a "
+"second parser specification here."
+msgstr ""
+"完整任务见[SDK 教程](../../tutorials/source-sdk.md)、[装配参考](assembly.md)、[TDD "
+"工作流](../../development/workflow.md)和[性能／HIL 指南](../../guides/performance-"
+"hil.md)。详细标志由各维护 CLI 的 `--help` 给出，不在此维护第二份解析器规范。"
+
+msgid ""
+"Fresh reports require nonzero actual executions and original logs. A missing"
+" tool, empty XML, skipped-only run, stale output or changed input cannot "
+"satisfy a gate. Do not filter or shard complete acceptance runs. Development"
+" subsets retain their limited scope and cannot close a full candidate exit."
+msgstr ""
+"新报告要求实际执行数量大于零，并保留原始日志。工具缺失、空 "
+"XML、只有跳过的运行、陈旧输出或输入变化都不能通过门禁。完整验收执行不得过滤或分片。开发子集保留有限范围，不能关闭完整候选退出条件。"

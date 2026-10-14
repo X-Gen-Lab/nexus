@@ -14,7 +14,8 @@ No fictitious personnel or local file can establish GitHub branch protection.
 
 ## Install and check tools
 
-From the repository root, initialize pinned recursive dependencies, then:
+First complete the [fixed source and recursive dependency guide](../guides/source-checkout.md).
+From that repository root, install the maintenance tools:
 
 ```sh
 python scripts/setup/install_dev_tools.py

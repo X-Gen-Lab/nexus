@@ -1,0 +1,305 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 25670b4f15152edc4f0f7bc8b2f1325fe6307401a5355d295859b245bf76613c\n"
+
+msgid "Documentation tools and preparation"
+msgstr "文档工具与环境准备"
+
+msgid ""
+"Use this reference to prepare one maintained documentation environment. The "
+"qualified build tuple is Linux x86_64 with CPython 3.12. The local "
+"preparation uses CPython 3.12.14; CI selects the same patch version. "
+"Documentation tool qualification does not grant firmware, hardware or "
+"product qualification."
+msgstr ""
+"使用本参考准备维护中的文档环境。已验证构建组合是 Linux x86_64 与 CPython 3.12。本地准备使用 CPython "
+"3.12.14；CI 选择同一补丁版本。文档工具资格不授予固件、硬件或产品资格。"
+
+msgid ""
+"First prepare the [fixed source and recursive "
+"dependencies](../guides/source-checkout.md). The manifest and tool lock must"
+" come from the same selected source revision."
+msgstr "先准备[固定源码与递归依赖](../guides/source-checkout.md)。清单与工具锁必须来自同一选定源码版本。"
+
+msgid "The authoritative closure"
+msgstr "权威依赖闭包"
+
+msgid ""
+"`dependencies/docs-tools.lock.json` owns archive identities, target "
+"constraints, direct requirements and license provenance. The complete Python"
+" dependency set is also expressed in `dependencies/docs-python-linux-"
+"cp312.txt`, using exact versions and SHA-256 hashes. "
+"`docs/sphinx/requirements.txt` references that file; it does not define "
+"another resolver input."
+msgstr ""
+"`dependencies/docs-tools.lock.json` 维护归档身份、目标约束、直接依赖和许可来源。完整 Python 依赖也在 "
+"`dependencies/docs-python-linux-cp312.txt` 中列出，使用精确版本与 "
+"SHA-256。`docs/sphinx/requirements.txt` 引用该文件，不定义另一份解析输入。"
+
+msgid "Tool or resource"
+msgstr "工具或资源"
+
+msgid "Maintained identity"
+msgstr "维护身份"
+
+msgid "Role"
+msgstr "用途"
+
+msgid "Sphinx"
+msgstr "Sphinx"
+
+msgid "7.4.7"
+msgstr "7.4.7"
+
+msgid "Strict HTML and gettext builders"
+msgstr "严格 HTML 与 gettext 构建器"
+
+msgid "MyST parser"
+msgstr "MyST parser"
+
+msgid "4.0.1"
+msgstr "4.0.1"
+
+msgid "Markdown directives, roles and navigation"
+msgstr "Markdown 指令、角色与导航"
+
+msgid "Breathe"
+msgstr "Breathe"
+
+msgid "4.35.0"
+msgstr "4.35.0"
+
+msgid "Public API from fresh Doxygen XML"
+msgstr "从新生成 Doxygen XML 提供公共 API"
+
+msgid "Docutils"
+msgstr "Docutils"
+
+msgid "0.21.2"
+msgstr "0.21.2"
+
+msgid "Structured document processing"
+msgstr "结构化文档处理"
+
+msgid "Alabaster"
+msgstr "Alabaster"
+
+msgid "0.7.16"
+msgstr "0.7.16"
+
+msgid "Local HTML theme assets"
+msgstr "本地 HTML 主题资源"
+
+msgid "polib"
+msgstr "polib"
+
+msgid "1.2.0"
+msgstr "1.2.0"
+
+msgid "Translation catalog validation"
+msgstr "翻译消息目录验证"
+
+msgid "Python closure"
+msgstr "Python 闭包"
+
+msgid "28 individually hashed wheels"
+msgstr "28 个分别记录摘要的 wheel 包"
+
+msgid "All runtime transitive packages"
+msgstr "全部运行时传递依赖包"
+
+msgid "Doxygen"
+msgstr "Doxygen"
+
+msgid "Official Linux 1.14.0 archive"
+msgstr "官方 Linux 1.14.0 归档"
+
+msgid "Public header XML and HTML"
+msgstr "公共头文件 XML 与 HTML"
+
+msgid "Graphviz"
+msgstr "Graphviz"
+
+msgid "Debian 2.42.4-3 archives"
+msgstr "Debian 2.42.4-3 归档"
+
+msgid "Reviewed DOT diagrams"
+msgstr "已审查 DOT 图示"
+
+msgid "Noto CJK"
+msgstr "Noto CJK"
+
+msgid "Debian 20240730+repack1-1 archive"
+msgstr "Debian 20240730+repack1-1 归档"
+
+msgid "Exact CJK glyphs and metrics"
+msgstr "精确 CJK 字形与度量"
+
+msgid "Native closure"
+msgstr "Native 闭包"
+
+msgid "46 individually hashed Debian archives"
+msgstr "46 个分别记录摘要的 Debian 归档"
+
+msgid "Loader, libraries, renderers and font data"
+msgstr "加载器、库、渲染器与字体数据"
+
+msgid ""
+"The native closure includes its libc loader, C/C++ runtime libraries, "
+"Graphviz core/dot/Pango plugins, fontconfig and each library actually linked"
+" by those executables and renderers. Preparation executes the locked "
+"loader's `--list` operation and rejects paths outside the prefix. It removes"
+" unsupported renderers instead of discovering host GTK, GD or Ghostscript "
+"installations. This tool set supports the maintained DOT/SVG/Cairo diagram "
+"path, not every Graphviz renderer."
+msgstr ""
+"Native 闭包包含 libc 加载器、C/C++ 运行库、Graphviz core／dot／Pango "
+"插件、fontconfig，以及这些执行文件和渲染器实际链接的每个库。准备流程执行锁定加载器的 `--list`，拒绝 prefix "
+"外路径。它移除不支持的渲染器，不发现主机 GTK、GD 或 Ghostscript 安装。此工具集支持维护中的 DOT／SVG／Cairo "
+"图链，不支持每一种 Graphviz 渲染器。"
+
+msgid ""
+"Linux kernel, the CPython/venv bootstrap, `dpkg-deb` and a POSIX shell are "
+"explicit host prerequisites. Their observed values belong to the preparation"
+" receipt. This lock does not claim a reproducible host image or a bitwise "
+"identical kernel."
+msgstr ""
+"Linux 内核、CPython／venv 引导、`dpkg-deb` 和 POSIX shell "
+"是明确主机前提，其实测值记录在准备回执中。本锁不宣称主机镜像可复现或内核逐字节相同。"
+
+msgid "Prepare a fresh prefix"
+msgstr "准备新 prefix"
+
+msgid "Run from the repository root, with CPython 3.12 available:"
+msgstr "从仓库根目录、在 CPython 3.12 可用的条件下执行："
+
+msgid ""
+"Preparation may download archives over HTTPS. It verifies the entire archive"
+" closure before creating the prefix. Wheel installation then uses `--no-"
+"index`, `--find-links` and `--require-hashes`; no transitive package is left"
+" for a fresh online resolution. Native packages are extracted locally "
+"without `sudo` or system package installation."
+msgstr ""
+"准备流程可以通过 HTTPS 下载归档。它先验证整个归档闭包，再创建 prefix。wheel 包安装随后使用 `--no-"
+"index`、`--find-links` 和 `--require-hashes`；没有传递依赖留给新的在线解析。Native 包在本地解包，不使用 "
+"`sudo` 或系统包安装。"
+
+msgid "For an independent installation from a previously prepared cache:"
+msgstr "从此前准备的缓存进行独立安装："
+
+msgid ""
+"The expected result is exit code zero and `installation.json` in the fresh "
+"prefix. It records the lock digest, observed tool versions, kernel, resolved"
+" ELF closure, archive digests, installed file digests and copied license "
+"digests. The installed `bin/fc-match` must resolve `Noto Sans CJK SC` from "
+"the locked font package. A missing archive, changed byte, failed command or "
+"mismatched font fails preparation and leaves no success prefix."
+msgstr ""
+"预期结果是退出码零，以及新 prefix 中的 `installation.json`。它记录工具锁摘要、实测版本、内核、解析后的 ELF "
+"闭包、归档摘要、已安装文件摘要与复制许可摘要。安装后的 `bin/fc-match` 必须从锁定字体包解析 `Noto Sans CJK "
+"SC`。归档缺失、字节变化、命令失败或字体不匹配都会使准备失败，不留下成功 prefix。"
+
+msgid ""
+"An existing prefix is rejected. Choose a fresh path for an upgrade; do not "
+"silently mutate an installation already referenced by build evidence. "
+"Archive cache corruption also fails rather than being silently replaced by a"
+" download."
+msgstr "已有 prefix 会被拒绝。升级时选择新路径，不得静默改变已经被构建证据引用的安装。缓存归档损坏同样失败，不通过重新下载静默替换。"
+
+msgid "Use the single documentation CLI"
+msgstr "使用唯一文档 CLI"
+
+msgid ""
+"Run the maintained CLI with the prepared Python and explicit tool prefix:"
+msgstr "使用准备好的 Python 和显式工具 prefix 运行维护 CLI："
+
+msgid ""
+"`install.environment(prefix)` returns a verified subprocess environment with"
+" the locked tool executables first on `PATH`. `install.diagnose(prefix)` "
+"rejects a changed lock, changed installed file or changed license before "
+"reporting tool identity. Neither operation installs or downloads tools. "
+"Builds must generate fresh XML and HTML; a former successful output cannot "
+"rescue a failed command."
+msgstr ""
+"`install.environment(prefix)` 返回已验证的子进程环境，将锁定执行文件放在 `PATH` "
+"首位。`install.diagnose(prefix)` 在报告工具身份前拒绝变化的工具锁、已安装文件或许可。两者均不安装或下载工具。构建必须生成新的"
+" XML 与 HTML；旧成功输出不能补救失败命令。"
+
+msgid ""
+"The `scripts/tools/docs.py`, `.sh`, `.ps1` and `.bat` entries only forward "
+"to this CLI. Legacy `all`, `doxygen` and `sphinx` targets all select the "
+"same complete strict build. Removed generation modifiers are rejected; "
+"wrappers cannot create a fallback Doxyfile or Sphinx configuration. Windows "
+"and macOS wrappers preserve CLI forwarding, while a formal build still "
+"requires the maintained Linux tuple."
+msgstr ""
+"`scripts/tools/docs.py`、`.sh`、`.ps1` 和 `.bat` 入口只转发到此 CLI。旧 `all`、`doxygen` "
+"和 `sphinx` 目标都选择同一完整严格构建。已移除的生成修饰选项会被拒绝；包装入口不能创建回退 Doxyfile 或 Sphinx "
+"配置。Windows 与 macOS 包装入口保留 CLI 转发，正式构建仍要求维护中的 Linux 工具组合。"
+
+msgid "CI permission boundary"
+msgstr "CI 权限边界"
+
+msgid ""
+"`docs-build.yml` has only `contents: read`. It prepares tools explicitly, "
+"runs source checks, builds both languages, packages offline output and "
+"records observed job identity. A failed build has no successful "
+"documentation upload. The package producer writes outside the source "
+"checkout. CI then copies the verified result to fresh ignored upload "
+"staging, compares the archive digest and verifies the copied manifest and "
+"payload before the existing job-identity gate. The staging copy does not "
+"rebuild or replace the original package."
+msgstr ""
+"`docs-build.yml` 只有 `contents: "
+"read`。它显式准备工具、执行源码检查、构建两种语言、打包离线输出并记录实测任务身份。构建失败时没有成功文档上传。包生产器在源码 checkout "
+"外写入。CI 随后将已验证结果复制到新的忽略上传暂存目录，比较归档摘要，并在已有任务身份门禁前验证复制后的清单与内容文件。该暂存复制不重建或替换原始包。"
+
+msgid ""
+"`docs-publish.yml` runs only for the reviewed `docs-delivery` branch. Its "
+"read-only job verifies the prepared public bytes and publication receipt "
+"before uploading a Pages artifact. The separate deployment job alone has "
+"Pages and OIDC write permissions and uses the `nexus-documentation` "
+"environment. It never checks out or executes external pull-request source "
+"code. Deployment branch rules and actual remote execution remain "
+"independently observable repository state."
+msgstr ""
+"`docs-publish.yml` 只为已审查的 `docs-delivery` 分支运行。其只读任务在上传 Pages "
+"产物前验证已准备的公开字节与发布回执。只有独立部署任务具有 Pages 和 OIDC 写权限，并使用 `nexus-documentation` "
+"环境。它从不 checkout 或执行外部 pull 请求源码。部署分支规则与实际远程执行仍是必须独立观察的仓库状态。"
+
+msgid "License and upgrade handling"
+msgstr "许可与升级处理"
+
+msgid ""
+"Each native archive carries its Debian copyright files. The locked `base-"
+"files` archive supplies every referenced complete text in `licenses/common-"
+"licenses/`; preparation rejects a missing shared license reference. Wheel "
+"license files are copied from the verified wheel; the five upstream wheels "
+"which omit license text use checked-in texts extracted from their exact "
+"verified source distributions. The lock records source archive digest, "
+"member and extracted text digest. The Doxygen archive carries its complete "
+"license text. Preparation copies these texts into `prefix/licenses/`; "
+"packaging retains the applicable license payload."
+msgstr ""
+"每个 Native 归档携带 Debian copyright 文件。锁定 `base-files` 归档提供 `licenses/common-"
+"licenses/` 中所有被引用完整文本；共享许可引用缺失时准备会拒绝。wheel 包许可从已验证 wheel 包复制；五个未包含许可文本的上游 "
+"wheel 包使用从各自精确已验证源发行包提取并检入的文本。工具锁记录源归档摘要、成员和提取文本摘要。Doxygen 归档携带完整许可。准备将文本复制到"
+" `prefix/licenses/`；打包保留适用许可内容文件。"
+
+msgid ""
+"To upgrade, review upstream changes and licenses, resolve one new exact "
+"closure, update both lock and hash requirements, execute a fresh online "
+"preparation and an independent offline preparation, then run strict "
+"bilingual build, diagram freshness, package verification and restoration. "
+"Retain raw failures and results; an updated version string alone is "
+"insufficient acceptance evidence."
+msgstr ""
+"升级时审查上游变更与许可，解析一份新的精确闭包，同时更新工具锁与摘要约束，执行新在线准备及独立离线准备，再运行严格双语构建、图示新鲜度、包验证和恢复。保留原始失败与结果；仅更新版本字符串不足以建立验收证据。"

@@ -12,6 +12,9 @@ Tools preserve actual process exits and input identities. A prepared plan is not
 execution evidence; a model pass is not physical qualification. Run maintained
 commands from the repository root with the selected tools on `PATH`.
 
+Use the [fixed source checkout guide](../../guides/source-checkout.md) before
+executing these tools; a default-branch clone may not contain the documented entry.
+
 | Entry | Task | Success does not establish |
 | --- | --- | --- |
 | `tools/dev/dev.py configure/build/test` | Explicit CMake/CTest preset path | Other presets, skipped tests or HIL |

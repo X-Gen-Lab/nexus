@@ -23,7 +23,9 @@ exclude_patterns = ['archive/**', 'api/**', '_build/**', '_output/**',
                     'sphinx/os.rst', 'sphinx/support.rst',
                     'sphinx/development/index.rst']
 html_theme = 'alabaster'
-html_theme_options = {'description': 'Static embedded platform mechanisms'}
+html_theme_options = {'description': ('可复用的静态嵌入式平台机制'
+                      if language == 'zh_CN' else 'Static embedded platform mechanisms')}
+templates_path = [str(_REPOSITORY / 'docs/sphinx/templates')]
 html_static_path = [str(_REPOSITORY / 'docs/assets/styles')]
 html_css_files = ['nexus.css']
 html_sidebars = {'**': ['about.html', 'navigation.html', 'searchbox.html']}

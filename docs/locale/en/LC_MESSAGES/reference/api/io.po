@@ -1,0 +1,881 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: a5f53133afdb560bcef446bfcc833ddbf8fc66f73b64833e5759efaedd6312c9\nX-Nexus-Reviewed: true\n"
+
+msgid "Typed I/O: devices and execution contracts"
+msgstr "Typed I/O: devices and execution contracts"
+
+msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgstr "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+
+msgid "adc.h"
+msgstr "adc.h"
+
+msgid "Reviewed ADC single-shot and low-rate polling scans."
+msgstr "Reviewed ADC single-shot and low-rate polling scans."
+
+msgid "Author  Nexus Team"
+msgstr "Author  Nexus Team"
+
+msgid "Typedefs"
+msgstr "Typedefs"
+
+msgid "Functions"
+msgstr "Functions"
+
+msgid "Query the fixed reviewed ADC sequence and raw-count format."
+msgstr "Query the fixed reviewed ADC sequence and raw-count format."
+
+msgid "Parameters"
+msgstr "Parameters"
+
+msgid "Returns"
+msgstr "Returns"
+
+msgid "Read fixed channel order and complete-scan timing facts."
+msgstr "Read fixed channel order and complete-scan timing facts."
+
+msgid "Attach optional observer storage before acquisition starts."
+msgstr "Attach optional observer storage before acquisition starts."
+
+msgid "Query one live consumer loan's software completion record."
+msgstr "Query one live consumer loan's software completion record."
+
+msgid "Sample the fixed single/scan sequence by bounded polling."
+msgstr "Sample the fixed single/scan sequence by bounded polling."
+
+msgid "Start selected trigger/block acquisition with caller storage."
+msgstr "Start selected trigger/block acquisition with caller storage."
+
+msgid "Stop trigger and memory sources without revoking consumer loans."
+msgstr "Stop trigger and memory sources without revoking consumer loans."
+
+msgid "Explicitly resume discrete block acquisition after consumer drain."
+msgstr "Explicitly resume discrete block acquisition after consumer drain."
+
+msgid "Attach an optional hint sink after checking publisher IRQ priority."
+msgstr "Attach an optional hint sink after checking publisher IRQ priority."
+
+msgid "Raw count facts; nominal Vref is not a calibrated physical measurement."
+msgstr "Raw count facts; nominal Vref is not a calibrated physical measurement."
+
+msgid "Public Members"
+msgstr "Public Members"
+
+msgid "Immutable complete-scan timing facts for the selected mode."
+msgstr "Immutable complete-scan timing facts for the selected mode."
+
+msgid "Shared read-only methods using one provider state."
+msgstr "Shared read-only methods using one provider state."
+
+msgid "Immutable interface pointing to caller-owned state."
+msgstr "Immutable interface pointing to caller-owned state."
+
+msgid "adc_observer.h"
+msgstr "adc_observer.h"
+
+msgid "Optional caller-owned ADC publication observations."
+msgstr "Optional caller-owned ADC publication observations."
+
+msgid "Defines"
+msgstr "Defines"
+
+msgid "Initialize fresh unborrowed optional observation storage."
+msgstr "Initialize fresh unborrowed optional observation storage."
+
+msgid "Provider-only cold bind validates every metadata/payload span before the first DMA loan."
+msgstr "Provider-only cold bind validates every metadata/payload span before the first DMA loan."
+
+msgid "Provider-only record before matching release-publication."
+msgstr "Provider-only record before matching release-publication."
+
+msgid "Read only a currently acquired block's exact epoch record."
+msgstr "Read only a currently acquired block's exact epoch record."
+
+msgid "Provider-only unbind after all producer/consumer loans join."
+msgstr "Provider-only unbind after all producer/consumer loans join."
+
+msgid "One loan's software observation, never a sample aperture."
+msgstr "One loan's software observation, never a sample aperture."
+
+msgid "Optional caller-owned observer control and exact records."
+msgstr "Optional caller-owned observer control and exact records."
+
+msgid "advanced_pwm.h"
+msgstr "advanced_pwm.h"
+
+msgid "Optional fixed complementary PWM with latched break."
+msgstr "Optional fixed complementary PWM with latched break."
+
+msgid "Stage duty against the fixed declared PSC/ARR and complementary pair."
+msgstr "Stage duty against the fixed declared PSC/ARR and complementary pair."
+
+msgid "Enable outputs only with inactive break and no latched fault."
+msgstr "Enable outputs only with inactive break and no latched fault."
+
+msgid "Disable/read back master output and both channel sources."
+msgstr "Disable/read back master output and both channel sources."
+
+msgid "Query staged duty, actual enable state and latched break facts."
+msgstr "Query staged duty, actual enable state and latched break facts."
+
+msgid "Clear a software fault only while disabled and BKIN is inactive."
+msgstr "Clear a software fault only while disabled and BKIN is inactive."
+
+msgid "Counts use the fixed post-prescaler clock; deadtime uses tDTS."
+msgstr "Counts use the fixed post-prescaler clock; deadtime uses tDTS."
+
+msgid "Shared immutable controls; configuration is a cold assembly fact."
+msgstr "Shared immutable controls; configuration is a cold assembly fact."
+
+msgid "Immutable identity; controller state and configuration outlive IRQs."
+msgstr "Immutable identity; controller state and configuration outlive IRQs."
+
+msgid "can.h"
+msgstr "can.h"
+
+msgid "Classic CAN value frames and caller-owned mailbox requests."
+msgstr "Classic CAN value frames and caller-owned mailbox requests."
+
+msgid "Enums"
+msgstr "Enums"
+
+msgid "Values:"
+msgstr "Values:"
+
+msgid "Validate and copy a classic frame into unborrowed request storage."
+msgstr "Validate and copy a classic frame into unborrowed request storage."
+
+msgid "Admit one frame into one of three hardware mailboxes."
+msgstr "Admit one frame into one of three hardware mailboxes."
+
+msgid "Request abort without revoking a borrowed request."
+msgstr "Request abort without revoking a borrowed request."
+
+msgid "Process latched completions and absolute timeout/drain deadlines."
+msgstr "Process latched completions and absolute timeout/drain deadlines."
+
+msgid "Consume value events without overwriting earlier unconsumed facts."
+msgstr "Consume value events without overwriting earlier unconsumed facts."
+
+msgid "Copy authoritative error/admission state, even when RX is full."
+msgstr "Copy authoritative error/admission state, even when RX is full."
+
+msgid "Close admission, abort TX and detach IRQ/RX publishers."
+msgstr "Close admission, abort TX and detach IRQ/RX publishers."
+
+msgid "Explicitly reenter initialization after bus-off and complete drain."
+msgstr "Explicitly reenter initialization after bus-off and complete drain."
+
+msgid "Borrow an optional wake target after checking all four actual IRQs."
+msgstr "Borrow an optional wake target after checking all four actual IRQs."
+
+msgid "Classic 2.0A/B value frame; DLC is always 0..8, never CAN FD."
+msgstr "Classic 2.0A/B value frame; DLC is always 0..8, never CAN FD."
+
+msgid "Caller-owned frame copied at prepare; base must first be initialized."
+msgstr "Caller-owned frame copied at prepare; base must first be initialized."
+
+msgid "Value receive fact or ordered loss boundary."
+msgstr "Value receive fact or ordered loss boundary."
+
+msgid "Latched controller state, independent of receive-ring fullness."
+msgstr "Latched controller state, independent of receive-ring fullness."
+
+msgid "Shared immutable operations; execution owner serializes task methods."
+msgstr "Shared immutable operations; execution owner serializes task methods."
+
+msgid "Immutable face; lookup does not allocate, start or acquire hardware."
+msgstr "Immutable face; lookup does not allocate, start or acquire hardware."
+
+msgid "dma.h"
+msgstr "dma.h"
+
+msgid "Explicit DMA memory domains, physical streams and drain facts."
+msgstr "Explicit DMA memory domains, physical streams and drain facts."
+
+msgid "Transfer direction determines device access to caller memory."
+msgstr "Transfer direction determines device access to caller memory."
+
+msgid "Validate an entire buffer within one explicit memory domain."
+msgstr "Validate an entire buffer within one explicit memory domain."
+
+msgid "Reject duplicate physical streams in an assembled resource set."
+msgstr "Reject duplicate physical streams in an assembled resource set."
+
+msgid "Require engine, IRQ and peripheral drain independently."
+msgstr "Require engine, IRQ and peripheral drain independently."
+
+msgid "Reviewed DMA-visible memory interval, never CPU accessibility."
+msgstr "Reviewed DMA-visible memory interval, never CPU accessibility."
+
+msgid "Opaque physical engine and request selector identities."
+msgstr "Opaque physical engine and request selector identities."
+
+msgid "Independent facts required before memory borrow release."
+msgstr "Independent facts required before memory borrow release."
+
+msgid "ethernet.h"
+msgstr "ethernet.h"
+
+msgid "Caller-owned untagged Ethernet II frames and receive loans."
+msgstr "Caller-owned untagged Ethernet II frames and receive loans."
+
+msgid "Prepare an initialized, unborrowed request and its immutable frame."
+msgstr "Prepare an initialized, unborrowed request and its immutable frame."
+
+msgid "Admit one frame into caller-owned hardware descriptors."
+msgstr "Admit one frame into caller-owned hardware descriptors."
+
+msgid "Close TX admission and drain the shared TX engine without replay."
+msgstr "Close TX admission and drain the shared TX engine without replay."
+
+msgid "Task-owner bounded progress; no worker, lock, pool or wait."
+msgstr "Task-owner bounded progress; no worker, lock, pool or wait."
+
+msgid "Task-consumer complete-frame loan; EMPTY creates no borrow."
+msgstr "Task-consumer complete-frame loan; EMPTY creates no borrow."
+
+msgid "Final consumer access; stale, foreign and double releases reject."
+msgstr "Final consumer access; stale, foreign and double releases reject."
+
+msgid "Copy latched instance/link/error facts; output is not retained."
+msgstr "Copy latched instance/link/error facts; output is not retained."
+
+msgid "Apply external PHY observations, not auto-negotiate or invent link."
+msgstr "Apply external PHY observations, not auto-negotiate or invent link."
+
+msgid "Close admission and withdraw MAC/DMA/IRQ sources with readback."
+msgstr "Close admission and withdraw MAC/DMA/IRQ sources with readback."
+
+msgid "Bind an optional borrowed hint after actual IRQ-policy validation."
+msgstr "Bind an optional borrowed hint after actual IRQ-policy validation."
+
+msgid "Caller-owned immutable contiguous frame, excluding its hardware FCS."
+msgstr "Caller-owned immutable contiguous frame, excluding its hardware FCS."
+
+msgid "Observed PHY fact, supplied explicitly by the external link owner."
+msgstr "Observed PHY fact, supplied explicitly by the external link owner."
+
+msgid "Complete immutable frame; release requires this exact incarnation."
+msgstr "Complete immutable frame; release requires this exact incarnation."
+
+msgid "Latched facts survive receive backpressure and failed wake hints."
+msgstr "Latched facts survive receive backpressure and failed wake hints."
+
+msgid "exti.h"
+msgstr "exti.h"
+
+msgid "Static EXTI line bindings, bounded event storage and drain."
+msgstr "Static EXTI line bindings, bounded event storage and drain."
+
+msgid "Read queued EXTI events from an exact static line binding."
+msgstr "Read queued EXTI events from an exact static line binding."
+
+msgid "Disable the line source, clear pending and drain its handler."
+msgstr "Disable the line source, clear pending and drain its handler."
+
+msgid "Attach or detach an explicit event/loss IRQ wake target."
+msgstr "Attach or detach an explicit event/loss IRQ wake target."
+
+msgid "Edge facts; timestamp precision and coalescing are provider-specific."
+msgstr "Edge facts; timestamp precision and coalescing are provider-specific."
+
+msgid "flash.h"
+msgstr "flash.h"
+
+msgid "Full physical Flash geometry and explicit bounded regions."
+msgstr "Full physical Flash geometry and explicit bounded regions."
+
+msgid "Query exact physical Flash geometry without side effects."
+msgstr "Query exact physical Flash geometry without side effects."
+
+msgid "Read bounded physical Flash without retaining destination."
+msgstr "Read bounded physical Flash without retaining destination."
+
+msgid "Program aligned physical Flash and settle all hardware pulses."
+msgstr "Program aligned physical Flash and settle all hardware pulses."
+
+msgid "Erase a whole physical sector range with pulse settlement."
+msgstr "Erase a whole physical sector range with pulse settlement."
+
+msgid "Validate region bounds against physical geometry."
+msgstr "Validate region bounds against physical geometry."
+
+msgid "Read within an explicit physical region."
+msgstr "Read within an explicit physical region."
+
+msgid "Program within an explicitly writable physical region."
+msgstr "Program within an explicitly writable physical region."
+
+msgid "Erase whole physical sectors within a writable region."
+msgstr "Erase whole physical sectors within a writable region."
+
+msgid "Erase sector geometry, with offset relative to full physical Flash."
+msgstr "Erase sector geometry, with offset relative to full physical Flash."
+
+msgid "Read-only physical geometry; platform reserves no product storage."
+msgstr "Read-only physical geometry; platform reserves no product storage."
+
+msgid "Explicit consumer-selected bounds; no implicit product partition."
+msgstr "Explicit consumer-selected bounds; no implicit product partition."
+
+msgid "gpio.h"
+msgstr "gpio.h"
+
+msgid "Fixed GPIO authorization masks and bounded port operations."
+msgstr "Fixed GPIO authorization masks and bounded port operations."
+
+msgid "Atomically set/reset one port's authorized output mask."
+msgstr "Atomically set/reset one port's authorized output mask."
+
+msgid "Read one input snapshot restricted to the binding mask."
+msgstr "Read one input snapshot restricted to the binding mask."
+
+msgid "Toggle authorized outputs under the single-writer contract."
+msgstr "Toggle authorized outputs under the single-writer contract."
+
+msgid "i2c.h"
+msgstr "i2c.h"
+
+msgid "Address endpoints, repeated START and explicit STOP settlement."
+msgstr "Address endpoints, repeated START and explicit STOP settlement."
+
+msgid "Maintained finite-message admission bounds, checked before hardware access."
+msgstr "Maintained finite-message admission bounds, checked before hardware access."
+
+msgid "Execute a polling 7-bit-address message transaction."
+msgstr "Execute a polling 7-bit-address message transaction."
+
+msgid "Recover an idle controller after a bus fault."
+msgstr "Recover an idle controller after a bus fault."
+
+msgid "Prepare an unborrowed request without copying payload."
+msgstr "Prepare an unborrowed request without copying payload."
+
+msgid "Validate finite descriptors and payload/control separation."
+msgstr "Validate finite descriptors and payload/control separation."
+
+msgid "Admit one finite asynchronous repeated-START transaction."
+msgstr "Admit one finite asynchronous repeated-START transaction."
+
+msgid "Start an already borrowed QUEUED request without readmission."
+msgstr "Start an already borrowed QUEUED request without readmission."
+
+msgid "Prove controller identity without hardware effects."
+msgstr "Prove controller identity without hardware effects."
+
+msgid "Request cancellation without reclaiming any storage."
+msgstr "Request cancellation without reclaiming any storage."
+
+msgid "Advance deadline and STOP/DMA drain in bounded task context."
+msgstr "Advance deadline and STOP/DMA drain in bounded task context."
+
+msgid "Close admission and stop only after every borrower drains."
+msgstr "Close admission and stop only after every borrower drains."
+
+msgid "Attach one optional hint sink after actual IRQ policy checks."
+msgstr "Attach one optional hint sink after actual IRQ policy checks."
+
+msgid "One message; a new message starts with repeated START, final with STOP."
+msgstr "One message; a new message starts with repeated START, final with STOP."
+
+msgid "Caller-owned finite message sequence."
+msgstr "Caller-owned finite message sequence."
+
+msgid "i2c_bus_clear.h"
+msgstr "i2c_bus_clear.h"
+
+msgid "Explicit open-drain I2C bus clear with retained leases."
+msgstr "Explicit open-drain I2C bus clear with retained leases."
+
+msgid "Maximum completed recovery low/high periods per attempt."
+msgstr "Maximum completed recovery low/high periods per attempt."
+
+msgid "Bind explicit electrical operations without touching pins."
+msgstr "Bind explicit electrical operations without touching pins."
+
+msgid "Clear one idle, authorized bus with at most nine pulses."
+msgstr "Clear one idle, authorized bus with at most nine pulses."
+
+msgid "Retry only retained STOP cleanup and ownership return."
+msgstr "Retry only retained STOP cleanup and ownership return."
+
+msgid "Read-only methods for an authorized two-pin GPIO handoff."
+msgstr "Read-only methods for an authorized two-pin GPIO handoff."
+
+msgid "Explicit immutable GPIO methods and caller-owned adapter state."
+msgstr "Explicit immutable GPIO methods and caller-owned adapter state."
+
+msgid "Caller-selected electrical timings in microseconds."
+msgstr "Caller-selected electrical timings in microseconds."
+
+msgid "Independent recovery and STOP/ownership-return results."
+msgstr "Independent recovery and STOP/ownership-return results."
+
+msgid "Caller-owned, zero-initialized single-executor session."
+msgstr "Caller-owned, zero-initialized single-executor session."
+
+msgid "mdio.h"
+msgstr "mdio.h"
+
+msgid "Narrow Clause22 station management with absolute deadlines."
+msgstr "Narrow Clause22 station management with absolute deadlines."
+
+msgid "Read one Clause22 PHY register without retaining output storage."
+msgstr "Read one Clause22 PHY register without retaining output storage."
+
+msgid "Write one Clause22 PHY register, not a PHY-specific policy sequence."
+msgstr "Write one Clause22 PHY register, not a PHY-specific policy sequence."
+
+msgid "model.h"
+msgstr "model.h"
+
+msgid "Explicit host-model fixtures; no physical MCU qualification."
+msgstr "Explicit host-model fixtures; no physical MCU qualification."
+
+msgid "Switch host model to a deterministic clock domain."
+msgstr "Switch host model to a deterministic clock domain."
+
+msgid "Advance deterministic time without an implicit hardware IRQ."
+msgstr "Advance deterministic time without an implicit hardware IRQ."
+
+msgid "Configure the fixed GPIO model after writer quiescence."
+msgstr "Configure the fixed GPIO model after writer quiescence."
+
+msgid "Inject one GPIO input snapshot in the deterministic model."
+msgstr "Inject one GPIO input snapshot in the deterministic model."
+
+msgid "Observe output state for a host behavioral assertion."
+msgstr "Observe output state for a host behavioral assertion."
+
+msgid "Configure exact RX/TX fixture capacities on the fixed UART."
+msgstr "Configure exact RX/TX fixture capacities on the fixed UART."
+
+msgid "Validate exact Native TX context for selected RS485 binding."
+msgstr "Validate exact Native TX context for selected RS485 binding."
+
+msgid "Copy explicit IRQ facts into a quiescent host UART model."
+msgstr "Copy explicit IRQ facts into a quiescent host UART model."
+
+msgid "Execute one deterministic TX IRQ byte/TC event."
+msgstr "Execute one deterministic TX IRQ byte/TC event."
+
+msgid "Inject one RX IRQ fact into bounded selected-profile storage."
+msgstr "Inject one RX IRQ fact into bounded selected-profile storage."
+
+msgid "Configure start failure or inability to prove hardware drain."
+msgstr "Configure start failure or inability to prove hardware drain."
+
+msgid "Observe captured TX bytes."
+msgstr "Observe captured TX bytes."
+
+msgid "Configure a fixed SPI echo or register-file model."
+msgstr "Configure a fixed SPI echo or register-file model."
+
+msgid "Inject bounded SPI partial failure or controller occupancy."
+msgstr "Inject bounded SPI partial failure or controller occupancy."
+
+msgid "Check the modeled CS level after a transaction."
+msgstr "Check the modeled CS level after a transaction."
+
+msgid "Configure one 7-bit-address register-file I2C model."
+msgstr "Configure one 7-bit-address register-file I2C model."
+
+msgid "Inject NACK, arbitration loss or a stuck bus."
+msgstr "Inject NACK, arbitration loss or a stuck bus."
+
+msgid "Configure physical-geometry RAM model, clearly nonpersistent."
+msgstr "Configure physical-geometry RAM model, clearly nonpersistent."
+
+msgid "Inject program/erase failure after complete modeled pulses."
+msgstr "Inject program/erase failure after complete modeled pulses."
+
+msgid "Reset the watchdog fixture as a simulated new boot."
+msgstr "Reset the watchdog fixture as a simulated new boot."
+
+msgid "Observe expiration of the enabled deterministic IWDG."
+msgstr "Observe expiration of the enabled deterministic IWDG."
+
+msgid "Configure exact storage for one static EXTI line."
+msgstr "Configure exact storage for one static EXTI line."
+
+msgid "Inject a timestamped selected edge fact."
+msgstr "Inject a timestamped selected edge fact."
+
+msgid "Configure fixed PWM model timer facts after writer quiescence."
+msgstr "Configure fixed PWM model timer facts after writer quiescence."
+
+msgid "Configure fixed ADC raw-count sequence and format."
+msgstr "Configure fixed ADC raw-count sequence and format."
+
+msgid "Inject ADC failure after a prefix of complete samples."
+msgstr "Inject ADC failure after a prefix of complete samples."
+
+msgid "Operate on the selected Native model face only."
+msgstr "Operate on the selected Native model face only."
+
+msgid "Choose explicit or automatic modeled SPI IRQ stepping."
+msgstr "Choose explicit or automatic modeled SPI IRQ stepping."
+
+msgid "Inject one bounded SPI byte/idle event on the exact Native bus."
+msgstr "Inject one bounded SPI byte/idle event on the exact Native bus."
+
+msgid "Inject inability to prove SPI hardware drain."
+msgstr "Inject inability to prove SPI hardware drain."
+
+msgid "Inject UART IDLE and publish its current valid byte prefix."
+msgstr "Inject UART IDLE and publish its current valid byte prefix."
+
+msgid "Inject one ADC timer-trigger scan into a free selected block."
+msgstr "Inject one ADC timer-trigger scan into a free selected block."
+
+msgid "Variables"
+msgstr "Variables"
+
+msgid "Fixed model bindings; no allocation, lookup, probe or construction."
+msgstr "Fixed model bindings; no allocation, lookup, probe or construction."
+
+msgid "UART storage belongs to the fixture until port stop and IRQ quiescence."
+msgstr "UART storage belongs to the fixture until port stop and IRQ quiescence."
+
+msgid "spi.h"
+msgstr "spi.h"
+
+msgid "Single-executor polling SPI endpoints and complete CS transactions."
+msgstr "Single-executor polling SPI endpoints and complete CS transactions."
+
+msgid "Explicit single-cell DMA addresses, both borrowed until SETTLED."
+msgstr "Explicit single-cell DMA addresses, both borrowed until SETTLED."
+
+msgid "Execute one bounded full-duplex 8-bit polling transaction."
+msgstr "Execute one bounded full-duplex 8-bit polling transaction."
+
+msgid "Recover an idle SPI controller after its retained fault."
+msgstr "Recover an idle SPI controller after its retained fault."
+
+msgid "Prepare an unborrowed finite request without copying buffers."
+msgstr "Prepare an unborrowed finite request without copying buffers."
+
+msgid "Submit one finite asynchronous whole-CS transaction."
+msgstr "Submit one finite asynchronous whole-CS transaction."
+
+msgid "Submit explicit incrementing or single-cell DMA memory."
+msgstr "Submit explicit incrementing or single-cell DMA memory."
+
+msgid "Start an adapter-admitted QUEUED request without readmission."
+msgstr "Start an adapter-admitted QUEUED request without readmission."
+
+msgid "Verify an endpoint belongs to the serviced bus."
+msgstr "Verify an endpoint belongs to the serviced bus."
+
+msgid "Request cancellation without revoking DMA/CS buffer loans."
+msgstr "Request cancellation without revoking DMA/CS buffer loans."
+
+msgid "Advance one asynchronous bus under its single task executor."
+msgstr "Advance one asynchronous bus under its single task executor."
+
+msgid "Close admission and retain active sources until full drain."
+msgstr "Close admission and retain active sources until full drain."
+
+msgid "Attach an optional hint sink to asynchronous bus IRQ publishers."
+msgstr "Attach an optional hint sink to asynchronous bus IRQ publishers."
+
+msgid "Caller-owned finite SPI request with one whole-CS interval."
+msgstr "Caller-owned finite SPI request with one whole-CS interval."
+
+msgid "stream.h"
+msgstr "stream.h"
+
+msgid "Bounded caller-owned blocks with explicit producer/consumer loans."
+msgstr "Bounded caller-owned blocks with explicit producer/consumer loans."
+
+msgid "Initialize an unborrowed stream and exact supplied block array."
+msgstr "Initialize an unborrowed stream and exact supplied block array."
+
+msgid "Reserve the next free block for one serialized producer."
+msgstr "Reserve the next free block for one serialized producer."
+
+msgid "Query the next physical slot without creating a loan or loss."
+msgstr "Query the next physical slot without creating a loan or loss."
+
+msgid "Latch explicitly observed dropped producer boundaries."
+msgstr "Latch explicitly observed dropped producer boundaries."
+
+msgid "Publish a complete block after all hardware writes detached."
+msgstr "Publish a complete block after all hardware writes detached."
+
+msgid "Acquire the next ready block for one serialized consumer."
+msgstr "Acquire the next ready block for one serialized consumer."
+
+msgid "Release only the matching consumer incarnation after final use."
+msgstr "Release only the matching consumer incarnation after final use."
+
+msgid "Abort a producer loan only after memory write sources detach."
+msgstr "Abort a producer loan only after memory write sources detach."
+
+msgid "Close producer admission while retaining every outstanding loan."
+msgstr "Close producer admission while retaining every outstanding loan."
+
+msgid "Bind a posted producer to a quiescent initialized stream."
+msgstr "Bind a posted producer to a quiescent initialized stream."
+
+msgid "Query the next preposted slot without a loan or guessed loss."
+msgstr "Query the next preposted slot without a loan or guessed loss."
+
+msgid "Reserve a future fill without making earlier blocks ready."
+msgstr "Reserve a future fill without making earlier blocks ready."
+
+msgid "Publish only the oldest pending detached producer loan."
+msgstr "Publish only the oldest pending detached producer loan."
+
+msgid "Cancel the newest pending fill after proof of memory drain."
+msgstr "Cancel the newest pending fill after proof of memory drain."
+
+msgid "Caller-owned block metadata; initialize data and capacity only."
+msgstr "Caller-owned block metadata; initialize data and capacity only."
+
+msgid "Caller-owned stream control, initialized before publication."
+msgstr "Caller-owned stream control, initialized before publication."
+
+msgid "Mutable producer loan; hardware must stop before abort or publish."
+msgstr "Mutable producer loan; hardware must stop before abort or publish."
+
+msgid "Optional caller-owned preposted producer; no default cost."
+msgstr "Optional caller-owned preposted producer; no default cost."
+
+msgid "Immutable consumer loan, valid until matching release succeeds."
+msgstr "Immutable consumer loan, valid until matching release succeeds."
+
+msgid "stream_budget.h"
+msgstr "stream_budget.h"
+
+msgid "Optional constant-work snapshot and checked cold sizing."
+msgstr "Optional constant-work snapshot and checked cold sizing."
+
+msgid "Snapshot maintained metadata under one short IRQ guard."
+msgstr "Snapshot maintained metadata under one short IRQ guard."
+
+msgid "Checked cold calculation, no stream mutation or allocation."
+msgstr "Checked cold calculation, no stream mutation or allocation."
+
+msgid "O(1) aggregate facts; free total does not imply cursor is free."
+msgstr "O(1) aggregate facts; free total does not imply cursor is free."
+
+msgid "Explicit engineering assumptions, no inferred hardware rate."
+msgstr "Explicit engineering assumptions, no inferred hardware rate."
+
+msgid "Conservative declared-assumption budget; never physical evidence."
+msgstr "Conservative declared-assumption budget; never physical evidence."
+
+msgid "timer.h"
+msgstr "timer.h"
+
+msgid "Fixed timer/channel PWM with one shared base configuration."
+msgstr "Fixed timer/channel PWM with one shared base configuration."
+
+msgid "Atomically stage a reviewed fixed-base PWM duty."
+msgstr "Atomically stage a reviewed fixed-base PWM duty."
+
+msgid "Enable a previously configured fixed PWM output."
+msgstr "Enable a previously configured fixed PWM output."
+
+msgid "Stop PWM at its declared Board inactive electrical level."
+msgstr "Stop PWM at its declared Board inactive electrical level."
+
+msgid "Query staged PWM counts and selected timer clock."
+msgstr "Query staged PWM counts and selected timer clock."
+
+msgid "PWM counts refer to the fixed declared post-prescaler timer clock."
+msgstr "PWM counts refer to the fixed declared post-prescaler timer clock."
+
+msgid "timer_capture.h"
+msgstr "timer_capture.h"
+
+msgid "Optional raw timer edge capture with caller-owned events."
+msgstr "Optional raw timer edge capture with caller-owned events."
+
+msgid "Observable loss incidents, not an exact count of physical edges."
+msgstr "Observable loss incidents, not an exact count of physical edges."
+
+msgid "Borrow an exact event ring and enable the fixed capture channel."
+msgstr "Borrow an exact event ring and enable the fixed capture channel."
+
+msgid "Disable and read back channel/IRQ sources before returning storage."
+msgstr "Disable and read back channel/IRQ sources before returning storage."
+
+msgid "Copy the oldest event in a short saved-mask metadata section."
+msgstr "Copy the oldest event in a short saved-mask metadata section."
+
+msgid "Query counter units and observable queue/loss facts."
+msgstr "Query counter units and observable queue/loss facts."
+
+msgid "Hardware modulo counter and the separate IRQ observation time."
+msgstr "Hardware modulo counter and the separate IRQ observation time."
+
+msgid "Fixed counter units and current software retention state."
+msgstr "Fixed counter units and current software retention state."
+
+msgid "Shared immutable methods; no per-call acquisition or allocation."
+msgstr "Shared immutable methods; no per-call acquisition or allocation."
+
+msgid "Immutable identity; state and methods outlive calls and IRQs."
+msgstr "Immutable identity; state and methods outlive calls and IRQs."
+
+msgid "uart.h"
+msgstr "uart.h"
+
+msgid "IRQ TX requests and independently budgeted byte/event reception."
+msgstr "IRQ TX requests and independently budgeted byte/event reception."
+
+msgid "Prepare an unborrowed IRQ TX descriptor without copying data."
+msgstr "Prepare an unborrowed IRQ TX descriptor without copying data."
+
+msgid "Submit one direct request to a single-executor UART."
+msgstr "Submit one direct request to a single-executor UART."
+
+msgid "Request cancellation; acceptance does not mean settlement."
+msgstr "Request cancellation; acceptance does not mean settlement."
+
+msgid "Observe time/hardware completion and drain one active request."
+msgstr "Observe time/hardware completion and drain one active request."
+
+msgid "Read buffered RX events from the selected event profile."
+msgstr "Read buffered RX events from the selected event profile."
+
+msgid "Read buffered bytes from the selected byte profile."
+msgstr "Read buffered bytes from the selected byte profile."
+
+msgid "Close admission and drain TX before releasing hardware."
+msgstr "Close admission and drain TX before releasing hardware."
+
+msgid "Attach or detach one explicit IRQ wake target."
+msgstr "Attach or detach one explicit IRQ wake target."
+
+msgid "Start the selected RX block mode using exact caller storage."
+msgstr "Start the selected RX block mode using exact caller storage."
+
+msgid "Stop RX block production without revoking consumer loans."
+msgstr "Stop RX block production without revoking consumer loans."
+
+msgid "Timestamp belongs to provider clock; precision is hardware-specific."
+msgstr "Timestamp belongs to provider clock; precision is hardware-specific."
+
+msgid "Caller-owned TX descriptor; initialize base before first prepare."
+msgstr "Caller-owned TX descriptor; initialize base before first prepare."
+
+msgid "uart_rs485.h"
+msgstr "uart_rs485.h"
+
+msgid "Optional single-owner RS485 direction and wire-tail adapter."
+msgstr "Optional single-owner RS485 direction and wire-tail adapter."
+
+msgid "Exact transport's side-effect-free TX admission validator."
+msgstr "Exact transport's side-effect-free TX admission validator."
+
+msgid "Param context"
+msgstr "Param context"
+
+msgid "Param request"
+msgstr "Param request"
+
+msgid "Return"
+msgstr "Return"
+
+msgid "Bind exclusive transport and establish inactive DE."
+msgstr "Bind exclusive transport and establish inactive DE."
+
+msgid "Immutable selected electrical/timing facts, no task or heap."
+msgstr "Immutable selected electrical/timing facts, no task or heap."
+
+msgid "Caller-owned opt-in adapter, zero-initialize before init."
+msgstr "Caller-owned opt-in adapter, zero-initialize before init."
+
+msgid "usb_device.h"
+msgstr "usb_device.h"
+
+msgid "Full-speed device packets and caller-owned endpoint loans."
+msgstr "Full-speed device packets and caller-owned endpoint loans."
+
+msgid "Prepare one IN packet without reading or borrowing its bytes."
+msgstr "Prepare one IN packet without reading or borrowing its bytes."
+
+msgid "Prepare an OUT packet capacity without modifying its storage."
+msgstr "Prepare an OUT packet capacity without modifying its storage."
+
+msgid "Admit one packet, never a hidden queue or complete USB transaction."
+msgstr "Admit one packet, never a hidden queue or complete USB transaction."
+
+msgid "Request endpoint disable/drain without revoking a buffer loan."
+msgstr "Request endpoint disable/drain without revoking a buffer loan."
+
+msgid "Set/clear STALL only after the endpoint has no live transfer."
+msgstr "Set/clear STALL only after the endpoint has no live transfer."
+
+msgid "Task-only bounded progress; deadline never depends on USB SOF."
+msgstr "Task-only bounded progress; deadline never depends on USB SOF."
+
+msgid "Consume bounded value events; output is never retained."
+msgstr "Consume bounded value events; output is never retained."
+
+msgid "Task-only authoritative snapshot, independent of event-ring space."
+msgstr "Task-only authoritative snapshot, independent of event-ring space."
+
+msgid "Stage SET_ADDRESS for the matching zero-data standard SETUP."
+msgstr "Stage SET_ADDRESS for the matching zero-data standard SETUP."
+
+msgid "Attach/detach a borrowed task/IRQ-compatible wake hint."
+msgstr "Attach/detach a borrowed task/IRQ-compatible wake hint."
+
+msgid "Disconnect, disable, drain, detach IRQs, then release clock consumer."
+msgstr "Disconnect, disable, drain, detach IRQs, then release clock consumer."
+
+msgid "Shared readonly packet methods; context is a selected endpoint."
+msgstr "Shared readonly packet methods; context is a selected endpoint."
+
+msgid "Controller identity remains separate from endpoint identities."
+msgstr "Controller identity remains separate from endpoint identities."
+
+msgid "wake.h"
+msgstr "wake.h"
+
+msgid "Explicit borrowed IRQ wake target and syscall-ceiling check."
+msgstr "Explicit borrowed IRQ wake target and syscall-ceiling check."
+
+msgid "Explicit kernel interrupt-mask policy, independent of any RTOS."
+msgstr "Explicit kernel interrupt-mask policy, independent of any RTOS."
+
+msgid "Validate actual IRQ facts against an explicit kernel policy."
+msgstr "Validate actual IRQ facts against an explicit kernel policy."
+
+msgid "Deliver one bounded hint after authoritative state is latched."
+msgstr "Deliver one bounded hint after authoritative state is latched."
+
+msgid "Optional immutable wake target borrowed by an IRQ provider."
+msgstr "Optional immutable wake target borrowed by an IRQ provider."
+
+msgid "Immutable CPU and kernel facts for cold wake binding."
+msgstr "Immutable CPU and kernel facts for cold wake binding."
+
+msgid "Actual publisher facts read before attaching any borrowed sink."
+msgstr "Actual publisher facts read before attaching any borrowed sink."
+
+msgid "watchdog.h"
+msgstr "watchdog.h"
+
+msgid "Irreversible IWDG effects and neutral hardware reset causes."
+msgstr "Irreversible IWDG effects and neutral hardware reset causes."
+
+msgid "Enable IWDG with reviewed bounds; activation is irreversible."
+msgstr "Enable IWDG with reviewed bounds; activation is irreversible."
+
+msgid "Feed an enabled IWDG without changing product health policy."
+msgstr "Feed an enabled IWDG without changing product health policy."
+
+msgid "Query current watchdog effect and timeout uncertainty."
+msgstr "Query current watchdog effect and timeout uncertainty."
+
+msgid "Read latched boot reset causes captured before clearing flags."
+msgstr "Read latched boot reset causes captured before clearing flags."
+
+msgid "Hardware-selected timeout bounds, including declared LSI uncertainty."
+msgstr "Hardware-selected timeout bounds, including declared LSI uncertainty."

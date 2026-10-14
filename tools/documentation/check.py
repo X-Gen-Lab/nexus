@@ -7,12 +7,12 @@ import re
 import urllib.error
 import urllib.parse
 import urllib.request
-import xml.etree.ElementTree as ET
 
 EXCLUDED = {"archive", "locale", "_build", ".doctrees"}
 LEGACY_SPHINX = {"index.rst", "api/index.rst", "api.rst", "getting_started.rst",
                  "architecture.rst", "configuration.rst", "migration.rst",
                  "os.rst", "support.rst", "development/index.rst"}
+SITE_READMES = {"assets/diagrams/README.md", "design/README.md", "delivery/README.md"}
 LINK = re.compile(r"!?\[[^\]]*\]\((<[^>]+>|[^)]+)\)")
 REFERENCE = re.compile(r"^\s*\[[^\]]+\]:\s*(\S+)", re.MULTILINE)
 FENCE = re.compile(r"^(`{3,}|~{3,})([^\n]*)\n(.*?)^\1\s*$",
@@ -70,7 +70,8 @@ def configuration_content(contents, suffix):
 def is_source(root, path):
     docs = root / "docs"
     return (path.is_relative_to(docs) and path.suffix in {".md", ".rst"}
-            and (path.name != "README.md" or path == docs / "assets/diagrams/README.md")
+            and (path.name != "README.md"
+                 or path.relative_to(docs).as_posix() in SITE_READMES)
             and path.relative_to(docs).parts[0] != "api"
             and not EXCLUDED.intersection(path.relative_to(docs).parts)
             and not (path.is_relative_to(docs / "sphinx") and
@@ -81,8 +82,115 @@ def sources(root):
     return sorted(path for path in (root / "docs").rglob("*") if is_source(root, path))
 
 
-def anchors(contents):
+def file_inputs(contents, suffix):
+    """Collect rendered include/image inputs, excluding fenced examples.
+
+    Ordinary hyperlinks are reader destinations, not build inputs. Includes
+    are followed separately so an included document's own inputs participate
+    in the same staged snapshot admission as the top-level document.
+    """
+    if suffix == ".rst":
+        from tools.documentation import rst
+        return rst.file_includes(contents)
+    result = []
+    blocks = list(FENCE.finditer(contents))
+    fenced_ranges = [(block.start(), block.end()) for block in blocks]
+    blocks += [block for block in re.finditer(
+        r"^(:{3,})\{([^\n]+)\}\s*([^\n]*)\n(.*?)^\1\s*$", contents,
+        re.MULTILINE | re.DOTALL) if not any(
+            start <= block.start() < end for start, end in fenced_ranges)]
+    for block in blocks:
+        if block.re == FENCE:
+            directive = re.fullmatch(r"\{(literalinclude|include|image|figure)\}"
+                                     r"\s+(.+)", block[2].strip())
+        else:
+            directive = re.fullmatch(r"(literalinclude|include|image|figure)"
+                                     r"\s+(.+)", block[2] + " " + block[3])
+        if directive:
+            result.append((directive[1], directive[2].strip()))
+    plain = FENCE.sub("", contents)
+    result.extend(("image", match[1].strip().split(' "', 1)[0].strip("<>"))
+                  for match in LINK.finditer(plain) if match[0].startswith("!"))
+    return result
+
+
+def resource_path(root, page, target, *, kind, require_file=True):
+    """Resolve actual directive inputs, rejecting escapes and symlinks.
+
+    Sphinx include/literalinclude arguments are filenames, not URLs. In those
+    names %, #, ? and angle brackets remain literal; decoding or truncation
+    would admit a different Git input. Only image/figure URI paths are decoded.
+    """
+    if kind in {"include", "literalinclude"}:
+        name = target
+    elif kind in {"image", "figure"}:
+        parsed = urllib.parse.urlsplit(target)
+        if parsed.scheme or target.startswith("//"):
+            return None
+        name = urllib.parse.unquote(parsed.path)
+    else:
+        raise ValueError("unknown documentation resource kind: " + kind)
+    candidate = ((root / "docs" / name.lstrip("/")) if name.startswith("/")
+                 else page.parent / name)
+    if require_file and any(part.is_symlink() for part in
+                            (candidate, *candidate.parents)):
+        raise ValueError("document input symlink rejected: " + target)
+    candidate = candidate.resolve()
+    if require_file and (not candidate.is_relative_to(root)
+                         or not candidate.is_file()):
+        raise ValueError("missing/escaping document input " + target)
+    return candidate
+
+
+def dependencies(root, pages=None, *, require_files=True):
+    """Return the direct and transitive local files actually rendered.
+
+    No parser, renderer, tool installation or network is needed. A repeated
+    include is allowed, but an include cycle has no finite source expansion.
+    Literal includes remain literal even when their suffix is Markdown/RST.
+    Output admission may collect declared paths even when missing; that mode
+    also collects escaping paths without reading their contents. Source checks
+    reject those inputs later, after legitimate failure reports are protected.
+    """
+    root = Path(root).resolve()
+    result, visiting, visited = set(), set(), set()
+
+    def visit(page, syntax):
+        identity = (page, syntax)
+        if identity in visiting:
+            if not require_files:
+                return
+            raise ValueError("documentation include cycle: " + str(page))
+        if identity in visited:
+            return
+        visiting.add(identity)
+        for kind, target in file_inputs(page.read_text(), syntax):
+            destination = resource_path(root, page, target, kind=kind,
+                                        require_file=require_files)
+            if destination is None:
+                if kind in {"include", "literalinclude"}:
+                    raise ValueError("document include must be local: "
+                                     + target)
+                continue
+            result.add(destination)
+            if (kind == "include" and destination.is_relative_to(root)
+                    and destination.is_file()):
+                # Include text is parsed in the including document's syntax;
+                # a .txt fragment does not switch RST into Markdown.
+                visit(destination, syntax)
+        visiting.remove(identity)
+        visited.add(identity)
+
+    for page in sources(root) if pages is None else pages:
+        visit(page, page.suffix)
+    return result
+
+
+def anchors(contents, suffix=".md"):
     """Check authored labels and heading fragments; Sphinx checks full roles."""
+    if suffix == ".rst":
+        from tools.documentation import rst
+        return rst.anchors(contents)
     result = set(re.findall(r"^\(([^)]+)\)=\s*$", contents, re.MULTILINE))
     result.update(re.findall(r"^\.\. _([^:]+):\s*$", contents, re.MULTILINE))
     result.update(re.findall(r'\bid=["\']([^"\']+)["\']', contents))
@@ -117,7 +225,8 @@ def navigation(path, contents):
             if any(character in entry for character in "*?["):
                 entries.extend(item.resolve() for item in path.parent.glob(entry)
                                if item.suffix in {".md", ".rst"}
-                               and item != path and item.name != "README.md")
+                               and item != path and (item.name != "README.md"
+                               or item.parent.name in {"design", "delivery"}))
                 continue
             if not destination.suffix:
                 destination = next((destination.with_suffix(suffix)
@@ -161,22 +270,30 @@ def validate_ledger(path):
 
 
 def validate_translations(root, *, pot_root=None, languages=("en", "zh_CN"),
-                          critical_pages=CRITICAL_PAGES):
-    """Critical paths require reviewed translations; other fallback stays visible."""
+                          critical_pages=None):
+    """Require reviewed translations for every current page in both directions.
+
+    An explicit page subset remains available for focused fixtures. Frozen
+    archives and source-only README entries follow the normal site source policy.
+    A formal build also verifies the exact newly extracted message set.
+    """
     from tools.documentation import sphinx_ext
     root = Path(root)
     records, errors = [], []
-    for docname in critical_pages:
-        page = root / "docs" / (docname + ".md")
-        if not page.is_file():
-            errors.append("missing critical page: " + docname)
+    pages = {page.relative_to(root / "docs").with_suffix("").as_posix(): page
+             for page in sources(root)}
+    selected = sorted(pages) if critical_pages is None else critical_pages
+    for docname in selected:
+        page = pages.get(docname)
+        if page is None:
+            errors.append("missing translation page: " + docname)
             continue
         source = page.read_text()
         messages = ()
         if pot_root is not None:
             pot = Path(pot_root) / (docname + ".pot")
             if not pot.is_file():
-                errors.append("missing critical gettext output: " + docname)
+                errors.append("missing gettext output: " + docname)
                 continue
             messages = tuple(sphinx_ext.read_catalog(pot)[1])
         for language in languages:
@@ -184,7 +301,7 @@ def validate_translations(root, *, pot_root=None, languages=("en", "zh_CN"),
                                                    root / "docs/locale", messages)
             records.append({"page": docname, **status})
             if status["status"] not in {"original", "reviewed"}:
-                errors.append(f"critical translation {docname}/{language}: {status['status']}")
+                errors.append(f"translation {docname}/{language}: {status['status']}")
     return {"errors": errors, "records": records,
             "status": "failed" if errors else "passed"}
 
@@ -242,14 +359,19 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
             for target in graph[path.resolve()]:
                 if not target.is_file():
                     errors.append(label + ": missing toctree target " + str(target))
-            includes = re.findall(r"```\{literalinclude\}\s+([^\n]+)", contents)
-            includes += re.findall(r"^\.\. literalinclude::\s*(\S+)",
-                                   contents, re.MULTILINE)
-            for include in includes:
-                destination = (path.parent / include.strip()).resolve()
-                if not destination.is_file() or not destination.is_relative_to(root):
-                    errors.append(label + ": missing/escaping literalinclude " + include)
-                elif check_configuration and destination.suffix == ".toml":
+            for kind, include in file_inputs(contents, path.suffix):
+                try:
+                    destination = resource_path(root, path, include, kind=kind)
+                except ValueError as error:
+                    errors.append(label + ": " + kind + ": " + str(error))
+                    continue
+                if destination is None:
+                    if kind in {"include", "literalinclude"}:
+                        errors.append(label + ": " + kind + " must be local: "
+                                      + include)
+                    continue
+                if (kind == "literalinclude" and check_configuration
+                        and destination.suffix == ".toml"):
                     from tools.configure import configure, runtime
                     import tomllib
                     raw = tomllib.loads(destination.read_text())
@@ -260,6 +382,9 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
             plain = FENCE.sub("", contents)
             targets = [match[1] for match in LINK.finditer(plain)]
             targets += REFERENCE.findall(plain)
+            if path.suffix == ".rst":
+                from tools.documentation import rst
+                targets = rst.target_links(contents)
             for target in targets:
                 target = target.strip().split(' "', 1)[0].strip("<>")
                 parsed = urllib.parse.urlsplit(target)
@@ -274,7 +399,8 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
                     errors.append(label + ": missing link " + target)
                 elif (destination.is_file() and parsed.fragment
                       and destination.suffix in {".md", ".rst"}):
-                    if urllib.parse.unquote(parsed.fragment) not in anchors(destination.read_text()):
+                    if urllib.parse.unquote(parsed.fragment) not in anchors(
+                            destination.read_text(), destination.suffix):
                         errors.append(label + ": missing anchor " + target)
             normalized = configuration_content(contents, path.suffix)
             if check_configuration and "```toml" in normalized:
@@ -303,17 +429,12 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
             with registry.open() as stream:
                 diagram_rows = list(csv.DictReader(stream))
             for row in diagram_rows:
-                if row["render_status"] != "rendered":
-                    errors.append(row["diagram_id"] + ": required diagram not rendered")
+                if row.get("render_status") != "rendered":
+                    errors.append(row.get("diagram_id", "diagram")
+                                  + ": required diagram not rendered")
                     continue
-                for field in ("source_dot", "rendered_svg"):
-                    path = registry.parent / row[field]
-                    if not row[field] or not path.is_file():
-                        errors.append(row["diagram_id"] + ": missing diagram pair")
-                try:
-                    validate_svg(registry.parent / row["rendered_svg"])
-                except (OSError, ValueError, ET.ParseError) as error:
-                    errors.append(row["diagram_id"] + ": " + str(error))
+            from tools.documentation import diagrams
+            errors.extend(diagrams.check(root, full=False)["errors"])
     ledger = root / "docs/design/documentation-system-execution.csv"
     if ledger.is_file():
         try:
@@ -328,6 +449,14 @@ def scan(root, *, check_diagrams=True, check_configuration=True,
                         errors.append(row["task_id"] + ": checklist differs from ledger")
         except (OSError, ValueError, KeyError) as error:
             errors.append(str(error))
+    index = root / "docs/status/documentation-results.json"
+    if index.is_file() or ledger.is_file():
+        from tools.documentation import results
+        errors.extend(results.validate(root))
+    try:
+        dependencies(root, pages)
+    except (OSError, UnicodeError, ValueError) as error:
+        errors.append(str(error))
     probes = external_links(urls) if external else []
     return {"schema_version": 1, "kind": "nexus_documentation_source_check",
             "status": "failed" if errors else "passed", "errors": errors,

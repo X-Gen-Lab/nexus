@@ -1,0 +1,464 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 1845acd2db3f28395a067d6b3032760b58de0998124c262973025177ee4e3a4d\nX-Nexus-Reviewed: true\n"
+
+msgid "OS adapters: tasks, waits and explicit storage"
+msgstr "OS adapters: tasks, waits and explicit storage"
+
+msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgstr "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+
+msgid "baremetal.h"
+msgstr "baremetal.h"
+
+msgid "Bare-metal poll notification with caller-owned storage."
+msgstr "Bare-metal poll notification with caller-owned storage."
+
+msgid "Author  Nexus Team"
+msgstr "Author  Nexus Team"
+
+msgid "Functions"
+msgstr "Functions"
+
+msgid "Initialize storage before exposing it to any ISR."
+msgstr "Initialize storage before exposing it to any ISR."
+
+msgid "Parameters"
+msgstr "Parameters"
+
+msgid "Returns"
+msgstr "Returns"
+
+msgid "Bind the explicit polling notification."
+msgstr "Bind the explicit polling notification."
+
+msgid "Explicit nonblocking bare-metal notification storage."
+msgstr "Explicit nonblocking bare-metal notification storage."
+
+msgid "Public Members"
+msgstr "Public Members"
+
+msgid "diagnostic.h"
+msgstr "diagnostic.h"
+
+msgid "Bounded diagnostics with explicit caller-owned ring storage."
+msgstr "Bounded diagnostics with explicit caller-owned ring storage."
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
+
+msgid "Initialize unpublished ring and caller-owned entries."
+msgstr "Initialize unpublished ring and caller-owned entries."
+
+msgid "Copy one event under a bounded saved interrupt mask."
+msgstr "Copy one event under a bounded saved interrupt mask."
+
+msgid "Consume one event from caller-owned ring."
+msgstr "Consume one event from caller-owned ring."
+
+msgid "Snapshot the saturating overflow count."
+msgstr "Snapshot the saturating overflow count."
+
+msgid "One opaque diagnostic record; interpretation belongs to its owner."
+msgstr "One opaque diagnostic record; interpretation belongs to its owner."
+
+msgid "Explicit ring state, with no default pool, worker or transport."
+msgstr "Explicit ring state, with no default pool, worker or transport."
+
+msgid "freertos.h"
+msgstr "freertos.h"
+
+msgid "Per-object static FreeRTOS storage and optional thin services."
+msgstr "Per-object static FreeRTOS storage and optional thin services."
+
+msgid "Typedefs"
+msgstr "Typedefs"
+
+msgid "Caller-owned single-operation latch for a closable queue."
+msgstr "Caller-owned single-operation latch for a closable queue."
+
+msgid "Test whether the current context may call kernel ISR APIs."
+msgstr "Test whether the current context may call kernel ISR APIs."
+
+msgid "Initialize unused notification storage."
+msgstr "Initialize unused notification storage."
+
+msgid "Bind a latched single-waiter notification."
+msgstr "Bind a latched single-waiter notification."
+
+msgid "Destroy after publishers and waiter have stopped and joined."
+msgstr "Destroy after publishers and waiter have stopped and joined."
+
+msgid "Create one task from its exact caller-owned stack and TCB."
+msgstr "Create one task from its exact caller-owned stack and TCB."
+
+msgid "Discard one created task before its wrapper has executed."
+msgstr "Discard one created task before its wrapper has executed."
+
+msgid "Join a cooperatively returned task and reclaim kernel state."
+msgstr "Join a cooperatively returned task and reclaim kernel state."
+
+msgid "Create an exact-sized static byte-copy queue."
+msgstr "Create an exact-sized static byte-copy queue."
+
+msgid "Copy an item with a bounded relative kernel wait."
+msgstr "Copy an item with a bounded relative kernel wait."
+
+msgid "Receive one byte-copy item."
+msgstr "Receive one byte-copy item."
+
+msgid "Destroy after admission is stopped and all users joined."
+msgstr "Destroy after admission is stopped and all users joined."
+
+msgid "Send using one absolute monotonic deadline."
+msgstr "Send using one absolute monotonic deadline."
+
+msgid "Receive using one absolute monotonic deadline."
+msgstr "Receive using one absolute monotonic deadline."
+
+msgid "Bind an exclusive slot of one live receiver task."
+msgstr "Bind an exclusive slot of one live receiver task."
+
+msgid "Get a direct notification wait port."
+msgstr "Get a direct notification wait port."
+
+msgid "Unbind after all publishers stop and join."
+msgstr "Unbind after all publishers stop and join."
+
+msgid "Start a task whose entry must never return."
+msgstr "Start a task whose entry must never return."
+
+msgid "Initialize one exact caller-owned queue waiter."
+msgstr "Initialize one exact caller-owned queue waiter."
+
+msgid "Destroy only after all operations stop and join."
+msgstr "Destroy only after all operations stop and join."
+
+msgid "Initialize an optional reliably closable byte-copy queue."
+msgstr "Initialize an optional reliably closable byte-copy queue."
+
+msgid "Send with close-aware admission and absolute deadline."
+msgstr "Send with close-aware admission and absolute deadline."
+
+msgid "Receive existing items after close, then CANCELLED."
+msgstr "Receive existing items after close, then CANCELLED."
+
+msgid "Stop sends and wake every currently registered waiter."
+msgstr "Stop sends and wake every currently registered waiter."
+
+msgid "Destroy a closed, drained and quiesced queue."
+msgstr "Destroy a closed, drained and quiesced queue."
+
+msgid "Static binary latch; one waiter, independently quiesced publishers."
+msgstr "Static binary latch; one waiter, independently quiesced publishers."
+
+msgid "Task has its own TCB; stack is supplied with its actual word count."
+msgstr "Task has its own TCB; stack is supplied with its actual word count."
+
+msgid "Queue control only; actual depth/item byte storage is external."
+msgstr "Queue control only; actual depth/item byte storage is external."
+
+msgid "Fixed receiver and exclusive kernel notification slot; no latch."
+msgstr "Fixed receiver and exclusive kernel notification slot; no latch."
+
+msgid "Permanent task control without a join completion semaphore."
+msgstr "Permanent task control without a join completion semaphore."
+
+msgid "Opt-in close broadcasts; raw queue storage remains unchanged."
+msgstr "Opt-in close broadcasts; raw queue storage remains unchanged."
+
+msgid "freertos_diagnostics.h"
+msgstr "freertos_diagnostics.h"
+
+msgid "Bounded explicit FreeRTOS trace sink without global storage."
+msgstr "Bounded explicit FreeRTOS trace sink without global storage."
+
+msgid "Enums"
+msgstr "Enums"
+
+msgid "Maintained kernel trace identities; product interpretation is external."
+msgstr "Maintained kernel trace identities; product interpretation is external."
+
+msgid "Values:"
+msgstr "Values:"
+
+msgid "Consume one bounded kernel trace event."
+msgstr "Consume one bounded kernel trace event."
+
+msgid "freertos_mpu.h"
+msgstr "freertos_mpu.h"
+
+msgid "Privileged static lifecycle for isolated MPU user tasks."
+msgstr "Privileged static lifecycle for isolated MPU user tasks."
+
+msgid "User data is nonexecuting normal RAM with only these permissions."
+msgstr "User data is nonexecuting normal RAM with only these permissions."
+
+msgid "Create an unprivileged task from exact caller-owned storage."
+msgstr "Create an unprivileged task from exact caller-owned storage."
+
+msgid "Delete another isolated task after external users quiesce."
+msgstr "Delete another isolated task after external users quiesce."
+
+msgid "A caller-selected exact region, copied during task creation."
+msgstr "A caller-selected exact region, copied during task creation."
+
+msgid "Complete caller-owned protected task metadata."
+msgstr "Complete caller-owned protected task metadata."
+
+msgid "Immutable creation inputs, borrowed for this call only."
+msgstr "Immutable creation inputs, borrowed for this call only."
+
+msgid "freertos_stack.h"
+msgstr "freertos_stack.h"
+
+msgid "Optional bounded task stack paint snapshot."
+msgstr "Optional bounded task stack paint snapshot."
+
+msgid "Copy bounded stack paint facts using actual kernel identity."
+msgstr "Copy bounded stack paint facts using actual kernel identity."
+
+msgid "Exact static task facts supplied at original creation."
+msgstr "Exact static task facts supplied at original creation."
+
+msgid "freertos_user.h"
+msgstr "freertos_user.h"
+
+msgid "Narrow pointer-free services for MPU-isolated user tasks."
+msgstr "Narrow pointer-free services for MPU-isolated user tasks."
+
+msgid "Defines"
+msgstr "Defines"
+
+msgid "Explicitly reviewed unprivileged executable code section."
+msgstr "Explicitly reviewed unprivileged executable code section."
+
+msgid "Explicit user RAM, separate from kernel and provider state."
+msgstr "Explicit user RAM, separate from kernel and provider state."
+
+msgid "Trusted static task metadata placed in protected kernel RAM."
+msgstr "Trusted static task metadata placed in protected kernel RAM."
+
+msgid "Delay the calling user task through the real MPU SVC."
+msgstr "Delay the calling user task through the real MPU SVC."
+
+msgid "Read the kernel's wrapping 32-bit tick counter through SVC."
+msgstr "Read the kernel's wrapping 32-bit tick counter through SVC."
+
+msgid "lowpower.h"
+msgstr "lowpower.h"
+
+msgid "Explicit continuous-clock tickless timer port."
+msgstr "Explicit continuous-clock tickless timer port."
+
+msgid "Bounded late alarm catch-up; larger delays violate the timer port."
+msgstr "Bounded late alarm catch-up; larger delays violate the timer port."
+
+msgid "Return the explicitly selected continuous timer port."
+msgstr "Return the explicitly selected continuous timer port."
+
+msgid "Kernel tickless hook with measured phase preservation."
+msgstr "Kernel tickless hook with measured phase preservation."
+
+msgid "Stopped-tick epoch with the concrete port's declared precision."
+msgstr "Stopped-tick epoch with the concrete port's declared precision."
+
+msgid "Caller-owned, immutable tickless timer implementation."
+msgstr "Caller-owned, immutable tickless timer implementation."
+
+msgid "All methods run in privileged Idle Thread mode with PRIMASK=1 and scheduler suspended. They are bounded, never block or call kernel functions. pause_tick atomically stops the periodic tick and snapshots elapsed phase in its current tick period; a pending tick is rejected without effects. SUCCESS borrows the timer until resume_tick. now_us is the same monotonic clock as snapshot, continuous during shallow sleep. arm_deadline programs an enabled IRQ wake source; rejection retains no alarm. disarm removes only that alarm. resume_tick restores the periodic source with its next expiry at the supplied absolute clock instant, preserving phase within its declared quantization and sampling bound rather than adding callback latency to every tick. It must not publish an already accounted tick. The alarm wakes by deadline; at most eight extra ticks of latency may be caught up. Reversed clocks or larger latency fail stop. This does not configure clocks, NVIC, SCR or a board timer."
+msgstr "All methods run in privileged Idle Thread mode with PRIMASK=1 and scheduler suspended. They are bounded, never block or call kernel functions. pause_tick atomically stops the periodic tick and snapshots elapsed phase in its current tick period; a pending tick is rejected without effects. SUCCESS borrows the timer until resume_tick. now_us is the same monotonic clock as snapshot, continuous during shallow sleep. arm_deadline programs an enabled IRQ wake source; rejection retains no alarm. disarm removes only that alarm. resume_tick restores the periodic source with its next expiry at the supplied absolute clock instant, preserving phase within its declared quantization and sampling bound rather than adding callback latency to every tick. It must not publish an already accounted tick. The alarm wakes by deadline; at most eight extra ticks of latency may be caught up. Reversed clocks or larger latency fail stop. This does not configure clocks, NVIC, SCR or a board timer."
+
+msgid "native.h"
+msgstr "native.h"
+
+msgid "Explicit POSIX notification, queue and task storage."
+msgstr "Explicit POSIX notification, queue and task storage."
+
+msgid "Read POSIX monotonic microseconds."
+msgstr "Read POSIX monotonic microseconds."
+
+msgid "Initialize a notification in unused caller storage."
+msgstr "Initialize a notification in unused caller storage."
+
+msgid "Bind a single-waiter latched notification port."
+msgstr "Bind a single-waiter latched notification port."
+
+msgid "Destroy after external publisher quiescence."
+msgstr "Destroy after external publisher quiescence."
+
+msgid "Initialize an explicit bounded byte-copy queue."
+msgstr "Initialize an explicit bounded byte-copy queue."
+
+msgid "Copy one item to the queue."
+msgstr "Copy one item to the queue."
+
+msgid "Receive one item; closed queues can still be drained."
+msgstr "Receive one item; closed queues can still be drained."
+
+msgid "Reject sends and wake all waiting callers."
+msgstr "Reject sends and wake all waiting callers."
+
+msgid "Destroy quiesced and drained queue storage."
+msgstr "Destroy quiesced and drained queue storage."
+
+msgid "Start a task using the supplied host stack."
+msgstr "Start a task using the supplied host stack."
+
+msgid "Join after requesting cooperative application stop."
+msgstr "Join after requesting cooperative application stop."
+
+msgid "Single waiter, multiple task publishers; fields are private."
+msgstr "Single waiter, multiple task publishers; fields are private."
+
+msgid "Caller-sized queue storage; no heap or global object pool."
+msgstr "Caller-sized queue storage; no heap or global object pool."
+
+msgid "Explicit task handle; stack storage is supplied at start."
+msgstr "Explicit task handle; stack storage is supplied at start."
+
+msgid "secure_context.h"
+msgstr "secure_context.h"
+
+msgid "Caller-owned Secure context leases for a trusted NS kernel."
+msgstr "Caller-owned Secure context leases for a trusted NS kernel."
+
+msgid "Minimum context capacity excludes the eight-byte ARM stack seal."
+msgstr "Minimum context capacity excludes the eight-byte ARM stack seal."
+
+msgid "Secure-context integrity failures, distinct from normal rejection."
+msgstr "Secure-context integrity failures, distinct from normal rejection."
+
+msgid "Prepare exact Secure storage for one trusted task identity."
+msgstr "Prepare exact Secure storage for one trusted task identity."
+
+msgid "Rebind retired metadata while preserving its epoch history."
+msgstr "Rebind retired metadata while preserving its epoch history."
+
+msgid "Resolve a trusted, statically composed Secure task record."
+msgstr "Resolve a trusted, statically composed Secure task record."
+
+msgid "Fail stop after a loaded Secure stack integrity failure."
+msgstr "Fail stop after a loaded Secure stack integrity failure."
+
+msgid "Explicit Secure metadata, never stored in Nonsecure RAM."
+msgstr "Explicit Secure metadata, never stored in Nonsecure RAM."
+
+msgid "threadx.h"
+msgstr "threadx.h"
+
+msgid "Caller-owned ThreadX task, wait and byte queue services."
+msgstr "Caller-owned ThreadX task, wait and byte queue services."
+
+msgid "One explicit caller latch per simultaneous close-aware operation."
+msgstr "One explicit caller latch per simultaneous close-aware operation."
+
+msgid "Explicit irreversible kernel entry owned by the product."
+msgstr "Explicit irreversible kernel entry owned by the product."
+
+msgid "Product failure hook; default parks forever."
+msgstr "Product failure hook; default parks forever."
+
+msgid "Mandatory product hook only for explicit external Tick."
+msgstr "Mandatory product hook only for explicit external Tick."
+
+msgid "Read-only configurable-IRQ and selected mask-policy gate."
+msgstr "Read-only configurable-IRQ and selected mask-policy gate."
+
+msgid "Initialize one binary latch in task or actual bootstrap."
+msgstr "Initialize one binary latch in task or actual bootstrap."
+
+msgid "Bind a sequence hint and one concurrent blocking waiter."
+msgstr "Bind a sequence hint and one concurrent blocking waiter."
+
+msgid "Destroy only after all publishers and waiter quiesce."
+msgstr "Destroy only after all publishers and waiter quiesce."
+
+msgid "Create a cooperatively returning task using exact storage."
+msgstr "Create a cooperatively returning task using exact storage."
+
+msgid "Join a cooperatively returned task and prove detachment."
+msgstr "Join a cooperatively returned task and prove detachment."
+
+msgid "Discard an unused task only inside actual bootstrap."
+msgstr "Discard an unused task only inside actual bootstrap."
+
+msgid "Start a permanent task without a completion latch."
+msgstr "Start a permanent task without a completion latch."
+
+msgid "Initialize an exact arbitrary-byte bounded queue."
+msgstr "Initialize an exact arbitrary-byte bounded queue."
+
+msgid "Task-only send; immediate readiness wins over expiration."
+msgstr "Task-only send; immediate readiness wins over expiration."
+
+msgid "Task-only receive; output changes only on SUCCESS."
+msgstr "Task-only receive; output changes only on SUCCESS."
+
+msgid "Destroy a drained queue after every caller quiesces."
+msgstr "Destroy a drained queue after every caller quiesces."
+
+msgid "Initialize one explicit close-aware operation latch."
+msgstr "Initialize one explicit close-aware operation latch."
+
+msgid "Destroy inactive waiter after its operation has returned."
+msgstr "Destroy inactive waiter after its operation has returned."
+
+msgid "Add explicit bounded close broadcast to a byte queue."
+msgstr "Add explicit bounded close broadcast to a byte queue."
+
+msgid "Reject sends, wake registered waiters, retain queued items."
+msgstr "Reject sends, wake registered waiters, retain queued items."
+
+msgid "Send with immediate close wake and explicit admission."
+msgstr "Send with immediate close wake and explicit admission."
+
+msgid "Receive and drain previously queued items after close."
+msgstr "Receive and drain previously queued items after close."
+
+msgid "Destroy only a closed, drained and quiesced queue."
+msgstr "Destroy only a closed, drained and quiesced queue."
+
+msgid "One binary latch; publishers quiesce before destruction."
+msgstr "One binary latch; publishers quiesce before destruction."
+
+msgid "Returning task retains all storage until external successful join."
+msgstr "Returning task retains all storage until external successful join."
+
+msgid "Permanent task has no completion latch, join or destroy."
+msgstr "Permanent task has no completion latch, join or destroy."
+
+msgid "Exact arbitrary byte items; no native word-size narrowing."
+msgstr "Exact arbitrary byte items; no native word-size narrowing."
+
+msgid "Optional bounded close broadcast; registry is task-only."
+msgstr "Optional bounded close broadcast; registry is task-only."
+
+msgid "tick.h"
+msgstr "tick.h"
+
+msgid "Explicit external Tick and diagnostic counter contracts."
+msgstr "Explicit external Tick and diagnostic counter contracts."
+
+msgid "Configure the application's selected kernel Tick source."
+msgstr "Configure the application's selected kernel Tick source."
+
+msgid "Start the explicitly selected diagnostic counter."
+msgstr "Start the explicitly selected diagnostic counter."
+
+msgid "Read the diagnostic counter without blocking."
+msgstr "Read the diagnostic counter without blocking."
+
+msgid "wait.h"
+msgstr "wait.h"
+
+msgid "Optional sequence-latched waiting without hidden workers."
+msgstr "Optional sequence-latched waiting without hidden workers."
+
+msgid "Wait for an authoritative caller predicate."
+msgstr "Wait for an authoritative caller predicate."
+
+msgid "Single-waiter notification port."
+msgstr "Single-waiter notification port."
+
+msgid "Caller owns storage and serializes arm/wait. Multiple wake publishers are permitted by each backend's documented context. Sequence is a hint; the predicate/request is authoritative. There must be fewer than 2^32 wakes between arm and recheck. All deadlines are absolute monotonic microseconds in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling timeout. Clocks must continue while waiting and never change domain; construct relative budgets with nx_deadline_after to avoid overflow. A timeout does not settle a request or release its buffers. Before destroy, stop and join every publisher and waiter; SETTLED alone does not prove notification storage is reclaimable. arm snapshots the sequence. wait must atomically observe a changed sequence or a latched wake, including a wake between the caller's recheck and sleeping. A changed sequence cannot bypass a finite deadline: wait checks expiry on every call and every return from blocking before reporting a hint. A nonblocking backend may return BUSY while unexpired. Only one owner may arm/wait; a second concurrent wait is outside the port contract even when a backend rejects it."
+msgstr "Caller owns storage and serializes arm/wait. Multiple wake publishers are permitted by each backend's documented context. Sequence is a hint; the predicate/request is authoritative. There must be fewer than 2^32 wakes between arm and recheck. All deadlines are absolute monotonic microseconds in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling timeout. Clocks must continue while waiting and never change domain; construct relative budgets with nx_deadline_after to avoid overflow. A timeout does not settle a request or release its buffers. Before destroy, stop and join every publisher and waiter; SETTLED alone does not prove notification storage is reclaimable. arm snapshots the sequence. wait must atomically observe a changed sequence or a latched wake, including a wake between the caller's recheck and sleeping. A changed sequence cannot bypass a finite deadline: wait checks expiry on every call and every return from blocking before reporting a hint. A nonblocking backend may return BUSY while unexpired. Only one owner may arm/wait; a second concurrent wait is outside the port contract even when a backend rejects it."

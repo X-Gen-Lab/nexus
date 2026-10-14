@@ -55,6 +55,26 @@ div.bodywrapper,
     outline-offset: -2px;
 }
 
+/* Search identity stays readable without depending on color or remote assets. */
+.nexus-search-identity {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35em 0.65em;
+    margin: 0.45em 0;
+    font-size: 0.85em;
+}
+
+.nexus-search-badge {
+    border: 1px solid currentColor;
+    border-radius: 0.2em;
+    padding: 0.1em 0.4em;
+    overflow-wrap: anywhere;
+}
+
+.nexus-search-excerpt {
+    overflow-wrap: anywhere;
+}
+
 /* Paper has no horizontal scroll rail; wrap complete code across pages. */
 @media print {
     .nexus-canonical-content pre {

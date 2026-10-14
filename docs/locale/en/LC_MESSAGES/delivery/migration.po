@@ -1,0 +1,177 @@
+# Authored translation; independent semantic review pending.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 1c65f485722223215c7aa57d5bf99e751eabb0a5482118abc3bec65068d922a4\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:1
+msgid "外部工程迁移"
+msgstr "External-project migration"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:3
+msgid ""
+"本轮保留 factory 与多态接口的总体模型，重新实现配置和静态实例生成。相比原始 工厂，实例具有精确的独立状态、共享只读操作表和明确生命周期；相比上一版直接 typed "
+"binding，调用者现在也可按类型 ID 获取接口并替换 provider。先 pin 新平台 源码版本，完整更新调用者和测试；旧部署产品的持久化格式与恢复另立合同。"
+msgstr ""
+"This iteration retains the overall factory and polymorphic-interface model while rebuilding "
+"configuration and static instance generation. Compared with the original factory, instances have "
+"exact independent state, shared read-only operation tables and explicit lifecycle. Compared with "
+"the previous direct typed binding, callers can now obtain interfaces by typed IDs and replace "
+"providers. First pin the new platform source version, then update callers and tests completely. "
+"Persistent formats and recovery for previously deployed products need separate contracts."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "旧路径／做法"
+msgstr "Old path/practice"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "当前替代"
+msgstr "Current replacement"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "原始 `hal/`、字符串 lookup、通用设备指针"
+msgstr "Original `hal/`, string lookup and generic device pointers"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "公共 typed 多态接口；生成 `nexus_factory.h` 的类型 ID 与 `nx_factory_*()`"
+msgstr ""
+"Public typed polymorphic interfaces; typed IDs in generated `nexus_factory.h` and `nx_factory_*()`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "上一版 provider 类型直接作为公共 port"
+msgstr "Previous provider type exposed directly as a public port"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "两指针只读 face：共享 `ops` 与独立 `context`；SDK／状态私有"
+msgstr "Two-pointer read-only face: shared `ops`, independent `context`; private SDK/state"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "Kconfig/defconfig/多处 CMake cache 选择"
+msgstr "Kconfig/defconfig/multiple CMake-cache selections"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "一份外部 TOML assembly、不可变 IR、SoC／Board facts，一个 resolved bundle"
+msgstr "One external TOML assembly, immutable IR, SoC/Board facts and one resolved bundle"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "SoC/Board/platform startup 混合"
+msgstr "Mixed SoC/Board/platform startup"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "Arch 原语、SoC system/drivers、只读 Board facts、外部启动 composition"
+msgstr "Arch primitives, SoC system/drivers, read-only Board facts and external startup composition"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "`osal/` 全局最大对象池／默认 worker"
+msgstr "`osal/` global maximum object pools/default workers"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "`os/` 按对象 TCB/stack/queue 与薄 wait/wake；外部显式任务"
+msgstr "`os/` per-object TCB/stack/queue and thin wait/wake; explicit external tasks"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "UART hidden TX queue/copy buffer"
+msgstr "UART hidden TX queue/copy buffer"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "caller-owned request/payload；精确 RX profile；可选 bounded owner"
+msgstr "Caller-owned request/payload; exact RX profile; optional bounded owner"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "默认 product Flash partition"
+msgstr "Default product Flash partition"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "全物理 geometry + 外部 erase-aligned writable region/layout"
+msgstr "Complete physical geometry plus an external erase-aligned writable region/layout"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "默认业务 services/framework"
+msgstr "Default business services/framework"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "`components/` 通用窄端口机制；产品协议寄存器、worker 与安全策略留外部"
+msgstr ""
+"`components/` generic narrow-port mechanisms; external product protocol registers, workers and "
+"security policy"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "多套 build/test/configure 脚本"
+msgstr "Multiple build/test/configure scripts"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "`tools/dev/dev.py`；原生命令和返回码透传"
+msgstr "`tools/dev/dev.py`; native commands and exit codes forwarded"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "历史支持矩阵／旧 test count"
+msgstr "Historical support matrices/old test counts"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:0
+msgid "当前 source/config/tool/dependency/ELF 与 fresh raw execution evidence"
+msgstr "Current source/config/tool/dependency/ELF and fresh raw execution evidence"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:21
+msgid ""
+"外部工程通过 `NEXUS_ASSEMBLY_FILE` 明确输入，链接 `Nexus::Platform`，由 `nexus_add_firmware()` 装入 "
+"startup/system/linker/resource gate。应用只包含公共 Nexus 头和生成 `nexus_factory.h`／`nexus_bindings.h`，不读取 "
+"private provider storage 或 SDK register 类型。SPI／I2C controller 和子设备 endpoint 分开获取，controller "
+"factory 不得返回第一个子设备的别名。无效 ID 返回 NULL；factory 不初始化、不分配内存。"
+msgstr ""
+"External projects supply explicit `NEXUS_ASSEMBLY_FILE`, link `Nexus::Platform`, and use "
+"`nexus_add_firmware()` for startup/system/linker/resource gates. Applications include only public "
+"Nexus headers and generated `nexus_factory.h`/`nexus_bindings.h`; they do not inspect private "
+"provider storage or SDK register types. SPI/I2C controllers and child-device endpoints are "
+"obtained separately; a controller factory must not return an alias of the first child. Invalid IDs"
+" return NULL. Factory lookup neither initializes nor allocates memory."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:27
+msgid ""
+"维护的 assembly 已统一为 TOML schema 2。schema 1 JSON 读取仅供明确迁移与工具 派生输入，不与 TOML 维护同一份配置。冷启动仍显式执行 "
+"`nx_platform_start()`， 停机执行 `nx_platform_stop()`；BUSY／QUARANTINED 时保持状态和所有借用存储。 在 start 前可以保存 "
+"face；在成功 stop 后 face 的身份不变，provider 拒绝操作。"
+msgstr ""
+"Maintained assemblies use TOML schema 2. Schema-1 JSON reading is only for explicit migration and "
+"tool-derived input, not a parallel authored copy of TOML configuration. Cold startup still "
+"explicitly calls `nx_platform_start()` and shutdown calls `nx_platform_stop()`. BUSY/QUARANTINED "
+"retain state and all borrowed storage. Faces may be retained before start. Successful stop "
+"preserves face identity while the provider rejects operations."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:32
+msgid ""
+"请求迁移必须同时更新所有权：prepare 不意味着 accepted，cancel 不意味着 settled。 接受后保持 request 与 payload，到 acquire-"
+"observed SETTLED 才能复用。共享 owner 的控制 handle 持有稳定 slot+epoch；不能用一个旧 request 指针取消新 operation。 producer"
+" 只提交与等待，唯一执行者持续 service；stop 先关 admission，再 drain 和 join，通知发布者退出前不能回收 notification。"
+msgstr ""
+"Request migration must update ownership too: prepare does not mean accepted, and cancel does not "
+"mean settled. After acceptance, retain request and payload until acquire-observed SETTLED permits "
+"reuse. Shared-owner control handles retain stable slot+epoch; an old request pointer cannot cancel"
+" a new operation. Producers submit and wait; the sole executor continuously services requests. "
+"Stop closes admission before drain/join, and notification storage cannot be reclaimed before "
+"publishers exit."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:38
+msgid ""
+"OS storage 使用真实每对象 stack/TCB/depth。任务 entry 返回不等于底层已删除： join 成功后才回收。超时保持 handle、stack 和 "
+"TCB。持久化实例拥有外部 workspace； mutating I/O 失败后 reopen 确认 generation，不能凭错误结果推断 commit 未发生。"
+msgstr ""
+"OS storage uses real per-object stack/TCB/depth. Task-entry return does not mean underlying "
+"deletion; storage is reclaimed only after successful join. Timeout retains handle, stack and TCB. "
+"Persistent instances own external workspace. After mutating-I/O failure, reopen to confirm "
+"generation; an error cannot prove that commit did not occur."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/migration.md:42
+msgid ""
+"迁移验收依次为：严格输入负路径、Native/model 行为、独立源码 SDK 消费、六基础 ARM ELF、精确预算、离线双构建与候选封存；最后按实际 PCB 和接线执行 HIL。 外部 "
+"`nexus-examples` 是独立示例仓库，平台 CI 不把产品应用加入平台默认目标。"
+msgstr ""
+"Migration acceptance proceeds through strict-input negative paths, Native/model behavior, "
+"independent source-SDK consumption, six base ARM ELFs, exact budgets, offline double-build and "
+"candidate sealing; HIL follows on the actual PCB/wiring. External `nexus-examples` is an "
+"independent example repository. Platform CI does not add product applications to default platform "
+"targets."

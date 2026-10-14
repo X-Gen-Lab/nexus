@@ -15,6 +15,9 @@ ownership rather than replacing interfaces with a runtime service registry.
 The [compatibility contract](../design/source-compatibility.md) owns
 version and interface epoch behavior.
 
+Obtain the [fixed source and recursive dependencies](source-checkout.md) first;
+keep the old consumer in its own checkout while validating the new one.
+
 | Legacy pattern | Current migration action |
 | --- | --- |
 | Kconfig or cache macros selecting instances | Write one complete schema-2 TOML assembly |

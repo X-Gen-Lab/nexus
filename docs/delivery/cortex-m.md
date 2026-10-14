@@ -124,7 +124,9 @@ mask 与其他 mask 在对象变更前拒绝。IRQ wake 另验证外部异常范
 示例**，不是新增芯片或 Board 声明；clock、IRQ 数量和可选能力应替换为真实芯片
 的受审事实。无需 Board 文件，也不输出 SoC/设备 factory。
 
-`runtime.toml` 仅接受以下四项，路径相对此 TOML：
+`runtime.toml` 必须包含以下四项，路径相对此 TOML；还可显式提供与所选后端
+匹配的 `[os]` 策略。裸机不接纳内核策略，CPU-only 配置不接纳需要 SoC timer
+事实的低功耗 timebase 选择：
 
 ```toml
 schema_version = 1
@@ -133,7 +135,10 @@ backend = "freertos"
 optimization = "Os"
 ```
 
-`backend` 为 `baremetal` 或 `freertos`，`optimization` 为 `O2`、`Os` 或 `O3`。
+`backend` 为 `baremetal`、`freertos` 或明确范围内的 `threadx`；ThreadX 仅接纳
+Native／Cortex-M4／M4F，不继承本页九核 FreeRTOS port 范围，详见
+[ThreadX 接入](../design/threadx.md)。`optimization` 接纳 `O0`、`Og`、`O2`、`Os`
+或 `O3`；Debug 选择不建立时序或资源资格。
 CPU package 和 CPU/IRQ 对象的字段完整且唯一，未知字段、重复 JSON keys、矛盾
 feature/ABI、非法 schema/clock 和 symlink path 被拒绝，不能用 authored override
 伪造芯片能力。

@@ -11,13 +11,13 @@
 | GoogleTest／GoogleMock | `scripts/ci/tdd_gate.py --all`；`tests/google/` | 全量发现与实际非过滤执行、fresh XML、零跳过；不是历史编辑顺序的自动证明 |
 | Cortex-M CPU 机制 | `tests/google/arch_*`、`*atomic*`；`scripts/ci/arch_compile.py` | 九核宏／ABI／对象／指令／原子依赖；生产 cache/MPU/SAU 模型；不扩大 SoC/Board 或实板支持 |
 | CPU runtime / kernel | `scripts/ci/cortex_runtime.py`；`tests/contracts/cortex_runtime/` | 公共 `nexus_add_runtime` 生产源图、Core/Arch/I/O/所选 OS 与真实 kernel context 的编译/ELF 审计；不是 MCU 执行 |
-| 生成器 | `tools/testing/run_tool_tests.py --suite configure` | 平台/CPU runtime TOML、冻结 IR、显式可选能力/ABI、九类 Native factory、资源冲突、错误输入和 stale bundle |
+| 生成器 | `tools/testing/run_tool_tests.py --suite configure` | 平台/CPU runtime TOML、冻结 IR、显式可选能力/ABI、维护的 Native factory 类型、资源冲突、错误输入和 stale bundle |
 | 工具门禁 | `tools/testing/run_tool_tests.py --suite testing`；`tests/contracts/test_*.py`；`scripts/ci/` | 实际负路径、暂存区稳定、报告身份和执行退出码 |
 | STM／GD 寄存器模型 | `tests/google/*dma*`、`*uart_stream*`、`*adc_stream*`、`gd32_multi_test.cpp` 与已有 C contracts | 真实生产 TU；内存／线上排空、EN 拒绝关闭、迟到 IRQ、借用／隔离、校准／稳定 |
 | 三板基础配置 | 六个 ARM presets | 实际 startup／vector／provider 链接、ELF／BIN／map 和预算 |
 | H743／U575 参考纵切片 | `scripts/ci/stm32h743.py`、`scripts/ci/stm32u575.py` | 各自 empty／selected × 裸机／FreeRTOS，实际 vector／资源／保留；H743 另查 pre-RAM 电源入口，不证明 MCU 实际运行 |
 | 可选 RAM 放置 | `scripts/ci/stm32_memory.py`、`scripts/ci/gd32_memory.py` | F407 CCM、GD ADDSRAM／TCM 的链接和初始化域；不证明掉电／reset retention |
-| 高级 controller 夹具 | `tests/contracts/{stm32,gd32}_assembly/*.toml` | 九类、DMA、块接收／触发、多控制器实际 ARM 链接；明确是软件 Board |
+| 高级 controller 夹具 | `tests/contracts/{stm32,gd32}_assembly/*.toml` | 维护的 controller 类型、DMA、块接收／触发、多控制器实际 ARM 链接；明确是软件 Board |
 | 最小资源矩阵 | `tools/measurement/compare.py` | 三板 60 个 O2／Os／O3 ± LTO 镜像；18 empty GC 检查；实际 face／ops 存储成本 |
 | 外部示例 | 独立 `X-Gen-Lab/nexus-examples` | 精确 pin 后 Native 运行与十个 ARM 配置、二十个 ELF；产品实现留在外部 |
 | 源码 SDK | `cmake/package/package_source_sdk.py`、`verify_consumers.py` | 干净版本、source closure/identity、移动路径 C／C++ Native 和 Runtime consumer、STM／GD 固件链接 |

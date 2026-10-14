@@ -1,0 +1,386 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: a614e9b22674004f6d3b28ba3b5671616408ce4b4f2d7bae8a948b55f740aba0\nX-Nexus-Reviewed: true\n"
+
+msgid "Optional common components"
+msgstr "Optional common components"
+
+msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgstr "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+
+msgid "bmp280.h"
+msgstr "bmp280.h"
+
+msgid "BMP280 calibration and explicit forced-conversion driver."
+msgstr "BMP280 calibration and explicit forced-conversion driver."
+
+msgid "Author  Nexus Team"
+msgstr "Author  Nexus Team"
+
+msgid "Functions"
+msgstr "Functions"
+
+msgid "Parse the exact 24-byte little-endian calibration block."
+msgstr "Parse the exact 24-byte little-endian calibration block."
+
+msgid "Parameters"
+msgstr "Parameters"
+
+msgid "Returns"
+msgstr "Returns"
+
+msgid "Compensate one raw sample using checked integer arithmetic."
+msgstr "Compensate one raw sample using checked integer arithmetic."
+
+msgid "Validate chip ID and load calibration, without scanning."
+msgstr "Validate chip ID and load calibration, without scanning."
+
+msgid "Start one forced temperature/pressure conversion."
+msgstr "Start one forced temperature/pressure conversion."
+
+msgid "Poll conversion without an implicit worker or blocking delay."
+msgstr "Poll conversion without an implicit worker or blocking delay."
+
+msgid "Stop software use after all synchronous calls have exited."
+msgstr "Stop software use after all synchronous calls have exited."
+
+msgid "Synchronous settled SPI transaction port."
+msgstr "Synchronous settled SPI transaction port."
+
+msgid "Public Members"
+msgstr "Public Members"
+
+msgid "Register calibration, owned by one device instance."
+msgstr "Register calibration, owned by one device instance."
+
+msgid "Output is valid only on successful conversion/compensation."
+msgstr "Output is valid only on successful conversion/compensation."
+
+msgid "Explicit device context, no Board pins or automatic sampling task."
+msgstr "Explicit device context, no Board pins or automatic sampling task."
+
+msgid "bmp280_spi.h"
+msgstr "bmp280_spi.h"
+
+msgid "Optional BMP280 adapter over a fixed SPI endpoint."
+msgstr "Optional BMP280 adapter over a fixed SPI endpoint."
+
+msgid "Bind a real polling SPI endpoint as settled transport."
+msgstr "Bind a real polling SPI endpoint as settled transport."
+
+msgid "bus_owner.h"
+msgstr "bus_owner.h"
+
+msgid "Explicit bounded multi-producer, single-executor adapter."
+msgstr "Explicit bounded multi-producer, single-executor adapter."
+
+msgid "Initialize unused owner/slot storage."
+msgstr "Initialize unused owner/slot storage."
+
+msgid "Establish the chain's unique admission."
+msgstr "Establish the chain's unique admission."
+
+msgid "Submit cancellation through stable adapter storage."
+msgstr "Submit cancellation through stable adapter storage."
+
+msgid "Advance at most one bounded execution step."
+msgstr "Advance at most one bounded execution step."
+
+msgid "Close admission and request every accepted operation to stop."
+msgstr "Close admission and request every accepted operation to stop."
+
+msgid "Test whether execution and completion publication have exited."
+msgstr "Test whether execution and completion publication have exited."
+
+msgid "Explicit bounded metadata exclusion port."
+msgstr "Explicit bounded metadata exclusion port."
+
+msgid "One real execution owner, injected without OS dependency."
+msgstr "One real execution owner, injected without OS dependency."
+
+msgid "start SUCCESS borrows operation until service SUCCESS. BUSY or any start error retains zero operation references/hardware effects; an error after partial start must instead accept and report through service. service SUCCESS proves all hardware/IRQ/deferred accesses stopped, writes final result/count, and releases the operation. BUSY still borrows. Other service errors retain ownership and require continued recovery/service. cancel requests drain; it never by itself releases operation. Callbacks run only in the externally scheduled executor, outside adapter metadata guard."
+msgstr "start SUCCESS borrows operation until service SUCCESS. BUSY or any start error retains zero operation references/hardware effects; an error after partial start must instead accept and report through service. service SUCCESS proves all hardware/IRQ/deferred accesses stopped, writes final result/count, and releases the operation. BUSY still borrows. Other service errors retain ownership and require continued recovery/service. cancel requests drain; it never by itself releases operation. Callbacks run only in the externally scheduled executor, outside adapter metadata guard."
+
+msgid "Stable control identity; never dereference a stale request pointer."
+msgstr "Stable control identity; never dereference a stale request pointer."
+
+msgid "Exact caller-owned slot, linked in either the free or FIFO chain; initialize only with owner init."
+msgstr "Exact caller-owned slot, linked in either the free or FIFO chain; initialize only with owner init."
+
+msgid "Explicit adapter state; external application supplies all storage."
+msgstr "Explicit adapter state; external application supplies all storage."
+
+msgid "clock_domain.h"
+msgstr "clock_domain.h"
+
+msgid "Explicit clock consumers and epoch-bound drain control."
+msgstr "Explicit clock consumers and epoch-bound drain control."
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
+
+msgid "Typedefs"
+msgstr "Typedefs"
+
+msgid "Opaque provider, statically supplied by its privileged owner."
+msgstr "Opaque provider, statically supplied by its privileged owner."
+
+msgid "One stable caller-owned consumer token."
+msgstr "One stable caller-owned consumer token."
+
+msgid "Enums"
+msgstr "Enums"
+
+msgid "Only shallow sleep preserves the established clock/time domain."
+msgstr "Only shallow sleep preserves the established clock/time domain."
+
+msgid "Values:"
+msgstr "Values:"
+
+msgid "Acquire one admitted clock consumer without waiting."
+msgstr "Acquire one admitted clock consumer without waiting."
+
+msgid "Remove the exact retained token after consumer drain."
+msgstr "Remove the exact retained token after consumer drain."
+
+msgid "Close admission and return the current epoch control."
+msgstr "Close admission and return the current epoch control."
+
+msgid "Validate closed admission and zero retained consumers."
+msgstr "Validate closed admission and zero retained consumers."
+
+msgid "Reopen a drained domain under a new admission epoch."
+msgstr "Reopen a drained domain under a new admission epoch."
+
+msgid "Epoch-bound close control and quiescence evidence."
+msgstr "Epoch-bound close control and quiescence evidence."
+
+msgid "dp83848.h"
+msgstr "dp83848.h"
+
+msgid "Explicit DP83848 identity, reset and observed link mechanism."
+msgstr "Explicit DP83848 identity, reset and observed link mechanism."
+
+msgid "Defines"
+msgstr "Defines"
+
+msgid "Read exact supported identity; mismatch never becomes a default PHY."
+msgstr "Read exact supported identity; mismatch never becomes a default PHY."
+
+msgid "Bounded BMCR soft reset and observed self-clearing acknowledgement."
+msgstr "Bounded BMCR soft reset and observed self-clearing acknowledgement."
+
+msgid "Start explicit negotiation or fixed mode, never wait for fake link."
+msgstr "Start explicit negotiation or fixed mode, never wait for fake link."
+
+msgid "Observe latch-low BMSR twice and DP83848 PHYSTS speed/duplex truth."
+msgstr "Observe latch-low BMSR twice and DP83848 PHYSTS speed/duplex truth."
+
+msgid "External policy explicitly selects autonegotiation or fixed mode."
+msgstr "External policy explicitly selects autonegotiation or fixed mode."
+
+msgid "Caller-owned PHY state; no board address, reset GPIO or worker default."
+msgstr "Caller-owned PHY state; no board address, reset GPIO or worker default."
+
+msgid "file_flash.h"
+msgstr "file_flash.h"
+
+msgid "Native persistent file Flash model with fault injection."
+msgstr "Native persistent file Flash model with fault injection."
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-09  Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "Author  Nexus Team   Version  1.0.0   Date  2026-10-09  Copyright  Copyright (c) 2026 Nexus Team"
+
+msgid "Open an exclusively locked persistent host Flash model."
+msgstr "Open an exclusively locked persistent host Flash model."
+
+msgid "Close the host file after all store users have quiesced."
+msgstr "Close the host file after all store users have quiesced."
+
+msgid "Set an explicit model interruption boundary."
+msgstr "Set an explicit model interruption boundary."
+
+msgid "flash_storage.h"
+msgstr "flash_storage.h"
+
+msgid "Explicit physical Flash-region adapter without global registry."
+msgstr "Explicit physical Flash-region adapter without global registry."
+
+msgid "Bind an explicit writable uniform-erase physical region."
+msgstr "Bind an explicit writable uniform-erase physical region."
+
+msgid "Set the next transaction's one absolute mutation deadline."
+msgstr "Set the next transaction's one absolute mutation deadline."
+
+msgid "Caller-owned adapter, no dynamic binding or global token lookup."
+msgstr "Caller-owned adapter, no dynamic binding or global token lookup."
+
+msgid "log.h"
+msgstr "log.h"
+
+msgid "Instance-local synchronous bounded log sink."
+msgstr "Instance-local synchronous bounded log sink."
+
+msgid "Structured severity, with filtering before touching a sink."
+msgstr "Structured severity, with filtering before touching a sink."
+
+msgid "Initialize an unused logger before exposing it to tasks."
+msgstr "Initialize an unused logger before exposing it to tasks."
+
+msgid "Write caller bytes, with no implicit allocation/formatting."
+msgstr "Write caller bytes, with no implicit allocation/formatting."
+
+msgid "Flush an explicit sink without creating a background worker."
+msgstr "Flush an explicit sink without creating a background worker."
+
+msgid "Reject new writes and test whether the sink has exited."
+msgstr "Reject new writes and test whether the sink has exited."
+
+msgid "Synchronous caller-injected sink."
+msgstr "Synchronous caller-injected sink."
+
+msgid "Logger storage belongs to its caller; shared immutable port is copied."
+msgstr "Logger storage belongs to its caller; shared immutable port is copied."
+
+msgid "modbus_rtu.h"
+msgstr "modbus_rtu.h"
+
+msgid "Bounded Modbus RTU core and explicit RS485 ports."
+msgstr "Bounded Modbus RTU core and explicit RS485 ports."
+
+msgid "Compute standard Modbus CRC16 over caller bytes."
+msgstr "Compute standard Modbus CRC16 over caller bytes."
+
+msgid "Initialize an unused or fully quiesced protocol instance."
+msgstr "Initialize an unused or fully quiesced protocol instance."
+
+msgid "Feed an externally timestamped UART byte."
+msgstr "Feed an externally timestamped UART byte."
+
+msgid "Service RTU silence and bounded synchronous RS485 response."
+msgstr "Service RTU silence and bounded synchronous RS485 response."
+
+msgid "Discard an errored or overrun receive frame."
+msgstr "Discard an errored or overrun receive frame."
+
+msgid "Settle retained TX then restore receive silence acquisition."
+msgstr "Settle retained TX then restore receive silence acquisition."
+
+msgid "Settle the port before reclaiming protocol storage."
+msgstr "Settle the port before reclaiming protocol storage."
+
+msgid "owner_observer.h"
+msgstr "owner_observer.h"
+
+msgid "Explicit owner progress diagnostics without default state."
+msgstr "Explicit owner progress diagnostics without default state."
+
+msgid "Bind an initialized exact owner without creating work."
+msgstr "Bind an initialized exact owner without creating work."
+
+msgid "Execute exactly one real service step and copy diagnostics."
+msgstr "Execute exactly one real service step and copy diagnostics."
+
+msgid "Drop only the observation binding, no owner/loan teardown."
+msgstr "Drop only the observation binding, no owner/loan teardown."
+
+msgid "Copied service facts without request, payload or slot references."
+msgstr "Copied service facts without request, payload or slot references."
+
+msgid "Opt-in caller sidecar; no pointer added to default owner."
+msgstr "Opt-in caller sidecar; no pointer added to default owner."
+
+msgid "spi_async_owner.h"
+msgstr "spi_async_owner.h"
+
+msgid "Optional finite async SPI executor for one explicit bus."
+msgstr "Optional finite async SPI executor for one explicit bus."
+
+msgid "Bind one async-capable bus to an explicit owner executor."
+msgstr "Bind one async-capable bus to an explicit owner executor."
+
+msgid "Exact async storage independent of the polling adapter."
+msgstr "Exact async storage independent of the polling adapter."
+
+msgid "spi_owner.h"
+msgstr "spi_owner.h"
+
+msgid "Explicit polling SPI executor for the bounded owner adapter."
+msgstr "Explicit polling SPI executor for the bounded owner adapter."
+
+msgid "Bind an explicit synchronous SPI execution adapter."
+msgstr "Bind an explicit synchronous SPI execution adapter."
+
+msgid "Caller-owned SPI transaction descriptor, borrowed until SETTLED."
+msgstr "Caller-owned SPI transaction descriptor, borrowed until SETTLED."
+
+msgid "Exact polling executor storage; no payload copy or queue."
+msgstr "Exact polling executor storage; no payload copy or queue."
+
+msgid "storage.h"
+msgstr "storage.h"
+
+msgid "Two-bank durable blob storage over an explicit narrow port."
+msgstr "Two-bank durable blob storage over an explicit narrow port."
+
+msgid "Storage errors expose retry/reopen/recovery decisions."
+msgstr "Storage errors expose retry/reopen/recovery decisions."
+
+msgid "Open/recover two externally supplied uniform erase banks."
+msgstr "Open/recover two externally supplied uniform erase banks."
+
+msgid "Load and validate the latest committed whole blob."
+msgstr "Load and validate the latest committed whole blob."
+
+msgid "Commit a complete blob to the inactive bank."
+msgstr "Commit a complete blob to the inactive bank."
+
+msgid "Query usable blob capacity without touching hardware."
+msgstr "Query usable blob capacity without touching hardware."
+
+msgid "Synchronous settled persistent Flash port."
+msgstr "Synchronous settled persistent Flash port."
+
+msgid "Instance metadata with caller-sized workspace."
+msgstr "Instance metadata with caller-sized workspace."
+
+msgid "uart_owner.h"
+msgstr "uart_owner.h"
+
+msgid "Explicit IRQ UART executor with private provider settlement."
+msgstr "Explicit IRQ UART executor with private provider settlement."
+
+msgid "Bind a UART controller to one explicit service executor."
+msgstr "Bind a UART controller to one explicit service executor."
+
+msgid "Caller-owned TX payload descriptor borrowed until outer SETTLED."
+msgstr "Caller-owned TX payload descriptor borrowed until outer SETTLED."
+
+msgid "One executor's exact private provider request."
+msgstr "One executor's exact private provider request."
+
+msgid "user_io_broker.h"
+msgstr "user_io_broker.h"
+
+msgid "Narrow kernel-invoked user GPIO message contract."
+msgstr "Narrow kernel-invoked user GPIO message contract."
+
+msgid "Broker and persistent kernel call storage stay provider private."
+msgstr "Broker and persistent kernel call storage stay provider private."
+
+msgid "Only scalar GPIO operations are admitted by this message ABI."
+msgstr "Only scalar GPIO operations are admitted by this message ABI."
+
+msgid "Execute one scalar GPIO message through a trusted gateway."
+msgstr "Execute one scalar GPIO message through a trusted gateway."
+
+msgid "Retry retained cleanup without reading users or replaying IO."
+msgstr "Retry retained cleanup without reading users or replaying IO."
+
+msgid "Untrusted copied message; identity never comes from users."
+msgstr "Untrusted copied message; identity never comes from users."
+
+msgid "Fully initialized copied result; value is zero for errors/WRITE."
+msgstr "Fully initialized copied result; value is zero for errors/WRITE."
+
+msgid "Distinguish admission, cleanup retention and possible effect."
+msgstr "Distinguish admission, cleanup retention and possible effect."

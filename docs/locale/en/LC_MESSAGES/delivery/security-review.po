@@ -1,0 +1,169 @@
+# Authored translation; independent semantic review pending.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 2f7cdd6b250306a4ff38c899d8bb8ca598dc8ca33c902e397f6450e6c942718c\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:1
+msgid "安全扫描与生命周期边界"
+msgstr "Security scanning and lifecycle boundaries"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:3
+msgid ""
+"CodeQL 在实际 Native 构建中分析维护中的生产实现、当前工具和行为测试。 Python 提取只排除 `docs/archive/` 内不再执行的历史文档工具；不排除当前测试、 "
+"配置器、证据工具或 SDK 打包代码。查询保持 `security-and-quality`，没有通过 关闭所有权或路径检查来消除诊断。扫描执行成功与诊断审查是不同结果。"
+msgstr ""
+"CodeQL analyzes maintained production implementations, current tools and behavior tests in an "
+"actual Native build. Python extraction excludes only nonexecuted historical documentation tools "
+"under `docs/archive/`, not current tests, configurator, evidence tools or SDK packaging. Queries "
+"remain `security-and-quality`; ownership/path checks were not disabled to remove diagnostics. "
+"Successful scan execution and diagnostic review are separate results."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:8
+msgid "本轮发现与修复"
+msgstr "Findings and fixes in this iteration"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:10
+msgid "注释检查 CLI 明确终止无效输入，不能继续输出未建立的成功报告；回归验证 错误退出码、标准错误和空标准输出。"
+msgstr ""
+"The comment-check CLI explicitly terminates invalid input rather than printing an unestablished "
+"success report; regressions check failure exit code, stderr and empty stdout."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:12
+msgid ""
+"存储故障测试使用自己创建的 `0700` 临时目录和固定文件名，用同一目录 FD 验证并进入目录，完成后恢复 cwd；不使用先检查路径再重新解析路径的方式。 跨进程持久化固定重执行 Linux "
+"`/proc/self/exe`，命令行不能指定文件或程序。 实际测试保留两组各 315 个写入／掉电边界及新进程读取，不用同进程内存代替。"
+msgstr ""
+"Storage fault tests use their own `0700` temporary directory and fixed filename, validate/enter it"
+" through the same directory FD, then restore cwd. They do not check a path before resolving it "
+"again. Cross-process persistence reexecutes fixed Linux `/proc/self/exe`; the command line cannot "
+"select files/programs. Actual tests retain two groups of 315 write/power-cut boundaries and fresh-"
+"process reads rather than substituting same-process memory."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:16
+msgid "STM32 GPIO 寄存器夹具退出前恢复其借用的全局 RCC 指针，随后实际调用验证 未绑定时拒绝访问；避免留下已经退出作用域的栈地址。"
+msgstr ""
+"STM32 GPIO register fixtures restore their borrowed global RCC pointer before exit and then "
+"actually verify rejection while unbound, avoiding escaped stack addresses."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:18
+msgid ""
+"GD32 watchdog 夹具使用静态存储。独立 watchdog 启用不可逆，`stop` 返回 unsupported，owner 必须持续到进程／平台复位，不能用普通作用域结束来释放。"
+msgstr ""
+"GD32 watchdog fixtures use static storage. Independent-watchdog enable is irreversible; `stop` "
+"returns unsupported and the owner lasts until process/platform reset, not ordinary scope exit."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:20
+msgid "删除维护工具中的未使用导入，说明进程清理的预期竞争和轮询超时；保留 失败时清理整个进程组并重新抛出异常的行为。"
+msgstr ""
+"Unused maintenance-tool imports were removed; expected process-cleanup races and polling timeout "
+"are documented. Failure still cleans the entire process group and rethrows the exception."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:23
+msgid ""
+"相关源码与回归位于 `scripts/ci/test_comment_style.py`、 "
+"`tests/contracts/components_storage.c`、`stm32_io_test.c`、`gd32_io_test.c` 以及工具合同测试。最终执行状态由当前提交的 CI"
+" 和候选证据记录决定。"
+msgstr ""
+"Relevant source/regressions are in `scripts/ci/test_comment_style.py`, "
+"`tests/contracts/components_storage.c`, `stm32_io_test.c`, `gd32_io_test.c` and tool contract "
+"tests. Current-commit CI and candidate evidence determine final execution status."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:27
+msgid "保留的借用语义与审查责任"
+msgstr "Retained borrow semantics and review responsibility"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:29
+msgid ""
+"异步接口把调用者提供的地址存入 provider／owner 是必要的借用。栈地址逃逸类 诊断须核对真正的生命周期，不能改用隐式 heap、去掉 IRQ 表或删除屏障来绕过。 生成的 MCU "
+"provider 对象均为静态存储；私有模型中的局部存储遵守同一责任。"
+msgstr ""
+"Asynchronous interfaces necessarily borrow caller addresses stored in providers/owners. Stack-"
+"address-escape diagnostics require checking actual lifecycle; implicit heap allocation, removal of"
+" IRQ tables or removal of barriers cannot bypass them. Generated MCU-provider objects use static "
+"storage; private-model local storage follows the same responsibility."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:0
+msgid "地址保存位置"
+msgstr "Address retention location"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:0
+msgid "必须满足的退出条件"
+msgstr "Required exit condition"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:0
+msgid "GD32 控制器 IRQ 表"
+msgstr "GD32 controller IRQ table"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:0
+msgid "正常 stop 先解绑 IRQ；失败恢复保留责任；不可逆 watchdog 持续到复位"
+msgstr ""
+"Normal stop unbinds IRQ first; failed recovery retains responsibility; irreversible watchdog "
+"persists until reset"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:0
+msgid "Native UART request"
+msgstr "Native UART request"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:0
+msgid "provider detach 后 release-publish SETTLED；调用者 acquire-observe 后才能释放"
+msgstr ""
+"Provider detaches before release-publishing SETTLED; caller releases only after acquire-"
+"observation"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:0
+msgid "FreeRTOS task context"
+msgstr "FreeRTOS task context"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:0
+msgid "静态 stack/TCB/context 持续到外部成功 join；不能由当前任务销毁自己"
+msgstr ""
+"Static stack/TCB/context persist until successful external join; a current task cannot destroy "
+"itself"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:0
+msgid "多 producer owner slot"
+msgstr "Multi-producer owner slot"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:0
+msgid "executor 结清请求、slot detach、发布者和观察者退出后才可回收"
+msgstr "Reclaim only after executor settles requests, slot detaches and publishers/observers exit"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:40
+msgid ""
+"GD32 Flash 的 program／erase 在重新上锁读回失败时进入不可用状态并保留静态 provider；普通 stop 不能宣称已恢复。此情况要求受控复位，不能释放 owner "
+"或继续 写入。当前 GoogleTest 寄存器模型已注入 relock 失败，验证错误后读写、erase、 geometry、stop "
+"与重新取得资源均不能绕过隔离，后到成功上锁也不能清除锁存故障。 该执行证明软件失败合同；实际 Flash 电气和复位恢复仍需实板验证。"
+msgstr ""
+"GD32 Flash program/erase enters unusable state and retains its static provider when relock "
+"readback fails. Ordinary stop cannot claim recovery. Controlled reset is required; the owner "
+"cannot be released or writing continued. Current GoogleTest register models inject relock failure,"
+" checking that later read/write, erase, geometry, stop and reacquisition cannot bypass isolation, "
+"and that later successful locking cannot clear the latched fault. This proves the software failure"
+" contract; actual Flash electrical behavior and reset recovery still need hardware verification."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:46
+msgid ""
+"较长状态机的可读性、第三方头中的注释和借用诊断仍需按具体路径审查。供应商 导入保留原始字节与许可身份。普通静态扫描不证明没有漏洞，也不替代实际 IRQ、 电气、掉电、时序、长期负载或产品安全资格。"
+msgstr ""
+"Long state-machine readability, comments in third-party headers and borrow diagnostics still "
+"require path-specific review. Vendor imports retain original bytes/license identity. Ordinary "
+"static scanning proves neither absence of vulnerabilities nor actual IRQ, electrical, power-cut, "
+"timing, sustained-load or product-safety qualification."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/security-review.md:50
+msgid ""
+"本次 factory／DMA／block 迭代还验证完整块与 IDLE 同时到达、错误前缀锁存、 ADC 错误后迟到 TC、DMA EN 拒绝排空与 NEVER deadline "
+"尾部超时。静态分析发现 的 ADC 零时钟分频路径加入实际失败测试后修复；资源解析也拒绝与 provider 固定 DMA 通道不同的声明及绕过 timer／时基保留的别名。最终状态由同一 "
+"clean HEAD 的执行记录决定。"
+msgstr ""
+"This factory/DMA/block iteration also tests simultaneous complete block/IDLE, latched error "
+"prefix, late ADC TC after error, DMA EN drain refusal and NEVER-deadline tail timeout. The ADC "
+"zero-clock-divider path found by static analysis was fixed after an actual failing test. Resource "
+"parsing rejects declarations inconsistent with fixed provider DMA channels and aliases bypassing "
+"timer/timebase reservations. Same-clean-HEAD execution records determine final status."

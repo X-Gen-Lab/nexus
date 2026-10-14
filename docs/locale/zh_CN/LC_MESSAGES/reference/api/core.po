@@ -1,0 +1,173 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 6192e0020a97003295af1a766d8e1d65e290729acdcd2cebe0d8c32b0f8fc60d\nX-Nexus-Reviewed: true\n"
+
+msgid "Core: requests, status and time"
+msgstr "Core：请求、状态与时间"
+
+msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgstr "这些声明来自公共头文件。选择、生命周期、支持的执行模式和物理资源授权范围仍以对应设计及支持记录为准。"
+
+msgid "fault.h"
+msgstr "fault.h"
+
+msgid "Bounded observation before retaining platform fail-stop."
+msgstr "在平台保持故障停止之前执行有界观察。"
+
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+msgid "Enums"
+msgstr "枚举"
+
+msgid "Fault origin, without any product safety or recovery decision."
+msgstr "故障来源，不包含任何产品安全或恢复决策。"
+
+msgid "Values:"
+msgstr "取值："
+
+msgid "Functions"
+msgstr "函数"
+
+msgid "Observe a terminal fault before the caller retains effects."
+msgstr "在调用者保留效果之前观察终止故障。"
+
+msgid "Parameters"
+msgstr "参数"
+
+msgid "memory.h"
+msgstr "memory.h"
+
+msgid "Variable-only placement in explicitly selected data regions."
+msgstr "仅将变量放入显式选定的数据区域。"
+
+msgid "Defines"
+msgstr "宏定义"
+
+msgid "Place static storage in an authored optional memory region."
+msgstr "将静态存储放入配置声明的可选内存区域。"
+
+msgid "request.h"
+msgstr "request.h"
+
+msgid "Caller-owned admission, borrow, settlement and stable cancellation."
+msgstr "调用者拥有的准入、借用、结清与稳定取消机制。"
+
+msgid "Request state; only READY and SETTLED have no provider borrow."
+msgstr "请求状态；只有 READY 和 SETTLED 不存在提供者借用。"
+
+msgid "Initialize fresh unborrowed request storage."
+msgstr "初始化全新且未被借用的请求存储。"
+
+msgid "Prepare a READY or consumed SETTLED request."
+msgstr "准备处于 READY 或结果已消费的 SETTLED 请求。"
+
+msgid "Returns"
+msgstr "返回值"
+
+msgid "Read request state with acquire ordering."
+msgstr "以 acquire 顺序读取请求状态。"
+
+msgid "Establish the chain's unique admission and provider borrow."
+msgstr "建立请求链唯一的准入判定和提供者借用。"
+
+msgid "Advance an already admitted request without readmission."
+msgstr "推进已准入的请求，不重复准入。"
+
+msgid "Release-publish SETTLED as the final provider access."
+msgstr "作为提供者最后一次访问，以 release 顺序发布 SETTLED。"
+
+msgid "Copy the unique settled result after acquire publication."
+msgstr "在 acquire 观察发布之后，复制唯一的最终结果。"
+
+msgid "Bind a stable slot to a new request incarnation."
+msgstr "将稳定槽绑定到新的请求实例世代。"
+
+msgid "Resolve cancellation using stable storage before dereference."
+msgstr "在解引用之前，通过稳定存储解析取消请求。"
+
+msgid "Drop a slot reference only after settlement and control drain."
+msgstr "仅在请求结清且控制引用排空之后撤销槽引用。"
+
+msgid "Caller-owned request metadata, without payload or callbacks."
+msgstr "调用者拥有的请求元数据，不含载荷或回调。"
+
+msgid "Public Members"
+msgstr "公共成员"
+
+msgid "Adapter-owned stable cancellation identity."
+msgstr "适配器拥有的稳定取消身份。"
+
+msgid "request_observer.h"
+msgstr "request_observer.h"
+
+msgid "Optional stable-identity request observation without locks."
+msgstr "可选、无锁、基于稳定身份的请求观察。"
+
+msgid "Bind the exact live incarnation without storing its pointer."
+msgstr "绑定准确且存活的实例世代，不存储其指针。"
+
+msgid "Copy state and acquire-observed final result for exact epoch."
+msgstr "复制准确 epoch 的状态，以及以 acquire 观察的最终结果。"
+
+msgid "Remove only this sidecar reference, leaving loans untouched."
+msgstr "仅移除此附加观察引用，不改变借用。"
+
+msgid "Copied facts; result/count are valid only when settled is true."
+msgstr "已复制的事实；仅 settled 为 true 时 result/count 有效。"
+
+msgid "Caller-owned optional sidecar, fresh zero storage before bind."
+msgstr "调用者拥有的可选附加状态，绑定之前必须使用全新清零存储。"
+
+msgid "stack_observation.h"
+msgstr "stack_observation.h"
+
+msgid "Bounded read-only observation of caller-painted stack spans."
+msgstr "对调用者涂色的栈范围作有界只读观察。"
+
+msgid "Read a bounded low-address paint prefix without mutation."
+msgstr "读取有界的低地址涂色前缀，不修改存储。"
+
+msgid "Byte-prefix paint observations, not an exact physical stack peak."
+msgstr "字节前缀涂色观察，不是准确的物理栈峰值。"
+
+msgid "status.h"
+msgstr "status.h"
+
+msgid "Small vendor-independent result vocabulary."
+msgstr "精简且独立于厂商的结果集合。"
+
+msgid "Operation result; success at submission means admission only."
+msgstr "操作结果；提交时成功只表示已准入。"
+
+msgid "time.h"
+msgstr "time.h"
+
+msgid "Absolute monotonic microsecond deadlines and wrap extension."
+msgstr "绝对单调微秒截止时间与回绕扩展。"
+
+msgid "Typedefs"
+msgstr "类型定义"
+
+msgid "Microseconds in one boot/clock domain; no wall-clock semantics."
+msgstr "同一启动／时钟域内的微秒数，不具有墙上时钟语义。"
+
+msgid "Read the selected provider's monotonic clock."
+msgstr "读取选定提供者的单调时钟。"
+
+msgid "Test an absolute deadline against a clock snapshot."
+msgstr "依据时钟快照检查绝对截止时间。"
+
+msgid "Add a duration without wrapping the monotonic domain."
+msgstr "增加持续时间，不使单调时间域回绕。"
+
+msgid "Initialize counter extension and its clock domain."
+msgstr "初始化计数扩展及其时钟域。"
+
+msgid "Extend a wrapping counter and convert to microseconds."
+msgstr "扩展回绕计数器并换算为微秒。"
+
+msgid "An explicitly injected clock; its context outlives all borrowers."
+msgstr "显式注入的时钟；其上下文必须在所有借用者退出前保持有效。"
+
+msgid "State for extending one 32-bit free-running hardware counter."
+msgstr "用于扩展一个 32 位自由运行硬件计数器的状态。"

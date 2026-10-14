@@ -1,0 +1,217 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: e8565f12cf1e44452da7b6b20930d0bcc0032995916674207e097f9e7c066357\n"
+
+msgid "Find the implementation authority"
+msgstr "定位实现权威"
+
+msgid ""
+"Use this map to locate an existing mechanism before changing it. It is a "
+"source navigation, not another build graph or support database. Source links"
+" bind the site's exact document revision; offline consumers can inspect the "
+"same paths in the matching checkout or Source SDK."
+msgstr ""
+"修改机制前，使用本映射定位已有实现。它是源码导航，不是另一份构建图或支持数据库。源码链接绑定站点精确文档版本；离线用户可以在匹配的 checkout 或"
+" Source SDK 中检查相同路径。"
+
+msgid "Task"
+msgstr "任务"
+
+msgid "Maintained entry"
+msgstr "维护入口"
+
+msgid "Contract and validation"
+msgstr "合同与验证"
+
+msgid "Authored assembly and fields"
+msgstr "编写装配与字段"
+
+msgid ""
+"[configure](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/README.md)"
+msgstr ""
+"[配置器](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/configure/README.md)"
+
+msgid ""
+"[Assembly reference](../reference/configuration/assembly.md); actual "
+"resolver rejection tests"
+msgstr "[装配参考](../reference/configuration/assembly.md)；实际解析器拒绝测试"
+
+msgid "CPU facts and Runtime"
+msgstr "CPU 事实与 Runtime"
+
+msgid ""
+"[Arch](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/arch/README.md)"
+msgstr ""
+"[Arch](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/arch/README.md)"
+
+msgid ""
+"[Arch contract](../design/arch-contracts.md); CPU runtime compiler/model "
+"matrix"
+msgstr "[Arch 合同](../design/arch-contracts.md)；CPU runtime 编译器／模型矩阵"
+
+msgid "Request and deadlines"
+msgstr "请求与截止时间"
+
+msgid ""
+"[Core](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/README.md)"
+msgstr ""
+"[Core](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/README.md)"
+
+msgid "[Ownership](../explanation/ownership.md); actual Core/epoch contracts"
+msgstr "[所有权](../explanation/ownership.md)；实际 Core／epoch 合同"
+
+msgid "Public face and dispatch"
+msgstr "公共接口面与分发"
+
+msgid ""
+"[I/O](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/io/README.md)"
+msgstr ""
+"[I/O](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/io/README.md)"
+
+msgid ""
+"[Factory](../explanation/factory.md); public headers and generated fixture "
+"tests"
+msgstr "[类型化工厂](../explanation/factory.md)；公共头文件与生成夹具测试"
+
+msgid "Chip/IRQ/DMA implementation"
+msgstr "芯片／IRQ／DMA 实现"
+
+msgid "[Provider assemblies](../design/provider-assemblies.md)"
+msgstr "[提供者装配](../design/provider-assemblies.md)"
+
+msgid ""
+"[Provider guide](../guides/provider-porting.md); production-register models "
+"and exact ARM ELF"
+msgstr "[提供者指南](../guides/provider-porting.md)；生产寄存器模型与精确 ARM ELF"
+
+msgid "PCB data"
+msgstr "PCB 数据"
+
+msgid "[Board guide](../guides/board-porting.md)"
+msgstr "[Board 指南](../guides/board-porting.md)"
+
+msgid "Reviewed Board JSON and exact physical unknowns"
+msgstr "已审查 Board JSON 与精确物理未知项"
+
+msgid "Wait, task and kernel adapters"
+msgstr "等待、任务与内核 adapter"
+
+msgid ""
+"[OS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/os/README.md)"
+msgstr ""
+"[OS](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/os/README.md)"
+
+msgid ""
+"[OS contract](../design/os-contracts.md); actual kernel and boundary tests"
+msgstr "[OS 合同](../design/os-contracts.md)；实际内核与边界测试"
+
+msgid "Reusable algorithms"
+msgstr "通用算法"
+
+msgid ""
+"[Components](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/README.md)"
+msgstr ""
+"[组件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/README.md)"
+
+msgid "Public narrow ports; component and owner behavior tests"
+msgstr "公共窄端口；组件与 owner 行为测试"
+
+msgid "Consumer/export boundary"
+msgstr "消费／导出边界"
+
+msgid ""
+"[Source SDK](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/cmake/package/README.md)"
+msgstr ""
+"[Source SDK](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/cmake/package/README.md)"
+
+msgid ""
+"[SDK tutorial](../tutorials/source-sdk.md); independent relocated C/C++ "
+"consumers"
+msgstr "[SDK 教程](../tutorials/source-sdk.md)；独立搬移的 C/C++ 消费工程"
+
+msgid "Build targets and presets"
+msgstr "构建目标与预设"
+
+msgid ""
+"[CMake](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/cmake/README.md)"
+msgstr ""
+"[CMake](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/cmake/README.md)"
+
+msgid ""
+"[Build contract](../design/build-system.md); actual configure/build/resource"
+" gates"
+msgstr "[构建合同](../design/build-system.md)；实际配置／构建／资源门禁"
+
+msgid "New production behavior"
+msgstr "新增生产行为"
+
+msgid ""
+"[Testing](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/testing/README.md)"
+msgstr ""
+"[测试工具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/testing/README.md)"
+
+msgid "[TDD workflow](workflow.md); retained actual RED/GREEN and full gate"
+msgstr "[TDD 工作流](workflow.md)；保留实际 RED／GREEN 与完整门禁"
+
+msgid "Qualification and hardware"
+msgstr "资格与硬件"
+
+msgid ""
+"[HIL](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/hil/README.md)"
+msgstr ""
+"[HIL](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/hil/README.md)"
+
+msgid ""
+"[Qualification](../reference/platforms/qualification.md); distinct software "
+"and physical records"
+msgstr "[资格](../reference/platforms/qualification.md)；软件与物理记录分开"
+
+msgid "Document content and delivery"
+msgstr "文档内容与交付"
+
+msgid "[Document standard](../design/documentation-standards.md)"
+msgstr "[文档标准](../design/documentation-standards.md)"
+
+msgid ""
+"[Maintenance](documentation.md); strict source/build/package/published-site "
+"checks"
+msgstr "[维护指南](documentation.md)；严格源码／构建／包／公开站点检查"
+
+msgid ""
+"Read the relevant contract and adjacent README before changing behavior. "
+"Select only maintained modes, keep private provider/vendor types out of "
+"consumers, and update declarations, diagrams, examples and translations "
+"together when their meaning changes. Preserve original evidence bytes and "
+"scope instead of renaming historical results to current HEAD."
+msgstr ""
+"改变行为前，阅读相应合同与相邻 "
+"README。只选择维护模式，消费工程不接触私有提供者／厂商类型；含义变化时同时更新声明、图示、示例和翻译。保留原证据字节与范围，不能把历史结果改名为当前"
+" HEAD。"

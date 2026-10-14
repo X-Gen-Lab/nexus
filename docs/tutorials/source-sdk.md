@@ -12,6 +12,9 @@ This tutorial verifies that an independent C and C++ project can consume a reloc
 Nexus Source SDK. It runs on a Linux host with Python 3.11+, CMake 3.31+, Ninja,
 a C/C++ compiler and Git. It does not flash or execute an MCU.
 
+First obtain the [fixed source and recursive dependencies](../guides/source-checkout.md).
+The following commands run from that checkout, not an arbitrary default branch.
+
 ## Run the maintained complete consumer
 
 Work from the repository root with the pinned recursive dependencies initialized.

@@ -1,0 +1,881 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: a5f53133afdb560bcef446bfcc833ddbf8fc66f73b64833e5759efaedd6312c9\nX-Nexus-Reviewed: true\n"
+
+msgid "Typed I/O: devices and execution contracts"
+msgstr "类型化 I/O：设备与执行合同"
+
+msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgstr "这些声明来自公共头文件。选择、生命周期、支持的执行模式和物理资源授权范围仍以对应设计及支持记录为准。"
+
+msgid "adc.h"
+msgstr "adc.h"
+
+msgid "Reviewed ADC single-shot and low-rate polling scans."
+msgstr "已审查的 ADC 单次采样与低速轮询扫描。"
+
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+msgid "Typedefs"
+msgstr "类型定义"
+
+msgid "Functions"
+msgstr "函数"
+
+msgid "Query the fixed reviewed ADC sequence and raw-count format."
+msgstr "查询固定、已审查的 ADC 序列与原始计数格式。"
+
+msgid "Parameters"
+msgstr "参数"
+
+msgid "Returns"
+msgstr "返回值"
+
+msgid "Read fixed channel order and complete-scan timing facts."
+msgstr "读取固定通道顺序与完整扫描的时序事实。"
+
+msgid "Attach optional observer storage before acquisition starts."
+msgstr "采集开始前附加可选观察者存储。"
+
+msgid "Query one live consumer loan's software completion record."
+msgstr "查询一个存活消费者借用的软件完成记录。"
+
+msgid "Sample the fixed single/scan sequence by bounded polling."
+msgstr "通过有界轮询采样固定单次／扫描序列。"
+
+msgid "Start selected trigger/block acquisition with caller storage."
+msgstr "使用调用者存储启动选定的触发／块采集。"
+
+msgid "Stop trigger and memory sources without revoking consumer loans."
+msgstr "停止触发与内存写入源，不撤销消费者借用。"
+
+msgid "Explicitly resume discrete block acquisition after consumer drain."
+msgstr "消费者排空后，显式恢复离散块采集。"
+
+msgid "Attach an optional hint sink after checking publisher IRQ priority."
+msgstr "检查发布者 IRQ 优先级后，附加可选提示接收端。"
+
+msgid "Raw count facts; nominal Vref is not a calibrated physical measurement."
+msgstr "原始计数事实；标称 Vref 不是经过校准的物理测量。"
+
+msgid "Public Members"
+msgstr "公共成员"
+
+msgid "Immutable complete-scan timing facts for the selected mode."
+msgstr "选定模式下不可变的完整扫描时序事实。"
+
+msgid "Shared read-only methods using one provider state."
+msgstr "使用同一个提供者状态的共享只读方法。"
+
+msgid "Immutable interface pointing to caller-owned state."
+msgstr "指向调用者自有状态的不可变接口。"
+
+msgid "adc_observer.h"
+msgstr "adc_observer.h"
+
+msgid "Optional caller-owned ADC publication observations."
+msgstr "调用者拥有的可选 ADC 发布观察。"
+
+msgid "Defines"
+msgstr "宏定义"
+
+msgid "Initialize fresh unborrowed optional observation storage."
+msgstr "初始化全新、尚未借用的可选观察存储。"
+
+msgid "Provider-only cold bind validates every metadata/payload span before the first DMA loan."
+msgstr "仅提供者可执行的冷绑定；第一次 DMA 借用之前验证每个元数据／载荷范围。"
+
+msgid "Provider-only record before matching release-publication."
+msgstr "仅提供者可执行的记录，必须先于对应的 release 发布。"
+
+msgid "Read only a currently acquired block's exact epoch record."
+msgstr "只读取当前已取得块的准确 epoch 记录。"
+
+msgid "Provider-only unbind after all producer/consumer loans join."
+msgstr "全部生产者／消费者借用完成 join 后，仅提供者可解除绑定。"
+
+msgid "One loan's software observation, never a sample aperture."
+msgstr "一个借用的软件观察，绝不表示采样孔径。"
+
+msgid "Optional caller-owned observer control and exact records."
+msgstr "调用者拥有的可选观察者控制与准确记录。"
+
+msgid "advanced_pwm.h"
+msgstr "advanced_pwm.h"
+
+msgid "Optional fixed complementary PWM with latched break."
+msgstr "可选固定互补 PWM 与锁存刹车。"
+
+msgid "Stage duty against the fixed declared PSC/ARR and complementary pair."
+msgstr "依据固定声明的 PSC/ARR 与互补通道对暂存占空比。"
+
+msgid "Enable outputs only with inactive break and no latched fault."
+msgstr "仅刹车未激活且无锁存故障时启用输出。"
+
+msgid "Disable/read back master output and both channel sources."
+msgstr "禁用并读回主输出与两个通道源。"
+
+msgid "Query staged duty, actual enable state and latched break facts."
+msgstr "查询暂存占空比、实际启用状态与锁存刹车事实。"
+
+msgid "Clear a software fault only while disabled and BKIN is inactive."
+msgstr "仅已禁用且 BKIN 未激活时清除软件故障。"
+
+msgid "Counts use the fixed post-prescaler clock; deadtime uses tDTS."
+msgstr "计数使用固定预分频后的时钟；死区使用 tDTS。"
+
+msgid "Shared immutable controls; configuration is a cold assembly fact."
+msgstr "共享不可变控制；配置是冷装配事实。"
+
+msgid "Immutable identity; controller state and configuration outlive IRQs."
+msgstr "不可变身份；控制器状态与配置必须在所有 IRQ 完全退出前保持有效。"
+
+msgid "can.h"
+msgstr "can.h"
+
+msgid "Classic CAN value frames and caller-owned mailbox requests."
+msgstr "经典 CAN 值帧与调用者拥有的邮箱请求。"
+
+msgid "Enums"
+msgstr "枚举"
+
+msgid "Values:"
+msgstr "取值："
+
+msgid "Validate and copy a classic frame into unborrowed request storage."
+msgstr "验证并复制经典帧到未被借用的请求存储。"
+
+msgid "Admit one frame into one of three hardware mailboxes."
+msgstr "将一个帧准入到三个硬件邮箱之一。"
+
+msgid "Request abort without revoking a borrowed request."
+msgstr "请求中止，不撤销请求借用。"
+
+msgid "Process latched completions and absolute timeout/drain deadlines."
+msgstr "处理锁存完成状态与绝对超时／排空截止时间。"
+
+msgid "Consume value events without overwriting earlier unconsumed facts."
+msgstr "消费值事件，不覆盖此前尚未消费的事实。"
+
+msgid "Copy authoritative error/admission state, even when RX is full."
+msgstr "即使 RX 已满，仍复制权威错误／准入状态。"
+
+msgid "Close admission, abort TX and detach IRQ/RX publishers."
+msgstr "关闭准入、中止 TX、撤离 IRQ/RX 发布者。"
+
+msgid "Explicitly reenter initialization after bus-off and complete drain."
+msgstr "bus-off 且完整排空之后，显式重新进入初始化。"
+
+msgid "Borrow an optional wake target after checking all four actual IRQs."
+msgstr "检查全部四个实际 IRQ 后，借用可选唤醒目标。"
+
+msgid "Classic 2.0A/B value frame; DLC is always 0..8, never CAN FD."
+msgstr "经典 2.0A/B 值帧；DLC 始终为 0..8，绝不是 CAN FD。"
+
+msgid "Caller-owned frame copied at prepare; base must first be initialized."
+msgstr "调用者拥有的帧在 prepare 时复制；必须先初始化 base。"
+
+msgid "Value receive fact or ordered loss boundary."
+msgstr "值接收事实或有序丢失边界。"
+
+msgid "Latched controller state, independent of receive-ring fullness."
+msgstr "锁存控制器状态，与接收环是否已满无关。"
+
+msgid "Shared immutable operations; execution owner serializes task methods."
+msgstr "共享不可变操作；执行所有者串行执行 Task 方法。"
+
+msgid "Immutable face; lookup does not allocate, start or acquire hardware."
+msgstr "不可变接口面；查找不分配、不启动、不取得硬件。"
+
+msgid "dma.h"
+msgstr "dma.h"
+
+msgid "Explicit DMA memory domains, physical streams and drain facts."
+msgstr "显式 DMA 内存域、物理流与排空事实。"
+
+msgid "Transfer direction determines device access to caller memory."
+msgstr "传输方向决定设备对调用者内存的访问。"
+
+msgid "Validate an entire buffer within one explicit memory domain."
+msgstr "验证整个缓冲区位于一个显式内存域内。"
+
+msgid "Reject duplicate physical streams in an assembled resource set."
+msgstr "拒绝装配资源集合中重复的物理流。"
+
+msgid "Require engine, IRQ and peripheral drain independently."
+msgstr "分别要求 DMA 引擎、IRQ 与外设排空。"
+
+msgid "Reviewed DMA-visible memory interval, never CPU accessibility."
+msgstr "已审查的 DMA 可见内存区间，不等同于 CPU 可访问性。"
+
+msgid "Opaque physical engine and request selector identities."
+msgstr "不透明物理引擎与请求选择器身份。"
+
+msgid "Independent facts required before memory borrow release."
+msgstr "释放内存借用前必须独立满足的事实。"
+
+msgid "ethernet.h"
+msgstr "ethernet.h"
+
+msgid "Caller-owned untagged Ethernet II frames and receive loans."
+msgstr "调用者拥有的无标签 Ethernet II 帧与接收借用。"
+
+msgid "Prepare an initialized, unborrowed request and its immutable frame."
+msgstr "准备已初始化、未借用的请求及不可变帧。"
+
+msgid "Admit one frame into caller-owned hardware descriptors."
+msgstr "将一个帧准入到调用者拥有的硬件描述符。"
+
+msgid "Close TX admission and drain the shared TX engine without replay."
+msgstr "关闭 TX 准入并排空共享 TX 引擎，不重放传输。"
+
+msgid "Task-owner bounded progress; no worker, lock, pool or wait."
+msgstr "Task 所有者有界推进；不含执行任务、锁、池或等待。"
+
+msgid "Task-consumer complete-frame loan; EMPTY creates no borrow."
+msgstr "Task 消费者取得完整帧借用；EMPTY 不产生借用。"
+
+msgid "Final consumer access; stale, foreign and double releases reject."
+msgstr "消费者最后一次访问；拒绝过期、外来及重复释放。"
+
+msgid "Copy latched instance/link/error facts; output is not retained."
+msgstr "复制锁存的实例／链路／错误事实；不保留输出。"
+
+msgid "Apply external PHY observations, not auto-negotiate or invent link."
+msgstr "应用外部 PHY 观察，不自动协商或虚构链路。"
+
+msgid "Close admission and withdraw MAC/DMA/IRQ sources with readback."
+msgstr "关闭准入，通过读回确认撤离 MAC/DMA/IRQ 源。"
+
+msgid "Bind an optional borrowed hint after actual IRQ-policy validation."
+msgstr "验证实际 IRQ 策略后绑定可选借用提示。"
+
+msgid "Caller-owned immutable contiguous frame, excluding its hardware FCS."
+msgstr "调用者拥有的不可变连续帧，不含硬件 FCS。"
+
+msgid "Observed PHY fact, supplied explicitly by the external link owner."
+msgstr "观察到的 PHY 事实，由外部链路所有者显式供给。"
+
+msgid "Complete immutable frame; release requires this exact incarnation."
+msgstr "完整不可变帧；释放必须匹配准确实例世代。"
+
+msgid "Latched facts survive receive backpressure and failed wake hints."
+msgstr "锁存事实不因接收背压或唤醒提示失败而丢失。"
+
+msgid "exti.h"
+msgstr "exti.h"
+
+msgid "Static EXTI line bindings, bounded event storage and drain."
+msgstr "静态 EXTI 线路绑定、有界事件存储与排空。"
+
+msgid "Read queued EXTI events from an exact static line binding."
+msgstr "从准确静态线路绑定读取排队 EXTI 事件。"
+
+msgid "Disable the line source, clear pending and drain its handler."
+msgstr "禁用线路源、清除 pending 并排空处理函数。"
+
+msgid "Attach or detach an explicit event/loss IRQ wake target."
+msgstr "附加或解除显式事件／丢失 IRQ 唤醒目标。"
+
+msgid "Edge facts; timestamp precision and coalescing are provider-specific."
+msgstr "边沿事实；时间戳精度与合并行为由提供者决定。"
+
+msgid "flash.h"
+msgstr "flash.h"
+
+msgid "Full physical Flash geometry and explicit bounded regions."
+msgstr "完整物理 Flash 几何与显式有界区域。"
+
+msgid "Query exact physical Flash geometry without side effects."
+msgstr "无副作用地查询准确物理 Flash 几何。"
+
+msgid "Read bounded physical Flash without retaining destination."
+msgstr "有界读取物理 Flash，不保留目标存储。"
+
+msgid "Program aligned physical Flash and settle all hardware pulses."
+msgstr "对齐编程物理 Flash，并结清全部硬件脉冲。"
+
+msgid "Erase a whole physical sector range with pulse settlement."
+msgstr "擦除完整物理扇区范围，并结清脉冲。"
+
+msgid "Validate region bounds against physical geometry."
+msgstr "根据物理几何验证区域边界。"
+
+msgid "Read within an explicit physical region."
+msgstr "在显式物理区域内读取。"
+
+msgid "Program within an explicitly writable physical region."
+msgstr "在显式可写物理区域内编程。"
+
+msgid "Erase whole physical sectors within a writable region."
+msgstr "在可写区域内擦除完整物理扇区。"
+
+msgid "Erase sector geometry, with offset relative to full physical Flash."
+msgstr "擦除扇区几何，偏移相对于完整物理 Flash。"
+
+msgid "Read-only physical geometry; platform reserves no product storage."
+msgstr "只读物理几何；平台不预留产品存储。"
+
+msgid "Explicit consumer-selected bounds; no implicit product partition."
+msgstr "消费者显式选择的边界，不含隐式产品分区。"
+
+msgid "gpio.h"
+msgstr "gpio.h"
+
+msgid "Fixed GPIO authorization masks and bounded port operations."
+msgstr "固定 GPIO 授权掩码与有界端口操作。"
+
+msgid "Atomically set/reset one port's authorized output mask."
+msgstr "原子设置／复位一个端口的授权输出掩码。"
+
+msgid "Read one input snapshot restricted to the binding mask."
+msgstr "读取受绑定掩码限制的单次输入快照。"
+
+msgid "Toggle authorized outputs under the single-writer contract."
+msgstr "在单写者合同下翻转授权输出。"
+
+msgid "i2c.h"
+msgstr "i2c.h"
+
+msgid "Address endpoints, repeated START and explicit STOP settlement."
+msgstr "地址端点、重复 START 与显式 STOP 结清。"
+
+msgid "Maintained finite-message admission bounds, checked before hardware access."
+msgstr "维护范围内的有限消息准入边界，访问硬件之前检查。"
+
+msgid "Execute a polling 7-bit-address message transaction."
+msgstr "执行一个轮询、7 位地址消息事务。"
+
+msgid "Recover an idle controller after a bus fault."
+msgstr "总线故障后恢复空闲控制器。"
+
+msgid "Prepare an unborrowed request without copying payload."
+msgstr "准备未借用请求，不复制载荷。"
+
+msgid "Validate finite descriptors and payload/control separation."
+msgstr "验证有限描述符以及载荷／控制存储分离。"
+
+msgid "Admit one finite asynchronous repeated-START transaction."
+msgstr "准入一个有限、异步、重复 START 事务。"
+
+msgid "Start an already borrowed QUEUED request without readmission."
+msgstr "启动已借用的 QUEUED 请求，不重复准入。"
+
+msgid "Prove controller identity without hardware effects."
+msgstr "证明控制器身份，不产生硬件效果。"
+
+msgid "Request cancellation without reclaiming any storage."
+msgstr "请求取消，不回收任何存储。"
+
+msgid "Advance deadline and STOP/DMA drain in bounded task context."
+msgstr "在有界 Task 上下文处理截止时间，并推进 STOP/DMA 排空。"
+
+msgid "Close admission and stop only after every borrower drains."
+msgstr "关闭准入，全部借用者排空后才停止。"
+
+msgid "Attach one optional hint sink after actual IRQ policy checks."
+msgstr "检查实际 IRQ 策略后附加一个可选提示接收端。"
+
+msgid "One message; a new message starts with repeated START, final with STOP."
+msgstr "一个消息；新消息以重复 START 开始，最后以 STOP 结束。"
+
+msgid "Caller-owned finite message sequence."
+msgstr "调用者拥有的有限消息序列。"
+
+msgid "i2c_bus_clear.h"
+msgstr "i2c_bus_clear.h"
+
+msgid "Explicit open-drain I2C bus clear with retained leases."
+msgstr "显式开漏 I2C 总线清理，保留租约。"
+
+msgid "Maximum completed recovery low/high periods per attempt."
+msgstr "每次尝试中允许完成的恢复低／高电平周期上限。"
+
+msgid "Bind explicit electrical operations without touching pins."
+msgstr "绑定显式电气操作，不接触引脚。"
+
+msgid "Clear one idle, authorized bus with at most nine pulses."
+msgstr "用至多九个脉冲清理一个空闲、已授权总线。"
+
+msgid "Retry only retained STOP cleanup and ownership return."
+msgstr "仅重试保留的 STOP 清理与所有权归还。"
+
+msgid "Read-only methods for an authorized two-pin GPIO handoff."
+msgstr "授权双引脚 GPIO 交接的只读方法。"
+
+msgid "Explicit immutable GPIO methods and caller-owned adapter state."
+msgstr "显式不可变 GPIO 方法与调用者拥有的适配器状态。"
+
+msgid "Caller-selected electrical timings in microseconds."
+msgstr "调用者选择的电气时序，单位为微秒。"
+
+msgid "Independent recovery and STOP/ownership-return results."
+msgstr "分别记录恢复结果与 STOP／所有权归还结果。"
+
+msgid "Caller-owned, zero-initialized single-executor session."
+msgstr "调用者拥有、零初始化的单执行者会话。"
+
+msgid "mdio.h"
+msgstr "mdio.h"
+
+msgid "Narrow Clause22 station management with absolute deadlines."
+msgstr "使用绝对截止时间的窄接口 Clause22 站点管理。"
+
+msgid "Read one Clause22 PHY register without retaining output storage."
+msgstr "读取一个 Clause22 PHY 寄存器，不保留输出存储。"
+
+msgid "Write one Clause22 PHY register, not a PHY-specific policy sequence."
+msgstr "写入一个 Clause22 PHY 寄存器，不实现特定 PHY 策略序列。"
+
+msgid "model.h"
+msgstr "model.h"
+
+msgid "Explicit host-model fixtures; no physical MCU qualification."
+msgstr "显式主机模型夹具，不建立物理 MCU 资格。"
+
+msgid "Switch host model to a deterministic clock domain."
+msgstr "将主机模型切换到确定性时钟域。"
+
+msgid "Advance deterministic time without an implicit hardware IRQ."
+msgstr "推进确定性时间，不隐式触发硬件 IRQ。"
+
+msgid "Configure the fixed GPIO model after writer quiescence."
+msgstr "写者静止后配置固定 GPIO 模型。"
+
+msgid "Inject one GPIO input snapshot in the deterministic model."
+msgstr "在确定性模型中注入一个 GPIO 输入快照。"
+
+msgid "Observe output state for a host behavioral assertion."
+msgstr "观察输出状态，用于主机行为断言。"
+
+msgid "Configure exact RX/TX fixture capacities on the fixed UART."
+msgstr "在固定 UART 上配置准确的 RX/TX 夹具容量。"
+
+msgid "Validate exact Native TX context for selected RS485 binding."
+msgstr "为选定 RS485 绑定验证准确 Native TX 上下文。"
+
+msgid "Copy explicit IRQ facts into a quiescent host UART model."
+msgstr "将显式 IRQ 事实复制到静止的主机 UART 模型。"
+
+msgid "Execute one deterministic TX IRQ byte/TC event."
+msgstr "执行一个确定性 TX IRQ 字节／TC 事件。"
+
+msgid "Inject one RX IRQ fact into bounded selected-profile storage."
+msgstr "将一个 RX IRQ 事实注入有界、选定配置的存储。"
+
+msgid "Configure start failure or inability to prove hardware drain."
+msgstr "配置启动失败或无法证明硬件排空。"
+
+msgid "Observe captured TX bytes."
+msgstr "观察捕获的 TX 字节。"
+
+msgid "Configure a fixed SPI echo or register-file model."
+msgstr "配置固定 SPI 回显或寄存器文件模型。"
+
+msgid "Inject bounded SPI partial failure or controller occupancy."
+msgstr "注入有界 SPI 部分失败或控制器占用。"
+
+msgid "Check the modeled CS level after a transaction."
+msgstr "事务结束后检查模型 CS 电平。"
+
+msgid "Configure one 7-bit-address register-file I2C model."
+msgstr "配置一个 7 位地址的寄存器文件 I2C 模型。"
+
+msgid "Inject NACK, arbitration loss or a stuck bus."
+msgstr "注入 NACK、仲裁丢失或总线卡死。"
+
+msgid "Configure physical-geometry RAM model, clearly nonpersistent."
+msgstr "配置物理几何 RAM 模型，明确不具备持久性。"
+
+msgid "Inject program/erase failure after complete modeled pulses."
+msgstr "完整模型脉冲之后注入编程／擦除失败。"
+
+msgid "Reset the watchdog fixture as a simulated new boot."
+msgstr "复位看门狗夹具，模拟新一次启动。"
+
+msgid "Observe expiration of the enabled deterministic IWDG."
+msgstr "观察已启用确定性 IWDG 的到期。"
+
+msgid "Configure exact storage for one static EXTI line."
+msgstr "为一个静态 EXTI 线路配置准确存储。"
+
+msgid "Inject a timestamped selected edge fact."
+msgstr "注入一个带时间戳的选定边沿事实。"
+
+msgid "Configure fixed PWM model timer facts after writer quiescence."
+msgstr "写者静止后配置固定 PWM 模型定时器事实。"
+
+msgid "Configure fixed ADC raw-count sequence and format."
+msgstr "配置固定 ADC 原始计数序列与格式。"
+
+msgid "Inject ADC failure after a prefix of complete samples."
+msgstr "若干完整样本之后注入 ADC 失败。"
+
+msgid "Operate on the selected Native model face only."
+msgstr "仅操作选定的 Native 模型接口面。"
+
+msgid "Choose explicit or automatic modeled SPI IRQ stepping."
+msgstr "选择显式或自动模型 SPI IRQ 推进。"
+
+msgid "Inject one bounded SPI byte/idle event on the exact Native bus."
+msgstr "在准确 Native 总线上注入一个有界 SPI 字节／空闲事件。"
+
+msgid "Inject inability to prove SPI hardware drain."
+msgstr "注入无法证明 SPI 硬件排空的失败。"
+
+msgid "Inject UART IDLE and publish its current valid byte prefix."
+msgstr "注入 UART IDLE，并发布当前有效字节前缀。"
+
+msgid "Inject one ADC timer-trigger scan into a free selected block."
+msgstr "向选定空闲块注入一次 ADC 定时器触发扫描。"
+
+msgid "Variables"
+msgstr "变量"
+
+msgid "Fixed model bindings; no allocation, lookup, probe or construction."
+msgstr "固定模型绑定；不分配、不查找、不探测、不构造。"
+
+msgid "UART storage belongs to the fixture until port stop and IRQ quiescence."
+msgstr "UART 存储归夹具所有，直到端口停止且 IRQ 静止。"
+
+msgid "spi.h"
+msgstr "spi.h"
+
+msgid "Single-executor polling SPI endpoints and complete CS transactions."
+msgstr "单执行者轮询 SPI 端点与完整 CS 事务。"
+
+msgid "Explicit single-cell DMA addresses, both borrowed until SETTLED."
+msgstr "显式单元素 DMA 地址，两者均借用到 SETTLED。"
+
+msgid "Execute one bounded full-duplex 8-bit polling transaction."
+msgstr "执行一个有界、全双工、8 位轮询事务。"
+
+msgid "Recover an idle SPI controller after its retained fault."
+msgstr "保留故障后恢复空闲 SPI 控制器。"
+
+msgid "Prepare an unborrowed finite request without copying buffers."
+msgstr "准备未借用的有限请求，不复制缓冲区。"
+
+msgid "Submit one finite asynchronous whole-CS transaction."
+msgstr "提交一个有限、异步、覆盖整个 CS 区间的事务。"
+
+msgid "Submit explicit incrementing or single-cell DMA memory."
+msgstr "提交显式递增或单元素 DMA 内存。"
+
+msgid "Start an adapter-admitted QUEUED request without readmission."
+msgstr "启动适配器已准入的 QUEUED 请求，不重复准入。"
+
+msgid "Verify an endpoint belongs to the serviced bus."
+msgstr "验证端点属于所推进的总线。"
+
+msgid "Request cancellation without revoking DMA/CS buffer loans."
+msgstr "请求取消，不撤销 DMA/CS 缓冲区借用。"
+
+msgid "Advance one asynchronous bus under its single task executor."
+msgstr "由唯一 Task 执行者推进一个异步总线。"
+
+msgid "Close admission and retain active sources until full drain."
+msgstr "关闭准入，完整排空之前保留活动源。"
+
+msgid "Attach an optional hint sink to asynchronous bus IRQ publishers."
+msgstr "向异步总线 IRQ 发布者附加可选提示接收端。"
+
+msgid "Caller-owned finite SPI request with one whole-CS interval."
+msgstr "调用者拥有的有限 SPI 请求，包含一个完整 CS 区间。"
+
+msgid "stream.h"
+msgstr "stream.h"
+
+msgid "Bounded caller-owned blocks with explicit producer/consumer loans."
+msgstr "调用者拥有的有界块与显式生产者／消费者借用。"
+
+msgid "Initialize an unborrowed stream and exact supplied block array."
+msgstr "初始化未借用的 stream 与准确供给的块数组。"
+
+msgid "Reserve the next free block for one serialized producer."
+msgstr "为一个串行生产者预留下一个空闲块。"
+
+msgid "Query the next physical slot without creating a loan or loss."
+msgstr "查询下一个物理槽，不产生借用或丢失。"
+
+msgid "Latch explicitly observed dropped producer boundaries."
+msgstr "锁存明确观察到的生产者丢弃边界。"
+
+msgid "Publish a complete block after all hardware writes detached."
+msgstr "全部硬件写引用撤离后，发布完整块。"
+
+msgid "Acquire the next ready block for one serialized consumer."
+msgstr "一个串行消费者取得下一个就绪块。"
+
+msgid "Release only the matching consumer incarnation after final use."
+msgstr "最终使用之后，仅释放匹配的消费者实例世代。"
+
+msgid "Abort a producer loan only after memory write sources detach."
+msgstr "仅内存写入源撤离之后中止生产者借用。"
+
+msgid "Close producer admission while retaining every outstanding loan."
+msgstr "关闭生产者准入，保留每一个未结清借用。"
+
+msgid "Bind a posted producer to a quiescent initialized stream."
+msgstr "将预提交生产者绑定到静止、已初始化的 stream。"
+
+msgid "Query the next preposted slot without a loan or guessed loss."
+msgstr "查询下一个预提交槽，不产生借用或猜测丢失。"
+
+msgid "Reserve a future fill without making earlier blocks ready."
+msgstr "预留未来填充，不提前使更早的块就绪。"
+
+msgid "Publish only the oldest pending detached producer loan."
+msgstr "仅发布最早 pending 且已撤离引用的生产者借用。"
+
+msgid "Cancel the newest pending fill after proof of memory drain."
+msgstr "证明内存排空后，取消最新 pending 填充。"
+
+msgid "Caller-owned block metadata; initialize data and capacity only."
+msgstr "调用者拥有的块元数据；仅初始化 data 与 capacity。"
+
+msgid "Caller-owned stream control, initialized before publication."
+msgstr "调用者拥有的 stream 控制，必须先初始化再发布。"
+
+msgid "Mutable producer loan; hardware must stop before abort or publish."
+msgstr "可变生产者借用；中止或发布前必须停止硬件。"
+
+msgid "Optional caller-owned preposted producer; no default cost."
+msgstr "调用者显式选择的预提交生产者，不产生默认成本。"
+
+msgid "Immutable consumer loan, valid until matching release succeeds."
+msgstr "不可变消费者借用，直到匹配释放成功之前均有效。"
+
+msgid "stream_budget.h"
+msgstr "stream_budget.h"
+
+msgid "Optional constant-work snapshot and checked cold sizing."
+msgstr "可选恒定工作量快照与经过检查的冷态容量计算。"
+
+msgid "Snapshot maintained metadata under one short IRQ guard."
+msgstr "在一个短 IRQ 临界区内快照维护的元数据。"
+
+msgid "Checked cold calculation, no stream mutation or allocation."
+msgstr "经过检查的冷态计算，不修改 stream 或分配存储。"
+
+msgid "O(1) aggregate facts; free total does not imply cursor is free."
+msgstr "O(1) 汇总事实；总空闲容量不证明游标位置空闲。"
+
+msgid "Explicit engineering assumptions, no inferred hardware rate."
+msgstr "显式工程假设，不推断硬件速率。"
+
+msgid "Conservative declared-assumption budget; never physical evidence."
+msgstr "依据声明假设得到的保守预算，绝不作为物理证据。"
+
+msgid "timer.h"
+msgstr "timer.h"
+
+msgid "Fixed timer/channel PWM with one shared base configuration."
+msgstr "固定定时器／通道 PWM，共享同一个基准配置。"
+
+msgid "Atomically stage a reviewed fixed-base PWM duty."
+msgstr "原子暂存已审查固定基准 PWM 的占空比。"
+
+msgid "Enable a previously configured fixed PWM output."
+msgstr "启用此前已配置的固定 PWM 输出。"
+
+msgid "Stop PWM at its declared Board inactive electrical level."
+msgstr "以声明的 Board 非活动电气电平停止 PWM。"
+
+msgid "Query staged PWM counts and selected timer clock."
+msgstr "查询暂存 PWM 计数与选定定时器时钟。"
+
+msgid "PWM counts refer to the fixed declared post-prescaler timer clock."
+msgstr "PWM 计数对应固定声明的预分频后定时器时钟。"
+
+msgid "timer_capture.h"
+msgstr "timer_capture.h"
+
+msgid "Optional raw timer edge capture with caller-owned events."
+msgstr "可选原始定时器边沿捕获与调用者拥有的事件。"
+
+msgid "Observable loss incidents, not an exact count of physical edges."
+msgstr "可观察丢失事件，不是准确的物理边沿总数。"
+
+msgid "Borrow an exact event ring and enable the fixed capture channel."
+msgstr "借用准确事件环并启用固定捕获通道。"
+
+msgid "Disable and read back channel/IRQ sources before returning storage."
+msgstr "归还存储之前禁用并读回通道／IRQ 源。"
+
+msgid "Copy the oldest event in a short saved-mask metadata section."
+msgstr "在短且保存原屏蔽状态的元数据临界区内复制最早事件。"
+
+msgid "Query counter units and observable queue/loss facts."
+msgstr "查询计数器单位与可观察队列／丢失事实。"
+
+msgid "Hardware modulo counter and the separate IRQ observation time."
+msgstr "硬件模计数器与独立的 IRQ 观察时间。"
+
+msgid "Fixed counter units and current software retention state."
+msgstr "固定计数器单位与当前软件保留状态。"
+
+msgid "Shared immutable methods; no per-call acquisition or allocation."
+msgstr "共享不可变方法；不逐次取得资源或分配。"
+
+msgid "Immutable identity; state and methods outlive calls and IRQs."
+msgstr "不可变身份；状态和方法必须在所有调用与 IRQ 完全退出前保持有效。"
+
+msgid "uart.h"
+msgstr "uart.h"
+
+msgid "IRQ TX requests and independently budgeted byte/event reception."
+msgstr "IRQ TX 请求与分别预算的字节／事件接收。"
+
+msgid "Prepare an unborrowed IRQ TX descriptor without copying data."
+msgstr "准备未借用 IRQ TX 描述符，不复制数据。"
+
+msgid "Submit one direct request to a single-executor UART."
+msgstr "向单执行者 UART 提交一个直接请求。"
+
+msgid "Request cancellation; acceptance does not mean settlement."
+msgstr "请求取消；接受取消不表示请求结清。"
+
+msgid "Observe time/hardware completion and drain one active request."
+msgstr "观察时间／硬件完成并排空一个活动请求。"
+
+msgid "Read buffered RX events from the selected event profile."
+msgstr "从选定事件配置读取缓冲的 RX 事件。"
+
+msgid "Read buffered bytes from the selected byte profile."
+msgstr "从选定字节配置读取缓冲字节。"
+
+msgid "Close admission and drain TX before releasing hardware."
+msgstr "关闭准入，并在释放硬件之前排空 TX。"
+
+msgid "Attach or detach one explicit IRQ wake target."
+msgstr "附加或解除一个显式 IRQ 唤醒目标。"
+
+msgid "Start the selected RX block mode using exact caller storage."
+msgstr "使用调用者准确存储启动选定 RX 块模式。"
+
+msgid "Stop RX block production without revoking consumer loans."
+msgstr "停止 RX 块生产，不撤销消费者借用。"
+
+msgid "Timestamp belongs to provider clock; precision is hardware-specific."
+msgstr "时间戳属于提供者时钟；精度由硬件决定。"
+
+msgid "Caller-owned TX descriptor; initialize base before first prepare."
+msgstr "调用者拥有的 TX 描述符；第一次 prepare 之前必须初始化 base。"
+
+msgid "uart_rs485.h"
+msgstr "uart_rs485.h"
+
+msgid "Optional single-owner RS485 direction and wire-tail adapter."
+msgstr "可选单所有者 RS485 方向与线尾适配器。"
+
+msgid "Exact transport's side-effect-free TX admission validator."
+msgstr "准确传输端口的无副作用 TX 准入验证器。"
+
+msgid "Param context"
+msgstr "参数 context"
+
+msgid "Param request"
+msgstr "参数 request"
+
+msgid "Return"
+msgstr "返回值"
+
+msgid "Bind exclusive transport and establish inactive DE."
+msgstr "绑定独占传输端口并建立非活动 DE。"
+
+msgid "Immutable selected electrical/timing facts, no task or heap."
+msgstr "不可变的选定电气／时序事实，不含任务或堆。"
+
+msgid "Caller-owned opt-in adapter, zero-initialize before init."
+msgstr "调用者显式选择的适配器，init 前零初始化。"
+
+msgid "usb_device.h"
+msgstr "usb_device.h"
+
+msgid "Full-speed device packets and caller-owned endpoint loans."
+msgstr "全速设备数据包与调用者拥有的端点借用。"
+
+msgid "Prepare one IN packet without reading or borrowing its bytes."
+msgstr "准备一个 IN 数据包，不读取或借用其字节。"
+
+msgid "Prepare an OUT packet capacity without modifying its storage."
+msgstr "准备 OUT 数据包容量，不修改其存储。"
+
+msgid "Admit one packet, never a hidden queue or complete USB transaction."
+msgstr "仅准入一个数据包，不隐式建立队列或执行完整 USB 事务。"
+
+msgid "Request endpoint disable/drain without revoking a buffer loan."
+msgstr "请求端点禁用／排空，不撤销缓冲区借用。"
+
+msgid "Set/clear STALL only after the endpoint has no live transfer."
+msgstr "仅端点无存活传输时设置／清除 STALL。"
+
+msgid "Task-only bounded progress; deadline never depends on USB SOF."
+msgstr "仅 Task 有界推进；截止时间绝不依赖 USB SOF。"
+
+msgid "Consume bounded value events; output is never retained."
+msgstr "消费有界值事件，绝不保留输出。"
+
+msgid "Task-only authoritative snapshot, independent of event-ring space."
+msgstr "仅 Task 的权威快照，与事件环可用空间无关。"
+
+msgid "Stage SET_ADDRESS for the matching zero-data standard SETUP."
+msgstr "为匹配的零数据标准 SETUP 暂存 SET_ADDRESS。"
+
+msgid "Attach/detach a borrowed task/IRQ-compatible wake hint."
+msgstr "附加／解除被借用且兼容 Task/IRQ 的唤醒提示。"
+
+msgid "Disconnect, disable, drain, detach IRQs, then release clock consumer."
+msgstr "断开连接、禁用、排空、撤离 IRQ，再释放时钟消费者。"
+
+msgid "Shared readonly packet methods; context is a selected endpoint."
+msgstr "共享只读数据包方法；上下文为选定端点。"
+
+msgid "Controller identity remains separate from endpoint identities."
+msgstr "控制器身份与端点身份保持分离。"
+
+msgid "wake.h"
+msgstr "wake.h"
+
+msgid "Explicit borrowed IRQ wake target and syscall-ceiling check."
+msgstr "显式借用 IRQ 唤醒目标与系统调用阈值检查。"
+
+msgid "Explicit kernel interrupt-mask policy, independent of any RTOS."
+msgstr "显式内核中断屏蔽策略，独立于任何 RTOS。"
+
+msgid "Validate actual IRQ facts against an explicit kernel policy."
+msgstr "依据显式内核策略验证实际 IRQ 事实。"
+
+msgid "Deliver one bounded hint after authoritative state is latched."
+msgstr "权威状态锁存后发送一个有界提示。"
+
+msgid "Optional immutable wake target borrowed by an IRQ provider."
+msgstr "IRQ 提供者借用的可选不可变唤醒目标。"
+
+msgid "Immutable CPU and kernel facts for cold wake binding."
+msgstr "用于冷态唤醒绑定的不可变 CPU 与内核事实。"
+
+msgid "Actual publisher facts read before attaching any borrowed sink."
+msgstr "附加任何被借用的接收端之前读取实际发布者事实。"
+
+msgid "watchdog.h"
+msgstr "watchdog.h"
+
+msgid "Irreversible IWDG effects and neutral hardware reset causes."
+msgstr "不可逆 IWDG 效果与中立硬件复位原因。"
+
+msgid "Enable IWDG with reviewed bounds; activation is irreversible."
+msgstr "在已审查边界内启用 IWDG；激活不可逆。"
+
+msgid "Feed an enabled IWDG without changing product health policy."
+msgstr "喂已启用 IWDG，不改变产品健康策略。"
+
+msgid "Query current watchdog effect and timeout uncertainty."
+msgstr "查询当前看门狗效果与超时不确定性。"
+
+msgid "Read latched boot reset causes captured before clearing flags."
+msgstr "读取清除标志前捕获的锁存启动复位原因。"
+
+msgid "Hardware-selected timeout bounds, including declared LSI uncertainty."
+msgstr "硬件选定的超时边界，包含声明的 LSI 不确定性。"

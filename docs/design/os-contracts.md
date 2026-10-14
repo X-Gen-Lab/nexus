@@ -63,7 +63,9 @@ settlement，不释放 request、operation、DMA buffer 或 notification storage
 CPU/SoC facts 包含实际 IRQ 数、实现优先级位数和分组能力。OS runtime policy 明确
 区分无内核、PRIMASK 内核和 BASEPRI 内核，不能仅凭 ceiling=0 推导内核不存在。
 Mainline 调用内核 ISR API 前验证实际 publisher IRQ、priority width、分组和 syscall
-ceiling；Baseline 按 PRIMASK port 合同检查实际 configurable IRQ。
+ceiling；Baseline 按 PRIMASK port 合同检查实际 configurable IRQ。typed IRQ sink
+和 priority policy 只约束所选 provider/backend/mode 已实现的通知路径；类型存在或
+ceiling 校验通过不建立新模式、新内核或实板 IRQ 资格。不支持的组合明确拒绝。
 
 NMI、HardFault 和内核专属异常不进入这些 kernel wake API。Task API 要求当前世界
 privileged Thread mode，运行时手工掩码已恢复、scheduler 未被挂起；启动阶段只允许
@@ -86,9 +88,12 @@ context 预算。Native 栈须满足 pthread 平台下限并加上应用预算�
 raw START SVC 不能再次取得启动权限。任务开始后的 FP/MVE 使用由对应 Port 管理，
 不是禁用应用浮点能力；实际 context retention 仍需要硬件验收。
 
-可 join 任务返回后由 wrapper 发布完成并挂起；外部单 joiner 执行删除后才能重用
-TCB/栈/context。join 超时保留全部存储。Native 同样只有一个外部 lifecycle owner，
-禁止绕过 adapter 对所属线程执行 `pthread_cancel`、detach 或另外一次 join。
+可 join 任务返回后的机制由后端决定：FreeRTOS wrapper 发布完成后挂起，等待外部
+joiner 删除；Native entry 返回 pthread，由 `pthread_join` 证明线程退出；ThreadX
+wrapper 发布完成提示后返回内核 completion 路径，join 仍检查完成状态并执行删除。
+三者均由唯一外部 lifecycle owner 完成 join；成功前不得重用 TCB/栈/context，
+join 超时保留全部存储。Native 禁止绕过 adapter 执行 `pthread_cancel`、detach
+或另外一次 join。完成提示本身不能替代后端的实际退出与引用撤离证明。
 
 永久任务使用独立显式 API，entry 不得返回，control/stack/context 保留到 reset；它
 没有 completion semaphore、join 或 destroy。适用于产品确实具有永久生命周期的任务。

@@ -1,0 +1,843 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 8e78275c29ddf9aa4918d057fb6ac1a7fa0a3060d171ad4e5a9bb91aab0c10b9\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:1
+msgid "Nexus 文档内容与图示标准"
+msgstr "Nexus 文档内容与图示标准"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:3
+msgid ""
+"本标准用于新增和修改的平台文档。目标是让读者明确任务、条件、操作和结果， 能够沿文档完成使用、接入、维护或验收。既有页面按 "
+"{download}`实施台账 <documentation-system-execution.csv>`逐批审查；本标准的存在不表示 "
+"正文迁移、图册、自动检查、翻译或发布已经完成。"
+msgstr ""
+"本标准用于新增和修改的平台文档。目标是让读者明确任务、条件、操作和结果， 能够沿文档完成使用、接入、维护或验收。既有页面按 "
+"{download}`实施台账 <documentation-system-execution.csv>`逐批审查；本标准的存在不表示 "
+"正文迁移、图册、自动检查、翻译或发布已经完成。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:8
+msgid ""
+"必须/不得表示合同要求；应/不应表示默认做法，例外需有理由；可以表示允许的 选择。规范性要求必须明确主体、条件、动作和可检查的结果。责任由 Codex "
+"承担， 独立 agent 进行内容和图示评审，不要求虚构人员账号。"
+msgstr ""
+"必须/不得表示合同要求；应/不应表示默认做法，例外需有理由；可以表示允许的 选择。规范性要求必须明确主体、条件、动作和可检查的结果。责任由 Codex "
+"承担， 独立 agent 进行内容和图示评审，不要求虚构人员账号。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:12
+msgid "1. 内容必须帮助读者完成任务"
+msgstr "1. 内容必须帮助读者完成任务"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "编号"
+msgstr "编号"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "约束"
+msgstr "约束"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "验收方法"
+msgstr "验收方法"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "TXT-01"
+msgstr "TXT-01"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "开头说明读者能完成什么、适用配置和必要限制"
+msgstr "开头说明读者能完成什么、适用配置和必要限制"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "单看开头能够判断是否适用"
+msgstr "单看开头能够判断是否适用"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "TXT-02"
+msgstr "TXT-02"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "tutorial/how-to 围绕一个主要目标，先给结果和必要步骤"
+msgstr "tutorial/how-to 围绕一个主要目标，先给结果和必要步骤"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "独立读者能够按步骤完成"
+msgstr "独立读者能够按步骤完成"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "TXT-03"
+msgstr "TXT-03"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "一段围绕一个问题，使用具体主体、主动动词和稳定术语"
+msgstr "一段围绕一个问题，使用具体主体、主动动词和稳定术语"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "去掉重复结论、口号和无解释的缩写"
+msgstr "去掉重复结论、口号和无解释的缩写"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "TXT-04"
+msgstr "TXT-04"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "比较/字段用表；顺序用步骤；结构与并发用对应图"
+msgstr "比较/字段用表；顺序用步骤；结构与并发用对应图"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "表、图、正文各自承担必要信息"
+msgstr "表、图、正文各自承担必要信息"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "TXT-05"
+msgstr "TXT-05"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "原始日志、大量hash和失败尝试链接到证据，不打断操作主线"
+msgstr "原始日志、大量hash和失败尝试链接到证据，不打断操作主线"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "可读摘要能定位完整原件"
+msgstr "可读摘要能定位完整原件"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "TXT-06"
+msgstr "TXT-06"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "精确区分当前实现、已验证、估计和计划"
+msgstr "精确区分当前实现、已验证、估计和计划"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "每个能力/性能结论有范围与出处"
+msgstr "每个能力/性能结论有范围与出处"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "TXT-07"
+msgstr "TXT-07"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "同一规范只维护一份，概述/翻译/图链接权威合同"
+msgstr "同一规范只维护一份，概述/翻译/图链接权威合同"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "修改接口不需同步两份手写声明"
+msgstr "修改接口不需同步两份手写声明"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "TXT-08"
+msgstr "TXT-08"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "架构和合同改变同时核对受影响图、示例与翻译"
+msgstr "架构和合同改变同时核对受影响图、示例与翻译"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "PR列出影响范围与审查结果"
+msgstr "PR列出影响范围与审查结果"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:25
+msgid ""
+"不设机械字数、句数或图数量门槛。复杂页面需要任务索引和分层说明；简单动作 不强制配图。不能用“极致、完整、全部支持”等无范围结论代替成本和资格记录。"
+msgstr ""
+"不设机械字数、句数或图数量门槛。复杂页面需要任务索引和分层说明；简单动作 不强制配图。不能用“极致、完整、全部支持”等无范围结论代替成本和资格记录。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:28
+msgid ""
+"页面采用 [五类内容模板](documentation-templates.md)。模板规定必须回答的问题， "
+"不强制所有页面使用相同标题。当前架构解释需回答：为何分层、谁拥有状态和资源、 谁调用谁、构建与运行各做什么、合法上下文、失败责任、成本及验证边界。"
+msgstr ""
+"页面采用 [五类内容模板](documentation-templates.md)。模板规定必须回答的问题， "
+"不强制所有页面使用相同标题。当前架构解释需回答：为何分层、谁拥有状态和资源、 谁调用谁、构建与运行各做什么、合法上下文、失败责任、成本及验证边界。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:32
+msgid "2. 术语、单位和约束"
+msgstr "2. 术语、单位和约束"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:34
+msgid ""
+"首次出现可给中英文对应，随后同一概念使用同一词。C符号、配置键、错误码、 "
+"结构字段及CSV/JSON中的机器身份值保持原样，包括状态、ID、摘要、路径、版本和 "
+"配置值。原CSV/JSON权威字节不得由翻译覆盖；人类任务、说明和退出条件可以提供 译文或派生显示，并保留原文权威及证据身份。必须区分："
+msgstr ""
+"首次出现可给中英文对应，随后同一概念使用同一词。C符号、配置键、错误码、 "
+"结构字段及CSV/JSON中的机器身份值保持原样，包括状态、ID、摘要、路径、版本和 "
+"配置值。原CSV/JSON权威字节不得由翻译覆盖；人类任务、说明和退出条件可以提供 译文或派生显示，并保留原文权威及证据身份。必须区分："
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "术语"
+msgstr "术语"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "本文档体系中的含义"
+msgstr "本文档体系中的含义"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "factory"
+msgstr "factory（工厂）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "返回该装配已有静态接口的typed查找"
+msgstr "返回该装配已有静态接口的typed查找"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "face"
+msgstr "face（只读接口面）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "公共只读接口，含ops和实例context"
+msgstr "公共只读接口，含ops和实例context"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "provider"
+msgstr "provider（实现）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "具体实现及私有状态"
+msgstr "具体实现及私有状态"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "controller/endpoint"
+msgstr "controller/endpoint（控制器／端点）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "控制器身份与其逻辑/外部端点身份"
+msgstr "控制器身份与其逻辑/外部端点身份"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "owner/executor"
+msgstr "owner/executor（所有者／执行者）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "资源/生命周期责任与实际执行推进责任"
+msgstr "资源/生命周期责任与实际执行推进责任"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "request/buffer"
+msgstr "request/buffer（请求／缓冲区）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "请求元数据与被借用的数据存储"
+msgstr "请求元数据与被借用的数据存储"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "DMA complete"
+msgstr "DMA complete（DMA 完成）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "DMA阶段完成，尚需外设和引用排空"
+msgstr "DMA阶段完成，尚需外设和引用排空"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "wire complete"
+msgstr "wire complete（线路完成）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "外设线上传输完成，尚需满足其余结束条件"
+msgstr "外设线上传输完成，尚需满足其余结束条件"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "SETTLED"
+msgstr "SETTLED"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "provider先排空必要引用，再以release发布SETTLED作为最后一次请求访问；调用方acquire观察"
+msgstr "provider先排空必要引用，再以release发布SETTLED作为最后一次请求访问；调用方acquire观察"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "QUARANTINED"
+msgstr "QUARANTINED"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "未安全结束，借用和恢复责任仍保留"
+msgstr "未安全结束，借用和恢复责任仍保留"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:50
+msgid ""
+"所有容量和测量写单位：B/KiB、Hz/MHz、cycles、µs/ms。Flash LOAD、Flash "
+"footprint、预留RAM和实测栈高水位分别记录。对齐、长度粒度、inclusive limit、 "
+"溢出、deadline时间域和最大配置须明确。理论上界、估计和实测值不能混写。"
+msgstr ""
+"所有容量和测量写单位：B/KiB、Hz/MHz、cycles、µs/ms。Flash LOAD、Flash "
+"footprint、预留RAM和实测栈高水位分别记录。对齐、长度粒度、inclusive limit、 "
+"溢出、deadline时间域和最大配置须明确。理论上界、估计和实测值不能混写。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:54
+msgid ""
+"有效约束示例：ACCEPTED后，调用方必须保持请求和缓冲区有效，直到acquire观察 "
+"SETTLED；复用相关adapter/observer存储还需对应引用排空。无效表述示例： “注意生命周期”。后者缺少主体、结束条件和失败责任。"
+msgstr ""
+"有效约束示例：ACCEPTED后，调用方必须保持请求和缓冲区有效，直到acquire观察 "
+"SETTLED；复用相关adapter/observer存储还需对应引用排空。无效表述示例： “注意生命周期”。后者缺少主体、结束条件和失败责任。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:58
+msgid "3. 事实、计划和资格必须分别表达"
+msgstr "3. 事实、计划和资格必须分别表达"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "表述"
+msgstr "表述"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "必需依据"
+msgstr "必需依据"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "当前实现"
+msgstr "当前实现"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "对应源码、配置/模式和行为范围"
+msgstr "对应源码、配置/模式和行为范围"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "已通过模型/Native"
+msgstr "已通过模型/Native"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "精确源码、测试scope、实际执行结果"
+msgstr "精确源码、测试scope、实际执行结果"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "ARM链接/资源验证"
+msgstr "ARM链接/资源验证"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "对应配置、工具、ELF/BIN/map与检查"
+msgstr "对应配置、工具、ELF/BIN/map与检查"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "软件候选"
+msgstr "软件候选"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "clean source、SDK、实际复现和同产物证据"
+msgstr "clean source、SDK、实际复现和同产物证据"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "实板通过"
+msgstr "实板通过"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "PCB/芯片/设备/station/image和实际测量"
+msgstr "PCB/芯片/设备/station/image和实际测量"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "计划或目标"
+msgstr "计划或目标"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "未实施任务及退出条件，不写成现有能力"
+msgstr "未实施任务及退出条件，不写成现有能力"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:69
+msgid ""
+"芯片具备、SDK提供、provider维护、Board授权、软件通过、HIL通过不能合并成 "
+"一个“支持”。当前、目标和参考配置必须在页面及图的caption中可见。文档发布 "
+"不建立新的平台资格。旧结果保留原始源码、失败尝试和状态，不能重标为新HEAD。"
+msgstr ""
+"芯片具备、SDK提供、provider维护、Board授权、软件通过、HIL通过不能合并成 "
+"一个“支持”。当前、目标和参考配置必须在页面及图的caption中可见。文档发布 "
+"不建立新的平台资格。旧结果保留原始源码、失败尝试和状态，不能重标为新HEAD。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:73
+msgid "4. 示例与命令"
+msgstr "4. 示例与命令"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:75
+msgid ""
+"完整例子必须来自维护fixture或固定版本外部示例，并关联实际consumer验证。 "
+"优先literalinclude；省略部分注明fragment原因。不能把示意片段称为完整教程。 "
+"普通构建不自动刷写、不执行任意Markdown命令，也不取得远程latest。"
+msgstr ""
+"完整例子必须来自维护fixture或固定版本外部示例，并关联实际consumer验证。 "
+"优先literalinclude；省略部分注明fragment原因。不能把示意片段称为完整教程。 "
+"普通构建不自动刷写、不执行任意Markdown命令，也不取得远程latest。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:79
+msgid ""
+"每个命令说明工作目录、工具和连接前提、输入、预期结果、检查成功方法、清理。 固件C示例遵守现有C11、80列、四空格、附着大括号、类型侧指针和反斜杠 "
+"Doxygen风格。工具及测试示例遵守对应语言规范，包括现有Python工具和C++17 "
+"GoogleTest/GoogleMock用法。文档规则不重新定义仓库代码风格。"
+msgstr ""
+"每个命令说明工作目录、工具和连接前提、输入、预期结果、检查成功方法、清理。 固件C示例遵守现有C11、80列、四空格、附着大括号、类型侧指针和反斜杠 "
+"Doxygen风格。工具及测试示例遵守对应语言规范，包括现有Python工具和C++17 "
+"GoogleTest/GoogleMock用法。文档规则不重新定义仓库代码风格。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:84
+msgid ""
+"异步例子必须说明拒绝、接受借用、执行推进、等待、取消、排空及结束后资源。 "
+"timeout/cancel不自动撤销借用；失败停止保留QUARANTINED存储。唤醒只是提示， "
+"不能用无限等待掩盖推进条件。产品任务、私有分区和恢复政策仍属于外部工程。"
+msgstr ""
+"异步例子必须说明拒绝、接受借用、执行推进、等待、取消、排空及结束后资源。 "
+"timeout/cancel不自动撤销借用；失败停止保留QUARANTINED存储。唤醒只是提示， "
+"不能用无限等待掩盖推进条件。产品任务、私有分区和恢复政策仍属于外部工程。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:88
+msgid "5. 图示身份与关系"
+msgstr "5. 图示身份与关系"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:90
+msgid ""
+"每张图至少有ID、名称、用途、类型、适用范围、关系图例、正文合同和来源。 "
+"ID用于目录和迁移；公共anchor使用标准显式target/label，不能依靠front matter 自动产生引用。图源与输出登记在 "
+"{download}`图册清单 <../assets/diagrams/diagram-index.csv>`。"
+msgstr ""
+"每张图至少有ID、名称、用途、类型、适用范围、关系图例、正文合同和来源。 "
+"ID用于目录和迁移；公共anchor使用标准显式target/label，不能依靠front matter 自动产生引用。图源与输出登记在 "
+"{download}`图册清单 <../assets/diagrams/diagram-index.csv>`。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "图的身份"
+msgstr "图的身份"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "允许表达"
+msgstr "允许表达"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "不得暗示"
+msgstr "不得暗示"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "current"
+msgstr "current（当前）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "经源码核对的结构/契约"
+msgstr "经源码核对的结构/契约"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "整个平台、所有模式或实板均通过"
+msgstr "整个平台、所有模式或实板均通过"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "target"
+msgstr "target（目标）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "已制定但待实施的设计"
+msgstr "已制定但待实施的设计"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "新模块/工具已存在或已部署"
+msgstr "新模块/工具已存在或已部署"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "reference"
+msgstr "reference（参考）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "精确芯片/板卡/模式的参考装配"
+msgstr "精确芯片/板卡/模式的参考装配"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "自动推广到其他平台、PCB和安全域"
+msgstr "自动推广到其他平台、PCB和安全域"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:100
+msgid ""
+"一张图解决一个主要问题。分层图、编译依赖图、生成流程、数据流、时序和状态图 分别表达对应关系；混合关系时逐边标明含义。跨边界箭头必须可解释，不能同时 "
+"把未标记箭头理解为调用、生成和所有权转移。"
+msgstr ""
+"一张图解决一个主要问题。分层图、编译依赖图、生成流程、数据流、时序和状态图 分别表达对应关系；混合关系时逐边标明含义。跨边界箭头必须可解释，不能同时 "
+"把未标记箭头理解为调用、生成和所有权转移。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:104
+msgid ""
+"节点名对应源码、接口或明确概念；可选项必须有文字或线型标记，不能只靠颜色。 返回箭头、异步事件、状态迁移的方向准确。图不会因美化增加不存在的CPU "
+"factory、 隐藏任务、统一池或强制OS层。"
+msgstr ""
+"节点名对应源码、接口或明确概念；可选项必须有文字或线型标记，不能只靠颜色。 返回箭头、异步事件、状态迁移的方向准确。图不会因美化增加不存在的CPU "
+"factory、 隐藏任务、统一池或强制OS层。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:108
+msgid "6. 必需图册与语义检查"
+msgstr "6. 必需图册与语义检查"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:110
+msgid "下列图分别对应DOC-43至DOC-57，具体顺序与退出条件在实施台账。"
+msgstr "下列图分别对应DOC-43至DOC-57，具体顺序与退出条件在实施台账。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "图ID"
+msgstr "图ID"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "内容"
+msgstr "内容"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "必须表达的关键事实"
+msgstr "必须表达的关键事实"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-01"
+msgstr "FIG-01"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "全平台架构与外部边界"
+msgstr "全平台架构与外部边界"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "产品外置，Core/Arch/SoC/I/O，组件和OS可选"
+msgstr "产品外置，Core/Arch/SoC/I/O，组件和OS可选"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-02"
+msgstr "FIG-02"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "编译目标依赖"
+msgstr "编译目标依赖"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "从实际CMake核对，SDK私有，应用依赖平台"
+msgstr "从实际CMake核对，SDK私有，应用依赖平台"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-03"
+msgstr "FIG-03"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "配置和生成"
+msgstr "配置和生成"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "TOML+facts→typed IR→原子bundle→CMake→产物；失败失效"
+msgstr "TOML+facts→typed IR→原子bundle→CMake→产物；失败失效"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-04"
+msgstr "FIG-04"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "factory/实例结构"
+msgstr "factory/实例结构"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "既有face、共享ops、独立context；controller与endpoint"
+msgstr "既有face、共享ops、独立context；controller与endpoint"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-05"
+msgstr "FIG-05"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "初始化与失败撤回"
+msgstr "初始化与失败撤回"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "显式启动、部分效果、逆序撤回、失败保留责任"
+msgstr "显式启动、部分效果、逆序撤回、失败保留责任"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-06"
+msgstr "FIG-06"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "请求状态"
+msgstr "请求状态"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "拒绝/借用/排空/隔离/SETTLED，观察者另需退出"
+msgstr "拒绝/借用/排空/隔离/SETTLED，观察者另需退出"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-07"
+msgstr "FIG-07"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "UART/SPI DMA时序"
+msgstr "UART/SPI DMA时序"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "DMA TC、线上完成、引用排空与最终发布分开"
+msgstr "DMA TC、线上完成、引用排空与最终发布分开"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-08"
+msgstr "FIG-08"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "wait/wake/退出"
+msgstr "wait/wake/退出"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "ready-arm-ready-wait-ready，执行器和join责任"
+msgstr "ready-arm-ready-wait-ready，执行器和join责任"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-09"
+msgstr "FIG-09"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "CPU/内存/DMA/Cache"
+msgstr "CPU/内存/DMA/Cache"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "精确配置、可达域、完整cache line与维护时点"
+msgstr "精确配置、可达域、完整cache line与维护时点"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-10"
+msgstr "FIG-10"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "SDK消费"
+msgstr "SDK消费"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "实际外部工程、搬移、配置/链接/运行和产物检查"
+msgstr "实际外部工程、搬移、配置/链接/运行和产物检查"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-11"
+msgstr "FIG-11"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "软件与HIL证据"
+msgstr "软件与HIL证据"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "各自实际取得，再按scope准入；不自动生成物理资格"
+msgstr "各自实际取得，再按scope准入；不自动生成物理资格"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-12"
+msgstr "FIG-12"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "文档/SDK发布与恢复"
+msgstr "文档/SDK发布与恢复"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "身份、不可变版本、离线包、下载和独立恢复"
+msgstr "身份、不可变版本、离线包、下载和独立恢复"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-13"
+msgstr "FIG-13"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "Cortex-M能力分层"
+msgstr "Cortex-M能力分层"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "原语、Runtime、SoC接入、实板资格分别表达"
+msgstr "原语、Runtime、SoC接入、实板资格分别表达"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-14"
+msgstr "FIG-14"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "U575双域"
+msgstr "U575双域"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "仅选定TZEN=1同步参考；SAU/MPU/GTZC/gateway责任"
+msgstr "仅选定TZEN=1同步参考；SAU/MPU/GTZC/gateway责任"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "FIG-15"
+msgstr "FIG-15"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "连续流与丢块"
+msgstr "连续流与丢块"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "producer/block/consumer、overrun和停止排空；服务预算"
+msgstr "producer/block/consumer、overrun和停止排空；服务预算"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:130
+msgid ""
+"运行图必须让读者看到：factory取得已有接口以后，日常I/O直接通过face进入 "
+"provider；Arch按编译目标选择；应用拥有调度和执行进度。初始化顺序不能由静态 结构图推断，静态结构图也不能代表运行时每次调用路径。"
+msgstr ""
+"运行图必须让读者看到：factory取得已有接口以后，日常I/O直接通过face进入 "
+"provider；Arch按编译目标选择；应用拥有调度和执行进度。初始化顺序不能由静态 结构图推断，静态结构图也不能代表运行时每次调用路径。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:134
+msgid ""
+"状态图中REJECTED/ACCEPTED是admission结果，不伪造为nx_request_state_t状态。 "
+"SETTLED只在全部必要引用排空后发布；取消/deadline不能直接指向“存储已释放”。 "
+"QUARANTINED到结束必须有实际恢复/排空证明，不暗示每个provider都有恢复API。 "
+"时序图必须包含相关失败分支或链接独立失败图，并标清Task/IRQ/DMA/安全域。"
+msgstr ""
+"状态图中REJECTED/ACCEPTED是admission结果，不伪造为nx_request_state_t状态。 "
+"SETTLED只在全部必要引用排空后发布；取消/deadline不能直接指向“存储已释放”。 "
+"QUARANTINED到结束必须有实际恢复/排空证明，不暗示每个provider都有恢复API。 "
+"时序图必须包含相关失败分支或链接独立失败图，并标清Task/IRQ/DMA/安全域。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:139
+msgid "图不能替代正文的调用前提与权威合同。图文冲突时暂停相关交付结论并修正来源， 不能只改图或教程隐藏规范冲突。"
+msgstr "图不能替代正文的调用前提与权威合同。图文冲突时暂停相关交付结论并修正来源， 不能只改图或教程隐藏规范冲突。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:142
+msgid "7. 图源、视觉和离线交付"
+msgstr "7. 图源、视觉和离线交付"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:144
+msgid ""
+"首批采用可编辑Graphviz DOT和本地SVG，图源与输出成对保存。Sphinx后续可用 "
+"内置graphviz扩展；新图链及工具锁仍按DOC-25/33实施。既有Mermaid作为迁移输入， "
+"不能另维护同一图的第二份权威源。需要时序专用工具时，以实际需求另行审查闭包。"
+msgstr ""
+"首批采用可编辑Graphviz DOT和本地SVG，图源与输出成对保存。Sphinx后续可用 "
+"内置graphviz扩展；新图链及工具锁仍按DOC-25/33实施。既有Mermaid作为迁移输入， "
+"不能另维护同一图的第二份权威源。需要时序专用工具时，以实际需求另行审查闭包。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:148
+msgid "每张图同时满足："
+msgstr "每张图同时满足："
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:150
+msgid "图源可审查，图名/ID稳定；图源变更后重新生成输出。"
+msgstr "图源可审查，图名/ID稳定；图源变更后重新生成输出。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:151
+msgid "深色文字与清楚边界；颜色不是唯一含义，灰度下仍可区分。"
+msgstr "深色文字与清楚边界；颜色不是唯一含义，灰度下仍可区分。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:152
+msgid "标签短且具体，复杂说明放正文；过密时拆图，不缩小到无法阅读。"
+msgstr "标签短且具体，复杂说明放正文；过密时拆图，不缩小到无法阅读。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:153
+msgid "中文、英文、C符号完整，无缺字、重叠、裁切和模糊截图。"
+msgstr "中文、英文、C符号完整，无缺字、重叠、裁切和模糊截图。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:154
+msgid "提供alt和caption；窄屏可以放大或独立打开SVG，不把整图强制缩成小字。"
+msgstr "提供alt和caption；窄屏可以放大或独立打开SVG，不把整图强制缩成小字。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:155
+msgid "SVG默认无脚本、动画、foreignObject、外部href/资源及DOCTYPE。"
+msgstr "SVG默认无脚本、动画、foreignObject、外部href/资源及DOCTYPE。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:156
+msgid "图和图源随离线包交付，加载、字体说明与检查不依赖CDN。"
+msgstr "图和图源随离线包交付，加载、字体说明与检查不依赖CDN。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:157
+msgid "Graphviz及实际字体进入文档工具闭包，缺失或差异不伪称已验证。"
+msgstr "Graphviz及实际字体进入文档工具闭包，缺失或差异不伪称已验证。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:159
+msgid ""
+"SVG解析和渲染成功不证明架构正确。独立审查必须逐边核对调用/依赖、状态和 失败责任。实际显示需要检查桌面、窄屏/放大和打印；未执行项保留未验证状态。"
+msgstr ""
+"SVG解析和渲染成功不证明架构正确。独立审查必须逐边核对调用/依赖、状态和 失败责任。实际显示需要检查桌面、窄屏/放大和打印；未执行项保留未验证状态。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:162
+msgid "8. 评审与自动化职责"
+msgstr "8. 评审与自动化职责"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "检查"
+msgstr "检查"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "机器可负责"
+msgstr "机器可负责"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "独立语义审查负责"
+msgstr "独立语义审查负责"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "正文"
+msgstr "正文"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "格式、字段、链接、anchor、导航"
+msgstr "格式、字段、链接、anchor、导航"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "任务完整、前提准确、术语清楚"
+msgstr "任务完整、前提准确、术语清楚"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "示例"
+msgstr "示例"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "实际解析/构建、固定输入与退出码"
+msgstr "实际解析/构建、固定输入与退出码"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "正常/失败/恢复和所有权正确"
+msgstr "正常/失败/恢复和所有权正确"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "图"
+msgstr "图"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "图源语法、文件配对、SVG资源、哈希"
+msgstr "图源语法、文件配对、SVG资源、哈希"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "箭头/可选项/时序/状态与代码一致"
+msgstr "箭头/可选项/时序/状态与代码一致"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "翻译"
+msgstr "翻译"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "源版本、缺译/fuzzy、状态"
+msgstr "源版本、缺译/fuzzy、状态"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "规范强度、单位和失败条件保持"
+msgstr "规范强度、单位和失败条件保持"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "交付"
+msgstr "交付"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "manifest、相对链接、实际站点身份"
+msgstr "manifest、相对链接、实际站点身份"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:0
+msgid "支持/计划/资格边界没有混淆"
+msgstr "支持/计划/资格边界没有混淆"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:172
+msgid ""
+"不通过正则扫描正文来自动判定“支持”或“安全”。新增gate行为采用实际负路径 TDD；纯正文和图源修改采用对应检查与语义评审，不新增镜像实现测试。"
+msgstr ""
+"不通过正则扫描正文来自动判定“支持”或“安全”。新增gate行为采用实际负路径 TDD；纯正文和图源修改采用对应检查与语义评审，不新增镜像实现测试。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:175
+msgid ""
+"审查记录至少绑定页面/图、代码与文档来源、发现、处理结果和退出条件。下列情况 必须修正后才能关闭相应任务：错误配置、借用提前回收、错误完成顺序、图中虚构"
+" 模块、错误支持/HIL声明、断链、未标注的过期翻译、关键图无法阅读。"
+msgstr ""
+"审查记录至少绑定页面/图、代码与文档来源、发现、处理结果和退出条件。下列情况 必须修正后才能关闭相应任务：错误配置、借用提前回收、错误完成顺序、图中虚构"
+" 模块、错误支持/HIL声明、断链、未标注的过期翻译、关键图无法阅读。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-standards.md:179
+msgid ""
+"完整标准应用和58项系统实施以台账实际状态为准。快速提交检查、严格文档CI、 "
+"图源/输出配对和全部当前页面的中英文翻译检查由统一CLI执行。原文摘要、审查 标记和严格构建新提取的完整消息集合同时有效；缺译、过期或 fuzzy "
+"必须修复。 混合语言原文可采用同源语言 catalog，代码、标识符和原证据值保持原样。 历史归档不参与当前翻译完成判定；独立语义、视觉、发布与恢复结果"
+" 分别绑定实际输入，不从规则或工作流存在推断执行完成。"
+msgstr ""
+"完整标准应用和58项系统实施以台账实际状态为准。快速提交检查、严格文档CI、 "
+"图源/输出配对和全部当前页面的中英文翻译检查由统一CLI执行。原文摘要、审查 标记和严格构建新提取的完整消息集合同时有效；缺译、过期或 fuzzy "
+"必须修复。 混合语言原文可采用同源语言 catalog，代码、标识符和原证据值保持原样。 历史归档不参与当前翻译完成判定；独立语义、视觉、发布与恢复结果"
+" 分别绑定实际输入，不从规则或工作流存在推断执行完成。"

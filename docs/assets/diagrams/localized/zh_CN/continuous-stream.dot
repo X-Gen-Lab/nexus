@@ -1,0 +1,44 @@
+// FIG-15 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph ContinuousStream {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-15 STM32F407 USART1 连续 RX：调用者拥有的块借用\nDMA2 stream2 channel4；两个硬件目标＋至少一个替换块"];
+    subgraph clusterSlots {
+        label="块状态与 token（slot＋单调 epoch）"; color="#64748b";
+        free [label="FREE：可保留为下一个生产者目标"];
+        filling [label="FILLING：两个硬件目标＋待替换借用\n硬件仍可能写入，不得交给消费者"];
+        ready [label="READY：旧地址已脱离所有硬件目标\n载荷不可变，携带边界／丢失标志"];
+        borrowed [label="BORROWED：消费者 acquire\n最后使用后以匹配 token 执行 release"];
+        free -> filling [label="预投递 reserve／显式 DMA 内存域验证"];
+        filling -> ready [label="FIFO 发布：旧块已证明脱离"];
+        ready -> borrowed [label="消费者 acquire"];
+        borrowed -> free [label="匹配 release；过期／重复 release 不改变借用", constraint=false];
+    }
+    irq [label="DMA TC IRQ：保留第三个 FREE 块\n替换已完成的非活动目标"];
+    proof [label="同时证明两个目标地址／CT／EN\n没有新 TC 或错误；旧地址完全脱离"];
+    noSpare [label="没有 FREE 块／CT 异常／新错误\n立即撤回 RX 写源，实际 disable／drain", fillcolor="#fff7ed"];
+    retained [label="无法证明 disable：保留全部生产者借用\n任务 service 有界重试；不回收消费者借用", fillcolor="#fff7ed"];
+    loss [label="排空后发布可靠正长度前缀／按 LIFO abort 后续借用\n记录可观察丢失／停止间隙，不猜测丢失字节"];
+    budget [label="预算：IRQ＋目标替换时间＜一块填充时间\n消费者前沿 release 延迟决定所需块数\nTC 标志不能恢复任意合并回绕", fillcolor="#fefce8"];
+    stop [label="rx_stop 关闭准入；不再 rearm\n写源＋引擎排空，消费者释放，outstanding=0\n成功后仍需观察者／调用者退出"];
+    filling -> irq [label="TC 是边界提示"];
+    irq -> proof [label="备用块存在"];
+    proof -> ready [label="全部证明成立"];
+    irq -> noSpare [label="无法替换"];
+    proof -> noSpare [label="任何证明失败"];
+    noSpare -> retained [label="写源未排空"];
+    noSpare -> loss [label="实际写源排空"];
+    loss -> ready [label="可靠前缀与标志", constraint=false];
+    budget -> irq [label="实板需测量最坏延迟", style=dashed];
+    borrowed -> stop [label="归还借用后判断成功"];
+    loss -> stop [label="显式停止路径"];
+}

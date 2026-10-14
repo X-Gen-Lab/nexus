@@ -1,0 +1,263 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: d8783cc8939f5b406c1e0e227f655300026e58af1e60f4c67ca6e7243eaddf96\nX-Nexus-Reviewed: true\n"
+
+msgid "Arch: CPU mechanisms and feature contracts"
+msgstr "Arch: CPU mechanisms and feature contracts"
+
+msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgstr "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+
+msgid "arch.h"
+msgstr "arch.h"
+
+msgid "CPU-local mask, context, ordering and cycle snapshot contract."
+msgstr "CPU-local mask, context, ordering and cycle snapshot contract."
+
+msgid "Author  Nexus Team"
+msgstr "Author  Nexus Team"
+
+msgid "Functions"
+msgstr "Functions"
+
+msgid "Save incoming local mask and mask configurable exceptions."
+msgstr "Save incoming local mask and mask configurable exceptions."
+
+msgid "Returns"
+msgstr "Returns"
+
+msgid "Restore the incoming mask, preserving nested exclusions."
+msgstr "Restore the incoming mask, preserving nested exclusions."
+
+msgid "Parameters"
+msgstr "Parameters"
+
+msgid "Snapshot the implemented local interrupt-mask registers."
+msgstr "Snapshot the implemented local interrupt-mask registers."
+
+msgid "Test masks that could prevent required completion progress."
+msgstr "Test masks that could prevent required completion progress."
+
+msgid "Query the exact current CPU exception identity."
+msgstr "Query the exact current CPU exception identity."
+
+msgid "Query privilege in the current CPU execution context."
+msgstr "Query privilege in the current CPU execution context."
+
+msgid "Query current CPU exception context."
+msgstr "Query current CPU exception context."
+
+msgid "Order explicit data memory accesses in the CPU domain."
+msgstr "Order explicit data memory accesses in the CPU domain."
+
+msgid "Complete preceding explicit memory accesses."
+msgstr "Complete preceding explicit memory accesses."
+
+msgid "Synchronize subsequent CPU instruction execution."
+msgstr "Synchronize subsequent CPU instruction execution."
+
+msgid "Snapshot an already enabled free-running cycle counter."
+msgstr "Snapshot an already enabled free-running cycle counter."
+
+msgid "Saved incoming PRIMASK or calling-thread Native nesting."
+msgstr "Saved incoming PRIMASK or calling-thread Native nesting."
+
+msgid "Public Members"
+msgstr "Public Members"
+
+msgid "Read-only snapshot of implemented local interrupt masks."
+msgstr "Read-only snapshot of implemented local interrupt masks."
+
+msgid "atomic.h"
+msgstr "atomic.h"
+
+msgid "Inline naturally aligned 32-bit publication and RMW ports."
+msgstr "Inline naturally aligned 32-bit publication and RMW ports."
+
+msgid "Read one word without publishing or acquiring other data."
+msgstr "Read one word without publishing or acquiring other data."
+
+msgid "Read one word and acquire data from the observed publication."
+msgstr "Read one word and acquire data from the observed publication."
+
+msgid "Store one word without publishing other data."
+msgstr "Store one word without publishing other data."
+
+msgid "Publish preceding data through one aligned release store."
+msgstr "Publish preceding data through one aligned release store."
+
+msgid "Strong acq_rel compare/exchange, acquire on failure."
+msgstr "Strong acq_rel compare/exchange, acquire on failure."
+
+msgid "Add modulo 2^32 with acq_rel ordering, returning the original word."
+msgstr "Add modulo 2^32 with acq_rel ordering, returning the original word."
+
+msgid "Add modulo 2^32 with release ordering; return original word."
+msgstr "Add modulo 2^32 with release ordering; return original word."
+
+msgid "Subtract modulo 2^32 with acq_rel ordering; return original."
+msgstr "Subtract modulo 2^32 with acq_rel ordering; return original."
+
+msgid "Subtract modulo 2^32 with release ordering; return original."
+msgstr "Subtract modulo 2^32 with release ordering; return original."
+
+msgid "cache.h"
+msgstr "cache.h"
+
+msgid "Explicit whole-line CPU cache maintenance mechanisms."
+msgstr "Explicit whole-line CPU cache maintenance mechanisms."
+
+msgid "Publish dirty data cache lines to the point of coherency."
+msgstr "Publish dirty data cache lines to the point of coherency."
+
+msgid "Discard complete data cache lines without writing them."
+msgstr "Discard complete data cache lines without writing them."
+
+msgid "Publish dirty data and discard the complete cache lines."
+msgstr "Publish dirty data and discard the complete cache lines."
+
+msgid "Make a complete owned range coherent for CPU instructions."
+msgstr "Make a complete owned range coherent for CPU instructions."
+
+msgid "cache_control.h"
+msgstr "cache_control.h"
+
+msgid "Explicit owned Cortex-M7 cold cache transitions."
+msgstr "Explicit owned Cortex-M7 cold cache transitions."
+
+msgid "Defines"
+msgstr "Defines"
+
+msgid "Data-cache ownership bit, independent of the hardware CCR layout."
+msgstr "Data-cache ownership bit, independent of the hardware CCR layout."
+
+msgid "Instruction-cache ownership bit."
+msgstr "Instruction-cache ownership bit."
+
+msgid "Enums"
+msgstr "Enums"
+
+msgid "Cold-transition admission or execution result."
+msgstr "Cold-transition admission or execution result."
+
+msgid "Values:"
+msgstr "Values:"
+
+msgid "Admit cold caches and enable the explicitly selected ones."
+msgstr "Admit cold caches and enable the explicitly selected ones."
+
+msgid "Clean and disable caches owned by this control object."
+msgstr "Clean and disable caches owned by this control object."
+
+msgid "Caller-owned cache responsibility and selector recovery."
+msgstr "Caller-owned cache responsibility and selector recovery."
+
+msgid "Retained data/instruction cache responsibility."
+msgstr "Retained data/instruction cache responsibility."
+
+msgid "Original CSSELR for an unfinished operation."
+msgstr "Original CSSELR for an unfinished operation."
+
+msgid "Original selector restoration is outstanding."
+msgstr "Original selector restoration is outstanding."
+
+msgid "features.h"
+msgstr "features.h"
+
+msgid "Reviewed CPU mechanisms and allocation-free result types."
+msgstr "Reviewed CPU mechanisms and allocation-free result types."
+
+msgid "Result of a validated local CPU mechanism operation."
+msgstr "Result of a validated local CPU mechanism operation."
+
+msgid "Security state compiled for this firmware image."
+msgstr "Security state compiled for this firmware image."
+
+msgid "Query immutable, compiled CPU mechanism capabilities."
+msgstr "Query immutable, compiled CPU mechanism capabilities."
+
+msgid "Reviewed mechanisms in the exact compiled CPU profile."
+msgstr "Reviewed mechanisms in the exact compiled CPU profile."
+
+msgid "mpu.h"
+msgstr "mpu.h"
+
+msgid "Distinct Armv7-M and Armv8-M MPU encoding mechanisms."
+msgstr "Distinct Armv7-M and Armv8-M MPU encoding mechanisms."
+
+msgid "Encode an exact Armv7-M region without accessing hardware."
+msgstr "Encode an exact Armv7-M region without accessing hardware."
+
+msgid "Encode an exact Armv8-M region without accessing hardware."
+msgstr "Encode an exact Armv8-M region without accessing hardware."
+
+msgid "Program one disabled-MPU Armv7-M region in this world."
+msgstr "Program one disabled-MPU Armv7-M region in this world."
+
+msgid "Program one disabled-MPU Armv8-M region in this world."
+msgstr "Program one disabled-MPU Armv8-M region in this world."
+
+msgid "Update one Armv8-M MAIR byte without changing its neighbors."
+msgstr "Update one Armv8-M MAIR byte without changing its neighbors."
+
+msgid "Armv7-M region fields, without an implicit memory policy."
+msgstr "Armv7-M region fields, without an implicit memory policy."
+
+msgid "Armv7-M words targeting the caller-selected RNR, not RBAR.VALID."
+msgstr "Armv7-M words targeting the caller-selected RNR, not RBAR.VALID."
+
+msgid "Armv8-M fields; limit is the exact inclusive final byte."
+msgstr "Armv8-M fields; limit is the exact inclusive final byte."
+
+msgid "Armv8-M words retaining its separate MAIR indirection."
+msgstr "Armv8-M words retaining its separate MAIR indirection."
+
+msgid "nonsecure.h"
+msgstr "nonsecure.h"
+
+msgid "Explicit NonSecure unprivileged address permission checks."
+msgstr "Explicit NonSecure unprivileged address permission checks."
+
+msgid "Requested NonSecure unprivileged CPU access, never execute access."
+msgstr "Requested NonSecure unprivileged CPU access, never execute access."
+
+msgid "Check current NonSecure unprivileged access to a full span."
+msgstr "Check current NonSecure unprivileged access to a full span."
+
+msgid "security.h"
+msgstr "security.h"
+
+msgid "Local security-state and explicit SAU region mechanisms."
+msgstr "Local security-state and explicit SAU region mechanisms."
+
+msgid "Query this image's compiled security state."
+msgstr "Query this image's compiled security state."
+
+msgid "Encode an explicit SAU region without hardware access."
+msgstr "Encode an explicit SAU region without hardware access."
+
+msgid "Program one owned SAU region while the SAU is disabled."
+msgstr "Program one owned SAU region while the SAU is disabled."
+
+msgid "Disable one owned SAU region while the SAU is disabled."
+msgstr "Disable one owned SAU region while the SAU is disabled."
+
+msgid "Exact 32-byte-aligned SAU region owned by the Secure caller."
+msgstr "Exact 32-byte-aligned SAU region owned by the Secure caller."
+
+msgid "Validated SAU words; encoding never changes hardware."
+msgstr "Validated SAU words; encoding never changes hardware."
+
+msgid "sleep.h"
+msgstr "sleep.h"
+
+msgid "Reviewed single-CPU shallow sleep contracts."
+msgstr "Reviewed single-CPU shallow sleep contracts."
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
+
+msgid "Wait once with configurable exceptions already masked."
+msgstr "Wait once with configurable exceptions already masked."
+
+msgid "Atomically recheck a published sequence before WFI."
+msgstr "Atomically recheck a published sequence before WFI."

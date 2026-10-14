@@ -123,9 +123,11 @@ dirty line。工作量随实际 set 数量增加，不承诺固定延迟。该�
 调用被拒绝，不通过自动关 MPU 改变保护策略。
 
 v8 MAIR 更新只改变指定 byte，保留相邻属性。调用者拥有使用该 attribute 的
-所有 region 与有效内存策略；实现不做 cache 维护。MPU 的后续 enable、重配、
-上下文切换和 FreeRTOS 用户 task 保护集成均属于外部设计，不能由 encoder 或
-单 region programming 声称已经实现。
+所有 region 与有效内存策略；实现不做 cache 维护。MPU 的后续 enable、重配和
+上下文切换属于 Arch 层之外的 OS 或产品集成责任。平台已有明确范围的
+[FreeRTOS MPU 用户任务集成](os-contracts.md)，其 CPU、
+任务、存储和系统调用边界由 OS 合同维护；不能只依据 Arch encoder 或单 region
+programming 推导这些能力，也不能扩大到未维护组合。
 
 ## 安全状态与 SAU
 

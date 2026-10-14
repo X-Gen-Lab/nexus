@@ -1,0 +1,625 @@
+# Authored translation; independent semantic review pending.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: ee52c2359bda6b1afcc4aee3509221a40326c6aa9003b287847eda3914b264ee\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:1
+msgid "Build system execution record"
+msgstr "构建系统执行记录"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:3
+msgid ""
+"This record covers the {download}`48-item ledger <../design/build-system-"
+"execution.csv>`. Its requirements and original exit conditions remain "
+"unchanged. The qualified code source is "
+"`cc6a065c002041234a212a964be863a69198f9b4`, tree "
+"`de0e687f659a22badb55259b2e03646fc7b748d1`. Later changes to these documents"
+" record this code source and do not claim a new code execution at their "
+"HEAD. The {download}`result index <build-system-results.json>` binds actual "
+"receipts, archive navigation and byte identities. The fixed primary "
+"execution index is `/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/formal-execution-evidence-index-cc6a065c00.json`, SHA-256 "
+"`b42e1857f6802cbabe35d10f515fd9033ee3bb0bbb40368a50222927c5a45e47`."
+msgstr ""
+"本记录覆盖 {download}`48 项台账 <../design/build-system-"
+"execution.csv>`，要求和原始退出条件保持不变。已资格化的代码源码为 "
+"`cc6a065c002041234a212a964be863a69198f9b4`，tree 为 "
+"`de0e687f659a22badb55259b2e03646fc7b748d1`。后续文档变更只记录此代码源码，不声称在各自 HEAD "
+"上重新执行代码。{download}`结果索引 <build-system-results.json>` "
+"绑定实际回执、归档导航和字节身份。固定主执行索引为 `/workspace/nexus-build-"
+"maintenance-20261012/final-qualification/formal-execution-evidence-index-"
+"cc6a065c00.json`，SHA-256 为 "
+"`b42e1857f6802cbabe35d10f515fd9033ee3bb0bbb40368a50222927c5a45e47`。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:14
+msgid ""
+"The implemented build path remains one authored TOML assembly, immutable "
+"typed IR and static typed factory, with one CMake target graph executed by "
+"Ninja. Configuration owns atomic publication and selected hardware facts; "
+"CMake owns software dependencies and scoped compile/link policy. Products "
+"continue to own application sources, composition, scheduling and deployment "
+"policy."
+msgstr ""
+"构建路径仍为一份手写 TOML 装配、不可变类型化 IR 和静态类型化工厂，通过唯一 CMake 目标图由 Ninja "
+"执行。配置负责原子发布和选定硬件事实；CMake 负责软件依赖及限定范围的编译／链接政策。产品继续负责应用源码、装配、调度和部署政策。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:20
+msgid "Final-source software gates"
+msgstr "最终源码软件门禁"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:22
+msgid ""
+"The exact staged code tree passed ordinary commit hooks, including the "
+"complete TDD and commit-message gates. The index and behavioral source "
+"stayed unchanged through execution. The subsequent canonical GitHub commit "
+"contains the same tree. Final qualification separately executes the clean "
+"committed source with fresh unfiltered discovery and reports. No hook "
+"bypass, test filter, empty report or skipped-only execution establishes "
+"acceptance."
+msgstr ""
+"精确的暂存代码树通过普通 commit hooks，包括完整 TDD 和提交消息门禁。执行期间 index 和行为源码保持不变，后续 canonical"
+" GitHub 提交包含相同 tree。最终资格另外针对干净的已提交源码进行全新、未过滤发现与执行。绕过 "
+"hook、测试过滤、空报告或仅跳过的执行都不能建立验收。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Scope"
+msgstr "范围"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Actual final-source result"
+msgstr "实际最终源码结果"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Receipt"
+msgstr "回执"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Complete Native CTest"
+msgstr "完整 Native CTest"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "200 entries"
+msgstr "200 项"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/native/execution.json`"
+msgstr ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/native/execution.json`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "GoogleTest/GoogleMock host contracts"
+msgstr "GoogleTest／GoogleMock 主机契约"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "177 executables / 3252 cases"
+msgstr "177 个可执行程序／3252 个用例"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Tool/evidence contracts"
+msgstr "工具／证据契约"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "677 cases"
+msgstr "677 个用例"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/testing/execution.json`"
+msgstr ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/testing/execution.json`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Configuration/IR/transaction contracts"
+msgstr "配置／IR／事务契约"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "480 cases"
+msgstr "480 个用例"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/configure/execution.json`"
+msgstr ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/configure/execution.json`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "CI runner/checker contracts"
+msgstr "CI 执行器／检查器契约"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "369 cases"
+msgstr "369 个用例"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/ci/execution.json`"
+msgstr ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/ci/execution.json`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Workflow orchestration boundaries"
+msgstr "工作流编排边界"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "24 cases"
+msgstr "24 个用例"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/workflows/execution.json`"
+msgstr ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/workflows/execution.json`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Both complete Source SDK boundary modules"
+msgstr "两个完整 Source SDK 边界模块"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "62 cases, 280 child commands"
+msgstr "62 个用例，280 条子命令"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json`"
+msgstr ""
+"`/workspace/nexus-build-maintenance-20261012/final-"
+"qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:39
+msgid ""
+"All final-source suites in the table have zero failures, errors and skips. "
+"Expected nonzero child commands test rejection and retained failure "
+"evidence; they are not suite failures. Counts overlap and must not be added "
+"into a platform test total. GoogleTest and GoogleMock remain host-only. "
+"Production firmware remains C11 and contains no C++ test framework or its "
+"runtime."
+msgstr ""
+"表中所有最终源码测试集均为零失败、零错误、零跳过。预期非零子命令检查拒绝及保留的失败证据，不属于测试集失败。计数存在重叠，不得相加为平台测试总数。GoogleTest"
+" 和 GoogleMock 仍仅用于主机；生产固件保持 C11，不包含 C++ 测试框架及其运行时。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:45
+msgid ""
+"The real small CMake projects exercise protected inputs, output publication,"
+" identical reconfigure/no-op builds, derived artifact repair, configuration "
+"and resource dependencies, external LTO and C/C++ policy propagation, "
+"invalid helper arguments, mixed assembly rejection, private includes and "
+"process cancellation. Source SDK fixtures deliberately mutate packages and "
+"remain nonpublishable. The candidate path separately generates a clean "
+"committed SDK and verifies its whole manifest before consumption."
+msgstr ""
+"实际小型 CMake 工程验证受保护输入、输出发布、相同重配置／无操作构建、派生产物修复、配置和资源依赖、外部 LTO、C／C++ 政策传播、非法 "
+"helper 参数、混合装配拒绝、私有 include 和进程取消。Source SDK 夹具有意修改包，仍不可发布。候选路径另外生成干净的已提交 "
+"SDK，并在消费前校验完整清单。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:53
+msgid ""
+"The selected SDK result is attempt 2 in `sdk-boundaries-attempt-2`, with its"
+" matching explicit receipt. It executes all 62 cases in 673.078 seconds and "
+"retains 280 actual child commands and 13 consumer artifact directories. "
+"Attempt 1 remains failed in the original `sdk-boundaries` namespace: missing"
+" CMake on its PATH caused six errors and six skips, with zero test failures."
+" No report or failed namespace was renamed or replaced to select attempt 2. "
+"The SDK suite runs serially with a one-job environment default; original "
+"consumer build argv explicitly request four or two jobs where specified. The"
+" offline candidate compiler uses its separately recorded bound; the SDK "
+"execution is not described as all compiler commands running with one job."
+msgstr ""
+"所选 SDK 结果为 `sdk-boundaries-attempt-2` 中的 attempt 2，具有匹配的显式回执。其 62 个用例实际执行 "
+"673.078 秒，保留 280 条子命令和 13 个 consumer 产物目录。Attempt 1 仍在原始 `sdk-boundaries` "
+"命名空间中记录为失败：PATH 缺少 CMake 导致六个错误、六个跳过，测试失败为零。没有通过重命名或替换报告／失败命名空间选出 attempt "
+"2。SDK 测试集串行执行，环境默认并发为一；原始 consumer 构建 argv 在指定处明确请求四或两个 "
+"job。离线候选编译器使用单独记录的边界，不能把 SDK 执行描述为所有编译器命令均使用单 job。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:64
+msgid "Actual GitHub execution and CI corrections"
+msgstr "实际 GitHub 执行与 CI 修正"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:66
+msgid ""
+"The final-source push run [38294880491](https://github.com/X-Gen-"
+"Lab/nexus/actions/runs/38294880491) completed with `success`: 29 successful "
+"jobs, zero failed jobs, and one expected main-only `Documentation / Deploy "
+"to Pages` skip. All job pages, actual executed job logs and the artifact "
+"metadata catalog are retained. The receipt binds the run, jobs and "
+"referenced workflow to the exact canonical code source."
+msgstr ""
+"最终源码 push run [38294880491](https://github.com/X-Gen-"
+"Lab/nexus/actions/runs/38294880491) 以 `success` 完成：29 个成功 job、零失败 "
+"job，以及一次预期的仅 main 执行 `Documentation / Deploy to Pages` 跳过。所有 job "
+"页面、实际日志和产物元数据目录均已保留。回执将 run、jobs 和引用工作流绑定到精确 canonical 代码源码。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:73
+msgid ""
+"The four Native debug/release/ASan/TSan profiles each execute their complete"
+" reported CTest and GoogleTest scopes. ARM, Cortex-M, OS, provider, "
+"installed SDK, quality and security scopes retain their actual individual "
+"results. All 27 artifact ZIP bytes were downloaded, digest-checked and CRC-"
+"checked. Twenty-six Nexus job identities and 25 required selected-dependency"
+" closures were verified; the Pages ZIP retains GitHub artifact byte identity"
+" without a Nexus job identity. The sealed CI index covers 131 files / "
+"104,572,091 bytes."
+msgstr ""
+"四种 Native debug／release／ASan／TSan profile 分别执行各自完整报告的 CTest 和 GoogleTest "
+"范围。ARM、Cortex-M、OS、provider、安装 SDK、质量与安全范围保留独立实际结果。全部 27 份产物 ZIP 字节已下载并进行摘要和"
+" CRC 校验；验证了 26 个 Nexus job 身份与 25 个必需的选定依赖闭包。Pages ZIP 保留 GitHub 产物字节身份，但没有 "
+"Nexus job 身份。密封 CI 索引覆盖 131 个文件／104,572,091 bytes。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:81
+msgid ""
+"The earlier `acc70f30` run [38280227545](https://github.com/X-Gen-"
+"Lab/nexus/actions/runs/38280227545) failed and remains failed evidence. Its "
+"successful Native jobs do not qualify the failed aggregate run or this later"
+" source. The fixes make scoped preparation receipts match actual selected "
+"dependency closures, separate canonical-budget byte tampering from measured "
+"authored-budget overruns, bind expected ThreadX link failure to the exact "
+"Ninja ELF edge, and execute all four Python tool domains through the "
+"maintained complete runner. Each fix retains real RED/GREEN execution and "
+"independent review. The subsequent `3e7c0d50` run also failed: three Tool "
+"Contract cases still addressed the removed GD32 helper. Its full raw "
+"196-case execution remains failed evidence; `cc6a065c` restores the checked "
+"contract entry point and retains the helper semantics. The final passing run"
+" above must establish this correction separately."
+msgstr ""
+"较早 `acc70f30` run [38280227545](https://github.com/X-Gen-"
+"Lab/nexus/actions/runs/38280227545) 失败，仍保留失败证据。其成功 Native jobs 不能资格化失败的汇总 "
+"run 或后续源码。修复让限定范围的准备回执匹配实际选定依赖闭包，分开 canonical budget 字节篡改与实测手写预算超限，将预期 "
+"ThreadX 链接失败绑定到精确 Ninja ELF edge，并通过维护中的完整执行器运行四个 Python 工具域。每项修复保留真实 "
+"RED／GREEN 执行和独立审查。后续 `3e7c0d50` run 也失败：三个 Tool Contract 用例仍指向已删除的 GD32 "
+"helper。其完整 196 用例原始执行仍为失败证据；`cc6a065c` 恢复经过检查的契约入口并保留 helper 语义。上面的最终成功 run "
+"独立建立此修正结果。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:95
+msgid "Offline software candidates and provenance"
+msgstr "离线软件候选与来源"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:97
+msgid ""
+"Eight exact H743/U575 reference profiles pass two fresh network-disabled "
+"builds per profile: H743 HSI64 with Cache off and U575 MSIS4 with TZEN=0, "
+"each with empty/UART selection and baremetal/FreeRTOS backend. The matrix "
+"records sixteen fresh builds and 32 actual network-none container commands. "
+"It does not qualify H743 Cache/DMA or U575 dual-domain firmware."
+msgstr ""
+"八个精确 H743／U575 参考 profile 各通过两次全新断网构建：H743 HSI64／Cache off 和 U575 "
+"MSIS4／TZEN=0，分别组合 empty／UART 及裸机／FreeRTOS。矩阵记录十六次全新构建、32 条实际 network-none "
+"容器命令，不资格化 H743 Cache／DMA 或 U575 双域固件。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:103
+msgid ""
+"The actual selected-image resource observations are below. Flash LOAD counts"
+" physical initialization bytes; footprint includes the occupied address "
+"span. Reserved RAM includes the 2,048-byte MSP once and zero heap, rather "
+"than measured stack high water. These are separate selections, not MCU cycle"
+" or latency results."
+msgstr ""
+"下面记录实际所选镜像的资源观察。Flash LOAD 统计物理初始化字节，footprint 包含占用地址跨度。预留 RAM 仅计一次 "
+"2,048-byte MSP，heap 为零，并非实测栈峰值。这些是不同选择，不是 MCU cycles 或延迟结果。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Profile"
+msgstr "配置 profile"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Flash LOAD bytes"
+msgstr "Flash LOAD 字节"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Flash footprint bytes"
+msgstr "Flash 占用跨度字节"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "Reserved RAM bytes"
+msgstr "预留 RAM 字节"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "h743-baremetal-empty"
+msgstr "h743-baremetal-empty"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "2437"
+msgstr "2437"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "2440"
+msgstr "2440"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "2104"
+msgstr "2104"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "h743-baremetal-uart"
+msgstr "h743-baremetal-uart"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "8708"
+msgstr "8708"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "2360"
+msgstr "2360"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "h743-freertos-empty"
+msgstr "h743-freertos-empty"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "4828"
+msgstr "4828"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "3032"
+msgstr "3032"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "h743-freertos-uart"
+msgstr "h743-freertos-uart"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "11100"
+msgstr "11100"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "3284"
+msgstr "3284"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "u575-baremetal-empty"
+msgstr "u575-baremetal-empty"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "2121"
+msgstr "2121"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "2124"
+msgstr "2124"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "2112"
+msgstr "2112"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "u575-baremetal-uart"
+msgstr "u575-baremetal-uart"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "8364"
+msgstr "8364"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "2368"
+msgstr "2368"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "u575-freertos-empty"
+msgstr "u575-freertos-empty"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "4548"
+msgstr "4548"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "3040"
+msgstr "3040"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "u575-freertos-uart"
+msgstr "u575-freertos-uart"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "10804"
+msgstr "10804"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:0
+msgid "3292"
+msgstr "3292"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:119
+msgid ""
+"The immutable Native/tool/SDK proof remains under `cc6a065c`; the new "
+"candidate execution uses the separate `cc6a065c00` namespace. The same clean"
+" committed Source SDK bytes are fully reverified and copied into independent"
+" fresh build roots. No failed matrix output or compiled object is reused."
+msgstr ""
+"不可变 Native／工具／SDK 证明仍位于 `cc6a065c`，新候选执行使用独立 `cc6a065c00` 命名空间。同一干净、已提交的 "
+"Source SDK 字节经过完整复核，复制到独立全新构建根目录，不复用失败矩阵输出或已编译对象。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:124
+msgid ""
+"The same source, clean Source SDK, authored configuration, recursive "
+"dependency pins, compiler/toolchain and OCI identities bind the executed "
+"commands and actual ELF/BIN/map/resource bytes. Each candidate passes the "
+"owned verifier and an actual fixed-checker `dev candidate` plan. Each "
+"complete archive is streamed and verified before only its owned live profile"
+" scratch is retired. Original live artifact paths then remain historical "
+"locators; the result index supplies the archive and member-relative "
+"navigation used for current verification."
+msgstr ""
+"相同源码、干净 Source SDK、手写配置、递归依赖 pin、编译器／工具链和 OCI 身份绑定实际命令以及 "
+"ELF／BIN／map／资源字节。各候选通过自有校验器和实际 fixed-checker `dev candidate` "
+"plan。每份完整归档先流式校验，之后仅清退该 profile 自有 live scratch。原始 live "
+"产物路径成为历史定位符；结果索引提供当前校验使用的归档及成员相对导航。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:132
+msgid ""
+"Two earlier matrices remain failed with zero qualified profiles: the first "
+"exhausted storage during reproduction, and the second passed two fresh "
+"builds but could not seal after temporary SDK reference files had been "
+"cleaned up. Independent review restored 102 exact original references from "
+"precaptured identities and verified source and original SDK proof records "
+"unchanged. The failed scratch was fully archived before retirement. These "
+"are storage operations; they do not add source behavior, a new SDK test "
+"execution or platform support. The new matrix uses the separate `cc6a065c00`"
+" namespace and qualifies all eight profiles from its own fresh builds and "
+"actual executed candidate plans."
+msgstr ""
+"此前两个矩阵保持失败，资格化 profile 为零：首个在复现中耗尽存储，第二个完成两次全新构建，但临时 SDK "
+"引用文件被清理后无法封存。独立审查从事先捕获的身份恢复 102 个精确原始引用，并验证源码及原始 SDK 证明未变。失败 scratch "
+"在清退前完整归档。这些存储操作不增加源码行为、新 SDK 测试执行或平台支持。新矩阵使用独立 `cc6a065c00` "
+"命名空间，依据自己的全新构建和实际候选计划资格化八个 profile。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:142
+msgid ""
+"Independent archive-only review passed for all eight archives after every "
+"original live profile was absent. It verified 168,468 members / 150,508 "
+"files and 3,356,224,498 uncompressed file bytes, executed the owned "
+"candidate verifier on each packed candidate, and independently reconstructed"
+" and fully verified each packed Source SDK. Private temporary copies were "
+"removed afterward. The same source and matrix remained unchanged. The main "
+"receipt is `/workspace/nexus-build-maintenance-20261012/independent-"
+"review/candidate-archive-audit/final-eight-archive-only-independent-"
+"review.json`, SHA-256 "
+"`1c127cb2a348b62e07809cfa7ce7b784f57c45cac7cca3f58922c5e973817c12`. Local "
+"archive retention does not establish off-site replication or publication. "
+"Candidates remain unsigned software candidates, with no product-release or "
+"hardware acceptance claim."
+msgstr ""
+"所有原始 live profile 消失后，八份归档均通过独立 archive-only 审查。验证 168,468 个成员／150,508 "
+"个文件、3,356,224,498 个未压缩文件字节，实际运行每份打包候选的自有校验器，并独立重建和完整验证打包 Source "
+"SDK。随后删除私有临时副本，源码和矩阵保持不变。主回执为 `/workspace/nexus-build-"
+"maintenance-20261012/independent-review/candidate-archive-audit/final-eight-"
+"archive-only-independent-review.json`，SHA-256 为 "
+"`1c127cb2a348b62e07809cfa7ce7b784f57c45cac7cca3f58922c5e973817c12`。本地归档保留不建立异地复制或发布。候选仍为无签名软件候选，不声称产品发布或硬件验收。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:154
+msgid ""
+"The maintained `tools/dev/plans/software.json` declares 72 reviewed stages. "
+"The individual software gates and eight actual candidate plans are recorded "
+"separately. **The complete 72-stage plan did not execute end-to-end through "
+"one qualification-plan invocation.** Its plan contracts and genuine failed-"
+"checker fixtures establish orchestration behavior; no separate execution is "
+"invented."
+msgstr ""
+"维护中的 `tools/dev/plans/software.json` 声明 72 个已审查阶段。各独立软件门禁和八个实际候选计划分别记录。**完整 "
+"72 阶段计划没有通过一次 qualification-plan 调用端到端执行。** 其计划契约和真实失败检查器夹具建立编排行为，不虚构独立执行。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:160
+msgid "Offline tools and environment boundaries"
+msgstr "离线工具和环境边界"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:162
+msgid ""
+"The final Linux x86_64 CP312 lock contains 15 hash-locked wheels. A fresh "
+"CP312 virtual environment executes a no-index, hash-required installation. "
+"Actual `pre-commit install --install-hooks` primes the Python hook with "
+"PEP517 build isolation enabled, and the isolated interpreter executes the "
+"complete tool domains. Setuptools is included for local PEP517 backend "
+"preparation; the hook has its exact PyYAML, pre-commit and clang-format "
+"runtime closure. Vendored nested wheel metadata remains covered by the "
+"whole-wheel digest, while top-level canonical distribution identity and "
+"duplicate metadata are checked strictly."
+msgstr ""
+"最终 Linux x86_64 CP312 lock 含 15 个摘要锁定 wheel。全新 CP312 虚拟环境实际执行 no-"
+"index、必需摘要安装。实际 `pre-commit install --install-hooks` 在启用 PEP517 构建隔离时准备 "
+"Python hook，隔离解释器执行完整工具域。Setuptools 用于本地 PEP517 后端准备；hook 具有精确 PyYAML、pre-"
+"commit、clang-format 运行闭包。Vendored 嵌套 wheel 元数据由整个 wheel 摘要覆盖；顶层 canonical "
+"distribution 身份和重复元数据严格检查。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:171
+msgid ""
+"CP311 wheel bytes are verified against the declared lock. CP311 installation"
+" is `not_executed`. The original 14-wheel runtime bundles remain historical "
+"artifacts and are not relabelled as the new hook closure. Linux is the "
+"executed host scope; Windows/macOS integration and non-Linux descendant "
+"cancellation remain untested."
+msgstr ""
+"CP311 wheel 字节已按声明 lock 校验；CP311 安装为 `not_executed`。原始 14-wheel runtime "
+"包保留为历史产物，没有重标为新 hook 闭包。实际主机范围为 Linux；Windows／macOS 集成及非 Linux 子孙进程取消仍未测试。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:176
+msgid ""
+"The recorded OCI and full ARM toolchain archives were actually transported, "
+"restored and byte-verified at their own recorded source scopes. The new "
+"candidate builds consume those same artifact identities. The OCI's "
+"Python/Git observations remain distinct from the development host. This "
+"proves artifact reuse, not recipe reconstruction."
+msgstr ""
+"记录的 OCI 和完整 ARM 工具链归档在各自源码范围内实际运输、恢复并逐字节校验。新候选构建消费同一产物身份。OCI 的 Python／Git "
+"观察与开发主机不同。这证明产物复用，不证明 recipe 重建。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:182
+msgid ""
+"The recipe declares fixed base/frontend digests, Debian snapshot and five "
+"exact APT packages, plus the hash of the final CP312 requirements. Emitted "
+"Dockerfile and ephemeral proxy-CA contracts are verified. Reconstruction of "
+"the observed OCI image bytes has not executed successfully; "
+"`recipe_reproducible` stays `false`."
+msgstr ""
+"Recipe 声明固定 base／frontend 摘要、Debian snapshot、五个精确 APT 包和最终 CP312 "
+"requirements 摘要。生成 Dockerfile 与临时 proxy-CA 契约已校验。观察到的 OCI "
+"镜像字节尚未成功重建，`recipe_reproducible` 保持 `false`。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:188
+msgid "Reading the 48-item ledger"
+msgstr "阅读 48 项台账"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:190
+msgid ""
+"`implemented_software_validated` records a completed mechanism with final-"
+"source software evidence. More specific states retain measured decisions, "
+"actual tool installation/transport, verified archive restoration and "
+"truthful scope limits. They do not turn every requirement into a physical or"
+" product exit condition."
+msgstr ""
+"`implemented_software_validated` "
+"记录已完成机制和最终源码软件证据。更精确的状态保留实测决策、真实工具安装／运输、归档恢复校验和真实范围边界，不把所有要求转为物理或产品退出条件。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:195
+msgid ""
+"BLD-18 retains full SDK byte checks at each consuming boundary after "
+"measurement; no persistent verification bypass is introduced. BLD-31 retains"
+" measured compiler unit and selected linked-image costs without a "
+"speculative source split. Their `decision_verified` states are intentional "
+"results. Prior timing/cache/LTO measurements retain their original source "
+"and selected-profile identities."
+msgstr ""
+"BLD-18 经测量后仍在各消费边界完整核验 SDK 字节，没有持久校验绕过。BLD-31 保留实测编译单元与所选链接镜像成本，不作推测性拆源。其 "
+"`decision_verified` 是有意记录的结果。此前 timing／cache／LTO 测量保留原始源码和所选 profile 身份。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:201
+msgid ""
+"BLD-38 records actual candidate plans while explicitly retaining the absence"
+" of one complete 72-stage software-plan invocation. BLD-39 verifies the "
+"dependency upgrade validator's evidence contracts; a real vendor dependency "
+"upgrade was not performed. BLD-40 records actual CP312 installation and hook"
+" isolation, and preserves the missing CP311 installation. BLD-42 retains "
+"declared-recipe versus successful reconstruction as separate states. BLD-44 "
+"records actual preserved current archives and archive-only verification, "
+"without claiming off-site storage."
+msgstr ""
+"BLD-38 记录实际候选计划，同时明确保留没有完整 72 阶段调用的事实。BLD-39 "
+"校验依赖升级检查器的证据契约，没有实际升级厂商依赖。BLD-40 记录实际 CP312 安装及 hook 隔离，保留未执行 CP311 "
+"安装。BLD-42 将声明 recipe 与成功重建分开。BLD-44 记录当前归档实际保留和 archive-only 校验，不声称异地存储。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/build-system-verification.md:209
+msgid ""
+"Earlier normal-hook failures, the isolated-environment installation failure "
+"and the failed GitHub run remain immutable failed attempts. Later passing "
+"attempts use new receipts and never overwrite their historical outcomes. No "
+"physical station is connected: every HIL result remains `not_executed`. This"
+" iteration makes no new MCU cycle/WCET, electrical, power-loss, cache/DMA "
+"coherence, TrustZone isolation, external-example, certification or product-"
+"release claim."
+msgstr ""
+"此前普通 hook 失败、隔离环境安装失败和 GitHub run 失败都保留不可变失败尝试。后续通过尝试使用新回执，不覆盖历史结果。没有连接物理 "
+"station，所有 HIL 仍为 `not_executed`。本轮不增加 MCU cycles／WCET、电气、掉电、cache／DMA "
+"一致性、TrustZone 隔离、外部示例、认证或产品发布声明。"

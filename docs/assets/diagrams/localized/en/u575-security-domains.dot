@@ -1,0 +1,42 @@
+// FIG-14 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph U575SecurityDomains {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-14 U575 TZEN=1: no-OS synchronous GPIO dual-domain reference\nIndependent Secure / NS images, not default TZEN0 Platform"];
+    boot [label="External boot / provisioning owner\n2 MiB, bank1 Secure, bank2 NS pages\nSupplies layout/vectors/option bytes; mechanism never writes option bytes", fillcolor="#f8fafc"];
+    attribution [label="Secure cold owner: no active worlds / IRQ / DMA\nSRAM1 Secure; zero future NS SRAM3 before declassification\nGTZC/MPCBB + SAU 3 spans + NS MPU\nRead/clear actual 8 or 16 regions, lock and read back"];
+    failed [label="Any error after admission: FAILED + effects\nIrreversible attribution retained until reset; no rollback", fillcolor="#fff7ed"];
+    ready [label="READY -> RUNNING -> actual CMSE entry\nNS unprivileged Thread; unexpected return fail-stops"];
+    subgraph clusterNS {
+        label="NonSecure: static mappings, no RTOS / handlers / autonomous masters"; color="#64748b";
+        ns [label="NS caller + explicit NS RAM request/output\nFixed world principal; do not trust message task IDs"];
+        nsDone [label="NS receives synchronous return\nFinal access to input/output storage has exited"];
+    }
+    subgraph clusterSecure {
+        label="Secure privileged Thread: exclusive synchronous gateway"; color="#64748b";
+        sg [label="Actual SG: validate NS caller / Thread / RUNNING\nSave and mask NS interrupts"];
+        pin [label="Constrain explicit NS RAM span + CMSE unprivileged check\nSynchronous pin under static attribution and no concurrency"];
+        snapshot [label="Bounded input copy to Secure snapshot\nFixed PC7 grant, output spans prevalidated"];
+        gpio [label="UserIoBroker: scalar GPIO read / set-reset\nNo arbitrary MMIO / callbacks / asynchronous DMA grant"];
+        copy [label="Final output copy -> unpin -> restore NS mask\nCleanup never replays GPIO; impossible release failure terminates"];
+    }
+    boot -> attribution [label="Actual prerequisites and parameters before entry"];
+    attribution -> ready [label="Read back all permissions / locks / vectors"];
+    attribution -> failed [label="Failure after acquiring effects"];
+    ready -> ns [label="Enter NS unprivileged Thread"];
+    ns -> sg [label="Synchronous SG call"];
+    sg -> pin [label="Actual principal and serialization prerequisites"];
+    pin -> snapshot [label="Pin succeeded; a check alone does not pin"];
+    snapshot -> gpio [label="Authorized and output prevalidation passed"];
+    gpio -> copy [label="Single result, no automatic replay"];
+    copy -> nsDone [label="Synchronous return"];
+}

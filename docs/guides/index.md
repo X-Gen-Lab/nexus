@@ -12,6 +12,7 @@ Each guide defines inputs, ownership, rejection and an observable result. Hardwa
 ```{toctree}
 :maxdepth: 2
 
+source-checkout
 board-porting
 provider-porting
 os-shutdown

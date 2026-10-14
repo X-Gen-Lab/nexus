@@ -41,14 +41,24 @@ not the FreeRTOS port or tickless/isolation capability set.
 6. Stop platform providers only when their selected lifetime and kernel clock/Tick
    ownership permit it. A running scheduler is not stopped by ordinary I/O teardown.
 
-A returning adapter task parks until its one external lifecycle owner joins it.
-Returning from an entry function does not allow stack/TCB reclamation. Raw queues
-and closable queues have different lifecycle contracts; close is not destruction.
-Keep all storage on the failure path and retry cleanup only through its real owner.
+Task return has a backend-specific implementation:
+
+| Backend | After the application entry returns | External owner must prove |
+| --- | --- | --- |
+| Native | The pthread entry returns and the host thread terminates | Successful `nx_native_task_join()` |
+| FreeRTOS | The wrapper publishes its completion hint and suspends until the external joiner deletes it | Successful `nx_freertos_task_join()` and external kernel detachment |
+| ThreadX | The wrapper publishes its return predicate and completion hint, then follows the kernel completion path | Successful `nx_threadx_task_join()`; the hint alone does not prove ready-list detachment |
+
+Returning from an entry function or observing a completion hint never authorizes
+stack/TCB reclamation. Keep wrapper, stack and kernel-control storage until the
+one external lifecycle owner successfully joins it. Raw queues and closable
+queues have different lifecycle contracts; close is not destruction. Keep all
+storage on the failure path and retry cleanup only through its real owner.
 
 ## Execute maintained software fixtures
 
-From the repository root:
+First prepare the [fixed source and recursive dependencies](source-checkout.md).
+From that repository root, with host build tools available:
 
 ```sh
 python tools/dev/dev.py configure --preset native-debug

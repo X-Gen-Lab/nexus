@@ -12,6 +12,9 @@ Use this guide when the exact SoC already has a maintained provider. A Board add
 PCB facts and reviewed bindings; it does not copy a vendor SDK or authorize every
 silicon route. Actual unobserved PCB revision, bridges and voltage stay unknown.
 
+Prepare the [fixed source and recursive dependencies](source-checkout.md) before
+using the resolver or build commands below.
+
 ## Gather the minimum facts
 
 Record the full part, package, source document revision and retained provenance.

@@ -13,6 +13,9 @@ The platform supplies measurement and HIL tooling; products choose workloads,
 electrical limits, safe outputs and release policy. No Board is physically qualified
 until real equipment executes its reviewed scope.
 
+Prepare the [fixed source and recursive dependencies](source-checkout.md), then
+the locked toolchain for the exact selected assembly.
+
 ## Measure an exact image
 
 Record clean source, assembly/resolved digest, dependencies, compiler and flags.

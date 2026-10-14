@@ -1,0 +1,306 @@
+# Authored translation; independent semantic review pending.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 891feca7918429b53d077178038b632c46365dbaf81e5b1f74102ca3e0ed631c\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:1
+msgid "后续迭代与团队执行"
+msgstr "Next iterations and team execution"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:3
+msgid "第一阶段：把软件候选变成实板证据"
+msgstr "Stage one: turn software candidates into physical evidence"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:5
+msgid ""
+"当前最高优先级是接入三块首发实际 Board、记录 PCB/晶振/供电/接线，建立 probe、serial 和 waveform/power-cut "
+"station。G474、H743、U575 来源参考配置另行核对实际板卡， H743 还需观察供电模式，U575 需在执行镜像前确认 option "
+"bytes 与启动状态。 先复核安全初值与 clock，再验证 UART 真 TC、取消、 RX 丢失、watchdog reset、Flash 掉电与"
+" EXTI/PWM/ADC。每种 mode 只在实际执行过的 target tuple 上资格化。试验输出保持脱离产品负载，具体现场操作由 "
+"station 合同约束。"
+msgstr ""
+"The highest priority is connecting the three actual launch Boards, recording"
+" PCB/crystal/power/wiring, and establishing probe, serial and "
+"waveform/power-cut stations. G474/H743/U575 source-reference configurations "
+"require separate actual-board checks. H743 additionally needs power-mode "
+"observation; U575 requires option-byte/start-state confirmation before "
+"running an image. Check safe initial outputs and clock first, then UART true"
+" TC, cancellation, RX loss, watchdog reset, Flash power cuts and "
+"EXTI/PWM/ADC. Qualify each mode only on actually executed target tuples. "
+"Keep trial outputs disconnected from product loads; station contracts govern"
+" field actions."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:12
+msgid ""
+"以同一 candidate ELF 做 cycles、IRQ latency、最长 service 间隔、stack high-water、 "
+"丢失、长负载测量。源码／汇编推断只能帮助定位，不写成真实时序结果。需要调整 预算或 provider 时重新生成对应 "
+"source/config/artifact 证据。"
+msgstr ""
+"Use the same candidate ELF to measure cycles, IRQ latency, maximum service "
+"interval, stack high-water, loss and sustained load. Source/assembly "
+"inference helps locate causes but is not a measured timing result. Budget or"
+" provider changes require regenerated source/config/artifact evidence."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:16
+msgid "第二阶段：按测量增加能力"
+msgstr "Stage two: add capabilities according to measurements"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:18
+msgid ""
+"F407/F470 已有 UART/SPI 有限 DMA、UART 连续 RX／双向 DMA、ADC 有限／连续 trigger blocks、I2C "
+"IRQ／DMA、Classic CAN、USB FS PIO，以及精确软件夹具的 Ethernet、capture 和 complementary "
+"PWM。先以实际吞吐、IRQ latency、块间 间隙、line drain 和 overload 测量收敛这些已存在模式；连续模式也不能承诺任意 "
+"IRQ 延迟或消费者速度下无丢失。I2C 保持 100 kHz、7-bit address，每条1–256 bytes、 最多8条消息和精确 "
+"route；10-bit 或更长事务仍是独立扩展。"
+msgstr ""
+"F407/F470 already have bounded UART/SPI DMA, continuous UART "
+"RX/bidirectional DMA, bounded/continuous ADC trigger blocks, I2C IRQ/DMA, "
+"Classic CAN, USB FS PIO and Ethernet/capture/complementary-PWM exact "
+"software fixtures. First refine these existing modes with actual throughput,"
+" IRQ latency, inter-block gap, line-drain and overload measurements. "
+"Continuous modes cannot promise losslessness under arbitrary IRQ latency or "
+"consumer speed. I2C remains 100 kHz, 7-bit, 1–256 bytes per message, at most"
+" eight messages and exact routes; 10-bit or longer transactions are separate"
+" extensions."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:25
+msgid ""
+"H743 当前维护固定 HSI 时钟、timebase、GPIO、IRQ UART 和显式有限 UART TX DMA； Cache-on TX "
+"只接受独占完整 Cache line 的 AXI SRAM payload，RX 仍是 IRQ bytes。 U575 的默认 TZEN0 "
+"Platform 与独立 TZEN1 双域同步 GPIO 参考分别维护；双域参考 不提供 RTOS、factory 或异步 "
+"DMA。芯片事实不授权其他模式、路由或实板资格。 后续顺序与明确退出条件见 [SOC-28–36](../design/soc-"
+"refinement.md)："
+msgstr ""
+"H743 currently maintains fixed HSI clocks, timebase, GPIO, IRQ UART and "
+"explicitly selected finite UART TX DMA. Cache-on TX accepts only AXI SRAM "
+"payloads whose complete cache lines are exclusively owned; RX remains IRQ "
+"bytes. U575 maintains its default TZEN0 Platform separately from the "
+"independent TZEN1 synchronous dual-world GPIO reference; the dual-world "
+"reference provides no RTOS, factory or asynchronous DMA. Chip facts "
+"authorize no other modes, routes or physical qualification. The sequence and"
+" explicit exit conditions are in [SOC-28–36](../design/soc-refinement.md):"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "方向"
+msgstr "Direction"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "进入实现前必须固定的合同"
+msgstr "Contract to fix before implementation"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "G474 新模式或更多 controller/route"
+msgstr "New G474 modes or more controllers/routes"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "精确寄存器、IRQ／DMA 冲突、Board 来源、实例隔离与预算"
+msgstr ""
+"Exact registers, IRQ/DMA conflicts, Board provenance, instance isolation and"
+" budgets"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "H743 DMA 与 Cache"
+msgstr "H743 DMA and Cache"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "DMA1/2、BDMA、MDMA 各自可达域，cache-line 所有权，对齐和 clean/invalidate 时序，失败后保留借用"
+msgstr ""
+"DMA1/2, BDMA and MDMA reachability domains; cache-line ownership, alignment "
+"and clean/invalidate timing; retained borrows on failure"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "U575 DMA 与安全域"
+msgstr "U575 DMA and security domains"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "GPDMA/LPDMA descriptor 生命周期、内存和外设归属、GTZC/MPCBB、实际 TZEN 入口与错误处理"
+msgstr ""
+"GPDMA/LPDMA descriptor lifecycle, memory/peripheral ownership, GTZC/MPCBB, "
+"actual TZEN entry and error handling"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "新固定时钟或运行时变频"
+msgstr "New fixed clocks or runtime frequency changes"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "供电／Flash／bus 顺序、consumer 重配置、回滚和 deadline domain；固定 profile 与动态转换分别实现"
+msgstr ""
+"Power/Flash/bus ordering, consumer reconfiguration, rollback and deadline "
+"domains; implement fixed profiles separately from dynamic transitions"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "bootloader 接管或 deep STOP"
+msgstr "Bootloader handover or deep STOP"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "VTOR／mask／FP／DMA 活跃状态、RAM 所有权，RTC/LPTIM 连续域、wake 恢复与精度"
+msgstr ""
+"Active VTOR/mask/FP/DMA state, RAM ownership, RTC/LPTIM continuous domain, "
+"wake recovery and precision"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "userspace I/O transport"
+msgstr "Userspace I/O transport"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid ""
+"真实 principal、权限、copy/pin、异步借用、退出回收和 SVC/MPU/TZ gateway；现有 scalar broker 不代替 "
+"transport"
+msgstr ""
+"Actual principals, permissions, copy/pin, asynchronous borrows, exit "
+"reclamation and SVC/MPU/TZ gateways; the existing scalar broker does not "
+"replace transport"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:38
+msgid ""
+"每次扩展先明确 owner、buffer、cancel/drain、ISR、deadline、对齐/cache 与停止 合同，再用 "
+"GoogleTest/GoogleMock 做真实 RED→GREEN 的生产 provider 纵切片， 随后验证实际生成 factory、ARM "
+"ELF、SDK 与物理边界。未选择模式不驻留资源， 不把不断扩大的通用对象成本摊到全部产品。"
+msgstr ""
+"Each extension first fixes owner, buffer, cancel/drain, ISR, deadline, "
+"alignment/cache and stop contracts. Then use GoogleTest/GoogleMock for an "
+"actual RED→GREEN production-provider vertical slice, followed by generated "
+"factory, ARM ELF, SDK and physical-boundary verification. Unselected modes "
+"retain no resources; growing generic-object costs are not imposed on every "
+"product."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:43
+msgid ""
+"优先复用已有窄端口与静态装配；当现有合同无法表达硬件事实时允许明确版本化的 破坏性变更。Flash "
+"认证、升级、制造密钥与工业安全政策属于外部产品／独立机制， 不能因已有 storage CRC 或 watchdog feed 就声称完成。"
+msgstr ""
+"Reuse existing narrow ports and static assembly first; allow explicitly "
+"versioned breaking changes when contracts cannot express hardware facts. "
+"Flash authentication, upgrades, manufacturing keys and industrial security "
+"policy belong to external products/independent mechanisms. Existing storage "
+"CRC or watchdog feed cannot establish their completion."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:47
+msgid "十人角色与企业工作流"
+msgstr "Ten-person roles and enterprise workflow"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "角色"
+msgstr "Role"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "席位"
+msgstr "Seats"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "负责的可复核产物"
+msgstr "Reviewable outputs owned"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "技术负责人"
+msgstr "Technical lead"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "1"
+msgstr "1"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "契约、边界、预算与支持 scope，跨层设计审查"
+msgstr ""
+"Contracts, boundaries, budgets, support scope and cross-layer design review"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "Core/I/O/OS"
+msgstr "Core/I/O/OS"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "2"
+msgstr "2"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "所有权、并发、时间、静态资源与公共 ABI"
+msgstr "Ownership, concurrency, time, static resources and public ABI"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "STM32/GD32 BSP"
+msgstr "STM32/GD32 BSP"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "精确 facts/routes、SDK/startup/provider、故障模型"
+msgstr "Exact facts/routes, SDK/startup/provider and fault models"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "通用器件／通信与外部应用"
+msgstr "Generic devices/communications and external applications"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "窄端口组件、器件 driver、外部 composition"
+msgstr "Narrow-port components, device drivers and external composition"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "QA/HIL"
+msgstr "QA/HIL"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "软件故障、实际 station、时序／掉电／长期负载证据"
+msgstr ""
+"Software faults, actual stations, timing/power-cut/sustained-load evidence"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "构建发布"
+msgstr "Build/release"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid "唯一配置／CMake图、锁与 SDK、CI、候选／复现证据"
+msgstr ""
+"Single configuration/CMake graph, locks/SDK, CI and candidate/reproduction "
+"evidence"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:58
+msgid ""
+"维护责任由 Codex 全部承担，`.github/maintainer-roles.json` 使用 `agent_managed` "
+"策略。十人角色保留为领域与容量划分，不再要求实名账号；安全、 制造和现场接口也由同一维护责任覆盖，产品权限／流程留在外部应用仓库。"
+msgstr ""
+"Codex assumes all maintenance responsibility; `.github/maintainer-"
+"roles.json` uses `agent_managed`. Ten-person roles remain domain/capacity "
+"divisions without requiring named accounts. The same maintenance "
+"responsibility covers security, manufacturing and field interfaces; product "
+"permissions/processes remain in external application repositories."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:62
+msgid ""
+"`python tools/maintenance/ownership.py --require-assigned` 验证负责 agent、 "
+"路径覆盖、备用领域和强制门禁。GoogleTest／GoogleMock、配置、ARM、预算、SDK 和证据身份检查继续执行。该策略不生成虚构 "
+"CODEOWNERS，不声明独立人工评审； GitHub branch rules 与 required checks 的实际配置状态仍须远程核实。 "
+"具体命令见[维护工具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/maintenance/README.md)。"
+msgstr ""
+"`python tools/maintenance/ownership.py --require-assigned` verifies "
+"responsible agents, path coverage, backup domains and required gates. "
+"GoogleTest/GoogleMock, configuration, ARM, budget, SDK and evidence-identity"
+" checks continue. This policy fabricates no CODEOWNERS and claims no "
+"independent human review. Actual GitHub branch-rule/required-check "
+"configuration still needs remote verification. Commands are in [maintenance "
+"tools](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/maintenance/README.md)."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:68
+msgid ""
+"Issue 描述具体触发和可观察结果；PR 明确源／配置／依赖／工具与影响的合同。每次 commit 自动检查 staged 内容和 "
+"Conventional Commit，CI 用同一整文件规范。 新行为和缺陷修复必须 TDD，主机合同采用 "
+"GoogleTest／GoogleMock；Python 工具 保留 unittest。新增用例先实际 RED，再最小修复 "
+"GREEN；机械门禁不证明历史编辑 顺序，PR 记录命令、失败原因和原始日志。中断、生命周期、持久化和并发变更要有 真实 failure-path "
+"回归。nightly/正式候选的测量、离线构建和 station 结果独立封存， 生产发布不由普通平台 CI 自动提升。"
+msgstr ""
+"Issues describe concrete triggers and observable results. PRs state "
+"source/config/dependency/tool identities and affected contracts. Each commit"
+" automatically checks staged content and Conventional Commit; CI uses the "
+"same whole-file standard. New behavior and bug fixes require TDD: "
+"GoogleTest/GoogleMock for host contracts, unittest for Python tools. New "
+"cases run RED first, then a minimal GREEN fix. Mechanical gates do not prove"
+" historical editing order; PRs record commands, failure reasons and raw "
+"logs. IRQ, lifecycle, persistence and concurrency changes need actual "
+"failure-path regressions. Nightly/formal-candidate measurements, offline "
+"builds and station results are sealed separately; ordinary platform CI does "
+"not automatically promote production releases."

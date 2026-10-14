@@ -13,6 +13,9 @@ facts remain maintained JSON; `resolved.json` is output, not an authored alterna
 CMake owns software dependencies. Failed TOML resolution never falls back to Kconfig,
 cache variables, schema-1 JSON or old generated headers.
 
+Before running the resolver, prepare the
+[fixed source and recursive dependencies](../../guides/source-checkout.md).
+
 ## Complete maintained input
 
 ```{literalinclude} ../../../tools/configure/assemblies/native-uart.toml

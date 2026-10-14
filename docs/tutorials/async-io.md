@@ -14,6 +14,9 @@ The complete executable fixture is the maintained GoogleTest target; its model
 controls stand in for external IRQ and wire progress only. GoogleTest/GoogleMock
 and C++17 are host-only; production firmware remains C11.
 
+First obtain the [fixed source and recursive dependencies](../guides/source-checkout.md).
+Keep the source revision with your fresh execution reports.
+
 ## Build and run the complete fixtures
 
 From the repository root, with host tools and pinned dependencies available:

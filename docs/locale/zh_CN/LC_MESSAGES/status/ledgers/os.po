@@ -1,0 +1,725 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 4c5bd4155a78ad1882fb1ca72881c797e5948fa58f0629fa7bfb0287d831e384\n"
+
+msgid "OS 原专项台账"
+msgstr "OS 原专项台账"
+
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/os-execution.csv>`。 源文件：`docs/design/os-"
+"execution.csv`；SHA-256：`df25e8d6e399df3b1aa6a1c444b9570be04929bf70d30f8484a11dff4e3ed747`。"
+msgstr ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/os-execution.csv>`。 源文件：`docs/design/os-"
+"execution.csv`；SHA-256：`df25e8d6e399df3b1aa6a1c444b9570be04929bf70d30f8484a11dff4e3ed747`。"
+
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+
+msgid ""
+"原台账未定义单独退出字段。本页保留任务与 qualification_authority 等 "
+"原字段；具体合同和实际验证需按原路径复核，不补写另一份退出条件。"
+msgstr ""
+"原台账未定义单独退出字段。本页保留任务与 qualification_authority 等 "
+"原字段；具体合同和实际验证需按原路径复核，不补写另一份退出条件。"
+
+msgid "本表包含 55 条原记录，仅表示来源行数。"
+msgstr "本表包含 55 条原记录，仅表示来源行数。"
+
+msgid "OS01"
+msgstr "OS01"
+
+msgid "原字段"
+msgstr "原字段"
+
+msgid "原值"
+msgstr "原值"
+
+msgid "`task_id`"
+msgstr "`task_id`"
+
+msgid "`priority`"
+msgstr "`priority`"
+
+msgid "P1"
+msgstr "P1"
+
+msgid "`task`"
+msgstr "`task`"
+
+msgid "Finite deadline under continuous unrelated wake"
+msgstr "持续无关唤醒下的有限 deadline"
+
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+msgid "os/baremetal/notify.c;os/native/native.c;os/freertos/freertos.c"
+msgstr "os/baremetal/notify.c;os/native/native.c;os/freertos/freertos.c"
+
+msgid "`evidence_paths`"
+msgstr "`evidence_paths`"
+
+msgid "tests/google/os_wait_test.cpp;tests/google/freertos_context_test.cpp"
+msgstr "tests/google/os_wait_test.cpp;tests/google/freertos_context_test.cpp"
+
+msgid "`implementation_status`"
+msgstr "`implementation_status`"
+
+msgid "implemented"
+msgstr "implemented"
+
+msgid "`software_status`"
+msgstr "`software_status`"
+
+msgid "development_passed"
+msgstr "development_passed"
+
+msgid "`hardware_status`"
+msgstr "`hardware_status`"
+
+msgid "not_applicable"
+msgstr "not_applicable"
+
+msgid "`qualification_authority`"
+msgstr "`qualification_authority`"
+
+msgid ""
+"fresh exact source/SDK/ELF evidence; physical requires admitted equipment "
+"records"
+msgstr "全新精确源码／SDK／ELF 证据；物理验证需要准入设备记录"
+
+msgid "OS02"
+msgstr "OS02"
+
+msgid "Final observed completion wins timeout competition"
+msgstr "最终观察到的完成优先于超时竞争"
+
+msgid "os/wait.c;os/include/nexus/os/wait.h"
+msgstr "os/wait.c;os/include/nexus/os/wait.h"
+
+msgid "tests/google/os_wait_test.cpp"
+msgstr "tests/google/os_wait_test.cpp"
+
+msgid "OS03"
+msgstr "OS03"
+
+msgid "Unified wait deadline/error/context contract"
+msgstr "统一等待 deadline／错误／context 合同"
+
+msgid "os/include/nexus/os/wait.h;docs/design/os-contracts.md"
+msgstr "os/include/nexus/os/wait.h;docs/design/os-contracts.md"
+
+msgid "OS04"
+msgstr "OS04"
+
+msgid "Actual port startup stack minimum and alignment"
+msgstr "真实 port 启动栈最小值与对齐"
+
+msgid "os/freertos/freertos.c;tools/configure/kernel.py"
+msgstr "os/freertos/freertos.c;tools/configure/kernel.py"
+
+msgid "tests/google/freertos_context_test.cpp;tools/configure/test_kernel.py"
+msgstr "tests/google/freertos_context_test.cpp;tools/configure/test_kernel.py"
+
+msgid "pending_exact_head_qualification"
+msgstr "pending_exact_head_qualification"
+
+msgid "OS05"
+msgstr "OS05"
+
+msgid "Task rejection before object mutation/kernel entry"
+msgstr "对象变更或进入内核前拒绝任务"
+
+msgid "os/freertos/freertos.c;os/freertos/include/nexus/os/freertos.h"
+msgstr "os/freertos/freertos.c;os/freertos/include/nexus/os/freertos.h"
+
+msgid "tests/google/freertos_context_test.cpp"
+msgstr "tests/google/freertos_context_test.cpp"
+
+msgid "OS06"
+msgstr "OS06"
+
+msgid "Baseline complete IRQ wake binding"
+msgstr "Baseline 完整 IRQ wake 绑定"
+
+msgid "io/src/wake.c;io/native/uart.c"
+msgstr "io/src/wake.c;io/native/uart.c"
+
+msgid ""
+"tests/google/wake_test.cpp;tests/google/irq_wake_test.cpp;tests/google/irq_wake_stm32_test.cpp;tests/google/irq_wake_gd32_test.cpp"
+msgstr ""
+"tests/google/wake_test.cpp;tests/google/irq_wake_test.cpp;tests/google/irq_wake_stm32_test.cpp;tests/google/irq_wake_gd32_test.cpp"
+
+msgid "not_executed"
+msgstr "not_executed"
+
+msgid "OS07"
+msgstr "OS07"
+
+msgid "Explicit NONE/PRIMASK/BASEPRI kernel policy"
+msgstr "显式 NONE/PRIMASK/BASEPRI 内核策略"
+
+msgid "io/include/nexus/io/wake.h;io/src/wake.c;tools/configure/kernel.py"
+msgstr "io/include/nexus/io/wake.h;io/src/wake.c;tools/configure/kernel.py"
+
+msgid "tests/google/wake_test.cpp;tools/configure/test_kernel.py"
+msgstr "tests/google/wake_test.cpp;tools/configure/test_kernel.py"
+
+msgid "OS08"
+msgstr "OS08"
+
+msgid "SysTick exact clock/rate/reload validation"
+msgstr "SysTick 精确时钟／频率／reload 验证"
+
+msgid "tools/configure/kernel.py;os/freertos/include/FreeRTOSConfig.h"
+msgstr "tools/configure/kernel.py;os/freertos/include/FreeRTOSConfig.h"
+
+msgid "tools/configure/test_kernel.py;scripts/ci/os_profiles.py"
+msgstr "tools/configure/test_kernel.py;scripts/ci/os_profiles.py"
+
+msgid "OS09"
+msgstr "OS09"
+
+msgid "External Tick strong setup hook"
+msgstr "外部 Tick 强符号设置 hook"
+
+msgid "os/freertos/tick.c;os/freertos/include/nexus/os/tick.h"
+msgstr "os/freertos/tick.c;os/freertos/include/nexus/os/tick.h"
+
+msgid "scripts/ci/os_profiles.py"
+msgstr "scripts/ci/os_profiles.py"
+
+msgid "OS10"
+msgstr "OS10"
+
+msgid "P2"
+msgstr "P2"
+
+msgid "Notification publisher/waiter lifecycle"
+msgstr "通知发布者／等待者生命周期"
+
+msgid ""
+"os/include/nexus/os/wait.h;os/native/include/nexus/os/native.h;docs/design/os-"
+"contracts.md"
+msgstr ""
+"os/include/nexus/os/wait.h;os/native/include/nexus/os/native.h;docs/design/os-"
+"contracts.md"
+
+msgid "OS11"
+msgstr "OS11"
+
+msgid "Single lifecycle owner and single joiner"
+msgstr "单一生命周期 owner 与单一 joiner"
+
+msgid ""
+"os/native/include/nexus/os/native.h;os/freertos/include/nexus/os/freertos.h"
+msgstr ""
+"os/native/include/nexus/os/native.h;os/freertos/include/nexus/os/freertos.h"
+
+msgid "tests/google/os_wait_test.cpp;tests/contracts/os_freertos_runtime"
+msgstr "tests/google/os_wait_test.cpp;tests/contracts/os_freertos_runtime"
+
+msgid "OS12"
+msgstr "OS12"
+
+msgid "Native external cancellation/detach exclusion"
+msgstr "排除 Native 外部取消／detach"
+
+msgid "os/native/include/nexus/os/native.h;docs/design/os-contracts.md"
+msgstr "os/native/include/nexus/os/native.h;docs/design/os-contracts.md"
+
+msgid "OS13"
+msgstr "OS13"
+
+msgid "Explicit queue close/drain/destroy"
+msgstr "显式 queue close／drain／destroy"
+
+msgid ""
+"os/freertos/include/nexus/os/freertos.h;os/freertos/freertos.c;os/native/native.c"
+msgstr ""
+"os/freertos/include/nexus/os/freertos.h;os/freertos/freertos.c;os/native/native.c"
+
+msgid ""
+"tests/contracts/os_freertos_runtime;tests/google/freertos_context_test.cpp"
+msgstr ""
+"tests/contracts/os_freertos_runtime;tests/google/freertos_context_test.cpp"
+
+msgid "OS14"
+msgstr "OS14"
+
+msgid "Queue absolute deadlines without repeated relative extension"
+msgstr "queue 使用绝对 deadline，不重复延长相对等待"
+
+msgid "os/freertos/freertos.c;os/native/native.c"
+msgstr "os/freertos/freertos.c;os/native/native.c"
+
+msgid "tests/google/freertos_context_test.cpp;tests/google/os_wait_test.cpp"
+msgstr "tests/google/freertos_context_test.cpp;tests/google/os_wait_test.cpp"
+
+msgid "OS15"
+msgstr "OS15"
+
+msgid "Owner progresses during producer stop/drain/join"
+msgstr "producer 停止／排空／join 时 owner 持续推进"
+
+msgid ""
+"components/bus_owner/src/bus_owner.c;X-Gen-Lab/nexus-"
+"examples/apps/uart_owner_runtime"
+msgstr ""
+"components/bus_owner/src/bus_owner.c;X-Gen-Lab/nexus-"
+"examples/apps/uart_owner_runtime"
+
+msgid "X-Gen-Lab/nexus-examples/tests/owner_lifecycle_test.cpp"
+msgstr "X-Gen-Lab/nexus-examples/tests/owner_lifecycle_test.cpp"
+
+msgid "OS16"
+msgstr "OS16"
+
+msgid "SETTLED distinct from notification reclamation"
+msgstr "SETTLED 与通知回收分离"
+
+msgid "docs/design/os-contracts.md;os/include/nexus/os/wait.h"
+msgstr "docs/design/os-contracts.md;os/include/nexus/os/wait.h"
+
+msgid ""
+"tests/google/os_wait_test.cpp;X-Gen-Lab/nexus-"
+"examples/tests/owner_lifecycle_test.cpp"
+msgstr ""
+"tests/google/os_wait_test.cpp;X-Gen-Lab/nexus-"
+"examples/tests/owner_lifecycle_test.cpp"
+
+msgid "OS17"
+msgstr "OS17"
+
+msgid "Error ownership and recovery obligations"
+msgstr "错误所有权与恢复义务"
+
+msgid "docs/design/os-contracts.md;docs/delivery/os.md"
+msgstr "docs/design/os-contracts.md;docs/delivery/os.md"
+
+msgid "OS18"
+msgstr "OS18"
+
+msgid "Maintained OS profiles and immutable IR"
+msgstr "维护中的 OS profile 与不可变 IR"
+
+msgid ""
+"tools/configure/kernel.py;tools/configure/ir.py;tools/configure/runtime.py"
+msgstr ""
+"tools/configure/kernel.py;tools/configure/ir.py;tools/configure/runtime.py"
+
+msgid "OS19"
+msgstr "OS19"
+
+msgid "Separate CPU/IRQ facts from kernel policy"
+msgstr "CPU／IRQ 事实与内核策略分离"
+
+msgid "tools/configure/kernel.py;tools/configure/cpu.py"
+msgstr "tools/configure/kernel.py;tools/configure/cpu.py"
+
+msgid "tools/configure/test_kernel.py"
+msgstr "tools/configure/test_kernel.py"
+
+msgid "OS20"
+msgstr "OS20"
+
+msgid "Optional kernel capability pruning"
+msgstr "可选内核能力裁剪"
+
+msgid "os/freertos/include/FreeRTOSConfig.h;tools/configure/kernel.py"
+msgstr "os/freertos/include/FreeRTOSConfig.h;tools/configure/kernel.py"
+
+msgid "OS21"
+msgstr "OS21"
+
+msgid "Explicit Idle stack and task name budgets"
+msgstr "显式 Idle 栈与任务名预算"
+
+msgid "tools/configure/kernel.py;os/freertos/hooks.c"
+msgstr "tools/configure/kernel.py;os/freertos/hooks.c"
+
+msgid "OS22"
+msgstr "OS22"
+
+msgid "Direct task notification optional adapter"
+msgstr "直接任务通知可选 adapter"
+
+msgid ""
+"tests/google/freertos_context_test.cpp;tests/contracts/os_freertos_runtime"
+msgstr ""
+"tests/google/freertos_context_test.cpp;tests/contracts/os_freertos_runtime"
+
+msgid "OS23"
+msgstr "OS23"
+
+msgid "Permanent task without join semaphore"
+msgstr "不含 join semaphore 的永久任务"
+
+msgid "OS24"
+msgstr "OS24"
+
+msgid "Measure shared wait table before ABI change"
+msgstr "ABI 变更前测量共享 wait 表"
+
+msgid "scripts/ci/os_wait_cost.py;tests/contracts/os_wait_cost"
+msgstr "scripts/ci/os_wait_cost.py;tests/contracts/os_wait_cost"
+
+msgid "scripts/ci/test_os_wait_cost.py"
+msgstr "scripts/ci/test_os_wait_cost.py"
+
+msgid "OS25"
+msgstr "OS25"
+
+msgid "Stable operation descriptors rather than payload copy"
+msgstr "稳定操作描述符，避免复制 payload"
+
+msgid ""
+"components/bus_owner/include/nexus/components/bus_owner.h;X-Gen-Lab/nexus-"
+"examples/apps/uart_owner_runtime"
+msgstr ""
+"components/bus_owner/include/nexus/components/bus_owner.h;X-Gen-Lab/nexus-"
+"examples/apps/uart_owner_runtime"
+
+msgid "OS26"
+msgstr "OS26"
+
+msgid "Actual OS object and linked image cost report"
+msgstr "真实 OS 对象与链接镜像成本报告"
+
+msgid ""
+"scripts/ci/os_resources.py;scripts/ci/os_profiles.py;scripts/ci/os_wait_cost.py"
+msgstr ""
+"scripts/ci/os_resources.py;scripts/ci/os_profiles.py;scripts/ci/os_wait_cost.py"
+
+msgid "tests/contracts/os_wait_cost;scripts/ci/test_os_resources.py"
+msgstr "tests/contracts/os_wait_cost;scripts/ci/test_os_resources.py"
+
+msgid "OS27"
+msgstr "OS27"
+
+msgid "Hot path instruction costs and measurement definitions"
+msgstr "热路径指令成本与测量定义"
+
+msgid ""
+"scripts/ci/os_resources.py;scripts/ci/os_wait_cost.py;tools/hil/os_acceptance.py"
+msgstr ""
+"scripts/ci/os_resources.py;scripts/ci/os_wait_cost.py;tools/hil/os_acceptance.py"
+
+msgid "tools/testing/test_os_acceptance.py;scripts/ci/test_os_resources.py"
+msgstr "tools/testing/test_os_acceptance.py;scripts/ci/test_os_resources.py"
+
+msgid "OS28"
+msgstr "OS28"
+
+msgid "Deadline GoogleTest/GoogleMock regression"
+msgstr "deadline GoogleTest／GoogleMock 回归"
+
+msgid "OS29"
+msgstr "OS29"
+
+msgid "Startup stack/alignment/zero-effect regression"
+msgstr "启动栈／对齐／零副作用回归"
+
+msgid "OS30"
+msgstr "OS30"
+
+msgid "Baseline facts to provider wake regression"
+msgstr "Baseline 事实到 provider wake 回归"
+
+msgid "tests/google/wake_test.cpp"
+msgstr "tests/google/wake_test.cpp"
+
+msgid "OS31"
+msgstr "OS31"
+
+msgid "Deterministic wait races and publisher isolation"
+msgstr "确定性 wait 竞态与发布者隔离"
+
+msgid "OS32"
+msgstr "OS32"
+
+msgid "Queue close broadcast and drain regression"
+msgstr "queue close 广播与 drain 回归"
+
+msgid "tests/contracts/os_freertos_runtime"
+msgstr "tests/contracts/os_freertos_runtime"
+
+msgid "OS33"
+msgstr "OS33"
+
+msgid "Returning task timeout/reuse/storage regression"
+msgstr "任务返回、超时／复用／存储回归"
+
+msgid "OS34"
+msgstr "OS34"
+
+msgid "Controlled concurrency and sanitizer validation"
+msgstr "受控并发与 sanitizer 验证"
+
+msgid ""
+"tests/google/os_wait_test.cpp;X-Gen-Lab/nexus-"
+"examples/apps/uart_owner_runtime;docs/design/os-contracts.md"
+msgstr ""
+"tests/google/os_wait_test.cpp;X-Gen-Lab/nexus-"
+"examples/apps/uart_owner_runtime;docs/design/os-contracts.md"
+
+msgid "OS35"
+msgstr "OS35"
+
+msgid "Profiles included in permanent CI and SDK checks"
+msgstr "profile 纳入长期 CI 与 SDK 检查"
+
+msgid "scripts/ci/os_profiles.py;.github/workflows"
+msgstr "scripts/ci/os_profiles.py;.github/workflows"
+
+msgid "OS36"
+msgstr "OS36"
+
+msgid "Actual pinned POSIX kernel lifecycle integration"
+msgstr "真实固定版本 POSIX 内核生命周期集成"
+
+msgid "OS37"
+msgstr "OS37"
+
+msgid "Current OS contracts and support boundaries"
+msgstr "当前 OS 合同与支持边界"
+
+msgid ""
+"docs/design/os-"
+"contracts.md;docs/delivery/os.md;os/README.md;docs/sphinx/os.rst"
+msgstr ""
+"docs/design/os-"
+"contracts.md;docs/delivery/os.md;os/README.md;docs/sphinx/os.rst"
+
+msgid "docs/design/os-execution.csv"
+msgstr "docs/design/os-execution.csv"
+
+msgid "OS38"
+msgstr "OS38"
+
+msgid "Kernel/port/overlay upgrade review workflow"
+msgstr "内核／port／overlay 升级评审流程"
+
+msgid ""
+"docs/design/os-contracts.md;os/freertos/prepare_m7_integer.py;dependencies"
+msgstr ""
+"docs/design/os-contracts.md;os/freertos/prepare_m7_integer.py;dependencies"
+
+msgid "os/freertos/test_m7_integer_overlay.py"
+msgstr "os/freertos/test_m7_integer_overlay.py"
+
+msgid "OS39"
+msgstr "OS39"
+
+msgid "Backend acceptance contract and checklist"
+msgstr "后端验收合同与清单"
+
+msgid ""
+"docs/design/os-contracts.md;docs/delivery/os.md;docs/design/os-backend-"
+"integration.md"
+msgstr ""
+"docs/design/os-contracts.md;docs/delivery/os.md;docs/design/os-backend-"
+"integration.md"
+
+msgid ""
+"tests/google/os_wait_test.cpp;tests/contracts/os_freertos_runtime;scripts/ci/os_backend_probe.py;scripts/ci/test_os_backend_probe.py"
+msgstr ""
+"tests/google/os_wait_test.cpp;tests/contracts/os_freertos_runtime;scripts/ci/os_backend_probe.py;scripts/ci/test_os_backend_probe.py"
+
+msgid "OS40"
+msgstr "OS40"
+
+msgid "External multiproducer IRQ UART owner example"
+msgstr "外部多 producer IRQ UART owner 示例"
+
+msgid "X-Gen-Lab/nexus-examples/apps/uart_owner_runtime"
+msgstr "X-Gen-Lab/nexus-examples/apps/uart_owner_runtime"
+
+msgid "OS41"
+msgstr "OS41"
+
+msgid "External admission/drain/join/reclaim example"
+msgstr "外部 admission／drain／join／reclaim 示例"
+
+msgid "X-Gen-Lab/nexus-examples/apps/uart_owner_runtime/lifecycle.c"
+msgstr "X-Gen-Lab/nexus-examples/apps/uart_owner_runtime/lifecycle.c"
+
+msgid "OS42"
+msgstr "OS42"
+
+msgid "Bounded failure hooks with product-owned policy"
+msgstr "有界失败 hook，策略由产品负责"
+
+msgid "os/freertos/hooks.c;docs/design/os-contracts.md"
+msgstr "os/freertos/hooks.c;docs/design/os-contracts.md"
+
+msgid "tools/hil/os_acceptance.py"
+msgstr "tools/hil/os_acceptance.py"
+
+msgid "OS43"
+msgstr "OS43"
+
+msgid "optional"
+msgstr "optional"
+
+msgid "CPU-local atomic shallow idle"
+msgstr "CPU 本地原子浅睡眠"
+
+msgid "arch/include/nexus/arch/sleep.h;arch/cortex_m/nx_arch_sleep.c"
+msgstr "arch/include/nexus/arch/sleep.h;arch/cortex_m/nx_arch_sleep.c"
+
+msgid "tests/google/arch_sleep_test.cpp"
+msgstr "tests/google/arch_sleep_test.cpp"
+
+msgid "OS44"
+msgstr "OS44"
+
+msgid "Explicit FreeRTOS custom tickless timer port"
+msgstr "显式 FreeRTOS 自定义 tickless 定时器 port"
+
+msgid "os/freertos/lowpower.c;os/freertos/include/nexus/os/lowpower.h"
+msgstr "os/freertos/lowpower.c;os/freertos/include/nexus/os/lowpower.h"
+
+msgid "tests/google/os_lowpower_test.cpp"
+msgstr "tests/google/os_lowpower_test.cpp"
+
+msgid "OS45"
+msgstr "OS45"
+
+msgid "Caller-sized diagnostics and actual trace hooks"
+msgstr "调用者定容诊断与真实 trace hook"
+
+msgid ""
+"os/freertos/diagnostics.c;os/include/nexus/os/diagnostic.h;os/freertos/include/nexus/os/freertos_diagnostics.h"
+msgstr ""
+"os/freertos/diagnostics.c;os/include/nexus/os/diagnostic.h;os/freertos/include/nexus/os/freertos_diagnostics.h"
+
+msgid "tests/google/os_diagnostic_test.cpp"
+msgstr "tests/google/os_diagnostic_test.cpp"
+
+msgid "OS46"
+msgstr "OS46"
+
+msgid "MPU user task kernel gateway"
+msgstr "MPU 用户任务内核 gateway"
+
+msgid ""
+"os/freertos/mpu;os/freertos/include/nexus/os/freertos_mpu.h;os/freertos/include/nexus/os/freertos_user.h"
+msgstr ""
+"os/freertos/mpu;os/freertos/include/nexus/os/freertos_mpu.h;os/freertos/include/nexus/os/freertos_user.h"
+
+msgid ""
+"tests/google/freertos_mpu_test.cpp;scripts/ci/os_mpu.py;scripts/ci/test_os_mpu.py"
+msgstr ""
+"tests/google/freertos_mpu_test.cpp;scripts/ci/os_mpu.py;scripts/ci/test_os_mpu.py"
+
+msgid "OS47"
+msgstr "OS47"
+
+msgid "TrustZone cross-world task service"
+msgstr "TrustZone 跨域任务服务"
+
+msgid ""
+"os/freertos/secure;os/freertos/include/nexus/os/secure_context.h;cmake/platform/Runtime.cmake"
+msgstr ""
+"os/freertos/secure;os/freertos/include/nexus/os/secure_context.h;cmake/platform/Runtime.cmake"
+
+msgid ""
+"tests/google/os_secure_context_test.cpp;tests/contracts/os_secure_runtime;scripts/ci/os_secure_runtime.py;scripts/ci/test_os_secure_runtime.py"
+msgstr ""
+"tests/google/os_secure_context_test.cpp;tests/contracts/os_secure_runtime;scripts/ci/os_secure_runtime.py;scripts/ci/test_os_secure_runtime.py"
+
+msgid "OS48"
+msgstr "OS48"
+
+msgid "Other RTOS backend admission contract"
+msgstr "其他 RTOS 后端准入合同"
+
+msgid ""
+"docs/design/os-backend-"
+"integration.md;scripts/ci/os_backend_probe.py;tests/contracts/os_backend_probe"
+msgstr ""
+"docs/design/os-backend-"
+"integration.md;scripts/ci/os_backend_probe.py;tests/contracts/os_backend_probe"
+
+msgid "scripts/ci/test_os_backend_probe.py;tests/google/os_wait_test.cpp"
+msgstr "scripts/ci/test_os_backend_probe.py;tests/google/os_wait_test.cpp"
+
+msgid "implemented_contract"
+msgstr "implemented_contract"
+
+msgid "no_additional_kernel_selected"
+msgstr "no_additional_kernel_selected"
+
+msgid "OS49"
+msgstr "OS49"
+
+msgid "physical"
+msgstr "physical"
+
+msgid "Actual IRQ to task wake latency"
+msgstr "真实 IRQ 到任务唤醒延迟"
+
+msgid "tools/testing/test_os_acceptance.py"
+msgstr "tools/testing/test_os_acceptance.py"
+
+msgid "implemented_tooling"
+msgstr "implemented_tooling"
+
+msgid "OS50"
+msgstr "OS50"
+
+msgid "Integer FP MVE register retention"
+msgstr "整数、FP、MVE 寄存器保持"
+
+msgid "OS51"
+msgstr "OS51"
+
+msgid "Task stack and exception MSP peaks"
+msgstr "任务栈与异常 MSP 峰值"
+
+msgid "OS52"
+msgstr "OS52"
+
+msgid "Tick frequency and deadline accuracy"
+msgstr "Tick 频率与 deadline 精度"
+
+msgid "OS53"
+msgstr "OS53"
+
+msgid "Lifecycle full-load stress and borrow settlement"
+msgstr "生命周期满载压力与借用结清"
+
+msgid "OS54"
+msgstr "OS54"
+
+msgid "Low-power restore clock/events"
+msgstr "低功耗恢复时钟／事件"
+
+msgid "OS55"
+msgstr "OS55"
+
+msgid "Observed assert/overflow safe output"
+msgstr "实际观察 assert／overflow 安全输出"

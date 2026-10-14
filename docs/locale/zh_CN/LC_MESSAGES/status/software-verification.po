@@ -1,0 +1,192 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 428dc47701a2526dd08639514a896f8ecd93c1bc89c7ee4f842525c163c5f02e\n"
+
+msgid "软件验证、源码身份与证据"
+msgstr "软件验证、源码身份与证据"
+
+msgid ""
+"本页导航已有执行记录，不建立本次文档 HEAD 的平台软件资格。必须同时比对 源码、装配、依赖、工具、实际执行与同一 ELF／BIN／map "
+"字节，不能只看 passed。 资格规则由 [资格合同](../delivery/qualification.md)维护。"
+msgstr ""
+"本页导航已有执行记录，不建立本次文档 HEAD 的平台软件资格。必须同时比对 源码、装配、依赖、工具、实际执行与同一 ELF／BIN／map "
+"字节，不能只看 passed。 资格规则由 [资格合同](../delivery/qualification.md)维护。"
+
+msgid "三种身份分别解释"
+msgstr "三种身份分别解释"
+
+msgid ""
+"下面字段用于成功打包的正式站点与离线包。构建预览先查看 `documentation-build.json` 的 `source`、状态和原命令 "
+"receipts；预览尚没有正式 `documentation-manifest.json`，也不据此声称发行完成。"
+msgstr ""
+"下面字段用于成功打包的正式站点与离线包。构建预览先查看 `documentation-build.json` 的 `source`、状态和原命令 "
+"receipts；预览尚没有正式 `documentation-manifest.json`，也不据此声称发行完成。"
+
+msgid "身份"
+msgstr "身份"
+
+msgid "取得位置"
+msgstr "取得位置"
+
+msgid "含义"
+msgstr "含义"
+
+msgid "当前代码源码"
+msgstr "当前代码源码"
+
+msgid "站点 `documentation-manifest.json` 的 `code_source`"
+msgstr "站点 `documentation-manifest.json` 的 `code_source`"
+
+msgid "本站描述的 checkout、tree、dirty 状态和代码路径"
+msgstr "本站描述的 checkout、tree、dirty 状态和代码路径"
+
+msgid "当前文档源码"
+msgstr "当前文档源码"
+
+msgid "同一 manifest 的 `documentation_source`"
+msgstr "同一 manifest 的 `documentation_source`"
+
+msgid "本次正式文档包的精确 commit/tree；不替代预览构建记录"
+msgstr "本次正式文档包的精确 commit/tree；不替代预览构建记录"
+
+msgid "被引用资格源码"
+msgstr "被引用资格源码"
+
+msgid "同一 manifest 的 `qualified_code` 与其结果索引"
+msgstr "同一 manifest 的 `qualified_code` 与其结果索引"
+
+msgid "旧的精确代码执行；不是当前代码／文档 HEAD 自动继承的资格"
+msgstr "旧的精确代码执行；不是当前代码／文档 HEAD 自动继承的资格"
+
+msgid ""
+"成功打包后，公开站点和离线包的 manifest 由实际构建输入生成。Git HEAD 可以因文档提交改变； 这里不手填一个很快漂移的 HEAD "
+"常量。未打包的工作树可执行 `git rev-parse HEAD` 核对 checkout，但命令输出本身不是 qualification "
+"receipt。"
+msgstr ""
+"成功打包后，公开站点和离线包的 manifest 由实际构建输入生成。Git HEAD 可以因文档提交改变； 这里不手填一个很快漂移的 HEAD "
+"常量。未打包的工作树可执行 `git rev-parse HEAD` 核对 checkout，但命令输出本身不是 qualification "
+"receipt。"
+
+msgid "已有三个独立结果索引"
+msgstr "已有三个独立结果索引"
+
+msgid "范围"
+msgstr "范围"
+
+msgid "精确代码源码"
+msgstr "精确代码源码"
+
+msgid "原权威及执行说明"
+msgstr "原权威及执行说明"
+
+msgid "构建系统及其实际软件 scopes"
+msgstr "构建系统及其实际软件 scopes"
+
+msgid "`cc6a065c002041234a212a964be863a69198f9b4`"
+msgstr "`cc6a065c002041234a212a964be863a69198f9b4`"
+
+msgid ""
+"{download}`结果索引 <../delivery/build-system-"
+"results.json>`、[执行记录](../delivery/build-system-verification.md)"
+msgstr ""
+"{download}`结果索引 <../delivery/build-system-"
+"results.json>`、[执行记录](../delivery/build-system-verification.md)"
+
+msgid "SoC 扩展软件切片"
+msgstr "SoC 扩展软件切片"
+
+msgid "`98270512ea2ff7eefe8ff79720018e582be3a949`"
+msgstr "`98270512ea2ff7eefe8ff79720018e582be3a949`"
+
+msgid ""
+"{download}`结果索引 <../delivery/soc-extensions-"
+"results.json>`、[执行记录](../delivery/soc-extensions-verification.md)"
+msgstr ""
+"{download}`结果索引 <../delivery/soc-extensions-"
+"results.json>`、[执行记录](../delivery/soc-extensions-verification.md)"
+
+msgid "较早 SoC refinement 基线"
+msgstr "较早 SoC refinement 基线"
+
+msgid "`3728b334b02eb2eb70bcf5d4caafbb9746837dd3`"
+msgstr "`3728b334b02eb2eb70bcf5d4caafbb9746837dd3`"
+
+msgid ""
+"{download}`结果索引 <../delivery/soc-refinement-"
+"results.json>`、[执行记录](../delivery/soc-refinement-verification.md)"
+msgstr ""
+"{download}`结果索引 <../delivery/soc-refinement-"
+"results.json>`、[执行记录](../delivery/soc-refinement-verification.md)"
+
+msgid ""
+"三个索引保留原 schema、范围、失败尝试、receipt、归档和 member 身份，不能相加 测试次数、ARM "
+"镜像数或任务数量，也不能据此计算全项目完成率。后续文档 commit 只记录这些基线。当前文档的检查、渲染、离线恢复与部署验证各自有独立记录。"
+msgstr ""
+"三个索引保留原 schema、范围、失败尝试、receipt、归档和 member 身份，不能相加 测试次数、ARM "
+"镜像数或任务数量，也不能据此计算全项目完成率。后续文档 commit 只记录这些基线。当前文档的检查、渲染、离线恢复与部署验证各自有独立记录。"
+
+msgid ""
+"构建系统记录没有执行一次完整 72-stage 软件总计划，也没有执行 OCI recipe 重建、 CP311 离线安装、Windows/macOS "
+"集成或 MCU HIL。独立执行过的具体 scopes 按原索引 解释；不要从其 aggregate 状态扩大结论。八个当前无签名软件候选是 H743 "
+"HSI64／ Cache off 和 U575 MSIS4／TZEN=0 的 empty／UART、裸机／FreeRTOS 组合。"
+msgstr ""
+"构建系统记录没有执行一次完整 72-stage 软件总计划，也没有执行 OCI recipe 重建、 CP311 离线安装、Windows/macOS "
+"集成或 MCU HIL。独立执行过的具体 scopes 按原索引 解释；不要从其 aggregate 状态扩大结论。八个当前无签名软件候选是 H743 "
+"HSI64／ Cache off 和 U575 MSIS4／TZEN=0 的 empty／UART、裸机／FreeRTOS 组合。"
+
+msgid "如何取得与核对旧证据"
+msgstr "如何取得与核对旧证据"
+
+msgid "先打开对应结果索引，确认 canonical code commit、配置和记录 scope。"
+msgstr "先打开对应结果索引，确认 canonical code commit、配置和记录 scope。"
+
+msgid "使用索引中的归档定位，核对归档 SHA-256 和 bytes；记录失败尝试的原身份。"
+msgstr "使用索引中的归档定位，核对归档 SHA-256 和 bytes；记录失败尝试的原身份。"
+
+msgid ""
+"根据 `archive_relative_path`、`archive_member_relative_path` 等原字段定位 member， "
+"继续核对该 member 的 hash 和 bytes。字段名因原 schema 而不同，按该索引解释。"
+msgstr ""
+"根据 `archive_relative_path`、`archive_member_relative_path` 等原字段定位 member， "
+"继续核对该 member 的 hash 和 bytes。字段名因原 schema 而不同，按该索引解释。"
+
+msgid "查看实际执行记录、原始日志和同一产物。软件模型、链接、独立消费和两次断网 重建分别证明自己的范围，某一类成功不替代另一类。"
+msgstr "查看实际执行记录、原始日志和同一产物。软件模型、链接、独立消费和两次断网 重建分别证明自己的范围，某一类成功不替代另一类。"
+
+msgid "物理记录按 [HIL 状态](hardware.md)另行判断。"
+msgstr "物理记录按 [HIL 状态](hardware.md)另行判断。"
+
+msgid ""
+"原 `/workspace/...`、`/dev/shm/...` 是执行主机定位，离开该主机不能当作公开下载。 构建系统索引的 "
+"`evidence_navigation` 明确候选归档、candidate document、ELF／BIN／map 和全部 member "
+"清单的定位方式。归档当前是原记录的本地留存；没有发布的远程证据 不能伪造下载 URL。文档包包含原 JSON "
+"以便核对，并不复制大型原始归档或重签历史字节。"
+msgstr ""
+"原 `/workspace/...`、`/dev/shm/...` 是执行主机定位，离开该主机不能当作公开下载。 构建系统索引的 "
+"`evidence_navigation` 明确候选归档、candidate document、ELF／BIN／map 和全部 member "
+"清单的定位方式。归档当前是原记录的本地留存；没有发布的远程证据 不能伪造下载 URL。文档包包含原 JSON "
+"以便核对，并不复制大型原始归档或重签历史字节。"
+
+msgid "![软件与物理证据分别绑定精确源码和执行范围](../assets/diagrams/qualification-evidence.svg)"
+msgstr ""
+"![软件与物理证据分别绑定精确源码和执行范围](../assets/diagrams/qualification-evidence.svg)"
+
+msgid "软件与物理证据分别绑定精确源码和执行范围"
+msgstr "软件与物理证据分别绑定精确源码和执行范围"
+
+msgid ""
+"FIG-11 表达资格关系，不生成 receipt。标准与图源依据见 [图册](../assets/diagrams/README.md)。 "
+"逐项原退出条件见 [台账视图](ledgers.md)。"
+msgstr ""
+"FIG-11 表达资格关系，不生成 receipt。标准与图源依据见 [图册](../assets/diagrams/README.md)。 "
+"逐项原退出条件见 [台账视图](ledgers.md)。"

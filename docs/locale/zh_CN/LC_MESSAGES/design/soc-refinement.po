@@ -1,0 +1,763 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 8a9589e684473e3a4da9863ea2fd6a0ccad97618d2af72796486dd6740241f42\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:1
+msgid "SoC refinement and physical acceptance"
+msgstr "SoC 完善与物理验收"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:3
+msgid ""
+"Nexus maintains exact silicon mechanisms. SoC facts and routes, private "
+"provider implementations, generated static instances, Board connections and "
+"observed physical behavior have separate responsibilities. The existing "
+"typed factory and shared readonly operations tables remain the runtime "
+"interface; no new registry, worker, allocator, lock or product configuration"
+" authority is introduced."
+msgstr ""
+"Nexus 维护精确芯片机制。SoC 事实和路由、私有 provider、生成的静态实例、Board 接线与实际物理行为分别承担责任。运行时仍使用现有 "
+"typed factory 和共享只读操作表，不引入新的 registry、worker、allocator、lock 或产品配置权威。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:9
+msgid ""
+"The {download}`55-item execution ledger <soc-refinement-execution.csv>` "
+"separates existing correction and optimization (SOC-01–27), conditional "
+"target extensions (SOC-28–36), and physical acceptance (SOC-37–55). Codex "
+"owns all maintenance. Implementation status, executed software evidence and "
+"physical status are recorded independently. An authored plan, a synthetic "
+"parser test or an ARM link cannot complete a physical exit condition."
+msgstr ""
+"{download}`55 项执行台账 <soc-refinement-"
+"execution.csv>`区分现有修正优化（SOC-01–27）、有条件目标扩展（SOC-28–36）和物理验收（SOC-37–55）。全部维护由 "
+"Codex 负责。实现状态、实际软件证据和物理状态分别记录。编写计划、synthetic parser 测试或 ARM 链接均不能完成物理退出条件。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:16
+msgid "Current software boundaries"
+msgstr "当前软件边界"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:18
+msgid ""
+"STM32F407VET6/ZGT6 and GD32F470ZGT6 maintain reviewed fixed clock, startup, "
+"monotonic timer and selected controller modes. The [derived capability "
+"matrix](../delivery/capabilities.md) enumerates exact facts, routes, "
+"selected production sources and software fixtures. STM32G474RET6 maintains "
+"GPIO/LPUART plus selected EXTI edge events. The non-M4 references are "
+"STM32H743ZIT6 / NUCLEO-H743ZI2 and STM32U575ZIT6Q / NUCLEO-U575ZI-Q. H743 "
+"adds fixed clock/cache profiles and finite UART DMA transmission. U575 keeps"
+" its single-state platform and an independent synchronous dual-world "
+"software reference separate. CPU ABI/runtime support for other Cortex-M "
+"profiles does not imply a full SoC, Board or peripheral implementation."
+msgstr ""
+"STM32F407VET6/ZGT6 和 GD32F470ZGT6 "
+"维护已复核的固定时钟、启动、单调计时器和选定控制器模式。[派生能力矩阵](../delivery/capabilities.md)列出精确事实、路由、生产源码选择和软件"
+" fixture。STM32G474RET6 维护 GPIO/LPUART 及选定 EXTI 边沿事件。非 M4 参考为 STM32H743ZIT6 /"
+" NUCLEO-H743ZI2 和 STM32U575ZIT6Q / NUCLEO-U575ZI-Q。H743 增加固定时钟/cache profile"
+" 和有限 UART DMA 发送；U575 将单状态平台与独立同步双域软件参考分开。其他 Cortex-M profile 的 CPU "
+"ABI/runtime 支持不代表完整 SoC、Board 或外设实现。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "Reference"
+msgstr "参考配置"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "Maintained execution contract"
+msgstr "维护的执行合同"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "Explicitly excluded"
+msgstr "明确排除"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "G474 / MB1367"
+msgstr "G474 / MB1367"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"HSE 24 / 170 MHz, TIM2, PA5 GPIO, LPUART1 PA2/PA3, selected PA0/PA1 EXTI "
+"edge events; baremetal or FreeRTOS"
+msgstr ""
+"HSE 24 / 170 MHz、TIM2、PA5 GPIO、LPUART1 PA2/PA3、选定 PA0/PA1 EXTI 边沿事件；裸机或 "
+"FreeRTOS。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Other controllers, DMA and ThreadX; EXTI fixture wiring is not an observed "
+"Board route"
+msgstr "其他控制器、DMA 和 ThreadX；EXTI fixture 接线并非观测到的 Board 路由。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "H743 / NUCLEO-H743ZI2"
+msgstr "H743 / NUCLEO-H743ZI2"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Bounded pre-RAM LDO entry; HSI 32/64 MHz with Cache off/on; TIM2, PB0 GPIO, "
+"USART3 PD8/PD9 IRQ bytes or finite DMA TX; baremetal or FreeRTOS"
+msgstr ""
+"有界 pre-RAM LDO 入口；HSI 32/64 MHz、Cache 关/开；TIM2、PB0 GPIO、USART3 PD8/PD9 IRQ "
+"bytes 或有限 DMA TX；裸机或 FreeRTOS。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Other supply/PLL profiles, DMA RX/other engines, optional RAM placement, "
+"running-state handoff and runtime reclocking"
+msgstr "其他供电／PLL profile、DMA RX／其他引擎、可选 RAM 放置、运行态交接与运行时重配时钟。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "U575 / NUCLEO-U575ZI-Q, platform"
+msgstr "U575 / NUCLEO-U575ZI-Q 平台"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Externally established TZEN=0 and SWAP_BANK=0, MSIS 4 MHz, Cache off, TIM2, "
+"PC7 GPIO, USART1 PA9/PA10; baremetal or FreeRTOS"
+msgstr ""
+"外部预先建立 TZEN=0、SWAP_BANK=0，MSIS 4 MHz、Cache 关闭、TIM2、PC7 GPIO、USART1 "
+"PA9/PA10；裸机或 FreeRTOS。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Option-byte changes, DMA, optional RAM placement and running-state handoff; "
+"this assembly has no TrustZone transport"
+msgstr "Option-byte 修改、DMA、可选 RAM 放置与运行态交接；此装配没有 TrustZone transport。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "U575, separate dual-world reference"
+msgstr "U575 独立双域参考"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Explicit TZEN=1 cold-owner contract, Secure/NS Runtime images, SAU/MPU/RAM "
+"attribution, actual CMSE entry and copied synchronous GPIO access from one "
+"unprivileged NS Thread"
+msgstr ""
+"显式 TZEN=1 cold-owner 合同、Secure/NS Runtime 镜像、SAU/MPU/RAM attribution、真实 CMSE"
+" 入口，以及一个非特权 NS Thread 的同步复制 GPIO 访问。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"General dual-world factory, NS RTOS/task identities, asynchronous loans, "
+"cross-domain DMA, product loader authentication and physical isolation "
+"qualification"
+msgstr ""
+"通用双域 factory、NS RTOS/task 身份、异步借用、跨域 DMA、产品 loader authentication 和物理隔离资格。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:36
+msgid ""
+"These are source-reviewed Board references. Their physical PCB revisions, "
+"silicon revisions, solder bridges, electrical connections and option bytes "
+"have not been observed. Reference-only HIL admission fails closed; selecting"
+" a matching chip name cannot promote a reference into a qualified physical "
+"Board. The [extension execution record](../delivery/soc-extensions-"
+"verification.md) distinguishes normal commit gates, development ARM "
+"observations and final qualification. The [earlier "
+"baseline](../delivery/soc-refinement-verification.md) retains its original "
+"source identity and evidence. Reference software status in the ledger "
+"records bounded host/ARM evidence; it does not establish a clean candidate, "
+"physical acceptance or every original exit condition."
+msgstr ""
+"这些是来源已复核的 Board 参考；实际 PCB/silicon revision、焊桥、电气连接与 option bytes "
+"尚未观测。reference-only HIL admission "
+"默认拒绝，匹配芯片名称不能使参考成为合格实板。[扩展执行记录](../delivery/soc-extensions-"
+"verification.md)区分普通 commit gate、开发 ARM 观测与最终资格。[原始基线](../delivery/soc-"
+"refinement-verification.md)保留原 source identity 和证据。台账中的参考软件状态仅建立有界 host/ARM "
+"证据，不建立 clean candidate、物理验收或全部原始退出条件。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:48
+msgid ""
+"The [G474 contract](stm32g474.md) describes independent EXTI0/PA0 and "
+"EXTI1/PA1 rings, pending-bit acknowledgement, mux/gate ownership and source "
+"withdrawal. Its test Board is an explicit software fixture, with no inferred"
+" connector, button or electrical bias. The [H743 "
+"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32h743/README.md) defines all four HSI 32/64 MHz and Cache "
+"off/on combinations. Fixed cold profile selection does not implement a "
+"running frequency transition."
+msgstr ""
+"[G474 合同](stm32g474.md)定义独立 EXTI0/PA0 和 EXTI1/PA1 ring、pending ACK、mux/gate "
+"ownership 和源撤离。测试 Board 是显式软件 fixture，不推测连接器、按钮或电气偏置。[H743 "
+"合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32h743/README.md)定义 HSI 32/64 MHz 与 Cache 关/开的四种组合。固定 cold "
+"profile 选择不实现运行中频率切换。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:55
+msgid ""
+"H743 USART3 DMA TX owns DMA1 Stream0, DMAMUX1 Channel0 request 46 and its "
+"separate vector; RX remains IRQ bytes. Cache-on buffers occupy exclusively "
+"owned complete 32-byte lines in selected AXI SRAM, with no outward rounding "
+"or hidden bounce buffer. Cache cleaning follows borrow admission, runs "
+"outside the long interrupt mask, and cannot settle storage while preparation"
+" is active. DMA completion, wire TC and source withdrawal remain distinct. "
+"Failed withdrawal quarantines the loan; the provider must drain before cache"
+" and timer shutdown."
+msgstr ""
+"H743 USART3 DMA TX 独占 DMA1 Stream0、DMAMUX1 Channel0 request 46 与独立 vector，RX"
+" 保持 IRQ bytes。Cache-on buffer 必须独占选定 AXI SRAM 中完整的 32-byte cache "
+"line，不向外取整或使用隐藏 bounce buffer。Cache clean 在 borrow admission 后、长 IRQ mask "
+"之外执行；准备未结束不能结清存储。DMA completion、wire TC 和源撤离彼此独立。撤离失败保留 QUARANTINED 借用；关闭 "
+"cache 和 timer 前 provider 必须排空。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:63
+msgid ""
+"The [U575 dual-world contract](u575-trustzone-contract.md) is an independent"
+" no-OS integration fixture. Its cold owner observes provisioned option "
+"bytes, checks actual physical permissions, clears future shared RAM, then "
+"configures and seals attribution. A real SG gateway authenticates the NS "
+"world rather than an untrusted task identity, checks CMSE permissions and "
+"copies a bounded request through the existing GPIO broker. The layout and "
+"GPIO grant belong to the reference fixture, not to reusable platform policy."
+" No option-byte programming, RTOS isolation, general factory integration or "
+"asynchronous transport is claimed."
+msgstr ""
+"[U575 双域合同](u575-trustzone-contract.md)是独立无 OS fixture。Cold owner 观察已配置 "
+"option bytes，检查实际物理权限，清除未来共享 RAM，再配置并封存 attribution。真实 SG gateway 验证 NS "
+"world 而非不可信 task identity，检查 CMSE 权限并通过现有 GPIO broker 复制有界请求。Layout/GPIO "
+"grant 属于参考 fixture，不属于可复用平台政策。不声明 option-byte 编程、RTOS 隔离、通用 factory 接入或异步 "
+"transport。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:72
+msgid ""
+"Clock bootstrap uses finite poll work bounds before the final clock exists; "
+"polls are not measured elapsed milliseconds. Cleanup must distinguish "
+"remaining recovery obligations from conservative settings allowed to remain."
+" The monotonic timer belongs to one successfully started boot domain, with "
+"an overflow-service limit of 2^32 microseconds. Old deadlines cannot be "
+"carried across stop/restart. NMI/HardFault, paused timers, dynamic PLL "
+"changes and deep STOP require their own exact contract rather than "
+"assumptions from ordinary task execution."
+msgstr ""
+"最终时钟建立前，时钟 bootstrap "
+"使用有限轮询工作量上限；轮询次数不是实测毫秒。清理必须区分尚未完成的恢复义务与允许保留的保守设置。单调定时器属于一次成功启动的 boot "
+"domain，溢出维护间隔上限为 2^32 微秒。旧 deadline 不能跨 stop/restart "
+"使用。NMI/HardFault、暂停的定时器、动态 PLL 变更和深 STOP 必须各有精确合同，不能从普通任务执行推导。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:80
+msgid ""
+"Cold admission rejects observable foreign selected owners before global "
+"clock mutation. Generated pin admission observes all required GPIO gates and"
+" validates all selected pin modes and locks before capturing or changing any"
+" pin. This includes controller routes and hidden endpoint CS pins; an "
+"unrelated shared-bank pin does not become owned. An initialization failure "
+"includes its partially initialized object in reverse cleanup. Failed "
+"readback preserves exactly the remaining cleanup responsibility instead of "
+"returning a successful release."
+msgstr ""
+"Cold admission 在全局时钟变化前拒绝可观察的外来 selected owner。生成的 pin admission 观察所需 GPIO "
+"gate，并在捕获/修改任意 pin 前验证全部选定 pin mode/lock，包括控制器 route 和隐藏 endpoint CS。共享 bank"
+" 中无关 pin 不因此成为自有。初始化失败将部分初始化对象纳入逆序 cleanup；readback 失败保留准确剩余责任，不返回成功释放。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:88
+msgid ""
+"The timer start transaction clears stale UIF, observes a fresh UG update, "
+"clears that flag and verifies CNT before publishing the epoch. Runtime "
+"overflow advances the epoch only after acknowledged UIF. A refused ACK "
+"invalidates public time, records the private timer fault and attempts finite"
+" source/clocked-counter/NVIC withdrawal. This loss of the deadline domain is"
+" always terminal, including successful source isolation: the CPU preserves a"
+" terminal interrupt mask, invokes the existing bounded fault observer and "
+"parks if that observer returns. No invalid zero timestamp resumes a deadline"
+" consumer, and no request or low-power loan is released. Products may "
+"provide separately reviewed non-returning recovery. Ordinary stop/restart "
+"and cleanup retry belong to normal lifecycle control; they do not resume "
+"this terminal path. A snapshot rechecks epoch validity under the same saved "
+"interrupt mask used to read both counter words."
+msgstr ""
+"Timer start transaction 清除 stale UIF，观察新 UG update，清除标志并确认 CNT 后才发布 "
+"epoch。运行期 overflow 只在 UIF ACK 成功后推进 epoch。ACK 被拒绝时使公共时间失效，记录私有故障并尝试有限 "
+"source/clocked-counter/NVIC 撤离。Deadline domain 丢失始终是 terminal，即使隔离成功：CPU 保持 "
+"terminal interrupt mask，调用有界 fault observer，observer 返回则停驻。无效零 timestamp "
+"不能恢复 deadline consumer，request/低功耗 loan 不释放。产品可以提供另经审查的不返回恢复。普通 stop/restart"
+" 或 cleanup retry 不恢复此 terminal 路径。Snapshot 在读取两段 counter 的同一 saved mask 下复查 "
+"epoch validity。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:102
+msgid ""
+"`.noinit` means startup neither copies nor clears those bytes. It does not "
+"prove retention through a particular reset, power event or sleep mode. CPU "
+"reachability, DMA reachability, linker placement and physical retention are "
+"separate facts. Factory access does not initialize or reacquire any of these"
+" resources."
+msgstr ""
+"`.noinit` 表示 startup 既不复制也不清零这些字节，不证明特定 reset、供电事件或 sleep 下的 retention。CPU "
+"可达、DMA 可达、linker placement 和物理 retention 分别是独立事实。Factory 访问不初始化或重新取得任何资源。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:107
+msgid ""
+"IRQ and DMA routines have finite work contracts. The selected execution "
+"owner must continue required service/cancel/drain progress. DMA completion, "
+"wire completion and withdrawal of every request reference precede SETTLED. "
+"Failed withdrawal retains QUARANTINED storage; cancellation is not "
+"permission to reclaim it. Continuous block providers stop on exhausted "
+"replacement storage and never write consumer-owned blocks or invent exact "
+"missed-event counts."
+msgstr ""
+"IRQ 与 DMA 例程具有有限工作量合同。选定执行 owner 必须持续推进所需 service/cancel/drain。DMA "
+"完成、线侧完成和全部请求引用撤离均先于 SETTLED。撤离失败时保留 QUARANTINED "
+"存储；取消不授予回收许可。连续块提供者在替换存储耗尽时停止，绝不写入消费者拥有的块，也不编造精确的漏事件数量。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:114
+msgid ""
+"Public typed I/O contracts belong under `io/include`; cross-chip controller "
+"algorithms have private headers and implementation targets. SoC wrappers own"
+" silicon layout/bit assertions and physical IRQ/DMA/clock bindings. Shared "
+"code placement follows those dependencies. CMake owns source selection, and "
+"resolver facts own configuration identity; moving a file does not create a "
+"second graph."
+msgstr ""
+"公共 typed I/O 合同归 `io/include`；跨芯片 controller algorithm 使用私有头和实现 target。SoC "
+"wrapper 拥有 silicon layout/bit assertion 与实际 IRQ/DMA/clock "
+"binding，共享源码位置由这些依赖决定。CMake 拥有源码选择，resolver facts 拥有配置身份；移动文件不创建第二张依赖图。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:120
+msgid "Implemented correction and optimization"
+msgstr "已实现的修正与优化"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:122
+msgid ""
+"SOC-01–27 retain their original exit conditions. The following groups "
+"identify the implementation, without extending a software result to physical"
+" behavior. Per-item status and evidence entry points remain in the CSV."
+msgstr "SOC-01–27 保留原始退出条件。下面按组定位实现，不把软件结果扩大为物理行为。逐项状态和证据入口仍在 CSV。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "Items"
+msgstr "条目"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "Mechanism and review boundary"
+msgstr "机制与审查边界"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "01–05"
+msgstr "01–05"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Current scope documentation, derived capability consistency, exact-package "
+"GPIO inventory, configuration input closure and versioned primary "
+"source/errata index. The source index is not a complete silicon-revision "
+"workaround qualification."
+msgstr ""
+"当前范围文档、派生能力一致性、精确封装 GPIO inventory、配置输入闭包和版本化 primary source/errata "
+"index。资料索引不等于完整 silicon-revision workaround 资格。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "06–07"
+msgstr "06–07"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Immutable controller and family descriptors unify configuration identities, "
+"provider dispatch and required SDK payload. CMake still exclusively owns "
+"production source dependencies."
+msgstr ""
+"不可变 controller/family descriptor 统一配置身份、provider dispatch 和必需 SDK "
+"payload；CMake 仍独占生产源码依赖。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "08–16"
+msgstr "08–16"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Explicit pre-RAM/post-RAM ownership, foreign-owner rejection, bounded clock "
+"transactions and rollback, observed timer start/ACK, context restrictions "
+"and boot-domain validity."
+msgstr ""
+"显式 pre-RAM/post-RAM ownership、foreign-owner 拒绝、有界 clock "
+"transaction/rollback、timer start/ACK 观测、context 限制与 boot-domain validity。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "17–19"
+msgstr "17–19"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Fixed-profile shallow Sleep/tickless contracts, shared USB48 ownership and "
+"`.noinit` semantics; no implicit deep-STOP or retention guarantee."
+msgstr ""
+"固定 profile shallow Sleep/tickless、共享 USB48 ownership 和 `.noinit` 语义；无隐式深 "
+"STOP/retention 承诺。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "20–22"
+msgstr "20–22"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"G474 UART comparison wrap and one-byte masked reads, selected-line GD EXTI "
+"dispatch, observed EXTI withdrawal and documented IRQ/service/drain work."
+msgstr ""
+"G474 UART 比较回绕和单字节 masked read、选定 GD EXTI line dispatch、实际 EXTI 撤离及 "
+"IRQ/service/drain 工作说明。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "23, 27"
+msgstr "23, 27"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Real ELF/disassembly observation, tool/input receipts and strict comparable-"
+"profile cost review. Flash, static RAM, reserved stack and caller storage "
+"are distinct quantities; instruction counts are not measured cycles."
+msgstr ""
+"真实 ELF/disassembly 观测、工具/输入 receipt 和严格同 profile 成本比较。Flash、静态 RAM、保留 stack "
+"和 caller storage 分开；指令数不是实测 cycles。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "24–25"
+msgstr "24–25"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Explicit F407 CCM placement and GD RAM initializer validation. All "
+"copy/clear spans are validated before the first write; unselected domains "
+"cost no default storage and `.noinit` remains untouched."
+msgstr ""
+"显式 F407 CCM 放置与 GD RAM initializer 校验。首次写入前验证全部 copy/clear "
+"span；未选域无默认成本，`.noinit` 不受修改。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "26"
+msgstr "26"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Public I/O, private cross-chip controller algorithms and SoC SDK assertions "
+"retain their dependency boundaries. No forwarding-only runtime layer or "
+"generic mutable registry is added."
+msgstr ""
+"公共 I/O、私有跨芯片算法与 SoC SDK assertion 保持依赖边界；不增加纯转发 runtime 层或通用可变 registry。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:137
+msgid ""
+"F407 CCM is CPU-only and rejected as a DMA buffer. H743 memory facts "
+"describe DMA1/DMA2, BDMA and MDMA separately. The implemented USART3 DMA1 TX"
+" lane admits selected AXI SRAM only; MDMA reachability to TCM does not "
+"authorize a driver, cache protocol or linker placement. U575 GPDMA/LPDMA "
+"facts do not implement linked-list engines or security-crossing DMA. Its "
+"synchronous CPU gateway does not authorize DMA buffers or asynchronous "
+"storage loans. Legacy `dma` facts and explicit `dma_engines` are alternative"
+" authored forms; contradictory inputs are rejected rather than repaired."
+msgstr ""
+"F407 CCM 仅 CPU 可达，作为 DMA 缓冲区时被拒绝。H743 内存事实分别描述 DMA1/DMA2、BDMA 和 MDMA。已实现的 "
+"USART3 DMA1 TX 路径只接纳选定 AXI SRAM；MDMA 可达 TCM 不授予驱动、缓存协议或链接放置授权。U575 "
+"GPDMA/LPDMA 事实不实现链表引擎或跨安全域 DMA；其同步 CPU 网关不授权 DMA 缓冲区或异步存储借用。旧 `dma` 事实与显式 "
+"`dma_engines` 是二选一的编写形式；矛盾输入直接拒绝，不自动修复。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:146
+msgid ""
+"SDK identity includes reviewed original CMSIS Device files, their licenses, "
+"upstream revisions and the selected family payload. Verification checks "
+"bytes, file sets and observed filesystem identity across its read window. A "
+"successful check is not an atomic filesystem snapshot; actual consumers must"
+" use the same immutable SDK. Independent installed consumers must exercise "
+"the public platform interface without inheriting private vendor include "
+"paths."
+msgstr ""
+"SDK 身份包含复核过的原始 CMSIS Device 文件、许可、上游 revision 和选定 family payload。验证在读取窗口内检查 "
+"bytes、文件集合与 filesystem identity，但不建立原子 filesystem snapshot；真实 consumer "
+"必须使用同一 immutable SDK。独立 installed consumer 使用公共平台接口，不能继承私有 vendor include "
+"路径。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:153
+msgid ""
+"Hot-path observations retain actual ELF bytes, resolved selection, compile "
+"flags, tool identities, resources and complete command receipts. A changed "
+"Board route, CPU/ABI, backend, clock, memory domain or capacity makes a "
+"regression comparison incomparable. Empty-to-selected image growth is "
+"reported as a selection cost, not as an equivalent-profile performance "
+"improvement. Physical cycles, maximum interrupt blackout and worst-case "
+"service intervals remain unmeasured."
+msgstr ""
+"Hot-path 观测保留实际 ELF bytes、resolved selection、flags、工具身份、资源及完整命令 "
+"receipt。Board route、CPU/ABI、backend、clock、memory domain 或 capacity "
+"改变时，回归比较不可比。Empty-to-selected 镜像增长是 selection cost，不是相同 profile 性能改善。物理 "
+"cycles、最大 IRQ blackout 和最坏 service 间隔仍未测量。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:160
+msgid "Physical preparation and execution"
+msgstr "物理准备与执行"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:162
+msgid ""
+"`tools/hil/soc_acceptance.py plan` prepares all nineteen physical "
+"obligations without touching equipment. Each case contains required "
+"hardware, stimulation, raw observations, assertions, safety actions, metric "
+"units, unreviewed null limits and an exit condition. Selection gaps and "
+"unsupported OS cases remain explicit. The result is always "
+"`prepared_unbound` / `not_executed`."
+msgstr ""
+"`tools/hil/soc_acceptance.py plan` 不操作设备即可准备十九项物理义务。每项包含所需硬件、激励、raw "
+"observation、assertion、安全动作、metric unit、未审查的 null limit 和退出条件。Selection "
+"gap/unsupported OS case 保持明确；结果始终为 `prepared_unbound` / `not_executed`。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:168
+msgid ""
+"A real station supplies observed PCB revision, part/UID, probe, supply, "
+"wiring, exact ELF, resolved configuration, recomputed resources and reviewed"
+" workload. Existing `admit.py` establishes that admission. A station-"
+"authored SoC protocol binds one case, selected controller IDs, required "
+"instruments/calibration bytes, stimulation and numeric limits. Invariant "
+"failure counts must remain exactly zero; actual work counts/durations "
+"require a positive reviewed lower bound. Nothing in the repository supplies "
+"product acceptance numbers or fabricates pin wiring."
+msgstr ""
+"真实 station 提供实测 PCB 修订、料号／UID、探针、供电、接线、精确 ELF、已解析配置、重算资源和已审查负载，由现有 "
+"`admit.py` 建立准入。站点编写的 SoC 协议绑定一个用例、选定控制器 "
+"ID、所需仪器／校准字节、激励与数值限制。不变量失败计数必须严格为零；实际工作量和耗时必须具有已审查的正数下限。仓库不提供产品验收数值，也不虚构引脚接线。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:176
+msgid ""
+"`capture` delegates to the maintained acquisition runner. The existing six "
+"operations retain exact tool/input identities, exclusive station ownership, "
+"whole-argument argv without a shell, timeout/output bounds, cleanup and "
+"quarantine. The serial/instrument adapter must receive and content-pin the "
+"SoC protocol and all instrument records. This runner does not implement "
+"automatic waveform, CAN/USB/Ethernet peers or power interruption; station-"
+"owned adapters provide those operations. A successful capture is only "
+"`executed_unqualified`."
+msgstr ""
+"`capture` 委托维护中的采集执行器。既有六种操作保留精确工具／输入身份、站点独占、无 shell 的完整 "
+"argv、超时／输出上限、清理和隔离责任。串口／仪器适配器必须接收并按内容锁定 SoC "
+"协议及全部仪器记录。此执行器不实现自动波形采集、CAN/USB/Ethernet 对端或断电；这些操作由站点适配器提供。成功采集也仅为 "
+"`executed_unqualified`。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:184
+msgid ""
+"`validate` rebuilds unchanged admission and recipe, verifies actual "
+"operation records, protocol, instrument bytes, session, "
+"firmware/configuration, acquisition context, raw observations and sample "
+"files. It derives every result from finite, contiguous nonempty samples "
+"against the reviewed limits. Rehashed opaque protocols, null limits, "
+"missing/failed/skipped operations, stale records, changed bytes and wrong "
+"scopes fail closed. A result qualifies only the named case, selected modes "
+"and recorded conditions; it does not establish WCET, unobserved loads, "
+"certification or product release."
+msgstr ""
+"`validate` 重建未变的 admission/recipe，校验实际 operation、protocol、instrument "
+"bytes、session、firmware/configuration、采集 context、raw observation 与 sample "
+"files。对有限、连续、非空 sample 按已审 limits 派生结果。重新hash的opaque protocol、null "
+"limit、缺失/失败/跳过操作、陈旧记录、字节漂移和错误scope均拒绝。结果仅资格化命名case、selected "
+"mode和记录条件，不建立WCET、未观察负载、认证或产品发布。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:193
+msgid ""
+"Flash power-loss cases additionally require a content-pinned external "
+"product layout. The test region must use the exact part's erase boundaries, "
+"remain within physical Flash, avoid every protected region and avoid all "
+"actual firmware LOAD bytes. The external layout must protect every admitted "
+"firmware LOAD. Products own the region, protected data, power-cut safety and"
+" recovery policy. The platform reserves no default test partition and "
+"performs no destructive action during preparation, validation or commit "
+"checks."
+msgstr ""
+"Flash 断电用例还需要按内容锁定的外部产品布局。测试区域必须使用精确料号的擦除边界，位于物理 Flash 内，避开全部受保护区域和实际固件 LOAD"
+" 字节。外部布局必须保护全部已准入固件 LOAD。区域、受保护数据、断电安全和恢复策略由产品拥有。平台不预留默认测试分区；准备、验证和 commit "
+"检查均不执行破坏性操作。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:201
+msgid "Extension decisions"
+msgstr "扩展决定"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:203
+msgid ""
+"SOC-28–36 keep their original exit conditions. Choosing H743 and U575 "
+"resolves the first non-M4 target decision; it does not complete every "
+"conditional feature."
+msgstr ""
+"SOC-28–36 保留原始退出条件。选择 H743/U575 解决首批非 M4 目标决策，不完成全部conditional feature。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "Item"
+msgstr "条目"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "Delivered subset or remaining implementation"
+msgstr "已交付子集或待实现范围"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "28"
+msgstr "28"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"H743 HSI 32/64 MHz with Cache off/on, plus the U575 MSIS 4 MHz reference. "
+"Other oscillator/PLL/supply profiles and electrical qualification remain "
+"outside the implemented subset."
+msgstr ""
+"H743 HSI 32/64 MHz、Cache 关/开及 U575 MSIS 4 MHz 参考。其他oscillator/PLL/supply "
+"profile和电气资格不在已实现子集。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "29"
+msgstr "29"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"G474 GPIO/LPUART and selected PA0/PA1 EXTI edge events, including generated "
+"ownership and software fixtures. Other peripheral modes and physical edge "
+"acceptance remain open."
+msgstr ""
+"G474 GPIO/LPUART 与选定 PA0/PA1 EXTI 边沿事件，包括生成的所有权和软件夹具。其他外设模式与实板边沿验收仍待完成。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "30"
+msgstr "30"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Exact H743ZI/U575ZIQ inventories and finite routes, plus the G474 EXTI "
+"fixture. Other packages/controllers/routes require their own facts, "
+"ownership, models and budgets; actual Board wiring remains unobserved."
+msgstr ""
+"精确 H743ZI/U575ZIQ inventory与有限route，及G474 EXTI "
+"fixture。其他package/controller/route需要自己的facts、ownership、model和budget；实际Board "
+"wiring仍未观测。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "31"
+msgstr "31"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Selected M7/H743 and M33/U575 startup/time/GPIO/UART and backend references."
+" A complete peripheral set, every OS mode and actual MCU execution are not "
+"established."
+msgstr ""
+"选定 M7/H743 与 M33/U575 startup/time/GPIO/UART/backend参考；不建立完整外设、全部OS "
+"mode或MCU实际执行。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "32"
+msgstr "32"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"H743 fixed cache ownership and finite USART3 DMA1 TX, plus U575 CPU-domain "
+"permission/attribution mechanisms. DMA RX/block streams, other H7 "
+"routes/engines, U5 DMA and security-crossing DMA remain unimplemented; "
+"physical coherency is unverified."
+msgstr ""
+"H743 固定cache ownership与有限USART3 DMA1 TX，及U575 CPU-domain "
+"permission/attribution。DMA RX/block stream、其他H7 route/engine、U5 "
+"DMA和跨安全域DMA未实现；物理coherency未验证。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "33"
+msgstr "33"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Not implemented. Unknown running state is rejected; bootloader-to-platform "
+"clock, IRQ, DMA, cache, RAM and live-owner handoff is absent. The U575 cold "
+"world transition does not implement this feature."
+msgstr ""
+"未实现。拒绝unknown running "
+"state；缺少bootloader→platform的clock、IRQ、DMA、cache、RAM与live-owner handoff。U575 "
+"cold world transition不实现此功能。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "34"
+msgstr "34"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Not implemented. H743's four profiles are cold configurations, with no "
+"running frequency transition, consumer reclocking or deadline-domain "
+"conversion."
+msgstr ""
+"未实现。H743四种profile是cold配置，无running frequency transition、consumer "
+"reclocking或deadline-domain conversion。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "35"
+msgstr "35"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Not implemented. Existing F407/F470 shallow Sleep does not supply a deep-"
+"STOP continuous RTC/LPTIM domain, retention proof or wake restoration."
+msgstr ""
+"未实现。F407/F470 shallow Sleep不提供deep-STOP continuous RTC/LPTIM "
+"domain、retention proof或wake restoration。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid "36"
+msgstr "36"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:0
+msgid ""
+"Partial synchronous U575 reference only: Secure/NS images, cold attribution "
+"owner, single unprivileged NS Thread and copied GPIO gateway. No dual-world "
+"platform factory, NS RTOS, multitask identity, mutable address space, "
+"asynchronous borrow/drain or HIL isolation qualification."
+msgstr ""
+"仅部分同步U575参考：Secure/NS镜像、cold attribution owner、单一非特权NS Thread、复制GPIO "
+"gateway。无双域platform factory、NS RTOS、多任务identity、mutable address "
+"space、异步borrow/drain或HIL isolation资格。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:218
+msgid ""
+"Implementing rejection of an unsupported configuration is a valid defensive "
+"contract; it is not implementation of the rejected feature. Additional "
+"features need exact controller/mode ownership and acceptance evidence before"
+" these ledger entries can close. Current first-release devices retain their "
+"declared fixed profiles."
+msgstr ""
+"拒绝unsupported配置是有效防御合同，但不等于实现被拒feature。关闭台账前，新feature需要精确controller/mode "
+"ownership和验收证据。首发芯片保留已声明fixed profiles。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:224
+msgid ""
+"The remaining software work for SOC-33–35 requires coordinated ownership "
+"rather than another profile label. Running-state handoff needs an exact "
+"outgoing and incoming image/resource contract, validated "
+"stack/vector/FP/IRQ/cache/RAM state, and a reviewed terminal transfer. "
+"External products retain loader authentication, partition and recovery "
+"policy. Dynamic frequency changes need actual consumer quiescence, ordered "
+"electrical changes, bounded rollback, OS timing adaptation and an explicit "
+"continuous time contract. Deep STOP additionally needs an exact RTC/LPTIM "
+"reference, wake/retention admission, elapsed-time reconstruction and "
+"consumer restoration; ordinary shallow-sleep preparation does not establish "
+"it."
+msgstr ""
+"SOC-33–35 剩余软件需要协同ownership，不是再加profile名。运行态handoff需要精确outgoing/incoming "
+"image/resource合同、已验证stack/vector/FP/IRQ/cache/RAM状态和受审terminal "
+"transfer。外部产品仍拥有loader authentication、partition和recovery。动态调频需要consumer "
+"quiescence、有序电气变化、有界rollback、OS timing adaptation和明确continuous time。Deep "
+"STOP额外需要精确RTC/LPTIM参考、wake/retention admission、elapsed-time "
+"reconstruction和consumer restoration；普通shallow准备不能建立这些能力。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:234
+msgid ""
+"SOC-36 still needs a separately reviewed dual-world configuration/factory "
+"path, trusted OS task identity and mutable-map/copy-fault contracts before "
+"general userspace support. Async and DMA extensions must preserve borrow, "
+"cancel, drain and final-publication rules across the security boundary. "
+"These are additional mechanisms, not consequences of the current synchronous"
+" GPIO reference."
+msgstr ""
+"SOC-36 要形成通用userspace支持，仍需独立审查的双域configuration/factory、可信OS task "
+"identity及mutable-map/copy-"
+"fault合同。Async/DMA扩展必须跨安全边界保留borrow/cancel/drain/final-"
+"publication规则；这些是新机制，不由当前同步GPIO参考自动产生。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/soc-refinement.md:240
+msgid ""
+"Physical equipment is currently disconnected. SOC-37–55 have executable "
+"tooling and station-binding obligations; their physical exit status remains "
+"`not_executed`. See [HIL authoring and commands](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/hil/README.md)."
+msgstr ""
+"当前设备未连接。SOC-37–55 有可执行工装和station绑定义务，物理退出状态仍为 "
+"`not_executed`。见[HIL编写与命令](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tools/hil/README.md)。"

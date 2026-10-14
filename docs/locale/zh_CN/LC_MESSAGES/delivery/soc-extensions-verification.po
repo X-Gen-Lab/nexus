@@ -1,0 +1,607 @@
+# Authored translation; independent semantic review pending.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 4d3bbec0277cd76f2a2b07982edaf684c891f51e7f8dba8a197b9c63233e49db\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:1
+msgid "SoC extension verification"
+msgstr "SoC 扩展验证"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:3
+msgid ""
+"This record continues the [earlier SoC baseline](soc-refinement-"
+"verification.md). The {download}`55-item ledger <../design/soc-refinement-"
+"execution.csv>` retains its original exit conditions. Implemented software, "
+"executed software evidence and physical acceptance are separate states. "
+"Hardware is not connected; every physical result remains `not_executed`."
+msgstr ""
+"本记录延续[较早 SoC 基线](soc-refinement-verification.md)。{download}`55 项台账 "
+"<../design/soc-refinement-execution.csv>` "
+"保留原始退出条件。已实现软件、实际软件证据和物理验收为不同状态。硬件未连接，全部物理结果保持 `not_executed`。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:9
+msgid ""
+"The qualified software source is commit "
+"`98270512ea2ff7eefe8ff79720018e582be3a949`, tree "
+"`8d3e69d3179d7b0d2382c5fd074c970dfc9348d9`. All formal runs use the clean "
+"canonical checkout and verify unchanged source inputs. Later documentation "
+"commits record this source; they do not claim a new software execution."
+msgstr ""
+"已资格化软件源码为 commit `98270512ea2ff7eefe8ff79720018e582be3a949`，tree "
+"`8d3e69d3179d7b0d2382c5fd074c970dfc9348d9`。所有正式执行使用干净 canonical "
+"checkout，并核对源码输入未变。后续文档提交记录该源码，不声称重新执行软件。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:15
+msgid "Executed software verification"
+msgstr "实际软件验证"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Scope"
+msgstr "范围"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Complete observed execution"
+msgstr "完整观察执行"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Native"
+msgstr "Native"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"199 CTest entries; 177 GoogleTest/GoogleMock programs, 3252 cases; no "
+"failures or skips"
+msgstr "199 项 CTest；177 个 GoogleTest／GoogleMock 程序、3252 个用例；零失败、零跳过"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Configuration and tools"
+msgstr "配置与工具"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"458 configuration, 585 tooling and 351 CI-tool tests; complete discovery and"
+" execution"
+msgstr "458 个配置、585 个工具、351 个 CI 工具测试；完整发现与执行"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "ARM platform matrix"
+msgstr "ARM 平台矩阵"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"121 linked images, including all 105 provider assemblies; six expected "
+"rejection cases"
+msgstr "121 个链接镜像，含全部 105 个 provider 装配；六个预期拒绝用例"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Cortex-M runtime"
+msgstr "Cortex-M runtime"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "104 runtime variants and 4359 actual ARM objects"
+msgstr "104 个 runtime 变体、4359 个实际 ARM 对象"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Cache and dual-world reference"
+msgstr "Cache 与双世界参考"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"12 cache compile profiles; actual U575 paired images and 15 mutation checks"
+msgstr "12 个 cache 编译 profile；实际 U575 配对镜像和 15 个 mutation 检查"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Arch/startup tools"
+msgstr "Arch／启动工具"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"133 tests across seven complete modules; includes the 15 paired-image "
+"mutations above"
+msgstr "七个完整模块共 133 个测试；包含上述 15 个配对镜像 mutation"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Source SDK"
+msgstr "源码 SDK"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"59 boundary tests, 258 actual child commands, 13 ARM consumers and their "
+"maps; negative commands retain their expected nonzero exits"
+msgstr "59 个边界测试、258 条实际子命令、13 个 ARM consumer 及其 map；负路径保留预期非零返回码"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Static analysis"
+msgstr "静态分析"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"Cppcheck 2.13 and clang-tidy 14 each checked all 358 owned translation units"
+msgstr "Cppcheck 2.13 与 clang-tidy 14 分别检查全部 358 个自有 translation unit"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "External examples"
+msgstr "外部示例"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"Code `3de8523811b00da8bd887abf53e61eedbaf5161e`, pinned to this SDK: 8 "
+"CTests, 43 Google cases, 44 tool tests and 20 ARM images; ten unbound HIL "
+"plans"
+msgstr ""
+"代码 `3de8523811b00da8bd887abf53e61eedbaf5161e` pin 至本 SDK：8 个 CTest、43 个 "
+"Google 用例、44 个工具测试、20 个 ARM 镜像；十个未绑定 HIL 计划"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:29
+msgid ""
+"These scopes overlap and must not be added into a unique-test total. The "
+"source SDK tests intentionally create a nonpublishable development fixture "
+"to exercise failure boundaries. The separately packaged clean SDK requires "
+"its own actual verification before candidate sealing."
+msgstr ""
+"这些范围存在重叠，不得相加为独立测试总数。Source SDK 测试有意创建不可发布开发夹具，以执行失败边界。独立打包的干净 SDK "
+"在候选封存前需另行实际校验。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:34
+msgid ""
+"[GitHub CI run 38256744920](https://github.com/X-Gen-"
+"Lab/nexus/actions/runs/38256744920) completed successfully for this exact "
+"source: 29 successful jobs and one normal branch-conditioned documentation "
+"deployment skip. Debug, Release, ASan/UBSan and TSan each executed all 199 "
+"CTest entries and 3252 Google cases. The artifact catalog is an API "
+"observation; it is not a claim that every remote archive was downloaded and "
+"independently checked."
+msgstr ""
+"[GitHub CI run 38256744920](https://github.com/X-Gen-"
+"Lab/nexus/actions/runs/38256744920) 针对精确源码成功完成：29 个成功 "
+"job，一次普通分支条件文档部署跳过。Debug、Release、ASan／UBSan、TSan 分别执行全部 199 个 CTest 和 3252 个"
+" Google 用例。产物目录是 API 观察，不声称已下载并独立校验所有远程归档。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:41
+msgid ""
+"Eight unsigned software candidates passed sealing and the platform's "
+"complete packed verification. Each has all six required qualification scopes"
+" bound to its actual run-a ELF and configuration. Sixteen independent builds"
+" used 32 network-disabled container commands; all eight ELF/BIN pairs are "
+"byte-identical. Both maps and original raw logs are retained. The "
+"{download}`source-bound result index <soc-extensions-results.json>` records "
+"the precise candidate identities, independent review and durable archive "
+"references."
+msgstr ""
+"八个无签名软件候选通过封存及平台完整打包校验；每个候选的六类必需资格均绑定实际 run-a ELF 和配置。十六次独立构建使用 32 "
+"条断网容器命令，八组 ELF／BIN 对均逐字节一致。两份 map 和原始日志全部保留。{download}`源码绑定结果索引 <soc-"
+"extensions-results.json>` 记录精确候选身份、独立审查和持久归档引用。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:49
+msgid ""
+"The final closure check found 102 report references to cleaned SDK fixture "
+"paths. Their 1,871,287 bytes were restored only from already retained, hash-"
+"identical artifacts. Original reports and qualifications were not rewritten;"
+" the first failed closure check remains recorded. All eight complete "
+"closures subsequently passed the original validator. The archived Native "
+"executables and test sources also remain available for audit. Native binary "
+"hashes are explicitly bound at archive time, rather than presented as "
+"invented execution-time signatures."
+msgstr ""
+"最终闭包检查发现 102 个报告引用指向已清理 SDK 夹具路径。仅从已保留、摘要相同的产物恢复 1,871,287 "
+"bytes；原始报告和资格没有重写，首次闭包失败仍保留。八个完整闭包随后通过原始检查器。归档 Native 可执行文件和测试源码也可审计；Native "
+"binary 摘要明确在归档时绑定，不冒充执行时签名。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:57
+msgid "Exact candidate image costs"
+msgstr "精确候选镜像成本"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:59
+msgid ""
+"These are the recorded GNU Arm 14.3.rel1 reference images, measured from the"
+" linked ELF and configuration. RAM below includes the 2048-byte MSP "
+"reservation; all eight images reserve zero libc heap. These values describe "
+"the selected reference firmware, not a product workload, runtime stack high-"
+"water, interrupt latency or WCET. The result index retains loaded Flash "
+"bytes, address footprint, per-domain RAM and the original budget reports "
+"separately."
+msgstr ""
+"以下为 GNU Arm 14.3.rel1 参考镜像记录，测量来自实际链接 ELF 和配置。RAM 包含 2048-byte MSP 预留，八个镜像的 "
+"libc heap 均为零。这些值描述所选参考固件，不是产品负载、运行栈峰值、中断延迟或 WCET。结果索引分别保留 Flash "
+"LOAD、地址跨度、各域 RAM 和原始预算报告。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Candidate"
+msgstr "候选"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Flash address footprint (bytes)"
+msgstr "Flash 地址跨度（bytes）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Reserved RAM including MSP (bytes)"
+msgstr "含 MSP 的预留 RAM（bytes）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "h743-baremetal-empty"
+msgstr "h743-baremetal-empty"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "2440"
+msgstr "2440"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "2104"
+msgstr "2104"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "h743-baremetal-uart"
+msgstr "h743-baremetal-uart"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "8708"
+msgstr "8708"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "2360"
+msgstr "2360"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "h743-freertos-empty"
+msgstr "h743-freertos-empty"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "4828"
+msgstr "4828"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "3032"
+msgstr "3032"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "h743-freertos-uart"
+msgstr "h743-freertos-uart"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "11100"
+msgstr "11100"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "3284"
+msgstr "3284"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "u575-baremetal-empty"
+msgstr "u575-baremetal-empty"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "2124"
+msgstr "2124"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "2112"
+msgstr "2112"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "u575-baremetal-uart"
+msgstr "u575-baremetal-uart"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "8364"
+msgstr "8364"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "2368"
+msgstr "2368"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "u575-freertos-empty"
+msgstr "u575-freertos-empty"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "4548"
+msgstr "4548"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "3040"
+msgstr "3040"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "u575-freertos-uart"
+msgstr "u575-freertos-uart"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "10804"
+msgstr "10804"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "3292"
+msgstr "3292"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:77
+msgid "Implemented scope"
+msgstr "已实现范围"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Layer"
+msgstr "层"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Added behavior"
+msgstr "新增行为"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Exact boundary"
+msgstr "精确边界"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Arch"
+msgstr "Arch"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Caller-owned Cortex-M7 cache transition control"
+msgstr "调用者拥有的 Cortex-M7 Cache 转换控制"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"Cold privileged entry, verified cache geometry, explicit ownership and "
+"bounded cleanup; other cores reject this particular control operation"
+msgstr "冷态特权入口、已核验 Cache 几何、显式所有权和有界清理；其他内核拒绝此控制操作"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Cortex-M33 NonSecure range permission observation"
+msgstr "Cortex-M33 NonSecure 范围权限观察"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"Real CMSE check; observation does not pin storage, copy data or authorize "
+"arbitrary peripherals"
+msgstr "真实 CMSE 检查；观察不 pin 存储、不复制数据、不授权任意外设"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "G474"
+msgstr "G474"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Static EXTI event providers"
+msgstr "静态 EXTI 事件提供者"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"Two selected software-fixture lines, bounded rings, pending-bit isolation, "
+"overflow order and retained cleanup; PCB routing and electrical behavior "
+"remain unqualified"
+msgstr "两条选定软件夹具 line、有界 ring、pending-bit 隔离、溢出顺序和保留清理；PCB 接线及电气未资格化"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "H743"
+msgstr "H743"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Fixed HSI32/HSI64 startup with cache selection"
+msgstr "固定 HSI32／HSI64 启动并选择 Cache"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"Four cold profiles; independent divider, timer and cache ownership; this is "
+"not runtime frequency switching"
+msgstr "四个冷 profile；独立 divider、timer、Cache 所有权；并非运行中变频"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "USART3 finite TX using DMA1/DMAMUX"
+msgstr "USART3 经 DMA1／DMAMUX 有限 TX"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"AXI SRAM only; explicit buffer borrow, wire completion, cancellation and "
+"quarantine; RX remains IRQ byte mode"
+msgstr "仅 AXI SRAM；显式 buffer 借用、线上完成、取消和隔离；RX 保持 IRQ bytes"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "U575"
+msgstr "U575"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Exact Secure/NonSecure software reference"
+msgstr "精确 Secure／NonSecure 软件参考"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"Fixed Flash/RAM attribution, restricted NonSecure MPU, actual CMSE gateway, "
+"synchronous bounded broker and real paired images"
+msgstr "固定 Flash／RAM 归属、受限 NonSecure MPU、真实 CMSE gateway、同步有界 broker 和实际配对镜像"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "SDK"
+msgstr "SDK"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Required private implementation closure"
+msgstr "必需私有实现闭包"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"Deleting a required source/header and recalculating the manifest still fails"
+" validation"
+msgstr "删除必需源码／头后重新计算 manifest 仍无法通过校验"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Automation"
+msgstr "自动化"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid "Complete dependency initialization and compiler context"
+msgstr "完整依赖初始化与编译器上下文"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:0
+msgid ""
+"SDK dependencies come from declared locks; static analysis must preserve the"
+" actual translation unit's defines and forced includes"
+msgstr ""
+"SDK 依赖来自声明 lock；静态分析必须保留实际 translation unit 的 defines 和 forced includes"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:90
+msgid ""
+"The public device architecture remains static typed factory plus immutable "
+"polymorphic interfaces. Factory lookup does not allocate, start hardware or "
+"take a lock. New modes extend selected private providers and configuration "
+"facts; they do not add a runtime registry, implicit worker or mandatory OS "
+"layer."
+msgstr ""
+"公共设备架构仍为静态类型化工厂与不可变多态接口。Factory 获取不分配、不启动硬件、不加锁。新模式扩展选中的私有 provider "
+"和配置事实，不增加运行时 registry、隐式 worker 或必需 OS 层。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:95
+msgid ""
+"H743 DMA borrows request and payload storage until acquire-observed SETTLED."
+" Cache-enabled transfers require the caller to own complete aligned cache "
+"lines; the provider does not round maintenance outward into neighboring "
+"allocations or allocate a bounce buffer. Cancellation and timeout do not "
+"revoke the borrow. Failure to withdraw hardware references retains storage "
+"in quarantine."
+msgstr ""
+"H743 DMA 借用 request 和 payload 到 acquire-observed SETTLED。启用 Cache "
+"时，调用者须独占完整对齐 cache line；provider 不向外取整触及相邻分配，也不分配 bounce "
+"buffer。取消和超时不撤销借用，无法撤回硬件引用时保留隔离中的存储。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:101
+msgid ""
+"The U575 reference admits a fixed TZEN=1 boot profile and an immutable "
+"unprivileged NonSecure thread without NonSecure interrupts, an RTOS or "
+"concurrent DMA. It clears and verifies future NonSecure RAM before changing "
+"attribution, checks final protection state, and enters through the actual "
+"compiler CMSE sequence. Its synchronous gateway copies bounded input and "
+"checks output before publication. This does not implement general "
+"asynchronous cross-domain loans, arbitrary userspace tasks, product "
+"authentication or secure update policy. See the [complete "
+"contract](../design/u575-trustzone-contract.md)."
+msgstr ""
+"U575 参考只接纳固定 TZEN=1 boot profile 和不可变的非特权 NonSecure Thread，没有 NS 中断、RTOS 或并发"
+" DMA。改变归属前先清零并验证未来 NS RAM，再检查最终保护状态，经实际编译器 CMSE 序列进入。同步 gateway "
+"复制有界输入并在发布前检查输出。它不实现通用异步跨域借用、任意 userspace "
+"任务、产品认证或安全升级。见[完整合同](../design/u575-trustzone-contract.md)。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:110
+msgid "Evidence rules"
+msgstr "证据规则"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:112
+msgid ""
+"Normal commit hooks execute the complete GoogleTest/GoogleMock, "
+"configuration and tool suites for behavioral changes. Formal qualification "
+"additionally binds a clean canonical commit and tree, actual compiler "
+"inputs, raw command output, configuration and linked artifacts. Failed "
+"attempts remain failed evidence; changing the source requires new source-"
+"bound execution."
+msgstr ""
+"行为变更的普通 commit hooks 执行完整 GoogleTest／GoogleMock、配置和工具测试。正式资格另外绑定干净 canonical"
+" commit/tree、实际 compiler 输入、原始命令输出、配置和链接产物。失败尝试保留为失败；源码改变后需要新的源码绑定执行。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:118
+msgid ""
+"The verification work exposed missing generated-header input in the H743 ARM"
+" startup test, a fixed virtual-environment path in CPU configuration tests, "
+"an uncontrolled scheduling assumption in a serial-noise test, and lost "
+"forced-include context in static analysis. Sanitizer jobs also exposed "
+"register-mask width conversions in host models and signal-dependent "
+"termination observers. Their regressions retain the actual compiler warnings"
+" and production nonreturning loops; test observers must work without a "
+"signal-delivery point inside those loops. U575 production clock and MPU "
+"masks also required explicit 32-bit operands before bit operations for GCC "
+"13 on the LP64 sanitizer host. The independent comparison found identical "
+"allocated ARM sections for the tested old/new translation units after "
+"normalizing `__FILE__`; this is a scoped code and storage comparison, not "
+"measured cycles or a promise for every compiler. Regression evidence and "
+"final execution status belong with the delivery index. No suppression or "
+"skipped test can substitute for closing these findings."
+msgstr ""
+"验证发现 H743 ARM 启动测试缺少生成头输入、CPU 配置测试固定虚拟环境路径、串口噪声测试不受控调度假设，以及静态分析丢失 forced-"
+"include 上下文。Sanitizer 还发现主机模型寄存器 mask "
+"宽度转换和依赖信号的终止观察者。回归保留真实编译器警告和生产非返回循环；观察者必须不依赖循环中的信号投递点。GCC 13／LP64 sanitizer "
+"主机还要求 U575 生产时钟和 MPU mask 在位操作前明确 32-bit operand。独立比较在归一化 `__FILE__` "
+"后发现被测旧／新 translation unit 的 ARM 已分配 section 相同；这是限定范围的代码和存储比较，不是实测 cycles "
+"或所有编译器保证。回归及最终状态归入交付索引，关闭这些问题不能用 suppression 或跳过测试替代。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:133
+msgid ""
+"Offline candidates cover the eight maintained public H743/U575 combinations "
+"of empty/IRQ-UART assemblies and baremetal/FreeRTOS. Each requires two "
+"fresh, network-disabled builds and comparison of actual ELF/BIN bytes, with "
+"both maps and raw logs retained. The H743 cache/DMA test fixtures and U575 "
+"paired-image reference have their own ARM evidence; they are outside those "
+"eight single-image candidate configurations. An unsigned software candidate "
+"is not a product release or physical qualification."
+msgstr ""
+"离线候选覆盖 H743／U575 维护中的八个公开组合：empty／IRQ-UART 与裸机／FreeRTOS。各自要求两次全新断网构建和实际 "
+"ELF／BIN 字节比较，并保留两份 map 及日志。H743 cache／DMA 夹具和 U575 配对参考具有各自 ARM "
+"证据，不属于八个单镜像候选。无签名软件候选不是产品发布或物理资格。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:141
+msgid "Durable evidence"
+msgstr "持久证据"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:143
+msgid ""
+"The local archive is `/workspace/nexus-soc-delivery-98270512/platform-"
+"evidence.tar.gz`: 1,269,027,807 bytes, SHA-256 "
+"`3aae3a6b96701ce1a042cb4e43078d00d59ba5460ebc4816fa68e2fe4a8fe41c`. Its "
+"embedded `delivery-manifest.json` and external manifest describe 216,230 "
+"entries, including 173,376 regular files. Original raw paths and record "
+"bytes remain unchanged. Resolve the recorded final execution root beneath "
+"`platform/`; additional roots and nested Native/source archives have "
+"explicit member maps. The result index binds the archive, manifests and "
+"verification receipts. An independent streaming review checked every outer "
+"member, all eight candidate payload closures, the three nested Native/source"
+" archives and the exact source identities from the retained archive bytes; "
+"no full unpack or original-root fallback was used."
+msgstr ""
+"本地归档为 `/workspace/nexus-soc-delivery-98270512/platform-"
+"evidence.tar.gz`：1,269,027,807 bytes，SHA-256 "
+"`3aae3a6b96701ce1a042cb4e43078d00d59ba5460ebc4816fa68e2fe4a8fe41c`。内嵌 "
+"`delivery-manifest.json` 和外部清单描述 216,230 项，含 173,376 个普通文件。原始 raw path "
+"和记录字节不变。在 `platform/` 下解析最终执行根；其他根和嵌套 Native／source "
+"归档有显式成员映射。结果索引绑定归档、清单和校验回执。独立流式审查从保留归档字节检查每个外层成员、八个候选 payload 闭包、三个嵌套 "
+"Native／source 归档及精确源码身份，没有完整解包或原始根回退。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:157
+msgid ""
+"All eight candidates also passed actual verification after copying to "
+"separate fresh directories while access to original evidence, SDK, OCI and "
+"ARM tool roots was denied. Original-path read attempts were zero. This "
+"verifies their packed evidence closure; rebuilding still requires provision "
+"of the recorded external OCI image and GNU Arm toolchain, whose binaries are"
+" not embedded. The local archive is not a published GitHub Release asset or "
+"a signed product release."
+msgstr ""
+"将八个候选复制到独立全新目录并禁止访问原始 evidence、SDK、OCI、ARM "
+"工具根后，均实际通过校验，原始路径读取尝试为零。这验证打包证据闭包；重建仍需提供记录的外部 OCI 和 GNU Arm "
+"工具链，二进制未嵌入。此本地归档不是已发布 GitHub Release asset 或已签名产品发布。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:164
+msgid "Remaining acceptance"
+msgstr "剩余验收"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:166
+msgid ""
+"SOC-28 through SOC-32 and SOC-36 are exact partial references. Their "
+"original hardware, peripheral and isolation exits remain open. SOC-33 "
+"bootloader/running state handoff, SOC-34 dynamic frequency changes and "
+"SOC-35 deep STOP with continuous time are not implemented. SOC-37 through "
+"SOC-55 provide station, admission, capture and result-validation tooling; "
+"physical execution remains pending equipment."
+msgstr ""
+"SOC-28 至 SOC-32 和 SOC-36 是精确的部分参考，原始硬件、外设、隔离退出条件保持开放。SOC-33 "
+"bootloader／运行态交接、SOC-34 动态变频、SOC-35 连续计时 deep STOP 未实现。SOC-37 至 SOC-55 提供 "
+"station、准入、采集和结果校验工具；物理执行等待设备。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:173
+msgid ""
+"Fixed clock profiles do not establish DVFS. Ordinary WFI or tickless idle "
+"does not establish deep STOP. Host models and linked ARM images do not "
+"establish electrical behavior, DMA/cache coherence on silicon, TrustZone "
+"isolation, interrupt latency, measured power or WCET. Applications, PCB-"
+"specific policies and recovery decisions remain in external projects."
+msgstr ""
+"固定时钟不建立 DVFS，普通 WFI／tickless idle 不建立 deep STOP。主机模型和链接 ARM 镜像不建立电气、硅片 "
+"DMA／cache 一致性、TrustZone 隔离、中断延迟、实测功耗或 WCET。应用、PCB 专有政策与恢复由外部工程负责。"

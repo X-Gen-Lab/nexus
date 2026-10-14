@@ -12,6 +12,9 @@ qualified build tuple is Linux x86_64 with CPython 3.12. The local preparation
 uses CPython 3.12.14; CI selects the same patch version. Documentation tool
 qualification does not grant firmware, hardware or product qualification.
 
+First prepare the [fixed source and recursive dependencies](../guides/source-checkout.md).
+The manifest and tool lock must come from the same selected source revision.
+
 ## The authoritative closure
 
 `dependencies/docs-tools.lock.json` owns archive identities, target constraints,

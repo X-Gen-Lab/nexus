@@ -46,10 +46,11 @@ queues and observers actually withdraw their references.
 
 The exact implementations and configured limits remain authoritative:
 
-- UART: `soc/*/drivers/uart*.c`; G474, H743 and U575 are IRQ bytes only. The F407,
-  G474, H743 and U575 wire-drain allowance is `20000000 / baud + 100`
-  microseconds. GD IRQ uses its
-  reviewed reset-abort protocol; it is not assigned the ST wire-drain formula.
+- UART: `soc/*/drivers/uart*.c`; G474 and U575 use IRQ bytes. H743 RX also uses
+  IRQ bytes; its explicitly selected finite TX DMA has a separate memory/Cache
+  and drain contract. The F407, G474, H743 and U575 wire-drain allowance is
+  `20000000 / baud + 100` microseconds. GD IRQ uses its reviewed reset-abort
+  protocol; it is not assigned the ST wire-drain formula.
 - SPI: `soc/*/drivers/spi*.c`; the finite DMA drain allowance is 200 microseconds.
 - I2C: `soc/common/i2c_v1_async.c` and the SoC wrappers; V1 async drain allowance
   is 1,000 microseconds. Polling STOP has separate finite work.

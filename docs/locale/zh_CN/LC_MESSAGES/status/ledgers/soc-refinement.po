@@ -1,0 +1,1031 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: e64ef491c1ef0475361cc617219312f750f7c17b0a6aab74bfe541f7b3d41d6a\n"
+
+msgid "SoC 原专项台账"
+msgstr "SoC 原专项台账"
+
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/soc-refinement-execution.csv>`。 源文件：`docs/design/soc-"
+"refinement-"
+"execution.csv`；SHA-256：`03add7405a9c459686bb0b6af326a56c4148b55a37202fb9bfd221bc9bcd6725`。"
+msgstr ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/soc-refinement-execution.csv>`。 源文件：`docs/design/soc-"
+"refinement-"
+"execution.csv`；SHA-256：`03add7405a9c459686bb0b6af326a56c4148b55a37202fb9bfd221bc9bcd6725`。"
+
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+
+msgid "本表包含 55 条原记录，仅表示来源行数。"
+msgstr "本表包含 55 条原记录，仅表示来源行数。"
+
+msgid "SOC-01"
+msgstr "SOC-01"
+
+msgid "原字段"
+msgstr "原字段"
+
+msgid "原值"
+msgstr "原值"
+
+msgid "`task_id`"
+msgstr "`task_id`"
+
+msgid "`priority`"
+msgstr "`priority`"
+
+msgid "P0"
+msgstr "P0"
+
+msgid "`scope`"
+msgstr "`scope`"
+
+msgid "revision"
+msgstr "revision"
+
+msgid "`task`"
+msgstr "`task`"
+
+msgid "Current SoC documentation"
+msgstr "当前 SoC 文档"
+
+msgid "`implementation_status`"
+msgstr "`implementation_status`"
+
+msgid "documentation_updated"
+msgstr "documentation_updated"
+
+msgid "`software_status`"
+msgstr "`software_status`"
+
+msgid "qualification_record_authority"
+msgstr "qualification_record_authority"
+
+msgid "`hardware_status`"
+msgstr "`hardware_status`"
+
+msgid "not_applicable"
+msgstr "not_applicable"
+
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+msgid ""
+"soc/stm32f407/README.md;soc/gd32f470/README.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tools/configure/README.md"
+msgstr ""
+"soc/stm32f407/README.md;soc/gd32f470/README.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tools/configure/README.md"
+
+msgid "`evidence_paths`"
+msgstr "`evidence_paths`"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/soc-refinement.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/soc-refinement.md"
+
+msgid "`exit_condition`"
+msgstr "`exit_condition`"
+
+msgid "SoC configure README match maintained modes and ownership"
+msgstr "SoC、configure 与 README 符合维护模式和所有权"
+
+msgid "`owner`"
+msgstr "`owner`"
+
+msgid "codex"
+msgstr "codex"
+
+msgid "SOC-02"
+msgstr "SOC-02"
+
+msgid "P1"
+msgstr "P1"
+
+msgid "automation"
+msgstr "automation"
+
+msgid "Capability declaration consistency"
+msgstr "能力声明一致"
+
+msgid "implemented"
+msgstr "implemented"
+
+msgid "tools/maintenance/capabilities.py"
+msgstr "tools/maintenance/capabilities.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/maintenance/capabilities.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/maintenance/capabilities.py"
+
+msgid ""
+"Facts routes constructors source and fixtures agree without claiming PCB "
+"qualification"
+msgstr "事实、路由、constructor、源码与夹具一致，不宣称 PCB 资格"
+
+msgid "SOC-03"
+msgstr "SOC-03"
+
+msgid "Exact package pin inventory"
+msgstr "精确封装引脚清单"
+
+msgid "soc;tools/configure/configure.py;tools/configure/fact_references.py"
+msgstr "soc;tools/configure/configure.py;tools/configure/fact_references.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_physical_facts.py;tools/configure/test_soc_facts.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_physical_facts.py;tools/configure/test_soc_facts.py"
+
+msgid "Every route validated against complete exact-part GPIO inventory"
+msgstr "每条路由按精确料号的完整 GPIO 清单验证"
+
+msgid "SOC-04"
+msgstr "SOC-04"
+
+msgid "GD SDK configuration input closure"
+msgstr "GD SDK 配置输入闭包"
+
+msgid ""
+"tools/configure/configure.py;vendors/gigadevice/gd32f4xx/source.lock.json"
+msgstr ""
+"tools/configure/configure.py;vendors/gigadevice/gd32f4xx/source.lock.json"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_configure.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_configure.py"
+
+msgid ""
+"GD source lock identity participates in resolved digest and import "
+"verification"
+msgstr "GD 源码锁身份参与 resolved 摘要与导入验证"
+
+msgid "SOC-05"
+msgstr "SOC-05"
+
+msgid "maintenance"
+msgstr "maintenance"
+
+msgid "Datasheet and errata provenance"
+msgstr "datasheet 与 errata 来源记录"
+
+msgid "source_index_implemented"
+msgstr "source_index_implemented"
+
+msgid "source_reviewed_applicability_pending"
+msgstr "source_reviewed_applicability_pending"
+
+msgid "soc;tools/configure/fact_references.py"
+msgstr "soc;tools/configure/fact_references.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_fact_references.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_fact_references.py"
+
+msgid ""
+"Flash RAM pin DMA IRQ clock facts retain source versions and silicon-review "
+"boundaries"
+msgstr "Flash、RAM、pin、DMA、IRQ、clock 事实保留来源版本与硅片审查边界"
+
+msgid "SOC-06"
+msgstr "SOC-06"
+
+msgid "optimization"
+msgstr "optimization"
+
+msgid "Immutable hardware binding descriptors"
+msgstr "不可变硬件 binding 描述符"
+
+msgid "tools/configure/providers/descriptor.py;tools/configure/providers"
+msgstr "tools/configure/providers/descriptor.py;tools/configure/providers"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_descriptors.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_descriptors.py"
+
+msgid ""
+"Controller instances reuse explicit descriptors while independent assertions"
+" remain"
+msgstr "控制器实例复用显式描述符，并保留独立断言"
+
+msgid "SOC-07"
+msgstr "SOC-07"
+
+msgid "P2"
+msgstr "P2"
+
+msgid "Family integration descriptors"
+msgstr "家族集成描述符"
+
+msgid ""
+"tools/configure/providers/descriptor.py;cmake/package/package_source_sdk.py"
+msgstr ""
+"tools/configure/providers/descriptor.py;cmake/package/package_source_sdk.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_descriptors.py;tests/contracts/test_source_sdk.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_descriptors.py;tests/contracts/test_source_sdk.py"
+
+msgid ""
+"Configuration family entry and dependency identities unified with CMake "
+"owning target graph"
+msgstr "配置家族入口与依赖身份统一，由 CMake 管理目标图"
+
+msgid "SOC-08"
+msgstr "SOC-08"
+
+msgid "contract"
+msgstr "contract"
+
+msgid "Startup phase responsibilities"
+msgstr "startup 阶段责任"
+
+msgid ""
+"soc/stm32f407/system.c;soc/gd32f470/system.c;soc/stm32g474/system.c;soc/stm32h743/system.c;soc/stm32u575/system.c"
+msgstr ""
+"soc/stm32f407/system.c;soc/gd32f470/system.c;soc/stm32g474/system.c;soc/stm32h743/system.c;soc/stm32u575/system.c"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_system_transaction_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_system_transaction_test.cpp"
+
+msgid "Pre-RAM post-RAM and fail-stop restrictions explicit and tested"
+msgstr "显式说明并测试 pre-RAM、post-RAM 和 fail-stop 限制"
+
+msgid "SOC-09"
+msgstr "SOC-09"
+
+msgid "defense"
+msgstr "defense"
+
+msgid "Cold-start admission"
+msgstr "冷启动准入"
+
+msgid "tools/configure/providers;soc"
+msgstr "tools/configure/providers;soc"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/physical_platform_factory_test.cpp;tests/google/multi_controller_factory_test.cpp;tests/google/g474_factory_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/physical_platform_factory_test.cpp;tests/google/multi_controller_factory_test.cpp;tests/google/g474_factory_test.cpp"
+
+msgid ""
+"Observable selected live owners rejected before global clock modification"
+msgstr "全局时钟变更前拒绝可观察的选定 live owner"
+
+msgid "SOC-10"
+msgstr "SOC-10"
+
+msgid "Clock transaction consistency"
+msgstr "时钟事务一致"
+
+msgid "soc/stm32f407/system.c;soc/gd32f470/system.c"
+msgstr "soc/stm32f407/system.c;soc/gd32f470/system.c"
+
+msgid ""
+"Critical readback bounded failures safe source switching and retained "
+"rollback responsibility"
+msgstr "关键读回、有界失败、安全时钟源切换与保留回退责任"
+
+msgid "SOC-11"
+msgstr "SOC-11"
+
+msgid "Clock residue semantics"
+msgstr "时钟残留语义"
+
+msgid ""
+"Primary cleanup remaining obligations distinguished from allowed retained "
+"PWR Flash settings"
+msgstr "区分主要错误、清理与剩余义务，以及允许保留的 PWR／Flash 设置"
+
+msgid "SOC-12"
+msgstr "SOC-12"
+
+msgid "Time context restrictions"
+msgstr "时间 context 限制"
+
+msgid "soc/stm32f407/private;soc/gd32f470/private;soc/stm32g474/private"
+msgstr "soc/stm32f407/private;soc/gd32f470/private;soc/stm32g474/private"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp;core/include/nexus/core/time.h"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp;core/include/nexus/core/time.h"
+
+msgid "Task configurable IRQ masks and NMI HardFault limitations align"
+msgstr "任务、可配置 IRQ mask 及 NMI／HardFault 限制一致"
+
+msgid "SOC-13"
+msgstr "SOC-13"
+
+msgid "Time lifecycle validity"
+msgstr "时间生命周期有效性"
+
+msgid "soc/stm32f407/system.c;soc/gd32f470/timebase.c;soc/stm32g474/system.c"
+msgstr "soc/stm32f407/system.c;soc/gd32f470/timebase.c;soc/stm32g474/system.c"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp;tests/google/g474_system_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp;tests/google/g474_system_test.cpp"
+
+msgid ""
+"Before-start failed-start and stopped reads have a documented tested valid "
+"domain"
+msgstr "启动前、启动失败和停止后的读取具有已说明且经测试的有效域"
+
+msgid "SOC-14"
+msgstr "SOC-14"
+
+msgid "Deadline boot domain"
+msgstr "deadline 启动域"
+
+msgid "contract_implemented"
+msgstr "contract_implemented"
+
+msgid "io/include;soc"
+msgstr "io/include;soc"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;core/include/nexus/core/time.h"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;core/include/nexus/core/time.h"
+
+msgid ""
+"Stop restart invalidates old deadlines and repeated-overflow limits remain "
+"explicit"
+msgstr "stop／restart 使旧 deadline 失效，重复溢出限制保持明确"
+
+msgid "SOC-15"
+msgstr "SOC-15"
+
+msgid "Bootstrap poll bounds"
+msgstr "bootstrap 轮询上限"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_timebase_contract_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_timebase_contract_test.cpp"
+
+msgid ""
+"Per-phase and total work bounds distinguish polls from measured elapsed time"
+msgstr "按阶段与总工作上限区分轮询次数和实测耗时"
+
+msgid "SOC-16"
+msgstr "SOC-16"
+
+msgid "GD stop controller coverage"
+msgstr "GD stop 控制器覆盖"
+
+msgid "soc/gd32f470/timebase.c"
+msgstr "soc/gd32f470/timebase.c"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp"
+
+msgid "Secondary polling enabled-controller defenses match maintained set"
+msgstr "次要轮询已启用控制器防护与维护集合一致"
+
+msgid "SOC-17"
+msgstr "SOC-17"
+
+msgid "Shallow sleep and tickless"
+msgstr "浅睡眠与 tickless"
+
+msgid "docs/design/timebase-lowpower.md;os/freertos"
+msgstr "docs/design/timebase-lowpower.md;os/freertos"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/timebase_lowpower_test.cpp;docs/design/timebase-"
+"lowpower.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/timebase_lowpower_test.cpp;docs/design/timebase-"
+"lowpower.md"
+
+msgid ""
+"OS tick SoC deadline and paused armed stop restrictions remain consistent"
+msgstr "OS Tick、SoC deadline 与暂停／已装载／停止限制保持一致"
+
+msgid "SOC-18"
+msgstr "SOC-18"
+
+msgid "USB48 lifecycle"
+msgstr "USB48 生命周期"
+
+msgid "soc/stm32f407/usb_clock.c;soc/gd32f470/usb_clock.c"
+msgstr "soc/stm32f407/usb_clock.c;soc/gd32f470/usb_clock.c"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/usb_clock_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/usb_clock_test.cpp"
+
+msgid ""
+"Shared consumers fail cleanup ownership and detached hardware precede clock "
+"release"
+msgstr "共享 consumer、失败清理所有权，以及分离硬件必须先于释放 clock"
+
+msgid "SOC-19"
+msgstr "SOC-19"
+
+msgid "No-init versus retention"
+msgstr "no-init 与 retention 的区别"
+
+msgid "docs/design/soc-refinement.md"
+msgstr "docs/design/soc-refinement.md"
+
+msgid ""
+"Software no-copy no-clear separated from physical reset and power retention"
+msgstr "软件不复制／不清零与物理复位／断电保持分离"
+
+msgid "SOC-20"
+msgstr "SOC-20"
+
+msgid "G474 UART bounded critical sections"
+msgstr "G474 UART 有界临界区"
+
+msgid "soc/stm32g474/drivers/uart.c"
+msgstr "soc/stm32g474/drivers/uart.c"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/g474_provider_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/g474_provider_test.cpp"
+
+msgid ""
+"No runtime modulo and explicit bounded blackout preserving arbitrary "
+"capacity loss order"
+msgstr "无运行时取模，显式有界中断屏蔽，保留任意容量的丢失顺序"
+
+msgid "SOC-21"
+msgstr "SOC-21"
+
+msgid "GD selected EXTI dispatch"
+msgstr "GD 选定 EXTI 分发"
+
+msgid "selected_profiles_observed"
+msgstr "selected_profiles_observed"
+
+msgid "soc/gd32f470/drivers/exti.c;tools/configure/providers/gd32f470"
+msgstr "soc/gd32f470/drivers/exti.c;tools/configure/providers/gd32f470"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_exti_test.cpp;tools/configure/test_gd32_exti_generation.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_exti_test.cpp;tools/configure/test_gd32_exti_generation.py"
+
+msgid ""
+"Measured selected-line costs preserve shared priority pending clear and "
+"owner isolation"
+msgstr "测量选定 line 成本，保留共享优先级、pending 清除和 owner 隔离"
+
+msgid "SOC-22"
+msgstr "SOC-22"
+
+msgid "IRQ service drain budgets"
+msgstr "IRQ service 排空预算"
+
+msgid "soc;docs/design/soc-refinement.md"
+msgstr "soc;docs/design/soc-refinement.md"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/soc-execution-budgets.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/soc-execution-budgets.md"
+
+msgid ""
+"Modes document work bounds service obligations and timeout consequences"
+msgstr "各模式说明工作上限、service 义务和超时后果"
+
+msgid "SOC-23"
+msgstr "SOC-23"
+
+msgid "measurement"
+msgstr "measurement"
+
+msgid "Hot-path instruction baselines"
+msgstr "热路径指令基线"
+
+msgid "measurement_tool_implemented"
+msgstr "measurement_tool_implemented"
+
+msgid "tools/measurement/soc_costs.py"
+msgstr "tools/measurement/soc_costs.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/testing/test_soc_costs.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/testing/test_soc_costs.py"
+
+msgid ""
+"Fixed compiler optimization actual disassembly records change cost without "
+"invented cycles"
+msgstr "固定编译器与优化的实际反汇编记录成本变化，不编造 cycles"
+
+msgid "SOC-24"
+msgstr "SOC-24"
+
+msgid "feature"
+msgstr "feature"
+
+msgid "F407 CCM placement"
+msgstr "F407 CCM 放置"
+
+msgid "soc/stm32f407;tools/configure/memory.py"
+msgstr "soc/stm32f407;tools/configure/memory.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_memory_boot_test.cpp;scripts/ci/stm32_memory.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_memory_boot_test.cpp;scripts/ci/stm32_memory.py"
+
+msgid ""
+"Explicit selected data bss noinit init budget bounds and DMA rejection with "
+"default zero cost"
+msgstr "显式选定 data、bss、noinit、init 预算上限与 DMA 拒绝，默认零成本"
+
+msgid "SOC-25"
+msgstr "SOC-25"
+
+msgid "GD RAM initializer consistency"
+msgstr "GD RAM initializer 一致"
+
+msgid "soc/gd32f470/memory_init.c;tools/configure/memory.py"
+msgstr "soc/gd32f470/memory_init.c;tools/configure/memory.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_memory_boot_test.cpp;scripts/ci/gd32_memory.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_memory_boot_test.cpp;scripts/ci/gd32_memory.py"
+
+msgid ""
+"Linker facts boot spans and first-write validation agree preserving noinit"
+msgstr "linker 事实、boot span 与首次写入验证一致，保留 noinit"
+
+msgid "SOC-26"
+msgstr "SOC-26"
+
+msgid "Shared controller engine ownership"
+msgstr "共享控制器引擎所有权"
+
+msgid "docs/design/soc-refinement.md;soc/common;io/private"
+msgstr "docs/design/soc-refinement.md;soc/common;io/private"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/delivery/architecture.md;docs/design/soc-refinement.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/delivery/architecture.md;docs/design/soc-refinement.md"
+
+msgid ""
+"Public private directory target SDK boundaries and selected retention stay "
+"explicit"
+msgstr "公共／私有目录、目标、SDK 边界和选定保留保持明确"
+
+msgid "SOC-27"
+msgstr "SOC-27"
+
+msgid "Per-mode image cost deltas"
+msgstr "按模式镜像成本差异"
+
+msgid "tools/measurement/soc_costs.py;tools/testing/test_soc_costs.py"
+msgstr "tools/measurement/soc_costs.py;tools/testing/test_soc_costs.py"
+
+msgid ""
+"Comparable empty selected backend mode ELF budgets with explained growth"
+msgstr "可比较的空／选定后端模式 ELF 预算，并说明增长"
+
+msgid "SOC-28"
+msgstr "SOC-28"
+
+msgid "conditional_extension"
+msgstr "conditional_extension"
+
+msgid "Additional fixed clock profiles"
+msgstr "新增固定时钟 profile"
+
+msgid "partial_exact_reference_implemented"
+msgstr "partial_exact_reference_implemented"
+
+msgid "reference_software_validated"
+msgstr "reference_software_validated"
+
+msgid "not_executed"
+msgstr "not_executed"
+
+msgid ""
+"soc/stm32h743/system.c;arch/cortex_m/nx_arch_cache_control.c;soc/stm32u575/system.c;tools/configure/test_clock_sources.py"
+msgstr ""
+"soc/stm32h743/system.c;arch/cortex_m/nx_arch_cache_control.c;soc/stm32u575/system.c;tools/configure/test_clock_sources.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tests/google/h743_system_test.cpp;scripts/ci/stm32h743.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tests/google/h743_system_test.cpp;scripts/ci/stm32h743.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+
+msgid ""
+"An exact reviewed oscillator profile has implementation rollback and HIL"
+msgstr "精确已审查晶振 profile 具有实现、回退与 HIL"
+
+msgid "SOC-29"
+msgstr "SOC-29"
+
+msgid "Additional G474 peripheral modes"
+msgstr "新增 G474 外设模式"
+
+msgid ""
+"soc/stm32g474/drivers/exti.c;soc/stm32g474/soc.json;soc/stm32g474/routes.json;tools/configure/providers/stm32g474"
+msgstr ""
+"soc/stm32g474/drivers/exti.c;soc/stm32g474/soc.json;soc/stm32g474/routes.json;tools/configure/providers/stm32g474"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/stm32g474.md;tests/google/g474_exti_test.cpp;tests/google/g474_factory_test.cpp;tests/contracts/g474_assembly;scripts/ci/provider_assemblies.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/stm32g474.md;tests/google/g474_exti_test.cpp;tests/google/g474_factory_test.cpp;tests/contracts/g474_assembly;scripts/ci/provider_assemblies.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+
+msgid ""
+"Each selected controller mode closes facts provider generated model ARM and "
+"HIL"
+msgstr "每个选定控制器模式闭合 facts、provider、generated、model、ARM 与 HIL"
+
+msgid "SOC-30"
+msgstr "SOC-30"
+
+msgid "Additional controllers routes packages"
+msgstr "新增控制器、路由与封装"
+
+msgid ""
+"soc/stm32g474;soc/stm32h743;soc/stm32u575;boards;tests/contracts/g474_assembly/exti_board"
+msgstr ""
+"soc/stm32g474;soc/stm32h743;soc/stm32u575;boards;tests/contracts/g474_assembly/exti_board"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32g474/routes.json;soc/stm32h743/routes.json;soc/stm32u575/routes.json;docs/design/stm32g474.md;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32g474/routes.json;soc/stm32h743/routes.json;soc/stm32u575/routes.json;docs/design/stm32g474.md;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+
+msgid ""
+"Exact hardware and independent resources budgets Board sources and isolation"
+" reviewed"
+msgstr "审查精确硬件、独立资源预算、Board 来源和隔离"
+
+msgid "SOC-31"
+msgstr "SOC-31"
+
+msgid "Non-M4 full SoC integration"
+msgstr "非 M4 完整 SoC 集成"
+
+msgid "soc/stm32h743;soc/stm32u575;arch;os"
+msgstr "soc/stm32h743;soc/stm32u575;arch;os"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;scripts/ci/stm32h743.py;scripts/ci/stm32u575.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;scripts/ci/stm32h743.py;scripts/ci/stm32u575.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+
+msgid ""
+"Exact selected MCU startup clock memory IRQ peripherals OS and unit-specific"
+" HIL"
+msgstr "精确选定 MCU 的 startup、clock、memory、IRQ、外设、OS 与单元级 HIL"
+
+msgid "SOC-32"
+msgstr "SOC-32"
+
+msgid "Complex DMA cache security domains"
+msgstr "复杂 DMA、cache 与安全域"
+
+msgid ""
+"arch/cortex_m/nx_arch_cache_control.c;arch/cortex_m/nx_arch_nonsecure.c;soc/stm32h743/drivers/uart_dma.c;soc/stm32h743/system.c;soc/stm32u575/security.c;tools/configure/memory.py"
+msgstr ""
+"arch/cortex_m/nx_arch_cache_control.c;arch/cortex_m/nx_arch_nonsecure.c;soc/stm32h743/drivers/uart_dma.c;soc/stm32h743/system.c;soc/stm32u575/security.c;tools/configure/memory.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;tests/google/arch_cache_control_test.cpp;tests/google/h743_dma_test.cpp;tests/google/h743_dma_factory_test.cpp;tests/contracts/h743_assembly;scripts/ci/cache_control_compile.py;scripts/ci/stm32h743.py;docs/design/u575-trustzone-"
+"contract.md;docs/delivery/soc-extensions-results.json;docs/delivery/soc-"
+"extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;tests/google/arch_cache_control_test.cpp;tests/google/h743_dma_test.cpp;tests/google/h743_dma_factory_test.cpp;tests/contracts/h743_assembly;scripts/ci/cache_control_compile.py;scripts/ci/stm32h743.py;docs/design/u575-trustzone-"
+"contract.md;docs/delivery/soc-extensions-results.json;docs/delivery/soc-"
+"extensions-verification.md"
+
+msgid ""
+"Per-engine reachability alignment cache security faults verified on exact "
+"target"
+msgstr "在精确目标上验证每个引擎的可达性、对齐、cache、安全 fault"
+
+msgid "SOC-33"
+msgstr "SOC-33"
+
+msgid "Bootloader and running-state handoff"
+msgstr "bootloader 与运行状态交接"
+
+msgid "not_implemented"
+msgstr "not_implemented"
+
+msgid "soc;docs/design/integration-contracts.md"
+msgstr "soc;docs/design/integration-contracts.md"
+
+msgid ""
+"Clock VTOR masks FP SysTick DMA RAM and live owners have exact entry "
+"contract"
+msgstr "clock、VTOR、mask、FP、SysTick、DMA、RAM 与 live owner 具有精确入口合同"
+
+msgid "SOC-34"
+msgstr "SOC-34"
+
+msgid "Dynamic frequency changes"
+msgstr "动态频率变更"
+
+msgid "soc"
+msgstr "soc"
+
+msgid ""
+"Consumer protocol reconfiguration electrical order rollback and deadline "
+"handling verified"
+msgstr "验证 consumer 协议重新配置、电气顺序、回退和 deadline 处理"
+
+msgid "SOC-35"
+msgstr "SOC-35"
+
+msgid "Deep STOP continuous time"
+msgstr "深 STOP 连续时间"
+
+msgid "soc;os"
+msgstr "soc;os"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/timebase-lowpower.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/timebase-lowpower.md"
+
+msgid ""
+"Exact RTC LPTIM retention wake recovery precision and power physically "
+"verified"
+msgstr "真实验证精确 RTC、LPTIM、retention、wake、恢复精度和功耗"
+
+msgid "SOC-36"
+msgstr "SOC-36"
+
+msgid "Userspace MPU TrustZone transport"
+msgstr "userspace MPU／TrustZone transport"
+
+msgid "partial_synchronous_reference_implemented"
+msgstr "partial_synchronous_reference_implemented"
+
+msgid ""
+"arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone"
+msgstr ""
+"arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-"
+"broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-"
+"broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+
+msgid ""
+"Actual permissions address copy borrow async exit gateway and hardware "
+"isolation verified"
+msgstr "验证真实权限、地址、复制／借用、异步退出、gateway 与硬件隔离"
+
+msgid "SOC-37"
+msgstr "SOC-37"
+
+msgid "HIL"
+msgstr "HIL"
+
+msgid "physical_acceptance"
+msgstr "physical_acceptance"
+
+msgid "Station binding"
+msgstr "station 绑定"
+
+msgid "tooling_implemented"
+msgstr "tooling_implemented"
+
+msgid "tooling_software_validated"
+msgstr "tooling_software_validated"
+
+msgid "tools/hil/soc_acceptance.py"
+msgstr "tools/hil/soc_acceptance.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/testing/test_soc_hil.py;tools/hil/README.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/testing/test_soc_hil.py;tools/hil/README.md"
+
+msgid ""
+"Exact admitted station selected modes raw instrument capture and case-"
+"specific assertions pass"
+msgstr "精确已准入 station、选定模式、原始仪器采集和各用例断言通过"
+
+msgid "SOC-38"
+msgstr "SOC-38"
+
+msgid "PCB electrical facts"
+msgstr "PCB 电气事实"
+
+msgid "SOC-39"
+msgstr "SOC-39"
+
+msgid "Fixed clock profile"
+msgstr "固定时钟 profile"
+
+msgid "SOC-40"
+msgstr "SOC-40"
+
+msgid "Startup rollback faults"
+msgstr "startup 回退 fault"
+
+msgid "SOC-41"
+msgstr "SOC-41"
+
+msgid "Monotonic time"
+msgstr "单调时间"
+
+msgid "SOC-42"
+msgstr "SOC-42"
+
+msgid "RAM DMA domains"
+msgstr "RAM／DMA 域"
+
+msgid "SOC-43"
+msgstr "SOC-43"
+
+msgid "UART"
+msgstr "UART"
+
+msgid "SOC-44"
+msgstr "SOC-44"
+
+msgid "SPI"
+msgstr "SPI"
+
+msgid "SOC-45"
+msgstr "SOC-45"
+
+msgid "I2C"
+msgstr "I2C"
+
+msgid "SOC-46"
+msgstr "SOC-46"
+
+msgid "ADC"
+msgstr "ADC"
+
+msgid "SOC-47"
+msgstr "SOC-47"
+
+msgid "EXTI capture"
+msgstr "EXTI capture"
+
+msgid "SOC-48"
+msgstr "SOC-48"
+
+msgid "PWM break"
+msgstr "PWM break"
+
+msgid "SOC-49"
+msgstr "SOC-49"
+
+msgid "Classic CAN"
+msgstr "Classic CAN"
+
+msgid "SOC-50"
+msgstr "SOC-50"
+
+msgid "USB FS device"
+msgstr "USB FS device"
+
+msgid "SOC-51"
+msgstr "SOC-51"
+
+msgid "Ethernet PHY"
+msgstr "Ethernet PHY"
+
+msgid "SOC-52"
+msgstr "SOC-52"
+
+msgid "Flash power loss"
+msgstr "Flash 断电"
+
+msgid "SOC-53"
+msgstr "SOC-53"
+
+msgid "Watchdog"
+msgstr "看门狗"
+
+msgid "SOC-54"
+msgstr "SOC-54"
+
+msgid "Shallow sleep tickless"
+msgstr "浅睡眠／tickless"
+
+msgid "SOC-55"
+msgstr "SOC-55"
+
+msgid "Load endurance"
+msgstr "满载耐久"

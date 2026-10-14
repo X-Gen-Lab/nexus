@@ -2,9 +2,11 @@
 
 GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 interfaces.
 Each selected instance has an immutable face with two pointers: shared read-only
-methods and caller-owned provider state. Generated faces live in read-only
-storage. A 32-bit target spends eight bytes of Flash per face; mutable state and
-exact-capacity buffers are separate. Method pointers are shared per provider and
+methods and a pointer to private provider state. Generated faces live in read-only
+storage; their state and selected buffers are private static objects in the
+generated translation unit. Manually assembled providers use storage supplied
+by their explicit constructor owner. A 32-bit target spends eight bytes of Flash
+per face; mutable state and exact-capacity buffers are separate. Method pointers are shared per provider and
 mode rather than repeated in every mutable instance.
 
 Public operations check the face and dispatch its exact context. Different
@@ -29,9 +31,9 @@ mask. Storage overlap validation remains a cold assembly operation whose work
 grows with block count. This complexity contract is not physical IRQ latency or
 cycle qualification.
 
-Default paths need no OS locks or hidden tasks. Requests and exact-capacity
-buffers are caller or assembly owned. UART tracks physical TC separately from
-loaded bytes and request release; error-only RX events never invent data. SPI
+Default paths need no OS locks or hidden tasks. Requests and transfer buffers
+remain caller-owned; generated provider buffers are assembly-owned and separate.
+UART tracks physical TC separately from loaded bytes and request release; error-only RX events never invent data. SPI
 and I2C preserve their bounded polling contracts, and controller recovery never
 replays a failed transaction. Flash exposes physical geometry; products provide
 explicit restricted regions.

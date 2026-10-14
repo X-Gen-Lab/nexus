@@ -1,0 +1,271 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 1d115a5d51c86dec46be247d122c848ab636b6c0ed3b46a09e78488dcf2c1460\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:1
+msgid "Nexus 文档页面模板"
+msgstr "Nexus 文档页面模板"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:3
+msgid ""
+"模板是必须回答的问题清单。标题可以按任务调整；已有规范通过包含或链接复用。 新增/修改正文遵守 [内容与图示标准](documentation-"
+"standards.md)，不得仅有页面 元数据就记录内容合格。实际教程代码来自已验证fixture或固定版本外部示例。"
+msgstr ""
+"模板是必须回答的问题清单。标题可以按任务调整；已有规范通过包含或链接复用。 新增/修改正文遵守 [内容与图示标准](documentation-"
+"standards.md)，不得仅有页面 元数据就记录内容合格。实际教程代码来自已验证fixture或固定版本外部示例。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:7
+msgid "1. Tutorial"
+msgstr "1. Tutorial（教程）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:9
+msgid "目标和预期完成结果。"
+msgstr "目标和预期完成结果。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:10
+msgid "适用代码/SDK版本、Board/OS/模式、工具、工作目录和设备前提。"
+msgstr "适用代码/SDK版本、Board/OS/模式、工具、工作目录和设备前提。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:11
+msgid "输入、配置、所需资源；完整输入与片段分别标明。"
+msgstr "输入、配置、所需资源；完整输入与片段分别标明。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:12
+msgid "一条完整操作路径，每步给命令或API、预期结果和检查方法。"
+msgstr "一条完整操作路径，每步给命令或API、预期结果和检查方法。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:13
+msgid "遇到常见拒绝/失败时如何定位和保持资源。"
+msgstr "遇到常见拒绝/失败时如何定位和保持资源。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:14
+msgid "停机、排空、清理，以及结果/存储何时可以复用。"
+msgstr "停机、排空、清理，以及结果/存储何时可以复用。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:15
+msgid "实际验证记录和下一步。"
+msgstr "实际验证记录和下一步。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:17
+msgid ""
+"异步教程连接提交/取消/排空时序图；外部SDK教程连接消费流程图。没有设备时只 说明软件验证和HIL准备，不把未执行硬件步骤写成教程成功结果。"
+msgstr ""
+"异步教程连接提交/取消/排空时序图；外部SDK教程连接消费流程图。没有设备时只 说明软件验证和HIL准备，不把未执行硬件步骤写成教程成功结果。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:20
+msgid "2. How-to"
+msgstr "2. How-to（操作指南）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:22
+msgid "要完成的单一任务和适用范围。"
+msgstr "要完成的单一任务和适用范围。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:23
+msgid "合法Task/IRQ/权限上下文、输入和资源所有者。"
+msgstr "合法Task/IRQ/权限上下文、输入和资源所有者。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:24
+msgid "最短完整步骤；默认选择与例外明确。"
+msgstr "最短完整步骤；默认选择与例外明确。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:25
+msgid "正常结果、拒绝、超时/取消及失败恢复。"
+msgstr "正常结果、拒绝、超时/取消及失败恢复。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:26
+msgid "结束后哪些资源已归还，哪些责任仍保留。"
+msgstr "结束后哪些资源已归还，哪些责任仍保留。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:27
+msgid "限制和对应权威合同。"
+msgstr "限制和对应权威合同。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:29
+msgid "可以省略基础原理并链接解释页，不能省略影响正确性的生命周期或并发条件。"
+msgstr "可以省略基础原理并链接解释页，不能省略影响正确性的生命周期或并发条件。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:31
+msgid "3. Reference"
+msgstr "3. Reference（参考）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "项目"
+msgstr "项目"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "必需内容"
+msgstr "必需内容"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "字段/符号"
+msgstr "字段/符号"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "精确名称、类型和权威源"
+msgstr "精确名称、类型和权威源"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "数值"
+msgstr "数值"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "单位、范围、默认值及生效条件"
+msgstr "单位、范围、默认值及生效条件"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "组合"
+msgstr "组合"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "有效/无效模式、平台和ABI组合"
+msgstr "有效/无效模式、平台和ABI组合"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "调用"
+msgstr "调用"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "上下文、deadline、输入/输出所有权"
+msgstr "上下文、deadline、输入/输出所有权"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "失败"
+msgstr "失败"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "拒绝条件、状态变化、效果与后续责任"
+msgstr "拒绝条件、状态变化、效果与后续责任"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "资格"
+msgstr "资格"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "当前维护/软件/实板范围和证据入口"
+msgstr "当前维护/软件/实板范围和证据入口"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:42
+msgid ""
+"API声明自动生成，手册不手抄第二份函数签名。引用完整配置或有原因的fragment。 "
+"controller/endpoint、资源和内存布局复杂时连接结构图或精确参考配置图。"
+msgstr ""
+"API声明自动生成，手册不手抄第二份函数签名。引用完整配置或有原因的fragment。 "
+"controller/endpoint、资源和内存布局复杂时连接结构图或精确参考配置图。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:45
+msgid "4. Explanation"
+msgstr "4. Explanation（解释）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:47
+msgid "具体问题和约束。"
+msgstr "具体问题和约束。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:48
+msgid "当前或目标结构，图的身份与来源。"
+msgstr "当前或目标结构，图的身份与来源。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:49
+msgid "各层责任、状态和资源所有者。"
+msgstr "各层责任、状态和资源所有者。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:50
+msgid "构建阶段与运行阶段，以及依赖/调用/数据流的区别。"
+msgstr "构建阶段与运行阶段，以及依赖/调用/数据流的区别。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:51
+msgid "主要流程和失败责任；并发流程连接时序/状态图。"
+msgstr "主要流程和失败责任；并发流程连接时序/状态图。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:52
+msgid "性能/空间成本、取舍和适用条件。"
+msgstr "性能/空间成本、取舍和适用条件。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:53
+msgid "当前限制与实际验证范围。"
+msgstr "当前限制与实际验证范围。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:54
+msgid "关联合同、源码和操作指南。"
+msgstr "关联合同、源码和操作指南。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:56
+msgid "架构解释必须有对应框图；单一简单事实可以引用已有图。无需重复画一张仅改变 颜色或名称的同义图。代码实现与目标提案不能在同一无标记图中合并。"
+msgstr "架构解释必须有对应框图；单一简单事实可以引用已有图。无需重复画一张仅改变 颜色或名称的同义图。代码实现与目标提案不能在同一无标记图中合并。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:59
+msgid "5. Status"
+msgstr "5. Status（状态）"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:61
+msgid "被描述代码、本文档和qualified source分别是什么。"
+msgstr "被描述代码、本文档和qualified source分别是什么。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:62
+msgid "精确配置、scope、工具与实际执行结果。"
+msgstr "精确配置、scope、工具与实际执行结果。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:63
+msgid "可取得的证据、档案/member与校验方法。"
+msgstr "可取得的证据、档案/member与校验方法。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:64
+msgid "已实现、已执行、未执行、失败或阻塞项。"
+msgstr "已实现、已执行、未执行、失败或阻塞项。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:65
+msgid "支持和资格边界；下一退出条件。"
+msgstr "支持和资格边界；下一退出条件。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:67
+msgid ""
+"表中的数字不能跨scope累加；implemented不替代软件/实板通过。资格流程图中 软件证据和HIL分别取得后汇合，不画成软件自动推进到物理通过。"
+msgstr ""
+"表中的数字不能跨scope累加；implemented不替代软件/实板通过。资格流程图中 软件证据和HIL分别取得后汇合，不画成软件自动推进到物理通过。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:70
+msgid "6. 每页审查清单"
+msgstr "6. 每页审查清单"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:72
+msgid "读者、目标、版本和适用范围明确。"
+msgstr "读者、目标、版本和适用范围明确。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:73
+msgid "步骤或规则可执行/可判断，命令前提与预期结果齐全。"
+msgstr "步骤或规则可执行/可判断，命令前提与预期结果齐全。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:74
+msgid "对象、单位、上下文、借用、失败和恢复明确。"
+msgstr "对象、单位、上下文、借用、失败和恢复明确。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:75
+msgid "当前/目标/参考、实现/软件/HIL身份没有混淆。"
+msgstr "当前/目标/参考、实现/软件/HIL身份没有混淆。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:76
+msgid "图中实体与每条边均可解释并与源码/合同一致。"
+msgstr "图中实体与每条边均可解释并与源码/合同一致。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:77
+msgid "代码和配置例子有实际验证或明确片段原因。"
+msgstr "代码和配置例子有实际验证或明确片段原因。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:78
+msgid "正文、图和翻译没有复制出竞争规范。"
+msgstr "正文、图和翻译没有复制出竞争规范。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:79
+msgid "引用、离线资源、alt/caption和旧URL处理正确。"
+msgstr "引用、离线资源、alt/caption和旧URL处理正确。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:80
+msgid "发现和修正记录绑定实际页面/图与来源。"
+msgstr "发现和修正记录绑定实际页面/图与来源。"

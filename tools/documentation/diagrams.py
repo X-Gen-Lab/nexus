@@ -200,5 +200,9 @@ def check(root, *, env=None, full=False):
     for output in folder.glob("*.svg"):
         if not output.with_suffix(".dot").is_file():
             errors.append("missing DOT pair: " + output.name)
+    from tools.documentation import diagram_localization
+    localized = diagram_localization.check(folder, env=env, full=full)
+    errors.extend(localized["errors"])
     return {"status": "failed" if errors else "passed", "diagrams": checked,
+            "localized_diagrams": localized["localized_diagrams"],
             "errors": errors, "render_check": bool(full)}

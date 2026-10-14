@@ -277,7 +277,7 @@ CAN/CANopen、Ethernet、USB、低功耗、cache/MPU、安全启动和远程更�
 
 RTOS tick、HAL时间、UART时序、ADC/PWM触发分别占用实际timebase资源。选型和配置不能让多个用途无意占用同一timer/channel。未确认三板的外设接线不从芯片具有该外设自动推导。
 
-当前维护 EXTI 有界事件、固定 PWM、ADC polling/scan、IWDG feed/reset-cause；并提供 STM/GD UART 有限 TX DMA、SPI 有限 full-duplex DMA、STM/GD UART IRQ RX blocks、STM/GD ADC timer-triggered DMA blocks。ADC 每块停机、consumer release 后显式 service 重启，存在间隔；UART `dma-tx` 与 `irq-blocks` 为不同 provider，不声明组合模式。DMA domain、硬件 route、IRQ、停止与 consumer loan 排空均有独立合同和模型验证；capture、advanced timer break/dead-time及持续无间隔采集仍需独立实现与实板资格。
+当前维护 EXTI 有界事件、固定 PWM、ADC polling/scan 与 IWDG feed/reset-cause。STM32F407／GD32F470 的选定路线还提供 UART `dma-tx`、`irq-blocks`、`rx-dma-idle`、`rx-dma-continuous`、`dma-duplex` 和 `dma-duplex-continuous`，SPI 有限 full-duplex DMA，ADC `trigger-dma`／`trigger-dma-continuous`，以及 `edge-capture` 和 `complementary-pwm` 的捕获、break／deadtime 机制。ADC `trigger-dma` 每块停机排空，consumer release 后由显式 service 重启，存在块间间隔；连续模式使用双缓冲与显式替换块，容量耗尽或硬件排空失败时保留借用，不覆写消费者存储。连续模式不承诺任意 IRQ 延迟、服务间隔或消费者速度下无丢失。DMA domain、硬件 route、IRQ、停止与 consumer loan 排空均按精确模式维护合同和软件模型；配置及生产实现范围以[派生能力矩阵](../delivery/capabilities.md)和对应合同为准，全部相关实板时序、电气与持续采集资格仍未执行。
 
 - timer说明频率、tick单位、wrap扩展、最长维护间隔和clock/stop行为；PWM同时检查共享PSC/ARR/base mode，明确0%/100%、shadow更新、误差及启动/停止电平。
 - ADC说明分辨率、sample time、参考电压/原始计数含义、sequence/trigger、overrun、时间信息和超时输出有效性；DMA stream另定义窗口覆盖和借用。

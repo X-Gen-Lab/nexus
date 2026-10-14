@@ -1,0 +1,270 @@
+# Authored translation; independent semantic review pending.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: f7ff646cd42ebd0b994c307446fb6a32ab03d81904743839bacfc1d86b0aa860\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:1
+msgid "当前平台交付"
+msgstr "Current platform delivery"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:3
+msgid ""
+"默认实现统一为 **Core / Arch / SoC / Board / 静态 factory / 多态 I/O / 可选 OS / 可选组件**。一份 TOML 经严格校验和不可变 IR "
+"生成精确实例；factory 返回稳定的 只读接口对象，共享只读操作表，独立状态留在 provider 内部。获取接口不启动硬件。 应用、产品任务、私有 PCB、Flash "
+"分区、恢复与安全策略由外部工程维护。"
+msgstr ""
+"The default implementation is **Core / Arch / SoC / Board / static factory / polymorphic I/O / "
+"optional OS / optional components**. One TOML is strictly validated and resolved through immutable"
+" IR to generate exact instances. The factory returns stable read-only interface objects with "
+"shared read-only operation tables; independent state remains inside each provider. Getting an "
+"interface does not start hardware. External projects own applications, product tasks, private "
+"PCBs, Flash partitions, recovery and security policy."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:8
+msgid ""
+"文档系统的后续整理见 [架构与交付规划](../design/documentation-system.md)。 对应文档工具、正文和图册已实现，实际文档验收与固件资格分别记录；当前资料总入口为 "
+"[文档入口](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/README.md)。"
+msgstr ""
+"Further documentation organization is described in [architecture and delivery "
+"planning](../design/documentation-system.md). The documentation tools, prose and figure atlas are "
+"implemented; documentation acceptance and firmware qualification are recorded separately. The "
+"current entry point is [documentation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/docs/README.md)."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "阅读入口"
+msgstr "Reading entry"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "说明"
+msgstr "Description"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[当前架构](architecture.md)"
+msgstr "[Current architecture](architecture.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "物理目录、依赖方向、执行与资源责任"
+msgstr "Physical directories, dependency direction, execution and resource responsibility"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[Cortex-M 软件支持](cortex-m.md)"
+msgstr "[Cortex-M software support](cortex-m.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "九核 ABI/feature、Core/Arch/OS runtime 与配置示例"
+msgstr "Nine-core ABI/features, Core/Arch/OS runtime and configuration examples"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[OS 交付](os.md)"
+msgstr "[OS delivery](os.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "配置、显式存储、外部多任务示例与 OS HIL 范围"
+msgstr "Configuration, explicit storage, external multitasking examples and OS HIL scope"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[Arch 契约](../design/arch-contracts.md)"
+msgstr "[Arch contracts](../design/arch-contracts.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "原子操作、掩码、cache/MPU/SAU 的上下文和所有权"
+msgstr "Context and ownership for atomics, masks, cache/MPU/SAU"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[支持范围](support.md)"
+msgstr "[Support scope](support.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "F407/F470 首发模式、G474/H743/U575 参考纵切片与精确未知项"
+msgstr "F407/F470 launch modes, G474/H743/U575 reference vertical slices and exact unknowns"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[派生能力矩阵](capabilities.md)"
+msgstr "[Derived capability matrix](capabilities.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "facts/routes、参考 Board、软件夹具和生产定义的一致性"
+msgstr "Consistency of facts/routes, reference Boards, software fixtures and production definitions"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[软件证据](verification.md)"
+msgstr "[Software evidence](verification.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "实际执行与尚待 clean-source 封存的区别"
+msgstr "Actual execution versus pending clean-source sealing"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[SoC 基线执行记录](soc-refinement-verification.md)"
+msgstr "[SoC baseline execution record](soc-refinement-verification.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "已封存基线的精确源码、执行结果与物理未执行边界"
+msgstr "Exact source, execution results and unexecuted physical boundaries of the sealed baseline"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[SoC 扩展执行记录](soc-extensions-verification.md)"
+msgstr "[SoC extension execution record](soc-extensions-verification.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "G474 EXTI、H743 Cache/DMA、U575 双域参考及后续验收状态"
+msgstr "G474 EXTI, H743 Cache/DMA, U575 split-domain reference and subsequent acceptance status"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "{download}`SoC 扩展结果索引 <soc-extensions-results.json>`"
+msgstr "{download}`SoC extension results index <soc-extensions-results.json>`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "历史 SoC 固定源码、完整 CI、离线候选和归档摘要"
+msgstr "Historical SoC fixed source, full CI, offline candidates and archive digests"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[构建系统契约](../design/build-system.md)"
+msgstr "[Build-system contracts](../design/build-system.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "单一配置权威、CMake 目标图、执行及工具边界"
+msgstr "Single configuration authority, CMake target graph, execution and tool boundaries"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[构建系统执行记录](build-system-verification.md)"
+msgstr "[Build-system execution record](build-system-verification.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "`cc6a065c` 的完整软件 gates、精确候选及失败尝试"
+msgstr "Full software gates, exact candidates and failed attempts for `cc6a065c`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "{download}`构建系统结果索引 <build-system-results.json>`"
+msgstr "{download}`Build-system results index <build-system-results.json>`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "当前源码与真实 CI、SDK、候选归档的字节身份"
+msgstr "Byte identities of source and actual CI, SDK and candidate archives"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "{download}`48 项构建实施台账 <../design/build-system-execution.csv>`"
+msgstr "{download}`48-item build implementation ledger <../design/build-system-execution.csv>`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "原始退出条件、实现与精确软件证据"
+msgstr "Original exit conditions, implementation and exact software evidence"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[迁移手册](migration.md)"
+msgstr "[Migration guide](migration.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "旧 API、配置、对象与外部应用迁移"
+msgstr "Migration of old APIs, configuration, objects and external applications"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[安全与生命周期审查](security-review.md)"
+msgstr "[Security and lifecycle review](security-review.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "扫描范围、测试工装修复与借用／恢复限制"
+msgstr "Scan scope, test-fixture fixes and borrow/recovery restrictions"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "[后续迭代](next-iterations.md)"
+msgstr "[Next iterations](next-iterations.md)"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "实板验收、测量驱动的扩展与团队流程"
+msgstr "Physical acceptance, measurement-driven extensions and team workflow"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "{download}`33 项实施台账 <../design/next-generation-execution.csv>`"
+msgstr "{download}`33-item implementation ledger <../design/next-generation-execution.csv>`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "每项实现路径、证据入口、软件和物理退出状态"
+msgstr "Implementation paths, evidence entries, software and physical exit status for each item"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "{download}`Factory 与 TDD 迭代台账 <../design/factory-platform-execution.csv>`"
+msgstr "{download}`Factory and TDD iteration ledger <../design/factory-platform-execution.csv>`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:0
+msgid "本次 P0–P5 的具体实现与条件验收"
+msgstr "Concrete P0–P5 implementation and conditional acceptance for this iteration"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:34
+msgid ""
+"CPU 软件层覆盖 M0/M0+/M3/M4/M7/M23/M33/M55/M85。外部工程可通过一份 严格 CPU runtime TOML/事实包使用 `nexus_add_runtime` "
+"或安装包的 Runtime component，复用 Core/Arch/I/O face 与选定裸机/FreeRTOS adapter。运行时装配 不生成 SoC、Board、启动或 "
+"factory，具体硬件、产品任务和安全策略仍由外部工程 负责。F407/F470 三板维护首发模式，G474/H743/U575 增加精确 GPIO／IRQ UART／ timebase "
+"参考装配。G474 另有 selected EXTI，H743 另有固定 Cache 配置与有限 TX DMA，U575 另有独立无 OS 的同步双域参考；这些纵切片不代表全外设或完整 "
+"安全域接入，物理 HIL 全部未执行。"
+msgstr ""
+"The CPU software layer covers M0/M0+/M3/M4/M7/M23/M33/M55/M85. External projects can use "
+"`nexus_add_runtime` or the installed Runtime component with one strict CPU-runtime TOML/facts "
+"package, reusing Core/Arch/I/O faces and the selected baremetal/FreeRTOS adapter. Runtime assembly"
+" generates no SoC, Board, startup or factory; external projects still own hardware, product tasks "
+"and security policy. The three F407/F470 Boards maintain launch modes; G474/H743/U575 add exact "
+"GPIO/IRQ-UART/timebase reference assemblies. G474 additionally has selected EXTI, H743 fixed Cache"
+" configuration and limited TX DMA, and U575 an independent OS-free synchronous split-domain "
+"reference. These vertical slices do not represent all peripherals or complete security-domain "
+"integration; all physical HIL remains unexecuted."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:43
+msgid ""
+"历史 SoC 扩展基线固定源码 `98270512` 已完成全部 Native 契约、工具和配置测试、121 个 ARM 镜像、104 个 CPU runtime 变体、SDK 独立消费及完整 "
+"GitHub CI。八个 H743/U575 公开参考配置分别完成两次独立断网构建，ELF/BIN 逐字节一致，并封存为无签名软件 "
+"候选；具体范围和原始证据见结果索引。后续文档提交只记录该源码，不继承为新的 代码执行资格。实板未接入，物理 HIL 均为 `not_executed`；运行态交接、DVFS 和 深 STOP "
+"连续计时尚未实现，55 项原始退出条件保持不变。"
+msgstr ""
+"The historical SoC-extension baseline at fixed source `98270512` completed all Native contracts, "
+"tool and configuration tests, 121 ARM images, 104 CPU-runtime variants, independent SDK "
+"consumption and full GitHub CI. Eight public H743/U575 reference configurations each completed two"
+" independent network-disabled builds with byte-identical ELF/BIN and were sealed as unsigned "
+"software candidates. Exact scope and raw evidence are in the results index. Later documentation "
+"commits only record that source and inherit no new code-execution qualification. Hardware is not "
+"connected; all physical HIL is `not_executed`. Runtime handover, DVFS and continuous deep-STOP "
+"timing remain unimplemented; the 55 original exit conditions are unchanged."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:50
+msgid ""
+"本次构建系统交付绑定 `cc6a065c`，完整结果单独记录在构建结果索引，不能继承 上面的历史 SoC 执行身份。八个当前候选使用 H743 HSI64／Cache off 和 U575 "
+"MSIS4／TZEN=0 的 empty／UART、裸机／FreeRTOS 参考组合；这不扩大实板支持。 72 阶段软件总计划未作为一次完整 plan invocation 执行，OCI "
+"recipe 重建、 CP311 离线安装和物理 HIL 仍未执行。后续文档提交只记录其精确代码源码。"
+msgstr ""
+"This build-system delivery is bound to `cc6a065c`; complete results are separately recorded in its"
+" build results index and cannot inherit the historical SoC execution identity above. The eight "
+"current candidates use H743 HSI64/Cache off and U575 MSIS4/TZEN=0 empty/UART baremetal/FreeRTOS "
+"reference combinations; this expands no physical-board support. The 72-stage software master plan "
+"was not executed as one complete plan invocation. OCI recipe rebuild, CP311 offline installation "
+"and physical HIL remain unexecuted. Later documentation commits only record the exact code source."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:56
+msgid ""
+"`docs/archive/` 保留历史设计、结果和旧 Sphinx 教程，不能继承为当前支持或验收。 当前公共 API 文档只从现有公开 include 树生成；代码格式和反斜杠 Doxygen"
+" 风格保持 根 `.clang-format`、`.editorconfig` 与现有规范。"
+msgstr ""
+"`docs/archive/` retains historical designs, results and old Sphinx tutorials; these confer no "
+"current support or acceptance. Current public API documentation is generated only from existing "
+"public include trees. Code formatting and backslash Doxygen style retain the root `.clang-format`,"
+" `.editorconfig` and existing standards."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:60
+msgid ""
+"行为变更遵循 TDD。GoogleTest／GoogleMock 只进入 host 测试目标，生产固件保持 C11。commit hooks 实际执行完整 "
+"testing／configure／ci／workflows 四域工具测试 和全部 GoogleTest 契约，拒绝未完成、过滤或跳过的报告。执行结果证明当前合同；真实 RED→GREEN 过程由"
+" PR 和原始日志记录。"
+msgstr ""
+"Behavior changes follow TDD. GoogleTest/GoogleMock enter host test targets only; production "
+"firmware remains C11. Commit hooks actually run the complete testing/configure/ci/workflows tool "
+"suites and all GoogleTest contracts, rejecting incomplete, filtered or skipped reports. Execution "
+"results prove current contracts; actual RED→GREEN history is recorded in PRs and raw logs."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/README.md:64
+msgid "[SoC refinement and physical acceptance](../design/soc-refinement.md)"
+msgstr "[SoC refinement and physical acceptance](../design/soc-refinement.md)"

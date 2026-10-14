@@ -1,0 +1,263 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: d8783cc8939f5b406c1e0e227f655300026e58af1e60f4c67ca6e7243eaddf96\nX-Nexus-Reviewed: true\n"
+
+msgid "Arch: CPU mechanisms and feature contracts"
+msgstr "Arch：CPU 机制与能力合同"
+
+msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgstr "这些声明来自公共头文件。选择、生命周期、支持的执行模式和物理资源授权范围仍以对应设计及支持记录为准。"
+
+msgid "arch.h"
+msgstr "arch.h"
+
+msgid "CPU-local mask, context, ordering and cycle snapshot contract."
+msgstr "CPU 本地屏蔽、上下文、内存顺序与周期快照合同。"
+
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+msgid "Functions"
+msgstr "函数"
+
+msgid "Save incoming local mask and mask configurable exceptions."
+msgstr "保存进入时的本地屏蔽状态，并屏蔽可配置异常。"
+
+msgid "Returns"
+msgstr "返回值"
+
+msgid "Restore the incoming mask, preserving nested exclusions."
+msgstr "恢复进入时的屏蔽状态，保留嵌套屏蔽区的约束。"
+
+msgid "Parameters"
+msgstr "参数"
+
+msgid "Snapshot the implemented local interrupt-mask registers."
+msgstr "读取已实现本地中断屏蔽寄存器的快照。"
+
+msgid "Test masks that could prevent required completion progress."
+msgstr "检查可能阻止必要完成推进的屏蔽状态。"
+
+msgid "Query the exact current CPU exception identity."
+msgstr "查询当前 CPU 异常的准确身份。"
+
+msgid "Query privilege in the current CPU execution context."
+msgstr "查询当前 CPU 执行上下文的特权级。"
+
+msgid "Query current CPU exception context."
+msgstr "查询当前 CPU 异常上下文。"
+
+msgid "Order explicit data memory accesses in the CPU domain."
+msgstr "为 CPU 域中的显式数据内存访问建立顺序。"
+
+msgid "Complete preceding explicit memory accesses."
+msgstr "完成此前的显式内存访问。"
+
+msgid "Synchronize subsequent CPU instruction execution."
+msgstr "同步后续 CPU 指令执行。"
+
+msgid "Snapshot an already enabled free-running cycle counter."
+msgstr "读取已启用自由运行周期计数器的快照。"
+
+msgid "Saved incoming PRIMASK or calling-thread Native nesting."
+msgstr "保存进入时的 PRIMASK 或调用线程的 Native 嵌套状态。"
+
+msgid "Public Members"
+msgstr "公共成员"
+
+msgid "Read-only snapshot of implemented local interrupt masks."
+msgstr "已实现本地中断屏蔽状态的只读快照。"
+
+msgid "atomic.h"
+msgstr "atomic.h"
+
+msgid "Inline naturally aligned 32-bit publication and RMW ports."
+msgstr "内联、自然对齐的 32 位发布与读改写端口。"
+
+msgid "Read one word without publishing or acquiring other data."
+msgstr "读取一个字，不发布或获取其他数据。"
+
+msgid "Read one word and acquire data from the observed publication."
+msgstr "读取一个字，并通过所观察的发布获取数据。"
+
+msgid "Store one word without publishing other data."
+msgstr "存储一个字，不发布其他数据。"
+
+msgid "Publish preceding data through one aligned release store."
+msgstr "通过一次对齐的 release 存储发布此前数据。"
+
+msgid "Strong acq_rel compare/exchange, acquire on failure."
+msgstr "强 acq_rel 比较交换，失败时采用 acquire 顺序。"
+
+msgid "Add modulo 2^32 with acq_rel ordering, returning the original word."
+msgstr "按模 2^32 以 acq_rel 顺序相加，返回原值。"
+
+msgid "Add modulo 2^32 with release ordering; return original word."
+msgstr "按模 2^32 以 release 顺序相加，返回原值。"
+
+msgid "Subtract modulo 2^32 with acq_rel ordering; return original."
+msgstr "按模 2^32 以 acq_rel 顺序相减，返回原值。"
+
+msgid "Subtract modulo 2^32 with release ordering; return original."
+msgstr "按模 2^32 以 release 顺序相减，返回原值。"
+
+msgid "cache.h"
+msgstr "cache.h"
+
+msgid "Explicit whole-line CPU cache maintenance mechanisms."
+msgstr "显式的 CPU 完整缓存行维护机制。"
+
+msgid "Publish dirty data cache lines to the point of coherency."
+msgstr "将脏数据缓存行发布到一致性点。"
+
+msgid "Discard complete data cache lines without writing them."
+msgstr "丢弃完整数据缓存行，不执行写回。"
+
+msgid "Publish dirty data and discard the complete cache lines."
+msgstr "发布脏数据并丢弃完整缓存行。"
+
+msgid "Make a complete owned range coherent for CPU instructions."
+msgstr "使调用者拥有的完整范围对 CPU 指令保持一致。"
+
+msgid "cache_control.h"
+msgstr "cache_control.h"
+
+msgid "Explicit owned Cortex-M7 cold cache transitions."
+msgstr "显式、自有的 Cortex-M7 冷缓存状态转换。"
+
+msgid "Defines"
+msgstr "宏定义"
+
+msgid "Data-cache ownership bit, independent of the hardware CCR layout."
+msgstr "数据缓存责任位，独立于硬件 CCR 位布局。"
+
+msgid "Instruction-cache ownership bit."
+msgstr "指令缓存责任位。"
+
+msgid "Enums"
+msgstr "枚举"
+
+msgid "Cold-transition admission or execution result."
+msgstr "冷转换准入或执行结果。"
+
+msgid "Values:"
+msgstr "取值："
+
+msgid "Admit cold caches and enable the explicitly selected ones."
+msgstr "对冷缓存作准入判定，并启用显式选定的缓存。"
+
+msgid "Clean and disable caches owned by this control object."
+msgstr "清理并禁用此控制对象负责的缓存。"
+
+msgid "Caller-owned cache responsibility and selector recovery."
+msgstr "调用者拥有的缓存责任与选择器恢复状态。"
+
+msgid "Retained data/instruction cache responsibility."
+msgstr "保留的数据／指令缓存责任。"
+
+msgid "Original CSSELR for an unfinished operation."
+msgstr "未完成操作对应的原始 CSSELR。"
+
+msgid "Original selector restoration is outstanding."
+msgstr "原始选择器的恢复仍未完成。"
+
+msgid "features.h"
+msgstr "features.h"
+
+msgid "Reviewed CPU mechanisms and allocation-free result types."
+msgstr "已审查的 CPU 机制与无分配结果类型。"
+
+msgid "Result of a validated local CPU mechanism operation."
+msgstr "经过验证的本地 CPU 机制操作结果。"
+
+msgid "Security state compiled for this firmware image."
+msgstr "为此固件镜像编译的安全状态。"
+
+msgid "Query immutable, compiled CPU mechanism capabilities."
+msgstr "查询不可变、编译期确定的 CPU 机制能力。"
+
+msgid "Reviewed mechanisms in the exact compiled CPU profile."
+msgstr "实际编译的精确 CPU profile 中的已审查机制。"
+
+msgid "mpu.h"
+msgstr "mpu.h"
+
+msgid "Distinct Armv7-M and Armv8-M MPU encoding mechanisms."
+msgstr "分别实现 Armv7-M 与 Armv8-M MPU 编码机制。"
+
+msgid "Encode an exact Armv7-M region without accessing hardware."
+msgstr "编码准确的 Armv7-M 区域，不访问硬件。"
+
+msgid "Encode an exact Armv8-M region without accessing hardware."
+msgstr "编码准确的 Armv8-M 区域，不访问硬件。"
+
+msgid "Program one disabled-MPU Armv7-M region in this world."
+msgstr "在当前安全世界的 MPU 关闭时，编程一个 Armv7-M 区域。"
+
+msgid "Program one disabled-MPU Armv8-M region in this world."
+msgstr "在当前安全世界的 MPU 关闭时，编程一个 Armv8-M 区域。"
+
+msgid "Update one Armv8-M MAIR byte without changing its neighbors."
+msgstr "更新一个 Armv8-M MAIR 字节，不修改相邻字节。"
+
+msgid "Armv7-M region fields, without an implicit memory policy."
+msgstr "Armv7-M 区域字段，不包含隐式内存策略。"
+
+msgid "Armv7-M words targeting the caller-selected RNR, not RBAR.VALID."
+msgstr "针对调用者选定 RNR 的 Armv7-M 寄存器字，不使用 RBAR.VALID。"
+
+msgid "Armv8-M fields; limit is the exact inclusive final byte."
+msgstr "Armv8-M 字段；limit 是准确且包含在范围内的最后一个字节。"
+
+msgid "Armv8-M words retaining its separate MAIR indirection."
+msgstr "保留独立 MAIR 间接索引的 Armv8-M 寄存器字。"
+
+msgid "nonsecure.h"
+msgstr "nonsecure.h"
+
+msgid "Explicit NonSecure unprivileged address permission checks."
+msgstr "显式的 NonSecure 非特权地址权限检查。"
+
+msgid "Requested NonSecure unprivileged CPU access, never execute access."
+msgstr "请求的 NonSecure 非特权 CPU 数据访问，不包含执行访问。"
+
+msgid "Check current NonSecure unprivileged access to a full span."
+msgstr "检查当前 NonSecure 非特权上下文对完整范围的访问权限。"
+
+msgid "security.h"
+msgstr "security.h"
+
+msgid "Local security-state and explicit SAU region mechanisms."
+msgstr "本地安全状态与显式 SAU 区域机制。"
+
+msgid "Query this image's compiled security state."
+msgstr "查询此镜像的编译期安全状态。"
+
+msgid "Encode an explicit SAU region without hardware access."
+msgstr "编码显式 SAU 区域，不访问硬件。"
+
+msgid "Program one owned SAU region while the SAU is disabled."
+msgstr "SAU 关闭时，编程一个自有 SAU 区域。"
+
+msgid "Disable one owned SAU region while the SAU is disabled."
+msgstr "SAU 关闭时，禁用一个自有 SAU 区域。"
+
+msgid "Exact 32-byte-aligned SAU region owned by the Secure caller."
+msgstr "由 Secure 调用者拥有、准确按 32 字节对齐的 SAU 区域。"
+
+msgid "Validated SAU words; encoding never changes hardware."
+msgstr "经过验证的 SAU 寄存器字；编码不会改变硬件。"
+
+msgid "sleep.h"
+msgstr "sleep.h"
+
+msgid "Reviewed single-CPU shallow sleep contracts."
+msgstr "已审查的单 CPU 浅睡眠合同。"
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "作者  Nexus Team   版本  1.0.0   日期  2026-10-11   版权  Copyright (c) 2026 Nexus Team"
+
+msgid "Wait once with configurable exceptions already masked."
+msgstr "在可配置异常已被屏蔽的条件下等待一次。"
+
+msgid "Atomically recheck a published sequence before WFI."
+msgstr "执行 WFI 前，以原子方式重新检查已发布序列。"

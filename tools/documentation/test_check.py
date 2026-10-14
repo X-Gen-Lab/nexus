@@ -65,6 +65,79 @@ class DocumentationCheckTests(unittest.TestCase):
         self.write("page.md", "# Page\n\n[use][link]\n\n[link]: absent.md\n")
         self.assertIn("missing", " ".join(self.scan()["errors"]))
 
+    def rst_page(self, contents):
+        (self.root / "docs/page.md").unlink(missing_ok=True)
+        self.write("page.rst", contents)
+
+    def test_rst_missing_inline_link_is_reported(self):
+        self.rst_page("Page\n====\n\n`missing <absent.md>`_\n")
+        self.assertIn("missing link absent.md", " ".join(self.scan()["errors"]))
+
+    def test_rst_missing_named_link_is_reported(self):
+        self.rst_page("Page\n====\n\nUse reader_.\n\n.. _reader: absent.md\n")
+        self.assertIn("missing link absent.md", " ".join(self.scan()["errors"]))
+
+    def test_rst_missing_cross_page_anchor_is_reported(self):
+        self.rst_page("Page\n====\n\n`missing <index.md#absent>`_\n")
+        self.assertIn("missing anchor", " ".join(self.scan()["errors"]))
+
+    def test_rst_heading_and_explicit_label_links_are_accepted(self):
+        self.rst_page("Page\n====\n\n.. _contract-label:\n\n"
+                      "Contract rules\n--------------\n")
+        self.write("index.md", "# Start\n\n```{toctree}\npage\n```\n"
+                   "[heading](page.rst#contract-rules) "
+                   "[label](page.rst#contract-label)\n")
+        self.assertEqual(self.scan()["errors"], [])
+
+    def test_rst_literal_code_does_not_create_links(self):
+        self.rst_page("Page\n====\n\n.. code-block:: rst\n\n"
+                      "    `example <absent.md>`_\n    .. image:: absent.png\n")
+        self.assertEqual(self.scan()["errors"], [])
+
+    def test_rst_missing_image_and_include_inputs_are_reported(self):
+        for directive in ("include", "image", "figure"):
+            with self.subTest(directive=directive):
+                self.rst_page("Page\n====\n\n.. " + directive
+                              + ":: absent.txt\n")
+                self.assertIn("absent.txt", " ".join(self.scan()["errors"]))
+
+    def test_fenced_include_documentation_is_not_a_source_dependency(self):
+        self.write("page.md", "# Page\n\n````markdown\n"
+                   "```{literalinclude} absent.c\n```\n"
+                   ":::{image} absent.png\n:::\n````\n")
+        self.assertEqual(self.scan()["errors"], [])
+
+    def test_nested_include_cycle_is_rejected(self):
+        self.write("page.md", "# Page\n\n```{include} fragment.txt\n```\n")
+        self.write("fragment.txt", "```{include} page.md\n```\n")
+        self.assertIn("include cycle", " ".join(self.scan()["errors"]))
+
+    def test_colon_fenced_local_image_is_a_checked_input(self):
+        self.write("page.md", "# Page\n\n:::{image} absent.png\n"
+                   ":alt: example\n:::\n")
+        self.assertIn("absent.png", " ".join(self.scan()["errors"]))
+
+    def test_include_symlink_is_rejected(self):
+        target = self.write("consumer.c", "int consumer(void) { return 0; }\n")
+        self.write("page.md", "# Page\n\n```{literalinclude} linked.c\n```\n")
+        (self.root / "docs/linked.c").symlink_to(target)
+        self.assertIn("symlink", " ".join(self.scan()["errors"]))
+
+    def test_include_filenames_are_not_uri_decoded(self):
+        for name in ("consumer.c#extra", "consumer%2Ec", "<consumer.c>",
+                     "consumer.c?extra", "scheme:consumer.c"):
+            with self.subTest(name=name):
+                actual = self.write(name, "int actual_input;\n")
+                self.write("consumer.c", "int decoy_input;\n")
+                self.write("page.md", "# Page\n\n```{literalinclude} "
+                           + name + "\n```\n")
+                self.assertEqual(check.dependencies(self.root), {actual})
+
+    def test_image_paths_still_use_uri_decoding(self):
+        image = self.write("consumer.svg", '<svg viewBox="0 0 1 1"/>')
+        self.write("page.md", "# Page\n\n![image](consumer%2Esvg#part)\n")
+        self.assertEqual(check.dependencies(self.root), {image})
+
     def test_symlink_escape_is_rejected(self):
         outside = Path(self.directory.name).parent / "outside-doc.md"
         (self.root / "docs" / "linked.md").symlink_to(outside)

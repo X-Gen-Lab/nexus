@@ -1,0 +1,280 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 33331456654162e38e2d743a62c82dd606ea6795f8fdb6565ec8b89b31927946\n"
+
+msgid "Coding Standards"
+msgstr "Coding Standards"
+
+msgid "Nexus follows strict coding standards for quality and safety."
+msgstr "Nexus follows strict coding standards for quality and safety."
+
+msgid "C Standard"
+msgstr "C Standard"
+
+msgid "C11 for source code"
+msgstr "C11 for source code"
+
+msgid "C11 for production code and maintained C contract fixtures"
+msgstr "C11 for production code and maintained C contract fixtures"
+
+msgid ""
+"C++17 for host GoogleTest/GoogleMock and external ABI consumer checks; "
+"neither the test framework nor its C++ runtime enters firmware"
+msgstr ""
+"C++17 for host GoogleTest/GoogleMock and external ABI consumer checks; "
+"neither the test framework nor its C++ runtime enters firmware"
+
+msgid "Code Formatting"
+msgstr "Code Formatting"
+
+msgid ""
+"The project uses clang-format for automatic code formatting. Run ``clang-"
+"format`` before committing code."
+msgstr ""
+"The project uses clang-format for automatic code formatting. Run ``clang-"
+"format`` before committing code."
+
+msgid ""
+"See also: ``.kiro/steering/comment-standards.md`` for detailed comment "
+"guidelines."
+msgstr ""
+"See also: ``.kiro/steering/comment-standards.md`` for detailed comment "
+"guidelines."
+
+msgid "Indentation"
+msgstr "Indentation"
+
+msgid "Use 4 spaces for indentation (no tabs)"
+msgstr "Use 4 spaces for indentation (no tabs)"
+
+msgid "Indent case labels inside switch statements"
+msgstr "Indent case labels inside switch statements"
+
+msgid "Do not indent preprocessor directives"
+msgstr "Do not indent preprocessor directives"
+
+msgid "Line Length"
+msgstr "Line Length"
+
+msgid "Maximum line length: 80 characters"
+msgstr "Maximum line length: 80 characters"
+
+msgid "Break long lines at appropriate points"
+msgstr "Break long lines at appropriate points"
+
+msgid "Braces"
+msgstr "Braces"
+
+msgid "Use attached braces (K&R style)::"
+msgstr "Use attached braces (K&R style)::"
+
+msgid "Spaces"
+msgstr "Spaces"
+
+msgid "Space after control keywords: ``if (``, ``for (``, ``while (``"
+msgstr "Space after control keywords: ``if (``, ``for (``, ``while (``"
+
+msgid "No space after function names: ``func()``"
+msgstr "No space after function names: ``func()``"
+
+msgid "No space after casts: ``(int)value``"
+msgstr "No space after casts: ``(int)value``"
+
+msgid "Two spaces before trailing comments"
+msgstr "Two spaces before trailing comments"
+
+msgid "Space around binary operators: ``a + b``, ``x = y``"
+msgstr "Space around binary operators: ``a + b``, ``x = y``"
+
+msgid "Pointer Alignment"
+msgstr "Pointer Alignment"
+
+msgid "Pointers align to the left (with the type)::"
+msgstr "Pointers align to the left (with the type)::"
+
+msgid "Empty Lines"
+msgstr "Empty Lines"
+
+msgid "Maximum one consecutive empty line"
+msgstr "Maximum one consecutive empty line"
+
+msgid "Use empty lines to separate logical sections"
+msgstr "Use empty lines to separate logical sections"
+
+msgid "Naming Conventions"
+msgstr "Naming Conventions"
+
+msgid "Functions: ``module_action_object()`` (e.g., ``nx_gpio_port_write()``)"
+msgstr ""
+"Functions: ``module_action_object()`` (e.g., ``nx_gpio_port_write()``)"
+
+msgid "Types: ``module_type_t`` (e.g., ``nx_result_t``)"
+msgstr "Types: ``module_type_t`` (e.g., ``nx_result_t``)"
+
+msgid "Macros: ``MODULE_MACRO_NAME`` (e.g., ``NX_SUCCESS``)"
+msgstr "Macros: ``MODULE_MACRO_NAME`` (e.g., ``NX_SUCCESS``)"
+
+msgid "Constants: ``MODULE_CONSTANT`` (e.g., ``NEXUS_UART0_SELECTED``)"
+msgstr "Constants: ``MODULE_CONSTANT`` (e.g., ``NEXUS_UART0_SELECTED``)"
+
+msgid "Static variables: ``s_variable_name`` prefix"
+msgstr "Static variables: ``s_variable_name`` prefix"
+
+msgid "Global variables: ``g_variable_name`` prefix (avoid when possible)"
+msgstr "Global variables: ``g_variable_name`` prefix (avoid when possible)"
+
+msgid "Documentation"
+msgstr "Documentation"
+
+msgid ""
+"All public APIs must have Doxygen comments. This project uses ``\\\\`` style"
+" Doxygen tags (not ``@`` style)."
+msgstr ""
+"All public APIs must have Doxygen comments. This project uses ``\\\\`` style"
+" Doxygen tags (not ``@`` style)."
+
+msgid "Tag Alignment"
+msgstr "Tag Alignment"
+
+msgid ""
+"Align the description after each Doxygen tag as shown below. Excluding any "
+"surrounding code indentation, the description starts at column 21: the tag "
+"and its padding occupy 17 characters after the opening comment star::"
+msgstr ""
+"Align the description after each Doxygen tag as shown below. Excluding any "
+"surrounding code indentation, the description starts at column 21: the tag "
+"and its padding occupy 17 characters after the opening comment star::"
+
+msgid "File Header Format"
+msgstr "File Header Format"
+
+msgid "Every source file must have a file header comment."
+msgstr "Every source file must have a file header comment."
+
+msgid "**Header files (.h)** - Minimal format::"
+msgstr "**Header files (.h)** - Minimal format::"
+
+msgid "**Source files (.c)** - Full format with version and copyright::"
+msgstr "**Source files (.c)** - Full format with version and copyright::"
+
+msgid "Header Files (.h)"
+msgstr "Header Files (.h)"
+
+msgid ""
+"Header files contain full API documentation including parameters and return "
+"values::"
+msgstr ""
+"Header files contain full API documentation including parameters and return "
+"values::"
+
+msgid "Source Files (.c)"
+msgstr "Source Files (.c)"
+
+msgid ""
+"Source definitions explain hardware ordering and invariants without "
+"duplicating ``\\param`` or ``\\return`` from the header. Use ``\\brief``, "
+"``\\details`` and ``\\note`` as needed::"
+msgstr ""
+"Source definitions explain hardware ordering and invariants without "
+"duplicating ``\\param`` or ``\\return`` from the header. Use ``\\brief``, "
+"``\\details`` and ``\\note`` as needed::"
+
+msgid "Section Comments"
+msgstr "Section Comments"
+
+msgid ""
+"Use section comments to organize code into logical blocks. The separator "
+"line must be exactly 79 characters (``/*`` + 75 characters + ``*/``), "
+"preserving the existing template::"
+msgstr ""
+"Use section comments to organize code into logical blocks. The separator "
+"line must be exactly 79 characters (``/*`` + 75 characters + ``*/``), "
+"preserving the existing template::"
+
+msgid ""
+"**Important**: Do NOT use ``/*===...===*/`` style separators. Always use "
+"``/*---...---*/`` for consistency."
+msgstr ""
+"**Important**: Do NOT use ``/*===...===*/`` style separators. Always use "
+"``/*---...---*/`` for consistency."
+
+msgid "Inline Comments"
+msgstr "Inline Comments"
+
+msgid "Use ``/* comment */`` style for inline comments, not ``//``::"
+msgstr "Use ``/* comment */`` style for inline comments, not ``//``::"
+
+msgid "Macro Comments"
+msgstr "Macro Comments"
+
+msgid "Use Doxygen block comments or inline comments for macros::"
+msgstr "Use Doxygen block comments or inline comments for macros::"
+
+msgid "Static Functions"
+msgstr "Static Functions"
+
+msgid "Static functions use simplified comments with only ``\\brief``::"
+msgstr "Static functions use simplified comments with only ``\\brief``::"
+
+msgid "Prohibited Practices"
+msgstr "Prohibited Practices"
+
+msgid "The following practices are NOT allowed:"
+msgstr "The following practices are NOT allowed:"
+
+msgid "Using ``@`` style Doxygen tags (use ``\\\\`` instead)"
+msgstr "Using ``@`` style Doxygen tags (use ``\\\\`` instead)"
+
+msgid "Using ``//`` single-line comments (use ``/* */`` instead)"
+msgstr "Using ``//`` single-line comments (use ``/* */`` instead)"
+
+msgid ""
+"Using ``/*===...===*/`` section separators (use ``/*---...---*/`` instead)"
+msgstr ""
+"Using ``/*===...===*/`` section separators (use ``/*---...---*/`` instead)"
+
+msgid "Duplicating ``\\param`` and ``\\return`` in source files (only in headers)"
+msgstr ""
+"Duplicating ``\\param`` and ``\\return`` in source files (only in headers)"
+
+msgid "Ownership and evidence"
+msgstr "Ownership and evidence"
+
+msgid ""
+"Public declarations specify context, deadlines, retained storage and failure"
+" state. Describe why a volatile read, ordering barrier or drain is "
+"necessary. ``SETTLED`` is the provider's final request access. Cancellation "
+"never permits reclaiming a borrowed buffer before settlement or proved "
+"controlled recovery."
+msgstr ""
+"Public declarations specify context, deadlines, retained storage and failure"
+" state. Describe why a volatile read, ordering barrier or drain is "
+"necessary. ``SETTLED`` is the provider's final request access. Cancellation "
+"never permits reclaiming a borrowed buffer before settlement or proved "
+"controlled recovery."
+
+msgid ""
+"Changed files pass whole-file formatting and mechanical comment checks. "
+"Install local Git hooks with ``python scripts/setup/install_dev_tools.py``. "
+"The commit and CI gates share ``scripts/ci/style_gate.py``; no hook bypass "
+"is a validation result. Actual warning/analyzer and behavioral evidence is "
+"separate from style."
+msgstr ""
+"Changed files pass whole-file formatting and mechanical comment checks. "
+"Install local Git hooks with ``python scripts/setup/install_dev_tools.py``. "
+"The commit and CI gates share ``scripts/ci/style_gate.py``; no hook bypass "
+"is a validation result. Actual warning/analyzer and behavioral evidence is "
+"separate from style."
+
+msgid ""
+"Selected analyzer checks do not establish MISRA certification or industrial "
+"functional-safety qualification."
+msgstr ""
+"Selected analyzer checks do not establish MISRA certification or industrial "
+"functional-safety qualification."

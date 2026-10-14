@@ -1,0 +1,363 @@
+# Authored translation; independent review pending.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 9a5768c18c66f7e75b7711d07151607d53972756df37334a9208e2ebea1a5237\n"
+
+msgid "SoC execution budgets"
+msgstr "SoC 执行预算"
+
+msgid ""
+"The authored assembly and immutable resolved IR select exact controller "
+"modes, capacities and clock profiles. This document explains how to review "
+"their execution costs; it is not another capability registry or "
+"configuration input. The [derived capability "
+"matrix](../delivery/capabilities.md) owns the maintained selection "
+"projection. Product scheduling and overload policy stay external."
+msgstr ""
+"作者装配与不可变解析 IR 选择精确控制器模式、容量及 clock profile。本文件说明如何审查执行成本，不是另一能力 registry "
+"或配置输入。[派生能力矩阵](../delivery/capabilities.md)持有维护中的选择投影。产品调度和过载策略留在外部。"
+
+msgid "Work, time and completion"
+msgstr "工作量、时间与完成"
+
+msgid ""
+"A finite work count is not a measured time bound. Bootstrap loops use "
+"explicit poll limits because the monotonic clock may not yet exist. Runtime "
+"absolute deadlines belong to the current boot clock domain. IRQ delay, DMA "
+"arbitration, bus stalls, notification latency and service intervals require "
+"measurements for the exact firmware and hardware under load."
+msgstr ""
+"有限工作次数不是实测时间上限。启动 loop 使用显式 poll limit，因为单调时钟可能尚未存在。运行时绝对 deadline "
+"属当前启动时钟域。IRQ 延迟、DMA 仲裁、总线 stall、通知延迟及 service 间隔须对精确固件／硬件负载测量。"
+
+msgid ""
+"Each selected mode must document its maximum IRQ work, task service work, "
+"critical-section scope, caller storage and terminal predicate. A drain "
+"deadline limits the period before quarantine; it never authorizes releasing "
+"borrowed memory. The executor must keep calling service/recovery until "
+"hardware, IRQ, queues and observers actually withdraw their references."
+msgstr ""
+"每种所选模式须说明最大 IRQ 工作、任务 service 工作、critical-section 范围、调用方存储及终止谓词。排空 deadline "
+"限制进入隔离前时间，绝不授权释放借用内存。执行者必须继续 service/recovery，直到硬件、IRQ、队列及观察者真正撤销引用。"
+
+msgid "Current mechanisms"
+msgstr "当前机制"
+
+msgid "Mode family"
+msgstr "模式族"
+
+msgid "Bounded work and progress"
+msgstr "有界工作与进展"
+
+msgid "Final ownership condition"
+msgstr "最终所有权条件"
+
+msgid "GPIO"
+msgstr "GPIO"
+
+msgid "Direct authorized register command; toggle requires serialized writers"
+msgstr "直接授权寄存器命令；toggle 需写入者串行"
+
+msgid "External direct writers joined before pin release"
+msgstr "引脚释放前 join 外部直接写入者"
+
+msgid "UART IRQ bytes/events"
+msgstr "UART IRQ 字节／事件"
+
+msgid ""
+"At most one TX and one RX hardware byte per IRQ; reads copy one ring item "
+"per short critical section"
+msgstr "每 IRQ 最多一个 TX／RX 硬件字节；read 每短 critical section 复制一个环元素"
+
+msgid ""
+"Actual wire TC or reviewed reset abort, TX IRQ withdrawal and captured wake "
+"join"
+msgstr "真实 wire TC 或已审 reset abort、TX IRQ 撤销及已捕获 wake join"
+
+msgid "UART IRQ blocks"
+msgstr "UART IRQ 数据块"
+
+msgid "One hardware byte per IRQ; block acquisition/release is explicit"
+msgstr "每 IRQ 一个硬件字节；block acquire/release 显式"
+
+msgid ""
+"Last prefix published, hardware sources withdrawn and every consumer loan "
+"returned"
+msgstr "最终 prefix 发布、硬件源撤销且全部 consumer loan 归还"
+
+msgid "UART finite TX DMA"
+msgstr "UART 有限 TX DMA"
+
+msgid ""
+"One selected channel's terminal facts per IRQ; task service observes DMA and"
+" UART independently"
+msgstr "每 IRQ 处理一个选定 channel 的终止事实；任务 service 独立观察 DMA 与 UART"
+
+msgid "DMA engine/source off and actual UART wire completion before SETTLED"
+msgstr "DMA engine/source 关闭和真实 UART wire 完成后才 SETTLED"
+
+msgid "UART RX DMA idle/continuous and duplex"
+msgstr "UART RX DMA 空闲／连续与双向"
+
+msgid ""
+"Selected bank/IDLE/error facts; caller supplies finite buffers/blocks and "
+"replacement capacity"
+msgstr "选定 bank/IDLE/error 事实；调用方提供有限 buffer/block 和替换容量"
+
+msgid ""
+"Memory engine stopped and stable prefix/bank proven; RX loans and "
+"independent TX drain retained"
+msgstr "memory engine 停止、稳定 prefix/bank 已证明；保留 RX loan 和独立 TX drain"
+
+msgid "SPI short polling"
+msgstr "SPI 短轮询"
+
+msgid "Per-call finite length and absolute deadline; no IRQ mode fallback"
+msgstr "每调用有限长度和绝对 deadline；无 IRQ 模式回退"
+
+msgid ""
+"Both controller and endpoint retain ownership for the complete CS interval"
+msgstr "整个 CS 区间 controller 和 endpoint 均保留所有权"
+
+msgid "SPI finite full-duplex DMA"
+msgstr "SPI 有限全双工 DMA"
+
+msgid "Two selected engines; task service checks memory and shifter facts"
+msgstr "两个所选 engine；任务 service 检查 memory 和 shifter 事实"
+
+msgid "Both DMA sources withdrawn, wire idle, then CS release and SETTLED"
+msgstr "两个 DMA 源撤销、wire idle，之后才释放 CS 并 SETTLED"
+
+msgid "I2C polling"
+msgstr "I2C 轮询"
+
+msgid "Finite message/byte count; reviewed ACK windows and bounded STOP work"
+msgstr "有限 message/byte 数；已审 ACK window 与有界 STOP 工作"
+
+msgid "STOP/master/line state satisfies the exact implementation contract"
+msgstr "STOP/master/line 状态满足精确实现合同"
+
+msgid "I2C IRQ/DMA messages"
+msgstr "I2C IRQ/DMA 消息"
+
+msgid ""
+"Shared V1 IRQ consumes at most two DATA bytes; DMA observes its selected "
+"direction"
+msgstr "共享 V1 IRQ 最多消费两个 DATA 字节；DMA 观察所选方向"
+
+msgid "Protocol STOP, wire/master state and DMA/source withdrawal all succeed"
+msgstr "protocol STOP、wire/master 状态及 DMA/source 撤销全部成功"
+
+msgid "ADC polling/trigger blocks"
+msgstr "ADC 轮询／触发数据块"
+
+msgid "At most the configured scan per task-side rearm; finite block capacity"
+msgstr "每次任务侧 rearm 最多配置 scan；有限 block 容量"
+
+msgid ""
+"Trigger and conversion stopped, DMA actually disabled, then "
+"publication/reclaim"
+msgstr "trigger/conversion 停止、DMA 实际关闭，之后才发布／回收"
+
+msgid "ADC continuous trigger blocks"
+msgstr "ADC 连续触发数据块"
+
+msgid ""
+"Double-bank terminal facts and explicit replacement; no overwrite of "
+"borrowed blocks"
+msgstr "double-bank 终止事实和显式 replacement；不覆盖借出 block"
+
+msgid "Closed producer and DMA sources; all outstanding block loans returned"
+msgstr "producer 与 DMA 源关闭；全部 outstanding block loan 归还"
+
+msgid "EXTI"
+msgstr "EXTI"
+
+msgid ""
+"Visit only selected line states in deterministic generated order; one queue "
+"fact per pending line"
+msgstr "只按生成确定次序访问所选 line；每 pending line 一个 queue 事实"
+
+msgid ""
+"This line masked/acknowledged, active shared vector joined, wake withdrawn"
+msgstr "本 line mask/ack、活动 shared vector join、wake 撤销"
+
+msgid "PWM/advanced PWM"
+msgstr "PWM／高级 PWM"
+
+msgid "Fixed authorized channel/period operations and latched break state"
+msgstr "固定授权 channel/period 操作和锁存 break"
+
+msgid "Reviewed inactive output before timer ownership release"
+msgstr "timer 所有权释放前进入已审 inactive 输出"
+
+msgid "Timer capture"
+msgstr "定时器捕获"
+
+msgid "Finite selected channels and visible capture/overflow facts"
+msgstr "有限所选 channel 与可见 capture/overflow 事实"
+
+msgid "Capture IRQ/source withdrawal before event storage release"
+msgstr "event 存储释放前 capture IRQ/source 撤销"
+
+msgid "Classic CAN"
+msgstr "经典 CAN"
+
+msgid ""
+"Three TX mailboxes; at most three initially queued frames per each of two RX"
+" FIFOs"
+msgstr "三个 TX mailbox；两个 RX FIFO 各最多三帧初始队列"
+
+msgid "Per-mailbox abort/terminal facts, INAK/RX drain and publisher join"
+msgstr "各 mailbox abort/terminal 事实、INAK/RX drain 及 publisher join"
+
+msgid "USB FS device PIO"
+msgstr "USB FS 设备 PIO"
+
+msgid ""
+"At most eight RX headers and 128 payload words per IRQ; progress scans "
+"selected endpoint count"
+msgstr "每 IRQ 最多八个 RX header／128 payload word；进展扫描所选 endpoint 数"
+
+msgid ""
+"Endpoint request drain, FIFO/source withdrawal, publisher join and clock "
+"release"
+msgstr "endpoint 请求排空、FIFO/source 撤销、publisher join 和 clock release"
+
+msgid "Raw Ethernet/MDIO"
+msgstr "原始 Ethernet／MDIO"
+
+msgid ""
+"Task progress bounded by selected descriptor counts; MDIO has an absolute "
+"deadline"
+msgstr "任务进展由所选 descriptor 数限定；MDIO 有绝对 deadline"
+
+msgid ""
+"Descriptor/DMA ownership withdrawn, IRQ publisher joined and every RX loan "
+"returned"
+msgstr "descriptor/DMA 所有权撤销、IRQ publisher join、全部 RX loan 归还"
+
+msgid "Internal Flash"
+msgstr "内部 Flash"
+
+msgid ""
+"Finite reviewed physical operation and absolute deadline; geometry is chip-"
+"specific"
+msgstr "有限已审物理操作与绝对 deadline；geometry 为芯片特定"
+
+msgid "Hardware busy cleared or explicit retained recovery responsibility"
+msgstr "hardware busy 清除或明确保留恢复责任"
+
+msgid "Watchdog"
+msgstr "看门狗"
+
+msgid "Finite enable/feed operation; enabling is irreversible"
+msgstr "有限 enable/feed 操作；使能不可逆"
+
+msgid "Stop never fabricates release of an active hardware watchdog"
+msgstr "stop 绝不虚构释放活动硬件 watchdog"
+
+msgid "The exact implementations and configured limits remain authoritative:"
+msgstr "精确实现与配置限值保持权威："
+
+msgid ""
+"UART: `soc/*/drivers/uart*.c`; G474 and U575 use IRQ bytes. H743 RX also "
+"uses IRQ bytes; its explicitly selected finite TX DMA has a separate "
+"memory/Cache and drain contract. The F407, G474, H743 and U575 wire-drain "
+"allowance is `20000000 / baud + 100` microseconds. GD IRQ uses its reviewed "
+"reset-abort protocol; it is not assigned the ST wire-drain formula."
+msgstr ""
+"UART：`soc/*/drivers/uart*.c`；G474 和 U575 使用 IRQ 字节。H743 RX 也使用 IRQ "
+"字节；显式选定的有限 TX DMA 有独立内存／Cache 与排空合同。F407/G474/H743/U575 的线侧排空余量为 `20000000 /"
+" baud + 100` 微秒。GD IRQ 使用已审 reset-abort，不套用 ST 线侧排空公式。"
+
+msgid ""
+"SPI: `soc/*/drivers/spi*.c`; the finite DMA drain allowance is 200 "
+"microseconds."
+msgstr "SPI：`soc/*/drivers/spi*.c`；有限 DMA drain 余量 200 微秒。"
+
+msgid ""
+"I2C: `soc/common/i2c_v1_async.c` and the SoC wrappers; V1 async drain "
+"allowance is 1,000 microseconds. Polling STOP has separate finite work."
+msgstr ""
+"I2C：`soc/common/i2c_v1_async.c` 与 SoC 包装；V1 async drain 余量 1,000 微秒，polling "
+"STOP 有独立有限工作。"
+
+msgid ""
+"ADC/EXTI/timer: selected SoC driver and private state; scan, queue and "
+"channel limits come from resolved inputs or explicit caller storage."
+msgstr ""
+"ADC/EXTI/timer：所选 SoC driver 和私有状态；scan、queue、channel 限值来自解析输入或显式调用方存储。"
+
+msgid ""
+"CAN/USB/Ethernet: `io/src/can_controller.c`, `usb_device_controller.c` and "
+"`eth_mac.c`; poll/drain limits and selected capacities are validated at cold"
+" admission. IRQ notification remains a hint, never a replacement for "
+"predicates."
+msgstr ""
+"CAN/USB/Ethernet：`io/src/can_controller.c`、`usb_device_controller.c`、`eth_mac.c`；poll/drain"
+" 限制和所选容量在冷态准入校验。IRQ 通知只是提示，绝不替代谓词。"
+
+msgid "Cost review and evidence"
+msgstr "成本审查与证据"
+
+msgid ""
+"Keep the exact resolved configuration, compiler identity, flags, linked "
+"ELF/map, resource budget and retention outputs together. Compare equivalent "
+"CPU/ABI, backend, clock, memory layout and capacities. A source instruction "
+"count, object-file size or different-capacity image cannot establish an "
+"equivalent whole-image saving. Report Flash, static RAM, reservations and "
+"caller storage separately. Disassembly is real tool output, not a cycle "
+"measurement."
+msgstr ""
+"将精确解析配置、编译器身份、flags、链接 ELF/map、资源预算及 retention 输出一同保留。比较等价 "
+"CPU/ABI、backend、clock、内存布局和容量。源码指令数、object 大小或不同容量镜像不能建立等价整镜像收益。分别报告 "
+"Flash、static RAM、reservation 和调用方存储。反汇编是真实工具输出，不是周期测量。"
+
+msgid ""
+"`tools/measurement/soc_costs.py` observes actual linked functions and ELF "
+"resource costs with complete raw command receipts and input/tool hashes. Its"
+" comparison rejects changed routes, bindings, claims, backend or capacity "
+"profiles rather than silently attributing their cost to an implementation "
+"improvement. The empty versus selected and baremetal versus FreeRTOS "
+"dimensions remain useful selection-cost reports, but are not same-profile "
+"regression comparisons. The [SoC execution record](../delivery/soc-"
+"refinement-verification.md) identifies the source scope of completed "
+"observations and pending final baselines."
+msgstr ""
+"`tools/measurement/soc_costs.py` 观察实际链接函数与 ELF 资源成本，保留完整原始命令凭据及 input/tool "
+"hash。比较拒绝 routes、bindings、claims、backend、capacity profile "
+"改变，避免把它们静默归为实现优化成本。Empty／selected、baremetal／FreeRTOS 维度是有用选择成本报告，但不是相同 "
+"profile 回归比较。[SoC 执行记录](../delivery/soc-refinement-verification.md)标明已完成观察的 "
+"source scope 与 pending 最终基线。"
+
+msgid ""
+"For changed interrupt/concurrency behavior, GoogleTest/GoogleMock calls the "
+"real production source with external register/CPU ports modeled. Record "
+"actual RED, then GREEN; retain admission, loss ordering, cancel, quarantine,"
+" wake and instance isolation regressions. ARM budget/retention verifies "
+"actual linking. Software checks do not certify physical IRQ latency or DMA "
+"throughput."
+msgstr ""
+"中断／并发行为变更时，GoogleTest/GoogleMock 调用真实生产源码，只模型化外部 register/CPU port。记录实际 RED "
+"后 GREEN，保留 admission、loss ordering、cancel、quarantine、wake 及 instance "
+"isolation 回归。ARM budget/retention 证明真实链接。软件检查不认证物理 IRQ latency 或 DMA "
+"throughput。"
+
+msgid ""
+"No numerical maximum service interval is asserted without the selected "
+"producer rate, storage, hardware and interference budget. External products "
+"must qualify that interval and the resulting overload policy. A missed "
+"service deadline cannot revoke an accepted request or block loan. Current "
+"physical measurements remain not executed until an actual station records "
+"them."
+msgstr ""
+"没有所选 producer rate、storage、hardware 和 interference budget，就不声明最大 service "
+"interval 数值。外部产品须为该间隔及过载策略建立资格。错过 service deadline 不能撤销接受的 request 或 block "
+"loan。当前物理测量均未执行，直到真实工位记录。"

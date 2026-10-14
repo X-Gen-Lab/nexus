@@ -1,0 +1,36 @@
+// FIG-13 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph CortexMCapabilities {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-13 Cortex-M 软件能力与实际平台接入\n内核名称不授权 FPU / cache / MPU / 安全域或实板资格"];
+    facts [label="显式 CPU facts\nM0 / M0+ / M3 / M4 / M7 / M23 / M33 / M55 / M85\nABI / DSP / FPU / MVE / cache / MPU / DWT / security / IRQ"];
+    resolver [label="严格 CpuProfileIR\n合法能力组合、ABI 与精确 kernel port"];
+    primitives [label="Arch / Core 原语\nmask、原子、屏障、显式 cache/MPU/SAU\nCache 冷控制仅维护 M7"];
+    runtime [label="Nexus::Runtime\nCore + Arch + typed I/O faces + 裸机/FreeRTOS\n没有 SoC / Board / startup / linker / factory"];
+    platform [label="Nexus::Platform：实际 SoC + Board 装配\nF407/F470 首发；G474/H743/U575 有限参考纵切片\n设备 ops / IRQ / clock / DMA 与资源另行接入"];
+    owner [label="外部产品 / boot owner\n任务、映射、安全启动、私有布局与恢复"];
+    software [label="独立 software scope\nHost/model 与实际 ARM/runtime 变体编译"];
+    physical [label="实际 CPU / SoC / PCB station\ncontext保存、cache/DMA、MPU/SAU、latency\n无实板保持 not_executed", fillcolor="#fff7ed"];
+    facts -> resolver [label="核对实际芯片事实"];
+    resolver -> primitives [label="选择 compile-time 机制"];
+    resolver -> runtime [label="选择 production targets / port"];
+    primitives -> runtime [label="公共机制"];
+    resolver -> platform [label="完整平台另需 SoC/Board facts"];
+    owner -> runtime [label="显式调用与责任"];
+    owner -> platform [label="外部装配 / 策略"];
+    primitives -> software [label="实际 gate"];
+    runtime -> software [label="实际 gate"];
+    platform -> software [label="选定整镜像 gate"];
+    platform -> physical [label="独立物理验收", style=dashed];
+    runtime -> physical [label="精确真实芯片验收", style=dashed];
+    { rank=same; runtime; platform; }
+}

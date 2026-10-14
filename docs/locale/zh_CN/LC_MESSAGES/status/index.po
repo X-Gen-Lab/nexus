@@ -1,11 +1,14 @@
-#
+# Authored translation; independently semantically reviewed.
 msgid ""
 msgstr ""
-"Project-Id-Version: Nexus source documentation\n"
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
 "X-Nexus-Source-SHA256: a3a17cb8c40c75faf1d25351fb597123fbb45aebc5135034457332c2f9e7bcfa\n"
 
@@ -16,4 +19,4 @@ msgid ""
 "Use these maintained records to locate implementation, software verification"
 " and physical work. Their recorded source IDs and configurations remain "
 "unchanged; this website build creates documentation evidence only."
-msgstr "通过维护记录定位实现、软件验证和实板工作。原记录的源码 ID 和配置保持不变；本网站构建只产生文档证据。"
+msgstr "使用这些维护记录定位实现、软件验证和实板工作。记录中的源码身份和配置保持不变；本站构建只产生文档证据。"

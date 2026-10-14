@@ -1,0 +1,309 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 1d115a5d51c86dec46be247d122c848ab636b6c0ed3b46a09e78488dcf2c1460\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:1
+msgid "Nexus 文档页面模板"
+msgstr "Nexus documentation page templates"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:3
+msgid ""
+"模板是必须回答的问题清单。标题可以按任务调整；已有规范通过包含或链接复用。 新增/修改正文遵守 [内容与图示标准](documentation-"
+"standards.md)，不得仅有页面 元数据就记录内容合格。实际教程代码来自已验证fixture或固定版本外部示例。"
+msgstr ""
+"Templates list questions every page must answer. Adapt headings to tasks and"
+" reuse standards by inclusion/linking. New/changed prose follows "
+"[content/diagram standards](documentation-standards.md); metadata alone does"
+" not establish content quality. Tutorial code comes from verified fixtures "
+"or pinned external examples."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:7
+msgid "1. Tutorial"
+msgstr "1. Tutorial"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:9
+msgid "目标和预期完成结果。"
+msgstr "Goal and expected completed outcome."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:10
+msgid "适用代码/SDK版本、Board/OS/模式、工具、工作目录和设备前提。"
+msgstr ""
+"Applicable code/SDK version, Board/OS/mode, tools, working directory and "
+"equipment prerequisites."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:11
+msgid "输入、配置、所需资源；完整输入与片段分别标明。"
+msgstr ""
+"Inputs, configuration and resources; label complete inputs separately from "
+"fragments."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:12
+msgid "一条完整操作路径，每步给命令或API、预期结果和检查方法。"
+msgstr ""
+"One complete path with commands/APIs, expected results and checks for each "
+"step."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:13
+msgid "遇到常见拒绝/失败时如何定位和保持资源。"
+msgstr "Diagnosing common rejection/failure while retaining resources."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:14
+msgid "停机、排空、清理，以及结果/存储何时可以复用。"
+msgstr "Shutdown, drain and cleanup; when results/storage may be reused."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:15
+msgid "实际验证记录和下一步。"
+msgstr "Actual validation records and next steps."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:17
+msgid ""
+"异步教程连接提交/取消/排空时序图；外部SDK教程连接消费流程图。没有设备时只 说明软件验证和HIL准备，不把未执行硬件步骤写成教程成功结果。"
+msgstr ""
+"Async tutorials link submission/cancellation/drain sequences; external-SDK "
+"tutorials link consumer flows. Without equipment, describe software "
+"validation/HIL preparation only rather than claiming hardware steps "
+"succeeded."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:20
+msgid "2. How-to"
+msgstr "2. How-to"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:22
+msgid "要完成的单一任务和适用范围。"
+msgstr "One task and its applicable scope."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:23
+msgid "合法Task/IRQ/权限上下文、输入和资源所有者。"
+msgstr "Legal Task/IRQ/privilege context, inputs and resource owners."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:24
+msgid "最短完整步骤；默认选择与例外明确。"
+msgstr "Shortest complete steps with explicit defaults/exceptions."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:25
+msgid "正常结果、拒绝、超时/取消及失败恢复。"
+msgstr "Normal results, rejection, timeout/cancel and failure recovery."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:26
+msgid "结束后哪些资源已归还，哪些责任仍保留。"
+msgstr "Resources returned and responsibilities still retained afterward."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:27
+msgid "限制和对应权威合同。"
+msgstr "Limitations and authoritative contracts."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:29
+msgid "可以省略基础原理并链接解释页，不能省略影响正确性的生命周期或并发条件。"
+msgstr ""
+"Link explanations instead of repeating fundamentals, but never omit "
+"lifecycle/concurrency conditions affecting correctness."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:31
+msgid "3. Reference"
+msgstr "3. Reference"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "项目"
+msgstr "Item"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "必需内容"
+msgstr "Required content"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "字段/符号"
+msgstr "Field/symbol"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "精确名称、类型和权威源"
+msgstr "Exact name, type and authority."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "数值"
+msgstr "Value"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "单位、范围、默认值及生效条件"
+msgstr "Units, range, defaults and activation conditions."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "组合"
+msgstr "Combination"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "有效/无效模式、平台和ABI组合"
+msgstr "Valid/invalid modes, platforms and ABIs."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "调用"
+msgstr "Call"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "上下文、deadline、输入/输出所有权"
+msgstr "Context, deadlines and input/output ownership."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "失败"
+msgstr "Failure"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "拒绝条件、状态变化、效果与后续责任"
+msgstr ""
+"Rejection conditions, state changes, effects and remaining responsibility."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "资格"
+msgstr "Qualification"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:0
+msgid "当前维护/软件/实板范围和证据入口"
+msgstr "Maintained/software/physical scope and evidence entry."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:42
+msgid ""
+"API声明自动生成，手册不手抄第二份函数签名。引用完整配置或有原因的fragment。 "
+"controller/endpoint、资源和内存布局复杂时连接结构图或精确参考配置图。"
+msgstr ""
+"Generate API declarations; manuals never hand-copy competing signatures. "
+"Reference complete configurations or explain fragments. Complex "
+"controller/endpoint, resource and memory relationships link "
+"structural/exact-reference diagrams."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:45
+msgid "4. Explanation"
+msgstr "4. Explanation"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:47
+msgid "具体问题和约束。"
+msgstr "Problem and constraints."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:48
+msgid "当前或目标结构，图的身份与来源。"
+msgstr "Current/target structure with diagram identity/sources."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:49
+msgid "各层责任、状态和资源所有者。"
+msgstr "Layer responsibilities, state and resource owners."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:50
+msgid "构建阶段与运行阶段，以及依赖/调用/数据流的区别。"
+msgstr ""
+"Build/runtime stages and distinctions between dependencies, calls and data "
+"flow."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:51
+msgid "主要流程和失败责任；并发流程连接时序/状态图。"
+msgstr ""
+"Main flows/failure responsibilities; concurrent flows link sequences/state "
+"diagrams."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:52
+msgid "性能/空间成本、取舍和适用条件。"
+msgstr "Performance/space costs, tradeoffs and conditions."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:53
+msgid "当前限制与实际验证范围。"
+msgstr "Limitations and actual validation scope."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:54
+msgid "关联合同、源码和操作指南。"
+msgstr "Related contracts, source and how-to guides."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:56
+msgid "架构解释必须有对应框图；单一简单事实可以引用已有图。无需重复画一张仅改变 颜色或名称的同义图。代码实现与目标提案不能在同一无标记图中合并。"
+msgstr ""
+"Architecture explanations must include corresponding diagrams; simple facts "
+"may reference existing diagrams. Do not redraw equivalent diagrams only to "
+"change colors/names. Never merge implementation and target proposals in one "
+"unlabeled diagram."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:59
+msgid "5. Status"
+msgstr "5. Status"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:61
+msgid "被描述代码、本文档和qualified source分别是什么。"
+msgstr ""
+"Separate identities of described code, documentation and qualified source."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:62
+msgid "精确配置、scope、工具与实际执行结果。"
+msgstr "Exact configuration/scope/tools and actual execution."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:63
+msgid "可取得的证据、档案/member与校验方法。"
+msgstr "Retrievable evidence, archives/members and verification."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:64
+msgid "已实现、已执行、未执行、失败或阻塞项。"
+msgstr "Implemented, executed, unexecuted, failed or blocked items."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:65
+msgid "支持和资格边界；下一退出条件。"
+msgstr "Support/qualification boundaries and next exit conditions."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:67
+msgid ""
+"表中的数字不能跨scope累加；implemented不替代软件/实板通过。资格流程图中 软件证据和HIL分别取得后汇合，不画成软件自动推进到物理通过。"
+msgstr ""
+"Never aggregate table numbers across scopes; implemented does not replace "
+"software/physical passes. Evidence flows acquire software and HIL "
+"independently before joining; software never automatically becomes physical "
+"qualification."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:70
+msgid "6. 每页审查清单"
+msgstr "6. Per-page review checklist"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:72
+msgid "读者、目标、版本和适用范围明确。"
+msgstr "Readers, goals, versions and scope are explicit."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:73
+msgid "步骤或规则可执行/可判断，命令前提与预期结果齐全。"
+msgstr ""
+"Steps/rules are actionable/checkable with command prerequisites and expected"
+" results."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:74
+msgid "对象、单位、上下文、借用、失败和恢复明确。"
+msgstr ""
+"Objects, units, contexts, borrowing, failures and recovery are explicit."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:75
+msgid "当前/目标/参考、实现/软件/HIL身份没有混淆。"
+msgstr ""
+"Current/target/reference and implementation/software/HIL identities stay "
+"distinct."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:76
+msgid "图中实体与每条边均可解释并与源码/合同一致。"
+msgstr ""
+"Every diagram entity/edge is explainable and matches source/contracts."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:77
+msgid "代码和配置例子有实际验证或明确片段原因。"
+msgstr ""
+"Code/configuration examples have actual validation or explicit fragment "
+"rationale."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:78
+msgid "正文、图和翻译没有复制出竞争规范。"
+msgstr "Prose, diagrams and translations create no competing standards."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:79
+msgid "引用、离线资源、alt/caption和旧URL处理正确。"
+msgstr ""
+"References, offline resources, alt/captions and legacy URLs are correct."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-templates.md:80
+msgid "发现和修正记录绑定实际页面/图与来源。"
+msgstr "Findings/fixes bind actual pages/diagrams and source identities."

@@ -33,6 +33,9 @@ def prepare_output(root, destination):
             or (destination.is_relative_to(root) and
                 destination.relative_to(root).parts[0] != "build")):
         raise ValueError("documentation output cannot overlap source inputs")
+    if any(path.is_relative_to(destination) for path in
+           check.dependencies(root, require_files=False)):
+        raise ValueError("documentation output cannot remove rendered inputs")
     marker = destination / OWNER
     if destination.exists():
         if not marker.is_file() or marker.is_symlink():
@@ -61,11 +64,12 @@ def _staged_sources(root):
     def relevant(path):
         name = path.relative_to(root).as_posix()
         if name.startswith("docs/"):
-            return (path.relative_to(root / "docs").parts[0] != "api"
-                    and not set(path.relative_to(root / "docs").parts).intersection(
-                        check.EXCLUDED - {"locale"})
-                    and path.suffix in {".md", ".rst", ".dot", ".svg", ".csv", ".json",
-                                        ".toml", ".po", ".py", ".html", ".css"})
+            parts = path.relative_to(root / "docs").parts
+            return (parts[0] != "api"
+                    and not set(parts).intersection(check.EXCLUDED - {"locale"})
+                    and (parts[0] == "assets" or path.suffix in {
+                        ".md", ".rst", ".dot", ".svg", ".csv", ".json",
+                        ".toml", ".po", ".py", ".html", ".css", ".js"}))
         return (name == "Doxyfile" or name.startswith("dependencies/docs-")
                 or name.startswith(("tools/documentation/", "tools/configure/"))
                 or (name.startswith(("boards/", "soc/")) and path.suffix == ".json"))
@@ -80,6 +84,7 @@ def _staged_sources(root):
         candidates.update(path for path in (root / directory).rglob("*")
                           if path.is_file() and relevant(path)
                           and "__pycache__" not in path.parts)
+    candidates.update(check.dependencies(root))
     for path in sorted(candidates):
         relative = path.relative_to(root).as_posix()
         indexed = subprocess.run(["git", "show", ":" + relative], cwd=root,
@@ -98,6 +103,8 @@ def _safe_report(root, path):
         raise ValueError("report cannot overwrite source inputs")
     if path.suffix != ".json":
         raise ValueError("documentation report must be JSON")
+    if path in check.dependencies(root, require_files=False):
+        raise ValueError("report cannot overwrite a rendered document input")
     return path
 
 
@@ -248,9 +255,13 @@ def main(arguments=None, *, root=ROOT):
                 command.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(arguments)
     root = Path(root).resolve()
+    failure_report = None
     try:
         if getattr(args, "report", None):
             args.report = _safe_report(root, args.report)
+            if args.action == "check":
+                failure_report = args.report
+                args.report.unlink(missing_ok=True)
         if args.action == "check":
             staged_tree = _staged_sources(root) if args.staged else None
             report = check.scan(root, external=args.external)
@@ -322,6 +333,16 @@ def main(arguments=None, *, root=ROOT):
                 server.server_close()
         return 0
     except (OSError, ValueError, subprocess.SubprocessError) as error:
+        if failure_report is not None:
+            try:
+                _record(failure_report, {
+                    "schema_version": 1,
+                    "kind": "nexus_documentation_source_check",
+                    "status": "failed", "errors": [str(error)],
+                    "admission_completed": False, "qualification": False})
+            except OSError as report_error:
+                print("Failure report could not be written: "
+                      + str(report_error), file=sys.stderr)
         print("Documentation command rejected: " + str(error), file=sys.stderr)
         return 2
 

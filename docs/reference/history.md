@@ -42,7 +42,10 @@ alias，不把全部历史教程塞进当前搜索或重新解释其合同。
 ## 旧地址如何处理
 
 [URL 迁移表](redirects.csv)列出旧 RST 对应路径、语言和目标页。
-`en/`、`zh_CN/` 旧地址分别保留；根 `api/index.html` 已用于当前公共 API，不能覆盖。
+`en/`、`zh_CN/` 旧地址分别保留。公开站点根 `api/index.html` 是历史 API 边界
+入口，引导读者确认版本后选择迁移说明；它不能静默解释为当前 API。
+当前公共 API 位于不可变版本根的 `versions/<release_id>/api/index.html`，
+或解压后离线包根的 `api/index.html`。判断地址时必须同时确认所属版本根。
 旧 HAL／OSAL／Kconfig 等不同语义的路径进入本页，明确版本边界后再选迁移指南。
 当前上一轮简版 Sphinx 同义入口可进入对应新页。alias 是本地 HTML 和相对链接，
 不依赖 JavaScript、CDN 或外部跳转服务。

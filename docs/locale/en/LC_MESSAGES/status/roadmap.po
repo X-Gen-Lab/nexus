@@ -1,0 +1,107 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 6216cc2c48cb898598e84c0dcc8038beec663ed0e3d17237aeaff2482aa452d5\n"
+
+msgid "迭代方向与进入条件"
+msgstr "Iteration directions and admission conditions"
+
+msgid ""
+"当前迭代以真实测量和原退出条件为依据。完整策略保留在 [后续迭代与团队执行](../delivery/next-iterations.md)，逐项状态由"
+" [原台账](ledgers.md)维护；本页提供任务入口，不重复更新状态。"
+msgstr ""
+"Current iteration follows actual measurements and original exit conditions. "
+"The complete strategy remains in [later iterations and team "
+"execution](../delivery/next-iterations.md); the [original "
+"ledgers](ledgers.md) maintain per-task status. This page provides task entry"
+" points without duplicating status updates."
+
+msgid "顺序"
+msgstr "Order"
+
+msgid "工作"
+msgstr "Work"
+
+msgid "进入与退出条件的权威"
+msgstr "Authority for admission and exit conditions"
+
+msgid "首先"
+msgstr "First"
+
+msgid "接入首发三板、来源参考板的真实 station，校准安全初值与 clock"
+msgstr ""
+"Connect real stations for the three initial and source-reference boards; "
+"calibrate safe initial levels and clocks"
+
+msgid "[HIL 状态](hardware.md)、原 station／qualification 合同"
+msgstr ""
+"[HIL status](hardware.md) and original station/qualification contracts"
+
+msgid "其次"
+msgstr "Next"
+
+msgid "测量已有 IRQ／DMA／连续流／取消排空模式及完整负载退出"
+msgstr ""
+"Measure existing IRQ/DMA/continuous-stream/cancellation-drain modes and "
+"full-load shutdown"
+
+msgid "原 I/O、OS 和 SoC 台账，以及同一 candidate 的真实 traces"
+msgstr ""
+"Original I/O, OS and SoC ledgers, and real traces for the same candidate"
+
+msgid "按测量扩展"
+msgstr "Expand according to measurements"
+
+msgid "新 controller／route、H743 更广 DMA／Cache、U575 DMA／安全域"
+msgstr ""
+"New controllers/routes, broader H743 DMA/Cache and U575 DMA/security domains"
+
+msgid "[SoC 原退出条件](ledgers/soc-refinement.md)，每个切片先固定所有权与失败合同"
+msgstr ""
+"[Original SoC exit conditions](ledgers/soc-refinement.md); first freeze "
+"ownership and failure contracts for each slice"
+
+msgid "独立设计"
+msgstr "Design separately"
+
+msgid "运行态交接、DVFS、deep STOP、真正的 userspace I/O transport"
+msgstr ""
+"Running-state handoff, DVFS, deep STOP and genuine userspace I/O transport"
+
+msgid "原 SOC-33–35 等仍未实现项；不能从当前固定 profile 推导完成"
+msgstr ""
+"Original unimplemented items such as SOC-33–35; completion cannot be "
+"inferred from current fixed profiles"
+
+msgid "维护交付"
+msgstr "Maintain delivery"
+
+msgid "工具、依赖、SDK、文档发布与恢复"
+msgstr "Tools, dependencies, SDK, documentation publication and recovery"
+
+msgid "各原台账及精确源执行记录，软件／发布／物理分别验收"
+msgstr ""
+"Original ledgers and exact-source execution records; accept "
+"software/publication/physical scope separately"
+
+msgid ""
+"Codex 负责所有维护领域，角色划分用于能力与容量安排，不需要虚构个人账号。 本地 ownership 文件不证明远程 GitHub branch "
+"rules 已启用。高风险改动保留独立审查， 新增行为与缺陷修复先真实 RED，再 GREEN，C 合同使用 "
+"GoogleTest／GoogleMock。 产品任务、恢复、安全升级、制造密钥与专有 PCB 位于外部工程。"
+msgstr ""
+"Codex owns all maintenance domains; role divisions allocate capabilities and"
+" capacity without inventing personal accounts. Local ownership files do not "
+"prove remote GitHub branch rules are enabled. Retain independent review for "
+"high-risk changes. New behavior and bug fixes require actual RED before "
+"GREEN, with GoogleTest/GoogleMock for C contracts. Product tasks, recovery, "
+"secure updates, manufacturing keys and proprietary PCBs belong in external "
+"projects."

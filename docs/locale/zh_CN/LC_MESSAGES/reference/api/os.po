@@ -1,0 +1,464 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 1845acd2db3f28395a067d6b3032760b58de0998124c262973025177ee4e3a4d\nX-Nexus-Reviewed: true\n"
+
+msgid "OS adapters: tasks, waits and explicit storage"
+msgstr "OS 适配器：任务、等待与显式存储"
+
+msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgstr "这些声明来自公共头文件。选择、生命周期、支持的执行模式和物理资源授权范围仍以对应设计及支持记录为准。"
+
+msgid "baremetal.h"
+msgstr "baremetal.h"
+
+msgid "Bare-metal poll notification with caller-owned storage."
+msgstr "使用调用者存储的裸机轮询通知。"
+
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+msgid "Functions"
+msgstr "函数"
+
+msgid "Initialize storage before exposing it to any ISR."
+msgstr "向任何 ISR 暴露存储之前先初始化。"
+
+msgid "Parameters"
+msgstr "参数"
+
+msgid "Returns"
+msgstr "返回值"
+
+msgid "Bind the explicit polling notification."
+msgstr "绑定显式轮询通知。"
+
+msgid "Explicit nonblocking bare-metal notification storage."
+msgstr "显式、非阻塞的裸机通知存储。"
+
+msgid "Public Members"
+msgstr "公共成员"
+
+msgid "diagnostic.h"
+msgstr "diagnostic.h"
+
+msgid "Bounded diagnostics with explicit caller-owned ring storage."
+msgstr "使用调用者显式环形存储的有界诊断。"
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "作者  Nexus Team   版本  1.0.0   日期  2026-10-11   版权  Copyright (c) 2026 Nexus Team"
+
+msgid "Initialize unpublished ring and caller-owned entries."
+msgstr "初始化尚未发布的环与调用者提供的条目。"
+
+msgid "Copy one event under a bounded saved interrupt mask."
+msgstr "在有界且保存原屏蔽状态的临界区内复制一个事件。"
+
+msgid "Consume one event from caller-owned ring."
+msgstr "从调用者拥有的环中消费一个事件。"
+
+msgid "Snapshot the saturating overflow count."
+msgstr "读取饱和溢出计数快照。"
+
+msgid "One opaque diagnostic record; interpretation belongs to its owner."
+msgstr "一个不透明诊断记录；解释责任属于其所有者。"
+
+msgid "Explicit ring state, with no default pool, worker or transport."
+msgstr "显式环状态，不提供默认池、执行任务或传输机制。"
+
+msgid "freertos.h"
+msgstr "freertos.h"
+
+msgid "Per-object static FreeRTOS storage and optional thin services."
+msgstr "每对象静态 FreeRTOS 存储与可选轻量服务。"
+
+msgid "Typedefs"
+msgstr "类型定义"
+
+msgid "Caller-owned single-operation latch for a closable queue."
+msgstr "调用者拥有的单操作锁存器，用于可关闭队列。"
+
+msgid "Test whether the current context may call kernel ISR APIs."
+msgstr "检查当前上下文是否允许调用内核 ISR API。"
+
+msgid "Initialize unused notification storage."
+msgstr "初始化尚未使用的通知存储。"
+
+msgid "Bind a latched single-waiter notification."
+msgstr "绑定序列锁存、单等待者通知。"
+
+msgid "Destroy after publishers and waiter have stopped and joined."
+msgstr "发布者和等待者均停止并完成 join 后再销毁。"
+
+msgid "Create one task from its exact caller-owned stack and TCB."
+msgstr "使用调用者提供的准确栈和 TCB 创建一个任务。"
+
+msgid "Discard one created task before its wrapper has executed."
+msgstr "在包装函数执行之前，丢弃一个已创建的任务。"
+
+msgid "Join a cooperatively returned task and reclaim kernel state."
+msgstr "对协作返回的任务执行 join，并回收内核状态。"
+
+msgid "Create an exact-sized static byte-copy queue."
+msgstr "创建准确容量的静态字节复制队列。"
+
+msgid "Copy an item with a bounded relative kernel wait."
+msgstr "在有界内核相对等待内复制一个条目。"
+
+msgid "Receive one byte-copy item."
+msgstr "接收一个字节复制条目。"
+
+msgid "Destroy after admission is stopped and all users joined."
+msgstr "准入已停止且全部使用者完成 join 后再销毁。"
+
+msgid "Send using one absolute monotonic deadline."
+msgstr "使用一个绝对单调截止时间发送。"
+
+msgid "Receive using one absolute monotonic deadline."
+msgstr "使用一个绝对单调截止时间接收。"
+
+msgid "Bind an exclusive slot of one live receiver task."
+msgstr "绑定一个存活接收任务的独占通知槽。"
+
+msgid "Get a direct notification wait port."
+msgstr "取得直接任务通知的等待端口。"
+
+msgid "Unbind after all publishers stop and join."
+msgstr "全部发布者停止并完成 join 后解除绑定。"
+
+msgid "Start a task whose entry must never return."
+msgstr "启动入口函数绝不允许返回的任务。"
+
+msgid "Initialize one exact caller-owned queue waiter."
+msgstr "初始化调用者提供的准确队列等待者存储。"
+
+msgid "Destroy only after all operations stop and join."
+msgstr "全部操作停止并完成 join 后才允许销毁。"
+
+msgid "Initialize an optional reliably closable byte-copy queue."
+msgstr "初始化可选、能可靠关闭的字节复制队列。"
+
+msgid "Send with close-aware admission and absolute deadline."
+msgstr "发送时执行关闭感知准入，并采用绝对截止时间。"
+
+msgid "Receive existing items after close, then CANCELLED."
+msgstr "关闭后仍接收已有条目，排空后返回 CANCELLED。"
+
+msgid "Stop sends and wake every currently registered waiter."
+msgstr "停止发送，并唤醒当前登记的全部等待者。"
+
+msgid "Destroy a closed, drained and quiesced queue."
+msgstr "销毁已关闭、已排空且静止的队列。"
+
+msgid "Static binary latch; one waiter, independently quiesced publishers."
+msgstr "静态二值锁存器；一个等待者，发布者分别停止并排空。"
+
+msgid "Task has its own TCB; stack is supplied with its actual word count."
+msgstr "任务拥有独立 TCB；栈以其实际字数显式供给。"
+
+msgid "Queue control only; actual depth/item byte storage is external."
+msgstr "仅队列控制状态；实际深度／条目字节存储由外部提供。"
+
+msgid "Fixed receiver and exclusive kernel notification slot; no latch."
+msgstr "固定接收者及独占内核通知槽；不含锁存器。"
+
+msgid "Permanent task control without a join completion semaphore."
+msgstr "永久任务控制，不含 join 完成信号量。"
+
+msgid "Opt-in close broadcasts; raw queue storage remains unchanged."
+msgstr "显式选择的关闭广播；原始队列存储不变。"
+
+msgid "freertos_diagnostics.h"
+msgstr "freertos_diagnostics.h"
+
+msgid "Bounded explicit FreeRTOS trace sink without global storage."
+msgstr "显式、有界的 FreeRTOS 跟踪接收端，不使用全局存储。"
+
+msgid "Enums"
+msgstr "枚举"
+
+msgid "Maintained kernel trace identities; product interpretation is external."
+msgstr "维护范围内的内核跟踪身份；产品解释位于外部。"
+
+msgid "Values:"
+msgstr "取值："
+
+msgid "Consume one bounded kernel trace event."
+msgstr "消费一个有界内核跟踪事件。"
+
+msgid "freertos_mpu.h"
+msgstr "freertos_mpu.h"
+
+msgid "Privileged static lifecycle for isolated MPU user tasks."
+msgstr "隔离 MPU 用户任务的特权静态生命周期。"
+
+msgid "User data is nonexecuting normal RAM with only these permissions."
+msgstr "用户数据是不可执行的普通 RAM，仅允许这些权限。"
+
+msgid "Create an unprivileged task from exact caller-owned storage."
+msgstr "使用调用者准确存储创建非特权任务。"
+
+msgid "Delete another isolated task after external users quiesce."
+msgstr "外部使用者静止后，删除另一个隔离任务。"
+
+msgid "A caller-selected exact region, copied during task creation."
+msgstr "调用者选定的准确区域，在任务创建时复制。"
+
+msgid "Complete caller-owned protected task metadata."
+msgstr "调用者拥有的完整受保护任务元数据。"
+
+msgid "Immutable creation inputs, borrowed for this call only."
+msgstr "不可变创建输入，仅在本次调用内被借用。"
+
+msgid "freertos_stack.h"
+msgstr "freertos_stack.h"
+
+msgid "Optional bounded task stack paint snapshot."
+msgstr "可选、有界的任务栈涂色快照。"
+
+msgid "Copy bounded stack paint facts using actual kernel identity."
+msgstr "使用真实内核身份复制有界栈涂色事实。"
+
+msgid "Exact static task facts supplied at original creation."
+msgstr "原始创建时提供的准确静态任务事实。"
+
+msgid "freertos_user.h"
+msgstr "freertos_user.h"
+
+msgid "Narrow pointer-free services for MPU-isolated user tasks."
+msgstr "MPU 隔离用户任务的窄接口、无指针服务。"
+
+msgid "Defines"
+msgstr "宏定义"
+
+msgid "Explicitly reviewed unprivileged executable code section."
+msgstr "显式审查的非特权可执行代码段。"
+
+msgid "Explicit user RAM, separate from kernel and provider state."
+msgstr "显式用户 RAM，与内核和提供者状态分离。"
+
+msgid "Trusted static task metadata placed in protected kernel RAM."
+msgstr "放入受保护内核 RAM 的可信静态任务元数据。"
+
+msgid "Delay the calling user task through the real MPU SVC."
+msgstr "通过真实 MPU SVC 延迟调用用户任务。"
+
+msgid "Read the kernel's wrapping 32-bit tick counter through SVC."
+msgstr "通过 SVC 读取内核可回绕的 32 位 tick 计数器。"
+
+msgid "lowpower.h"
+msgstr "lowpower.h"
+
+msgid "Explicit continuous-clock tickless timer port."
+msgstr "显式的连续时钟无 tick 定时器端口。"
+
+msgid "Bounded late alarm catch-up; larger delays violate the timer port."
+msgstr "有界的延迟闹钟追赶；超出边界即违反定时器端口合同。"
+
+msgid "Return the explicitly selected continuous timer port."
+msgstr "返回显式选定的连续定时器端口。"
+
+msgid "Kernel tickless hook with measured phase preservation."
+msgstr "保留实测相位的内核无 tick 钩子。"
+
+msgid "Stopped-tick epoch with the concrete port's declared precision."
+msgstr "tick 停止 epoch，精度以具体端口声明为准。"
+
+msgid "Caller-owned, immutable tickless timer implementation."
+msgstr "调用者拥有的不可变无 tick 定时器实现。"
+
+msgid "All methods run in privileged Idle Thread mode with PRIMASK=1 and scheduler suspended. They are bounded, never block or call kernel functions. pause_tick atomically stops the periodic tick and snapshots elapsed phase in its current tick period; a pending tick is rejected without effects. SUCCESS borrows the timer until resume_tick. now_us is the same monotonic clock as snapshot, continuous during shallow sleep. arm_deadline programs an enabled IRQ wake source; rejection retains no alarm. disarm removes only that alarm. resume_tick restores the periodic source with its next expiry at the supplied absolute clock instant, preserving phase within its declared quantization and sampling bound rather than adding callback latency to every tick. It must not publish an already accounted tick. The alarm wakes by deadline; at most eight extra ticks of latency may be caught up. Reversed clocks or larger latency fail stop. This does not configure clocks, NVIC, SCR or a board timer."
+msgstr "全部方法在特权 Idle Thread 模式、PRIMASK=1 且调度器挂起时运行。方法必须有界，不阻塞、不调用内核函数。pause_tick 以原子方式停止周期 tick，并快照当前 tick 周期已经过的相位；若有 pending tick，则无效果地拒绝。SUCCESS 开始借用定时器，直到 resume_tick。now_us 必须与 snapshot 使用同一单调时钟，并在浅睡眠期间连续运行。arm_deadline 配置已启用的 IRQ 唤醒源；拒绝时不得保留闹钟。disarm 仅撤销该闹钟。resume_tick 恢复周期源，下一次到期必须位于所供给的绝对时钟时刻；在已声明量化和采样边界内保持相位，而不是给每个 tick 累加回调延迟。不得发布已经计入的 tick。闹钟必须不晚于截止时间唤醒；至多允许追赶八个额外 tick 的延迟。时钟倒退或更大延迟必须故障停止。本接口不配置时钟、NVIC、SCR 或板级定时器。"
+
+msgid "native.h"
+msgstr "native.h"
+
+msgid "Explicit POSIX notification, queue and task storage."
+msgstr "显式 POSIX 通知、队列与任务存储。"
+
+msgid "Read POSIX monotonic microseconds."
+msgstr "读取 POSIX 单调微秒时间。"
+
+msgid "Initialize a notification in unused caller storage."
+msgstr "在调用者尚未使用的存储中初始化通知。"
+
+msgid "Bind a single-waiter latched notification port."
+msgstr "绑定单等待者的序列锁存通知端口。"
+
+msgid "Destroy after external publisher quiescence."
+msgstr "外部发布者静止后再销毁。"
+
+msgid "Initialize an explicit bounded byte-copy queue."
+msgstr "初始化显式、有界的字节复制队列。"
+
+msgid "Copy one item to the queue."
+msgstr "向队列复制一个条目。"
+
+msgid "Receive one item; closed queues can still be drained."
+msgstr "接收一个条目；关闭的队列仍可排空。"
+
+msgid "Reject sends and wake all waiting callers."
+msgstr "拒绝发送，并唤醒全部正在等待的调用者。"
+
+msgid "Destroy quiesced and drained queue storage."
+msgstr "销毁已静止且已排空的队列存储。"
+
+msgid "Start a task using the supplied host stack."
+msgstr "使用供给的主机栈启动任务。"
+
+msgid "Join after requesting cooperative application stop."
+msgstr "请求应用协作停止之后执行 join。"
+
+msgid "Single waiter, multiple task publishers; fields are private."
+msgstr "单等待者、多个 Task 发布者；字段为私有状态。"
+
+msgid "Caller-sized queue storage; no heap or global object pool."
+msgstr "由调用者确定容量的队列存储，不使用堆或全局对象池。"
+
+msgid "Explicit task handle; stack storage is supplied at start."
+msgstr "显式任务句柄；启动时供给栈存储。"
+
+msgid "secure_context.h"
+msgstr "secure_context.h"
+
+msgid "Caller-owned Secure context leases for a trusted NS kernel."
+msgstr "供可信 NS 内核使用的调用者自有 Secure 上下文租约。"
+
+msgid "Minimum context capacity excludes the eight-byte ARM stack seal."
+msgstr "最小上下文容量不包含八字节 ARM 栈封印。"
+
+msgid "Secure-context integrity failures, distinct from normal rejection."
+msgstr "Secure 上下文完整性失败，与普通拒绝区分。"
+
+msgid "Prepare exact Secure storage for one trusted task identity."
+msgstr "为一个可信任务身份准备准确 Secure 存储。"
+
+msgid "Rebind retired metadata while preserving its epoch history."
+msgstr "在保留 epoch 历史的前提下重新绑定已退役元数据。"
+
+msgid "Resolve a trusted, statically composed Secure task record."
+msgstr "解析可信、静态组合的 Secure 任务记录。"
+
+msgid "Fail stop after a loaded Secure stack integrity failure."
+msgstr "已加载 Secure 栈发生完整性失败后执行故障停止。"
+
+msgid "Explicit Secure metadata, never stored in Nonsecure RAM."
+msgstr "显式 Secure 元数据，绝不存放于 Nonsecure RAM。"
+
+msgid "threadx.h"
+msgstr "threadx.h"
+
+msgid "Caller-owned ThreadX task, wait and byte queue services."
+msgstr "调用者拥有的 ThreadX 任务、等待和字节队列服务。"
+
+msgid "One explicit caller latch per simultaneous close-aware operation."
+msgstr "每个同时执行的关闭感知操作都显式拥有一个调用者锁存器。"
+
+msgid "Explicit irreversible kernel entry owned by the product."
+msgstr "由产品拥有的显式、不可逆内核入口。"
+
+msgid "Product failure hook; default parks forever."
+msgstr "产品失败钩子；默认永久停驻。"
+
+msgid "Mandatory product hook only for explicit external Tick."
+msgstr "仅显式外部 Tick 模式要求的产品钩子。"
+
+msgid "Read-only configurable-IRQ and selected mask-policy gate."
+msgstr "只读的可配置 IRQ 与选定屏蔽策略检查。"
+
+msgid "Initialize one binary latch in task or actual bootstrap."
+msgstr "在任务或真实 bootstrap 上下文初始化一个二值锁存器。"
+
+msgid "Bind a sequence hint and one concurrent blocking waiter."
+msgstr "绑定序列提示和一个并发阻塞等待者。"
+
+msgid "Destroy only after all publishers and waiter quiesce."
+msgstr "全部发布者和等待者静止后才允许销毁。"
+
+msgid "Create a cooperatively returning task using exact storage."
+msgstr "使用准确存储创建可协作返回的任务。"
+
+msgid "Join a cooperatively returned task and prove detachment."
+msgstr "对协作返回的任务执行 join，并证明引用已撤离。"
+
+msgid "Discard an unused task only inside actual bootstrap."
+msgstr "仅在真实 bootstrap 内丢弃尚未使用的任务。"
+
+msgid "Start a permanent task without a completion latch."
+msgstr "启动不含完成锁存器的永久任务。"
+
+msgid "Initialize an exact arbitrary-byte bounded queue."
+msgstr "初始化支持准确任意字节条目的有界队列。"
+
+msgid "Task-only send; immediate readiness wins over expiration."
+msgstr "仅 Task 发送；立即就绪优先于截止到期。"
+
+msgid "Task-only receive; output changes only on SUCCESS."
+msgstr "仅 Task 接收；只在 SUCCESS 时修改输出。"
+
+msgid "Destroy a drained queue after every caller quiesces."
+msgstr "每个调用者静止后，销毁已排空队列。"
+
+msgid "Initialize one explicit close-aware operation latch."
+msgstr "初始化一个显式关闭感知操作锁存器。"
+
+msgid "Destroy inactive waiter after its operation has returned."
+msgstr "等待者操作返回后，销毁其非活动存储。"
+
+msgid "Add explicit bounded close broadcast to a byte queue."
+msgstr "向字节队列加入显式、有界的关闭广播。"
+
+msgid "Reject sends, wake registered waiters, retain queued items."
+msgstr "拒绝发送、唤醒已登记等待者、保留已入队条目。"
+
+msgid "Send with immediate close wake and explicit admission."
+msgstr "发送时提供立即关闭唤醒与显式准入。"
+
+msgid "Receive and drain previously queued items after close."
+msgstr "关闭后接收并排空此前已入队的条目。"
+
+msgid "Destroy only a closed, drained and quiesced queue."
+msgstr "仅销毁已关闭、已排空且静止的队列。"
+
+msgid "One binary latch; publishers quiesce before destruction."
+msgstr "一个二值锁存器；销毁之前发布者必须静止。"
+
+msgid "Returning task retains all storage until external successful join."
+msgstr "返回型任务保留全部存储，直到外部成功 join。"
+
+msgid "Permanent task has no completion latch, join or destroy."
+msgstr "永久任务不含完成锁存器、join 或 destroy。"
+
+msgid "Exact arbitrary byte items; no native word-size narrowing."
+msgstr "准确的任意字节条目，不缩减为原生字尺寸。"
+
+msgid "Optional bounded close broadcast; registry is task-only."
+msgstr "可选、有界关闭广播；登记仅在 Task 上下文执行。"
+
+msgid "tick.h"
+msgstr "tick.h"
+
+msgid "Explicit external Tick and diagnostic counter contracts."
+msgstr "显式外部 Tick 与诊断计数器合同。"
+
+msgid "Configure the application's selected kernel Tick source."
+msgstr "配置应用选定的内核 Tick 源。"
+
+msgid "Start the explicitly selected diagnostic counter."
+msgstr "启动显式选定的诊断计数器。"
+
+msgid "Read the diagnostic counter without blocking."
+msgstr "无阻塞地读取诊断计数器。"
+
+msgid "wait.h"
+msgstr "wait.h"
+
+msgid "Optional sequence-latched waiting without hidden workers."
+msgstr "可选的序列锁存等待，不含隐藏执行任务。"
+
+msgid "Wait for an authoritative caller predicate."
+msgstr "等待调用者的权威谓词。"
+
+msgid "Single-waiter notification port."
+msgstr "单等待者通知端口。"
+
+msgid "Caller owns storage and serializes arm/wait. Multiple wake publishers are permitted by each backend's documented context. Sequence is a hint; the predicate/request is authoritative. There must be fewer than 2^32 wakes between arm and recheck. All deadlines are absolute monotonic microseconds in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling timeout. Clocks must continue while waiting and never change domain; construct relative budgets with nx_deadline_after to avoid overflow. A timeout does not settle a request or release its buffers. Before destroy, stop and join every publisher and waiter; SETTLED alone does not prove notification storage is reclaimable. arm snapshots the sequence. wait must atomically observe a changed sequence or a latched wake, including a wake between the caller's recheck and sleeping. A changed sequence cannot bypass a finite deadline: wait checks expiry on every call and every return from blocking before reporting a hint. A nonblocking backend may return BUSY while unexpired. Only one owner may arm/wait; a second concurrent wait is outside the port contract even when a backend rejects it."
+msgstr "调用者拥有存储，并串行执行 arm/wait。各后端文档规定的上下文允许多个唤醒发布者。序列只是提示；谓词／请求才是权威依据。arm 与重新检查之间的唤醒次数必须少于 2^32。所有截止时间均为后端时钟域内的绝对单调微秒时间；NX_DEADLINE_NEVER 显式禁用超时。时钟必须在等待期间连续运行且不得改变时间域；应使用 nx_deadline_after 构造相对预算，避免溢出。超时不会使请求结清或释放缓冲区。销毁前，必须停止并 join 每个发布者和等待者；仅有 SETTLED 不能证明通知存储可回收。arm 快照序列；wait 必须原子地观察序列变化或已锁存唤醒，包括调用者再次检查与睡眠之间发生的唤醒。序列变化不能绕过有限截止时间：wait 在每次调用以及每次从阻塞返回后，都先检查到期，再报告提示。未到期时，非阻塞后端可以返回 BUSY。仅一个所有者可以执行 arm/wait；即使后端会拒绝第二个并发等待，其行为仍位于端口合同之外。"

@@ -1,0 +1,2231 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: d1121f646c2ba6f5085fb58009d601c6a3fbd2c5c466418f7108b53d9ef71238\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:1
+msgid "Nexus 下一代平台：从第一性原理设计"
+msgstr "Nexus next-generation platform: design from first principles"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:3
+msgid ""
+"状态：**当前 factory + 多态平台架构合同；实现与验收映射见[当前交付](../delivery/README.md)。** 代码采用 "
+"TOML 静态装配、纯 typed "
+"factory、共享只读方法表、独立私有实例和显式所有权边界。本文的伪代码解释合同；精确可编译接口以当前公共头文件及测试为准。软件执行、离线可复现构建和实板资格分别记录，历史[架构](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/docs/archive/strategy/target-"
+"architecture.md)仅用于迁移对照。"
+msgstr ""
+"Status: **Current factory + polymorphic platform architecture contract; see "
+"[current delivery](../delivery/README.md) for implementation and acceptance "
+"mapping.** Code uses TOML static assembly, pure typed factories, shared "
+"read-only method tables, separate private instances and explicit ownership "
+"boundaries. Pseudocode explains contracts; current public headers/tests "
+"define compilable interfaces. Software execution, offline reproducible "
+"builds and physical qualification are recorded separately. The [historical "
+"architecture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/docs/archive/strategy/target-architecture.md) is migration context "
+"only."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:5
+msgid "本次迭代将设计、工程规范、接入契约与33项实施清单落实为新的生产代码和构建链。新源码与产物建立独立资格；历史通过结果不能继承。"
+msgstr ""
+"This iteration implements design, engineering rules, integration contracts "
+"and the 33-item checklist in new production code/build chains. New "
+"source/artifacts establish independent qualification; historical passes do "
+"not carry over."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:7
+msgid ""
+"用户明确要求代码格式和注释风格保持当前仓库规范。架构可以重构，排版、命名和Doxygen形式沿用现有配置及贡献/注释指南；通过完善合同内容提高可维护性。"
+msgstr ""
+"The user requires existing code formatting/comment style. Architecture may "
+"change, while layout, naming and Doxygen retain repository configuration and"
+" contribution/comment guides. Better contract content improves "
+"maintainability."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:9
+msgid ""
+"配套资料：[工程手册](engineering-handbook.md)、[接入契约](integration-"
+"contracts.md)、{download}`基础执行清单 <next-generation-"
+"execution.csv>`、{download}`factory/TOML/TDD P0–P5 清单 <factory-platform-"
+"execution.csv>`。实施阶段的决策可据实验结果修订，不能用架构提案代替实验。"
+msgstr ""
+"Companion material: [engineering handbook](engineering-handbook.md), "
+"[integration contracts](integration-contracts.md), {download}`base execution"
+" checklist <next-generation-execution.csv>` and {download}`factory/TOML/TDD "
+"P0–P5 checklist <factory-platform-execution.csv>`. Experimental results may "
+"revise decisions; architecture proposals do not replace experiments."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:11
+msgid "1. 平台要解决的问题"
+msgstr "1. Problems the platform solves"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:13
+msgid "MCU 平台的本质是把固定硬件、并发执行和有限资源连接起来，使多个产品复用可信实现。首先确定事实和约束，然后决定哪些抽象值得付费。"
+msgstr ""
+"An MCU platform connects fixed hardware, concurrent execution and finite "
+"resources so products can reuse trusted implementations. Establish "
+"facts/constraints first, then decide which abstractions justify their cost."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "第一性事实"
+msgstr "First-principle fact"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "设计推导"
+msgstr "Design consequence"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "一个固件通常只运行在一种精确芯片和 PCB 上"
+msgstr "Firmware usually targets one exact chip and PCB."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "CPU、寄存器、引脚、时钟、DMA 路由在构建期绑定"
+msgstr "Bind CPU, registers, pins, clocks and DMA routes at build time."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "RAM、Flash、带宽与执行时间都有限"
+msgstr "RAM, Flash, bandwidth and execution time are finite."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "每个对象有来源、容量、寿命和资源预算；启用什么才分配什么"
+msgstr ""
+"Every object has provenance, capacity, lifetime and a budget; allocate only "
+"enabled resources."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "外设和总线是真实的共享资源"
+msgstr "Peripherals and buses are real shared resources."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "静态写入权与单一总线执行者明确；共享请求经过有界仲裁"
+msgstr ""
+"Establish static write authority and one bus executor; arbitrate shared "
+"requests within bounds."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "IRQ、DMA 和 deferred 工作可能晚于调用函数返回"
+msgstr "IRQ, DMA and deferred work can outlive the calling function."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "请求和 buffer 借用必须延续到所有使用者结清"
+msgstr "Borrow requests/buffers until every user has settled."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "CPU 时间、RAM、Flash、功耗之间有取舍"
+msgstr "CPU time, RAM, Flash and power consumption trade off."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "在约束满足后比较 Pareto 候选；不以一个编译选项宣称同时绝对最优"
+msgstr ""
+"Compare Pareto candidates after satisfying constraints; one compiler flag "
+"cannot prove absolute optimality in every dimension."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "企业项目需要多人并行维护和可重复交付"
+msgstr ""
+"Enterprise projects require parallel maintenance and repeatable delivery."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "边界窄、事实单一、工具固定、错误可诊断、产物与证据一致"
+msgstr ""
+"Keep boundaries narrow, facts authoritative, tools pinned, failures "
+"diagnosable and artifacts consistent with evidence."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "C 类型与静态资源规划不能隔离恶意本机代码"
+msgstr "C types/static planning do not isolate malicious native code."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "编程契约与硬件隔离分别承诺；MPU/安全域需要独立实现"
+msgstr ""
+"Programming contracts and hardware isolation are separate promises; "
+"MPU/security domains need separate implementations."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "产品任务、升级、制造和健康策略各不相同"
+msgstr "Tasks, updates, manufacturing and health policy vary by product."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "平台交付机制与端口，外部产品拥有政策和资格责任"
+msgstr ""
+"Platforms provide mechanisms/ports; external products own policy and "
+"qualification."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:26
+msgid ""
+"优先顺序：满足正确性和产品硬约束；减少必需运行成本；减少预留资源；降低接入与维护成本。不能用提前交还 DMA "
+"buffer、遗漏错误或未检查的越界换取更小的 benchmark 数值。"
+msgstr ""
+"Priority: satisfy correctness and hard product constraints; reduce necessary"
+" runtime cost; reduce reserved resources; reduce integration/maintenance "
+"cost. Premature DMA-buffer return, missing errors and unchecked bounds "
+"cannot buy better benchmark numbers."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:28
+msgid ""
+"第一阶段范围：Cortex-M4F、STM32F407ZG 启明欣欣 V3.1、STM32F407VE 天空星青春版、GD32F470ZG "
+"梁山派；裸机和 FreeRTOS；Native 行为模型。Discovery "
+"可保留为开发参考，不强制新产品依赖它。芯片精确型号、路由、执行模式和证据分别管理。"
+msgstr ""
+"First-stage scope: Cortex-M4F, STM32F407ZG Qiming Xinxin V3.1, STM32F407VE "
+"Sky Star Youth and GD32F470ZG Liangshan Pi; bare-metal/FreeRTOS backends and"
+" Native behavior models. Discovery may remain a development reference "
+"without becoming a product dependency. Exact parts, routes, modes and "
+"evidence are managed separately."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:30
+msgid ""
+"现有 controller 支持、引脚资料和故障测试仅用于识别需求。新实现可以直接替换不良结构。暂无实板接入，首阶段交付软件和 HIL 工装准备。"
+msgstr ""
+"Existing controller support, pin sources and fault tests identify "
+"requirements only. New implementations may replace poor structures directly."
+" With no connected hardware, first-stage delivery covers software and HIL "
+"tooling preparation."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:32
+msgid "1.1 现有体系与选择依据"
+msgstr "1.1 Existing systems and selection rationale"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:34
+msgid "以下比较常见架构机制与适用条件。功能裁剪、编译器、配置和工作负载都会改变成本，性能排名需要同条件实验。"
+msgstr ""
+"The following compares common mechanisms and their conditions. Trimming, "
+"compilers, configurations and workloads affect cost; performance rankings "
+"require equivalent experiments."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "体系"
+msgstr "System"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "适用机制"
+msgstr "Applicable mechanisms"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "对本平台的设计启示"
+msgstr "Implications for Nexus"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "厂商SDK＋手工BSP"
+msgstr "Vendor SDK + handwritten BSP"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "单芯片直接控制、少量手写静态初始化"
+msgstr ""
+"Direct single-chip control and small handwritten static initialization."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "保留接近硬件的表达；跨芯片公共合同、资源规划和失败语义由平台补足"
+msgstr ""
+"Keep hardware-close expression; the platform supplies cross-chip contracts, "
+"planning and failure semantics."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "Zephyr"
+msgstr "Zephyr"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "Devicetree硬件描述、配置与统一device driver model"
+msgstr ""
+"Devicetree hardware descriptions, configuration and a unified device-driver "
+"model."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "借鉴构建期资源描述和能力检查；是否需要统一device model取决于运行时设备集合与产品需求"
+msgstr ""
+"Use build-time resource descriptions/capability checks. Runtime device sets "
+"and product needs determine whether a unified device model is useful."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "FreeRTOS"
+msgstr "FreeRTOS"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "内核机制、应用提供静态task/object storage"
+msgstr ""
+"Kernel mechanisms with application-provided static task/object storage."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "使用真实内核与逐对象容量；HAL、硬件描述和产品调度分别归属，不把内核变成设备中心"
+msgstr ""
+"Use real kernels and per-object capacity; HAL, hardware facts and scheduling"
+" remain separate rather than making the kernel the device hub."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "RT-Thread"
+msgstr "RT-Thread"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "I/O设备注册、查找、open/close及统一访问框架"
+msgstr "I/O registration, lookup, open/close and unified access."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "动态设备访问有明确价值时才支付相应身份和生命周期成本；固定物理端口采用更窄合同"
+msgstr ""
+"Pay identity/lifecycle cost only where dynamic access has value; fixed ports"
+" use narrower contracts."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "Embassy/Rust async"
+msgstr "Embassy/Rust async"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "编译期大小的静态task与显式async执行"
+msgstr "Compile-time-sized static tasks and explicit asynchronous execution."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "借鉴按实际状态分配和显式执行责任；首版保持C生态，buffer借用与DMA结清通过合同和故障验证落实"
+msgstr ""
+"Use actual-state allocation and explicit execution responsibility. Keep the "
+"C ecosystem initially and enforce buffer borrowing/DMA settlement through "
+"contracts and fault validation."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:44
+msgid ""
+"参考官方机制说明：[Zephyr "
+"Devicetree](https://docs.zephyrproject.org/latest/build/dts/index.html)、[Zephyr"
+" device "
+"model](https://docs.zephyrproject.org/latest/kernel/drivers/index.html)、[FreeRTOS静态任务API](https://github.com/FreeRTOS/FreeRTOS-"
+"Kernel/blob/main/include/task.h)、[RT-Thread I/O框架](https://www.rt-"
+"thread.io/document/site/programming-manual/device/device/)、[Embassy "
+"executor](https://docs.embassy.dev/embassy-"
+"executor/)。这些参考用于架构取舍；正式依赖仍须锁定精确revision并另行验收。"
+msgstr ""
+"Official mechanism references: [Zephyr "
+"Devicetree](https://docs.zephyrproject.org/latest/build/dts/index.html), "
+"[Zephyr device "
+"model](https://docs.zephyrproject.org/latest/kernel/drivers/index.html), "
+"[FreeRTOS static task API](https://github.com/FreeRTOS/FreeRTOS-"
+"Kernel/blob/main/include/task.h), [RT-Thread I/O framework](https://www.rt-"
+"thread.io/document/site/programming-manual/device/device/) and [Embassy "
+"executor](https://docs.embassy.dev/embassy-executor/). These guide "
+"architectural tradeoffs; formal dependencies still need pinned revisions and"
+" separate acceptance."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:46
+msgid ""
+"选择依据是两SoC、三板、固定BOM、十人维护和C产品接入：构建期描述硬件，链接期选择实现，运行期只维护实际执行与借用状态。工业控制中的高频固定输出与企业设备管理中的运行时发现不是相同问题，需要不同的成本模型。"
+msgstr ""
+"Two SoCs, three Boards, fixed BOMs, ten maintainers and C product consumers "
+"favor build-time hardware descriptions, link-time implementation selection "
+"and only actual execution/borrow state at runtime. High-frequency fixed "
+"industrial outputs and enterprise runtime discovery are different problems "
+"with different cost models."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:48
+msgid "2. 默认运行模型：静态装配、固定绑定、最小驱动"
+msgstr ""
+"2. Default runtime model: static assembly, fixed binding, minimal drivers"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:50
+msgid ""
+"默认产品在构建期选定硬件资源、组件、执行模式和容量。启动建立硬件配置，RUN "
+"阶段保持端口身份、路由及写入权稳定。外设实际运行态和一次请求的借用状态由驱动维护。"
+msgstr ""
+"Products select resources, components, modes and capacities at build time. "
+"Startup configures hardware; RUN keeps port identities, routes and write "
+"authority stable. Drivers retain actual peripheral runtime state and request"
+" borrows."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:52
+msgid ""
+"默认不建设通用设备注册中心、runtime probe、每 pin 的 "
+"open/close/ref、全局对象继承树或隐藏线程。资源固定不表示硬件永不故障；驱动仍管理 BUSY、FAULT、取消、排空和受控恢复。"
+msgstr ""
+"The default has no generic registry, runtime probing, per-pin "
+"open/close/ref, global inheritance tree or hidden threads. Fixed resources "
+"can still fail; drivers manage BUSY, FAULT, cancellation, draining and "
+"controlled recovery."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:54
+msgid "三个路径采用不同成本："
+msgstr "Three paths have different costs:"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "路径"
+msgstr "Path"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "执行内容"
+msgstr "Work"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "成本约束"
+msgstr "Cost constraint"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "构建期"
+msgstr "Build time"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "选择、冲突检查、能力检查、静态绑定、容量与链接布局"
+msgstr ""
+"Selection, conflicts, capabilities, static binding, capacity and link "
+"layout."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "可以充分检查，不进入固件高频路径"
+msgstr "Extensive checks are allowed without entering hot firmware paths."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "控制路径"
+msgstr "Control path"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "初始化、校准、start/stop/recovery、配置变更"
+msgstr "Initialization, calibration, start/stop/recovery and reconfiguration."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "有界、明确失败与剩余资源；可使用诊断信息"
+msgstr ""
+"Bounded behavior, explicit failures/remaining resources; diagnostics "
+"allowed."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "数据路径"
+msgstr "Data path"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "GPIO 操作、请求启动、IRQ 数据搬运、完成状态发布"
+msgstr ""
+"GPIO operations, request starts, IRQ data movement and result publication."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "无名称查找、无分配、无无界扫描、无默认应用回调"
+msgstr ""
+"No name lookup, allocation, unbounded scans or default application "
+"callbacks."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:62
+msgid ""
+"默认固定端口采用只读 typed face：共享 `const ops` 加私有 context。factory 按生成的 `uint16_t` "
+"typed ID 返回静态身份，无构造或启动副作用。生产 SoC 和 Native 实现同一公共合同，多实例共享表但各自拥有状态。"
+msgstr ""
+"Fixed ports use read-only typed faces: shared `const ops` and private "
+"contexts. Generated `uint16_t` typed IDs return static identity through "
+"factories without construction/startup effects. Production SoC and Native "
+"providers implement one public contract; multiple instances share tables but"
+" own separate state."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:64
+msgid ""
+"硬件接口使用一致的 typed 多态布局；算法组件通过窄 transport/time/storage 端口接入。每个 provider/mode "
+"共享只读表，不按实例复制方法字段。IRQ 调用具体 provider，OS 和有界 owner 保持可选，不叠加不必要的转发对象。"
+msgstr ""
+"Hardware interfaces have a consistent typed polymorphic layout; algorithms "
+"use narrow transport/time/storage ports. Provider/mode tables are shared "
+"rather than copied per instance. IRQs call concrete providers. OS and "
+"bounded owners remain optional, without unnecessary forwarding objects."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:66
+msgid ""
+"不承诺所有调用都内联或 LTO 都能去虚化。普通函数、共享方法表、生成的直接绑定分别使用 ELF/反汇编及实板测量判断。默认先选择简单的可维护表达。"
+msgstr ""
+"Not every call is promised inline, nor every LTO build devirtualized. Judge "
+"ordinary functions, shared tables and generated direct bindings through "
+"ELF/disassembly and physical measurements. Prefer simple maintainable "
+"expression first."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:68
+msgid "3. 责任边界与建议源码组织"
+msgstr "3. Responsibilities and proposed source organization"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:70
+msgid "责任边界不等于逐层调用链。GPIO 数据操作可以直接进入 SoC 实现；纯协议不经过 OS、Board 或系统生命周期。"
+msgstr ""
+"Responsibility boundaries are not a mandatory layer-by-layer call chain. "
+"GPIO can enter SoC implementations directly; pure protocols need not "
+"traverse OS, Board or system lifecycle."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "部分"
+msgstr "Part"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "拥有的内容"
+msgstr "Owned content"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "公共依赖边界"
+msgstr "Public dependency boundary"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "core"
+msgstr "core"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "少量状态码、基础类型、时间/请求的共同规则"
+msgstr "Small status/type set and shared time/request rules."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "标准 C；不提供通用可变设备树"
+msgstr "Standard C; no generic mutable device tree."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "arch"
+msgstr "arch"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "异常上下文、原子/屏障、CPU-local 临界区、必要的 cycle 能力"
+msgstr ""
+"Exception context, atomics/barriers, CPU-local critical sections and "
+"required cycle support."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "不依赖 vendor、Board 或 OS"
+msgstr "No vendor, Board or OS dependencies."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "soc"
+msgstr "soc"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "精确芯片能力、clock/IRQ/DMA、controllers、Flash/内存、startup、私有 SDK"
+msgstr ""
+"Exact chip capabilities, clocks/IRQs/DMA, controllers, Flash/memory, startup"
+" and private SDK."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "实现 io 合同，使用 arch"
+msgstr "Implements I/O contracts; uses Arch."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "board package"
+msgstr "board package"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "PCB 接线、晶振、外接器件事实、安全初值、特殊电气动作"
+msgstr ""
+"PCB wiring, oscillators, external-device facts, safe initial values and "
+"special electrical actions."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "只读资源与窄 hook；可在外部仓库"
+msgstr "Read-only resources/narrow hooks; may live externally."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "io"
+msgstr "io"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "GPIO、UART、SPI、I2C、Flash、timer/ADC 等各自的 typed 合同"
+msgstr ""
+"Separate typed GPIO, UART, SPI, I2C, Flash, timer/ADC and other contracts."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "公共头不暴露 SDK/内核类型"
+msgstr "Public headers expose no SDK/kernel types."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "os"
+msgstr "os"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "实际需要的时间、通知、锁与可选任务/storage 适配"
+msgstr ""
+"Necessary time, notifications, locks and optional task/storage adapters."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "裸机/FreeRTOS/Native 分别实现能力"
+msgstr "Bare-metal, FreeRTOS and Native implement capabilities separately."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "components"
+msgstr "components"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "器件驱动、协议、存储/日志等可复用 core 和明确 adapter"
+msgstr ""
+"Reusable device/protocol/storage/logging cores with explicit adapters."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "窄 io/time/transport/storage 端口"
+msgstr "Narrow I/O/time/transport/storage ports."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "tools"
+msgstr "tools"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "配置、构建编排、资源检查、证据、打包、HIL"
+msgstr ""
+"Configuration, build orchestration, resources, evidence, packaging and HIL."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "标准工具；不生成业务执行算法"
+msgstr "Standard tools; no generated business execution algorithms."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "外部工程"
+msgstr "External project"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "main、任务、roles、私有器件/协议、布局、恢复/升级/制造策略"
+msgstr ""
+"main, tasks, roles, private devices/protocols, layouts and "
+"recovery/update/manufacturing policy."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "消费源码 SDK，不被平台反向链接"
+msgstr "Consumes source SDKs without reverse platform linking."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:84
+msgid "建议目标目录如下；实际命名在首个垂直切片中一次确定。目录迁移与接口实现一起完成，不维护永久双路径。"
+msgstr ""
+"The proposed directory layout follows; the first vertical slice fixes actual"
+" names once. Migrate directories with interfaces, without permanent "
+"duplicate paths."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:99
+msgid ""
+"startup/linker/clock 属于所选芯片实现，最终 image target 装配一次。没有必须存在的 platforms "
+"转发层。系统启动与逆序撤销可用少量普通 C 函数；不为目录对称性增加 runtime 模块。"
+msgstr ""
+"Startup/linker/clocks belong to selected chip implementations and assemble "
+"once in the final image. No platforms forwarding layer is mandatory. "
+"Startup/reverse cleanup can be ordinary C functions; directory symmetry does"
+" not justify runtime modules."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:101
+msgid ""
+"组件定义在标准 CMake target 中，显式 sources、PUBLIC/PRIVATE 依赖和 include；vendor/生成实现头与测试"
+" fake 不进入普通 consumer 的 include 路径。工具不得另维护一套软件依赖图。"
+msgstr ""
+"Components use standard CMake targets with explicit sources, PUBLIC/PRIVATE "
+"dependencies and includes. Vendor/generated-private headers and test fakes "
+"stay outside ordinary consumer paths. Tools maintain no parallel dependency "
+"graph."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:103
+msgid "4. 配置体系：三类输入，一份解析结果"
+msgstr "4. Configuration: three inputs, one resolved result"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:105
+msgid ""
+"装配使用 TOML schema 2，SoC/Board 事实保持 JSON；Python 标准 `tomllib` 解析后产生冻结的 typed "
+"IR。严格字段模型同时生成 editor schema。`init/list-bindings/check/explain` "
+"降低接入成本；Kconfig 和 cache 不形成另一份有效配置。"
+msgstr ""
+"Assemblies use TOML schema 2, while SoC/Board facts remain JSON. Standard "
+"Python `tomllib` parses the TOML and resolution produces frozen typed IR. "
+"Strict models generate editor schemas. `init/list-bindings/check/explain` "
+"lower integration effort; Kconfig/cache do not establish another effective "
+"configuration."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "输入"
+msgstr "Input"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "事实拥有者"
+msgstr "Fact owner"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "SoC package"
+msgstr "SoC package"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "精确 part/package/density、内存域、reviewed route、实现模式、clock profile、SDK 来源"
+msgstr ""
+"Exact part/package/density, memory domains, reviewed routes, implemented "
+"modes, clock profiles and SDK origins."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "Board package"
+msgstr "Board package"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "实际 HSE、PCB/source revision、连接、装配器件、跳线、电气、安全初值"
+msgstr ""
+"Actual HSE, PCB/source revisions, connections, fitted devices, jumpers, "
+"electrical facts and safe initial values."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "外部 assembly.toml"
+msgstr "External assembly.toml"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "所选 Board/backend、组件和实例、路由、执行模式、容量、外部 layout"
+msgstr ""
+"Board/backend, components/instances, routes, modes, capacities and external "
+"layout."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:113
+msgid ""
+"拒绝未知字段、未实现模式、矛盾和资源冲突。首版不支持 overlay/inherit 合并语言、自动拓扑求解或从 SDK "
+"宏推导所有路由。使用者显式选择已复核资源，配置器给出字段路径、冲突资源及声明来源。"
+msgstr ""
+"Reject unknown fields, unimplemented modes, contradictions and conflicts. "
+"The first version has no overlay/inherit merging, topology solving or SDK-"
+"macro-derived complete routes. Users explicitly select reviewed resources; "
+"diagnostics name field paths, resources and declaration origins."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:115
+msgid ""
+"冻结 typed IR 直接生成 resolved.json、配置头、只读 face、共享 ops 接线、typed factory、linker "
+"输入和资源报告。生成器只做确定性校验和静态装配，不生成业务 main、worker、调度算法、器件状态机或驱动算法。"
+msgstr ""
+"Frozen typed IR directly generates resolved.json, headers, read-only faces, "
+"shared ops wiring, factories, linker inputs and resource reports. Generators"
+" perform deterministic validation/static assembly without business "
+"main/workers, schedulers, device state machines or driver algorithms."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:117
+msgid ""
+"CMake Presets 选择 assembly、正式工具环境、优化 profile 和独立 build root。CMake "
+"是源与依赖权威；它读取解析结果并检查组件所需能力，不重写选择结果。不允许 cache、手工 CONFIG 宏和生成头共同决定同一事实。"
+msgstr ""
+"CMake Presets choose assemblies, formal environments, optimization profiles "
+"and separate roots. CMake owns sources/dependencies; it reads results and "
+"checks component capabilities without rewriting selections. Cache, "
+"handwritten CONFIG macros and generated headers cannot jointly decide one "
+"fact."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:119
+msgid ""
+"console/control/sensor等应用role由外部C "
+"composition映射到生成的typed物理端口；平台schema和resolved不生成role政策。硬件资源声明者的标识用于冲突诊断，不自动成为C调用权限或业务owner证明。"
+msgstr ""
+"External C composition maps console/control/sensor roles to generated typed "
+"physical ports. Schemas/resolved data generate no role policy. Resource "
+"declarer IDs support conflict diagnostics, not automatic C access authority "
+"or proof of business ownership."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:121
+msgid ""
+"解析失败阻断构建；生成使用原子提交，旧输出不能作为成功回退。跨 Board、backend、ABI 或 instrumentation 使用不同 "
+"build root。发布记录所有输入和派生输出的身份。"
+msgstr ""
+"Failed resolution blocks builds. Generation commits atomically without old-"
+"output success fallback. Separate Board/backend/ABI/instrumentation roots "
+"are required; releases record every input and derived identity."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:123
+msgid ""
+"资源计划检查 pin/AF、电气、controller、共享总线 endpoint、DMA stream/request、IRQ/共享 "
+"vector、EXTI line、timer/channel、timebase、clock、RTOS 保留异常、内存域、layout 和 ABI。详见 "
+"[接入契约](integration-contracts.md)。"
+msgstr ""
+"Plans check pins/AF, electrical constraints, controllers, shared endpoints, "
+"DMA streams/requests, IRQ/shared vectors, EXTI lines, timer/channels, "
+"timebases, clocks, RTOS-reserved exceptions, memory, layout and ABI. See "
+"[integration contracts](integration-contracts.md)."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:125
+msgid "5. 设备抽象：controller、endpoint、request、器件"
+msgstr "5. Device abstractions: controllers, endpoints, requests and devices"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:127
+msgid "四种实体采用不同模型："
+msgstr "Four entities use different models:"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "实体"
+msgstr "Entity"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "必需状态"
+msgstr "Required state"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "controller"
+msgstr "controller"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "实际硬件/clock/IRQ/DMA 状态，active request、必要的仲裁和故障恢复"
+msgstr ""
+"Actual hardware/clock/IRQ/DMA state, active requests and necessary "
+"arbitration/recovery."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "endpoint"
+msgstr "endpoint"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "不可变 CS/address、速率/mode、电气动作与连接参数"
+msgstr ""
+"Immutable CS/address, rate/mode, electrical actions and connection "
+"parameters."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "request"
+msgstr "request"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "一次操作的 buffer、长度、绝对 deadline、结果、借用状态、必要 epoch"
+msgstr ""
+"Operation buffers, lengths, absolute deadlines, results, borrow state and "
+"required epochs."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "器件 driver"
+msgstr "Device driver"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "寄存器协议、校准、转换、初始化/重试与该器件状态"
+msgstr ""
+"Register protocol, calibration, conversion, initialization/retries and "
+"device state."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:136
+msgid ""
+"controller 拥有线上独占和执行；endpoint 不再复制 controller 锁和硬件生命周期。sensor driver 使用 "
+"endpoint 或窄 transport，不选择 PCB pin，不创建采样任务。"
+msgstr ""
+"Controllers own exclusive wire execution. Endpoints do not duplicate "
+"controller locks/lifecycles. Sensor drivers use endpoints/narrow transport "
+"without choosing PCB pins or creating sampling tasks."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:138
+msgid ""
+"GPIO/PWM/ADC stream 不强行转换成字节事务。SPI 的 CS/全双工、I2C 的 repeated "
+"START/ACK/仲裁、Flash 的 program/erase 几何各自保持具体合同。共用 request 辅助规则，不建设万能事务执行器。"
+msgstr ""
+"GPIO/PWM/ADC streams are not forced into byte transactions. SPI CS/full-"
+"duplex, I2C repeated START/ACK/arbitration and Flash program/erase geometry "
+"retain concrete contracts. Shared request helpers do not become universal "
+"transaction executors."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:140
+msgid ""
+"factory 是生成的纯 typed getter：固定 `uint16_t` ID、具名常量和静态 switch；越界返回 "
+"NULL。它不承担动态构造、隐式启动或生命周期。诊断名称不进入默认数据路径；SPI/I2C 的 controller 和 endpoint "
+"身份分别取得。"
+msgstr ""
+"Factories are generated pure typed getters: fixed `uint16_t` IDs, named "
+"constants and static switches; invalid IDs return NULL. They perform no "
+"dynamic construction, startup or lifecycle management. Diagnostic names stay"
+" outside data paths; SPI/I2C controller/endpoint identities are distinct."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:142
+msgid ""
+"默认不为每 GPIO 保存 owner/generation。构建期证明资源规划不冲突；外部应用明确单一 writer/协调者。普通 C "
+"代码遵守该组织约束，配置器不能证明所有用户源码没有越权调用。"
+msgstr ""
+"GPIOs have no default per-pin owner/generation. Build-time planning proves "
+"conflicts absent; applications organize one writer/coordinator. C code obeys"
+" that contract; configuration cannot prove every user source avoids "
+"unauthorized calls."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:144
+msgid ""
+"需要runtime owner更换、资源回收、动态重绑定，或可撤销的observer/独立loan时，才引入checked "
+"session/epoch。固定输入被多个组件只读不需要此成本。此类managed模式使用同一controller，且排除未受管理的直接调用；不能给共享context增加一个token后继续允许旧静态调用绕过撤销。第一阶段不实现全平台动态设备管理。"
+msgstr ""
+"Introduce checked sessions/epochs only for runtime owner changes, "
+"reclamation, rebinding, revocable observers or independent loans. Shared "
+"read-only fixed inputs do not need that cost. Managed modes use the same "
+"controller and exclude unmanaged direct calls; adding a token while old "
+"static calls bypass revocation is invalid. The first stage has no platform-"
+"wide dynamic device manager."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:146
+msgid ""
+"GPIO batch "
+"set/reset要求两mask互斥且均为授权mask子集；动态输入越界明确拒绝，构建可证明的常量允许编译器消除重复检查。read是所选port的单次输入快照，不承诺跨port同时采样。toggle只在独占串行writer或明确原子实现下提供，不隐含与另一个ISR写入兼容。紧急输出控制与普通控制共享引脚时，使用产品明确的仲裁/硬件interlock，不能把两种写入上下文统称一个owner来消除竞态。"
+msgstr ""
+"GPIO batch masks must be disjoint authorized subsets. Runtime out-of-range "
+"inputs fail; compiler-proven constants may eliminate repeated checks. Reads "
+"snapshot one selected port, not multiple ports simultaneously. Toggle "
+"requires an exclusive serial writer or explicit atomic implementation, "
+"without implied compatibility with ISR writes. Emergency and ordinary "
+"control sharing pins need explicit product arbitration/hardware interlocks; "
+"calling both contexts one owner does not remove races."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:148
+msgid "6. 默认并发模型"
+msgstr "6. Default concurrency model"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:150
+msgid ""
+"每个固定硬件 controller 有一个明确执行 owner。GPIO 输出由一个组件控制；共享总线由一个执行者串行执行请求。多个应用 client "
+"可以通过显式 adapter 的有界队列请求它。裸机 owner 可以是 loop；FreeRTOS owner 可以是应用声明的 task。"
+msgstr ""
+"Every fixed controller has one explicit executor. One component controls "
+"GPIO outputs; one executor serializes shared buses. Multiple clients may "
+"submit through bounded explicit adapter queues. Bare-metal owners can be "
+"loops; FreeRTOS owners can be application-declared tasks."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:152
+msgid ""
+"运行时不自动创建总线 worker、日志 worker、completion worker。一个请求不在 HAL queue、OS queue 和 "
+"completion queue 中重复保存相同生命周期元数据。应用业务队列有独立意义时，由应用预算。"
+msgstr ""
+"No automatic bus/log/completion workers. Requests do not duplicate lifecycle"
+" metadata in HAL, OS and completion queues. Distinct business queues have "
+"product-owned budgets."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:154
+msgid ""
+"单 owner 路径避免内核锁；明确的多 producer adapter 才增加必要同步。API 声明调用上下文和串行要求；公共异步操作仍检查真实 "
+"BUSY/FAULT、长度、request 状态和容量。"
+msgstr ""
+"Single-owner paths avoid kernel locks; explicit multi-producer adapters add "
+"necessary synchronization. APIs define context/serialization; public async "
+"calls still check actual BUSY/FAULT, lengths, request states and capacity."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:156
+msgid ""
+"默认 prepare/submit/cancel/result-consume/reuse由同一 request "
+"owner串行执行。其他任务通过显式adapter发送取消命令，不直接用旧 request 指针取消。跨任务控制使用 adapter-"
+"owned稳定身份和 expected epoch，并持有 storage到 owner确认；owner在命中仍有效的记录后再访问 "
+"request，不能对可能已释放的指针先读epoch。"
+msgstr ""
+"One request owner serializes prepare/submit/cancel/result-consume/reuse. "
+"Other tasks send adapter cancellation commands instead of using old request "
+"pointers. Cross-task controls use stable adapter-owned identity/expected "
+"epoch and retain storage until owner acknowledgment. Owners resolve still-"
+"valid records before accessing requests; they cannot read epochs from "
+"potentially freed pointers."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:158
+msgid ""
+"直接提交路径中request owner与controller execution "
+"owner重合。共享adapter路径中，client负责prepare、提交控制命令、消费结果和最终回收；adapter执行者独占controller"
+" "
+"start/cancel/service/drain。client不在ACCEPTED期间直接修改request，也不通过wait调用controller"
+" service。跨任务命令的storage/身份保护由adapter承担。"
+msgstr ""
+"Direct submission has the same request owner/controller executor. Shared "
+"clients prepare, submit controls, consume results and reclaim storage; the "
+"adapter exclusively starts/cancels/services/drains controllers. Clients do "
+"not modify ACCEPTED requests or service controllers through waits. Adapters "
+"protect cross-task command storage/identity."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:160
+msgid ""
+"短临界区保护 admission、active 指针、取消标记和 IRQ 发布。大 buffer 复制、wait、vendor "
+"阻塞操作和用户代码在区外。DMA 在途不持续持有 task mutex；多producer适配必须能接受控制命令并使owner继续推进取消/drain。"
+msgstr ""
+"Short critical sections protect admission, active pointers, cancellation "
+"flags and IRQ publication. Large copies, waits, blocking vendor calls and "
+"user code stay outside. DMA does not hold task mutexes throughout transfers;"
+" multi-producer adapters admit controls while owners continue "
+"cancellation/drain."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:162
+msgid ""
+"SPSC 仅在恰好一个不可重入 producer 和一个 consumer 时使用。IRQ、error IRQ、task recovery "
+"同时入队会改变这个条件。队列索引使用明确的 atomic/release-acquire 或短临界区；volatile "
+"不充当并发协议。环回绕先用加一/比较，避免强制 power-of-two 容量造成不必要 RAM。"
+msgstr ""
+"SPSC requires exactly one nonreentrant producer and one consumer. IRQ, error"
+" IRQ and task recovery enqueueing concurrently breaks that condition. "
+"Indices use explicit atomics/release-acquire or short critical sections, "
+"never volatile as synchronization. Increment/compare wrap avoids mandatory "
+"power-of-two capacities wasting RAM."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:164
+msgid ""
+"IRQ 只做规定的数据动作、状态发布和受支持的唤醒。不得分配、格式化日志、无界查找、阻塞或调用任意应用 callback。使用 FreeRTOS "
+"FromISR 时遵守 priority ceiling；更高优先级 handler 只能走可证明的 deferred 路径。"
+msgstr ""
+"IRQs perform prescribed data actions, publish state and issue supported "
+"wakeups. No allocation, formatted logs, unbounded lookup, blocking or "
+"arbitrary application callbacks. FreeRTOS FromISR obeys syscall ceilings; "
+"higher-priority handlers need proven deferred paths."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:166
+msgid ""
+"CPU metadata PRIMASK、FreeRTOS BASEPRI、总线 owner 和 DMA "
+"生命周期是不同机制。架构审查后确定最小必要屏障，不能凭 benchmark 直接删除硬件顺序保障。内核计时与 HAL 计时独立规划；降低 RTOS "
+"tick 必须先实现真实可用的 HAL 时间源。"
+msgstr ""
+"CPU metadata PRIMASK, FreeRTOS BASEPRI, bus ownership and DMA lifetimes are "
+"distinct mechanisms. Architecture review determines minimum barriers; "
+"benchmarks do not justify deleting hardware ordering. Plan kernel/HAL time "
+"independently; lower RTOS tick rates require a genuinely usable HAL time "
+"source."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:168
+msgid "7. 请求、deadline、取消与完成"
+msgstr "7. Requests, deadlines, cancellation and completion"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:170
+msgid ""
+"异步默认使用 caller-owned request 和 payload；排队仅借用指针或小 descriptor。以下 API "
+"为合同示意，当前可编译接口见 `core/include/nexus/core/request.h`："
+msgstr ""
+"Async defaults use caller-owned requests/payload; queues borrow pointers or "
+"small descriptors only. The following illustrates contracts; compilable "
+"interfaces are in `core/include/nexus/core/request.h`:"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:181
+msgid ""
+"该示意采用直接单执行者路径；wait便利函数仅在所选适配具有等待和service能力时提供。共享adapter使用自身的client提交/取消/等待入口，不把公共请求辅助规则实现成强制万能controller调度器。"
+msgstr ""
+"The illustration is direct single-executor use. Wait conveniences require "
+"adapters with waiting/service capability. Shared adapters expose their own "
+"client admission/cancel/wait APIs; shared request helpers are not mandatory "
+"universal controller schedulers."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:183
+msgid "submit 明确 admission 结果："
+msgstr "Submission states admission explicitly:"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:185
+msgid "REJECTED：没有借用 request/buffer，没有遗留需要结清的硬件动作。"
+msgstr ""
+"REJECTED: no request/buffer borrows and no residual hardware needing "
+"settlement."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:186
+msgid ""
+"ACCEPTED：借用成立，后续 start failure、IRQ error、timeout 和 abort failure通过 request "
+"报告；不把已经借用的请求作为普通拒绝返回。"
+msgstr ""
+"ACCEPTED: borrowing starts; later start/IRQ/timeout/abort failures report "
+"through requests rather than relabeling borrowed requests as ordinary "
+"rejection."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:188
+msgid ""
+"共享adapter的队列接受是这条链唯一admission点，立即建立借用和总deadline。后续controller暂时BUSY保留QUEUED，实际start失败成为request结果；不能向原caller倒退为REJECTED。QUEUED取消先移除全部排队引用再结清，满队列拒绝不得留下借用。controller直接提交和adapter提交复用同一request状态规则。"
+msgstr ""
+"Queue acceptance is the shared chain’s only admission point, immediately "
+"starting borrowing and total deadlines. Temporary controller BUSY retains "
+"QUEUED; actual start failures are request results, never retroactive "
+"REJECTED. Queued cancellation removes all references before settlement; "
+"full-queue rejection leaves no borrow. Direct/adapter paths share request-"
+"state rules."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:190
+msgid ""
+"默认一个request "
+"owner/结果consumer。准备和复用要求上一次已结清且consumer/adapter不再持有。只有存在可保留的延迟身份记录/控制命令时才分配序列/epoch；该模式的身份不重复、耗尽明确失败。完全串行、无逃逸引用且旧源已drain的request不强制此字段，更不给固定pin制造额外生命周期。"
+msgstr ""
+"Default requests have one owner/result consumer. Preparation/reuse requires "
+"prior settlement and released consumer/adapter references. Allocate "
+"sequences/epochs only for retained delayed identity/control records; "
+"identities never repeat and exhaustion fails explicitly. Fully serial "
+"requests with no escaping references and drained old sources need no "
+"mandatory epoch, nor do fixed pins need extra lifecycles."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "请求状态"
+msgstr "Request state"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "backend是否借用 request/buffer"
+msgstr "Backend borrows request/buffer"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "含义"
+msgstr "Meaning"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "READY"
+msgstr "READY"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "否"
+msgstr "No"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "可准备和提交"
+msgstr "May prepare/submit."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "QUEUED"
+msgstr "QUEUED"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "是"
+msgstr "Yes"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "已 admission，等待 controller"
+msgstr "Admitted, waiting for controller."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "ACTIVE"
+msgstr "ACTIVE"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "硬件或 handler 可访问"
+msgstr "Hardware/handlers may access."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "DRAINING"
+msgstr "DRAINING"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "正在停止源和排空使用者"
+msgstr "Stopping sources and draining users."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "SETTLED"
+msgstr "SETTLED"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "硬件、IRQ、deferred 使用均结束"
+msgstr "Hardware, IRQ and deferred accesses have ended."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "QUARANTINED"
+msgstr "QUARANTINED"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "无法证明排空，保留责任直到受控恢复/reset"
+msgstr ""
+"Drain cannot be proven; retain responsibility until controlled "
+"recovery/reset."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:201
+msgid ""
+"transfer deadline 使用明确 monotonic clock domain 的绝对截止时间，包含排队。wait "
+"deadline只决定等待者停留多久。cancel accepted、传输超时、等待超时都不代表 SETTLED。"
+msgstr ""
+"Transfer deadlines are absolute in an explicit monotonic domain and include "
+"queueing. Wait deadlines bound only waiter residence. Cancellation "
+"acceptance, transfer timeout and wait timeout do not mean SETTLED."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:203
+msgid ""
+"每个 execution profile 明示 deadline 观察者、service 调度要求、取消能力和 drain 上界。polling "
+"不能宣称低 CPU 异步；硬件 Flash pulse 和异常 DMA不能被 C deadline 自动抢占。超时后的残余硬件访问必须有归属。"
+msgstr ""
+"Every profile declares deadline observers, service scheduling, cancellation "
+"capability and drain bounds. Polling does not claim low-CPU async behavior. "
+"C deadlines cannot automatically preempt Flash pulses or abnormal DMA; "
+"residual accesses remain owned after timeout."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:205
+msgid ""
+"完成默认是 request 中的 level state 加单 owner 通知。通知是唤醒提示，通知丢失/满队列不会丢失唯一结果。用户 "
+"callback 由显式 task adapter执行，它自己持有并归还必要借用。默认驱动不保存应用 callback。"
+msgstr ""
+"Completion is a level state in requests plus single-owner notification. "
+"Notifications are wake hints; lost/full notifications cannot erase the sole "
+"result. Explicit task adapters execute user callbacks while "
+"retaining/returning required borrows. Default drivers retain no application "
+"callbacks."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:207
+msgid ""
+"controller执行者的可选wait适配必须同时保证进展：先有界service，再检查request和控制命令；arm静态通知后重查完成/待service谓词，再等待最早的wait"
+" deadline、transfer "
+"deadline或最大service间隔。等待不得让唯一执行者阻塞在需要它自己完成的drain上。共享adapter的client只观察自身结果并防lost-"
+"wake；adapter执行者继续承担service/deadline/drain，不允许多个client接管controller。纯裸机使用显式pump；没有wait能力就不提供伪阻塞成功。"
+msgstr ""
+"Optional executor waits must preserve progress: bounded service, "
+"request/control checks, arm static notifications, recheck completion/service"
+" predicates, then wait for the earliest wait deadline, transfer deadline or "
+"maximum service interval. The sole executor cannot block waiting for its own"
+" drain. Shared clients observe only their own results and prevent lost "
+"wakes; adapter executors retain service/deadline/drain responsibility "
+"without client takeover. Bare metal pumps explicitly; absent wait capability"
+" never masquerades as successful blocking."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:209
+msgid ""
+"通知port提供level-latched或sequence语义，arm/重查/休眠之间不存在lost-"
+"wake窗口。无法保证不丢通知的port采用有界重查，不能无限睡眠。IRQ完成标记、取消控制和deadline到期都能使owner重新执行必要service；这些规则不要求通用executor或隐藏worker。"
+msgstr ""
+"Notification ports provide level-latched or sequence semantics without lost "
+"wakes between arming, rechecking and sleeping. Ports lacking reliable "
+"notification use bounded rechecks rather than infinite sleep. IRQ results, "
+"controls and deadline expiry can all make owners service again; no generic "
+"executor/hidden worker is required."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:211
+msgid ""
+"SETTLED 发布前，必须关闭/停止所有可能访问该request的硬件源、证明 DMA 不再访问、排空相关IRQ/deferred使用者，并完成必要 "
+"memory ordering。持续RX等独立存储路径不必因此停止。epoch不能替代drain：无硬件tag的旧IRQ可能读取新active指针。"
+msgstr ""
+"Before publishing SETTLED, stop every hardware source that can access the "
+"request, prove DMA no longer accesses its storage, drain IRQ/deferred users "
+"and apply necessary ordering. Independent continuous RX storage need not "
+"stop. Epochs do not replace drain: untagged old IRQs may read new active "
+"pointers."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:213
+msgid ""
+"默认IRQ记录硬件完成/错误标记并唤醒owner，需要task上下文的drain由owner完成。结果字段、从controller "
+"detach及必要通知对象先准备，release发布SETTLED是backend对request的最后一次访问；caller用acquire观察。发布后的通知只能使用提前取得且仍有效的静态owner通知对象。IRQ直接发布只有在旧源已经结清、发布后不再访问request且尾部不影响下一笔时才作为明确profile允许；Native并发模型也须证明相同借用终点。"
+msgstr ""
+"Default IRQs latch completion/errors and wake owners; owners perform task-"
+"context drain. Prepare result fields, detach from controllers and acquire "
+"needed notification identities first. Release-publication of SETTLED is the "
+"backend’s final request access; callers observe with acquire. Post-"
+"publication notification uses pre-acquired still-valid static owner objects."
+" IRQ-direct publication is allowed only by explicit profiles with old "
+"sources settled, no later request access and no tail interference with "
+"subsequent transfers. Native concurrency models prove the same borrow "
+"endpoint."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:215
+msgid ""
+"同步便利 API 也遵守这些规则。如果它使用 stack request，返回前必须结清；如果等待预算到期而无法结清，不能返回并使该 stack "
+"失效。此类操作选择 caller-owned 长寿命 request，或进入明确的 fail-stop/reset 政策。"
+msgstr ""
+"Synchronous conveniences obey these rules. Stack requests must settle before"
+" return. If wait budgets expire without settlement, returning cannot "
+"invalidate their stacks. Use caller-owned long-lived requests or explicit "
+"fail-stop/reset policy."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:217
+msgid ""
+"SETTLED 表示 backend 的借用结束；caller 复用还必须满足结果已消费、observer/显式 callback adapter "
+"已退出。adapter 自己持有的借用不能被一个 driver 状态自动解除。默认单 owner 模式不增加独立 completion "
+"latch；request 是唯一结果权威。"
+msgstr ""
+"SETTLED ends backend borrowing; reuse also needs consumed results and exited"
+" observers/callback adapters. Driver states cannot revoke independent "
+"adapter borrows. Single-owner defaults add no separate completion latch; "
+"requests remain the sole result authority."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:219
+msgid "8. 启动、故障与停止"
+msgstr "8. Startup, faults and shutdown"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:221
+msgid ""
+"静态装配产生可读的初始化依赖顺序；用普通串行 C 调用建立 "
+"CPU/clock/timebase、安全初值、内核必要静态对象和所选驱动。外部应用显式启动业务组件和 scheduler。平台不生成业务 main "
+"或自动开启所有设备。"
+msgstr ""
+"Static assembly provides readable initialization order. Ordinary serial C "
+"calls establish CPU/clocks/timebases, safe values, required static kernel "
+"objects and selected drivers. External applications start business "
+"components/schedulers explicitly. Platforms generate no business main or "
+"automatic all-device startup."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:223
+msgid ""
+"失败逆序撤销，只撤销实际取得的资源；同时记录原错误、cleanup 错误和剩余所有权。发生残余 DMA/IRQ 时保留 "
+"context/request，不伪造回到 OFFLINE。"
+msgstr ""
+"Undo only acquired resources in reverse order; retain original failures, "
+"cleanup errors and remaining ownership. Residual DMA/IRQ keeps "
+"contexts/requests alive rather than falsely returning to OFFLINE."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:225
+msgid ""
+"初始化动作声明可撤销与不可撤销效果。已启用IWDG、Flash option "
+"bytes或硬件锁不能假装由逆序cleanup关闭。默认watchdog启用由产品显式决定，已有启用状态也必须识别；后续启动失败记录不可撤销效果，产品选择继续喂狗的受控失败状态或复位。平台不在rollback中谎报watchdog已停止。"
+msgstr ""
+"Initialization declares reversible/irreversible effects. Enabled IWDG, Flash"
+" option bytes and hardware locks cannot be pretended undone by reverse "
+"cleanup. Products explicitly choose watchdog enabling; existing enabling "
+"must be detected. Later failures record irreversible effects and leave "
+"products to continue feeding in controlled failure states or reset. Rollback"
+" never falsely reports watchdog stopped."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:227
+msgid ""
+"RUN 阶段固定端口身份和写入权。controller 内部受控 recovery 可以恢复同一端口，不借机换 "
+"owner/route。stop先关闭新admission并请求producer停止新增操作；controller执行者仍处理控制命令、deadline和drain，直到请求及adapter借用结清。完成通知发布者也须退出，随后外部应用join调用者/执行者并回收OS"
+" storage，最后关闭clock/引脚。不能先停掉唯一执行者，再join仍在等待SETTLED的producer。"
+msgstr ""
+"RUN fixes identity/write authority. Controlled recovery restores the same "
+"port without changing owner/routes. Stop closes admission and asks producers"
+" to stop new operations; executors continue controls/deadlines/drain until "
+"requests/adapter borrows settle. Notification publishers also exit; "
+"applications then join clients/executors, reclaim OS storage and finally "
+"disable clocks/pins. Never stop the sole executor before joining producers "
+"waiting for SETTLED."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:229
+msgid ""
+"无admission的直接GPIO writer和相关ISR必须先静止，才能改变mode/clock；通用stop "
+"flag不能撤销无检查的直接调用。通知对象即使静态分配，也不能在仍可能被wake访问时删除、复用或解除内核注册；request已SETTLED不足以单独证明通知对象可回收。"
+msgstr ""
+"Direct GPIO writers without admission, and related ISRs, must quiesce before"
+" changing modes/clocks; generic stop flags cannot revoke unchecked calls. "
+"Static notification objects cannot be deleted, reused or unregistered while "
+"wakeups may still access them. Request SETTLED alone does not prove "
+"notification reclamation safe."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:231
+msgid ""
+"固定 hot path 的低成本依赖这个 quiescence 前提。默认没有任意时刻由另一个 task teardown/rebind "
+"的承诺。需要该能力的产品使用单独评审的 managed binding 合同，并承担对应检查与状态成本。"
+msgstr ""
+"Low-cost fixed hot paths depend on quiescence. The default promises no "
+"arbitrary concurrent teardown/rebinding. Products requiring that use "
+"separately reviewed managed-binding contracts and pay corresponding "
+"state/check costs."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:233
+msgid ""
+"安全输出的物理初值由 Board描述；产品在错误时选择停止、降级或复位。reset/启动电平、外部器件时序及输出连续性需要实板证明。默认不承诺 MCU "
+"内核运行中的全平台热重启。"
+msgstr ""
+"Boards describe physical initial output levels; products choose stop, "
+"degradation or reset on errors. Reset/start levels, external-device timing "
+"and output continuity require physical proof. Platform-wide hot restart "
+"during kernel execution is not promised by default."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:235
+msgid "Board初值表达电气约束和已知inactive polarity；阀门、加热器等过程安全状态属于产品。两者不能因同称“安全”而互相替代。"
+msgstr ""
+"Board initial values express electrical constraints and known inactive "
+"polarity; process-safe valve/heater states belong to products. The word "
+"“safe” does not make them interchangeable."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:237
+msgid "9. 内存与资源策略"
+msgstr "9. Memory and resource policy"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:239
+msgid ""
+"默认 core/io 没有 heap、隐藏 OS 对象或全量资源池。controller、选中的 mode 状态、endpoint、必要队列和 "
+"buffer按实际实例分配。固定配置/绑定/方法表放 Flash，可变 context零初始化放 BSS。"
+msgstr ""
+"Default core/I/O has no heap, hidden OS objects or all-resource pools. "
+"Controllers, selected-mode state, endpoints, queues and buffers allocate for"
+" actual instances. Fixed configurations/bindings/tables live in Flash; "
+"mutable zeroed contexts live in BSS."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "资源"
+msgstr "Resource"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "默认策略"
+msgstr "Default policy"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "请求 payload"
+msgstr "Request payload"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "caller-owned，借用到 SETTLED；copy API 另选入"
+msgstr ""
+"Caller-owned, borrowed until SETTLED; copy APIs are separately selected."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "queue"
+msgstr "queue"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "实际 depth 与 item size；只存需要的数据；overflow 策略明确"
+msgstr ""
+"Actual depth/item size; only necessary data, explicit overflow policy."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "task"
+msgstr "task"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "外部声明的 stack/TCB storage；预算为各任务之和"
+msgstr "Externally declared stack/TCB storage; budget totals each task."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "RX"
+msgstr "RX"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "精确选择 event/byte/block 语义及容量；不默认最大事件池"
+msgstr ""
+"Exact event/byte/block semantics and capacity; no maximum default event "
+"pool."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "DMA"
+msgstr "DMA"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "仅 DMA mode 保留状态；地址域、alignment、alias 和借用检查"
+msgstr ""
+"State only for DMA modes; check domains, alignment, aliases and borrowing."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "trace/stats"
+msgstr "trace/stats"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "单独编译选择；关闭后无常驻格式化或每操作统计分支"
+msgstr ""
+"Separate compile choices; disabled modes leave no permanent formatting or "
+"per-operation statistics branch."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "managed heap"
+msgstr "managed heap"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "明确 opt-in、域/容量/失败/封存；libc 与 kernel heap分别记账"
+msgstr ""
+"Explicit opt-in with domain/capacity/failure/sealing; account libc/kernel "
+"heaps separately."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:251
+msgid ""
+"UART逐 byte时间戳、byte stream、DMA block loan是不同合同。需要精确帧间时间的应用选择保真 event "
+"profile；选择 block profile的应用接受它实际提供的时间信息。不能根据 DMA completion倒推出带间隙数据的每 "
+"byte到达时间。"
+msgstr ""
+"Per-byte UART timestamps, byte streams and DMA block loans are different "
+"contracts. Frame-gap applications choose faithful event profiles; block "
+"users accept actual provided timing. DMA completion cannot reconstruct each "
+"byte’s arrival across gaps."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:253
+msgid ""
+"circular DMA loan必须保证未释放窗口不会覆盖；做不到时使用有界复制、流控、停机或明确丢弃策略。buffer非 NULL不等于 DMA "
+"可达。F407 CCM等 CPU-only memory域必须与 DMA域分开；GD按照精确芯片文档另列。"
+msgstr ""
+"Circular DMA loans must prevent overwrite of unreleased windows. Otherwise "
+"use bounded copying, flow control, stopping or explicit drop policy. Non-"
+"NULL does not mean DMA-reachable. Separate F407 CCM/other CPU-only domains "
+"from DMA domains; describe GD domains from exact chip documents."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:255
+msgid ""
+"静态 RAM 以实际 ELF分配区域和独立保留区记账，避免把 BSS内的 "
+"stack/heap/buffer再重复加一次。高水位反映使用，不缩小已经占用的静态区域。Flash包括vector、代码、rodata、注册/绑定和 "
+"RAM初始化装载；不能只统计 text。"
+msgstr ""
+"Account static RAM from actual ELF regions and independent reservations, "
+"without adding BSS stacks/heaps/buffers twice. High-water marks describe use"
+" without shrinking reserved allocations. Flash includes vectors, code, "
+"rodata, registration/bindings and RAM initialization loads, not text alone."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:257
+msgid ""
+"大而统一的 generic metadata先删除。具体状态仍保留：busy/fault、active request、IRQ/drain标记、实际 "
+"callback/loan借用和必要epoch。不能只凭字段大小删除一个安全不变量。"
+msgstr ""
+"Remove large generic metadata first. Preserve actual busy/fault, active-"
+"request, IRQ/drain, callback/loan and necessary epoch state. Field sizes "
+"alone do not justify removing safety invariants."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:259
+msgid "9.1 工业控制类别与首发实施范围"
+msgstr "9.1 Industrial-control categories and initial scope"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:261
+msgid "首先定义各类别具体合同，再按已复核连接和实际需求实现。公共类型的存在不构成 provider 支持；未实现的 mode 在配置阶段拒绝。"
+msgstr ""
+"Define category contracts first, then implement reviewed wiring and actual "
+"requirements. Public types alone establish no provider support; "
+"unimplemented modes fail configuration."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "类别"
+msgstr "Category"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "必需抽象"
+msgstr "Required abstraction"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "必需验收"
+msgstr "Required acceptance"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "GPIO/EXTI"
+msgstr "GPIO/EXTI"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "固定授权mask；输入/输出；真实line归属、边沿与事件"
+msgstr ""
+"Fixed authorized masks; inputs/outputs; actual line ownership, edges and "
+"events."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "初值/原子输出；共享EXTI vector；事件溢出；停机排空"
+msgstr ""
+"Initial/atomic outputs, shared EXTI vectors, event overflow and shutdown "
+"drain."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "UART/RS485"
+msgstr "UART/RS485"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "byte/event/block接收语义；TX memory settlement与wire-idle；明确DE/RE电气动作"
+msgstr ""
+"Byte/event/block RX; TX memory settlement versus wire-idle; explicit DE/RE "
+"electrical actions."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "error/loss/TC/取消；帧间时间；实际收发器与接线"
+msgstr "Errors/loss/TC/cancel, frame gaps, actual transceivers and wiring."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "SPI"
+msgstr "SPI"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "controller、静态CS endpoint、mode/speed、完整transaction"
+msgstr ""
+"Controllers, static CS endpoints, modes/speeds and complete transactions."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "CS保持/释放；同步全双工；DMA/取消及deadline"
+msgstr "CS hold/release, synchronized full-duplex, DMA/cancel/deadlines."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "I2C"
+msgstr "I2C"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "地址endpoint；消息序列；repeated START/STOP与错误"
+msgstr "Address endpoints, message sequences, repeated START/STOP and errors."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "NACK/仲裁/挂死；恢复动作与终态；不把bus recovery伪装成功"
+msgstr ""
+"NACK/arbitration/stuck buses, recovery and terminal states; no false "
+"recovery success."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "timer/PWM/capture"
+msgstr "timer/PWM/capture"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "时钟域、timer/channel、周期/占空比、硬件trigger、固定安全值"
+msgstr ""
+"Clock domains, timer/channels, periods/duty, hardware triggers and fixed "
+"safe values."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "时间精度/边界；原子更新；ADC触发资源；停机输出"
+msgstr ""
+"Timing precision/bounds, atomic updates, ADC trigger resources and shutdown "
+"outputs."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "ADC"
+msgstr "ADC"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "已审channel/scan/trigger、样本格式、校准、block借用/溢出"
+msgstr ""
+"Reviewed channels/scans/triggers, sample formats, calibration, block "
+"borrowing/overflow."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "采样率/精度；DMA可达；sequence/trigger；丢失和buffer回收"
+msgstr ""
+"Rates/accuracy, DMA reachability, sequences/triggers, loss and buffer "
+"return."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "watchdog/reset"
+msgstr "watchdog/reset"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "硬件配置范围、feed与reset cause"
+msgstr "Hardware ranges, feeding and reset causes."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "实际超时复位；调试冻结行为；上电/复位差异"
+msgstr "Actual timeout reset, debug freezing and power-on/reset differences."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "内部Flash"
+msgstr "Internal Flash"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "物理几何、region、program/erase、不可中断脉冲"
+msgstr ""
+"Physical geometry, regions, programming/erasing and nonpreemptible pulses."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "越界/对齐；硬件终态；掉电与暂停预算"
+msgstr ""
+"Bounds/alignment, hardware terminal states, power loss and pause budgets."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:274
+msgid ""
+"第一个软件垂直切片完成GPIO、时钟与请求模型；UART、SPI、内部Flash是基础通讯/持久化切片；I2C、watchdog及timer/PWM/ADC/EXTI按工业需求逐模式进入后续批次。NG-018、NG-031、NG-032、NG-033分别管理watchdog、EXTI、固定timer/PWM、ADC单次/低速scan，进入对应故障/资源验收和候选依赖，不能用一个类别总状态关闭所有模式。"
+msgstr ""
+"The first slice establishes GPIO, clocks and requests; UART/SPI/internal "
+"Flash provide basic communication/persistence. "
+"I2C/watchdog/timer/PWM/ADC/EXTI enter subsequent mode-specific industrial "
+"batches. NG-018/031/032/033 separately govern watchdog, EXTI, fixed "
+"timer/PWM and single/low-rate ADC scan with fault/resource acceptance and "
+"candidate dependencies; aggregate category status cannot close all modes."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:276
+msgid ""
+"CAN/CANopen、Ethernet、USB、低功耗、cache/MPU、安全启动和远程更新需要明确产品需求、维护依赖及独立预算。架构保留窄端口接入位置，首个候选不要求全芯片外设覆盖；也不公开仅有SDK壳的能力。"
+msgstr ""
+"CAN/CANopen, Ethernet, USB, low power, cache/MPU, secure boot and remote "
+"updates need explicit product demand, maintained dependencies and "
+"independent budgets. Narrow integration ports remain available, but the "
+"first candidate need not cover all chip peripherals or expose SDK-only "
+"shells."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:278
+msgid ""
+"RTOS "
+"tick、HAL时间、UART时序、ADC/PWM触发分别占用实际timebase资源。选型和配置不能让多个用途无意占用同一timer/channel。未确认三板的外设接线不从芯片具有该外设自动推导。"
+msgstr ""
+"RTOS ticks, HAL time, UART timing and ADC/PWM triggers each consume actual "
+"timebases. Selection must not accidentally share one timer/channel across "
+"incompatible uses. Chip capabilities do not establish unverified Board "
+"wiring."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:280
+msgid ""
+"当前维护 EXTI 有界事件、固定 PWM、ADC polling/scan 与 IWDG feed/reset-"
+"cause。STM32F407／GD32F470 的选定路线还提供 UART `dma-tx`、`irq-blocks`、`rx-dma-"
+"idle`、`rx-dma-continuous`、`dma-duplex` 和 `dma-duplex-continuous`，SPI 有限 "
+"full-duplex DMA，ADC `trigger-dma`／`trigger-dma-continuous`，以及 `edge-capture`"
+" 和 `complementary-pwm` 的捕获、break／deadtime 机制。ADC `trigger-dma` "
+"每块停机排空，consumer release 后由显式 service "
+"重启，存在块间间隔；连续模式使用双缓冲与显式替换块，容量耗尽或硬件排空失败时保留借用，不覆写消费者存储。连续模式不承诺任意 IRQ "
+"延迟、服务间隔或消费者速度下无丢失。DMA domain、硬件 route、IRQ、停止与 consumer loan "
+"排空均按精确模式维护合同和软件模型；配置及生产实现范围以[派生能力矩阵](../delivery/capabilities.md)和对应合同为准，全部相关实板时序、电气与持续采集资格仍未执行。"
+msgstr ""
+"Maintained modes include bounded EXTI events, fixed PWM, ADC polling/scan "
+"and IWDG feed/reset causes. Selected STM32F407/GD32F470 routes also provide "
+"UART `dma-tx`, `irq-blocks`, `rx-dma-idle`, `rx-dma-continuous`, `dma-"
+"duplex` and `dma-duplex-continuous`, finite full-duplex SPI DMA, ADC "
+"`trigger-dma`/`trigger-dma-continuous`, and capture/break/deadtime "
+"mechanisms through `edge-capture` and `complementary-pwm`. ADC `trigger-dma`"
+" stops and drains each block, then explicit service restarts after consumer "
+"release, leaving inter-block gaps. Continuous modes use double buffering and"
+" explicit replacement blocks; exhausted capacity or failed hardware drain "
+"retains borrows without overwriting consumer storage. They do not promise "
+"lossless operation under arbitrary IRQ latency, service intervals or "
+"consumer speed. DMA domains, hardware routes, IRQs, stop and consumer-loan "
+"drain retain exact-mode contracts and software models. The [derived "
+"capability matrix](../delivery/capabilities.md) and corresponding contracts "
+"define configuration and production-implementation scope. All related "
+"physical timing, electrical and continuous-acquisition qualification remains"
+" unexecuted."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:282
+msgid ""
+"timer说明频率、tick单位、wrap扩展、最长维护间隔和clock/stop行为；PWM同时检查共享PSC/ARR/base "
+"mode，明确0%/100%、shadow更新、误差及启动/停止电平。"
+msgstr ""
+"Timers define frequency, tick units, wrap extension, maximum maintenance "
+"intervals and clock/stop behavior. PWM checks shared PSC/ARR/base modes and "
+"defines 0%/100%, shadow updates, error and start/stop levels."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:283
+msgid ""
+"ADC说明分辨率、sample time、参考电压/原始计数含义、sequence/trigger、overrun、时间信息和超时输出有效性；DMA "
+"stream另定义窗口覆盖和借用。"
+msgstr ""
+"ADC defines resolution, sample time, reference voltage/raw counts, "
+"sequences/triggers, overruns, timing information and timeout output "
+"validity. DMA streams separately define window overwrite and borrowing."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:284
+msgid "EXTI说明line/port mux、共享vector、边沿合并/丢失、时间精度和pending清理；debounce策略由产品决定。"
+msgstr ""
+"EXTI defines line/port muxing, shared vectors, merged/lost edges, timing "
+"precision and pending cleanup. Products choose debounce policy."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:285
+msgid ""
+"IWDG说明启用不可逆性、已有状态、含LSI误差的超时范围、固定feed责任、reset cause及debug freeze；健康判断不进入平台。"
+msgstr ""
+"IWDG defines irreversible enabling, existing state, timeout range including "
+"LSI error, fixed feeding responsibility, reset causes and debug freezing. "
+"Health decisions stay external."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:287
+msgid "10. 性能策略与成本验收"
+msgstr "10. Performance policy and cost acceptance"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:289
+msgid ""
+"默认优化对象是总成本：CPU cycles、最大观测屏蔽时间、Flash加载字节、RAM保留、stack峰值、吞吐/丢失率、能耗，以及新增实例边际成本。"
+msgstr ""
+"Optimize total cost: CPU cycles, maximum observed masking duration, Flash "
+"loads, reserved RAM, peak stacks, throughput/loss, energy and marginal per-"
+"instance cost."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:291
+msgid ""
+"先测最小垂直切片：空 image、GPIO、UART、SPI请求，分别为裸机和 FreeRTOS。新板 "
+"profile只选切片必需资源，不能把完整板配置当作最小平台成本。"
+msgstr ""
+"Measure minimal bare-metal/FreeRTOS slices first: empty images, GPIO and "
+"UART/SPI requests. Board profiles select only slice-essential resources; "
+"complete Board configurations are not minimal platform cost."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "操作"
+msgstr "Operation"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "设计成本目标"
+msgstr "Cost target"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "验证方式"
+msgstr "Validation"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "固定 GPIO set/reset"
+msgstr "Fixed GPIO set/reset"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "无注册查找/通用ref/OS锁，使用授权 mask，支持同port batch"
+msgstr ""
+"No registry lookup/generic refs/OS locks; authorized masks and same-port "
+"batches."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "反汇编＋DWT/logic analyzer"
+msgstr "Disassembly + DWT/logic analyzer."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "request admission"
+msgstr "request admission"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "O(1)或明确固定队列上界；无payload复制/分配/名称查找"
+msgstr ""
+"O(1) or explicit fixed queue bounds; no payload copy, allocation or name "
+"lookup."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "模型故障＋边界输入＋cycles"
+msgstr "Fault models + boundary inputs + cycles."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "IRQ数据发布"
+msgstr "IRQ data publication"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "有界动作，无应用callback/无界扫描；index发布正确"
+msgstr ""
+"Bounded actions without application callbacks/unbounded scans; correct index"
+" publication."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "竞态模型＋优先级负载＋实板"
+msgstr "Race models + priority loads + physical Boards."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "completion观察"
+msgstr "Completion observation"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "从request读取已有状态；通知不构成结果权威"
+msgstr "Read existing request state; notifications are not result authority."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "通知满/丢失＋取消/late IRQ"
+msgstr "Full/lost notifications + cancellation/late IRQ."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "新实例"
+msgstr "New instance"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "只增加该实例必需context/storage与只读绑定"
+msgstr "Only necessary instance context/storage/read-only bindings."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "image delta/map＋配置说明"
+msgstr "Image delta/maps + configuration explanation."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "禁用功能"
+msgstr "Disabled capability"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "不保留相应RAM和不可达方法引用"
+msgstr "No retained RAM or unreachable method references."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "符号/section/实际ELF差分"
+msgstr "Symbol/section/actual ELF differences."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:302
+msgid ""
+"正式优化 profile从 O2/Os/O3与 LTO比较中选少量组合，不沿用 CMake默认或发布器硬编码。按单个热点确有收益时局部优化；不全局启用 "
+"fast-math或删掉必要边界检查。"
+msgstr ""
+"Select a few formal profiles by comparing O2/Os/O3/LTO, not CMake defaults "
+"or hardcoded publishers. Apply hotspot-local optimizations where proven. No "
+"global fast-math or deletion of necessary checks."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:304
+msgid ""
+"测量记录clock/waitstate、ABI/FPU、compiler、执行模式、负载、IRQ干扰、测量开销和ELF身份。不能把指令数当cycles、Native"
+" wall time当MCU "
+"deadline、观测最大值当严格WCET。DWT使用快照差值，profiler不能重置驱动使用的共同monotonic时基。"
+msgstr ""
+"Measurements record clocks/wait states, ABI/FPU, compiler, modes, loads, IRQ"
+" interference, overhead and ELF identity. Instruction counts are not cycles;"
+" Native wall time is not MCU deadlines; observed maxima are not strict WCET."
+" DWT uses snapshot differences; profilers do not reset driver-shared "
+"monotonic clocks."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:306
+msgid ""
+"绝对预算由参考benchmark与产品共同确定。平台先保证结构性约束和软件资源门禁；只有实测满足指定环境和负载，才承诺相应性能。架构不能无条件证明在所有负载、编译器和硬件上全局最优。"
+msgstr ""
+"Reference benchmarks and products define absolute budgets. The platform "
+"establishes structural constraints/software gates first and promises "
+"performance only when measured under stated conditions/loads. Architecture "
+"cannot prove unconditional global optimality across workloads, compilers and"
+" hardware."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:308
+msgid "11. 工程工具、风格与管理"
+msgstr "11. Tools, style and management"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:310
+msgid ""
+"默认 C11 production，公共 ABI保持 C；C++可用于 host tests，不作为 driver对象系统。正式工具用锁定 "
+"ARM/Native compiler、CMake/Ninja/CTest、Python、clang-format/精选clang-"
+"tidy和一个host测试框架。其他工具只有覆盖明确缺口时引入。"
+msgstr ""
+"Production defaults to C11/public C ABI. C++ may support host tests, not "
+"driver object systems. Formal tools use locked ARM/Native compilers, "
+"CMake/Ninja/CTest, Python, clang-format/selected clang-tidy and one host "
+"framework. Other tools enter only for explicit gaps."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:312
+msgid ""
+"正式环境锁定版本与 OCI digest，源依赖另外锁定内容和许可。一个薄 "
+"dev入口编排原生命令；本地与CI复用，不建立第二build/test/workflow engine。"
+msgstr ""
+"Lock formal versions/OCI digests and separately source contents/licenses. "
+"One thin dev entry orchestrates native commands for local/CI; no second "
+"build/test/workflow engine."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:314
+msgid ""
+"风格沿用根目录.clang-format/.editorconfig：80列、4空格、K&R attached braces和类型侧pointer "
+"alignment。公共symbol延续模块前缀、type的_t后缀和既有命名；private实现static，header自足，整数/长度/序列化规则明确。vendor代码独立target，不通过全局关闭warnings掩盖own代码。"
+msgstr ""
+"Preserve root .clang-format/.editorconfig: 80 columns, four spaces, attached"
+" K&R braces and type-side pointers. Keep module prefixes, _t types and "
+"current naming; private code is static, headers self-contained and "
+"integer/length/encoding rules explicit. Vendor targets stay separate; global"
+" warning suppression never hides owned defects."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:316
+msgid ""
+"注释沿用反斜杠Doxygen、现有文件头与section/inline形式。public "
+"header写完整参数和返回合同，source避免重复；调用context、阻塞和deadline起点、所有权、输出有效性、取消/结清及失败剩余状态用现有标签说明。共享规则放类型/模块contract，函数仅写差异。内部注释解释竞态、屏障、勘误和取舍。文件头保留作者/版本/日期等现有约定，Git补充历史追踪。具体规则和现有落实缺口见[工程手册第12节](engineering-"
+"handbook.md#12-代码风格注释与静态检查)。"
+msgstr ""
+"Comments retain backslash Doxygen, file headers and section/inline forms. "
+"Public headers define parameters/returns; sources avoid duplication. "
+"Existing tags describe context, blocking/deadline origins, ownership, output"
+" validity, cancel/settlement and residual failures. Shared rules live on "
+"types/modules; functions state differences. Internals explain races, "
+"barriers, errata and tradeoffs. Headers retain authors/versions/dates and "
+"Git supplements history. See [handbook section 12](engineering-"
+"handbook.md#12-代码风格注释与静态检查)."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:318
+msgid ""
+"状态码服务于caller可以执行的恢复动作；raw vendor诊断为可选detail。API不隐式格式化日志、不写全局last "
+"error、不在IRQ调用全局用户handler。普通错误与invariant违约分别处理。"
+msgstr ""
+"Statuses support actionable caller recovery; vendor diagnostics are optional"
+" detail. APIs do not format logs implicitly, write global last errors or "
+"call global application handlers in IRQs. Ordinary errors and invariant "
+"violations are distinct."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:320
+msgid ""
+"十人配置沿用职责投入，不绑定旧代码边界：TL1、core/io/os2、STM/GD "
+"BSP2、器件/通信2、QA/HIL2、build/release1。每个维护域落实primary/backup。普通变更一个独立domain "
+"reviewer；公共合同、IRQ/DMA、同步、持久化和发布链增加消费者/跨层review。"
+msgstr ""
+"The ten-person capacity follows responsibilities, not old code boundaries: "
+"TL1, core/I/O/OS2, STM/GD BSP2, device/communications2, QA/HIL2, "
+"build/release1. Each domain has primary/backup responsibility. Ordinary "
+"changes need independent domain review; public contracts, IRQ/DMA, "
+"synchronization, persistence and publishing add consumer/cross-layer review."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:322
+msgid ""
+"状态分为设计、实现、软件资格、硬件资格、发布资格。任务不以代码行、PR数、文档数量或测试数量完成。详见 [工程手册](engineering-"
+"handbook.md)。"
+msgstr ""
+"Distinguish design, implementation, software, hardware and release "
+"qualification. Code lines, PRs, pages and test counts do not close tasks. "
+"See [engineering handbook](engineering-handbook.md)."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:324
+msgid "12. 验证、交付与平台接入"
+msgstr "12. Validation, delivery and integration"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:326
+msgid ""
+"验证层次：fast local → PR集成 → nightly广度/负载 →专用HIL "
+"→同工件晋升。检查选择依据契约与风险，配置、同步、公共API、linker/toolchain变化触发跨层检查。"
+msgstr ""
+"Validation layers: fast local → PR integration → nightly breadth/load → "
+"dedicated HIL → same-artifact promotion. Contracts/risks drive selection; "
+"configuration, synchronization, public APIs and linker/toolchain changes "
+"trigger cross-layer checks."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:328
+msgid ""
+"核心不变量：REJECTED无借用；ACCEPTED的错误仍有归属；SETTLED后backend/DMA/IRQ/deferred不再访问request/buffer；caller回收还需consumer/adapter退出；request复用前排空旧源；一个bus仅一个wire-"
+"active事务；stop先禁admission再排空；overflow/通知满不伪造成功；wait仍能推进drain且无lost-"
+"wake；资源计划与实现一致。"
+msgstr ""
+"Core invariants: REJECTED retains no borrow; ACCEPTED failures remain owned;"
+" after SETTLED no backend/DMA/IRQ/deferred access to the request/buffer "
+"remains; reclamation also needs consumer/adapter exit; reuse drains old "
+"sources; one wire-active transaction per bus; stop closes admission then "
+"drains; overflow/full notifications cannot fake success; waits preserve "
+"drain/protect against lost wakes; resource plans match implementations."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:330
+msgid ""
+"模型测试覆盖partial start、late "
+"IRQ、epoch复用、queue满、取消和deadline竞争、abort失败及stop重试。ARM真实链接覆盖startup/vector/strongIRQ、layout、ABI和资源。实板覆盖TC、DMA"
+" drain、电气、屏蔽时间、高水位和长期负载，当前明确未执行。"
+msgstr ""
+"Models cover partial starts, late IRQs, epoch reuse, full queues, "
+"cancel/deadline races, failed aborts and stop retries. Actual ARM links "
+"cover startup/vectors/strong IRQs, layout, ABI and resources. Physical "
+"testing covers TC, DMA drain, electrical behavior, masking duration, high-"
+"water marks and sustained loads; currently not executed."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:332
+msgid ""
+"provenance证明输入/命令/输出绑定，hermetic证明只读声明输入，可复现证明独立clean "
+"build字节相同。三者单独验收。正式产物从完整锁定输入构建，封存ELF/BIN/map/config/manifest；晋升同一hash，不在最后发布步骤重建另一个image。"
+msgstr ""
+"Provenance binds inputs/commands/outputs; hermeticity proves reading only "
+"declared inputs; reproducibility proves identical independent clean-build "
+"bytes. Accept them separately. Formal artifacts build from complete locked "
+"inputs and seal ELF/BIN/maps/config/manifests. Promote identical hashes "
+"without rebuilding at publication."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:334
+msgid ""
+"支持单元由 exact part、Board source/PCB revision、route、execution "
+"mode、backend与resolved配置确定。source资料、编译/链接、model、physical、product负载分别记录。一个Board名称不代表全部外设已支持。"
+msgstr ""
+"Support units include exact part, Board source/PCB revision, routes, modes, "
+"backend and resolved configuration. Source review, compile/link, models, "
+"physical tests and product loads are separate evidence dimensions. Board "
+"names do not imply all-peripheral support."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:336
+msgid ""
+"新Board交付少量硬件事实和必要电气hook；新SoC交付真实provider/startup/clock/IRQ/memory/SDK；新器件交付窄transport与器件逻辑；新协议交付纯core与adapter；外部工程交付assembly/main/tasks/policy。典型流程和源码SDK升级见"
+" [接入契约](integration-contracts.md)。"
+msgstr ""
+"New Boards provide small fact sets/electrical hooks; SoCs provide actual "
+"providers/startup/clocks/IRQs/memory/SDKs; devices provide narrow "
+"transport/logic; protocols provide pure cores/adapters; products provide "
+"assembly/main/tasks/policy. See [integration contracts](integration-"
+"contracts.md) for workflows and SDK upgrades."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:338
+msgid "13. 实施顺序与退出条件"
+msgstr "13. Implementation order and exit conditions"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:340
+msgid ""
+"每批按新公共合同原子更新实现、caller、测试和文档；外部examples更新独立SDK "
+"pin。既有接口允许直接删除；持久化数据若已部署，仍需独立迁移与回滚政策。"
+msgstr ""
+"Each batch atomically updates implementations, callers, tests and docs to "
+"new contracts. External examples update SDK pins separately. Old interfaces "
+"may be deleted directly; deployed persistence still requires "
+"migration/rollback policy."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "批次"
+msgstr "Batch"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "内容"
+msgstr "Content"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "软件退出条件"
+msgstr "Software exit condition"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B0"
+msgstr "B0"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "设计冻结、需求/风险、基准workload与预算schema"
+msgstr ""
+"Freeze design, requirements/risks, reference workloads and budget schemas."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "一套可评审合同，未实现/未测量状态准确"
+msgstr ""
+"One reviewable contract set with truthful unimplemented/unmeasured states."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B1"
+msgstr "B1"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "正式工具、源码包、schema配置、最小image/target"
+msgstr ""
+"Formal tools, source packages, schema configuration and minimum "
+"images/targets."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "两SoC真实最小ELF；错误输入真实拒绝；一个有效配置"
+msgstr ""
+"Actual minimum ELFs for two SoCs; real invalid-input rejection; one resolved"
+" configuration."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B2"
+msgstr "B2"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "CPU/clock/memory/启动与固定GPIO"
+msgstr "CPU/clocks/memory/startup and fixed GPIO."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "三Board基础组合；直接/batch路径；安全初值及输入身份一致"
+msgstr ""
+"Three-Board base combinations, direct/batch paths, consistent safe "
+"values/input identity."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B3"
+msgstr "B3"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "请求、UART/SPI/I2C/Flash及EXTI/PWM/ADC/IWDG首发模式"
+msgstr "Requests, UART/SPI/I2C/Flash and first EXTI/PWM/ADC/IWDG modes."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "cancel/deadline/drain与不可逆效果不变量；按实际支持模式链接和故障回归"
+msgstr ""
+"Cancel/deadline/drain and irreversible-effect invariants; actual mode-"
+"specific linking/fault regressions."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B4"
+msgstr "B4"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "按对象OS storage、通用器件/组件、外部examples"
+msgstr ""
+"Per-object OS storage, shared devices/components and external examples."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "真实外部consumer；业务不进入平台；未用资源不驻留"
+msgstr ""
+"Actual external consumers, no internal business logic or unused resident "
+"resources."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B5"
+msgstr "B5"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "静态分析、资源/性能工具、hermetic/reproducible、HIL准备"
+msgstr ""
+"Static analysis, resource/performance tools, hermetic/reproducible builds "
+"and HIL preparation."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "软件门禁、独立重建、真实工件准入；物理结果仍未执行"
+msgstr ""
+"Software gates, independent rebuilds and actual artifact admission; physical"
+" results still unexecuted."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B6"
+msgstr "B6"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "新候选与迁移收束"
+msgstr "New candidates and migration closure."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "新源码资格与交付证据完整；旧入口删除；支持范围真实"
+msgstr ""
+"Complete new-source qualification/evidence, removed old entries and truthful"
+" support scope."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:352
+msgid ""
+"具体依赖与主责见 {download}`执行清单 <next-generation-"
+"execution.csv>`。十人3–6个月用于范围受控的迭代，不能在此窗口默认完成所有外设、自动拓扑、动态设备系统、低功耗、MPU、安全更新和企业LTS。"
+msgstr ""
+"See {download}`execution checklist <next-generation-execution.csv>` for "
+"dependencies/domain owners. Ten people over 3–6 months deliver controlled "
+"scope, not automatically every peripheral, topology solver, dynamic device "
+"system, low power, MPU, secure updates or enterprise LTS."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:354
+msgid ""
+"以下是十人投入下的排期假设，任务依赖和退出证据优先于日历。各provider首个切片即带故障验证、格式/warning和最小资源预算，B5负责扩大与收束，不能把检查推迟到最后。"
+msgstr ""
+"The following schedule assumes ten-person capacity; dependencies/evidence "
+"take precedence over calendars. Each provider’s first slice includes faults,"
+" style/warnings and minimal budgets. B5 expands/closes checks rather than "
+"deferring them until the end."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "时间窗"
+msgstr "Window"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "主线及并行工作"
+msgstr "Main and parallel work"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "阶段结果"
+msgstr "Stage outcome"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "第1–2周"
+msgstr "Weeks 1–2"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B0；工具与QA同时准备最小workload和锁定环境"
+msgstr "B0; tools/QA prepare minimum workloads and locked environments."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "首发模式、资源口径、失败/借用合同明确"
+msgstr ""
+"Explicit initial modes, resource accounting and failure/borrow contracts."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "第3–6周"
+msgstr "Weeks 3–6"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B1；两BSP准备精确startup/memory，接口组建立请求模型"
+msgstr ""
+"B1; BSPs prepare exact startup/memory while interfaces establish request "
+"models."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "外部消费到两SoC最小ELF的完整切片"
+msgstr "Complete external-consumer-to-minimum-ELF slices on two SoCs."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "第7–12周"
+msgstr "Weeks 7–12"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B2及B3基础路径；两BSP并行GPIO/UART，QA同步故障模型"
+msgstr ""
+"B2 and base B3; parallel GPIO/UART BSP work with concurrent QA fault models."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "三板基础通讯软件基线与资源报告"
+msgstr ""
+"Three-Board base communications software baseline and resource reports."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "第13–18周"
+msgstr "Weeks 13–18"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B3工业模式及B4；器件/通信组迁移组件和六个基础examples"
+msgstr ""
+"Industrial B3 and B4; device/communications teams migrate components and six"
+" base examples."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "首发EXTI/PWM/ADC/IWDG及明确I2C范围，裸机/FreeRTOS消费闭合"
+msgstr ""
+"Initial EXTI/PWM/ADC/IWDG and explicit I2C scope; closed bare-metal/FreeRTOS"
+" consumption."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "第19–24周"
+msgstr "Weeks 19–24"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "B5/B6；QA与构建组收束门禁、离线重建、HIL准备和旧路径删除"
+msgstr ""
+"B5/B6; QA/build close gates, offline rebuilds, HIL preparation and old "
+"paths."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:0
+msgid "范围受控的新软件候选、精确支持记录和可用工装准备"
+msgstr ""
+"Controlled-scope software candidates, exact support records and usable "
+"tooling."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:364
+msgid "第3个月基线与第6个月候选承担不同范围。实板接入后按实际产物继续物理验收；硬件依赖未关闭时保留未执行状态，不用缩小测试范围来维持日历承诺。"
+msgstr ""
+"Month-three baselines and month-six candidates have different scopes. After "
+"hardware connects, perform physical acceptance on actual artifacts. Unclosed"
+" hardware dependencies remain not executed; do not shrink tests to preserve "
+"calendar promises."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:366
+msgid ""
+"首个验证切片是固定GPIO及caller-"
+"owned请求状态模型，再实现一个必要的真实UART或SPI执行路径。DMA列为独立模式与资格项，不能因为SDK提供函数而计完成。软件候选与产品实板资格分开交付。"
+msgstr ""
+"Begin with fixed GPIO and caller-owned request state, then implement one "
+"necessary actual UART/SPI path. DMA modes/qualification remain separate; SDK"
+" functions do not establish completion. Software candidates and product "
+"physical qualification are delivered separately."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:368
+msgid "14. 会删除或不引入的默认复杂度"
+msgstr "14. Default complexity removed or excluded"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:370
+msgid "逐GPIO的通用注册/owner/ref/generation及热路径字符串查询。"
+msgstr ""
+"Per-GPIO generic registration/owner/ref/generation and hot-path string "
+"lookup."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:371
+msgid "每实例复制的可变OOP接口、raw getter与managed引用并存的长期兼容。"
+msgstr ""
+"Per-instance mutable OOP tables and permanent raw-getter/managed-reference "
+"coexistence."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:372
+msgid "未选模式的DMA handle、最大legacy copy buffer、全类型最大对象池。"
+msgstr ""
+"Unselected DMA handles, maximum legacy copy buffers and all-class maximum "
+"pools."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:373
+msgid "必须经过统一OSAL的所有kernel功能、通用executor、隐藏worker和默认completion队列。"
+msgstr ""
+"Mandatory OSAL traversal for all kernel functions, generic executors, hidden"
+" workers and default completion queues."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:374
+msgid "重复配置事实、多重overlay、生成业务流程的DSL、所有引脚自动求解器。"
+msgstr ""
+"Duplicate configuration facts, multiple overlays, generated business DSLs "
+"and all-pin automatic solvers."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:375
+msgid "重复构建/发布入口、只看test count的资格、与实际产物不一致的PASS报告。"
+msgstr ""
+"Duplicate build/release entries, count-only qualification and PASS reports "
+"for different artifacts."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:376
+msgid "为名称现代化而拆仓、增加目录转发层或一次引入多个构建/包管理体系。"
+msgstr ""
+"Repository splits, forwarding directories or multiple build/package systems "
+"introduced only to modernize names."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/design/next-generation-platform.md:378
+msgid ""
+"新方案保留的是实际问题所需的状态和证据：固定资源规划、真实请求借用、故障与drain、明确context、实际内存/时序、可重复工程与外部产品边界。"
+msgstr ""
+"Retain the state/evidence real problems need: fixed planning, genuine "
+"borrows, faults/draining, explicit contexts, actual memory/timing and "
+"repeatable engineering with external product boundaries."

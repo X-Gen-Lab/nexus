@@ -1,0 +1,43 @@
+// FIG-05 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph PlatformLifecycle {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-05 Generated Platform explicit cold lifecycle\nOne external privileged task owner advances serially"];
+    cold [label="Cold object: no successful running permission", fillcolor="#f8fafc"];
+    context [label="Check context / started\nReject ISR and masks; physical implementation checks privilege"];
+    system [label="SoC start_system / start_resources\nExact cold clock, timebase, pin-lease prerequisites"];
+    instances [label="Initialize instances in declaration order\nCount potentially effectful attempts before calling for cleanup"];
+    running [label="start primary=SUCCESS\nExternal application may operate; no scheduler start", fillcolor="#f0fdf4"];
+    quiesce [label="Externally close producers / direct writers first\nExecutor continues draining; join callers and observers"];
+    reverse [label="nx_platform_stop: stop initialized instances in reverse order\nDecrease initialized count only after each successful step"];
+    withdraw [label="Provider stop_system\nRestore owned pin / gate / timebase / cache effects"];
+    released [label="stop=SUCCESS: remaining effects released\nDoes not promise continued active product-safe output drive", fillcolor="#f0fdf4"];
+    primary [label="Initialization error: retain primary\nCall nx_platform_stop to collect cleanup outcome", fillcolor="#fff7ed"];
+    retained [label="BUSY / IO: retain uncleaned leases and storage\nMay be partially stopped; continue required service, then retry", fillcolor="#fff7ed"];
+    cold -> context [label="Explicit start"];
+    rejected [label="Rejected: preserve existing lifecycle and effects\nNo newly authorized operational calls", fillcolor="#fff7ed"];
+    context -> rejected [label="Context / STATE error"];
+    context -> system [label="Prerequisites passed"];
+    system -> instances [label="Stage succeeded"];
+    system -> retained [label="Failure after acquiring effects"];
+    instances -> running [label="All succeeded"];
+    instances -> primary [label="Any failure"];
+    primary -> reverse [label="Reverse cleanup including the effectful failed instance"];
+    running -> quiesce [label="Product decides to stop"];
+    quiesce -> reverse [label="Stop-call prerequisites satisfied"];
+    reverse -> withdraw [label="All instances released"];
+    reverse -> retained [label="First uncleaned effect encountered"];
+    withdraw -> released [label="Observe successful cleanup"];
+    withdraw -> retained [label="System cleanup failed"];
+    retained -> reverse [label="Retry the actual retained stage\nNo forced timeout reclamation", constraint=false];
+    released -> cold [label="New epoch / new lifecycle", constraint=false];
+}

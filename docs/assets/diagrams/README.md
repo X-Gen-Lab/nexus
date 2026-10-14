@@ -9,13 +9,27 @@
 文档工具实现另以最终执行记录为准；固件源码关系没有随图生成改变。图源为可编辑
 DOT，输出为本地SVG。深色标签、线型和文字共同表达关系，不依赖颜色单独传达。
 
-FIG-01/03/04/06/08/10/12的节点和关系附简短英文，供关键双语页面共享同一图源。
+17个图源各派生中文与英文视图，页面按所选语言使用本地SVG。节点、箭头、属性与
+范围仍由同一canonical DOT维护；`labels.json`只维护完整标签译文，不能改变拓扑。
+34组语言DOT/SVG与原图配对检查；缺失译文、陈旧输出和非法资源使门禁失败。
 SVG采用Graphviz Cairo字形路径输出，使离线读者无需安装中文字体；每图附title、
 desc和正文alt/caption。生成主机需要锁定Graphviz、Cairo及Noto Sans CJK SC，
 最终工具身份与自动检查结果由文档交付记录绑定。源码语义、实际浏览器桌面/窄屏/
 放大/打印与离线包验收分开记录。15主图和2补充图已独立逐边与PNG审查；current为source_reviewed，reference为
 reference_reviewed，补充target为design_reviewed。浏览器与正式包验收另按实际
 执行记录判断，这些状态不建立HIL或公开部署资格。
+
+修改标签后显式使用已准备的锁定工具生成语言视图，然后执行完整检查：
+
+```sh
+python -m tools.documentation.diagram_localization --write \
+    --tool-prefix /absolute/path/to/prepared-doc-tools
+python tools/dev/dev.py docs check --full \
+    --tool-prefix /absolute/path/to/prepared-doc-tools
+```
+
+`localized/en/`和`localized/zh_CN/`是派生资产。生成成功只证明渲染；标签语义、
+真实浏览器和离线资源闭包分别审查，原图代码依据与历史执行身份保持不变。
 
 ## FIG-01 全平台分层与外部边界
 
@@ -78,7 +92,7 @@ reference_reviewed，补充target为design_reviewed。浏览器与正式包验�
 
 ![FIG-06：Core helper允许的迁移与调用前提；不承诺各provider恢复API](request-lifecycle.svg)
 
-REJECTED/ACCEPTED是admission结果而非request状态。ACCEPTED后保持request/buffer借用，cancel/deadline只启动终止进度。SETTLED前必须完成provider最终访问、排空全部必要引用并release发布；调用方acquire观察。相关adapter/observer另需退出。QUARANTINED到SETTLED仅在实际恢复和排空证明成立时合法，不能通过initialize强行重置借用对象。
+REJECTED/ACCEPTED是admission结果而非request状态。ACCEPTED后保持request/buffer借用，cancel/deadline只启动终止进度。provider先排空全部必要引用，再以release发布SETTLED作为对request的最后一次访问；调用方以acquire观察。相关adapter/observer另需退出。QUARANTINED到SETTLED仅在实际恢复和排空证明成立时合法，不能通过initialize强行重置借用对象。
 
 依据：[request公开合同](../../../core/include/nexus/core/request.h)、[实际Core迁移](../../../core/src/request.c)、[owner最终发布](../../../components/bus_owner/src/bus_owner.c)。
 [可编辑DOT](request-lifecycle.dot)；实施关联：DOC-48。

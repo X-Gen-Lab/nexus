@@ -8,6 +8,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import html
+import json
 import os
 import re
 import shutil
@@ -98,9 +99,11 @@ def translation_status(source: str, docname: str, requested: str,
     original = source_language(source)
     result = {'source_language': original, 'requested_language': requested,
               'actual_language': original, 'status': 'original'}
-    if original == requested:
-        return result
     path = locale_root / requested / 'LC_MESSAGES' / f'{docname}.po'
+    # A mixed-language canonical contract can have a reviewed catalog for its
+    # declared source locale too. Do not discard those normalized paragraphs.
+    if original == requested and not path.is_file():
+        return result
     result['status'] = 'missing'
     if not path.is_file():
         return result
@@ -120,7 +123,8 @@ def translation_status(source: str, docname: str, requested: str,
 
 
 def rewrite_local_links(source: str, page: Path, source_root: Path,
-                        repository: Path, revision: str) -> str:
+                        repository: Path, revision: str, *,
+                        document_root_links: bool = False) -> str:
     """Bind out-of-tree source links and keep raw data as offline downloads."""
     fenced = False
     marker = ''
@@ -157,7 +161,13 @@ def rewrite_local_links(source: str, page: Path, source_root: Path,
                 base = _SOURCE_URL.replace('/blob', '/tree') if candidate.is_dir() else _SOURCE_URL
                 return f'[{label}]({base}/{revision}/{relative}{fragment})'
             if candidate.suffix in _RAW_SUFFIXES:
-                return '{download}`' + label + ' <' + parsed.path + '>`'
+                path = ('/' + quote(candidate.relative_to(source_root).as_posix())
+                        if document_root_links else parsed.path)
+                return '{download}`' + label + ' <' + path + '>`'
+            if document_root_links and candidate.suffix in ('.md', '.rst'):
+                path = '/' + quote(candidate.relative_to(source_root).as_posix())
+                fragment = '#' + parsed.fragment if parsed.fragment else ''
+                return f'[{label}]({path}{fragment})'
             return match.group(0)
 
         parts = re.split(r'(`+.*?`+)', line)
@@ -241,6 +251,19 @@ def _read_source(app, docname: str, source: list[str]) -> None:
                                         Path(app.srcdir).parent.resolve(), 'NEXUS-DOCUMENTATION-SOURCE')
 
 
+def normalize_included_read(app, relative_path: Path, parent_docname: str,
+                            source: list[str]) -> None:
+    """Bind included Markdown links before gettext can lose their source path."""
+    source_root = Path(app.srcdir).resolve()
+    repository = source_root.parent
+    page = (source_root / relative_path).resolve()
+    if page.suffix != '.md' or not page.is_relative_to(repository):
+        return
+    source[0] = rewrite_local_links(
+        source[0], page, source_root, repository, 'NEXUS-DOCUMENTATION-SOURCE',
+        document_root_links=True)
+
+
 def _bind_source_links(app, doctree, docname: str) -> None:
     """Bind stable gettext link placeholders after translation has completed."""
     from docutils import nodes
@@ -277,6 +300,19 @@ def link_local_svg_images(app, doctree, docname: str) -> None:
         reference.append(image)
 
 
+def localize_diagram_images(app, doctree) -> None:
+    """Resolve label variants before the ordinary Sphinx image collector."""
+    if app.builder.format != 'html':
+        return
+    from docutils import nodes
+    from tools.documentation import diagram_localization
+    for image in doctree.findall(nodes.image):
+        if image.source:
+            image['uri'] = diagram_localization.image_uri(
+                image.get('uri', ''), Path(image.source), Path(app.srcdir),
+                app.config.language)
+
+
 def wrap_html_tables(app, doctree, docname: str) -> None:
     """Contain wide tables in a focusable region while preserving table markup."""
     if app.builder.format != 'html':
@@ -295,6 +331,136 @@ def wrap_html_tables(app, doctree, docname: str) -> None:
         container += nodes.raw('', '</div>', format='html')
 
 
+def search_page_type(source: str, docname: str) -> str:
+    """Use the authored role; legacy paths have a conservative scope default."""
+    metadata = re.match(r'\A---\s*\n(.*?)\n---\s*\n', source, re.DOTALL)
+    if metadata:
+        declared = re.search(r'^type:\s*[\'"]?([^\s\'"]+)',
+                             metadata.group(1), re.MULTILINE)
+        if declared:
+            value = declared.group(1)
+            if value not in ('tutorial', 'how-to', 'reference', 'explanation', 'status'):
+                raise ValueError('search page_type must use a maintained content role')
+            return value
+    scope = docname.split('/', 1)[0]
+    return {'tutorials': 'tutorial', 'guides': 'how-to', 'development': 'how-to',
+            'design': 'explanation', 'explanation': 'explanation',
+            'delivery': 'status', 'status': 'status'}.get(scope, 'reference')
+
+
+def search_excerpt(doctree, limit: int = 12000) -> str:
+    """Extract bounded prose from the translated tree, without tables or code."""
+    from docutils import nodes
+    paragraphs = []
+    seen = set()
+    length = 0
+    omitted = (nodes.table, nodes.literal_block, nodes.admonition,
+               nodes.field_list, nodes.definition_list, nodes.raw)
+    for paragraph in doctree.findall(nodes.paragraph):
+        ancestor = paragraph.parent
+        while (ancestor is not None and not isinstance(ancestor, omitted)
+               and 'toctree-wrapper' not in ancestor.get('classes', [])):
+            ancestor = ancestor.parent
+        if ancestor is not None:
+            continue
+        text = ' '.join(paragraph.astext().split())
+        if text and text not in seen:
+            paragraphs.append(text)
+            seen.add(text)
+            length += len(text) + 1
+        if length >= limit:
+            break
+    return ' '.join(paragraphs)[:limit].strip()
+
+
+def search_record(docname: str, uri: str, source: str, doctree,
+                  state: dict[str, str]) -> dict[str, str]:
+    """Bind visible text to the same reviewed language state as the page banner."""
+    from docutils import nodes
+    if (not docname or docname.startswith('/') or '\\' in docname
+            or any(part in ('', '.', '..') for part in docname.split('/'))
+            or any(value in docname for value in ('?', '#'))):
+        raise ValueError('invalid search page name')
+    parsed = urlsplit(uri)
+    if (parsed.scheme or parsed.netloc or parsed.query or parsed.fragment
+            or uri.startswith('/') or '\\' in uri
+            or any(part in ('.', '..') for part in parsed.path.split('/'))):
+        raise ValueError('invalid search page URI')
+    title = next(doctree.findall(nodes.title), None)
+    return {'title': title.astext() if title is not None else docname,
+            'type': search_page_type(source, docname),
+            'excerpt': search_excerpt(doctree), **state}
+
+
+def search_data_script(payload: dict) -> str:
+    """Encode data without markup/script termination or JavaScript separators."""
+    encoded = json.dumps(payload, ensure_ascii=True, sort_keys=True)
+    encoded = encoded.replace('<', '\\u003c').replace('>', '\\u003e')
+    encoded = encoded.replace('&', '\\u0026')
+    return 'window.NEXUS_SEARCH_DATA = ' + encoded + ';\n'
+
+
+def configure_search(app, config) -> None:
+    """Serve generated excerpts locally, including direct offline file browsing."""
+    # The Sphinx default fetches each HTML result for its summary. Local metadata
+    # already contains the reviewed visible prose and avoids file:// fetch errors.
+    config.html_show_search_summary = False
+
+
+def add_search_assets(app, pagename: str, template: str,
+                      context: dict, doctree) -> None:
+    """Load the local search data only where readers actually request search."""
+    if app.builder.format == 'html' and pagename == 'search':
+        app.add_js_file('nexus-search-data.js', priority=500)
+        app.add_js_file('nexus-search.js', priority=501)
+
+
+def theme_locale_context(app, pagename: str, template: str,
+                         context: dict, doctree) -> None:
+    """Supply ordinary theme labels without changing brands or upstream credits."""
+    context['nexus_theme_ui'] = (
+        {'related': '相关主题', 'overview': '文档总览', 'previous': '上一页',
+         'next': '下一页', 'powered_by': '技术支持：'}
+        if app.config.language == 'zh_CN' else
+        {'related': 'Related Topics', 'overview': 'Documentation overview',
+         'previous': 'Previous', 'next': 'Next', 'powered_by': 'Powered by '})
+
+
+def collect_search_record(app, pagename: str, template: str,
+                          context: dict, doctree) -> None:
+    """Persist one translated record per worker; generated pages have no source."""
+    if doctree is None or pagename not in app.env.found_docs:
+        return
+    if app.builder.format != 'html':
+        return
+    source = _source_file(app, pagename).read_text(encoding='utf-8')
+    record = search_record(pagename, app.builder.get_target_uri(pagename),
+                           source, doctree, _state(app, pagename, source))
+    destination = Path(app.doctreedir) / 'nexus-search-records' / (pagename + '.json')
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(record, ensure_ascii=False) + '\n', encoding='utf-8')
+
+
+def write_search_data(app, exception) -> None:
+    """Write immutable local data and its enhancement asset for each HTML build."""
+    if exception is not None or app.builder.format != 'html':
+        return
+    records = {}
+    for docname in sorted(app.env.found_docs):
+        path = Path(app.doctreedir) / 'nexus-search-records' / (docname + '.json')
+        if not path.is_file():
+            raise ValueError('missing generated search metadata for ' + docname)
+        records[app.builder.get_target_uri(docname)] = json.loads(path.read_text(encoding='utf-8'))
+    payload = {'schema_version': 1, 'version': app.config.release,
+               'revision': app.config.nexus_revision,
+               'requested_language': app.config.language, 'records': records}
+    destination = Path(app.outdir) / '_static'
+    destination.mkdir(parents=True, exist_ok=True)
+    (destination / 'nexus-search-data.js').write_text(search_data_script(payload), encoding='utf-8')
+    asset = Path(__file__).resolve().parents[2] / 'docs/assets/styles/nexus-search.js'
+    shutil.copyfile(asset, destination / asset.name)
+
+
 def _page_context(app, pagename: str, template: str, context: dict, doctree) -> None:
     if not doctree or pagename not in app.env.found_docs:
         return
@@ -304,18 +470,46 @@ def _page_context(app, pagename: str, template: str, context: dict, doctree) -> 
     link = f'{_SOURCE_URL}/{app.config.nexus_revision}/{quote(relative)}'
     other = 'en' if app.config.language == 'zh_CN' else 'zh_CN'
     switch = '../' * (pagename.count('/') + 1) + other + '/' + pagename + '.html'
-    switch_link = (f'<a href="{switch}" lang="{other.replace("_", "-")}">{other}</a>. '
+    language_name = 'English' if other == 'en' else '中文'
+    switch_link = (f'<a href="{switch}" lang="{other.replace("_", "-")}">'
+                   f'{language_name}</a>. '
                    if other in app.config.nexus_available_languages else '')
-    dirty = ' (working tree modified; preview only)' if app.config.nexus_source_dirty else ''
-    banner = ('<aside class="nexus-page-identity" lang="en" aria-label="Document identity">'
-              f'<p>Document source: <a href="{html.escape(link)}">'
-              f'{app.config.nexus_revision[:12]}</a>{dirty}; code reference: '
-              f'{app.config.nexus_code_revision[:12]}. '
-              f'{switch_link}'
-              f'Source language: {state["source_language"]}; requested: {state["requested_language"]}; '
-              f'actual: {state["actual_language"]}; translation: <strong>{state["status"]}</strong>.</p>'
-              '<p>Source documentation does not establish software or physical hardware qualification. '
-              'See the support and qualification records for their exact scope.</p></aside>')
+    chinese = app.config.language == 'zh_CN'
+    labels = (('文档身份', '文档源码', '代码引用', '源语言', '请求语言',
+               '实际语言', '翻译状态') if chinese else
+              ('Document identity', 'Document source', 'code reference',
+               'Source language', 'requested', 'actual', 'translation'))
+    preview = ('工作目录有改动；仅供预览' if chinese else
+               'working tree modified; preview only')
+    dirty = ' (' + preview + ')' if app.config.nexus_source_dirty else ''
+    status_label = ({'original': '原文', 'reviewed': '已审查',
+                     'missing': '缺少译文', 'stale': '译文过期'}[state['status']]
+                    if chinese else state['status'])
+    qualification = (
+        '文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。'
+        if chinese else
+        'Source documentation does not establish software or physical hardware '
+        'qualification. See the support and qualification records for their '
+        'exact scope.')
+    attributes = ' '.join(
+        'data-nexus-' + key.replace('_', '-') + '="' + html.escape(value) + '"'
+        for key, value in state.items())
+    # Visible labels use the selected UI locale; stable data attributes keep
+    # the actual source/translation state observable without parsing prose.
+    attributes = attributes.replace('data-nexus-status=',
+                                    'data-nexus-translation-status=')
+    banner = (
+        '<aside class="nexus-page-identity" lang="'
+        + app.config.language.replace('_', '-') + '" aria-label="' + labels[0]
+        + '" ' + attributes + '><p>' + labels[1] + ': <a href="'
+        + html.escape(link) + '">' + app.config.nexus_revision[:12]
+        + '</a>' + dirty + '; ' + labels[2] + ': '
+        + app.config.nexus_code_revision[:12] + '. ' + switch_link
+        + labels[3] + ': ' + state['source_language'] + '; '
+        + labels[4] + ': ' + state['requested_language'] + '; '
+        + labels[5] + ': ' + state['actual_language'] + '; '
+        + labels[6] + ': <strong>' + status_label + '</strong>.</p><p>'
+        + qualification + '</p></aside>')
     actual = state['actual_language'].replace('_', '-')
     context['body'] = (banner + f'<div class="nexus-canonical-content" lang="{actual}">'
                        + context.get('body', '') + '</div>')
@@ -372,9 +566,16 @@ def setup(app) -> dict[str, object]:
     app.add_config_value('nexus_gettext_root', os.environ.get('NEXUS_DOCS_GETTEXT_ROOT'), 'env')
     app.connect('config-inited', _configure)
     app.connect('source-read', _read_source)
+    app.connect('include-read', normalize_included_read)
     app.connect('doctree-resolved', _bind_source_links)
     app.connect('doctree-resolved', link_local_svg_images)
     app.connect('doctree-resolved', wrap_html_tables)
     app.connect('html-page-context', _page_context)
+    app.connect('html-page-context', collect_search_record)
+    app.connect('html-page-context', add_search_assets)
+    app.connect('html-page-context', theme_locale_context)
+    app.connect('build-finished', write_search_data)
+    app.connect('config-inited', configure_search)
     app.connect('doctree-read', normalize_included_references, priority=100)
+    app.connect('doctree-read', localize_diagram_images, priority=400)
     return {'version': '1.0', 'parallel_read_safe': False, 'parallel_write_safe': True}

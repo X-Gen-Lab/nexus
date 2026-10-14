@@ -90,10 +90,11 @@ class TranslationStatusTests(unittest.TestCase):
         self.catalog = self.root / 'en/LC_MESSAGES/factory.po'
         self.catalog.parent.mkdir(parents=True)
 
-    def write_catalog(self, *, digest=None, reviewed=True, fuzzy=False, translated=True, message='工厂'):
+    def write_catalog(self, *, digest=None, reviewed=True, fuzzy=False, translated=True,
+                      message='工厂', language='en'):
         self.catalog.write_text(
             'msgid ""\nmsgstr ""\n'
-            '"Language: en\\n"\n'
+            f'"Language: {language}\\n"\n'
             f'"X-Nexus-Source-SHA256: {digest or self.digest}\\n"\n'
             f'"X-Nexus-Reviewed: {str(reviewed).lower()}\\n"\n\n'
             + ('#, fuzzy\n' if fuzzy else '')
@@ -105,6 +106,20 @@ class TranslationStatusTests(unittest.TestCase):
     def test_original_means_actual_source_language(self):
         self.assertEqual(self.state('zh_CN')['status'], 'original')
         self.assertEqual(self.state('zh_CN')['actual_language'], 'zh_CN')
+
+    def test_same_source_locale_catalog_can_normalize_mixed_prose(self):
+        self.catalog = self.root / 'zh_CN/LC_MESSAGES/factory.po'
+        self.catalog.parent.mkdir(parents=True)
+        self.write_catalog(language='zh_CN')
+        result = self.state('zh_CN')
+        self.assertEqual(result['status'], 'reviewed')
+        self.assertEqual(result['actual_language'], 'zh_CN')
+
+    def test_same_source_locale_stale_catalog_is_not_silently_original(self):
+        self.catalog = self.root / 'zh_CN/LC_MESSAGES/factory.po'
+        self.catalog.parent.mkdir(parents=True)
+        self.write_catalog(language='zh_CN', digest='b' * 64)
+        self.assertEqual(self.state('zh_CN')['status'], 'stale')
 
     def test_missing_catalog_falls_back_to_source_language(self):
         self.assertEqual(self.state()['status'], 'missing')
@@ -395,7 +410,8 @@ class SphinxTranslationIntegrationTests(unittest.TestCase):
             self.assertTrue('working tree modified; preview only' in english_view)
             build('html', 'zh_CN', root / 'zh_CN')
             chinese_view = (root / 'zh_CN/english.html').read_text(encoding='utf-8')
-            self.assertIn('actual: zh_CN; translation: <strong>reviewed</strong>', chinese_view)
+            self.assertIn('data-nexus-actual-language="zh_CN"', chinese_view)
+            self.assertIn('data-nexus-translation-status="reviewed"', chinese_view)
             self.assertIn('返回已有实例。', chinese_view)
             environment['NEXUS_DOCS_LANGUAGES'] = 'en,zh_CN'
             build('html', 'en', root / 'en')
@@ -408,14 +424,16 @@ class SphinxTranslationIntegrationTests(unittest.TestCase):
                                                       'X-Nexus-Reviewed: false'), encoding='utf-8')
             build('html', 'zh_CN', root / 'zh_CN')
             unreviewed = (root / 'zh_CN/english.html').read_text(encoding='utf-8')
-            self.assertIn('actual: en; translation: <strong>missing</strong>', unreviewed)
+            self.assertIn('data-nexus-actual-language="en"', unreviewed)
+            self.assertIn('data-nexus-translation-status="missing"', unreviewed)
             self.assertIn('Returns an existing instance.', unreviewed)
             reviewed.write_text(catalog_bytes, encoding='utf-8')
             # A changed source must not consume an obsolete translated catalog.
             (docs / 'english.md').write_text(source_en + '\nChanged contract.\n', encoding='utf-8')
             build('html', 'zh_CN', root / 'zh_CN')
             stale_view = (root / 'zh_CN/english.html').read_text(encoding='utf-8')
-            self.assertIn('actual: en; translation: <strong>stale</strong>', stale_view)
+            self.assertIn('data-nexus-actual-language="en"', stale_view)
+            self.assertIn('data-nexus-translation-status="stale"', stale_view)
             self.assertIn('Changed contract.', stale_view)
             self.assertTrue('<div class="nexus-canonical-content" lang="en">' in stale_view)
             (docs / 'locale/en/LC_MESSAGES/chinese.po').unlink()

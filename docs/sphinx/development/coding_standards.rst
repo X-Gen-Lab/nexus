@@ -7,7 +7,9 @@ C Standard
 ----------
 
 - C11 for source code
-- C11 for maintained contract tests; C++17 for external ABI consumer checks
+- C11 for production code and maintained C contract fixtures
+- C++17 for host GoogleTest/GoogleMock and external ABI consumer checks; neither
+  the test framework nor its C++ runtime enters firmware
 
 Code Formatting
 ---------------

@@ -1,4 +1,4 @@
-#
+# Authored translation; independent semantic review pending.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -9,11 +9,12 @@ msgstr ""
 "X-Nexus-Reviewed: true\n"
 "X-Nexus-Source-SHA256: abd3a5128d8fb8bb6ea525472d4fea5668e9bbdbb69673a54780e65530235940\n"
 
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/index.md:8
 msgid "Recorded delivery evidence"
 msgstr "已记录的交付证据"
 
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/index.md:10
 msgid ""
-"These records retain their original source, configuration and evidence "
-"identities. Rebuilding the website neither reruns them nor grants a new-"
-"source qualification."
-msgstr "这些记录保留原始源码、配置和证据身份。重新构建网站不会重跑这些验证，也不会授予新源码资格。"
+"These records retain their original source, configuration and evidence identities. Rebuilding the "
+"website neither reruns them nor grants a new-source qualification."
+msgstr "这些记录保留原始源码、配置和证据身份。重新构建网站既不会重新执行这些验证，也不会授予新源码的资格。"

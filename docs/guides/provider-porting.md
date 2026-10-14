@@ -30,21 +30,29 @@ Read the [architecture](../explanation/platform-architecture.md),
 
 ## Implement in a reviewable sequence
 
-1. Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the
+1. Prepare the [fixed source and recursive dependencies](source-checkout.md).
+   Define the new behavior, supported modes, public ownership obligations and
+   rejection boundaries before changing its production implementation.
+2. Add and execute a meaningful RED GoogleTest/GoogleMock contract against the
+   current production path. Retain the actual command, nonzero execution and
+   expected failing assertion. Test MMIO/CPU/dependency ports through mocks;
+   Python resolver behavior uses stdlib unittest. A missing tool or compile-only
+   error is not the expected behavioral RED result.
+3. Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the
    shared CPU resolver; do not duplicate CPU flags or infer optional features.
-2. Add the family to the explicit maintained provider map in `tools/configure/`.
+4. Add the family to the explicit maintained provider map in `tools/configure/`.
    Define supported modes, numerical limits, constructors, rollback and IRQ wiring.
    Unsupported modes reject; there is no runtime registration or plugin discovery.
-3. Add explicit CMake targets and private SDK dependencies. Update declared
+5. Add explicit CMake targets and private SDK dependencies. Update declared
    resolver reconfiguration inputs and the Source SDK required-file closure.
-4. Define an immutable public face with shared readonly ops and independent context.
+6. Implement the smallest correct production change. Define an immutable public
+   face with shared readonly ops and independent context.
    Reuse public Nexus types; keep vendor structures and concrete storage private.
-5. Write and execute RED GoogleTest/GoogleMock contracts before production behavior.
-   Mock MMIO/CPU/dependency ports, then execute the real provider. Verify rejection
+7. Execute GREEN against the real provider. Verify rejection
    without residual effects, accepted borrow, cancel/deadline, failed drain,
    quarantine, stop/restart and instance isolation where the mode needs them.
-6. Execute GREEN, then refactor. Link exact ARM fixtures and verify actual resources,
-   handler retention, vector bytes and unselected-driver pruning. Validate an
+8. Refactor while keeping contracts passing. Link exact ARM fixtures and verify
+   actual resources, handler retention, vector bytes and unselected-driver pruning. Validate an
    independent relocated SDK consumer and record physical work as not executed.
 
 For a component, pass explicit bus, GPIO, time and optional OS ports. Do not create

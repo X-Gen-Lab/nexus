@@ -1,0 +1,48 @@
+// FIG-01 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph PlatformArchitecture {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-01 Current platform layers and product boundary"];
+    subgraph clusterExternal {
+        label="External product and safety policy"; color="#64748b";
+        product [label="tasks / services / protocols / private layout\nscheduling, budgets, recovery, shutdown", fillcolor="#f8fafc"];
+        assembly [label="external TOML assembly\nBoard / backend / instances / budgets", fillcolor="#f8fafc"];
+    }
+    subgraph clusterNexus {
+        label="Nexus: reusable mechanisms and maintained providers"; color="#64748b";
+        components [label="Optional components: owner / device / storage ports", style="rounded,dashed,filled"];
+        os [label="optional OS task / wait / notify\nexternal task storage and kernel start", style="rounded,dashed,filled"];
+        platform [label="Platform: generated static assembly\ntyped factory / start / stop"];
+        io [label="I/O: public types / readonly faces / checked dispatch"];
+        soc [label="SoC provider: controller / IRQ / DMA implementation\nPrivate state, clock, timebase, memory facts"];
+        arch [label="Arch: CPU primitives and explicit mechanisms\nmask / barrier / cache / MPU / SAU"];
+        core [label="Core: status / deadline / request\nSmall common contracts, no hardware registry"];
+        board [label="Board: pins / oscillators / authorized routes / provenance\nBuild-time facts, no ordinary runtime I/O forwarding", fillcolor="#fefce8"];
+    }
+    hardware [label="selected MCU / PCB\nseparate physical qualification", fillcolor="#f8fafc"];
+    assembly -> platform [label="resolved generation (build time)", style=dashed];
+    board -> platform [label="facts / authorization (build time)", style=dashed];
+    product -> platform [label="lookup identity / explicit start-stop"];
+    product -> io [label="direct ordinary I/O"];
+    product -> components [label="explicit opt-in", style=dashed];
+    product -> os [label="explicit opt-in", style=dashed];
+    components -> io [label="device access under component contract"];
+    components -> core [label="shared contracts"];
+    os -> core [label="wait and time contracts"];
+    io -> soc [label="ops(context, ...) dispatch"];
+    io -> core [label="checked lifecycle rules"];
+    soc -> arch [label="direct CPU primitive calls"];
+    soc -> core [label="request and time rules"];
+    soc -> hardware [label="selected register / IRQ / DMA access"];
+    { rank=same; components; os; }
+    { rank=same; arch; core; }
+}

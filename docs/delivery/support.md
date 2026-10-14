@@ -145,7 +145,8 @@ UART 的 `irq-blocks` 保留独立 IRQ 接收实现；`rx-dma-idle` 使用有限
 `dma-duplex-continuous`。块由调用者提供，消费者 acquire 后保持不可变，直到匹配
 epoch 的 release。连续模式必须预留两个硬件目标及替换块；替换地址读回、目标银行
 和新错误检查成立后才能发布旧块。没有替换块就停止，不覆写消费者借用。
-仅接收模式使用独立只读方法表，不驻留 TX DMA 状态和方法。RTS/CTS 并不代替
+仅接收模式使用独立只读方法表，不保留 TX DMA 方法与对应链接代码；当前共享
+接收状态布局仍包含 TX DMA 基类字段，不能宣称冷态字段开销为零。RTS/CTS 并不代替
 容量和排空合同；RS485 的 DE 引脚、极性及 setup/hold 时间由外部工程明确提供，
 到达真实 UART TC 后才开始 hold 并撤销 DE。详见
 [UART DMA 与 RS485](../design/uart-dma-rs485.md)。

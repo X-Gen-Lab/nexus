@@ -22,8 +22,11 @@ Ethernet、capture 和 complementary PWM。先以实际吞吐、IRQ latency、�
 IRQ 延迟或消费者速度下无丢失。I2C 保持 100 kHz、7-bit address，每条1–256 bytes、
 最多8条消息和精确 route；10-bit 或更长事务仍是独立扩展。
 
-H743／U575 当前只提供固定时钟、timebase、GPIO 和 IRQ UART；芯片中的 DMA、
-Cache 与安全单元不会因为 facts 存在就自动可用。后续顺序与明确退出条件见
+H743 当前维护固定 HSI 时钟、timebase、GPIO、IRQ UART 和显式有限 UART TX DMA；
+Cache-on TX 只接受独占完整 Cache line 的 AXI SRAM payload，RX 仍是 IRQ bytes。
+U575 的默认 TZEN0 Platform 与独立 TZEN1 双域同步 GPIO 参考分别维护；双域参考
+不提供 RTOS、factory 或异步 DMA。芯片事实不授权其他模式、路由或实板资格。
+后续顺序与明确退出条件见
 [SOC-28–36](../design/soc-refinement.md)：
 
 | 方向 | 进入实现前必须固定的合同 |

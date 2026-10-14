@@ -10,7 +10,7 @@ digraph requestLifecycle {
           fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
     fresh [shape=point, label="", fillcolor="#0f172a"];
     ready [label="READY：无 provider 借用\nREADY: no provider borrow", fillcolor="#f8fafc"];
-    settled [label="SETTLED：provider 最终访问后发布\nSETTLED: published after final provider access", fillcolor="#f0fdf4"];
+    settled [label="SETTLED：provider 的最终访问是 release 发布\nSETTLED: provider's final access is release-publication", fillcolor="#f0fdf4"];
     subgraph clusterBorrowed {
         label="provider 借用保持\nprovider borrow remains valid"; color="#64748b"; fontname="Noto Sans CJK SC";
         queued [label="QUEUED"];

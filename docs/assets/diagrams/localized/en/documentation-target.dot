@@ -1,0 +1,41 @@
+// FIG-12 target: documentation design, not an implemented publishing system.
+// Authority: docs/design/documentation-system.md and documentation-standards.md.
+// Evidence is read; document building does not create platform qualification.
+digraph documentationTarget {
+    graph [label="FIG-12 supplement: original documentation-system target design", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    prose [label="One Markdown / RST prose source", fillcolor="#f8fafc"];
+    headers [label="Current public C headers", fillcolor="#f8fafc"];
+    facts [label="Existing facts / ledgers / software and HIL records", fillcolor="#f8fafc"];
+    translations [label="gettext / PO: actual translation state", fillcolor="#f8fafc"];
+    dotSources [label="Reviewable DOT source", fillcolor="#f8fafc"];
+    sourceChecks [label="Content, link and example checks with independent review"];
+    apiXml [label="Public-only Doxygen XML"];
+    statusViews [label="Read-only derived support / qualification views"];
+    localSvg [label="Local SVG: rendering and resource checks"];
+    siteBuild [label="Strict MyST / Sphinx / Breathe build"];
+    html [label="HTML / search / diagrams / language entry"];
+    identity [label="Identity and documentation-package verification"];
+    online [label="Immutable version / stable documentation entry", fillcolor="#f0fdf4"];
+    offline [label="Relative-link offline package / verification / licenses", fillcolor="#f0fdf4"];
+    restore [label="Actual post-deployment check / independent restoration", fillcolor="#f0fdf4"];
+    prose -> sourceChecks [label="Review current prose"];
+    headers -> apiXml [label="Generate API"];
+    facts -> statusViews [label="Preserve separate qualification identities"];
+    dotSources -> localSvg [label="Render with locked tools"];
+    sourceChecks -> siteBuild [label="Admitted prose"];
+    apiXml -> siteBuild [label="XML from this build"];
+    statusViews -> siteBuild [label="Admitted status views"];
+    translations -> siteBuild [label="Language and review state"];
+    localSvg -> siteBuild [label="Diagrams and provenance"];
+    siteBuild -> html [label="Successful output from this build"];
+    html -> identity [label="Bind code / docs / qualified source"];
+    identity -> online [label="Actual deployment"];
+    identity -> offline [label="Seal documentation package"];
+    online -> restore [label="Check online identity"];
+    offline -> restore [label="Retrieve, browse and verify"];
+}

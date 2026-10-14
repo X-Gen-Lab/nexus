@@ -69,8 +69,13 @@ production configuration examples without installing tools or using the network.
 Prepare the hash-locked documentation tuple explicitly with
 `python tools/documentation/install.py`; `dev.py docs test` executes the complete
 documentation suite using the same nonzero, no-skip result admission as other
-tool tests. Strict bilingual builds, critical translation checks and immutable
+tool tests. Strict bilingual builds, whole-site translation checks and immutable
 packages use that tuple. Trusted publication only consumes verified bytes.
+Every current page has complete English and Chinese prose through one canonical
+source and reviewed gettext catalogs. Mixed-source contracts may use a reviewed
+catalog for their declared source locale too. Keep symbols, configuration keys
+and original evidence values intact. A stale, fuzzy or missing translation fails
+current-site admission; historical archives retain their frozen language scope.
 
 Install commit tools with `python scripts/setup/install_dev_tools.py`, then
 `.venv/bin/python -m pip install -r dependencies/environment-tools.txt` (Windows:

@@ -1,0 +1,207 @@
+# Authored translation, independently corrected and reviewed.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 79679d89b17a37ec0b37b0a6600f52a27606a88a9bf243f5b95b7c2a2e3f2eb5\n"
+
+msgid "Cortex-M 软件支持与平台接入边界"
+msgstr "Cortex-M software support and platform-integration boundaries"
+
+msgid "Nexus 的 CPU 软件层支持 M0、M0+、M3、M4、M7、M23、M33、M55、M85。 同一不可变 CPU profile 解析器驱动 Core、Arch、原子操作及裸机/FreeRTOS 运行时配置；DSP、FPU、MVE、cache、MPU、DWT、security 和 SAU 均显式声明。 选择某个内核不生成新 SoC、Board、向量表、启动、驱动、链接布局或 typed factory。 STM32F407/GD32F470 三板维护首发模式；G474、H743、U575 另有精确 GPIO／IRQ UART／timebase 参考装配，G474 增加 selected EXTI，H743 增加固定 Cache 配置和有限 UART TX DMA；U575 另有独立无 OS 的同步双域 GPIO 参考。 选择 CPU 本身不建立这些 SoC 机制，也不扩大它们的外设范围。全部实板 HIL 未执行。"
+msgstr "Nexus CPU software supports M0, M0+, M3, M4, M7, M23, M33, M55 and M85. One immutable CPU-profile parser drives Core/Arch/atomics/baremetal-FreeRTOS runtime configuration. DSP, FPU, MVE, cache, MPU, DWT, security and SAU are explicit facts. Core selection generates no new SoC/Board/vector/startup/driver/link layout/typed factory. The three STM32F407/GD32F470 Boards maintain launch modes. G474/H743/U575 have exact GPIO/IRQ-UART/timebase references; G474 adds selected EXTI, H743 fixed Cache and bounded UART TX DMA, U575 an independent OS-free synchronous split-domain GPIO reference. CPU selection alone establishes none of these SoC mechanisms or wider peripheral support. All physical HIL remains unexecuted."
+
+msgid "详细所有权、上下文与拒绝语义见 [Arch 契约](../design/arch-contracts.md)， OS 生命周期见 [OS 适配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/README.md)，精确整平台范围见 [支持矩阵](support.md)。旧 HEAD 的软件候选和 qualification 不继承到本轮。"
+msgstr "Detailed ownership/context/rejection semantics are in [Arch contracts](../design/arch-contracts.md), OS lifecycle in [OS adaptation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/README.md), and exact whole-platform scope in [support matrix](support.md). Previous-HEAD candidates/qualification are not inherited."
+
+msgid "九核与可选能力"
+msgstr "Nine cores and optional capabilities"
+
+msgid "下表列出解析器接受的能力格式；可选能力必须由具体芯片事实证明，不能从 CPU 名称推断存在或已启用。`none`/零明确表示未声明该能力，不做运行时发现。"
+msgstr "The table lists capability formats accepted by the parser. Optional capabilities require concrete chip facts, not inference from CPU names. `none`/zero explicitly means undeclared, with no runtime discovery."
+
+msgid "CPU"
+msgstr "CPU"
+
+msgid "原子 RMW / IRQ mask"
+msgstr "Atomic RMW / IRQ mask"
+
+msgid "可选硬件格式"
+msgstr "Optional hardware formats"
+
+msgid "维护的 FreeRTOS port"
+msgstr "Maintained FreeRTOS port"
+
+msgid "M0"
+msgstr "M0"
+
+msgid "saved-PRIMASK / PRIMASK"
+msgstr "saved-PRIMASK / PRIMASK"
+
+msgid "无 FPU/MVE/cache/MPU/SAU"
+msgstr "No FPU/MVE/cache/MPU/SAU"
+
+msgid "GCC/ARM_CM0"
+msgstr "GCC/ARM_CM0"
+
+msgid "M0+"
+msgstr "M0+"
+
+msgid "可选 v7-format MPU"
+msgstr "Optional v7-format MPU"
+
+msgid "M3"
+msgstr "M3"
+
+msgid "compiler exclusive / BASEPRI"
+msgstr "compiler exclusive / BASEPRI"
+
+msgid "v7 MPU、DWT"
+msgstr "v7 MPU, DWT"
+
+msgid "GCC/ARM_CM3"
+msgstr "GCC/ARM_CM3"
+
+msgid "M4"
+msgstr "M4"
+
+msgid "fpv4-sp-d16、v7 MPU、DWT"
+msgstr "fpv4-sp-d16, v7 MPU, DWT"
+
+msgid "无 FP 用 CM3；有 FP 用 CM4F"
+msgstr "CM3 without FP; CM4F with FP"
+
+msgid "M7"
+msgstr "M7"
+
+msgid "fpv5-sp-d16/fpv5-d16、32-byte cache、v7 MPU、DWT"
+msgstr "fpv5-sp-d16/fpv5-d16, 32-byte cache, v7 MPU, DWT"
+
+msgid "无 FP 用受审 integer overlay；有 FP 用 CM7/r0p1"
+msgstr "Reviewed integer overlay without FP; CM7/r0p1 with FP"
+
+msgid "M23"
+msgstr "M23"
+
+msgid "compiler exclusive / PRIMASK"
+msgstr "compiler exclusive / PRIMASK"
+
+msgid "v8 MPU、显式安全状态、Secure SAU"
+msgstr "v8 MPU, explicit security state, Secure SAU"
+
+msgid "ARM_CM23_NTZ/non_secure"
+msgstr "ARM_CM23_NTZ/non_secure"
+
+msgid "M33"
+msgstr "M33"
+
+msgid "可选 DSP、fpv5-sp-d16、v8 MPU、DWT、显式安全状态、Secure SAU"
+msgstr "Optional DSP, fpv5-sp-d16, v8 MPU, DWT, explicit security state, Secure SAU"
+
+msgid "ARM_CM33_NTZ/non_secure"
+msgstr "ARM_CM33_NTZ/non_secure"
+
+msgid "M55"
+msgstr "M55"
+
+msgid "显式 FPU/MVE、32-byte cache、v8 MPU、DWT、安全状态、Secure SAU"
+msgstr "Explicit FPU/MVE, 32-byte cache, v8 MPU, DWT, security state, Secure SAU"
+
+msgid "ARM_CM55_NTZ/non_secure"
+msgstr "ARM_CM55_NTZ/non_secure"
+
+msgid "M85"
+msgstr "M85"
+
+msgid "ARM_CM85_NTZ/non_secure"
+msgstr "ARM_CM85_NTZ/non_secure"
+
+msgid "Cortex-M 使用 short-enums ABI。无 FPU、无 MVE 时使用 soft；有 FPU 时明确选择 hard 或 softfp。M55/M85 的 MVE 为 `none`、`integer` 或 `float`：无 MVE 添加 `+nomve`，无 scalar FP 添加 `+nofp`；integer-only MVE 使用 softfp，FPU 事实 仍为 `none`。FP-MVE 必须同时声明可用 FPU。M55/M85 的 FPU 选择为 `auto`、 `fpv5-sp-d16` 或 `fpv5-d16`，`auto` 是显式编译器选项，不是硬件自动探测。"
+msgstr "Cortex-M uses short-enums ABI. Without FPU/MVE use soft; with FPU explicitly choose hard/softfp. M55/M85 MVE is `none`, `integer` or `float`: no MVE adds `+nomve`, no scalar FP adds `+nofp`; integer-only MVE uses softfp while FPU remains `none`. FP-MVE requires a declared available FPU. M55/M85 FPU choices are `auto`, `fpv5-sp-d16` or `fpv5-d16`; `auto` is an explicit compiler option, not hardware detection."
+
+msgid "安全状态为 `single`、`secure` 或 `nonsecure`。只有支持安全扩展的 M23/M33/ M55/M85 可声明后两者；Secure 编译添加 `-mcmse`。SAU 仅允许 Secure 事实为真。 Cache line 仅允许零或 32 bytes，MPU 为零或该内核维护的 v7/v8 格式。M0/M0+/ M23 禁止 DWT capability；其他内核也必须显式声明才能读已启用的周期计数器。"
+msgstr "Security state is `single`, `secure` or `nonsecure`. Only security-extension-capable M23/M33/M55/M85 may declare the latter states; Secure adds `-mcmse`. SAU requires true Secure facts. Cache lines are zero/32 bytes; MPU is zero or maintained v7/v8 format. M0/M0+/M23 forbid DWT capability. Other cores also require explicit facts to read an already enabled cycle counter."
+
+msgid "IRQ priority width、external IRQ count 和 clock 是芯片事实。PRIMASK profile 固定为 2 个优先级 bits，BASEPRI profile 支持 3–8 bits。M0/M0+ 最多支持 32 个 external IRQ，M3/M4/M7/M23 为 240，M33/M55/M85 为 480；SoC 必须 声明实际有效范围。这些边界不代替厂商芯片事实或电气验证。"
+msgstr "IRQ priority width, external IRQ count and clock are chip facts. PRIMASK profiles fix two priority bits; BASEPRI supports 3–8. M0/M0+ support at most 32 external IRQs; M3/M4/M7/M23 240; M33/M55/M85 480. SoCs declare actual valid ranges. These limits do not replace vendor facts/electrical verification."
+
+msgid "CPU 机制与所有权"
+msgstr "CPU mechanisms and ownership"
+
+msgid "Arch 无 SoC、I/O、内核或厂商 SDK 依赖。生产算法通过内联指令/MMIO 边界执行； GoogleTest/GoogleMock 只替换该硬件边界。Native 提供真实递归线程排他、C11 fence 与 publication 行为，不模拟 NVIC、物理 IRQ、特权切换或真实周期。"
+msgstr "Arch depends on no SoC/I/O/kernel/vendor SDK. Production algorithms execute through inline-instruction/MMIO boundaries; GoogleTest/GoogleMock replace only that hardware boundary. Native provides actual recursive thread exclusion, C11 fences/publication but models no NVIC, physical IRQ, privilege switching or actual cycles."
+
+msgid "PRIMASK token 只在同 CPU/线程逆序恢复一次，保留输入 BASEPRI/FAULTMASK。 被保护元数据只允许特权 Thread/可配置 IRQ 参与，NMI/HardFault、其他核、安全 世界和 DMA 不在排他域内。上下文查询不授权 kernel ISR 调用；屏障不证明外设 idle 或 DMA drain。DWT 不启用/复位计数器，也不作为单调 deadline 时钟。"
+msgstr "Restore PRIMASK tokens once, in reverse order on the same CPU/thread, preserving input BASEPRI/FAULTMASK. Protected metadata permits privileged Thread/configurable IRQ only; NMI/HardFault, other CPUs/security worlds/DMA are outside exclusion. Context queries authorize no kernel-ISR calls. Barriers prove neither peripheral idle nor DMA drain. DWT enables/resets no counters and is not a monotonic deadline source."
+
+msgid "对齐 word acquire/release load/store 不屏蔽 IRQ。M0/M0+ RMW 使用 bounded saved-PRIMASK exclusion，不静默链接 libatomic；其他核使用 compiler lock-free RMW，exclusive retry 不等于固定 cycles。request/buffer/notify 生命周期仍由 owner 保证，atomic publication 不自动回收对象。"
+msgstr "Aligned-word acquire/release loads/stores do not mask IRQs. M0/M0+ RMW uses bounded saved-PRIMASK exclusion without silent libatomic linkage. Other cores use compiler lock-free RMW; exclusive retries are not fixed cycles. Owners guarantee request/buffer/notification lifetimes; atomic publication reclaims no objects."
+
+msgid "`cache.h` 只维护独占的完整 32-byte lines，不 rounding、不 enable；所有相关 cache 在写入前完成 capability/enabled 检查。DMA receive 前置/排空后的维护、 可达地址和 buffer loan 由 provider/产品负责。`cache_control.h` 独立维护 M7 冷启停，其他核明确拒绝。调用者提供自有控制对象并排除其他内存使用者；可信复位 或此前成功完成自有 clean/disable 是前提，CCR=0 不能证明外来 dirty 状态干净。 实现校验实际 set/way 几何，失败保留 cache/selector 恢复责任；stack-free leaf 完成全量 clean 后关闭 D-cache。它不属于运行中的普通范围维护或 DMA drain。"
+msgstr "`cache.h` maintains exclusive complete 32-byte lines only, without rounding/enabling; all relevant cache capability/enabled checks precede writes. Providers/products own pre-DMA-RX/post-drain maintenance, reachable addresses and buffer loans. `cache_control.h` separately maintains M7 cold enable/disable; other cores reject it. Callers supply owned control objects/exclude other memory users. Trusted reset or prior successful owned clean/disable is required; CCR=0 proves no foreign-dirty cleanliness. Actual set/way geometry is checked, failures retain cache/selector responsibility, and a stack-free leaf cleans all D-cache before disabling. This is neither ordinary live range maintenance nor DMA drain."
+
+msgid "MPU v7/v8 与 SAU 使用不同精确 encoder；实际单 region 编程要求本域内 privileged Thread、输入 PRIMASK=1， 相应单元已经 disabled，保留 CTRL、其他 region 与输入 RNR，不隐式启用。"
+msgstr "MPU v7/v8 and SAU use distinct exact encoders. Actual single-region programming requires privileged Thread in this domain, input PRIMASK=1 and the unit already disabled. CTRL, other regions and input RNR are preserved; nothing implicitly enables the unit."
+
+msgid "产品拥有 MPU/MAIR policy、SAU/IDAU、NSC veneers、安全启动、共享资源协议和 恢复。单独的 CPU MPU 编程机制不建立用户任务隔离；显式 restricted-task runtime 使用实际 FreeRTOS MPU port，软件与实板安全验收仍分别记录。"
+msgstr "Products own MPU/MAIR policy, SAU/IDAU, NSC veneers, secure boot, shared-resource protocols and recovery. CPU MPU programming alone establishes no user-task isolation. Explicit restricted-task runtime uses an actual FreeRTOS MPU port; software and physical security acceptance remain separate."
+
+msgid "`nonsecure.h` 提供 Secure 特权 Thread 的完整跨度 CMSE 权限观察，按 NS 非特权 read/read-write 校验归属和 MPU；其他 image 明确拒绝。观察不复制或 pin 内存，不鉴别调用者、不排除 MMIO／DMA，也不冻结映射。U575 独立双域参考通过 冷归属 owner、固定 world principal 和同步输入快照／输出预验证补齐有限 gateway 前提，不接入 NS RTOS 或异步用户 DMA；见 [U575 双域合同](../design/u575-trustzone-contract.md)。"
+msgstr "`nonsecure.h` provides full-span CMSE permission observation from Secure privileged Thread, checking attribution/MPU as NS-unprivileged read/read-write; other images reject it. Observation neither copies/pins memory, identifies callers, excludes MMIO/DMA nor freezes mapping. The U575 reference adds cold ownership, fixed world principal, synchronous snapshots/output prevalidation for a limited gateway; no NS RTOS/asynchronous user DMA. See [U575 split-domain contract](../design/u575-trustzone-contract.md)."
+
+msgid "FreeRTOS 软件合同"
+msgstr "FreeRTOS software contracts"
+
+msgid "全部 CPU profile 选择锁定内核的精确 port 源码；M0 及 v8-M port 同时编译所需 独立 assembly 文件。M7 无 FP 使用从锁定 CM3 派生的受审构建 overlay，添加 errata 837070 的 PRIMASK-preserving BASEPRI helpers 与 PendSV 处理，厂商 源文件保持锁定内容。禁止为了省事将所有内核映射到 CM4F。"
+msgstr "Every CPU profile selects exact pinned-kernel port sources; M0/v8-M also compile required assembly files. Non-FP M7 uses a reviewed build overlay derived from pinned CM3, adding erratum-837070 PRIMASK-preserving BASEPRI helpers/PendSV handling while vendor files remain locked. Mapping every core to CM4F for convenience is forbidden."
+
+msgid "Armv8-M 的 NTZ、Secure-only 和 standalone NonSecure 默认路径由显式事实选择， 使用 `configENABLE_TRUSTZONE=0`。可选 split profile 使用匹配的 Secure/NS 图像、 实际 TZ-aware port 和调用者提供的 Secure context/Idle 存储，没有默认 Secure heap/pool。Secure 启动、IDAU/SAU 与 NonSecure coprocessor access 仍由外部工程 负责。可选 MPU profile 提供 restricted task 与窄 delay/tick SVC；普通 API 保持 privileged 合同。MPU-only 与 split-only 独立，MPU+split 当前拒绝。精确变体与 已执行软件证据见 [OS 支持](os.md)，不代表物理隔离验收。"
+msgstr "Armv8-M NTZ, Secure-only and standalone NonSecure defaults are selected by explicit facts with `configENABLE_TRUSTZONE=0`. Optional split profiles use matched Secure/NS images, actual TZ-aware ports and caller Secure-context/Idle storage, without default Secure heaps/pools. External projects still own Secure startup, IDAU/SAU and NS coprocessor access. Optional MPU profiles provide restricted tasks/narrow delay-tick SVC; ordinary APIs remain privileged. MPU-only/split-only are separate; MPU+split is rejected. [OS support](os.md) records exact variants/executed software evidence, not physical-isolation acceptance."
+
+msgid "M55/M85 使用实际 MVE-aware context port。`configENABLE_FPU` 在 FP 或 MVE 存在时打开共享寄存器 bank 和 extended/lazy frame；integer-only MVE 不因此 获得 scalar FP capability。Upper bank 的保存路径在 port 源码/对象中单独检查； VPR/lower bank 依赖硬件 extended exception framing，是该 port 的验收假设， 必须结合架构资料与实板核对。编译/ELF 不能证明完整 payload 保留或真实 FP/MVE 切换，不替代物理验收。"
+msgstr "M55/M85 use actual MVE-aware context ports. `configENABLE_FPU` with FP/MVE enables shared register banks/extended-lazy frames; integer-only MVE gains no scalar FP. Upper-bank save paths are checked separately in source/objects. VPR/lower bank depend on hardware extended exception framing, a port-acceptance assumption requiring architectural/physical checks. Compilation/ELF proves neither complete payload retention nor real FP/MVE switching and cannot replace physical acceptance."
+
+msgid "任务、TCB、stack、queue 和 notification storage 由调用者静态提供，内核不链接 heap allocator。应用拥有 scheduler start、workers、队列深度、公平性、shutdown 进度与 join 后的 reclaim；平台启动不启动 scheduler、不生成隐藏任务或 daemon。"
+msgstr "Callers statically supply tasks, TCBs, stacks, queues and notification storage; kernels link no heap allocator. Applications own scheduler startup, workers, queue depths, fairness, shutdown progress and post-join reclaim. Platform start neither starts schedulers nor generates hidden tasks/daemons."
+
+msgid "运行中 API 要求 privileged、unmasked Thread。仅在 NOT_STARTED 阶段接受锁定 port 的 canonical bootstrap mask：Baseline 为 PRIMASK=1，Mainline 为精确 syscall BASEPRI；它们不能证明 mask 的来源，不能在运行/暂停时继承许可。Fault mask 与其他 mask 在对象变更前拒绝。IRQ wake 另验证外部异常范围、优先级宽度 与实际 port 的 syscall 合同，notification 只提示重查 request/sequence 谓词。"
+msgstr "Running APIs require privileged unmasked Thread. Only NOT_STARTED permits the pinned port's canonical bootstrap mask: PRIMASK=1 for Baseline, exact syscall BASEPRI for Mainline. Masks prove no provenance and confer no runtime/suspended permission. Fault/other masks are rejected before object changes. IRQ wake separately checks external exception range, priority width and actual-port syscall rules; notification only prompts request/sequence predicate rechecks."
+
+msgid "外部 CPU runtime 配置"
+msgstr "External CPU-runtime configuration"
+
+msgid "完整 SoC 工程继续使用原有严格平台 assembly。仅复用 CPU/Core/OS 时，外部工程 提供 `runtime.toml` 与芯片包维护的 `cpu.json`。以下是 **M33 NonSecure 软件配置 示例**，不是新增芯片或 Board 声明；clock、IRQ 数量和可选能力应替换为真实芯片 的受审事实。无需 Board 文件，也不输出 SoC/设备 factory。"
+msgstr "Complete SoC projects retain strict platform assembly. CPU/Core/OS-only reuse takes external `runtime.toml` plus chip-package `cpu.json`. The following is an **M33 NonSecure software-configuration example**, not new chip/Board support. Replace clock/IRQ-count/optional capabilities with reviewed real-chip facts. No Board file is needed and no SoC/device factory is emitted."
+
+msgid "`runtime.toml` 必须包含以下四项，路径相对此 TOML；还可显式提供与所选后端 匹配的 `[os]` 策略。裸机不接纳内核策略，CPU-only 配置不接纳需要 SoC timer 事实的低功耗 timebase 选择："
+msgstr "`runtime.toml` must contain the following four entries; paths are relative to that TOML. It may also explicitly provide `[os]` policy matching the selected backend. Baremetal accepts no kernel policy; CPU-only configuration rejects low-power timebase selections requiring SoC timer facts:"
+
+msgid "`backend` 为 `baremetal`、`freertos` 或明确范围内的 `threadx`；ThreadX 仅接纳 Native／Cortex-M4／M4F，不继承本页九核 FreeRTOS port 范围，详见 [ThreadX 接入](../design/threadx.md)。`optimization` 接纳 `O0`、`Og`、`O2`、`Os` 或 `O3`；Debug 选择不建立时序或资源资格。 CPU package 和 CPU/IRQ 对象的字段完整且唯一，未知字段、重复 JSON keys、矛盾 feature/ABI、非法 schema/clock 和 symlink path 被拒绝，不能用 authored override 伪造芯片能力。"
+msgstr "`backend` is `baremetal`, `freertos` or explicitly scoped `threadx`. ThreadX accepts Native/Cortex-M4/M4F only and inherits no nine-core FreeRTOS port scope from this page; see [ThreadX integration](../design/threadx.md). `optimization` accepts `O0`, `Og`, `O2`, `Os` or `O3`; Debug selections establish no timing or resource qualification. CPU-package/CPU/IRQ fields are complete and unique. Unknown fields, duplicate JSON keys, contradictory feature/ABI, invalid schema/clock and symlink paths are rejected; authored overrides cannot fabricate chip capabilities."
+
+msgid "单独检查并原子生成 bundle："
+msgstr "Validate independently and emit the bundle atomically:"
+
+msgid "输出 `resolved-cpu.json`、`nexus_config.h`、`selection.cmake`、`input_paths.json` 与 ownership marker，绑定输入和配置 SHA-256，不输出 linker script、bindings 或 factory。配置失败使已有 owned bundle 失效，不继续使用 stale selection； 非 owned 目录不会被清空，输出不能覆盖输入或其父目录。`clock_hz` 不设时钟。"
+msgstr "Outputs are `resolved-cpu.json`, `nexus_config.h`, `selection.cmake`, `input_paths.json` and ownership marker, binding input/config SHA-256. No linker script/bindings/factory is emitted. Failed configuration invalidates existing owned bundles instead of reusing stale selection. Nonowned directories are never cleared; outputs cannot overwrite inputs/parents. `clock_hz` does not set clocks."
+
+msgid "Source checkout 的公共 CMake 入口："
+msgstr "Public CMake entry from a source checkout:"
+
+msgid "安装后的 source SDK 使用下列入口，其余两条 target 操作相同："
+msgstr "Installed source SDK uses the entry below; the other two target operations are unchanged:"
+
+msgid "`Nexus::Runtime` 传递 Config/ABI、Core、Arch、typed I/O face 和选定 OS adapter， 没有 SoC/Board/factory。一个 CMake build 只允许一个解析后的 Nexus assembly， 不能在同一 build 混用相互冲突的 ABI；额外组件由外部工程显式链接。MCU 工程在 首次 CMake configure 时选择 `cmake/toolchains/arm-gcc.cmake`。应用自己的启动、 向量表、链接布局、时钟、具体硬件和最终 executable 仍需由外部工程实现。示例 只展示可复用静态 library 的源图，不声称生成了可上板运行的 firmware。"
+msgstr "`Nexus::Runtime` propagates Config/ABI, Core, Arch, typed I/O faces and selected OS adapter without SoC/Board/factory. A CMake build allows one resolved Nexus assembly and no conflicting ABIs; external projects explicitly link extra components. MCU projects select `cmake/toolchains/arm-gcc.cmake` on first configure. External projects still implement startup/vectors/link layout/clocks/hardware/final executable. The example shows a reusable static-library source graph, not runnable-board firmware."
+
+msgid "Installed SDK 在生成/编译前核验完整 source identity。开发 fixture SDK 需要明确 opt-in，不能当作 publishable candidate；该 opt-in 也不会绕过 checksum/closure 校验。SDK/外部 consumer 必须针对本轮新 HEAD 重新执行。"
+msgstr "Installed SDK checks complete source identity before generation/compilation. Development-fixture SDK requires explicit opt-in and is not a publishable candidate; opt-in bypasses no checksum/closure checks. SDK/external consumers must rerun for this new HEAD."
+
+msgid "执行证据与剩余验收"
+msgstr "Execution evidence and remaining acceptance"
+
+msgid "CPU profile/Runtime resolver 测试覆盖 immutable IR、严格 schema、ABI/feature 冲突、原子发布 bundle、输入变化和 stale output；Google 模型执行实际 CPU 算法，ARM 编译门禁保留宏、对象、汇编/反汇编、命令、返回码和 raw hash。 Runtime 门禁复用 `nexus_add_runtime` 的生产源图构建 Core/Arch/OS 组合，分别 检查真实 kernel 的 FP/MVE context 与 ELF，而不维护第二份手写 source graph。"
+msgstr "CPU-profile/Runtime-resolver tests cover immutable IR, strict schemas, ABI/feature conflicts, atomic publication, changed inputs and stale outputs. Google models execute actual CPU algorithms. ARM gates retain macros/objects/assembly-disassembly/commands/exits/raw hashes. Runtime gates reuse the `nexus_add_runtime` production graph to build Core/Arch/OS and inspect actual FP/MVE kernel context/ELF rather than maintain another handwritten source graph."
+
+msgid "这些命令建立实际执行范围内的 CPU primitive／runtime 软件证据。具体 F407/F470 平台、G474/H743/U575 参考装配与物理 station 有各自门禁； 编译命令不建立实板证据。 可选 feature 组合按实际执行范围记录，单个组合通过不继承给所有可能组合。 当前开发执行目录为 `/workspace/nexus-all-cortex-evidence`；最终通过数与源码身份 由实际报告核对，不引用之前版本的 counts。"
+msgstr "These commands establish CPU-primitive/runtime software evidence within actually executed scope. Concrete F407/F470 platforms, G474/H743/U575 references and physical stations have their own gates; compilation provides no physical evidence. Optional-feature scope follows actual execution; one passed combination does not qualify every possible combination. Current development output is `/workspace/nexus-all-cortex-evidence`; actual reports establish counts/source identity instead of previous-version counts."
+
+msgid "本轮没有新增真实 Board，没有执行物理 HIL。IRQ latency、FPU/MVE context 切换、cache/DMA coherence、MPU/SAU 行为、安全世界协作、stack high-water、时钟 和物理波形均保持未验收。正式 clean-source SDK、离线双构建、镜像 hash 和 candidate 封存须依据 [qualification](qualification.md) 重新执行；软件支持不 自动提升为 production release、硬件资格、安全认证或 LTS。"
+msgstr "This iteration adds no actual Board and runs no physical HIL. IRQ latency, FP/MVE switching, cache/DMA coherence, MPU/SAU behavior, security-world cooperation, stack high-water, clocks/waveforms remain unaccepted. Formal clean-source SDK, offline double-build, image hashes and candidate sealing must rerun per [qualification](qualification.md). Software support does not automatically become production release, hardware qualification, safety certification or LTS."
