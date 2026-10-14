@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "kind": "documentation_tool_cache_parts",
+  "name": "documentation-tools-linux-x86_64-cp312.tar.gz",
+  "bytes": 164835100,
+  "sha256": "87eada76c444233dc33ea5151553ed022ab90f055d7763fbf907a08a59aa4528",
+  "parts": [
+    {
+      "path": "documentation-tools-linux-x86_64-cp312/part-000.bin",
+      "bytes": 33554432,
+      "sha256": "9445d3ea2de1ef5855fc42264f3deb35e3fc289a84e74fa3372e1cabb6b22b94"
+    },
+    {
+      "path": "documentation-tools-linux-x86_64-cp312/part-001.bin",
+      "bytes": 33554432,
+      "sha256": "9a2fbd059cb9a97700cb15554809f3904b97d172d2364e3782a2a04a64c30ba3"
+    },
+    {
+      "path": "documentation-tools-linux-x86_64-cp312/part-002.bin",
+      "bytes": 33554432,
+      "sha256": "eadd8dc2a661bd4fa49a5079c7927bf095c4af98bcad11f85a8e485a95b009a5"
+    },
+    {
+      "path": "documentation-tools-linux-x86_64-cp312/part-003.bin",
+      "bytes": 33554432,
+      "sha256": "d3e692ff262713c9ad3b1ac09ad401cdb0dac89ceba18e74cbc46ab1f9df7ad8"
+    },
+    {
+      "path": "documentation-tools-linux-x86_64-cp312/part-004.bin",
+      "bytes": 30617372,
+      "sha256": "a350f23cca975ff17add1089166fe4eb2e4a1e910fb9d4d0c019db131bfc8efe"
+    }
+  ]
+}

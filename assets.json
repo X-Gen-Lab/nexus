@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "kind": "immutable_documentation_git_assets",
+  "documentation_commit": "3835e13cd7da34bd75307746859d4514745ae2ff",
+  "members": [
+    {
+      "path": "docs-20261014-3835e13cd7da/SHA256SUMS",
+      "bytes": 212,
+      "sha256": "03a71c2140724bbbb37a4b59cedfa3b9f48a8d610429251fc49ffedf2c6907e4"
+    },
+    {
+      "path": "docs-20261014-3835e13cd7da/docs-20261014-3835e13cd7da.tar.gz",
+      "bytes": 7078685,
+      "sha256": "566acb2d7f4a8ec80022364ca6002ec07b93319c1eb150f5df78e5b996b879df"
+    },
+    {
+      "path": "docs-20261014-3835e13cd7da/documentation-tools-linux-x86_64-cp312/part-000.bin",
+      "bytes": 33554432,
+      "sha256": "9445d3ea2de1ef5855fc42264f3deb35e3fc289a84e74fa3372e1cabb6b22b94"
+    },
+    {
+      "path": "docs-20261014-3835e13cd7da/documentation-tools-linux-x86_64-cp312/part-001.bin",
+      "bytes": 33554432,
+      "sha256": "9a2fbd059cb9a97700cb15554809f3904b97d172d2364e3782a2a04a64c30ba3"
+    },
+    {
+      "path": "docs-20261014-3835e13cd7da/documentation-tools-linux-x86_64-cp312/part-002.bin",
+      "bytes": 33554432,
+      "sha256": "eadd8dc2a661bd4fa49a5079c7927bf095c4af98bcad11f85a8e485a95b009a5"
+    },
+    {
+      "path": "docs-20261014-3835e13cd7da/documentation-tools-linux-x86_64-cp312/part-003.bin",
+      "bytes": 33554432,
+      "sha256": "d3e692ff262713c9ad3b1ac09ad401cdb0dac89ceba18e74cbc46ab1f9df7ad8"
+    },
+    {
+      "path": "docs-20261014-3835e13cd7da/documentation-tools-linux-x86_64-cp312/part-004.bin",
+      "bytes": 30617372,
+      "sha256": "a350f23cca975ff17add1089166fe4eb2e4a1e910fb9d4d0c019db131bfc8efe"
+    },
+    {
+      "path": "docs-20261014-3835e13cd7da/documentation-tools-parts.json",
+      "bytes": 1198,
+      "sha256": "ef5ac771334134f22f7895a463c871b9764823abd2523a6f90a1b16bcb64612b"
+    },
+    {
+      "path": "docs-20261014-3835e13cd7da/release-assets.json",
+      "bytes": 709,
+      "sha256": "e31e61e0233367262e2270abacd3de1e80aad0f955576ddac112f5a7a44e1b7c"
+    }
+  ],
+  "physical_hil": "not_executed",
+  "transport_boundary": "Release asset uploads returned HTTP 401; assets are stored as Git objects and retrieved through commit-specific raw URLs."
+}

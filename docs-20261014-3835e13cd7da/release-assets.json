@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "kind": "documentation_release_assets",
+  "documentation_commit": "3835e13cd7da34bd75307746859d4514745ae2ff",
+  "manifest_sha256": "21912550daba4d9c7f9c7292c43d44e1b26923dc0b4331544196971c3c9a7aaa",
+  "assets": [
+    {
+      "name": "docs-20261014-3835e13cd7da.tar.gz",
+      "bytes": 7078685,
+      "sha256": "566acb2d7f4a8ec80022364ca6002ec07b93319c1eb150f5df78e5b996b879df"
+    },
+    {
+      "name": "documentation-tools-linux-x86_64-cp312.tar.gz",
+      "bytes": 164835100,
+      "sha256": "87eada76c444233dc33ea5151553ed022ab90f055d7763fbf907a08a59aa4528"
+    }
+  ],
+  "physical_hil": "not_executed",
+  "qualified_code_reference": "cc6a065c002041234a212a964be863a69198f9b4"
+}
