@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "kind": "independent_fixed_commit_git_asset_restoration",
+  "status": "passed",
+  "executor": "/root/final_evidence_retention",
+  "started_at_utc": "2026-10-14T18:47:40.025782+00:00",
+  "finished_at_utc": "2026-10-14T18:47:47.529233+00:00",
+  "input_assets_commit": "b32c64ee20b796e75c8a7488c34c48a4c286e450",
+  "input_asset_prefix": "docs-polish-20261014-51e93508",
+  "restore_destination": "/tmp/nexus-docs-polish-remote-restore-b32c64ee20b7",
+  "transport": "HTTPS raw.githubusercontent.com; exact full commit URL per file; no release API upload",
+  "files": [
+    {
+      "path": "docs-polish-20261014-51e93508/README.txt",
+      "restore_path": "README.txt",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/README.txt",
+      "http_status": 200,
+      "bytes": 5357,
+      "expected_sha256": "a8461e80a55417959b72210d2ec71f39c467fba84b492743bf173c327a31653f",
+      "observed_sha256": "a8461e80a55417959b72210d2ec71f39c467fba84b492743bf173c327a31653f",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 5357
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/RETAINED-SHA256SUMS",
+      "restore_path": "RETAINED-SHA256SUMS",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/RETAINED-SHA256SUMS",
+      "http_status": 200,
+      "bytes": 1138,
+      "expected_sha256": "2a0af08404c0f23687f319ecbbdb2ed6f1f2099e82f90471a3c9c9814290390c",
+      "observed_sha256": "2a0af08404c0f23687f319ecbbdb2ed6f1f2099e82f90471a3c9c9814290390c",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1138
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/SHA256SUMS",
+      "restore_path": "SHA256SUMS",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/SHA256SUMS",
+      "http_status": 200,
+      "bytes": 170713,
+      "expected_sha256": "ed95a0cd7911ae0a65440f637bc5652e12170eacac11aaab34abc3fb20b94dbf",
+      "observed_sha256": "ed95a0cd7911ae0a65440f637bc5652e12170eacac11aaab34abc3fb20b94dbf",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 170713
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/acceptance-scopes.json",
+      "restore_path": "acceptance-scopes.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/acceptance-scopes.json",
+      "http_status": 200,
+      "bytes": 3495,
+      "expected_sha256": "dc94f13f2333c9c483bb1bfcecb56541d8becd5e08c6178c577e83bc1a296c8a",
+      "observed_sha256": "dc94f13f2333c9c483bb1bfcecb56541d8becd5e08c6178c577e83bc1a296c8a",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 3495
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/docs-20261014-51e93508f22f.tar.gz",
+      "restore_path": "docs-20261014-51e93508f22f.tar.gz",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/docs-20261014-51e93508f22f.tar.gz",
+      "http_status": 200,
+      "bytes": 8414431,
+      "expected_sha256": "928a1d3f78a2568f955f764b3fa1d1b3ee7e861c7985ea1a31985d0c72da8727",
+      "observed_sha256": "928a1d3f78a2568f955f764b3fa1d1b3ee7e861c7985ea1a31985d0c72da8727",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 8414431
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/documentation-manifest.json",
+      "restore_path": "documentation-manifest.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/documentation-manifest.json",
+      "http_status": 200,
+      "bytes": 289498,
+      "expected_sha256": "38979748d90b08861eba98f4577192768edf64eebee150f21e133848da38b990",
+      "observed_sha256": "38979748d90b08861eba98f4577192768edf64eebee150f21e133848da38b990",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 289498
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/exclusions.json",
+      "restore_path": "exclusions.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/exclusions.json",
+      "http_status": 200,
+      "bytes": 1353,
+      "expected_sha256": "a645356abd70168e0720beed74e47a6a938c835ea922bae92d0519de4883d91e",
+      "observed_sha256": "a645356abd70168e0720beed74e47a6a938c835ea922bae92d0519de4883d91e",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1353
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/nested-evidence-index.json",
+      "restore_path": "nested-evidence-index.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/nested-evidence-index.json",
+      "http_status": 200,
+      "bytes": 4119672,
+      "expected_sha256": "e4342ee91f2b47baa0de2e0f55d2568a113e829ec22378138953203f807d8fd2",
+      "observed_sha256": "e4342ee91f2b47baa0de2e0f55d2568a113e829ec22378138953203f807d8fd2",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 4119672
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/raw-evidence-index.json",
+      "restore_path": "raw-evidence-index.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/raw-evidence-index.json",
+      "http_status": 200,
+      "bytes": 5375952,
+      "expected_sha256": "fa3ba4661d60507171a968ad55c6ac0611c6463381a8f97118cbe6f37fd464a7",
+      "observed_sha256": "fa3ba4661d60507171a968ad55c6ac0611c6463381a8f97118cbe6f37fd464a7",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 5375952
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/raw-evidence.tar.gz",
+      "restore_path": "raw-evidence.tar.gz",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/raw-evidence.tar.gz",
+      "http_status": 200,
+      "bytes": 27782046,
+      "expected_sha256": "c9d1d6d1e3ba8543aeca49d6935ae0387f61faa272c0046abe6cac756a40e75b",
+      "observed_sha256": "c9d1d6d1e3ba8543aeca49d6935ae0387f61faa272c0046abe6cac756a40e75b",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 27782046
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/retained-assets.json",
+      "restore_path": "retained-assets.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/retained-assets.json",
+      "http_status": 200,
+      "bytes": 2706,
+      "expected_sha256": "72f13ffa737ff7785f1ed7cdeab535dd8781a795121a683bd3e0bafeb3c53eb0",
+      "observed_sha256": "72f13ffa737ff7785f1ed7cdeab535dd8781a795121a683bd3e0bafeb3c53eb0",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2706
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/seal-retention.py",
+      "restore_path": "seal-retention.py",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/seal-retention.py",
+      "http_status": 200,
+      "bytes": 20427,
+      "expected_sha256": "da9e647879d82e64de894fd41cadcc0655926b9334115b7580bcd05142c58797",
+      "observed_sha256": "da9e647879d82e64de894fd41cadcc0655926b9334115b7580bcd05142c58797",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 20427
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/source-snapshot.json",
+      "restore_path": "source-snapshot.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/source-snapshot.json",
+      "http_status": 200,
+      "bytes": 1772,
+      "expected_sha256": "8b02e1ff0979626253abdf94a2cf4338fb4e3bc1730222010e6ab0efea3cf238",
+      "observed_sha256": "8b02e1ff0979626253abdf94a2cf4338fb4e3bc1730222010e6ab0efea3cf238",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1772
+        }
+      ]
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/verify-retained-assets.py",
+      "restore_path": "verify-retained-assets.py",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/docs-polish-20261014-51e93508/verify-retained-assets.py",
+      "http_status": 200,
+      "bytes": 4984,
+      "expected_sha256": "fa72f8ead07ff7b987e53ac6d4eb1b24c656a57af118011bb2749742d3520a3a",
+      "observed_sha256": "fa72f8ead07ff7b987e53ac6d4eb1b24c656a57af118011bb2749742d3520a3a",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 4984
+        }
+      ]
+    },
+    {
+      "path": "assets.json",
+      "restore_path": "repository-assets-inventory.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/b32c64ee20b796e75c8a7488c34c48a4c286e450/assets.json",
+      "http_status": 200,
+      "bytes": 9408,
+      "expected_sha256": "23c46663320bb9ed970f789b11e54330df4be981a29feaf08f8ce58d92898a9d",
+      "observed_sha256": "23c46663320bb9ed970f789b11e54330df4be981a29feaf08f8ce58d92898a9d",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9408
+        }
+      ]
+    }
+  ],
+  "standalone_file_count": 15,
+  "reader_verification": {
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "/tmp/nexus-docs-polish-remote-restore-b32c64ee20b7/verify-retained-assets.py"
+    ],
+    "cwd": "/tmp/nexus-docs-polish-remote-restore-b32c64ee20b7",
+    "returncode": 0,
+    "stdout": "{\"status\": \"passed\", \"retained_files\": 12, \"evidence_members\": 12150, \"nested_evidence_archives\": [{\"path\": \"delivery/6f395-hook-tdd.tar.gz\", \"members\": 4195}, {\"path\": \"delivery/ci-budget-followup-hook-tdd.tar.gz\", \"members\": 6355}, {\"path\": \"delivery/final-hook-tdd.tar.gz\", \"members\": 5275}, {\"path\": \"source/build/quality/docs-polish-tdd-first.tar.gz\", \"members\": 2035}], \"offline_payload_files\": 1675, \"offline_total_files\": 1677, \"offline_archive_sha256\": \"928a1d3f78a2568f955f764b3fa1d1b3ee7e861c7985ea1a31985d0c72da8727\", \"offline_manifest_sha256\": \"38979748d90b08861eba98f4577192768edf64eebee150f21e133848da38b990\"}\n",
+    "stderr": "",
+    "result": {
+      "status": "passed",
+      "retained_files": 12,
+      "evidence_members": 12150,
+      "nested_evidence_archives": [
+        {
+          "path": "delivery/6f395-hook-tdd.tar.gz",
+          "members": 4195
+        },
+        {
+          "path": "delivery/ci-budget-followup-hook-tdd.tar.gz",
+          "members": 6355
+        },
+        {
+          "path": "delivery/final-hook-tdd.tar.gz",
+          "members": 5275
+        },
+        {
+          "path": "source/build/quality/docs-polish-tdd-first.tar.gz",
+          "members": 2035
+        }
+      ],
+      "offline_payload_files": 1675,
+      "offline_total_files": 1677,
+      "offline_archive_sha256": "928a1d3f78a2568f955f764b3fa1d1b3ee7e861c7985ea1a31985d0c72da8727",
+      "offline_manifest_sha256": "38979748d90b08861eba98f4577192768edf64eebee150f21e133848da38b990"
+    }
+  },
+  "raw_evidence_archive_sha256": "c9d1d6d1e3ba8543aeca49d6935ae0387f61faa272c0046abe6cac756a40e75b",
+  "raw_evidence_members_verified": 12150,
+  "nested_evidence_archives_verified": 4,
+  "nested_evidence_members_verified": 17860,
+  "offline_archive_sha256": "928a1d3f78a2568f955f764b3fa1d1b3ee7e861c7985ea1a31985d0c72da8727",
+  "offline_manifest_sha256": "38979748d90b08861eba98f4577192768edf64eebee150f21e133848da38b990",
+  "offline_payload_files": 1675,
+  "offline_total_files_verified": 1677,
+  "member_observations": {
+    "path": "remote-member-observations.json",
+    "bytes": 7727201,
+    "sha256": "1dd6794b3e5ff60be380e72701b1f50af297053338ce3fa3d24f1e42afd4ce95"
+  },
+  "documentation_source_commit": "51e93508f22fc1eb540c4ce4dd8713a91cc429f6",
+  "qualified_firmware_baseline": "cc6a065c002041234a212a964be863a69198f9b4",
+  "new_firmware_qualification": false,
+  "physical_hil": "not executed",
+  "scope": "Independent remote byte restoration and reader verification only. Existing executed build/test/browser/CI/HTTPS publication claims retain their receipt-specific source/scope.",
+  "self_hashing": "This followup receipt and observations are separate from the original sealed capsule; they do not recursively index themselves.",
+  "restoration_script": {
+    "path": "verify-remote-restore.py",
+    "execution_origin": "/tmp/nexus-docs-polish-remote-restore.py",
+    "bytes": 8600,
+    "sha256": "ea52db40d205ccd20040c6114c7bcd12be235a2e19dfee6c098be1f946cd6a9f",
+    "argv": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "/tmp/nexus-docs-polish-remote-restore.py",
+      "b32c64ee20b796e75c8a7488c34c48a4c286e450"
+    ],
+    "interpreter_path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "interpreter_binary_sha256": "fa67443527ed9647f760d807e2a38f26340757123e643c4639cf273ed15d5ea7"
+  }
+}

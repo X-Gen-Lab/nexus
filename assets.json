@@ -232,6 +232,26 @@
       "path": "docs-polish-20261014-51e93508/verify-retained-assets.py",
       "bytes": 4984,
       "sha256": "fa72f8ead07ff7b987e53ac6d4eb1b24c656a57af118011bb2749742d3520a3a"
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/remote-restore.json",
+      "bytes": 13955,
+      "sha256": "4f6dd842f647314ab50a265f6564b9ef91e8d9ea662e15803d7b9a7bd11ab15d"
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/remote-member-observations.json",
+      "bytes": 7727201,
+      "sha256": "1dd6794b3e5ff60be380e72701b1f50af297053338ce3fa3d24f1e42afd4ce95"
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/REMOTE-RESTORE-SHA256SUMS",
+      "bytes": 275,
+      "sha256": "68e6ab41506a0f4e6843663d9e30784c65068c422532f6914bf3c873384277dc"
+    },
+    {
+      "path": "docs-polish-20261014-51e93508/verify-remote-restore.py",
+      "bytes": 8600,
+      "sha256": "ea52db40d205ccd20040c6114c7bcd12be235a2e19dfee6c098be1f946cd6a9f"
     }
   ],
   "physical_hil": "not_executed",
