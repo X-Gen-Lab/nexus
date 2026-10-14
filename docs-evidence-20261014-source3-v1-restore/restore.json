@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "kind": "independent_remote_documentation_evidence_restore",
+  "status": "passed",
+  "physical_status": "not_executed",
+  "started_at": "2026-10-14T10:46:02.186467+00:00",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "/tmp/nexus-docs-later-evidence/verify_remote_evidence.py",
+    "--asset-commit",
+    "ed6835c5caf698f2daa356f72d38c1f0199303eb",
+    "--asset-prefix",
+    "docs-evidence-20261014-source3-v1",
+    "--tag",
+    "docs-evidence-20261014-source3-v1",
+    "--audited-verifier-sha256",
+    "d3d92e12a8765efda2a8b958ec8d74af11cc9e37f3e1657ed24e690286446324",
+    "--archive-sha256",
+    "1774f52c323a9544348026195db19773b483da9d053d3f55a91eb49f44b3f098",
+    "--inventory-sha256",
+    "88b4f5ee0659b56a44a57a32bcfbcb9de528b7e7dfbc63bbc890cfa350af50b4",
+    "--source-root",
+    "/tmp/nexus-docs-implementation-source-20261014",
+    "--evidence-root",
+    "/tmp/nexus-docs-later-evidence/evidence-restore"
+  ],
+  "asset_commit": "ed6835c5caf698f2daa356f72d38c1f0199303eb",
+  "asset_prefix": "docs-evidence-20261014-source3-v1",
+  "tag": "docs-evidence-20261014-source3-v1",
+  "script_sha256": "817200cd92c6df9f91745b7b5cafc4634d4dbc0d778130ba0f3c3dacbae4e7b9",
+  "audited_verifier_sha256": "d3d92e12a8765efda2a8b958ec8d74af11cc9e37f3e1657ed24e690286446324",
+  "source_before": {
+    "root": "/tmp/nexus-docs-implementation-source-20261014",
+    "commit": "63d64c1b33248f15dd517953a63be5598942b225",
+    "tree": "3e09d0fc14e7a08f4b138a274bdda38a3f51d01d",
+    "dirty": true,
+    "status_sha256": "e554089cf2ee1a226cc4c9acc618c52a088bf29be2907d4b05fa4c4de4761ae8",
+    "dirty_diff_sha256": "02143575cae3e045b4668000872d3b64d0537a18c51c0bff18f3f24907f07bfb",
+    "submodules_sha256": "6b9aa439a858d86d396ddda87e1d9fc5fb23e72ede5af58db0ec9f83ae77ec0c"
+  },
+  "source_scope": "Observer provenance only; portable verification and restoration require no Nexus source or installed prefix.",
+  "commands": [
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/X-Gen-Lab/nexus/git/commits/ed6835c5caf698f2daa356f72d38c1f0199303eb"
+      ],
+      "returncode": 0,
+      "stdout": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/remote-commit.json",
+      "stdout_sha256": "31960b975ed70ed2f13c1dfd496e82f8639326362d0ea3850260f8c0ba79a572",
+      "stderr": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/remote-commit.stderr"
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/X-Gen-Lab/nexus/git/trees/3aa75d1b915dfbcf1f8be4f7cfb8b3507a2e04f5?recursive=1"
+      ],
+      "returncode": 0,
+      "stdout": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/remote-tree.json",
+      "stdout_sha256": "b1514e2d4ccd27584c93b63d3dea10a9f01250ed2bb56b5c41e9f40fb456346c",
+      "stderr": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/remote-tree.stderr"
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/X-Gen-Lab/nexus/git/ref/tags/docs-evidence-20261014-source3-v1"
+      ],
+      "returncode": 0,
+      "stdout": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/remote-tag.json",
+      "stdout_sha256": "ff14d24ed5527296b1081daaad5648ddfaa9702a9adda907b1862f61084705e8",
+      "stderr": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/remote-tag.stderr"
+    }
+  ],
+  "requests": [
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/assets.json",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/assets.json",
+      "status": 200,
+      "bytes": 4442,
+      "sha256": "73e1e947cbe025de85485616a6bf47ad0ea704300678f854fbe17b66d8fff024",
+      "git_blob_sha1": "00a36d15daa5a7c315c3e01603a72be77370bf0f",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/assets.json",
+      "elapsed_seconds": 0.293
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/EVIDENCE-EXCLUSIONS.json",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/EVIDENCE-EXCLUSIONS.json",
+      "status": 200,
+      "bytes": 3522148,
+      "sha256": "b1b76b1eb26a64ee2e0f591dc16d650867c2bcdcdf477cea74cf9c7842542eb8",
+      "git_blob_sha1": "874c66dffca1b6108471ef8ccdd36ffa4884783b",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/EVIDENCE-EXCLUSIONS.json",
+      "elapsed_seconds": 0.375
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/EVIDENCE-INVENTORY.json",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/EVIDENCE-INVENTORY.json",
+      "status": 200,
+      "bytes": 4190535,
+      "sha256": "88b4f5ee0659b56a44a57a32bcfbcb9de528b7e7dfbc63bbc890cfa350af50b4",
+      "git_blob_sha1": "9723898341679ddbe470fbbe897ee7666df73b27",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/EVIDENCE-INVENTORY.json",
+      "elapsed_seconds": 0.59
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/EVIDENCE-LOCATORS.json",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/EVIDENCE-LOCATORS.json",
+      "status": 200,
+      "bytes": 5275549,
+      "sha256": "c6a6cfdb2a13452059bde9cce430433c5d8630512328746f161ba357679d8a22",
+      "git_blob_sha1": "8046cc788d16072d840e8fa0428fef0b75181415",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/EVIDENCE-LOCATORS.json",
+      "elapsed_seconds": 0.535
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/README.txt",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/README.txt",
+      "status": 200,
+      "bytes": 710,
+      "sha256": "2c7f54c0e005edbfe863f00a7c06bf8bb19f3714553331dea50e72850e9e1434",
+      "git_blob_sha1": "a121e87a52d17389d8ae30b12d614f54f2b92cac",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/README.txt",
+      "elapsed_seconds": 0.238
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/VERIFY-EVIDENCE.py",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/VERIFY-EVIDENCE.py",
+      "status": 200,
+      "bytes": 27902,
+      "sha256": "d3d92e12a8765efda2a8b958ec8d74af11cc9e37f3e1657ed24e690286446324",
+      "git_blob_sha1": "9e18d26e26ea95509cbdda6b21acf3e70e4e996b",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/VERIFY-EVIDENCE.py",
+      "elapsed_seconds": 0.226
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/evidence-parts.json",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/evidence-parts.json",
+      "status": 200,
+      "bytes": 1245,
+      "sha256": "14621960f5c040a234986380356bc7a6c2b7311ceb604c7637221e940bca6a75",
+      "git_blob_sha1": "5db01728e309a9b587b089102d7b1b53a802906a",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/evidence-parts.json",
+      "elapsed_seconds": 0.229
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/export-receipt.json",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/export-receipt.json",
+      "status": 200,
+      "bytes": 2065,
+      "sha256": "ccc66a8200d8922120622a2d8944c5c1a89467596a5e6381700b383c714d54ea",
+      "git_blob_sha1": "17a23b308c0a06903caf43fcc7bf2a178ccaba55",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/export-receipt.json",
+      "elapsed_seconds": 0.221
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0000",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0000",
+      "status": 200,
+      "bytes": 33554432,
+      "sha256": "5a3a9695b39464206a7a43fc5dc269cadfa70adbc4e269c26514ff2f3f54d9da",
+      "git_blob_sha1": "5f9faf98f005deb6680146140dfe0b878ada43c5",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0000",
+      "elapsed_seconds": 1.008
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0001",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0001",
+      "status": 200,
+      "bytes": 33554432,
+      "sha256": "3c14c20199d32cd51f482eec0fe09ca06a4d59a7abc0c8a6f49fd271c68d5146",
+      "git_blob_sha1": "0da7324c0509b5b59d7e71e9af84dac275d181b1",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0001",
+      "elapsed_seconds": 1.454
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0002",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0002",
+      "status": 200,
+      "bytes": 33554432,
+      "sha256": "da3fa344a3dbe5a424839a51fa9eac2be41f581a145db0b20457184d5ef913a1",
+      "git_blob_sha1": "7910cc77a9596e0bf61501bf2e87807ce311b41b",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0002",
+      "elapsed_seconds": 0.905
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0003",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0003",
+      "status": 200,
+      "bytes": 6927764,
+      "sha256": "90c18eeaa8bc27ceda17f3dcd6e0b95caa27839bdacf937ec4c6e7a2d9d3435f",
+      "git_blob_sha1": "9112ed00b6f04822d7f48d2814dc1b134fa8775d",
+      "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/downloaded/docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0003",
+      "elapsed_seconds": 0.546
+    }
+  ],
+  "hash_cycle_boundary": "This receipt and its observations are outside the verified D2 archive; publish separately.",
+  "returncode": 0,
+  "archive_bytes": 107591060,
+  "archive_sha256": "1774f52c323a9544348026195db19773b483da9d053d3f55a91eb49f44b3f098",
+  "inventory_sha256": "88b4f5ee0659b56a44a57a32bcfbcb9de528b7e7dfbc63bbc890cfa350af50b4",
+  "actual_full_archive_verification": {
+    "status": "passed",
+    "members": 17118,
+    "payload_files": 17113,
+    "payload_bytes": 345553832,
+    "inventory_sha256": "88b4f5ee0659b56a44a57a32bcfbcb9de528b7e7dfbc63bbc890cfa350af50b4",
+    "physical_status": "not_executed"
+  },
+  "actual_remote_files": 11,
+  "observed_members": 17118,
+  "selected_proof_members": 36,
+  "restored_reader_members": 41,
+  "restored_reader_root": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/independent-reader",
+  "accepted_task_records": 58,
+  "member_observations": {
+    "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/archive-member-observations.json",
+    "bytes": 4190629,
+    "sha256": "49032e2123a476cadbc900203d1b654f7b14c933443d24c5cc8716ac0ad8a87b"
+  },
+  "selected_reader": {
+    "path": "/tmp/nexus-docs-later-evidence/evidence-restore/20261014T104602Z-fc90467c16ec4a3294097894789cf29b/selected-reader-members.json",
+    "bytes": 7761,
+    "sha256": "88a5583aa3c023e00cbb5984ea262896230f7a52de79e68d05d857e468317130"
+  },
+  "limitations": [
+    "Hashes are not signatures.",
+    "Documentation evidence grants no firmware or physical HIL qualification.",
+    "Selected reader restore is 36 proofs plus five controls; all 17118 archive members were actually streamed and verified."
+  ],
+  "elapsed_seconds": 14.436,
+  "finished_at": "2026-10-14T10:46:16.848540+00:00",
+  "source_after": {
+    "root": "/tmp/nexus-docs-implementation-source-20261014",
+    "commit": "63d64c1b33248f15dd517953a63be5598942b225",
+    "tree": "3e09d0fc14e7a08f4b138a274bdda38a3f51d01d",
+    "dirty": true,
+    "status_sha256": "e554089cf2ee1a226cc4c9acc618c52a088bf29be2907d4b05fa4c4de4761ae8",
+    "dirty_diff_sha256": "02143575cae3e045b4668000872d3b64d0537a18c51c0bff18f3f24907f07bfb",
+    "submodules_sha256": "6b9aa439a858d86d396ddda87e1d9fc5fb23e72ede5af58db0ec9f83ae77ec0c"
+  }
+}

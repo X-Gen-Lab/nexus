@@ -49,6 +49,26 @@
       "sha256": "e31e61e0233367262e2270abacd3de1e80aad0f955576ddac112f5a7a44e1b7c"
     },
     {
+      "path": "docs-evidence-20261014-source3-v1-restore/archive-member-observations.json",
+      "bytes": 4190629,
+      "sha256": "49032e2123a476cadbc900203d1b654f7b14c933443d24c5cc8716ac0ad8a87b"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1-restore/restore.json",
+      "bytes": 15315,
+      "sha256": "68c36a43bd3a7fe5d01827cb3c4ac0fb2d86bc518ca7660c7229dcd470b98504"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1-restore/selected-reader-members.json",
+      "bytes": 7761,
+      "sha256": "88a5583aa3c023e00cbb5984ea262896230f7a52de79e68d05d857e468317130"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1-restore/verify_remote_evidence.py",
+      "bytes": 17381,
+      "sha256": "817200cd92c6df9f91745b7b5cafc4634d4dbc0d778130ba0f3c3dacbae4e7b9"
+    },
+    {
       "path": "docs-evidence-20261014-source3-v1/EVIDENCE-EXCLUSIONS.json",
       "bytes": 3522148,
       "sha256": "b1b76b1eb26a64ee2e0f591dc16d650867c2bcdcdf477cea74cf9c7842542eb8"
