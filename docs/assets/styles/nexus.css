@@ -18,6 +18,12 @@ div.bodywrapper,
     overflow-wrap: anywhere;
 }
 
+/* C API identifiers wrap without changing their text or reference anchors. */
+.nexus-canonical-content .sig .pre {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
 /* Source commands keep whitespace and scroll inside their own block. */
 .nexus-canonical-content pre {
     max-width: 100%;

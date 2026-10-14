@@ -108,6 +108,27 @@ strict build. Removed generation modifiers are rejected; wrappers cannot create
 a fallback Doxyfile or Sphinx configuration. Windows and macOS wrappers preserve
 CLI forwarding, while a formal build still requires the maintained Linux tuple.
 
+## Replay the API mobile-layout regression
+
+This optional diagnostic needs an existing Chromium and Playwright in addition
+to the documented Sphinx tuple. It never installs tools. Use a separate prepared
+browser test environment; the formal documentation build and default stdlib test
+suite do not import Playwright.
+
+Run from the repository root, supplying the existing browser executable:
+
+```sh
+python tools/documentation/check_browser_layout.py \
+    --chromium /path/to/chromium --report build/quality/api-layout.json
+```
+
+The helper builds a temporary English/Chinese C API fixture from the production
+theme. At 390 CSS pixels it checks long signatures, unchanged symbols and anchors,
+complete code and table content with internal scrolling, and an unclipped page.
+Missing tools or failed checks return nonzero. A successful receipt qualifies
+only that fixture and observed browser; full-site responsive acceptance and
+archive verification remain separate.
+
 ## CI permission boundary
 
 `docs-build.yml` has only `contents: read`. It prepares tools explicitly, runs
