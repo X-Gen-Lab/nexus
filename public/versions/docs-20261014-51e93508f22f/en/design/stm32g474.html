@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>STM32G474RET6 / MB1367 initial vertical slice &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=3a7bed40"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ThreadX configuration and integration" href="threadx.html" />
+    <link rel="prev" title="Stack observations and owner lifecycle endurance" href="stack-observation-endurance.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/design/stm32g474.md">51e93508f22f</a>; code reference: 51e93508f22f. <a href="../../zh_CN/design/stm32g474.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="stm32g474ret6-mb1367-initial-vertical-slice">
+<h1>STM32G474RET6 / MB1367 initial vertical slice<a class="headerlink" href="#stm32g474ret6-mb1367-initial-vertical-slice" title="Link to this heading">¶</a></h1>
+<p>This is a source-reviewed STM32G474RET6 baseline for NUCLEO-G474RE. It implements
+CPU startup, a fixed clock transaction, TIM2 time, GPIOA, LPUART1 IRQ bytes and
+independent PA0/PA1 EXTI edge events.
+It does not establish Flash programming, DMA, ADC, SPI, I2C, FDCAN, USB, Ethernet,
+low-power continuity or other G4 peripheral support. Unsupported modes must fail
+the configuration resolver. Actual PCB inspection and all HIL remain not executed.</p>
+<section id="reviewed-sources">
+<h2>Reviewed sources<a class="headerlink" href="#reviewed-sources" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Source</p></th>
+<th class="head"><p>Revision / pinned identity</p></th>
+<th class="head"><p>Relevant facts</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.st.com/resource/en/datasheet/stm32g474rc.pdf">STM32G474xx datasheet</a></p></td>
+<td><p>DS12288 Rev6</p></td>
+<td><p>M4F, 170 MHz, memory and clock limits</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32G4 reference manual</a></p></td>
+<td><p>RM0440 Rev9</p></td>
+<td><p>RCC/PWR/Flash boost sequence, TIM2, GPIO, LPUART</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://www.st.com/resource/en/user_manual/um2505-stm32g4-nucleo64-boards-mb1367-stmicroelectronics.pdf">MB1367 user manual</a></p></td>
+<td><p>UM2505 Rev7</p></td>
+<td><p>X3, VCP bridges and LD2 wiring</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/STMicroelectronics/cmsis-device-g4/tree/626ee412334a5ed2e5b320af5a8d77d69f03a558">CMSIS Device G4</a></p></td>
+<td><p>626ee412334a5ed2e5b320af5a8d77d69f03a558</p></td>
+<td><p>Actual G474 register masks/layout, IRQ102, GCC startup</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Source hashes and original SDK licensing belong in the dependency lock and
+review evidence. Vendor notices and LICENSE.md remain unchanged. The public
+Nexus interface stays independent of register definitions.</p>
+</section>
+<section id="exact-target-and-memory">
+<h2>Exact target and memory<a class="headerlink" href="#exact-target-and-memory" title="Link to this heading">¶</a></h2>
+<p>The initial target is STM32G474RET6, Cortex-M4F, ARMv7E-M, FPv4-SP-D16 hard ABI,
+DSP and DWT CYCCNT. External IRQ IDs cover 0..101, including TIM2=28,
+LPUART1=91 and FMAC=101. Four priority bits are implemented.</p>
+<p>Flash is 512 KiB at 0x08000000. Startup checks observed DEV_ID 0x469, Flash density
+512 KiB and actual DBANK=1. DEV_ID identifies a silicon category, not the package
+or order code. DBANK=1 yields 2 KiB pages across two banks; DBANK=0 is rejected by
+this first geometry profile. Startup never writes option bytes or performs erase
+or programming. A product must verify the exact order code and option state.</p>
+<p>RAM consists of 80 KiB SRAM1 at 0x20000000, 16 KiB SRAM2 at 0x20014000, and 32 KiB
+CCM with a system-bus alias at 0x20018000. The CCM CPU address 0x10000000 aliases
+the same physical storage and is not counted again. The first linker layout uses
+one contiguous 128 KiB region at 0x20000000 and reserves 2048 bytes for MSP. This
+CPU-only layout makes no implemented DMA-provider claim. No caller buffer is
+silently relocated into another memory region.</p>
+</section>
+<section id="reference-board-facts-and-uncertainty">
+<h2>Reference Board facts and uncertainty<a class="headerlink" href="#reference-board-facts-and-uncertainty" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Reviewed default reference</p></th>
+<th class="head"><p>Required physical confirmation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>HSE</p></td>
+<td><p>X3 24 MHz crystal, SB25/SB26 on, SB27 off</p></td>
+<td><p>Fitted X3 and actual bridge/revision</p></td>
+</tr>
+<tr class="row-odd"><td><p>LED LD2</p></td>
+<td><p>PA5, active high, SB6 on</p></td>
+<td><p>LED and bridge population</p></td>
+</tr>
+<tr class="row-even"><td><p>ST-LINK VCP</p></td>
+<td><p>LPUART1 PA2 TX / PA3 RX, AF12; SB17/SB23 on, SB18/SB22/SB13/SB19 off</p></td>
+<td><p>Actual bridge and ST-LINK connection</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The alternate ST-LINK MCO 8 MHz clock wiring needs a different reviewed profile
+and is not accepted here. The VCP route is LPUART1, not USART2. Source review does
+not prove physical electrical states, UART reception, board power or oscillator
+frequency. Private PCB data and bridge policy stay outside the platform.</p>
+</section>
+<section id="clock-transaction-and-rollback">
+<h2>Clock transaction and rollback<a class="headerlink" href="#clock-transaction-and-rollback" title="Link to this heading">¶</a></h2>
+<p>Admission requires privileged task context, incoming masks clear, positive phase
+poll budget, reset-like HSI16 selected, PLL/HSE idle and reserved TIM2/NVIC unused.
+Unknown active resources are rejected before effects. A poll count bounds work;
+it is not an elapsed-time deadline while the timebase is unavailable.</p>
+<p>The reviewed profile is HSE 24 / PLLM 6 / PLLN 85 / PLLR 2 = 170 MHz. PLL input is
+4 MHz and VCO 340 MHz, inside the datasheet limits. HCLK/APB1/APB2 and the TIM2
+kernel clock are 170 MHz. G4 uses SW_HSI=1 and SW_PLL=3; F4 clock encodings are
+not reused.</p>
+<p>Startup acquires PWREN with readback and a barrier before reading PWR state.
+It selects voltage range 1, waits for VOSF clear, uses boost mode and four Flash
+wait states, starts and observes HSE/PLL, switches through AHB/2 (85 MHz), waits
+at least the required transition interval, then selects AHB/1. The actual M4
+object contains 85 dependent SUBS/BNE iterations at verified 85 MHz. At least
+170 instructions/core cycles gives a conservative 2 microsecond lower bound;
+IRQs can extend it. Physical timing remains unmeasured. Volatile accesses,
+readback and ordering barriers cannot be optimized away.</p>
+<p>Failure records the primary result, cleanup result and still-owned effects.
+Rollback restores observed HSI before disabling PLL/HSE or reducing Flash/voltage
+settings. TIM2 source withdrawal and NVIC proof precede removing its ownership.
+Failed rollback retains the resource bits for explicit retry; it never reports
+successful cleanup or publishes usable I/O. Stop requires every external
+peripheral/task consumer already joined; no hidden coordinator guesses this.</p>
+</section>
+<section id="time-gpio-and-serial-contracts">
+<h2>Time, GPIO and serial contracts<a class="headerlink" href="#time-gpio-and-serial-contracts" title="Link to this heading">¶</a></h2>
+<p>TIM2 is reserved: 32-bit count, prescaler 169, ARR 0xffffffff, 1 MHz, overflow IRQ
+priority0 with no OS API. Snapshot saves/restores interrupt state and corrects
+one pending overflow; IRQ must run at least once per 2^32 microseconds. NMI,
+HardFault, dynamic reclocking and deep sleep are outside this time contract.</p>
+<p>GPIO initialization preloads BSRR and observes ODR before exposing a mode. It
+observes push/pull and pull configuration, then the selected MODER bits. Partial
+failure retains the instance for an explicit inactive-level rollback. Hot writes
+use BSRR directly. Toggle requires the single-owner serialization contract.</p>
+<p>LPUART1 supports caller-owned byte rings and one borrowed TX request. Its actual
+20-bit BRR is round(256<em>PCLK/(16</em>baud)), range0x300..0xfffff; 115200 at 170 MHz
+uses PRESC=16 (register7), BRR 23611. Initialization observes TEACK/REACK before
+publishing the face. IRQ is bounded to one TX byte and one RX byte, reports
+aggregate corruption/overflow loss and preserves older ring contents. It does
+not reuse F4’s USART divisor, register offsets or error-clear sequences.</p>
+<p>TXE proves a register can accept a byte; TC proves the final wire byte completed.
+Request metadata/payload/ring/private registers/wake target cannot overlap.
+Cancel and timeout disable new sends, then wait for actual wire completion.
+Failed drain retains QUARANTINED storage; later hardware proof can settle it.
+The provider detaches its active pointer and interrupt sources before SETTLED,
+which is its final request access. Cold stop closes admission, joins captured
+callbacks, observes UE and TEACK/REACK off, disables/clears/readbacks NVIC, then
+withdraws ring/wake ownership. FreeRTOS-capable sinks require actual priority and
+priority-group validation; waking does not start a scheduler.</p>
+</section>
+<section id="software-evidence-and-outstanding-qualification">
+<h2>Software evidence and outstanding qualification<a class="headerlink" href="#software-evidence-and-outstanding-qualification" title="Link to this heading">¶</a></h2>
+<section id="exact-exti-extension">
+<h3>Exact EXTI extension<a class="headerlink" href="#exact-exti-extension" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">EXTI0</span></code>/PA0 and <code class="docutils literal notranslate"><span class="pre">EXTI1</span></code>/PA1 use independent IRQ6/7 with explicit priority and
+caller-selected 1..4096 event slots. RM0440 Rev9 section10.2.3 pp367–368 gives
+the GPIOA zero encoding of each <code class="docutils literal notranslate"><span class="pre">SYSCFG_EXTICR1</span></code> field; sections15.3–15.5
+pp441–453 describe interrupt selection and W1C <code class="docutils literal notranslate"><span class="pre">EXTI_PR1</span></code>. The official CMSIS
+layout and exact-part package inventory supply the register and pin facts.
+<code class="docutils literal notranslate"><span class="pre">tests/contracts/g474_assembly/exti_board</span></code> is only a software fixture; it does
+not assert an actual NUCLEO button, connector, bias resistor or electrical route.</p>
+<p>The common <code class="docutils literal notranslate"><span class="pre">edge-event</span></code> face has a single task reader and one IRQ producer per
+line. Each invocation acknowledges one selected pending bit, samples at most
+one level and records one timebase timestamp. Hardware edges may coalesce;
+both-edge direction reflects the sampled level. No polling loop reconstructs
+lost edges. A full ring preserves older events, exposes a separate loss boundary
+and only then admits later events. CPU exclusion per copied event is bounded;
+read work scales with the explicit caller capacity.</p>
+<p>Platform admission checks line masks, triggers, pending and NVIC before changing
+global clocks or GPIO. A shared SYSCFG gate has one generated owner and retains
+a preexisting enable. Each line saves its mux nibble and restores only that
+field after its own sources and independent vector are observed withdrawn.
+GPIO cold leases restore the original input/analog state at complete Platform
+stop. A failed cleanup keeps storage and recovery responsibility. Wake binding
+checks actual IRQ policy and joins captured callbacks before releasing storage.
+No public API, dynamic allocation, worker, runtime registry or extra OS layer is
+introduced.</p>
+<p>The two authored EXTI fixtures select baremetal/FreeRTOS and exact three/two
+event capacities. Native GoogleTest/GoogleMock executes the real provider and
+generated two-line factory; ARM fixtures retain the selected ops/handlers and
+actual FreeRTOS graph. Empty and existing GPIO/LPUART fixtures remain separate
+regressions. Physical HIL remains <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>: a future admitted station must
+confirm PA0/PA1 accessibility and bias, inject observed edges, compare instrument
+counts/waveforms with coalesced/loss semantics, measure IRQ latency and prove
+source withdrawal before storage reuse. Software success is not that evidence.</p>
+</section>
+<section id="existing-baseline-evidence">
+<h3>Existing baseline evidence<a class="headerlink" href="#existing-baseline-evidence" title="Link to this heading">¶</a></h3>
+<p>Actual host models execute the production register algorithm with official SDK
+layout and masks. They verify bounded timeout, failed rollback, initial-latch
+failure, source withdrawal, request alias rejection, wire drain, overflow,
+callback borrow and independent state. They do not establish oscillator,
+voltage, timing, peripheral errata or physical IRQ behavior.</p>
+<p>An actual ARM C11 build with GCC 14.3 and the pinned official GCC startup links
+empty, LED, UART and mixed bare-metal ELFs. The selected types occupy System 56,
+GPIO 12, UART 72 and TX request 32 bytes. The small profile costs are measured from
+those ELF files and include the 2048-byte MSP reservation; they are not inferred
+from host sizeof. Unselected GPIO/UART symbols disappear through section GC.</p>
+<p>Generated typed factories, both OS backend compositions, clean reproducible
+builds, exact SDK lock/bundle identities and any later Board HIL have separate
+qualification exits. Software-only delivery must keep physical status unknown.</p>
+</section>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

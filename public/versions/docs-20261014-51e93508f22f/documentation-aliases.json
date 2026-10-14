@@ -1,0 +1,2045 @@
+{
+  "aliases": [
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/DOCUMENTATION_GUIDE.rst",
+      "old_url": "DOCUMENTATION_GUIDE.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/DOCUMENTATION_GUIDE.rst",
+      "old_url": "en/DOCUMENTATION_GUIDE.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/DOCUMENTATION_GUIDE.rst",
+      "old_url": "zh_CN/DOCUMENTATION_GUIDE.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/QUICK_REFERENCE.rst",
+      "old_url": "QUICK_REFERENCE.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/QUICK_REFERENCE.rst",
+      "old_url": "en/QUICK_REFERENCE.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/QUICK_REFERENCE.rst",
+      "old_url": "zh_CN/QUICK_REFERENCE.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/config.rst",
+      "old_url": "api/config.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/config.rst",
+      "old_url": "en/api/config.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/config.rst",
+      "old_url": "zh_CN/api/config.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/hal.rst",
+      "old_url": "api/hal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/hal.rst",
+      "old_url": "en/api/hal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/hal.rst",
+      "old_url": "zh_CN/api/hal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/index.rst",
+      "old_url": "en/api/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/index.rst",
+      "old_url": "zh_CN/api/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/init.rst",
+      "old_url": "api/init.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/init.rst",
+      "old_url": "en/api/init.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/init.rst",
+      "old_url": "zh_CN/api/init.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/kconfig_tools.rst",
+      "old_url": "api/kconfig_tools.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/kconfig_tools.rst",
+      "old_url": "en/api/kconfig_tools.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/kconfig_tools.rst",
+      "old_url": "zh_CN/api/kconfig_tools.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/log.rst",
+      "old_url": "api/log.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/log.rst",
+      "old_url": "en/api/log.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/log.rst",
+      "old_url": "zh_CN/api/log.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/osal.rst",
+      "old_url": "api/osal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/osal.rst",
+      "old_url": "en/api/osal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/osal.rst",
+      "old_url": "zh_CN/api/osal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/shell.rst",
+      "old_url": "api/shell.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/shell.rst",
+      "old_url": "en/api/shell.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/api/shell.rst",
+      "old_url": "zh_CN/api/shell.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/api_design_guidelines.rst",
+      "old_url": "development/api_design_guidelines.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/api_design_guidelines.rst",
+      "old_url": "en/development/api_design_guidelines.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/api_design_guidelines.rst",
+      "old_url": "zh_CN/development/api_design_guidelines.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/architecture_design.rst",
+      "old_url": "development/architecture_design.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/architecture_design.rst",
+      "old_url": "en/development/architecture_design.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/architecture_design.rst",
+      "old_url": "zh_CN/development/architecture_design.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/build_system.rst",
+      "old_url": "development/build_system.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/build_system.rst",
+      "old_url": "en/development/build_system.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/build_system.rst",
+      "old_url": "zh_CN/development/build_system.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/ci_cd_integration.rst",
+      "old_url": "development/ci_cd_integration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/ci_cd_integration.rst",
+      "old_url": "en/development/ci_cd_integration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/ci_cd_integration.rst",
+      "old_url": "zh_CN/development/ci_cd_integration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/code_review_guidelines.rst",
+      "old_url": "development/code_review_guidelines.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/code_review_guidelines.rst",
+      "old_url": "en/development/code_review_guidelines.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/code_review_guidelines.rst",
+      "old_url": "zh_CN/development/code_review_guidelines.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/coding_standards.rst",
+      "old_url": "development/coding_standards.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/coding_standards.rst",
+      "old_url": "en/development/coding_standards.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/coding_standards.rst",
+      "old_url": "zh_CN/development/coding_standards.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/contributing.rst",
+      "old_url": "development/contributing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/contributing.rst",
+      "old_url": "en/development/contributing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/contributing.rst",
+      "old_url": "zh_CN/development/contributing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/coverage_analysis.rst",
+      "old_url": "development/coverage_analysis.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/coverage_analysis.rst",
+      "old_url": "en/development/coverage_analysis.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/coverage_analysis.rst",
+      "old_url": "zh_CN/development/coverage_analysis.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/debugging_guide.rst",
+      "old_url": "development/debugging_guide.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/debugging_guide.rst",
+      "old_url": "en/development/debugging_guide.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/debugging_guide.rst",
+      "old_url": "zh_CN/development/debugging_guide.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/development_environment.rst",
+      "old_url": "development/development_environment.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/development_environment.rst",
+      "old_url": "en/development/development_environment.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/development_environment.rst",
+      "old_url": "zh_CN/development/development_environment.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/documentation_contributing.rst",
+      "old_url": "development/documentation_contributing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/documentation_contributing.rst",
+      "old_url": "en/development/documentation_contributing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/documentation_contributing.rst",
+      "old_url": "zh_CN/development/documentation_contributing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/index.rst",
+      "old_url": "development/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/index.rst",
+      "old_url": "en/development/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/index.rst",
+      "old_url": "zh_CN/development/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/kconfig_guide.rst",
+      "old_url": "development/kconfig_guide.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/kconfig_guide.rst",
+      "old_url": "en/development/kconfig_guide.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/kconfig_guide.rst",
+      "old_url": "zh_CN/development/kconfig_guide.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/performance_optimization.rst",
+      "old_url": "development/performance_optimization.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/performance_optimization.rst",
+      "old_url": "en/development/performance_optimization.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/performance_optimization.rst",
+      "old_url": "zh_CN/development/performance_optimization.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/porting_guide.rst",
+      "old_url": "development/porting_guide.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/porting_guide.rst",
+      "old_url": "en/development/porting_guide.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/porting_guide.rst",
+      "old_url": "zh_CN/development/porting_guide.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/release_process.rst",
+      "old_url": "development/release_process.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/release_process.rst",
+      "old_url": "en/development/release_process.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/release_process.rst",
+      "old_url": "zh_CN/development/release_process.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/script_validation.rst",
+      "old_url": "development/script_validation.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/script_validation.rst",
+      "old_url": "en/development/script_validation.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/script_validation.rst",
+      "old_url": "zh_CN/development/script_validation.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/scripts.rst",
+      "old_url": "development/scripts.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/scripts.rst",
+      "old_url": "en/development/scripts.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/scripts.rst",
+      "old_url": "zh_CN/development/scripts.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/security_guidelines.rst",
+      "old_url": "development/security_guidelines.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/security_guidelines.rst",
+      "old_url": "en/development/security_guidelines.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/security_guidelines.rst",
+      "old_url": "zh_CN/development/security_guidelines.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/static_analysis.rst",
+      "old_url": "development/static_analysis.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/static_analysis.rst",
+      "old_url": "en/development/static_analysis.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/static_analysis.rst",
+      "old_url": "zh_CN/development/static_analysis.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/testing.rst",
+      "old_url": "development/testing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/testing.rst",
+      "old_url": "en/development/testing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/testing.rst",
+      "old_url": "zh_CN/development/testing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/troubleshooting.rst",
+      "old_url": "development/troubleshooting.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/troubleshooting.rst",
+      "old_url": "en/development/troubleshooting.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/troubleshooting.rst",
+      "old_url": "zh_CN/development/troubleshooting.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/validation_framework.rst",
+      "old_url": "development/validation_framework.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/validation_framework.rst",
+      "old_url": "en/development/validation_framework.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/development/validation_framework.rst",
+      "old_url": "zh_CN/development/validation_framework.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/build_and_flash.rst",
+      "old_url": "getting_started/build_and_flash.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/build_and_flash.rst",
+      "old_url": "en/getting_started/build_and_flash.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/build_and_flash.rst",
+      "old_url": "zh_CN/getting_started/build_and_flash.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/configuration.rst",
+      "old_url": "getting_started/configuration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/configuration.rst",
+      "old_url": "en/getting_started/configuration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/configuration.rst",
+      "old_url": "zh_CN/getting_started/configuration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/core_concepts.rst",
+      "old_url": "getting_started/core_concepts.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/core_concepts.rst",
+      "old_url": "en/getting_started/core_concepts.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/core_concepts.rst",
+      "old_url": "zh_CN/getting_started/core_concepts.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/environment_setup.rst",
+      "old_url": "getting_started/environment_setup.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/environment_setup.rst",
+      "old_url": "en/getting_started/environment_setup.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/environment_setup.rst",
+      "old_url": "zh_CN/getting_started/environment_setup.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/examples_tour.rst",
+      "old_url": "getting_started/examples_tour.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/examples_tour.rst",
+      "old_url": "en/getting_started/examples_tour.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/examples_tour.rst",
+      "old_url": "zh_CN/getting_started/examples_tour.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/faq.rst",
+      "old_url": "getting_started/faq.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/faq.rst",
+      "old_url": "en/getting_started/faq.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/faq.rst",
+      "old_url": "zh_CN/getting_started/faq.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/first_application.rst",
+      "old_url": "getting_started/first_application.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/first_application.rst",
+      "old_url": "en/getting_started/first_application.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/first_application.rst",
+      "old_url": "zh_CN/getting_started/first_application.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/index.rst",
+      "old_url": "getting_started/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/index.rst",
+      "old_url": "en/getting_started/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/index.rst",
+      "old_url": "zh_CN/getting_started/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/introduction.rst",
+      "old_url": "getting_started/introduction.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/introduction.rst",
+      "old_url": "en/getting_started/introduction.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/introduction.rst",
+      "old_url": "zh_CN/getting_started/introduction.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/project_structure.rst",
+      "old_url": "getting_started/project_structure.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/project_structure.rst",
+      "old_url": "en/getting_started/project_structure.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/project_structure.rst",
+      "old_url": "zh_CN/getting_started/project_structure.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/quick_start.rst",
+      "old_url": "getting_started/quick_start.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/quick_start.rst",
+      "old_url": "en/getting_started/quick_start.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/getting_started/quick_start.rst",
+      "old_url": "zh_CN/getting_started/quick_start.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/gd32.rst",
+      "old_url": "platform_guides/gd32.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/gd32.rst",
+      "old_url": "en/platform_guides/gd32.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/gd32.rst",
+      "old_url": "zh_CN/platform_guides/gd32.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/index.rst",
+      "old_url": "platform_guides/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/index.rst",
+      "old_url": "en/platform_guides/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/index.rst",
+      "old_url": "zh_CN/platform_guides/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/native.rst",
+      "old_url": "platform_guides/native.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/native.rst",
+      "old_url": "en/platform_guides/native.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/native.rst",
+      "old_url": "zh_CN/platform_guides/native.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/stm32f4.rst",
+      "old_url": "platform_guides/stm32f4.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/stm32f4.rst",
+      "old_url": "en/platform_guides/stm32f4.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/stm32f4.rst",
+      "old_url": "zh_CN/platform_guides/stm32f4.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/stm32h7.rst",
+      "old_url": "platform_guides/stm32h7.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/stm32h7.rst",
+      "old_url": "en/platform_guides/stm32h7.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/platform_guides/stm32h7.rst",
+      "old_url": "zh_CN/platform_guides/stm32h7.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/reference/api_index.rst",
+      "old_url": "reference/api_index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/reference/api_index.rst",
+      "old_url": "en/reference/api_index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/reference/api_index.rst",
+      "old_url": "zh_CN/reference/api_index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/reference/error_codes.rst",
+      "old_url": "reference/error_codes.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/reference/error_codes.rst",
+      "old_url": "en/reference/error_codes.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/reference/error_codes.rst",
+      "old_url": "zh_CN/reference/error_codes.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/reference/kconfig_index.rst",
+      "old_url": "reference/kconfig_index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/reference/kconfig_index.rst",
+      "old_url": "en/reference/kconfig_index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/reference/kconfig_index.rst",
+      "old_url": "zh_CN/reference/kconfig_index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/adc_sampling.rst",
+      "old_url": "tutorials/adc_sampling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/adc_sampling.rst",
+      "old_url": "en/tutorials/adc_sampling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/adc_sampling.rst",
+      "old_url": "zh_CN/tutorials/adc_sampling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/examples.rst",
+      "old_url": "tutorials/examples.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/examples.rst",
+      "old_url": "en/tutorials/examples.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/examples.rst",
+      "old_url": "zh_CN/tutorials/examples.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/first_application.rst",
+      "old_url": "tutorials/first_application.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/first_application.rst",
+      "old_url": "en/tutorials/first_application.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/first_application.rst",
+      "old_url": "zh_CN/tutorials/first_application.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/gpio_control.rst",
+      "old_url": "tutorials/gpio_control.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/gpio_control.rst",
+      "old_url": "en/tutorials/gpio_control.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/gpio_control.rst",
+      "old_url": "zh_CN/tutorials/gpio_control.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/i2c_sensors.rst",
+      "old_url": "tutorials/i2c_sensors.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/i2c_sensors.rst",
+      "old_url": "en/tutorials/i2c_sensors.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/i2c_sensors.rst",
+      "old_url": "zh_CN/tutorials/i2c_sensors.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/index.rst",
+      "old_url": "tutorials/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/index.rst",
+      "old_url": "en/tutorials/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/index.rst",
+      "old_url": "zh_CN/tutorials/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/interrupt_handling.rst",
+      "old_url": "tutorials/interrupt_handling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/interrupt_handling.rst",
+      "old_url": "en/tutorials/interrupt_handling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/interrupt_handling.rst",
+      "old_url": "zh_CN/tutorials/interrupt_handling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/spi_communication.rst",
+      "old_url": "tutorials/spi_communication.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/spi_communication.rst",
+      "old_url": "en/tutorials/spi_communication.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/spi_communication.rst",
+      "old_url": "zh_CN/tutorials/spi_communication.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/task_creation.rst",
+      "old_url": "tutorials/task_creation.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/task_creation.rst",
+      "old_url": "en/tutorials/task_creation.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/task_creation.rst",
+      "old_url": "zh_CN/tutorials/task_creation.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/timer_pwm.rst",
+      "old_url": "tutorials/timer_pwm.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/timer_pwm.rst",
+      "old_url": "en/tutorials/timer_pwm.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/timer_pwm.rst",
+      "old_url": "zh_CN/tutorials/timer_pwm.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/uart_communication.rst",
+      "old_url": "tutorials/uart_communication.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/uart_communication.rst",
+      "old_url": "en/tutorials/uart_communication.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/tutorials/uart_communication.rst",
+      "old_url": "zh_CN/tutorials/uart_communication.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/architecture.rst",
+      "old_url": "user_guide/architecture.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/architecture.rst",
+      "old_url": "en/user_guide/architecture.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/architecture.rst",
+      "old_url": "zh_CN/user_guide/architecture.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/best_practices.rst",
+      "old_url": "user_guide/best_practices.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/best_practices.rst",
+      "old_url": "en/user_guide/best_practices.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/best_practices.rst",
+      "old_url": "zh_CN/user_guide/best_practices.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/build_system.rst",
+      "old_url": "user_guide/build_system.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/build_system.rst",
+      "old_url": "en/user_guide/build_system.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/build_system.rst",
+      "old_url": "zh_CN/user_guide/build_system.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/config.rst",
+      "old_url": "user_guide/config.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/config.rst",
+      "old_url": "en/user_guide/config.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/config.rst",
+      "old_url": "zh_CN/user_guide/config.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/debugging.rst",
+      "old_url": "user_guide/debugging.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/debugging.rst",
+      "old_url": "en/user_guide/debugging.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/debugging.rst",
+      "old_url": "zh_CN/user_guide/debugging.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/error_handling.rst",
+      "old_url": "user_guide/error_handling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/error_handling.rst",
+      "old_url": "en/user_guide/error_handling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/error_handling.rst",
+      "old_url": "zh_CN/user_guide/error_handling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/hal.rst",
+      "old_url": "user_guide/hal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/hal.rst",
+      "old_url": "en/user_guide/hal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/hal.rst",
+      "old_url": "zh_CN/user_guide/hal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/ide_integration.rst",
+      "old_url": "user_guide/ide_integration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/ide_integration.rst",
+      "old_url": "en/user_guide/ide_integration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/ide_integration.rst",
+      "old_url": "zh_CN/user_guide/ide_integration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/index.rst",
+      "old_url": "user_guide/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/index.rst",
+      "old_url": "en/user_guide/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/index.rst",
+      "old_url": "zh_CN/user_guide/index.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig.rst",
+      "old_url": "user_guide/kconfig.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig.rst",
+      "old_url": "en/user_guide/kconfig.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig.rst",
+      "old_url": "zh_CN/user_guide/kconfig.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_osal.rst",
+      "old_url": "user_guide/kconfig_osal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_osal.rst",
+      "old_url": "en/user_guide/kconfig_osal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_osal.rst",
+      "old_url": "zh_CN/user_guide/kconfig_osal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_peripherals.rst",
+      "old_url": "user_guide/kconfig_peripherals.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_peripherals.rst",
+      "old_url": "en/user_guide/kconfig_peripherals.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_peripherals.rst",
+      "old_url": "zh_CN/user_guide/kconfig_peripherals.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_platforms.rst",
+      "old_url": "user_guide/kconfig_platforms.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_platforms.rst",
+      "old_url": "en/user_guide/kconfig_platforms.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_platforms.rst",
+      "old_url": "zh_CN/user_guide/kconfig_platforms.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_tools.rst",
+      "old_url": "user_guide/kconfig_tools.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_tools.rst",
+      "old_url": "en/user_guide/kconfig_tools.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_tools.rst",
+      "old_url": "zh_CN/user_guide/kconfig_tools.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_tutorial.rst",
+      "old_url": "user_guide/kconfig_tutorial.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_tutorial.rst",
+      "old_url": "en/user_guide/kconfig_tutorial.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/kconfig_tutorial.rst",
+      "old_url": "zh_CN/user_guide/kconfig_tutorial.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/log.rst",
+      "old_url": "user_guide/log.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/log.rst",
+      "old_url": "en/user_guide/log.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/log.rst",
+      "old_url": "zh_CN/user_guide/log.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/memory_management.rst",
+      "old_url": "user_guide/memory_management.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/memory_management.rst",
+      "old_url": "en/user_guide/memory_management.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/memory_management.rst",
+      "old_url": "zh_CN/user_guide/memory_management.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/osal.rst",
+      "old_url": "user_guide/osal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/osal.rst",
+      "old_url": "en/user_guide/osal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/osal.rst",
+      "old_url": "zh_CN/user_guide/osal.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/performance.rst",
+      "old_url": "user_guide/performance.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/performance.rst",
+      "old_url": "en/user_guide/performance.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/performance.rst",
+      "old_url": "zh_CN/user_guide/performance.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/platform_differences.rst",
+      "old_url": "user_guide/platform_differences.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/platform_differences.rst",
+      "old_url": "en/user_guide/platform_differences.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/platform_differences.rst",
+      "old_url": "zh_CN/user_guide/platform_differences.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/porting.rst",
+      "old_url": "user_guide/porting.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/porting.rst",
+      "old_url": "en/user_guide/porting.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/porting.rst",
+      "old_url": "zh_CN/user_guide/porting.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/power_management.rst",
+      "old_url": "user_guide/power_management.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/power_management.rst",
+      "old_url": "en/user_guide/power_management.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/power_management.rst",
+      "old_url": "zh_CN/user_guide/power_management.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/profiling.rst",
+      "old_url": "user_guide/profiling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/profiling.rst",
+      "old_url": "en/user_guide/profiling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/profiling.rst",
+      "old_url": "zh_CN/user_guide/profiling.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/shell.rst",
+      "old_url": "user_guide/shell.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/shell.rst",
+      "old_url": "en/user_guide/shell.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/shell.rst",
+      "old_url": "zh_CN/user_guide/shell.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/testing.rst",
+      "old_url": "user_guide/testing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/testing.rst",
+      "old_url": "en/user_guide/testing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/testing.rst",
+      "old_url": "zh_CN/user_guide/testing.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/vendor_integration.rst",
+      "old_url": "user_guide/vendor_integration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/vendor_integration.rst",
+      "old_url": "en/user_guide/vendor_integration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/history.html"
+    },
+    {
+      "old_source": "docs/archive/sphinx-before-next-generation/user_guide/vendor_integration.rst",
+      "old_url": "zh_CN/user_guide/vendor_integration.html",
+      "semantics": "historical_contract_version_boundary",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/history.html"
+    },
+    {
+      "old_source": "docs/sphinx/api.rst",
+      "old_url": "api.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/api/index.html"
+    },
+    {
+      "old_source": "docs/sphinx/api.rst",
+      "old_url": "en/api.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/api/index.html"
+    },
+    {
+      "old_source": "docs/sphinx/api.rst",
+      "old_url": "zh_CN/api.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/api/index.html"
+    },
+    {
+      "old_source": "docs/sphinx/architecture.rst",
+      "old_url": "architecture.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/explanation/platform-architecture.html"
+    },
+    {
+      "old_source": "docs/sphinx/architecture.rst",
+      "old_url": "en/architecture.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/explanation/platform-architecture.html"
+    },
+    {
+      "old_source": "docs/sphinx/architecture.rst",
+      "old_url": "zh_CN/architecture.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/explanation/platform-architecture.html"
+    },
+    {
+      "old_source": "docs/sphinx/configuration.rst",
+      "old_url": "configuration.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/configuration/index.html"
+    },
+    {
+      "old_source": "docs/sphinx/configuration.rst",
+      "old_url": "en/configuration.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/reference/configuration/index.html"
+    },
+    {
+      "old_source": "docs/sphinx/configuration.rst",
+      "old_url": "zh_CN/configuration.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/reference/configuration/index.html"
+    },
+    {
+      "old_source": "docs/sphinx/getting_started.rst",
+      "old_url": "getting_started.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/tutorials/source-sdk.html"
+    },
+    {
+      "old_source": "docs/sphinx/getting_started.rst",
+      "old_url": "en/getting_started.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/tutorials/source-sdk.html"
+    },
+    {
+      "old_source": "docs/sphinx/getting_started.rst",
+      "old_url": "zh_CN/getting_started.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/tutorials/source-sdk.html"
+    },
+    {
+      "old_source": "docs/sphinx/migration.rst",
+      "old_url": "migration.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/guides/migration.html"
+    },
+    {
+      "old_source": "docs/sphinx/migration.rst",
+      "old_url": "en/migration.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/guides/migration.html"
+    },
+    {
+      "old_source": "docs/sphinx/migration.rst",
+      "old_url": "zh_CN/migration.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/guides/migration.html"
+    },
+    {
+      "old_source": "docs/sphinx/os.rst",
+      "old_url": "os.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/guides/os-shutdown.html"
+    },
+    {
+      "old_source": "docs/sphinx/os.rst",
+      "old_url": "en/os.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/guides/os-shutdown.html"
+    },
+    {
+      "old_source": "docs/sphinx/os.rst",
+      "old_url": "zh_CN/os.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/guides/os-shutdown.html"
+    },
+    {
+      "old_source": "docs/sphinx/support.rst",
+      "old_url": "support.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/status/support.html"
+    },
+    {
+      "old_source": "docs/sphinx/support.rst",
+      "old_url": "en/support.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "en/status/support.html"
+    },
+    {
+      "old_source": "docs/sphinx/support.rst",
+      "old_url": "zh_CN/support.html",
+      "semantics": "current_contract_reorganized",
+      "source_revision": "0111c8d3b9c7b37d258b9c401070305b13b6f3a1",
+      "target_url": "zh_CN/status/support.html"
+    }
+  ],
+  "canonical_collisions": [
+    {
+      "html_sha256": "cb64934be32e2c4335460dbd96b37cdc04dd518c11cbf2e79e30bee03e514b23",
+      "source_path": "docs/development/index.md",
+      "source_sha256": "2e19c41000ce21f90ebe8985382b0aaa0aac62dcd3725c4e25e5d5c7a6ba87d9",
+      "url": "en/development/index.html"
+    },
+    {
+      "html_sha256": "2f22e41213ff65267b56b3cb23d4f35aa852e9a0a22ab70e072c11f9c3d2e300",
+      "source_path": "docs/development/index.md",
+      "source_sha256": "2e19c41000ce21f90ebe8985382b0aaa0aac62dcd3725c4e25e5d5c7a6ba87d9",
+      "url": "zh_CN/development/index.html"
+    },
+    {
+      "html_sha256": "f622f2a39a91b86ac3f66c260858f3fc577eb7f8fe07fda7d37066a138b4fb83",
+      "source_path": "docs/tutorials/index.md",
+      "source_sha256": "041c6d7fc9d602ec69588fc14d9ef2f96722ac163ef1d3f69802f42251422e34",
+      "url": "en/tutorials/index.html"
+    },
+    {
+      "html_sha256": "06390cff9c72d8b0fcbacd0510a08afdf062a75e9fc936b170b7809d2e9c2ddf",
+      "source_path": "docs/tutorials/index.md",
+      "source_sha256": "041c6d7fc9d602ec69588fc14d9ef2f96722ac163ef1d3f69802f42251422e34",
+      "url": "zh_CN/tutorials/index.html"
+    }
+  ],
+  "kind": "nexus_documentation_aliases",
+  "schema_version": 1,
+  "source": {
+    "path": "docs/reference/redirects.csv",
+    "sha256": "ceeb3e72f7c867c1b6f5874164794cc576f0274e9ad06876f62c00b651829733"
+  }
+}

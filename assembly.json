@@ -1,7 +1,7 @@
 {
   "kind": "nexus_documentation_deployment_assembly",
   "schema_version": 1,
-  "publication_sha256": "cad6798855d855d092e348636b5eeaa1677a8cbf1d0d1d1a27c159a1ecafb945",
+  "publication_sha256": "68f3f4dd05f9786d68bc83bf1c30109dff302141613989bd7be69af54751ca06",
   "trusted_source_files": {
     "tools/documentation/delivery.py": "3602c777556a774ca7271e3bc2492c8e48472a122fa5e42f0724036a2a29cccd",
     "tools/evidence/identity.py": "87392736b01456a9dc7875994532147507bd623d21aa18a94eff977371eb4ace",
@@ -13,12 +13,12 @@
   },
   "verified_publication": {
     "status": "verified",
-    "release_id": "docs-20261014-5a7a75c321ea",
-    "documentation_commit": "5a7a75c321ea173df8692714f95a8df13715293d",
-    "manifest_sha256": "37db6ca0218ce0f70def6baf33c3c23a370503ef61ee58073c8f3a84516adf34",
-    "archive_sha256": "79740121a640fa8e829f8110fb3e0fc5900474e7daa6067b5faf7a99f05ae6e6",
-    "public_files": 3501,
-    "offline_links": 226312,
+    "release_id": "docs-20261014-51e93508f22f",
+    "documentation_commit": "51e93508f22fc1eb540c4ce4dd8713a91cc429f6",
+    "manifest_sha256": "38979748d90b08861eba98f4577192768edf64eebee150f21e133848da38b990",
+    "archive_sha256": "928a1d3f78a2568f955f764b3fa1d1b3ee7e861c7985ea1a31985d0c72da8727",
+    "public_files": 5179,
+    "offline_links": 368119,
     "physical_status": "not_executed"
   },
   "not_performed": [

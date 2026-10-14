@@ -1,0 +1,38 @@
+// FIG-01 current: runtime access, not the complete CMake dependency graph.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Factory lookup and ordinary I/O are separate paths.
+digraph platformRuntime {
+    graph [label="FIG-01 supplement: current runtime access", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.55];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    subgraph clusterProduct {
+        label="External product project"; color="#64748b"; fontname="Noto Sans CJK SC";
+        app [label="Application: resources, scheduling, execution progress", fillcolor="#f8fafc"];
+    }
+    subgraph clusterPlatform {
+        label="Nexus reusable platform"; color="#64748b"; fontname="Noto Sans CJK SC";
+        factory [label="Typed factory: lookup of existing instances"];
+        face [label="Public face: readonly ops + context"];
+        owner [label="Optional owner / execution adapter", style="rounded,dashed,filled"];
+        waitPort [label="Optional OS / wait-wake", style="rounded,dashed,filled"];
+        provider [label="SoC provider: private instance state"];
+        core [label="Core: request, deadline, epoch"];
+        arch [label="Arch: compile-time CPU primitives"];
+    }
+    hardware [label="Selected controller / IRQ / DMA", fillcolor="#f8fafc"];
+    app -> factory [label="Obtain interface"];
+    factory -> face [label="Return existing reference"];
+    app -> face [label="Direct I/O after successful start"];
+    app -> owner [label="Optional shared path", style=dashed];
+    owner -> face [label="Executor port uses interface", style=dashed];
+    app -> waitPort [label="Explicit task and wait selection", style=dashed];
+    owner -> waitPort [label="Selected wait / wake adaptation", style=dashed];
+    owner -> core [label="Lifecycle and stable slots"];
+    provider -> core [label="Request and time contracts"];
+    provider -> arch [label="Direct CPU primitive call"];
+    face -> provider [label="ops(context, ...)"];
+    provider -> hardware [label="Drive selected hardware mode"];
+}

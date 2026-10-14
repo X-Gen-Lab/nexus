@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>显式 I2C 总线恢复 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="接入、资源装配与源码 SDK 合同" href="integration-contracts.html" />
+    <link rel="prev" title="故障观测与保留责任" href="fault-observation.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="zh_CN" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="original"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/design/i2c-bus-clear.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/design/i2c-bus-clear.html" lang="en">English</a>. 源语言: zh_CN; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>原文</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="i2c">
+<h1>显式 I2C 总线恢复<a class="headerlink" href="#i2c" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">nx_i2c_bus_clear_t</span></code> 是调用方持有的可选 GPIO 恢复机制。它不扫描设备，不重放
+失败的 transaction，也不自动替换 SoC 的 <code class="docutils literal notranslate"><span class="pre">nx_i2c_port_recover</span></code>。既有 controller
+恢复与本机制分开：前者证明控制器停止并回收硬件引用；后者需要板卡明确授权，
+才允许切换双引脚并驱动实际电气总线。</p>
+<p>公共接口在 <code class="docutils literal notranslate"><span class="pre">io/include/nexus/io/i2c_bus_clear.h</span></code>，算法在
+<code class="docutils literal notranslate"><span class="pre">io/src/i2c_bus_clear.c</span></code>。生产代码仍为 C11，没有 heap、默认 worker、动态注册表
+或隐藏 OS 锁。调用方保存 session、只读 ops 表、adapter context 和 clock，按
+单 executor 合同调用；这些对象必须活到租约成功归还。</p>
+<section id="id1">
+<h2>板级授权与资源交接<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>调用方显式提供 <code class="docutils literal notranslate"><span class="pre">acquire/drive/sample/wait_until/release</span></code> 五个方法和
+<code class="docutils literal notranslate"><span class="pre">nx_clock_t</span></code>。<code class="docutils literal notranslate"><span class="pre">acquire</span></code> 的成功合同包括：controller 已停用，DMA 与 IRQ 发布者
+已排空，其他总线 master 与引脚用户静止，SCL/SDA 独占，双引脚已安全释放并
+采用开漏模式。失败不能留下引用、租约或未报告硬件效果。</p>
+<p><code class="docutils literal notranslate"><span class="pre">drive(scl_low,</span> <span class="pre">sda_low)</span></code> 中 <code class="docutils literal notranslate"><span class="pre">true</span></code> 只允许拉低，<code class="docutils literal notranslate"><span class="pre">false</span></code> 只允许释放为高阻。
+公共 <code class="docutils literal notranslate"><span class="pre">nx_gpio_port_write</span></code> 不能证明开漏、电压、上拉或引脚复用，因此不能直接
+替代这个授权合同。<code class="docutils literal notranslate"><span class="pre">sample</span></code> 必须读取实际输入电平。adapter 必须先核对 PCB
+修订、两引脚权限、上拉、电压与所有权交接，不能从芯片 capability 猜测接线。
+这批交付没有自动接入 F407/F470 物理引脚，也没有对未审板卡进行操作。</p>
+<p>当 <code class="docutils literal notranslate"><span class="pre">scl_low=true</span></code>，adapter 必须先建立 SCL LOW，再修改 SDA。两引脚可能在
+不同 GPIO port，不能假设双引脚寄存器写原子；尤其从失败保留状态重试 STOP
+时，SDA 的先前输出状态可能未知。</p>
+<p><code class="docutils literal notranslate"><span class="pre">release</span></code> 恢复已保存的 peripheral/pin 所有权。返回失败必须保留租约与保存的
+状态；调用方不能把 controller 再次启用或复用 context。所有方法都是有界的，
+<code class="docutils literal notranslate"><span class="pre">acquire/release/drive/sample</span></code> 不等待其他 owner；只有显式 <code class="docutils literal notranslate"><span class="pre">wait_until</span></code> 按绝对
+时间等待。wait adapter 必须证明有限返回界，即使 clock 停止也必须能报错并
+返回，不能在 callback 内无限等待冻结的 timer；helper 不能抢占或修复一个
+违反这个合同的 callback。helper 返回后重读 clock，晚到则报 deadline 失败。
+调用方不能在 callback 内递归调用本 session。</p>
+</section>
+<section id="id2">
+<h2>执行与停止<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>调用方显式选择非零 <code class="docutils literal notranslate"><span class="pre">low_us/high_us/stop_setup_us/stretch_poll_us</span></code>，依据实际
+器件和电气模式给出时间。没有默认“安全”数值。<code class="docutils literal notranslate"><span class="pre">run</span></code> 接收同一 monotonic
+clock 域的有限 primary deadline 和独立 cleanup deadline，后者不早于前者。
+<code class="docutils literal notranslate"><span class="pre">NX_DEADLINE_NEVER</span></code>、无效 timing 与缺失方法均在硬件访问前拒绝。</p>
+<p>取得租约后，机制先观察实际 SCL/SDA。SCL 被拉低时，以有界 poll interval 等待
+clock stretching；每次 <code class="docutils literal notranslate"><span class="pre">wait_until</span></code> 返回成功后重读 clock，证明它已推进至
+target。冻结、倒退或耗尽的 clock 报 IO 并退出。释放 SCL 后，只有观察到实际
+HIGH 才开始计算高电平保持时间。SDA 已释放时不生成恢复脉冲；否则最多九个
+完整低/高周期，SDA 释放后立即结束，不再继续脉冲。</p>
+<p>拉低阶段结束后还会 sample 确认实际 SCL LOW；释放后的高周期结束也确认 SCL
+仍 HIGH。STOP 先验证双线 LOW，并在 setup 结束后再次确认 SCL HIGH、SDA LOW，
+才释放 SDA。间隔中未经采集的瞬态无法用主机模型证明，仍需真实波形验收。</p>
+<p>任何取得租约的执行都在 cleanup budget 内尝试 STOP：先拉低 SCL，再在 SCL
+低时拉低 SDA；保持 low，释放 SCL，等到实际 HIGH；保持 STOP setup 时间，
+释放 SDA，再保持 high 并观察双线 HIGH。STOP 准备边沿不计入最多九个恢复
+脉冲，未完成的高周期也不计为已完成。STOP 失败不会被误报为 bus free。</p>
+<p>STOP 与恢复状态不是 transaction 完成状态。即使总线恢复成功，原失败数据
+操作仍失败，是否发起新 transaction 是外部产品策略。</p>
+</section>
+<section id="id3">
+<h2>独立错误与保留状态<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>输出包含 <code class="docutils literal notranslate"><span class="pre">primary/cleanup/pulses/stop_observed/lease_held</span></code>。<code class="docutils literal notranslate"><span class="pre">run</span></code> 返回 primary
+失败，否则返回 cleanup；cleanup 永远不覆盖主错误。未取得租约时不会调用
+release。取得租约后 STOP 失败或 release 方法失败，均保留 session 和完整
+租约，停止新 transaction 与 recovery pulse。</p>
+<p><code class="docutils literal notranslate"><span class="pre">finish</span></code> 仅重试未证明的 STOP 或所有权归还，不重新 acquire、不生成恢复
+脉冲。如果 STOP 已证明而 release 失败，下一次只重试 release；已成功步骤
+不重复。<code class="docutils literal notranslate"><span class="pre">finish</span></code> 返回最新 cleanup，输出中的原 primary 与 pulse count 不变。
+新的 <code class="docutils literal notranslate"><span class="pre">run</span></code> 和重新 init 在仍有租约时拒绝，不用“重初始化”掩盖残余状态。</p>
+<p>如果 release 方法实际成功，但返还时间已经超出 deadline，cleanup 报 TIMEOUT，
+同时 <code class="docutils literal notranslate"><span class="pre">lease_held=false</span></code> 如实报告已归还的资源。deadline 错误不能虚造租约。
+其他保留的失败不能释放、丢弃或移走 session/context；产品必须隔离故障设备，
+由明确 recovery/reset 策略处理。机制不自动复位或自称安全输出。</p>
+</section>
+<section id="id4">
+<h2>验证边界<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>GoogleTest/GoogleMock 用真实生产算法及外部引脚/clock/lease mock 验证九周期
+上限、SCL stretching、冻结 clock、primary/cleanup、STOP 失败保留、仅清理
+重试与实例独立性。这证明软件合同，不证明实际开漏或波形。</p>
+<p>物理资格要求实际 station 绑定与原始电平采集，测量 SCL 的 low/high、SDA 的
+STOP setup、stretching 与失败后的引脚/外设所有权。上拉、rise time、多 master
+排他、设备 stuck-low 与 SDA 释放时机必须用实际装备执行；数值预算由板卡和
+器件确定。当前所有相关 physical status 保持 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 首批纵切片</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 同步双域参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

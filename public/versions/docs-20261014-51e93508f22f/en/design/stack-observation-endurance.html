@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Stack observations and owner lifecycle endurance &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=3a7bed40"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="STM32G474RET6 / MB1367 initial vertical slice" href="stm32g474.html" />
+    <link rel="prev" title="Source versions, factory generations and dependency maintenance" href="source-compatibility.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/design/stack-observation-endurance.md">51e93508f22f</a>; code reference: 51e93508f22f. <a href="../../zh_CN/design/stack-observation-endurance.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="stack-observations-and-owner-lifecycle-endurance">
+<h1>Stack observations and owner lifecycle endurance<a class="headerlink" href="#stack-observations-and-owner-lifecycle-endurance" title="Link to this heading">¶</a></h1>
+<p>Nexus supplies bounded, read-only paint observations. It does not paint a live
+stack, create a sampling worker, suspend a task or claim that paint detects every
+reserved stack byte. Product stack sizing and physical station sampling remain
+external responsibilities.</p>
+<section id="core-and-msp-provenance">
+<h2>Core and MSP provenance<a class="headerlink" href="#core-and-msp-provenance" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nx_stack_observe</span></code> accepts the original positive byte capacity of a
+caller-provenance painted region. It reads at most that capacity, returns the
+low-address untouched prefix and the remaining touched bytes, and retains no
+pointer. Invalid, wrapped or output-overlapping spans preserve the output.
+The original request, stream, owner and task structures gain no fields.</p>
+<p>The region must have been painted while it had no live frames. Sampling needs a
+quiescent region and excludes the current SP, all live frames and exception
+reservation. An MSP observation therefore requires boot paint provenance and a
+reviewed quiescent sampling point. This API does not access the MSP register or
+repair missing provenance. An all-painted region terminates at its supplied
+capacity rather than reading beyond the region.</p>
+<p>A touched-pattern observation is not a peak measurement: an unwritten frame
+reservation or a write equal to the paint can remain invisible. It is not stack
+canary validation or overflow detection. Physical task/MSP sizing still requires
+workload, nested exception and station evidence.</p>
+</section>
+<section id="optional-freertos-static-task-binding">
+<h2>Optional FreeRTOS static-task binding<a class="headerlink" href="#optional-freertos-static-task-binding" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nx_freertos_stack_observe</span></code> is compiled only when <code class="docutils literal notranslate"><span class="pre">[os].trace</span> <span class="pre">=</span> <span class="pre">true</span></code>, including
+the maintained diagnostic profile. The standard/minimal/lowpower selections do
+not compile its translation unit. The caller supplies the original static task
+handle, TCB, stack and word capacity. <code class="docutils literal notranslate"><span class="pre">xTaskGetStaticBuffers</span></code> confirms the exact
+live TCB/stack identity; it cannot confirm capacity, so capacity remains the
+original-creation contract.</p>
+<p>Calls require privileged, unmasked running Thread mode. The caller excludes
+join, deletion, prestart discard, rebinding, reinitialization and writes to the
+sampled stack through the scan. A returned-and-suspended joinable task can be
+sampled before its external join; the binding must stop being used before join
+reclaims the task. No stale handle is queried after deletion.</p>
+<p>The locked FreeRTOS <code class="docutils literal notranslate"><span class="pre">tasks.c</span></code> fills new static task stacks with <code class="docutils literal notranslate"><span class="pre">0xA5</span></code> under the
+maintained paint-enabling configuration. The adapter uses that exact paint and
+performs a capacity-bounded Core scan. It deliberately does not call the kernel’s
+unbounded free-space helper. No extra task/TCB state, masks, queues or runtime
+registry are introduced.</p>
+<p>The POSIX FreeRTOS port stores startup bookkeeping in the supplied static array
+and creates a separate pthread execution stack. Its successful static-buffer
+query proves API identity and bounded inspection, not an MCU or Linux execution
+stack peak.</p>
+</section>
+<section id="measured-software-cost">
+<h2>Measured software cost<a class="headerlink" href="#measured-software-cost" title="Link to this heading">¶</a></h2>
+<p>Development evidence uses the existing production Runtime CMake graph with
+Cortex-M4F hard-float, GNU Arm 14.3, <code class="docutils literal notranslate"><span class="pre">-Os</span></code>, <code class="docutils literal notranslate"><span class="pre">-fshort-enums</span></code> and section GC. The
+standard graph compiles no stack snapshot TU; the diagnostic graph compiles one.
+A probe compiled with that exact adapter command’s ABI measured a 16-byte
+caller binding and a 12-byte output. Each is caller-owned and optional.</p>
+<p>Owned object sections measured 242 bytes of adapter <code class="docutils literal notranslate"><span class="pre">.text</span></code> and 64 bytes of Core
+scan <code class="docutils literal notranslate"><span class="pre">.text</span></code>, with zero <code class="docutils literal notranslate"><span class="pre">.data</span></code>/<code class="docutils literal notranslate"><span class="pre">.bss</span></code> in both objects. These are object-code
+figures before final link alignment and any newly retained kernel identity query;
+they are not a whole-image Flash delta. Unreferenced sections can be discarded.
+The snapshot costs at most <code class="docutils literal notranslate"><span class="pre">words</span> <span class="pre">*</span> <span class="pre">sizeof(StackType_t)</span></code> byte comparisons and
+copies a fixed-size output. No cycles or interrupt latency are inferred.</p>
+</section>
+<section id="real-kernel-lifecycle-endurance">
+<h2>Real kernel lifecycle endurance<a class="headerlink" href="#real-kernel-lifecycle-endurance" title="Link to this heading">¶</a></h2>
+<p>Two unfiltered cases run 32 and 256 rounds through the actual pinned FreeRTOS
+POSIX kernel, two real producer tasks, one real owner task, the UART owner and
+the Native UART provider. Rounds rotate normal completion, cancellation and a
+failed-drain quarantine followed by explicit successful drain.</p>
+<p>Each round verifies that quarantined requests cannot be prepared/reclaimed,
+producer tasks and owner task are joined, the executor/provider have no retained
+request/data pointer, the IRQ hint is detached before its sink is destroyed,
+provider stop completes, notifications are destroyed and the kernel task count
+returns to the pre-round baseline. Fatal cleanup failure aborts the fixture
+instead of releasing storage while tasks still borrow it.</p>
+<p>The large hosted fixture is explicitly test-owned outside the coordinator’s
+pthread stack. A bounded scheduler-suspend guard around Native hardware model
+steps prevents the signal-driven POSIX scheduler from parking a pthread mutex
+holder and running another model user. It is fixture composition and does not
+change a production provider or MCU scheduling rule.</p>
+<p>The resulting 288 rounds establish this software lifecycle on Linux. Native IRQ
+hints and modeled TC/drain are not physical interrupts or wire evidence. Physical
+soak, real UART/DMA wake latency and board current measurements remain not
+executed until the three-board station is connected.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

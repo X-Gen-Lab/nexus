@@ -1,0 +1,44 @@
+// FIG-15 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph ContinuousStream {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-15 STM32F407 USART1 continuous RX: caller-owned block loans\nDMA2 stream2 channel4; two targets + at least one replacement block"];
+    subgraph clusterSlots {
+        label="Block states and token (slot + monotonic epoch)"; color="#64748b";
+        free [label="FREE: available for the next producer target"];
+        filling [label="FILLING: two hardware targets + pending replacement loan\nHardware may still write; do not lend to consumers"];
+        ready [label="READY: old address detached from every hardware target\nImmutable payload with boundary / loss flags"];
+        borrowed [label="BORROWED: consumer acquire\nRelease the matching token after final use"];
+        free -> filling [label="Preposted reserve / explicit DMA-domain validation"];
+        filling -> ready [label="FIFO publish: old block proven detached"];
+        ready -> borrowed [label="Consumer acquire"];
+        borrowed -> free [label="Matching release; stale/double release cannot alter the loan", constraint=false];
+    }
+    irq [label="DMA TC IRQ: reserve a third FREE block\nReplace the completed inactive target"];
+    proof [label="Prove both target addresses / CT / EN\nNo new TC or error; old address fully removed"];
+    noSpare [label="No FREE block / abnormal CT / new error\nWithdraw RX source immediately; actually disable/drain", fillcolor="#fff7ed"];
+    retained [label="Disable not proven: retain all producer loans\nBounded task-service retries; do not reclaim consumer loans", fillcolor="#fff7ed"];
+    loss [label="After drain, publish a reliable positive-length prefix / LIFO-abort future loans\nRecord observable loss / stop gaps; do not guess lost bytes"];
+    budget [label="Budget: IRQ + target replacement < one block fill time\nConsumer frontier-release delay determines block count\nTC cannot recover arbitrarily coalesced wraps", fillcolor="#fefce8"];
+    stop [label="rx_stop closes admission; no rearm\nDrain source + engine, release consumer loans, outstanding=0\nObservers and callers must also exit before reuse"];
+    filling -> irq [label="TC is a boundary hint"];
+    irq -> proof [label="Replacement block exists"];
+    proof -> ready [label="Every proof holds"];
+    irq -> noSpare [label="Cannot replace"];
+    proof -> noSpare [label="Any proof fails"];
+    noSpare -> retained [label="Write source not drained"];
+    noSpare -> loss [label="Actual write source drained"];
+    loss -> ready [label="Reliable prefix and flags", constraint=false];
+    budget -> irq [label="Measure worst latency on hardware", style=dashed];
+    borrowed -> stop [label="Check success after loans return"];
+    loss -> stop [label="Explicit stop path"];
+}

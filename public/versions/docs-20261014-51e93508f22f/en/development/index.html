@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Maintaining Nexus &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=3a7bed40"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Develop with TDD and normal commit gates" href="workflow.html" />
+    <link rel="prev" title="Iteration directions and admission conditions" href="../status/roadmap.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/development/index.md">51e93508f22f</a>; code reference: 51e93508f22f. <a href="../../zh_CN/development/index.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="maintaining-nexus">
+<h1>Maintaining Nexus<a class="headerlink" href="#maintaining-nexus" title="Link to this heading">¶</a></h1>
+<p>Preserve current formatting and comment conventions. New behavior uses real RED–GREEN execution; documentation checks and firmware qualification have separate scopes.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Develop with TDD and normal commit gates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html#install-and-check-tools">Install and check tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html#execute-red-green-and-review">Execute RED, GREEN and review</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html#preserve-style-and-scope">Preserve style and scope</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Maintain clear and verifiable documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#write-around-a-reader-task">Write around a reader task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#review-diagrams-and-translations">Review diagrams and translations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#apply-the-correct-acceptance-boundary">Apply the correct acceptance boundary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementation-map.html">Find the implementation authority</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sphinx/development/coding_standards.html">Coding Standards</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html#c-standard">C Standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html#code-formatting">Code Formatting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html#naming-conventions">Naming Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html#ownership-and-evidence">Ownership and evidence</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Maintaining Nexus</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Develop with TDD and normal commit gates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">Maintain clear and verifiable documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation-map.html">Find the implementation authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html">Coding Standards</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>源码旁的权威合同 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="状态与证据" href="../status/index.html" />
+    <link rel="prev" title="借用、完成与观察者生命周期" href="ownership.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/explanation/source-map.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/explanation/source-map.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="source-adjacent-contracts">
+<h1>源码旁的权威合同<a class="headerlink" href="#source-adjacent-contracts" title="Link to this heading">¶</a></h1>
+<p>各层 README 与实现相邻，保持其权威合同身份。以下引用直接读取这些文件，不复制第二份合同。相对源码链接绑定到本站的源码 revision。</p>
+<section id="core">
+<h2>Core<a class="headerlink" href="#core" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="core-contracts">
+<h1>Core 合同<a class="headerlink" href="#core-contracts" title="Link to this heading">¶</a></h1>
+<p>C11 调用者拥有的请求准入、稳定控制身份、完成状态和绝对单调截止时间。不包含设备、OS 调度器、分配或全局登记表。公共接口位于 <code class="docutils literal notranslate"><span class="pre">include/nexus/core</span></code>。</p>
+<p>REJECTED 不保留任何引用。接受的请求链借用 request 和 buffer，直到调用者以 acquire 观察到 SETTLED。SETTLED 的发布是其对请求的最后一次访问。取消／超时绝不撤销借用；排空失败后仍保持 QUARANTINED 存储有效。生产者等待锁存状态，由唯一执行者推进操作。队列适配器拥有外层请求，并按需要使用显式内层提供者元数据。</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/contracts/core_contract_test.c</span></code> 实际验证发布、准入、回绕时间运算和终态不变量。主机结果不能证明 MCU 中断顺序或最坏执行时间。</p>
+<section id="arch">
+<h2>Arch<a class="headerlink" href="#arch" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="cpu-local-primitives">
+<h1>CPU 本地原语<a class="headerlink" href="#cpu-local-primitives" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">Nexus::Arch</span></code> 暴露保存／恢复中断屏蔽、准确异常身份、当前特权级、顺序屏障及可选的已启用 DWT 周期快照。它不调用 I/O、OS 或厂商 SDK。一个编译期 Cortex-M 原语实现覆盖 M0/M0+/M3/M4/M7/M23/M33/M55/M85，包括 ARMv8.1-M Mainline 编译配置。STM32F407 与 GD32F470 维持首发平台范围；G474、H743、U575 提供<a class="reference internal" href="../delivery/support.html"><span class="std std-doc">支持矩阵</span></a>中的明确参考切片。CPU 支持不扩大这些 SoC 或 Board 切片。独立 CPU runtime 装配为全部九核选择 Core/Arch 及可选 OS 软件，不创建 SoC、Board、startup 或 factory。详见 <a class="reference internal" href="../design/arch-contracts.html"><span class="std std-doc">CPU 合同</span></a>和 <a class="reference internal" href="../delivery/cortex-m.html"><span class="std std-doc">runtime 装配示例</span></a>。</p>
+<p>必须在同一 CPU／线程上严格逆序保存／恢复 token。Cortex-M 保持进入时的 PRIMASK，并在相应寄存器存在时不覆盖 BASEPRI/FAULTMASK。只有特权 Task／可配置 IRQ 调用者可以修改屏蔽。NMI 与 HardFault 保持未屏蔽，且不得访问这些受保护元数据。元数据临界区必须短小：不得阻塞、分配、大量复制、调用内核或用户回调。已保存的 Arch token 不是内核临界区 token，也不是 SMP 锁。</p>
+<p>屏蔽／上下文查询允许阻塞 I/O 拒绝会阻碍其推进的上下文。只读屏蔽快照区分 PRIMASK、BASEPRI、FAULTMASK；它不是恢复 token，也不冻结中断或安全世界执行。Baseline M0/M0+/M23 查询绝不读取不存在的 BASEPRI/FAULTMASK。即使 CONTROL.nPRIV 描述的是被打断的非特权 Thread，Handler 模式仍为特权。异常号识别当前 CPU／安全状态，不授予内核 ISR API 调用权限，也不协调另一安全世界。DMB/DSB/ISB 具有不同顺序保证，不能证明外设或 DMA 静止。DWT 快照要求显式审查的 CPU 能力和特权访问；能力禁用时不产生 DWT 读取。快照不启用或复位计数器，也不是单调截止时间；回绕／频率限制见头文件。已审查能力是明确 CPU 事实，绝不能通过探测任意寄存器或启用可选单元来推断。</p>
+<p><code class="docutils literal notranslate"><span class="pre">sleep.h</span></code> 暴露两个显式浅睡眠操作。屏蔽模式的 <code class="docutils literal notranslate"><span class="pre">nx_arch_wait_for_interrupt()</span></code> 要求特权 Thread、PRIMASK=1、BASEPRI/FAULTMASK 清零且 SCR.SLEEPDEEP 清零。它执行 DSB/WFI/ISB，不改变屏蔽、时钟或 pending 中断。调用者负责最后就绪检查及已启用 IRQ 唤醒源；即使 PRIMASK 已置位，pending 的已启用 IRQ 仍可唤醒 WFI，并在调用者恢复保存的屏蔽后执行。<code class="docutils literal notranslate"><span class="pre">nx_arch_idle_if_unchanged()</span></code> 则要求进入时全部屏蔽清零，保存 PRIMASK，再以 acquire 语义重新检查对齐的已发布序列；仅仍与调用者快照匹配时睡眠。它恢复准确进入屏蔽；调用者重新检查权威谓词，并为有限截止时间供给 IRQ 定时器。这是单 CPU、单安全状态的发布域，排除 NMI/HardFault、DMA、SMP 和另一安全世界发布者。Native 返回不支持。编译器／模型证据不建立具体定时器、时钟连续性、物理功耗行为或唤醒延迟资格。</p>
+<p><code class="docutils literal notranslate"><span class="pre">cache.h</span></code> 分别暴露数据 clean、invalidate、组合维护及指令同步。每个范围必须独占完整、已审查的 32 字节行，位于 CPU 地址空间内，并在 CPU/DMA／安全用户之间保持静止。函数不扩展对齐范围、不启用缓存、不刷新无关脏行。<code class="docutils literal notranslate"><span class="pre">cache_control.h</span></code> 单独拥有 M7 冷态转换。调用者供给一个零初始化控制对象，屏蔽可配置中断，并排除 DMA 及全部其他内存使用者。可信复位或此前成功的自有 clean/disable 建立冷态；仅 CCR 位清零不能证明不存在外来脏行。Enable 拒绝已有启用缓存；disable 清理全部已审查数据 set/way，并在不会弄脏自身栈的叶函数中修改 CCR。部分变更失败后保留缓存／CSSELR 恢复责任。实际指令审计在 O0/Os/O2 验证地址、循环和屏障。其他 CPU 配置不受此冷控制 API 支持；其范围维护能力不暗示已审查的全局缓存转换。<code class="docutils literal notranslate"><span class="pre">mpu.h</span></code> 分开保留 v7 格式和 v8 base/limit/MAIR 编码器。单区域编程要求已屏蔽的特权 Thread 及关闭的 MPU；写入前检查实际 TYPE 边界与字段。CTRL 和进入时 RNR 保持不变。内存策略和后续 enable 属于调用者。可选 M0+ MPU 使用 CMSIS 确认的 v7 格式寄存器。</p>
+<p><code class="docutils literal notranslate"><span class="pre">security.h</span></code> 识别已审查镜像状态并编码显式 SAU 区域。只有带已审查 SAU 区域的 Secure 编译器／配置可以编程一个自有区域，且 SAU 必须关闭、特权 Thread 已设置 PRIMASK。API 不修改 SAU CTRL/ALLNS、其他区域、Secure 网关或另一安全世界别名。NonSecure 和单域镜像在不访问 SAU MMIO 的情况下返回不支持。IDAU、重叠规则、内存权限与网关策略位于这些机制之外。</p>
+<p><code class="docutils literal notranslate"><span class="pre">nonsecure.h</span></code> 使用真实 CMSE NonSecure 非特权读或读写检查，提供 Secure Thread 对完整范围的瞬时观察。若 IDAU 已建立属性，则不需要可编程 SAU。Native、单状态和 NonSecure 镜像不跨域，直接返回不支持。成功不表示 pin、复制、鉴权、排除 MMIO，或冻结映射、DMA 和总线防火墙策略。SoC 与网关所有者必须在访问内存或执行操作之前，分别建立这些条件。</p>
+<p><code class="docutils literal notranslate"><span class="pre">features.h</span></code> 报告不可变、已审查的 cache/MPU/DWT/security/SAU 能力，不报告启用状态或硬件资格。Native 暴露相同 API，但返回硬件不存在结果；纯编码器仍可使用。扩展 CPU 机制不提供 SoC startup、向量表、时钟树、内存／DMA 路由、Board 接线或 RTOS FPU/MVE 上下文端口。每个新平台必须独立供给并验证这些边界。发布及 RMW 原子操作在 <code class="docutils literal notranslate"><span class="pre">atomic.h</span></code> 中具有独立合同；CPU 特定回退绝不隐式链接 libatomic。对齐的 acquire/release 字加载和存储不屏蔽 IRQ。M0/M0+ RMW 使用有界、保存 PRIMASK 的互斥机制，并恢复进入屏蔽；全部并发使用者必须是本地特权 Thread／可配置 IRQ 调用者。NMI、HardFault、其他核、DMA 和另一安全世界位于互斥域之外。其他维护核使用编译器无锁 RMW；exclusive 重试不建立固定周期上限。发布前初始化字，并保持其生命周期直到每个读者／写者停止。</p>
+<p>Native 模拟递归互斥与 C11 屏障，不模拟真实 NVIC、DMA、物理时序或信号安全中断。Debug 与 Release 都会在非法恢复嵌套时中止。GoogleTest/GoogleMock 在九种 CPU 配置中，以窄寄存器／指令硬件边界编译真实 Cortex-M 算法；普通 ARM 路径内联该边界，绝不链接 mock。Native 测试执行真实递归互斥、严格 token 嵌套和上下文查询。缓存、MPU、安全模型只 mock 外部 CPU/MMIO 操作，运行生产 C 算法，包括在状态变更前拒绝。锁定 CMSIS 的 <code class="docutils literal notranslate"><span class="pre">core_cm0plus/7/23/33/55/85.h</span></code>、<code class="docutils literal notranslate"><span class="pre">mpu_armv7/8.h</span></code>、<code class="docutils literal notranslate"><span class="pre">cachel1_armv7.h</span></code> 建立维护范围内的寄存器布局。实际 IRQ 延迟、特权转换、DMA／缓存一致性与 CPU 时序需要 HIL。</p>
+<section id="typed-i-o">
+<h2>类型化 I/O<a class="headerlink" href="#typed-i-o" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="id1">
+<h1>类型化 I/O<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>GPIO、UART、SPI、I2C、Flash、watchdog、EXTI、PWM、ADC 提供 C11 接口。每个选定实例包含不可变接口面，持有两个指针：共享只读方法及私有提供者状态指针。生成接口面位于只读存储；状态及选定缓冲区是生成翻译单元中的私有静态对象。手工装配提供者使用显式构造所有者提供的存储。32 位目标的每个接口面占用八字节 Flash；可变状态和准确容量缓冲区单独计算。方法指针按提供者及模式共享，不在每个可变实例中重复。</p>
+<p>公共操作检查接口面并分派其准确 context。不同提供者方法表可以共存于同一镜像，不重新定义公共符号。缺失可选方法返回 <code class="docutils literal notranslate"><span class="pre">NX_ERROR_UNSUPPORTED</span></code>；非法接口面在访问提供者前拒绝。方法必须保持公共操作的执行、截止时间、缓冲区所有权和失败合同。提供者头文件、寄存器布局与 SDK 类型保持私有。</p>
+<p>生成的类型化 factory ID 选择实例，并区分 SPI/I2C 控制器及子端点。查找返回静态身份。Platform 启动、请求准入、service、恢复和停止均保持显式；查找不初始化硬件、不分配、不搜索名称、不加锁。提供者存储存在时接口面仍有效，因此停止要求调用者和 IRQ 静止，不能承诺指针已被撤销。</p>
+<p>Stream reserve、publish、acquire、release、abort、stop 访问的元数据数量固定，不随块数变化。Stop 检查 outstanding-block 计数；filling、ready、borrowed 块均保持计数，直到已证明 abort 或匹配 release。它不在中断屏蔽期间扫描块数组或撤销借用。存储重叠验证仍为冷装配操作，其工作量随块数增长。该复杂度合同不建立物理 IRQ 延迟或周期资格。</p>
+<p>默认路径不需要 OS 锁或隐藏任务。Request 与传输缓冲区由调用者拥有；生成提供者缓冲区归装配所有且单独存在。UART 分别跟踪物理 TC、已加载字节及请求释放；只有错误的 RX 事件绝不虚构数据。SPI 与 I2C 保持有界轮询合同，控制器恢复绝不重放失败事务。Flash 暴露物理几何；产品提供显式受限区域。</p>
+<p>Native 模型为每实例保留独立状态。其显式默认夹具用于聚焦测试；生成装配使用独立状态和缓冲区。Native 行为、生产寄存器故障模型及 ARM 链接夹具建立软件证据。Board 事实授权已审查物理路由；仅软件夹具不建立 PCB 连通性或物理时序。</p>
+<section id="os-adapters">
+<h2>OS 适配器<a class="headerlink" href="#os-adapters" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="optional-os-adapters">
+<h1>可选 OS 适配器<a class="headerlink" href="#optional-os-adapters" title="Link to this heading">¶</a></h1>
+<p>轻量 wait/wake 与每对象存储合同。裸机没有调度器；Native 使用 POSIX 线程；FreeRTOS 使用调用者选择的显式静态 TCB、栈及队列存储。不使用通用最大对象池、隐藏执行任务、默认定时器 daemon，也不让设备依赖 OS。</p>
+<p>通知是提示：arm 后重新检查权威请求谓词。内核 ISR 操作验证选定系统调用阈值。Native 任务返回后 pthread 结束；FreeRTOS 包装函数发布完成并挂起，等待外部删除；ThreadX 包装函数进入内核完成路径。唯一外部生命周期所有者必须成功 join，才能回收包装状态、TCB 或栈存储。只有完成提示不能证明内核引用已撤离。应用拥有调度器启动、执行任务、队列深度、公平性及停机推进。</p>
+<p>真实 FreeRTOS POSIX 调度器夹具验证主机任务／队列生命周期。默认特权 runtime 根据已验证 CPU 事实选入准确锁定内核源：M0/M0+ 使用 CM0；M3 及无 FP 的 M4 使用 CM3 整数上下文；有 FP 的 M4 使用 CM4F；有 FP 的 M7 使用 CM7/r0p1；CM23/33/55/85 则使用各自 NTZ 端口及独立汇编文件。纯整数 M7 使用已审查、构建派生的 CM3 端口，加入保持 PRIMASK 的勘误 837070 防护；锁定厂商文件保持不变。主机执行不建立 MCU 异常优先级、FP/MVE 上下文切换、栈高水位或时序资格。</p>
+<p>运行期 API 要求特权且未屏蔽的 Thread 模式。调度器启动前，锁定 Baseline 端口可能保留 PRIMASK=1，Mainline 端口保留准确 syscall BASEPRI；该阶段只允许所选端口的规范屏蔽状态。数值匹配不能证明所有者身份。故障屏蔽或其他屏蔽状态在对象变更前拒绝；只读调度器查询区分 bootstrap 与运行／挂起任务。Baseline IRQ 唤醒使用 PRIMASK 内核合同；Mainline IRQ 唤醒检查实现边界、优先级位宽及系统调用阈值。</p>
+<p>Armv8-M 支持显式 NTZ、Secure-only 及独立 Nonsecure 构建模式。选定 NTZ 内核不分配 Secure 任务上下文，也不暴露跨世界 Secure 函数调用。Secure startup 拥有 SAU/IDAU 与 Nonsecure 协处理器访问；Nonsecure 本地屏蔽不能防护 Secure 发布者。默认任务 API 保持特权；显式 MPU 配置提供独立静态受限任务生命周期和两个无指针用户 delay/tick SVC 服务。必须提供调用者自有受保护元数据及已审查用户链接区域；不暴露通用用户对象池或特权 I/O API。M0/M0+、M7 MPU 以及 MPU 与分裂安全状态组合均被拒绝。选择可选隔离配置前必须查看 OS 合同及当前矩阵。</p>
+<p>显式 split 模式选择真实 TrustZone 感知 Nonsecure 端口，及独立链接、带 <code class="docutils literal notranslate"><span class="pre">Nexus::SecureContext</span></code> 的 Secure 裸机 Runtime。两个镜像使用匹配 CPU/ABI 事实及真实 CMSE import/SG veneers。包括 Idle 在内的每个授权任务，都拥有调用者提供的 NS TCB／栈，以及由不可变可信映射选择的已准备 Secure 元数据／栈。不提供 Secure 堆或最大上下文池。NS 特权内核被信任；SAU/IDAU、startup、向量表、NSC 内存属性和中断路由仍由消费者／SoC 负责。集成前阅读 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/os/freertos/secure/README.md">Secure 配套合同</a>。双镜像链接与主机租约测试不建立物理属性、上下文保持、栈峰值或对抗恶意 NS 内核的隔离资格。</p>
+<p>第一次调度器启动要求冷态特权 Thread/MSP 且 FPCA 清零；应用不得在 bootstrap 前留下活动 FP 上下文。MPU 启动防护依据真实来源／异常帧消费受保护的一次性租约。v8-M 中，配置声明的 <code class="docutils literal notranslate"><span class="pre">security</span> <span class="pre">=</span> <span class="pre">&quot;single&quot;</span></code> 表示 Arch 状态 0，而不是 Nonsecure。它使用传统 FD/F9 端口返回元组，不具备 CMSE 权限；显式 Secure 使用相同元组，但具有独立 Secure 事实；显式 Nonsecure 使用 BC/B8。生成的 <code class="docutils literal notranslate"><span class="pre">NEXUS_CPU_SECURE_ONLY</span></code> 宏选择该端口编码，不向单世界镜像授予 Secure 访问权限。</p>
+<p>M55/M85 使用真实、感知 MVE 的异常／上下文端口。内核 <code class="docutils literal notranslate"><span class="pre">configENABLE_FPU</span></code> 开关为 FP 或 MVE 激活共享协处理器寄存器组及扩展／惰性异常帧；CPU 标量 FP 事实保持独立。纯整数 MVE 使用 <code class="docutils literal notranslate"><span class="pre">+nofp</span></code> 和 softfp 调用约定编译。共享上半寄存器由端口保存；完整下半寄存器与 VPR 保持依赖硬件扩展异常帧，仍属于物理上下文切换验收。此构建合同不建立该行为资格，也不保证跨世界载荷保持。</p>
+<p>主机夹具保持锁定内核与 POSIX 端口不变，并使用 <code class="docutils literal notranslate"><span class="pre">tests/contracts/os_freertos_runtime/posix_event.c</span></code> 作为自有事件支持。端口在发信号／join 之前取消条件变量等待中的 pthread；上游事件支持没有取消清理，可能使已退出线程的 mutex 保持锁定。自有等待在返回与取消时均解锁，避免重复任务 join 死锁。该主机修正不改变 MCU 后端，也不建立 MCU 调度器资格。</p>
+<section id="maintained-execution-contracts">
+<h2>维护范围内的执行合同<a class="headerlink" href="#maintained-execution-contracts" title="Link to this heading">¶</a></h2>
+<p>参见 <a class="reference internal" href="../design/os-contracts.html"><span class="std std-doc">OS 合同</span></a>、<a class="reference internal" href="../delivery/os.html"><span class="std std-doc">交付范围</span></a>及 <a class="reference download internal" download="" href="../_downloads/fccd25e37a1c1e4c2119798d61bf4981/os-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">OS01-OS55</span> <span class="pre">执行台账</span></code></a>。新内核准入遵守<a class="reference internal" href="../design/os-backend-integration.html"><span class="std std-doc">后端接入合同</span></a>及主动执行探针；探针通过不登记另一个已支持 RTOS。</p>
+<p>即使序列提示已合并，仍检查有限通知截止时间；持续无关唤醒不能延长等待。超时后公共谓词获得最后一次观察机会，因此观察到真实完成仍可返回成功。队列操作保持立即尝试语义，只在阻塞时消耗绝对预算。<code class="docutils literal notranslate"><span class="pre">NX_DEADLINE_NEVER</span></code> 使用真正无超时的主机等待。</p>
+<p>任务创建在修改内核之前验证选定端口的启动帧与对齐。启动最小栈和实测运行期栈预算保持区分。每个返回型任务由唯一外部生命周期所有者 join。不得在适配器背后取消或 detach Native 任务。永久任务及直接通知是显式可选路径，分别具有存储及接收者／索引合同。</p>
+<p>可关闭队列使用独立、调用者拥有的控制及每操作等待者存储；原始队列保留最小原生阻塞实现。停机必须关闭准入、保持 owner 推进、完成并排空并 join 生产者、join owner、使硬件 IRQ 发布者静止，最后才能销毁通知、队列与 guard 存储。外部 UART owner 示例展示该流程。</p>
+<p>可选 tickless 路径要求显式绑定定时器端口及连续时钟；未供给时正常 Tick 继续运行。诊断采用调用者确定容量的环与 weak 空操作接收端。跟踪、低功耗及任务隔离不表示物理资格。<code class="docutils literal notranslate"><span class="pre">tools/hil/os_acceptance.py</span></code> 只准备或验证保留的 OS 硬件记录，不操作设备；全部尚未执行的物理用例保持 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。</p>
+</section>
+<section id="components">
+<h2>组件<a class="headerlink" href="#components" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="optional-common-components">
+<h1>可选通用组件<a class="headerlink" href="#optional-common-components" title="Link to this heading">¶</a></h1>
+<p>显式 CMake 目标组合窄端口：有界 BusOwner、SPI/UART owner、BMP280 核心与 SPI 传输、实例级 Log、双 bank 最后提交标记 Storage、物理 Flash 区域及 Native 文件适配器、纯 Modbus RTU 解析。未被引用组件代码不进入固件镜像。</p>
+<p>Owner 具有唯一执行者、准确槽容量、稳定取消 epoch 及调用者拥有的操作。初始化在发布之前连接尚未使用的槽。准入在元数据临界区中移除一个空闲槽并追加一个 FIFO 条目；完成并排空／拒绝归还一个可复用槽。两者的工作量固定，不随容量变化。同一个槽链接服务于空闲链或 FIFO 链；每个 owner 仅有一个 free-head 索引，不增加逐槽存储。达到最后 epoch 的槽永久退役，不使用重复身份重新绑定。UART 显式内层提供者请求使 owner 仅在自身最后一次访问之后释放外层请求。设备及协议不选择 Board 引脚、产品寄存器、默认执行任务或全局查找。产品供给传输、授权、区域、任务策略及预算。</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/contracts</span></code> 中的有效回归覆盖并发生产者、延后取消／TC、失败隔离保留、持久化中断及协议畸形输入。持久主机文件不建立物理 Flash 断电资格。</p>
+<section id="exact-soc-implementations">
+<h2>准确 SoC 实现<a class="headerlink" href="#exact-soc-implementations" title="Link to this heading">¶</a></h2>
+<p>私有实现边界及参考配置分别维护在 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/soc/stm32f407/README.md">STM32F407</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/soc/gd32f470/README.md">GD32F470</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/soc/stm32g474/README.md">STM32G474</a>、<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/soc/stm32h743/README.md">STM32H743</a> 和 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/soc/stm32u575/README.md">STM32U575</a>。链接绑定本站 revision。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">架构解释</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html">平台如何装配与执行</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">类型化 factory、静态实例与多态接口面</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html">借用、完成与观察者生命周期</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">源码旁的权威合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#core-contracts">Core 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cpu-local-primitives">CPU 本地原语</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">类型化 I/O</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-os-adapters">可选 OS 适配器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-common-components">可选通用组件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

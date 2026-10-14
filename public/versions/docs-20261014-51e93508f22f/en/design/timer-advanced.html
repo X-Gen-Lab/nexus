@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Optional timer capture and complementary PWM &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=3a7bed40"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="U575 synchronous dual-world reference contract" href="u575-trustzone-contract.html" />
+    <link rel="prev" title="Reviewed shallow tickless timebase" href="timebase-lowpower.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/design/timer-advanced.md">51e93508f22f</a>; code reference: 51e93508f22f. <a href="../../zh_CN/design/timer-advanced.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="optional-timer-capture-and-complementary-pwm">
+<h1>Optional timer capture and complementary PWM<a class="headerlink" href="#optional-timer-capture-and-complementary-pwm" title="Link to this heading">¶</a></h1>
+<p>These modes are independent of the existing general-purpose <code class="docutils literal notranslate"><span class="pre">nx_pwm_port_t</span></code>.
+They keep the same immutable typed face and shared operations model. Selection
+owns static controller storage; no registry, pool, allocator, worker or OS lock
+is introduced. An unselected mode has no instance storage. Default-image removal
+is a separate whole-ELF assembly gate, not a conclusion from an object size.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Mode</p></th>
+<th class="head"><p>STM32F407 silicon route</p></th>
+<th class="head"><p>GD32F470 silicon route</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Input capture</p></td>
+<td><p>TIM4 CH1, PB6 AF2</p></td>
+<td><p>TIMER3 CH0, PB6 AF2</p></td>
+</tr>
+<tr class="row-odd"><td><p>Complementary PWM</p></td>
+<td><p>TIM1 CH1 PA8, CH1N PB13, BKIN PB12, AF1</p></td>
+<td><p>TIMER0 CH0 PA8, CH0_ON PB13, BRKIN PB12, AF1</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The reviewed STM32F407 and GD32F470 datasheets establish these alternate
+functions. They do not establish a connector, external load, safe electrical
+level or PCB revision. External Board facts must authorize the actual route.
+The main clock is the established fixed SoC profile; dynamic reclocking is
+unsupported. Constructors verify enabled clock gates, APB timer selection and
+actual AF fields. They do not measure crystal tolerance.</p>
+<p>Cold assembly owns the clock, pins and IRQ vector before construction and keeps
+them until stop and publisher quiescence. Its sole immutable configuration
+defines exact timer clock, integer prescaler, channel, filter or complementary
+output policy. <code class="docutils literal notranslate"><span class="pre">exclusive</span></code> is explicit authority over the whole timer, including
+clock-gated peer writers; a disabled register is not proof of absent ownership.
+The TIM1/TIMER0 break vectors are shared with TIM9/TIMER8. Assembly must reserve
+that shared resource or supply reviewed static dispatch; a provider never changes
+the NVIC vector on behalf of a peer. A cold configuration failure must be cleaned
+up by its acquisition owner before releasing leases or publishing a factory face.</p>
+<p>Capture uses four public controls: start, stop, read and state. Start borrows an
+exact caller-owned ring. An admitted IRQ reads one CCR value, which clears its
+input capture event flag in hardware, then observes overcapture status. Normal
+IRQ handling acknowledges only observed overcapture W0C facts; it preserves a
+new unread edge arriving after the data read. A draining IRQ may discard its
+observed event without publishing. It publishes at most one value. Consumer read
+copies one oldest event under a saved incoming interrupt mask. Queue operations
+use conditional cursor wrap and have no division, scanning or variable-length
+copy. An observable overcapture or full ring increments a saturating incident
+counter; old values are never overwritten. Incidents may coalesce edges, so they
+are not an exact count of physical loss.</p>
+<p>The raw capture value is a 16-bit modulo timer count. <code class="docutils literal notranslate"><span class="pre">tick_hz</span></code> describes its
+post-prescaler unit. <code class="docutils literal notranslate"><span class="pre">observed_at</span></code> comes from the common monotonic clock at IRQ
+publication; it is not the edge aperture or a reconstructed absolute hardware
+timestamp. Hardware filter codes specify the selected silicon sampling/filter
+policy, not a measured debounce interval. Stop first disables and reads back
+channel, counter and IRQ sources. Queued events require task drain; a refused
+detach keeps the ring borrowed and returns BUSY. Successful stop is the final
+ring access. Failed admission has no retained ring, while the execution owner
+still checks and cleans any refused hardware-control write before releasing
+the outer clock/pin/vector lease.</p>
+<p>Complementary PWM has five public controls: set duty, start, stop, state and
+clear fault. Period, clock, deadtime, polarity and idle levels are immutable cold
+facts. Duty stages CCR shadow against that fixed base. Zero and full-period duty
+remain explicit count boundaries; electrical behavior still requires the
+reviewed complementary output circuit and physical validation.</p>
+<p>Deadtime uses the actual timer tDTS with CKD zero, independently of PSC. Counts
+0–127 encode directly, 128–254 by multiples of two, 256–504 by multiples of
+eight and 512–1008 by multiples of sixteen. Unrepresentable counts reject;
+rounding would silently change a safety-relevant physical interval. Every
+hardware encoding is exercised by the production-register model. The repeated
+counter, slave clock/gate selection and alternate capture XOR input are cleared
+and read back during construction, rather than inherited from a prior owner.</p>
+<p>BKIN is enabled in hardware. Automatic output reenabling and irreversible LOCK
+are never selected. An active physical input or observed break latches software
+fault and disables master output. Start verifies the unchanged deadtime/clock
+and break configuration, rechecks pending break before enabling MOE and verifies
+actual MOE readback; it cannot clear a fault. These software observations do not
+prove behavior for a physical pulse wholly inside a read/write window. Pulse
+width, hardware reaction and any required external fault latch are Board/system
+qualification facts. Stop
+requires actual MOE, both channel sources, counter and break interrupt withdrawal.
+A refused write retains responsibility. Explicit clear fault requires disabled
+outputs, inactive actual BKIN and a successful pending-break acknowledgment.
+It does not start outputs. Products own power-stage recovery policy.</p>
+<p>The private cold release controls require successful source withdrawal, task
+event drain and an already-quiescent generated IRQ publisher. They clear only
+the ended static session under a saved mask. Pins, clocks and vector leases
+remain with assembly until it explicitly drives and reads back the Board’s
+declared inactive levels, then releases resources. Public stop makes a timer
+source-withdrawal promise; it does not certify an electrical safety state.</p>
+<p>The maintained GoogleTest/GoogleMock targets compile real production C against
+locked vendor register layouts. Models provide only MMIO/CPU/clock boundaries,
+including input capture read-clear, W0C, rejected stores and asynchronous edges
+and hardware break. Strict ARM
+compilation and type/object reports are separate evidence. Physical edge rate,
+ISR latency, noise/filter response, duty/deadtime tolerance, shared-vector load,
+break reaction time and power-stage safety remain <strong>not executed</strong> until a real
+station supplies measured results. Nexus makes no safety certification claim.</p>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SoC 执行预算 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="SoC 完善与物理验收" href="soc-refinement.html" />
+    <link rel="prev" title="选定提供者装配门禁" href="provider-assemblies.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/design/soc-execution-budgets.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/design/soc-execution-budgets.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="soc-execution-budgets">
+<h1>SoC 执行预算<a class="headerlink" href="#soc-execution-budgets" title="Link to this heading">¶</a></h1>
+<p>作者装配与不可变解析 IR 选择精确控制器模式、容量及 clock profile。本文件说明如何审查执行成本，不是另一能力 registry 或配置输入。<a class="reference internal" href="../delivery/capabilities.html"><span class="std std-doc">派生能力矩阵</span></a>持有维护中的选择投影。产品调度和过载策略留在外部。</p>
+<section id="work-time-and-completion">
+<h2>工作量、时间与完成<a class="headerlink" href="#work-time-and-completion" title="Link to this heading">¶</a></h2>
+<p>有限工作次数不是实测时间上限。启动 loop 使用显式 poll limit，因为单调时钟可能尚未存在。运行时绝对 deadline 属当前启动时钟域。IRQ 延迟、DMA 仲裁、总线 stall、通知延迟及 service 间隔须对精确固件／硬件负载测量。</p>
+<p>每种所选模式须说明最大 IRQ 工作、任务 service 工作、critical-section 范围、调用方存储及终止谓词。排空 deadline 限制进入隔离前时间，绝不授权释放借用内存。执行者必须继续 service/recovery，直到硬件、IRQ、队列及观察者真正撤销引用。</p>
+</section>
+<section id="current-mechanisms">
+<h2>当前机制<a class="headerlink" href="#current-mechanisms" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>模式族</p></th>
+<th class="head"><p>有界工作与进展</p></th>
+<th class="head"><p>最终所有权条件</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GPIO</p></td>
+<td><p>直接授权寄存器命令；toggle 需写入者串行</p></td>
+<td><p>引脚释放前 join 外部直接写入者</p></td>
+</tr>
+<tr class="row-odd"><td><p>UART IRQ 字节／事件</p></td>
+<td><p>每 IRQ 最多一个 TX／RX 硬件字节；read 每短 critical section 复制一个环元素</p></td>
+<td><p>真实 wire TC 或已审 reset abort、TX IRQ 撤销及已捕获 wake join</p></td>
+</tr>
+<tr class="row-even"><td><p>UART IRQ 数据块</p></td>
+<td><p>每 IRQ 一个硬件字节；block acquire/release 显式</p></td>
+<td><p>最终 prefix 发布、硬件源撤销且全部 consumer loan 归还</p></td>
+</tr>
+<tr class="row-odd"><td><p>UART 有限 TX DMA</p></td>
+<td><p>每 IRQ 处理一个选定 channel 的终止事实；任务 service 独立观察 DMA 与 UART</p></td>
+<td><p>DMA engine/source 关闭和真实 UART wire 完成后才 SETTLED</p></td>
+</tr>
+<tr class="row-even"><td><p>UART RX DMA 空闲／连续与双向</p></td>
+<td><p>选定 bank/IDLE/error 事实；调用方提供有限 buffer/block 和替换容量</p></td>
+<td><p>memory engine 停止、稳定 prefix/bank 已证明；保留 RX loan 和独立 TX drain</p></td>
+</tr>
+<tr class="row-odd"><td><p>SPI 短轮询</p></td>
+<td><p>每调用有限长度和绝对 deadline；无 IRQ 模式回退</p></td>
+<td><p>整个 CS 区间 controller 和 endpoint 均保留所有权</p></td>
+</tr>
+<tr class="row-even"><td><p>SPI 有限全双工 DMA</p></td>
+<td><p>两个所选 engine；任务 service 检查 memory 和 shifter 事实</p></td>
+<td><p>两个 DMA 源撤销、wire idle，之后才释放 CS 并 SETTLED</p></td>
+</tr>
+<tr class="row-odd"><td><p>I2C 轮询</p></td>
+<td><p>有限 message/byte 数；已审 ACK window 与有界 STOP 工作</p></td>
+<td><p>STOP/master/line 状态满足精确实现合同</p></td>
+</tr>
+<tr class="row-even"><td><p>I2C IRQ/DMA 消息</p></td>
+<td><p>共享 V1 IRQ 最多消费两个 DATA 字节；DMA 观察所选方向</p></td>
+<td><p>protocol STOP、wire/master 状态及 DMA/source 撤销全部成功</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADC 轮询／触发数据块</p></td>
+<td><p>每次任务侧 rearm 最多配置 scan；有限 block 容量</p></td>
+<td><p>trigger/conversion 停止、DMA 实际关闭，之后才发布／回收</p></td>
+</tr>
+<tr class="row-even"><td><p>ADC 连续触发数据块</p></td>
+<td><p>double-bank 终止事实和显式 replacement；不覆盖借出 block</p></td>
+<td><p>producer 与 DMA 源关闭；全部 outstanding block loan 归还</p></td>
+</tr>
+<tr class="row-odd"><td><p>EXTI</p></td>
+<td><p>只按生成确定次序访问所选 line；每 pending line 一个 queue 事实</p></td>
+<td><p>本 line mask/ack、活动 shared vector join、wake 撤销</p></td>
+</tr>
+<tr class="row-even"><td><p>PWM／高级 PWM</p></td>
+<td><p>固定授权 channel/period 操作和锁存 break</p></td>
+<td><p>timer 所有权释放前进入已审 inactive 输出</p></td>
+</tr>
+<tr class="row-odd"><td><p>定时器捕获</p></td>
+<td><p>有限所选 channel 与可见 capture/overflow 事实</p></td>
+<td><p>event 存储释放前 capture IRQ/source 撤销</p></td>
+</tr>
+<tr class="row-even"><td><p>经典 CAN</p></td>
+<td><p>三个 TX mailbox；两个 RX FIFO 各最多三帧初始队列</p></td>
+<td><p>各 mailbox abort/terminal 事实、INAK/RX drain 及 publisher join</p></td>
+</tr>
+<tr class="row-odd"><td><p>USB FS 设备 PIO</p></td>
+<td><p>每 IRQ 最多八个 RX header／128 payload word；进展扫描所选 endpoint 数</p></td>
+<td><p>endpoint 请求排空、FIFO/source 撤销、publisher join 和 clock release</p></td>
+</tr>
+<tr class="row-even"><td><p>原始 Ethernet／MDIO</p></td>
+<td><p>任务进展由所选 descriptor 数限定；MDIO 有绝对 deadline</p></td>
+<td><p>descriptor/DMA 所有权撤销、IRQ publisher join、全部 RX loan 归还</p></td>
+</tr>
+<tr class="row-odd"><td><p>内部 Flash</p></td>
+<td><p>有限已审物理操作与绝对 deadline；geometry 为芯片特定</p></td>
+<td><p>hardware busy 清除或明确保留恢复责任</p></td>
+</tr>
+<tr class="row-even"><td><p>看门狗</p></td>
+<td><p>有限 enable/feed 操作；使能不可逆</p></td>
+<td><p>stop 绝不虚构释放活动硬件 watchdog</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>精确实现与配置限值保持权威：</p>
+<ul class="simple">
+<li><p>UART：<code class="docutils literal notranslate"><span class="pre">soc/*/drivers/uart*.c</span></code>；G474 和 U575 使用 IRQ 字节。H743 RX 也使用 IRQ 字节；显式选定的有限 TX DMA 有独立内存／Cache 与排空合同。F407/G474/H743/U575 的线侧排空余量为 <code class="docutils literal notranslate"><span class="pre">20000000</span> <span class="pre">/</span> <span class="pre">baud</span> <span class="pre">+</span> <span class="pre">100</span></code> 微秒。GD IRQ 使用已审 reset-abort，不套用 ST 线侧排空公式。</p></li>
+<li><p>SPI：<code class="docutils literal notranslate"><span class="pre">soc/*/drivers/spi*.c</span></code>；有限 DMA drain 余量 200 微秒。</p></li>
+<li><p>I2C：<code class="docutils literal notranslate"><span class="pre">soc/common/i2c_v1_async.c</span></code> 与 SoC 包装；V1 async drain 余量 1,000 微秒，polling STOP 有独立有限工作。</p></li>
+<li><p>ADC/EXTI/timer：所选 SoC driver 和私有状态；scan、queue、channel 限值来自解析输入或显式调用方存储。</p></li>
+<li><p>CAN/USB/Ethernet：<code class="docutils literal notranslate"><span class="pre">io/src/can_controller.c</span></code>、<code class="docutils literal notranslate"><span class="pre">usb_device_controller.c</span></code>、<code class="docutils literal notranslate"><span class="pre">eth_mac.c</span></code>；poll/drain 限制和所选容量在冷态准入校验。IRQ 通知只是提示，绝不替代谓词。</p></li>
+</ul>
+</section>
+<section id="cost-review-and-evidence">
+<h2>成本审查与证据<a class="headerlink" href="#cost-review-and-evidence" title="Link to this heading">¶</a></h2>
+<p>将精确解析配置、编译器身份、flags、链接 ELF/map、资源预算及 retention 输出一同保留。比较等价 CPU/ABI、backend、clock、内存布局和容量。源码指令数、object 大小或不同容量镜像不能建立等价整镜像收益。分别报告 Flash、static RAM、reservation 和调用方存储。反汇编是真实工具输出，不是周期测量。</p>
+<p><code class="docutils literal notranslate"><span class="pre">tools/measurement/soc_costs.py</span></code> 观察实际链接函数与 ELF 资源成本，保留完整原始命令凭据及 input/tool hash。比较拒绝 routes、bindings、claims、backend、capacity profile 改变，避免把它们静默归为实现优化成本。Empty／selected、baremetal／FreeRTOS 维度是有用选择成本报告，但不是相同 profile 回归比较。<a class="reference internal" href="../delivery/soc-refinement-verification.html"><span class="std std-doc">SoC 执行记录</span></a>标明已完成观察的 source scope 与 pending 最终基线。</p>
+<p>中断／并发行为变更时，GoogleTest/GoogleMock 调用真实生产源码，只模型化外部 register/CPU port。记录实际 RED 后 GREEN，保留 admission、loss ordering、cancel、quarantine、wake 及 instance isolation 回归。ARM budget/retention 证明真实链接。软件检查不认证物理 IRQ latency 或 DMA throughput。</p>
+<p>没有所选 producer rate、storage、hardware 和 interference budget，就不声明最大 service interval 数值。外部产品须为该间隔及过载策略建立资格。错过 service deadline 不能撤销接受的 request 或 block loan。当前物理测量均未执行，直到真实工位记录。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 首批纵切片</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 同步双域参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

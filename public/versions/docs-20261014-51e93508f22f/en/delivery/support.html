@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Exact support scope &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=3a7bed40"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Current evidence and acceptance boundaries" href="verification.html" />
+    <link rel="prev" title="SoC refinement execution record" href="soc-refinement-verification.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/delivery/support.md">51e93508f22f</a>; code reference: 51e93508f22f. <a href="../../zh_CN/delivery/support.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="id1">
+<h1>Exact support scope<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>The <a class="reference internal" href="capabilities.html"><span class="std std-doc">derived capability matrix</span></a> automatically checks SoC/route modes, reference-Board bindings and production sources selected by the actual resolver/emitter. Narrative tables describe runtime contracts; derived tables describe exact identities and bounded source consistency. Neither inherits old-HEAD qualification nor replaces physical execution.</p>
+<section id="id2">
+<h2>Chips, Boards and systems<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Target</p></th>
+<th class="head"><p>Software implementation</p></th>
+<th class="head"><p>Unfinished physical facts</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407ZGT6 / Qiming Xinxin V3.1</p></td>
+<td><p>Cortex-M4F; 1 MiB Flash; main SRAM 128 KiB, CCM 64 KiB; declared clock/profile and reviewed routes</p></td>
+<td><p>Actual PCB revision, crystal, power, continuity, waveforms and loads</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32F407VET6 / Sky Star Youth Edition</p></td>
+<td><p>Cortex-M4F; 512 KiB Flash; main SRAM 128 KiB, CCM 64 KiB; independent Board resources</p></td>
+<td><p>Corresponding actual PCB/electrical/HIL acceptance</p></td>
+</tr>
+<tr class="row-even"><td><p>GD32F470ZGT6 / Liangshan Pi</p></td>
+<td><p>Cortex-M4F; 1 MiB Flash; main SRAM 192 KiB, ADDSRAM 256 KiB, TCM 64 KiB; declared 25 MHz input, 200 MHz profile; optional independent 48 MHz USB owner</p></td>
+<td><p>PCB/crystal/electrical facts unobserved; default linker uses main SRAM only; actual USB clock/PHY unmeasured</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32G474RET6 / MB1367 source-reference configuration</p></td>
+<td><p>Cortex-M4F; 512 KiB Flash; contiguous 128 KiB CPU SRAM alias; HSE24/170 MHz, independent TIM2; GPIOA PA5, LPUART1 PA2/PA3 IRQ bytes; PA0/PA1 selected-EXTI software fixture; generated factory and baremetal/FreeRTOS ELF</p></td>
+<td><p>Actual PCB/crystal/solder bridges/EXTI wiring unobserved; no DMA authorization; software reports separate from actual PCB/electrical acceptance</p></td>
+</tr>
+<tr class="row-even"><td><p>STM32H743ZIT6 / NUCLEO-H743ZI2 source-reference configuration</p></td>
+<td><p>Cortex-M7F; 2 MiB Flash; default AXI SRAM 512 KiB; pre-RAM LDO, fixed HSI32/HSI64 × Cache off/on, TIM2; PB0 GPIO, USART3 PD8/PD9 IRQ bytes or bounded TX DMA; baremetal/FreeRTOS static assembly</p></td>
+<td><p>PCB/power/silicon revision/solder bridges/Cache coherence unobserved; RX remains IRQ bytes; no RX DMA, alternate RAM placement or running-state handover; final software qualification recorded separately</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32U575ZIT6Q / NUCLEO-U575ZI-Q single-state reference configuration</p></td>
+<td><p>Cortex-M33F; 2 MiB Flash; default SRAM1 192 KiB; externally preconfirmed TZEN=0/SWAP_BANK=0; MSIS4 MHz, TIM2; PC7 GPIO, USART1 PA9/PA10 IRQ bytes; baremetal/FreeRTOS static assembly</p></td>
+<td><p>PCB/SMPS/silicon revision/option bytes unobserved; Cache disabled; this Platform exposes no DMA, split-domain factory or alternate RAM placement; final software qualification recorded separately</p></td>
+</tr>
+<tr class="row-even"><td><p>Independent STM32U575 TZEN=1 split-domain reference</p></td>
+<td><p>Externally preconfigured option bytes; two Runtime images, cold SAU/MPU/SRAM-attribution owner, actual CMSE SG; one unprivileged NonSecure Thread accesses restricted PC7 GPIO through synchronously copied messages</p></td>
+<td><p>No physical-isolation acceptance; no OS, generic split-domain factory, NS task identity, asynchronous borrow/cross-domain DMA or product-image authentication; does not change default TZEN=0 assembly above</p></td>
+</tr>
+<tr class="row-odd"><td><p>Native</p></td>
+<td><p>Linux/POSIX behavior model with actual threads/persistent-file fault models</p></td>
+<td><p>No MCU or electrical qualification</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Baremetal/pinned FreeRTOS are explicitly selected thin adapters. Startup establishes platform clocks/interfaces only, without schedulers, product tasks or workflows. FreeRTOS POSIX host execution verifies software lifecycle, not MCU IRQ ceilings, FPU context or physical stack high-water.</p>
+<p>H743 uses official Cortex-M7 startup/bounded LDO entry and forbids RAM writes before ACTVOSRDY, establishing selected clocks/Cache from trusted HSI64/Cache-off cold state. Disabled Cache bits do not prove foreign dirty data clean; trusted reset/prior successful owned clean-disable is required. Default U575 Platform uses official Cortex-M33 startup/TZEN=0 single-address state. Independent TZEN=1 has separate entry/security owner. Reading option registers after startup cannot legalize incompatible startup. Neither changes option bytes or automatically takes over bootloaders, DMA or existing clock/IRQ owners. Original CMSIS Device H7/U5 bytes/licenses/versions are source-locked. Entries: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/soc/stm32h743/README.md">H743</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/soc/stm32u575/README.md">U575</a>.</p>
+<p>ThreadX is an additional explicit backend pinned to official Eclipse ThreadX 6.5.2.202603. Configuration maintains Cortex-M4 GNU on three F407/F470 Boards and Native Linux GNU. Independent CPU runtime maintains M4 integer/M4F hard-softfp with BASEPRI/PRIMASK policies; other Cortex-M ThreadX ports reject. Production graphs, actual Linux task/queue/join and three-board ARM links are verified separately. Linux pthread stacks/internal host allocations are not MCU cost. ThreadX implements none of this project’s FreeRTOS MPU/split-security/tickless modes. See <a class="reference internal" href="../design/threadx.html"><span class="std std-doc">ThreadX</span></a>. Platform start enters no kernel; products enter explicitly. Running schedulers cannot lose clock/Tick through ordinary I/O shutdown.</p>
+<p>CPU software additionally supports M0/M0+/M3/M4/M7/M23/M33/M55/M85. One strict fact parser selects Core/Arch/atomics/baremetal-FreeRTOS runtime. M0/M0+ RMW uses bounded saved-PRIMASK. Optional cache/MPU/SAU execute real CPU algorithms; FPU/MVE/security choose exact kernel ports/ABI. CPU-only runtime generates no SoC/Board/factory. H743/U575 slices separately own assembly/acceptance. Compilation, register models and actual FP/MVE/cache/MPU/security-world acceptance are recorded separately. <code class="docutils literal notranslate"><span class="pre">cache.h</span></code> range maintenance and M7-only cold control are separate; CMSE permission observation alone provides no user-memory pin/copy/transport. Restricted-MPU-task/split Secure-NonSecure runtime have independent software implementations with separately verified narrow delay/tick SVC, Secure-context leases and caller static storage. Default remains privileged single-world; MPU+split rejects; no physical HIL added. See <a class="reference internal" href="cortex-m.html"><span class="std std-doc">Cortex-M</span></a> and <a class="reference internal" href="../design/arch-contracts.html"><span class="std std-doc">Arch contracts</span></a>.</p>
+</section>
+<section id="id3">
+<h2>Launch modes<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>The full peripheral table below describes F407/F470 launch implementations. G474 additionally maintains selected EXTI; H743 fixed Cache/bounded UART TX DMA; default U575 GPIO/IRQ UART with separately maintained synchronous split-domain GPIO. Chip names/generic interfaces imply no additional peripherals, DMA, ThreadX or low-power modes.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Interface</p></th>
+<th class="head"><p>Implemented modes and limits</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GPIO</p></td>
+<td><p>Authorized mask, atomic set/reset, snapshot read and single-writer toggle</p></td>
+</tr>
+<tr class="row-odd"><td><p>UART</p></td>
+<td><p>8N1 IRQ TX or bounded TX DMA; caller-owned requests, actual TC; IRQ RX blocks/IDLE, bounded/continuous RX DMA and duplex DMA; explicit RTS/CTS/external static RS485 adapter; STM minimum baud 1282, GD minimum 1526, maximum 1 Mbaud</p></td>
+</tr>
+<tr class="row-even"><td><p>SPI</p></td>
+<td><p>8-bit MSB-first; short polling ≤256 bytes/transaction; bounded DMA ≤65535 bytes; incrementing bidirectional spans or caller one-byte fixed dummy/discard; one wire-active operation, complete CS interval, separate CS endpoints</p></td>
+</tr>
+<tr class="row-odd"><td><p>I2C</p></td>
+<td><p>100 kHz; ≤8 messages, read/write 1–256 bytes each; polling/IRQ/DMA messages; 1/2/final-three-byte ACK, repeated START/NACK/arbitration/STOP; recovery checks BUSY/selected SCL-SDA levels; separate bounded GPIO bus-clear tool</p></td>
+</tr>
+<tr class="row-even"><td><p>Flash</p></td>
+<td><p>STM exact 16/64/128 KiB sectors and x32 program (4-byte alignment/length, declared 2.7–3.6 V); GD official independent 4 KiB page erase/halfword program; complete physical space with external restricted regions</p></td>
+</tr>
+<tr class="row-odd"><td><p>Watchdog</p></td>
+<td><p>Independent enable/feed/reset cause; irreversible enable, retained responsibility after late failure; GD IRC32K physical timeout bounds not guaranteed</p></td>
+</tr>
+<tr class="row-even"><td><p>EXTI</p></td>
+<td><p>Selected lines, shared vectors, caller-sized event queues, visible loss/coalescing; no debounce policy</p></td>
+</tr>
+<tr class="row-odd"><td><p>PWM</p></td>
+<td><p>Fixed timer/channel/base, CCR shadow, 0/100%, safe inactive; public stop permits restart, platform teardown releases owner</p></td>
+</tr>
+<tr class="row-even"><td><p>ADC</p></td>
+<td><p>Reviewed channels, single-shot/low-rate scan, bounded/continuous double-buffer timer-triggered DMA blocks; explicit sample time/reference; complete scans only; optional external sequences/software observation timestamps</p></td>
+</tr>
+<tr class="row-odd"><td><p>Classic CAN</p></td>
+<td><p>11/29-bit DATA/RTR, 0–8 bytes, three real mailboxes/shared filter domain, explicit abort/bus-off recovery; no CAN FD/automatic retransmission</p></td>
+</tr>
+<tr class="row-even"><td><p>USB FS device</p></td>
+<td><p>Internal-PHY PIO, EP0 control IN/OUT64, EP1–3 bulk8/16/32/64, packet loans, SETUP epochs, reset/stop drain, independent 48 MHz owner; no Host/HS/DMA/ISO/class stack</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>USB configuration/factory actually ARM-links on software-Board fixtures for both STM packages/GD470. Default reference Boards expose no automatic USB connector/VBUS electrical facts. <code class="docutils literal notranslate"><span class="pre">vbus_sensing=true</span></code> rejects absent reviewed electrical facts. PA11/PA12 AF10 silicon routes prove no actual jumpers/power/VBUS/ESD; CAN1/USART1-flow-control conflicts must reject. See <a class="reference internal" href="../design/usb-device.html"><span class="std std-doc">USB packet contract</span></a>.</p>
+<p>The following slices have independent production mechanisms/development evidence. Final configuration/SDK/full-image integration are accepted separately. One passed model cannot mean whole-platform/reference-PCB acceptance.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Optional mechanism</p></th>
+<th class="head"><p>Exact scope and current boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Raw Ethernet / MDIO / DP83848</p></td>
+<td><p>Native/ST/GD normal chained descriptors, RMII, 14–1514-byte untagged Ethernet II, caller-owned RX loans; ETH/MDIO faces share one MAC context; ST-ZG/GD-ZG software fixtures have factory/baremetal-FreeRTOS ELFs; no protocol stack/PTP/checksum offload/VLAN/jumbo</p></td>
+</tr>
+<tr class="row-odd"><td><p>Input capture</p></td>
+<td><p>STM TIM4 CH1 / GD TIMER3 CH0, PB6 AF2, 16-bit modulo counts, caller event rings; software observation time is not edge aperture; assembly integration separately accepted</p></td>
+</tr>
+<tr class="row-even"><td><p>Complementary PWM / break</p></td>
+<td><p>STM TIM1 / GD TIMER0, PA8/PB13/PB12 AF1; immutable exact deadtime/BKIN, no automatic restart; no power-stage safety qualification</p></td>
+</tr>
+<tr class="row-odd"><td><p>User I/O broker</p></td>
+<td><p>Privileged-kernel scalar GPIO read/set-reset with actual principal/pin/copy/unpin narrow ports; independent OS-free U575 synchronous CMSE gateway; no generic SVC/multitask-userspace transport/asynchronous user DMA</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Reference Boards declare no default Ethernet PHY/REFCLK/reset wiring. Qiming-ZG optional RMII provenance needs PG11/13/14, unauthorized on VE100. Sky Star/Liangshan Pi lack reviewed PHY routes. External projects own protocols/cables/PHY power-reset/product MAC/recovery. See <a class="reference internal" href="../design/ethernet.html"><span class="std std-doc">Ethernet</span></a>, <a class="reference internal" href="../design/timer-advanced.html"><span class="std std-doc">advanced timers</span></a>, <a class="reference internal" href="../design/user-io-broker.html"><span class="std std-doc">user I/O broker</span></a> and <a class="reference internal" href="../design/stm32g474.html"><span class="std std-doc">G474</span></a>.</p>
+<p>G474 maintains actual generated-factory host contracts, independent system/provider regressions and empty/GPIO-UART/selected-EXTI baremetal-FreeRTOS ARM fixtures. Gates check budgets/table retention/unselected-driver trimming/vector bytes. Reviewed Board documents/pinned official CMSIS prove no actual MCU/X3 crystal/VCP-LD2 bridges. <a class="reference internal" href="soc-refinement-verification.html"><span class="std std-doc">Initial SoC execution</span></a> retains historical code revision; <a class="reference internal" href="soc-extensions-verification.html"><span class="std std-doc">extensions</span></a> independently bind later source/evidence. Offline reproduction/candidate sealing have separate exits and inherit no old F407/F470 qualification.</p>
+<p>H743 bounded TX DMA maintains only USART3, DMA1 Stream0, DMAMUX1 channel0/request46 and AXI SRAM reachability. Cache on requires caller ownership of complete 32-byte lines and clean before DMA. Neither incomplete preparation nor drain releases borrows. Cache lifecycle is fixed at platform start/stop; all providers drain before timebase withdrawal/cache clean-disable. No RX DMA, other DMA engines, optional RAM layout or live scaling. Independent U575 split partitions/fixed principal/synchronous-borrow premises are in <a class="reference internal" href="../design/u575-trustzone-contract.html"><span class="std std-doc">TrustZone</span></a>.</p>
+<p>Ethernet fixtures retain exact TX/RX descriptors/RX buffers and admit only STM main SRAM128 KiB/GD main SRAM192 KiB. Development budget/retention on four ZG ARM graphs authorize no GD ADDSRAM/TCM, STM CCM, VE100 PG routes or product PHY. Independent cold review/clean-source SDK/physical qualification remain separate. Default references select no ETH/MDIO.</p>
+<p>Exact bounded-DMA launch routes follow; the resolver rejects other controller/channel combinations.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Mode</p></th>
+<th class="head"><p>STM32F407</p></th>
+<th class="head"><p>GD32F470</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>UART TX DMA</p></td>
+<td><p>USART1; DMA2 stream7 channel4</p></td>
+<td><p>USART0; DMA1 channel7 selector4</p></td>
+</tr>
+<tr class="row-odd"><td><p>UART RX DMA / duplex DMA</p></td>
+<td><p>USART1; RX DMA2 stream2 channel4; TX as above</p></td>
+<td><p>USART0; RX DMA1 channel2 selector4; TX as above</p></td>
+</tr>
+<tr class="row-even"><td><p>SPI full-duplex DMA</p></td>
+<td><p>SPI1; DMA2 RXstream0/TXstream3 channel3</p></td>
+<td><p>SPI4; DMA1 RXchannel3/TXchannel4 selector2</p></td>
+</tr>
+<tr class="row-odd"><td><p>I2C message DMA</p></td>
+<td><p>I2C1; DMA1 RXstream0/TXstream6 channel1</p></td>
+<td><p>I2C0; DMA0 RXchannel0/TXchannel6 selector1</p></td>
+</tr>
+<tr class="row-even"><td><p>ADC bounded/continuous trigger blocks</p></td>
+<td><p>ADC1; TIM3 TRGO; DMA2 stream4 channel0</p></td>
+<td><p>ADC0; TIMER2 TRGO; DMA1 channel0 selector0</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Reviewed software-Board configurations support STM32F407 I2C1/I2C2 and GD32F470 I2C0/I2C1 IRQ/DMA assembly/typed factories. Dual-controller fixtures have independent-instance isolation/real-SDK link evidence. Reference Boards expose declared bindings only; other silicon routes/actual wiring require separate review. See <a class="reference internal" href="../design/multiple-controllers.html"><span class="std std-doc">multicontroller ownership</span></a>.</p>
+<p>SPI DMA requires nonempty/nonoverlapping actual TX/RX spans; fixed-address directions access caller one-byte storage only. No scratch/implicit copy pool is allocated. Providers recheck actual memory domains/permissions; STM CCM/GD TCM cannot be DMA buffers. DMA TC is a memory fact; UART TC/SPI idle are line facts. Both drain proofs precede SETTLED. Cancellation/timeout/EN-disable refusal retain borrows in QUARANTINED.</p>
+<p>UART <code class="docutils literal notranslate"><span class="pre">irq-blocks</span></code> keeps independent IRQ RX. <code class="docutils literal notranslate"><span class="pre">rx-dma-idle</span></code> uses bounded DMA/IDLE, <code class="docutils literal notranslate"><span class="pre">rx-dma-continuous</span></code> hardware double buffers; explicit <code class="docutils literal notranslate"><span class="pre">dma-duplex</span></code>/<code class="docutils literal notranslate"><span class="pre">dma-duplex-continuous</span></code> also exist. Caller blocks remain immutable after consumer acquire until matching-epoch release. Continuous modes reserve two hardware targets/replacement blocks. Replacement-address readback, bank/new-error checks precede old-block publication. No replacement means stop, never overwrite consumer loans. RX-only uses a separate read-only table without TX-DMA methods or corresponding linked code; the shared receive-state layout still contains TX-DMA base fields, so zero cold-field overhead is not claimed. RTS/CTS does not replace capacity/drain. External RS485 supplies DE pin/polarity/setup-hold; actual UART TC precedes hold/DE withdrawal. See <a class="reference internal" href="../design/uart-dma-rs485.html"><span class="std std-doc">UART DMA/RS485</span></a>.</p>
+<p>ADC <code class="docutils literal notranslate"><span class="pre">trigger-dma</span></code> uses ordinary bounded DMA: stop trigger/conversion/memory writes per block before publishing complete blocks. Callers explicitly service stabilization/GD calibration before next trigger. No free loan means pause without overwriting/invented exact missed samples. Inter-block gaps are expected. <code class="docutils literal notranslate"><span class="pre">trigger-dma-continuous</span></code> explicitly selects hardware double buffers/preposted blocks, publishing after successful replacement; at least three caller slots are needed. Frequency must satisfy exact timer division/full scan time. GD continuous selects SDK sample-time codes; bounded mode retains 15-cycle samples. Optional timestamps are software publication observations, not sampling apertures. One latched TC/CT cannot count unobserved multiple rounds. Stop with outstanding loans returns BUSY.</p>
+<p>I2C IRQ/DMA share a V1 register algorithm checked against both SDK layouts/bits; MCU hot paths access registers directly. DMA TC is not wire completion. Final byte/BTF/STOP-MSL/DMA-EN/IRQ publishers drain before SETTLED. Separate bus-clear requires quiescent peripherals, exclusive open-drain GPIO and bounded waits; at most nine completed pulses. STOP/release failure retains leases for cleanup retries. No automatic pin switching occurs on unreviewed Boards. See <a class="reference internal" href="../design/i2c-bus-clear.html"><span class="std std-doc">I2C recovery</span></a>.</p>
+<p>These are <strong>SoC implementation capabilities</strong>. Default reference bindings, software-fixture routes and field measurements are independent. STM defaults declare no qualifiable SPI CS; resource matrices measure only empty/GPIO/UART, so fixture SPI does not qualify reference-board SPI. Default GD SPI4 PF6/7/8/9 has public provenance; external NOR exact part remains unknown.</p>
+</section>
+<section id="id4">
+<h2>Explicit boundaries<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>Continuous modes promise no losslessness under arbitrary IRQ latency/consumer speed. I2C reads beyond 256 bytes, dynamic clocks, deep sleep/STOP, secure boot/update and unmaintained modes are unavailable. FreeRTOS <code class="docutils literal notranslate"><span class="pre">lowpower_port=&quot;timebase&quot;</span></code> uses shallow Sleep only on fixed F407/GD470 profiles, requiring SysTick/tickless/single-privileged/no-MPU. Default <code class="docutils literal notranslate"><span class="pre">custom</span></code> adds no sleep mechanism; CPU-only runtime without SoC timebase rejects the choice. Actual phase/clock continuity/wake latency/power are physically unexecuted; see <a class="reference internal" href="../design/timebase-lowpower.html"><span class="std std-doc">shallow sleep</span></a>. Unsupported configurations reject explicitly rather than claim support through successful stubs.</p>
+<p>Deadlines cannot cancel Flash pulses; uncleared BUSY retains responsibility. Products own Flash stalls/voltage/watchdog windows/power cuts/authentication/layout/persistent-format migration. Generic storage CRC/commit is not a secure-update protocol.</p>
+<p>GD32 Flash relock-readback failure retains static providers/rejects further operations and requires controlled reset; ordinary stop cannot recover it. <code class="docutils literal notranslate"><span class="pre">tests/google/gd32_flash_fault_test.cpp</span></code> checks postfault read/write/controller-reacquisition refusal, without physical qualification. See <a class="reference internal" href="security-review.html"><span class="std std-doc">security review</span></a> for lifecycle/scan diagnostics.</p>
+<p>Hardware is disconnected. Clock/reset/GPIO-safe-output/UART-TC-abort-RX/SPI-I2C-electrical/Flash-power-cut/watchdog-reset/EXTI-waveform/PWM/ADC-precision execution is absent for every MCU target. Current support cannot replace physical HIL or product-release promotion.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Recorded delivery evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current platform delivery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Current system architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system-verification.html">Build system execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capabilities.html">Derived capabilities and integration matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortex-m.html">Cortex-M software support and platform-integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">External-project migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-iterations.html">Next iterations and team execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html">OS delivery scope and verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qualification.html">Software candidates and physical qualification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security-review.html">Security scanning and lifecycle boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-extensions-verification.html">SoC extension verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement-verification.html">SoC refinement execution record</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Exact support scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="verification.html">Current evidence and acceptance boundaries</a></li>
+</ul>
+</li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>多控制器所有权 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="独立的有限 UART 与 SPI DMA 控制器" href="multiple-dma-controllers.html" />
+    <link rel="prev" title="I/O 观察、容量与保留恢复" href="io-observation-recovery.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/design/multiple-controllers.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/design/multiple-controllers.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="multiple-controller-ownership">
+<h1>多控制器所有权<a class="headerlink" href="#multiple-controller-ownership" title="Link to this heading">¶</a></h1>
+<p>公共 I/O 接口面保持既有方法表与调用方持有的请求合同。选择另一个物理控制器会建立另一个私有提供者实例，而不是增加传输抽象或全局注册表。实例的冷态寄存器、时钟、DMA 和 IRQ 事实在发布者集合撤销且实例停止前保持不可变。</p>
+<section id="i2c-v1-irq-and-finite-dma">
+<h2>I2C V1 IRQ 与有限 DMA<a class="headerlink" href="#i2c-v1-irq-and-finite-dma" title="Link to this heading">¶</a></h2>
+<p>STM32F407 I2C1／I2C2 和 GD32F470 I2C0／I2C1 执行同一维护中的 V1 寄存器算法。各控制器的冷态包装使用真实 SDK 校验寄存器指针、DATA 偏移、线路输入、总线时钟与 DMA 选择器。EV、ER、RX DMA 和 TX DMA IRQ 由所选控制器身份确定。初始化已使能的物理控制器时，在修改控制寄存器或 IRQ 优先级前返回 <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>SoC 控制器</p></th>
+<th class="head"><p>GPIOB 引脚与 AF</p></th>
+<th class="head"><p>外设时钟</p></th>
+<th class="head"><p>有限 RX／TX 路由</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407 I2C1</p></td>
+<td><p>PB6/PB7 或 PB8/PB9，AF4</p></td>
+<td><p>42 MHz</p></td>
+<td><p>DMA1 stream0 / stream6，channel1</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32F407 I2C2</p></td>
+<td><p>PB10/PB11，AF4</p></td>
+<td><p>42 MHz</p></td>
+<td><p>DMA1 stream2 / stream7，channel7</p></td>
+</tr>
+<tr class="row-even"><td><p>GD32F470 I2C0</p></td>
+<td><p>PB6/PB7 或 PB8/PB9，AF4</p></td>
+<td><p>50 MHz</p></td>
+<td><p>DMA0 channel0 / channel6，selector1</p></td>
+</tr>
+<tr class="row-odd"><td><p>GD32F470 I2C1</p></td>
+<td><p>PB10/PB11，AF4</p></td>
+<td><p>50 MHz</p></td>
+<td><p>DMA0 channel2 / channel7，selector7</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>本表 GD32 名称使用厂商原始 DMA0／DMA1 命名。平台配置中的不透明控制器 ID 使用独立映射。DMA 请求选择器既不标识也不分配内存引擎。静态冷态装配必须拒绝其他器件选择已被占用的物理引擎。</p>
+<p>私有状态中的 DMA 描述符设为 <code class="docutils literal notranslate"><span class="pre">NULL</span></code> 时选择纯 IRQ 消息，不取得 DMA 向量。精确不可变宏 <code class="docutils literal notranslate"><span class="pre">NX_STM32_I2C2_DMA(regions,</span> <span class="pre">count)</span></code> 和 <code class="docutils literal notranslate"><span class="pre">NX_GD32_I2C1_DMA(regions,</span> <span class="pre">count)</span></code> 选择第二组有限路由。初始化 API 不变。引脚、总线时钟、DMA 时钟和共享资源租约仍由冷态装配负责；提供者不会静默分配这些资源。</p>
+<p>每个请求保留描述符、消息、缓冲区和端点，直到该控制器的引擎、中断源与线侧完成排空。一个实例的完成或取消不能确认另一 stream 的 W1C 标志、关闭其向量、释放其请求或改变其唤醒接收器。DMA 拒绝停止时，仅受影响实例的借用保留在 <code class="docutils literal notranslate"><span class="pre">DRAINING</span></code> 或 <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code>；时间流逝不能证明硬件静止。</p>
+<p>共享 DMA 确认叶子编译为直接写入所选寄存器。测试覆盖模拟真实 W1C 副作用，而不是把清除寄存器当普通 RAM。没有逐字节 MMIO 方法表或新增可变字段。真实 Cortex-M4F 编译测得不变状态为 56 字节、端点 8 字节、可选不可变 DMA 描述符 80 字节。提供者与共享算法对象的全局 DATA/BSS 为零。选中对象的 text 大小只是编译对象证据，不代表完整镜像保留的 Flash 或周期测量。</p>
+<p>已审阅硅片路由来源为 STM32 RM0090 Rev22 表 43 和 GD32F4xx User Manual Rev3.3 表 10-2／10-3。这些事实不能证明板级外部接线。第二控制器板级路由需要显式审阅配置。主机测试模拟外部 CPU/MMIO，真实 ARM 编译使用真实厂商 SDK 头文件。总线时序、电气电平和 DMA 争用仍需硬件资格；本页不声明物理结果。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 首批纵切片</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 同步双域参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

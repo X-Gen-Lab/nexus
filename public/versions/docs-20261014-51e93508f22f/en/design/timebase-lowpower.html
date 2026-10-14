@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Reviewed shallow tickless timebase &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=3a7bed40"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Optional timer capture and complementary PWM" href="timer-advanced.html" />
+    <link rel="prev" title="ThreadX configuration and integration" href="threadx.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/design/timebase-lowpower.md">51e93508f22f</a>; code reference: 51e93508f22f. <a href="../../zh_CN/design/timebase-lowpower.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="reviewed-shallow-tickless-timebase">
+<h1>Reviewed shallow tickless timebase<a class="headerlink" href="#reviewed-shallow-tickless-timebase" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">[os].lowpower_port</span> <span class="pre">=</span> <span class="pre">&quot;timebase&quot;</span></code> selects a maintained private FreeRTOS
+binding for STM32F407 and GD32F470. The default is <code class="docutils literal notranslate"><span class="pre">&quot;custom&quot;</span></code>: existing
+application-provided ports and the weak NULL fallback keep their behavior.
+Selection also requires <code class="docutils literal notranslate"><span class="pre">tickless</span> <span class="pre">=</span> <span class="pre">true</span></code>, SysTick, a single privileged
+security domain and no MPU profile. CPU-only Runtime configurations reject this
+selection because they have no reviewed SoC timer, clock or IRQ facts.</p>
+<p>This binding uses shallow Sleep. The fixed clock and 1 MHz monotonic timer keep
+running. It does not enter STOP, suspend clocks, select a different tick source,
+configure a wake pin or make board electrical claims.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>SoC</p></th>
+<th class="head"><p>Clock / timer</p></th>
+<th class="head"><p>Private compare</p></th>
+<th class="head"><p>Existing shared owner</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407</p></td>
+<td><p>HSE8 / PLL168, TIM2 PSC83</p></td>
+<td><p>CC1, CCR1</p></td>
+<td><p>TIM2 update / 64-bit epoch</p></td>
+</tr>
+<tr class="row-odd"><td><p>GD32F470</p></td>
+<td><p>HXTAL25 / PLL200, TIMER1 PSC99</p></td>
+<td><p>CH0, CH0CV</p></td>
+<td><p>TIMER1 update / 64-bit epoch</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The timer is already exclusively reserved by the platform timebase. No output
+channel is connected to a pin. The getter only inspects the established profile:
+the actual PLL tuple, oscillator/source ready bits, mux/bus dividers, Flash
+latency and disabled spread spectrum; the free-running upward timer mode,
+prescaler, full counter range, disabled compare preload/output, sleep clock,
+overflow interrupt and enabled NVIC route. Missing facts return NULL;
+there is no repair or hidden initialization. Clock consumers must remain
+quiescent throughout platform shutdown. A pending pause or alarm additionally
+rejects clock release before any register or NVIC effect.</p>
+<section id="phase-admission-and-failure">
+<h2>Phase, admission and failure<a class="headerlink" href="#phase-admission-and-failure" title="Link to this heading">¶</a></h2>
+<p>The generic Idle adapter owns scheduler suspension and incoming PRIMASK
+restoration. The private timer callbacks never block or call the kernel. Alarm
+IRQ dispatch runs under the SoC’s saved interrupt guard. SysTick calls the
+renamed real kernel tick handler once per real periodic interrupt.</p>
+<p>Pause rejects a pending periodic tick and a still-active first short interval.
+The writable snapshot must be disjoint from private retained state, immutable
+bindings, MMIO and opaque clock-context storage. Known spans, alignment and
+address wrap are checked before effects; the private caller proves the opaque
+clock-context extent. A successful pause retains the periodic-source loan until
+resume. The paused
+counter records whole microseconds and the remaining core-cycle fraction. Each
+capture and restore rejects a clock reversal or an observed sampling window
+larger than four continuous-clock microseconds.</p>
+<p>An alarm uses an absolute deadline in that same boot domain. Admission requires
+strictly future time, at most <code class="docutils literal notranslate"><span class="pre">UINT32_MAX</span></code> microseconds ahead. The low 32 bits
+match the free-running counter across one wrap. Late arm, compare readback
+failure or disabled-source readback failure never become successful admission.
+Rejected alarms remove only their own interrupt source. Timer status is W0C:
+ones preserve all unrelated sources, including a compare event arriving between
+an overflow flag read and acknowledgement.</p>
+<p>Resume programs one short SysTick interval. It proves that VAL consumed the
+short reload, then restores the full LOAD before the first underflow. Restoring
+LOAD only in the first ISR would allow a second short interval. The wrapper
+also restores the full LOAD before kernel dispatch. A sub-microsecond remainder
+is rounded up by less than one microsecond, rather than relying on an unprovable
+near-zero reload race.</p>
+<p>The precision contract is quantized. A 1 MHz clock cannot represent arbitrary
+core-cycle timestamps, and register operations have latency. The model executes
+15 phase/latency combinations with a continuously advancing timer and proves
+those executions fall in a conservative minus-one to plus-eleven microsecond
+phase interval. The independent capture and restore window checks are the
+runtime bound; the model is not a proof of physical MCU instruction latency or
+all hardware executions. Repeated sleeps can accumulate bounded phase bias.
+Applications needing tighter synchronization must qualify a separate timer
+compare clock profile rather than assuming exact sub-microsecond phase.</p>
+<p>A pending tick, COUNTFLAG, late first underflow, unconsumed reload or incorrect
+restored control bits makes resume fail stop. Failed pause rollback also fails
+stop if the source cannot be restored. Failed alarm disable retains both pause
+and alarm ownership. Fault state never returns a borrowed source to the caller,
+continues the kernel with missing ticks or attempts automatic reclamation.</p>
+</section>
+<section id="cost-and-validation-scope">
+<h2>Cost and validation scope<a class="headerlink" href="#cost-and-validation-scope" title="Link to this heading">¶</a></h2>
+<p>Selection adds one static private context. For the maintained 32-bit ABI its
+layout is 16 bytes; the read-only register binding and port face are 52 and
+24 bytes. These are structure layouts, not a linked image cost claim. The
+existing timebase, default request/stream state and OS objects gain no fields.
+Default source selection omits the common mechanism, SoC binding and selected
+IRQ branches. Four actual production CMake ARM graphs verify zero default new
+mechanism TUs/symbols, versus two selected TUs and a strong getter. In the same
+empty assembly retaining kernel startup, no-LTO Os/GNUArm14.3.1, selection adds
+1532 bytes of Flash / 16 bytes RAM on STM32 and 1516 bytes Flash / 16 bytes RAM
+on GD32. These are development fixture deltas, not application or hardware costs.</p>
+<p>The GoogleTest / GoogleMock suites execute production common C, actual SDK
+register layouts, real SoC timebase IRQ and shutdown code. Tests cover pending
+arrival, reversed time, late compare, counter wrap, failed disable/restore,
+first-reload consumption, second-pause rejection and shared IRQ flag races.
+The two chip suites use external CPU, clock-bootstrap and register semantics
+models; they are software evidence.</p>
+<p>Physical HIL has not run. Acceptance still requires the real boards and probes:
+verify shallow-Sleep clock continuity, NVIC wake, actual capture/restore windows,
+SysTick phase and catch-up across repeated sleeps, wrap, competing interrupts
+and load. Neither model timing nor ARM linking establishes power savings,
+physical WCET, IRQ latency or board readiness.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

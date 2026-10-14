@@ -1,0 +1,51 @@
+// FIG-12 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph ReleaseRecovery {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-12 文档 / SDK / 证据分别交付与独立恢复\n每条链有独立payload与验证；公开动作以真实receipt为准"];
+    docs [label="文档：HTML + 本地图 / 图源\n文档源与软件资格输入身份", group="docs"];
+    sdk [label="Source SDK：完整安装prefix\n源码 / 依赖 / 许可闭包", group="sdk"];
+    candidate [label="软件候选与证据：同source/config/image\nscope reports / 原始执行日志", group="evidence"];
+    docsSeal [label="delivery.package → verify\npayload manifest 不含自身/checksums\narchive hash 在外层receipt", group="docs"];
+    sdkSeal [label="package_source_sdk.prepare / verify\n源码与依赖manifest / 必需文件闭包\n真实consumer通过才建立该软件scope", group="sdk"];
+    proofSeal [label="candidate.py / proof.py → store.export_tree\n重新验证scope proof，封存完整字节闭包\n归档成功不代表重新执行历史tests", group="evidence"];
+    docsPublish [label="delivery.publish：versions/<release-id> / stable\n受信任部署选择不可变文档版本", group="docs"];
+    sdkPublish [label="交付者保存不可变SDK版本包\n稳定下载索引 + archive receipt", group="sdk"];
+    proofPublish [label="交付者保存content-id归档 + 外层receipt\n独立长期存储，不能只依赖短期CI artifact", group="evidence"];
+    docsDownload [label="delivery.post_deploy：实际HTTP站点与下载\n核对manifest / stable / payload / archive", group="docs"];
+    sdkDownload [label="独立位置实际下载完整SDK包\n校验archive hash和包内路径/size/hash", group="sdk"];
+    proofDownload [label="store.verify_external：实际独立归档\n核对archive、inventory与所有payload字节", group="evidence"];
+    docsRestore [label="delivery.restore → 新根\n离线HTML / anchors / 本地图 / 下载均验证", group="docs"];
+    sdkRestore [label="完整prefix恢复到新根 → SDK verify\n独立consumer构建；Native实际运行", group="sdk"];
+    proofRestore [label="store.restore_tree → 新根 + 重新verify\n按scope验证proof和同artifact引用\n不因恢复提升HIL或产品资格", group="evidence"];
+    receipt [label="分别记录真实发布 / 下载 / 恢复结果\n未发生的外部动作保留not_executed；任何失败禁止promotion", fillcolor="#f0fdf4"];
+    docs -> docsSeal [label="文档专用payload"];
+    docsSeal -> docsPublish [label="验证通过"];
+    docsPublish -> docsDownload [label="真实部署URL"];
+    docsDownload -> docsRestore [label="下载的同字节包"];
+    docsRestore -> receipt [label="文档结果"];
+    sdk -> sdkSeal [label="SDK专用payload"];
+    sdkSeal -> sdkPublish [label="该scope验证通过"];
+    sdkPublish -> sdkDownload [label="实际storage位置"];
+    sdkDownload -> sdkRestore [label="完整prefix，不只搬source子树"];
+    sdkRestore -> receipt [label="SDK消费结果"];
+    candidate -> proofSeal [label="候选与完整证据closure"];
+    proofSeal -> proofPublish [label="实际proof验证通过"];
+    proofPublish -> proofDownload [label="实际storage与receipt"];
+    proofDownload -> proofRestore [label="拒绝缺失 / 改字节 / 非法路径"];
+    proofRestore -> receipt [label="归档恢复结果"];
+    { rank=same; docs; sdk; candidate; }
+    { rank=same; docsSeal; sdkSeal; proofSeal; }
+    { rank=same; docsPublish; sdkPublish; proofPublish; }
+    { rank=same; docsDownload; sdkDownload; proofDownload; }
+    { rank=same; docsRestore; sdkRestore; proofRestore; }
+}

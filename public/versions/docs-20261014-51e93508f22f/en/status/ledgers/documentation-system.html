@@ -1,0 +1,3077 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Documentation-system ledger &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nexus.css?v=4084a1dc" />
+    <script src="../../_static/documentation_options.js?v=3a7bed40"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Iteration directions and admission conditions" href="../roadmap.html" />
+    <link rel="prev" title="Original build-system workstream ledger" href="build-system.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/status/ledgers/documentation-system.md">51e93508f22f</a>; code reference: 51e93508f22f. <a href="../../../zh_CN/status/ledgers/documentation-system.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="status-ledgers-documentation-system">
+<span id="id1"></span><h1>Documentation-system ledger<a class="headerlink" href="#status-ledgers-documentation-system" title="Link to this heading">¶</a></h1>
+<p>This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and all fields come from the <a class="reference download internal" download="" href="../../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">original</span> <span class="pre">ledger</span></code></a>. Source: <code class="docutils literal notranslate"><span class="pre">docs/design/documentation-system-execution.csv</span></code>; SHA-256: <code class="docutils literal notranslate"><span class="pre">d1f5adad33468cb83c2849b9ec5176d10d958db044620943e93fb0d02d6a2c77</span></code>.</p>
+<p>Different ledgers overlap in scope; do not add their counts or calculate a project-wide completion rate. Interpret implementation, software and physical status separately. <code class="docutils literal notranslate"><span class="pre">development_passed</span></code> does not mean execution at the current documentation HEAD. Consult the exact results index for the source and scope of <code class="docutils literal notranslate"><span class="pre">qualification_record_authority</span></code>. Absolute <code class="docutils literal notranslate"><span class="pre">/workspace</span></code> and <code class="docutils literal notranslate"><span class="pre">/dev/shm</span></code> locators retain their original bytes and only identify the original execution host. See the <a class="reference internal" href="../software-verification.html"><span class="std std-doc">software-evidence entry</span></a> for retrievable archives and member locations.</p>
+<p><strong>Original exit fields</strong> are only fields actually present in the original CSV. Tasks, qualification prerequisites and contract links also retain their original wording; they cannot be used to invent an execution.</p>
+<p>This table contains 58 original records; this is only the source row count.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#doc-01" id="id2">DOC-01</a></p></li>
+<li><p><a class="reference internal" href="#doc-02" id="id3">DOC-02</a></p></li>
+<li><p><a class="reference internal" href="#doc-03" id="id4">DOC-03</a></p></li>
+<li><p><a class="reference internal" href="#doc-04" id="id5">DOC-04</a></p></li>
+<li><p><a class="reference internal" href="#doc-05" id="id6">DOC-05</a></p></li>
+<li><p><a class="reference internal" href="#doc-06" id="id7">DOC-06</a></p></li>
+<li><p><a class="reference internal" href="#doc-07" id="id8">DOC-07</a></p></li>
+<li><p><a class="reference internal" href="#doc-08" id="id9">DOC-08</a></p></li>
+<li><p><a class="reference internal" href="#doc-09" id="id10">DOC-09</a></p></li>
+<li><p><a class="reference internal" href="#doc-10" id="id11">DOC-10</a></p></li>
+<li><p><a class="reference internal" href="#doc-11" id="id12">DOC-11</a></p></li>
+<li><p><a class="reference internal" href="#doc-12" id="id13">DOC-12</a></p></li>
+<li><p><a class="reference internal" href="#doc-13" id="id14">DOC-13</a></p></li>
+<li><p><a class="reference internal" href="#doc-14" id="id15">DOC-14</a></p></li>
+<li><p><a class="reference internal" href="#doc-15" id="id16">DOC-15</a></p></li>
+<li><p><a class="reference internal" href="#doc-16" id="id17">DOC-16</a></p></li>
+<li><p><a class="reference internal" href="#doc-17" id="id18">DOC-17</a></p></li>
+<li><p><a class="reference internal" href="#doc-18" id="id19">DOC-18</a></p></li>
+<li><p><a class="reference internal" href="#doc-19" id="id20">DOC-19</a></p></li>
+<li><p><a class="reference internal" href="#doc-20" id="id21">DOC-20</a></p></li>
+<li><p><a class="reference internal" href="#doc-21" id="id22">DOC-21</a></p></li>
+<li><p><a class="reference internal" href="#doc-22" id="id23">DOC-22</a></p></li>
+<li><p><a class="reference internal" href="#doc-23" id="id24">DOC-23</a></p></li>
+<li><p><a class="reference internal" href="#doc-24" id="id25">DOC-24</a></p></li>
+<li><p><a class="reference internal" href="#doc-25" id="id26">DOC-25</a></p></li>
+<li><p><a class="reference internal" href="#doc-26" id="id27">DOC-26</a></p></li>
+<li><p><a class="reference internal" href="#doc-27" id="id28">DOC-27</a></p></li>
+<li><p><a class="reference internal" href="#doc-28" id="id29">DOC-28</a></p></li>
+<li><p><a class="reference internal" href="#doc-29" id="id30">DOC-29</a></p></li>
+<li><p><a class="reference internal" href="#doc-30" id="id31">DOC-30</a></p></li>
+<li><p><a class="reference internal" href="#doc-31" id="id32">DOC-31</a></p></li>
+<li><p><a class="reference internal" href="#doc-32" id="id33">DOC-32</a></p></li>
+<li><p><a class="reference internal" href="#doc-33" id="id34">DOC-33</a></p></li>
+<li><p><a class="reference internal" href="#doc-34" id="id35">DOC-34</a></p></li>
+<li><p><a class="reference internal" href="#doc-35" id="id36">DOC-35</a></p></li>
+<li><p><a class="reference internal" href="#doc-36" id="id37">DOC-36</a></p></li>
+<li><p><a class="reference internal" href="#doc-37" id="id38">DOC-37</a></p></li>
+<li><p><a class="reference internal" href="#doc-38" id="id39">DOC-38</a></p></li>
+<li><p><a class="reference internal" href="#doc-39" id="id40">DOC-39</a></p></li>
+<li><p><a class="reference internal" href="#doc-40" id="id41">DOC-40</a></p></li>
+<li><p><a class="reference internal" href="#doc-41" id="id42">DOC-41</a></p></li>
+<li><p><a class="reference internal" href="#doc-42" id="id43">DOC-42</a></p></li>
+<li><p><a class="reference internal" href="#doc-43" id="id44">DOC-43</a></p></li>
+<li><p><a class="reference internal" href="#doc-44" id="id45">DOC-44</a></p></li>
+<li><p><a class="reference internal" href="#doc-45" id="id46">DOC-45</a></p></li>
+<li><p><a class="reference internal" href="#doc-46" id="id47">DOC-46</a></p></li>
+<li><p><a class="reference internal" href="#doc-47" id="id48">DOC-47</a></p></li>
+<li><p><a class="reference internal" href="#doc-48" id="id49">DOC-48</a></p></li>
+<li><p><a class="reference internal" href="#doc-49" id="id50">DOC-49</a></p></li>
+<li><p><a class="reference internal" href="#doc-50" id="id51">DOC-50</a></p></li>
+<li><p><a class="reference internal" href="#doc-51" id="id52">DOC-51</a></p></li>
+<li><p><a class="reference internal" href="#doc-52" id="id53">DOC-52</a></p></li>
+<li><p><a class="reference internal" href="#doc-53" id="id54">DOC-53</a></p></li>
+<li><p><a class="reference internal" href="#doc-54" id="id55">DOC-54</a></p></li>
+<li><p><a class="reference internal" href="#doc-55" id="id56">DOC-55</a></p></li>
+<li><p><a class="reference internal" href="#doc-56" id="id57">DOC-56</a></p></li>
+<li><p><a class="reference internal" href="#doc-57" id="id58">DOC-57</a></p></li>
+<li><p><a class="reference internal" href="#doc-58" id="id59">DOC-58</a></p></li>
+</ul>
+</nav>
+<section id="doc-01">
+<span id="status-documentation-system-doc-01"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">DOC-01</a><a class="headerlink" href="#doc-01" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Register page authorities and reader tasks</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>(original field empty)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Identify authoritative prose, API, support, qualification, ledger and historical sources for every page; directory structure and unique navigation must be reviewable</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/design/documentation-migration.csv;docs/index.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-02">
+<span id="status-documentation-system-doc-02"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">DOC-02</a><a class="headerlink" href="#doc-02" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Correct root entries and support statements</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>README statements about typed factory, TOML, ThreadX, continuous modes and exact support are consistent; do not expand physical-board scope</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>README.md;README_CN.md;docs/status/support.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-03">
+<span id="status-documentation-system-doc-03"></span><h2><a class="toc-backref" href="#id4" role="doc-backlink">DOC-03</a><a class="headerlink" href="#doc-03" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Correct executable configuration templates</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Board examples include soc_family; complete Board and CPU/TOML inputs are actually parsed; fragments explicitly do not establish complete-configuration qualification</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/design/integration-contracts.md;tools/configure/documentation.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-04">
+<span id="status-documentation-system-doc-04"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">DOC-04</a><a class="headerlink" href="#doc-04" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-04</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Unify latest-qualification navigation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Current code, documentation HEAD, qualified source and historical records are separately locatable; prior execution is not inherited</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/status/software-verification.md;docs/status/hardware.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-04</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-05">
+<span id="status-documentation-system-doc-05"></span><h2><a class="toc-backref" href="#id6" role="doc-backlink">DOC-05</a><a class="headerlink" href="#doc-05" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-05</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Map original exit conditions and new evidence for each ledger</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-04</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Map OS48 and outdated statuses by scope; retain original IDs, conditions and failed records; do not bulk-mark passed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/status.py;docs/status/ledgers.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-05</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-06">
+<span id="status-documentation-system-doc-06"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">DOC-06</a><a class="headerlink" href="#doc-06" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-06</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Create migration-reference and legacy-URL inventories</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Every current content source has a destination; relative links, anchors, tool inputs and legacy URLs have complete handling rules</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/reference/history.md;docs/reference/redirects.csv</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-06</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-07">
+<span id="status-documentation-system-doc-07"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">DOC-07</a><a class="headerlink" href="#doc-07" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-07</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Select and integrate MyST</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Remain compatible with maintained Sphinx/Breathe; actually build complete positive and negative Markdown/RST fixtures; specify the pin</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/sphinx/conf.py;docs/sphinx/requirements.txt</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-07</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-08">
+<span id="status-documentation-system-doc-08"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">DOC-08</a><a class="headerlink" href="#doc-08" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-08</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Adjust the Sphinx source root and exclusions</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-07</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Use docs as source root and index prose directly; keep archives, generated outputs and large evidence outside the site</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/sphinx/conf.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-08</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-09">
+<span id="status-documentation-system-doc-09"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">DOC-09</a><a class="headerlink" href="#doc-09" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-09</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Implement unique task navigation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-08;DOC-06</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>The home page provides use, integration, maintenance, acceptance and migration entries; current pages are reachable and searchable; do not maintain a second copy of prose</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/index.md;docs/reference/index.md;docs/guides/index.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-09</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-10">
+<span id="status-documentation-system-doc-10"></span><h2><a class="toc-backref" href="#id11" role="doc-backlink">DOC-10</a><a class="headerlink" href="#doc-10" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-10</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Reorganize public API and factory explanations</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-08</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Core/Arch/I/O/OS/Components module pages link to symbols; factory examples use actual generated interfaces</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/reference/api/index.md;docs/explanation/factory.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-10</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-11">
+<span id="status-documentation-system-doc-11"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">DOC-11</a><a class="headerlink" href="#doc-11" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-11</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Integrate system contracts and architecture explanations</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-08;DOC-06</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Lifecycle and safety restrictions retain their original normative meaning; contracts and explanations each have one authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/explanation/platform-architecture.md;docs/explanation/ownership.md;docs/delivery/architecture.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-11</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-12">
+<span id="status-documentation-system-doc-12"></span><h2><a class="toc-backref" href="#id13" role="doc-backlink">DOC-12</a><a class="headerlink" href="#doc-12" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-12</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Integrate source-adjacent READMEs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-08;DOC-06</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Retain the implementation map and local SoC authorities; include-relative references are correct or source links are bound to the site revision</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/explanation/source-map.md;docs/development/implementation-map.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-12</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-13">
+<span id="status-documentation-system-doc-13"></span><h2><a class="toc-backref" href="#id14" role="doc-backlink">DOC-13</a><a class="headerlink" href="#doc-13" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-13</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver the external SDK introductory tutorial</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-03;DOC-09;DOC-27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>A real external consumer at a fixed revision configures, builds and runs or links successfully; retain actual commands and cleanup steps</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/tutorials/source-sdk.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-13</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-14">
+<span id="status-documentation-system-doc-14"></span><h2><a class="toc-backref" href="#id15" role="doc-backlink">DOC-14</a><a class="headerlink" href="#doc-14" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-14</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver the async I/O and cancellation-drain tutorial</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-13;DOC-10</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Real examples cover reject/accept/cancel/drain/settled/quarantine; borrowed storage is not reclaimed early</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/tutorials/async-io.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-14</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-15">
+<span id="status-documentation-system-doc-15"></span><h2><a class="toc-backref" href="#id16" role="doc-backlink">DOC-15</a><a class="headerlink" href="#doc-15" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-15</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver the Board-integration guide</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-03;DOC-09</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Verifiable templates, route authorization, sources and unknowns are explicit; reuse existing SoCs; separate software and PCB qualification</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/guides/board-porting.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-15</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-16">
+<span id="status-documentation-system-doc-16"></span><h2><a class="toc-backref" href="#id17" role="doc-backlink">DOC-16</a><a class="headerlink" href="#doc-16" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-16</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver SoC/provider/component integration guides</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-03;DOC-11</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>List facts/startup/time/provider/testing/SDK/HIL conditions by vertical slice; generic devices need not enter the generator</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/guides/provider-porting.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-16</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-17">
+<span id="status-documentation-system-doc-17"></span><h2><a class="toc-backref" href="#id18" role="doc-backlink">DOC-17</a><a class="headerlink" href="#doc-17" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-17</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver OS waiting and shutdown guidance</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-02;DOC-11</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Backend semantics, execution progress, actual deletion and storage-reclamation conditions are clear; examples are validated on maintained backends</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/guides/os-shutdown.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-17</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-18">
+<span id="status-documentation-system-doc-18"></span><h2><a class="toc-backref" href="#id19" role="doc-backlink">DOC-18</a><a class="headerlink" href="#doc-18" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-18</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver legacy configuration and interface migration guidance</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-02;DOC-09</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Legacy HAL/OSAL/Kconfig has an executable migration path to current TOML/factory; old IDs are not persisted across bundles</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/guides/migration.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-18</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-19">
+<span id="status-documentation-system-doc-19"></span><h2><a class="toc-backref" href="#id20" role="doc-backlink">DOC-19</a><a class="headerlink" href="#doc-19" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-19</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver configuration and tool references</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-10;DOC-11</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Fields, units, rejection rules and CLI come from maintained implementation; do not manually copy API declarations or duplicate configuration authorities</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/reference/configuration/assembly.md;docs/reference/configuration/tools.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-19</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-20">
+<span id="status-documentation-system-doc-20"></span><h2><a class="toc-backref" href="#id21" role="doc-backlink">DOC-20</a><a class="headerlink" href="#doc-20" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-20</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver performance-diagnosis and HIL-preparation guidance</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-09;DOC-04</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Distinguish ELF budgets, measured cycles, stack and HIL; tool preparation does not claim hardware execution</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/guides/performance-hil.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-20</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-21">
+<span id="status-documentation-system-doc-21"></span><h2><a class="toc-backref" href="#id22" role="doc-backlink">DOC-21</a><a class="headerlink" href="#doc-21" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-21</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D4</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Define bilingual terminology and release-critical pages</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Original languages and nontranslatable identifiers are explicit; fix critical-page scope; do not require duplicated CSVs or raw logs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/locale/terminology.csv</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-21</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-22">
+<span id="status-documentation-system-doc-22"></span><h2><a class="toc-backref" href="#id23" role="doc-backlink">DOC-22</a><a class="headerlink" href="#doc-22" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-22</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D4</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Implement gettext and translation-source revision checks</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-07;DOC-21</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Use one translation chain; build English and Chinese originals into en/zh_CN respectively; mark missing fallback and stale/fuzzy according to actual prose language and source revision</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/sphinx_ext.py;docs/locale</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-22</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-23">
+<span id="status-documentation-system-doc-23"></span><h2><a class="toc-backref" href="#id24" role="doc-backlink">DOC-23</a><a class="headerlink" href="#doc-23" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-23</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D4</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Complete bilingual review of critical use paths</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-13;DOC-14;DOC-15;DOC-17;DOC-18;DOC-22</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Independently review critical introductory, configuration, factory, borrow, support, qualification and migration prose; do not falsely report missing languages as complete</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/locale;docs/locale/terminology.csv</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-23</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-24">
+<span id="status-documentation-system-doc-24"></span><h2><a class="toc-backref" href="#id25" role="doc-backlink">DOC-24</a><a class="headerlink" href="#doc-24" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-24</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D4</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Show actual page language and translation status</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-22</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>reviewed/stale/missing/original are visible on pages and entry points; English fallback is not marked as translated Chinese; locale does not override source_language</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/sphinx_ext.py;docs/sphinx/conf.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-24</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-25">
+<span id="status-documentation-system-doc-25"></span><h2><a class="toc-backref" href="#id26" role="doc-backlink">DOC-25</a><a class="headerlink" href="#doc-25" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-25</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D4</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Organize local diagrams and offline resources</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-08</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Diagram sources are reviewable and arrows agree with contracts; images/fonts/scripts do not depend on CDNs; lock new rendering tools; pair DOT/SVG; lock Graphviz and actual fonts; SVG has no external resources/scripts/DOCTYPE</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/diagrams.py;docs/assets/diagrams/diagram-index.csv</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-25</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-26">
+<span id="status-documentation-system-doc-26"></span><h2><a class="toc-backref" href="#id27" role="doc-backlink">DOC-26</a><a class="headerlink" href="#doc-26" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-26</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D4</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Complete reader-task walkthroughs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-13;DOC-14;DOC-15;DOC-16;DOC-17;DOC-18;DOC-19;DOC-20;DOC-24;DOC-42</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>An independent agent completes tasks from their entry points; correct bad steps, inaccessible contracts and revision confusion; record actual results; independently review semantics against content standards</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/index.md;docs/status/index.md;docs/tutorials/index.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-26</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-27">
+<span id="status-documentation-system-doc-27"></span><h2><a class="toc-backref" href="#id28" role="doc-backlink">DOC-27</a><a class="headerlink" href="#doc-27" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Unify the docs CLI and legacy-script forwarding</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-08</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>check/build/preview/package/doctor have clear purposes; local and CI strict arguments match; preserve failure codes and diagnostics</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/cli.py;tools/dev/dev.py;scripts/tools/docs.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-28">
+<span id="status-documentation-system-doc-28"></span><h2><a class="toc-backref" href="#id29" role="doc-backlink">DOC-28</a><a class="headerlink" href="#doc-28" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-28</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Create offline link, anchor and navigation checks</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-06;DOC-09;DOC-27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Deliberately bad files/anchors/duplicate IDs/unreachable pages actually fail; legal cross-page references and migration aliases actually pass</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/check.py;tools/documentation/delivery.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-28</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-29">
+<span id="status-documentation-system-doc-29"></span><h2><a class="toc-backref" href="#id30" role="doc-backlink">DOC-29</a><a class="headerlink" href="#doc-29" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-29</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Expand actual configuration-fragment validation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-03;DOC-27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>New paths, RST, complete Board and CPU inputs pass the actual resolver; syntax fragments do not gain executable qualification</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/documentation.py;tools/documentation/check.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-29</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-30">
+<span id="status-documentation-system-doc-30"></span><h2><a class="toc-backref" href="#id31" role="doc-backlink">DOC-30</a><a class="headerlink" href="#doc-30" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-30</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Associate executable code and consumers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-13;DOC-27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>literalinclude sources and test identities are traceable; maintained examples actually build; do not arbitrarily execute documentation shell text</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/tutorials/source-sdk.md;docs/tutorials/async-io.md;cmake/package/verify_consumers.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-30</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-31">
+<span id="status-documentation-system-doc-31"></span><h2><a class="toc-backref" href="#id32" role="doc-backlink">DOC-31</a><a class="headerlink" href="#doc-31" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-31</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Create bounded external-link checking</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-28</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Report 404/revision mistakes separately from network failures; bound timeout/retry; commits require no network by default</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/check.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-31</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-32">
+<span id="status-documentation-system-doc-32"></span><h2><a class="toc-backref" href="#id33" role="doc-backlink">DOC-32</a><a class="headerlink" href="#doc-32" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-32</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Integrate documentation commit and strict CI gates</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-27;DOC-28;DOC-29;DOC-30</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Execute fast offline commit checks and complete documentation CI; apply TDD to negative tool paths; prose changes do not fabricate firmware acceptance; machine diagram-resource checks and prose/diagram semantic review have explicit separate responsibilities</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>.pre-commit-config.yaml;.github/workflows/docs-build.yml;tools/documentation/check.py;tools/documentation/test_status.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-32</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-33">
+<span id="status-documentation-system-doc-33"></span><h2><a class="toc-backref" href="#id34" role="doc-backlink">DOC-33</a><a class="headerlink" href="#doc-33" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-33</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Lock and actually install the documentation-tool closure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-07;DOC-27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Lock all transitive Python wheel hashes and Doxygen identity; actually install/build at a clean maintained tuple; actually verify Graphviz and font closure</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>dependencies/docs-tools.lock.json;dependencies/docs-python-linux-cp312.txt;tools/documentation/install.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-33</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-34">
+<span id="status-documentation-system-doc-34"></span><h2><a class="toc-backref" href="#id35" role="doc-backlink">DOC-34</a><a class="headerlink" href="#doc-34" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-34</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Separate preview builds from publication permissions</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-32;DOC-33</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>PR artifacts carry source identity; trusted deployment consumes only verified outputs; do not execute external PR source with elevated privileges</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>.github/workflows/docs-build.yml;.github/workflows/docs-publish.yml</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-34</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-35">
+<span id="status-documentation-system-doc-35"></span><h2><a class="toc-backref" href="#id36" role="doc-backlink">DOC-35</a><a class="headerlink" href="#doc-35" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-35</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D6</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Generate version and qualification manifests</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-04;DOC-24;DOC-27;DOC-33</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Read platform version from existing policy; separate code/docs/qualified source; outputs list payload only; exclude manifest/checksums/archive and indirect hash self-reference</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/delivery.py;docs/reference/documentation-delivery.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-35</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-36">
+<span id="status-documentation-system-doc-36"></span><h2><a class="toc-backref" href="#id37" role="doc-backlink">DOC-36</a><a class="headerlink" href="#doc-36" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-36</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D6</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Generate relative-link offline HTML packages</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-25;DOC-32;DOC-35</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Include languages/API/manifest/checksums/licenses; browse and verify outside the workspace; avoid hash self-reference</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/delivery.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-36</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-37">
+<span id="status-documentation-system-doc-37"></span><h2><a class="toc-backref" href="#id38" role="doc-backlink">DOC-37</a><a class="headerlink" href="#doc-37" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-37</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D6</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Publish immutable versions and the stable entry</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-23;DOC-26;DOC-34;DOC-36;DOC-31;DOC-58</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Bind release-id to a manifest without overwrite; actual deployment succeeds; stable does not claim all HIL passed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/delivery.py;.github/workflows/docs-publish.yml</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-37</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-38">
+<span id="status-documentation-system-doc-38"></span><h2><a class="toc-backref" href="#id39" role="doc-backlink">DOC-38</a><a class="headerlink" href="#doc-38" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-38</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D6</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Execute post-publication site and download verification</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-37</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Online identity matches the deployed package; critical pages, legacy URLs, diagrams and downloads pass checks; old APIs are not silently mapped to new contracts</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/delivery.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-38</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-39">
+<span id="status-documentation-system-doc-39"></span><h2><a class="toc-backref" href="#id40" role="doc-backlink">DOC-39</a><a class="headerlink" href="#doc-39" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-39</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D6</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Complete independent recovery and long-term storage</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-36;DOC-37</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Stable acquisition locations and retention policy are explicit; restore, browse and verify in an independent root; remote recovery must actually execute</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/delivery.py;tools/evidence/store.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-39</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-40">
+<span id="status-documentation-system-doc-40"></span><h2><a class="toc-backref" href="#id41" role="doc-backlink">DOC-40</a><a class="headerlink" href="#doc-40" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-40</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D6</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Close migration and independently review delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-06;DOC-38;DOC-39;DOC-41;DOC-42;DOC-58</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>All mappings handled; no duplicate standards, broken links or incorrect qualification; original evidence retained; all 58 tasks and 15 required diagram classes meet exit conditions; unclaimed configurations, HIL and later extensions retain accurate boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/design/documentation-migration.csv;docs/status/documentation-acceptance.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-40</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-41">
+<span id="status-documentation-system-doc-41"></span><h2><a class="toc-backref" href="#id42" role="doc-backlink">DOC-41</a><a class="headerlink" href="#doc-41" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Apply prose-writing and semantic standards</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-01;DOC-21</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Critical pages specify readers, goals and configurations; terminology, units, normative strength, facts and qualification pass independent review</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/design/documentation-standards.md;docs/development/documentation.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-42">
+<span id="status-documentation-system-doc-42"></span><h2><a class="toc-backref" href="#id43" role="doc-backlink">DOC-42</a><a class="headerlink" href="#doc-42" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-42</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Apply five templates and per-page content review</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-41;DOC-11;DOC-13;DOC-14;DOC-15;DOC-16;DOC-17;DOC-18;DOC-19;DOC-20</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Walk through critical tutorial/how-to/reference/explanation/status pages against templates; correct omissions or explain them; metadata does not substitute for acceptable content</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/design/documentation-templates.md;docs/tutorials;docs/guides;docs/reference;docs/explanation;docs/status</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-42</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-43">
+<span id="status-documentation-system-doc-43"></span><h2><a class="toc-backref" href="#id44" role="doc-backlink">DOC-43</a><a class="headerlink" href="#doc-43" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-43</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver whole-platform architecture and external-boundary diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-11;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Core/Arch/SoC/Board/I/O/optional OS components and external-product responsibilities are clear; distinguish factory interface lookup from direct I/O</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/platform-architecture.dot;docs/assets/diagrams/platform-architecture.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-43</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-44">
+<span id="status-documentation-system-doc-44"></span><h2><a class="toc-backref" href="#id45" role="doc-backlink">DOC-44</a><a class="headerlink" href="#doc-44" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-44</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver the actual compilation-target dependency graph</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-08;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Check actual CMake targets and private/public dependencies; vendor implementation remains private; do not treat generation or runtime arrows as compilation dependencies</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/build-targets.dot;docs/assets/diagrams/build-targets.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-44</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-45">
+<span id="status-documentation-system-doc-45"></span><h2><a class="toc-backref" href="#id46" role="doc-backlink">DOC-45</a><a class="headerlink" href="#doc-45" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-45</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver configuration and generation-flow diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-03;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>TOML/facts/typed IR/atomic bundles/CMake/Ninja artifacts and failure invalidation are accurate; do not turn unknown Board facts into known facts</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/configuration-generation.dot;docs/assets/diagrams/configuration-generation.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-45</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-46">
+<span id="status-documentation-system-doc-46"></span><h2><a class="toc-backref" href="#id47" role="doc-backlink">DOC-46</a><a class="headerlink" href="#doc-46" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-46</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver factory and instance-structure diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-10;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Static faces/shared ops/independent contexts and controller/endpoint relationships match source; getters allocate or initialize nothing</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/factory-instances.dot;docs/assets/diagrams/factory-instances.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-46</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-47">
+<span id="status-documentation-system-doc-47"></span><h2><a class="toc-backref" href="#id48" role="doc-backlink">DOC-47</a><a class="headerlink" href="#doc-47" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-47</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver initialization, shutdown and failed-start withdrawal diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-11;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>prepare/start/stop/withdraw follow the actual selected sequence; partial effects and reverse-order withdrawal responsibilities are explicit; do not start the scheduler automatically</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/platform-lifecycle.dot;docs/assets/diagrams/platform-lifecycle.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-47</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-48">
+<span id="status-documentation-system-doc-48"></span><h2><a class="toc-backref" href="#id49" role="doc-backlink">DOC-48</a><a class="headerlink" href="#doc-48" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-48</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver request-state and borrow diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-14;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Separate admission outcomes from enum states; cancellation/deadline retain borrowing; SETTLED and observer/slot-release conditions are explicit</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/request-lifecycle.dot;docs/assets/diagrams/request-lifecycle.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-48</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-49">
+<span id="status-documentation-system-doc-49"></span><h2><a class="toc-backref" href="#id50" role="doc-backlink">DOC-49</a><a class="headerlink" href="#doc-49" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-49</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver UART and SPI DMA execution sequences</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-14;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Show normal and cancellation/drain-failure paths for selected modes; separate Task/IRQ/DMA domains and DMA TC/wire complete/SETTLED</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/dma-completion.dot;docs/assets/diagrams/dma-completion.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-49</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-50">
+<span id="status-documentation-system-doc-50"></span><h2><a class="toc-backref" href="#id51" role="doc-backlink">DOC-50</a><a class="headerlink" href="#doc-50" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-50</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver wait/wake and OS-shutdown diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-17;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>ready-arm-ready-wait-ready, deadlines and execution-progress responsibilities are accurate; reclaim storage only after actual join/delete</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/wait-wake-shutdown.dot;docs/assets/diagrams/wait-wake-shutdown.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-50</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-51">
+<span id="status-documentation-system-doc-51"></span><h2><a class="toc-backref" href="#id52" role="doc-backlink">DOC-51</a><a class="headerlink" href="#doc-51" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-51</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver memory, DMA and Cache reference diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-20;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Specify exact chip/mode/memory domain/reachability/alignment and whole-line maintenance; do not infer DMA or coherence from a CPU name</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/h743-memory-cache.dot;docs/assets/diagrams/h743-memory-cache.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-51</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-52">
+<span id="status-documentation-system-doc-52"></span><h2><a class="toc-backref" href="#id53" role="doc-backlink">DOC-52</a><a class="headerlink" href="#doc-52" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-52</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver Source SDK consumption-flow diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-13;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Separate actual relocated external consumers from source-tree self-tests; accurately state configuration/build/run-or-link scope</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/source-sdk-consumer.dot;docs/assets/diagrams/source-sdk-consumer.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-52</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-53">
+<span id="status-documentation-system-doc-53"></span><h2><a class="toc-backref" href="#id54" role="doc-backlink">DOC-53</a><a class="headerlink" href="#doc-53" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-53</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver software and HIL evidence-relationship diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-04;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Associate source/configuration/tools/receipts with candidate identity; software and HIL evidence are separately acquired through actual execution; no automatic physical qualification</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/qualification-evidence.dot;docs/assets/diagrams/qualification-evidence.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-53</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-54">
+<span id="status-documentation-system-doc-54"></span><h2><a class="toc-backref" href="#id55" role="doc-backlink">DOC-54</a><a class="headerlink" href="#doc-54" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-54</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D6</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver release and independent-recovery diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-35;DOC-36;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Documentation/SDK/archive channels and identities are accurate; distinguish targets from actual publications; clarify independent acquisition/recovery/verification boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/release-recovery.dot;docs/assets/diagrams/release-recovery.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-54</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-55">
+<span id="status-documentation-system-doc-55"></span><h2><a class="toc-backref" href="#id56" role="doc-backlink">DOC-55</a><a class="headerlink" href="#doc-55" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-55</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver Cortex-M capability-layer diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-19;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Separate CPU primitives/Runtime/SoC/Board/HIL; FPU/MVE/Cache/security capabilities and actual ports do not inherit qualification from one another</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/cortex-m-capabilities.dot;docs/assets/diagrams/cortex-m-capabilities.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-55</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-56">
+<span id="status-documentation-system-doc-56"></span><h2><a class="toc-backref" href="#id57" role="doc-backlink">DOC-56</a><a class="headerlink" href="#doc-56" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-56</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver the U575 synchronous two-domain reference diagram</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-20;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Limit scope to an independent TZEN1 synchronous no-OS reference; define SAU/MPU/GTZC/gateway and seal-failure responsibilities; no general NS RTOS/async claim</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/u575-security-domains.dot;docs/assets/diagrams/u575-security-domains.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-56</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-57">
+<span id="status-documentation-system-doc-57"></span><h2><a class="toc-backref" href="#id58" role="doc-backlink">DOC-57</a><a class="headerlink" href="#doc-57" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-57</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D3</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Deliver continuous-stream and visible-loss diagrams</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-14;DOC-25;DOC-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>producer/block/consumer/loan/overrun/stop are accurate; service and capacity conditions are explicit; do not promise unconditional zero loss</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/assets/diagrams/continuous-stream.dot;docs/assets/diagrams/continuous-stream.svg;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-57</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="doc-58">
+<span id="status-documentation-system-doc-58"></span><h2><a class="toc-backref" href="#id59" role="doc-backlink">DOC-58</a><a class="headerlink" href="#doc-58" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Original field</p></th>
+<th class="head"><p>Original value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>DOC-58</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">phase</span></code></p></td>
+<td><p>D4</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>Execute diagram/prose consistency and visual/offline review</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dependencies</span></code></p></td>
+<td><p>DOC-25;DOC-28;DOC-43;DOC-44;DOC-45;DOC-46;DOC-47;DOC-48;DOC-49;DOC-50;DOC-51;DOC-52;DOC-53;DOC-54;DOC-55;DOC-56;DOC-57</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_status</span></code></p></td>
+<td><p>passed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Check every edge and state against sources; include sources/outputs/alt/captions; check SVG-safe resources and fonts; actually verify desktop/narrow-screen zoom/print/offline; do not mark unexecuted checks passed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">owner</span></code></p></td>
+<td><p>codex</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/documentation/diagrams.py;docs/assets/styles/nexus.css;docs/assets/diagrams/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/status/documentation-results.json;payload/final-closure/accepted-task-records.json#DOC-58</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_scope</span></code></p></td>
+<td><p>accepted_docs_exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Status and evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../support.html">Support scope and platform selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../software-verification.html">Software verification, source identity and evidence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-acceptance.html">Documentation-system implementation and formal acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hardware.html">HIL and physical-board status</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../ledgers.html">Original ledgers, exit conditions and derived views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../roadmap.html">Iteration directions and admission conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>文档工具与环境准备 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="历史文档与版本迁移" href="history.html" />
+    <link rel="prev" title="文档包、发布与独立恢复" href="documentation-delivery.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/reference/documentation-tools.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/reference/documentation-tools.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="documentation-tools-and-preparation">
+<h1>文档工具与环境准备<a class="headerlink" href="#documentation-tools-and-preparation" title="Link to this heading">¶</a></h1>
+<p>使用本参考准备维护中的文档环境。已验证构建组合是 Linux x86_64 与 CPython 3.12。本地准备使用 CPython 3.12.14；CI 选择同一补丁版本。文档工具资格不授予固件、硬件或产品资格。</p>
+<p>先准备<a class="reference internal" href="../guides/source-checkout.html"><span class="std std-doc">固定源码与递归依赖</span></a>。清单与工具锁必须来自同一选定源码版本。</p>
+<section id="the-authoritative-closure">
+<h2>权威依赖闭包<a class="headerlink" href="#the-authoritative-closure" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">dependencies/docs-tools.lock.json</span></code> 维护归档身份、目标约束、直接依赖和许可来源。完整 Python 依赖也在 <code class="docutils literal notranslate"><span class="pre">dependencies/docs-python-linux-cp312.txt</span></code> 中列出，使用精确版本与 SHA-256。<code class="docutils literal notranslate"><span class="pre">docs/sphinx/requirements.txt</span></code> 引用该文件，不定义另一份解析输入。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>工具或资源</p></th>
+<th class="head"><p>维护身份</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sphinx</p></td>
+<td><p>7.4.7</p></td>
+<td><p>严格 HTML 与 gettext 构建器</p></td>
+</tr>
+<tr class="row-odd"><td><p>MyST parser</p></td>
+<td><p>4.0.1</p></td>
+<td><p>Markdown 指令、角色与导航</p></td>
+</tr>
+<tr class="row-even"><td><p>Breathe</p></td>
+<td><p>4.35.0</p></td>
+<td><p>从新生成 Doxygen XML 提供公共 API</p></td>
+</tr>
+<tr class="row-odd"><td><p>Docutils</p></td>
+<td><p>0.21.2</p></td>
+<td><p>结构化文档处理</p></td>
+</tr>
+<tr class="row-even"><td><p>Alabaster</p></td>
+<td><p>0.7.16</p></td>
+<td><p>本地 HTML 主题资源</p></td>
+</tr>
+<tr class="row-odd"><td><p>polib</p></td>
+<td><p>1.2.0</p></td>
+<td><p>翻译消息目录验证</p></td>
+</tr>
+<tr class="row-even"><td><p>Python 闭包</p></td>
+<td><p>28 个分别记录摘要的 wheel 包</p></td>
+<td><p>全部运行时传递依赖包</p></td>
+</tr>
+<tr class="row-odd"><td><p>Doxygen</p></td>
+<td><p>官方 Linux 1.14.0 归档</p></td>
+<td><p>公共头文件 XML 与 HTML</p></td>
+</tr>
+<tr class="row-even"><td><p>Graphviz</p></td>
+<td><p>Debian 2.42.4-3 归档</p></td>
+<td><p>已审查 DOT 图示</p></td>
+</tr>
+<tr class="row-odd"><td><p>Noto CJK</p></td>
+<td><p>Debian 20240730+repack1-1 归档</p></td>
+<td><p>精确 CJK 字形与度量</p></td>
+</tr>
+<tr class="row-even"><td><p>Native 闭包</p></td>
+<td><p>46 个分别记录摘要的 Debian 归档</p></td>
+<td><p>加载器、库、渲染器与字体数据</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Native 闭包包含 libc 加载器、C/C++ 运行库、Graphviz core／dot／Pango 插件、fontconfig，以及这些执行文件和渲染器实际链接的每个库。准备流程执行锁定加载器的 <code class="docutils literal notranslate"><span class="pre">--list</span></code>，拒绝 prefix 外路径。它移除不支持的渲染器，不发现主机 GTK、GD 或 Ghostscript 安装。此工具集支持维护中的 DOT／SVG／Cairo 图链，不支持每一种 Graphviz 渲染器。</p>
+<p>Linux 内核、CPython／venv 引导、<code class="docutils literal notranslate"><span class="pre">dpkg-deb</span></code> 和 POSIX shell 是明确主机前提，其实测值记录在准备回执中。本锁不宣称主机镜像可复现或内核逐字节相同。</p>
+</section>
+<section id="prepare-a-fresh-prefix">
+<h2>准备新 prefix<a class="headerlink" href="#prepare-a-fresh-prefix" title="Link to this heading">¶</a></h2>
+<p>从仓库根目录、在 CPython 3.12 可用的条件下执行：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python3.12<span class="w"> </span>tools/documentation/install.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prefix<span class="w"> </span>build/docs-tools<span class="w"> </span>--cache<span class="w"> </span>build/docs-tool-cache
+</pre></div>
+</div>
+<p>准备流程可以通过 HTTPS 下载归档。它先验证整个归档闭包，再创建 prefix。wheel 包安装随后使用 <code class="docutils literal notranslate"><span class="pre">--no-index</span></code>、<code class="docutils literal notranslate"><span class="pre">--find-links</span></code> 和 <code class="docutils literal notranslate"><span class="pre">--require-hashes</span></code>；没有传递依赖留给新的在线解析。Native 包在本地解包，不使用 <code class="docutils literal notranslate"><span class="pre">sudo</span></code> 或系统包安装。</p>
+<p>从此前准备的缓存进行独立安装：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python3.12<span class="w"> </span>tools/documentation/install.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--prefix<span class="w"> </span>build/docs-tools-restored<span class="w"> </span>--cache<span class="w"> </span>build/docs-tool-cache<span class="w"> </span>--offline
+</pre></div>
+</div>
+<p>预期结果是退出码零，以及新 prefix 中的 <code class="docutils literal notranslate"><span class="pre">installation.json</span></code>。它记录工具锁摘要、实测版本、内核、解析后的 ELF 闭包、归档摘要、已安装文件摘要与复制许可摘要。安装后的 <code class="docutils literal notranslate"><span class="pre">bin/fc-match</span></code> 必须从锁定字体包解析 <code class="docutils literal notranslate"><span class="pre">Noto</span> <span class="pre">Sans</span> <span class="pre">CJK</span> <span class="pre">SC</span></code>。归档缺失、字节变化、命令失败或字体不匹配都会使准备失败，不留下成功 prefix。</p>
+<p>已有 prefix 会被拒绝。升级时选择新路径，不得静默改变已经被构建证据引用的安装。缓存归档损坏同样失败，不通过重新下载静默替换。</p>
+</section>
+<section id="use-the-single-documentation-cli">
+<h2>使用唯一文档 CLI<a class="headerlink" href="#use-the-single-documentation-cli" title="Link to this heading">¶</a></h2>
+<p>使用准备好的 Python 和显式工具 prefix 运行维护 CLI：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>build/docs-tools/venv/bin/python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>docs<span class="w"> </span>doctor<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--tool-prefix<span class="w"> </span>build/docs-tools
+build/docs-tools/venv/bin/python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>docs<span class="w"> </span>check<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--report<span class="w"> </span>build/docs-check.json
+build/docs-tools/venv/bin/python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>docs<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--tool-prefix<span class="w"> </span>build/docs-tools<span class="w"> </span>--language<span class="w"> </span>all<span class="w"> </span>--output<span class="w"> </span>build/documentation
+build/docs-tools/venv/bin/python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>docs<span class="w"> </span>package<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--build<span class="w"> </span>build/documentation<span class="w"> </span>--output<span class="w"> </span>../nexus-documentation-packages
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">install.environment(prefix)</span></code> 返回已验证的子进程环境，将锁定执行文件放在 <code class="docutils literal notranslate"><span class="pre">PATH</span></code> 首位。<code class="docutils literal notranslate"><span class="pre">install.diagnose(prefix)</span></code> 在报告工具身份前拒绝变化的工具锁、已安装文件或许可。两者均不安装或下载工具。构建必须生成新的 XML 与 HTML；旧成功输出不能补救失败命令。</p>
+<p><code class="docutils literal notranslate"><span class="pre">scripts/tools/docs.py</span></code>、<code class="docutils literal notranslate"><span class="pre">.sh</span></code>、<code class="docutils literal notranslate"><span class="pre">.ps1</span></code> 和 <code class="docutils literal notranslate"><span class="pre">.bat</span></code> 入口只转发到此 CLI。旧 <code class="docutils literal notranslate"><span class="pre">all</span></code>、<code class="docutils literal notranslate"><span class="pre">doxygen</span></code> 和 <code class="docutils literal notranslate"><span class="pre">sphinx</span></code> 目标都选择同一完整严格构建。已移除的生成修饰选项会被拒绝；包装入口不能创建回退 Doxyfile 或 Sphinx 配置。Windows 与 macOS 包装入口保留 CLI 转发，正式构建仍要求维护中的 Linux 工具组合。</p>
+</section>
+<section id="replay-the-api-mobile-layout-regression">
+<h2>重放 API 移动端布局回归<a class="headerlink" href="#replay-the-api-mobile-layout-regression" title="Link to this heading">¶</a></h2>
+<p>此可选诊断除了已说明的 Sphinx 工具组合，还需要已有的 Chromium 和 Playwright。它不会安装工具。请使用单独准备的浏览器测试环境；正式文档构建和默认 stdlib 测试套件不导入 Playwright。</p>
+<p>在仓库根目录执行，并提供已有的浏览器可执行文件：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/documentation/check_browser_layout.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--chromium<span class="w"> </span>/path/to/chromium<span class="w"> </span>--report<span class="w"> </span>build/quality/api-layout.json
+</pre></div>
+</div>
+<p>该工具使用生产主题构建临时的中英文 C API 夹具。在 390 CSS 像素视口下，它检查长签名、未改变的符号和锚点、通过内部滚动保留的完整代码及表格内容，以及未裁切的页面。缺少工具或检查失败时返回非零值。成功记录只验证该夹具和实际观察的浏览器；全站响应式验收和归档验证仍需分别执行。</p>
+</section>
+<section id="search-the-current-site">
+<h2>搜索当前站点<a class="headerlink" href="#search-the-current-site" title="Link to this heading">¶</a></h2>
+<p>中英文搜索页面分别使用本地 Sphinx 索引和当前语言的元数据。中文分词器不依赖外部分词词典，可处理汉字序列和拉丁字符标识符。组合查询时使用空格分隔关键词，例如 <code class="docutils literal notranslate"><span class="pre">借用</span> <span class="pre">排空</span></code> 或 <code class="docutils literal notranslate"><span class="pre">借用</span> <span class="pre">HAL</span></code>。</p>
+<p>结果展示版本、内容类型、源语言和实际语言，以及正文摘要。搜索资源仅在搜索页面加载。归档链接和原始资格记录保留其冻结的源码与语言范围。</p>
+</section>
+<section id="ci-permission-boundary">
+<h2>CI 权限边界<a class="headerlink" href="#ci-permission-boundary" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">docs-build.yml</span></code> 只有 <code class="docutils literal notranslate"><span class="pre">contents:</span> <span class="pre">read</span></code>。它显式准备工具、执行源码检查、构建两种语言、打包离线输出并记录实测任务身份。构建失败时没有成功文档上传。包生产器在源码 checkout 外写入。CI 随后将已验证结果复制到新的忽略上传暂存目录，比较归档摘要，并在已有任务身份门禁前验证复制后的清单与内容文件。该暂存复制不重建或替换原始包。</p>
+<p><code class="docutils literal notranslate"><span class="pre">docs-publish.yml</span></code> 只为已审查的 <code class="docutils literal notranslate"><span class="pre">docs-delivery</span></code> 分支运行。其只读任务在上传 Pages 产物前验证已准备的公开字节与发布回执。只有独立部署任务具有 Pages 和 OIDC 写权限，并使用 <code class="docutils literal notranslate"><span class="pre">nexus-documentation</span></code> 环境。它从不 checkout 或执行外部 pull 请求源码。部署分支规则与实际远程执行仍是必须独立观察的仓库状态。</p>
+</section>
+<section id="license-and-upgrade-handling">
+<h2>许可与升级处理<a class="headerlink" href="#license-and-upgrade-handling" title="Link to this heading">¶</a></h2>
+<p>每个 Native 归档携带 Debian copyright 文件。锁定 <code class="docutils literal notranslate"><span class="pre">base-files</span></code> 归档提供 <code class="docutils literal notranslate"><span class="pre">licenses/common-licenses/</span></code> 中所有被引用完整文本；共享许可引用缺失时准备会拒绝。wheel 包许可从已验证 wheel 包复制；五个未包含许可文本的上游 wheel 包使用从各自精确已验证源发行包提取并检入的文本。工具锁记录源归档摘要、成员和提取文本摘要。Doxygen 归档携带完整许可。准备将文本复制到 <code class="docutils literal notranslate"><span class="pre">prefix/licenses/</span></code>；打包保留适用许可内容文件。</p>
+<p>升级时审查上游变更与许可，解析一份新的精确闭包，同时更新工具锁与摘要约束，执行新在线准备及独立离线准备，再运行严格双语构建、图示新鲜度、包验证和恢复。保留原始失败与结果；仅更新版本字符串不足以建立验收证据。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">参考</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api/index.html">公共 API 参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/index.html">配置与工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platforms/index.html">平台与资格</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-delivery.html">文档包、发布与独立恢复</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">文档工具与环境准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="history.html">历史文档与版本迁移</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../assets/diagrams/README.html">Nexus 平台图册</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

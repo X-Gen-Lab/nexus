@@ -1,0 +1,248 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>OS delivery scope and verification &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=3a7bed40"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Software candidates and physical qualification" href="qualification.html" />
+    <link rel="prev" title="Next iterations and team execution" href="next-iterations.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/delivery/os.md">51e93508f22f</a>; code reference: 51e93508f22f. <a href="../../zh_CN/delivery/os.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="os">
+<h1>OS delivery scope and verification<a class="headerlink" href="#os" title="Link to this heading">¶</a></h1>
+<p>The OS retains public Wait plus backend-specific explicit storage. The platform creates no default workers, starts no scheduler, implicitly occupies no task-notification index and creates no maximum object pools. Product composition/recovery policy live in independent examples/product projects.</p>
+<p>Full contracts are in <a class="reference internal" href="../design/os-contracts.html"><span class="std std-doc">OS contracts</span></a>; per-item actual status is in <a class="reference download internal" download="" href="../_downloads/fccd25e37a1c1e4c2119798d61bf4981/os-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">OS01–OS55</span> <span class="pre">ledger</span></code></a>. <code class="docutils literal notranslate"><span class="pre">implemented</span></code> means code exists. Software qualification requires actual execution bound to current clean Git/config/dependency/tool identities.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Mechanism</p></th>
+<th class="head"><p>Delivery boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Wait</p></td>
+<td><p>One waiter, multiple legal publishers, absolute same-domain deadlines and authoritative business predicates</p></td>
+</tr>
+<tr class="row-odd"><td><p>Baremetal</p></td>
+<td><p>Bounded polling without task emulation; sleep uses explicit Arch contracts</p></td>
+</tr>
+<tr class="row-even"><td><p>Native</p></td>
+<td><p>Caller stacks, join, closable byte-copy queues and real monotonic condition waits</p></td>
+</tr>
+<tr class="row-odd"><td><p>FreeRTOS</p></td>
+<td><p>Maintained nine-core ports, static objects, legal task/IRQ contexts and joinable lifecycle</p></td>
+</tr>
+<tr class="row-even"><td><p>direct notify</p></td>
+<td><p>Explicit receiver/index/lifecycle reduce optional binary-semaphore costs</p></td>
+</tr>
+<tr class="row-odd"><td><p>permanent task</p></td>
+<td><p>No join semaphore; entry never returns and storage remains until reset</p></td>
+</tr>
+<tr class="row-even"><td><p>closable queue</p></td>
+<td><p>Separate opt-in storage/waiters; raw queues pay no default close cost</p></td>
+</tr>
+<tr class="row-odd"><td><p>Tick/profile</p></td>
+<td><p>SoC IRQ/CPU facts separate from runtime policy; explicit legal Tick sources</p></td>
+</tr>
+<tr class="row-even"><td><p>low power</p></td>
+<td><p>Shallow sleep plus explicit timer port; no automatic sleep without a port</p></td>
+</tr>
+<tr class="row-odd"><td><p>trace</p></td>
+<td><p>Caller bounded ring plus weak hook; no default large trace buffer</p></td>
+</tr>
+<tr class="row-even"><td><p>MPU</p></td>
+<td><p>Separate restricted-task profile, protected metadata, explicit user linker/regions and narrow delay/tick SVC</p></td>
+</tr>
+<tr class="row-odd"><td><p>split security</p></td>
+<td><p>Matched Secure/NS Runtime, actual TZ-aware port, caller Secure contexts and Idle storage</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<section id="id1">
+<h2>External application delivery<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nexus-examples/apps/uart_owner_runtime</span></code> uses generated typed-factory UART faces. Native creates actual pthreads for two producers/one owner. FreeRTOS creates explicit static producer/owner/stop-coordinator tasks. Baremetal cooperatively services the same owner. Three Boards reuse existing console routes without defining new wiring/providers.</p>
+<p>Shutdown includes admission stop, active cancel/drain, producer join, owner join, IRQ-wake quiescence and notification destruction. GoogleTest/GoogleMock exercise actual BusOwner/application-shutdown modules, mocking only external join/hardware quiescence. Coverage includes stage order, timeout, errors, premature reclaim and retries.</p>
+<p>Partial startup failures reclaim acquired resources separately. Native closes submission, keeps the owner draining and joins running tasks. Pre-scheduler FreeRTOS uses <code class="docutils literal notranslate"><span class="pre">nx_freertos_task_discard_before_scheduler</span></code>: suspend removes kernel candidate-TCB references before synchronous task/completion-latch deletion. It requires privileged bootstrap, NOT_STARTED, an unexecuted wrapper and no unmatched scheduler suspension. Successful discard alone permits stack/TCB/context reuse; running tasks use cooperative stop/join. Actual POSIX-kernel regressions verify reverse reclaim, poisoned-storage reuse, actual scheduler execution and refusal to discard executed wrappers after scheduler end; they replace no MCU validation.</p>
+<p>Native explicitly provides three 64 KiB host-stack buffers, separately increasing application budgets; this is host-fixture cost, not MCU stacks. MCU references use four tasks of 256 StackType_t words each with 8-byte alignment; physical peak measurement remains required and is not inferred from startup minimums. After I/O/publisher stop, FreeRTOS retains scheduler clock/Tick and suspends the coordinator. Native/baremetal may continue platform stop. Products separately own reset/scheduler-stop policy.</p>
+</section>
+<section id="id2">
+<h2>Software verification and physical boundaries<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>Software execution should cover continuously waking deadlines, final-completion races, startup-stack rejection, complete Baseline IRQ binding, close/drain, task reuse, direct-notification receiver/index, tickless failures and trace overflow. GoogleMock context models, actual POSIX kernel, Native multitasking, nine-core ABI links and installed SDK consumption each establish separate evidence.</p>
+<p>Twelve actual ARM MPU variants and V7/V8 host contracts were executed; M0/M0+, M7-kernel-MPU and MPU+split are rejected. Optional split has 31 Secure/NS pairs (62 ELFs), covering maintained M23/M33/M55/M85 CPU-authority combinations and checking seven real SG veneers/imports/context ASM/caller Idle callbacks without default Secure heaps/pools. Two host lease targets cover integer/shared-FP-MVE-bank software contracts. Both require explicit consumer linkers/storage/trusted lifecycles. Fixture addresses are synthetic; actual MPU faults, security attribution, cross-world startup/context switches remain unexecuted. See <a class="reference internal" href="../design/os-contracts.html"><span class="std std-doc">OS contracts</span></a>.</p>
+<p>OS49–55 physical fixtures execute as prepare/validate tools, but disconnected hardware means no actual IRQ→task latency, FP/MVE retention, MSP/task peaks, Tick/deadline error, full-load lifecycle, sleep recovery or exception-safe outputs. Plans remain <code class="docutils literal notranslate"><span class="pre">prepared_unbound</span></code>, physical status <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>. Plans are not measurements, WCET, safety certification or product releases.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/hil/os_acceptance.py<span class="w"> </span>plan<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--resolved<span class="w"> </span>build/stm32-qiming-freertos/generated/resolved.json<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--report<span class="w"> </span>build/stm32-qiming-freertos/os-hil-plan.json
+</pre></div>
+</div>
+<p>After hardware connection, station owners set five budgets: <code class="docutils literal notranslate"><span class="pre">os_irq_latency</span></code>, <code class="docutils literal notranslate"><span class="pre">os_deadline_lateness</span></code>, <code class="docutils literal notranslate"><span class="pre">os_low_power_lateness</span></code>, <code class="docutils literal notranslate"><span class="pre">os_lifecycle</span></code>, <code class="docutils literal notranslate"><span class="pre">os_fail_response</span></code>, with us/us/us/count/us units. Lifecycle requires positive minimum; the other four use maximum. Records bind station admission and budgets cannot be relaxed inside acquisition context.</p>
+<p>Strict OS-context fields are schema_version=1/kind=os_hil_context, admission_sha256, workload/instrument file identities, actual load/executor/irq_priorities/cpu_clock_hz, features.fpu/mve, complete <code class="docutils literal notranslate"><span class="pre">stack_names</span></code> and requirements. Names include MSP/every selected workload task and raw stack traces must match exactly, not one example task. Features exactly match admitted CPU ABI. Each independent raw trace binds context SHA and retains per-sample/register/stack/lifecycle/fail-stop data. A self-authored <code class="docutils literal notranslate"><span class="pre">status=passed</span></code> summary cannot replace it. Acquisition time needs a fresh UTC offset.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/hil/os_acceptance.py<span class="w"> </span>validate<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--admission<span class="w"> </span>station/admission.json<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--raw-evidence<span class="w"> </span>station/os-run.json<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--report<span class="w"> </span>station/os-validation.json
+</pre></div>
+</div>
+<p>Reports require unused output targets and never overwrite old evidence/inputs. These commands read retained records only and never operate hardware automatically. Actual station/workload review owns measurement method, observed load, power, safe outputs and product budgets; host models/old commits confer no physical qualification.</p>
+</section>
+<section id="id3">
+<h2>Explicit optimization costs<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>The 32-bit-ABI <code class="docutils literal notranslate"><span class="pre">standard</span></code> development resource probe measured the object sizes below. Changed profile/CPU port/enum ABI/compiler requires fresh cost gates. These are actual ELF object sizes, not runtime cycles/final software-candidate qualification.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Object</p></th>
+<th class="head text-right"><p>RAM bytes</p></th>
+<th class="head"><p>Cost responsibility</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Wait face</p></td>
+<td class="text-right"><p>16</p></td>
+<td><p>Retains existing public ABI</p></td>
+</tr>
+<tr class="row-odd"><td><p>Ordinary notification</p></td>
+<td class="text-right"><p>84</p></td>
+<td><p>Per-object static latch</p></td>
+</tr>
+<tr class="row-even"><td><p>direct notify</p></td>
+<td class="text-right"><p>16</p></td>
+<td><p>Explicit receiver/index; saves 68 B</p></td>
+</tr>
+<tr class="row-odd"><td><p>Joinable task</p></td>
+<td class="text-right"><p>172</p></td>
+<td><p>Excludes caller stack</p></td>
+</tr>
+<tr class="row-even"><td><p>Permanent task</p></td>
+<td class="text-right"><p>88</p></td>
+<td><p>Excludes caller stack; saves 84 B</p></td>
+</tr>
+<tr class="row-odd"><td><p>raw queue</p></td>
+<td class="text-right"><p>80</p></td>
+<td><p>Excludes payload</p></td>
+</tr>
+<tr class="row-even"><td><p>closable queue</p></td>
+<td class="text-right"><p>96</p></td>
+<td><p>16 B above raw; excludes payload/waiters</p></td>
+</tr>
+<tr class="row-odd"><td><p>Each concurrent queue waiter</p></td>
+<td class="text-right"><p>84</p></td>
+<td><p>Caller provides actual concurrency capacity</p></td>
+</tr>
+<tr class="row-even"><td><p>Idle TCB plus default stack</p></td>
+<td class="text-right"><p>596</p></td>
+<td><p>Default 84+512 B; profiles may change it</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p><code class="docutils literal notranslate"><span class="pre">maximum_waiters</span></code> bounds close traversal while the scheduler is paused; payload item size bounds each kernel-copy critical section. Entire close traversal is not IRQ-masked time and static instruction counts are not measured latency. Cost gates retain argv, ELF/nm/disassembly/sizes. Compare minimal-resource/complete-capability profiles separately; different-workload images are not one baseline.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Recorded delivery evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current platform delivery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Current system architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system-verification.html">Build system execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capabilities.html">Derived capabilities and integration matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortex-m.html">Cortex-M software support and platform-integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">External-project migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-iterations.html">Next iterations and team execution</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">OS delivery scope and verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qualification.html">Software candidates and physical qualification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security-review.html">Security scanning and lifecycle boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-extensions-verification.html">SoC extension verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement-verification.html">SoC refinement execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support.html">Exact support scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="verification.html">Current evidence and acceptance boundaries</a></li>
+</ul>
+</li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

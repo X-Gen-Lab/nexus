@@ -1,0 +1,1243 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Arch：CPU 机制与能力合同 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nexus.css?v=4084a1dc" />
+    <script src="../../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="类型化 I/O：设备与执行合同" href="io.html" />
+    <link rel="prev" title="Core：请求、状态与时间" href="core.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/reference/api/arch.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../../en/reference/api/arch.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="arch-cpu-mechanisms-and-feature-contracts">
+<h1>Arch：CPU 机制与能力合同<a class="headerlink" href="#arch-cpu-mechanisms-and-feature-contracts" title="Link to this heading">¶</a></h1>
+<p>这些声明来自公共头文件。选择、生命周期、支持的执行模式和物理资源授权范围仍以对应设计及支持记录为准。</p>
+<section id="arch-h">
+<span id="arch-8h"></span><h2>arch.h<a class="headerlink" href="#arch-h" title="Link to this heading">¶</a></h2>
+<p>CPU 本地屏蔽、上下文、内存顺序与周期快照合同。</p>
+<p>作者  Nexus Team</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">函数</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_irq_save">
+<span class="target" id="arch_8h_1ad57e13d43072d0cc68964d952c186d65"></span><a class="reference internal" href="#c.nx_arch_irq_state_t" title="nx_arch_irq_state_t"><span class="n"><span class="pre">nx_arch_irq_state_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_irq_save</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_irq_save" title="Link to this definition">¶</a><br /></dt>
+<dd><p>保存进入时的本地屏蔽状态，并屏蔽可配置异常。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Privileged Task/configurable-IRQ short metadata sections only; do not block, allocate, call OS functions, copy large buffers or invoke callbacks. NMI/HardFault remain unmasked. Native uses a recursive host exclusion model, not physical IRQ timing or signal safety. NMI/HardFault must not access shared metadata protected by this mask. ARM unprivileged callers need an explicit privileged gateway owned by their OS. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Token to restore exactly once in reverse nesting order.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_irq_restore">
+<span class="target" id="arch_8h_1a1e987fb3f434f4174a3cbc6130b0fe08"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_irq_restore</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.nx_arch_irq_state_t" title="nx_arch_irq_state_t"><span class="n"><span class="pre">nx_arch_irq_state_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">previous</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_irq_restore" title="Link to this definition">¶</a><br /></dt>
+<dd><p>恢复进入时的屏蔽状态，保留嵌套屏蔽区的约束。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Privileged contexts only. Restores PRIMASK only; BASEPRI/FAULTMASK, where present, are not modified. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>previous</strong> – <strong>[in]</strong> Token from this CPU/thread’s latest unmatched save.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_irq_masks">
+<span class="target" id="arch_8h_1ac0df501b6aea585084386c559e27641c"></span><a class="reference internal" href="#c.nx_arch_irq_masks_t" title="nx_arch_irq_masks_t"><span class="n"><span class="pre">nx_arch_irq_masks_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_irq_masks</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_irq_masks" title="Link to this definition">¶</a><br /></dt>
+<dd><p>读取已实现本地中断屏蔽寄存器的快照。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Bounded read-only privileged task/IRQ query. Does not mask interrupts or grant a stable critical section. Values refer to this CPU/security state, not another security world or an SMP peer. Unprivileged reads do not establish mask state. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Current PRIMASK and implemented BASEPRI/FAULTMASK values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_irq_is_masked">
+<span class="target" id="arch_8h_1abae622a9676b790815e962b27a54bd23"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_irq_is_masked</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_irq_is_masked" title="Link to this definition">¶</a><br /></dt>
+<dd><p>检查可能阻止必要完成推进的屏蔽状态。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Bounded privileged task/IRQ query, no state change. ARM unprivileged reads do not establish the actual mask state. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True for PRIMASK, implemented BASEPRI/FAULTMASK, or Native thread nesting. Baseline Cortex-M cores query PRIMASK only.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_exception_number">
+<span class="target" id="arch_8h_1acc023ec7287c56026e2b10c786f15f50"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_exception_number</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_exception_number" title="Link to this definition">¶</a><br /></dt>
+<dd><p>查询当前 CPU 异常的准确身份。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Bounded read-only task/IRQ query. The identity belongs to the current CPU/security state; it is not a portable SoC IRQ number or evidence that a kernel ISR call is allowed. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>IPSR exception number, zero for Thread mode or Native.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_is_privileged">
+<span class="target" id="arch_8h_1a17fbd542dfec03fefe833a92948586e2"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_is_privileged</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_is_privileged" title="Link to this definition">¶</a><br /></dt>
+<dd><p>查询当前 CPU 执行上下文的特权级。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Bounded read-only task/IRQ query. Handler privilege does not depend on the interrupted Thread’s CONTROL.nPRIV. This query does not establish Secure-world ownership. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True in Handler mode or privileged Thread mode. Native always returns true because it has no CPU privilege model.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_in_isr">
+<span class="target" id="arch_8h_1af9c0fc6c892dcc813544c6f65c30cdfe"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_in_isr</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_in_isr" title="Link to this definition">¶</a><br /></dt>
+<dd><p>查询当前 CPU 异常上下文。</p>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cortex-M IPSR is nonzero; Native has no hardware ISR and always returns false. Host signals are unsupported contexts. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_dmb">
+<span class="target" id="arch_8h_1a3867be9231d8b4e232af1eaf4ed11b32"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_dmb</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_dmb" title="Link to this definition">¶</a><br /></dt>
+<dd><p>为 CPU 域中的显式数据内存访问建立顺序。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Cortex-M DMB; Native sequentially consistent thread fence. Does not prove DMA idle or clean noncoherent cache lines. </p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_dsb">
+<span class="target" id="arch_8h_1a32a277a0b05022414f7627fafca7c274"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_dsb</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_dsb" title="Link to this definition">¶</a><br /></dt>
+<dd><p>完成此前的显式内存访问。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Cortex-M DSB; Native thread fence is a behavioral model, not a physical bus/DMA completion guarantee. </p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_isb">
+<span class="target" id="arch_8h_1aaf78e9982ebc50105a7794628dbd9c99"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_isb</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_isb" title="Link to this definition">¶</a><br /></dt>
+<dd><p>同步后续 CPU 指令执行。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Cortex-M ISB; Native thread fence has no pipeline semantics. </p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_cycle_snapshot">
+<span class="target" id="arch_8h_1a98fe15b5ba4b56068a81707e42adee4a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_cycle_snapshot</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">cycles</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_cycle_snapshot" title="Link to this definition">¶</a><br /></dt>
+<dd><p>读取已启用自由运行周期计数器的快照。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Counter frequency follows CPU clock. Use unsigned snapshot subtraction only for intervals shorter than 2^32 cycles; this counter is neither shared monotonic time nor a deadline. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cycles</strong> – <strong>[out]</strong> DWT CYCCNT snapshot, unchanged when unavailable.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>True when a maintained CPU counter is enabled; false on Native, an unreviewed/disabled/unavailable DWT, or an unprivileged caller. Does not enable/reset it. Only a reviewed CPU profile may read the optional DWT registers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.nx_arch_irq_state_t">
+<span class="target" id="structnx__arch__irq__state__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_irq_state_t</span></span></span><a class="headerlink" href="#c.nx_arch_irq_state_t" title="Link to this definition">¶</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;<a class="reference internal" href="#arch-8h"><span class="std std-ref">arch.h</span></a>&gt;</em></div>
+<p>保存进入时的 PRIMASK 或调用线程的 Native 嵌套状态。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Restore on the same CPU/thread in strict reverse order. This is neither a FreeRTOS BASEPRI token nor an SMP lock. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">公共成员</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_irq_state_t.value">
+<span class="target" id="structnx__arch__irq__state__t_1abe25af14a3df558bf7cec5f80726cd06"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><a class="headerlink" href="#c.nx_arch_irq_state_t.value" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.nx_arch_irq_masks_t">
+<span class="target" id="structnx__arch__irq__masks__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_irq_masks_t</span></span></span><a class="headerlink" href="#c.nx_arch_irq_masks_t" title="Link to this definition">¶</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;<a class="reference internal" href="#arch-8h"><span class="std std-ref">arch.h</span></a>&gt;</em></div>
+<p>已实现本地中断屏蔽状态的只读快照。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Absent BASEPRI/FAULTMASK registers are zero. Native reports PRIMASK as zero or one according to current thread nesting. This snapshot is neither a restore token nor a kernel lock. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">公共成员</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_irq_masks_t.primask">
+<span class="target" id="structnx__arch__irq__masks__t_1a4e72a8b5b9c3225b1eeb0caebb24356f"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">primask</span></span></span><a class="headerlink" href="#c.nx_arch_irq_masks_t.primask" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_irq_masks_t.basepri">
+<span class="target" id="structnx__arch__irq__masks__t_1ab8dc43770a7e7da59dc714e291a43d8d"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basepri</span></span></span><a class="headerlink" href="#c.nx_arch_irq_masks_t.basepri" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_irq_masks_t.faultmask">
+<span class="target" id="structnx__arch__irq__masks__t_1ac38d179fb9bb02d98ea161514b1e9b04"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">faultmask</span></span></span><a class="headerlink" href="#c.nx_arch_irq_masks_t.faultmask" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="atomic-h">
+<span id="atomic-8h"></span><h2>atomic.h<a class="headerlink" href="#atomic-h" title="Link to this heading">¶</a></h2>
+<p>内联、自然对齐的 32 位发布与读改写端口。</p>
+<p>作者  Nexus Team</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Storage is a live, naturally aligned uint32_t; all concurrent accesses use these helpers or compatible compiler atomics. Initialize before publishing storage. Load/store use compiler acquire/release operations on all maintained CPUs and never mask interrupts. Other than ARMv6-M, RMW uses compiler lock-free operations; exclusive instruction retries do not establish a fixed cycle bound.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>ARMv6-M RMW is CPU-local, bounded saved-PRIMASK exclusion. Only privileged Thread/configurable-IRQ contexts on one CPU may access this domain. NMI/HardFault, unprivileged callers, another core, DMA and another security domain must not access its storage concurrently. It is not an SMP or bus atomic operation. No callback, allocation, blocking call or payload copy occurs while masked. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">函数</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_atomic_u32_load_relaxed">
+<span class="target" id="atomic_8h_1a724aaab789c0fef723d5f196a290d7fa"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_atomic_u32_load_relaxed</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_atomic_u32_load_relaxed" title="Link to this definition">¶</a><br /></dt>
+<dd><p>读取一个字，不发布或获取其他数据。</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_atomic_u32_load_acquire">
+<span class="target" id="atomic_8h_1a6c3378d31b247c69df1b9c6efd405319"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_atomic_u32_load_acquire</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_atomic_u32_load_acquire" title="Link to this definition">¶</a><br /></dt>
+<dd><p>读取一个字，并通过所观察的发布获取数据。</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_atomic_u32_store_relaxed">
+<span class="target" id="atomic_8h_1af2c99b2ac6f010356255aa5db168844e"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_atomic_u32_store_relaxed</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">desired</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_atomic_u32_store_relaxed" title="Link to this definition">¶</a><br /></dt>
+<dd><p>存储一个字，不发布其他数据。</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_atomic_u32_store_release">
+<span class="target" id="atomic_8h_1a5edcbed19c4645e1469cd9a53425bf6d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_atomic_u32_store_release</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">desired</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_atomic_u32_store_release" title="Link to this definition">¶</a><br /></dt>
+<dd><p>通过一次对齐的 release 存储发布此前数据。</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_atomic_u32_compare_exchange_acq_rel">
+<span class="target" id="atomic_8h_1abb398d23f8620e1c5306371d91b60494"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_atomic_u32_compare_exchange_acq_rel</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">expected</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">desired</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_atomic_u32_compare_exchange_acq_rel" title="Link to this definition">¶</a><br /></dt>
+<dd><p>强 acq_rel 比较交换，失败时采用 acquire 顺序。</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – <strong>[inout]</strong> Live naturally aligned word in the caller-owned atomic domain; all concurrent accesses use this contract. </p></li>
+<li><p><strong>expected</strong> – <strong>[inout]</strong> Separate, private caller storage; failure replaces it with the observed value. Success leaves it unchanged. </p></li>
+<li><p><strong>desired</strong> – <strong>[in]</strong> Replacement word stored only when comparison succeeds. </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>True only when the original word equals expected and the desired word was stored. No spurious failure is allowed. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_atomic_u32_fetch_add_acq_rel">
+<span class="target" id="atomic_8h_1a1add17c3307b7faa3df4a5e1eb48030d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_atomic_u32_fetch_add_acq_rel</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">amount</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_atomic_u32_fetch_add_acq_rel" title="Link to this definition">¶</a><br /></dt>
+<dd><p>按模 2^32 以 acq_rel 顺序相加，返回原值。</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_atomic_u32_fetch_add_release">
+<span class="target" id="atomic_8h_1a6a387989c5a8dd69c9abe1bc0c7ab2bb"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_atomic_u32_fetch_add_release</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">amount</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_atomic_u32_fetch_add_release" title="Link to this definition">¶</a><br /></dt>
+<dd><p>按模 2^32 以 release 顺序相加，返回原值。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>ARMv6-M conservatively acquires the observed word too. </p>
+</div>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_atomic_u32_fetch_sub_acq_rel">
+<span class="target" id="atomic_8h_1a65e28f737daeed17cafd31f3e53e5217"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_atomic_u32_fetch_sub_acq_rel</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">amount</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_atomic_u32_fetch_sub_acq_rel" title="Link to this definition">¶</a><br /></dt>
+<dd><p>按模 2^32 以 acq_rel 顺序相减，返回原值。</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_atomic_u32_fetch_sub_release">
+<span class="target" id="atomic_8h_1a75a9a617fa9d797951bb24ca1b45576e"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_atomic_u32_fetch_sub_release</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">value</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">amount</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_atomic_u32_fetch_sub_release" title="Link to this definition">¶</a><br /></dt>
+<dd><p>按模 2^32 以 release 顺序相减，返回原值。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>ARMv6-M conservatively acquires the observed word too. </p>
+</div>
+</dd></dl>
+
+</div>
+</section>
+<section id="cache-h">
+<span id="cache-8h"></span><h2>cache.h<a class="headerlink" href="#cache-h" title="Link to this heading">¶</a></h2>
+<p>显式的 CPU 完整缓存行维护机制。</p>
+<p>作者  Nexus Team</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">函数</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_dcache_clean">
+<span class="target" id="cache_8h_1acec245a26d50fac5075f546b7f01382c"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_dcache_clean</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uintptr_t</span></span><span class="w"> </span><span class="n"><span class="pre">address</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_dcache_clean" title="Link to this definition">¶</a><br /></dt>
+<dd><p>将脏数据缓存行发布到一致性点。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Privileged task/configurable-IRQ context in the current security domain only. The caller excludes other CPU, security-world and DMA users of every complete line until return, and keeps cache configuration stable. No hidden IRQ mask, allocation or cache enable occurs. Supported geometry is an explicitly reviewed 32-byte line; range rounding is forbidden. Work is bounded by bytes/32 and is not a DMA drain, device completion or transfer of ownership. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>address</strong> – <strong>[in]</strong> First byte of exclusively owned complete lines. </p></li>
+<li><p><strong>bytes</strong> – <strong>[in]</strong> Nonzero whole-line length in the CPU address space.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>OK after maintenance and barriers; INVALID for partial lines or an overflowing/non-32-bit range; CONTEXT for an unprivileged caller; UNSUPPORTED for an absent or disabled reviewed cache. Rejection performs no maintenance writes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_dcache_invalidate">
+<span class="target" id="cache_8h_1a6047d21fb22b558992478218cbf5c19b"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_dcache_invalidate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uintptr_t</span></span><span class="w"> </span><span class="n"><span class="pre">address</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_dcache_invalidate" title="Link to this definition">¶</a><br /></dt>
+<dd><p>丢弃完整数据缓存行，不执行写回。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>The caller permits all dirty data in these lines to be discarded and satisfies clean’s exclusion/context contract. No adjacent line is touched or rounded into the range. For DMA receive, providers coordinate both pre-DMA and post-drain maintenance; this call does not establish idle. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>address</strong> – <strong>[in]</strong> First byte of exclusively owned complete lines. </p></li>
+<li><p><strong>bytes</strong> – <strong>[in]</strong> Nonzero whole-line length in the CPU address space.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>The same context, range and capability results as clean.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_dcache_clean_invalidate">
+<span class="target" id="cache_8h_1a47c7691530c9e72b76f37108fa0e103e"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_dcache_clean_invalidate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uintptr_t</span></span><span class="w"> </span><span class="n"><span class="pre">address</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_dcache_clean_invalidate" title="Link to this definition">¶</a><br /></dt>
+<dd><p>发布脏数据并丢弃完整缓存行。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Satisfies clean’s exclusion/context contract. Distinct from invalidate: dirty contents are written before discard. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>address</strong> – <strong>[in]</strong> First byte of exclusively owned complete lines. </p></li>
+<li><p><strong>bytes</strong> – <strong>[in]</strong> Nonzero whole-line length in the CPU address space.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>The same context, range and capability results as clean.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_instruction_sync">
+<span class="target" id="cache_8h_1a772f54a968de39aa873b90f59ec93ace"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_instruction_sync</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uintptr_t</span></span><span class="w"> </span><span class="n"><span class="pre">address</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_instruction_sync" title="Link to this definition">¶</a><br /></dt>
+<dd><p>使调用者拥有的完整范围对 CPU 指令保持一致。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Satisfies clean’s exclusion/context contract. All present caches are checked before any maintenance. With only one reviewed cache, only that cache is maintained. The caller prevents execution from the changing range, including other security-world users. This is not code validation, an MPU policy change or a global cache/branch-predictor flush. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>address</strong> – <strong>[in]</strong> First byte of exclusively owned complete lines. </p></li>
+<li><p><strong>bytes</strong> – <strong>[in]</strong> Nonzero whole-line length in the CPU address space.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>OK after data clean, instruction invalidate and execution barriers; INVALID/CONTEXT as above; UNSUPPORTED when both reviewed caches are absent or a present cache is disabled.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</section>
+<section id="cache-control-h">
+<span id="cache-control-8h"></span><h2>cache_control.h<a class="headerlink" href="#cache-control-h" title="Link to this heading">¶</a></h2>
+<p>显式、自有的 Cortex-M7 冷缓存状态转换。</p>
+<p>作者  Nexus Team</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">宏定义</p>
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.NX_ARCH_CACHE_DATA">
+<span class="target" id="cache__control_8h_1a47be4852192c25aceacadc04c10cc643"></span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_CACHE_DATA</span></span></span><a class="headerlink" href="#c.NX_ARCH_CACHE_DATA" title="Link to this definition">¶</a><br /></dt>
+<dd><p>数据缓存责任位，独立于硬件 CCR 位布局。</p>
+</dd></dl>
+
+<dl class="c macro">
+<dt class="sig sig-object c" id="c.NX_ARCH_CACHE_INSTRUCTION">
+<span class="target" id="cache__control_8h_1ad051a5fc00e020d8a603a46b6b0ec00b"></span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_CACHE_INSTRUCTION</span></span></span><a class="headerlink" href="#c.NX_ARCH_CACHE_INSTRUCTION" title="Link to this definition">¶</a><br /></dt>
+<dd><p>指令缓存责任位。</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">枚举</p>
+<dl class="c enum">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_result_t">
+<span class="target" id="cache__control_8h_1a77bd8f1820d5ec4ba836fec1c1ddb71c"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_cache_control_result_t</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_result_t" title="Link to this definition">¶</a><br /></dt>
+<dd><p>冷转换准入或执行结果。</p>
+<p>取值：</p>
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_OK">
+<span class="target" id="cache__control_8h_1a77bd8f1820d5ec4ba836fec1c1ddb71ca93a8d987dea588dec5e1f7d77d213721"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_CACHE_OK</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_OK" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_INVALID">
+<span class="target" id="cache__control_8h_1a77bd8f1820d5ec4ba836fec1c1ddb71ca5f20796ac439b8be430d85c1fc0cc2d9"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_CACHE_INVALID</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_INVALID" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_CONTEXT">
+<span class="target" id="cache__control_8h_1a77bd8f1820d5ec4ba836fec1c1ddb71ca361711412fa45354a426ff3a902e8870"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_CACHE_CONTEXT</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_CONTEXT" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_UNSUPPORTED">
+<span class="target" id="cache__control_8h_1a77bd8f1820d5ec4ba836fec1c1ddb71ca1b2e93665b2a96e8d115d7e16abb4029"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_CACHE_UNSUPPORTED</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_UNSUPPORTED" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_STATE">
+<span class="target" id="cache__control_8h_1a77bd8f1820d5ec4ba836fec1c1ddb71ca3828385271f6bf8a45b2bbfc2f49962c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_CACHE_STATE</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_STATE" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_IO">
+<span class="target" id="cache__control_8h_1a77bd8f1820d5ec4ba836fec1c1ddb71ca9dd0d7730db9461f8ddfaa45f1bc34fe"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_CACHE_IO</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_result_t.NX_ARCH_CACHE_IO" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">函数</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_cache_cold_enable">
+<span class="target" id="cache__control_8h_1a0456108b25c14fd7e2f9714204aae4c6"></span><a class="reference internal" href="#c.nx_arch_cache_control_result_t" title="nx_arch_cache_control_result_t"><span class="n"><span class="pre">nx_arch_cache_control_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_cache_cold_enable</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.nx_arch_cache_control_t" title="nx_arch_cache_control_t"><span class="n"><span class="pre">nx_arch_cache_control_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">control</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">mask</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_cache_cold_enable" title="Link to this definition">¶</a><br /></dt>
+<dd><p>对冷缓存作准入判定，并启用显式选定的缓存。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Reviewed M7 only. Requires privileged Thread, PRIMASK=1, BASEPRI=FAULTMASK=0 and known-clean caches from a trusted reset or prior successful owned clean/disable. CCR bits being zero alone do not prove clean foreign state; never adopt an unknown bootloader state. Caller excludes all other cache users, DMA, NMI and HardFault access to affected memory throughout the transition. It owns memory attributes, execution and coherency policy; enabling a cache does not establish DMA coherence. No IRQ mask changes, allocation or cache adoption occur. Rejected initial admission has no retained responsibility. An IO failure can retain owned_mask/selector_pending; call cold_disable and retain storage until it succeeds. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>control</strong> – <strong>[inout]</strong> Exclusively owned, initially empty control object. </p></li>
+<li><p><strong>mask</strong> – <strong>[in]</strong> Nonzero combination of DATA and INSTRUCTION bits. </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>OK after verified enable and selector restoration; INVALID for arguments; CONTEXT for unsafe context; UNSUPPORTED for an unreviewed CPU/geometry; STATE for live/foreign caches; IO when a register write is not confirmed by readback. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_cache_cold_disable">
+<span class="target" id="cache__control_8h_1a508107106eab90d7217fd6a29b3d90ad"></span><a class="reference internal" href="#c.nx_arch_cache_control_result_t" title="nx_arch_cache_control_result_t"><span class="n"><span class="pre">nx_arch_cache_control_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_cache_cold_disable</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.nx_arch_cache_control_t" title="nx_arch_cache_control_t"><span class="n"><span class="pre">nx_arch_cache_control_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">control</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_cache_cold_disable" title="Link to this definition">¶</a><br /></dt>
+<dd><p>清理并禁用此控制对象负责的缓存。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Satisfies enable’s exclusion and context contract after every DMA/provider has drained. Rejects enabled caches outside owned_mask. The data clean/disable transition uses a stack-free leaf so no local dirty line can appear between the final clean and CCR update. Its bounded work is four ways times the verified set count, not constant latency. Failed operations remain retryable without adopting a new cache or forgetting the original selector. A zero object is an idempotent no-op on a supported CPU profile. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>control</strong> – <strong>[inout]</strong> Same live object passed to cold_enable. </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>OK only after cache disable and selector restoration; INVALID, CONTEXT, UNSUPPORTED, STATE or IO retain ownership. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_t">
+<span class="target" id="structnx__arch__cache__control__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_cache_control_t</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_t" title="Link to this definition">¶</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;<a class="reference internal" href="#cache-control-8h"><span class="std std-ref">cache_control.h</span></a>&gt;</em></div>
+<p>调用者拥有的缓存责任与选择器恢复状态。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Zero initialize before first use; do not modify fields or copy a live object. Retain the object until owned_mask and selector_pending are both zero. owned_mask conservatively records cleanup responsibility, not enabled hardware bits. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">公共成员</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_t.owned_mask">
+<span class="target" id="structnx__arch__cache__control__t_1aa8e730e9b5069ae297a864b83e169330"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">owned_mask</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_t.owned_mask" title="Link to this definition">¶</a><br /></dt>
+<dd><p>保留的数据／指令缓存责任。</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_t.saved_selector">
+<span class="target" id="structnx__arch__cache__control__t_1a33264825d0d475a567c67df25978465c"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">saved_selector</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_t.saved_selector" title="Link to this definition">¶</a><br /></dt>
+<dd><p>未完成操作对应的原始 CSSELR。</p>
+</dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_cache_control_t.selector_pending">
+<span class="target" id="structnx__arch__cache__control__t_1abeff2200e3783d421fa4d89ec378d70c"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">selector_pending</span></span></span><a class="headerlink" href="#c.nx_arch_cache_control_t.selector_pending" title="Link to this definition">¶</a><br /></dt>
+<dd><p>原始选择器的恢复仍未完成。</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="features-h">
+<span id="features-8h"></span><h2>features.h<a class="headerlink" href="#features-h" title="Link to this heading">¶</a></h2>
+<p>已审查的 CPU 机制与无分配结果类型。</p>
+<p>作者  Nexus Team</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">枚举</p>
+<dl class="c enum">
+<dt class="sig sig-object c" id="c.nx_arch_result_t">
+<span class="target" id="features_8h_1a627a4e4bfabecdb570721c95b8a6c51d"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_result_t</span></span></span><a class="headerlink" href="#c.nx_arch_result_t" title="Link to this definition">¶</a><br /></dt>
+<dd><p>经过验证的本地 CPU 机制操作结果。</p>
+<p>取值：</p>
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_result_t.NX_ARCH_OK">
+<span class="target" id="features_8h_1a627a4e4bfabecdb570721c95b8a6c51da7c40e9420ac0aca4f8ad489118fad8be"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_OK</span></span></span><a class="headerlink" href="#c.nx_arch_result_t.NX_ARCH_OK" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_result_t.NX_ARCH_INVALID">
+<span class="target" id="features_8h_1a627a4e4bfabecdb570721c95b8a6c51da574e0f9a973795c5a697ad425ce0fe6f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_INVALID</span></span></span><a class="headerlink" href="#c.nx_arch_result_t.NX_ARCH_INVALID" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_result_t.NX_ARCH_CONTEXT">
+<span class="target" id="features_8h_1a627a4e4bfabecdb570721c95b8a6c51da1a3d3c8b2cb00422b30c13d93036648c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_CONTEXT</span></span></span><a class="headerlink" href="#c.nx_arch_result_t.NX_ARCH_CONTEXT" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_result_t.NX_ARCH_UNSUPPORTED">
+<span class="target" id="features_8h_1a627a4e4bfabecdb570721c95b8a6c51dabeec6b8aa98e5559ae52c66477d671a2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_UNSUPPORTED</span></span></span><a class="headerlink" href="#c.nx_arch_result_t.NX_ARCH_UNSUPPORTED" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="c enum">
+<dt class="sig sig-object c" id="c.nx_arch_security_state_t">
+<span class="target" id="features_8h_1ae418a1e0c0e2b79af1566e8476eed88d"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_security_state_t</span></span></span><a class="headerlink" href="#c.nx_arch_security_state_t" title="Link to this definition">¶</a><br /></dt>
+<dd><p>为此固件镜像编译的安全状态。</p>
+<p>取值：</p>
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_security_state_t.NX_ARCH_SECURITY_SINGLE">
+<span class="target" id="features_8h_1ae418a1e0c0e2b79af1566e8476eed88daa02293aa7331f6dd1887972ad1a2bb98"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_SECURITY_SINGLE</span></span></span><a class="headerlink" href="#c.nx_arch_security_state_t.NX_ARCH_SECURITY_SINGLE" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_security_state_t.NX_ARCH_SECURITY_SECURE">
+<span class="target" id="features_8h_1ae418a1e0c0e2b79af1566e8476eed88da100fed2889f649510ec03c84015a98b0"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_SECURITY_SECURE</span></span></span><a class="headerlink" href="#c.nx_arch_security_state_t.NX_ARCH_SECURITY_SECURE" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_security_state_t.NX_ARCH_SECURITY_NONSECURE">
+<span class="target" id="features_8h_1ae418a1e0c0e2b79af1566e8476eed88dabcbe304b535d1bc75c6c2359fa42dfa6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_SECURITY_NONSECURE</span></span></span><a class="headerlink" href="#c.nx_arch_security_state_t.NX_ARCH_SECURITY_NONSECURE" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">函数</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_features">
+<span class="target" id="features_8h_1ae8b90137ef68db02cf02b52538f2c842"></span><a class="reference internal" href="#c.nx_arch_features_t" title="nx_arch_features_t"><span class="n"><span class="pre">nx_arch_features_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_features</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_features" title="Link to this definition">¶</a><br /></dt>
+<dd><p>查询不可变、编译期确定的 CPU 机制能力。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Read-only Task/IRQ query, no hardware access or discovery. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Exact reviewed CPU facts; Native reports absent hardware.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.nx_arch_features_t">
+<span class="target" id="structnx__arch__features__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_features_t</span></span></span><a class="headerlink" href="#c.nx_arch_features_t" title="Link to this definition">¶</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;<a class="reference internal" href="#features-8h"><span class="std std-ref">features.h</span></a>&gt;</em></div>
+<p>实际编译的精确 CPU profile 中的已审查机制。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Cache sizes are zero when absent, MPU version is zero, seven or eight. These facts do not prove enabled hardware, memory reachability, cross-domain ownership or HIL status. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">公共成员</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_features_t.dcache_line_bytes">
+<span class="target" id="structnx__arch__features__t_1a5db12cdefdd8a9b1cbf5ba9e21f6724b"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dcache_line_bytes</span></span></span><a class="headerlink" href="#c.nx_arch_features_t.dcache_line_bytes" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_features_t.icache_line_bytes">
+<span class="target" id="structnx__arch__features__t_1a6736725ba6afc5980b8b096fd4545e3a"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">icache_line_bytes</span></span></span><a class="headerlink" href="#c.nx_arch_features_t.icache_line_bytes" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_features_t.mpu_version">
+<span class="target" id="structnx__arch__features__t_1aaecc0e8898a6472843045de84e82bb59"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mpu_version</span></span></span><a class="headerlink" href="#c.nx_arch_features_t.mpu_version" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_features_t.dwt_cycle_counter">
+<span class="target" id="structnx__arch__features__t_1ad32029eaf0f864a50c93fc02f970ee22"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dwt_cycle_counter</span></span></span><a class="headerlink" href="#c.nx_arch_features_t.dwt_cycle_counter" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_features_t.sau">
+<span class="target" id="structnx__arch__features__t_1ad26adcc70034aea3187cab7923b6b25d"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sau</span></span></span><a class="headerlink" href="#c.nx_arch_features_t.sau" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_features_t.security_state">
+<span class="target" id="structnx__arch__features__t_1a35db0d307cac363f0353d7387a0de104"></span><a class="reference internal" href="#c.nx_arch_security_state_t" title="nx_arch_security_state_t"><span class="n"><span class="pre">nx_arch_security_state_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">security_state</span></span></span><a class="headerlink" href="#c.nx_arch_features_t.security_state" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="mpu-h">
+<span id="mpu-8h"></span><h2>mpu.h<a class="headerlink" href="#mpu-h" title="Link to this heading">¶</a></h2>
+<p>分别实现 Armv7-M 与 Armv8-M MPU 编码机制。</p>
+<p>作者  Nexus Team</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">函数</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_encode">
+<span class="target" id="mpu_8h_1ad7410649ae2260d9fc781a6680b91f8c"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_mpu_v7_encode</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#c.nx_arch_mpu_v7_region_t" title="nx_arch_mpu_v7_region_t"><span class="n"><span class="pre">nx_arch_mpu_v7_region_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">region</span></span>, <a class="reference internal" href="#c.nx_arch_mpu_v7_encoding_t" title="nx_arch_mpu_v7_encoding_t"><span class="n"><span class="pre">nx_arch_mpu_v7_encoding_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">encoding</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_mpu_v7_encode" title="Link to this definition">¶</a><br /></dt>
+<dd><p>编码准确的 Armv7-M 区域，不访问硬件。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Pure bounded task/IRQ function. Inputs and output must not overlap. This encodes fields, not SoC memory reachability, cache ownership, DMA coherency or product protection policy. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>region</strong> – <strong>[in]</strong> Size exponent 5..32, aligned base, AP 0/1/2/3/5/6, TEX 0..7 and raw S/C/B bits. Subregion mask is at most 255 and must be zero for sizes below 256 bytes. A 4 GiB region has base zero. Reserved/implementation-defined TEX/C/B encodings are rejected, never truncated or rounded. </p></li>
+<li><p><strong>encoding</strong> – <strong>[out]</strong> RBAR and enabled RASR; unchanged on failure.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>NX_ARCH_OK or NX_ARCH_INVALID, independent of CPU profile.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_encode">
+<span class="target" id="mpu_8h_1abb89bdd1cabcdbd07ccc2c8bcff217ca"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_mpu_v8_encode</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#c.nx_arch_mpu_v8_region_t" title="nx_arch_mpu_v8_region_t"><span class="n"><span class="pre">nx_arch_mpu_v8_region_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">region</span></span>, <a class="reference internal" href="#c.nx_arch_mpu_v8_encoding_t" title="nx_arch_mpu_v8_encoding_t"><span class="n"><span class="pre">nx_arch_mpu_v8_encoding_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">encoding</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_mpu_v8_encode" title="Link to this definition">¶</a><br /></dt>
+<dd><p>编码准确的 Armv8-M 区域，不访问硬件。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Pure bounded task/IRQ function. Inputs and output must not overlap. No address rounding or v7/v8 policy conversion. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>region</strong> – <strong>[in]</strong> 32-byte aligned base, inclusive limit ending in 0x1f, base not above limit, AP 0..3, SH 0/2/3 and MAIR index 0..7. The caller owns the corresponding MAIR policy. </p></li>
+<li><p><strong>encoding</strong> – <strong>[out]</strong> RBAR and enabled RLAR; unchanged on failure.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>NX_ARCH_OK or NX_ARCH_INVALID, independent of CPU profile.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_program">
+<span class="target" id="mpu_8h_1af1a85216a3fe651ad0b3e1bfafccbb03"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_mpu_v7_program</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">index</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#c.nx_arch_mpu_v7_region_t" title="nx_arch_mpu_v7_region_t"><span class="n"><span class="pre">nx_arch_mpu_v7_region_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">region</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_mpu_v7_program" title="Link to this definition">¶</a><br /></dt>
+<dd><p>在当前安全世界的 MPU 关闭时，编程一个 Armv7-M 区域。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Privileged Thread only with PRIMASK set and exclusive caller ownership of this MPU. NMI/HardFault/another security world must not modify it. Disables only the selected region, writes its fields, restores incoming RNR and leaves CTRL unchanged. No allocation, OS calls, implicit MPU enable, bulk clear or Secure access to the Non-secure alias. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – <strong>[in]</strong> Region number below actual MPU_TYPE.DREGION. </p></li>
+<li><p><strong>region</strong> – <strong>[in]</strong> Fields validated by nx_arch_mpu_v7_encode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>NX_ARCH_UNSUPPORTED before MMIO for a different/absent compiled MPU; NX_ARCH_INVALID for invalid fields or index; NX_ARCH_CONTEXT for an unprivileged, Handler, unmasked or enabled-MPU caller. Rejection performs no register writes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_program">
+<span class="target" id="mpu_8h_1a842ce97e59ce374389bb2f9680651579"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_mpu_v8_program</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">index</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#c.nx_arch_mpu_v8_region_t" title="nx_arch_mpu_v8_region_t"><span class="n"><span class="pre">nx_arch_mpu_v8_region_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">region</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_mpu_v8_program" title="Link to this definition">¶</a><br /></dt>
+<dd><p>在当前安全世界的 MPU 关闭时，编程一个 Armv8-M 区域。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Privileged masked Thread, disabled MPU and exclusive local ownership required. No MAIR updates or cross-world alias access. Incoming RNR and CTRL are preserved. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – <strong>[in]</strong> Region number below actual MPU_TYPE.DREGION. </p></li>
+<li><p><strong>region</strong> – <strong>[in]</strong> Fields validated by nx_arch_mpu_v8_encode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>Same rejection and ownership rules as v7_program; the compiled MPU must specifically implement Armv8-M.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_attribute_set">
+<span class="target" id="mpu_8h_1a9978ced9bd76e091b1f74c1df04fa560"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_mpu_v8_attribute_set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">index</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">attribute</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_mpu_v8_attribute_set" title="Link to this definition">¶</a><br /></dt>
+<dd><p>更新一个 Armv8-M MAIR 字节，不修改相邻字节。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Caller owns valid memory attributes and all regions using this slot. Privileged masked Thread, disabled MPU and exclusive local ownership required. No CTRL or RNR writes, no cache maintenance, and no cross-world register access. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – <strong>[in]</strong> Attribute slot 0..7. </p></li>
+<li><p><strong>attribute</strong> – <strong>[in]</strong> Architectural MAIR byte, at most 255. Device encodings are 0x00/0x04/0x08/0x0c; Normal memory uses nonzero outer/inner nibbles other than reserved 0x8.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>NX_ARCH_OK, NX_ARCH_UNSUPPORTED for absent/v7 MPU, NX_ARCH_INVALID for an out-of-range field, or NX_ARCH_CONTEXT under the programming context rules.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_region_t">
+<span class="target" id="structnx__arch__mpu__v7__region__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_mpu_v7_region_t</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_region_t" title="Link to this definition">¶</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;<a class="reference internal" href="#mpu-8h"><span class="std std-ref">mpu.h</span></a>&gt;</em></div>
+<p>Armv7-M 区域字段，不包含隐式内存策略。</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">公共成员</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_region_t.base">
+<span class="target" id="structnx__arch__mpu__v7__region__t_1a6cc7edd04827083214ce220fcd428fa1"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">base</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_region_t.base" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_region_t.size_log2">
+<span class="target" id="structnx__arch__mpu__v7__region__t_1a680274a6326b820317fcccd094ec1049"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size_log2</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_region_t.size_log2" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_region_t.access">
+<span class="target" id="structnx__arch__mpu__v7__region__t_1a0049b1bca9115d80f75459ca010a7e3b"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">access</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_region_t.access" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_region_t.tex">
+<span class="target" id="structnx__arch__mpu__v7__region__t_1ab5b565689d6cf5b2c8547bed5c5b9272"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tex</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_region_t.tex" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_region_t.subregion_disable">
+<span class="target" id="structnx__arch__mpu__v7__region__t_1abeaa4804408fe96e8b8b8cb2d454425a"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">subregion_disable</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_region_t.subregion_disable" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_region_t.shareable">
+<span class="target" id="structnx__arch__mpu__v7__region__t_1a5aea2fcd84bb821ab7d80b601d2d386c"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shareable</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_region_t.shareable" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_region_t.cacheable">
+<span class="target" id="structnx__arch__mpu__v7__region__t_1a2fcfd351f73b88851f5eff78c80813cf"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cacheable</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_region_t.cacheable" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_region_t.bufferable">
+<span class="target" id="structnx__arch__mpu__v7__region__t_1a6f39d754770e390311fbd3789bc8298c"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bufferable</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_region_t.bufferable" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_region_t.execute_never">
+<span class="target" id="structnx__arch__mpu__v7__region__t_1a6be6292c163078f049f9ec5521cc41a5"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">execute_never</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_region_t.execute_never" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_encoding_t">
+<span class="target" id="structnx__arch__mpu__v7__encoding__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_mpu_v7_encoding_t</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_encoding_t" title="Link to this definition">¶</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;<a class="reference internal" href="#mpu-8h"><span class="std std-ref">mpu.h</span></a>&gt;</em></div>
+<p>针对调用者选定 RNR 的 Armv7-M 寄存器字，不使用 RBAR.VALID。</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">公共成员</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_encoding_t.rbar">
+<span class="target" id="structnx__arch__mpu__v7__encoding__t_1a603276359ed924c42e603f59332bfac8"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rbar</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_encoding_t.rbar" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v7_encoding_t.rasr">
+<span class="target" id="structnx__arch__mpu__v7__encoding__t_1adf2d276af8f36f3ccdc918b0d7aa2cda"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rasr</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v7_encoding_t.rasr" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_region_t">
+<span class="target" id="structnx__arch__mpu__v8__region__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_mpu_v8_region_t</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v8_region_t" title="Link to this definition">¶</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;<a class="reference internal" href="#mpu-8h"><span class="std std-ref">mpu.h</span></a>&gt;</em></div>
+<p>Armv8-M 字段；limit 是准确且包含在范围内的最后一个字节。</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">公共成员</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_region_t.base">
+<span class="target" id="structnx__arch__mpu__v8__region__t_1ac5605540ccbfab71158f4f85e83af18c"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">base</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v8_region_t.base" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_region_t.limit">
+<span class="target" id="structnx__arch__mpu__v8__region__t_1a0d2d181443a439ec1acca343c3edc876"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">limit</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v8_region_t.limit" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_region_t.access">
+<span class="target" id="structnx__arch__mpu__v8__region__t_1a0f81763c8c8de63aee3bb276c4a879e9"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">access</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v8_region_t.access" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_region_t.shareability">
+<span class="target" id="structnx__arch__mpu__v8__region__t_1aea3132e07c5743fac41e0a8c1539bb88"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shareability</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v8_region_t.shareability" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_region_t.attribute_index">
+<span class="target" id="structnx__arch__mpu__v8__region__t_1a97e8bd65dfce1e05635b82541b8d3c96"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">attribute_index</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v8_region_t.attribute_index" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_region_t.execute_never">
+<span class="target" id="structnx__arch__mpu__v8__region__t_1a186941f86747e0a447142e675aa0c5ff"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">execute_never</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v8_region_t.execute_never" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_encoding_t">
+<span class="target" id="structnx__arch__mpu__v8__encoding__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_mpu_v8_encoding_t</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v8_encoding_t" title="Link to this definition">¶</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;<a class="reference internal" href="#mpu-8h"><span class="std std-ref">mpu.h</span></a>&gt;</em></div>
+<p>保留独立 MAIR 间接索引的 Armv8-M 寄存器字。</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">公共成员</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_encoding_t.rbar">
+<span class="target" id="structnx__arch__mpu__v8__encoding__t_1a71a75228a53c60b2a3d2538900991a18"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rbar</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v8_encoding_t.rbar" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_mpu_v8_encoding_t.rlar">
+<span class="target" id="structnx__arch__mpu__v8__encoding__t_1ad7d728237c7cf2f912a649b205417f79"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rlar</span></span></span><a class="headerlink" href="#c.nx_arch_mpu_v8_encoding_t.rlar" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="nonsecure-h">
+<span id="nonsecure-8h"></span><h2>nonsecure.h<a class="headerlink" href="#nonsecure-h" title="Link to this heading">¶</a></h2>
+<p>显式的 NonSecure 非特权地址权限检查。</p>
+<p>作者  Nexus Team</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">枚举</p>
+<dl class="c enum">
+<dt class="sig sig-object c" id="c.nx_arch_nonsecure_access_t">
+<span class="target" id="nonsecure_8h_1a314061e8c009c12809b53e7192cb3291"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_nonsecure_access_t</span></span></span><a class="headerlink" href="#c.nx_arch_nonsecure_access_t" title="Link to this definition">¶</a><br /></dt>
+<dd><p>请求的 NonSecure 非特权 CPU 数据访问，不包含执行访问。</p>
+<p>取值：</p>
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_nonsecure_access_t.NX_ARCH_NONSECURE_READ">
+<span class="target" id="nonsecure_8h_1a314061e8c009c12809b53e7192cb3291ada8171f76c4a118b0047616d544fbcf1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_NONSECURE_READ</span></span></span><a class="headerlink" href="#c.nx_arch_nonsecure_access_t.NX_ARCH_NONSECURE_READ" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.nx_arch_nonsecure_access_t.NX_ARCH_NONSECURE_READWRITE">
+<span class="target" id="nonsecure_8h_1a314061e8c009c12809b53e7192cb3291a3fa3be35214fbe563c3df29942c2a7c6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NX_ARCH_NONSECURE_READWRITE</span></span></span><a class="headerlink" href="#c.nx_arch_nonsecure_access_t.NX_ARCH_NONSECURE_READWRITE" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">函数</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_nonsecure_check">
+<span class="target" id="nonsecure_8h_1a877844f7ec51a537eefb9b01d18239db"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_nonsecure_check</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">address</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span>, <a class="reference internal" href="#c.nx_arch_nonsecure_access_t" title="nx_arch_nonsecure_access_t"><span class="n"><span class="pre">nx_arch_nonsecure_access_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">access</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_nonsecure_check" title="Link to this definition">¶</a><br /></dt>
+<dd><p>检查当前 NonSecure 非特权上下文对完整范围的访问权限。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Allocation-free permission observation only. Hardware CMSE checks both security attribution and NonSecure MPU rights as an unprivileged caller. Adjacent permitted regions may be conservatively rejected. No memory is copied, pinned or borrowed. Success neither authenticates a gateway caller nor proves RAM, DMA reachability, lifetime or fault safety. The integrating owner must exclude MMIO through its SoC RAM policy and prevent attribution/mapping changes through the subsequent access. Interrupts, another world, DMA and faults are not excluded here; no masks or hardware policy are changed. A gateway must separately snapshot its input and validate output before any irreversible operation. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>address</strong> – <strong>[in]</strong> Non-null start; never dereferenced by this API. </p></li>
+<li><p><strong>bytes</strong> – <strong>[in]</strong> Positive length with a representable inclusive end. </p></li>
+<li><p><strong>access</strong> – <strong>[in]</strong> Exact READ or READWRITE access, never a bit mask. </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>OK for complete current access; INVALID for malformed or denied spans; CONTEXT outside privileged Secure Thread; UNSUPPORTED in Native, single-state or NonSecure images. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</section>
+<section id="security-h">
+<span id="security-8h"></span><h2>security.h<a class="headerlink" href="#security-h" title="Link to this heading">¶</a></h2>
+<p>本地安全状态与显式 SAU 区域机制。</p>
+<p>作者  Nexus Team</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">函数</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_security_state">
+<span class="target" id="security_8h_1a744fe7742d2f27bdcbf130642d31ea7c"></span><a class="reference internal" href="#c.nx_arch_security_state_t" title="nx_arch_security_state_t"><span class="n"><span class="pre">nx_arch_security_state_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_security_state</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_security_state" title="Link to this definition">¶</a><br /></dt>
+<dd><p>查询此镜像的编译期安全状态。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Bounded read-only Task/IRQ query, no hardware access. This does not grant access to another world’s memory or devices. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Single-domain, Secure or NonSecure reviewed image state.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_sau_encode">
+<span class="target" id="security_8h_1a9beb620779542dbbb93bb040ada3c21f"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_sau_encode</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#c.nx_arch_sau_region_t" title="nx_arch_sau_region_t"><span class="n"><span class="pre">nx_arch_sau_region_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">region</span></span>, <a class="reference internal" href="#c.nx_arch_sau_words_t" title="nx_arch_sau_words_t"><span class="n"><span class="pre">nx_arch_sau_words_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">words</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_sau_encode" title="Link to this definition">¶</a><br /></dt>
+<dd><p>编码显式 SAU 区域，不访问硬件。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Pure Task/IRQ operation. Encoding marks the requested region enabled but does not enable SAU hardware. External policy owns overlap, IDAU restrictions and NSC veneers. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>region</strong> – <strong>[in]</strong> Base aligned to 32 bytes; inclusive limit ending at a complete 32-byte boundary. Base must not exceed limit. </p></li>
+<li><p><strong>words</strong> – <strong>[out]</strong> Encoded region, unchanged on failure.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>OK or INVALID for null arguments or invalid boundaries.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_sau_write">
+<span class="target" id="security_8h_1ac25eaa131d38b035acb09de6212f6e2b"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_sau_write</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">index</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#c.nx_arch_sau_region_t" title="nx_arch_sau_region_t"><span class="n"><span class="pre">nx_arch_sau_region_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">region</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_sau_write" title="Link to this definition">¶</a><br /></dt>
+<dd><p>SAU 关闭时，编程一个自有 SAU 区域。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Secure privileged Thread with incoming PRIMASK set only. Caller excludes all other region/selector users and keeps NMI/HardFault outside this metadata. Requires reviewed SAU region support. Does not modify CTRL, ALLNS, another region, another security world’s registers or enable the SAU. Current RNR is restored; DSB/ISB complete region writes. Policy, secure gateways and IDAU configuration stay external. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – <strong>[in]</strong> Region index below the actual hardware TYPE count. </p></li>
+<li><p><strong>region</strong> – <strong>[in]</strong> Explicit reviewed region and NSC permission.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>OK, INVALID, CONTEXT or UNSUPPORTED without retained state.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_sau_clear">
+<span class="target" id="security_8h_1a1e3aa646e314c3abe0895e9df016e98a"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_sau_clear</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_sau_clear" title="Link to this definition">¶</a><br /></dt>
+<dd><p>SAU 关闭时，禁用一个自有 SAU 区域。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Same context and ownership contract as nx_arch_sau_write. Preserves CTRL, ALLNS, other regions and incoming RNR. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – <strong>[in]</strong> Region index below the actual hardware TYPE count.</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>OK, INVALID, CONTEXT or UNSUPPORTED without other writes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.nx_arch_sau_region_t">
+<span class="target" id="structnx__arch__sau__region__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_sau_region_t</span></span></span><a class="headerlink" href="#c.nx_arch_sau_region_t" title="Link to this definition">¶</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;<a class="reference internal" href="#security-8h"><span class="std std-ref">security.h</span></a>&gt;</em></div>
+<p>由 Secure 调用者拥有、准确按 32 字节对齐的 SAU 区域。</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">公共成员</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_sau_region_t.base">
+<span class="target" id="structnx__arch__sau__region__t_1aa6e5694d50f110f9f89a247f7dd54c85"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">base</span></span></span><a class="headerlink" href="#c.nx_arch_sau_region_t.base" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_sau_region_t.limit">
+<span class="target" id="structnx__arch__sau__region__t_1a07f4e59d59362f4be585516a29e2b923"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">limit</span></span></span><a class="headerlink" href="#c.nx_arch_sau_region_t.limit" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_sau_region_t.nonsecure_callable">
+<span class="target" id="structnx__arch__sau__region__t_1a1ae83e6fee5c2612b867ac72035d45e0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nonsecure_callable</span></span></span><a class="headerlink" href="#c.nx_arch_sau_region_t.nonsecure_callable" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="c struct">
+<dt class="sig sig-object c" id="c.nx_arch_sau_words_t">
+<span class="target" id="structnx__arch__sau__words__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_sau_words_t</span></span></span><a class="headerlink" href="#c.nx_arch_sau_words_t" title="Link to this definition">¶</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;<a class="reference internal" href="#security-8h"><span class="std std-ref">security.h</span></a>&gt;</em></div>
+<p>经过验证的 SAU 寄存器字；编码不会改变硬件。</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">公共成员</p>
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_sau_words_t.rbar">
+<span class="target" id="structnx__arch__sau__words__t_1ae46b488de8a7c2df03890c6a928aa9a7"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rbar</span></span></span><a class="headerlink" href="#c.nx_arch_sau_words_t.rbar" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="c var">
+<dt class="sig sig-object c" id="c.nx_arch_sau_words_t.rlar">
+<span class="target" id="structnx__arch__sau__words__t_1a350e3311d213bbf2c586008f411e157a"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rlar</span></span></span><a class="headerlink" href="#c.nx_arch_sau_words_t.rlar" title="Link to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="sleep-h">
+<span id="sleep-8h"></span><h2>sleep.h<a class="headerlink" href="#sleep-h" title="Link to this heading">¶</a></h2>
+<p>已审查的单 CPU 浅睡眠合同。</p>
+<p>作者  Nexus Team   版本  1.0.0   日期  2026-10-11   版权  Copyright (c) 2026 Nexus Team</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">函数</p>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_wait_for_interrupt">
+<span class="target" id="sleep_8h_1a113fe45e189da0d269dad7f9c472c57b"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_wait_for_interrupt</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_wait_for_interrupt" title="Link to this definition">¶</a><br /></dt>
+<dd><p>在可配置异常已被屏蔽的条件下等待一次。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Privileged Thread mode, incoming PRIMASK=1, BASEPRI and FAULTMASK clear. SCR.SLEEPDEEP must be clear. The caller owns the final readiness check and timer/wake source. WFI wakes for a pending enabled interrupt despite PRIMASK; the interrupt runs after the caller restores its saved mask. No register, mask, clock or pending interrupt is changed. Current CPU/security state only; no physical HIL claim. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p>OK after wake, CONTEXT or UNSUPPORTED without sleeping. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.nx_arch_idle_if_unchanged">
+<span class="target" id="sleep_8h_1a813b19f97b95a023f34aa2c226f808cd"></span><a class="reference internal" href="#c.nx_arch_result_t" title="nx_arch_result_t"><span class="n"><span class="pre">nx_arch_result_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nx_arch_idle_if_unchanged</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">sequence</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">expected</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">slept</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.nx_arch_idle_if_unchanged" title="Link to this definition">¶</a><br /></dt>
+<dd><p>执行 WFI 前，以原子方式重新检查已发布序列。</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Privileged Thread mode with all incoming masks clear. Saves PRIMASK, performs acquire observation under that mask, optionally sleeps, and restores the exact mask. Publishers must be same-CPU configurable IRQs or Threads; NMI/HardFault, DMA, SMP and other security-world publishers are excluded. The caller keeps storage alive, owns an enabled IRQ timer for finite deadlines, and retries the authoritative predicate after wake. Native is unsupported. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> – <strong>[in]</strong> Naturally aligned, shared 32-bit wake sequence. </p></li>
+<li><p><strong>expected</strong> – <strong>[in]</strong> Snapshot before the caller’s readiness check. </p></li>
+<li><p><strong>slept</strong> – <strong>[out]</strong> True only when WFI was executed. </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p>OK, INVALID, CONTEXT or UNSUPPORTED. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">操作指南</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">参考</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">公共 API 参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration/index.html">配置与工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../platforms/index.html">平台与资格</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-delivery.html">文档包、发布与独立恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-tools.html">文档工具与环境准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html">历史文档与版本迁移</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../assets/diagrams/README.html">Nexus 平台图册</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

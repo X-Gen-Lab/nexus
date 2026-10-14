@@ -1,0 +1,286 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>U575 synchronous dual-world reference contract &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=3a7bed40"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="UART receive DMA, duplex DMA and electrical adaptation" href="uart-dma-rs485.html" />
+    <link rel="prev" title="Optional timer capture and complementary PWM" href="timer-advanced.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/design/u575-trustzone-contract.md">51e93508f22f</a>; code reference: 51e93508f22f. <a href="../../zh_CN/design/u575-trustzone-contract.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="u575-synchronous-dual-world-reference-contract">
+<h1>U575 synchronous dual-world reference contract<a class="headerlink" href="#u575-synchronous-dual-world-reference-contract" title="Link to this heading">¶</a></h1>
+<p>This is a software reference for an explicit Secure and NonSecure image pair on
+STM32U575 with 2 MiB Flash. It is separate from the existing TZEN0 platform
+profile. It does not turn that profile into a TrustZone provider, integrate a
+NonSecure RTOS, authenticate firmware, or establish physical isolation evidence.
+No board has executed this reference yet.</p>
+<section id="ownership-and-assembly">
+<h2>Ownership and assembly<a class="headerlink" href="#ownership-and-assembly" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">soc/stm32u575/security.c</span></code> implements the cold-owner mechanism. Its private
+<code class="docutils literal notranslate"><span class="pre">nx_stm32u575_tz_layout_t</span></code> contains caller-selected spans, not a platform-owned
+product partition. The owner lives in Secure SRAM1 and remains allocated until
+reset. The boot owner supplies mutually consistent linker scripts, vectors,
+Secure fault handlers, partition parameters and image-loading policy.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/contracts/u575_trustzone</span></code> is the explicit reference assembly. It owns the
+example partition, a single fixed NonSecure-world principal and a PC7 GPIO grant.
+Its two Runtime builds produce separate ELFs, a real SG veneer and Secure import
+library, and an actual compiler-generated NonSecure call. The reference does not
+use the TZEN0 SoC startup or claim generated factory integration.</p>
+<p>Cold preflight performs observations without owner updates or configuration
+writes. This does not promise that all hardware reads are side-effect free:
+reading SysTick CTRL observes and clears COUNTFLAG. The trusted cold contract
+starts with no running timer. Preflight rejects incompatible geometry, context, option
+bytes, Flash permissions, active interrupts, autonomous bus masters, caches and
+floating-point ownership. It requires Secure privileged Thread mode, MSP within
+the supplied Secure SRAM1 stack, PRIMASK set, and BASEPRI/FAULTMASK clear. The
+Secure vector table must already be at the Secure bank1 address. A previously
+running world or a bootloader-owned peripheral configuration is not adopted.</p>
+<p>After admission the owner records FAILED and effects=true before enabling the
+GTZC/SYSCFG clocks. Any later failure keeps that state and requires reset; there is
+no rollback, retry or release promise. Only complete configuration and readback
+publish READY. Successful entry publishes RUNNING before the actual CMSE
+transition. The production transition never returns; an unexpected NS return
+enters terminal fault handling.</p>
+</section>
+<section id="attribution-and-memory">
+<h2>Attribution and memory<a class="headerlink" href="#attribution-and-memory" title="Link to this heading">¶</a></h2>
+<p>The mechanism accepts page-aligned NS Flash within bank2, superblock-aligned NS
+SRAM within SRAM3, NSC within Secure bank1 outside its first vector page, and a
+Secure stack within SRAM1’s Secure alias. At least one SRAM3 superblock remains
+Secure so its clock/reset attribution remains Secure with INVSECSTATE clear.</p>
+<p>The current hardware admission is intentionally narrow: TZEN=1, SWAP_BANK=0,
+2 MiB Flash, SRAM3 ECC disabled, bank1 fully Secure, Secure boot address
+0x0c000000, no hide protection, no security inversion, Flash programming locked
+and idle, and the selected bank2 pages neither Secure nor privileged. In
+particular, SRAM3_ECC=1 means ECC disabled. The mechanism never writes option
+bytes, erases Flash, or programs images. Provisioning must establish this boot
+contract before execution; a late register check cannot retroactively protect
+instructions already executed.</p>
+<p>After verifying actual SRAM1/SRAM3 security and privilege configuration, the
+mechanism zeroes the future NS RAM through its still-Secure alias and reads it
+back before declassification. It then makes only the selected SRAM3 superblocks
+NonSecure and unprivileged. SRAM1 remains Secure and privileged. It locks the
+implemented SRAM1 and SRAM3 superblocks and the corresponding global MPCBB
+configuration until reset. CMSE checks alone do not establish these bus-firewall
+permissions: GTZC unprivileged denials may read as zero or ignore writes.</p>
+<p>The SAU enables exactly three spans: NS Flash, NS RAM and NSC at its Secure Flash
+alias. All remaining addresses retain Secure attribution. The NS MPU provides
+read-only executable Flash and read/write execute-never RAM, with no privileged
+default map or peripheral region. MAIR uses normal non-cacheable memory. Unused
+regions are disabled. Actual MPU TYPE is read: this mechanism accepts 8 or 16
+regions and clears all observed regions, rejecting other counts. This is not a
+claim that every U575 revision implements 16 regions: RM0456 states eight,
+whereas DS13737 describes up to sixteen. The existing TZEN0 provider separately
+maintains an exact eight-region CPU tuple. Protected FreeRTOS preserves its
+exact comparison with hardware TYPE and rejects an actual sixteen-region
+configuration rather than silently interpreting the field as a lower bound.
+The no-OS dual-world mapper’s observed region count does not change that contract.</p>
+<p>NSC instruction fetch does not require an additional NS MPU region. Arm
+DDI0553B.z <code class="docutils literal notranslate"><span class="pre">ValidateAddress()</span></code> selects the MPU for instruction fetch from the
+resolved security attribution: <code class="docutils literal notranslate"><span class="pre">secureMpu</span> <span class="pre">=</span> <span class="pre">!sAttrib.ns</span></code>. An NSC address has
+Secure attribution, so its SG fetch is checked using the Secure MPU and Secure
+privilege state. This reference requires the Secure MPU disabled and Secure
+Thread privileged; it does not grant NS ordinary data access to NSC.</p>
+<p>After readback, SYSCFG locks NS VTOR, the documented NS MPU controls, SAU and the
+Secure VTOR/AIRCR security routing. RM0456 explicitly lists MPU_CTRL_NS,
+MPU_RNR_NS and MPU_RBAR_NS for LOCKNSMPU; it does not explicitly list every MPU
+alias, RLAR or MAIR register. The contract therefore does not treat that bit as
+proof that all MPU words are immutable. Final admission rechecks MAIR, the two
+active regions through the base/alias registers, controls, locks, physical SRAM
+permissions, Flash permissions and quiescent interrupt/master state without
+rewriting a locked region selector.</p>
+<p>The remaining privilege boundary is mandatory: NS enters unprivileged Thread
+mode with no NS kernel or privileged exception handler. The immutable NS vector
+table contains only MSP and Reset; every other implemented exception vector is
+zero. All interrupt target bits and fault routing remain Secure. NS cannot use
+an SVC/IRQ handler to alter attribution. Secure NMI/fault handlers fail stop, and
+Secure software never changes mappings or enables DMA after the cold seal.</p>
+</section>
+<section id="synchronous-gateway-and-borrow-boundary">
+<h2>Synchronous gateway and borrow boundary<a class="headerlink" href="#synchronous-gateway-and-borrow-boundary" title="Link to this heading">¶</a></h2>
+<p>The reference SG transport checks an actual NonSecure caller, Thread context,
+Secure privilege and RUNNING ownership. Identity is the fixed NS world, not a
+claimed task ID from untrusted input. It preserves and masks NS interrupts
+through the synchronous call; the Secure broker retains its own documented
+masking and serialization rules.</p>
+<p>The memory port first restricts a request to the explicit NS RAM span, then uses
+<code class="docutils literal notranslate"><span class="pre">nx_arch_nonsecure_check</span></code> with real CMSE NonSecure and unprivileged MPU checks.
+The broker copies a bounded request into Secure storage before acting, checks
+the fixed GPIO grant, and holds the output mapping until its final copy.
+The permission check itself is only an observation: it neither copies nor pins
+memory. The reference’s synchronous pin relies on the already established
+static mapping, lack of NS concurrent execution/handlers, lack of autonomous
+masters, and exclusive Secure owner. It does not authorize asynchronous loans,
+DMA buffers, arbitrary MMIO, callbacks or mutable user address spaces. Retained
+cleanup or an impossible mapping-release failure is terminal.</p>
+<p>No security property is inferred from a host pointer model or the presence of
+SG/BLXNS opcodes alone. Host Google tests establish software admission and
+failure behavior; real ARM ELFs establish ABI/link/layout properties. Hardware
+must still verify attribution, fault delivery, CMSE observations, lock behavior,
+GPIO effect, provisioning and the exact board revision.</p>
+</section>
+<section id="source-basis-and-validation">
+<h2>Source basis and validation<a class="headerlink" href="#source-basis-and-validation" title="Link to this heading">¶</a></h2>
+<p>The implementation uses locked STM32U5 CMSIS v1.4.3, commit
+<code class="docutils literal notranslate"><span class="pre">624374fa1e21ca195d6f2102ac0caaa50d0ea4c8</span></code>, and the repository’s locked Arm CMSIS.
+Authoritative register review used ST RM0456 revision 7:</p>
+<ul class="simple">
+<li><p>Sections 3.5.2 and 3.7.1: banked MPU and documented region count.</p></li>
+<li><p>Sections 5.4.2, 5.4.4, 5.4.6 and 5.8.1–5.8.5: SRAM granularity, privilege,
+security aliases, clock attribution, MPCBB inversion and reset-only locks.</p></li>
+<li><p>Sections 7.5 and 7.9.13: Flash attribution and SRAM3 ECC option polarity.</p></li>
+<li><p>Sections 7.9.16–7.9.17 and 7.9.29–7.9.34: Secure boot address, watermarks,
+Secure/privileged Flash block configuration and the exact U575 bank geometry.</p></li>
+<li><p>Sections 11.5 and 13.3.18: RCC/GPIO security ownership.</p></li>
+<li><p>Sections 15.3.4–15.3.5: CPU NonSecure/Secure configuration lock scope.</p></li>
+</ul>
+<p>The reviewed official PDF is
+<a class="reference external" href="https://www.st.com/resource/en/reference_manual/rm0456-stm32u5-series-armbased-32bit-mcus-stmicroelectronics.pdf">https://www.st.com/resource/en/reference_manual/rm0456-stm32u5-series-armbased-32bit-mcus-stmicroelectronics.pdf</a>,
+SHA-256 <code class="docutils literal notranslate"><span class="pre">6edaaaae0c5d57c58ffc3a576d44e7b62e8d9cd0e495e8f61bab688226fc327c</span></code>.
+The instruction-fetch rule was independently reviewed against Arm DDI0553B.z
+(2026-02-24), E2.1.419 <code class="docutils literal notranslate"><span class="pre">ValidateAddress()</span></code> pages 2087–2089 and E2.1.296 <code class="docutils literal notranslate"><span class="pre">MemI[]</span></code>
+page 2044. Official PDF:
+<a class="reference external" href="https://documentation-service.arm.com/static/699eb70d77ad5021756604d8">https://documentation-service.arm.com/static/699eb70d77ad5021756604d8</a>,
+SHA-256 <code class="docutils literal notranslate"><span class="pre">468594b22cf5a4bae1261f2cd39d5aa51040fbb566be18cc358c169918fd7a72</span></code>.
+The actual compiler CMSE helper may contain architecture-defined FP context
+instructions even in this soft-float image pair. Admission rejects active FP
+ownership (both CONTROL.FPCA and CONTROL.SFPA), CPACR enablement and lazy
+preservation; this is not a claim that the ELF contains no
+FP-related opcodes. DDI0553B.z C2.4.368 (VLSTM, pages 1177–1178) specifies that
+SFPA=0 makes that instruction a no-op; SFPA=1 would require coprocessor access.
+Therefore SFPA-only state is explicitly rejected before acquiring hardware.</p>
+<p>The Google suite compiles the production mapper and substitutes only hardware
+MMIO, physical RAM and CPU instruction leaves. It covers rejected admission,
+actual permission layout, every changed configuration-write failure, zeroing
+failure, irreversible ownership, vector/stack boundaries, forbidden privileged
+handlers, metadata changes and final transition ownership. The paired ARM gate
+checks the actual vector words and executable addresses against this contract.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

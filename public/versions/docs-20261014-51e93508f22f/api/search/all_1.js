@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['bank_5fsize_0',['bank_size',['../structnx__storage__t.html#a56090c2913e61a3e48398f2e9a22dc46',1,'nx_storage_t']]],
+  ['baremetal_2eh_1',['baremetal.h',['../baremetal_8h.html',1,'']]],
+  ['base_2',['base',['../structnx__arch__mpu__v7__region__t.html#a6cc7edd04827083214ce220fcd428fa1',1,'nx_arch_mpu_v7_region_t::base'],['../structnx__arch__mpu__v8__region__t.html#ac5605540ccbfab71158f4f85e83af18c',1,'nx_arch_mpu_v8_region_t::base'],['../structnx__arch__sau__region__t.html#aa6e5694d50f110f9f89a247f7dd54c85',1,'nx_arch_sau_region_t::base'],['../structnx__can__tx__request__t.html#a74bcaef6901bb88e6f0a4784305d8d30',1,'nx_can_tx_request_t::base'],['../structnx__eth__tx__request__t.html#a4e35f082dd3663cf43aba5a4baf43057',1,'nx_eth_tx_request_t::base'],['../structnx__i2c__request__t.html#a15e3dd11e7e6db6dc3f925fa78724096',1,'nx_i2c_request_t::base'],['../structnx__spi__request__t.html#a38206428fddf1e7a0376d08bd6255604',1,'nx_spi_request_t::base'],['../structnx__uart__tx__request__t.html#a94a1ada0b33ed8246cb409265b7b5ebd',1,'nx_uart_tx_request_t::base'],['../structnx__usb__request__t.html#acb3910c2edf7c8f09a23e305a5052d2a',1,'nx_usb_request_t::base']]],
+  ['base_5faddress_3',['base_address',['../structnx__flash__geometry__t.html#a2a133ca7d484e16698f75101692f9d48',1,'nx_flash_geometry_t']]],
+  ['basepri_4',['basepri',['../structnx__arch__irq__masks__t.html#ab8dc43770a7e7da59dc714e291a43d8d',1,'nx_arch_irq_masks_t']]],
+  ['baudrate_5',['baudrate',['../structnx__modbus__config__t.html#ae6c6046391dfae45fefd614b58425d6d',1,'nx_modbus_config_t']]],
+  ['begin_6',['begin',['../structnx__dma__memory__region__t.html#a685d7cac0a0e9fd3a9a56291a305fbf3',1,'nx_dma_memory_region_t']]],
+  ['bits_5fper_5fcharacter_7',['bits_per_character',['../structnx__modbus__config__t.html#a9895d9897ce8a47ee3601813954a63c4',1,'nx_modbus_config_t']]],
+  ['block_5ffill_5fus_8',['block_fill_us',['../structnx__stream__budget__result__t.html#a16b9b6bb6cb85c183e72395aacd5e865',1,'nx_stream_budget_result_t']]],
+  ['block_5fobservation_9',['block_observation',['../structnx__adc__ops__t.html#a04f972c4fe12a36bd294e3c2978d0cbe',1,'nx_adc_ops_t']]],
+  ['bmp280_2eh_10',['bmp280.h',['../bmp280_8h.html',1,'']]],
+  ['bmp280_5fspi_2eh_11',['bmp280_spi.h',['../bmp280__spi_8h.html',1,'']]],
+  ['boundary_12',['boundary',['../structnx__uart__rs485__state__t.html#a52dc440672f2a8e76dac4aa87d470660',1,'nx_uart_rs485_state_t']]],
+  ['broadcasts_13',['broadcasts',['../structnx__modbus__counters__t.html#a654ccdb69be2d7dca5487558cfd25f0a',1,'nx_modbus_counters_t']]],
+  ['bufferable_14',['bufferable',['../structnx__arch__mpu__v7__region__t.html#a6f39d754770e390311fbd3789bc8298c',1,'nx_arch_mpu_v7_region_t']]],
+  ['bus_5foff_15',['bus_off',['../structnx__can__state__t.html#aa853833d5e1f5909c0d26c9429f92272',1,'nx_can_state_t']]],
+  ['bus_5fowner_2eh_16',['bus_owner.h',['../bus__owner_8h.html',1,'']]],
+  ['busy_17',['busy',['../structnx__log__t.html#a05ba3f6c931f237532426c641f921fae',1,'nx_log_t::busy'],['../structnx__owner__observation__t.html#ab1103557be1953ed4eaa8b944daf14c6',1,'nx_owner_observation_t::busy']]],
+  ['byte_18',['byte',['../structnx__uart__rx__event__t.html#ac5f052946d2ef7409613422b54597f8d',1,'nx_uart_rx_event_t']]],
+  ['bytes_19',['bytes',['../structnx__native__queue__t.html#ae5302c35c873db5383358d2ba128737a',1,'nx_native_queue_t::bytes'],['../structnx__freertos__mpu__region__t.html#ae8d3594f48d4b0c0c39861c7a86a15e1',1,'nx_freertos_mpu_region_t::bytes']]]
+];

@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>观察拒绝、借用、取消与排空 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="操作指南" href="../guides/index.html" />
+    <link rel="prev" title="构建独立的 Source SDK 消费工程" href="source-sdk.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/tutorials/async-io.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/tutorials/async-io.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="observe-rejection-borrow-cancellation-and-drain">
+<span id="docs-tutorials-async-io"></span><h1>观察拒绝、借用、取消与排空<a class="headerlink" href="#observe-rejection-borrow-cancellation-and-drain" title="Link to this heading">¶</a></h1>
+<p>执行本主机教程，观察真实公共 SPI API 与 Native 提供者的行为。它说明软件所有权和失败路径，不建立物理 DMA 时序。完整可执行夹具是维护中的 GoogleTest 目标；模型控制仅替代外部 IRQ 与线上进度。GoogleTest/GoogleMock 和 C++17 仅用于主机；生产固件保持 C11。</p>
+<p>先取得<a class="reference internal" href="../guides/source-checkout.html"><span class="std std-doc">固定源码与递归依赖</span></a>。将源码版本与新的执行报告一起保留。</p>
+<section id="build-and-run-the-complete-fixtures">
+<h2>构建并运行完整夹具<a class="headerlink" href="#build-and-run-the-complete-fixtures" title="Link to this heading">¶</a></h2>
+<p>从仓库根目录执行，先具备主机工具和锁定依赖：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>configure<span class="w"> </span>--preset<span class="w"> </span>native-debug
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>build<span class="w"> </span>--preset<span class="w"> </span>native-debug<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span><span class="w">     </span>--target<span class="w"> </span>nexus_native_async_test<span class="w"> </span>nexus_native_factory_test<span class="w"> </span>nexus_uart_owner_mock_test
+</pre></div>
+</div>
+<p>不加过滤器运行每个可执行文件，将新生成的 XML 保存在新目录：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>/tmp/nexus-io-tutorial
+build/native-debug/bin/nexus_native_async_test<span class="w">     </span>--gtest_output<span class="o">=</span>xml:/tmp/nexus-io-tutorial/async.xml
+build/native-debug/bin/nexus_native_factory_test<span class="w">     </span>--gtest_output<span class="o">=</span>xml:/tmp/nexus-io-tutorial/factory.xml
+build/native-debug/bin/nexus_uart_owner_mock_test<span class="w">     </span>--gtest_output<span class="o">=</span>xml:/tmp/nexus-io-tutorial/owner.xml
+</pre></div>
+</div>
+<p>三个命令都必须退出零，并报告非零的通过用例数。这些完整目标执行属于教程范围，不是全部目标的 commit TDD 资格。保留所需报告后才能删除教程目录。</p>
+</section>
+<section id="follow-the-normal-and-rejected-admission-path">
+<h2>观察正常准入与拒绝路径<a class="headerlink" href="#follow-the-normal-and-rejected-admission-path" title="Link to this heading">¶</a></h2>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">完整维护测试：同控制器拒绝与线上完成。</span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TEST_F</span><span class="p">(</span><span class="n">NativeAsync</span><span class="p">,</span><span class="w"> </span><span class="n">SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">nx_native_spi_state_t</span><span class="w"> </span><span class="n">controller</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">    </span><span class="n">nx_native_spi_endpoint_state_t</span><span class="w"> </span><span class="n">first</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">    </span><span class="n">nx_native_spi_endpoint_state_t</span><span class="w"> </span><span class="n">second</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">nx_spi_port_t</span><span class="w"> </span><span class="n">bus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="o">&amp;</span><span class="n">nx_native_spi_ops</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">controller</span><span class="p">};</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">nx_spi_endpoint_t</span><span class="w"> </span><span class="n">first_api</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="o">&amp;</span><span class="n">nx_native_spi_endpoint_ops</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">first</span><span class="p">};</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">nx_spi_endpoint_t</span><span class="w"> </span><span class="n">second_api</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="o">&amp;</span><span class="n">nx_native_spi_endpoint_ops</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">second</span><span class="p">};</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span><span class="n">nx_native_spi_port_configure_instance</span><span class="p">(</span><span class="o">&amp;</span><span class="n">controller</span><span class="p">),</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span><span class="n">nx_native_spi_configure_instance</span><span class="p">(</span><span class="o">&amp;</span><span class="n">first</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">controller</span><span class="p">,</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span>
+<span class="w">              </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span>
+<span class="w">        </span><span class="n">nx_native_spi_configure_instance</span><span class="p">(</span><span class="o">&amp;</span><span class="n">second</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">controller</span><span class="p">,</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span>
+<span class="w">        </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_native_spi_model_async_configure</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+<span class="w">    </span><span class="n">WakeFacts</span><span class="w"> </span><span class="n">facts</span><span class="p">;</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">nx_irq_wake_t</span><span class="w"> </span><span class="n">wake</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="o">&amp;</span><span class="n">facts</span><span class="p">,</span><span class="w"> </span><span class="n">record_wake</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">};</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span><span class="n">nx_spi_port_attach_wake</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">wake</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">),</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">tx</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">17</span><span class="p">,</span><span class="w"> </span><span class="mi">29</span><span class="p">};</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">rx</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">    </span><span class="n">nx_spi_request_t</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">    </span><span class="n">nx_spi_request_t</span><span class="w"> </span><span class="n">rejected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">    </span><span class="n">nx_request_initialize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">.</span><span class="n">base</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_request_initialize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">rejected</span><span class="p">.</span><span class="n">base</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span><span class="n">nx_spi_request_prepare</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">tx</span><span class="p">,</span><span class="w"> </span><span class="n">rx</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">),</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span><span class="n">nx_spi_request_prepare</span><span class="p">(</span><span class="o">&amp;</span><span class="n">rejected</span><span class="p">,</span><span class="w"> </span><span class="n">tx</span><span class="p">,</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">),</span>
+<span class="w">              </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span><span class="n">nx_spi_endpoint_submit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">first_api</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">request</span><span class="p">),</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_TRUE</span><span class="p">(</span><span class="n">nx_native_spi_model_cs_active</span><span class="p">(</span><span class="o">&amp;</span><span class="n">first_api</span><span class="p">));</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">facts</span><span class="p">.</span><span class="n">calls</span><span class="p">,</span><span class="w"> </span><span class="mi">0u</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_spi_endpoint_submit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">second_api</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">rejected</span><span class="p">),</span><span class="w"> </span><span class="n">NX_ERROR_BUSY</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_request_state</span><span class="p">(</span><span class="o">&amp;</span><span class="n">rejected</span><span class="p">.</span><span class="n">base</span><span class="p">),</span><span class="w"> </span><span class="n">NX_REQUEST_READY</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_native_spi_model_irq_step</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_native_spi_model_irq_step</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_spi_port_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_request_state</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">.</span><span class="n">base</span><span class="p">),</span><span class="w"> </span><span class="n">NX_REQUEST_ACTIVE</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">facts</span><span class="p">.</span><span class="n">calls</span><span class="p">,</span><span class="w"> </span><span class="mi">0u</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_TRUE</span><span class="p">(</span><span class="n">nx_native_spi_model_cs_active</span><span class="p">(</span><span class="o">&amp;</span><span class="n">first_api</span><span class="p">));</span>
+<span class="w">    </span><span class="n">nx_native_spi_model_irq_step</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_spi_port_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_request_state</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">.</span><span class="n">base</span><span class="p">),</span><span class="w"> </span><span class="n">NX_REQUEST_SETTLED</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_FALSE</span><span class="p">(</span><span class="n">nx_native_spi_model_cs_active</span><span class="p">(</span><span class="o">&amp;</span><span class="n">first_api</span><span class="p">));</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">facts</span><span class="p">.</span><span class="n">calls</span><span class="p">,</span><span class="w"> </span><span class="mi">1u</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_FALSE</span><span class="p">(</span><span class="n">facts</span><span class="p">.</span><span class="n">masked</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">rx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="mi">17</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">rx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="mi">29</span><span class="p">);</span>
+<span class="w">    </span><span class="n">tx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">99</span><span class="p">;</span>
+<span class="w">    </span><span class="n">nx_native_spi_model_irq_step</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">rx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="mi">17</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_spi_port_stop</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">),</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_native_spi_model_irq_step</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">facts</span><span class="p">.</span><span class="n">calls</span><span class="p">,</span><span class="w"> </span><span class="mi">1u</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>第一个端点接受请求，调用方保持请求和缓冲区有效。第二个端点返回 <code class="docutils literal notranslate"><span class="pre">NX_ERROR_BUSY</span></code>，其请求仍为 READY；该拒绝不保留借用。模拟载荷传输推进后，在模拟线上完成步骤之前不会发布 SETTLED。Service 与 IRQ 进度保持显式；等待客户端不能假设存在隐藏执行任务。</p>
+</section>
+<section id="follow-cancellation-and-failed-drain">
+<h2>观察取消与失败排空<a class="headerlink" href="#follow-cancellation-and-failed-drain" title="Link to this heading">¶</a></h2>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">完整维护取消夹具；保持排空阻塞时保留借用。</span><a class="headerlink" href="#id2" title="Link to this code">¶</a></div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TEST_F</span><span class="p">(</span><span class="n">NativeAsync</span><span class="p">,</span><span class="w"> </span><span class="n">SPIQuarantineRetainsBorrowAndStopUntilDrain</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">nx_native_spi_state_t</span><span class="w"> </span><span class="n">controller</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">    </span><span class="n">nx_native_spi_endpoint_state_t</span><span class="w"> </span><span class="n">endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">nx_spi_port_t</span><span class="w"> </span><span class="n">bus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="o">&amp;</span><span class="n">nx_native_spi_ops</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">controller</span><span class="p">};</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">nx_spi_endpoint_t</span><span class="w"> </span><span class="n">endpoint_api</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="o">&amp;</span><span class="n">nx_native_spi_endpoint_ops</span><span class="p">,</span>
+<span class="w">                                            </span><span class="o">&amp;</span><span class="n">endpoint</span><span class="p">};</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span><span class="n">nx_native_spi_port_configure_instance</span><span class="p">(</span><span class="o">&amp;</span><span class="n">controller</span><span class="p">),</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span>
+<span class="w">        </span><span class="n">nx_native_spi_configure_instance</span><span class="p">(</span><span class="o">&amp;</span><span class="n">endpoint</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">controller</span><span class="p">,</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span>
+<span class="w">        </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_native_spi_model_async_configure</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_native_spi_model_drain_hold</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">tx</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">};</span>
+<span class="w">    </span><span class="n">nx_spi_request_t</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="w">    </span><span class="n">nx_request_initialize</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">.</span><span class="n">base</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span><span class="n">nx_spi_request_prepare</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">tx</span><span class="p">,</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">),</span>
+<span class="w">              </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span><span class="n">nx_spi_endpoint_submit</span><span class="p">(</span><span class="o">&amp;</span><span class="n">endpoint_api</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">request</span><span class="p">),</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_native_spi_model_irq_step</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_spi_port_cancel</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">request</span><span class="p">),</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_spi_port_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_request_state</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">.</span><span class="n">base</span><span class="p">),</span><span class="w"> </span><span class="n">NX_REQUEST_QUARANTINED</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_spi_port_stop</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">),</span><span class="w"> </span><span class="n">NX_ERROR_BUSY</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_spi_request_prepare</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">tx</span><span class="p">,</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">),</span>
+<span class="w">              </span><span class="n">NX_ERROR_STATE</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_native_spi_model_drain_hold</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_spi_port_service</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_request_state</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">.</span><span class="n">base</span><span class="p">),</span><span class="w"> </span><span class="n">NX_REQUEST_SETTLED</span><span class="p">);</span>
+<span class="w">    </span><span class="n">nx_result_t</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ASSERT_EQ</span><span class="p">(</span><span class="n">nx_request_result</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">.</span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">result</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">count</span><span class="p">),</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">result</span><span class="p">,</span><span class="w"> </span><span class="n">NX_ERROR_CANCELLED</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="mi">1u</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span>
+<span class="w">        </span><span class="n">nx_spi_endpoint_transfer</span><span class="p">(</span><span class="o">&amp;</span><span class="n">endpoint_api</span><span class="p">,</span><span class="w"> </span><span class="n">tx</span><span class="p">,</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">count</span><span class="p">),</span>
+<span class="w">        </span><span class="n">NX_ERROR_STATE</span><span class="p">);</span>
+<span class="w">    </span><span class="n">EXPECT_EQ</span><span class="p">(</span><span class="n">nx_spi_port_stop</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bus</span><span class="p">),</span><span class="w"> </span><span class="n">NX_SUCCESS</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Cancel 请求终止。故意保持排空阻塞时，请求进入 QUARANTINED，停止返回 BUSY，prepare 拒绝复用。随后模型提供实际排空进度，service 发布 SETTLED，结果观察提供取消结果与已传输前缀。解除模型阻塞是测试控制，不是通用生产恢复 API。</p>
+<p>生成的 factory 夹具也测试持有隔离 UART 借用时的平台停止。UART owner 夹具通过 GoogleMock 依赖端口检查拒绝提交和载荷保留。将请求存储移入应用前先阅读<a class="reference internal" href="../explanation/ownership.html"><span class="std std-doc">所有权</span></a>。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/request-lifecycle.svg" title="打开 SVG 大图"><img alt="请求准入、排空、隔离与最终结束" src="../_images/request-lifecycle.svg" /></a></p>
+<p>FIG-06 表示当前 Core 辅助函数转移和提供者的证明义务。<a class="reference internal" href="../design/io-lifecycle-matrix.html"><span class="std std-doc">I/O 生命周期矩阵</span></a>限定模型建立的范围。IRQ 提示、稳定槽 epoch、观察者 detach 和 join 需遵循 <a class="reference internal" href="../guides/os-shutdown.html"><span class="std std-doc">OS 停机指南</span></a>。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">入门教程</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="source-sdk.html">构建独立的 Source SDK 消费工程</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">观察拒绝、借用、取消与排空</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

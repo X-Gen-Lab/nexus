@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>U575 同步双域参考合同 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="UART 接收 DMA、双向 DMA 与电气适配" href="uart-dma-rs485.html" />
+    <link rel="prev" title="可选 timer 捕获与互补 PWM" href="timer-advanced.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/design/u575-trustzone-contract.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/design/u575-trustzone-contract.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="u575-synchronous-dual-world-reference-contract">
+<h1>U575 同步双域参考合同<a class="headerlink" href="#u575-synchronous-dual-world-reference-contract" title="Link to this heading">¶</a></h1>
+<p>这是 2 MiB Flash STM32U575 上显式 Secure／NonSecure 镜像对的软件参考，独立于既有 TZEN0 平台配置。它不把该配置变成 TrustZone 提供者，不集成 NonSecure RTOS，不认证固件，也不建立物理隔离证据。尚无实板执行此参考。</p>
+<section id="ownership-and-assembly">
+<h2>所有权与装配<a class="headerlink" href="#ownership-and-assembly" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">soc/stm32u575/security.c</span></code> 实现冷态所有者机制。私有 <code class="docutils literal notranslate"><span class="pre">nx_stm32u575_tz_layout_t</span></code> 包含调用方选定范围，不是平台持有的产品分区。Owner 位于 Secure SRAM1 并保留至 reset。启动 owner 提供相互一致的链接脚本、向量、Secure fault handler、分区参数及镜像加载策略。</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/contracts/u575_trustzone</span></code> 是显式参考装配，持有示例分区、唯一固定 NonSecure-world 主体及 PC7 GPIO 授权。两个 Runtime 构建生成独立 ELF、真实 SG veneer／Secure import library 和编译器生成的真实 NonSecure 调用。参考不使用 TZEN0 SoC startup，也不声明生成 factory 集成。</p>
+<p>冷态预检仅观察，不更新 owner 或写配置，但不承诺所有硬件读取无副作用：读取 SysTick CTRL 会观察并清 COUNTFLAG。可信冷合同要求没有运行 timer。预检拒绝不兼容 geometry、context、option bytes、Flash 权限、活动中断、自主 bus master、cache 及浮点所有权。要求 Secure 特权 Thread、MSP 位于所供 Secure SRAM1 stack、PRIMASK 已设置且 BASEPRI/FAULTMASK 全清。Secure 向量表已在 Secure bank1 地址；不认领已运行 world 或 bootloader 持有的外设配置。</p>
+<p>准入后，在使能 GTZC/SYSCFG 时钟前记录 FAILED 和 effects=true。后续任何失败保留该状态并要求 reset，无 rollback、retry 或 release 承诺。只有完整配置及读回才发布 READY；成功进入在真实 CMSE 转换前发布 RUNNING。生产转换不返回，意外 NS 返回进入终止 fault 处理。</p>
+</section>
+<section id="attribution-and-memory">
+<h2>归属与内存<a class="headerlink" href="#attribution-and-memory" title="Link to this heading">¶</a></h2>
+<p>机制接纳 bank2 中 page-aligned NS Flash、SRAM3 中 superblock-aligned NS SRAM、Secure bank1 首向量页外的 NSC，以及 SRAM1 Secure alias 中的 Secure stack。至少一个 SRAM3 superblock 保持 Secure，以便时钟／reset 归属仍为 Secure 且 INVSECSTATE 清零。</p>
+<p>当前硬件准入刻意收窄：TZEN=1、SWAP_BANK=0、2 MiB Flash、SRAM3 ECC disabled、bank1 全 Secure、Secure boot 地址 0x0c000000、无 hide protection／security inversion、Flash 编程锁定且 idle、所选 bank2 页既非 Secure 也非 privileged。特别是 SRAM3_ECC=1 表示 ECC disabled。机制绝不写 option bytes、擦 Flash 或编程镜像。Provisioning 必须在执行前建立此启动合同；迟到寄存器校验不能追溯保护已执行指令。</p>
+<p>校验实际 SRAM1/SRAM3 security／privilege 后，机制通过仍为 Secure 的 alias 清零未来 NS RAM 并读回，再降为 NonSecure。只把所选 SRAM3 superblock 改为 NonSecure／unprivileged，SRAM1 保持 Secure／privileged。实现的 SRAM1／SRAM3 superblock 及对应全局 MPCBB 配置锁定至 reset。CMSE 检查自身不能建立这些总线防火墙权限：GTZC 非特权拒绝可能读取零或忽略写。</p>
+<p>SAU 精确使能三个范围：NS Flash、NS RAM、Secure Flash alias 上的 NSC，其余地址仍归 Secure。NS MPU 提供只读可执行 Flash 和读写不可执行 RAM，没有 privileged default map 或外设 region；MAIR 用 normal non-cacheable。未用 region 关闭。读取真实 MPU TYPE，接纳 8 或 16 region 并清除全部已观察 region，拒绝其他数量。这不宣称每个 U575 修订都有 16 region：RM0456 写八，DS13737 描述最多十六。既有 TZEN0 提供者独立维护精确八-region CPU tuple。受保护 FreeRTOS 对真实 TYPE 保持精确比较，实际十六 region 时拒绝，不把字段静默解释为下限。无 OS 双域 mapper 的观察数量不改变该合同。</p>
+<p>NSC 取指不需要额外 NS MPU region。Arm DDI0553B.z <code class="docutils literal notranslate"><span class="pre">ValidateAddress()</span></code> 按解析的安全归属选取指 MPU：<code class="docutils literal notranslate"><span class="pre">secureMpu</span> <span class="pre">=</span> <span class="pre">!sAttrib.ns</span></code>。NSC 属 Secure，所以 SG fetch 经 Secure MPU 与 Secure privilege 检查。此参考要求 Secure MPU disabled、Secure Thread privileged，不授予 NS 对 NSC 的普通数据访问。</p>
+<p>读回后 SYSCFG 锁 NS VTOR、文档列明的 NS MPU 控制、SAU 及 Secure VTOR/AIRCR 安全路由。RM0456 对 LOCKNSMPU 明确列 MPU_CTRL_NS、MPU_RNR_NS、MPU_RBAR_NS，未明确列全部 MPU alias、RLAR 或 MAIR。因此合同不把该位当全部 MPU word 不可变证明。最终准入不重写锁定 region selector，复查 MAIR、经 base/alias 寄存器的两个活动 region、control／lock、物理 SRAM／Flash 权限及静止中断／master。</p>
+<p>余下特权边界是强制条件：NS 进入非特权 Thread，没有 NS kernel 或 privileged exception handler。不可变 NS 向量表仅含 MSP 与 Reset，其他已实现异常向量为零。全部 interrupt target 和 fault routing 保持 Secure。NS 不能通过 SVC／IRQ handler 改归属。Secure NMI/fault handler fail-stop；冷态封存后 Secure 软件绝不改映射或使能 DMA。</p>
+</section>
+<section id="synchronous-gateway-and-borrow-boundary">
+<h2>同步 gateway 与借用边界<a class="headerlink" href="#synchronous-gateway-and-borrow-boundary" title="Link to this heading">¶</a></h2>
+<p>参考 SG transport 检查真实 NonSecure caller、Thread context、Secure privilege 和 RUNNING ownership。身份是固定 NS world，不是不可信输入宣称的 task ID。同步调用中保存并屏蔽 NS 中断；Secure broker 保持自身合同中的掩码与串行规则。</p>
+<p>Memory port 先限制请求于显式 NS RAM 范围，再用 <code class="docutils literal notranslate"><span class="pre">nx_arch_nonsecure_check</span></code> 执行真实 CMSE NonSecure／非特权 MPU 检查。Broker 在动作前将有界请求复制到 Secure storage，校验固定 GPIO 授权，保留输出映射直到最终复制。权限检查只是观察，既不 copy 也不 pin。参考同步 pin 依赖已建立静态映射、无 NS 并发／handler、无自主 master 和独占 Secure owner。它不授权异步借用、DMA buffer、任意 MMIO、callback 或可变用户地址空间。保留 cleanup 或不应出现的 mapping-release 失败进入终止路径。</p>
+<p>主机指针模型或仅出现 SG/BLXNS opcode 都不能推导安全性质。Host Google 测试建立软件准入与失败行为，真实 ARM ELF 建立 ABI／link／layout。硬件仍须验证归属、fault delivery、CMSE 观察、lock、GPIO 效果、provisioning 与精确 PCB 修订。</p>
+</section>
+<section id="source-basis-and-validation">
+<h2>源码依据与验证<a class="headerlink" href="#source-basis-and-validation" title="Link to this heading">¶</a></h2>
+<p>实现使用锁定 STM32U5 CMSIS v1.4.3、commit <code class="docutils literal notranslate"><span class="pre">624374fa1e21ca195d6f2102ac0caaa50d0ea4c8</span></code> 及仓库锁定 Arm CMSIS。权威寄存器审查使用 ST RM0456 revision 7：</p>
+<ul class="simple">
+<li><p>3.5.2、3.7.1 节：banked MPU 与文档 region 数量。</p></li>
+<li><p>5.4.2、5.4.4、5.4.6、5.8.1–5.8.5 节：SRAM 粒度、privilege、security alias、clock 归属、MPCBB inversion 和仅 reset 解锁。</p></li>
+<li><p>7.5、7.9.13 节：Flash 归属与 SRAM3 ECC option 极性。</p></li>
+<li><p>7.9.16–7.9.17、7.9.29–7.9.34 节：Secure boot 地址、watermark、Secure／privileged Flash block 配置及精确 U575 bank geometry。</p></li>
+<li><p>11.5、13.3.18 节：RCC/GPIO 安全所有权。</p></li>
+<li><p>15.3.4–15.3.5 节：CPU NonSecure／Secure 配置锁范围。</p></li>
+</ul>
+<p>已审官方 PDF 为 <a class="reference external" href="https://www.st.com/resource/en/reference_manual/rm0456-stm32u5-series-armbased-32bit-mcus-stmicroelectronics.pdf">https://www.st.com/resource/en/reference_manual/rm0456-stm32u5-series-armbased-32bit-mcus-stmicroelectronics.pdf</a>，SHA-256 <code class="docutils literal notranslate"><span class="pre">6edaaaae0c5d57c58ffc3a576d44e7b62e8d9cd0e495e8f61bab688226fc327c</span></code>。取指规则另据 Arm DDI0553B.z（2026-02-24）E2.1.419 <code class="docutils literal notranslate"><span class="pre">ValidateAddress()</span></code> 2087–2089 页及 E2.1.296 <code class="docutils literal notranslate"><span class="pre">MemI[]</span></code> 2044 页独立审查。官方 PDF <a class="reference external" href="https://documentation-service.arm.com/static/699eb70d77ad5021756604d8">https://documentation-service.arm.com/static/699eb70d77ad5021756604d8</a>，SHA-256 <code class="docutils literal notranslate"><span class="pre">468594b22cf5a4bae1261f2cd39d5aa51040fbb566be18cc358c169918fd7a72</span></code>。即使此镜像对 soft-float，真实编译器 CMSE helper 仍可能含体系结构定义的 FP context 指令。准入拒绝活动 FP 所有权（CONTROL.FPCA 和 CONTROL.SFPA）、CPACR 使能及 lazy preservation，不声称 ELF 无 FP 相关 opcode。DDI0553B.z C2.4.368（VLSTM，1177–1178 页）规定 SFPA=0 时该指令无效果，SFPA=1 则需 coprocessor access，因此取得硬件前显式拒绝只有 SFPA 的状态。</p>
+<p>Google suite 编译生产 mapper，仅替换硬件 MMIO、物理 RAM 与 CPU 指令叶端口，覆盖拒绝准入、实际权限布局、每次配置写失败、清零失败、不可逆所有权、vector/stack 边界、禁止 privileged handler、元数据变化及最终转换所有权。镜像对 ARM 门禁按本合同检查实际向量字及 executable 地址。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 首批纵切片</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">U575 同步双域参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

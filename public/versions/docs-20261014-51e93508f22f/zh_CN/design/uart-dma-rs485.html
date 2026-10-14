@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>UART 接收 DMA、双向 DMA 与电气适配 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="USB FS device 包所有权与接入边界" href="usb-device.html" />
+    <link rel="prev" title="U575 同步双域参考合同" href="u575-trustzone-contract.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="zh_CN" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="original"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/design/uart-dma-rs485.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/design/uart-dma-rs485.html" lang="en">English</a>. 源语言: zh_CN; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>原文</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="uart-dma-dma">
+<h1>UART 接收 DMA、双向 DMA 与电气适配<a class="headerlink" href="#uart-dma-dma" title="Link to this heading">¶</a></h1>
+<p>UART 公共面继续使用 <code class="docutils literal notranslate"><span class="pre">nx_uart_port_t</span></code> 和共享只读 <code class="docutils literal notranslate"><span class="pre">nx_uart_ops_t</span></code>。实例由配置
+生成，调用方只保存接口和上下文。新机制按模式选择；既有 IRQ、<code class="docutils literal notranslate"><span class="pre">dma-tx</span></code>、
+<code class="docutils literal notranslate"><span class="pre">irq-blocks</span></code> 的状态结构和默认 ops 槽数没有增加。生产代码仍为 C11，没有
+heap、设备扫描、隐藏 worker 或默认 OS 锁。</p>
+<section id="id1">
+<h2>模式与精确资源<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>模式</p></th>
+<th class="head"><p>TX</p></th>
+<th class="head"><p>RX</p></th>
+<th class="head"><p>接收特点</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rx-dma-idle</span></code></p></td>
+<td><p>IRQ</p></td>
+<td><p>NORMAL DMA</p></td>
+<td><p>有限块，IDLE 发布稳定前缀，owner 显式 service 重启</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dma-duplex</span></code></p></td>
+<td><p>DMA</p></td>
+<td><p>NORMAL DMA</p></td>
+<td><p>独立 TX/RX 引擎；接收仍有有限块重启间隙</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rx-dma-continuous</span></code></p></td>
+<td><p>IRQ</p></td>
+<td><p>双缓冲 DMA</p></td>
+<td><p>两个预置目标与第三个可用替换块</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dma-duplex-continuous</span></code></p></td>
+<td><p>DMA</p></td>
+<td><p>双缓冲 DMA</p></td>
+<td><p>双向独立引擎，连续接收使用相同贷款协议</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>首批只接入 STM32F407 USART1 和 GD32F470 USART0。STM32 RX 是 DMA2 stream2
+channel4，TX 是 DMA2 stream7 channel4；GD32 RX 是物理 DMA1 channel2
+selector4，TX 是物理 DMA1 channel7 selector4。控制器编号来自芯片手册，
+不能把公共 opaque resource ID 的编码当成物理 DMA 编号。配置必须独占 UART、
+DMA 目标、向量、时钟和引脚，冲突在生成阶段拒绝。</p>
+<p>接收块容量为 1～65535 字节。连续模式至少有三个等容量块；有限模式允许
+不同容量。DMA 目标必须落在已授权、可写且 DMA 可到达的区域；两款芯片的
+CCM 不属于接收 DMA 可达 SRAM。两款 MCU 没有 CPU D-cache，这些 provider
+不执行虚构的 cache clean/invalidate。以后接入带 cache 的 MCU，需要新的
+域和维护合同，不能复用这里的无 cache 假设。</p>
+<p>RX-only 与 duplex 使用不同的只读 ops 和直接 TX 调用。TX 热路径没有运行时
+<code class="docutils literal notranslate"><span class="pre">dma_transmit</span></code> 判断；RX-only 链接不保留 TX-DMA ops。当前 provider 使用同一
+显式选择的接收状态布局，因此 RX-only 的冷存储仍含 TX-DMA 基类字段；这
+不是零字段开销声明。</p>
+</section>
+<section id="id2">
+<h2>块所有权与连续接收<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>调用方初始化 <code class="docutils literal notranslate"><span class="pre">nx_stream_t</span></code> 与槽表，再通过 <code class="docutils literal notranslate"><span class="pre">nx_uart_port_rx_start</span></code> 借出。
+设备负责 producer，调用方负责 consumer。两者不能混用普通 producer 与
+<code class="docutils literal notranslate"><span class="pre">nx_stream_post_*</span></code> 预置 producer API。stream、槽表、所有块和 provider 状态
+互不重叠，并在成功 <code class="docutils literal notranslate"><span class="pre">rx_stop</span></code> 和外部 observer 排空前保持有效。活动 TX
+payload 不允许与整个 RX 块池重叠。</p>
+<p>有限模式直接将 DMA 指向 caller payload，不做 CPU payload copy。TC、IDLE
+或错误到达后，先撤销 UART DMA request 和接收中断，再写 DMA disable。
+实际 EN、request 与 interrupt 位回读证明静止后，才读取稳定剩余计数。
+最后再次读取 DMA/UART 错误，随后执行唯一 status/data 清除顺序。可靠的
+正长度前缀才能 READY 发布；不可靠的前缀回退为 FREE 并记录 loss。
+stop 时没有收到的空块不会假发布为成功数据。</p>
+<p>连续模式以两个 FILLING 贷款启动双缓冲 DMA。TC 后先保留第三个 FREE 块，
+再替换已完成的非活动目标。发布旧块前同时证明替换地址、另一个目标地址、
+CT 位、EN、无新 TC/错误和旧地址从两个硬件目标中完全消失。失败不会将
+硬件仍可能写入的块交给 consumer；它撤源、排空并按 LIFO 撤销未来贷款。
+成功发布遵守 FIFO。IRQ 不复制 payload，只做有界控制和至多三个贷款处理。</p>
+<p>没有可替换 FREE 块时，立即停止接收写源并等待实际排空，保留 consumer 的
+BORROWED 块。稳定的已完成块和部分块仍可发布，同时记录一次停止间隙。
+不会猜测丢失字节数。失败的 disable 保留所有 producer 贷款，owner 后续
+<code class="docutils literal notranslate"><span class="pre">service</span></code> 有界重试；这段时间调用方不能复用任何块或状态。</p>
+<p>TC 是标志位，不是回绕计数器。连续资格要求最坏 IRQ 延迟和目标替换时间
+小于一个块的填充时间；必须按实际波特率、块大小、中断优先级、屏蔽窗口和
+并发 DMA 负载测量。软件检查能识别可观察的错误、目标变化与 CT 异常，不能
+恢复任意多个合并的回绕。违反延迟预算时不能声称数据序列可靠，即使所有
+目标始终保持 FILLING 而没有侵犯 consumer 内存。</p>
+<p>IDLE、有限块重启和容量压力后的恢复存在接收间隙。owner 的 service 周期
+也是显式资源预算。重启前观察到 UART overrun/error 会在清 status/data 前
+记录 loss；无错误位的间隙不能凭软件推断精确遗漏数。loss 是已观测边界，
+不是精确 wire 字节统计。上层协议决定是否允许间隙及如何恢复。</p>
+</section>
+<section id="tx">
+<h2>TX、停止与调用上下文<a class="headerlink" href="#tx" title="Link to this heading">¶</a></h2>
+<p>TX DMA TC 只证明 payload 已送入外设，不证明最后一位已离开引脚。TX
+settlement 继续等待实际 UART TC；取消仍先撤源，再证明 DMA/外设排空。
+RX DMA 和 TX DMA 使用不同目标与向量，二者的完成状态互不替代。</p>
+<p><code class="docutils literal notranslate"><span class="pre">rx_start/rx_stop/service/stop</span></code> 由唯一未屏蔽的任务 executor 调用。ISR 只使用
+生成器绑定的精确 IRQ 入口；保护区保存并恢复原中断状态。<code class="docutils literal notranslate"><span class="pre">rx_stop</span></code> 关闭
+stream admission，可能返回 BUSY：已发布、已借用的块必须由 consumer 正常
+归还。成功必须同时满足源已撤销、引擎静止以及 outstanding 为零。关闭后
+service 不重新启动 RX。完整 <code class="docutils literal notranslate"><span class="pre">stop</span></code> 也先关闭 TX admission，只有 RX 排空
+后才能停底层时钟。失败时不能销毁或更换 owner。</p>
+<p>GD32 IRQ TX 取消使用共享 USART reset，额外先排空正在运行的 RX；RX EN
+拒绝停止时保留 TX/RX 贷款并推迟 reset。reset 后恢复已选择的硬件流控位。</p>
+</section>
+<section id="rts-cts-rs485">
+<h2>RTS/CTS 与 RS485<a class="headerlink" href="#rts-cts-rs485" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nx_*_uart_flow_configure</span></code> 是显式可选冷配置。STM32 设置 CR3 RTSE/CTSE，
+GD32 设置 CTL2 RTSEN/CTSEN，读回失败会回滚。它在初始化后、活动 TX/RX
+开始前调用，不能修改正在运行的借用。芯片可用信号为 PA11 CTS、PA12 RTS、
+AF7；这些芯片事实不代表当前三块开发板已经接线或外部设备支持握手。
+板级必须审核 PCB、GPIO 权限、电压、复用与 peer 行为再绑定。硬件 RTS
+反映 UART 数据寄存器的接收状态，不代表软件块池剩余容量，不能替代协议
+背压或在无 FREE 块时自动保证不丢数据。</p>
+<p>RS485 选用 <code class="docutils literal notranslate"><span class="pre">nx_uart_rs485_state_t</span></code>、不可变 <code class="docutils literal notranslate"><span class="pre">nx_uart_rs485_config_t</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">nx_uart_rs485_ops</span></code>，默认 UART 状态不增加 DE、timer 或 task。调用方绑定
+真实 GPIO、唯一授权位、DE 极性、setup/hold 时间以及精确底层 provider 的
+纯 TX validator。validator 与 submit/start 共用同一拒绝规则；它不写 GPIO、
+MMIO、不 admit，也不留引用。config、两个 face、ops、context 绑定和电气
+事实全程不可变，所有冷事实与 mutable request/payload/control 必须分离。
+同一 executor 独占底层 TX；不得绕过 adapter 直接提交或修改 transport。</p>
+<p>拒绝发生在 DE assertion 前。接受后 DE 建立成功才开始 setup，绝对 transfer
+deadline 包括 setup 与 wire 完成。setup 超时不启动 UART。底层实际 SETTLED
+才开始 hold，随后 DE 撤销成功，adapter 删除内部 payload/active 引用，再
+发布外层 SETTLED。失败的 drain 或 DE 撤销保留 QUARANTINED 外层贷款与 DE
+所有权，owner service 重试。必需 drain/hold 可以延长借用超过 transfer
+deadline；不能因 deadline 已过就提前释放内存或 DE。</p>
+<p>setup/hold 使用 <code class="docutils literal notranslate"><span class="pre">nx_time_now_us</span></code> 的 monotonic 域；service 的最坏间隔决定
+边界偏差。hold 保证至少声明时长，并不保证精确到时刻就撤 DE。精确波形
+需求需要显式硬件 timer/电气预算，当前不会猜测收发器或提供假定时资格。</p>
+</section>
+<section id="id3">
+<h2>软件证据和实板验收<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>GoogleTest/GoogleMock 直接执行生产 provider，覆盖银行替换拒绝、CT 翻转、
+地址错写、新错误到达 W1C 窗口、disable 拒绝、终止期间 DMA/UART 错误、
+status/data 清除竞态、epoch 耗尽、双向取消、flow 配置、RS485 setup/hold
+和 DE 失败。Native adapter 另验证真实请求生命周期。这些结果建立软件
+合同，不证明电气波形、总线仲裁或物理延迟。</p>
+<p>同一 no-LTO Release RX-only 开发 fixture 的分表前后 ARM ELF 实测，STM32
+text 减少 2310 字节、GD32 减少 2262 字节，两者 bss 减少 8 字节。它只说明
+该中间分表 fixture 的 section GC 成本，不能继承为最终源码、任意应用或
+所有模式的预算。最终候选必须重新绑定配置、源码、ELF/map/nm 与工具身份。</p>
+<p>终止错误修复后，同一 fixture 的新一轮生产图 ARM 链接为 STM32 text 7866
+字节、GD32 text 9932 字节，相对旧基线分别减少 2218、2174 字节，bss 仍
+各减少 8 字节。最终十四个 mode fixture 都已链接，RX-only 的 nm 中没有
+任何 <code class="docutils literal notranslate"><span class="pre">nx_*_uart_dma_*</span></code> symbol，duplex 保留真实 TX-DMA 方法。该结果仍是
+软件开发构建证据，候选签封和实板验证分别执行。</p>
+<p>当前没有连接实板，所有物理验收均未执行。实板退出条件包括：两个引擎
+并行的最大 baud/负载，最坏 IRQ 与 service 延迟，目标换址和 wrap 压力，
+consumer 长持有后的 overflow/recovery，IDLE 与最后 DMA beat 竞态，真实
+TC wire tail，RTS/CTS stall/resume，DE setup/hold 极性与边沿，以及反复
+stop/start 后时钟、向量和 SRAM 贷款均排空。逐板记录 PCB 修订、探针、串口、
+外部接线、逻辑分析仪原始波形和同一 ELF，未执行项不能标成通过。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 首批纵切片</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 同步双域参考合同</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

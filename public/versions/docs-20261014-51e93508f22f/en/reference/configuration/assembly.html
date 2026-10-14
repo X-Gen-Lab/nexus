@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Assembly input and rejected selections &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nexus.css?v=4084a1dc" />
+    <script src="../../_static/documentation_options.js?v=3a7bed40"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Configuration, development and evidence tools" href="tools.html" />
+    <link rel="prev" title="Configuration and tools" href="index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/reference/configuration/assembly.md">51e93508f22f</a>; code reference: 51e93508f22f. <a href="../../../zh_CN/reference/configuration/assembly.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="assembly-input-and-rejected-selections">
+<span id="docs-reference-configuration-assembly"></span><h1>Assembly input and rejected selections<a class="headerlink" href="#assembly-input-and-rejected-selections" title="Link to this heading">¶</a></h1>
+<p>The authored configuration authority is one schema-2 TOML assembly. SoC and Board
+facts remain maintained JSON; <code class="docutils literal notranslate"><span class="pre">resolved.json</span></code> is output, not an authored alternative.
+CMake owns software dependencies. Failed TOML resolution never falls back to Kconfig,
+cache variables, schema-1 JSON or old generated headers.</p>
+<p>Before running the resolver, prepare the
+<a class="reference internal" href="../../guides/source-checkout.html"><span class="std std-doc">fixed source and recursive dependencies</span></a>.</p>
+<section id="complete-maintained-input">
+<h2>Complete maintained input<a class="headerlink" href="#complete-maintained-input" title="Link to this heading">¶</a></h2>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Complete Native UART assembly, parsed by the production resolver.</span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"native_reference"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"native"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"model"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2048</span>
+<span class="n">flash_load_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">65536</span>
+<span class="n">static_ram_limit_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32768</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="k">[uart.uart0]</span>
+<span class="n">binding</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"uart0"</span>
+<span class="n">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"irq"</span>
+<span class="n">baud</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">115200</span>
+
+<span class="k">[uart.uart0.rx]</span>
+<span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"bytes"</span>
+<span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span>
+
+<span class="k">[uart.uart0.irq]</span>
+<span class="n">priority</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+</pre></div>
+</div>
+</div>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Selection</p></th>
+<th class="head"><p>Meaning and rejection boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">schema</span> <span class="pre">=</span> <span class="pre">2</span></code></p></td>
+<td><p>Authored TOML generation; unknown keys reject</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">board</span></code></p></td>
+<td><p>Maintained immediate child of <code class="docutils literal notranslate"><span class="pre">boards/</span></code>; exactly one Board selector</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">board_package</span></code></p></td>
+<td><p>External package path relative to the assembly; alternative to <code class="docutils literal notranslate"><span class="pre">board</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">backend</span></code></p></td>
+<td><p>Explicit <code class="docutils literal notranslate"><span class="pre">native</span></code>, <code class="docutils literal notranslate"><span class="pre">baremetal</span></code>, <code class="docutils literal notranslate"><span class="pre">freertos</span></code> or supported <code class="docutils literal notranslate"><span class="pre">threadx</span></code> subset</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">clock</span></code></p></td>
+<td><p>Maintained exact profile matching Board and SoC facts</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">optimization</span></code></p></td>
+<td><p>Maintained optimization/debug/LTO profile; no arbitrary compiler override</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[memory]</span></code></p></td>
+<td><p>Byte budgets for stack, libc heap, static RAM and Flash LOAD</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[factory]</span></code></p></td>
+<td><p>Explicit optional strong IDs and capability metadata</p></td>
+</tr>
+<tr class="row-even"><td><p>Kind instance table</p></td>
+<td><p>Stable authored name, reviewed binding, mode and bounded options</p></td>
+</tr>
+<tr class="row-odd"><td><p>SPI/I2C device table</p></td>
+<td><p>Separate endpoint identity tied to an existing controller</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[abi]</span></code></p></td>
+<td><p>Assert reviewed CPU architecture/FPU/float ABI; cannot invent chip features</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Resource checks cover actual pin/AF, controller, IRQ ceiling, shared timer/timebase,
+physical DMA controller/stream, clock, exact memory domain, mode and endpoint identity.
+A syntactically valid selector can still reject because that provider does not
+implement the route. The resolver never silently changes pins, modes or clock.</p>
+</section>
+<section id="inspect-and-generate">
+<h2>Inspect and generate<a class="headerlink" href="#inspect-and-generate" title="Link to this heading">¶</a></h2>
+<p>Run from the repository root, using a new output you own:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/configure/configure.py<span class="w"> </span>list-bindings<span class="w">     </span>--assembly<span class="w"> </span>tools/configure/assemblies/native-uart.toml
+python<span class="w"> </span>tools/configure/configure.py<span class="w"> </span>check<span class="w">     </span>--assembly<span class="w"> </span>tools/configure/assemblies/native-uart.toml
+python<span class="w"> </span>tools/configure/configure.py<span class="w"> </span>explain<span class="w">     </span>--assembly<span class="w"> </span>tools/configure/assemblies/native-uart.toml
+python<span class="w"> </span>tools/configure/configure.py<span class="w"> </span>generate<span class="w">     </span>--assembly<span class="w"> </span>tools/configure/assemblies/native-uart.toml<span class="w">     </span>--output<span class="w"> </span>/tmp/nexus-native-config
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">check</span></code> and <code class="docutils literal notranslate"><span class="pre">explain</span></code> do not generate output. <code class="docutils literal notranslate"><span class="pre">generate</span></code> publishes one atomic owned
+bundle; failure invalidates its owned output without replacing unrelated data.
+Inspect <code class="docutils literal notranslate"><span class="pre">resolved.json</span></code>, input identities, generated <code class="docutils literal notranslate"><span class="pre">nexus_config.h</span></code>, bindings,
+factory, linker memory and budgets. Changing declared inputs requires a fresh
+resolution; separate Board/backend combinations use separate build roots.</p>
+<p>CPU-only Runtime has a separate authored runtime TOML using the shared CPU resolver.
+It emits Core/Arch/optional OS policy, no SoC/Board/startup/factory. Do not use it to
+claim a full device platform. The <a class="reference internal" href="../../design/build-system.html"><span class="std std-doc">build contract</span></a>,
+<a class="reference internal" href="../../design/integration-contracts.html"><span class="std std-doc">integration contract</span></a> and production field
+model/schema own detailed accepted fields; editor completion does not establish
+hardware capability.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Task guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api/index.html">Public C API</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Configuration and tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../platforms/index.html">Platforms and qualification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-delivery.html">Documentation packages, publication and independent restoration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-tools.html">Documentation tools and preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html">Historical documentation and version migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../assets/diagrams/README.html">Nexus platform diagram atlas</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>文档系统实施与正式验收 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="HIL 与实板状态" href="hardware.html" />
+    <link rel="prev" title="软件验证、源码身份与证据" href="software-verification.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="zh_CN" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/status/documentation-acceptance.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/status/documentation-acceptance.html" lang="en">English</a>. 源语言: zh_CN; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="status-documentation-acceptance">
+<span id="id1"></span><h1>文档系统实施与正式验收<a class="headerlink" href="#status-documentation-acceptance" title="Link to this heading">¶</a></h1>
+<p>本轮文档系统的 58 项任务已按原退出条件完成独立验收。实现、教程、图示、自动
+门禁、锁定工具、正式构建、公网发布和远端恢复均有实际记录。任务值以
+<a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">58</span> <span class="pre">项源台账</span></code></a>为唯一权威；
+<a class="reference internal" href="../design/documentation-improvements.html"><span class="std std-doc">可读清单</span></a>和
+<a class="reference internal" href="ledgers/documentation-system.html"><span class="std std-doc">逐项原字段</span></a>由该台账自动生成。</p>
+<p><a class="reference download internal" download="" href="../_downloads/a975512301d2ad733ba44c087f43da20/documentation-results.json"><code class="xref download docutils literal notranslate"><span class="pre">交付结果索引</span></code></a>记录精确 commit、归档摘要、下载位置、
+证据成员和逐项接受依据。<code class="docutils literal notranslate"><span class="pre">passed</span></code> 在这里表示对应的文档退出条件已接受；它不改变
+原始测试记录的源码、配置、工具或物理状态，也不表示当前文档提交重新执行了全部
+历史固件测试。</p>
+<section id="id2">
+<h2>正式交付与实际验证<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>主要文档资格绑定干净源码 <code class="docutils literal notranslate"><span class="pre">3835e13cd7da34bd75307746859d4514745ae2ff</span></code>，版本为
+<code class="docutils literal notranslate"><span class="pre">docs-20261014-3835e13cd7da</span></code>。后续台账和交付索引提交记录该次实际结果，另有自身
+构建 manifest；不能把它们的 HEAD 填入此前执行记录。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>证据范围</p></th>
+<th class="head"><p>实际结果</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>严格构建</p></td>
+<td><p>Doxygen、gettext、英文和中文 HTML 完成；Sphinx 零警告</p></td>
+</tr>
+<tr class="row-odd"><td><p>内容与翻译</p></td>
+<td><p>99 份维护正文、五类内容模板；22 份关键页和导航 catalog 的 273 条译文独立审查</p></td>
+</tr>
+<tr class="row-even"><td><p>架构图</p></td>
+<td><p>17 对 DOT／SVG，包括 15 类必需图；源码、箭头、状态、说明及本地字体核对通过</p></td>
+</tr>
+<tr class="row-odd"><td><p>浏览器与打印</p></td>
+<td><p>162 项检查，15 张 SVG，22 份 A4 PDF；32 个代码块和 800 行代码完整；实际查看 6 份 PDF 的 18 页</p></td>
+</tr>
+<tr class="row-even"><td><p>读者任务</p></td>
+<td><p>干净 <code class="docutils literal notranslate"><span class="pre">7aadd347</span></code> 下执行 85 条主命令及 28 条 SDK 内部命令；实际配置、Native 示例、搬移 consumer 和 ARM 链接通过</p></td>
+</tr>
+<tr class="row-odd"><td><p>提交门禁</p></td>
+<td><p>正常钩子通过；177 个 GoogleTest／GoogleMock 程序、3,252 个用例；四个工具域共 1,555 个用例；文档域另执行 169 个用例</p></td>
+</tr>
+<tr class="row-even"><td><p>公网核对</p></td>
+<td><p>1,895 次真实 HTTP 请求全部 200；1,600 个 payload、290 个旧 URL 根入口、stable 和实际下载归档逐字节一致</p></td>
+</tr>
+<tr class="row-odd"><td><p>远端恢复</p></td>
+<td><p>从固定 Git commit 实际下载 9 项资产，独立恢复 1,600 个文件；75 个工具归档和 2 份配置一致；恢复后另执行 162 项浏览器检查和 22 份新 PDF 校验</p></td>
+</tr>
+<tr class="row-even"><td><p>逐项收尾</p></td>
+<td><p>独立核对全部 58 项原退出条件、230 条来源迁移、287 个旧 URL 和原资格边界；编号及退出条件逐字保留</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>读者任务的执行源码保持 <code class="docutils literal notranslate"><span class="pre">7aadd347</span></code>。实际 Git 比较证明它与主要文档资格源码之间
+只修改了打印 CSS，相关代码、配置和工具子树相同；打印另以 <code class="docutils literal notranslate"><span class="pre">3835e13c</span></code> 实际验收。
+正常提交钩子的记录保留各次暂存范围和原执行身份，不改标为后续干净 HEAD 的新
+固件资格。恢复后的新 PDF 通过机械和完整代码检查；原 18 页视觉结果通过全部
+1,600 个渲染输入逐 SHA 一致性复用，没有声称再次查看这 18 页。</p>
+</section>
+<section id="id3">
+<h2>在线阅读、离线包和长期证据<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://x-gen-lab.github.io/nexus/stable/">在线入口</a>选择当前发布版本。不可变
+<code class="docutils literal notranslate"><span class="pre">versions/&lt;release_id&gt;/</span></code> 保留原字节；根目录旧书签显示准确的历史或当前合同说明。
+旧 HAL／OSAL API 不会静默映射为当前接口。</p>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/releases/tag/docs-20261014-3835e13cd7da">文档发行说明</a>
+提供离线 HTML、完整文档工具缓存和执行证据的固定 commit 取得入口。实际长期
+存储使用独立 Git 资产提交；Release 附件接口曾返回 401，未把 Git 文件写成已上传
+附件。证据索引记录真实上传、重新下载及成员验真的结果，原失败尝试同时保留。</p>
+<p>取得归档先核对 bytes／SHA-256。分片归档按记录顺序取得，每片不超过 32 MiB，
+逐片验证后重组，再验证整包和 inventory 中的每个成员。归档中的 receipt 保留原
+命令、退出码和原主机路径；portable locator 负责将这些路径映射到相对成员。
+已单独保留的工具归档及文档包不在证据包中重复存储，明确的 exclusion 表逐文件
+记录其摘要、不可变下载位置和归档成员，原执行记录完整保留。</p>
+<p>原版本和资产 commit 由保留标签及后续提交保持可达；新版本新增身份，不替换同名
+归档。维护者按发行说明保存独立副本。摘要用于检测字节偏离，不是数字签名。
+具体拒绝规则见 <a class="reference internal" href="../reference/documentation-delivery.html"><span class="std std-doc">文档交付合同</span></a>。</p>
+</section>
+<section id="id4">
+<h2>适用范围和平台资格<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>文档工具闭包已在 Linux x86_64／Python 3.12 实际安装验证，浏览器为 Linux 上的
+Chromium 151。实际执行了本地 HTTP、停止服务器后的浏览器离线读取、搜索、语言
+切换和本地图示；<code class="docutils literal notranslate"><span class="pre">file://</span></code> 被既有企业策略阻止，策略未改，不声明该路径已验收。
+非关键译文按页面显示 original／missing／stale／reviewed，双语入口不等于所有
+历史页面均已翻译。</p>
+<p>平台固件资格仍引用 <code class="docutils literal notranslate"><span class="pre">cc6a065c</span></code> 及原 SoC 精确索引，见
+<a class="reference internal" href="software-verification.html"><span class="std std-doc">软件验证入口</span></a>。MCU HIL 始终为 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>；文档构建、
+发布、恢复和软件模型检查均不增加芯片、板卡、产品安全或实板资格。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">状态与证据</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="support.html">支持范围与选型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software-verification.html">软件验证、源码身份与证据</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">文档系统实施与正式验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hardware.html">HIL 与实板状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ledgers.html">原台账、退出条件与派生视图</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roadmap.html">迭代方向与进入条件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

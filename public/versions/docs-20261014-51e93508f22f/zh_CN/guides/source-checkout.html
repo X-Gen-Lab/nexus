@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>取得精确源码与锁定依赖 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="接入复核的 Board 包" href="board-porting.html" />
+    <link rel="prev" title="操作指南" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/guides/source-checkout.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/guides/source-checkout.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="obtain-the-exact-source-and-pinned-dependencies">
+<span id="docs-guides-source-checkout"></span><h1>取得精确源码与锁定依赖<a class="headerlink" href="#obtain-the-exact-source-and-pinned-dependencies" title="Link to this heading">¶</a></h1>
+<p>在执行教程、配置参考或维护工作流中的仓库命令前，先使用本指南。你将取得处于 detached 状态的精确 Nexus 源码版本及其递归依赖。首次克隆和取得依赖需要 Git、Python 3.11+ 及网络访问。本流程不构建、不刷写，也不建立软件或硬件资格。</p>
+<section id="select-the-revision-described-by-your-documentation">
+<h2>选择当前文档描述的版本<a class="headerlink" href="#select-the-revision-described-by-your-documentation" title="Link to this heading">¶</a></h2>
+<p>打开页面版本横幅标识的不可变文档版本。从该版本根目录下载 <code class="docutils literal notranslate"><span class="pre">documentation-manifest.json</span></code>，或使用已验证离线包根目录中的同名文件。将其保存在即将创建的 checkout 外，例如工作父目录下的 <code class="docutils literal notranslate"><span class="pre">nexus-documentation-manifest.json</span></code>。如果从 <code class="docutils literal notranslate"><span class="pre">stable/</span></code> 进入，先记录其选择的不可变版本，再下载；不得混用两个版本。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>清单字段</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">documentation_source.commit</span></code></p></td>
+<td><p>包含这些页面及其工具的精确源码</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">code_source.commit</span></code></p></td>
+<td><p>文档包描述的源码；应单独核对其身份</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">qualified_code.commit</span></code></p></td>
+<td><p>被引用的软件资格基线，保留其原始范围与结果</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>GitHub 默认分支可能落后于已审查的文档分支。分支名、成功克隆或文档发行都不能替代精确提交。此前已审查的文档快照是 <code class="docutils literal notranslate"><span class="pre">5a7a75c321ea173df8692714f95a8df13715293d</span></code>；选择它只能重建该快照，不能取得后续文档。它的<a class="reference external" href="https://x-gen-lab.github.io/nexus/versions/docs-20261014-5a7a75c321ea/documentation-manifest.json">不可变包清单</a>是一个具体例子。执行当前教程时，使用你所读版本自己的清单。</p>
+</section>
+<section id="clone-and-initialize-that-exact-revision">
+<h2>克隆并初始化该精确版本<a class="headerlink" href="#clone-and-initialize-that-exact-revision" title="Link to this heading">¶</a></h2>
+<p>从保存已下载清单的父目录执行以下 POSIX shell 命令。选择新的 checkout 目录；命令不会替换已有目录。Python 命令先验证身份，再将其传给 Git：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">nexus_source_revision</span><span class="o">=</span><span class="k">$(</span>python<span class="w"> </span>-c<span class="w"> </span><span class="s1">'import json, re; from pathlib import Path; manifest = json.loads(Path("nexus-documentation-manifest.json").read_text()); revision = manifest["documentation_source"]["commit"]; assert re.fullmatch(r"[0-9a-f]{40}", revision), "invalid documentation commit"; print(revision)'</span><span class="k">)</span>
+git<span class="w"> </span>clone<span class="w"> </span>--no-checkout<span class="w"> </span>https://github.com/X-Gen-Lab/nexus.git<span class="w"> </span>nexus
+<span class="nb">cd</span><span class="w"> </span>nexus
+git<span class="w"> </span>checkout<span class="w"> </span>--detach<span class="w"> </span><span class="s2">"</span><span class="nv">$nexus_source_revision</span><span class="s2">"</span>
+git<span class="w"> </span>submodule<span class="w"> </span>sync<span class="w"> </span>--recursive
+git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w"> </span>--init<span class="w"> </span>--recursive
+git<span class="w"> </span>rev-parse<span class="w"> </span>HEAD
+git<span class="w"> </span>submodule<span class="w"> </span>status<span class="w"> </span>--recursive
+git<span class="w"> </span>status<span class="w"> </span>--short
+</pre></div>
+</div>
+<p>检查每条命令的退出状态。<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rev-parse</span> <span class="pre">HEAD</span></code> 必须与清单中的完整提交一致。递归子模块输出不能以 <code class="docutils literal notranslate"><span class="pre">-</span></code>（缺失）、<code class="docutils literal notranslate"><span class="pre">+</span></code>（版本不同）或 <code class="docutils literal notranslate"><span class="pre">U</span></code>（冲突）开头；开始干净源码工作流前，<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">status</span> <span class="pre">--short</span></code> 必须为空。提交不可取得或依赖取得失败时立即停止，绝不能替换为 <code class="docutils literal notranslate"><span class="pre">main</span></code>、<code class="docutils literal notranslate"><span class="pre">HEAD</span></code> 或最新依赖。没有包清单的预览应从源码横幅或 <code class="docutils literal notranslate"><span class="pre">documentation-build.json</span></code> 记录完整提交，并显式使用该已验证提交。</p>
+<p>Windows 下可在 Git Bash 中执行这段 POSIX 命令，或读取同一清单字段，在自己的 shell 中执行对应 Git 命令。不要将这里的变量语法直接当作可移植的 PowerShell 命令。</p>
+</section>
+<section id="prepare-only-the-tools-required-by-your-task">
+<h2>只准备当前任务所需的工具<a class="headerlink" href="#prepare-only-the-tools-required-by-your-task" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>任务</p></th>
+<th class="head"><p>后续准备</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Native 消费工程或 I/O 夹具</p></td>
+<td><p>所选教程要求的主机 Python、CMake、Ninja 和 C/C++ 编译器</p></td>
+</tr>
+<tr class="row-odd"><td><p>检查配置</p></td>
+<td><p>Python 与维护中的解析器；ARM 编译仍是独立步骤</p></td>
+</tr>
+<tr class="row-even"><td><p>平台维护</p></td>
+<td><p><a class="reference internal" href="../development/workflow.html"><span class="std std-doc">开发工具、TDD 与钩子</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>文档检查、构建或打包</p></td>
+<td><p><a class="reference internal" href="../reference/documentation-tools.html"><span class="std std-doc">锁定文档工具组合与统一 CLI</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>MCU 链接或硬件准备</p></td>
+<td><p><a class="reference internal" href="performance-hil.html"><span class="std std-doc">精确工具链与 HIL 准备</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>每个教程都从上面确定的仓库根目录开始。按要求将独立消费工程和包输出保存在源码 checkout 外。删除目录前，保留清单、源码身份及必需报告，并且只删除自己创建的目录。干净 checkout 只提供输入身份；实际执行与<a class="reference internal" href="../status/software-verification.html"><span class="std std-doc">资格证据</span></a>仍需分别建立。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">操作指南</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">取得精确源码与锁定依赖</a></li>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html">接入复核的 Board 包</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html">接入 SoC、提供者或通用组件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html">正确等待并停止显式 owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">迁移旧配置与接口访问</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html">测量资源并准备硬件验收</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

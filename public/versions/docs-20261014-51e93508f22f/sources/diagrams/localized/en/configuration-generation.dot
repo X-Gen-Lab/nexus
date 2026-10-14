@@ -1,0 +1,35 @@
+// FIG-03 current: build-time inputs and artifacts.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Edges denote configuration/production flow, not runtime I/O.
+digraph configurationGeneration {
+    graph [label="FIG-03 Current configuration and generation", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    assembly [label="one authored TOML assembly", fillcolor="#f8fafc"];
+    socFacts [label="SoC / CPU / route facts", fillcolor="#f8fafc"];
+    boardFacts [label="Board wiring and provenance", fillcolor="#f8fafc"];
+    resolver [label="strict field / mode / resource / identity checks"];
+    typedIr [label="immutable typed IR"];
+    bundle [label="transactional generation and atomic publish"];
+    outputs [label="static instances / factory / config / budgets"];
+    targets [label="CMake: sole software target graph"];
+    ninja [label="Ninja: compile / link / resource checks"];
+    firmware [label="ELF / BIN / map / resource reports", fillcolor="#f0fdf4"];
+    rejected [label="rejected input or generation failure", fillcolor="#fff7ed"];
+    invalidated [label="invalidate owned bundle, no partial outputs", fillcolor="#fff7ed"];
+    assembly -> resolver [label="product selection"];
+    socFacts -> resolver [label="silicon capability"];
+    boardFacts -> resolver [label="Board authorization"];
+    resolver -> typedIr [label="validated"];
+    typedIr -> bundle [label="generate selected content"];
+    bundle -> outputs [label="atomic publish"];
+    outputs -> targets [label="configuration and generated sources"];
+    targets -> ninja [label="execute target graph"];
+    ninja -> firmware [label="actual artifacts of this execution"];
+    resolver -> rejected [label="invalid / conflict / input changed"];
+    bundle -> rejected [label="generation or publish failure"];
+    rejected -> invalidated [label="invalidate owned outputs only"];
+}

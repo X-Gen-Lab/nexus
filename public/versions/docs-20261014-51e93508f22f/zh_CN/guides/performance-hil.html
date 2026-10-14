@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>测量资源并准备硬件验收 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=2930ce09"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="参考" href="../reference/index.html" />
+    <link rel="prev" title="迁移旧配置与接口访问" href="migration.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/51e93508f22fc1eb540c4ce4dd8713a91cc429f6/docs/guides/performance-hil.md">51e93508f22f</a>; 代码引用: 51e93508f22f. <a href="../../en/guides/performance-hil.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="measure-resources-and-prepare-hardware-acceptance">
+<span id="docs-guides-performance-hil"></span><h1>测量资源并准备硬件验收<a class="headerlink" href="#measure-resources-and-prepare-hardware-acceptance" title="Link to this heading">¶</a></h1>
+<p>使用本指南区分链接后的软件成本与物理 MCU 行为。平台提供测量与 HIL 工具；产品选择工作负载、电气限制、安全输出和发行策略。真实设备执行已审查范围之前，任何 Board 都没有实板资格。</p>
+<p>先准备<a class="reference internal" href="source-checkout.html"><span class="std std-doc">固定源码与递归依赖</span></a>，再为精确选择的装配准备锁定工具链。</p>
+<section id="measure-an-exact-image">
+<h2>测量精确镜像<a class="headerlink" href="#measure-an-exact-image" title="Link to this heading">¶</a></h2>
+<p>记录干净源码、装配／resolved 摘要、依赖、编译器和标志。在变更前后构建同一负载。核对实际 ELF／BIN／map 与资源报告，不使用对象数量估算。分别记录 Flash LOAD、Flash 占用范围、各物理 RAM 预留、MSP、任务栈／TCB、队列和 I/O 缓冲区。栈容量不是实测栈高水位。</p>
+<p><a class="reference internal" href="../design/build-system.html"><span class="std std-doc">构建合同</span></a>维护资源检查。使用维护中的 <code class="docutils literal notranslate"><span class="pre">tools/measurement/</span></code> 门禁；<a class="reference internal" href="../design/soc-execution-budgets.html"><span class="std std-doc">执行预算</span></a>说明范围。速度结论必须包含单位、时钟、输入规模、负载、采样方法和不确定度。DWT 32 位快照需要有界回绕间隔；主机到达时间戳不能证明 MCU cycles 或 IRQ 延迟。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/h743-memory-cache.svg" title="打开 SVG 大图"><img alt="H743 精确内存与缓存所有权参考" src="../_images/h743-memory-cache.svg" /></a></p>
+<p>FIG-09 是精确 H743 参考。启用缓存的 TX 要求拥有完整 32 字节缓存行，并可达 AXI SRAM；DMA 完成、线上完成和借用结束分别判断。它不授权 RX DMA 或 TCM 放置。</p>
+</section>
+<section id="prepare-without-operating-equipment">
+<h2>在不操作设备的情况下准备<a class="headerlink" href="#prepare-without-operating-equipment" title="Link to this heading">¶</a></h2>
+<p>先配置并构建所选维护装配。以下仓库根目录命令使用梁山派裸机参考的实际输出：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>configure<span class="w"> </span>--preset<span class="w"> </span>gd32-liangshan-baremetal
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>build<span class="w"> </span>--preset<span class="w"> </span>gd32-liangshan-baremetal<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span>
+python<span class="w"> </span>tools/hil/prepare.py<span class="w">     </span>--fixture<span class="w"> </span>tools/hil/fixtures/gd32f470_liangshan.json<span class="w">     </span>--resolved<span class="w"> </span>build/gd32-liangshan-baremetal/generated/resolved.json<span class="w">     </span>--report<span class="w"> </span>/tmp/nexus-hil-preparation.json
+python<span class="w"> </span>tools/hil/measure.py<span class="w"> </span>plan<span class="w">     </span>--fixture<span class="w"> </span>tools/hil/fixtures/gd32f470_liangshan.json<span class="w">     </span>--resolved<span class="w"> </span>build/gd32-liangshan-baremetal/generated/resolved.json<span class="w">     </span>--report<span class="w"> </span>/tmp/nexus-hil-measurement-plan.json
+</pre></div>
+</div>
+<p>锁定 ARM 编译器必须位于 <code class="docutils literal notranslate"><span class="pre">PATH</span></code>。检查报告中的型号、引脚、选择模式和 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code> 项。准备流程不打开串口、不刷写，也不操作电源设备。数值限制和仪器在审查前保持未绑定。G474／H743／U575 软件参考夹具会明确拒绝物理工位准入；未来实板夹具需要独立审查的工具集成。</p>
+</section>
+<section id="execute-only-a-real-reviewed-station">
+<h2>只执行真实且经过审查的工位<a class="headerlink" href="#execute-only-a-real-reviewed-station" title="Link to this heading">¶</a></h2>
+<p>将实际观察的 PCB／型号／UID、探针、稳定串口路径、接线和供电绑定到精确 ELF、resolved 配置与资源报告。锁定采集工具、操作配方、仪器和数值上下限。遵守维护中的 HIL 采集合同：识别、刷写、验证、复位、串口和清理。失败保留原始日志；清理失败继续隔离保留工位，并要求实物检查。</p>
+<p>采集完成只表示执行过，尚未取得资格。分别验证实际基本功能检查、测量和 OS 记录。不得合成物理跟踪记录或将软件模型当作 HIL。资格只覆盖已记录观察，不证明未观察的 WCET、电气安全或产品发行。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">操作指南</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="source-checkout.html">取得精确源码与锁定依赖</a></li>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html">接入复核的 Board 包</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html">接入 SoC、提供者或通用组件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html">正确等待并停止显式 owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">迁移旧配置与接口访问</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">测量资源并准备硬件验收</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>
