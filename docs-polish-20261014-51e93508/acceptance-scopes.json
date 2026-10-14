@@ -1,0 +1,85 @@
+{
+  "kind": "documentation_evidence_scope_notes",
+  "documentation_source_commit": "51e93508f22fc1eb540c4ce4dd8713a91cc429f6",
+  "maintenance_source_commit": "78c3bc90b9df861906b423c5dab8d326c010491c",
+  "latest_clean_receipts": [
+    "delivery/final-build.json",
+    "delivery/package-result.json",
+    "delivery/independent-package-review-51e93508.json",
+    "source/build/quality/docs-browser-final-51e93508.json"
+  ],
+  "canonical_pages": 102,
+  "language_page_states": 204,
+  "catalogs": 151,
+  "catalog_messages": 13319,
+  "documentation_suite_latest": {
+    "executed": 305,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0,
+    "receipt": "source/build/quality/docs-polish-search-tests.json"
+  },
+  "superseded_documentation_suite_counts": {
+    "docs-polish-tests.json": 285,
+    "docs-polish-fixed-tests.json": 295
+  },
+  "native_host_suite": {
+    "passed": 3252,
+    "suites": 177,
+    "receipt": "documentation-source51/build/native-debug/tdd/execution.json",
+    "scope": "Actual host execution with raw commit-gate logs and command receipts; not proof of historical TDD order or physical hardware qualification."
+  },
+  "maintenance_followup_tdd_receipt": "maintenance-followup/78c3bc90b9df861906b423c5dab8d326c010491c/build/native-debug/tdd/execution.json",
+  "tools_suite": {
+    "passed": 1555,
+    "testing": 678,
+    "configure": 481,
+    "ci": 369,
+    "workflows": 27
+  },
+  "latest_browser": {
+    "page_loads": 408,
+    "representative_viewports": 30,
+    "actual_searches": 8,
+    "transport": "loopback HTTP; direct file access not executed",
+    "equivalent200": "720 CSS px viewport at device scale factor 2; no browser UI zoom claimed"
+  },
+  "editorial_review_scope": "polish/final-editorial-review.json records prior 5a7a75c working-tree source hashes; final clean-source build/browser/package receipts are separate.",
+  "superseded_receipts": "Older a73568e and 6f395 build/package/browser/native-query/CI receipts, failed previews, script assumption failures and actual RED execution are preserved with their original values and source identities.",
+  "offline_package": {
+    "payload_files": 1675,
+    "total_files": 1677,
+    "archive_sha256": "928a1d3f78a2568f955f764b3fa1d1b3ee7e861c7985ea1a31985d0c72da8727",
+    "manifest_sha256": "38979748d90b08861eba98f4577192768edf64eebee150f21e133848da38b990"
+  },
+  "ci_original_run": 38608480244,
+  "ci_original_source": "51e93508f22fc1eb540c4ce4dd8713a91cc429f6",
+  "ci_attempt1_outcome": "Native ASan and Tool Contracts cancelled at 30-minute job limits; CI Status failed. Original JSON/raw log are retained. Timings do not establish absence of a hang.",
+  "ci_capture_run_ids": [
+    38608480244
+  ],
+  "ci_capture": {
+    "status": "completed",
+    "conclusion": "cancelled",
+    "documentation_jobs": [
+      {
+        "name": "Documentation / Build Docs",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/X-Gen-Lab/nexus/actions/runs/38608480244/job/116005614033"
+      }
+    ]
+  },
+  "ci_followup_capture": {
+    "status": "completed",
+    "conclusion": "success",
+    "headSha": "78c3bc90b9df861906b423c5dab8d326c010491c",
+    "run_ids": [
+      38614597898
+    ],
+    "receipt": "delivery/ci-final-followup.json",
+    "scope": "Separate maintenance source with only two job-budget changes. The accepted offline package and Pages publication remain documentation source51."
+  },
+  "new_firmware_qualification": false,
+  "physical_hil": "not executed"
+}

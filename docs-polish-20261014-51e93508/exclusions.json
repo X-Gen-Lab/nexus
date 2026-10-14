@@ -1,0 +1,25 @@
+{
+  "kind": "nexus_documentation_retention_exclusions",
+  "excluded": [
+    {
+      "scope": "search/*fixture/** and search/__pycache__/**",
+      "reason": "Generated fixture sites, fixture Git internals, doctrees and Python caches; raw browser/probe/build receipts and their command output are retained."
+    },
+    {
+      "scope": "delivery/packages/*/** payload directories and delivery/independent-restore*/**",
+      "reason": "Final immutable offline archive retains current payload once; exact per-package manifests and metadata retain source scope; generated extraction copies are not needed."
+    },
+    {
+      "scope": "superseded docs-20261014-a73568e172ab.tar.gz and docs-20261014-6f395bfe228a.tar.gz",
+      "reason": "Rejected/superseded package receipts and manifests are retained; only the accepted final offline package is published in this prefix."
+    },
+    {
+      "scope": "polish/relocated-historical-cache/** except relocation.json",
+      "reason": "Retired caches are not current qualification evidence; relocation record is retained."
+    },
+    {
+      "scope": "build binaries, object files, generated Doxygen XML, gettext trees and doctrees",
+      "reason": "Durable source, exact accepted offline package, raw command outputs, JUnit and execution receipts establish the retained documentation/host scope."
+    }
+  ]
+}

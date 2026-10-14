@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_polished_documentation_retained_assets",
+  "documentation_source_commit": "51e93508f22fc1eb540c4ce4dd8713a91cc429f6",
+  "maintenance_source_commit": "78c3bc90b9df861906b423c5dab8d326c010491c",
+  "ci_followup_run": 38614597898,
+  "offline_package": {
+    "path": "docs-20261014-51e93508f22f.tar.gz",
+    "payload_files": 1675,
+    "total_files": 1677,
+    "archive_sha256": "928a1d3f78a2568f955f764b3fa1d1b3ee7e861c7985ea1a31985d0c72da8727",
+    "manifest_sha256": "38979748d90b08861eba98f4577192768edf64eebee150f21e133848da38b990"
+  },
+  "new_firmware_qualification": false,
+  "physical_hil": "not executed",
+  "index_exclusions": "This index excludes its own bytes and RETAINED-SHA256SUMS to avoid recursive hashing; that checksum table includes this index.",
+  "files": [
+    {
+      "path": "README.txt",
+      "bytes": 5357,
+      "sha256": "a8461e80a55417959b72210d2ec71f39c467fba84b492743bf173c327a31653f"
+    },
+    {
+      "path": "SHA256SUMS",
+      "bytes": 170713,
+      "sha256": "ed95a0cd7911ae0a65440f637bc5652e12170eacac11aaab34abc3fb20b94dbf"
+    },
+    {
+      "path": "acceptance-scopes.json",
+      "bytes": 3495,
+      "sha256": "dc94f13f2333c9c483bb1bfcecb56541d8becd5e08c6178c577e83bc1a296c8a"
+    },
+    {
+      "path": "docs-20261014-51e93508f22f.tar.gz",
+      "bytes": 8414431,
+      "sha256": "928a1d3f78a2568f955f764b3fa1d1b3ee7e861c7985ea1a31985d0c72da8727"
+    },
+    {
+      "path": "documentation-manifest.json",
+      "bytes": 289498,
+      "sha256": "38979748d90b08861eba98f4577192768edf64eebee150f21e133848da38b990"
+    },
+    {
+      "path": "exclusions.json",
+      "bytes": 1353,
+      "sha256": "a645356abd70168e0720beed74e47a6a938c835ea922bae92d0519de4883d91e"
+    },
+    {
+      "path": "nested-evidence-index.json",
+      "bytes": 4119672,
+      "sha256": "e4342ee91f2b47baa0de2e0f55d2568a113e829ec22378138953203f807d8fd2"
+    },
+    {
+      "path": "raw-evidence-index.json",
+      "bytes": 5375952,
+      "sha256": "fa3ba4661d60507171a968ad55c6ac0611c6463381a8f97118cbe6f37fd464a7"
+    },
+    {
+      "path": "raw-evidence.tar.gz",
+      "bytes": 27782046,
+      "sha256": "c9d1d6d1e3ba8543aeca49d6935ae0387f61faa272c0046abe6cac756a40e75b"
+    },
+    {
+      "path": "seal-retention.py",
+      "bytes": 20427,
+      "sha256": "da9e647879d82e64de894fd41cadcc0655926b9334115b7580bcd05142c58797"
+    },
+    {
+      "path": "source-snapshot.json",
+      "bytes": 1772,
+      "sha256": "8b02e1ff0979626253abdf94a2cf4338fb4e3bc1730222010e6ab0efea3cf238"
+    },
+    {
+      "path": "verify-retained-assets.py",
+      "bytes": 4984,
+      "sha256": "fa72f8ead07ff7b987e53ac6d4eb1b24c656a57af118011bb2749742d3520a3a"
+    }
+  ]
+}
