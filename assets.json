@@ -124,6 +124,21 @@
       "sha256": "90c18eeaa8bc27ceda17f3dcd6e0b95caa27839bdacf937ec4c6e7a2d9d3435f"
     },
     {
+      "path": "docs-final-20261014-5a7a75c3-restore/restore.json",
+      "bytes": 10629,
+      "sha256": "49aa39b28c9e3d54aea537bc1e343e7734c580c8ee8728b0990a0264ff17e305"
+    },
+    {
+      "path": "docs-final-20261014-5a7a75c3-restore/supplement-member-observations.json",
+      "bytes": 22830,
+      "sha256": "222272f6175f4e0465a1952189dc57a1bec7ca1349790d5a4c9ba47ff80e0401"
+    },
+    {
+      "path": "docs-final-20261014-5a7a75c3-restore/verify_final_retention.py",
+      "bytes": 12271,
+      "sha256": "e96ac034f6f2b86b13755a13f200ab22c3f512dd7ea896cf0d65310f4e700aef"
+    },
+    {
       "path": "docs-final-20261014-5a7a75c3/README.txt",
       "bytes": 566,
       "sha256": "b228c1d63458bc6976802e86dc5429f291195d6df96e511829733dafe428cf41"

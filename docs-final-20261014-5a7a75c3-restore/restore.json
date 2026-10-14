@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "kind": "independent_final_documentation_retention_verification",
+  "status": "passed",
+  "started_at": "2026-10-14T11:24:15.791397+00:00",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "/tmp/nexus-docs-later-evidence/verify_final_retention.py",
+    "--source-root",
+    "/workspace/nexus-build-system-20261012",
+    "--asset-commit",
+    "13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e",
+    "--asset-prefix",
+    "docs-final-20261014-5a7a75c3",
+    "--tag",
+    "docs-final-delivery-20261014-5a7a75c3",
+    "--evidence-root",
+    "/tmp/nexus-docs-later-evidence/final-retention-verify"
+  ],
+  "script_sha256": "e96ac034f6f2b86b13755a13f200ab22c3f512dd7ea896cf0d65310f4e700aef",
+  "asset_commit": "13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e",
+  "asset_prefix": "docs-final-20261014-5a7a75c3",
+  "tag": "docs-final-delivery-20261014-5a7a75c3",
+  "source_before": {
+    "root": "/workspace/nexus-build-system-20261012",
+    "commit": "5a7a75c321ea173df8692714f95a8df13715293d",
+    "tree": "03ca682f6ea3779e6a42b9b9a92408e42750f115",
+    "dirty": false,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (heads/master)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (heads/master)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)"
+    ]
+  },
+  "production_module_sha256": "3602c777556a774ca7271e3bc2492c8e48472a122fa5e42f0724036a2a29cccd",
+  "physical_status": "not_executed",
+  "browser_execution": "not_executed",
+  "commands": [
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/X-Gen-Lab/nexus/git/commits/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "ff845e2245cf1b4704e8ebcc86176e6685fe78c7e0bd2617720dc482d8e1b8bc"
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/X-Gen-Lab/nexus/git/trees/23e2901a42e81cccdba6ac85a9e60bbcfb84bc25?recursive=1"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "fcd754703bc2221a4237545aa0fc5f1593e9355ed773b80a23204e0ee6a59fd6"
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/X-Gen-Lab/nexus/git/ref/tags/docs-final-delivery-20261014-5a7a75c3"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "3c9d43cb668f84e10f6a85c367045d51c3ea80727861a3dfbc8e9321988f978c"
+    }
+  ],
+  "requests": [
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/assets.json",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/assets.json",
+      "status": 200,
+      "bytes": 6203,
+      "sha256": "d8a3108280d63af7788b04746ecb27fc36c542de3ccaa447bc067764dde5a742",
+      "git_blob_sha1": "fb553648b242557522a3eb035365412e11821226",
+      "path": "/tmp/nexus-docs-later-evidence/final-retention-verify/20261014T112415Z-4743a61a9d4d49b3864430673162d63b/downloaded/assets.json"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/docs-final-20261014-5a7a75c3/README.txt",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/docs-final-20261014-5a7a75c3/README.txt",
+      "status": 200,
+      "bytes": 566,
+      "sha256": "b228c1d63458bc6976802e86dc5429f291195d6df96e511829733dafe428cf41",
+      "git_blob_sha1": "140ca9bb8b7e23b875c28bdeea3d6c87c28e180e",
+      "path": "/tmp/nexus-docs-later-evidence/final-retention-verify/20261014T112415Z-4743a61a9d4d49b3864430673162d63b/downloaded/docs-final-20261014-5a7a75c3/README.txt"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/docs-final-20261014-5a7a75c3/docs-20261014-5a7a75c321ea.tar.gz",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/docs-final-20261014-5a7a75c3/docs-20261014-5a7a75c321ea.tar.gz",
+      "status": 200,
+      "bytes": 7099794,
+      "sha256": "79740121a640fa8e829f8110fb3e0fc5900474e7daa6067b5faf7a99f05ae6e6",
+      "git_blob_sha1": "8df92e8e0a34dc5b82bc6ea82467c50989eab33b",
+      "path": "/tmp/nexus-docs-later-evidence/final-retention-verify/20261014T112415Z-4743a61a9d4d49b3864430673162d63b/downloaded/docs-final-20261014-5a7a75c3/docs-20261014-5a7a75c321ea.tar.gz"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/docs-final-20261014-5a7a75c3/documentation-package.json",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/docs-final-20261014-5a7a75c3/documentation-package.json",
+      "status": 200,
+      "bytes": 444,
+      "sha256": "f74042fb4bbfb7db860679a7aeffaa85ee8a4420ed282c01f34ad8d3c33d60cf",
+      "git_blob_sha1": "c6cce2c14b9fd534f2dc4935c2d238c86e8f5ffb",
+      "path": "/tmp/nexus-docs-later-evidence/final-retention-verify/20261014T112415Z-4743a61a9d4d49b3864430673162d63b/downloaded/docs-final-20261014-5a7a75c3/documentation-package.json"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/docs-final-20261014-5a7a75c3/final-journal-evidence.json",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/docs-final-20261014-5a7a75c3/final-journal-evidence.json",
+      "status": 200,
+      "bytes": 36792,
+      "sha256": "9d661fe443e92f9c560846fe1ca6059af8edb627c47cc4d3457f3693295a4eab",
+      "git_blob_sha1": "f7b033c2dfc7c60e476dd6fd8b4dde0865cdbf80",
+      "path": "/tmp/nexus-docs-later-evidence/final-retention-verify/20261014T112415Z-4743a61a9d4d49b3864430673162d63b/downloaded/docs-final-20261014-5a7a75c3/final-journal-evidence.json"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/docs-final-20261014-5a7a75c3/final-journal-evidence.tar.gz",
+      "final_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/13b315c3b6ff13ef3e7abd0704785d7ab7b5ab3e/docs-final-20261014-5a7a75c3/final-journal-evidence.tar.gz",
+      "status": 200,
+      "bytes": 28531727,
+      "sha256": "4670eab7e605be9fab49960cd85ec41a1a0aec7e91716093b4fadc55ef0686d0",
+      "git_blob_sha1": "44643583dda02e6f18cecac17511cc206c4a7626",
+      "path": "/tmp/nexus-docs-later-evidence/final-retention-verify/20261014T112415Z-4743a61a9d4d49b3864430673162d63b/downloaded/docs-final-20261014-5a7a75c3/final-journal-evidence.tar.gz"
+    }
+  ],
+  "returncode": 0,
+  "verified_assets": 5,
+  "verified_documentation_files": 1600,
+  "documentation_source": {
+    "commit": "5a7a75c321ea173df8692714f95a8df13715293d",
+    "dirty": false,
+    "paths": [
+      "docs",
+      "tools/documentation"
+    ],
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)"
+    ],
+    "tree": "03ca682f6ea3779e6a42b9b9a92408e42750f115",
+    "tree_entries_sha256": "972747d4f79d1ea6995409974ecf966776058a0d73b388a87b991ad7a43c2004"
+  },
+  "documentation_archive_bytes": 7099794,
+  "documentation_archive_sha256": "79740121a640fa8e829f8110fb3e0fc5900474e7daa6067b5faf7a99f05ae6e6",
+  "documentation_manifest_sha256": "37db6ca0218ce0f70def6baf33c3c23a370503ef61ee58073c8f3a84516adf34",
+  "supplement_archive_bytes": 28531727,
+  "supplement_archive_sha256": "4670eab7e605be9fab49960cd85ec41a1a0aec7e91716093b4fadc55ef0686d0",
+  "verified_supplement_members": 119,
+  "supplement_observations": {
+    "path": "/tmp/nexus-docs-later-evidence/final-retention-verify/20261014T112415Z-4743a61a9d4d49b3864430673162d63b/supplement-member-observations.json",
+    "bytes": 22830,
+    "sha256": "222272f6175f4e0465a1952189dc57a1bec7ca1349790d5a4c9ba47ff80e0401"
+  },
+  "limitations": [
+    "No tools installation or new browser/physical HIL execution.",
+    "Documentation package verified from actual raw Git delivery; independent Pages download/restore was separately executed."
+  ],
+  "elapsed_seconds": 9.522,
+  "finished_at": "2026-10-14T11:24:25.535083+00:00",
+  "source_after": {
+    "root": "/workspace/nexus-build-system-20261012",
+    "commit": "5a7a75c321ea173df8692714f95a8df13715293d",
+    "tree": "03ca682f6ea3779e6a42b9b9a92408e42750f115",
+    "dirty": false,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (heads/master)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (heads/master)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)"
+    ]
+  }
+}
