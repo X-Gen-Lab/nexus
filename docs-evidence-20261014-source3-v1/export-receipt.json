@@ -1,0 +1,50 @@
+{
+  "actual_part_join_verification": {
+    "inventory_sha256": "88b4f5ee0659b56a44a57a32bcfbcb9de528b7e7dfbc63bbc890cfa350af50b4",
+    "members": 17118,
+    "payload_bytes": 345553832,
+    "payload_files": 17113,
+    "physical_status": "not_executed",
+    "status": "passed"
+  },
+  "actual_tar_verification": {
+    "inventory_sha256": "88b4f5ee0659b56a44a57a32bcfbcb9de528b7e7dfbc63bbc890cfa350af50b4",
+    "members": 17118,
+    "payload_bytes": 345553832,
+    "payload_files": 17113,
+    "physical_status": "not_executed",
+    "status": "passed"
+  },
+  "archive": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz",
+  "archive_bytes": 107591060,
+  "archive_sha256": "1774f52c323a9544348026195db19773b483da9d053d3f55a91eb49f44b3f098",
+  "digest_boundaries": "Inventory excludes itself. Archive is outside payload. Parts manifest and export receipt are outside archive; receipt excludes its own hash.",
+  "excluded_bytes": 958047227,
+  "excluded_files": 4451,
+  "excluded_subtree": "evidence-export",
+  "exclusions_sha256": "b1b76b1eb26a64ee2e0f591dc16d650867c2bcdcdf477cea74cf9c7842542eb8",
+  "inventory_sha256": "88b4f5ee0659b56a44a57a32bcfbcb9de528b7e7dfbc63bbc890cfa350af50b4",
+  "kind": "nexus_evidence_export",
+  "locators_sha256": "c6a6cfdb2a13452059bde9cce430433c5d8630512328746f161ba357679d8a22",
+  "maximum_part_bytes": 33554432,
+  "part_count": 4,
+  "payload_bytes": 345553832,
+  "payload_files": 17113,
+  "physical_status": "not_executed",
+  "schema_version": 1,
+  "source_root": "/tmp/nexus-docs-final-evidence",
+  "source_snapshot_unchanged": true,
+  "status": "passed",
+  "upload_members": [
+    "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0000",
+    "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0001",
+    "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0002",
+    "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0003",
+    "evidence-parts.json",
+    "VERIFY-EVIDENCE.py",
+    "EVIDENCE-INVENTORY.json",
+    "EVIDENCE-LOCATORS.json",
+    "EVIDENCE-EXCLUSIONS.json",
+    "README.txt"
+  ]
+}

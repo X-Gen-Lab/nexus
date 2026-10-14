@@ -1,0 +1,34 @@
+{
+  "archive": {
+    "bytes": 107591060,
+    "path": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz",
+    "sha256": "1774f52c323a9544348026195db19773b483da9d053d3f55a91eb49f44b3f098"
+  },
+  "inventory_sha256": "88b4f5ee0659b56a44a57a32bcfbcb9de528b7e7dfbc63bbc890cfa350af50b4",
+  "kind": "nexus_evidence_archive_parts",
+  "part_size_bytes": 33554432,
+  "parts": [
+    {
+      "bytes": 33554432,
+      "path": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0000",
+      "sha256": "5a3a9695b39464206a7a43fc5dc269cadfa70adbc4e269c26514ff2f3f54d9da"
+    },
+    {
+      "bytes": 33554432,
+      "path": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0001",
+      "sha256": "3c14c20199d32cd51f482eec0fe09ca06a4d59a7abc0c8a6f49fd271c68d5146"
+    },
+    {
+      "bytes": 33554432,
+      "path": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0002",
+      "sha256": "da3fa344a3dbe5a424839a51fa9eac2be41f581a145db0b20457184d5ef913a1"
+    },
+    {
+      "bytes": 6927764,
+      "path": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0003",
+      "sha256": "90c18eeaa8bc27ceda17f3dcd6e0b95caa27839bdacf937ec4c6e7a2d9d3435f"
+    }
+  ],
+  "physical_status": "not_executed",
+  "schema_version": 1
+}

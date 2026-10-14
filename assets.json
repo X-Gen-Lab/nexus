@@ -47,6 +47,61 @@
       "path": "docs-20261014-3835e13cd7da/release-assets.json",
       "bytes": 709,
       "sha256": "e31e61e0233367262e2270abacd3de1e80aad0f955576ddac112f5a7a44e1b7c"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/EVIDENCE-EXCLUSIONS.json",
+      "bytes": 3522148,
+      "sha256": "b1b76b1eb26a64ee2e0f591dc16d650867c2bcdcdf477cea74cf9c7842542eb8"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/EVIDENCE-INVENTORY.json",
+      "bytes": 4190535,
+      "sha256": "88b4f5ee0659b56a44a57a32bcfbcb9de528b7e7dfbc63bbc890cfa350af50b4"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/EVIDENCE-LOCATORS.json",
+      "bytes": 5275549,
+      "sha256": "c6a6cfdb2a13452059bde9cce430433c5d8630512328746f161ba357679d8a22"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/README.txt",
+      "bytes": 710,
+      "sha256": "2c7f54c0e005edbfe863f00a7c06bf8bb19f3714553331dea50e72850e9e1434"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/VERIFY-EVIDENCE.py",
+      "bytes": 27902,
+      "sha256": "d3d92e12a8765efda2a8b958ec8d74af11cc9e37f3e1657ed24e690286446324"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/evidence-parts.json",
+      "bytes": 1245,
+      "sha256": "14621960f5c040a234986380356bc7a6c2b7311ceb604c7637221e940bca6a75"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/export-receipt.json",
+      "bytes": 2065,
+      "sha256": "ccc66a8200d8922120622a2d8944c5c1a89467596a5e6381700b383c714d54ea"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0000",
+      "bytes": 33554432,
+      "sha256": "5a3a9695b39464206a7a43fc5dc269cadfa70adbc4e269c26514ff2f3f54d9da"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0001",
+      "bytes": 33554432,
+      "sha256": "3c14c20199d32cd51f482eec0fe09ca06a4d59a7abc0c8a6f49fd271c68d5146"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0002",
+      "bytes": 33554432,
+      "sha256": "da3fa344a3dbe5a424839a51fa9eac2be41f581a145db0b20457184d5ef913a1"
+    },
+    {
+      "path": "docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0003",
+      "bytes": 6927764,
+      "sha256": "90c18eeaa8bc27ceda17f3dcd6e0b95caa27839bdacf937ec4c6e7a2d9d3435f"
     }
   ],
   "physical_hil": "not_executed",
