@@ -1,0 +1,41 @@
+task_id,priority,phase,task,dependencies,implementation_status,validation_status,exit_condition,owner
+DOC-01,P1,D1,登记页面权威与读者任务,,planned,not_executed,逐页明确正文、API、支持、资格、台账和历史来源；目录和唯一导航可审查,codex
+DOC-02,P1,D1,修正根入口与支持口径,DOC-01,planned,not_executed,README中typed factory、TOML、ThreadX、连续模式与精确支持一致；不扩大实板范围,codex
+DOC-03,P1,D1,修正可执行配置模板,DOC-01,planned,not_executed,Board示例含soc_family；完整Board和CPU/TOML经实际解析；片段明确不建立完整配置资格,codex
+DOC-04,P1,D1,统一最新资格导航,DOC-01,planned,not_executed,当前代码、文档HEAD、qualified source和历史记录分别可定位；不继承旧执行,codex
+DOC-05,P1,D1,逐台账映射原退出条件与新证据,DOC-04,planned,not_executed,OS48和已过期状态按scope映射；原编号/条件/失败记录保留；不批量标passed,codex
+DOC-06,P1,D1,建立迁移引用与旧URL清单,DOC-01,planned,not_executed,每个当前内容源有去向；相对链接/anchor/工具输入/旧URL的处理规则齐全,codex
+DOC-07,P1,D2,选择并接入MyST,DOC-01,planned,not_executed,兼容维护Sphinx/Breathe；完整Markdown与RST正负样例实际构建；pin明确,codex
+DOC-08,P1,D2,调整Sphinx source root与排除范围,DOC-07,planned,not_executed,docs为source root；正文直接索引；archive/生成输出/大证据不误入站点,codex
+DOC-09,P1,D2,实施唯一任务导航,DOC-08;DOC-06,planned,not_executed,首页提供使用/接入/维护/验收/迁移入口；当前页面可达可搜索；无第二套正文,codex
+DOC-10,P1,D2,重组公共API和factory说明,DOC-08,planned,not_executed,Core/Arch/I/O/OS/Components模块页连到符号；factory示例基于实际生成接口,codex
+DOC-11,P1,D2,接入系统合同与架构解释,DOC-08;DOC-06,planned,not_executed,生命周期和安全限制保持原规范；合同与解释分别有一份authority,codex
+DOC-12,P2,D2,接入源码相邻README,DOC-08;DOC-06,planned,not_executed,保留实现地图和SoC局部权威；include相对引用正确或源码链接绑定站点revision,codex
+DOC-13,P1,D3,交付外部SDK入门教程,DOC-03;DOC-09;DOC-27,planned,not_executed,固定版本的真实外部consumer配置/构建/运行或链接成功；保留实际命令和清理步骤,codex
+DOC-14,P1,D3,交付异步I/O与取消排空教程,DOC-13;DOC-10,planned,not_executed,真实示例覆盖reject/accept/cancel/drain/settled/quarantine；无借用提前回收,codex
+DOC-15,P1,D3,交付Board接入指南,DOC-03;DOC-09,planned,not_executed,可验证模板、路由授权、来源和unknown明确；已有SoC复用；软件与PCB资格分开,codex
+DOC-16,P2,D3,交付SoC/provider/组件接入指南,DOC-03;DOC-11,planned,not_executed,按纵切片列facts/startup/time/provider/测试/SDK/HIL条件；通用器件不强制进生成器,codex
+DOC-17,P1,D3,交付OS等待与停机指南,DOC-02;DOC-11,planned,not_executed,后端语义、执行推进、真实删除和存储回收条件清晰；示例经维护后端验证,codex
+DOC-18,P1,D3,交付旧配置与接口迁移指南,DOC-02;DOC-09,planned,not_executed,旧HAL/OSAL/Kconfig到当前TOML/factory有可执行转换路径；旧ID不跨bundle持久化,codex
+DOC-19,P2,D3,交付配置和工具参考,DOC-10;DOC-11,planned,not_executed,字段/单位/拒绝规则和CLI来自维护实现；API声明不手抄；无重复配置权威,codex
+DOC-20,P2,D3,交付性能诊断与HIL准备指南,DOC-09;DOC-04,planned,not_executed,区分ELF预算/实测cycles/stack/HIL；工具准备不声称已执行硬件,codex
+DOC-21,P1,D4,确定双语术语与发布关键页,DOC-01,planned,not_executed,原文语言和不可翻译标识明确；关键页范围固定；不要求复制CSV或原始日志,codex
+DOC-22,P1,D4,实施gettext与翻译源版本检查,DOC-07;DOC-21,planned,not_executed,只有一条翻译链；中文/英文原文分别做en/zh_CN构建；缺译fallback与stale/fuzzy按实际正文语言和源版本标记,codex
+DOC-23,P1,D4,完成关键使用路径双语审查,DOC-13;DOC-14;DOC-15;DOC-17;DOC-18;DOC-22,planned,not_executed,入门/配置/factory/借用/支持/资格/迁移关键正文独立审查；缺失语言不假报完整,codex
+DOC-24,P1,D4,显示真实页面语言与翻译状态,DOC-22,planned,not_executed,reviewed/stale/missing/original在页和入口可见；英文fallback不标中文已译；locale不覆盖source_language,codex
+DOC-25,P2,D4,整理本地图示与离线资源,DOC-08,planned,not_executed,图源可审查、箭头与契约一致；图像/字体/脚本不依赖CDN；新增渲染工具受锁,codex
+DOC-26,P1,D4,完成读者任务走查,DOC-13;DOC-14;DOC-15;DOC-16;DOC-17;DOC-18;DOC-19;DOC-20;DOC-24,planned,not_executed,独立agent从入口完成任务；错误步骤/不可达合同/版本混淆修正；记录实际结果,codex
+DOC-27,P1,D5,统一docs CLI与旧脚本转发,DOC-08,planned,not_executed,check/build/preview/package/doctor目标明确；本地与CI严格参数一致；失败码与诊断保留,codex
+DOC-28,P1,D5,建立离线链接anchor导航检查,DOC-06;DOC-09;DOC-27,planned,not_executed,故意坏文件/anchor/重复ID/不可达页实际失败；合法跨页引用和迁移别名实际通过,codex
+DOC-29,P1,D5,扩大实际配置片段验证,DOC-03;DOC-27,planned,not_executed,新路径/RST/完整Board和CPU输入经实际resolver；语法片段不升级可执行资格,codex
+DOC-30,P1,D5,关联可执行代码和consumer,DOC-13;DOC-27,planned,not_executed,literalinclude来源和测试身份可追溯；维护示例真实构建；不任意执行文档shell,codex
+DOC-31,P2,D5,建立有界外部链接检查,DOC-28,planned,not_executed,404/版本错误与网络失败分别报告；timeout/retry有界；commit默认无需网络,codex
+DOC-32,P1,D5,接入文档commit与严格CI门禁,DOC-27;DOC-28;DOC-29;DOC-30,planned,not_executed,快速离线commit检查和完整文档CI执行；工具负路径TDD；正文调整不伪造固件验收,codex
+DOC-33,P1,D5,锁定并实际安装文档工具闭包,DOC-07;DOC-27,planned,not_executed,Python全部传递wheel hash及Doxygen身份锁定；干净维护tuple实际安装/构建成功,codex
+DOC-34,P1,D5,隔离preview构建与发布权限,DOC-32;DOC-33,planned,not_executed,PR artifact带source身份；可信部署只消费验证输出；不在高权限执行外部PR源码,codex
+DOC-35,P1,D6,生成版本与资格manifest,DOC-04;DOC-24;DOC-27;DOC-33,planned,not_executed,平台版本由既有policy读取；code/docs/qualified source独立；outputs只列payload；不包含manifest/checksums/archive或间接hash自引用,codex
+DOC-36,P1,D6,生成相对链接离线HTML包,DOC-25;DOC-32;DOC-35,planned,not_executed,包含语言/API/manifest/校验/许可；脱离workspace可浏览验真；无hash自引用,codex
+DOC-37,P1,D6,发布不可变版本与stable入口,DOC-23;DOC-26;DOC-34;DOC-36;DOC-31,planned,not_executed,release-id绑定manifest且不覆盖；实际部署成功；stable不宣称HIL全部通过,codex
+DOC-38,P1,D6,执行发布后站点与下载验证,DOC-37,planned,not_executed,在线身份与部署包一致；关键页面/旧URL/图/下载校验通过；旧API不静默映射新合同,codex
+DOC-39,P1,D6,完成独立恢复与长期存储,DOC-36;DOC-37,planned,not_executed,稳定取得位置和保留策略明确；独立根恢复浏览验真；异地恢复须真实执行,codex
+DOC-40,P1,D6,收尾迁移并独立交付审查,DOC-06;DOC-38;DOC-39,planned,not_executed,映射全部处理；无重复规范/断链/错误资格；原证据保留；未支持主机和HIL继续标条件,codex
