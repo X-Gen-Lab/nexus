@@ -91,6 +91,39 @@ delivery.restore(result["archive"], independent_root,
 这是接口说明片段，路径由调用方显式提供；可执行命令和实际验收结果以统一 docs CLI
 及其本次交付 receipt 为准。
 
+## 旧书签与版本边界
+
+`docs/reference/redirects.csv` 是旧 URL 迁移的唯一人工维护输入。每行明确旧地址、
+目标页、来源文档与固定 revision，并选择历史合同边界或同一当前合同的位置迁移。
+禁止把旧 HAL／OSAL／Kconfig API 当成当前接口，也不能把同合同的位置变化描述为
+API 变化。旧地址保留在台账中；后续调整同时检查来源、目标及实际书签行为。
+
+正式双语构建使用 `install_alias_catalog()` 验证这份 CSV，生成包内说明页和
+`documentation-aliases.json`。catalog 是派生文件，记录原 CSV 摘要并进入 manifest
+payload；不能单独手写另一份 alias 配置。单语言开发预览不生成完整 catalog，也
+不能作为正式双语包。没有 catalog 的历史测试夹具仍可验证，不建立旧 URL 验收。
+
+旧 URL 恰好与新正文路径同名时，生成器保留版本目录中的当前正文，派生
+`canonical_collisions` 记录对应当前源路径／摘要和 HTML 摘要。必须存在真实当前
+源文件及 HTML，不能用手填标记绕过一致性检查。根目录仍按原 CSV 语义提供说明。
+当前 `development/index.html`、`tutorials/index.html` 的两语言页面各有这种同名情况。
+
+发布除保留不可变 `versions/<release_id>/` 外，还在站点根生成旧书签说明页。
+`en/index.html` 和 `zh_CN/index.html` 明确引向当前版本；根 `api/index.html` 说明
+旧 API 合同并引导阅读历史版本边界，不自动跳转或默默解释为当前公共 API。
+当前台账有 287 个旧地址，加上三个语言／API 总入口，共验证 290 个根 gateway。
+所有链接都是相对地址，不使用脚本、meta refresh 或外部跳转服务。
+
+未知字段或语义、重复／非标准 URL、保留命名空间、目标缺失、alias 链、语言或
+来源语义不一致均在写入前拒绝。已有无关页面、symlink 和父目录冲突不能覆盖。
+根 `documentation-gateways.json` 只登记工具生成的说明页及入口摘要；重新发布前
+核对已登记字节，外部修改需维护者明确处理。该记录在包外，不进入自身摘要闭包，
+没有数字签名，不能证明发布者身份，也不能授予实板或 HIL 验证资格。
+
+`post_deploy()` 对当前发布版本逐个真实读取全部根 alias 与三个语言／API 入口，
+核对源 catalog 派生的准确字节。版本目录里的说明页成功，不代替站点根书签验收。
+检查历史不可变版本并显式关闭 stable 验收时，receipt 如实记录根 gateway 未检查。
+
 ## 不可变发布与 stable
 
 `publish()` 将已验证的目录安装到 `<webroot>/versions/<release_id>/`，然后更新

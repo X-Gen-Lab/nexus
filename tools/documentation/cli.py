@@ -199,25 +199,9 @@ def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
         shutil.copyfile(root / "LICENSE", licenses / "LICENSE.txt")
         shutil.copytree(prefix / "licenses", licenses / "documentation-tools")
         shutil.copytree(root / "docs/assets/diagrams", output / "sources/diagrams")
-        redirects = root / "docs/reference/redirects.csv"
-        if redirects.is_file():
-            import csv
-            with redirects.open() as stream:
-                for row in csv.DictReader(stream):
-                    old = row.get("old_url", row.get("old_path", ""))
-                    target = row.get("target_url", row.get("target_path", ""))
-                    if not old or not target:
-                        continue
-                    alias = output / old.lstrip("/")
-                    if not alias.resolve().is_relative_to(output) or alias.exists():
-                        continue
-                    import html
-                    relative = os.path.relpath(output / target.lstrip("/"), alias.parent)
-                    alias.parent.mkdir(parents=True, exist_ok=True)
-                    alias.write_text('<!doctype html><html><meta charset="utf-8">'
-                        '<title>Versioned documentation migration</title><p>This historical '
-                        'URL has a different API contract. <a href="' + html.escape(relative) + '">'
-                        'Read the version boundary and migration guide.</a></p></html>')
+        if languages == ["en", "zh_CN"]:
+            from tools.documentation import delivery
+            delivery.install_alias_catalog(output, root)
         after = observe_git_source(root)
         if after != source:
             raise ValueError("source identity changed during documentation build")

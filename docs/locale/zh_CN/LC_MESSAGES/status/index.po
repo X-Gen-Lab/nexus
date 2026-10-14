@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 0d821f9713706c25ebdb991984b1df52c95b79063d516ce8a6a695f9f29bd691\n"
+"X-Nexus-Source-SHA256: a3a17cb8c40c75faf1d25351fb597123fbb45aebc5135034457332c2f9e7bcfa\n"
 
 msgid "Status and evidence"
 msgstr "状态与证据"

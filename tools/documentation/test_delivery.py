@@ -1,6 +1,7 @@
 """Documentation packages bind actual bytes and reject unsafe restoration."""
 
 import functools
+import csv
 import hashlib
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import io
@@ -437,6 +438,243 @@ class DeliveryTests(unittest.TestCase):
             delivery.post_deploy(base_url, "1.0.0-docs-test",
                                  result["manifest_sha256"],
                                  expected_archive_sha256=result["archive_sha256"])
+
+    def alias_inputs(self):
+        rows = [
+            {"old_url": "en/user_guide/uart.html",
+             "target_url": "en/reference/history.html",
+             "semantics": "historical_contract_version_boundary",
+             "old_source": "docs/archive/uart.rst", "source_revision": "a" * 40},
+            {"old_url": "zh_CN/user_guide/uart.html",
+             "target_url": "zh_CN/reference/history.html",
+             "semantics": "historical_contract_version_boundary",
+             "old_source": "docs/archive/uart.rst", "source_revision": "a" * 40},
+            {"old_url": "en/getting_started.html",
+             "target_url": "en/tutorials/source-sdk.html",
+             "semantics": "current_contract_reorganized",
+             "old_source": "docs/sphinx/getting_started.rst",
+             "source_revision": "a" * 40}]
+        for relative in ("en/reference/history.html", "zh_CN/reference/history.html",
+                         "en/tutorials/source-sdk.html"):
+            file = self.build / relative
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.write_text('<html><h1 id="overview">Canonical fixture</h1></html>')
+        for row in rows:
+            source = self.source / row["old_source"]
+            source.parent.mkdir(parents=True, exist_ok=True)
+            source.write_text("Frozen documentation fixture\n")
+        csv_path = self.source / "docs/reference/redirects.csv"
+        csv_path.parent.mkdir(parents=True, exist_ok=True)
+        with csv_path.open("w", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=list(rows[0]))
+            writer.writeheader()
+            writer.writerows(rows)
+        self.git("add", ".")
+        self.git("-c", "user.name=Test", "-c", "user.email=test@example.com",
+                 "commit", "-qm", "Declare fixture aliases")
+        metadata_path = self.build / "documentation-build.json"
+        metadata = json.loads(metadata_path.read_bytes())
+        metadata["source"] = delivery.observe_git_source(self.source)
+        metadata_path.write_text(json.dumps(metadata))
+        return rows
+
+    def alias_package(self):
+        self.alias_inputs()
+        delivery.install_alias_catalog(self.build, self.source)
+        return self.package()
+
+    def test_alias_catalog_is_bound_and_current_alias_does_not_claim_api_change(self):
+        result = self.alias_package()
+        manifest = delivery.verify(result["directory"])
+        self.assertIn("documentation-aliases.json", [row["path"] for row in manifest["files"]])
+        page = Path(result["directory"]) / "en/getting_started.html"
+        self.assertIn("same current platform contract", page.read_text())
+        self.assertNotIn("different API contract", page.read_text())
+
+    def test_publish_restores_root_bookmarks_and_api_boundary(self):
+        result = self.alias_package()
+        webroot = self.base / "webroot"
+        delivery.publish(result["directory"], webroot)
+        self.assertIn("../../versions/1.0.0-docs-test/en/reference/history.html",
+                      (webroot / "en/user_guide/uart.html").read_text())
+        self.assertIn("same current platform contract",
+                      (webroot / "en/getting_started.html").read_text())
+        self.assertIn("../versions/1.0.0-docs-test/en/index.html",
+                      (webroot / "en/index.html").read_text())
+        api = (webroot / "api/index.html").read_text()
+        self.assertIn("historical API contract", api)
+        self.assertIn("en/reference/history.html", api)
+        delivery.publish(result["directory"], webroot)
+
+    def test_malformed_catalog_rejects_before_package_and_publish(self):
+        rows = self.alias_inputs()
+        valid = {"schema_version": 1, "kind": "nexus_documentation_aliases",
+                 "source": {"path": "docs/reference/redirects.csv", "sha256": "a" * 64},
+                 "aliases": rows, "canonical_collisions": []}
+        variants = []
+        unknown = json.loads(json.dumps(valid))
+        unknown["extra"] = True
+        variants.append(unknown)
+        for old_url in ("../escape.html", "versions/overwrite.html", "api/index.html",
+                        "en/index.html", "downloads/overwrite.html",
+                        "documentation-gateways.json/alias.html", "index.html/alias.html"):
+            item = json.loads(json.dumps(valid))
+            item["aliases"][0]["old_url"] = old_url
+            variants.append(item)
+        duplicate = json.loads(json.dumps(valid))
+        duplicate["aliases"].append(duplicate["aliases"][0])
+        variants.append(duplicate)
+        for field, value in (("semantics", "guess_contract"),
+                             ("target_url", "en/index.html"),
+                             ("target_url", "absent.html")):
+            item = json.loads(json.dumps(valid))
+            item["aliases"][0][field] = value
+            variants.append(item)
+        for catalog in variants:
+            (self.build / "documentation-aliases.json").write_text(json.dumps(catalog))
+            with self.assertRaisesRegex(ValueError, "alias|gateway|reserved|escape|fields"):
+                self.package()
+        self.assertFalse((self.base / "output").exists())
+
+    def test_catalog_install_rejects_existing_unowned_payload_collision(self):
+        self.alias_inputs()
+        collision = self.build / "en/getting_started.html"
+        collision.write_text("Existing input")
+        with self.assertRaisesRegex(ValueError, "alias|collision|existing"):
+            delivery.install_alias_catalog(self.build, self.source)
+        self.assertEqual(collision.read_text(), "Existing input")
+        self.assertFalse((self.build / "documentation-aliases.json").exists())
+
+    def test_alias_directory_and_parent_collisions_reject_before_first_write(self):
+        rows = self.alias_inputs()
+        conflict = self.build / rows[1]["old_url"]
+        conflict.mkdir(parents=True)
+        with self.assertRaisesRegex(ValueError, "alias|collision"):
+            delivery.install_alias_catalog(self.build, self.source)
+        self.assertFalse((self.build / rows[0]["old_url"]).exists())
+        self.assertFalse((self.build / "documentation-aliases.json").exists())
+        conflict.rmdir()
+        parent = self.build / "en/user_guide"
+        parent.write_text("Parent is an existing file")
+        with self.assertRaisesRegex(ValueError, "alias|collision"):
+            delivery.install_alias_catalog(self.build, self.source)
+        self.assertEqual(parent.read_text(), "Parent is an existing file")
+
+    def test_catalog_directory_collision_rejects_before_first_alias_write(self):
+        rows = self.alias_inputs()
+        (self.build / "documentation-aliases.json").mkdir()
+        with self.assertRaisesRegex(ValueError, "alias|catalog|collision"):
+            delivery.install_alias_catalog(self.build, self.source)
+        self.assertFalse((self.build / rows[0]["old_url"]).exists())
+
+    def test_control_file_descendants_reject_before_catalog_install(self):
+        rows = self.alias_inputs()
+        rows[0]["old_url"] = "documentation-gateways.json/alias.html"
+        csv_path = self.source / "docs/reference/redirects.csv"
+        with csv_path.open("w", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=list(rows[0]))
+            writer.writeheader()
+            writer.writerows(rows)
+        with self.assertRaisesRegex(ValueError, "alias|reserved|namespace"):
+            delivery.install_alias_catalog(self.build, self.source)
+        self.assertFalse((self.build / "documentation-gateways.json").exists())
+
+    def test_canonical_collision_preserves_version_page_and_binds_source_and_html(self):
+        self.alias_inputs()
+        original = self.source / "docs/getting_started.md"
+        original.write_text("---\nsource_language: en\n---\n# Current page\n")
+        page = self.build / "en/getting_started.html"
+        page.write_text("<html><h1>Canonical current page</h1></html>")
+        before = page.read_bytes()
+        delivery.install_alias_catalog(self.build, self.source)
+        catalog = json.loads((self.build / "documentation-aliases.json").read_bytes())
+        self.assertEqual(page.read_bytes(), before)
+        record = catalog["canonical_collisions"][0]
+        self.assertEqual(record["source_path"], "docs/getting_started.md")
+        self.assertEqual(record["source_sha256"], hashlib.sha256(original.read_bytes()).hexdigest())
+        self.assertEqual(record["html_sha256"], hashlib.sha256(before).hexdigest())
+        self.git("add", ".")
+        self.git("-c", "user.name=Test", "-c", "user.email=test@example.com",
+                 "commit", "-qm", "Record current canonical fixture")
+        metadata_path = self.build / "documentation-build.json"
+        metadata = json.loads(metadata_path.read_bytes())
+        metadata["source"] = delivery.observe_git_source(self.source)
+        metadata_path.write_text(json.dumps(metadata))
+        result = self.package()
+        webroot = self.base / "webroot"
+        delivery.publish(result["directory"], webroot)
+        self.assertIn("same current platform contract", (webroot / "en/getting_started.html").read_text())
+
+    def test_existing_gateway_owner_is_checked_for_new_no_catalog_package(self):
+        result = self.alias_package()
+        webroot = self.base / "webroot"
+        delivery.publish(result["directory"], webroot)
+        stable = webroot / "stable/index.html"
+        stable.write_text("External edit")
+        catalog = json.loads((self.build / "documentation-aliases.json").read_bytes())
+        for row in catalog["aliases"]:
+            (self.build / row["old_url"]).unlink()
+        (self.build / "documentation-aliases.json").unlink()
+        bare = delivery.package(self.build, self.base / "bare-output",
+                                source_root=self.source, release_id="new-docs")
+        with self.assertRaisesRegex(ValueError, "gateway|owned|digest"):
+            delivery.publish(bare["directory"], webroot)
+        self.assertEqual(stable.read_text(), "External edit")
+        self.assertFalse((webroot / "versions/new-docs").exists())
+
+    def test_dangling_owner_symlink_rejects_no_catalog_publish_before_writes(self):
+        result = self.package()
+        webroot = self.base / "webroot"
+        webroot.mkdir()
+        marker = webroot / "documentation-gateways.json"
+        marker.symlink_to(webroot / "missing-owner.json")
+        with self.assertRaisesRegex(ValueError, "symlink"):
+            delivery.publish(result["directory"], webroot)
+        self.assertTrue(marker.is_symlink())
+        self.assertEqual(list(webroot.iterdir()), [marker])
+
+    def test_root_gateway_collision_and_symlink_reject_before_any_publication(self):
+        result = self.alias_package()
+        for symbolic in (False, True):
+            webroot = self.base / ("symbolic-root" if symbolic else "collision-root")
+            page = webroot / "en/getting_started.html"
+            page.parent.mkdir(parents=True)
+            if symbolic:
+                page.symlink_to(self.source / "CMakeLists.txt")
+            else:
+                page.write_text("Unowned root document")
+            with self.assertRaisesRegex(ValueError, "unowned|collision|symlink|gateway"):
+                delivery.publish(result["directory"], webroot)
+            self.assertFalse((webroot / "versions").exists())
+            if not symbolic:
+                self.assertEqual(page.read_text(), "Unowned root document")
+
+    def test_modified_owned_gateway_cannot_be_silently_replaced(self):
+        result = self.alias_package()
+        webroot = self.base / "webroot"
+        delivery.publish(result["directory"], webroot)
+        page = webroot / "en/getting_started.html"
+        page.write_text("External alteration")
+        with self.assertRaisesRegex(ValueError, "gateway|owned|digest|bytes"):
+            delivery.publish(result["directory"], webroot)
+        self.assertEqual(page.read_text(), "External alteration")
+
+    def test_post_deploy_checks_every_root_alias_and_api_boundary(self):
+        result = self.alias_package()
+        webroot = self.base / "webroot"
+        delivery.publish(result["directory"], webroot, archive=result["archive"])
+        server = ThreadingHTTPServer(("127.0.0.1", 0),
+            functools.partial(QuietHandler, directory=str(webroot)))
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        url = f"http://127.0.0.1:{server.server_port}"
+        receipt = delivery.post_deploy(url, "1.0.0-docs-test", result["manifest_sha256"],
+                                       expected_archive_sha256=result["archive_sha256"])
+        self.assertEqual(receipt["verified_root_gateways"], 6)
+        (webroot / "en/user_guide/uart.html").write_text("Changed root alias")
+        with self.assertRaisesRegex(ValueError, "alias|gateway|digest|bytes"):
+            delivery.post_deploy(url, "1.0.0-docs-test", result["manifest_sha256"])
 
 
 class QuietHandler(SimpleHTTPRequestHandler):

@@ -7,12 +7,14 @@ An externally retained manifest digest anchors verification; this is not signing
 from __future__ import annotations
 
 import gzip
+import csv
 import hashlib
 from html import escape
 from html.parser import HTMLParser
 import io
 import json
 from pathlib import Path, PurePosixPath
+from posixpath import relpath
 import re
 import subprocess
 import tarfile
@@ -28,6 +30,11 @@ from tools.configure.metadata import load_policy, parse_json, policy_contract
 MANIFEST = "documentation-manifest.json"
 CHECKSUMS = "SHA256SUMS"
 BUILD_METADATA = "documentation-build.json"
+ALIASES = "documentation-aliases.json"
+GATEWAY_OWNER = "documentation-gateways.json"
+ALIAS_FIELDS = {"old_url", "target_url", "semantics", "old_source", "source_revision"}
+GATEWAY_HOMES = {"en/index.html", "zh_CN/index.html", "api/index.html"}
+PUBLISH_ENTRIES = {"index.html", "stable/index.html", "downloads/index.html"}
 REQUIRED = ("index.html", "en/index.html", "zh_CN/index.html",
             "api/index.html", "licenses/LICENSE.txt", BUILD_METADATA)
 MAX_FILES = 100000
@@ -83,6 +90,244 @@ def _no_symlink(path):
 
 def _overlap(left, right):
     return left == right or left in right.parents or right in left.parents
+
+
+def _alias_url(name):
+    path = _path(name)
+    if not re.fullmatch(r"[A-Za-z0-9_./-]+\.html", name):
+        raise ValueError("Documentation alias must be a normalized HTML URL")
+    controls = {MANIFEST, BUILD_METADATA, ALIASES, GATEWAY_OWNER, CHECKSUMS} | GATEWAY_HOMES | PUBLISH_ENTRIES
+    if (path.parts[0].lower() in {"versions", "stable", "downloads", "sources",
+                               "licenses", "_static", "_sources", ".git"} or
+            any(name.lower() == value.lower() or name.lower().startswith(value.lower() + "/")
+                for value in controls)):
+        raise ValueError("Documentation alias uses a reserved namespace")
+    return path
+
+
+def _alias_page(row, target):
+    chinese = row["old_url"].startswith("zh_CN/")
+    historical = row["semantics"] == "historical_contract_version_boundary"
+    if chinese:
+        message = ("此地址描述历史 API 合同。使用当前平台前，请先阅读版本边界。"
+                   if historical else "文档位置已迁移；目标页说明同一当前平台合同。")
+        label = "阅读版本边界与迁移指南" if historical else "阅读迁移后的文档"
+    else:
+        message = ("This address describes a historical API contract. Read the version "
+                   "boundary before using the current platform." if historical else
+                   "This documentation has moved; the target describes the same current platform contract.")
+        label = "Read the version boundary and migration guide" if historical else "Read the moved documentation"
+    return (f'<!doctype html><html lang="{"zh-CN" if chinese else "en"}">'
+            f'<meta charset="utf-8"><title>{"文档版本与迁移" if chinese else "Versioned documentation migration"}</title>'
+            f'<h1>{escape(label)}</h1><p>{escape(message)}</p>'
+            f'<p><a href="{escape(target)}">{escape(label)}</a></p>'
+            f'<p>{"来源快照" if chinese else "Source snapshot"}: '
+            f'<code>{row["source_revision"]}</code></p></html>\n').encode("utf-8")
+
+
+def _alias_rows(payload, catalog=None, *, require_pages=True):
+    if catalog is None:
+        if ALIASES not in payload:
+            return []
+        catalog = _json(payload[ALIASES], "alias catalog")
+    if (not isinstance(catalog, dict) or
+            set(catalog) != {"schema_version", "kind", "source", "aliases", "canonical_collisions"} or
+            type(catalog["schema_version"]) is not int or catalog["schema_version"] != 1 or
+            catalog["kind"] != "nexus_documentation_aliases"):
+        raise ValueError("Documentation alias catalog fields/schema invalid")
+    source = catalog["source"]
+    if (not isinstance(source, dict) or set(source) != {"path", "sha256"} or
+            source["path"] != "docs/reference/redirects.csv" or
+            not isinstance(source["sha256"], str) or
+            not re.fullmatch(r"[0-9a-f]{64}", source["sha256"])):
+        raise ValueError("Documentation alias source identity invalid")
+    rows = catalog["aliases"]
+    if not isinstance(rows, list) or not rows or len(rows) > MAX_FILES:
+        raise ValueError("Documentation alias list missing or exceeds bound")
+    if any(not payload.get(language + "/reference/history.html", b"").strip()
+           for language in ("en", "zh_CN")):
+        raise ValueError("Documentation alias gateways require both language history pages")
+    names = set()
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != ALIAS_FIELDS:
+            raise ValueError("Documentation alias exact fields required")
+        old, target = _alias_url(row["old_url"]), _path(row["target_url"])
+        if row["old_url"].lower() in names:
+            raise ValueError("Documentation alias duplicate URL")
+        names.add(row["old_url"].lower())
+        if target.suffix != ".html" or row["target_url"] not in payload or not payload[row["target_url"]].strip():
+            raise ValueError("Documentation alias target must be an existing nonempty HTML page")
+        language = "zh_CN" if old.parts[0] == "zh_CN" else "en"
+        if target.parts[0] != language:
+            raise ValueError("Documentation alias target changes language")
+        if not isinstance(row["source_revision"], str) or not re.fullmatch(r"[0-9a-f]{40}", row["source_revision"]):
+            raise ValueError("Documentation alias source revision invalid")
+        original = _path(row["old_source"])
+        historical = row["semantics"] == "historical_contract_version_boundary"
+        current = row["semantics"] == "current_contract_reorganized"
+        if (not (historical or current) or original.suffix != ".rst" or
+                (historical and (not row["old_source"].startswith("docs/archive/") or
+                 row["target_url"] != language + "/reference/history.html")) or
+                (current and (not row["old_source"].startswith("docs/sphinx/") or
+                 row["target_url"].endswith("/reference/history.html")))):
+            raise ValueError("Documentation alias semantics/source boundary invalid")
+    collision_rows = catalog["canonical_collisions"]
+    if not isinstance(collision_rows, list) or len(collision_rows) > len(rows):
+        raise ValueError("Documentation alias canonical collision list invalid")
+    collisions = set()
+    for item in collision_rows:
+        if not isinstance(item, dict) or set(item) != {"url", "source_path", "source_sha256", "html_sha256"}:
+            raise ValueError("Documentation alias canonical collision fields invalid")
+        url = item["url"]
+        parsed = _alias_url(url)
+        parts = parsed.parts[1:] if parsed.parts[0] in ("en", "zh_CN") else parsed.parts
+        original = "docs/" + str(PurePosixPath(*parts).with_suffix(".md"))
+        if (url.lower() not in names or url in collisions or item["source_path"] != original or
+                any(not isinstance(item[key], str) or not re.fullmatch(r"[0-9a-f]{64}", item[key])
+                    for key in ("source_sha256", "html_sha256")) or
+                url not in payload or not payload[url].strip() or
+                b"<html" not in payload[url].lower() or _digest(payload[url]) != item["html_sha256"]):
+            raise ValueError("Documentation alias canonical source/HTML identity invalid")
+        collisions.add(url)
+    for row in rows:
+        if row["target_url"].lower() in names:
+            raise ValueError("Documentation alias target must not be another alias")
+        expected = _alias_page(row, relpath(row["target_url"], str(PurePosixPath(row["old_url"]).parent)))
+        if require_pages and row["old_url"] not in collisions and payload.get(row["old_url"]) != expected:
+            raise ValueError("Documentation alias page bytes differ from catalog semantics")
+    return rows
+
+
+def install_alias_catalog(build_dir, source_root):
+    """Derive portable aliases only from the maintained CSV; never guess redirects."""
+    build_dir, source_root = _no_symlink(build_dir), _no_symlink(source_root)
+    if any(_overlap(build_dir, source_root / name)
+           for name in (*CODE_PATHS, "docs", "tools")):
+        raise ValueError("Documentation aliases output overlaps source inputs")
+    source = _no_symlink(source_root / "docs/reference/redirects.csv")
+    raw = source.read_bytes()
+    reader = csv.DictReader(io.StringIO(raw.decode("utf-8")))
+    if set(reader.fieldnames or ()) != ALIAS_FIELDS or len(reader.fieldnames or ()) != len(ALIAS_FIELDS):
+        raise ValueError("Documentation alias CSV exact fields required")
+    catalog = {"schema_version": 1, "kind": "nexus_documentation_aliases",
+               "source": {"path": "docs/reference/redirects.csv", "sha256": _digest(raw)},
+               "aliases": list(reader), "canonical_collisions": []}
+    payload = _payload(build_dir)
+    rows = _alias_rows(payload, catalog, require_pages=False)
+    catalog_destination = _no_symlink(build_dir / ALIASES)
+    if catalog_destination.exists():
+        raise ValueError("Documentation alias output collides with existing payload")
+    for row in rows:
+        original = _no_symlink(source_root / row["old_source"])
+        if not original.is_file():
+            raise ValueError("Documentation alias original source is missing")
+        destination = _no_symlink(build_dir / row["old_url"])
+        if destination.exists():
+            if not destination.is_file():
+                raise ValueError("Documentation alias output directory collision")
+            parts = PurePosixPath(row["old_url"]).parts
+            parts = parts[1:] if parts[0] in ("en", "zh_CN") else parts
+            current_path = "docs/" + str(PurePosixPath(*parts).with_suffix(".md"))
+            current = _no_symlink(source_root / current_path)
+            if (not current.is_file() or not current.read_bytes().strip() or
+                    b"<html" not in payload[row["old_url"]].lower()):
+                raise ValueError("Documentation alias output collides with existing payload")
+            catalog["canonical_collisions"].append({"url": row["old_url"],
+                "source_path": current_path, "source_sha256": _digest(current.read_bytes()),
+                "html_sha256": _digest(payload[row["old_url"]])})
+        for parent in destination.parents:
+            if parent == build_dir.parent:
+                break
+            if parent.exists() and not parent.is_dir():
+                raise ValueError("Documentation alias output parent collision")
+    _alias_rows(payload, catalog, require_pages=False)
+    collision_urls = {item["url"] for item in catalog["canonical_collisions"]}
+    for row in rows:
+        if row["old_url"] in collision_urls:
+            continue
+        target = relpath(row["target_url"], str(PurePosixPath(row["old_url"]).parent))
+        _atomic_text(build_dir / row["old_url"], _alias_page(row, target).decode("utf-8"))
+    _atomic_text(build_dir / ALIASES, _json_bytes(catalog).decode("utf-8"))
+    return {"aliases": len(rows), "source_sha256": _digest(raw)}
+
+
+def _root_gateways(rows, release_id):
+    pages = {}
+    for row in rows:
+        target = relpath(f"versions/{release_id}/{row['target_url']}",
+                         str(PurePosixPath(row["old_url"]).parent))
+        pages[row["old_url"]] = _alias_page(row, target)
+    for language in ("en", "zh_CN"):
+        target = f"../versions/{release_id}/{language}/"
+        pages[language + "/index.html"] = (
+            f'<!doctype html><html lang="{"zh-CN" if language == "zh_CN" else "en"}">'
+            f'<meta charset="utf-8"><title>{"Nexus 平台文档" if language == "zh_CN" else "Nexus documentation"}</title>'
+            f'<h1>{"Nexus 平台文档" if language == "zh_CN" else "Nexus documentation"}</h1>'
+            f'<p>{"当前文档版本" if language == "zh_CN" else "Current documentation version"}: '
+            f'{release_id}</p><p><a href="{target}index.html">'
+            f'{"当前平台文档" if language == "zh_CN" else "Current platform documentation"}</a></p>'
+            f'<p><a href="{target}reference/history.html">'
+            f'{"历史 API 版本边界" if language == "zh_CN" else "Historical API version boundary"}'
+            '</a></p></html>\n').encode("utf-8")
+    pages["api/index.html"] = (
+        '<!doctype html><html lang="en"><meta charset="utf-8">'
+        '<title>Historical API version boundary</title><h1>Historical API contract</h1>'
+        '<p>This address was used by a historical API contract. It does not establish '
+        'compatibility with the current public C API.</p>'
+        f'<p><a href="../versions/{release_id}/en/reference/history.html">'
+        'Read the version boundary and migration guide</a> '
+        f'<a href="../versions/{release_id}/zh_CN/reference/history.html">'
+        '阅读历史 API 版本边界与迁移指南</a></p></html>\n').encode("utf-8")
+    return pages
+
+
+def _gateway_preflight(webroot, planned):
+    marker = _no_symlink(webroot / GATEWAY_OWNER)
+    owned = set()
+    if marker.exists():
+        record = _json(marker.read_bytes(), "gateway ownership")
+        if (set(record) != {"schema_version", "kind", "files"} or
+                type(record["schema_version"]) is not int or record["schema_version"] != 1 or
+                record["kind"] != "nexus_documentation_gateways" or not isinstance(record["files"], list) or
+                not record["files"] or len(record["files"]) > MAX_FILES):
+            raise ValueError("Documentation gateway ownership fields invalid")
+        for item in record["files"]:
+            if not isinstance(item, dict) or set(item) != {"path", "bytes", "sha256"}:
+                raise ValueError("Documentation gateway ownership record invalid")
+            name = item["path"]
+            if (not isinstance(name, str) or type(item["bytes"]) is not int or
+                    item["bytes"] < 0 or not isinstance(item["sha256"], str) or
+                    not re.fullmatch(r"[0-9a-f]{64}", item["sha256"])):
+                raise ValueError("Documentation gateway ownership field types invalid")
+            if name not in GATEWAY_HOMES | PUBLISH_ENTRIES:
+                _alias_url(name)
+            if name in owned:
+                raise ValueError("Documentation gateway ownership duplicate")
+            owned.add(name)
+            path = _no_symlink(webroot / name)
+            if (not path.is_file() or len(path.read_bytes()) != item["bytes"] or
+                    _digest(path.read_bytes()) != item["sha256"]):
+                raise ValueError("Documentation owned gateway digest/bytes changed")
+    for name in planned:
+        path = _no_symlink(webroot / name)
+        if path.exists() and (not path.is_file() or name not in owned):
+            raise ValueError("Documentation gateway collides with unowned root file")
+        for parent in path.parents:
+            if parent == webroot.parent:
+                break
+            if parent.exists() and not parent.is_dir():
+                raise ValueError("Documentation gateway parent collision")
+    return owned
+
+
+def _write_gateways(webroot, pages, owned):
+    for name, contents in pages.items():
+        _atomic_text(webroot / name, contents.decode("utf-8"))
+    names = owned | set(pages) | PUBLISH_ENTRIES
+    files = [{"path": name, "bytes": (webroot / name).stat().st_size,
+              "sha256": _digest((webroot / name).read_bytes())} for name in sorted(names)]
+    _atomic_text(webroot / GATEWAY_OWNER, _json_bytes({"schema_version": 1,
+        "kind": "nexus_documentation_gateways", "files": files}).decode("utf-8"))
 
 
 def _payload(directory):
@@ -308,6 +553,7 @@ def _manifest(payload, expected_manifest_sha256=None):
             metadata.get("tools") != manifest["tool_versions"] or
             metadata.get("languages") != manifest["languages"]):
         raise ValueError("Documentation build and manifest identities differ")
+    _alias_rows(payload)
     _offline({name: payload[name] for name in declared})
     return manifest
 
@@ -562,6 +808,10 @@ def publish(package_dir, webroot, *, archive=None):
     version = webroot / "versions" / manifest["release_id"]
     _no_symlink(version)
     digest = _digest(payload[MANIFEST])
+    gateways = _root_gateways(_alias_rows(payload), manifest["release_id"]) if ALIASES in payload else {}
+    marker = webroot / GATEWAY_OWNER
+    managed_gateways = bool(gateways) or marker.exists() or marker.is_symlink()
+    owned_gateways = _gateway_preflight(webroot, set(gateways) | PUBLISH_ENTRIES) if managed_gateways else set()
     archive_digest = None
     download = _no_symlink(webroot / "downloads" /
                            (manifest["release_id"] + ".tar.gz"))
@@ -639,6 +889,8 @@ def publish(package_dir, webroot, *, archive=None):
                  '<!doctype html><html lang="en"><meta charset="utf-8">'
                  '<title>Nexus documentation downloads</title><h1>Offline HTML</h1>'
                  '<ul>' + ''.join(entries) + '</ul></html>\n')
+    if managed_gateways:
+        _write_gateways(webroot, gateways, owned_gateways)
     result = {"release_id": manifest["release_id"], "manifest_sha256": digest,
               "directory": str(version), "stable": str(stable / "index.html"),
               "physical_status": "not_executed"}
@@ -726,6 +978,12 @@ def _post_deploy(base_url, release_id, expected_manifest_sha256,
             raise ValueError("Published documentation exceeds bounded size")
         payload[name] = contents
     _manifest(payload, expected_manifest_sha256)
+    root_gateways = 0
+    if ALIASES in payload and verify_stable:
+        for name, expected in _root_gateways(_alias_rows(payload), release_id).items():
+            if fetch(name, root_url) != expected:
+                raise ValueError(f"Published documentation root gateway bytes differ: {name}")
+            root_gateways += 1
     if verify_stable:
         stable = fetch("stable/index.html", root_url)
         parser = _HTML()
@@ -757,6 +1015,7 @@ def _post_deploy(base_url, release_id, expected_manifest_sha256,
                "status": "verified", "base_url": base_url,
                "release_id": release_id, "manifest_sha256": _digest(raw),
                "verified_files": len(records), "stable_verified": verify_stable,
+               "verified_root_gateways": root_gateways,
                "observations": observations, "physical_status": "not_executed"}
     if archive_digest is not None:
         receipt["archive_sha256"] = archive_digest
