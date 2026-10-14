@@ -1,0 +1,41 @@
+// FIG-12 target: documentation design, not an implemented publishing system.
+// Authority: docs/design/documentation-system.md and documentation-standards.md.
+// Evidence is read; document building does not create platform qualification.
+digraph documentationTarget {
+    graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    prose [label="单一 Markdown / RST 正文", fillcolor="#f8fafc"];
+    headers [label="当前 public C headers", fillcolor="#f8fafc"];
+    facts [label="已有 facts / 台账 / 软件与 HIL 记录", fillcolor="#f8fafc"];
+    translations [label="gettext / PO：真实翻译状态", fillcolor="#f8fafc"];
+    dotSources [label="可审查 DOT 图源", fillcolor="#f8fafc"];
+    sourceChecks [label="内容、链接、示例检查与独立审查"];
+    apiXml [label="public-only Doxygen XML"];
+    statusViews [label="只读派生支持 / 资格视图"];
+    localSvg [label="本地 SVG：渲染与资源检查"];
+    siteBuild [label="MyST / Sphinx / Breathe 严格构建"];
+    html [label="HTML / 搜索 / 图 / 语言入口"];
+    identity [label="身份与文档包验真"];
+    online [label="不可变版本 / stable 文档入口", fillcolor="#f0fdf4"];
+    offline [label="相对链接离线包 / 校验 / 许可", fillcolor="#f0fdf4"];
+    restore [label="实际发布后检查 / 独立恢复", fillcolor="#f0fdf4"];
+    prose -> sourceChecks [label="审查当前正文"];
+    headers -> apiXml [label="生成 API"];
+    facts -> statusViews [label="保留各自资格身份"];
+    dotSources -> localSvg [label="受锁工具渲染"];
+    sourceChecks -> siteBuild [label="合格正文"];
+    apiXml -> siteBuild [label="本次 XML"];
+    statusViews -> siteBuild [label="合格状态视图"];
+    translations -> siteBuild [label="语言与审查状态"];
+    localSvg -> siteBuild [label="图与来源"];
+    siteBuild -> html [label="本次成功输出"];
+    html -> identity [label="绑定 code / docs / qualified source"];
+    identity -> online [label="实际部署"];
+    identity -> offline [label="封存文档包"];
+    online -> restore [label="核对在线身份"];
+    offline -> restore [label="取得、浏览和验真"];
+}

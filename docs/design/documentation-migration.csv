@@ -3,6 +3,7 @@ source_path,canonical_source_after_migration,site_page,migration_action,doc_task
 .github/pull_request_template/README.md,.github/pull_request_template/README.md,development/ci,retain_workflow_map,DOC-02;DOC-34;DOC-40,保持工作流说明与真实artifact/identity/部署边界一致
 .github/workflows/README.md,.github/workflows/README.md,development/ci,retain_workflow_map,DOC-02;DOC-34;DOC-40,保持工作流说明与真实artifact/identity/部署边界一致
 .github/workflows/docs-build.yml,.github/workflows/docs-build.yml,development/documentation,unify_ci_and_publish,DOC-32;DOC-34;DOC-37;DOC-38,严格构建和实际部署分开；预览低权限；部署后身份验证
+AGENTS.md,AGENTS.md,development/workflow,retain_behavior_contract,DOC-41;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
 CONTRIBUTING.md,CONTRIBUTING.md,development/workflow,retain_behavior_contract,DOC-11;DOC-32;DOC-40,保留既有贡献规则与gate控制输入；网站引用同一权威；规则变更走实际行为门禁
 CONTRIBUTING_CN.md,CONTRIBUTING_CN.md,development/workflow,retain_behavior_contract,DOC-11;DOC-32;DOC-40,保留既有贡献规则与gate控制输入；网站引用同一权威；规则变更走实际行为门禁
 Doxyfile,Doxyfile,reference/api/index,retain_public_api_pipeline,DOC-10;DOC-33;DOC-35,公共头与反斜杠注释风格不变；版本读取policy；工具实际锁定
@@ -24,6 +25,16 @@ components/owner_observer/README.md,components/owner_observer/README.md,referenc
 components/user_io_broker/README.md,components/user_io_broker/README.md,reference/components/user_io_broker,retain_adjacent_source,DOC-12;DOC-40,保留模块责任/文件地图/局部不变量；公开内容包含或绑定revision链接；不复制规范
 core/README.md,core/README.md,reference/api/core/index,retain_adjacent_source,DOC-12;DOC-40,保留模块责任/文件地图/局部不变量；公开内容包含或绑定revision链接；不复制规范
 docs/README.md,docs/README.md,index,retain_root_index,DOC-01;DOC-06;DOC-40,保留本次规划与实际实施区别；任务planned不建立新站点或平台资格
+docs/assets/diagrams/README.md,docs/assets/diagrams/README.md,reference/diagrams/index,retain_diagram_index,DOC-25;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
+docs/assets/diagrams/configuration-generation.dot,docs/assets/diagrams/configuration-generation.dot,reference/diagrams/index,retain_diagram_asset,DOC-25;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
+docs/assets/diagrams/configuration-generation.svg,docs/assets/diagrams/configuration-generation.svg,reference/diagrams/index,retain_diagram_asset,DOC-25;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
+docs/assets/diagrams/diagram-index.csv,docs/assets/diagrams/diagram-index.csv,reference/diagrams/index,retain_diagram_registry,DOC-25;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
+docs/assets/diagrams/documentation-target.dot,docs/assets/diagrams/documentation-target.dot,reference/diagrams/index,retain_diagram_asset,DOC-25;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
+docs/assets/diagrams/documentation-target.svg,docs/assets/diagrams/documentation-target.svg,reference/diagrams/index,retain_diagram_asset,DOC-25;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
+docs/assets/diagrams/platform-runtime.dot,docs/assets/diagrams/platform-runtime.dot,reference/diagrams/index,retain_diagram_asset,DOC-25;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
+docs/assets/diagrams/platform-runtime.svg,docs/assets/diagrams/platform-runtime.svg,reference/diagrams/index,retain_diagram_asset,DOC-25;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
+docs/assets/diagrams/request-lifecycle.dot,docs/assets/diagrams/request-lifecycle.dot,reference/diagrams/index,retain_diagram_asset,DOC-25;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
+docs/assets/diagrams/request-lifecycle.svg,docs/assets/diagrams/request-lifecycle.svg,reference/diagrams/index,retain_diagram_asset,DOC-25;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
 docs/delivery/README.md,docs/delivery/README.md,delivery/README,retain_index,DOC-04;DOC-09,保留执行记录导航；最新指针与历史源码分开
 docs/delivery/architecture.md,docs/explanation/architecture.md,explanation/architecture,move_reviewed,DOC-11;DOC-40,作为当前架构解释权威；规范链接到合同；不复制根README
 docs/delivery/build-system-results.json,docs/delivery/build-system-results.json,status/software-verification,retain_qualification_index,DOC-04;DOC-35;DOC-36,保留原schema/源码/receipt/member身份；公开定位导出为可取得位置不改旧证据
@@ -47,9 +58,12 @@ docs/design/build-system-execution.csv,docs/design/build-system-execution.csv,st
 docs/design/build-system.md,docs/reference/build-system.md,reference/build-system,move_contract,DOC-19;DOC-27,单TOML/IR/CMake权威和真实执行边界保留；台账源路径不变
 docs/design/classic-can.md,docs/reference/contracts/classic-can.md,reference/contracts/classic-can,move_contract,DOC-11;DOC-19,三邮箱/filter domain/abort范围保持；不扩展CAN FD
 docs/design/clock-domain-sleep.md,docs/reference/contracts/clock-domain-sleep.md,reference/contracts/clock-domain-sleep,move_contract,DOC-11;DOC-20,lease和浅睡眠前提保持；实测预算单独记录
+docs/design/documentation-improvements.md,docs/design/documentation-improvements.md,status/documentation-plan,retain_generated_task_view,DOC-32;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
 docs/design/documentation-migration.csv,docs/design/documentation-migration.csv,development/documentation-migration,retain_migration_map,DOC-01;DOC-06;DOC-40,保留本次规划与实际实施区别；任务planned不建立新站点或平台资格
+docs/design/documentation-standards.md,docs/design/documentation-standards.md,development/documentation-standards,retain_current_standard,DOC-41;DOC-58;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
 docs/design/documentation-system-execution.csv,docs/design/documentation-system-execution.csv,status/documentation-plan,retain_ledger,DOC-01;DOC-06;DOC-40,保留本次规划与实际实施区别；任务planned不建立新站点或平台资格
 docs/design/documentation-system.md,docs/design/documentation-system.md,design/documentation-system,retain_planning_contract,DOC-01;DOC-06;DOC-40,保留本次规划与实际实施区别；任务planned不建立新站点或平台资格
+docs/design/documentation-templates.md,docs/design/documentation-templates.md,development/documentation-templates,retain_page_templates,DOC-42;DOC-40,保留标准/图源/输出/实际审查身份；参考图不替代任务或平台资格
 docs/design/engineering-handbook.md,docs/development/engineering.md;docs/development/tdd-and-review.md;docs/guides/release-sdk.md,development/engineering,split_reviewed,DOC-11;DOC-32;DOC-40,不改既有风格与TDD规则；工具步骤与规则分离；原页不保留第二份规范
 docs/design/ethernet.md,docs/reference/contracts/ethernet.md,reference/contracts/ethernet,move_contract,DOC-11;DOC-19,raw MAC/MDIO/PHY责任和RX loan保持；协议与电气政策外置
 docs/design/factory-platform-execution.csv,docs/design/factory-platform-execution.csv,status/ledgers,retain_ledger,DOC-05;DOC-09;DOC-40,保留原编号/原退出条件/源路径；站点只派生视图；不累加跨台账完成率

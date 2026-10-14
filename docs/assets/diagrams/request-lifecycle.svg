@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="855pt" height="446pt" viewBox="0.00 0.00 855.00 445.60">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(18 427.6)">
+<title>requestLifecycle</title>
+<polygon fill="white" stroke="transparent" points="-18,18 -18,-427.6 837,-427.6 837,18 -18,18" />
+<g id="clust1" class="cluster">
+<title>clusterBorrowed</title>
+<polygon fill="white" stroke="#64748b" points="8,-90 8,-263 417,-263 417,-90 8,-90" />
+<text text-anchor="middle" x="212.5" y="-247.8" font-family="Noto Sans CJK SC" font-size="14.00">provider 借用保持</text>
+</g>
+
+<g id="node1" class="node">
+<title>fresh</title>
+<ellipse fill="#0f172a" stroke="#475569" cx="255" cy="-407.8" rx="1.8" ry="1.8" />
+</g>
+
+<g id="node2" class="node">
+<title>ready</title>
+<path fill="#f8fafc" stroke="#475569" d="M330,-344C330,-344 180,-344 180,-344 174,-344 168,-338 168,-332 168,-332 168,-320 168,-320 168,-314 174,-308 180,-308 180,-308 330,-308 330,-308 336,-308 342,-314 342,-320 342,-320 342,-332 342,-332 342,-338 336,-344 330,-344" />
+<text text-anchor="middle" x="255" y="-322.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">READY：无 provider 借用</text>
+</g>
+
+<g id="edge1" class="edge">
+<title>fresh-&gt;ready</title>
+<path fill="none" stroke="#475569" d="M255,-405.9C255,-400.67 255,-373.53 255,-352.53" />
+<polygon fill="#475569" stroke="#475569" points="257.8,-352.27 255,-344.27 252.2,-352.27 257.8,-352.27" />
+<text text-anchor="middle" x="291.5" y="-372.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">fresh initialize</text>
+</g>
+
+<g id="edge2" class="edge">
+<title>ready-&gt;ready</title>
+<path fill="none" stroke="#475569" d="M342.26,-334.91C364.91,-334.36 382,-331.39 382,-326 382,-321.28 368.92,-318.42 350.47,-317.41" />
+<polygon fill="#475569" stroke="#475569" points="350.36,-314.61 342.26,-317.09 350.14,-320.2 350.36,-314.61" />
+<text text-anchor="middle" x="460" y="-323.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">REJECTED：无残留引用或效果</text>
+</g>
+
+<g id="node4" class="node">
+<title>queued</title>
+<path fill="#eff6ff" stroke="#475569" d="M367,-232C367,-232 315,-232 315,-232 309,-232 303,-226 303,-220 303,-220 303,-208 303,-208 303,-202 309,-196 315,-196 315,-196 367,-196 367,-196 373,-196 379,-202 379,-208 379,-208 379,-220 379,-220 379,-226 373,-232 367,-232" />
+<text text-anchor="middle" x="341" y="-210.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">QUEUED</text>
+</g>
+
+<g id="edge3" class="edge">
+<title>ready-&gt;queued</title>
+<path fill="none" stroke="#475569" d="M273.86,-307.8C281.43,-300.49 290,-291.66 297,-283 308.11,-269.25 318.92,-252.61 327.05,-239.23" />
+<polygon fill="#475569" stroke="#475569" points="329.57,-240.47 331.27,-232.17 324.76,-237.6 329.57,-240.47" />
+<text text-anchor="middle" x="350.5" y="-274.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">适配器 ACCEPTED</text>
+</g>
+
+<g id="node5" class="node">
+<title>active</title>
+<path fill="#eff6ff" stroke="#475569" d="M190.5,-232C190.5,-232 147.5,-232 147.5,-232 141.5,-232 135.5,-226 135.5,-220 135.5,-220 135.5,-208 135.5,-208 135.5,-202 141.5,-196 147.5,-196 147.5,-196 190.5,-196 190.5,-196 196.5,-196 202.5,-202 202.5,-208 202.5,-208 202.5,-220 202.5,-220 202.5,-226 196.5,-232 190.5,-232" />
+<text text-anchor="middle" x="169" y="-210.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">ACTIVE</text>
+</g>
+
+<g id="edge4" class="edge">
+<title>ready-&gt;active</title>
+<path fill="none" stroke="#475569" d="M189.3,-307.96C177.7,-301.96 167.09,-293.88 160,-283 151.74,-270.32 153.9,-253.48 158.17,-239.72" />
+<polygon fill="#475569" stroke="#475569" points="160.86,-240.52 160.86,-232.04 155.57,-238.66 160.86,-240.52" />
+<text text-anchor="middle" x="223.5" y="-274.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">直接 provider ACCEPTED</text>
+</g>
+
+<g id="node3" class="node">
+<title>settled</title>
+<path fill="#f0fdf4" stroke="#475569" d="M490.5,-36C490.5,-36 279.5,-36 279.5,-36 273.5,-36 267.5,-30 267.5,-24 267.5,-24 267.5,-12 267.5,-12 267.5,-6 273.5,0 279.5,0 279.5,0 490.5,0 490.5,0 496.5,0 502.5,-6 502.5,-12 502.5,-12 502.5,-24 502.5,-24 502.5,-30 496.5,-36 490.5,-36" />
+<text text-anchor="middle" x="385" y="-14.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">SETTLED：provider 最终访问后发布</text>
+</g>
+
+<g id="edge14" class="edge">
+<title>settled:e-&gt;ready:e</title>
+<path fill="none" stroke="#475569" d="M504,-18C529.37,-18 732.35,-21.24 668,-134 586.22,-277.29 513.23,-324.44 351.28,-325.96" />
+<polygon fill="#475569" stroke="#475569" points="350.99,-323.16 343,-326 351.01,-328.76 350.99,-323.16" />
+<text text-anchor="middle" x="735.5" y="-162.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">消费结果和观察者退出后 prepare</text>
+</g>
+
+<g id="edge10" class="edge">
+<title>queued-&gt;settled</title>
+<path fill="none" stroke="#475569" d="M379.03,-212.23C430.51,-208.84 520.37,-194.11 559,-134 569.57,-117.55 569.91,-106.23 559,-90 542.53,-65.49 515.97,-49.44 488.5,-38.93" />
+<polygon fill="#475569" stroke="#475569" points="489.21,-36.21 480.73,-36.11 487.3,-41.47 489.21,-36.21" />
+<text text-anchor="middle" x="612.5" y="-113.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">队列等引用已排空</text>
+</g>
+
+<g id="edge5" class="edge">
+<title>queued-&gt;active</title>
+<path fill="none" stroke="#475569" d="M302.72,-214C275.39,-214 238.66,-214 210.61,-214" />
+<polygon fill="#475569" stroke="#475569" points="210.57,-211.2 202.57,-214 210.57,-216.8 210.57,-211.2" />
+<text text-anchor="middle" x="252.75" y="-220.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">执行推进</text>
+</g>
+
+<g id="node6" class="node">
+<title>draining</title>
+<path fill="#eff6ff" stroke="#475569" d="M355,-134C355,-134 293,-134 293,-134 287,-134 281,-128 281,-122 281,-122 281,-110 281,-110 281,-104 287,-98 293,-98 293,-98 355,-98 355,-98 361,-98 367,-104 367,-110 367,-110 367,-122 367,-122 367,-128 361,-134 355,-134" />
+<text text-anchor="middle" x="324" y="-112.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">DRAINING</text>
+</g>
+
+<g id="edge6" class="edge">
+<title>queued-&gt;draining</title>
+<path fill="none" stroke="#475569" d="M337.96,-195.84C335.33,-180.96 331.48,-159.22 328.49,-142.34" />
+<polygon fill="#475569" stroke="#475569" points="331.17,-141.4 327.01,-134.01 325.65,-142.38 331.17,-141.4" />
+<text text-anchor="middle" x="371.5" y="-162.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">取消 / 停机推进</text>
+</g>
+
+<g id="edge11" class="edge">
+<title>active-&gt;settled</title>
+<path fill="none" stroke="#475569" d="M202.54,-207.95C270.1,-197.71 416.45,-175.11 420,-171 451.97,-134 439.28,-106.74 422,-61 419.48,-54.34 415.37,-48.04 410.79,-42.46" />
+<polygon fill="#475569" stroke="#475569" points="412.67,-40.36 405.26,-36.24 408.49,-44.08 412.67,-40.36" />
+<text text-anchor="middle" x="490" y="-113.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">全部必要引用已排空</text>
+</g>
+
+<g id="edge7" class="edge">
+<title>active-&gt;draining</title>
+<path fill="none" stroke="#475569" d="M176.02,-195.98C181.7,-184.11 190.77,-168.72 203,-159 223.09,-143.04 249.65,-132.93 272.77,-126.64" />
+<polygon fill="#475569" stroke="#475569" points="273.74,-129.29 280.79,-124.58 272.34,-123.86 273.74,-129.29" />
+<text text-anchor="middle" x="262" y="-162.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">完成 / cancel / deadline</text>
+</g>
+
+<g id="node7" class="node">
+<title>quarantined</title>
+<path fill="#fff7ed" stroke="#475569" d="M183.5,-134C183.5,-134 28.5,-134 28.5,-134 22.5,-134 16.5,-128 16.5,-122 16.5,-122 16.5,-110 16.5,-110 16.5,-104 22.5,-98 28.5,-98 28.5,-98 183.5,-98 183.5,-98 189.5,-98 195.5,-104 195.5,-110 195.5,-110 195.5,-122 195.5,-122 195.5,-128 189.5,-134 183.5,-134" />
+<text text-anchor="middle" x="106" y="-112.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">QUARANTINED：责任保留</text>
+</g>
+
+<g id="edge8" class="edge">
+<title>active-&gt;quarantined</title>
+<path fill="none" stroke="#475569" d="M135.28,-211.14C107.58,-207.62 69.93,-197.83 51,-171 42.79,-159.36 50.91,-148.07 63.21,-138.84" />
+<polygon fill="#475569" stroke="#475569" points="64.94,-141.05 69.96,-134.21 61.78,-136.43 64.94,-141.05" />
+<text text-anchor="middle" x="85" y="-162.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">不能安全排空</text>
+</g>
+
+<g id="edge12" class="edge">
+<title>draining-&gt;settled</title>
+<path fill="none" stroke="#475569" d="M317.19,-97.93C313.87,-86.76 311.79,-72.22 318,-61 322.43,-53 329.09,-46.32 336.52,-40.81" />
+<polygon fill="#475569" stroke="#475569" points="338.46,-42.88 343.52,-36.08 335.32,-38.24 338.46,-42.88" />
+<text text-anchor="middle" x="367" y="-64.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">排空后 release 发布</text>
+</g>
+
+<g id="edge9" class="edge">
+<title>draining-&gt;quarantined</title>
+<path fill="none" stroke="#475569" d="M280.91,-116C258.81,-116 230.92,-116 203.95,-116" />
+<polygon fill="#475569" stroke="#475569" points="203.61,-113.2 195.61,-116 203.61,-118.8 203.61,-113.2" />
+<text text-anchor="middle" x="238.25" y="-122.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">排空失败</text>
+</g>
+
+<g id="edge13" class="edge">
+<title>quarantined-&gt;settled</title>
+<path fill="none" stroke="#475569" d="M120.85,-97.96C132.46,-85.75 149.65,-69.95 168,-61 196.1,-47.29 228.29,-38.06 259.12,-31.83" />
+<polygon fill="#475569" stroke="#475569" points="260.03,-34.51 267.35,-30.24 258.96,-29.01 260.03,-34.51" />
+<text text-anchor="middle" x="236" y="-64.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">仅实际恢复和排空证明成立</text>
+</g>
+</g>
+</svg>

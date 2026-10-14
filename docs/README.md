@@ -9,7 +9,11 @@
 | 判断支持和精确执行状态 | [软件交付](delivery/README.md) |
 | 查看现有站点构建规则 | [Sphinx 构建说明](sphinx/README.md) |
 | 规划完整文档系统 | [架构与交付规划](design/documentation-system.md) |
-| 跟踪文档系统实施 | [40 项台账](design/documentation-system-execution.csv) |
+| 查阅完整优化清单 | [58 项可读清单](design/documentation-improvements.md) |
+| 编写清晰正文与架构图 | [内容与图示标准](design/documentation-standards.md) |
+| 采用页面模板 | [五类内容模板](design/documentation-templates.md) |
+| 查看当前与目标参考图 | [图册](assets/diagrams/README.md) |
+| 跟踪文档系统实施 | [58 项台账](design/documentation-system-execution.csv) |
 | 查阅内容迁移规则 | [迁移映射](design/documentation-migration.csv) |
 | 查阅旧方案 | [历史资料](archive/README.md) |
 

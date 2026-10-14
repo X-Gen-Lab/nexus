@@ -1,0 +1,38 @@
+// FIG-06 current: Core request helper transitions and ownership conditions.
+// Code basis: 929a3bd684152fc3d49717bbd51497f554e5e8d5.
+// REJECTED and ACCEPTED are admission results, not request enum states.
+digraph requestLifecycle {
+    graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.55, ranksep=0.70];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    fresh [shape=point, label="", fillcolor="#0f172a"];
+    ready [label="READY：无 provider 借用", fillcolor="#f8fafc"];
+    settled [label="SETTLED：provider 最终访问后发布", fillcolor="#f0fdf4"];
+    subgraph clusterBorrowed {
+        label="provider 借用保持"; color="#64748b"; fontname="Noto Sans CJK SC";
+        queued [label="QUEUED"];
+        active [label="ACTIVE"];
+        draining [label="DRAINING"];
+        quarantined [label="QUARANTINED：责任保留", fillcolor="#fff7ed"];
+        { rank=same; queued; active; }
+        { rank=same; draining; quarantined; }
+    }
+    fresh -> ready [label="fresh initialize"];
+    ready -> ready [label="REJECTED：无残留引用或效果"];
+    ready -> queued [label="适配器 ACCEPTED"];
+    ready -> active [label="直接 provider ACCEPTED"];
+    queued -> active [label="执行推进", constraint=false];
+    queued -> draining [label="取消 / 停机推进"];
+    active -> draining [label="完成 / cancel / deadline"];
+    active -> quarantined [label="不能安全排空"];
+    draining -> quarantined [label="排空失败", constraint=false];
+    queued -> settled [label="队列等引用已排空"];
+    active -> settled [label="全部必要引用已排空"];
+    draining -> settled [label="排空后 release 发布"];
+    quarantined -> settled [label="仅实际恢复和排空证明成立"];
+    settled:e -> ready:e [label="消费结果和观察者退出后 prepare",
+                          constraint=false];
+}

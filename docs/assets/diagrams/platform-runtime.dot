@@ -1,0 +1,38 @@
+// FIG-01 current: runtime access, not the complete CMake dependency graph.
+// Code basis: 929a3bd684152fc3d49717bbd51497f554e5e8d5.
+// Factory lookup and ordinary I/O are separate paths.
+digraph platformRuntime {
+    graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.55];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    subgraph clusterProduct {
+        label="外部产品工程"; color="#64748b"; fontname="Noto Sans CJK SC";
+        app [label="应用：资源、调度、执行进度", fillcolor="#f8fafc"];
+    }
+    subgraph clusterPlatform {
+        label="Nexus 通用平台"; color="#64748b"; fontname="Noto Sans CJK SC";
+        factory [label="typed factory：既有实例查找"];
+        face [label="公共 face：readonly ops + context"];
+        owner [label="可选 owner / 执行适配", style="rounded,dashed,filled"];
+        waitPort [label="可选 OS / wait-wake", style="rounded,dashed,filled"];
+        provider [label="SoC provider：私有实例状态"];
+        core [label="Core：请求、deadline、epoch"];
+        arch [label="Arch：编译时 CPU 原语"];
+    }
+    hardware [label="选定控制器 / IRQ / DMA", fillcolor="#f8fafc"];
+    app -> factory [label="取得接口"];
+    factory -> face [label="返回既有引用"];
+    app -> face [label="启动成功后直接 I/O"];
+    app -> owner [label="可选共享路径", style=dashed];
+    owner -> face [label="执行端口使用接口", style=dashed];
+    app -> waitPort [label="显式选择任务与等待", style=dashed];
+    owner -> waitPort [label="选定 wait / wake 适配", style=dashed];
+    owner -> core [label="生命周期与稳定槽"];
+    provider -> core [label="请求与时间合同"];
+    provider -> arch [label="直接调用 CPU 原语"];
+    face -> provider [label="ops(context, ...)"];
+    provider -> hardware [label="驱动选定硬件模式"];
+}

@@ -57,6 +57,13 @@ They do not establish current support or qualification.
 
 ## Tools, style and validation
 
+Documentation changes follow the [content and diagram standards](docs/design/documentation-standards.md)
+and [page templates](docs/design/documentation-templates.md). Architecture pages
+include or reference diagrams that distinguish current implementation, target
+design and exact reference configurations. Review arrow meaning, ownership,
+failure paths and source identity; rendering does not establish correctness or
+hardware qualification. Preserve one authoritative contract and existing style.
+
 Install commit tools with `python scripts/setup/install_dev_tools.py`, then
 `.venv/bin/python -m pip install -r dependencies/environment-tools.txt` (Windows:
 use `.venv/Scripts/python.exe`). This installs pre-commit and commit-msg hooks;

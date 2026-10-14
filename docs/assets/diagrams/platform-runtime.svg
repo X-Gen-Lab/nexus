@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="695pt" height="498pt" viewBox="0.00 0.00 695.00 498.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(18 480)">
+<title>platformRuntime</title>
+<polygon fill="white" stroke="transparent" points="-18,18 -18,-480 677,-480 677,18 -18,18" />
+<g id="clust1" class="cluster">
+<title>clusterProduct</title>
+<polygon fill="white" stroke="#64748b" points="236,-379 236,-454 442,-454 442,-379 236,-379" />
+<text text-anchor="middle" x="339" y="-438.8" font-family="Noto Sans CJK SC" font-size="14.00">外部产品工程</text>
+</g>
+<g id="clust2" class="cluster">
+<title>clusterPlatform</title>
+<polygon fill="white" stroke="#64748b" points="8,-8 8,-347 451,-347 451,-8 8,-8" />
+<text text-anchor="middle" x="229.5" y="-331.8" font-family="Noto Sans CJK SC" font-size="14.00">Nexus 通用平台</text>
+</g>
+
+<g id="node1" class="node">
+<title>app</title>
+<path fill="#f8fafc" stroke="#475569" d="M422,-423C422,-423 256,-423 256,-423 250,-423 244,-417 244,-411 244,-411 244,-399 244,-399 244,-393 250,-387 256,-387 256,-387 422,-387 422,-387 428,-387 434,-393 434,-399 434,-399 434,-411 434,-411 434,-417 428,-423 422,-423" />
+<text text-anchor="middle" x="339" y="-401.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">应用：资源、调度、执行进度</text>
+</g>
+
+<g id="node2" class="node">
+<title>factory</title>
+<path fill="#eff6ff" stroke="#475569" d="M200,-316C200,-316 28,-316 28,-316 22,-316 16,-310 16,-304 16,-304 16,-292 16,-292 16,-286 22,-280 28,-280 28,-280 200,-280 200,-280 206,-280 212,-286 212,-292 212,-292 212,-304 212,-304 212,-310 206,-316 200,-316" />
+<text text-anchor="middle" x="114" y="-294.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">typed factory：既有实例查找</text>
+</g>
+
+<g id="edge1" class="edge">
+<title>app-&gt;factory</title>
+<path fill="none" stroke="#475569" d="M302.35,-386.9C262.88,-368.48 200.09,-339.18 157.99,-319.53" />
+<polygon fill="#475569" stroke="#475569" points="159.07,-316.94 150.64,-316.1 156.7,-322.02 159.07,-316.94" />
+<text text-anchor="middle" x="276" y="-358.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">取得接口</text>
+</g>
+
+<g id="node3" class="node">
+<title>face</title>
+<path fill="#eff6ff" stroke="#475569" d="M260.5,-228C260.5,-228 55.5,-228 55.5,-228 49.5,-228 43.5,-222 43.5,-216 43.5,-216 43.5,-204 43.5,-204 43.5,-198 49.5,-192 55.5,-192 55.5,-192 260.5,-192 260.5,-192 266.5,-192 272.5,-198 272.5,-204 272.5,-204 272.5,-216 272.5,-216 272.5,-222 266.5,-228 260.5,-228" />
+<text text-anchor="middle" x="158" y="-206.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">公共 face：readonly ops + context</text>
+</g>
+
+<g id="edge3" class="edge">
+<title>app-&gt;face</title>
+<path fill="none" stroke="#475569" d="M380.69,-386.82C389.18,-381.59 397.26,-375.04 403,-367 418.61,-345.15 441.63,-268.25 424,-248 423.36,-247.26 350.16,-237.11 280.72,-227.63" />
+<polygon fill="#475569" stroke="#475569" points="281.01,-224.84 272.71,-226.54 280.26,-230.39 281.01,-224.84" />
+<text text-anchor="middle" x="477.5" y="-295.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">启动成功后直接 I/O</text>
+</g>
+
+<g id="node4" class="node">
+<title>owner</title>
+<path fill="#eff6ff" stroke="#475569" stroke-dasharray="5,2" d="M379,-316C379,-316 249,-316 249,-316 243,-316 237,-310 237,-304 237,-304 237,-292 237,-292 237,-286 243,-280 249,-280 249,-280 379,-280 379,-280 385,-280 391,-286 391,-292 391,-292 391,-304 391,-304 391,-310 385,-316 379,-316" />
+<text text-anchor="middle" x="314" y="-294.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">可选 owner / 执行适配</text>
+</g>
+
+<g id="edge4" class="edge">
+<title>app-&gt;owner</title>
+<path fill="none" stroke="#475569" stroke-dasharray="5,2" d="M334.87,-386.66C330.79,-369.54 324.52,-343.17 319.91,-323.83" />
+<polygon fill="#475569" stroke="#475569" points="322.63,-323.15 318.05,-316.02 317.18,-324.45 322.63,-323.15" />
+<text text-anchor="middle" x="363" y="-358.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">可选共享路径</text>
+</g>
+
+<g id="node5" class="node">
+<title>waitPort</title>
+<path fill="#eff6ff" stroke="#475569" stroke-dasharray="5,2" d="M430.5,-228C430.5,-228 309.5,-228 309.5,-228 303.5,-228 297.5,-222 297.5,-216 297.5,-216 297.5,-204 297.5,-204 297.5,-198 303.5,-192 309.5,-192 309.5,-192 430.5,-192 430.5,-192 436.5,-192 442.5,-198 442.5,-204 442.5,-204 442.5,-216 442.5,-216 442.5,-222 436.5,-228 430.5,-228" />
+<text text-anchor="middle" x="370" y="-206.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">可选 OS / wait-wake</text>
+</g>
+
+<g id="edge6" class="edge">
+<title>app-&gt;waitPort</title>
+<path fill="none" stroke="#475569" stroke-dasharray="5,2" d="M434.13,-388.94C480.83,-379.4 530.03,-365.38 544,-347 562.02,-323.29 560.73,-304.63 544,-280 522.87,-248.88 485.27,-231.8 450.42,-222.42" />
+<polygon fill="#475569" stroke="#475569" points="451.02,-219.68 442.57,-220.42 449.64,-225.11 451.02,-219.68" />
+<text text-anchor="middle" x="608" y="-295.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">显式选择任务与等待</text>
+</g>
+
+<g id="edge2" class="edge">
+<title>factory-&gt;face</title>
+<path fill="none" stroke="#475569" d="M87.81,-279.85C77.17,-270.68 68.87,-259.03 76,-248 79.98,-241.83 85.27,-236.68 91.24,-232.39" />
+<polygon fill="#475569" stroke="#475569" points="92.76,-234.74 97.96,-228.05 89.72,-230.03 92.76,-234.74" />
+<text text-anchor="middle" x="110" y="-251.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">返回既有引用</text>
+</g>
+
+<g id="node6" class="node">
+<title>provider</title>
+<path fill="#eff6ff" stroke="#475569" d="M332.5,-140C332.5,-140 163.5,-140 163.5,-140 157.5,-140 151.5,-134 151.5,-128 151.5,-128 151.5,-116 151.5,-116 151.5,-110 157.5,-104 163.5,-104 163.5,-104 332.5,-104 332.5,-104 338.5,-104 344.5,-110 344.5,-116 344.5,-116 344.5,-128 344.5,-128 344.5,-134 338.5,-140 332.5,-140" />
+<text text-anchor="middle" x="248" y="-118.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">SoC provider：私有实例状态</text>
+</g>
+
+<g id="edge11" class="edge">
+<title>face-&gt;provider</title>
+<path fill="none" stroke="#475569" d="M176.21,-191.6C189.97,-178.46 208.97,-160.3 223.97,-145.97" />
+<polygon fill="#475569" stroke="#475569" points="226.27,-147.64 230.12,-140.08 222.4,-143.59 226.27,-147.64" />
+<text text-anchor="middle" x="247.5" y="-163.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">ops(context, ...)</text>
+</g>
+
+<g id="edge5" class="edge">
+<title>owner-&gt;face</title>
+<path fill="none" stroke="#475569" stroke-dasharray="5,2" d="M279.23,-279.95C267.05,-273.82 253.34,-266.76 241,-260 224.98,-251.22 207.54,-241.03 192.79,-232.21" />
+<polygon fill="#475569" stroke="#475569" points="194.09,-229.72 185.79,-228.01 191.21,-234.53 194.09,-229.72" />
+<text text-anchor="middle" x="286.5" y="-251.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">执行端口使用接口</text>
+</g>
+
+<g id="edge7" class="edge">
+<title>owner-&gt;waitPort</title>
+<path fill="none" stroke="#475569" stroke-dasharray="5,2" d="M325.33,-279.6C333.66,-266.81 345.08,-249.27 354.29,-235.13" />
+<polygon fill="#475569" stroke="#475569" points="356.86,-236.32 358.88,-228.08 352.16,-233.26 356.86,-236.32" />
+<text text-anchor="middle" x="399.5" y="-251.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">选定 wait / wake 适配</text>
+</g>
+
+<g id="node7" class="node">
+<title>core</title>
+<path fill="#eff6ff" stroke="#475569" d="M215.5,-52C215.5,-52 28.5,-52 28.5,-52 22.5,-52 16.5,-46 16.5,-40 16.5,-40 16.5,-28 16.5,-28 16.5,-22 22.5,-16 28.5,-16 28.5,-16 215.5,-16 215.5,-16 221.5,-16 227.5,-22 227.5,-28 227.5,-28 227.5,-40 227.5,-40 227.5,-46 221.5,-52 215.5,-52" />
+<text text-anchor="middle" x="122" y="-30.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">Core：请求、deadline、epoch</text>
+</g>
+
+<g id="edge8" class="edge">
+<title>owner-&gt;core</title>
+<path fill="none" stroke="#475569" d="M242.86,-279.93C159.3,-259.85 31.84,-229.07 31,-228 -11.68,-173.66 56.14,-96.05 96.1,-57.92" />
+<polygon fill="#475569" stroke="#475569" points="98.33,-59.67 102.25,-52.15 94.5,-55.58 98.33,-59.67" />
+<text text-anchor="middle" x="67.5" y="-163.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">生命周期与稳定槽</text>
+</g>
+
+<g id="edge9" class="edge">
+<title>provider-&gt;core</title>
+<path fill="none" stroke="#475569" d="M222.8,-103.8C202.98,-90.27 175.22,-71.32 153.85,-56.74" />
+<polygon fill="#475569" stroke="#475569" points="155.34,-54.36 147.15,-52.17 152.18,-58.99 155.34,-54.36" />
+<text text-anchor="middle" x="231.5" y="-75.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">请求与时间合同</text>
+</g>
+
+<g id="node8" class="node">
+<title>arch</title>
+<path fill="#eff6ff" stroke="#475569" d="M401.5,-52C401.5,-52 264.5,-52 264.5,-52 258.5,-52 252.5,-46 252.5,-40 252.5,-40 252.5,-28 252.5,-28 252.5,-22 258.5,-16 264.5,-16 264.5,-16 401.5,-16 401.5,-16 407.5,-16 413.5,-22 413.5,-28 413.5,-28 413.5,-40 413.5,-40 413.5,-46 407.5,-52 401.5,-52" />
+<text text-anchor="middle" x="333" y="-30.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">Arch：编译时 CPU 原语</text>
+</g>
+
+<g id="edge10" class="edge">
+<title>provider-&gt;arch</title>
+<path fill="none" stroke="#475569" d="M265.2,-103.6C278.19,-90.46 296.13,-72.3 310.3,-57.97" />
+<polygon fill="#475569" stroke="#475569" points="312.48,-59.74 316.11,-52.08 308.5,-55.81 312.48,-59.74" />
+<text text-anchor="middle" x="342" y="-75.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">直接调用 CPU 原语</text>
+</g>
+
+<g id="node9" class="node">
+<title>hardware</title>
+<path fill="#f8fafc" stroke="#475569" d="M607,-52C607,-52 471,-52 471,-52 465,-52 459,-46 459,-40 459,-40 459,-28 459,-28 459,-22 465,-16 471,-16 471,-16 607,-16 607,-16 613,-16 619,-22 619,-28 619,-28 619,-40 619,-40 619,-46 613,-52 607,-52" />
+<text text-anchor="middle" x="539" y="-30.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">选定控制器 / IRQ / DMA</text>
+</g>
+
+<g id="edge12" class="edge">
+<title>provider-&gt;hardware</title>
+<path fill="none" stroke="#475569" d="M320.84,-103.91C344.6,-98.01 371.02,-91.08 395,-84 424.73,-75.21 457.48,-64.18 484.23,-54.81" />
+<polygon fill="#475569" stroke="#475569" points="485.35,-57.38 491.96,-52.09 483.49,-52.1 485.35,-57.38" />
+<text text-anchor="middle" x="475.5" y="-75.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">驱动选定硬件模式</text>
+</g>
+</g>
+</svg>

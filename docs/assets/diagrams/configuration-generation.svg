@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="564pt" height="660pt" viewBox="0.00 0.00 564.00 660.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(18 642)">
+<title>configurationGeneration</title>
+<polygon fill="white" stroke="transparent" points="-18,18 -18,-642 546,-642 546,18 -18,18" />
+
+<g id="node1" class="node">
+<title>assembly</title>
+<path fill="#f8fafc" stroke="#475569" d="M152.5,-624C152.5,-624 27.5,-624 27.5,-624 21.5,-624 15.5,-618 15.5,-612 15.5,-612 15.5,-600 15.5,-600 15.5,-594 21.5,-588 27.5,-588 27.5,-588 152.5,-588 152.5,-588 158.5,-588 164.5,-594 164.5,-600 164.5,-600 164.5,-612 164.5,-612 164.5,-618 158.5,-624 152.5,-624" />
+<text text-anchor="middle" x="90" y="-602.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">一份 authored TOML</text>
+</g>
+
+<g id="node4" class="node">
+<title>resolver</title>
+<path fill="#eff6ff" stroke="#475569" d="M384,-540C384,-540 154,-540 154,-540 148,-540 142,-534 142,-528 142,-528 142,-516 142,-516 142,-510 148,-504 154,-504 154,-504 384,-504 384,-504 390,-504 396,-510 396,-516 396,-516 396,-528 396,-528 396,-534 390,-540 384,-540" />
+<text text-anchor="middle" x="269" y="-518.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">严格解析：字段、模式、资源、输入身份</text>
+</g>
+
+<g id="edge1" class="edge">
+<title>assembly-&gt;resolver</title>
+<path fill="none" stroke="#475569" d="M127.52,-587.81C155.78,-574.87 194.62,-557.07 224.45,-543.41" />
+<polygon fill="#475569" stroke="#475569" points="225.73,-545.9 231.83,-540.03 223.39,-540.81 225.73,-545.9" />
+<text text-anchor="middle" x="214" y="-561.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">产品选择</text>
+</g>
+
+<g id="node2" class="node">
+<title>socFacts</title>
+<path fill="#f8fafc" stroke="#475569" d="M339.5,-624C339.5,-624 198.5,-624 198.5,-624 192.5,-624 186.5,-618 186.5,-612 186.5,-612 186.5,-600 186.5,-600 186.5,-594 192.5,-588 198.5,-588 198.5,-588 339.5,-588 339.5,-588 345.5,-588 351.5,-594 351.5,-600 351.5,-600 351.5,-612 351.5,-612 351.5,-618 345.5,-624 339.5,-624" />
+<text text-anchor="middle" x="269" y="-602.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">SoC / CPU / routes 事实</text>
+</g>
+
+<g id="edge2" class="edge">
+<title>socFacts-&gt;resolver</title>
+<path fill="none" stroke="#475569" d="M269,-587.61C269,-576.23 269,-561.16 269,-548.44" />
+<polygon fill="#475569" stroke="#475569" points="271.8,-548.08 269,-540.08 266.2,-548.08 271.8,-548.08" />
+<text text-anchor="middle" x="292" y="-561.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">芯片能力</text>
+</g>
+
+<g id="node3" class="node">
+<title>boardFacts</title>
+<path fill="#f8fafc" stroke="#475569" d="M516,-624C516,-624 386,-624 386,-624 380,-624 374,-618 374,-612 374,-612 374,-600 374,-600 374,-594 380,-588 386,-588 386,-588 516,-588 516,-588 522,-588 528,-594 528,-600 528,-600 528,-612 528,-612 528,-618 522,-624 516,-624" />
+<text text-anchor="middle" x="451" y="-602.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">Board 接线与来源事实</text>
+</g>
+
+<g id="edge3" class="edge">
+<title>boardFacts-&gt;resolver</title>
+<path fill="none" stroke="#475569" d="M412.85,-587.81C384.12,-574.87 344.63,-557.07 314.29,-543.41" />
+<polygon fill="#475569" stroke="#475569" points="315.23,-540.76 306.79,-540.03 312.93,-545.87 315.23,-540.76" />
+<text text-anchor="middle" x="398.5" y="-561.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">Board 授权</text>
+</g>
+
+<g id="node5" class="node">
+<title>typedIr</title>
+<path fill="#eff6ff" stroke="#475569" d="M267.5,-456C267.5,-456 174.5,-456 174.5,-456 168.5,-456 162.5,-450 162.5,-444 162.5,-444 162.5,-432 162.5,-432 162.5,-426 168.5,-420 174.5,-420 174.5,-420 267.5,-420 267.5,-420 273.5,-420 279.5,-426 279.5,-432 279.5,-432 279.5,-444 279.5,-444 279.5,-450 273.5,-456 267.5,-456" />
+<text text-anchor="middle" x="221" y="-434.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">不可变 typed IR</text>
+</g>
+
+<g id="edge4" class="edge">
+<title>resolver-&gt;typedIr</title>
+<path fill="none" stroke="#475569" d="M258.82,-503.61C251.97,-491.9 242.83,-476.29 235.25,-463.35" />
+<polygon fill="#475569" stroke="#475569" points="237.46,-461.57 231,-456.08 232.63,-464.4 237.46,-461.57" />
+<text text-anchor="middle" x="271" y="-477.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">验证通过</text>
+</g>
+
+<g id="node11" class="node">
+<title>rejected</title>
+<path fill="#fff7ed" stroke="#475569" d="M361,-288C361,-288 273,-288 273,-288 267,-288 261,-282 261,-276 261,-276 261,-264 261,-264 261,-258 267,-252 273,-252 273,-252 361,-252 361,-252 367,-252 373,-258 373,-264 373,-264 373,-276 373,-276 373,-282 367,-288 361,-288" />
+<text text-anchor="middle" x="317" y="-266.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">拒绝 / 生成失败</text>
+</g>
+
+<g id="edge10" class="edge">
+<title>resolver-&gt;rejected</title>
+<path fill="none" stroke="#475569" d="M287.29,-503.96C291.89,-498.66 296.28,-492.5 299,-486 325.85,-421.8 323.21,-337.55 319.74,-296.16" />
+<polygon fill="#475569" stroke="#475569" points="322.51,-295.72 319,-288 316.93,-296.22 322.51,-295.72" />
+<text text-anchor="middle" x="363" y="-393.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">非法 / 冲突 / 变化</text>
+</g>
+
+<g id="node6" class="node">
+<title>bundle</title>
+<path fill="#eff6ff" stroke="#475569" d="M270.5,-372C270.5,-372 155.5,-372 155.5,-372 149.5,-372 143.5,-366 143.5,-360 143.5,-360 143.5,-348 143.5,-348 143.5,-342 149.5,-336 155.5,-336 155.5,-336 270.5,-336 270.5,-336 276.5,-336 282.5,-342 282.5,-348 282.5,-348 282.5,-360 282.5,-360 282.5,-366 276.5,-372 270.5,-372" />
+<text text-anchor="middle" x="213" y="-350.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">事务生成与原子发布</text>
+</g>
+
+<g id="edge5" class="edge">
+<title>typedIr-&gt;bundle</title>
+<path fill="none" stroke="#475569" d="M219.3,-419.61C218.18,-408.12 216.69,-392.87 215.45,-380.07" />
+<polygon fill="#475569" stroke="#475569" points="218.23,-379.77 214.67,-372.08 212.66,-380.32 218.23,-379.77" />
+<text text-anchor="middle" x="252" y="-393.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">生成选定内容</text>
+</g>
+
+<g id="node7" class="node">
+<title>outputs</title>
+<path fill="#eff6ff" stroke="#475569" d="M219.5,-288C219.5,-288 14.5,-288 14.5,-288 8.5,-288 2.5,-282 2.5,-276 2.5,-276 2.5,-264 2.5,-264 2.5,-258 8.5,-252 14.5,-252 14.5,-252 219.5,-252 219.5,-252 225.5,-252 231.5,-258 231.5,-264 231.5,-264 231.5,-276 231.5,-276 231.5,-282 225.5,-288 219.5,-288" />
+<text text-anchor="middle" x="117" y="-266.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">静态实例 / factory / 配置 / 内存预算</text>
+</g>
+
+<g id="edge6" class="edge">
+<title>bundle-&gt;outputs</title>
+<path fill="none" stroke="#475569" d="M169.61,-335.85C160.49,-330.97 151.4,-325.03 144,-318 137.45,-311.78 132.01,-303.62 127.78,-295.84" />
+<polygon fill="#475569" stroke="#475569" points="130.06,-294.15 123.95,-288.28 125.07,-296.68 130.06,-294.15" />
+<text text-anchor="middle" x="167" y="-309.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">成功发布</text>
+</g>
+
+<g id="edge11" class="edge">
+<title>bundle-&gt;rejected</title>
+<path fill="none" stroke="#475569" d="M211.91,-335.6C212.22,-325.89 214.22,-314.14 221,-306 229.42,-295.9 241.01,-288.72 253.23,-283.6" />
+<polygon fill="#475569" stroke="#475569" points="254.42,-286.15 260.9,-280.68 252.43,-280.91 254.42,-286.15" />
+<text text-anchor="middle" x="260.5" y="-309.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">生成或发布失败</text>
+</g>
+
+<g id="node8" class="node">
+<title>targets</title>
+<path fill="#eff6ff" stroke="#475569" d="M170.5,-204C170.5,-204 27.5,-204 27.5,-204 21.5,-204 15.5,-198 15.5,-192 15.5,-192 15.5,-180 15.5,-180 15.5,-174 21.5,-168 27.5,-168 27.5,-168 170.5,-168 170.5,-168 176.5,-168 182.5,-174 182.5,-180 182.5,-180 182.5,-192 182.5,-192 182.5,-198 176.5,-204 170.5,-204" />
+<text text-anchor="middle" x="99" y="-182.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">CMake：唯一软件目标图</text>
+</g>
+
+<g id="edge7" class="edge">
+<title>outputs-&gt;targets</title>
+<path fill="none" stroke="#475569" d="M113.18,-251.61C110.66,-240.12 107.31,-224.87 104.5,-212.07" />
+<polygon fill="#475569" stroke="#475569" points="107.2,-211.3 102.75,-204.08 101.73,-212.5 107.2,-211.3" />
+<text text-anchor="middle" x="144" y="-225.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">配置与生成源</text>
+</g>
+
+<g id="node9" class="node">
+<title>ninja</title>
+<path fill="#eff6ff" stroke="#475569" d="M186,-120C186,-120 12,-120 12,-120 6,-120 0,-114 0,-108 0,-108 0,-96 0,-96 0,-90 6,-84 12,-84 12,-84 186,-84 186,-84 192,-84 198,-90 198,-96 198,-96 198,-108 198,-108 198,-114 192,-120 186,-120" />
+<text text-anchor="middle" x="99" y="-98.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">Ninja：编译、链接、资源检查</text>
+</g>
+
+<g id="edge8" class="edge">
+<title>targets-&gt;ninja</title>
+<path fill="none" stroke="#475569" d="M99,-167.61C99,-156.23 99,-141.16 99,-128.44" />
+<polygon fill="#475569" stroke="#475569" points="101.8,-128.08 99,-120.08 96.2,-128.08 101.8,-128.08" />
+<text text-anchor="middle" x="127.5" y="-141.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">执行目标图</text>
+</g>
+
+<g id="node10" class="node">
+<title>firmware</title>
+<path fill="#f0fdf4" stroke="#475569" d="M177.5,-36C177.5,-36 20.5,-36 20.5,-36 14.5,-36 8.5,-30 8.5,-24 8.5,-24 8.5,-12 8.5,-12 8.5,-6 14.5,0 20.5,0 20.5,0 177.5,0 177.5,0 183.5,0 189.5,-6 189.5,-12 189.5,-12 189.5,-24 189.5,-24 189.5,-30 183.5,-36 177.5,-36" />
+<text text-anchor="middle" x="99" y="-14.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">ELF / BIN / map / 资源报告</text>
+</g>
+
+<g id="edge9" class="edge">
+<title>ninja-&gt;firmware</title>
+<path fill="none" stroke="#475569" d="M99,-83.61C99,-72.23 99,-57.16 99,-44.44" />
+<polygon fill="#475569" stroke="#475569" points="101.8,-44.08 99,-36.08 96.2,-44.08 101.8,-44.08" />
+<text text-anchor="middle" x="133" y="-57.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">本次实际产物</text>
+</g>
+
+<g id="node12" class="node">
+<title>invalidated</title>
+<path fill="#fff7ed" stroke="#475569" d="M424,-204C424,-204 216,-204 216,-204 210,-204 204,-198 204,-192 204,-192 204,-180 204,-180 204,-174 210,-168 216,-168 216,-168 424,-168 424,-168 430,-168 436,-174 436,-180 436,-180 436,-192 436,-192 436,-198 430,-204 424,-204" />
+<text text-anchor="middle" x="320" y="-182.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">owned bundle 失效，不暴露半成品</text>
+</g>
+
+<g id="edge12" class="edge">
+<title>rejected-&gt;invalidated</title>
+<path fill="none" stroke="#475569" d="M317.64,-251.61C318.05,-240.23 318.6,-225.16 319.07,-212.44" />
+<polygon fill="#475569" stroke="#475569" points="321.88,-212.18 319.37,-204.08 316.28,-211.98 321.88,-212.18" />
+<text text-anchor="middle" x="363.5" y="-225.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">仅清理拥有的输出</text>
+</g>
+</g>
+</svg>

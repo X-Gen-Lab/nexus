@@ -1,0 +1,202 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1045pt" height="576pt" viewBox="0.00 0.00 1044.50 576.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(18 558)">
+<title>documentationTarget</title>
+<polygon fill="white" stroke="transparent" points="-18,18 -18,-558 1026.5,-558 1026.5,18 -18,18" />
+
+<g id="node1" class="node">
+<title>prose</title>
+<path fill="#f8fafc" stroke="#475569" d="M186.5,-540C186.5,-540 29.5,-540 29.5,-540 23.5,-540 17.5,-534 17.5,-528 17.5,-528 17.5,-516 17.5,-516 17.5,-510 23.5,-504 29.5,-504 29.5,-504 186.5,-504 186.5,-504 192.5,-504 198.5,-510 198.5,-516 198.5,-516 198.5,-528 198.5,-528 198.5,-534 192.5,-540 186.5,-540" />
+<text text-anchor="middle" x="108" y="-518.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">单一 Markdown / RST 正文</text>
+</g>
+
+<g id="node6" class="node">
+<title>sourceChecks</title>
+<path fill="#eff6ff" stroke="#475569" d="M204,-456C204,-456 12,-456 12,-456 6,-456 0,-450 0,-444 0,-444 0,-432 0,-432 0,-426 6,-420 12,-420 12,-420 204,-420 204,-420 210,-420 216,-426 216,-432 216,-432 216,-444 216,-444 216,-450 210,-456 204,-456" />
+<text text-anchor="middle" x="108" y="-434.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">内容、链接、示例检查与独立审查</text>
+</g>
+
+<g id="edge1" class="edge">
+<title>prose-&gt;sourceChecks</title>
+<path fill="none" stroke="#475569" d="M108,-503.61C108,-492.23 108,-477.16 108,-464.44" />
+<polygon fill="#475569" stroke="#475569" points="110.8,-464.08 108,-456.08 105.2,-464.08 110.8,-464.08" />
+<text text-anchor="middle" x="142" y="-477.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">审查当前正文</text>
+</g>
+
+<g id="node2" class="node">
+<title>headers</title>
+<path fill="#f8fafc" stroke="#475569" d="M582,-540C582,-540 450,-540 450,-540 444,-540 438,-534 438,-528 438,-528 438,-516 438,-516 438,-510 444,-504 450,-504 450,-504 582,-504 582,-504 588,-504 594,-510 594,-516 594,-516 594,-528 594,-528 594,-534 588,-540 582,-540" />
+<text text-anchor="middle" x="516" y="-518.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">当前 public C headers</text>
+</g>
+
+<g id="node7" class="node">
+<title>apiXml</title>
+<path fill="#eff6ff" stroke="#475569" d="M610,-456C610,-456 456,-456 456,-456 450,-456 444,-450 444,-444 444,-444 444,-432 444,-432 444,-426 450,-420 456,-420 456,-420 610,-420 610,-420 616,-420 622,-426 622,-432 622,-432 622,-444 622,-444 622,-450 616,-456 610,-456" />
+<text text-anchor="middle" x="533" y="-434.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">public-only Doxygen XML</text>
+</g>
+
+<g id="edge2" class="edge">
+<title>headers-&gt;apiXml</title>
+<path fill="none" stroke="#475569" d="M519.61,-503.61C521.99,-492.12 525.15,-476.87 527.8,-464.07" />
+<polygon fill="#475569" stroke="#475569" points="530.58,-464.49 529.46,-456.08 525.09,-463.35 530.58,-464.49" />
+<text text-anchor="middle" x="547" y="-477.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">生成 API</text>
+</g>
+
+<g id="node3" class="node">
+<title>facts</title>
+<path fill="#f8fafc" stroke="#475569" d="M824,-540C824,-540 628,-540 628,-540 622,-540 616,-534 616,-528 616,-528 616,-516 616,-516 616,-510 622,-504 628,-504 628,-504 824,-504 824,-504 830,-504 836,-510 836,-516 836,-516 836,-528 836,-528 836,-534 830,-540 824,-540" />
+<text text-anchor="middle" x="726" y="-518.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">已有 facts / 台账 / 软件与 HIL 记录</text>
+</g>
+
+<g id="node8" class="node">
+<title>statusViews</title>
+<path fill="#eff6ff" stroke="#475569" d="M795.5,-456C795.5,-456 656.5,-456 656.5,-456 650.5,-456 644.5,-450 644.5,-444 644.5,-444 644.5,-432 644.5,-432 644.5,-426 650.5,-420 656.5,-420 656.5,-420 795.5,-420 795.5,-420 801.5,-420 807.5,-426 807.5,-432 807.5,-432 807.5,-444 807.5,-444 807.5,-450 801.5,-456 795.5,-456" />
+<text text-anchor="middle" x="726" y="-434.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">只读派生支持 / 资格视图</text>
+</g>
+
+<g id="edge3" class="edge">
+<title>facts-&gt;statusViews</title>
+<path fill="none" stroke="#475569" d="M726,-503.61C726,-492.23 726,-477.16 726,-464.44" />
+<polygon fill="#475569" stroke="#475569" points="728.8,-464.08 726,-456.08 723.2,-464.08 728.8,-464.08" />
+<text text-anchor="middle" x="771.5" y="-477.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">保留各自资格身份</text>
+</g>
+
+<g id="node4" class="node">
+<title>translations</title>
+<path fill="#f8fafc" stroke="#475569" d="M410,-456C410,-456 250,-456 250,-456 244,-456 238,-450 238,-444 238,-444 238,-432 238,-432 238,-426 244,-420 250,-420 250,-420 410,-420 410,-420 416,-420 422,-426 422,-432 422,-432 422,-444 422,-444 422,-450 416,-456 410,-456" />
+<text text-anchor="middle" x="330" y="-434.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">gettext / PO：真实翻译状态</text>
+</g>
+
+<g id="node10" class="node">
+<title>siteBuild</title>
+<path fill="#eff6ff" stroke="#475569" d="M633,-372C633,-372 433,-372 433,-372 427,-372 421,-366 421,-360 421,-360 421,-348 421,-348 421,-342 427,-336 433,-336 433,-336 633,-336 633,-336 639,-336 645,-342 645,-348 645,-348 645,-360 645,-360 645,-366 639,-372 633,-372" />
+<text text-anchor="middle" x="533" y="-350.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">MyST / Sphinx / Breathe 严格构建</text>
+</g>
+
+<g id="edge8" class="edge">
+<title>translations-&gt;siteBuild</title>
+<path fill="none" stroke="#475569" d="M372.56,-419.81C404.87,-406.76 449.39,-388.77 483.34,-375.06" />
+<polygon fill="#475569" stroke="#475569" points="484.48,-377.62 490.85,-372.03 482.38,-372.43 484.48,-377.62" />
+<text text-anchor="middle" x="483.5" y="-393.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">语言与审查状态</text>
+</g>
+
+<g id="node5" class="node">
+<title>dotSources</title>
+<path fill="#f8fafc" stroke="#475569" d="M967,-540C967,-540 871,-540 871,-540 865,-540 859,-534 859,-528 859,-528 859,-516 859,-516 859,-510 865,-504 871,-504 871,-504 967,-504 967,-504 973,-504 979,-510 979,-516 979,-516 979,-528 979,-528 979,-534 973,-540 967,-540" />
+<text text-anchor="middle" x="919" y="-518.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">可审查 DOT 图源</text>
+</g>
+
+<g id="node9" class="node">
+<title>localSvg</title>
+<path fill="#eff6ff" stroke="#475569" d="M996.5,-456C996.5,-456 841.5,-456 841.5,-456 835.5,-456 829.5,-450 829.5,-444 829.5,-444 829.5,-432 829.5,-432 829.5,-426 835.5,-420 841.5,-420 841.5,-420 996.5,-420 996.5,-420 1002.5,-420 1008.5,-426 1008.5,-432 1008.5,-432 1008.5,-444 1008.5,-444 1008.5,-450 1002.5,-456 996.5,-456" />
+<text text-anchor="middle" x="919" y="-434.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">本地 SVG：渲染与资源检查</text>
+</g>
+
+<g id="edge4" class="edge">
+<title>dotSources-&gt;localSvg</title>
+<path fill="none" stroke="#475569" d="M919,-503.61C919,-492.23 919,-477.16 919,-464.44" />
+<polygon fill="#475569" stroke="#475569" points="921.8,-464.08 919,-456.08 916.2,-464.08 921.8,-464.08" />
+<text text-anchor="middle" x="953" y="-477.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">受锁工具渲染</text>
+</g>
+
+<g id="edge5" class="edge">
+<title>sourceChecks-&gt;siteBuild</title>
+<path fill="none" stroke="#475569" d="M196.32,-419.96C266.45,-406.43 364.4,-387.53 436.57,-373.61" />
+<polygon fill="#475569" stroke="#475569" points="437.47,-376.28 444.79,-372.02 436.41,-370.78 437.47,-376.28" />
+<text text-anchor="middle" x="369" y="-393.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">合格正文</text>
+</g>
+
+<g id="edge6" class="edge">
+<title>apiXml-&gt;siteBuild</title>
+<path fill="none" stroke="#475569" d="M533,-419.61C533,-408.23 533,-393.16 533,-380.44" />
+<polygon fill="#475569" stroke="#475569" points="535.8,-380.08 533,-372.08 530.2,-380.08 535.8,-380.08" />
+<text text-anchor="middle" x="556" y="-393.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">本次 XML</text>
+</g>
+
+<g id="edge7" class="edge">
+<title>statusViews-&gt;siteBuild</title>
+<path fill="none" stroke="#475569" d="M685.54,-419.81C654.94,-406.81 612.84,-388.92 580.62,-375.23" />
+<polygon fill="#475569" stroke="#475569" points="581.53,-372.58 573.07,-372.03 579.34,-377.73 581.53,-372.58" />
+<text text-anchor="middle" x="676" y="-393.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">合格状态视图</text>
+</g>
+
+<g id="edge9" class="edge">
+<title>localSvg-&gt;siteBuild</title>
+<path fill="none" stroke="#475569" d="M847.86,-419.94C808.73,-410.73 759.27,-399.35 715,-390 688.61,-384.42 659.99,-378.75 633.43,-373.63" />
+<polygon fill="#475569" stroke="#475569" points="633.64,-370.82 625.25,-372.06 632.58,-376.32 633.64,-370.82" />
+<text text-anchor="middle" x="789" y="-393.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">图与来源</text>
+</g>
+
+<g id="node11" class="node">
+<title>html</title>
+<path fill="#eff6ff" stroke="#475569" d="M612,-288C612,-288 454,-288 454,-288 448,-288 442,-282 442,-276 442,-276 442,-264 442,-264 442,-258 448,-252 454,-252 454,-252 612,-252 612,-252 618,-252 624,-258 624,-264 624,-264 624,-276 624,-276 624,-282 618,-288 612,-288" />
+<text text-anchor="middle" x="533" y="-266.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">HTML / 搜索 / 图 / 语言入口</text>
+</g>
+
+<g id="edge10" class="edge">
+<title>siteBuild-&gt;html</title>
+<path fill="none" stroke="#475569" d="M533,-335.61C533,-324.23 533,-309.16 533,-296.44" />
+<polygon fill="#475569" stroke="#475569" points="535.8,-296.08 533,-288.08 530.2,-296.08 535.8,-296.08" />
+<text text-anchor="middle" x="567" y="-309.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">本次成功输出</text>
+</g>
+
+<g id="node12" class="node">
+<title>identity</title>
+<path fill="#eff6ff" stroke="#475569" d="M584.5,-204C584.5,-204 481.5,-204 481.5,-204 475.5,-204 469.5,-198 469.5,-192 469.5,-192 469.5,-180 469.5,-180 469.5,-174 475.5,-168 481.5,-168 481.5,-168 584.5,-168 584.5,-168 590.5,-168 596.5,-174 596.5,-180 596.5,-180 596.5,-192 596.5,-192 596.5,-198 590.5,-204 584.5,-204" />
+<text text-anchor="middle" x="533" y="-182.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">身份与文档包验真</text>
+</g>
+
+<g id="edge11" class="edge">
+<title>html-&gt;identity</title>
+<path fill="none" stroke="#475569" d="M533,-251.61C533,-240.23 533,-225.16 533,-212.44" />
+<polygon fill="#475569" stroke="#475569" points="535.8,-212.08 533,-204.08 530.2,-212.08 535.8,-212.08" />
+<text text-anchor="middle" x="620" y="-225.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">绑定 code / docs / qualified source</text>
+</g>
+
+<g id="node13" class="node">
+<title>online</title>
+<path fill="#f0fdf4" stroke="#475569" d="M511.5,-120C511.5,-120 344.5,-120 344.5,-120 338.5,-120 332.5,-114 332.5,-108 332.5,-108 332.5,-96 332.5,-96 332.5,-90 338.5,-84 344.5,-84 344.5,-84 511.5,-84 511.5,-84 517.5,-84 523.5,-90 523.5,-96 523.5,-96 523.5,-108 523.5,-108 523.5,-114 517.5,-120 511.5,-120" />
+<text text-anchor="middle" x="428" y="-98.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">不可变版本 / stable 文档入口</text>
+</g>
+
+<g id="edge12" class="edge">
+<title>identity-&gt;online</title>
+<path fill="none" stroke="#475569" d="M510.99,-167.81C495.17,-155.46 473.7,-138.69 456.56,-125.3" />
+<polygon fill="#475569" stroke="#475569" points="458.01,-122.88 449.98,-120.17 454.56,-127.3 458.01,-122.88" />
+<text text-anchor="middle" x="510" y="-141.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">实际部署</text>
+</g>
+
+<g id="node14" class="node">
+<title>offline</title>
+<path fill="#f0fdf4" stroke="#475569" d="M720.5,-120C720.5,-120 557.5,-120 557.5,-120 551.5,-120 545.5,-114 545.5,-108 545.5,-108 545.5,-96 545.5,-96 545.5,-90 551.5,-84 557.5,-84 557.5,-84 720.5,-84 720.5,-84 726.5,-84 732.5,-90 732.5,-96 732.5,-96 732.5,-108 732.5,-108 732.5,-114 726.5,-120 720.5,-120" />
+<text text-anchor="middle" x="639" y="-98.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">相对链接离线包 / 校验 / 许可</text>
+</g>
+
+<g id="edge13" class="edge">
+<title>identity-&gt;offline</title>
+<path fill="none" stroke="#475569" d="M555.22,-167.81C571.19,-155.46 592.87,-138.69 610.17,-125.3" />
+<polygon fill="#475569" stroke="#475569" points="612.19,-127.28 616.81,-120.17 608.77,-122.85 612.19,-127.28" />
+<text text-anchor="middle" x="621.5" y="-141.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">封存文档包</text>
+</g>
+
+<g id="node15" class="node">
+<title>restore</title>
+<path fill="#f0fdf4" stroke="#475569" d="M609,-36C609,-36 457,-36 457,-36 451,-36 445,-30 445,-24 445,-24 445,-12 445,-12 445,-6 451,0 457,0 457,0 609,0 609,0 615,0 621,-6 621,-12 621,-12 621,-24 621,-24 621,-30 615,-36 609,-36" />
+<text text-anchor="middle" x="533" y="-14.6" font-family="Noto Sans CJK SC" font-size="13.00" fill="#0f172a">实际发布后检查 / 独立恢复</text>
+</g>
+
+<g id="edge14" class="edge">
+<title>online-&gt;restore</title>
+<path fill="none" stroke="#475569" d="M450.01,-83.81C465.83,-71.46 487.3,-54.69 504.44,-41.3" />
+<polygon fill="#475569" stroke="#475569" points="506.44,-43.3 511.02,-36.17 502.99,-38.88 506.44,-43.3" />
+<text text-anchor="middle" x="521" y="-57.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">核对在线身份</text>
+</g>
+
+<g id="edge15" class="edge">
+<title>offline-&gt;restore</title>
+<path fill="none" stroke="#475569" d="M616.78,-83.81C600.81,-71.46 579.13,-54.69 561.83,-41.3" />
+<polygon fill="#475569" stroke="#475569" points="563.23,-38.85 555.19,-36.17 559.81,-43.28 563.23,-38.85" />
+<text text-anchor="middle" x="638.5" y="-57.2" font-family="Noto Sans CJK SC" font-size="11.00" fill="#0f172a">取得、浏览和验真</text>
+</g>
+</g>
+</svg>

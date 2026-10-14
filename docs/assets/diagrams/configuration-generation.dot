@@ -1,0 +1,35 @@
+// FIG-03 current: build-time inputs and artifacts.
+// Code basis: 929a3bd684152fc3d49717bbd51497f554e5e8d5.
+// Edges denote configuration/production flow, not runtime I/O.
+digraph configurationGeneration {
+    graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    assembly [label="一份 authored TOML", fillcolor="#f8fafc"];
+    socFacts [label="SoC / CPU / routes 事实", fillcolor="#f8fafc"];
+    boardFacts [label="Board 接线与来源事实", fillcolor="#f8fafc"];
+    resolver [label="严格解析：字段、模式、资源、输入身份"];
+    typedIr [label="不可变 typed IR"];
+    bundle [label="事务生成与原子发布"];
+    outputs [label="静态实例 / factory / 配置 / 内存预算"];
+    targets [label="CMake：唯一软件目标图"];
+    ninja [label="Ninja：编译、链接、资源检查"];
+    firmware [label="ELF / BIN / map / 资源报告", fillcolor="#f0fdf4"];
+    rejected [label="拒绝 / 生成失败", fillcolor="#fff7ed"];
+    invalidated [label="owned bundle 失效，不暴露半成品", fillcolor="#fff7ed"];
+    assembly -> resolver [label="产品选择"];
+    socFacts -> resolver [label="芯片能力"];
+    boardFacts -> resolver [label="Board 授权"];
+    resolver -> typedIr [label="验证通过"];
+    typedIr -> bundle [label="生成选定内容"];
+    bundle -> outputs [label="成功发布"];
+    outputs -> targets [label="配置与生成源"];
+    targets -> ninja [label="执行目标图"];
+    ninja -> firmware [label="本次实际产物"];
+    resolver -> rejected [label="非法 / 冲突 / 变化"];
+    bundle -> rejected [label="生成或发布失败"];
+    rejected -> invalidated [label="仅清理拥有的输出"];
+}

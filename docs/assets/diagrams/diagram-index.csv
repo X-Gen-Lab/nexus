@@ -1,0 +1,16 @@
+diagram_id,title,kind,source_dot,rendered_svg,render_status,review_status,code_basis,task_id,scope
+FIG-01,当前平台运行时访问,current,platform-runtime.dot,platform-runtime.svg,rendered,source_reviewed,929a3bd684152fc3d49717bbd51497f554e5e8d5,DOC-43,运行时视图；完整分层与编译依赖仍需其他图
+FIG-02,编译目标依赖,current,,,planned,not_started,,DOC-44,以实际CMake目标图核对
+FIG-03,配置与生成,current,configuration-generation.dot,configuration-generation.svg,rendered,source_reviewed,929a3bd684152fc3d49717bbd51497f554e5e8d5,DOC-45,输入产物链路，不表示运行调用或HIL
+FIG-04,factory与实例结构,current,,,planned,not_started,,DOC-46,共享ops、独立state和controller/endpoint
+FIG-05,初始化与失败撤回,current,,,planned,not_started,,DOC-47,失败效果和责任保持
+FIG-06,Core请求状态与借用,current,request-lifecycle.dot,request-lifecycle.svg,rendered,source_reviewed,929a3bd684152fc3d49717bbd51497f554e5e8d5,DOC-48,有效对象的Core迁移；不承诺所有provider恢复API
+FIG-07,UART与SPI DMA时序,reference,,,planned,not_started,,DOC-49,选定模式和具体完成/失败条件
+FIG-08,wait wake与退出,current,,,planned,not_started,,DOC-50,谓词、执行推进和真实退出分开
+FIG-09,CPU内存DMA Cache,reference,,,planned,not_started,,DOC-51,精确SoC和配置；不从内核名猜可达性
+FIG-10,Source SDK消费,current,,,planned,not_started,,DOC-52,实际外部consumer与搬移
+FIG-11,软件与HIL证据,current,,,planned,not_started,,DOC-53,分别取得实际证据后按scope准入
+FIG-12,目标文档发布与恢复,target,documentation-target.dot,documentation-target.svg,rendered,design_reviewed,,DOC-54,本次规划；SDK/档案独立恢复视图尚待补齐
+FIG-13,Cortex M能力分层,current,,,planned,not_started,,DOC-55,CPU原语/Runtime/SoC/实板资格分开
+FIG-14,U575同步双域,reference,,,planned,not_started,,DOC-56,仅TZEN1无OS同步GPIO参考
+FIG-15,连续流与可见丢块,reference,,,planned,not_started,,DOC-57,选定UART/ADC流与服务条件

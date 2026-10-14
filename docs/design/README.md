@@ -8,7 +8,11 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | 文档 | 用途 |
 |---|---|
 | [文档系统架构与交付规划](documentation-system.md) | 读者任务、单一正文、MyST/API、双语、门禁、版本与离线交付的目标方案 |
-| [文档系统40项台账](documentation-system-execution.csv) | 新规划的依赖、退出条件与实际实施/验证状态；初始均 planned |
+| [文档系统58项台账](documentation-system-execution.csv) | 保留DOC-01至40并补内容/图示任务；依赖、退出条件与实施/验证分别记录 |
+| [完整文档优化清单](documentation-improvements.md) | 从同一台账派生的读者清单，不建立第二份状态权威 |
+| [内容与图示标准](documentation-standards.md) | 清晰表达、规范用语、事实/资格、示例、架构图和独立审查约束 |
+| [页面模板](documentation-templates.md) | tutorial/how-to/reference/explanation/status必需问题 |
+| [当前与目标参考图](../assets/diagrams/README.md) | 四个本地SVG和DOT图源；完整15类图册范围单独记录 |
 | [文档迁移映射](documentation-migration.csv) | 当前正文、工具和相邻 README 的去向；保留原资格与台账身份 |
 | [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
 | [工程手册](engineering-handbook.md) | 既有格式/注释、工具、自动化、证据与发布 |
