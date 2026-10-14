@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Add a reviewed Board package &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Add a SoC, provider or reusable component" href="provider-porting.html" />
+    <link rel="prev" title="Task guides" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/guides/board-porting.md">3835e13cd7da</a>; code reference: 3835e13cd7da. <a href="../../zh_CN/guides/board-porting.html" lang="zh-CN">zh_CN</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="add-a-reviewed-board-package">
+<span id="docs-guides-board-porting"></span><h1>Add a reviewed Board package<a class="headerlink" href="#add-a-reviewed-board-package" title="Link to this heading">¶</a></h1>
+<p>Use this guide when the exact SoC already has a maintained provider. A Board adds
+PCB facts and reviewed bindings; it does not copy a vendor SDK or authorize every
+silicon route. Actual unobserved PCB revision, bridges and voltage stay unknown.</p>
+<section id="gather-the-minimum-facts">
+<h2>Gather the minimum facts<a class="headerlink" href="#gather-the-minimum-facts" title="Link to this heading">¶</a></h2>
+<p>Record the full part, package, source document revision and retained provenance.
+Record oscillator values, supply conditions, SWD reservations, pins, active levels,
+jumper conditions and safe initial outputs. Distinguish document defaults from an
+observation of your particular board. Start with one LED and one console route.</p>
+<p>The following is a complete maintained Board file, including <code class="docutils literal notranslate"><span class="pre">soc_family</span></code>:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Source-reviewed Qiming V3.1 facts; physical PCB revision remains unknown.</span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"schema_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stm32f407zg-qiming-v31"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"soc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"STM32F407ZGT6"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"soc_family"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stm32f407"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"source_revision"</span><span class="p">:</span><span class="w"> </span><span class="s2">"V3.1"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"physical_pcb_revision"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"clocks"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"hse_hz"</span><span class="p">:</span><span class="w"> </span><span class="mi">8000000</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"bindings"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"led0"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GPIOE"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"route"</span><span class="p">:</span><span class="w"> </span><span class="s2">"gpio-pe3"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"initial"</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"mask"</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"led1"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GPIOE"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"route"</span><span class="p">:</span><span class="w"> </span><span class="s2">"gpio-pe4"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"initial"</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"mask"</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"led2"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GPIOG"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"route"</span><span class="p">:</span><span class="w"> </span><span class="s2">"gpio-pg9"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"initial"</span><span class="p">:</span><span class="w"> </span><span class="mi">512</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"mask"</span><span class="p">:</span><span class="w"> </span><span class="mi">512</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"uart1"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USART1"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"route"</span><span class="p">:</span><span class="w"> </span><span class="s2">"usart1-pa9-pa10"</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"flash0"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FLASH"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"route"</span><span class="p">:</span><span class="w"> </span><span class="s2">"flash-internal"</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"iwdg0"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"IWDG"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"route"</span><span class="p">:</span><span class="w"> </span><span class="s2">"iwdg"</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"can1"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CAN1"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"route"</span><span class="p">:</span><span class="w"> </span><span class="s2">"can1-pa11-pa12"</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"can2"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"controller"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CAN2"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"route"</span><span class="p">:</span><span class="w"> </span><span class="s2">"can2-pb12-pb13"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"reserved_resources"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">"PA13"</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">"PA14"</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"unknowns"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">"Physical PCB revision and fitted options not inspected"</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">"SPI/I2C/PWM/ADC/EXTI external wiring not bound or physically qualified"</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">"CAN optional fitted transceivers, termination and jumper positions not inspected; software pad routes only, physical CAN qualification not executed"</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"provenance"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://github.com/petercwq/STM32407/blob/master/启明欣欣407开发板(高配版)V3.1例程使用手册.pdf"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"V3.1 LED identities and low-active behavior"</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"repository"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://github.com/petercwq/STM32407"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"tree"</span><span class="p">:</span><span class="w"> </span><span class="s2">"08c5f513f1677388fcacaa519dca0c9ef00b6d2e"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"led_header_blob"</span><span class="p">:</span><span class="w"> </span><span class="s2">"63ed6144e8d33f947fbe2784a9962d2913028ac8"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"led_source_blob"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4adeb6f04323f6c8ae4eabf3308334e3e6910277"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"clock_source_blob"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e99736d005f731db67300447d77ce96901d4c3ec"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"uart_source_blob"</span><span class="p">:</span><span class="w"> </span><span class="s2">"e0f9a0fdf6633de6ef5f1c451c2966f22dae204b"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LED pins and inactive initialization; HSE_VALUE 8 MHz with PLL_M 8 / PLL_N 336 / PLL_P 2; USART1 PA9/PA10 AF7"</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"repository"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://github.com/petercwq/STM32407"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"tree"</span><span class="p">:</span><span class="w"> </span><span class="s2">"08c5f513f1677388fcacaa519dca0c9ef00b6d2e"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CAN1 sample blob 8731616cf0d5bf02917c76463c49e722b39eb415 PA11/PA12 AF9; CAN2 blob ef8da679c5e7c7163fe2a48a80b6ce8f9d6ecfaa PB12/PB13 AF9. Fitted transceiver options and jumper positions require commissioning inspection."</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>The <a class="reference internal" href="../design/integration-contracts.html"><span class="std std-doc">integration contract</span></a> owns
+field and resource requirements. Keep your Board package in its external product
+repository when it describes private PCB data. Public reusable packages live under
+<code class="docutils literal notranslate"><span class="pre">boards/</span></code>; ordinary packages require only <code class="docutils literal notranslate"><span class="pre">board.json</span></code> and a README. Add bounded
+neutral Board hooks only for electrical actions not expressible by maintained data.</p>
+</section>
+<section id="validate-through-the-actual-resolver">
+<h2>Validate through the actual resolver<a class="headerlink" href="#validate-through-the-actual-resolver" title="Link to this heading">¶</a></h2>
+<p>From the Nexus repository root, inspect a known-good reference before authoring:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/configure/configure.py<span class="w"> </span>list-bindings<span class="w">     </span>--assembly<span class="w"> </span>tools/configure/assemblies/qiming-baremetal-uart.toml
+python<span class="w"> </span>tools/configure/configure.py<span class="w"> </span>check<span class="w">     </span>--assembly<span class="w"> </span>tools/configure/assemblies/qiming-baremetal-uart.toml
+python<span class="w"> </span>tools/configure/configure.py<span class="w"> </span>explain<span class="w">     </span>--assembly<span class="w"> </span>tools/configure/assemblies/qiming-baremetal-uart.toml
+</pre></div>
+</div>
+<p>For your package, select <code class="docutils literal notranslate"><span class="pre">board_package</span></code> in an external complete assembly and run
+those same commands with its absolute path. Relative package paths resolve from
+the authored assembly. A JSON syntax check alone cannot prove SoC identity, clock,
+route or resource compatibility. Unknown fields and unreviewed routes must reject.</p>
+</section>
+<section id="build-and-record-the-selected-scope">
+<h2>Build and record the selected scope<a class="headerlink" href="#build-and-record-the-selected-scope" title="Link to this heading">¶</a></h2>
+<p>Configure your external consumer using its assembly and the locked ARM toolchain.
+Keep baremetal and FreeRTOS in separate output roots. Check resolved claims,
+vector/startup, strong handlers, ELF/BIN/map and every physical RAM/Flash budget.
+Factory lookup must be pure before start and instance state must remain isolated.
+Use a software Board fixture for model/link testing; label its wiring accordingly.</p>
+<p>Prepare <a class="reference internal" href="performance-hil.html"><span class="std std-doc">HIL plans</span></a> without equipment. Physical qualification
+requires a separately reviewed station, observed Board/part/UID/probe/wiring,
+exact image and real raw measurements. Source-reviewed pads never establish
+connector continuity, immunity or safe electrical behavior.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Task guides</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Add a reviewed Board package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html">Add a SoC, provider or reusable component</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html">Wait correctly and shut down an explicit owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migrate legacy configuration and interface access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html">Measure resources and prepare hardware acceptance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

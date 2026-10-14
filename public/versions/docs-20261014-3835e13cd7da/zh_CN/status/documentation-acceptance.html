@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>文档系统实施与正式验收 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="HIL 与实板状态" href="hardware.html" />
+    <link rel="prev" title="软件验证、源码身份与证据" href="software-verification.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/status/documentation-acceptance.md">3835e13cd7da</a>; code reference: 3835e13cd7da. <a href="../../en/status/documentation-acceptance.html" lang="en">en</a>. Source language: zh_CN; requested: zh_CN; actual: zh_CN; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="status-documentation-acceptance">
+<span id="id1"></span><h1>文档系统实施与正式验收<a class="headerlink" href="#status-documentation-acceptance" title="Link to this heading">¶</a></h1>
+<p>本页只解释文档系统的交付证据。平台固件资格仍引用原精确代码索引，MCU HIL
+仍为 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。文档渲染、浏览、发布或归档成功不会增加芯片和板卡资格。</p>
+<p><a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">58</span> <span class="pre">项源台账</span></code></a>是任务、实现和验收值的
+唯一权威；<a class="reference internal" href="../design/documentation-improvements.html"><span class="std std-doc">可读清单</span></a>和
+<a class="reference internal" href="ledgers/documentation-system.html"><span class="std std-doc">逐项原字段</span></a>由同一源自动生成。
+<a class="reference download internal" download="" href="../_downloads/a975512301d2ad733ba44c087f43da20/documentation-results.json"><code class="xref download docutils literal notranslate"><span class="pre">文档交付结果索引</span></code></a>定位真实执行及需要正式证据的范围，
+不另维护一份任务完成率。</p>
+<section id="id2">
+<h2>按证据范围解释状态<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>状态或记录</p></th>
+<th class="head"><p>能证明的范围</p></th>
+<th class="head"><p>不能自动证明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implemented</span></code></p></td>
+<td><p>当前页面、图源、CLI、门禁和交付机制已落入源文件</p></td>
+<td><p>原退出条件、实板或公开部署全部完成</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">development_passed</span></code></p></td>
+<td><p>已发生的开发检查、预览、示例、图文审查或工具回归</p></td>
+<td><p>当前未封存 HEAD 的正式发布资格</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pending_formal_evidence</span></code></p></td>
+<td><p>已准备执行路径，仍待本次准确来源的实际证据</p></td>
+<td><p>可据此升级为 passed</p></td>
+</tr>
+<tr class="row-odd"><td><p>clean-source 文档构建</p></td>
+<td><p>本次干净源码、锁定工具、双语 HTML 和 Doxygen 输出</p></td>
+<td><p>固件重新执行或 MCU HIL</p></td>
+</tr>
+<tr class="row-even"><td><p>文档 package／verify</p></td>
+<td><p>同字节 payload、三类源码身份与许可闭包</p></td>
+<td><p>已公开部署、下载或独立恢复</p></td>
+</tr>
+<tr class="row-odd"><td><p>post-deploy 与独立 restore</p></td>
+<td><p>真实站点与下载身份、恢复后字节及适用浏览范围</p></td>
+<td><p>全部历史固件 tests、产品安全或长期支持</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>原退出条件完整保留。发布、发布后验证、独立恢复与长期存储、最终独立审查，以及
+浏览器／放大／打印／离线验收要取得各自正式证据后逐项关闭。具体待处理编号和
+实际状态以源台账及同源可读清单为准，不从一张预览截图推断完成。</p>
+</section>
+<section id="id3">
+<h2>当前源码与既有资格分别定位<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>正式文档包的 <code class="docutils literal notranslate"><span class="pre">documentation-manifest.json</span></code> 分开记录 <code class="docutils literal notranslate"><span class="pre">documentation_source</span></code>、
+<code class="docutils literal notranslate"><span class="pre">code_source</span></code> 和 <code class="docutils literal notranslate"><span class="pre">qualified_code</span></code>。前两项由实际干净构建和封存取得，不能预先填入
+将来的 commit 或 tree。预览先读 <code class="docutils literal notranslate"><span class="pre">documentation-build.json</span></code>，修改过的工作树明确
+是开发来源。本站引用的固件资格 <code class="docutils literal notranslate"><span class="pre">cc6a065c</span></code> 及两份原 SoC 索引保持原身份，见
+<a class="reference internal" href="software-verification.html"><span class="std std-doc">软件验证入口</span></a>。</p>
+<p>验收结果索引中的空值表示该正式身份、locator 或摘要尚未取得。结果应由实际
+receipt 回填，并核对同一 source/config/tool/output；不能用占位摘要或自行填写
+<code class="docutils literal notranslate"><span class="pre">passed</span></code> 代替执行。</p>
+</section>
+<section id="id4">
+<h2>长期取得证据<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>正式证据预期随独立 GitHub 文档发行版本提供：文档离线包、文档执行证据归档、
+外层 receipt 和校验摘要分开交付。索引记录真实 release URL、资产 URL、归档
+SHA-256／bytes 和归档中的 member path。取得后先检查归档字节，再核对指定
+member 的 bytes／SHA-256，最后读取实际命令、退出码和原始结果。</p>
+<p>当前结果框架不提供尚未发生的 release 或资产下载链接。仅有 <code class="docutils literal notranslate"><span class="pre">/workspace</span></code> 或
+<code class="docutils literal notranslate"><span class="pre">/tmp</span></code> 定位不足以建立长期取得性；短期 CI artifact 也不能替代所需的长期版本。
+索引中的 <code class="docutils literal notranslate"><span class="pre">expected_member_paths</span></code> 只说明待封存目录安排，必须在实际归档生成后
+用其 inventory 确认，才可改为已取得成员。</p>
+<p>独立恢复须从公开取得的同字节包进入新的根目录，使用实际浏览器核对桌面、窄屏、
+放大、打印、离线导航、搜索、本地图和关键读者任务。保存实际观察及失败重试，
+不要把 XML／HTML parser 检查或 PNG 源图审查称为这些浏览器验收。</p>
+<p>交付和拒绝规则见 <a class="reference internal" href="../reference/documentation-delivery.html"><span class="std std-doc">文档交付合同</span></a>。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">状态与证据</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="support.html">支持范围与选型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software-verification.html">软件验证、源码身份与证据</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">文档系统实施与正式验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hardware.html">HIL 与实板状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ledgers.html">原台账、退出条件与派生视图</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roadmap.html">迭代方向与进入条件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

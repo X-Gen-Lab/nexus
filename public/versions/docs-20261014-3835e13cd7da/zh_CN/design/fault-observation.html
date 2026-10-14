@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>故障观测与保留责任 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="显式 I2C 总线恢复" href="i2c-bus-clear.html" />
+    <link rel="prev" title="Raw Ethernet MAC, MDIO and DP83848" href="ethernet.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/design/fault-observation.md">3835e13cd7da</a>; code reference: 3835e13cd7da. <a href="../../en/design/fault-observation.html" lang="en">en</a>. Source language: zh_CN; requested: zh_CN; actual: zh_CN; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="id1">
+<h1>故障观测与保留责任<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>Core 的 <code class="docutils literal notranslate"><span class="pre">nx_fault_observe(domain,</span> <span class="pre">reason,</span> <span class="pre">file,</span> <span class="pre">line)</span></code> 是一个可覆盖的有限
+观测入口。弱默认实现没有状态、分配、队列、OS 锁或副作用；没有隐含事件
+对象、registry、worker 或实例 RAM。四个标量参数避免将临时事件结构作为
+借用对象传给产品。产品若需要记录，必须提供一个强实现和自身的静态存储。</p>
+<section id="id2">
+<h2>终止调用路径<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>维护的 FreeRTOS 默认 assert/stack-overflow hook 在 park 前调用观测入口。
+stack hook 不解引用可能损坏的 task/name。返回的 observer 不会允许损坏
+的内核继续执行，也不会释放 request、栈、TCB、IRQ 或 DMA 借用。</p>
+<p>FreeRTOS terminal path 用只读 Arch leaf 读取当前 masks。已有 PRIMASK、
+FAULTMASK，或者等于/强于 kernel ceiling 的 BASEPRI 保持不变；其他情况
+使用实际 port 的禁用操作。这样不会被 Mainline port 的直接 BASEPRI store
+减弱已有 mask。Baseline/POSIX 编译仍遵循各自 port，不声称主机有 MCU IRQ。
+这是单核终止合同；observer 必须保持进入时的 masks。</p>
+<p><code class="docutils literal notranslate"><span class="pre">nx_freertos_assert_failed</span></code> 和 stack hook 本身仍允许强覆盖。直接覆盖它们
+会替换默认观测，因此产品须显式保留 <code class="docutils literal notranslate"><span class="pre">nx_fault_observe</span></code> 调用，并保证
+non-returning。公共声明保持 C11/C++ ABI；返回到损坏的 <code class="docutils literal notranslate"><span class="pre">configASSERT</span></code> 调用者
+不属于允许行为。</p>
+<p>ThreadX 在中央 adapter fail-stop 和 M4 外部 timer setup 失败处，先观测，再
+调用产品 fail-stop port。产品 port 返回时 adapter 继续保留并 park；不会
+假装 kernel startup、任务 borrow 或 clock effects 已撤销。其支持范围仍以
+ThreadX 文档与实际 target 为准，不继承所有 FreeRTOS CPU 组合。</p>
+</section>
+<section id="id3">
+<h2>产品合同与限制<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>observer 在原来的 task、ISR 或已屏蔽中断上下文运行，权限和上下文不会被
+规范化。它必须有界、无分配，不获取 OS 锁、不进入 provider、不改变
+accepted request、不释放 retained storage，也不能假定 kernel、clock、
+stack、transport 或 peripheral 仍工作。文件名仅为静态源码 literal 或
+NULL；不能解引用未知动态内存。损坏栈的观测是 best effort。</p>
+<p>kernel ceiling 不是所有中断的全局静止证明，也不撤销 NMI、DMA 或外围电气
+效果。该 API 不实现安全输出、复位、Flash 持久化、loan 回收或安全认证。
+产品可实现另行审查的 non-returning recovery；责任仍由外部工程承担。</p>
+<p><code class="docutils literal notranslate"><span class="pre">nexus-examples/apps/uart_owner_runtime/fault_policy.*</span></code> 演示一个 caller-owned
+首故障记录和明确的产品 output port。先 release 发布诊断，再调用 port；
+嵌套/重复报告不能重复输出动作或替换首个故障。未提供或失败的 port 保持
+未验证，不 cleanup/reset/reclaim。示例默认不选择任何 GPIO 或假定板级安全
+电平。成功的软件 callback 也不证明实际电气安全，仍需产品/Board/HIL 验收。</p>
+<p>Google death contracts 验证默认 hook 的观测→mask→park 顺序、坏 task/name
+不解引用、返回 observer 保留 loan，以及强/等/弱 BASEPRI、PRIMASK 和
+FAULTMASK。它们使用真实默认生产 hook 和明确的 port/Arch leaf 模型；
+实际故障后的可记录性、物理安全输出及最坏时间没有实板资格。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

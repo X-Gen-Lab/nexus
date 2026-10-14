@@ -1,0 +1,57 @@
+// FIG-14 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph U575SecurityDomains {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-14 U575 TZEN=1：无 OS 同步 GPIO 双域参考
+独立 Secure / NS 镜像，不是默认 TZEN0 Platform"];
+    boot [label="外部 boot / provisioning owner
+2 MiB、bank1 Secure、bank2 NS pages
+供给布局/向量/选项字节，机制不写 option bytes", fillcolor="#f8fafc"];
+    attribution [label="Secure cold owner：无活动世界 / IRQ / DMA
+SRAM1 Secure；未来 NS SRAM3先清零再去分类
+GTZC/MPCBB + SAU 3 spans + NS MPU
+读取并清除实际 8或16 regions，锁定 / readback"];
+    failed [label="admission 后任何错误：FAILED + effects
+不可逆归属保留到 reset，无 rollback", fillcolor="#fff7ed"];
+    ready [label="READY → RUNNING → 实际 CMSE entry
+NS unprivileged Thread；意外返回 fail-stop"];
+    subgraph clusterNS {
+        label="NonSecure：静态映射，无 RTOS / handlers / autonomous masters"; color="#64748b";
+        ns [label="NS caller + 明确 NS RAM request/output
+固定 world principal，不信任消息中的 task ID"];
+        nsDone [label="NS 收到同步返回
+输入/输出存储的最终访问已退出"];
+    }
+    subgraph clusterSecure {
+        label="Secure privileged Thread：独占同步 gateway"; color="#64748b";
+        sg [label="真实 SG：验证 NS caller / Thread / RUNNING
+保存并屏蔽 NS interrupts"];
+        pin [label="限制明确 NS RAM span + CMSE unprivileged check
+静态归属与无并发前提下同步 pin"];
+        snapshot [label="有界复制输入到 Secure snapshot
+固定 PC7 grant，输出跨度预验证"];
+        gpio [label="UserIoBroker：scalar GPIO read / set-reset
+不授权任意 MMIO / callback / 异步 DMA"];
+        copy [label="最终 output copy → unpin → 恢复 NS mask
+cleanup 不重放 GPIO；不可能 release 失败则终止"];
+    }
+    boot -> attribution [label="启动前真实条件与参数"];
+    attribution -> ready [label="全部权限 / locks / vectors readback"];
+    attribution -> failed [label="取得效果后失败"];
+    ready -> ns [label="进入 NS unprivileged Thread"];
+    ns -> sg [label="同步 SG 调用"];
+    sg -> pin [label="真实 principal 与序列化前提"];
+    pin -> snapshot [label="pin 成功；check 本身不 pin"];
+    snapshot -> gpio [label="授权且输出预验证通过"];
+    gpio -> copy [label="单次结果，不自动重放"];
+    copy -> nsDone [label="同步 return"];
+}

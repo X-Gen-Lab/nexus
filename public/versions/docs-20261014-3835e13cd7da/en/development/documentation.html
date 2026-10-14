@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Maintain clear and verifiable documentation &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Find the implementation authority" href="implementation-map.html" />
+    <link rel="prev" title="Develop with TDD and normal commit gates" href="workflow.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/development/documentation.md">3835e13cd7da</a>; code reference: 3835e13cd7da. <a href="../../zh_CN/development/documentation.html" lang="zh-CN">zh_CN</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="maintain-clear-and-verifiable-documentation">
+<span id="docs-development-documentation"></span><h1>Maintain clear and verifiable documentation<a class="headerlink" href="#maintain-clear-and-verifiable-documentation" title="Link to this heading">¶</a></h1>
+<p>Use the <a class="reference internal" href="../design/documentation-standards.html"><span class="std std-doc">content and diagram standard</span></a> and
+<a class="reference internal" href="../design/documentation-templates.html"><span class="std std-doc">five page templates</span></a> for every new or changed
+page. Keep one authoritative contract and one canonical prose source. Current
+implementation, target design and exact reference configurations remain distinct.</p>
+<section id="write-around-a-reader-task">
+<h2>Write around a reader task<a class="headerlink" href="#write-around-a-reader-task" title="Link to this heading">¶</a></h2>
+<p>State the result, prerequisites and limit at the start. Explain who acts, on what
+input, in which context, and what observable result or failure follows. Use stable
+terms and explicit units. Keep raw hashes/logs in evidence links rather than the
+operation narrative. Do not replace scope with claims such as complete support.</p>
+<p>Tutorials provide a complete maintained fixture or pinned external consumer,
+actual commands, expected results and cleanup. Use literalinclude for source-owned
+inputs. Fragments state why they are incomplete. Ordinary document builds do not
+execute arbitrary Markdown commands, fetch latest examples or operate hardware.</p>
+</section>
+<section id="review-diagrams-and-translations">
+<h2>Review diagrams and translations<a class="headerlink" href="#review-diagrams-and-translations" title="Link to this heading">¶</a></h2>
+<p>A diagram has an ID, scope, caption, alt text, editable source and local SVG.
+Label arrow meanings, optional paths, owners and failure responsibility. Review
+against actual code/contract, then render and inspect text, line crossings, zoom,
+print and offline resources. Successful rendering alone does not prove semantics.</p>
+<p>English canonical pages use gettext PO for Chinese; canonical Chinese contracts
+keep their source language. A translation tracks the actual canonical source digest,
+actual extracted messages and independent review. Changed source, fuzzy or missing
+messages display the true status instead of pretending a complete translation.
+Do not translate C symbols, configuration keys, result codes or original receipts.
+Use the <a class="reference download internal" download="" href="../_downloads/6e8a1c4b7a6c20973fafcb507322ea78/terminology.csv"><code class="xref download docutils literal notranslate"><span class="pre">reviewed</span> <span class="pre">bilingual</span> <span class="pre">terminology</span></code></a> for these shared
+terms; its authority links preserve the single contract.</p>
+</section>
+<section id="apply-the-correct-acceptance-boundary">
+<h2>Apply the correct acceptance boundary<a class="headerlink" href="#apply-the-correct-acceptance-boundary" title="Link to this heading">¶</a></h2>
+<p>Follow the unified document commands documented by the current CLI. A source check,
+strict bilingual build, real configuration/consumer execution, diagram audit, offline
+package and actual published-site check are separate results. Record command exits
+and exact inputs; never claim deployment from local HTML or hardware from a plan.</p>
+<p>The <a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">documentation</span> <span class="pre">ledger</span></code></a> owns
+implementation and validation exits. The migration map preserves historical paths;
+old API redirects point to a version-aware migration or history page, not silently
+to a different new function contract. Retain qualification records at their original
+paths and identities.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintaining Nexus</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Develop with TDD and normal commit gates</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Maintain clear and verifiable documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation-map.html">Find the implementation authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html">Coding Standards</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

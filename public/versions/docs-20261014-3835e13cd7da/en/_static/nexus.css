@@ -1,0 +1,75 @@
+/* Keep normal text sizing; constrain overflow at the content that causes it. */
+div.body,
+div.bodywrapper,
+.nexus-canonical-content,
+.nexus-page-identity,
+.nexus-table-shell {
+    min-width: 0;
+}
+
+.nexus-canonical-content,
+.nexus-page-identity {
+    overflow-wrap: anywhere;
+}
+
+.nexus-canonical-content code.literal,
+.nexus-canonical-content code.literal span.pre {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+/* Source commands keep whitespace and scroll inside their own block. */
+.nexus-canonical-content pre {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+.nexus-canonical-content pre code,
+.nexus-canonical-content pre span {
+    white-space: inherit;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+/* Preserve native table/heading semantics inside a keyboard-accessible rail. */
+.nexus-table-shell,
+.nexus-table-scroll {
+    max-width: 100%;
+}
+
+.nexus-table-scroll {
+    overflow-x: auto;
+    margin: 1em 0;
+    padding-bottom: 0.25em;
+}
+
+.nexus-table-scroll table {
+    margin: 0;
+}
+
+.nexus-table-scroll:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
+}
+
+/* Paper has no horizontal scroll rail; wrap complete code across pages. */
+@media print {
+    .nexus-canonical-content pre {
+        font-family: "Noto Sans Mono CJK SC", monospace;
+    }
+
+    .nexus-canonical-content .highlight,
+    .nexus-canonical-content pre,
+    .nexus-canonical-content pre code,
+    .nexus-canonical-content pre span {
+        max-width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        word-break: normal;
+        overflow: visible;
+        break-inside: auto;
+    }
+}

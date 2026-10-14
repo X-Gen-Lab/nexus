@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['last_5fbyte_5fus_0',['last_byte_us',['../structnx__modbus__rtu__t.html#a6dab82477b882ed4f655a6774c1281c9',1,'nx_modbus_rtu_t']]],
+  ['last_5ferror_1',['last_error',['../structnx__can__state__t.html#aae73ec6529659473b7f7f18f36627dfa',1,'nx_can_state_t']]],
+  ['last_5fevent_5fus_2',['last_event_us',['../structnx__modbus__rtu__t.html#a2f00e2a6a78d0409e7772e712d7d16fb',1,'nx_modbus_rtu_t']]],
+  ['last_5fobserved_3',['last_observed',['../structnx__request__observer__t.html#a2028030a58c4e71082878775789a0579',1,'nx_request_observer_t::last_observed'],['../structnx__owner__observer__t.html#aa46b0f9b8757eca785275e989c483207',1,'nx_owner_observer_t::last_observed']]],
+  ['last_5fstate_4',['last_state',['../structnx__request__observer__t.html#a1c748a011232c7480c63ecc963b913e5',1,'nx_request_observer_t']]],
+  ['last_5ftime_5',['last_time',['../structnx__i2c__bus__clear__t.html#a7bf0943c2daefa5e865bb806a8be1574',1,'nx_i2c_bus_clear_t']]],
+  ['lease_5fheld_6',['lease_held',['../structnx__i2c__bus__clear__result__t.html#ae4b9a707ab15a7477195392a7ea5d34e',1,'nx_i2c_bus_clear_result_t']]],
+  ['leased_7',['leased',['../structnx__freertos__secure__context__t.html#ae429ec8d325fc0405e151a612f6b1c79',1,'nx_freertos_secure_context_t']]],
+  ['leave_8',['leave',['../structnx__owner__guard__port__t.html#adcfa19e5f69a9acd1b8708e5f764d06c',1,'nx_owner_guard_port_t']]],
+  ['length_9',['length',['../structnx__dma__drain__facts__t.html#aaf7c8ce5dafe73470cc885eae89e06fd',1,'nx_dma_drain_facts_t::length'],['../structnx__eth__tx__request__t.html#ad181dd06e63c4bd78b3e92f00cd4b2be',1,'nx_eth_tx_request_t::length'],['../structnx__eth__rx__frame__t.html#a551e9c413f86804f5b9fc0ad9ea042ee',1,'nx_eth_rx_frame_t::length'],['../structnx__i2c__message__t.html#a276b527ac1e79a2e9e652f384af396f9',1,'nx_i2c_message_t::length'],['../structnx__spi__request__t.html#ade7e22bb59c4d63a66b9de8453c43e79',1,'nx_spi_request_t::length'],['../structnx__stream__slot__t.html#ab68ccc70a42c730bf748c0634efc9c4c',1,'nx_stream_slot_t::length'],['../structnx__stream__block__t.html#a2a85763eea9985f3d2637ce3461852fc',1,'nx_stream_block_t::length'],['../structnx__uart__tx__request__t.html#a8392be7100105260bc43c299c4c271e6',1,'nx_uart_tx_request_t::length'],['../structnx__usb__request__t.html#a84f16fc6ebc2ba16be3163cf64e71f20',1,'nx_usb_request_t::length'],['../structnx__usb__setup__t.html#a9c3d71cac5ba8f61c71412d77bf63dd0',1,'nx_usb_setup_t::length'],['../structnx__spi__owner__operation__t.html#a5008244589dbbe0b0a514b06fb44d0bd',1,'nx_spi_owner_operation_t::length'],['../structnx__uart__owner__operation__t.html#a0f6d8ff1331127228887e35a93d660fe',1,'nx_uart_owner_operation_t::length']]],
+  ['limit_10',['limit',['../structnx__arch__mpu__v8__region__t.html#a0d2d181443a439ec1acca343c3edc876',1,'nx_arch_mpu_v8_region_t::limit'],['../structnx__arch__sau__region__t.html#a07f4e59d59362f4be585516a29e2b923',1,'nx_arch_sau_region_t::limit'],['../structnx__freertos__secure__context__t.html#a53ad5ee1daa04c8779250e349cf8575d',1,'nx_freertos_secure_context_t::limit']]],
+  ['line_11',['line',['../structnx__exti__event__t.html#a110592688f89d39b281221628193fe50',1,'nx_exti_event_t']]],
+  ['link_12',['link',['../structnx__eth__state__t.html#aec10838c8674f5801fe125556915efbf',1,'nx_eth_state_t']]],
+  ['live_13',['live',['../structnx__threadx__notify__t.html#a80c4f410d9378d64c3605b04bef02e95',1,'nx_threadx_notify_t::live'],['../structnx__threadx__task__t.html#aff109a5028212925d47ad4336b6c0686',1,'nx_threadx_task_t::live'],['../structnx__threadx__permanent__task__t.html#af4c2ad3cd9427ac89375c3cf547a72f9',1,'nx_threadx_permanent_task_t::live'],['../structnx__threadx__queue__t.html#a6fadfe6806f2fc1fc0ef16e425c7c50a',1,'nx_threadx_queue_t::live']]],
+  ['log_2eh_14',['log.h',['../log_8h.html',1,'']]],
+  ['loss_5fincidents_15',['loss_incidents',['../structnx__timer__capture__state__t.html#a9ef691f84c257a509ac5a9dab7fe1d7e',1,'nx_timer_capture_state_t']]],
+  ['losses_16',['losses',['../structnx__stream__t.html#aa66b9061c75b9984ed1f0225dc4acf9d',1,'nx_stream_t::losses'],['../structnx__stream__observation__t.html#aecefdd294b514a9fba026bdf48f89ec9',1,'nx_stream_observation_t::losses']]],
+  ['lost_17',['lost',['../structnx__can__event__t.html#a39dda2e9885844b5a7bda7a516427a12',1,'nx_can_event_t::lost'],['../structnx__usb__event__t.html#aa159f50207f3b6ec57c08a33eda2aee8',1,'nx_usb_event_t::lost']]],
+  ['lost_5fblocks_18',['lost_blocks',['../structnx__stream__slot__t.html#a127caf3263567b17688def66776c1cf9',1,'nx_stream_slot_t::lost_blocks'],['../structnx__stream__block__t.html#a7844e076697f374173ccd3423c7f7129',1,'nx_stream_block_t::lost_blocks']]],
+  ['lost_5fevents_19',['lost_events',['../structnx__usb__device__state__t.html#a8c6d39c350acdba29f9c5ddc6c36f67e',1,'nx_usb_device_state_t']]],
+  ['low_5fus_20',['low_us',['../structnx__i2c__bus__clear__timing__t.html#ae54910f65c62457b89f799306e4ceb3b',1,'nx_i2c_bus_clear_timing_t']]],
+  ['lowpower_2eh_21',['lowpower.h',['../lowpower_8h.html',1,'']]]
+];

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Measure resources and prepare hardware acceptance &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="参考" href="../reference/index.html" />
+    <link rel="prev" title="迁移旧配置与接口访问" href="migration.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/guides/performance-hil.md">3835e13cd7da</a>; code reference: 3835e13cd7da. <a href="../../en/guides/performance-hil.html" lang="en">en</a>. Source language: en; requested: zh_CN; actual: en; translation: <strong>missing</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="measure-resources-and-prepare-hardware-acceptance">
+<span id="docs-guides-performance-hil"></span><h1>Measure resources and prepare hardware acceptance<a class="headerlink" href="#measure-resources-and-prepare-hardware-acceptance" title="Link to this heading">¶</a></h1>
+<p>Use this guide to separate linked software costs from physical MCU behavior.
+The platform supplies measurement and HIL tooling; products choose workloads,
+electrical limits, safe outputs and release policy. No Board is physically qualified
+until real equipment executes its reviewed scope.</p>
+<section id="measure-an-exact-image">
+<h2>Measure an exact image<a class="headerlink" href="#measure-an-exact-image" title="Link to this heading">¶</a></h2>
+<p>Record clean source, assembly/resolved digest, dependencies, compiler and flags.
+Build the same workload before and after a change. Check actual ELF/BIN/map and
+resource reports, not estimates derived from object counts. Separate Flash LOAD,
+Flash footprint, each physical RAM reservation, MSP, task stack/TCB, queue and I/O
+buffers. Stack capacity is not a measured stack high-water value.</p>
+<p>The <a class="reference internal" href="../design/build-system.html"><span class="std std-doc">build contract</span></a> owns resource checks.
+Use maintained <code class="docutils literal notranslate"><span class="pre">tools/measurement/</span></code> gates; <a class="reference internal" href="../design/soc-execution-budgets.html"><span class="std std-doc">execution budgets</span></a>
+state scope. A speed claim needs units, clock, input size, load, sampling method
+and uncertainty. DWT 32-bit snapshots require a bounded wrap interval; host arrival
+timestamps do not establish MCU cycles or IRQ latency.</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/h743-memory-cache.svg" title="打开 SVG 大图"><img alt="H743 exact memory and Cache ownership reference" src="../_images/h743-memory-cache.svg" /></a></p>
+<p>FIG-09 is an exact H743 reference. Cache-enabled TX requires complete 32-byte
+line ownership and AXI SRAM reachability; DMA completion, wire completion and
+borrow settlement are separate. It does not authorize RX DMA or TCM placement.</p>
+</section>
+<section id="prepare-without-operating-equipment">
+<h2>Prepare without operating equipment<a class="headerlink" href="#prepare-without-operating-equipment" title="Link to this heading">¶</a></h2>
+<p>First configure and build the selected maintained assembly. For the Liangshan
+baremetal reference, these repository-root commands consume its actual output:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>configure<span class="w"> </span>--preset<span class="w"> </span>gd32-liangshan-baremetal
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>build<span class="w"> </span>--preset<span class="w"> </span>gd32-liangshan-baremetal<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span>
+python<span class="w"> </span>tools/hil/prepare.py<span class="w">     </span>--fixture<span class="w"> </span>tools/hil/fixtures/gd32f470_liangshan.json<span class="w">     </span>--resolved<span class="w"> </span>build/gd32-liangshan-baremetal/generated/resolved.json<span class="w">     </span>--report<span class="w"> </span>/tmp/nexus-hil-preparation.json
+python<span class="w"> </span>tools/hil/measure.py<span class="w"> </span>plan<span class="w">     </span>--fixture<span class="w"> </span>tools/hil/fixtures/gd32f470_liangshan.json<span class="w">     </span>--resolved<span class="w"> </span>build/gd32-liangshan-baremetal/generated/resolved.json<span class="w">     </span>--report<span class="w"> </span>/tmp/nexus-hil-measurement-plan.json
+</pre></div>
+</div>
+<p>The locked ARM compiler must be on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>. Check the part, pins, selected modes
+and <code class="docutils literal notranslate"><span class="pre">not_executed</span></code> cases in reports. Preparation does not open serial, flash or
+power equipment. Numeric limits and instruments remain unbound until reviewed.
+G474/H743/U575 software-reference fixtures deliberately reject physical station
+admission; a future physical fixture needs separately reviewed tooling integration.</p>
+</section>
+<section id="execute-only-a-real-reviewed-station">
+<h2>Execute only a real reviewed station<a class="headerlink" href="#execute-only-a-real-reviewed-station" title="Link to this heading">¶</a></h2>
+<p>Bind observed PCB/part/UID, probe, stable serial path, wiring and supply to the exact
+ELF, resolved configuration and resource report. Pin acquisition tools, recipe,
+instruments and numeric lower/upper limits. Follow the maintained HIL acquisition
+contract: identify, flash, verify, reset, serial, cleanup. Failure preserves raw logs;
+cleanup failure retains station quarantine and requires physical inspection.</p>
+<p>Capture completion means executed but unqualified. Validate the actual smoke,
+measurement and OS records separately. Do not synthesize physical traces or
+convert a software model into HIL. Qualification covers recorded observations;
+it does not establish unobserved WCET, electrical safety or a product release.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">操作指南</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html">接入复核的 Board package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html">Add a SoC, provider or reusable component</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html">正确等待并停止显式 owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">迁移旧配置与接口访问</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Measure resources and prepare hardware acceptance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

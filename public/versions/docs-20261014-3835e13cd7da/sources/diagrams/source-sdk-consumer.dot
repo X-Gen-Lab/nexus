@@ -1,0 +1,50 @@
+// FIG-10 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph SourceSdkConsumer {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-10 Source SDK 独立消费
+搬移完整 prefix；Native 运行与 ARM 链接分别验证\nFIG-10 Independent Source SDK consumers\nrelocate full prefix; Native run != ARM link"];
+    source [label="clean Git source + 锁定依赖 / 许可
+开发 fixture 必须显式 opt-in\nclean Git source / locked deps / licenses\ndevelopment fixtures require explicit opt-in", fillcolor="#f8fafc"];
+    package [label="package_source_sdk.prepare / verify
+安装 prefix + manifest + 必需文件闭包\ncomplete prefix / manifest / required files"];
+    move [label="移动完整 prefix 到独立路径
+不只移动 share/nexus/src\nrelocate complete prefix to a new root\nnot only the source subtree"];
+    consumer [label="独立 consumer source / build
+find_package(Nexus EXACT CONFIG REQUIRED)
+外部 NEXUS_ASSEMBLY_FILE\nindependent consumer source / build\nexternal NEXUS_ASSEMBLY_FILE"];
+    verify [label="SDK.cmake / resolver 边界 verify
+实际文件 hash / source / 依赖 / closure\nverify SDK bytes at every public boundary\nactual hashes / source / deps / closure"];
+    target [label="nexus_add_firmware()
+公共 Nexus targets；SDK/provider headers 不泄漏\npublic Nexus targets, no vendor header leaks"];
+    native [label="Native consumer
+实际 configure / build / run
+验证返回码与生产接口合同\nactual Native configure / build / run\nexit codes and production contracts", fillcolor="#f0fdf4"];
+    arm [label="ARM consumer
+真实 startup/system/linker + ELF/BIN/map
+检查选定模式、资源、kernel linkage\nactual ARM startup / system / link / artifacts\nselected modes, resources, kernel linkage", fillcolor="#f0fdf4"];
+    reject [label="陈旧身份 / 改字节 / 缺闭包 / 错 prefix
+拒绝生成或编译，不继续使用 stale 包\nstale identity / bytes / closure / prefix\nreject without using stale outputs", fillcolor="#fff7ed"];
+    reports [label="verify_consumers 报告 + raw + 同产物身份
+ARM 链接不是实板运行\nconsumer report, raw logs, artifact identity\nARM linking is not physical execution", fillcolor="#fefce8"];
+    source -> package [label="实际打包\nactual packaging"];
+    package -> move [label="完整包\ncomplete package"];
+    move -> consumer [label="独立安装消费\nindependent installation consumer"];
+    consumer -> verify [label="加载公共入口\nload public entry"];
+    verify -> target [label="通过\nvalidated"];
+    verify -> reject [label="失败\nfailure"];
+    target -> native [label="Native 配置\nNative assembly"];
+    target -> arm [label="精确 MCU 配置\nexact MCU assembly"];
+    native -> reports [label="实际结果\nexecuted results"];
+    arm -> reports [label="实际结果\nexecuted results"];
+    { rank=same; native; arm; }
+}

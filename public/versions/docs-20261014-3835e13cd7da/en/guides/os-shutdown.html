@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Wait correctly and shut down an explicit owner &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Migrate legacy configuration and interface access" href="migration.html" />
+    <link rel="prev" title="Add a SoC, provider or reusable component" href="provider-porting.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/guides/os-shutdown.md">3835e13cd7da</a>; code reference: 3835e13cd7da. <a href="../../zh_CN/guides/os-shutdown.html" lang="zh-CN">zh_CN</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="wait-correctly-and-shut-down-an-explicit-owner">
+<span id="docs-guides-os-shutdown"></span><h1>Wait correctly and shut down an explicit owner<a class="headerlink" href="#wait-correctly-and-shut-down-an-explicit-owner" title="Link to this heading">¶</a></h1>
+<p>Use this guide for applications selecting an optional Native, FreeRTOS or ThreadX
+adapter. The application owns tasks, stacks, notifications, queues and execution
+progress. Baremetal has no scheduler. Platform start never starts a kernel.
+The <a class="reference internal" href="../design/os-contracts.html"><span class="std std-doc">OS contract</span></a> remains authoritative.</p>
+<section id="avoid-lost-completion-and-unbounded-waits">
+<h2>Avoid lost completion and unbounded waits<a class="headerlink" href="#avoid-lost-completion-and-unbounded-waits" title="Link to this heading">¶</a></h2>
+<p>Use the request’s latched predicate as truth. Check the completion predicate, arm the
+notification sequence, recheck, wait with the same absolute monotonic deadline,
+then recheck again. Wakes are hints and may be coalesced or unrelated. On timeout,
+perform the contract’s final predicate observation. Do not restart a relative
+budget after each hint and do not block the only executor that must make progress.</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/wait-wake-shutdown.svg" title="Open SVG at full size"><img alt="Predicate, wake and explicit shutdown responsibilities" src="../_images/wait-wake-shutdown.svg" /></a></p>
+<p>FIG-08 shows the current wait/wake responsibilities. A provider IRQ sink must
+respect the selected kernel syscall ceiling; an unqualified priority cannot call
+an ISR kernel API. ThreadX has its own reviewed M4/Native subset and masking policy,
+not the FreeRTOS port or tickless/isolation capability set.</p>
+</section>
+<section id="shut-down-in-dependency-order">
+<h2>Shut down in dependency order<a class="headerlink" href="#shut-down-in-dependency-order" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Close client admission and reject new work without borrowing it.</p></li>
+<li><p>Keep the resource owner/executor running. Request cancellation using stable
+slots and matching epochs; cancellation does not release accepted storage.</p></li>
+<li><p>Drain transfers and block loans. Acquire-observe SETTLED and read results.
+A failed drain retains QUARANTINED storage and explicit recovery responsibility.</p></li>
+<li><p>Join producers and detach/join control observers before slot or request reuse.</p></li>
+<li><p>Stop and join the owner. Quiesce hardware IRQ publishers before destroying
+their notification, queue, guard, stack or TCB storage.</p></li>
+<li><p>Stop platform providers only when their selected lifetime and kernel clock/Tick
+ownership permit it. A running scheduler is not stopped by ordinary I/O teardown.</p></li>
+</ol>
+<p>A returning adapter task parks until its one external lifecycle owner joins it.
+Returning from an entry function does not allow stack/TCB reclamation. Raw queues
+and closable queues have different lifecycle contracts; close is not destruction.
+Keep all storage on the failure path and retry cleanup only through its real owner.</p>
+</section>
+<section id="execute-maintained-software-fixtures">
+<h2>Execute maintained software fixtures<a class="headerlink" href="#execute-maintained-software-fixtures" title="Link to this heading">¶</a></h2>
+<p>From the repository root:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>configure<span class="w"> </span>--preset<span class="w"> </span>native-debug
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>build<span class="w"> </span>--preset<span class="w"> </span>native-debug<span class="w"> </span>--parallel<span class="w"> </span><span class="m">4</span><span class="w">     </span>--target<span class="w"> </span>nexus_os_wait_test<span class="w"> </span>nexus_uart_owner_mock_test
+build/native-debug/bin/nexus_os_wait_test
+build/native-debug/bin/nexus_uart_owner_mock_test
+</pre></div>
+</div>
+<p>Both binaries must execute nonempty passing cases. This targeted development scope
+does not replace the complete TDD gate. The external UART owner application in
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus-examples">nexus-examples</a> supplies product workers;
+its pin/revision must be recorded before claiming consumer execution.</p>
+<p>Physical scheduler context, IRQ ceiling, FP/MVE retention, stack peaks and wake
+latency require real station evidence. Do not inherit POSIX behavior as MCU timing.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Task guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html">Add a reviewed Board package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html">Add a SoC, provider or reusable component</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Wait correctly and shut down an explicit owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migrate legacy configuration and interface access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html">Measure resources and prepare hardware acceptance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

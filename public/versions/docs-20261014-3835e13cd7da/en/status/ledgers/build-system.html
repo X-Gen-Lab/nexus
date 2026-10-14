@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>构建系统原专项台账 &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nexus.css?v=1e57c037" />
+    <script src="../../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="文档系统台账" href="documentation-system.html" />
+    <link rel="prev" title="SoC 原专项台账" href="soc-refinement.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/status/ledgers/build-system.md">3835e13cd7da</a>; code reference: 3835e13cd7da. <a href="../../../zh_CN/status/ledgers/build-system.html" lang="zh-CN">zh_CN</a>. Source language: zh_CN; requested: en; actual: zh_CN; translation: <strong>missing</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="status-ledgers-build-system">
+<span id="id1"></span><h1>构建系统原专项台账<a class="headerlink" href="#status-ledgers-build-system" title="Link to this heading">¶</a></h1>
+<p>本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
+原编号、顺序和全部原字段来自 <a class="reference download internal" download="" href="../../_downloads/627f2f57f03b30c8b6242525d8433d77/build-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">原台账</span></code></a>。
+源文件：<code class="docutils literal notranslate"><span class="pre">docs/design/build-system-execution.csv</span></code>；SHA-256：<code class="docutils literal notranslate"><span class="pre">cc459a0d064abc1ec360f1d3daf4ed5e5b531f299e581d0b2724d04aa7c7074c</span></code>。</p>
+<p>不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
+物理状态分别解释；<code class="docutils literal notranslate"><span class="pre">development_passed</span></code> 不表示当前文档 HEAD 已执行。
+<code class="docutils literal notranslate"><span class="pre">qualification_record_authority</span></code> 要回到精确结果索引判断源码和范围。
+绝对 <code class="docutils literal notranslate"><span class="pre">/workspace</span></code>、<code class="docutils literal notranslate"><span class="pre">/dev/shm</span></code> 定位保留原字节，仅说明原执行主机位置；
+可取得归档及 member 定位见 <a class="reference internal" href="../software-verification.html"><span class="std std-doc">软件证据入口</span></a>。</p>
+<p><strong>原退出字段</strong>只有原 CSV 中实际存在的字段；任务、资格前提和合同链接
+也按原文保留，不能据此补造某次执行。</p>
+<p>本表包含 48 条原记录，仅表示来源行数。</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#bld-01" id="id2">BLD-01</a></p></li>
+<li><p><a class="reference internal" href="#bld-02" id="id3">BLD-02</a></p></li>
+<li><p><a class="reference internal" href="#bld-03" id="id4">BLD-03</a></p></li>
+<li><p><a class="reference internal" href="#bld-04" id="id5">BLD-04</a></p></li>
+<li><p><a class="reference internal" href="#bld-05" id="id6">BLD-05</a></p></li>
+<li><p><a class="reference internal" href="#bld-06" id="id7">BLD-06</a></p></li>
+<li><p><a class="reference internal" href="#bld-07" id="id8">BLD-07</a></p></li>
+<li><p><a class="reference internal" href="#bld-08" id="id9">BLD-08</a></p></li>
+<li><p><a class="reference internal" href="#bld-09" id="id10">BLD-09</a></p></li>
+<li><p><a class="reference internal" href="#bld-10" id="id11">BLD-10</a></p></li>
+<li><p><a class="reference internal" href="#bld-11" id="id12">BLD-11</a></p></li>
+<li><p><a class="reference internal" href="#bld-12" id="id13">BLD-12</a></p></li>
+<li><p><a class="reference internal" href="#bld-13" id="id14">BLD-13</a></p></li>
+<li><p><a class="reference internal" href="#bld-14" id="id15">BLD-14</a></p></li>
+<li><p><a class="reference internal" href="#bld-15" id="id16">BLD-15</a></p></li>
+<li><p><a class="reference internal" href="#bld-16" id="id17">BLD-16</a></p></li>
+<li><p><a class="reference internal" href="#bld-17" id="id18">BLD-17</a></p></li>
+<li><p><a class="reference internal" href="#bld-18" id="id19">BLD-18</a></p></li>
+<li><p><a class="reference internal" href="#bld-19" id="id20">BLD-19</a></p></li>
+<li><p><a class="reference internal" href="#bld-20" id="id21">BLD-20</a></p></li>
+<li><p><a class="reference internal" href="#bld-21" id="id22">BLD-21</a></p></li>
+<li><p><a class="reference internal" href="#bld-22" id="id23">BLD-22</a></p></li>
+<li><p><a class="reference internal" href="#bld-23" id="id24">BLD-23</a></p></li>
+<li><p><a class="reference internal" href="#bld-24" id="id25">BLD-24</a></p></li>
+<li><p><a class="reference internal" href="#bld-25" id="id26">BLD-25</a></p></li>
+<li><p><a class="reference internal" href="#bld-26" id="id27">BLD-26</a></p></li>
+<li><p><a class="reference internal" href="#bld-27" id="id28">BLD-27</a></p></li>
+<li><p><a class="reference internal" href="#bld-28" id="id29">BLD-28</a></p></li>
+<li><p><a class="reference internal" href="#bld-29" id="id30">BLD-29</a></p></li>
+<li><p><a class="reference internal" href="#bld-30" id="id31">BLD-30</a></p></li>
+<li><p><a class="reference internal" href="#bld-31" id="id32">BLD-31</a></p></li>
+<li><p><a class="reference internal" href="#bld-32" id="id33">BLD-32</a></p></li>
+<li><p><a class="reference internal" href="#bld-33" id="id34">BLD-33</a></p></li>
+<li><p><a class="reference internal" href="#bld-34" id="id35">BLD-34</a></p></li>
+<li><p><a class="reference internal" href="#bld-35" id="id36">BLD-35</a></p></li>
+<li><p><a class="reference internal" href="#bld-36" id="id37">BLD-36</a></p></li>
+<li><p><a class="reference internal" href="#bld-37" id="id38">BLD-37</a></p></li>
+<li><p><a class="reference internal" href="#bld-38" id="id39">BLD-38</a></p></li>
+<li><p><a class="reference internal" href="#bld-39" id="id40">BLD-39</a></p></li>
+<li><p><a class="reference internal" href="#bld-40" id="id41">BLD-40</a></p></li>
+<li><p><a class="reference internal" href="#bld-41" id="id42">BLD-41</a></p></li>
+<li><p><a class="reference internal" href="#bld-42" id="id43">BLD-42</a></p></li>
+<li><p><a class="reference internal" href="#bld-43" id="id44">BLD-43</a></p></li>
+<li><p><a class="reference internal" href="#bld-44" id="id45">BLD-44</a></p></li>
+<li><p><a class="reference internal" href="#bld-45" id="id46">BLD-45</a></p></li>
+<li><p><a class="reference internal" href="#bld-46" id="id47">BLD-46</a></p></li>
+<li><p><a class="reference internal" href="#bld-47" id="id48">BLD-47</a></p></li>
+<li><p><a class="reference internal" href="#bld-48" id="id49">BLD-48</a></p></li>
+</ul>
+</nav>
+<section id="bld-01">
+<span id="status-build-system-bld-01"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">BLD-01</a><a class="headerlink" href="#bld-01" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Protect authored and fact inputs from output cleanup</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Reject output containment before mutation; all input bytes unchanged</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/bundle.py;tools/configure/configure.py;tools/configure/test_bundle_transaction.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/red.log;/workspace/nexus-build-maintenance-20261012/config/nested-fact-red.log;/workspace/nexus-build-maintenance-20261012/config/nested-fact-green.log;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-02">
+<span id="status-build-system-bld-02"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">BLD-02</a><a class="headerlink" href="#bld-02" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Transactional configuration and failure invalidation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Errors and interrupted generation never expose stale valid or partial bundles</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/bundle.py;tools/configure/configure.py;tools/configure/runtime.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/code-race-red.log;/workspace/nexus-build-maintenance-20261012/config/code-race-green.log;/workspace/nexus-build-maintenance-20261012/config/transaction-green-v2.log;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-03">
+<span id="status-build-system-bld-03"></span><h2><a class="toc-backref" href="#id4" role="doc-backlink">BLD-03</a><a class="headerlink" href="#bld-03" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Single writer for each generated output</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Same output concurrency rejects or serializes; separate outputs remain independent</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/bundle.py;tools/configure/test_bundle_transaction.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/red.log;/workspace/nexus-build-maintenance-20261012/config/green.log;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-04">
+<span id="status-build-system-bld-04"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">BLD-04</a><a class="headerlink" href="#bld-04" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-04</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Complete derived artifact rules</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Normal target build restores deleted BIN map and resource report</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/platform/Firmware.cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/targets/green-arm-canonical-budget.log;/workspace/nexus-build-maintenance-20261012/targets/arm-artifacts-contract.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-05">
+<span id="status-build-system-bld-05"></span><h2><a class="toc-backref" href="#id6" role="doc-backlink">BLD-05</a><a class="headerlink" href="#bld-05" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-05</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Resource checker input dependencies</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>ELF configuration budget or checker changes cause a new checked execution</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/memory.py;tools/measurement/resources.py;tests/contracts/test_measurement_resources.py;cmake/platform/Firmware.cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/config/budget-origin-red.log;/workspace/nexus-build-maintenance-20261012/config/budget-origin-final-green.log;/workspace/nexus-build-maintenance-20261012/targets/green-arm-canonical-budget.log;/workspace/nexus-build-maintenance-20261012/targets/arm-artifacts-contract.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-06">
+<span id="status-build-system-bld-06"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">BLD-06</a><a class="headerlink" href="#bld-06" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-06</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Actual configuration code dependencies</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Changed factory epoch or required verifier causes automatic reconfiguration</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/dependencies.py;cmake/platform/Configure.cmake;cmake/platform/Runtime.cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/red.log;/workspace/nexus-build-maintenance-20261012/config/code-race-red-return.json;/workspace/nexus-build-maintenance-20261012/config/code-race-red.log;/workspace/nexus-build-maintenance-20261012/config/code-race-green.log;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-07">
+<span id="status-build-system-bld-07"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">BLD-07</a><a class="headerlink" href="#bld-07" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-07</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Explicit target LTO for external consumers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Owned application and startup targets share selected IPO policy</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/platform/TargetPolicy.cmake;cmake/platform/Options.cmake;cmake/platform/Firmware.cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/targets/green-native-final-20.log;/workspace/nexus-build-maintenance-20261012/targets/green-arm-canonical-budget.log;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-08">
+<span id="status-build-system-bld-08"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">BLD-08</a><a class="headerlink" href="#bld-08" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-08</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Shared hook and CI change classification</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Gitlinks vendors dependency locks and build environments trigger the same gates</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/change_paths.py;scripts/ci/tdd_gate.py;scripts/ci/native_contracts.py;.github/workflows/ci.yml;scripts/ci/test_change_paths.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/workflow/final-related-tests-v4.command.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-09">
+<span id="status-build-system-bld-09"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">BLD-09</a><a class="headerlink" href="#bld-09" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-09</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Preserve unchanged generated file timestamps</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Identical resolution preserves unchanged header source and linker mtimes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/bundle.py;tools/configure/configure.py;tools/configure/runtime.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/red.log;/workspace/nexus-build-maintenance-20261012/config/green.log;/workspace/nexus-build-maintenance-20261012/config/incremental-consumer.json;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-10">
+<span id="status-build-system-bld-10"></span><h2><a class="toc-backref" href="#id11" role="doc-backlink">BLD-10</a><a class="headerlink" href="#bld-10" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-10</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>No-change build regression</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Repeated build and identical configure perform no unnecessary compilation or linking</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/test_incremental_consumer.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/incremental-consumer.json;/workspace/nexus-build-maintenance-20261012/config/incremental-consumer.log;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-11">
+<span id="status-build-system-bld-11"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">BLD-11</a><a class="headerlink" href="#bld-11" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-11</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Changes rebuild the intended scope</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Application driver header assembly and budget mutations follow declared dependencies</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/test_bundle_transaction.py;tools/configure/test_incremental_consumer.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/red.log;/workspace/nexus-build-maintenance-20261012/config/incremental-consumer.json;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-12">
+<span id="status-build-system-bld-12"></span><h2><a class="toc-backref" href="#id13" role="doc-backlink">BLD-12</a><a class="headerlink" href="#bld-12" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-12</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Stage-level execution metrics</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Actual duration command and execution counts are recorded per stage</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/process.py;tools/dev/qualification.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/delivery/plan-success-pinned-run/report.json;/workspace/nexus-build-maintenance-20261012/delivery/plan-failure-pinned-run/report.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-matrix.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-13">
+<span id="status-build-system-bld-13"></span><h2><a class="toc-backref" href="#id14" role="doc-backlink">BLD-13</a><a class="headerlink" href="#bld-13" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-13</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Bounded build concurrency</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Local hooks and CI use explicit memory-conscious parallel bounds</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/process.py;tools/dev/dev.py;scripts/ci/tdd_gate.py;scripts/ci/native_contracts.py;.github/workflows/ci.yml</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/workflow/final-related-tests-v4.command.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-14">
+<span id="status-build-system-bld-14"></span><h2><a class="toc-backref" href="#id15" role="doc-backlink">BLD-14</a><a class="headerlink" href="#bld-14" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-14</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Timeout cancellation and process cleanup</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Hung child processes terminate with retained nonzero evidence and no surviving descendants</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/process.py;tools/testing/test_build_workflow.py;tools/testing/test_staged_execution.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/workflow/final-related-tests-v4.command.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-15">
+<span id="status-build-system-bld-15"></span><h2><a class="toc-backref" href="#id16" role="doc-backlink">BLD-15</a><a class="headerlink" href="#bld-15" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-15</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Correctly keyed compiler cache</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Compiler flags configuration and dependencies distinguish cache inputs; qualification builds remain fresh</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/cache.py;cmake/platform/TargetPolicy.cmake;cmake/platform/Options.cmake;dependencies/ccache.lock.json;tests/contracts/test_build_system.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/delivery/ccache-archive.json;/workspace/nexus-build-maintenance-20261012/delivery/ccache-prepare.log;/workspace/nexus-build-maintenance-20261012/targets/actual-ccache-contract-final.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-matrix.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_measured_cache_and_fresh_builds_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-16">
+<span id="status-build-system-bld-16"></span><h2><a class="toc-backref" href="#id17" role="doc-backlink">BLD-16</a><a class="headerlink" href="#bld-16" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-16</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Content-addressed download and tool caches</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Cached bytes require digest verification; corruption is rejected</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/cache.py;tools/dev/dependencies.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/delivery/ccache-archive.json;/workspace/nexus-build-maintenance-20261012/delivery/final-all-owned-green.log;/workspace/nexus-build-maintenance-20261012/workflow/hook-isolation-final-v2/final-report.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_actual_digest_checked_cache_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-17">
+<span id="status-build-system-bld-17"></span><h2><a class="toc-backref" href="#id18" role="doc-backlink">BLD-17</a><a class="headerlink" href="#bld-17" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-17</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Prepare dependencies for the actual execution scope</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Each scope initializes required sources including host hardware model headers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/dependencies.py;.github/actions/setup-build/action.yml</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/delivery/prepare-native.json;/workspace/nexus-build-maintenance-20261012/delivery/prepare-h743.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_actual_scoped_preparation_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-18">
+<span id="status-build-system-bld-18"></span><h2><a class="toc-backref" href="#id19" role="doc-backlink">BLD-18</a><a class="headerlink" href="#bld-18" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-18</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Avoid duplicate verification within one SDK configure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Internal verified identity may be reused without cross-run stale-byte acceptance</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/package/NexusConfig.cmake.in;cmake/platform/SDK.cmake;tools/configure/sdk.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/delivery/sdk-current-repeat-verification-decision.json;/workspace/nexus-build-maintenance-20261012/delivery/sdk-current-full-verify-0.raw;/workspace/nexus-build-maintenance-20261012/delivery/sdk-current-full-verify-1.raw;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>decision_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-19">
+<span id="status-build-system-bld-19"></span><h2><a class="toc-backref" href="#id20" role="doc-backlink">BLD-19</a><a class="headerlink" href="#bld-19" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-19</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Resolver stages with clear responsibilities</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Input facts selection resources memory and IR sealing have explicit stage boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/configure.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-20">
+<span id="status-build-system-bld-20"></span><h2><a class="toc-backref" href="#id21" role="doc-backlink">BLD-20</a><a class="headerlink" href="#bld-20" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-20</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Typed IR emission interfaces</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Maintained emitters consume named immutable records with checked projection boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/ir.py;tools/configure/factory.py;tools/configure/bindings.py;tools/configure/secondary_controllers.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/factory-refactor-first.log;/workspace/nexus-build-maintenance-20261012/config/endpoint-ir-red.log;/workspace/nexus-build-maintenance-20261012/config/endpoint-ir-green.log;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-21">
+<span id="status-build-system-bld-21"></span><h2><a class="toc-backref" href="#id22" role="doc-backlink">BLD-21</a><a class="headerlink" href="#bld-21" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-21</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Configuration factory and target mapping consistency</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Missing kinds modes or component mappings fail owned consistency checks</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/contracts.py;tools/configure/matrix.py;tools/configure/test_matrix.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/matrix-tests-red.log;/workspace/nexus-build-maintenance-20261012/config/matrix-tests-green-v3.log;/workspace/nexus-build-maintenance-20261012/config/support-matrix.json;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-22">
+<span id="status-build-system-bld-22"></span><h2><a class="toc-backref" href="#id23" role="doc-backlink">BLD-22</a><a class="headerlink" href="#bld-22" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-22</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Separate configuration and source identities</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Configuration generator source dependency and toolchain identities retain distinct meanings</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/dependencies.py;tools/configure/sdk.py;tools/configure/memory.py;tools/measurement/resources.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/code-race-red-return.json;/workspace/nexus-build-maintenance-20261012/config/code-race-green.log;/workspace/nexus-build-maintenance-20261012/config/budget-origin-final-green.log;/workspace/nexus-build-maintenance-20261012/config/sdk-actual-old-boundary/report.json;/workspace/nexus-build-maintenance-20261012/config/sdk-final-restored-verify.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-23">
+<span id="status-build-system-bld-23"></span><h2><a class="toc-backref" href="#id24" role="doc-backlink">BLD-23</a><a class="headerlink" href="#bld-23" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-23</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Actionable configuration errors</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Errors identify source field instance conflict and allowed range</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/configure.py;tools/configure/test_bundle_transaction.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/diagnostics-red.log;/workspace/nexus-build-maintenance-20261012/config/diagnostics-green.log;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-24">
+<span id="status-build-system-bld-24"></span><h2><a class="toc-backref" href="#id25" role="doc-backlink">BLD-24</a><a class="headerlink" href="#bld-24" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-24</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Maintained selection and validation inventory</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Supported selections bind existing fixtures and evidence scopes without promoting physical support</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/matrix.py;tools/configure/assemblies/catalogue.json;tools/configure/test_matrix.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/config/implementation-report.json;/workspace/nexus-build-maintenance-20261012/config/support-matrix.log;/workspace/nexus-build-maintenance-20261012/config/support-matrix.json;/workspace/nexus-build-maintenance-20261012/config/complete-green-final.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-25">
+<span id="status-build-system-bld-25"></span><h2><a class="toc-backref" href="#id26" role="doc-backlink">BLD-25</a><a class="headerlink" href="#bld-25" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-25</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Compile and link policy propagation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>ABI requirements propagate while private policy remains scoped</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/platform/Options.cmake;cmake/platform/TargetPolicy.cmake;cmake/platform/Firmware.cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/targets/green-native-final-20.log;/workspace/nexus-build-maintenance-20261012/targets/arm-artifacts-contract.json; /workspace/nexus-build-maintenance-20261012/targets/soc-sleep-policy-fixture-report.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-26">
+<span id="status-build-system-bld-26"></span><h2><a class="toc-backref" href="#id27" role="doc-backlink">BLD-26</a><a class="headerlink" href="#bld-26" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-26</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Explicit debuggable optimization profiles</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Symbolic production optimization and single-step profiles have inspectable final flags</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/platform/Options.cmake;CMakePresets.json;tools/configure/assemblies/native-step-debug.toml;tools/configure/runtime.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/targets/green-native-final-20.log;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-27">
+<span id="status-build-system-bld-27"></span><h2><a class="toc-backref" href="#id28" role="doc-backlink">BLD-27</a><a class="headerlink" href="#bld-27" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-27</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Consumer-owned application warnings</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Owned platform remains strict; applications explicitly choose warning policy</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/platform/TargetPolicy.cmake;cmake/platform/Firmware.cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/targets/green-native-final-20.log;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-28">
+<span id="status-build-system-bld-28"></span><h2><a class="toc-backref" href="#id29" role="doc-backlink">BLD-28</a><a class="headerlink" href="#bld-28" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-28</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Firmware helper argument validation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Unknown missing repeated or invalid setup arguments fail at configuration</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/platform/Firmware.cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/targets/red-repeat-keywords.log;/workspace/nexus-build-maintenance-20261012/targets/green-native-final-20.log;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-29">
+<span id="status-build-system-bld-29"></span><h2><a class="toc-backref" href="#id30" role="doc-backlink">BLD-29</a><a class="headerlink" href="#bld-29" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-29</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Early single assembly enforcement</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Mixed resolved sources or Runtime and Platform modes reject before target collisions</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>CMakeLists.txt;cmake/platform/Options.cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/targets/red-second-assembly.log;/workspace/nexus-build-maintenance-20261012/targets/green-native-final-20.log;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-30">
+<span id="status-build-system-bld-30"></span><h2><a class="toc-backref" href="#id31" role="doc-backlink">BLD-30</a><a class="headerlink" href="#bld-30" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-30</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Declared generator support</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Maintained single-config Ninja works; unsupported generator modes fail clearly</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>CMakeLists.txt;cmake/platform/TargetPolicy.cmake</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/targets/green-native-final-20.log;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-31">
+<span id="status-build-system-bld-31"></span><h2><a class="toc-backref" href="#id32" role="doc-backlink">BLD-31</a><a class="headerlink" href="#bld-31" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-31</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Measure unnecessary compilation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Compile-unit and linked-image costs are measured before choosing source splits</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tests/contracts/test_build_artifacts.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/targets/arm-artifacts-contract.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-matrix.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>decision_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-32">
+<span id="status-build-system-bld-32"></span><h2><a class="toc-backref" href="#id33" role="doc-backlink">BLD-32</a><a class="headerlink" href="#bld-32" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-32</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>External consumer boundary coverage</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Subdirectory SDK C and C++ LTO relocated paths and private include isolation execute</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tests/contracts/test_build_system.py;tests/contracts/test_build_artifacts.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/targets/green-native-final-20.log;/workspace/nexus-build-maintenance-20261012/targets/arm-artifacts-contract.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-33">
+<span id="status-build-system-bld-33"></span><h2><a class="toc-backref" href="#id34" role="doc-backlink">BLD-33</a><a class="headerlink" href="#bld-33" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-33</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>One preset resolver</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Supported inheritance includes and user presets resolve identically for all runners</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/presets.py;tools/dev/dev.py;scripts/ci/tdd_gate.py;scripts/ci/native_contracts.py;tools/testing/test_build_workflow.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/workflow/final-related-tests-v4.command.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-34">
+<span id="status-build-system-bld-34"></span><h2><a class="toc-backref" href="#id35" role="doc-backlink">BLD-34</a><a class="headerlink" href="#bld-34" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-34</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Discoverable maintained platform builds</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>H743 U575 and explicitly labelled G474 fixtures have clear build entry points</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>CMakePresets.json;tools/configure/assemblies/catalogue.json;tools/configure/assemblies/native-step-debug.toml</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/workflow/final-related-tests-v4.command.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-35">
+<span id="status-build-system-bld-35"></span><h2><a class="toc-backref" href="#id36" role="doc-backlink">BLD-35</a><a class="headerlink" href="#bld-35" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-35</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Scope-specific environment diagnosis</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Selected Native ARM or candidate scope checks necessary versions tools and dependencies</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/dev.py;tools/dev/dependencies.py;dependencies/environment.lock.json;tools/testing/test_dev.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/workflow/final-related-tests-v4.command.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-36">
+<span id="status-build-system-bld-36"></span><h2><a class="toc-backref" href="#id37" role="doc-backlink">BLD-36</a><a class="headerlink" href="#bld-36" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-36</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Development and qualification execution scopes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Focused execution never claims full suite qualification; receipts declare actual scope</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/dev.py;tools/dev/process.py;tools/testing/test_google_report.py;scripts/ci/tdd_gate.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/workflow/final-related-tests-v4.command.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-37">
+<span id="status-build-system-bld-37"></span><h2><a class="toc-backref" href="#id38" role="doc-backlink">BLD-37</a><a class="headerlink" href="#bld-37" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-37</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Shared dependency and tool preparation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Development and CI use one checked online or offline preparation path</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/dependencies.py;tools/dev/dev.py;.github/actions/setup-build/action.yml</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/workflow/final-related-tests-v4.command.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-38">
+<span id="status-build-system-bld-38"></span><h2><a class="toc-backref" href="#id39" role="doc-backlink">BLD-38</a><a class="headerlink" href="#bld-38" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-38</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Explicit qualification and candidate orchestration</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Fixed maintained checkers execute from a reviewable plan with real failures and identity</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/qualification.py;tools/dev/plans/software.json;tools/dev/plans/candidate.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/delivery/plan-success-pinned-run/report.json;/workspace/nexus-build-maintenance-20261012/delivery/plan-failure-pinned-run/report.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-matrix.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_actual_candidate_plan_verified_full_software_plan_not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-39">
+<span id="status-build-system-bld-39"></span><h2><a class="toc-backref" href="#id40" role="doc-backlink">BLD-39</a><a class="headerlink" href="#bld-39" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-39</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Dependency upgrade validation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Upgrade binds source license locks host ARM SDK and applicable reproducibility evidence</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/dependencies.py;tools/maintenance/dependency_proposals.py;dependencies/actions.lock.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/delivery/final-tools-catalogue-green.log;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_upgrade_contract_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-40">
+<span id="status-build-system-bld-40"></span><h2><a class="toc-backref" href="#id41" role="doc-backlink">BLD-40</a><a class="headerlink" href="#bld-40" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-40</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Complete hash-locked offline Python tools</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Transitive dependencies and wheel digests support installation without network</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/dependencies.py;dependencies/python-tools-linux-cp311.lock.json;dependencies/python-tools-linux-cp311.txt;dependencies/python-tools-linux-cp312.lock.json;dependencies/python-tools-linux-cp312.txt</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/delivery/offline-install-cp312-result.json;/workspace/nexus-build-maintenance-20261012/delivery/python-offline-cp312-envelope.json;/workspace/nexus-build-maintenance-20261012/delivery/wheel-package-restore.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/workflow/hook-isolation-final-v2/final-report.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>actual_cp312_offline_install_and_hook_isolation_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-41">
+<span id="status-build-system-bld-41"></span><h2><a class="toc-backref" href="#id42" role="doc-backlink">BLD-41</a><a class="headerlink" href="#bld-41" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-41</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Portable qualified environment distribution</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Another directory imports the recorded OCI and toolchain identities and verifies bytes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/evidence/environment.py;tools/evidence/store.py;tools/evidence/container.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/environment-execution/oci-transport-receipt.json;/workspace/nexus-build-maintenance-20261012/delivery/portable-navigation-red.log;/workspace/nexus-build-maintenance-20261012/delivery/portable-navigation-green.log;/workspace/nexus-build-maintenance-20261012/delivery/environment-report-archive-red.log;/workspace/nexus-build-maintenance-20261012/delivery/environment-report-archive-green.log;/workspace/nexus-build-maintenance-20261012/environment-execution/toolchain-transport-receipt.json;/workspace/nexus-build-maintenance-20261012/environment-execution/oci-runtime-provenance-clarification.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-matrix.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>actual_toolchain_and_oci_transport_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-42">
+<span id="status-build-system-bld-42"></span><h2><a class="toc-backref" href="#id43" role="doc-backlink">BLD-42</a><a class="headerlink" href="#bld-42" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-42</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Reproducible environment recipe boundary</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Snapshot package versions are declared; artifact reuse and recipe reconstruction remain distinct</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/evidence/recipe.py;dependencies/build-recipe.lock.json;tools/dev/Dockerfile</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/delivery/observed-apt.json;/workspace/nexus-build-maintenance-20261012/delivery/observed-apt-command.json;/workspace/nexus-build-maintenance-20261012/delivery/recipe-declared-inputs.json;/workspace/nexus-build-maintenance-20261012/delivery/recipe-green.log; /workspace/nexus-build-maintenance-20261012/delivery/recipe-ca-lock-preservation.json;/workspace/nexus-build-maintenance-20261012/workflow/hook-isolation-final-v2/final-report.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>declared_recipe_verified_reconstruction_unverified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-43">
+<span id="status-build-system-bld-43"></span><h2><a class="toc-backref" href="#id44" role="doc-backlink">BLD-43</a><a class="headerlink" href="#bld-43" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-43</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Complete build provenance</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Formal output binds source configuration dependencies compiler environment and executed commands</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/provenance.py;tools/dev/qualification.py;tools/dev/dev.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/delivery/provenance-fixture/verification.json;/workspace/nexus-build-maintenance-20261012/workflow/green-automatic-provenance.txt;/workspace/nexus-build-maintenance-20261012/workflow/green-final-metadata-provenance.txt; /workspace/nexus-build-maintenance-20261012/workflow/report-v5.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-44">
+<span id="status-build-system-bld-44"></span><h2><a class="toc-backref" href="#id45" role="doc-backlink">BLD-44</a><a class="headerlink" href="#bld-44" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-44</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Durable independently verifiable evidence</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Delivery evidence survives original workspace removal and retains independent integrity verification</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/evidence/store.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/delivery/delivery-implementation-status.json;/workspace/nexus-build-maintenance-20261012/delivery/durable-adoption.json;/workspace/nexus-build-maintenance-20261012/delivery/wheel-package-restore.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-matrix.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>actual_current_evidence_archive_restoration_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-45">
+<span id="status-build-system-bld-45"></span><h2><a class="toc-backref" href="#id46" role="doc-backlink">BLD-45</a><a class="headerlink" href="#bld-45" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-45</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Current executable build documentation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>TOML and CPU ABI descriptions match implementation; maintained command examples execute</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/README.md;cmake/package/README.md;tools/dev/README.md;tools/configure/README.md;docs/design/build-system.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/workflow/doctor-arm.txt;/workspace/nexus-build-maintenance-20261012/workflow/prepare-h743-v2.txt;/workspace/nexus-build-maintenance-20261012/delivery/final-tools-catalogue-green.log;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-matrix.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_documentation_and_commands_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-46">
+<span id="status-build-system-bld-46"></span><h2><a class="toc-backref" href="#id47" role="doc-backlink">BLD-46</a><a class="headerlink" href="#bld-46" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-46</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Explicit host and tool support matrix</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Tools compiler OS versions and validated versus unknown scopes are stated accurately</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/design/build-system.md;dependencies/environment.lock.json;dependencies/toolchains.lock.json;dependencies/python-tools-linux-cp311.lock.json;dependencies/python-tools-linux-cp312.lock.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/documentation/host-tool-support-observations.json;/workspace/nexus-build-maintenance-20261012/workflow/hook-isolation-final-v2/final-report.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-matrix.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_observed_matrix_verified</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-47">
+<span id="status-build-system-bld-47"></span><h2><a class="toc-backref" href="#id48" role="doc-backlink">BLD-47</a><a class="headerlink" href="#bld-47" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-47</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Build-system TDD regression suite</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Real small projects cover protection no-op repair dependencies external LTO rejection and cancellation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tests/contracts/test_build_system.py;tests/contracts/test_build_artifacts.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/targets/targets-implementation-report-v2.json;/workspace/nexus-build-maintenance-20261012/targets/green-native-final-20.log;/workspace/nexus-build-maintenance-20261012/targets/green-arm-canonical-budget.log;/workspace/nexus-build-maintenance-20261012/targets/actual-ccache-contract-final.json; /workspace/nexus-build-maintenance-20261012/failed-normal-hook-1/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="bld-48">
+<span id="status-build-system-bld-48"></span><h2><a class="toc-backref" href="#id49" role="doc-backlink">BLD-48</a><a class="headerlink" href="#bld-48" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>BLD-48</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">requirement</span></code></p></td>
+<td><p>Common execution and failure record format</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exit_condition</span></code></p></td>
+<td><p>Stage argv exit duration identity and artifacts are retained; retry preserves earlier failed records</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/process.py;tools/dev/provenance.py;scripts/ci/tdd_gate.py;scripts/ci/native_contracts.py;tools/testing/test_staged_execution.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>/workspace/nexus-build-maintenance-20261012/workflow/report-v4.json;/workspace/nexus-build-maintenance-20261012/workflow/final-related-tests-v4.command.json; /workspace/nexus-build-maintenance-20261012/workflow/report-v5.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json;/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-matrix.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json;/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json;/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>implemented_software_validated</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Status and evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../support.html">支持范围与选型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../software-verification.html">软件验证、源码身份与证据</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-acceptance.html">文档系统实施与正式验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hardware.html">HIL 与实板状态</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../ledgers.html">原台账、退出条件与派生视图</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../roadmap.html">迭代方向与进入条件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>历史文档与版本迁移 &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Nexus 平台图册" href="../assets/diagrams/README.html" />
+    <link rel="prev" title="Documentation tools and preparation" href="documentation-tools.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/reference/history.md">3835e13cd7da</a>; code reference: 3835e13cd7da. <a href="../../zh_CN/reference/history.html" lang="zh-CN">zh_CN</a>. Source language: zh_CN; requested: en; actual: zh_CN; translation: <strong>missing</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="reference-history">
+<span id="id1"></span><h1>历史文档与版本迁移<a class="headerlink" href="#reference-history" title="Link to this heading">¶</a></h1>
+<p>旧 HAL／OSAL／Kconfig 页面描述旧目录、接口、实例生成和所有权规则。它们不能作为
+当前 typed factory／静态实例／借用生命周期的规范。本页为旧 URL 提供有版本边界
+的入口；不会把旧函数名静默解释为当前公共 API。</p>
+<section id="id2">
+<h2>当前用户从这里继续<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>旧内容</p></th>
+<th class="head"><p>当前入口</p></th>
+<th class="head"><p>必须重新确认</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>HAL factory／设备接口</p></td>
+<td><p><a class="reference internal" href="api/index.html"><span class="std std-doc">当前 API</span></a>、<a class="reference internal" href="../explanation/factory.html"><span class="std std-doc">配置与 factory</span></a></p></td>
+<td><p>生成 ID、只读 face、cold lookup 与平台生命周期</p></td>
+</tr>
+<tr class="row-odd"><td><p>OSAL</p></td>
+<td><p><a class="reference internal" href="../guides/os-shutdown.html"><span class="std std-doc">OS 等待与停机</span></a>、<a class="reference internal" href="api/os.html"><span class="std std-doc">当前 OS API</span></a></p></td>
+<td><p>后端差异、静态存储、deadline、publisher 与 join</p></td>
+</tr>
+<tr class="row-even"><td><p>Kconfig 平台／外设／OS 宏</p></td>
+<td><p><a class="reference internal" href="configuration/index.html"><span class="std std-doc">配置参考</span></a>、<a class="reference internal" href="../guides/migration.html"><span class="std std-doc">迁移指南</span></a></p></td>
+<td><p>单 authored TOML、不可变 IR、拒绝规则与精确 mode</p></td>
+</tr>
+<tr class="row-odd"><td><p>旧 build／flash 教程</p></td>
+<td><p><a class="reference internal" href="../tutorials/index.html"><span class="std std-doc">首次构建</span></a>、<a class="reference internal" href="../status/support.html"><span class="std std-doc">支持范围</span></a></p></td>
+<td><p>实际工具版本、Board、SDK 和产物身份</p></td>
+</tr>
+<tr class="row-even"><td><p>历史软件数量或通过记录</p></td>
+<td><p><a class="reference internal" href="../status/software-verification.html"><span class="std std-doc">精确证据入口</span></a></p></td>
+<td><p>原 source、scope、receipt；文档更新不继承资格</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>迁移应同时改变配置、接口访问、存储所有权与停止流程，然后对迁移后的源码与
+装配重新验证。旧参数、旧 object ID 和相邻配置的结果不能继承到新 bundle。</p>
+</section>
+<section id="id3">
+<h2>获取冻结的旧资料<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">docs/archive/sphinx-before-next-generation/</span></code> 和 <code class="docutils literal notranslate"><span class="pre">docs/archive/implementation/</span></code>
+保留历史源码及原编号。它们不参与当前站点默认搜索，不作为当前能力或资格。
+可在 Git 中选择具体 commit 浏览或下载旧源：</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/tree/0111c8d3b9c7b37d258b9c401070305b13b6f3a1/docs/archive/sphinx-before-next-generation">旧 Sphinx 文档源：冻结文档规划基线 0111c8d3</a></p></li>
+<li><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/tree/0111c8d3b9c7b37d258b9c401070305b13b6f3a1/docs/archive/implementation">历史 RF 实施源：同一冻结基线</a></p></li>
+</ul>
+<p>这个固定 revision 只确定旧资料字节，不表示该 revision 的固件得到历史资格。
+旧 locale PO 也是历史翻译，不能因当前 language selector 自动成为已审查新译文。
+需要离线阅读旧资料时取得上述固定 Git snapshot；当前文档包提供迁移解释和旧 URL
+alias，不把全部历史教程塞进当前搜索或重新解释其合同。</p>
+</section>
+<section id="id4">
+<h2>旧地址如何处理<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p><a class="reference download internal" download="" href="../_downloads/96563472d31f1ba94d267280c507397e/redirects.csv"><code class="xref download docutils literal notranslate"><span class="pre">URL</span> <span class="pre">迁移表</span></code></a>列出旧 RST 对应路径、语言和目标页。
+<code class="docutils literal notranslate"><span class="pre">en/</span></code>、<code class="docutils literal notranslate"><span class="pre">zh_CN/</span></code> 旧地址分别保留；根 <code class="docutils literal notranslate"><span class="pre">api/index.html</span></code> 已用于当前公共 API，不能覆盖。
+旧 HAL／OSAL／Kconfig 等不同语义的路径进入本页，明确版本边界后再选迁移指南。
+当前上一轮简版 Sphinx 同义入口可进入对应新页。alias 是本地 HTML 和相对链接，
+不依赖 JavaScript、CDN 或外部跳转服务。</p>
+<p><a class="reference download internal" download="" href="../_downloads/c842ae0910b28a190d5978c12c524a50/documentation-migration.csv"><code class="xref download docutils literal notranslate"><span class="pre">页面迁移与权威映射</span></code></a>记录源页面、权威、读者任务、
+实际站点去向与保留规则。原合同和结果路径保留，链接原文或派生视图，避免建立第二份
+状态和规范。后续路径变化应同步映射、导航、alias 和离线检查。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api/index.html">Public C API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/index.html">Configuration and tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platforms/index.html">Platforms and qualification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-delivery.html">文档包、发布与独立恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-tools.html">Documentation tools and preparation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">历史文档与版本迁移</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../assets/diagrams/README.html">Nexus 平台图册</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

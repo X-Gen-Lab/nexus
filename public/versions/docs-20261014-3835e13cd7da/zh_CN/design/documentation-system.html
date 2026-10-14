@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Nexus 文档系统架构与交付规划 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Nexus 文档页面模板" href="documentation-templates.html" />
+    <link rel="prev" title="Nexus 文档内容与图示标准" href="documentation-standards.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/design/documentation-system.md">3835e13cd7da</a>; code reference: 3835e13cd7da. <a href="../../en/design/documentation-system.html" lang="en">en</a>. Source language: zh_CN; requested: zh_CN; actual: zh_CN; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="nexus">
+<h1>Nexus 文档系统架构与交付规划<a class="headerlink" href="#nexus" title="Link to this heading">¶</a></h1>
+<p>本方案把现有维护合同、公共 API、使用说明和交付证据组织为一个按读者任务导航、
+版本明确、可离线取得的文档系统。正文使用现有 Markdown 和公开头文件；站点继续
+采用 Sphinx、Doxygen、Breathe，增加 MyST。产品代码和策略仍在外部仓库。</p>
+<p>站点、CLI、依赖锁、正文、翻译和图册已按本方案实现。实际构建、发布和恢复
+以 <a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">58</span> <span class="pre">项实施台账</span></code></a>及对应执行证据为准；
+<a class="reference download internal" download="" href="../_downloads/c842ae0910b28a190d5978c12c524a50/documentation-migration.csv"><code class="xref download docutils literal notranslate"><span class="pre">迁移映射</span></code></a>记录当前内容的去向和保留规则。
+这份文档不修改既有平台支持、软件资格或实板状态。
+新增和修改文档遵守 <a class="reference internal" href="documentation-standards.html"><span class="std std-doc">内容与图示标准</span></a>及
+<a class="reference internal" href="documentation-templates.html"><span class="std std-doc">页面模板</span></a>。<a class="reference internal" href="documentation-improvements.html"><span class="std std-doc">完整优化清单</span></a>
+从同一台账派生；<a class="reference internal" href="../assets/diagrams/README.html"><span class="std std-doc">参考图册</span></a>区分当前与目标视图。</p>
+<section id="id1">
+<h2>1. 目标和边界<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>文档首先帮助应用开发者正确使用平台，其次帮助接入者扩展平台，最后帮助维护者
+和验收人员判断变更与证据。读者能够完成一次明确任务，不需要先遍历实施历史。</p>
+<ul class="simple">
+<li><p>应用使用当前静态实例、typed factory 和 C 多态接口。</p></li>
+<li><p>默认配置是一份 authored TOML，SoC/Board 事实使用维护的 JSON。</p></li>
+<li><p>接入说明保留上下文、deadline、借用、排空和失败恢复条件。</p></li>
+<li><p>生产支持、软件测试、ARM 链接、候选和 HIL 状态分别表达。</p></li>
+<li><p>文档、源码、配置和已验证基线都有明确身份。</p></li>
+<li><p>一处维护规范内容，其他页面引用、包含或派生，不复制一套合同。</p></li>
+<li><p>内部链接、搜索和离线包覆盖当前正文；历史资料具有可见边界。</p></li>
+</ul>
+<p>文档系统不创建产品应用、任务、私有 PCB、Flash 分区、安全升级或恢复策略。
+教程引用 X-Gen-Lab/nexus-examples 的固定版本；平台仓库只保留通用测试夹具和
+验证所需代码。文档发布不把软件模型或链接结果升级为实板资格。</p>
+</section>
+<section id="id2">
+<h2>2. 首页从读者任务进入<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>读者</p></th>
+<th class="head"><p>首页路径</p></th>
+<th class="head"><p>完成结果</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>应用开发者</p></td>
+<td><p>使用 SDK → 选择 Board/OS → 配置实例 → factory 取得接口 → I/O → 停机</p></td>
+<td><p>可构建的外部工程和正确的资源生命周期</p></td>
+</tr>
+<tr class="row-odd"><td><p>平台接入者</p></td>
+<td><p>新 Board → 新 SoC/provider → 通用器件/组件 → 模型/ARM/HIL</p></td>
+<td><p>明确范围、资源和验证的接入切片</p></td>
+</tr>
+<tr class="row-even"><td><p>维护者</p></td>
+<td><p>安装工具 → TDD → 评审 → 依赖升级 → SDK/文档交付</p></td>
+<td><p>可追溯变更和可恢复交付</p></td>
+</tr>
+<tr class="row-odd"><td><p>验收人员</p></td>
+<td><p>支持矩阵 → 精确配置 → 软件记录 → 候选 → 实板状态</p></td>
+<td><p>针对具体基线的资格判断</p></td>
+</tr>
+<tr class="row-even"><td><p>旧版用户</p></td>
+<td><p>配置迁移 → 接口迁移 → 所有权变化 → 重验证</p></td>
+<td><p>不依赖旧 API 的新消费工程</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>教程只走一条经过验证的路径；操作指南解决一个目标；参考给出精确规则；解释
+说明原理与取舍。首页侧栏保持两层，复杂域通过索引页展开。搜索默认排除历史
+教程和大型原始证据，搜索结果显示当前版本、页面类别和翻译状态。</p>
+</section>
+<section id="id3">
+<h2>3. 内容权威和派生关系<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>内容</p></th>
+<th class="head"><p>权威来源</p></th>
+<th class="head"><p>网站处理</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>公共声明及单 API 合同</p></td>
+<td><p>core/arch/io/os/components 的 public headers</p></td>
+<td><p>Doxygen/Breathe 生成，指南链接符号</p></td>
+</tr>
+<tr class="row-odd"><td><p>CPU/芯片/路由/Board 事实</p></td>
+<td><p>SoC/Board JSON、生产 resolver、来源审查</p></td>
+<td><p>复用既有能力派生工具，附人工限制说明</p></td>
+</tr>
+<tr class="row-even"><td><p>跨 API 生命周期和执行顺序</p></td>
+<td><p>当前系统合同正文</p></td>
+<td><p>直接纳入站点，不从教程反推规范</p></td>
+</tr>
+<tr class="row-odd"><td><p>配置语法和拒绝规则</p></td>
+<td><p>生产配置器、typed IR、配置合同</p></td>
+<td><p>完整示例实际解析，片段明确标记</p></td>
+</tr>
+<tr class="row-even"><td><p>工程与风格要求</p></td>
+<td><p>AGENTS、既有风格文件和工程合同</p></td>
+<td><p>保留现有约束并连接操作步骤</p></td>
+</tr>
+<tr class="row-odd"><td><p>实现支持范围</p></td>
+<td><p>生产实现/选择与 reviewed facts、人工边界</p></td>
+<td><p>一个权威支持入口，其余页摘要并链接</p></td>
+</tr>
+<tr class="row-even"><td><p>已执行资格</p></td>
+<td><p>精确源码的结果索引与原始 receipts</p></td>
+<td><p>展示 scope、配置、工具和产物身份</p></td>
+</tr>
+<tr class="row-odd"><td><p>工作计划与退出条件</p></td>
+<td><p>各专项 CSV 台账</p></td>
+<td><p>派生任务视图，不生成重复状态数据库</p></td>
+</tr>
+<tr class="row-even"><td><p>内部文件组织和维护定位</p></td>
+<td><p>源码相邻 README</p></td>
+<td><p>保留局部入口，公开部分包含或版本化链接</p></td>
+</tr>
+<tr class="row-odd"><td><p>历史方案和计数</p></td>
+<td><p>docs/archive</p></td>
+<td><p>独立历史入口，不建立当前资格</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>芯片具备外设、provider 实现模式、Board 授权接线、软件执行和 HIL 通过，是不同
+事实。派生表只读取已经定义的 authority，不另建一套芯片能力或资格规则。
+一个 CSV 的 implemented 不自动映射成 accepted；多个台账重叠，不能相加为
+项目完成百分比。旧记录保留原编号、原退出条件和失败尝试。</p>
+</section>
+<section id="id4">
+<h2>4. 目标目录与渐进接入<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>docs/
+├── index.md                      任务入口、版本与资格边界
+├── tutorials/                    首次完成一个可验证流程
+├── guides/                       使用、接入、取消/排空、故障处理
+├── reference/
+│   ├── api/                      Core/Arch/I/O/OS/Components
+│   ├── configuration/            TOML、facts、IR、预算、CLI
+│   ├── platforms/                CPU/SoC/Board 精确支持切片
+│   └── contracts/                当前有效系统合同
+├── explanation/                  架构、factory、所有权、资源和取舍
+├── status/                       支持、当前资格、HIL、发布、台账视图
+├── development/                  风格、TDD、评审、依赖与文档维护
+├── design/                       活跃方案、决策和原始专项台账
+├── delivery/                     保留原路径的执行记录与结果索引
+├── locale/                       gettext/PO 翻译
+├── assets/                       本地图片、图源和样式
+├── sphinx/                       迁移期配置与 API/RST 包装页
+└── archive/                      历史资料，不进入默认站点搜索
+</pre></div>
+</div>
+<p>第一步把 Sphinx source root 改为 docs/，配置迁移期仍放 docs/sphinx/conf.py。
+MyST 使现有 design/delivery Markdown 成为真实文档页面，并进入导航和搜索。
+先接入正文和修复入口，再按映射移动可变内容；不先大批移动再修引用。</p>
+<p>toctree 是唯一导航编排，README 是仓库入口。第一阶段可直接导航旧路径，后续
+保持稳定 page ID 并维护小型 URL redirect 表。相对链接按源文件实际位置解析，
+移动时检查所有引用和显式 anchor。目录重组与规范意义变化分别评审。</p>
+<p>以下材料保留源路径：</p>
+<ul class="simple">
+<li><p>三份已有 delivery results JSON 和对应执行记录。</p></li>
+<li><p>六份原专项执行 CSV，以及本方案的新文档系统台账。</p></li>
+<li><p>archive 的原内容、编号和历史资格。</p></li>
+<li><p>被工具当作输入的合同，直到实际引用与门禁同时迁移通过。</p></li>
+</ul>
+<p>当前状态页引用这些来源或派生视图，不重写历史 receipts。外部归档仍使用原字节
+和 member 定位。新路径不能伪造原源码执行或改变旧档案的身份。</p>
+</section>
+<section id="id5">
+<h2>5. 技术选择<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>决策</p></th>
+<th class="head"><p>选择与理由</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>站点</p></td>
+<td><p>复用 Sphinx，已有严格 CI 和 C API 交叉引用</p></td>
+</tr>
+<tr class="row-odd"><td><p>正文</p></td>
+<td><p>Markdown/MyST，RST 继续用于 API 指令和过渡页</p></td>
+</tr>
+<tr class="row-even"><td><p>API</p></td>
+<td><p>public-only Doxygen XML + Breathe，保持已有注释风格</p></td>
+</tr>
+<tr class="row-odd"><td><p>翻译</p></td>
+<td><p>单正文源 + Sphinx gettext/PO，一条翻译链</p></td>
+</tr>
+<tr class="row-even"><td><p>导航</p></td>
+<td><p>toctree 和模块索引，不建立独立内容数据库</p></td>
+</tr>
+<tr class="row-odd"><td><p>状态</p></td>
+<td><p>复用能力派生、结果索引、CSV 和 identity 工具</p></td>
+</tr>
+<tr class="row-even"><td><p>主题</p></td>
+<td><p>先沿用现有主题；内容/搜索合格后再独立评估</p></td>
+</tr>
+<tr class="row-odd"><td><p>图示</p></td>
+<td><p>可编辑DOT + 本地SVG，Graphviz受锁；可用Sphinx内置graphviz扩展</p></td>
+</tr>
+<tr class="row-even"><td><p>交付</p></td>
+<td><p>相对链接的 HTML 包和 manifest，不依赖 CDN</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>本轮不切换 MkDocs 或 Docusaurus，不引入额外前端运行时来完成基础导航。
+已有 MyST/Sphinx 功能不足时，再以实际失败样例评估扩展。不要为每篇文档维护
+第二份目录表、能力表或通用 snippet DSL。</p>
+<p>站点排除 docs/archive、Doxygen 生成输出、_build、原始日志、大型归档和软件
+fixture 产物。状态页提供可读摘要和下载索引，原始证据不批量成为搜索页面。
+源码相邻 README 不复制为第二份合同；若包含，须验证原相对链接的重定位。
+其他源码链接使用当前站点绑定的 Git revision，避免固定开发分支漂移。</p>
+</section>
+<section id="api">
+<h2>6. 页面和 API 组织<a class="headerlink" href="#api" title="Link to this heading">¶</a></h2>
+<p>新公共页使用标准 MyST front matter，保持少量维护字段：</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guides.cancel-and-drain</span>
+<span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">how-to</span>
+<span class="nt">audience</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">consumer</span>
+<span class="nt">source_language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zh_CN</span>
+</pre></div>
+</div>
+<p>id 用于页面身份与迁移检查，不会自动生成 MyST 可引用 anchor。公共 anchor 使用
+标准 MyST 显式 target 或 Sphinx label，路径调整后保留并实际构建验证；旧 URL
+由 redirect 处理，不另建引用框架。版本、更新时间、源码链接和验证状态从实际
+Git/执行输入派生，不要求作者手填多个时间戳或复制源码 hash。
+旧页在迁移时逐批补字段，不通过默认值伪造其语言或验证状态。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>页面类型</p></th>
+<th class="head"><p>必需内容</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>tutorial</p></td>
+<td><p>目标、精确前提、固定配置、完整步骤、预期结果和清理</p></td>
+</tr>
+<tr class="row-odd"><td><p>how-to</p></td>
+<td><p>单一任务、上下文、最短步骤、失败处理和适用边界</p></td>
+</tr>
+<tr class="row-even"><td><p>reference</p></td>
+<td><p>字段/符号、范围、单位、拒绝条件与权威来源</p></td>
+</tr>
+<tr class="row-odd"><td><p>explanation</p></td>
+<td><p>问题、机制、取舍、边界，链接规范合同</p></td>
+</tr>
+<tr class="row-even"><td><p>status</p></td>
+<td><p>source/config/scope、实际执行状态与证据定位</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>API 从一个总 doxygenindex 改为 Core、Arch、I/O、OS、Components 模块入口。
+每个设备页先连接公共合同与调用顺序，再进入自动生成符号。不要手抄函数声明。</p>
+<p>factory 单独解释：查找返回已生成静态对象，日常 I/O 直接通过 face 调用 provider。
+示例使用实际生成的 nexus_factory.h；默认 ID、strong-ID 和可选能力记录各有
+精确配置和执行证据。公开头文件与每次装配生成的接口不能混为全平台恒定 API。</p>
+</section>
+<section id="id6">
+<h2>7. 双语与图示<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/documentation-target.svg" title="打开 SVG 大图"><img alt="目标文档系统的内容、API、状态、图示与交付链路" src="../_images/documentation-target.svg" /></a></p>
+<p>图为目标设计，不代表已实现。箭头表示输入/产物传递；软件和HIL只读记录，文档
+构建不产生平台资格。来源与完整说明见 <a class="reference internal" href="../assets/diagrams/README.html"><span class="std std-doc">FIG-12</span></a>。</p>
+<p>每篇正文只有一份 canonical source，记录原始语言。关键操作路径中文优先；
+现有英文合同先原文接入并标明语言，避免目录迁移同时承担全部重写和翻译。
+API 标识符、配置键、错误码、CSV、JSON 和原始日志保持原字节或语义。</p>
+<p>gettext/PO 是唯一翻译链。翻译审查绑定原文版本；原文变化后，受影响翻译进入
+stale 或 fuzzy，不能因 language=zh_CN/en 构建成功而记录翻译完成。
+状态只有 reviewed、stale、missing、original，按页派生并在页面可见。</p>
+<p>翻译门禁分别用中文原文和英文原文验证 en/zh_CN round-trip、缺译 fallback、
+stale/fuzzy。标记依据实际正文语言和审查状态，不能被构建 locale 覆盖。</p>
+<p>发布关键页包括入门、配置、factory、借用/取消/排空、支持范围、资格边界和迁移。
+这些页对应语言的可见规范正文需完成独立语义审查且无未处理 fuzzy。其他页允许
+标注原文或缺失翻译；语言入口展示覆盖范围，不把英文原文称为完整中文文档。</p>
+<p>图示保留可审查源，输出本地资源。首批不依赖在线 Mermaid/CDN、外部字体或脚本。
+新增渲染器需要独立工具锁和实际验证；图的箭头、生命周期和支持边界随正文评审。
+离线包检查图像、搜索、导航与双语入口，不只检查首页存在。
+完整15类必需图及视觉、源码和失败路径约束由内容与图示标准定义。</p>
+</section>
+<section id="id7">
+<h2>8. 示例与文档门禁<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<p>代码示例优先从真实 fixture 或固定 external example literalinclude，不维护一套
+无法编译的手抄实现。完整使用教程需实际消费当前 Source SDK；声明硬件命令时
+注明工具、板卡和连接前提，普通文档构建不刷写或访问设备。
+external example 先取得固定 revision/hash 的本地输入并记录许可证，Sphinx 只读
+该输入，不在构建时联网取得最新版或执行外部仓库脚本。</p>
+<p>完整 TOML 使用生产 resolver。Board/CPU JSON 通过实际接入路径验证，不能只
+做 JSON syntax check。部分示例有明确 fragment 原因，保留语法检查，但不计为
+完整可执行配置。现有 nexus-toml-fragment 约定继续使用。</p>
+<p>维护的 shell/CMake 流程只由明确审核的 fixture 执行，不能从任意 Markdown 自动
+提取并执行命令。完整片段、示意片段和执行报告的范围分别呈现。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>层级</p></th>
+<th class="head"><p>验证</p></th>
+<th class="head"><p>触发</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>快速源检查</p></td>
+<td><p>格式、元数据、page ID、内部文件/anchor、导航可达</p></td>
+<td><p>commit/CI</p></td>
+</tr>
+<tr class="row-odd"><td><p>配置示例</p></td>
+<td><p>完整 TOML 与 JSON 的实际 resolver、片段原因</p></td>
+<td><p>相关变更 commit/CI</p></td>
+</tr>
+<tr class="row-even"><td><p>可执行示例</p></td>
+<td><p>真实 Native/ARM/SDK consumer 和失败路径</p></td>
+<td><p>相关行为变更 CI</p></td>
+</tr>
+<tr class="row-odd"><td><p>公共 API</p></td>
+<td><p>既有注释合同 + Doxygen/Breathe 严格构建</p></td>
+<td><p>API/文档 CI</p></td>
+</tr>
+<tr class="row-even"><td><p>全站</p></td>
+<td><p>MyST/Sphinx 严格引用、导航、搜索、翻译状态、资源</p></td>
+<td><p>CI/发布</p></td>
+</tr>
+<tr class="row-odd"><td><p>外部链接</p></td>
+<td><p>有限 timeout/retry，分开报告404与网络不可达</p></td>
+<td><p>定期/发布</p></td>
+</tr>
+<tr class="row-even"><td><p>发布后</p></td>
+<td><p>实际站点身份、关键页、旧URL、资源与下载</p></td>
+<td><p>实际部署后</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>commit 快速检查默认离线，不每次重跑固件全平台资格。新增文档工具与 gate 使用
+Python unittest 的实际 RED→GREEN；新增 C 行为测试用 GoogleTest/GoogleMock，
+示例消费用现有真实构建。纯正文调整运行相应文档检查，不增加镜像实现的测试。</p>
+</section>
+<section id="id8">
+<h2>9. 一个工具入口<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<p>统一工具入口如下，安装工具与实际验收见文档维护指南：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>python tools/dev/dev.py docs check
+python tools/dev/dev.py docs test
+python tools/dev/dev.py docs build --language zh_CN
+python tools/dev/dev.py docs build --language en
+python tools/dev/dev.py docs preview
+python tools/dev/dev.py docs package
+python tools/dev/dev.py doctor --target docs
+</pre></div>
+</div>
+<p>dev.py 保持薄路由，文档模块复用现有 process runner、超时、退出码和 identity。
+docs.py/.sh/.ps1/.bat 转为转发或明确迁移提示，不各自维护生成规则。</p>
+<ul class="simple">
+<li><p>check 验证受维护的源文档和实际配置片段，不建立平台资格。</p></li>
+<li><p>build 在新输出根执行 Doxygen 与 Sphinx；统一 -n -W –keep-going。</p></li>
+<li><p>preview 服务已成功生成的目录，不隐式安装或替换依赖。</p></li>
+<li><p>package 验证成功输出和身份后封存，不自动发布平台或产品。</p></li>
+<li><p>doctor 区分缺工具、版本不符和未执行资格。</p></li>
+</ul>
+<p>真实失败码、详细诊断和原始日志必须保留。输出目录受 ownership 控制，不能覆盖
+输入；旧 XML/HTML 不能作为新构建成功的输入。重复构建隔离输出和翻译缓存。
+Breathe XML 路径由本次输出根注入，不能继续固定读取 docs/api 的旧结果。</p>
+<p>文档 Python 传递依赖和 wheel hash 形成独立闭包；首次支持 Linux x86_64 的已
+执行 Python tuple。Doxygen 输入也固定版本及字节身份；Doxygen的HAVE_DOT=NO
+不表示文档图链不使用Graphviz。图渲染的Graphviz和实际字体一并进入闭包。
+干净环境实际执行 require-hashes 安装，不用 lock 的存在
+替代安装结果。其他主机资格独立记录。</p>
+</section>
+<section id="id9">
+<h2>10. 版本和发布身份<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
+<p>文档 manifest 复用既有 identity 和证据定位结构，至少绑定：</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>字段</p></th>
+<th class="head"><p>来源与意义</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>platform_version</p></td>
+<td><p>现有平台版本 policy，核对 CMake，不另写常量</p></td>
+</tr>
+<tr class="row-odd"><td><p>code_source_commit</p></td>
+<td><p>被文档描述的实际代码源码</p></td>
+</tr>
+<tr class="row-even"><td><p>documentation_commit</p></td>
+<td><p>本次正文/配置/翻译源码</p></td>
+</tr>
+<tr class="row-odd"><td><p>qualified_code_source</p></td>
+<td><p>当前引用资格的精确源码；无则为空</p></td>
+</tr>
+<tr class="row-even"><td><p>qualification_record</p></td>
+<td><p>既有结果索引，保留其scope和配置</p></td>
+</tr>
+<tr class="row-odd"><td><p>docs_tools</p></td>
+<td><p>实际 Python、Doxygen、Sphinx、MyST/Breathe 闭包</p></td>
+</tr>
+<tr class="row-even"><td><p>languages</p></td>
+<td><p>实际正文/翻译状态与审查身份</p></td>
+</tr>
+<tr class="row-odd"><td><p>outputs</p></td>
+<td><p>仅成功 payload 的相对路径、size、hash；不列 manifest/checksums/archive/外层receipt</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>三种源码身份不能互相覆盖。文档更新可引用经过验证的旧代码记录，不把该记录
+重新标记为当前 HEAD 已执行。若描述的代码与资格不同，页面显示各自来源和边界。
+本方案描述的起点是 docs HEAD 7abde0e4、qualified code cc6a065c；历史 SoC
+记录保持独立。计划工具一旦实现变更，按新源码执行其门禁。</p>
+<p>版本 URL 结构如下；具体已发布版本以实际发布记录为准：</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/dev/&lt;documentation-commit&gt;/&lt;language&gt;/
+/versions/&lt;release-id&gt;/&lt;language&gt;/
+/stable/&lt;language&gt;/
+/versions/&lt;release-id&gt;/api/
+</pre></div>
+</div>
+<p>release-id 唯一绑定文档 manifest；相同 platform_version 的文档修订也不能覆盖
+已发布不可变目录。stable 只是已验收软件 SDK 文档入口，不代表全部 HIL 已通过。
+HIL 未执行允许按真实状态发布软件文档，不能发布虚构的实板支持。</p>
+<p>PR 首阶段通过有身份的 CI artifact 预览。发布使用受信任部署作业和已验证输出，
+不在高权限上下文执行外部 PR 源码。版本站点和 stable 指针只有实际部署后才能
+记为 published；工作流存在或 build 成功都不是公开发布证据。
+发布前的外链报告绑定本次输入，分别记录坏链与网络不可达；必需源码、规范和
+下载入口未验证时不能报告交付通过，非必需引用的限制明确保留。</p>
+<p>旧 /en、/zh_CN、/api 入口逐项处理。旧 HAL/OSAL/Kconfig 页转向标明版本的
+历史或迁移页，不能把同名旧函数静默重定向为不同合同的新接口。</p>
+</section>
+<section id="id10">
+<h2>11. 离线包、下载和恢复<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>nexus-docs-&lt;release-id&gt;/
+├── index.html
+├── en/
+├── zh_CN/
+├── api/
+├── downloads/                 小型索引和独立下载说明
+├── manifest.json
+├── checksums.txt
+└── licenses/
+</pre></div>
+</div>
+<p>HTML、图、搜索和内部链接全部相对化，不依赖 CDN。公开定位不要求原 workspace
+路径；历史 receipts 的绝对路径保留原样，新增归档/member导航提供取得步骤。
+大型原始档案单独发布，不默认装入整个网站；缺少可下载对象时明确记录 local-only。</p>
+<p>manifest 绑定输入与payload；checksums 覆盖payload和manifest，不包含自身。
+外层 archive hash 放在独立 receipt，不形成包内自引用。使用既有归档/校验工具，
+不建立第二个平台候选状态机。HTML 包只证明文档交付，不替代 SDK/MCU/HIL。
+HTML 可以显示输入身份，不能嵌入覆盖自身的最终 manifest hash；manifest 与
+checksums 都不进入 manifest.outputs，避免间接形成自引用。</p>
+<p>CI artifact 用于预览，长期发布必须有稳定位置、保留策略和校验。实际从独立根
+取得并恢复，浏览关键页并验真；异地故障域恢复依赖真实存储，未执行不标完成。
+时间/路径造成的可消除差异可以规范化，但字节复现结论必须由实际双构建建立。</p>
+</section>
+<section id="id11">
+<h2>12. 实施工作包与排程<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h2>
+<p>D1至D6是工作包分类，不表示必须依次完成的六个时间阶段。实际执行顺序以
+台账的dependencies有向无环图为准；预估工期须在工具和内容范围确认后另行记录。
+术语基线DOC-21与图工具/离线规则DOC-25先于依赖它们的正文和图示交付。
+DOC-58逐图审查可以并行推进，但最终关闭必须等待全部15类图及相关检查完成。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>工作包</p></th>
+<th class="head"><p>内容范围</p></th>
+<th class="head"><p>交付与退出条件</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D1</p></td>
+<td><p>入口、权威与正文规则</p></td>
+<td><p>修正入口/样例/证据导航；确认所有正文去向和保留路径</p></td>
+</tr>
+<tr class="row-odd"><td><p>D2</p></td>
+<td><p>站点、架构与API</p></td>
+<td><p>MyST/source-root、唯一导航、模块API与当前合同可搜索</p></td>
+</tr>
+<tr class="row-even"><td><p>D3</p></td>
+<td><p>教程、接入与执行机制</p></td>
+<td><p>SDK/异步/接入/停机/迁移任务路径经真实consumer验证</p></td>
+</tr>
+<tr class="row-odd"><td><p>D4</p></td>
+<td><p>双语、图示与读者审查</p></td>
+<td><p>关键双语页、翻译状态与离线图示；读者任务走查</p></td>
+</tr>
+<tr class="row-even"><td><p>D5</p></td>
+<td><p>工具、门禁与CI</p></td>
+<td><p>统一CLI、门禁、工具锁、CI/preview真实负路径</p></td>
+</tr>
+<tr class="row-odd"><td><p>D6</p></td>
+<td><p>发布、恢复与迁移收尾</p></td>
+<td><p>版本/离线包、实际发布检查、独立恢复与迁移收尾</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>基础规则先确认，工具与正文并行，发布依赖成功构建、身份、关键内容、翻译
+状态及完整图册审查；平台 main/版本集成是实际发布的外部依赖，不能从本方案
+推断已合入或部署。所有维护责任由 Codex 承担，必要独立评审由其他 agent 执行。</p>
+<p>每个 DOC 编号分别记录 implementation_status、validation_status 和 exit_condition。
+原专项台账不重新编号。本文档系统台账与既有48项构建台账、对话中的48项全项目
+优化建议不同；全项目建议需另建独立台账，不混入文档完成度。</p>
+</section>
+<section id="id12">
+<h2>13. 最终交付检查<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h2>
+<p>完成文档系统必须同时满足：</p>
+<ol class="arabic simple">
+<li><p>当前正文、公共API、支持、资格和历史的权威来源明确，页面无重复规范。</p></li>
+<li><p>使用、接入、维护和验收任务有完整路径；必需配置和consumer实际执行成功。</p></li>
+<li><p>所有受维护页面可达可搜索，内部引用无断链，旧URL具有准确版本边界。</p></li>
+<li><p>关键语言页面实际审查通过，其他页显示原文/stale/missing，不假报翻译完成。</p></li>
+<li><p>本地/CI使用相同严格规则，故意错误、缺工具、失效输入真实失败并保留诊断。</p></li>
+<li><p>API、factory、TOML、ThreadX、DMA和参考平台口径与生产选择一致。</p></li>
+<li><p>文档、代码、资格与工具身份可读可验证；历史执行和HIL状态保持真实。</p></li>
+<li><p>干净环境生成的离线包可独立浏览验真，下载与实际站点身份匹配。</p></li>
+<li><p>发布和恢复有实际结果；未建立的主机、存储或硬件资格继续保留条件。</p></li>
+<li><p>全部15类必需图满足各自退出条件并完成图文、视觉及离线审查；当前四个
+图的身份与验证范围分别记录，未声明支持的配置和后续扩展仍明确标注边界。</p></li>
+</ol>
+</section>
+<section id="id13">
+<h2>14. 相关入口<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="README.html"><span class="std std-doc">当前设计和原始台账</span></a></p></li>
+<li><p><a class="reference internal" href="../delivery/README.html"><span class="std std-doc">当前交付和精确源码</span></a></p></li>
+<li><p><a class="reference internal" href="source-compatibility.html"><span class="std std-doc">SDK版本与接口代际</span></a></p></li>
+<li><p><a class="reference internal" href="engineering-handbook.html"><span class="std std-doc">工程手册</span></a></p></li>
+<li><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/sphinx/README.md">当前文档构建说明</a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">文档系统实施台账</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/c842ae0910b28a190d5978c12c524a50/documentation-migration.csv"><code class="xref download docutils literal notranslate"><span class="pre">迁移映射</span></code></a></p></li>
+</ul>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

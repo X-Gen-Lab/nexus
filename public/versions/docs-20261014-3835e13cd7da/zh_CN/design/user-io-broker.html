@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Kernel-invoked user I/O admission &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="已记录的交付证据" href="../delivery/index.html" />
+    <link rel="prev" title="USB FS device 包所有权与接入边界" href="usb-device.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/3835e13cd7da34bd75307746859d4514745ae2ff/docs/design/user-io-broker.md">3835e13cd7da</a>; code reference: 3835e13cd7da. <a href="../../en/design/user-io-broker.html" lang="en">en</a>. Source language: en; requested: zh_CN; actual: en; translation: <strong>missing</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="kernel-invoked-user-i-o-admission">
+<h1>Kernel-invoked user I/O admission<a class="headerlink" href="#kernel-invoked-user-i-o-admission" title="Link to this heading">¶</a></h1>
+<p>The optional broker separates untrusted scalar input from trusted kernel policy
+and retained user-memory ownership. The implemented operation is a bounded typed
+GPIO read or set/reset write. There is no user-provided port, MMIO address,
+callback, principal, private slot pointer or asynchronous DMA operation.</p>
+<p>The 32-byte input and 8-byte output contain explicit <code class="docutils literal notranslate"><span class="pre">uint32_t</span></code> fields. The
+trusted gateway calls the public API from privileged Thread mode with incoming
+interrupt masks clear. A kernel identity callback authenticates the current
+principal; the public message cannot choose it. Construction retains immutable
+nonoverlapping nominal user RAM windows, exact device/mask grants, a positive
+loan capacity and the kernel memory port. All known broker, policy, port-table
+and private context spans stay outside those user windows.</p>
+<p>Admission validates full-span arithmetic, alignment, access and one-window
+containment before pinning. <code class="docutils literal notranslate"><span class="pre">pin</span></code> must establish the specified CPU access and
+retain address-space/process/mapping lifetime until successful <code class="docutils literal notranslate"><span class="pre">unpin</span></code>. A failed
+pin must leave no mapping references or residual effects. The whitelist alone
+does not establish actual mapped RAM, DMA reachability, MMIO exclusion or MPU
+isolation; the trusted kernel and SoC memory layout establish those facts.</p>
+<p>The input is pinned and copied once into kernel storage. Policy checks use that
+snapshot. The reply span is pinned before any GPIO operation. A final saved-mask
+guard serializes revocation with the bounded scalar provider operation. Close
+before this guard prohibits the effect; close after dispatch cannot undo it.
+Every dispatched result copies a fully initialized reply, including provider
+errors. A cancelled admission leaves the reply untouched. Pins remain held
+through all copies.</p>
+<p><code class="docutils literal notranslate"><span class="pre">result</span></code> reports admission/device execution and <code class="docutils literal notranslate"><span class="pre">cleanup_result</span></code> reports the
+most recent release attempt. <code class="docutils literal notranslate"><span class="pre">accepted</span></code> becomes true at the first successful
+pin. <code class="docutils literal notranslate"><span class="pre">device_effect_possible</span></code> is set before calling the WRITE provider, even if
+that provider returns an error. <code class="docutils literal notranslate"><span class="pre">retained</span></code> requires the exact kernel call slot,
+user memory and address-space identity to stay alive. Cleanup tries output then
+input release, records errors and preserves every failed pin independently.
+<code class="docutils literal notranslate"><span class="pre">gpio_finish</span></code> retries only retained cleanup; it never rereads users, writes a
+reply or repeats a device operation. Neither an operation error nor successful
+cleanup authorizes replay of an earlier write.</p>
+<p>The private generic loan mechanism retains one exact slot pointer with a
+monotonic 64-bit epoch. Copied tokens and stale epochs cannot release it; epoch
+exhaustion rejects reuse. Read-only spans may share bytes; any writable overlap
+with a peer loan rejects. Known policy, provider, other loan and drain-control
+aliases reject before mutation. Only the two exact internal GPIO child slots
+may share their own call proof. A trusted drain callback must prove actual
+peripheral/DMA/IRQ/deferred/copy final access and observer join. User input cannot
+claim this proof. A failed proof or unpin keeps the exact pin and token retained.</p>
+<p>One privileged serialized kernel owner controls a broker and its slots. All
+memory/proof callbacks are bounded and run outside Arch guards; they may mark
+close, but cannot recursively admit, release, execute or retain the cookie
+output. Close inhibits admission and preserves every live loan. Quiescence is
+valid only after close, with zero loans/list entries and no executor. It does
+not implicitly stop providers or establish an application shutdown barrier.
+There is no reopen or hidden identity registry. NMI/fault/SMP publishers and
+unserialized privileged memory writers are outside this contract.</p>
+<p>This is a component callable by an integrating privileged kernel, not an
+implemented userspace transport. FreeRTOS SVC/MPU wrappers, task principal
+authentication, real memory pins, fault-safe copy mechanisms and TrustZone
+veneers are not connected in this slice. Generic loans provide ownership
+mechanics; asynchronous UART/SPI/CAN user messages are not implemented. Those
+future transports must supply their actual provider drain and memory-port
+contracts rather than accepting a user-supplied “drained” flag.</p>
+<p>Google tests run the actual broker, typed GPIO wrapper, Native GPIO provider,
+Core request state and Native saved-mask implementation. They model only the
+external kernel identity/pin/unpin/proof boundary and privileged context.
+Behavioral RED/GREEN logs, sanitizer runs, public-header probes and strict ARM
+compilation are recorded in
+<code class="docutils literal notranslate"><span class="pre">tools/testing/evidence/user-io-broker-iteration/manifest.json</span></code>. These establish
+software behavior and compilation, not physical isolation, HIL timing or a
+qualified product release. The optional archive defines no mutable globals;
+default factory/source/ELF omission is verified separately by the integrating
+build graph.</p>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
