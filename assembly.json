@@ -8,7 +8,7 @@
     "tools/evidence/common.py": "70245d32c0f0dc2746d7f6a5403f5f5c6b426177d4b058ab42bc8434c7c38b7f",
     "tools/configure/metadata.py": "c52d16ce8e8efa6ad761eb0fea916db14a751e19886bad0c6f00471aaa75f9eb",
     "tools/documentation/verify_publication.py": "c1659750a7d4c79a082933e777240fdbd75d76c1fb9099426f7cebba9f3bb12b",
-    ".github/workflows/docs-publish.yml": "80aced8e3051dc1041b0b244cc0a74517b8c402d6d5a3d780319eb10989a6e0b",
+    ".github/workflows/docs-publish.yml": "02821fdc987ac59d85c29d66396f92da4981fe62b7c2494c2e49e1f86d052fcb",
     "LICENSE": "b7152bd37691794b676615577f8c2b292288fa0691159c1e04f129e07f322913"
   },
   "verified_publication": {
@@ -25,5 +25,7 @@
     "git_commit",
     "git_push",
     "pages_deploy"
-  ]
+  ],
+  "publisher_fix_commit": "63d64c1b33248f15dd517953a63be5598942b225",
+  "scope": "Fix pinned Pages artifact hidden-file transport; immutable Source3 public bytes unchanged"
 }
