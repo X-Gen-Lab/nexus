@@ -101,6 +101,14 @@ class WorkflowContracts(unittest.TestCase):
         self.assertFalse(any(step.get('uses', '').startswith('actions/checkout@')
                              or 'run' in step for step in deploy['steps']))
 
+    def test_docs_publish_upload_preserves_hidden_payload_identities(self):
+        steps = workflow('docs-publish.yml')['jobs']['validate']['steps']
+        upload = next(step for step in steps if step.get(
+            'uses', '').startswith('actions/upload-pages-artifact@'))
+        # Output ownership markers and .nojekyll are verified public bytes.
+        # The pinned Pages uploader otherwise excludes every hidden path.
+        self.assertEqual(upload['with'].get('include-hidden-files'), 'true')
+
     def test_source_sdk_attests_only_a_successful_observed_manifest(self):
         job = workflow('release.yml')['jobs']['source-sdk']
         self.assertEqual(job.get('permissions', {}).get('id-token'), 'write')
