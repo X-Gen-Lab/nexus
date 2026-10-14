@@ -9,6 +9,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from docutils import nodes
+from sphinx.search import js_index
 
 from tools.documentation import sphinx_ext
 
@@ -97,6 +98,79 @@ class SearchMetadataTests(unittest.TestCase):
 
 
 class SearchBuildIntegrationTests(unittest.TestCase):
+    def test_both_locales_keep_native_postings_and_search_asset_load_order(self):
+        project = Path(__file__).resolve().parents[2]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            docs = root / 'docs'
+            docs.mkdir()
+            (docs / 'conf.py').write_text(
+                'import os, sys\n'
+                + f'sys.path.insert(0, {str(project)!r})\n'
+                + "extensions = ['myst_parser', 'tools.documentation.sphinx_ext']\n"
+                + "source_suffix = {'.md': 'markdown'}\nroot_doc = 'index'\n"
+                + "project = 'Posting fixture'\nhtml_theme = 'alabaster'\n"
+                + f'html_static_path = [{str(project / "docs/assets/styles")!r}]\n'
+                + "language = os.environ['NEXUS_DOCS_LANGUAGE']\n",
+                encoding='utf-8')
+            pages = {
+                'a_zero': '# Zero\n\nborrow zeroexcluded arrayexcluded\n',
+                'b_allowed': '# Allowed\n\nborrow\n',
+                'c_array': '# Array\n\nborrow arrayexcluded\n',
+                'd_scalar': '# Scalar\n\nborrow singletonexcluded\n',
+                'e_title': '# Titleexcluded\n\nborrow\n',
+                'f_titlearray': '# Arraytitle first\n\nborrow\n',
+                'g_titlearray': '# Arraytitle second\n\nborrow\n',
+            }
+            (docs / 'index.md').write_text(
+                '# Posting fixture\n\n```{toctree}\n'
+                + '\n'.join(pages) + '\n```\n', encoding='utf-8')
+            for name, source in pages.items():
+                (docs / (name + '.md')).write_text(source, encoding='utf-8')
+            for arguments in (['init', '-q'], ['add', 'docs'],
+                              ['-c', 'user.name=Fixture', '-c',
+                               'user.email=fixture@example.invalid', 'commit',
+                               '-q', '-m', 'test: native search postings']):
+                subprocess.run(['git', '-C', str(root)] + arguments,
+                               check=True, capture_output=True)
+            environment = os.environ.copy()
+            for name in tuple(environment):
+                if name.startswith('NEXUS_DOCS_'):
+                    environment.pop(name)
+            for language in ('en', 'zh_CN'):
+                with self.subTest(language=language):
+                    output = root / language
+                    result = subprocess.run(
+                        [sys.executable, '-m', 'sphinx', '-E', '-n', '-W',
+                         '-b', 'html', str(docs), str(output)],
+                        env=environment | {'NEXUS_DOCS_LANGUAGE': language},
+                        capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0,
+                                     result.stdout + result.stderr)
+                    index = js_index.loads(
+                        (output / 'searchindex.js').read_text(encoding='utf-8'))
+                    ids = {name: number for number, name
+                           in enumerate(index['docnames'])}
+                    self.assertEqual(index['terms']['zeroexclud'], 0)
+                    self.assertEqual(ids['a_zero'], 0)
+                    self.assertEqual(index['terms']['singletonexclud'],
+                                     ids['d_scalar'])
+                    self.assertEqual(set(index['terms']['arrayexclud']),
+                                     {ids['a_zero'], ids['c_array']})
+                    self.assertEqual(index['titleterms']['titleexclud'],
+                                     ids['e_title'])
+                    self.assertEqual(set(index['titleterms']['arraytitl']),
+                                     {ids['f_titlearray'], ids['g_titlearray']})
+                    self.assertEqual(
+                        (output / '_static/nexus-search.js').read_bytes(),
+                        (project / 'docs/assets/styles/nexus-search.js').read_bytes())
+                    search = (output / 'search.html').read_text(encoding='utf-8')
+                    self.assertLess(search.index('_static/nexus-search.js'),
+                                    search.index('_static/searchtools.js'))
+                    self.assertIn('src="searchindex.js" defer="defer"', search)
+                    article = (output / 'a_zero.html').read_text(encoding='utf-8')
+                    self.assertNotIn('_static/nexus-search.js', article)
+
     def test_real_build_creates_local_records_and_assets_in_single_locale(self):
         project = Path(__file__).resolve().parents[2]
         with tempfile.TemporaryDirectory() as temporary:

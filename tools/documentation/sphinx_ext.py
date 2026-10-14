@@ -557,6 +557,8 @@ def normalize_included_references(app, doctree) -> None:
 
 def setup(app) -> dict[str, object]:
     """Register only deterministic source and HTML transformations."""
+    from tools.documentation.search_language import NexusChineseSearch
+    app.add_search_language(NexusChineseSearch)
     app.add_config_value('nexus_source_dirty', False, 'env')
     app.add_config_value('nexus_available_languages', os.environ.get('NEXUS_DOCS_LANGUAGES'),
                          'env', types=(str, tuple, type(None)))
@@ -578,4 +580,5 @@ def setup(app) -> dict[str, object]:
     app.connect('config-inited', configure_search)
     app.connect('doctree-read', normalize_included_references, priority=100)
     app.connect('doctree-read', localize_diagram_images, priority=400)
-    return {'version': '1.0', 'parallel_read_safe': False, 'parallel_write_safe': True}
+    return {'version': '1.0', 'env_version': 1,
+            'parallel_read_safe': False, 'parallel_write_safe': True}

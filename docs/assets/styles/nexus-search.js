@@ -2,6 +2,39 @@
 (() => {
     "use strict";
 
+    const installExclusionCompatibility = () => {
+        if (typeof Search === "undefined"
+                || typeof Search.performTermsSearch !== "function"
+                || Search.performTermsSearch.nexusExclusionsCompatible) {
+            return;
+        }
+        const native = Search.performTermsSearch;
+        const compatible = (required, excluded) => {
+            // Sphinx 7.4.7 treats scalar postings as arrays and stops all
+            // candidates at the first exclusion. Keep its positive AND/score.
+            const results = native.call(Search, required, new Set());
+            if (!excluded || !excluded.size) {
+                return results;
+            }
+            const index = Search._index;
+            const excludedFiles = new Set();
+            for (const term of excluded) {
+                for (const table of [index.terms, index.titleterms]) {
+                    const files = table[term];
+                    if (Array.isArray(files)) {
+                        files.forEach((file) => excludedFiles.add(file));
+                    } else if (typeof files === "number") {
+                        excludedFiles.add(files);
+                    }
+                }
+            }
+            const ids = new Map(index.docnames.map((name, file) => [name, file]));
+            return results.filter((row) => !excludedFiles.has(ids.get(row[0])));
+        };
+        compatible.nexusExclusionsCompatible = true;
+        Search.performTermsSearch = compatible;
+    };
+
     const enhanceSearch = () => {
         const data = window.NEXUS_SEARCH_DATA;
         const output = document.getElementById("search-results");
@@ -101,9 +134,15 @@
         enhance();
     };
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", enhanceSearch, {once: true});
-    } else {
+    const initializeSearch = () => {
+        // This asset precedes searchtools.js, so install before Search.init's
+        // DOMContentLoaded callback runs the first query from the URL.
+        installExclusionCompatibility();
         enhanceSearch();
+    };
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initializeSearch, {once: true});
+    } else {
+        initializeSearch();
     }
 })();

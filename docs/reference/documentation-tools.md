@@ -129,6 +129,17 @@ Missing tools or failed checks return nonzero. A successful receipt qualifies
 only that fixture and observed browser; full-site responsive acceptance and
 archive verification remain separate.
 
+## Search the current site
+
+The English and Chinese search pages use their own local Sphinx index and
+current-language metadata. The Chinese tokenizer has no external dictionary
+dependency and accepts Han character sequences and Latin identifiers. Separate
+keywords with whitespace for combined queries, such as `借用 排空` or `借用 HAL`.
+
+Results show the version, content type, source and actual language, and body
+excerpts. Search assets load only on the search page. Archive links and original
+qualification records retain their frozen source and language scope.
+
 ## CI permission boundary
 
 `docs-build.yml` has only `contents: read`. It prepares tools explicitly, runs
