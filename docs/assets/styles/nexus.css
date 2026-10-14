@@ -54,3 +54,22 @@ div.bodywrapper,
     outline: 2px solid currentColor;
     outline-offset: -2px;
 }
+
+/* Paper has no horizontal scroll rail; wrap complete code across pages. */
+@media print {
+    .nexus-canonical-content pre {
+        font-family: "Noto Sans Mono CJK SC", monospace;
+    }
+
+    .nexus-canonical-content .highlight,
+    .nexus-canonical-content pre,
+    .nexus-canonical-content pre code,
+    .nexus-canonical-content pre span {
+        max-width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        word-break: normal;
+        overflow: visible;
+        break-inside: auto;
+    }
+}
