@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_documentation_build",
+  "status": "passed",
+  "source": {
+    "root": "/tmp/nexus-docs-implementation-source-20261014",
+    "commit": "5a7a75c321ea173df8692714f95a8df13715293d",
+    "tree": "03ca682f6ea3779e6a42b9b9a92408e42750f115",
+    "dirty": false,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)"
+    ]
+  },
+  "tools": {
+    "prefix": "/workspace/nexus-docs-implementation-20261014/tool-lock/prefix-qualified",
+    "lock_sha256": "9c33a22690587cd9c02f1b2d78e0f9a70313f4359afa67dd404b449c8f565288",
+    "tools": {
+      "doxygen": "1.14.0 (cbe58f6237b2238c9af7f51c6b7afb8bbf52c866)",
+      "graphviz": "dot - graphviz version 2.42.4 (0)",
+      "font": "NotoSansCJK-Regular.ttc: \"Noto Sans CJK SC\" \"Regular\""
+    },
+    "target": {
+      "system": "Linux",
+      "machine": "x86_64",
+      "python": "3.12",
+      "glibc": "2.41",
+      "qualified_host": "Debian 13 amd64 userland; CPython 3.12.14; kernel recorded by each preparation",
+      "scope": "Preparation closure; a downloaded tool identity does not establish firmware or HIL qualification."
+    },
+    "installation_receipt": "/workspace/nexus-docs-implementation-20261014/tool-lock/prefix-qualified/installation.json",
+    "installation_sha256": "6eb9ca66414b99533d0b62cb7928994f5bb2046ed431a5e771a519bb821f28a8"
+  },
+  "languages": [
+    "en",
+    "zh_CN"
+  ],
+  "qualification": false,
+  "translations": {
+    "errors": [],
+    "records": [
+      {
+        "page": "index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "tutorials/source-sdk",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "tutorials/source-sdk",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "tutorials/async-io",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "tutorials/async-io",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "guides/board-porting",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "guides/board-porting",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "guides/os-shutdown",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "guides/os-shutdown",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "guides/migration",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "guides/migration",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/configuration/assembly",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/configuration/assembly",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "explanation/factory",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "explanation/factory",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "explanation/ownership",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "explanation/ownership",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/platforms/support",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/platforms/support",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/platforms/qualification",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/platforms/qualification",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      }
+    ],
+    "status": "passed"
+  },
+  "command_receipts": [
+    "/tmp/nexus-docs-implementation-source-20261014/build/documentation-attempts/cd58bba85a204af396c1b179b9bedc27/doxygen.attempts/1791975312200017792-11c91748b8124c42bc0cad7096b2473f/receipt.json",
+    "/tmp/nexus-docs-implementation-source-20261014/build/documentation-attempts/cd58bba85a204af396c1b179b9bedc27/gettext.attempts/1791975312515856031-a2a1bf69ed944a83b547527ebda5b728/receipt.json",
+    "/tmp/nexus-docs-implementation-source-20261014/build/documentation-attempts/cd58bba85a204af396c1b179b9bedc27/html-en.attempts/1791975324128313283-74544e80510444d0809283aeb8c8d21c/receipt.json",
+    "/tmp/nexus-docs-implementation-source-20261014/build/documentation-attempts/cd58bba85a204af396c1b179b9bedc27/html-zh_CN.attempts/1791975337193476936-0ec02bcdbaca4b7880d42d32bb8be6fc/receipt.json"
+  ],
+  "source_check": {
+    "schema_version": 1,
+    "kind": "nexus_documentation_source_check",
+    "status": "passed",
+    "errors": [],
+    "pages": 99,
+    "page_ids": 51,
+    "configuration_examples": [
+      {
+        "document": "/tmp/nexus-docs-implementation-source-20261014/docs/delivery/cortex-m.md",
+        "line": 129,
+        "kind": "runtime",
+        "configuration_sha256": "43d6109c16230e5d454b4896566e794c6d04c60b985be3b7879669acad5c00e5"
+      },
+      {
+        "document": "/tmp/nexus-docs-implementation-source-20261014/docs/design/integration-contracts.md",
+        "line": 94,
+        "kind": "fragment",
+        "reason": "external Board paths and clock profile must be supplied."
+      },
+      {
+        "document": "/tmp/nexus-docs-implementation-source-20261014/docs/design/threadx.md",
+        "line": 35,
+        "kind": "assembly",
+        "configuration_sha256": "67b2f6ee05d6cd487d18540baa8eadd3b417ce493b29f082ba9e82cac338b07e"
+      },
+      {
+        "source": "/tmp/nexus-docs-implementation-source-20261014/tests/contracts/native_assembly/multi.toml",
+        "kind": "literalinclude",
+        "resolved": true
+      },
+      {
+        "source": "/tmp/nexus-docs-implementation-source-20261014/tools/configure/assemblies/native-uart.toml",
+        "kind": "literalinclude",
+        "resolved": true
+      },
+      {
+        "source": "/tmp/nexus-docs-implementation-source-20261014/tools/configure/assemblies/native-uart.toml",
+        "kind": "literalinclude",
+        "resolved": true
+      }
+    ],
+    "external_links": [],
+    "qualification": false
+  },
+  "workspace": "/tmp/nexus-docs-implementation-source-20261014/build/documentation-attempts/cd58bba85a204af396c1b179b9bedc27"
+}

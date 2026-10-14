@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>USB FS device 包所有权与接入边界 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Kernel-invoked user I/O admission" href="user-io-broker.html" />
+    <link rel="prev" title="UART 接收 DMA、双向 DMA 与电气适配" href="uart-dma-rs485.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/design/usb-device.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../en/design/usb-device.html" lang="en">en</a>. Source language: zh_CN; requested: zh_CN; actual: zh_CN; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="usb-fs-device">
+<h1>USB FS device 包所有权与接入边界<a class="headerlink" href="#usb-fs-device" title="Link to this heading">¶</a></h1>
+<p>公共接口是 <code class="docutils literal notranslate"><span class="pre">nexus/io/usb_device.h</span></code>。当前纵切片提供 Native、STM32F407 和
+GD32F470 的 internal-PHY full-speed device PIO 机制及实际 SDK 绑定。维护范围是
+EP0 control、显式选择的 EP1–EP3 bulk IN/OUT、SETUP/reset/suspend/resume 事实、
+STALL、SET_ADDRESS、取消与退出。没有 Host、HS、DMA、ISO、remote wake、USB class
+或产品协议栈。一次 request 是一个不超过 MPS 的包；多包 control/class 事务、
+终止 ZLP、描述符与工作者由外部应用负责。</p>
+<section id="id1">
+<h2>对象、资源与时钟<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>controller 和 endpoint 保持独立 identity；公共 face 只有 readonly ops 与 context。
+装配拥有一个 controller、精确 endpoint 数组、精确事件环和一个显式 48 MHz clock
+owner。实例共享只读方法表，没有全局可变 registry、endpoint 最大池、隐藏 worker
+或必选 OS。未选实例不产生状态，MCU 热路径用 direct volatile MMIO。模型编译只
+替换外部 MMIO/NVIC 叶端口，MCU 不携带模型函数表或运行时模拟分支。</p>
+<p>两款 SoC 的 USBFS 基址都是 <code class="docutils literal notranslate"><span class="pre">0x50000000</span></code>，四个 IN / 四个 OUT 方向、320-word FIFO，
+单一 IRQ 67；绑定用锁定 SDK 验证实际 offset、stride、容量和 W1C/只读位。
+EP0 固定 64-byte MPS；bulk MPS 只能是 8/16/32/64。RX FIFO 至少 64 words；每个
+被选 IN FIFO 至少 16 words，分区先验证无重叠且总计不超过 320 words。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>SoC</p></th>
+<th class="head"><p>实际 48 MHz 来源</p></th>
+<th class="head"><p>接入行为</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407</p></td>
+<td><p>HSE 8 MHz / M8 × N336 / Q7</p></td>
+<td><p>验证现有 PLL/ready，只管理 USBFS gate</p></td>
+</tr>
+<tr class="row-odd"><td><p>GD32F470</p></td>
+<td><p>HXTAL 25 MHz / M25 × PLLSAI N192 / P4</p></td>
+<td><p>独占闲置 PLLSAI 与 CK48 mux 后有界启动</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>GD32 原 200 MHz 主 PLL 的 Q9 输出不是 48 MHz，不能直接用于 USB。GD32 clock owner
+拒绝新活跃 USBHS/TRNG/SDIO/TLI 消费者，保留旁邻字段并从未修改 SYSCLK。clock owner
+有 IDLE/CLEANUP/READY 与精确 consumer count；失败回滚缺少读回证明时仍保留 CLEANUP
+责任。DCD 先 validate/retain，退出完成后 release consumer，最后由外部 owner stop
+时钟。pin/electrical/VBUS 和所有 clock-gated 隐藏消费者必须由外部资源 owner 先
+授权并静止，不能仅凭 gate 为零推断系统独占。</p>
+<p>ARM GCC 14.3 的实际 sizeof probe 为：controller 144 B、每个 endpoint 40 B、
+每个 event 40 B、request 56 B，STM/GD clock state 分别 8/16 B。生产单元的 ARM
+objects 无全局 <code class="docutils literal notranslate"><span class="pre">.data</span></code>/<code class="docutils literal notranslate"><span class="pre">.bss</span></code>；完整 ELF 的未选 GC/资源变化由实际装配构建另行证明。</p>
+</section>
+<section id="epoch">
+<h2>包完成与控制 epoch<a class="headerlink" href="#epoch" title="Link to this heading">¶</a></h2>
+<p>prepare 不访问 payload；拒绝 admission 不保留新引用。ACCEPTED 借用 request 与
+payload，直到 acquire-observed SETTLED。所有 request、payload、输出、count、
+immutable clock ops 和 wake target 均检查与 controller/endpoint/ring/clock state
+及已有 loan 的重叠。拒绝 state/read_events 输出别名时输出保持原值。</p>
+<p>IN FIFO 写入不是完成，只有 XFRC、EP enable 已清、FIFO 空闲容量恢复并且观察到的
+W1C completion 清除读回成功才发布 SUCCESS。OUT 必须同时读到包数据和 XFRC，
+short packet 正常完成；越界包的所有 FIFO words 都被消费，最多复制 caller capacity，
+之后报告 OVERFLOW 并排空，不越界写 caller buffer。</p>
+<p>IN TXFE 是只读状态，不参与 W1C 清除/完成的零值证明。ITTXFE 是主机 IN token 在
+FIFO 尚空时到达的可重试信息，OUT STUP 是正常 SETUP phase 事实；两者不错误地终止
+包。IN control timeout 和 OUT FIFO overrun 使用对应方向的真实事件位。EP0 的
+DATA PID 由 SETUP/core 管理：bits 29:28/16 对 EP0 是 reserved，软件仅对 bulk
+endpoint 使用 DATA0 命令。</p>
+<p>SETUP 严格解码八个 little-endian bytes，并产生单调递增 epoch。新 SETUP/reset
+使旧 control loan 进入排空，不能仅改 epoch 就撤销借用。reset 与 queued SETUP
+在同一 snapshot 中没有先后证明，先前 queued SETUP 被丢弃；复位排空完成后才允许
+新 admission。SET_ADDRESS 验证当前标准 SETUP 的各字段，先 staged，只有对应
+status-IN 实际 XFRC 后写 DCFG 地址。地址读回失败关闭 controller。</p>
+<p>事件环保存 value facts，满时不覆盖旧事件；精确软件 loss marker 排在原队列后。
+最新 SETUP/epoch/closing 状态不依赖事件环空间。时间戳是 IRQ acquisition time，
+不是 USB 总线采样时刻；reset 批次中的无序旧 SETUP 不计作新的已接收 control。</p>
+</section>
+<section id="id2">
+<h2>取消、失败与完整停止<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>任务入口要求单一序列化特权执行者、Handler 外与 incoming IRQ masks clear。IRQ
+保存/恢复 mask；一次最多消费八个 RX status、128 payload words 和八个选中方向。
+冷热路径分开：cold reset/flush 有有限 poll budget；IRQ flush 只发一次命令并读回，
+从不在 IRQ 使用 cold poll loop。超时使用独立 monotonic deadline，USB suspend 或
+拔线后仍须由外部执行者调用 service，不依赖 SOF 或隐藏 timer。</p>
+<p>IN drain 先请求 SNAK、读到实际 NAK 状态，再请求 disable；EN clear、EPDISD、FIFO
+flush 和 W1C clear 必须全部成立。OUT 非零方向先确认 global OUT NAK，再 disable
+及排空 RX。drain 超时保留 QUARANTINED，不能撤销 buffer loan。</p>
+<p>Control OUT0 的 EPD 位固定为零，SETUP 也可绕过 NAK。不能模拟一个不存在的 disable
+ack 来完成取消。OUT0 individual cancel 在缺少真实完成证明时保持 DRAINING，随后
+QUARANTINED；用户可选择完整 device stop。完整停止先读回 soft disconnect、global
+OUT NAK 与 DMAEN=0，消费 RX FIFO；随后关闭 global/endpoint/NVIC sources 并 join
+所有通知发布者，flush FIFO，再次验证 disconnect/NAK/FIFO/IRQ 状态，才解除 OUT0
+PIO loan、最后发布 SETTLED。OUT0 EP enable 此时可以仍为一，因为硬件只拥有内部
+FIFO，已撤回的 PIO 执行者不再拥有 caller buffer；下一次 cold core reset 重新
+建立硬件状态。任一步证据缺失就返回 BUSY，并保留 caller storage 与 clock consumer。</p>
+<p>捕获 wake target 后 publisher count 仍保留该借用；stop/detach 在 notify 未返回时
+拒绝 BUSY。wake 必须同时支持 service/cancel 的 task 上下文和真正 IRQ 上下文，
+绑定读取实际 priority/group 验证 syscall ceiling，不修改全局 grouping。</p>
+</section>
+<section id="id3">
+<h2>证据与尚未建立的资格<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>开发证据在 <code class="docutils literal notranslate"><span class="pre">tools/testing/evidence/usb-device-iteration/manifest.json</span></code>。完整执行
+Native 43、STM32 7、GD32 7 个 Google cases，ASan/UBSan 同 57 cases、零 skip；
+两家实际 SDK 的六个 production ARM 单元通过 strict C11 编译。对应 clock owner 的
+27 个独立 cases 保留在 <code class="docutils literal notranslate"><span class="pre">usb-clock-iteration</span></code>，不重复计入 DCD 57。历史模型的
+错误 TXFE/EP0/PID 假设和失败日志保留，最新源与旧报告的身份不混用。</p>
+<p>资料是锁定 ST CMSIS header 的 FS 寄存器事实，以及 GD32F4xx User Manual Rev3.3
+§29.3（尤其 printed p986–995 的 EP0、W1C、TXFE）和 §4.3.24/26 的 PLLSAI/CK48。
+GD 手册 SHA256 是 <code class="docutils literal notranslate"><span class="pre">c8e1d20d7cde338892d08dcb233345e03f7960256a60a36c755c576d9cd65c13</span></code>。
+完整出处身份绑定在 manifest。</p>
+<p>这不是 clean software candidate、产品 release 或物理资格。三块 PCB 的 USB role、
+VBUS sensing/power/backfeed、pull-up/ESD、电气跳帽、pin lease 与共享引脚冲突尚需
+独立 reviewed Board 装配；本批没有配置这些引脚。枚举、主机重试、reset/拔线、
+传输错误、PHY 三周期 flush 时序和实际 ISR/WCET/HIL 均未执行，不继承旧例程测试。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

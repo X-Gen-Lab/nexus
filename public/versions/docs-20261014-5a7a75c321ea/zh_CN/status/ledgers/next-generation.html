@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>原平台重构台账 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nexus.css?v=1e57c037" />
+    <script src="../../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="Factory 与 TDD 台账" href="factory-platform.html" />
+    <link rel="prev" title="原台账、退出条件与派生视图" href="../ledgers.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/status/ledgers/next-generation.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../../en/status/ledgers/next-generation.html" lang="en">en</a>. Source language: zh_CN; requested: zh_CN; actual: zh_CN; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="status-ledgers-next-generation">
+<span id="id1"></span><h1>原平台重构台账<a class="headerlink" href="#status-ledgers-next-generation" title="Link to this heading">¶</a></h1>
+<p>本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
+原编号、顺序和全部原字段来自 <a class="reference download internal" download="" href="../../_downloads/59e7eaa5794f5dfc55a672b8a7ab5730/next-generation-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">原台账</span></code></a>。
+源文件：<code class="docutils literal notranslate"><span class="pre">docs/design/next-generation-execution.csv</span></code>；SHA-256：<code class="docutils literal notranslate"><span class="pre">7ac51ba75151159ac854db5e5f5791652fab48827ea8d1373d87432ae5ad93e1</span></code>。</p>
+<p>不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
+物理状态分别解释；<code class="docutils literal notranslate"><span class="pre">development_passed</span></code> 不表示当前文档 HEAD 已执行。
+<code class="docutils literal notranslate"><span class="pre">qualification_record_authority</span></code> 要回到精确结果索引判断源码和范围。
+绝对 <code class="docutils literal notranslate"><span class="pre">/workspace</span></code>、<code class="docutils literal notranslate"><span class="pre">/dev/shm</span></code> 定位保留原字节，仅说明原执行主机位置；
+可取得归档及 member 定位见 <a class="reference internal" href="../software-verification.html"><span class="std std-doc">软件证据入口</span></a>。</p>
+<p><strong>原退出字段</strong>只有原 CSV 中实际存在的字段；任务、资格前提和合同链接
+也按原文保留，不能据此补造某次执行。</p>
+<p>本表包含 33 条原记录，仅表示来源行数。</p>
+<nav class="contents local" id="id2">
+<ul class="simple">
+<li><p><a class="reference internal" href="#ng-001" id="id3">NG-001</a></p></li>
+<li><p><a class="reference internal" href="#ng-002" id="id4">NG-002</a></p></li>
+<li><p><a class="reference internal" href="#ng-003" id="id5">NG-003</a></p></li>
+<li><p><a class="reference internal" href="#ng-004" id="id6">NG-004</a></p></li>
+<li><p><a class="reference internal" href="#ng-005" id="id7">NG-005</a></p></li>
+<li><p><a class="reference internal" href="#ng-006" id="id8">NG-006</a></p></li>
+<li><p><a class="reference internal" href="#ng-007" id="id9">NG-007</a></p></li>
+<li><p><a class="reference internal" href="#ng-008" id="id10">NG-008</a></p></li>
+<li><p><a class="reference internal" href="#ng-009" id="id11">NG-009</a></p></li>
+<li><p><a class="reference internal" href="#ng-010" id="id12">NG-010</a></p></li>
+<li><p><a class="reference internal" href="#ng-011" id="id13">NG-011</a></p></li>
+<li><p><a class="reference internal" href="#ng-012" id="id14">NG-012</a></p></li>
+<li><p><a class="reference internal" href="#ng-013" id="id15">NG-013</a></p></li>
+<li><p><a class="reference internal" href="#ng-014" id="id16">NG-014</a></p></li>
+<li><p><a class="reference internal" href="#ng-015" id="id17">NG-015</a></p></li>
+<li><p><a class="reference internal" href="#ng-016" id="id18">NG-016</a></p></li>
+<li><p><a class="reference internal" href="#ng-017" id="id19">NG-017</a></p></li>
+<li><p><a class="reference internal" href="#ng-018" id="id20">NG-018</a></p></li>
+<li><p><a class="reference internal" href="#ng-031" id="id21">NG-031</a></p></li>
+<li><p><a class="reference internal" href="#ng-032" id="id22">NG-032</a></p></li>
+<li><p><a class="reference internal" href="#ng-033" id="id23">NG-033</a></p></li>
+<li><p><a class="reference internal" href="#ng-019" id="id24">NG-019</a></p></li>
+<li><p><a class="reference internal" href="#ng-020" id="id25">NG-020</a></p></li>
+<li><p><a class="reference internal" href="#ng-021" id="id26">NG-021</a></p></li>
+<li><p><a class="reference internal" href="#ng-022" id="id27">NG-022</a></p></li>
+<li><p><a class="reference internal" href="#ng-023" id="id28">NG-023</a></p></li>
+<li><p><a class="reference internal" href="#ng-024" id="id29">NG-024</a></p></li>
+<li><p><a class="reference internal" href="#ng-025" id="id30">NG-025</a></p></li>
+<li><p><a class="reference internal" href="#ng-026" id="id31">NG-026</a></p></li>
+<li><p><a class="reference internal" href="#ng-027" id="id32">NG-027</a></p></li>
+<li><p><a class="reference internal" href="#ng-028" id="id33">NG-028</a></p></li>
+<li><p><a class="reference internal" href="#ng-029" id="id34">NG-029</a></p></li>
+<li><p><a class="reference internal" href="#ng-030" id="id35">NG-030</a></p></li>
+</ul>
+</nav>
+<section id="ng-001">
+<span id="status-next-generation-ng-001"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">NG-001</a><a class="headerlink" href="#ng-001" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-001</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>architecture</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>冻结第一性原理契约与范围</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>（原字段为空）</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>TL</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K1;B1;I1;Q1;R1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>ADR;架构蓝图;接入/工程契约</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>默认静态模型与managed边界一致;所有能力区分planned/implemented/qualified;冻结EXTI边沿/PWM/ADC单次scan/IWDG首发模式及deferred扩展</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>不适用;不以设计计硬件资格</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-ARC-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/design/next-generation-platform.md;docs/design/integration-contracts.md;docs/delivery/architecture.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>docs/delivery/architecture.md;docs/delivery/support.md</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_applicable</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-002">
+<span id="status-next-generation-ng-002"></span><h2><a class="toc-backref" href="#id4" role="doc-backlink">NG-002</a><a class="headerlink" href="#ng-002" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-002</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>measurement</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>定义最小workload与资源/时序预算schema</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-001</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>Q1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>TL;K2;B1;B2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>最小GPIO/UART/SPI workload;成本口径;预算schema</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>真实基线输入和工具/配置/产物可绑定;不能以旧完整Board镜像代替最小成本</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>cycles/IRQ/端到端预算在真实station校准;当前未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-BAS-01;RF-HIL-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/measurement/compare.py;tools/measurement/resources.py;tools/measurement/workload.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>build/measurement-qiming-v3/matrix.json;build/measurement-sky-v1/matrix.json;build/measurement-liangshan-v5/matrix.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-003">
+<span id="status-next-generation-ng-003"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">NG-003</a><a class="headerlink" href="#ng-003" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-003</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>tooling</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>锁定正式工具环境与唯一dev入口</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-001</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>R1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K1;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>工具/源依赖锁;OCI环境;薄dev入口;基础formatter/warning/local checks</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>fresh checkout用同一入口configure/build/test;原生命令与退出码保留;首个owned切片即执行格式与基础warning门禁;使用根.clang-format/.editorconfig现有80列风格而非另起配置</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>不适用</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-BLD-01;RF-CI-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/dev/dev.py;tools/dev/Dockerfile;dependencies/environment.lock.json;scripts/setup/install_dev_tools.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>dependencies/environment.lock.json;tools/dev/dev.py doctor;Git hooks/style gate</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_applicable</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-004">
+<span id="status-next-generation-ng-004"></span><h2><a class="toc-backref" href="#id6" role="doc-backlink">NG-004</a><a class="headerlink" href="#ng-004" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-004</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>configuration</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现SoC/Board/assembly到单resolved校验</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-001;NG-003</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>R1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>B1;B2;K1;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>schema;窄resolver;负配置用例;原子生成</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>未知键/非法模式/资源冲突/失效输入真实拒绝;CMake代码依赖仍唯一权威</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>资料与实际PCB一致性待实板</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-BRD-01;RF-BLD-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/configure.py;soc/<em>/soc.json;soc/</em>/routes.json;boards/*/board.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts:contract_configuration_rejection;tools/configure/test_configure.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-005">
+<span id="status-next-generation-ng-005"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">NG-005</a><a class="headerlink" href="#ng-005" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-005</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>build</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现静态绑定与最小firmware target</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-004</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>R1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K1;B1;B2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>配置头;binding C;linker输入;显式targets</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>两SoC最小bootstrap链接ELF含正确startup/vector/ABI;不冒充完整clock/rollback;生成器不生成业务或软件依赖图;最小Flash LOAD/RAM/MSP报告与预算比较</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>启动时序和电气待实板</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-BLD-01;RF-BLD-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/configure/bindings.py;cmake/platform/Firmware.cmake;CMakeLists.txt</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>six ARM preset ELF/BIN/map/resource reports;tests/contracts/*_assembly</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-006">
+<span id="status-next-generation-ng-006"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">NG-006</a><a class="headerlink" href="#ng-006" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-006</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>sdk</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>定义外部源码SDK消费与依赖锁合同</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-003;NG-005</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>R1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>I1;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>源码package入口;输入/许可manifest;外部consumer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>独立移动路径consumer真实build/run/link;dirty包标不可发布</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>不适用;包消费不构成硬件资格</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-SDK-01;RF-SDK-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>cmake/package/package_source_sdk.py;cmake/package/NexusConfig.cmake.in;tests/contracts/test_source_sdk.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/test_source_sdk.py;clean SDK relocated consumer pending</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_applicable</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-007">
+<span id="status-next-generation-ng-007"></span><h2><a class="toc-backref" href="#id9" role="doc-backlink">NG-007</a><a class="headerlink" href="#ng-007" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-007</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>arch</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现最小Cortex-M4原语与monotonic时间合同</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-005</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>K1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K2;B1;B2;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>异常/临界区/atomic边界;cycle snapshot;时钟域</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>保存恢复incoming mask;时间wrap/clock变化语义;无假时钟/未审屏障删除</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>测量mask/cycle开销;timer精度;IRQ抢占</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-ARC-01;RF-OS-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>arch/include/nexus/arch/arch.h;arch/cortex_m/nx_arch_cortex_m.c;core/src/time.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/core_contract_test.c;tests/google/arch_cortex_test.cpp;tests/google/arch_native_test.cpp;tests/google/gd32_arch_test.cpp;tests/contracts/gd32_system_test.c;tests/contracts/stm32_model</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-008">
+<span id="status-next-generation-ng-008"></span><h2><a class="toc-backref" href="#id10" role="doc-backlink">NG-008</a><a class="headerlink" href="#ng-008" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-008</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>soc</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>接入STM32F407精确variant基础设施</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-007</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K1;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>VE/ZG memory/clock/IRQ/startup;私有SDK;失败回滚</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>精确density/ABI输入闭合;真实ELF;partial-init故障可回滚或保留责任</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>复位/clock/Flash density/safe-output资格</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-BOOT-01;RF-FIX-01;RF-FIX-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32f407/system.c;soc/stm32f407/soc.json;soc/stm32f407/CMakeLists.txt</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/stm32_io_test.c;tests/contracts/stm32_model;tests/contracts/stm32_assembly</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-009">
+<span id="status-next-generation-ng-009"></span><h2><a class="toc-backref" href="#id11" role="doc-backlink">NG-009</a><a class="headerlink" href="#ng-009" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-009</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>soc</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>接入GD32F470ZG基础设施</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-007</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K1;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>memory/clock/IRQ/startup;官方SDK lock;失败回滚</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>真实ELF;精确芯片模式;时钟/IRQ/reset错误可诊断</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>复位/clock/Flash density/safe-output资格</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-BRD-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/gd32f470/system.c;soc/gd32f470/timebase.c;soc/gd32f470/soc.json;vendors/gigadevice/gd32f4xx/source.lock.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/gd32_system_test.c;tests/contracts/gd32_io_test.c;tests/contracts/gd32_assembly</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-010">
+<span id="status-next-generation-ng-010"></span><h2><a class="toc-backref" href="#id12" role="doc-backlink">NG-010</a><a class="headerlink" href="#ng-010" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-010</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>board</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>重建三首发Board只读资源包</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-004;NG-008;NG-009</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B1;B2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>Q2;R1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>三Board facts/provenance;特殊电气hook;输入摘要</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>同SoC已审路线换板无需修改controller;声明与实际操作一致;未知PCB/route显式</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>实际PCB/晶振/接线/初值复核;当前未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-BRD-01;RF-HIL-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>boards/stm32f407_qiming_v31/board.json;boards/stm32f407ve_sky_qingchun/board.json;boards/gd32f470_liangshan/board.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>boards/*/README.md;tools/hil/fixtures;unknown PCB remains explicit</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-011">
+<span id="status-next-generation-ng-011"></span><h2><a class="toc-backref" href="#id13" role="doc-backlink">NG-011</a><a class="headerlink" href="#ng-011" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-011</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>gpio</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现固定typed GPIO与授权mask批量操作</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-010</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>K1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>B1;B2;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>固定GPIO合同;SoC实现;Native模型;batch</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>热路径无注册/字符串/通用ref/OS锁;原子set/reset;停机quiescence前提明确;mask子集与set/reset重叠拒绝;toggle/read语义;首切片map/预算比较</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>GPIO波形/复位初值/并发电气;批量cycles</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-01;RF-FIX-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>io/include/nexus/io/gpio.h;soc/*/drivers/gpio.c;io/native/gpio.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/native_io_test.c;tests/contracts/stm32_io_test.c;tests/contracts/gd32_io_test.c;actual resource matrices</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-012">
+<span id="status-next-generation-ng-012"></span><h2><a class="toc-backref" href="#id14" role="doc-backlink">NG-012</a><a class="headerlink" href="#ng-012" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-012</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>request</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现caller-owned请求规则与通知port</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-007;NG-011</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>K2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K1;Q1;I1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>admission/borrow/deadline/result合同;必要state helper</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>REJECTED零借用;单owner取消/跨任务token寿命;全链唯一admission;SETTLED最后访问;wait进展/arm-recheck;必要最小竞态回归在首个切片执行;共享client不service;stop期间执行者持续drain后才join</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>真实IRQ/DMA drain证明在各provider验收</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-01;RF-OS-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>core/include/nexus/core/request.h;core/src/request.c;os/wait.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/core_contract_test.c;tests/contracts/components_owner.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-013">
+<span id="status-next-generation-ng-013"></span><h2><a class="toc-backref" href="#id15" role="doc-backlink">NG-013</a><a class="headerlink" href="#ng-013" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-013</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>uart</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>重建STM32 UART IRQ与接收profile</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-008;NG-012</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K2;I1;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>直接typed UART;byte/event profile;按实例storage</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>真实IRQ实现编译;partial start/cancel/late IRQ/通知丢失模型;无闲置DMA/legacy池</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>TC/abort/RX丢失/时间精度/吞吐;未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-02;RF-FIX-03;RF-HIL-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/stm32f407/drivers/uart.c;io/include/nexus/io/uart.h</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/stm32_io_test.c;tests/contracts/stm32_model;actual ARM presets</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-014">
+<span id="status-next-generation-ng-014"></span><h2><a class="toc-backref" href="#id16" role="doc-backlink">NG-014</a><a class="headerlink" href="#ng-014" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-014</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>uart</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>重建GD32 UART IRQ与接收profile</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-009;NG-012</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K2;I1;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>直接typed UART;byte/event profile;按实例storage</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>错误/取消/TC合同与STM公共行为一致;能力差异显式</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>TC/abort/RX丢失/时间精度/吞吐;未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-BRD-02;RF-HIL-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/gd32f470/drivers/uart.c;io/include/nexus/io/uart.h</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/gd32_io_test.c;contract_gd32_io;actual ARM preset</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-015">
+<span id="status-next-generation-ng-015"></span><h2><a class="toc-backref" href="#id17" role="doc-backlink">NG-015</a><a class="headerlink" href="#ng-015" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-015</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>spi</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现单总线执行者与SPI真实执行模式</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-010;NG-012</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B1;B2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K2;I2;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>静态endpoint;短polling;按需求IRQ/DMA;无固定copy池</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>一个wire-active;CS/config稳定;绝对deadline包含排队;service不伪异步</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>CS/clock/MISO/DMA abort/drain;只对实测模式资格化</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-01;RF-HAL-04;RF-HIL-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/*/drivers/spi.c;components/bus_owner/src/spi_owner.c;io/native/spi.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/components_spi.c;tests/contracts/<em>_io_test.c;tests/contracts/</em>_assembly/*spi.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-016">
+<span id="status-next-generation-ng-016"></span><h2><a class="toc-backref" href="#id18" role="doc-backlink">NG-016</a><a class="headerlink" href="#ng-016" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-016</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>i2c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现明确范围的MCU I2C provider</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-010;NG-012</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B1;B2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K2;I2;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>I2C endpoint;reviewed routes;transaction/STOP/recovery</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>ACK/NACK/STOP/repeated START/故障范围明确;实际ARM链接;无成功stub</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>真实连线/总线挂死/recovery/波形;未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-03;RF-HIL-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/<em>/drivers/i2c.c;tools/configure/</em>_bindings.py;io/native/i2c.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/<em>_io_test.c;tests/contracts/</em>_assembly/*i2c.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-017">
+<span id="status-next-generation-ng-017"></span><h2><a class="toc-backref" href="#id19" role="doc-backlink">NG-017</a><a class="headerlink" href="#ng-017" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-017</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>flash</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>重建全物理Flash与受限region接口</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-008;NG-009;NG-012</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>K2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>B1;B2;I2;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>精确几何;region端口;脉冲deadline/错误合同</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>范围/overflow/erase alignment拒绝;不预留产品区;结束前硬件不再访问</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>erase/program/功耗电压/掉电;未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-FLS-01;RF-FLS-02;RF-FLS-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/*/drivers/flash.c;io/src/flash_region.c;io/include/nexus/io/flash.h</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/*_io_test.c;tests/contracts/components_flash_storage.c;tests/contracts/components_storage.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-018">
+<span id="status-next-generation-ng-018"></span><h2><a class="toc-backref" href="#id20" role="doc-backlink">NG-018</a><a class="headerlink" href="#ng-018" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-018</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>watchdog</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现watchdog与reset-cause垂直合同</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-010;NG-012</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B1;B2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K1;I2;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>IWDG配置/feed/reset cause;真实SoC实现;Native模型</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>两个SoC真实provider和ELF;范围/时钟/调试冻结语义;产品feed政策留外部;启用不可逆/已有状态/启动失败的remaining-effect正确记录</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>真实超时复位/调试冻结/上电reset cause;未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-ARC-01;RF-HIL-02;RF-HIL-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/*/drivers/watchdog.c;io/native/watchdog.c;io/include/nexus/io/watchdog.h</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/*_io_test.c;contract_gd32_watchdog-late-failure;contract_gd32_watchdog-hardware-enabled</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-031">
+<span id="status-next-generation-ng-031"></span><h2><a class="toc-backref" href="#id21" role="doc-backlink">NG-031</a><a class="headerlink" href="#ng-031" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-031</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>exti</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现静态EXTI line与共享vector事件</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-010;NG-011;NG-012</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B1;B2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K1;Q1;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>reviewed line/edge;共享vector;有界事件;停止合同</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>真实SoC provider/ELF;重复line拒绝;事件溢出/排序/stop排空;未实现模式拒绝</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>真实edge/去抖策略边界/优先级/丢失与排空;未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-01;RF-HIL-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/*/drivers/exti.c;io/include/nexus/io/exti.h;io/native/exti.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/<em>_io_test.c;tests/contracts/</em>_assembly/*exti.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-032">
+<span id="status-next-generation-ng-032"></span><h2><a class="toc-backref" href="#id22" role="doc-backlink">NG-032</a><a class="headerlink" href="#ng-032" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-032</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>timer</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现固定timer时基与PWM输出</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-007;NG-010;NG-012</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B1;B2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K1;I2;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>选定timer/channel;period/duty;电气初值;后续capture/trigger资源边界</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>首发固定timer/PWM真实provider/ELF;overflow/range/原子更新;timebase冲突拒绝;共享PSC/ARR/base mode与0/100pct/shadow更新明确;capture/advanced模式另立项不计首发退出</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>真实周期/占空比/停止输出;首发模式未执行;capture/advanced另验收</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-01;RF-HIL-02;RF-HIL-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/*/drivers/timer.c;io/include/nexus/io/timer.h;io/native/timer.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/<em>_io_test.c;tests/contracts/</em>_assembly/*pwm.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-033">
+<span id="status-next-generation-ng-033"></span><h2><a class="toc-backref" href="#id23" role="doc-backlink">NG-033</a><a class="headerlink" href="#ng-033" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-033</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>adc</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现ADC单次与低速scan</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-010;NG-012;NG-032</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>B1;B2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K2;I2;Q2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>reviewed ADC channel/sequence;选定采样模式;校准;buffer合同</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>首发single-shot/低速scan真实provider/ELF;样本格式/range/overflow;未选模式不驻留;参考电压/计数/sample time/超时输出有效性明确;trigger/DMA/block合同另立项不计首发退出</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>首发真实计数/精度/采样率/超时;未执行;高频trigger/DMA/block独立验收</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-01;RF-HIL-02;RF-HIL-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>soc/*/drivers/adc.c;io/include/nexus/io/adc.h;io/native/adc.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/<em>_io_test.c;tests/contracts/</em>_assembly/<em>adc</em>.json</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-019">
+<span id="status-next-generation-ng-019"></span><h2><a class="toc-backref" href="#id24" role="doc-backlink">NG-019</a><a class="headerlink" href="#ng-019" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-019</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B4</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>os</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现薄wait/wake与逐对象静态OS storage</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-007;NG-012</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>K1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K2;Q1;R1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>裸机/FreeRTOS/Native能力;静态task/queue参数</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>不强制driver依赖OS;无统一最大池;delete/join回收时点正确;ISR ceiling拒绝</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>真实scheduler/IRQ wake/stack/FPU;未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-OS-01;RF-OS-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>os/baremetal/notify.c;os/native/native.c;os/freertos/freertos.c;os/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/os_wait.c;tests/contracts/os_freertos_runtime;build/ng-agent-cmake/evidence/freertos-100-fresh-processes.log</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-020">
+<span id="status-next-generation-ng-020"></span><h2><a class="toc-backref" href="#id25" role="doc-backlink">NG-020</a><a class="headerlink" href="#ng-020" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-020</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B4</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>integration</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现有界多producer适配与总线owner样例</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-015;NG-019</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>I1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K2;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>显式queue/service adapter;可选callback adapter</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>无隐藏worker;adapter已admit后start失败仍有归属;旧cancel不命中新epoch;SETTLED后通知不访问request;唯一owner等待仍drain;通知满/丢失无lost-wake;client等待不接管执行;producer等待SETTLED时stop不死锁;wake发布者退出后才回收通知storage</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>最长service间隔/负载队列/公平性按产品实测</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-02;RF-CMP-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>components/bus_owner/src/bus_owner.c;components/bus_owner/src/uart_owner.c;components/bus_owner/src/spi_owner.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/components_owner.c;tests/contracts/components_uart.c;tests/contracts/components_spi.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-021">
+<span id="status-next-generation-ng-021"></span><h2><a class="toc-backref" href="#id26" role="doc-backlink">NG-021</a><a class="headerlink" href="#ng-021" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-021</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B4</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>devices</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现一个可复用外部器件driver垂直切片</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-015;NG-020</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>I2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>B1;B2;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>一个SPI器件的core/transport;外部composition;I2C器件按实际需要另选</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>无Board pin/默认任务;chip-ID/解析/失败/请求寿命正确;无未reviewed route假支持</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>连接/波形/测量误差/长期负载;未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-CMP-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>components/bmp280/src/bmp280.c;components/bmp280/src/spi_transport.c</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/components_bmp280.c;tests/contracts/components_spi.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-022">
+<span id="status-next-generation-ng-022"></span><h2><a class="toc-backref" href="#id27" role="doc-backlink">NG-022</a><a class="headerlink" href="#ng-022" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-022</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B4</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>components</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>重建通用协议/存储/日志窄端口边界</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-017;NG-019;NG-020</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>I1;I2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K2;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>实际选入组件core和adapter;删除默认worker与全局发现</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>协议与OS/Board解耦;格式/恢复正确;错误可释放;未用组件不驻留</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>wire timing/持久化掉电/负载按组件资格</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-02;RF-CMP-01;RF-FIX-04;RF-FIX-05</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>components/modbus;components/storage;components/log;components/README.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/components_modbus.c;tests/contracts/components_storage.c;tests/contracts/components_log.c</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-023">
+<span id="status-next-generation-ng-023"></span><h2><a class="toc-backref" href="#id28" role="doc-backlink">NG-023</a><a class="headerlink" href="#ng-023" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-023</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B4</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>examples</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>迁移三Board裸机/FreeRTOS外部examples</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-006;NG-013;NG-014;NG-019</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>I1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>I2;R1;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>六基础firmware配置;SDK pin/callers;说明</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>真实外部build/Native运行/六基础ARM ELF;功能仅按支持route扩展</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>实物启动/UART及选择用例;未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-EX-01;RF-BLD-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>X-Gen-Lab/nexus-examples:assemblies;X-Gen-Lab/nexus-examples:apps;X-Gen-Lab/nexus-examples:scripts</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>external build/nextgen-development/native/ctest-results.xml;external build/nextgen-development/arm-development.json;clean pin pending</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-024">
+<span id="status-next-generation-ng-024"></span><h2><a class="toc-backref" href="#id29" role="doc-backlink">NG-024</a><a class="headerlink" href="#ng-024" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-024</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B5</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>engineering</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>扩展本地/PR/nightly风险门禁与证据</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-003;NG-004;NG-012</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>R1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>TL;K1;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>精选analyzer;现有Doxygen合同模板;完整CI风险矩阵;既有formatter/warning门禁扩展;格式目录和入口一致</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>owned warning阻断;public/private隔离;不以路径过滤漏高风险;失效报告拒绝;新旧owned目录均纳入相同格式范围;反斜杠Doxygen/文件头/header-source分工复核;第三方排除</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>不适用</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-CI-01;RF-REL-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>scripts/ci/style_gate.py;scripts/ci/quality_tools.py;.github/workflows;Doxyfile;docs/sphinx</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>whole-file format/comments;compile_commands analyzer;actual Doxygen/Sphinx;CI workflow tests</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_applicable</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-025">
+<span id="status-next-generation-ng-025"></span><h2><a class="toc-backref" href="#id30" role="doc-backlink">NG-025</a><a class="headerlink" href="#ng-025" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-025</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B5</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>verification</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>建立新契约故障/并发/边界回归</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-012;NG-013;NG-014;NG-015;NG-017;NG-019;NG-018;NG-031;NG-032;NG-033;NG-016;NG-021;NG-022</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>Q1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K2;B1;B2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>host/model/fuzz;sanitizer;边界和late-event用例</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>非零真实执行;partial start/abort失败/timeout/notification满/stop竞争;失败不释放借用</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>模型不升格硬件;具体物理项在HIL</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-BAS-01;RF-HIL-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tests/contracts;tests/contracts/os_freertos_runtime;tests/contracts/stm32_model;tests/contracts/gd32_model</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>actual Native/model CTest and sanitizer JUnit;tools unit suites</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-026">
+<span id="status-next-generation-ng-026"></span><h2><a class="toc-backref" href="#id31" role="doc-backlink">NG-026</a><a class="headerlink" href="#ng-026" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-026</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B5</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>performance</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>实现ELF资源预算与受控benchmark工具</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-002;NG-011;NG-023;NG-018;NG-031;NG-032;NG-033;NG-016;NG-021;NG-022</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>Q1;R1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>K1;B1;B2</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>资源schema报告;最小image delta;O2/Os/O3/LTO比较</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>静态预算越界真实阻断;stack/instruction与cycles分开;同artifact身份</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>专用station测cycles/latency/high-water/丢失/负载;未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HIL-03;RF-BLD-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/measurement/resources.py;tools/measurement/compare.py;tools/schemas/resource-budget.schema.json</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>60 actual O2/Os/O3 with/without LTO images;18 GC checks;tests/contracts/test_measurement_*.py</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-027">
+<span id="status-next-generation-ng-027"></span><h2><a class="toc-backref" href="#id32" role="doc-backlink">NG-027</a><a class="headerlink" href="#ng-027" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-027</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B5</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>hil</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>重建HIL准入与三Board工装准备</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-010;NG-023;NG-026</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>Q2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>B1;B2;R1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>station/fixture/probe/serial工具;raw evidence schema</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>错Board/ELF/config/空station真实拒绝;软件工具准备完成;不执行未接入设备</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>真实probe/刷写/读回/waveform/断电/负载需接入后验收</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HIL-01;RF-HIL-02;RF-HIL-03</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/hil/admit.py;tools/hil/fixtures;tests/contracts/test_hil_admission.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tests/contracts/test_hil_admission.py;three fixtures;incomplete station rejection;physical not executed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_executed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-028">
+<span id="status-next-generation-ng-028"></span><h2><a class="toc-backref" href="#id33" role="doc-backlink">NG-028</a><a class="headerlink" href="#ng-028" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-028</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B5</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>reproducibility</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>独立验收hermetic与可复现构建</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-003;NG-006;NG-024</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>R1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>Q1;TL</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>离线正式build;路径归一;独立clean rebuild比较</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>网络关闭与声明输入边界;双clean ELF/BIN确定性比较;不把hash称可复现</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>不适用</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-SDK-02;RF-REL-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/evidence/container.py;tools/evidence/reproduce.py;tests/contracts/test_repro_execution.py</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tools/evidence/reproduce.py;delivery bundle/reproducibility*.json;two offline source SDK builds</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_applicable</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-029">
+<span id="status-next-generation-ng-029"></span><h2><a class="toc-backref" href="#id34" role="doc-backlink">NG-029</a><a class="headerlink" href="#ng-029" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-029</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B6</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>migration</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>删除旧运行架构并原子迁移消费路径</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-023;NG-024;NG-025;NG-026</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>TL;K1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>I1;B1;B2;R1;Q1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>旧API/targets/scripts/docs清理;源码迁移说明</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>无长期双注册/对象/OS队列/配置入口;外部pin一致;持久化迁移另立合同</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>已部署产品需独立迁移/恢复与物理回归</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-HAL-01;RF-HAL-02;RF-ARC-01</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>docs/delivery/migration.md;CMakeLists.txt;tools/configure;docs/archive</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>current target/include/script graph;docs/archive;external caller migration development builds</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_applicable</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="ng-030">
+<span id="status-next-generation-ng-030"></span><h2><a class="toc-backref" href="#id35" role="doc-backlink">NG-030</a><a class="headerlink" href="#ng-030" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>原字段</p></th>
+<th class="head"><p>原值</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task_id</span></code></p></td>
+<td><p>NG-030</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch</span></code></p></td>
+<td><p>B6</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>P0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">area</span></code></p></td>
+<td><p>delivery</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">task</span></code></p></td>
+<td><p>封存新软件候选及精确支持证据</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">depends_on</span></code></p></td>
+<td><p>NG-006;NG-023;NG-025;NG-026;NG-027;NG-028;NG-029;NG-018;NG-031;NG-032;NG-033</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">primary_role</span></code></p></td>
+<td><p>R1;Q1</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">review_roles</span></code></p></td>
+<td><p>TL;Q2;I1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">deliverables</span></code></p></td>
+<td><p>source/config/tool/dependency/ELF包;支持tuple;known limits</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_exit</span></code></p></td>
+<td><p>当前完整源码资格;源码SDK干净外部消费;同hash候选;软件/物理资格分列</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_exit</span></code></p></td>
+<td><p>实板资格与产品release promotion另验收;当前未执行</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>implemented</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">legacy_rf_refs</span></code></p></td>
+<td><p>RF-REL-01;RF-REL-02</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">implementation_paths</span></code></p></td>
+<td><p>tools/evidence/candidate.py;tools/evidence/proof.py;tools/evidence/qualification.py;docs/delivery/qualification.md</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evidence_paths</span></code></p></td>
+<td><p>tools/evidence/candidate.py;delivery bundle/candidate/candidate.json;six actual qualification scopes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">software_status</span></code></p></td>
+<td><p>qualification_record_authority</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hardware_status</span></code></p></td>
+<td><p>not_applicable</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">状态与证据</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../support.html">支持范围与选型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../software-verification.html">软件验证、源码身份与证据</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-acceptance.html">文档系统实施与正式验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../hardware.html">HIL 与实板状态</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../ledgers.html">原台账、退出条件与派生视图</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../roadmap.html">迭代方向与进入条件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

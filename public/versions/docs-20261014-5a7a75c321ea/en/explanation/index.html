@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Architecture explanations &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How the platform is assembled and executed" href="platform-architecture.html" />
+    <link rel="prev" title="Nexus 平台图册" href="../assets/diagrams/README.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/explanation/index.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../zh_CN/explanation/index.html" lang="zh-CN">zh_CN</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="architecture-explanations">
+<h1>Architecture explanations<a class="headerlink" href="#architecture-explanations" title="Link to this heading">¶</a></h1>
+<p>Understand boundaries, static assembly and retained storage before changing a provider. The linked design contracts remain authoritative.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="platform-architecture.html">How the platform is assembled and executed</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html#build-time-decisions-and-runtime-work">Build-time decisions and runtime work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html#lifecycle-and-failure-responsibility">Lifecycle and failure responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html#costs-and-tradeoffs">Costs and tradeoffs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="factory.html">Typed factory, static instances and polymorphic faces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="factory.html#what-generation-owns">What generation owns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html#what-a-call-does">What a call does</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html#verify-the-generated-design">Verify the generated design</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ownership.html">Borrow, completion and observer lifetime</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html#three-different-completion-facts">Three different completion facts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html#cross-task-control-and-continuous-streams">Cross-task control and continuous streams</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html">Source-adjacent contracts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#core">Core</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html#core-contracts">Core contracts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#arch">Arch</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html#cpu-local-primitives">CPU-local primitives</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#typed-i-o">Typed I/O</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html#id1">Typed I/O</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#os-adapters">OS adapters</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html#optional-os-adapters">Optional OS adapters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#maintained-execution-contracts">Maintained execution contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#components">Components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html#optional-common-components">Optional common components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#exact-soc-implementations">Exact SoC implementations</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Architecture explanations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html">How the platform is assembled and executed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">Typed factory, static instances and polymorphic faces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html">Borrow, completion and observer lifetime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html">Source-adjacent contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#core-contracts">Core contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#cpu-local-primitives">CPU-local primitives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#id1">Typed I/O</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-os-adapters">Optional OS adapters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-common-components">Optional common components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

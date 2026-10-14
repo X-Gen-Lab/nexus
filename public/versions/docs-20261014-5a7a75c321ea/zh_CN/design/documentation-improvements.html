@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Nexus 文档系统完整优化清单 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Nexus 文档内容与图示标准" href="documentation-standards.html" />
+    <link rel="prev" title="显式时钟借用与浅睡眠" href="clock-domain-sleep.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/design/documentation-improvements.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../en/design/documentation-improvements.html" lang="en">en</a>. Source language: zh_CN; requested: zh_CN; actual: zh_CN; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="nexus">
+<h1>Nexus 文档系统完整优化清单<a class="headerlink" href="#nexus" title="Link to this heading">¶</a></h1>
+<p>本页由 <a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">实施台账</span></code></a> 派生。任务、依赖、
+实现和验收值以该 CSV 为唯一权威；原编号及退出条件不因状态更新改变。
+源 SHA-256：<code class="docutils literal notranslate"><span class="pre">d1f5adad33468cb83c2849b9ec5176d10d958db044620943e93fb0d02d6a2c77</span></code>。同一生成器在 commit／CI 检查缺失或陈旧视图。</p>
+<section id="id1">
+<h2>当前实现与验收<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">implemented</span></code> 表示页面、工具、门禁或交付路径已实现；
+<code class="docutils literal notranslate"><span class="pre">development_passed</span></code> 表示实际开发检查，不自动建立正式发布或退出验收。
+<code class="docutils literal notranslate"><span class="pre">pending_formal_evidence</span></code> 要等待精确 clean-source、部署、恢复或独立审查记录。
+实际记录与取得范围见 <a class="reference internal" href="../status/documentation-acceptance.html"><span class="std std-doc">文档验收入口</span></a>；
+<a class="reference internal" href="../status/ledgers/documentation-system.html"><span class="std std-doc">逐项原字段</span></a>保留全部状态和证据定位。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>实现值</p></th>
+<th class="head"><p>验收值</p></th>
+<th class="head"><p>源记录数</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implemented</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">passed</span></code></p></td>
+<td><p>58</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>需正式证据、失败或未执行复核的项：无待处理状态；仍按实际证据范围解释。</p>
+<p>预览、软件模型、图源存在或成功渲染不能替代公开部署、物理 HIL 或产品资格。
+文档包和证据归档分别绑定同一次交付；未实际取得的摘要与 locator 不编造。</p>
+<p>P1 优先完成，P2 也属于交付范围。责任统一为 Codex，独立 agent 参与评审。
+新增和修改正文遵守 <a class="reference internal" href="documentation-standards.html"><span class="std std-doc">内容与图示标准</span></a>和
+<a class="reference internal" href="documentation-templates.html"><span class="std std-doc">页面模板</span></a>，图册见 <a class="reference internal" href="../assets/diagrams/README.html"><span class="std std-doc">15 类必需图</span></a>。
+D1 至 D6 是工作包，顺序以依赖为准；不累加其他专项台账的任务或验收次数。</p>
+</section>
+<section id="d1">
+<h2>D1 入口、权威与正文规则<a class="headerlink" href="#d1" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>编号</p></th>
+<th class="head"><p>优先级</p></th>
+<th class="head"><p>完善事项</p></th>
+<th class="head"><p>退出条件</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-01</p></td>
+<td><p>P1</p></td>
+<td><p>登记页面权威与读者任务</p></td>
+<td><p>逐页明确正文、API、支持、资格、台账和历史来源；目录和唯一导航可审查</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-02</p></td>
+<td><p>P1</p></td>
+<td><p>修正根入口与支持口径</p></td>
+<td><p>README中typed factory、TOML、ThreadX、连续模式与精确支持一致；不扩大实板范围</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-03</p></td>
+<td><p>P1</p></td>
+<td><p>修正可执行配置模板</p></td>
+<td><p>Board示例含soc_family；完整Board和CPU/TOML经实际解析；片段明确不建立完整配置资格</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-04</p></td>
+<td><p>P1</p></td>
+<td><p>统一最新资格导航</p></td>
+<td><p>当前代码、文档HEAD、qualified source和历史记录分别可定位；不继承旧执行</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-05</p></td>
+<td><p>P1</p></td>
+<td><p>逐台账映射原退出条件与新证据</p></td>
+<td><p>OS48和已过期状态按scope映射；原编号/条件/失败记录保留；不批量标passed</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-06</p></td>
+<td><p>P1</p></td>
+<td><p>建立迁移引用与旧URL清单</p></td>
+<td><p>每个当前内容源有去向；相对链接/anchor/工具输入/旧URL的处理规则齐全</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-41</p></td>
+<td><p>P1</p></td>
+<td><p>应用正文写作与语义标准</p></td>
+<td><p>关键页面明确读者/目标/配置；术语/单位/规范强度/事实与资格通过独立审查</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="d2-api">
+<h2>D2 站点、架构与API<a class="headerlink" href="#d2-api" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>编号</p></th>
+<th class="head"><p>优先级</p></th>
+<th class="head"><p>完善事项</p></th>
+<th class="head"><p>退出条件</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-07</p></td>
+<td><p>P1</p></td>
+<td><p>选择并接入MyST</p></td>
+<td><p>兼容维护Sphinx/Breathe；完整Markdown与RST正负样例实际构建；pin明确</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-08</p></td>
+<td><p>P1</p></td>
+<td><p>调整Sphinx source root与排除范围</p></td>
+<td><p>docs为source root；正文直接索引；archive/生成输出/大证据不误入站点</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-09</p></td>
+<td><p>P1</p></td>
+<td><p>实施唯一任务导航</p></td>
+<td><p>首页提供使用/接入/维护/验收/迁移入口；当前页面可达可搜索；无第二套正文</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-10</p></td>
+<td><p>P1</p></td>
+<td><p>重组公共API和factory说明</p></td>
+<td><p>Core/Arch/I/O/OS/Components模块页连到符号；factory示例基于实际生成接口</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-11</p></td>
+<td><p>P1</p></td>
+<td><p>接入系统合同与架构解释</p></td>
+<td><p>生命周期和安全限制保持原规范；合同与解释分别有一份authority</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-12</p></td>
+<td><p>P2</p></td>
+<td><p>接入源码相邻README</p></td>
+<td><p>保留实现地图和SoC局部权威；include相对引用正确或源码链接绑定站点revision</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-43</p></td>
+<td><p>P1</p></td>
+<td><p>交付全平台架构与外部边界图</p></td>
+<td><p>Core/Arch/SoC/Board/I/O/可选OS组件和外部产品责任清楚；factory取接口与直接I/O区分</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-44</p></td>
+<td><p>P1</p></td>
+<td><p>交付真实编译目标依赖图</p></td>
+<td><p>实际CMake目标和private/public依赖核对；厂商实现私有；不把生成或运行箭头当编译依赖</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-45</p></td>
+<td><p>P1</p></td>
+<td><p>交付配置与生成流程图</p></td>
+<td><p>TOML/facts/typed IR/原子bundle/CMake/Ninja产物和失败失效准确；未知Board事实不修复为已知</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-46</p></td>
+<td><p>P1</p></td>
+<td><p>交付factory和实例结构图</p></td>
+<td><p>静态face/共享ops/独立context与controller/endpoint对应源码；getter无分配或初始化</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-53</p></td>
+<td><p>P1</p></td>
+<td><p>交付软件与HIL证据关系图</p></td>
+<td><p>源码/配置/工具/receipt与候选身份关联；软件和HIL分别实际取得；无自动物理资格</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="d3">
+<h2>D3 教程、接入与执行机制<a class="headerlink" href="#d3" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>编号</p></th>
+<th class="head"><p>优先级</p></th>
+<th class="head"><p>完善事项</p></th>
+<th class="head"><p>退出条件</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-13</p></td>
+<td><p>P1</p></td>
+<td><p>交付外部SDK入门教程</p></td>
+<td><p>固定版本的真实外部consumer配置/构建/运行或链接成功；保留实际命令和清理步骤</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-14</p></td>
+<td><p>P1</p></td>
+<td><p>交付异步I/O与取消排空教程</p></td>
+<td><p>真实示例覆盖reject/accept/cancel/drain/settled/quarantine；无借用提前回收</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-15</p></td>
+<td><p>P1</p></td>
+<td><p>交付Board接入指南</p></td>
+<td><p>可验证模板、路由授权、来源和unknown明确；已有SoC复用；软件与PCB资格分开</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-16</p></td>
+<td><p>P2</p></td>
+<td><p>交付SoC/provider/组件接入指南</p></td>
+<td><p>按纵切片列facts/startup/time/provider/测试/SDK/HIL条件；通用器件不强制进生成器</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-17</p></td>
+<td><p>P1</p></td>
+<td><p>交付OS等待与停机指南</p></td>
+<td><p>后端语义、执行推进、真实删除和存储回收条件清晰；示例经维护后端验证</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-18</p></td>
+<td><p>P1</p></td>
+<td><p>交付旧配置与接口迁移指南</p></td>
+<td><p>旧HAL/OSAL/Kconfig到当前TOML/factory有可执行转换路径；旧ID不跨bundle持久化</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-19</p></td>
+<td><p>P2</p></td>
+<td><p>交付配置和工具参考</p></td>
+<td><p>字段/单位/拒绝规则和CLI来自维护实现；API声明不手抄；无重复配置权威</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-20</p></td>
+<td><p>P2</p></td>
+<td><p>交付性能诊断与HIL准备指南</p></td>
+<td><p>区分ELF预算/实测cycles/stack/HIL；工具准备不声称已执行硬件</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-42</p></td>
+<td><p>P1</p></td>
+<td><p>应用五类模板与逐页内容审查</p></td>
+<td><p>tutorial/how-to/reference/explanation/status关键页面按模板走查；缺项修正或理由明确；metadata不替代内容合格</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-47</p></td>
+<td><p>P1</p></td>
+<td><p>交付初始化停机与失败撤回图</p></td>
+<td><p>prepare/start/stop/withdraw按实际选定流程；部分效果和逆序撤回责任明确；不自动启动scheduler</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-48</p></td>
+<td><p>P1</p></td>
+<td><p>交付请求状态与借用图</p></td>
+<td><p>admission结果与enum状态分开；取消/deadline仍借用；SETTLED和观察者/slot释放条件明确</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-49</p></td>
+<td><p>P1</p></td>
+<td><p>交付UART和SPI DMA执行时序</p></td>
+<td><p>选定模式正常与取消/排空失败路径；Task/IRQ/DMA域、DMA TC/wire complete/SETTLED分开</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-50</p></td>
+<td><p>P1</p></td>
+<td><p>交付wait wake和OS退出图</p></td>
+<td><p>ready-arm-ready-wait-ready、deadline和执行推进责任准确；实际join/delete后回收存储</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-51</p></td>
+<td><p>P1</p></td>
+<td><p>交付内存DMA和Cache参考图</p></td>
+<td><p>精确芯片/模式/内存域/可达性/对齐和完整line维护；不从CPU名推导DMA或coherence</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-52</p></td>
+<td><p>P1</p></td>
+<td><p>交付Source SDK消费流程图</p></td>
+<td><p>真实搬移外部consumer与源码树自测试分开；配置/构建/运行或链接的scope准确</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-55</p></td>
+<td><p>P2</p></td>
+<td><p>交付Cortex M能力分层图</p></td>
+<td><p>CPU原语/Runtime/SoC/Board/HIL分层；FPU/MVE/Cache/安全能力和实际port不互相继承</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-56</p></td>
+<td><p>P2</p></td>
+<td><p>交付U575同步双域参考图</p></td>
+<td><p>限定独立TZEN1无OS同步参考；SAU/MPU/GTZC/gateway和seal失败责任；无通用NS RTOS/async声明</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-57</p></td>
+<td><p>P2</p></td>
+<td><p>交付连续流与可见丢块图</p></td>
+<td><p>producer/block/consumer/loan/overrun/stop准确；服务与容量条件明确；不承诺无条件零丢失</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="d4">
+<h2>D4 双语、图示与读者审查<a class="headerlink" href="#d4" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>编号</p></th>
+<th class="head"><p>优先级</p></th>
+<th class="head"><p>完善事项</p></th>
+<th class="head"><p>退出条件</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-21</p></td>
+<td><p>P1</p></td>
+<td><p>确定双语术语与发布关键页</p></td>
+<td><p>原文语言和不可翻译标识明确；关键页范围固定；不要求复制CSV或原始日志</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-22</p></td>
+<td><p>P1</p></td>
+<td><p>实施gettext与翻译源版本检查</p></td>
+<td><p>只有一条翻译链；中文/英文原文分别做en/zh_CN构建；缺译fallback与stale/fuzzy按实际正文语言和源版本标记</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-23</p></td>
+<td><p>P1</p></td>
+<td><p>完成关键使用路径双语审查</p></td>
+<td><p>入门/配置/factory/借用/支持/资格/迁移关键正文独立审查；缺失语言不假报完整</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-24</p></td>
+<td><p>P1</p></td>
+<td><p>显示真实页面语言与翻译状态</p></td>
+<td><p>reviewed/stale/missing/original在页和入口可见；英文fallback不标中文已译；locale不覆盖source_language</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-25</p></td>
+<td><p>P2</p></td>
+<td><p>整理本地图示与离线资源</p></td>
+<td><p>图源可审查、箭头与契约一致；图像/字体/脚本不依赖CDN；新增渲染工具受锁；DOT/SVG成对；Graphviz及实际字体受锁；SVG无外部资源/脚本/DOCTYPE</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-26</p></td>
+<td><p>P1</p></td>
+<td><p>完成读者任务走查</p></td>
+<td><p>独立agent从入口完成任务；错误步骤/不可达合同/版本混淆修正；记录实际结果；按内容标准独立语义审查</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-58</p></td>
+<td><p>P1</p></td>
+<td><p>执行图文一致性与视觉离线审查</p></td>
+<td><p>每条边和状态核对来源；图源/输出/alt/caption齐全；SVG安全资源与字体；桌面/窄屏放大/打印/离线实际验证，未执行不标通过</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="d5-ci">
+<h2>D5 工具、门禁与CI<a class="headerlink" href="#d5-ci" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>编号</p></th>
+<th class="head"><p>优先级</p></th>
+<th class="head"><p>完善事项</p></th>
+<th class="head"><p>退出条件</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-27</p></td>
+<td><p>P1</p></td>
+<td><p>统一docs CLI与旧脚本转发</p></td>
+<td><p>check/build/preview/package/doctor目标明确；本地与CI严格参数一致；失败码与诊断保留</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-28</p></td>
+<td><p>P1</p></td>
+<td><p>建立离线链接anchor导航检查</p></td>
+<td><p>故意坏文件/anchor/重复ID/不可达页实际失败；合法跨页引用和迁移别名实际通过</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-29</p></td>
+<td><p>P1</p></td>
+<td><p>扩大实际配置片段验证</p></td>
+<td><p>新路径/RST/完整Board和CPU输入经实际resolver；语法片段不升级可执行资格</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-30</p></td>
+<td><p>P1</p></td>
+<td><p>关联可执行代码和consumer</p></td>
+<td><p>literalinclude来源和测试身份可追溯；维护示例真实构建；不任意执行文档shell</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-31</p></td>
+<td><p>P2</p></td>
+<td><p>建立有界外部链接检查</p></td>
+<td><p>404/版本错误与网络失败分别报告；timeout/retry有界；commit默认无需网络</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-32</p></td>
+<td><p>P1</p></td>
+<td><p>接入文档commit与严格CI门禁</p></td>
+<td><p>快速离线commit检查和完整文档CI执行；工具负路径TDD；正文调整不伪造固件验收；图资源机器检查与正文/图语义审查分工明确</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-33</p></td>
+<td><p>P1</p></td>
+<td><p>锁定并实际安装文档工具闭包</p></td>
+<td><p>Python全部传递wheel hash及Doxygen身份锁定；干净维护tuple实际安装/构建成功；Graphviz与实际字体闭包实际验证</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-34</p></td>
+<td><p>P1</p></td>
+<td><p>隔离preview构建与发布权限</p></td>
+<td><p>PR artifact带source身份；可信部署只消费验证输出；不在高权限执行外部PR源码</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="d6">
+<h2>D6 发布、恢复与迁移收尾<a class="headerlink" href="#d6" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>编号</p></th>
+<th class="head"><p>优先级</p></th>
+<th class="head"><p>完善事项</p></th>
+<th class="head"><p>退出条件</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-35</p></td>
+<td><p>P1</p></td>
+<td><p>生成版本与资格manifest</p></td>
+<td><p>平台版本由既有policy读取；code/docs/qualified source独立；outputs只列payload；不包含manifest/checksums/archive或间接hash自引用</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-36</p></td>
+<td><p>P1</p></td>
+<td><p>生成相对链接离线HTML包</p></td>
+<td><p>包含语言/API/manifest/校验/许可；脱离workspace可浏览验真；无hash自引用</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-37</p></td>
+<td><p>P1</p></td>
+<td><p>发布不可变版本与stable入口</p></td>
+<td><p>release-id绑定manifest且不覆盖；实际部署成功；stable不宣称HIL全部通过</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-38</p></td>
+<td><p>P1</p></td>
+<td><p>执行发布后站点与下载验证</p></td>
+<td><p>在线身份与部署包一致；关键页面/旧URL/图/下载校验通过；旧API不静默映射新合同</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-39</p></td>
+<td><p>P1</p></td>
+<td><p>完成独立恢复与长期存储</p></td>
+<td><p>稳定取得位置和保留策略明确；独立根恢复浏览验真；异地恢复须真实执行</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-40</p></td>
+<td><p>P1</p></td>
+<td><p>收尾迁移并独立交付审查</p></td>
+<td><p>映射全部处理；无重复规范/断链/错误资格；原证据保留；58项范围及15类必需图满足退出条件；未声明支持的配置、HIL和后续扩展如实保留边界</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-54</p></td>
+<td><p>P2</p></td>
+<td><p>交付发布与独立恢复图</p></td>
+<td><p>文档/SDK/档案交付渠道与身份准确；目标和实际已发布分开；独立取得/恢复/验真边界明确</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

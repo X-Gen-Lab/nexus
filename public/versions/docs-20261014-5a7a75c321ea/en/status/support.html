@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>支持范围与选型 &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="软件验证、源码身份与证据" href="software-verification.html" />
+    <link rel="prev" title="Status and evidence" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/status/support.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../zh_CN/status/support.html" lang="zh-CN">zh_CN</a>. Source language: zh_CN; requested: en; actual: zh_CN; translation: <strong>missing</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="status-support">
+<span id="id1"></span><h1>支持范围与选型<a class="headerlink" href="#status-support" title="Link to this heading">¶</a></h1>
+<p>本页帮助确认一种精确装配是否处于维护范围。完整支持说明仍由
+<a class="reference internal" href="../delivery/support.html"><span class="std std-doc">原支持记录</span></a>维护；本页只提供判断入口。
+<a class="reference internal" href="../delivery/capabilities.html"><span class="std std-doc">事实派生矩阵</span></a>读取 SoC／Board／route、provider
+和软件夹具，不能替代 PCB 或物理验收。不要按“芯片属于 Cortex-M”推导全部外设可用。</p>
+<section id="id2">
+<h2>选型必须分别核对五个事实<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>核对项</p></th>
+<th class="head"><p>权威来源</p></th>
+<th class="head"><p>可得到的结论</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>芯片能力</p></td>
+<td><p>精确 SoC JSON 与来源</p></td>
+<td><p>该芯片有什么资源；unknown 保持 unknown</p></td>
+</tr>
+<tr class="row-odd"><td><p>provider 实现</p></td>
+<td><p>生产代码、resolver 与派生矩阵</p></td>
+<td><p>哪个 controller、route、mode 真正可选</p></td>
+</tr>
+<tr class="row-even"><td><p>板级授权</p></td>
+<td><p>精确 Board facts 与来源</p></td>
+<td><p>哪种 PCB、引脚、电气配置获准；不能猜接线</p></td>
+</tr>
+<tr class="row-odd"><td><p>软件验证</p></td>
+<td><p><a class="reference internal" href="software-verification.html"><span class="std std-doc">精确软件结果</span></a></p></td>
+<td><p>特定 source/config/tool/artifact 范围实际执行</p></td>
+</tr>
+<tr class="row-even"><td><p>实板验证</p></td>
+<td><p><a class="reference internal" href="hardware.html"><span class="std std-doc">物理状态</span></a></p></td>
+<td><p>真实 station 对精确 tuple 的实际测量</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p><a class="reference internal" href="../reference/platforms/index.html"><span class="std std-doc">平台参考入口</span></a>连接各芯片的软件切片；
+<a class="reference internal" href="../reference/platforms/support.html"><span class="std std-doc">选择指南</span></a>解释 F407、F470、G474、H743、U575
+与 CPU-only Runtime 的差异。两个入口都引用原支持记录，不另建能力规则。</p>
+</section>
+<section id="id3">
+<h2>判定流程<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>固定完整料号、Board 和 PCB 来源；检查尚未知的晶振、电源和接线事实。</p></li>
+<li><p>在派生矩阵中找到精确 mode、controller 和 endpoint；未列模式不自动支持。</p></li>
+<li><p>使用实际 TOML resolver；冲突、unknown 或不支持的配置应当拒绝。</p></li>
+<li><p>比对软件结果的源码、配置与产物，不能借用相邻板或相邻模式的执行身份。</p></li>
+<li><p>在声称物理能力前取得真实 station 记录；当前 MCU HIL 均未执行。</p></li>
+</ol>
+<p>平台启动不启动调度器。任务、缓冲区、栈、owner 服务预算、停止及恢复策略
+属于外部工程。连续流模式也不承诺任意中断延迟或消费者速度下无丢失。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/cortex-m-capabilities.svg" title="Open SVG at full size"><img alt="CPU Runtime、具体 SoC 和物理资格边界" src="../_images/cortex-m-capabilities.svg" /></a></p>
+<p>FIG-13 是软件支持层次图；完整图示适用条件见 <a class="reference internal" href="../assets/diagrams/README.html"><span class="std std-doc">图册</span></a>。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Status and evidence</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">支持范围与选型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software-verification.html">软件验证、源码身份与证据</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-acceptance.html">文档系统实施与正式验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hardware.html">HIL 与实板状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ledgers.html">原台账、退出条件与派生视图</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roadmap.html">迭代方向与进入条件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

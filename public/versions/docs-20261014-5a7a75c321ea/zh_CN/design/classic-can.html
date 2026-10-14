@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Classic CAN 的平台机制与接入边界 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="显式时钟借用与浅睡眠" href="clock-domain-sleep.html" />
+    <link rel="prev" title="Build system maintenance contract" href="build-system.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/design/classic-can.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../en/design/classic-can.html" lang="en">en</a>. Source language: zh_CN; requested: zh_CN; actual: zh_CN; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="classic-can">
+<h1>Classic CAN 的平台机制与接入边界<a class="headerlink" href="#classic-can" title="Link to this heading">¶</a></h1>
+<p>当前公共接口是 <code class="docutils literal notranslate"><span class="pre">nexus/io/can.h</span></code>，维护 Native、STM32F407 和 GD32F470 的同一
+classic CAN 所有权机制。两款 SoC 只有 CAN 2.0A/B：11/29-bit ID、DATA/RTR、
+0–8-byte DLC；接口拒绝 CAN FD、大于 8 的发送 DLC 和越界 ID。</p>
+<section id="id1">
+<h2>静态对象与执行<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>公共 <code class="docutils literal notranslate"><span class="pre">nx_can_port_t</span></code> 只含 readonly ops 与私有 context。三个真实硬件邮箱对应
+三个静态 slot，没有软件 TX 队列、分配器、全局可变 registry、worker 或必选 OS。
+接收事件环由装配提供精确容量。未选实例不生成状态；当前生产单元的 ARM objects
+没有 <code class="docutils literal notranslate"><span class="pre">.data</span></code>/<code class="docutils literal notranslate"><span class="pre">.bss</span></code>，最终未选 ELF 的 GC/资源验证由实际装配构建建立。</p>
+<p>一个特权任务执行者序列化 submit、cancel、service、read、recover 和 stop；入口
+拒绝 Handler、非特权或已有 PRIMASK/BASEPRI/FAULTMASK 屏蔽状态。四条 IRQ 执行
+有界邮箱/接收处理：最多三个邮箱、两个 FIFO 各三个初始帧。MCU 的寄存器访问
+是 direct volatile MMIO；Native 只在模型编译时替换外部寄存器/NVIC 叶端口，
+生产 MCU 不携带模型访问表或运行时模型分支。</p>
+<p>IRQ wake 是提示，不替代 request predicate。绑定时读取四条实际 IRQ priority
+和 grouping，逐条验证 policy/syscall ceiling；不修改全局 grouping。sink 必须
+同时支持任务 service/cancel 与 IRQ 通知。捕获 sink 后执行者计数继续保留借用；
+stop、detach 或 recover 在通知尚未返回时报告 BUSY。</p>
+</section>
+<section id="id2">
+<h2>共享过滤器域与硬件事实<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>每个装配显式生成一个 <code class="docutils literal notranslate"><span class="pre">nx_can_filter_domain_t</span></code>，拥有主时钟、次时钟、28 个共享
+filter banks、split 与 immutable filter plan。无其他 controller 持有 active bit
+时才允许 domain stop 释放时钟。STM32 CAN2 依赖 CAN1 的时钟/过滤器域；GD32
+CAN1 同样依赖 CAN0。停止一个实例不 reset 主 controller，也不覆盖 peer filters。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>SoC</p></th>
+<th class="head"><p>控制器</p></th>
+<th class="head text-right"><p>CAN 输入时钟</p></th>
+<th class="head"><p>TX/RX0/RX1/error IRQ</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407</p></td>
+<td><p>CAN1 / CAN2</p></td>
+<td class="text-right"><p>APB1 42 MHz</p></td>
+<td><p>19/20/21/22；63/64/65/66</p></td>
+</tr>
+<tr class="row-odd"><td><p>GD32F470</p></td>
+<td><p>CAN0 / CAN1</p></td>
+<td class="text-right"><p>APB1 50 MHz</p></td>
+<td><p>19/20/21/22；63/64/65/66</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>私有绑定用锁定 SDK 的真实寄存器 offset、bit masks、mailbox/FIFO/filter stride、
+CPU IRQ 数和 NVIC priority bits 做编译期/启动期检查。CAN 输入没有 APB timer 的
+倍频规则。prescaler/BS1/BS2/SJW 使用物理计数，必须精确满足
+<code class="docutils literal notranslate"><span class="pre">clock_hz</span> <span class="pre">=</span> <span class="pre">bitrate</span> <span class="pre">×</span> <span class="pre">prescaler</span> <span class="pre">×</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">BS1</span> <span class="pre">+</span> <span class="pre">BS2)</span></code>；不搜索或替换参数。
+第一版采用单次发送 NART，关闭 ABOM，RX 使用 locked FIFO；过滤器只实现 32-bit
+mask，显式匹配 IDE，可选择匹配 RTR。过滤器归属与 bank/split 范围先验证再写。</p>
+<p>安全装配顺序是：reviewed Board electrical/pin handoff → domain initialize →
+各 controller initialize → 外部执行者启动。cold initialize 在 acknowledged
+init 中证明没有未知 TXRQ，并 drain retained RX FIFO；IER、四条 IRQ 使能与
+priority 读回不符会保留 closing/retained 责任。退出顺序是各 controller stop
+成功 → domain stop 成功 → Board pin/electrical lease release。失败时不得回收
+provider、ring、filter plan 或 sink。</p>
+</section>
+<section id="id3">
+<h2>完成、取消与恢复<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>prepare 在 READY/已消费 SETTLED storage 中复制 value frame；ACCEPTED 后借用整个
+request 到 acquire-observed SETTLED。第四个请求、非法 frame/context/deadline、
+以及 request 与 controller/ring/domain/filter plan 的重叠都拒绝且不产生借用。</p>
+<p>线上完成必须同时观察 RQCP、TME 和 TXRQ clear；只有 TXOK 能证明发送成功。
+清 W1C completion 后还要读回 RQCP clear，随后解除 slot，最后 release-publish
+SETTLED；这之后 provider 不再访问 request。cancel/timeout/bus-off/stop 请求
+abort 并等待真实 acknowledgement；deadline 不能撤销借用。drain 超时或 W1C
+清除失败保留 QUARANTINED。TXOK 与 cancel 竞争时保留真实 SUCCESS，不保证帧
+从未上线。RTR 成功的 transferred 为零，DATA 为 DLC。</p>
+<p>bus-off/TEC/REC/last-error 的 authoritative snapshot 不依赖 RX ring 是否有空位。
+ABOM 关闭；recover 是显式 controller-local init，在所有 TX loan 与 publisher
+退出后执行，不重发原帧，不 reset 活跃 peer。未完成硬件/IRQ/FIFO drain 的 stop
+返回 BUSY，保留原 storage。成功 stop 后 read_events 拒绝 STATE，不接触已释放
+接收环。</p>
+</section>
+<section id="id4">
+<h2>接收与丢失事实<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>接收保存 value frame、FIFO/filter、raw DLC 与 IRQ acquisition timestamp。
+raw DLC 9–15 被规范为 8 并加标志，最多复制八字节；不解释为 CAN FD。时间不是
+物理 SOF timestamp。RFOM 必须读回释放完成后才能发布一次事件；卡住时停止 admission
+并保留责任，不能重复发布同一个硬件邮箱。</p>
+<p>事件环不覆盖未消费事实。软件丢失计数是精确值；硬件 FIFO overrun 只报告下界。
+locked FIFO 中先前保存的帧先于 overrun loss marker；pending loss 排在旧 buffered
+事件后、未来新帧前。饱和计数有显式标记。错误状态单独锁存，不借事件队列容量
+决定 completion 或 bus-off 是否存在。</p>
+</section>
+<section id="board">
+<h2>Board 来源与软件/物理资格<a class="headerlink" href="#board" title="Link to this heading">¶</a></h2>
+<p>启明 V3.1 原始 tree <code class="docutils literal notranslate"><span class="pre">08c5f513f1677388fcacaa519dca0c9ef00b6d2e</span></code> 的 CAN1
+示例 blob <code class="docutils literal notranslate"><span class="pre">8731616cf0d5bf02917c76463c49e722b39eb415</span></code> 给出 PA11 RX/PA12 TX AF9；
+CAN2 blob <code class="docutils literal notranslate"><span class="pre">ef8da679c5e7c7163fe2a48a80b6ce8f9d6ecfaa</span></code> 给出 PB12 RX/PB13 TX AF9。
+<a class="reference external" href="https://github.com/petercwq/STM32407/blob/08c5f513f1677388fcacaa519dca0c9ef00b6d2e/%E5%90%AF%E6%98%8E%E6%AC%A3%E6%AC%A3407%E5%BC%80%E5%8F%91%E6%9D%BF(%E9%AB%98%E9%85%8D%E7%89%88)V3.1%E4%BE%8B%E7%A8%8B%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C.pdf">用户手册</a>
+printed18/physical20 给出 TJA1050 U9/U11、5 V supply、RS 接地、120 Ω R35/R49。
+P21/P15 是人工复用跳帽；不能虚构软件 standby GPIO，也不能把软件 pin claim
+当作实物跳帽证明。CAN1 与 USART1 RTS/CTS、USB FS 的 PA11/PA12 必须拒绝并选。
+天空星与梁山派当前没有审阅的外接 CAN transceiver 路线，不猜 Board binding。</p>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/tools/testing/evidence/can-iteration/manifest.json">本轮执行证据</a> 记录 genuine
+RED/GREEN 与 fresh 30 Native + 8 STM32 + 8 GD32 production register-model cases、
+同三套 ASan/UBSan，以及 GCC14.3 六个严格 ARM compile units。历史 API 链接 RED
+与早期 harness 配置错误分开保留。开发 harness 位于外部工作目录，不能替代仓库
+维护构建注册、配置/factory/向量集成、完整 ARM ELF 或 clean candidate。</p>
+<p>物理 CAN 波形、晶振/传播/采样点容差、termination、跳帽/电压、transceiver、
+仲裁/ACK/error 注入、bus-off 恢复时间与最大 IRQ 屏蔽/WCET 均未执行 HIL。
+有限 poll_limit 是软件工作预算，不证明实物 init 最长应答时间；寄存器模型也不
+证明总线故障或 store corruption。外部 CANopen/产品重试/总线管理策略归产品工程。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

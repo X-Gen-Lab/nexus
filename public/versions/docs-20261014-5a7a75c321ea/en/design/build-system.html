@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Build system maintenance contract &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Classic CAN 的平台机制与接入边界" href="classic-can.html" />
+    <link rel="prev" title="CPU、原子操作与运行时装配契约" href="arch-contracts.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/design/build-system.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../zh_CN/design/build-system.html" lang="zh-CN">zh_CN</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="build-system-maintenance-contract">
+<h1>Build system maintenance contract<a class="headerlink" href="#build-system-maintenance-contract" title="Link to this heading">¶</a></h1>
+<p>Nexus uses one authored TOML assembly, a validated immutable configuration IR,
+static instances and typed factory, and one CMake software target graph. Ninja
+executes the declared graph. Products own application sources and composition.</p>
+<p>The <a class="reference download internal" download="" href="../_downloads/627f2f57f03b30c8b6242525d8433d77/build-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">48-item</span> <span class="pre">execution</span> <span class="pre">ledger</span></code></a> preserves the requested
+exit conditions. Implementation, executed software verification, environment
+distribution and physical acceptance have distinct evidence. Historical source
+qualification does not qualify changed build tools.</p>
+<p>Configuration publication is a single-writer transaction. It protects every
+authored and fact input before changing owned output. A rejected or interrupted
+attempt cannot expose the previous configuration as current. Successful identical
+generation preserves file content and timestamps so ordinary reconfiguration
+does not force unrelated compilation. A configuration digest is not a compiler
+or generator-source identity.</p>
+<p>CMake owns source lists and target dependencies. The resolver emits selected
+facts and its configuration-code dependencies, never a parallel software build
+graph. ABI, optimization, diagnostics and firmware link policy have explicit
+target boundaries. The firmware target guarantees its declared delivery outputs
+and resource check. External application warnings are a consumer policy.</p>
+<p>Developer presets and native CMake/CTest remain the normal build interface.
+Focused tests are development feedback. Commit gates and formal qualifications
+execute their complete declared suites with fresh reports. All runners preserve
+actual command exits, bounded concurrency, deadlines and process cleanup.</p>
+<p>Preparation may retrieve dependencies. Formal reproducibility uses two fresh
+network-disabled builds with the same verified source SDK and recorded environment
+and toolchain bytes. Compiler caches improve development only; they cannot prove
+fresh-build reproducibility. Durable evidence stores retain original records,
+member identities and failed attempts without changing their historical status.</p>
+<p>Behavioral fixes use actual RED then GREEN execution. Python tools use unittest;
+C/C++ contracts use the pinned GoogleTest/GoogleMock host framework. CMake graph
+and policy defects require real small consumer builds and artifact observations.
+Firmware stays C11 and contains no host test runtime. Normal commit hooks and
+independent review apply to this maintenance work.</p>
+<p>The following support matrix records observed host tools and declared locks.
+The final clean-source software gates and eight exact offline candidates are
+recorded in the <a class="reference internal" href="../delivery/build-system-verification.html"><span class="std std-doc">execution record</span></a>.
+Host observations retain their own scope; source qualification uses the recorded
+code commit and never follows a later documentation HEAD automatically.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Host or execution path</p></th>
+<th class="head"><p>Maintained boundary</p></th>
+<th class="head"><p>Current evidence</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Linux x86_64 development host</p></td>
+<td><p>Configuration, Ninja, Native/ARM consumers, offline tools and evidence transport</p></td>
+<td><p>Actual local execution; Linux 6.18.44 and glibc 2.41 observed</p></td>
+</tr>
+<tr class="row-odd"><td><p>Linux descendant cancellation</p></td>
+<td><p>Bounded <code class="docutils literal notranslate"><span class="pre">/proc</span></code> inspection, group/descendant freeze, kill and terminal-state observation</p></td>
+<td><p>Actual nested-process and hostile signal-handler regressions</p></td>
+</tr>
+<tr class="row-even"><td><p>Linux/amd64 OCI artifact</p></td>
+<td><p>Sealed manifest, config and layer bytes; local offline load</p></td>
+<td><p>Actual export, independent archive restore and Docker load/inspect</p></td>
+</tr>
+<tr class="row-odd"><td><p>Windows development paths</p></td>
+<td><p>Bootstrap selects <code class="docutils literal notranslate"><span class="pre">.venv/Scripts</span></code>; CMake and tool paths remain explicit</p></td>
+<td><p>Integration not executed in this maintenance run</p></td>
+</tr>
+<tr class="row-even"><td><p>macOS development paths</p></td>
+<td><p>Python/CMake tooling entry points; host-specific compiler setup</p></td>
+<td><p>Integration not executed in this maintenance run</p></td>
+</tr>
+<tr class="row-odd"><td><p>Other hosts or cross-host ARM distributions</p></td>
+<td><p>Require a separately reviewed tool lock and execution matrix</p></td>
+<td><p>Not established by Linux archive identities</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Linux descendant cleanup depends on Linux process observation. Generic process
+termination paths on other hosts do not establish the same nested-process
+acceptance. Windows and macOS path handling is an implementation boundary, not
+an integrated test result.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tool</p></th>
+<th class="head"><p>Declared requirement or lock</p></th>
+<th class="head"><p>Actual local observation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Python</p></td>
+<td><p>Minimum 3.11; local lock 3.12.14</p></td>
+<td><p>CPython 3.12.14</p></td>
+</tr>
+<tr class="row-odd"><td><p>CMake</p></td>
+<td><p>Minimum 3.31; tool lock 3.31.6</p></td>
+<td><p>3.31.6</p></td>
+</tr>
+<tr class="row-even"><td><p>Ninja</p></td>
+<td><p>Tool lock 1.13.2; single configuration</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1.13.2.git.kitware.jobserver-pipe-1</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Native compiler</p></td>
+<td><p>GNU 14.2.0 in the environment lock</p></td>
+<td><p>GCC/G++ 14.2.0, Debian 14.2.0-19</p></td>
+</tr>
+<tr class="row-even"><td><p>ARM compiler</p></td>
+<td><p>GNU Arm 14.3.rel1, Linux x86_64 archive lock</p></td>
+<td><p>GCC 14.3.1, build dated 20250623</p></td>
+</tr>
+<tr class="row-odd"><td><p>clang-format</p></td>
+<td><p>14.0.6</p></td>
+<td><p>14.0.6</p></td>
+</tr>
+<tr class="row-even"><td><p>pre-commit</p></td>
+<td><p>4.3.0</p></td>
+<td><p>4.3.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Optional ccache</p></td>
+<td><p>4.14.1, Linux x86_64 static distribution</p></td>
+<td><p>Actual binary and cache hit/miss validation</p></td>
+</tr>
+<tr class="row-even"><td><p>Git</p></td>
+<td><p>Source and submodule identity tooling</p></td>
+<td><p>Host 2.52.0; recorded OCI artifact 2.47.3</p></td>
+</tr>
+<tr class="row-odd"><td><p>GoogleTest/GoogleMock</p></td>
+<td><p>1.16.0, pinned commit and archive SHA-256</p></td>
+<td><p>Host-only framework; final full-source execution separately recorded</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Ninja single-configuration builds are maintained. Ninja Multi-Config is
+explicitly rejected; other generators have no implied acceptance. C11 remains
+the firmware language. Native test targets enable C++17 without linking that
+test runtime into firmware.</p>
+<p>The Linux x86_64 CP312 offline tool closure contains 15 hash-locked wheels,
+including the Setuptools build backend required by isolated local pre-commit
+preparation. A fresh CP312 virtual environment completed an actual
+<code class="docutils literal notranslate"><span class="pre">--no-index</span> <span class="pre">--require-hashes</span></code> installation and real isolated hook initialization.
+The complete isolated tool domains retain their actual recorded source scopes;
+the final ordinary commit gate separately executes the current source. CP311
+wheel bytes were checked against their 15-wheel lock; CP311 installation was
+not executed. The minimum Python version and wheel inventory do not substitute
+for that missing installation result.</p>
+<p>The recorded OCI artifact uses Python 3.12.15 and Git 2.47.3, distinct from the
+current host versions. Its manifest is
+<code class="docutils literal notranslate"><span class="pre">e936b188b9e30cf37ce109a5407019c91fe2dbc62fb10afceb3f2abbfc823ac8</span></code> and
+its image config is
+<code class="docutils literal notranslate"><span class="pre">a1ba03c16d424aef88dad6e5b2ead2892734a0bf909dedc23d8855fa4861fbe0</span></code>.
+The actual ARM toolchain tree contains 7,190 files and 1,106,755,364 bytes with
+tree SHA-256
+<code class="docutils literal notranslate"><span class="pre">44d2fe14e401730074302ad87bdef9762a6cfe12de4bebc6853d181fd51c74fd</span></code>.
+Toolchain and OCI transport executions retain their own tool-source identities;
+their results do not transfer source qualification to later tool changes.</p>
+<p>Fixed base/frontend digests, Debian snapshot selection, five APT package
+versions and hash-required Python inputs are declared in the recipe lock.
+Reconstruction of the observed OCI bytes has not executed successfully:
+<code class="docutils literal notranslate"><span class="pre">recipe_reproducible</span></code> remains <code class="docutils literal notranslate"><span class="pre">false</span></code>. Verified artifact reuse and declared
+recipe inputs therefore remain separate acceptance states.</p>
+<p>The execution ledger keeps all 48 requested requirements and exit conditions
+unchanged. Its updated paths bind the implementation, original RED/GREEN
+records and the final-source software gates in the
+<a class="reference internal" href="../delivery/build-system-verification.html"><span class="std std-doc">execution record</span></a> and
+<a class="reference download internal" download="" href="../_downloads/030d50eaee967f47692c76d96b9f97b7/build-system-results.json"><code class="xref download docutils literal notranslate"><span class="pre">result</span> <span class="pre">index</span></code></a>. Historical measurements
+retain their source and exact selections instead of inheriting a later HEAD.</p>
+<p>Automatic developer provenance binds a unique immutable command-attempt receipt
+and checks its command and working directory. Complete current contracts and
+actual candidate plan execution establish this association; a shared latest
+report name cannot substitute for an exact attempt.</p>
+<p>BLD-18 retains full SDK byte checks at each consumption boundary after
+measurement, with no parent marker or persistent verification bypass. BLD-31
+retains common static libraries after measuring declared versus actually
+compiled units and exact selected-image costs. Their <code class="docutils literal notranslate"><span class="pre">decision_verified</span></code> states
+record measured choices rather than speculative source splitting.</p>
+<p>BLD-38 records actual fixed-checker candidate plans and genuine failed-checker
+execution. The original orchestration exit condition remains unchanged. The
+maintained 72-stage software plan did not run through one complete plan
+invocation; individually executed full gates are recorded separately. BLD-39
+validates dependency-upgrade evidence contracts, without claiming an actual
+vendor dependency upgrade.</p>
+<p>BLD-40 covers actual CP312 offline installation and isolated hook preparation;
+CP311 installation remains unexecuted. BLD-41 covers actual whole-toolchain and
+OCI transport and verified reuse of the same bytes. BLD-42 remains
+<code class="docutils literal notranslate"><span class="pre">declared_recipe_verified_reconstruction_unverified</span></code>, with
+<code class="docutils literal notranslate"><span class="pre">recipe_reproducible=false</span></code>. BLD-44 covers actual new-source archived proof and
+independent archive-only verification. Local archive retention and a durable
+hard-link name do not establish off-site storage, publication or a release.</p>
+<p>The host observations retain their recorded source scopes in
+<code class="docutils literal notranslate"><span class="pre">/workspace/nexus-build-maintenance-20261012/documentation/host-tool-support-observations.json</span></code>.
+Current locked closure and final-source receipts are indexed in the delivery
+result index. The ledger’s configuration, target, workflow, delivery and transport
+reports retain their raw executions, failure attempts and source scopes. Physical HIL
+remains <code class="docutils literal notranslate"><span class="pre">not_executed</span></code> throughout this build-system maintenance work.</p>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

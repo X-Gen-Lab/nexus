@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Public C API &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nexus.css?v=1e57c037" />
+    <script src="../../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Core: requests, status and time" href="core.html" />
+    <link rel="prev" title="Reference" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/reference/api/index.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../../zh_CN/reference/api/index.html" lang="zh-CN">zh_CN</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="public-c-api">
+<h1>Public C API<a class="headerlink" href="#public-c-api" title="Link to this heading">¶</a></h1>
+<p>Doxygen reads only current public header trees. The module pages render real declarations through Breathe; vendor SDKs, mutable provider storage, tests and historical APIs are excluded. Generated nexus_factory.h belongs to one resolved assembly and is described in the factory explanation.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="core.html">Core: requests, status and time</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core.html#fault-h">fault.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core.html#memory-h">memory.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core.html#request-h">request.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core.html#request-observer-h">request_observer.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core.html#stack-observation-h">stack_observation.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core.html#status-h">status.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core.html#time-h">time.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="arch.html">Arch: CPU mechanisms and feature contracts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#arch-h">arch.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#atomic-h">atomic.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#cache-h">cache.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#cache-control-h">cache_control.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#features-h">features.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#mpu-h">mpu.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#nonsecure-h">nonsecure.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#security-h">security.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch.html#sleep-h">sleep.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">Typed I/O: devices and execution contracts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="io.html#adc-h">adc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#adc-observer-h">adc_observer.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#advanced-pwm-h">advanced_pwm.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#can-h">can.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#dma-h">dma.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#ethernet-h">ethernet.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#exti-h">exti.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#flash-h">flash.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#gpio-h">gpio.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#i2c-h">i2c.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#i2c-bus-clear-h">i2c_bus_clear.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#mdio-h">mdio.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#model-h">model.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#spi-h">spi.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#stream-h">stream.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#stream-budget-h">stream_budget.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#timer-h">timer.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#timer-capture-h">timer_capture.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#uart-h">uart.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#uart-rs485-h">uart_rs485.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#usb-device-h">usb_device.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#wake-h">wake.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#watchdog-h">watchdog.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="os.html">OS adapters: tasks, waits and explicit storage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="os.html#baremetal-h">baremetal.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#diagnostic-h">diagnostic.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#freertos-h">freertos.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#freertos-diagnostics-h">freertos_diagnostics.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#freertos-mpu-h">freertos_mpu.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#freertos-stack-h">freertos_stack.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#freertos-user-h">freertos_user.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#lowpower-h">lowpower.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#native-h">native.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#secure-context-h">secure_context.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#threadx-h">threadx.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#tick-h">tick.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html#wait-h">wait.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="components.html">Optional common components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="components.html#bmp280-h">bmp280.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#bmp280-spi-h">bmp280_spi.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#bus-owner-h">bus_owner.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#clock-domain-h">clock_domain.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#dp83848-h">dp83848.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#file-flash-h">file_flash.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#flash-storage-h">flash_storage.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#log-h">log.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#modbus-rtu-h">modbus_rtu.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#owner-observer-h">owner_observer.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#spi-async-owner-h">spi_async_owner.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#spi-owner-h">spi_owner.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#storage-h">storage.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#uart-owner-h">uart_owner.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#user-io-broker-h">user_io_broker.h</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Task guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Public C API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configuration/index.html">Configuration and tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../platforms/index.html">Platforms and qualification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-delivery.html">文档包、发布与独立恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation-tools.html">Documentation tools and preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../history.html">历史文档与版本迁移</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../assets/diagrams/README.html">Nexus 平台图册</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

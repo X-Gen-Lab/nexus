@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>文档包、发布与独立恢复 &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Documentation tools and preparation" href="documentation-tools.html" />
+    <link rel="prev" title="源码、软件证据与物理资格" href="platforms/qualification.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/reference/documentation-delivery.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../en/reference/documentation-delivery.html" lang="en">en</a>. Source language: zh_CN; requested: zh_CN; actual: zh_CN; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="id1">
+<h1>文档包、发布与独立恢复<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>本页说明 <code class="docutils literal notranslate"><span class="pre">tools/documentation/delivery.py</span></code> 的交付合同。目标是让同一份文档可以在线
+阅读、离线阅读并从归档独立恢复，同时保留准确的源码和软件验证身份。文档交付
+不增加固件测试资格，不代表物理 HIL、产品发布、安全认证或长期支持承诺。</p>
+<section id="id2">
+<h2>输入与身份<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>交付输入是严格构建后的 HTML 根目录和当前 Git 源码。构建根必须包含：</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>文件</p></th>
+<th class="head"><p>用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">index.html</span></code></p></td>
+<td><p>文档总入口</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">en/index.html</span></code></p></td>
+<td><p>英文入口</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">zh_CN/index.html</span></code></p></td>
+<td><p>中文入口</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">api/index.html</span></code></p></td>
+<td><p>公共 API 入口</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">licenses/LICENSE.txt</span></code></p></td>
+<td><p>随包许可</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">documentation-build.json</span></code></p></td>
+<td><p>构建时观测的源码和工具身份</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>本地图源、SVG、CSS、JavaScript、字体、下载说明和其他许可随实际构建产物一起登记。
+网页资源使用相对路径，不能依赖在线 CDN。正常的 HTTP(S) 参考链接可以保留；离线
+阅读的页面、脚本、样式和图片必须已经在包中。</p>
+<p>构建记录采用 schema 1，<code class="docutils literal notranslate"><span class="pre">kind</span></code> 为 <code class="docutils literal notranslate"><span class="pre">nexus_documentation_build</span></code>。其 <code class="docutils literal notranslate"><span class="pre">source</span></code> 使用
+<code class="docutils literal notranslate"><span class="pre">tools.evidence.identity.observe_git_source()</span></code> 的实际观测结果，<code class="docutils literal notranslate"><span class="pre">tools</span></code> 保存实际工具
+版本，<code class="docutils literal notranslate"><span class="pre">languages</span></code> 固定为 <code class="docutils literal notranslate"><span class="pre">en</span></code>、<code class="docutils literal notranslate"><span class="pre">zh_CN</span></code>。交付工具拒绝脏源码、缺失或偏离锁定版本
+的 submodule，以及与当前源码不一致的陈旧构建。</p>
+<p>版本号读取根 <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> 的 <code class="docutils literal notranslate"><span class="pre">project(nexus</span> <span class="pre">VERSION</span> <span class="pre">...)</span></code>，并使用既有严格 policy
+loader 核对 <code class="docutils literal notranslate"><span class="pre">dependencies/platform-compatibility.json</span></code>。manifest 同时记录该 policy
+的摘要、接口 epoch 和 schema epochs；版本不一致、重复 JSON 键和非法常量均拒绝。
+版本身份另外使用
+明确的 <code class="docutils literal notranslate"><span class="pre">release_id</span></code>；例如 <code class="docutils literal notranslate"><span class="pre">1.0.0-docs-g&lt;commit&gt;</span></code>。这个身份只允许字母、数字、点、
+下划线和短横线，不能携带目录或 URL。</p>
+<p>manifest 分开记录三类身份：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">documentation_source</span></code>：构建时完整 commit／tree 和文档目录的限定树摘要。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">code_source</span></code>：同一 checkout 的完整 commit／tree 和平台代码目录的限定树摘要。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">qualified_code</span></code>：当前交付索引中原已验证代码的 commit／tree 及索引文件摘要。</p></li>
+</ul>
+<p>前两项可能来自同一 Git 提交，但覆盖的目录不同。第三项引用既有软件证据，不能
+因文档提交而变成当前 HEAD 的新固件验证。<code class="docutils literal notranslate"><span class="pre">physical_status</span></code> 固定为 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。</p>
+</section>
+<section id="id3">
+<h2>文件与摘要合同<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">documentation-manifest.json</span></code> 的 <code class="docutils literal notranslate"><span class="pre">files</span></code> 只列实际 payload，每项包含标准化相对路径、
+字节数和 SHA-256。manifest、<code class="docutils literal notranslate"><span class="pre">SHA256SUMS</span></code>、归档本身及执行 receipt 不进入这个表，
+避免摘要自引用。<code class="docutils literal notranslate"><span class="pre">SHA256SUMS</span></code> 覆盖 payload 和 manifest，也不包含自己。</p>
+<p>manifest 摘要和归档摘要由交付命令返回，保存在包外的执行证据及远程发布记录中。
+独立恢复时传入保存的 manifest 摘要；这能检测 payload 和 manifest 是否偏离原交付。
+摘要校验不是签名，不能认证作者或抵抗已经控制全部信任来源的攻击者。</p>
+<p>构建 metadata 的 <code class="docutils literal notranslate"><span class="pre">status</span></code> 必须为 <code class="docutils literal notranslate"><span class="pre">passed</span></code>。<code class="docutils literal notranslate"><span class="pre">failed</span></code>、<code class="docutils literal notranslate"><span class="pre">running</span></code>、缺失状态和陈旧
+成功记录不能装包；即使手工重算 manifest 与摘要，独立验证仍拒绝失败构建记录。</p>
+<p>验证同时检查：</p>
+<ul class="simple">
+<li><p>manifest schema、源码身份、语言、工具记录和软件资格引用是否完整。</p></li>
+<li><p>文件闭包是否精确；缺失文件、额外文件、重复记录、摘要或字节数不符均拒绝。</p></li>
+<li><p>必需入口和许可是否存在；页面、资源、anchor 是否可在包内找到。</p></li>
+<li><p>路径是否标准化；绝对路径、目录逃逸、symlink、tar hardlink 和重复成员均拒绝。</p></li>
+<li><p>归档是否只包含正常文件，数量和总字节数是否超过工具上限。</p></li>
+</ul>
+</section>
+<section id="id4">
+<h2>装包与恢复<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">package()</span></code> 在独立临时目录完成验证、文件复制和归档，再安装到新的输出路径。
+输出目录不能与源码或输入 payload 重叠；发布 webroot 也不能包含输入包，或位于
+输入包内部。拒绝必须发生在写入前，避免污染被绑定的输入字节。
+过程前后再次检查源码和构建 payload，拒绝并发修改。同一份已验证输入产生相同
+tar.gz 字节；归档文件顺序、时间、拥有者和文件模式固定。</p>
+<p><code class="docutils literal notranslate"><span class="pre">restore()</span></code> 先验证归档所有成员和文件闭包，再写入新的独立目录。不会使用
+<code class="docutils literal notranslate"><span class="pre">extractall()</span></code>，不会覆盖已有目录，失败不会留下半恢复的目标。恢复目录不需要原
+Git checkout、Python 虚拟环境或网络即可使用浏览器打开 HTML；执行校验需要该工具。</p>
+<p>Python 调用接口如下，CLI 入口由统一 docs 命令提供：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tools.documentation</span><span class="w"> </span><span class="kn">import</span> <span class="n">delivery</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">delivery</span><span class="o">.</span><span class="n">package</span><span class="p">(</span><span class="n">build_dir</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">source_root</span><span class="o">=</span><span class="n">source_root</span><span class="p">,</span>
+                          <span class="n">release_id</span><span class="o">=</span><span class="n">release_id</span><span class="p">)</span>
+<span class="n">manifest</span> <span class="o">=</span> <span class="n">delivery</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"archive"</span><span class="p">],</span>
+                           <span class="n">expected_manifest_sha256</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">"manifest_sha256"</span><span class="p">])</span>
+<span class="n">delivery</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"archive"</span><span class="p">],</span> <span class="n">independent_root</span><span class="p">,</span>
+                 <span class="n">expected_manifest_sha256</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">"manifest_sha256"</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>这是接口说明片段，路径由调用方显式提供；可执行命令和实际验收结果以统一 docs CLI
+及其本次交付 receipt 为准。</p>
+</section>
+<section id="id5">
+<h2>旧书签与版本边界<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">docs/reference/redirects.csv</span></code> 是旧 URL 迁移的唯一人工维护输入。每行明确旧地址、
+目标页、来源文档与固定 revision，并选择历史合同边界或同一当前合同的位置迁移。
+禁止把旧 HAL／OSAL／Kconfig API 当成当前接口，也不能把同合同的位置变化描述为
+API 变化。旧地址保留在台账中；后续调整同时检查来源、目标及实际书签行为。</p>
+<p>正式双语构建使用 <code class="docutils literal notranslate"><span class="pre">install_alias_catalog()</span></code> 验证这份 CSV，生成包内说明页和
+<code class="docutils literal notranslate"><span class="pre">documentation-aliases.json</span></code>。catalog 是派生文件，记录原 CSV 摘要并进入 manifest
+payload；不能单独手写另一份 alias 配置。单语言开发预览不生成完整 catalog，也
+不能作为正式双语包。没有 catalog 的历史测试夹具仍可验证，不建立旧 URL 验收。</p>
+<p>旧 URL 恰好与新正文路径同名时，生成器保留版本目录中的当前正文，派生
+<code class="docutils literal notranslate"><span class="pre">canonical_collisions</span></code> 记录对应当前源路径／摘要和 HTML 摘要。必须存在真实当前
+源文件及 HTML，不能用手填标记绕过一致性检查。根目录仍按原 CSV 语义提供说明。
+当前 <code class="docutils literal notranslate"><span class="pre">development/index.html</span></code>、<code class="docutils literal notranslate"><span class="pre">tutorials/index.html</span></code> 的两语言页面各有这种同名情况。</p>
+<p>发布除保留不可变 <code class="docutils literal notranslate"><span class="pre">versions/&lt;release_id&gt;/</span></code> 外，还在站点根生成旧书签说明页。
+<code class="docutils literal notranslate"><span class="pre">en/index.html</span></code> 和 <code class="docutils literal notranslate"><span class="pre">zh_CN/index.html</span></code> 明确引向当前版本；根 <code class="docutils literal notranslate"><span class="pre">api/index.html</span></code> 说明
+旧 API 合同并引导阅读历史版本边界，不自动跳转或默默解释为当前公共 API。
+当前台账有 287 个旧地址，加上三个语言／API 总入口，共验证 290 个根 gateway。
+所有链接都是相对地址，不使用脚本、meta refresh 或外部跳转服务。</p>
+<p>未知字段或语义、重复／非标准 URL、保留命名空间、目标缺失、alias 链、语言或
+来源语义不一致均在写入前拒绝。已有无关页面、symlink 和父目录冲突不能覆盖。
+根 <code class="docutils literal notranslate"><span class="pre">documentation-gateways.json</span></code> 只登记工具生成的说明页及入口摘要；重新发布前
+核对已登记字节，外部修改需维护者明确处理。该记录在包外，不进入自身摘要闭包，
+没有数字签名，不能证明发布者身份，也不能授予实板或 HIL 验证资格。</p>
+<p><code class="docutils literal notranslate"><span class="pre">post_deploy()</span></code> 对当前发布版本逐个真实读取全部根 alias 与三个语言／API 入口，
+核对源 catalog 派生的准确字节。版本目录里的说明页成功，不代替站点根书签验收。
+检查历史不可变版本并显式关闭 stable 验收时，receipt 如实记录根 gateway 未检查。</p>
+</section>
+<section id="stable">
+<h2>不可变发布与 stable<a class="headerlink" href="#stable" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">publish()</span></code> 将已验证的目录安装到 <code class="docutils literal notranslate"><span class="pre">&lt;webroot&gt;/versions/&lt;release_id&gt;/</span></code>，然后更新
+<code class="docutils literal notranslate"><span class="pre">&lt;webroot&gt;/stable/index.html</span></code>。stable 的中英文和 API 入口使用 <code class="docutils literal notranslate"><span class="pre">../versions/.../</span></code>
+相对链接，不改变被引用版本的内容。显式传入 <code class="docutils literal notranslate"><span class="pre">archive</span></code> 后，归档保存到包外的
+<code class="docutils literal notranslate"><span class="pre">&lt;webroot&gt;/downloads/&lt;release_id&gt;.tar.gz</span></code>。stable 显示下载链接和归档摘要，根入口和
+下载索引使用相对链接；同名归档也不能替换为不同字节。</p>
+<p>同一个 <code class="docutils literal notranslate"><span class="pre">release_id</span></code> 已存在时，工具必须验证其 manifest 和全部 payload。只有原
+字节完全相同才能重复执行；相同身份但不同字节的发布会被拒绝。新内容使用新身份，
+不能通过覆盖旧版本消除历史证据。预览构建与发布权限分离，不把预览自动提升为
+stable，也不把文档版本当作软件候选状态机。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">delivery</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">"directory"</span><span class="p">],</span> <span class="n">webroot</span><span class="p">,</span> <span class="n">archive</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">"archive"</span><span class="p">])</span>
+<span class="n">delivery</span><span class="o">.</span><span class="n">post_deploy</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">release_id</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s2">"manifest_sha256"</span><span class="p">],</span>
+                     <span class="n">receipt_path</span><span class="o">=</span><span class="n">post_deploy_receipt</span><span class="p">,</span>
+                     <span class="n">expected_archive_sha256</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s2">"archive_sha256"</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>发布后的验收必须访问实际站点 URL。<code class="docutils literal notranslate"><span class="pre">post_deploy()</span></code> 通过 HTTP(S) 读取 manifest、
+校验文件以及每个登记的 payload，检查与包外保存摘要的一致性，并验证实际下载
+字节和包内链接。默认检查 stable 是否选择本次版本；传入归档摘要时，还检查下载
+入口及实际下载归档的完整闭包。命令成功后写入独立 receipt，逐条记录请求 URL、
+最终 URL、状态、字节数和摘要。本地 HTTP 验证不替代公网验收。</p>
+<p>新验收开始前，工具将自己拥有的旧 receipt 标为 <code class="docutils literal notranslate"><span class="pre">running</span></code>。失败写入 <code class="docutils literal notranslate"><span class="pre">failed</span></code>，
+不能留下上次的 <code class="docutils literal notranslate"><span class="pre">verified</span></code> 冒充本次成功；无关文件和 symlink 不能作为 receipt。</p>
+<p>历史不可变版本不一定是当前 stable。仅验证历史版本时可以显式设置
+<code class="docutils literal notranslate"><span class="pre">verify_stable=False</span></code>，receipt 同时记录未检查 stable，不能作为最新发布入口的验收。</p>
+</section>
+<section id="id6">
+<h2>长期保留与退出条件<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p>远程发布保留不可变文档归档、归档与 manifest 摘要、精确源码身份和恢复 receipt。
+交付者需实际上传、重新下载、校验并恢复；“配置了上传”不等于“完成长期存储”。
+第二个独立根目录恢复后，检查语言入口、API、图示和许可，使用实际文件记录结果。</p>
+<p>文档发行说明可以指向 Release 附件，也可以指向独立资产分支的不可变 Git commit。
+取得性以实际成功的渠道为准：附件上传失败不能写成附件已发布。Git 渠道必须使用
+包含完整 commit 的下载地址，记录准确 path／bytes／SHA-256；可变分支名只作发现
+入口。超过单文件上限的工具或证据归档分片保存，每片不超过 32 MiB，另附有序
+分片表及整包摘要。下载全部分片后真实重组、核对整包并逐成员验真，才建立恢复
+结果。原发行 commit 和既有版本目录保留；后续证据新增独立路径或 commit，不覆盖
+同身份归档。保留这些对象不能自动保证服务商永不删除，维护者仍需按下载说明
+保留独立副本。</p>
+<p>软件工具回归使用 stdlib <code class="docutils literal notranslate"><span class="pre">unittest</span></code>，覆盖脏／陈旧源码、缺失入口、内容篡改、路径
+逃逸、链接成员、同身份冲突、独立恢复、真实 HTTP 成功与篡改拒绝。新的回归执行
+不能继承历史测试数量。没有实板执行的物理状态始终保留为 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">参考</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api/index.html">公共 C API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration/index.html">配置与工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platforms/index.html">平台与资格</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">文档包、发布与独立恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-tools.html">Documentation tools and preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="history.html">历史文档与版本迁移</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../assets/diagrams/README.html">Nexus 平台图册</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

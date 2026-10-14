@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Develop with TDD and normal commit gates &#8212; Nexus Embedded Platform 1.0.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=86952a2f"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Maintain clear and verifiable documentation" href="documentation.html" />
+    <link rel="prev" title="维护 Nexus" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/development/workflow.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../en/development/workflow.html" lang="en">en</a>. Source language: en; requested: zh_CN; actual: en; translation: <strong>missing</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="develop-with-tdd-and-normal-commit-gates">
+<span id="docs-development-workflow"></span><h1>Develop with TDD and normal commit gates<a class="headerlink" href="#develop-with-tdd-and-normal-commit-gates" title="Link to this heading">¶</a></h1>
+<p>This workflow preserves current C11 architecture, formatting and explicit evidence.
+Codex owns platform maintenance; independent agents review high-risk changes.
+No fictitious personnel or local file can establish GitHub branch protection.</p>
+<section id="install-and-check-tools">
+<h2>Install and check tools<a class="headerlink" href="#install-and-check-tools" title="Link to this heading">¶</a></h2>
+<p>From the repository root, initialize pinned recursive dependencies, then:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/setup/install_dev_tools.py
+.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>dependencies/environment-tools.txt
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>doctor
+</pre></div>
+</div>
+<p>Windows uses <code class="docutils literal notranslate"><span class="pre">.venv/Scripts/python.exe</span></code>. Installation establishes pre-commit and
+commit-msg hooks. Hooks inspect staged inputs without staging or silently fixing
+files. Preserve unstaged work and actual failure diagnostics; never bypass hooks.</p>
+</section>
+<section id="execute-red-green-and-review">
+<h2>Execute RED, GREEN and review<a class="headerlink" href="#execute-red-green-and-review" title="Link to this heading">¶</a></h2>
+<p>For new C behavior or defect fixes, first add a meaningful GoogleTest/GoogleMock
+regression. Execute it and retain the expected failure reason and original command.
+Implement the smallest correct production change, execute GREEN, then refactor.
+Mock external ports/MMIO, not the implementation being tested. Cover relevant
+rejection, cancellation, drain, overflow, quarantine and instance isolation.
+Python production tools use stdlib unittest with the same actual RED/GREEN rule.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/ci/tdd_gate.py<span class="w"> </span>--all<span class="w"> </span>--preset<span class="w"> </span>native-debug
+</pre></div>
+</div>
+<p>The full gate builds the pinned offline framework and executes discovered cases
+with fresh reports and no filters/shards. Empty, skipped, partial, stale or changed
+inputs fail. The hook checks the staged tree remains unchanged; CI independently
+executes the gate. The framework is host-only C++17; firmware remains C11.
+Automation proves execution, while retained development logs document historical
+RED/GREEN order. Pure prose or diagram edits need corresponding document checks
+and semantic review rather than mirrored implementation tests.</p>
+</section>
+<section id="preserve-style-and-scope">
+<h2>Preserve style and scope<a class="headerlink" href="#preserve-style-and-scope" title="Link to this heading">¶</a></h2>
+<p>Use the unchanged <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> and <code class="docutils literal notranslate"><span class="pre">.editorconfig</span></code>: 80 columns, four spaces,
+attached braces, type-attached pointer stars and backslash Doxygen comments.
+Public headers document context, deadline, ownership and failures. Source comments
+explain invariants and hardware ordering instead of repeating declaration parameters.
+New/changed files pass whole-file checks; existing frozen debt may only shrink.</p>
+<p>Commit one reviewable change with Conventional Commits. Review interface/configuration
+changes together with diagrams, examples, translation and execution scope. Keep
+products, workers, private PCB and recovery policy outside Nexus. Record actual
+source/configuration/tool/ELF identities and physical pending items; a successful
+commit or CI does not promote a product release.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护 Nexus</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Develop with TDD and normal commit gates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">Maintain clear and verifiable documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation-map.html">Find the implementation authority</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html">Coding Standards</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Multiple controller ownership &#8212; Nexus Embedded Platform 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=1e57c037" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Independent finite UART and SPI DMA controllers" href="multiple-dma-controllers.html" />
+    <link rel="prev" title="I/O observations, capacity and retained recovery" href="io-observation-recovery.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/5a7a75c321ea173df8692714f95a8df13715293d/docs/design/multiple-controllers.md">5a7a75c321ea</a>; code reference: 5a7a75c321ea. <a href="../../zh_CN/design/multiple-controllers.html" lang="zh-CN">zh_CN</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="multiple-controller-ownership">
+<h1>Multiple controller ownership<a class="headerlink" href="#multiple-controller-ownership" title="Link to this heading">¶</a></h1>
+<p>The public I/O faces keep their existing operation tables and caller-owned
+request contracts. Selecting another physical controller creates another
+private provider instance, not another transport abstraction or global
+registry. An instance’s cold register, clock, DMA and IRQ facts remain immutable
+until its publisher set has been withdrawn and the instance stopped.</p>
+<section id="i2c-v1-irq-and-finite-dma">
+<h2>I2C V1 IRQ and finite DMA<a class="headerlink" href="#i2c-v1-irq-and-finite-dma" title="Link to this heading">¶</a></h2>
+<p>STM32F407 I2C1 and I2C2, and GD32F470 I2C0 and I2C1, execute the same maintained
+V1 register algorithm. Per-controller cold wrappers validate all register
+pointers, DATA offsets, line inputs, bus clocks and DMA selectors against the
+actual SDK. Their EV, ER, RX DMA and TX DMA IRQs come from the selected
+controller identity. Initialization of an already enabled physical controller
+returns <code class="docutils literal notranslate"><span class="pre">BUSY</span></code> before changing its control registers or IRQ priorities.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>SoC controller</p></th>
+<th class="head"><p>GPIOB pins and AF</p></th>
+<th class="head"><p>Peripheral clock</p></th>
+<th class="head"><p>Finite RX / TX route</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407 I2C1</p></td>
+<td><p>PB6/PB7 or PB8/PB9, AF4</p></td>
+<td><p>42 MHz</p></td>
+<td><p>DMA1 stream0 / stream6, channel1</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32F407 I2C2</p></td>
+<td><p>PB10/PB11, AF4</p></td>
+<td><p>42 MHz</p></td>
+<td><p>DMA1 stream2 / stream7, channel7</p></td>
+</tr>
+<tr class="row-even"><td><p>GD32F470 I2C0</p></td>
+<td><p>PB6/PB7 or PB8/PB9, AF4</p></td>
+<td><p>50 MHz</p></td>
+<td><p>DMA0 channel0 / channel6, selector1</p></td>
+</tr>
+<tr class="row-odd"><td><p>GD32F470 I2C1</p></td>
+<td><p>PB10/PB11, AF4</p></td>
+<td><p>50 MHz</p></td>
+<td><p>DMA0 channel2 / channel7, selector7</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>GD32 names in this table are the vendor’s literal DMA0/DMA1 names. The platform
+configuration’s opaque controller IDs use a separate mapping. A DMA request
+selector never identifies or allocates a memory engine. Static cold assembly
+must reject other devices that select an already owned physical engine.</p>
+<p>Setting the private state’s DMA descriptor to <code class="docutils literal notranslate"><span class="pre">NULL</span></code> selects IRQ-only messages
+and acquires no DMA vector. Exact immutable macros
+<code class="docutils literal notranslate"><span class="pre">NX_STM32_I2C2_DMA(regions,</span> <span class="pre">count)</span></code> and <code class="docutils literal notranslate"><span class="pre">NX_GD32_I2C1_DMA(regions,</span> <span class="pre">count)</span></code> select
+the secondary finite routes. The initialization API is unchanged. Pin, bus
+clock, DMA clock and shared resource leases remain cold assembly’s
+responsibility; the provider does not silently allocate these resources.</p>
+<p>Each request retains its descriptor, messages, buffers and endpoint until that
+controller’s engine, interrupt sources and wire have drained. Completing or
+cancelling one instance cannot acknowledge another stream’s W1C flags, disable
+its vectors, release its request or change its wake sink. A refused DMA disable
+retains only the affected instance’s borrow in <code class="docutils literal notranslate"><span class="pre">DRAINING</span></code> or <code class="docutils literal notranslate"><span class="pre">QUARANTINED</span></code>;
+elapsed time does not prove hardware quiescence.</p>
+<p>The shared DMA acknowledge leaf compiles to a direct selected register write.
+Its test override models the real W1C side effect rather than treating a clear
+register as ordinary RAM. There is no per-byte MMIO operation table or new
+mutable field. Actual Cortex-M4F compilation measures the unchanged state at
+56 bytes, endpoint at 8 bytes and optional immutable DMA descriptor at 80 bytes.
+The provider and shared algorithm objects contain zero global DATA/BSS.
+Selected object text size is evidence of a compiled object, not an entire
+image’s retained Flash size or a cycle measurement.</p>
+<p>The reviewed silicon route sources are STM32 RM0090 Rev22 Table 43 and GD32F4xx
+User Manual Rev3.3 Tables 10-2 and 10-3. These facts do not establish a board’s
+external wiring. Secondary-board routes require an explicit reviewed board
+configuration. Host tests model external CPU/MMIO behavior, and real ARM
+compilation uses actual vendor SDK headers. Bus timing, electrical levels and
+DMA contention still need hardware qualification; no physical result is
+claimed here.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

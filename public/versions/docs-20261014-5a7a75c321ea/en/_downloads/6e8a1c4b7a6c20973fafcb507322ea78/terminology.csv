@@ -1,0 +1,14 @@
+term_id,api_form,en,zh_CN,meaning,authority
+factory,nexus_factory.h,typed factory,类型化工厂,Lookup of existing generated static objects without initialization or allocation,docs/explanation/factory.md
+face,ops/context,interface face,接口面,Immutable typed operations and instance context visible to a consumer,docs/design/next-generation-platform.md
+provider,provider,provider,提供者,Private state and hardware implementation behind a public face,docs/design/next-generation-platform.md
+assembly,assembly.toml,assembly,装配,One authored TOML resolved with reviewed SoC and Board facts,docs/reference/configuration/assembly.md
+admission,ACCEPTED/REJECTED,admission,准入判定,REJECTED retains no references; ACCEPTED begins the explicitly defined borrow,core/include/nexus/core/request.h
+borrow,ACCEPTED,borrow,借用,Retained request and buffers until acquire-observed SETTLED,core/include/nexus/core/request.h
+settled,SETTLED,settled,已完成并排空,Provider final access published after all retained references are detached,core/include/nexus/core/request.h
+quarantine,QUARANTINED,quarantined,隔离保留,Storage remains borrowed after failed drain until responsible recovery establishes quiescence,core/include/nexus/core/request.h
+drain,drain,drain,排空,Detach actual hardware IRQ queue and observer references before reclamation,docs/design/os-contracts.md
+deadline,deadline,absolute monotonic deadline,绝对单调截止时间,Absolute time in one explicitly defined monotonic domain,core/include/nexus/core/time.h
+wake,nx_irq_wake_t,wake hint,唤醒提示,Notification prompts another predicate observation and is not completion,io/include/nexus/io/wake.h
+candidate,software candidate,software candidate,软件候选,Exact source/configuration/dependencies/tools/artifact bytes bound to executed software evidence,docs/delivery/qualification.md
+hil,HIL,hardware-in-the-loop,硬件在环验证,Executed physical station result with exact board equipment firmware and logs,docs/delivery/qualification.md

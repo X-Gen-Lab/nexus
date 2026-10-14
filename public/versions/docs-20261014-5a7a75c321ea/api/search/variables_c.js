@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['name_0',['name',['../structnx__freertos__mpu__config__t.html#a0418db71e731cec270e534c4c7114562',1,'nx_freertos_mpu_config_t']]],
+  ['next_1',['next',['../structnx__freertos__queue__waiter.html#a5c565634ca269fc451753b24a2c079a4',1,'nx_freertos_queue_waiter::next'],['../structnx__owner__slot__t.html#a87f708d2099afa4f670478568ab26bb1',1,'nx_owner_slot_t::next'],['../structnx__threadx__queue__waiter.html#ae6f95a994cb86f105a739af76af90365',1,'nx_threadx_queue_waiter::next'],['../structnx__clock__lease.html#abe3da9565d2dbf5319d455e657f1ad0a',1,'nx_clock_lease::next']]],
+  ['next_5ffree_2',['next_free',['../structnx__stream__observation__t.html#a3413086f287afeb5df54460433417076',1,'nx_stream_observation_t']]],
+  ['nonsecure_5fcallable_3',['nonsecure_callable',['../structnx__arch__sau__region__t.html#a1ae83e6fee5c2612b867ac72035d45e0',1,'nx_arch_sau_region_t']]],
+  ['notification_4',['notification',['../structnx__threadx__queue__waiter.html#a35418c33361b76a1ec2184359c849445',1,'nx_threadx_queue_waiter']]],
+  ['notify_5',['notify',['../structnx__irq__wake__t.html#a9f6873fe963b03fd3af30fd6c363daa8',1,'nx_irq_wake_t']]],
+  ['now_5fus_6',['now_us',['../structnx__baremetal__notify__t.html#a6fe3ae661e9e0b1c921a4e7721137920',1,'nx_baremetal_notify_t::now_us'],['../structnx__freertos__lowpower__port__t.html#a5316bfe664644c06ba85bb9bf2293d74',1,'nx_freertos_lowpower_port_t::now_us'],['../structnx__modbus__rs485__port__t.html#ae541891cb4f9ccb7bef72f3b793750da',1,'nx_modbus_rs485_port_t::now_us']]],
+  ['nx_5fnative_5fadc_7',['nx_native_adc',['../model_8h.html#a20106fdcbc0db3903b4f5058ec8d3b6d',1,'model.h']]],
+  ['nx_5fnative_5fexti_8',['nx_native_exti',['../model_8h.html#a3300f2f1eeb4d8b6ebef3f8b1622cf26',1,'model.h']]],
+  ['nx_5fnative_5fflash_9',['nx_native_flash',['../model_8h.html#a71d68c37c869b9ba86d8ea028074405d',1,'model.h']]],
+  ['nx_5fnative_5fgpio_10',['nx_native_gpio',['../model_8h.html#a39bec1d9aeeff61d66ffc23b2d28dff2',1,'model.h']]],
+  ['nx_5fnative_5fi2c_11',['nx_native_i2c',['../model_8h.html#aa92fb8075a9859510505cc89b57deabb',1,'model.h']]],
+  ['nx_5fnative_5fi2c_5fport_12',['nx_native_i2c_port',['../model_8h.html#a0f9ed8ae20827a25f5dbc5fa9f3aa0f5',1,'model.h']]],
+  ['nx_5fnative_5fpwm_13',['nx_native_pwm',['../model_8h.html#af18eb9256dfc49f6e9058b8779a48ad0',1,'model.h']]],
+  ['nx_5fnative_5fspi_14',['nx_native_spi',['../model_8h.html#a10d7b0cc8ae3eea6a1d1e55b88febc24',1,'model.h']]],
+  ['nx_5fnative_5fspi_5fport_15',['nx_native_spi_port',['../model_8h.html#a098882e3e99d788414bf4050074aa8b4',1,'model.h']]],
+  ['nx_5fnative_5fuart_16',['nx_native_uart',['../model_8h.html#aab8a32bfe9bf53a4ce0bcd7c57ab6fe0',1,'model.h']]],
+  ['nx_5fnative_5fwatchdog_17',['nx_native_watchdog',['../model_8h.html#a0efde3f0a7a8dd19307ee5f85d23b9de',1,'model.h']]],
+  ['nx_5fuart_5frs485_5fops_18',['nx_uart_rs485_ops',['../uart__rs485_8h.html#a4a04053b67f1bdc252fefcd15dc0f5ee',1,'uart_rs485.h']]]
+];

@@ -1,0 +1,2547 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_build_system_validation_index",
+  "status": "software_scopes_validated",
+  "date": "2026-10-12",
+  "source": {
+    "repository": "https://github.com/X-Gen-Lab/nexus",
+    "canonical_code_commit": "cc6a065c002041234a212a964be863a69198f9b4",
+    "code_tree": "de0e687f659a22badb55259b2e03646fc7b748d1",
+    "branch": "codex/build-system-refinement-20261012",
+    "pull_request": "https://github.com/X-Gen-Lab/nexus/pull/6",
+    "clean_before_after": true,
+    "unchanged_during_execution": true,
+    "documentation_boundary": "Later documentation commits record the exact qualified code snapshot and do not claim a new code execution at their HEAD."
+  },
+  "implementation": {
+    "ledger": "../design/build-system-execution.csv",
+    "requirements": 48,
+    "exit_conditions_unchanged": true,
+    "decision_items": [
+      "BLD-18",
+      "BLD-31"
+    ],
+    "physical_status": "not_executed",
+    "individual_statuses_indexed": 48,
+    "blanket_unqualified_completion_claim": false,
+    "individual_statuses": {
+      "BLD-01": "implemented_software_validated",
+      "BLD-02": "implemented_software_validated",
+      "BLD-03": "implemented_software_validated",
+      "BLD-04": "implemented_software_validated",
+      "BLD-05": "implemented_software_validated",
+      "BLD-06": "implemented_software_validated",
+      "BLD-07": "implemented_software_validated",
+      "BLD-08": "implemented_software_validated",
+      "BLD-09": "implemented_software_validated",
+      "BLD-10": "implemented_software_validated",
+      "BLD-11": "implemented_software_validated",
+      "BLD-12": "implemented_software_validated",
+      "BLD-13": "implemented_software_validated",
+      "BLD-14": "implemented_software_validated",
+      "BLD-15": "implemented_measured_cache_and_fresh_builds_verified",
+      "BLD-16": "implemented_actual_digest_checked_cache_verified",
+      "BLD-17": "implemented_actual_scoped_preparation_verified",
+      "BLD-18": "decision_verified",
+      "BLD-19": "implemented_software_validated",
+      "BLD-20": "implemented_software_validated",
+      "BLD-21": "implemented_software_validated",
+      "BLD-22": "implemented_software_validated",
+      "BLD-23": "implemented_software_validated",
+      "BLD-24": "implemented_software_validated",
+      "BLD-25": "implemented_software_validated",
+      "BLD-26": "implemented_software_validated",
+      "BLD-27": "implemented_software_validated",
+      "BLD-28": "implemented_software_validated",
+      "BLD-29": "implemented_software_validated",
+      "BLD-30": "implemented_software_validated",
+      "BLD-31": "decision_verified",
+      "BLD-32": "implemented_software_validated",
+      "BLD-33": "implemented_software_validated",
+      "BLD-34": "implemented_software_validated",
+      "BLD-35": "implemented_software_validated",
+      "BLD-36": "implemented_software_validated",
+      "BLD-37": "implemented_software_validated",
+      "BLD-38": "implemented_actual_candidate_plan_verified_full_software_plan_not_executed",
+      "BLD-39": "implemented_upgrade_contract_verified",
+      "BLD-40": "actual_cp312_offline_install_and_hook_isolation_verified",
+      "BLD-41": "actual_toolchain_and_oci_transport_verified",
+      "BLD-42": "declared_recipe_verified_reconstruction_unverified",
+      "BLD-43": "implemented_software_validated",
+      "BLD-44": "actual_current_evidence_archive_restoration_verified",
+      "BLD-45": "implemented_documentation_and_commands_verified",
+      "BLD-46": "implemented_observed_matrix_verified",
+      "BLD-47": "implemented_software_validated",
+      "BLD-48": "implemented_software_validated"
+    }
+  },
+  "normal_commit": {
+    "status": "normal_commit_passed",
+    "exact_staged_tree": "de0e687f659a22badb55259b2e03646fc7b748d1",
+    "receipt": {
+      "path": "/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json",
+      "bytes": 3261,
+      "sha256": "945ca177f92b93c7d60c9feae8387a66b21e8febfff8350c5061905b08cb19df"
+    },
+    "canonical_sync": {
+      "path": "/workspace/nexus-build-maintenance-20261012/memory-contract-fix-code-sync-receipt.json",
+      "bytes": 735,
+      "sha256": "cf2adfb196892080090918588ab4829807e65757f1cb3ff31f2463290e088479"
+    },
+    "hook_bypassed": false,
+    "actual_tools": {
+      "testing": {
+        "suite": "testing",
+        "discovered": 677,
+        "executed": 677,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      "configure": {
+        "suite": "configure",
+        "discovered": 480,
+        "executed": 480,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      "ci": {
+        "suite": "ci",
+        "discovered": 369,
+        "executed": 369,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      "workflows": {
+        "suite": "workflows",
+        "discovered": 24,
+        "executed": 24,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      }
+    },
+    "actual_google_cases": 3252,
+    "actual_google_programs": 177
+  },
+  "software_results": {
+    "native": {
+      "status": "executed_passed",
+      "actual_counts_from_report": {
+        "ctest_entries": 200,
+        "google_executables": 177,
+        "google_cases": 3252
+      },
+      "receipt": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/execution.json",
+        "bytes": 8244185,
+        "sha256": "d0531bf5ebf861bf9b5b1a87439d5fa40c96448926222229e969e06648ed9418"
+      },
+      "case_report": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/tdd/execution.json",
+        "bytes": 604496,
+        "sha256": "f79dbb9b54653f63694f1cb7b9d55ae23c8ffcc52d4d932d4c2c306c4a3f4ea0"
+      },
+      "raw": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/main.raw",
+        "bytes": 23394,
+        "sha256": "6ed266a71d975ed8c0de52dd63887af5738a7f410b982468d0ca5b4770207928"
+      },
+      "ctest_xml": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/ctest-results.xml",
+        "bytes": 238283,
+        "sha256": "df0dd060aca08351262a4e73e638536bdd2570d3e79a9f04f0a9711fe3039a1a"
+      },
+      "google_discovery": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/native/google-contracts.json",
+        "bytes": 17480,
+        "sha256": "b6c8c01a0db106dd4234a779df4eb0c12e1893a3c3a49106c67e131ac977a37b"
+      },
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "scope": "Fresh Native execution on final code source; reused object preparation is not offline fresh-build reproduction. Preserved historical attempt logs are not relabelled as current execution."
+    },
+    "testing": {
+      "status": "executed_passed",
+      "actual_counts_from_report": {
+        "suite": "testing",
+        "discovered": 677,
+        "executed": 677,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      "receipt": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/execution.json",
+        "bytes": 6503234,
+        "sha256": "4ae962c22b1052c8e47ca3f8152a733f02266e7811b5461b5a33a53119336d25"
+      },
+      "result": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/result.json",
+        "bytes": 190,
+        "sha256": "155417ee58e9a7f404d645edd6bec6a93dd4d42c7f33e92bfd91e20dcb56696f"
+      },
+      "raw": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/testing/main.raw",
+        "bytes": 2592,
+        "sha256": "0c1336350a70e5cf15745e1ec79cf5fac860864f05baccc721fabc80ce156ef5"
+      },
+      "independent_actual_source_raw_review": {
+        "path": "/workspace/nexus-build-maintenance-20261012/independent-review/four-tools-actual-execution-review-cc6a065c.json",
+        "bytes": 173863,
+        "sha256": "a6c87f5141f31fac98f2d56a09435c94a56590b36dc8bfa1cff4250c86cf77e9"
+      },
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "configure": {
+      "status": "executed_passed",
+      "actual_counts_from_report": {
+        "suite": "configure",
+        "discovered": 480,
+        "executed": 480,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      "receipt": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/execution.json",
+        "bytes": 6503251,
+        "sha256": "9dd39af714165c97d7a9cee14a8b7c328bde7c41c42efe90f2d9af4f8850b74d"
+      },
+      "result": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/result.json",
+        "bytes": 192,
+        "sha256": "b0c835863c9e7ff200b33151ce721ae0dc8283ff1f8f3c8dc89f67db744c89e4"
+      },
+      "raw": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/configure/main.raw",
+        "bytes": 672,
+        "sha256": "0fba71104b2101d204d3991514041b33f9adb95fcd3f6874189c00dc1c35c7f5"
+      },
+      "independent_actual_source_raw_review": {
+        "path": "/workspace/nexus-build-maintenance-20261012/independent-review/four-tools-actual-execution-review-cc6a065c.json",
+        "bytes": 173863,
+        "sha256": "a6c87f5141f31fac98f2d56a09435c94a56590b36dc8bfa1cff4250c86cf77e9"
+      },
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "ci": {
+      "status": "executed_passed",
+      "actual_counts_from_report": {
+        "suite": "ci",
+        "discovered": 369,
+        "executed": 369,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      "receipt": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/execution.json",
+        "bytes": 6503167,
+        "sha256": "43d56693888968510a8341372f021c0089387a412636a63079922e019176be91"
+      },
+      "result": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/result.json",
+        "bytes": 185,
+        "sha256": "1b6aa2bc8713d24e67a4efd872c5b4c9b8033079e9cb227b3b6852fcb1d20ed6"
+      },
+      "raw": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/ci/main.raw",
+        "bytes": 517,
+        "sha256": "1e6056f591109af8da5d33d3c90838551ef13ccfcfec3f326ebedb9253962be8"
+      },
+      "independent_actual_source_raw_review": {
+        "path": "/workspace/nexus-build-maintenance-20261012/independent-review/four-tools-actual-execution-review-cc6a065c.json",
+        "bytes": 173863,
+        "sha256": "a6c87f5141f31fac98f2d56a09435c94a56590b36dc8bfa1cff4250c86cf77e9"
+      },
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "workflows": {
+      "status": "executed_passed",
+      "actual_counts_from_report": {
+        "suite": "workflows",
+        "discovered": 24,
+        "executed": 24,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      "receipt": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/execution.json",
+        "bytes": 6503251,
+        "sha256": "36cce8aae2cdbbabfb539d29b8002c7ed122dcc57b43f618807f2294c1c221b8"
+      },
+      "result": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/result.json",
+        "bytes": 190,
+        "sha256": "40642deb493db934987e12977e2cf8639d885ed4e03a6a81f0a60bd0d9ddc88f"
+      },
+      "raw": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/workflows/main.raw",
+        "bytes": 123,
+        "sha256": "c988c723ca4dc50a8111c9c279e5505594a8bf24debe9f3e324ace228d580654"
+      },
+      "independent_actual_source_raw_review": {
+        "path": "/workspace/nexus-build-maintenance-20261012/independent-review/four-tools-actual-execution-review-cc6a065c.json",
+        "bytes": 173863,
+        "sha256": "a6c87f5141f31fac98f2d56a09435c94a56590b36dc8bfa1cff4250c86cf77e9"
+      },
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "source_sdk": {
+      "status": "passed",
+      "selected_attempt": 2,
+      "actual_counts_from_report": {
+        "discovered": 62,
+        "executed": 62,
+        "child_commands": 280,
+        "consumer_archives": 13
+      },
+      "suite_elapsed_seconds": 673.078,
+      "wrapper_elapsed_seconds": 678.66015168,
+      "receipt": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-receipt.json",
+        "bytes": 7075,
+        "sha256": "06eca1d1da3c21d51672ba944bdd1e24a3d849e5d68aa3bccfdd45ae90e84787"
+      },
+      "report": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2/report.json",
+        "bytes": 309452,
+        "sha256": "dc768d19fa4b2ff5cc1e33019e3cfac1012e635b2087fe96493de762f4972a05"
+      },
+      "raw": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2-run.raw",
+        "bytes": 10512,
+        "sha256": "0c83659ed7e1816b3a77c70fd48e0d21649dc84ccee46f9505fd75b80d971d8a"
+      },
+      "wrapper_invocation": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-attempt-2-wrapper-invocation.json",
+        "bytes": 5255,
+        "sha256": "d39b4d9c06360d73b9d6a8a4fd2b2f85617e207649a144dedf85bb2651b8801f"
+      },
+      "owned_validator_summary": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-attempt-2-validation-summary.json",
+        "bytes": 6429,
+        "sha256": "b5fff54f1011499448b324bb2092e18da2a432a4c38086bc812e39b02cfdfa58"
+      },
+      "independent_actual_sdk_review": {
+        "path": "/workspace/nexus-build-maintenance-20261012/independent-review/sdk-boundary-attempt2-actual-execution-review-cc6a065c.json",
+        "bytes": 12511,
+        "sha256": "4399bd471c10e82b132528f975f288a9948d1a2d6a360438083ca9f885d0d28f"
+      },
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "explicit_selected_directory": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-attempt-2",
+      "compiler_parallelism": {
+        "suite_execution": "serial",
+        "environment_default_jobs": 1,
+        "actual_child_argv": "Original SDK consumer commands explicitly request --parallel 4 or 2; retained unchanged."
+      },
+      "expected_negative_child_commands": 167,
+      "artifact_manifest_verified_files": 6506
+    }
+  },
+  "source_sdk": {
+    "boundary_fixture_publishable": false,
+    "separate_clean_publishable_sdk": true,
+    "manifest": {
+      "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/publishable-sdk/share/nexus/src/.nexus-source-sdk.json",
+      "sha256": "3563c6f1764f0012a72a77e657fac1124fb1a096ba21d4fba741eb1439eabb8d",
+      "size": 743834
+    },
+    "complete_manifest_verification": "Actual publishable SDK CLI plus all eight independently reconstructed full packed Source SDK packages verified; mutated boundary development fixture remains nonpublishable."
+  },
+  "github_ci": {
+    "run_id": 38294880491,
+    "url": "https://github.com/X-Gen-Lab/nexus/actions/runs/38294880491",
+    "status": "completed",
+    "conclusion": "success",
+    "job_counts": {
+      "success": 29,
+      "skipped": 1
+    },
+    "normal_skipped_job": "Documentation / Deploy to Pages",
+    "complete_job_pages": true,
+    "all_executed_logs": 29,
+    "summary": {
+      "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/summary.json",
+      "bytes": 4251,
+      "sha256": "4bc52944baee32d8f314b7aa4281c68f3591e47f250f873199b22b5699395b5f"
+    },
+    "manifest": {
+      "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/cc6a065c002041234a212a964be863a69198f9b4/manifest.json",
+      "bytes": 23681,
+      "sha256": "008ba392504787c972240ea8c0ce602613670924b41b6585d8082faa783c2b77"
+    },
+    "preserved_files": 131,
+    "preserved_file_bytes": 104572091,
+    "artifact_metadata_count": 27,
+    "all_27_artifacts_downloaded_digest_and_zip_crc_verified": true,
+    "nexus_job_identities_verified": 26,
+    "required_selected_dependency_closures_verified": 25,
+    "pages_identity_scope": "GitHub artifact metadata and exact artifact digest; no Nexus job identity in the Pages ZIP",
+    "native_profiles": [
+      {
+        "job_id": 114963525679,
+        "name": "Build & Test / Native contracts (native-tsan)",
+        "conclusion": "success",
+        "log_file": "terminal-logs/job-114963525679.raw.log",
+        "execution_summary_lines": [
+          "2026-10-12T19:10:35.7147583Z Executed 200 CTest entries and 3252 GoogleTest cases once; evidence: /home/runner/work/nexus/nexus/build/native-tsan/tdd/execution.json"
+        ]
+      },
+      {
+        "job_id": 114963525782,
+        "name": "Build & Test / Native contracts (native-asan)",
+        "conclusion": "success",
+        "log_file": "terminal-logs/job-114963525782.raw.log",
+        "execution_summary_lines": [
+          "2026-10-12T19:18:49.7014913Z Executed 200 CTest entries and 3252 GoogleTest cases once; evidence: /home/runner/work/nexus/nexus/build/native-asan/tdd/execution.json"
+        ]
+      },
+      {
+        "job_id": 114963525849,
+        "name": "Build & Test / Native contracts (native-debug)",
+        "conclusion": "success",
+        "log_file": "terminal-logs/job-114963525849.raw.log",
+        "execution_summary_lines": [
+          "2026-10-12T19:10:35.3557321Z Executed 200 CTest entries and 3252 GoogleTest cases once; evidence: /home/runner/work/nexus/nexus/build/native-debug/tdd/execution.json"
+        ]
+      },
+      {
+        "job_id": 114963525888,
+        "name": "Build & Test / Native contracts (native-release)",
+        "conclusion": "success",
+        "log_file": "terminal-logs/job-114963525888.raw.log",
+        "execution_summary_lines": [
+          "2026-10-12T19:11:39.3147998Z Executed 200 CTest entries and 3252 GoogleTest cases once; evidence: /home/runner/work/nexus/nexus/build/native-release/tdd/execution.json"
+        ]
+      }
+    ],
+    "native_artifact_counts": {
+      "configurations": 4,
+      "each_ctest": 200,
+      "each_google_cases": 3252,
+      "each_executables": 177,
+      "each_skipped": 0,
+      "receipt": "native-artifact-validation.json"
+    },
+    "tool_contracts": {
+      "cases": 196,
+      "passed": 196,
+      "errors": 0,
+      "raw_inventory": "terminal-logs/196-contract-cases.json",
+      "actual_domains": {
+        "testing": 677,
+        "configure": 480,
+        "ci": 369,
+        "workflows": 24
+      },
+      "raw_log": "terminal-logs/job-114963525443.raw.log"
+    },
+    "aggregate_offline_candidate_qualification": "software_qualified_and_independently_archive_closed"
+  },
+  "offline_candidates": {
+    "status": "software_qualified",
+    "profiles": [
+      {
+        "id": "h743-baremetal-empty",
+        "status": "software_qualified",
+        "archive": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/h743-baremetal-empty.tar.gz",
+          "sha256": "b41cfbbb54c07e6a2bb8239f1bb32503ee557c7bdedef5e0e35116ab518c9820",
+          "size": 110496411
+        },
+        "archive_review": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/h743-baremetal-empty-review.json",
+          "sha256": "66cdafe91819a4887530845ff86397f67d1130a0eb7719cb6774e3ce81d939fd",
+          "size": 6175597
+        },
+        "archive_prefix": "profile/",
+        "candidate_id": "nexus-cc6a065c0020-h743-baremetal-empty",
+        "candidate_document": {
+          "archive_member_relative_path": "profile/candidates/h743-baremetal-empty/candidate.json",
+          "mode": 384,
+          "size": 3856951,
+          "sha256": "b4f0ba9903b3543ea9cbdfa623f9a3a21bf3cc845932956bf367032dff19f9f2"
+        },
+        "configuration_sha256": "392d85a6b11758a8fa1b13651cd60d9a8d79ef7a55bd8f98b6038d18847c6f5b",
+        "artifacts": {
+          "bin": {
+            "archive_member_relative_path": "profile/executions/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "packed_member_relative_path": "profile/candidates/h743-baremetal-empty/payloads/9af78e56acf1306a5c95b385880c539a0338af0ebff9cfa9a50990b6e88499b6",
+            "size": 2440,
+            "sha256": "9af78e56acf1306a5c95b385880c539a0338af0ebff9cfa9a50990b6e88499b6",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-baremetal-empty/executions/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin"
+          },
+          "elf": {
+            "archive_member_relative_path": "profile/executions/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "packed_member_relative_path": "profile/candidates/h743-baremetal-empty/payloads/cfff91d9f771d252444561d0f9814162658485860b7716faa9e8be4a267e2d9d",
+            "size": 17320,
+            "sha256": "cfff91d9f771d252444561d0f9814162658485860b7716faa9e8be4a267e2d9d",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-baremetal-empty/executions/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf"
+          },
+          "map": {
+            "archive_member_relative_path": "profile/executions/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "packed_member_relative_path": "profile/candidates/h743-baremetal-empty/payloads/3b1156b72627c017810bfce09c869308726502a6c38df9b06452781b05fec8a9",
+            "size": 33056,
+            "sha256": "3b1156b72627c017810bfce09c869308726502a6c38df9b06452781b05fec8a9",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-baremetal-empty/executions/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map"
+          }
+        },
+        "resources": {
+          "metrics": {
+            "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+            "cycles_latency": "not_measured",
+            "dynamic_high_water": "not_measured",
+            "flash": {
+              "capacity_bytes": 2097152,
+              "footprint_bytes": 2440,
+              "loaded_bytes": 2437,
+              "ranges": [
+                [
+                  134217728,
+                  134220117
+                ],
+                [
+                  134220120,
+                  134220168
+                ]
+              ]
+            },
+            "ram": {
+              "axi-sram": {
+                "capacity_bytes": 524288,
+                "linker_supported": true,
+                "ranges": [
+                  [
+                    603979776,
+                    603979832
+                  ],
+                  [
+                    604502016,
+                    604504064
+                  ]
+                ],
+                "reserved_bytes": 2104
+              },
+              "backup-sram": {
+                "capacity_bytes": 4096,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "dtcm": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "itcm": {
+                "capacity_bytes": 65536,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram1": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram2": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram3": {
+                "capacity_bytes": 32768,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram4": {
+                "capacity_bytes": 65536,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              }
+            },
+            "reservations": {
+              "heap": {
+                "bytes": 0,
+                "domain": "axi-sram",
+                "end": 603979832,
+                "start": 603979832
+              },
+              "msp": {
+                "bytes": 2048,
+                "domain": "axi-sram",
+                "end": 604504064,
+                "start": 604502016
+              }
+            }
+          },
+          "report": {
+            "archive_member_relative_path": "profile/executions/h743-baremetal-empty/resources.json",
+            "mode": 384,
+            "size": 6144,
+            "sha256": "78719d1414a16eb8081fb0de70d73a950ce187ba672ebbec322201110ad1404b"
+          }
+        },
+        "configuration": {
+          "archive_member_relative_path": "profile/executions/h743-baremetal-empty/reproduction-runs/run-a/build/generated/resolved.json",
+          "mode": 420,
+          "size": 9694,
+          "sha256": "c78c9446c6f1d9ed3d299f28b007d44c185951a1e4e6273e16ce08061e84647c"
+        },
+        "actual_owned_candidate_plan": {
+          "archive_member_relative_path": "profile/candidate-orchestration-plan.json",
+          "mode": 384,
+          "size": 392,
+          "sha256": "edb1ac9739d0d53cfc088298f396770fdf1e88fc57aa256973e7400688b5cf9e"
+        },
+        "actual_owned_candidate_plan_execution": {
+          "archive_member_relative_path": "profile/candidate-orchestration/report.json",
+          "mode": 384,
+          "size": 3897,
+          "sha256": "70a2252e47cf820291e1edc7740ad19fb1c0b57e123e0f531b9d5bed4898b2f8"
+        },
+        "reproduction": {
+          "archive_member_relative_path": "profile/executions/h743-baremetal-empty/reproduction.json",
+          "mode": 384,
+          "size": 18926,
+          "sha256": "365e76db7732aa6075fe9328fa0c5d4b06b23da04f7a0560e90554612fc83cf4"
+        },
+        "qualified_scopes": [
+          "arm_link",
+          "hil_tooling",
+          "host_contracts",
+          "reproducibility",
+          "resource_budget",
+          "source_sdk"
+        ],
+        "actual_scope_counts": {
+          "ci": 369,
+          "configure": 480,
+          "native": {
+            "ctest": 200,
+            "google": 3252
+          },
+          "source_sdk": 62,
+          "testing": 677,
+          "workflows": 24
+        },
+        "fresh_network_none_builds": 2,
+        "actual_container_commands": 4,
+        "original_live_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-baremetal-empty",
+        "live_profile_retired_after_complete_archive_review": true,
+        "producer_archive_counts": {
+          "members": 21029,
+          "files": 18800,
+          "file_bytes": 419235788
+        },
+        "parent_quiescent_independent_archive_verification": {
+          "status": "passed",
+          "owned_audit": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-baremetal-empty-final-owned-audit.json",
+            "bytes": 157440,
+            "sha256": "1bfd9ee715a38377d9412363b584093535f774ae034ee8176d668af5fd620e83"
+          },
+          "quiescent_envelope": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-baremetal-empty-final-quiescent-envelope.json",
+            "bytes": 108418,
+            "sha256": "b5aef0c5967901100a17f5056727b9b01b2c767a8a0256c2615c48f40588e19c"
+          },
+          "raw": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-baremetal-empty-final-owned-audit.raw",
+            "bytes": 506,
+            "sha256": "489719406efbec73b482dbf9df4cdf52a4061bc90cc3eaced5d3e53e16979773"
+          },
+          "full_source_sdk_verified": [
+            {
+              "allocated_upper_bound": 123518976,
+              "directories": 1013,
+              "files": 5376
+            }
+          ],
+          "all_private_temporary_copies_removed": true
+        },
+        "physical_status": "not_executed"
+      },
+      {
+        "id": "h743-baremetal-uart",
+        "status": "software_qualified",
+        "archive": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/h743-baremetal-uart.tar.gz",
+          "sha256": "2ac5856490f19c949014d2c0ae38e76a3e3a4d0bc24ad05b89ad3f60296f304e",
+          "size": 110565466
+        },
+        "archive_review": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/h743-baremetal-uart-review.json",
+          "sha256": "6c2fd1cea354ebfb9897e6a3b48dd1d8ce079f1cd147b9f866ef1b2727096253",
+          "size": 6157101
+        },
+        "archive_prefix": "profile/",
+        "candidate_id": "nexus-cc6a065c0020-h743-baremetal-uart",
+        "candidate_document": {
+          "archive_member_relative_path": "profile/candidates/h743-baremetal-uart/candidate.json",
+          "mode": 384,
+          "size": 3856951,
+          "sha256": "4821432ef4e546556ca866b981b032d37d09d210e03459dce00264d59ae1045b"
+        },
+        "configuration_sha256": "b9c5e2aeaa3dd200bd169c4cfe2fb245a4d34ba6b2fb2554fcc91b14fc2e206b",
+        "artifacts": {
+          "bin": {
+            "archive_member_relative_path": "profile/executions/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "packed_member_relative_path": "profile/candidates/h743-baremetal-uart/payloads/6ae91bfe067ec561ea1f4208237d3935baffc787fd8ab9adf982106f6fc4ac12",
+            "size": 8708,
+            "sha256": "6ae91bfe067ec561ea1f4208237d3935baffc787fd8ab9adf982106f6fc4ac12",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-baremetal-uart/executions/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin"
+          },
+          "elf": {
+            "archive_member_relative_path": "profile/executions/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "packed_member_relative_path": "profile/candidates/h743-baremetal-uart/payloads/ad11cfff757900897b90c615cca0d91e1f3d9106e688d643076b1e965cf5b487",
+            "size": 29140,
+            "sha256": "ad11cfff757900897b90c615cca0d91e1f3d9106e688d643076b1e965cf5b487",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-baremetal-uart/executions/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf"
+          },
+          "map": {
+            "archive_member_relative_path": "profile/executions/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "packed_member_relative_path": "profile/candidates/h743-baremetal-uart/payloads/d503be1c677fa9efcd4f3be373b7e0f375c12366741417d673483185664df311",
+            "size": 48940,
+            "sha256": "d503be1c677fa9efcd4f3be373b7e0f375c12366741417d673483185664df311",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-baremetal-uart/executions/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map"
+          }
+        },
+        "resources": {
+          "metrics": {
+            "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+            "cycles_latency": "not_measured",
+            "dynamic_high_water": "not_measured",
+            "flash": {
+              "capacity_bytes": 2097152,
+              "footprint_bytes": 8708,
+              "loaded_bytes": 8708,
+              "ranges": [
+                [
+                  134217728,
+                  134226436
+                ]
+              ]
+            },
+            "ram": {
+              "axi-sram": {
+                "capacity_bytes": 524288,
+                "linker_supported": true,
+                "ranges": [
+                  [
+                    603979776,
+                    603980088
+                  ],
+                  [
+                    604502016,
+                    604504064
+                  ]
+                ],
+                "reserved_bytes": 2360
+              },
+              "backup-sram": {
+                "capacity_bytes": 4096,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "dtcm": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "itcm": {
+                "capacity_bytes": 65536,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram1": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram2": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram3": {
+                "capacity_bytes": 32768,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram4": {
+                "capacity_bytes": 65536,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              }
+            },
+            "reservations": {
+              "heap": {
+                "bytes": 0,
+                "domain": "axi-sram",
+                "end": 603980088,
+                "start": 603980088
+              },
+              "msp": {
+                "bytes": 2048,
+                "domain": "axi-sram",
+                "end": 604504064,
+                "start": 604502016
+              }
+            }
+          },
+          "report": {
+            "archive_member_relative_path": "profile/executions/h743-baremetal-uart/resources.json",
+            "mode": 384,
+            "size": 6063,
+            "sha256": "13cc5697b25e3377d91034b60e2f6961fbeb14ced3ddc44212e0ed9b0d5ff002"
+          }
+        },
+        "configuration": {
+          "archive_member_relative_path": "profile/executions/h743-baremetal-uart/reproduction-runs/run-a/build/generated/resolved.json",
+          "mode": 420,
+          "size": 11158,
+          "sha256": "493bc1caf73394f8cbba29325699a09407482c4b0c78042dbde26004505c0a6c"
+        },
+        "actual_owned_candidate_plan": {
+          "archive_member_relative_path": "profile/candidate-orchestration-plan.json",
+          "mode": 384,
+          "size": 390,
+          "sha256": "7a9c1e27fb59168acaa98c129b228ec64b5a796992d6d2dafd465b76c914ef07"
+        },
+        "actual_owned_candidate_plan_execution": {
+          "archive_member_relative_path": "profile/candidate-orchestration/report.json",
+          "mode": 384,
+          "size": 3892,
+          "sha256": "4c3ad6ebf74eed849593445735df7bf7262b655f1e2ba705b64c130a95f68b15"
+        },
+        "reproduction": {
+          "archive_member_relative_path": "profile/executions/h743-baremetal-uart/reproduction.json",
+          "mode": 384,
+          "size": 18875,
+          "sha256": "2569b23ecf24913a601e8c9e6f96c793ff3de745627d9416cf6a17537ee1b44e"
+        },
+        "qualified_scopes": [
+          "arm_link",
+          "hil_tooling",
+          "host_contracts",
+          "reproducibility",
+          "resource_budget",
+          "source_sdk"
+        ],
+        "actual_scope_counts": {
+          "ci": 369,
+          "configure": 480,
+          "native": {
+            "ctest": 200,
+            "google": 3252
+          },
+          "source_sdk": 62,
+          "testing": 677,
+          "workflows": 24
+        },
+        "fresh_network_none_builds": 2,
+        "actual_container_commands": 4,
+        "original_live_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-baremetal-uart",
+        "live_profile_retired_after_complete_archive_review": true,
+        "producer_archive_counts": {
+          "members": 21039,
+          "files": 18806,
+          "file_bytes": 419450730
+        },
+        "parent_quiescent_independent_archive_verification": {
+          "status": "passed",
+          "owned_audit": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-baremetal-uart-final-owned-audit.json",
+            "bytes": 157429,
+            "sha256": "f6149cd1d32eba5df859022567b19d86ebb7315fce3dbfebaea16fb7a6385c70"
+          },
+          "quiescent_envelope": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-baremetal-uart-final-quiescent-envelope.json",
+            "bytes": 108492,
+            "sha256": "0c418a7f77bd88ad41ac478c6562ca8e7146eb202bcc20c60b444f1deab5d7c6"
+          },
+          "raw": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-baremetal-uart-final-owned-audit.raw",
+            "bytes": 505,
+            "sha256": "dcf896428ed1ec38bc4ce084d6e620cdec8f3b1fa44b551235c561e5d5221bca"
+          },
+          "full_source_sdk_verified": [
+            {
+              "allocated_upper_bound": 123518976,
+              "directories": 1013,
+              "files": 5376
+            }
+          ],
+          "all_private_temporary_copies_removed": true
+        },
+        "physical_status": "not_executed"
+      },
+      {
+        "id": "h743-freertos-empty",
+        "status": "software_qualified",
+        "archive": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/h743-freertos-empty.tar.gz",
+          "sha256": "4c50cd59fe6d4afea47d4a4926e27600442d5551de69e7fb2c9687452b355555",
+          "size": 110592869
+        },
+        "archive_review": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/h743-freertos-empty-review.json",
+          "sha256": "06b08413ae1fe9ba0d014737f59320b0cd2f6104e8acf2d08a331c83e9391a5c",
+          "size": 6166469
+        },
+        "archive_prefix": "profile/",
+        "candidate_id": "nexus-cc6a065c0020-h743-freertos-empty",
+        "candidate_document": {
+          "archive_member_relative_path": "profile/candidates/h743-freertos-empty/candidate.json",
+          "mode": 384,
+          "size": 3856951,
+          "sha256": "4158af84be7e8d6c15b32bbebe58e57743a498e284beb71d8b694b27223fe322"
+        },
+        "configuration_sha256": "cd359e687352f2ebf7d0809694a519139c09e5a85787339a05c84c521a078865",
+        "artifacts": {
+          "bin": {
+            "archive_member_relative_path": "profile/executions/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "packed_member_relative_path": "profile/candidates/h743-freertos-empty/payloads/fb9f083134821746971c67081f7e5de812fbe7b75f3c125d8ec360bb08a67a13",
+            "size": 4828,
+            "sha256": "fb9f083134821746971c67081f7e5de812fbe7b75f3c125d8ec360bb08a67a13",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-freertos-empty/executions/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin"
+          },
+          "elf": {
+            "archive_member_relative_path": "profile/executions/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "packed_member_relative_path": "profile/candidates/h743-freertos-empty/payloads/878f04bdf65489c14a7020a4cdab29a7d37df6e3cae896ccdac99c3582ce6e96",
+            "size": 24528,
+            "sha256": "878f04bdf65489c14a7020a4cdab29a7d37df6e3cae896ccdac99c3582ce6e96",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-freertos-empty/executions/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf"
+          },
+          "map": {
+            "archive_member_relative_path": "profile/executions/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "packed_member_relative_path": "profile/candidates/h743-freertos-empty/payloads/9f4bd0b9aeba925fd4f2867d7c03a507ec4f089f10afd1bae8b6793f24277b2d",
+            "size": 50705,
+            "sha256": "9f4bd0b9aeba925fd4f2867d7c03a507ec4f089f10afd1bae8b6793f24277b2d",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-freertos-empty/executions/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map"
+          }
+        },
+        "resources": {
+          "metrics": {
+            "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+            "cycles_latency": "not_measured",
+            "dynamic_high_water": "not_measured",
+            "flash": {
+              "capacity_bytes": 2097152,
+              "footprint_bytes": 4828,
+              "loaded_bytes": 4828,
+              "ranges": [
+                [
+                  134217728,
+                  134222556
+                ]
+              ]
+            },
+            "ram": {
+              "axi-sram": {
+                "capacity_bytes": 524288,
+                "linker_supported": true,
+                "ranges": [
+                  [
+                    603979776,
+                    603980760
+                  ],
+                  [
+                    604502016,
+                    604504064
+                  ]
+                ],
+                "reserved_bytes": 3032
+              },
+              "backup-sram": {
+                "capacity_bytes": 4096,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "dtcm": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "itcm": {
+                "capacity_bytes": 65536,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram1": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram2": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram3": {
+                "capacity_bytes": 32768,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram4": {
+                "capacity_bytes": 65536,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              }
+            },
+            "reservations": {
+              "heap": {
+                "bytes": 0,
+                "domain": "axi-sram",
+                "end": 603980760,
+                "start": 603980760
+              },
+              "msp": {
+                "bytes": 2048,
+                "domain": "axi-sram",
+                "end": 604504064,
+                "start": 604502016
+              }
+            }
+          },
+          "report": {
+            "archive_member_relative_path": "profile/executions/h743-freertos-empty/resources.json",
+            "mode": 384,
+            "size": 6063,
+            "sha256": "43964177c862560972221aae9ed67083bfedffff7b9c071de95c14ce14506f1a"
+          }
+        },
+        "configuration": {
+          "archive_member_relative_path": "profile/executions/h743-freertos-empty/reproduction-runs/run-a/build/generated/resolved.json",
+          "mode": 420,
+          "size": 11723,
+          "sha256": "3911480624ad1e0e40f330836b25b341084f4fef51d8cfb7577336dc772b1b7a"
+        },
+        "actual_owned_candidate_plan": {
+          "archive_member_relative_path": "profile/candidate-orchestration-plan.json",
+          "mode": 384,
+          "size": 390,
+          "sha256": "3ec18d8550acb1376235d58bf36b0a549cb5e6df9e1c95ce96c62c5d06567633"
+        },
+        "actual_owned_candidate_plan_execution": {
+          "archive_member_relative_path": "profile/candidate-orchestration/report.json",
+          "mode": 384,
+          "size": 3892,
+          "sha256": "2ba6913bc54c18dd622fa287d64acbf9ebccf3a553e3ba931fbbbfab02d27b13"
+        },
+        "reproduction": {
+          "archive_member_relative_path": "profile/executions/h743-freertos-empty/reproduction.json",
+          "mode": 384,
+          "size": 18878,
+          "sha256": "9effb58b7797edec30d1b0ece9018ad5aa494f037d1a5c08fab8236164a361ab"
+        },
+        "qualified_scopes": [
+          "arm_link",
+          "hil_tooling",
+          "host_contracts",
+          "reproducibility",
+          "resource_budget",
+          "source_sdk"
+        ],
+        "actual_scope_counts": {
+          "ci": 369,
+          "configure": 480,
+          "native": {
+            "ctest": 200,
+            "google": 3252
+          },
+          "source_sdk": 62,
+          "testing": 677,
+          "workflows": 24
+        },
+        "fresh_network_none_builds": 2,
+        "actual_container_commands": 4,
+        "original_live_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-freertos-empty",
+        "live_profile_retired_after_complete_archive_review": true,
+        "producer_archive_counts": {
+          "members": 21079,
+          "files": 18822,
+          "file_bytes": 419627628
+        },
+        "parent_quiescent_independent_archive_verification": {
+          "status": "passed",
+          "owned_audit": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-freertos-empty-final-owned-audit.json",
+            "bytes": 157429,
+            "sha256": "86745035261f94800b78f3065dbcd79102a8dd1769152bd62a089639b49a3e58"
+          },
+          "quiescent_envelope": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-freertos-empty-final-quiescent-envelope.json",
+            "bytes": 108492,
+            "sha256": "2f34098eb5da5f04aa1b62f7c931da7f83940e6097b8a785858db4673f0bf3cf"
+          },
+          "raw": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-freertos-empty-final-owned-audit.raw",
+            "bytes": 505,
+            "sha256": "20b6fb31894e2c230f9419ef6874ed46664393b4fb405c11ea1ebaa054fb0294"
+          },
+          "full_source_sdk_verified": [
+            {
+              "allocated_upper_bound": 123518976,
+              "directories": 1013,
+              "files": 5376
+            }
+          ],
+          "all_private_temporary_copies_removed": true
+        },
+        "physical_status": "not_executed"
+      },
+      {
+        "id": "h743-freertos-uart",
+        "status": "software_qualified",
+        "archive": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/h743-freertos-uart.tar.gz",
+          "sha256": "c2a8565946e0c79884f07907e8fdbb8c28543685f5c620c4f615479ede2e8c89",
+          "size": 110672036
+        },
+        "archive_review": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/h743-freertos-uart-review.json",
+          "sha256": "03906c91544e878cc0b2c65c5c6fab1c578ccb13d5d5aeaca6c867d3fe70e7e0",
+          "size": 6147912
+        },
+        "archive_prefix": "profile/",
+        "candidate_id": "nexus-cc6a065c0020-h743-freertos-uart",
+        "candidate_document": {
+          "archive_member_relative_path": "profile/candidates/h743-freertos-uart/candidate.json",
+          "mode": 384,
+          "size": 3856952,
+          "sha256": "eb4d588e11be232d978627984385baa62c10fd0988a841a9076ecbc280fc89fc"
+        },
+        "configuration_sha256": "43e769ed4376b3a44e8c94c2b9fc1d5c169286c09f40131f1f3a9a2baf1a10d5",
+        "artifacts": {
+          "bin": {
+            "archive_member_relative_path": "profile/executions/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "packed_member_relative_path": "profile/candidates/h743-freertos-uart/payloads/3edaba8e7732c96442eb5d18158644223b4eba271447b5a03ef93a25b69dab52",
+            "size": 11100,
+            "sha256": "3edaba8e7732c96442eb5d18158644223b4eba271447b5a03ef93a25b69dab52",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-freertos-uart/executions/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin"
+          },
+          "elf": {
+            "archive_member_relative_path": "profile/executions/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "packed_member_relative_path": "profile/candidates/h743-freertos-uart/payloads/e6c2626637e42d2910741507dea2b4c5568b4f8c627671cfa63c4e7dcaa08459",
+            "size": 32256,
+            "sha256": "e6c2626637e42d2910741507dea2b4c5568b4f8c627671cfa63c4e7dcaa08459",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-freertos-uart/executions/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf"
+          },
+          "map": {
+            "archive_member_relative_path": "profile/executions/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "packed_member_relative_path": "profile/candidates/h743-freertos-uart/payloads/435900f140a46296b9c37660b0f00fe4414bf8883ca6ab97b0f11dd0654c492c",
+            "size": 66473,
+            "sha256": "435900f140a46296b9c37660b0f00fe4414bf8883ca6ab97b0f11dd0654c492c",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-freertos-uart/executions/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map"
+          }
+        },
+        "resources": {
+          "metrics": {
+            "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+            "cycles_latency": "not_measured",
+            "dynamic_high_water": "not_measured",
+            "flash": {
+              "capacity_bytes": 2097152,
+              "footprint_bytes": 11100,
+              "loaded_bytes": 11100,
+              "ranges": [
+                [
+                  134217728,
+                  134228828
+                ]
+              ]
+            },
+            "ram": {
+              "axi-sram": {
+                "capacity_bytes": 524288,
+                "linker_supported": true,
+                "ranges": [
+                  [
+                    603979776,
+                    603979828
+                  ],
+                  [
+                    603979832,
+                    603981016
+                  ],
+                  [
+                    604502016,
+                    604504064
+                  ]
+                ],
+                "reserved_bytes": 3284
+              },
+              "backup-sram": {
+                "capacity_bytes": 4096,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "dtcm": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "itcm": {
+                "capacity_bytes": 65536,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram1": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram2": {
+                "capacity_bytes": 131072,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram3": {
+                "capacity_bytes": 32768,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              },
+              "sram4": {
+                "capacity_bytes": 65536,
+                "linker_supported": false,
+                "ranges": [],
+                "reserved_bytes": 0
+              }
+            },
+            "reservations": {
+              "heap": {
+                "bytes": 0,
+                "domain": "axi-sram",
+                "end": 603981016,
+                "start": 603981016
+              },
+              "msp": {
+                "bytes": 2048,
+                "domain": "axi-sram",
+                "end": 604504064,
+                "start": 604502016
+              }
+            }
+          },
+          "report": {
+            "archive_member_relative_path": "profile/executions/h743-freertos-uart/resources.json",
+            "mode": 384,
+            "size": 6115,
+            "sha256": "89c8d0a18d0c5339e1181786f4c3b9df66a02dd4853328c7a75c7b3dd4cc981f"
+          }
+        },
+        "configuration": {
+          "archive_member_relative_path": "profile/executions/h743-freertos-uart/reproduction-runs/run-a/build/generated/resolved.json",
+          "mode": 420,
+          "size": 13187,
+          "sha256": "054a657db9a11c1b54c4fdf986985c58b652086353461d302840868648aed386"
+        },
+        "actual_owned_candidate_plan": {
+          "archive_member_relative_path": "profile/candidate-orchestration-plan.json",
+          "mode": 384,
+          "size": 388,
+          "sha256": "953eb7e0054c0de6b1237e8925ccd073d24e70eb96f5be3b4251067bcd94f753"
+        },
+        "actual_owned_candidate_plan_execution": {
+          "archive_member_relative_path": "profile/candidate-orchestration/report.json",
+          "mode": 384,
+          "size": 3888,
+          "sha256": "eef8bf44be0085fd4dfb07a2ba502d4cfde68a3288b082ccd85ff811029719c4"
+        },
+        "reproduction": {
+          "archive_member_relative_path": "profile/executions/h743-freertos-uart/reproduction.json",
+          "mode": 384,
+          "size": 18830,
+          "sha256": "118071fff65e8c88b855b87958fd3ede5dbf270693ebd457c8c83d3042667860"
+        },
+        "qualified_scopes": [
+          "arm_link",
+          "hil_tooling",
+          "host_contracts",
+          "reproducibility",
+          "resource_budget",
+          "source_sdk"
+        ],
+        "actual_scope_counts": {
+          "ci": 369,
+          "configure": 480,
+          "native": {
+            "ctest": 200,
+            "google": 3252
+          },
+          "source_sdk": 62,
+          "testing": 677,
+          "workflows": 24
+        },
+        "fresh_network_none_builds": 2,
+        "actual_container_commands": 4,
+        "original_live_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/h743-freertos-uart",
+        "live_profile_retired_after_complete_archive_review": true,
+        "producer_archive_counts": {
+          "members": 21089,
+          "files": 18828,
+          "file_bytes": 419830499
+        },
+        "parent_quiescent_independent_archive_verification": {
+          "status": "passed",
+          "owned_audit": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-freertos-uart-final-owned-audit.json",
+            "bytes": 157419,
+            "sha256": "15d073c2cb8baadd1e9c3f10df9ff1b35f406e48868b881dce628efe2a244a0c"
+          },
+          "quiescent_envelope": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-freertos-uart-final-quiescent-envelope.json",
+            "bytes": 108479,
+            "sha256": "b002e4eccd6806adbea1a8fd70012a08ee1c41dee06f224348c8f649f0f86871"
+          },
+          "raw": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/h743-freertos-uart-final-owned-audit.raw",
+            "bytes": 504,
+            "sha256": "aafc9526300994cdac666b9895ccc471e785c52e061c2975af5822566769f819"
+          },
+          "full_source_sdk_verified": [
+            {
+              "allocated_upper_bound": 123518976,
+              "directories": 1013,
+              "files": 5376
+            }
+          ],
+          "all_private_temporary_copies_removed": true
+        },
+        "physical_status": "not_executed"
+      },
+      {
+        "id": "u575-baremetal-empty",
+        "status": "software_qualified",
+        "archive": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/u575-baremetal-empty.tar.gz",
+          "sha256": "3c876279cd7e069a9b2f871ffcd13eb10349fb91a6e6d545a0dd3fba42c86010",
+          "size": 110496073
+        },
+        "archive_review": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/u575-baremetal-empty-review.json",
+          "sha256": "cf9ad1fd12ea9883e769ef3f3ec1d5549233d02260c0ab4db05a0946cceb6fe1",
+          "size": 6174981
+        },
+        "archive_prefix": "profile/",
+        "candidate_id": "nexus-cc6a065c0020-u575-baremetal-empty",
+        "candidate_document": {
+          "archive_member_relative_path": "profile/candidates/u575-baremetal-empty/candidate.json",
+          "mode": 384,
+          "size": 3856952,
+          "sha256": "f8e2deda1e3f843056a0a46194681b063063628f780b7a41bbcba5cbab6092e0"
+        },
+        "configuration_sha256": "591ba84ee248420d4267ee2d521296b2622d7fe3fc62d00e5782e9d7365a2ef2",
+        "artifacts": {
+          "bin": {
+            "archive_member_relative_path": "profile/executions/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "packed_member_relative_path": "profile/candidates/u575-baremetal-empty/payloads/a8fd34e6becab198fd4dd4a0fcb27c1795a80ef406d6c5d74da7b45e0bcc9e01",
+            "size": 2124,
+            "sha256": "a8fd34e6becab198fd4dd4a0fcb27c1795a80ef406d6c5d74da7b45e0bcc9e01",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-baremetal-empty/executions/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin"
+          },
+          "elf": {
+            "archive_member_relative_path": "profile/executions/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "packed_member_relative_path": "profile/candidates/u575-baremetal-empty/payloads/44c137e8935817efa874cb7ca10b31d073e9baf8a4e37fdc2cc50a23a1b1ccb1",
+            "size": 16568,
+            "sha256": "44c137e8935817efa874cb7ca10b31d073e9baf8a4e37fdc2cc50a23a1b1ccb1",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-baremetal-empty/executions/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf"
+          },
+          "map": {
+            "archive_member_relative_path": "profile/executions/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "packed_member_relative_path": "profile/candidates/u575-baremetal-empty/payloads/f44748d8ac986db2d63fba4b94a70cd8509c6f3ae9ee23e30e7583029aca2757",
+            "size": 29308,
+            "sha256": "f44748d8ac986db2d63fba4b94a70cd8509c6f3ae9ee23e30e7583029aca2757",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-baremetal-empty/executions/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map"
+          }
+        },
+        "resources": {
+          "metrics": {
+            "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+            "cycles_latency": "not_measured",
+            "dynamic_high_water": "not_measured",
+            "flash": {
+              "capacity_bytes": 2097152,
+              "footprint_bytes": 2124,
+              "loaded_bytes": 2121,
+              "ranges": [
+                [
+                  134217728,
+                  134219793
+                ],
+                [
+                  134219796,
+                  134219852
+                ]
+              ]
+            },
+            "ram": {
+              "sram1": {
+                "capacity_bytes": 196608,
+                "linker_supported": true,
+                "ranges": [
+                  [
+                    536870912,
+                    536870976
+                  ],
+                  [
+                    537065472,
+                    537067520
+                  ]
+                ],
+                "reserved_bytes": 2112
+              }
+            },
+            "reservations": {
+              "heap": {
+                "bytes": 0,
+                "domain": "sram1",
+                "end": 536870976,
+                "start": 536870976
+              },
+              "msp": {
+                "bytes": 2048,
+                "domain": "sram1",
+                "end": 537067520,
+                "start": 537065472
+              }
+            }
+          },
+          "report": {
+            "archive_member_relative_path": "profile/executions/u575-baremetal-empty/resources.json",
+            "mode": 384,
+            "size": 5126,
+            "sha256": "76733f862e08f0145abf0c2f356c87220d2be28599f93e4b46f91dbc99a765a1"
+          }
+        },
+        "configuration": {
+          "archive_member_relative_path": "profile/executions/u575-baremetal-empty/reproduction-runs/run-a/build/generated/resolved.json",
+          "mode": 420,
+          "size": 13739,
+          "sha256": "4452a9df3ab5d1a2feb52641247f6c51f69467516db5bad1b18c7923250347f1"
+        },
+        "actual_owned_candidate_plan": {
+          "archive_member_relative_path": "profile/candidate-orchestration-plan.json",
+          "mode": 384,
+          "size": 392,
+          "sha256": "0d54756a665e971cb676a9c6587f5e47ebd53a4c3a5b9b4f0234381111aa6039"
+        },
+        "actual_owned_candidate_plan_execution": {
+          "archive_member_relative_path": "profile/candidate-orchestration/report.json",
+          "mode": 384,
+          "size": 3896,
+          "sha256": "3b4cdd36f4d4a9aec8fd96601da6ea43a76224f7fd1259c824f3830dd861cc73"
+        },
+        "reproduction": {
+          "archive_member_relative_path": "profile/executions/u575-baremetal-empty/reproduction.json",
+          "mode": 384,
+          "size": 18924,
+          "sha256": "f1a05f84ce115131460b1a6c88bc0b239e26c12e05259ce18f5aa6bde1ba1324"
+        },
+        "qualified_scopes": [
+          "arm_link",
+          "hil_tooling",
+          "host_contracts",
+          "reproducibility",
+          "resource_budget",
+          "source_sdk"
+        ],
+        "actual_scope_counts": {
+          "ci": 369,
+          "configure": 480,
+          "native": {
+            "ctest": 200,
+            "google": 3252
+          },
+          "source_sdk": 62,
+          "testing": 677,
+          "workflows": 24
+        },
+        "fresh_network_none_builds": 2,
+        "actual_container_commands": 4,
+        "original_live_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-baremetal-empty",
+        "live_profile_retired_after_complete_archive_review": true,
+        "producer_archive_counts": {
+          "members": 21027,
+          "files": 18798,
+          "file_bytes": 419208674
+        },
+        "parent_quiescent_independent_archive_verification": {
+          "status": "passed",
+          "owned_audit": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-baremetal-empty-final-owned-audit.json",
+            "bytes": 157440,
+            "sha256": "424b1c848769d7b36a7edf81ce20c4ea52705f789928ac55b56d1d9680ad10f9"
+          },
+          "quiescent_envelope": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-baremetal-empty-final-quiescent-envelope.json",
+            "bytes": 108505,
+            "sha256": "5d5e46e95210296a2c66945d4eb739a5bf9216fb7d6de1af496a7f9a1e058444"
+          },
+          "raw": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-baremetal-empty-final-owned-audit.raw",
+            "bytes": 506,
+            "sha256": "1ddc14c4d17c2bdddcda122aa78c3228f8f0100017d3c4f6a7112807f5d96862"
+          },
+          "full_source_sdk_verified": [
+            {
+              "allocated_upper_bound": 123518976,
+              "directories": 1013,
+              "files": 5376
+            }
+          ],
+          "all_private_temporary_copies_removed": true
+        },
+        "physical_status": "not_executed"
+      },
+      {
+        "id": "u575-baremetal-uart",
+        "status": "software_qualified",
+        "archive": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/u575-baremetal-uart.tar.gz",
+          "sha256": "0820e79b81f30c46f9dc103b730be6d144d371a72b415bf261b1f19c6b7843a0",
+          "size": 110553276
+        },
+        "archive_review": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/u575-baremetal-uart-review.json",
+          "sha256": "5053925e85e09b845744318cb697a922ccd6fcae0e644618d7789569f42a1102",
+          "size": 6156484
+        },
+        "archive_prefix": "profile/",
+        "candidate_id": "nexus-cc6a065c0020-u575-baremetal-uart",
+        "candidate_document": {
+          "archive_member_relative_path": "profile/candidates/u575-baremetal-uart/candidate.json",
+          "mode": 384,
+          "size": 3856951,
+          "sha256": "ece64443411eeb993fa0d037a837c878ceadef7c76a544f5e20a74d5018adfdd"
+        },
+        "configuration_sha256": "365b610de9f6756e11574d60488e7745bd5157e2b1e805070a871797dc083af4",
+        "artifacts": {
+          "bin": {
+            "archive_member_relative_path": "profile/executions/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "packed_member_relative_path": "profile/candidates/u575-baremetal-uart/payloads/0a00c911829ee614c5d7ca69b95de04acac533758da81c4199501f6cb7137d3a",
+            "size": 8364,
+            "sha256": "0a00c911829ee614c5d7ca69b95de04acac533758da81c4199501f6cb7137d3a",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-baremetal-uart/executions/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin"
+          },
+          "elf": {
+            "archive_member_relative_path": "profile/executions/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "packed_member_relative_path": "profile/candidates/u575-baremetal-uart/payloads/64fd70ee61bcce0a16baa0763e4267121270ade337308d8e31832d5425a487c7",
+            "size": 28296,
+            "sha256": "64fd70ee61bcce0a16baa0763e4267121270ade337308d8e31832d5425a487c7",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-baremetal-uart/executions/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf"
+          },
+          "map": {
+            "archive_member_relative_path": "profile/executions/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "packed_member_relative_path": "profile/candidates/u575-baremetal-uart/payloads/91e1f859dff4c59e0f08db56dde8f1efc491cf3ecbbf4ac482505e21ee6edcc6",
+            "size": 44822,
+            "sha256": "91e1f859dff4c59e0f08db56dde8f1efc491cf3ecbbf4ac482505e21ee6edcc6",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-baremetal-uart/executions/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map"
+          }
+        },
+        "resources": {
+          "metrics": {
+            "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+            "cycles_latency": "not_measured",
+            "dynamic_high_water": "not_measured",
+            "flash": {
+              "capacity_bytes": 2097152,
+              "footprint_bytes": 8364,
+              "loaded_bytes": 8364,
+              "ranges": [
+                [
+                  134217728,
+                  134226092
+                ]
+              ]
+            },
+            "ram": {
+              "sram1": {
+                "capacity_bytes": 196608,
+                "linker_supported": true,
+                "ranges": [
+                  [
+                    536870912,
+                    536871232
+                  ],
+                  [
+                    537065472,
+                    537067520
+                  ]
+                ],
+                "reserved_bytes": 2368
+              }
+            },
+            "reservations": {
+              "heap": {
+                "bytes": 0,
+                "domain": "sram1",
+                "end": 536871232,
+                "start": 536871232
+              },
+              "msp": {
+                "bytes": 2048,
+                "domain": "sram1",
+                "end": 537067520,
+                "start": 537065472
+              }
+            }
+          },
+          "report": {
+            "archive_member_relative_path": "profile/executions/u575-baremetal-uart/resources.json",
+            "mode": 384,
+            "size": 5044,
+            "sha256": "44e044829c800288ff51f3b86facdff04238036f607ab8a23f9925105528ec93"
+          }
+        },
+        "configuration": {
+          "archive_member_relative_path": "profile/executions/u575-baremetal-uart/reproduction-runs/run-a/build/generated/resolved.json",
+          "mode": 420,
+          "size": 15212,
+          "sha256": "415dbab9956aa24aa1f8face8fc1f6bf7753d80f4a4e126ce3f38036d023185a"
+        },
+        "actual_owned_candidate_plan": {
+          "archive_member_relative_path": "profile/candidate-orchestration-plan.json",
+          "mode": 384,
+          "size": 390,
+          "sha256": "8356fe23fa82aa5eeb99059bab9b79c8115b470c935b44d6f060951cc210a412"
+        },
+        "actual_owned_candidate_plan_execution": {
+          "archive_member_relative_path": "profile/candidate-orchestration/report.json",
+          "mode": 384,
+          "size": 3892,
+          "sha256": "c622396aceba94e82bd041d8aa1534bbe65fd77775b5171c51edb3b2469a935d"
+        },
+        "reproduction": {
+          "archive_member_relative_path": "profile/executions/u575-baremetal-uart/reproduction.json",
+          "mode": 384,
+          "size": 18876,
+          "sha256": "28111164a08a8fe125f507a64e911f105bfe258eed394a1f71bb63a946698644"
+        },
+        "qualified_scopes": [
+          "arm_link",
+          "hil_tooling",
+          "host_contracts",
+          "reproducibility",
+          "resource_budget",
+          "source_sdk"
+        ],
+        "actual_scope_counts": {
+          "ci": 369,
+          "configure": 480,
+          "native": {
+            "ctest": 200,
+            "google": 3252
+          },
+          "source_sdk": 62,
+          "testing": 677,
+          "workflows": 24
+        },
+        "fresh_network_none_builds": 2,
+        "actual_container_commands": 4,
+        "original_live_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-baremetal-uart",
+        "live_profile_retired_after_complete_archive_review": true,
+        "producer_archive_counts": {
+          "members": 21037,
+          "files": 18804,
+          "file_bytes": 419421051
+        },
+        "parent_quiescent_independent_archive_verification": {
+          "status": "passed",
+          "owned_audit": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-baremetal-uart-final-owned-audit.json",
+            "bytes": 157429,
+            "sha256": "4ae0d91b8b67f3dcaf9fc8c2f2e6d3f642616218ca5b23d11f510e95b4e5956e"
+          },
+          "quiescent_envelope": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-baremetal-uart-final-quiescent-envelope.json",
+            "bytes": 108492,
+            "sha256": "2978f380662ef939a840ce2136bc9c3078c7b7185f62c39c9d00dd9ab6c3dcf6"
+          },
+          "raw": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-baremetal-uart-final-owned-audit.raw",
+            "bytes": 505,
+            "sha256": "876c897625a07935458a7da3cf86efd8bad6e7ef5fdb6e82d26e840532aef7e7"
+          },
+          "full_source_sdk_verified": [
+            {
+              "allocated_upper_bound": 123518976,
+              "directories": 1013,
+              "files": 5376
+            }
+          ],
+          "all_private_temporary_copies_removed": true
+        },
+        "physical_status": "not_executed"
+      },
+      {
+        "id": "u575-freertos-empty",
+        "status": "software_qualified",
+        "archive": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/u575-freertos-empty.tar.gz",
+          "sha256": "c54602d242cc945db3b073a2ba7f8d1a58caacc2205fe6e6a8afeec41b72be4d",
+          "size": 110590358
+        },
+        "archive_review": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/u575-freertos-empty-review.json",
+          "sha256": "fa68ed6efa32c42ca387f4dca889a8b92a1b50a9ff66ce8931944e1b9f1fc3cf",
+          "size": 6166607
+        },
+        "archive_prefix": "profile/",
+        "candidate_id": "nexus-cc6a065c0020-u575-freertos-empty",
+        "candidate_document": {
+          "archive_member_relative_path": "profile/candidates/u575-freertos-empty/candidate.json",
+          "mode": 384,
+          "size": 3856951,
+          "sha256": "39a6e5ebe90b1dd3ea609cd7975ed666d50e61d580a90319cafcd1fb66193b00"
+        },
+        "configuration_sha256": "894d67e407e877df145b9807461baa1a7de8a23fbc8abf711232790aa580315f",
+        "artifacts": {
+          "bin": {
+            "archive_member_relative_path": "profile/executions/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "packed_member_relative_path": "profile/candidates/u575-freertos-empty/payloads/855bbaa9272f172c9af57df2721d72bf9591a9a504dd0c534157275e88434927",
+            "size": 4548,
+            "sha256": "855bbaa9272f172c9af57df2721d72bf9591a9a504dd0c534157275e88434927",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-freertos-empty/executions/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin"
+          },
+          "elf": {
+            "archive_member_relative_path": "profile/executions/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "packed_member_relative_path": "profile/candidates/u575-freertos-empty/payloads/ddee0571be6045257e4a628cd87c8b0aea6a9efe671fab4926edd615f28fd752",
+            "size": 23972,
+            "sha256": "ddee0571be6045257e4a628cd87c8b0aea6a9efe671fab4926edd615f28fd752",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-freertos-empty/executions/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf"
+          },
+          "map": {
+            "archive_member_relative_path": "profile/executions/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "packed_member_relative_path": "profile/candidates/u575-freertos-empty/payloads/f33b17cc31828435d26ed9fe1d8bfeeb07a05e179ed2ee9b59e8748611a15d1a",
+            "size": 48712,
+            "sha256": "f33b17cc31828435d26ed9fe1d8bfeeb07a05e179ed2ee9b59e8748611a15d1a",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-freertos-empty/executions/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map"
+          }
+        },
+        "resources": {
+          "metrics": {
+            "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+            "cycles_latency": "not_measured",
+            "dynamic_high_water": "not_measured",
+            "flash": {
+              "capacity_bytes": 2097152,
+              "footprint_bytes": 4548,
+              "loaded_bytes": 4548,
+              "ranges": [
+                [
+                  134217728,
+                  134222276
+                ]
+              ]
+            },
+            "ram": {
+              "sram1": {
+                "capacity_bytes": 196608,
+                "linker_supported": true,
+                "ranges": [
+                  [
+                    536870912,
+                    536871904
+                  ],
+                  [
+                    537065472,
+                    537067520
+                  ]
+                ],
+                "reserved_bytes": 3040
+              }
+            },
+            "reservations": {
+              "heap": {
+                "bytes": 0,
+                "domain": "sram1",
+                "end": 536871904,
+                "start": 536871904
+              },
+              "msp": {
+                "bytes": 2048,
+                "domain": "sram1",
+                "end": 537067520,
+                "start": 537065472
+              }
+            }
+          },
+          "report": {
+            "archive_member_relative_path": "profile/executions/u575-freertos-empty/resources.json",
+            "mode": 384,
+            "size": 5044,
+            "sha256": "41a8ddf5b0f80e4a60501ccb615f99d4480dc56248f2b91b1904c29567a1c0de"
+          }
+        },
+        "configuration": {
+          "archive_member_relative_path": "profile/executions/u575-freertos-empty/reproduction-runs/run-a/build/generated/resolved.json",
+          "mode": 420,
+          "size": 15832,
+          "sha256": "09a7e1dd952708c3ab7c07cb5215ebaaf0cf166e73a8390dd2f70499b1d39567"
+        },
+        "actual_owned_candidate_plan": {
+          "archive_member_relative_path": "profile/candidate-orchestration-plan.json",
+          "mode": 384,
+          "size": 390,
+          "sha256": "83c0e50b1c94543fa70aef733800ac5d05e40ccfd59e677c631f0d8673cc9b5e"
+        },
+        "actual_owned_candidate_plan_execution": {
+          "archive_member_relative_path": "profile/candidate-orchestration/report.json",
+          "mode": 384,
+          "size": 3891,
+          "sha256": "f3ff4ad2f7d077465c31c855b7a39187e6497e43ce20b6369c2c9325c3aeef0c"
+        },
+        "reproduction": {
+          "archive_member_relative_path": "profile/executions/u575-freertos-empty/reproduction.json",
+          "mode": 384,
+          "size": 18879,
+          "sha256": "8e74f78cfe7242b55cc71511a2ec88db3f7d6e27d64881c2a1242f94ada6b141"
+        },
+        "qualified_scopes": [
+          "arm_link",
+          "hil_tooling",
+          "host_contracts",
+          "reproducibility",
+          "resource_budget",
+          "source_sdk"
+        ],
+        "actual_scope_counts": {
+          "ci": 369,
+          "configure": 480,
+          "native": {
+            "ctest": 200,
+            "google": 3252
+          },
+          "source_sdk": 62,
+          "testing": 677,
+          "workflows": 24
+        },
+        "fresh_network_none_builds": 2,
+        "actual_container_commands": 4,
+        "original_live_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-freertos-empty",
+        "live_profile_retired_after_complete_archive_review": true,
+        "producer_archive_counts": {
+          "members": 21079,
+          "files": 18822,
+          "file_bytes": 419624807
+        },
+        "parent_quiescent_independent_archive_verification": {
+          "status": "passed",
+          "owned_audit": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-freertos-empty-final-owned-audit.json",
+            "bytes": 157429,
+            "sha256": "fa15baa58dfe6fe899143e80c3d1e03f33497137ffe47ee5346b4e2fba9fc8bc"
+          },
+          "quiescent_envelope": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-freertos-empty-final-quiescent-envelope.json",
+            "bytes": 108492,
+            "sha256": "c8c4de648d49aa6be3662bc46a7d40dc2513631ef4880313d9019f62c48d8f80"
+          },
+          "raw": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-freertos-empty-final-owned-audit.raw",
+            "bytes": 505,
+            "sha256": "a71d3eda1143bfab0487f597421321b42939e0d6300f1a7e15697d2b50a5cbb0"
+          },
+          "full_source_sdk_verified": [
+            {
+              "allocated_upper_bound": 123518976,
+              "directories": 1013,
+              "files": 5376
+            }
+          ],
+          "all_private_temporary_copies_removed": true
+        },
+        "physical_status": "not_executed"
+      },
+      {
+        "id": "u575-freertos-uart",
+        "status": "software_qualified",
+        "archive": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/u575-freertos-uart.tar.gz",
+          "sha256": "b9ae30791db69c5c83934557451b56411ba162fdd141f8968032ac174aea16da",
+          "size": 110644423
+        },
+        "archive_review": {
+          "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-archives/u575-freertos-uart-review.json",
+          "sha256": "9b856485db6f061b82cd5de5343712deb55c1d02b12148a568be57652183facb",
+          "size": 6148050
+        },
+        "archive_prefix": "profile/",
+        "candidate_id": "nexus-cc6a065c0020-u575-freertos-uart",
+        "candidate_document": {
+          "archive_member_relative_path": "profile/candidates/u575-freertos-uart/candidate.json",
+          "mode": 384,
+          "size": 3856952,
+          "sha256": "d3356ffa1c7ec4742a2cb38df0cd40c3f1aaedc4a2372c0df713c57361c850c4"
+        },
+        "configuration_sha256": "acbbfb080f1d38b0ace85675e0a7a05d5584bbe4412d87eae5ba3566600449ab",
+        "artifacts": {
+          "bin": {
+            "archive_member_relative_path": "profile/executions/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "packed_member_relative_path": "profile/candidates/u575-freertos-uart/payloads/3ab1361834c151768c71cd730fdbce073b48909f6a47ffa5561006ede9d66aa4",
+            "size": 10804,
+            "sha256": "3ab1361834c151768c71cd730fdbce073b48909f6a47ffa5561006ede9d66aa4",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-freertos-uart/executions/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin"
+          },
+          "elf": {
+            "archive_member_relative_path": "profile/executions/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "packed_member_relative_path": "profile/candidates/u575-freertos-uart/payloads/0d29d9f76d27954e798637ab15046b58839d79053f506b4c85880756d2a59e14",
+            "size": 31604,
+            "sha256": "0d29d9f76d27954e798637ab15046b58839d79053f506b4c85880756d2a59e14",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-freertos-uart/executions/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf"
+          },
+          "map": {
+            "archive_member_relative_path": "profile/executions/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "packed_member_relative_path": "profile/candidates/u575-freertos-uart/payloads/8825883233e10f0c8c9204b97660917f506e4c07becbf5934c94fc978a53a835",
+            "size": 64149,
+            "sha256": "8825883233e10f0c8c9204b97660917f506e4c07becbf5934c94fc978a53a835",
+            "original_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-freertos-uart/executions/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map"
+          }
+        },
+        "resources": {
+          "metrics": {
+            "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+            "cycles_latency": "not_measured",
+            "dynamic_high_water": "not_measured",
+            "flash": {
+              "capacity_bytes": 2097152,
+              "footprint_bytes": 10804,
+              "loaded_bytes": 10804,
+              "ranges": [
+                [
+                  134217728,
+                  134228532
+                ]
+              ]
+            },
+            "ram": {
+              "sram1": {
+                "capacity_bytes": 196608,
+                "linker_supported": true,
+                "ranges": [
+                  [
+                    536870912,
+                    536870972
+                  ],
+                  [
+                    536870976,
+                    536872160
+                  ],
+                  [
+                    537065472,
+                    537067520
+                  ]
+                ],
+                "reserved_bytes": 3292
+              }
+            },
+            "reservations": {
+              "heap": {
+                "bytes": 0,
+                "domain": "sram1",
+                "end": 536872160,
+                "start": 536872160
+              },
+              "msp": {
+                "bytes": 2048,
+                "domain": "sram1",
+                "end": 537067520,
+                "start": 537065472
+              }
+            }
+          },
+          "report": {
+            "archive_member_relative_path": "profile/executions/u575-freertos-uart/resources.json",
+            "mode": 384,
+            "size": 5096,
+            "sha256": "5f39d58c450909b29babe7210d1bf9d2d5ce23e17550f02a7a921a400b047f9c"
+          }
+        },
+        "configuration": {
+          "archive_member_relative_path": "profile/executions/u575-freertos-uart/reproduction-runs/run-a/build/generated/resolved.json",
+          "mode": 420,
+          "size": 17305,
+          "sha256": "2026470964e2c3e1da70736905362ecbcbc80a39c66c618e7f68cc96d32fe193"
+        },
+        "actual_owned_candidate_plan": {
+          "archive_member_relative_path": "profile/candidate-orchestration-plan.json",
+          "mode": 384,
+          "size": 388,
+          "sha256": "b6ec6332b633378b2454339642b4350209ddc33eb79aad16ba53949e7f7973d5"
+        },
+        "actual_owned_candidate_plan_execution": {
+          "archive_member_relative_path": "profile/candidate-orchestration/report.json",
+          "mode": 384,
+          "size": 3888,
+          "sha256": "57f4b55822174954c42405bb380cb0ccde1979a7badd1233824376a509246a2f"
+        },
+        "reproduction": {
+          "archive_member_relative_path": "profile/executions/u575-freertos-uart/reproduction.json",
+          "mode": 384,
+          "size": 18831,
+          "sha256": "523e60b4a64c61d7c0d713534f33f71bc439400bb61f66f5803b5a73f0f51723"
+        },
+        "qualified_scopes": [
+          "arm_link",
+          "hil_tooling",
+          "host_contracts",
+          "reproducibility",
+          "resource_budget",
+          "source_sdk"
+        ],
+        "actual_scope_counts": {
+          "ci": 369,
+          "configure": 480,
+          "native": {
+            "ctest": 200,
+            "google": 3252
+          },
+          "source_sdk": 62,
+          "testing": 677,
+          "workflows": 24
+        },
+        "fresh_network_none_builds": 2,
+        "actual_container_commands": 4,
+        "original_live_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/live-profiles/u575-freertos-uart",
+        "live_profile_retired_after_complete_archive_review": true,
+        "producer_archive_counts": {
+          "members": 21089,
+          "files": 18828,
+          "file_bytes": 419825321
+        },
+        "parent_quiescent_independent_archive_verification": {
+          "status": "passed",
+          "owned_audit": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-freertos-uart-final-owned-audit.json",
+            "bytes": 157419,
+            "sha256": "74adae06de199656e62b26d475ec9ecc516e56684f49c80bf50f1f39efa9dd42"
+          },
+          "quiescent_envelope": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-freertos-uart-final-quiescent-envelope.json",
+            "bytes": 108479,
+            "sha256": "bb1b41ae27c6576355e1517ca1e9284daa79b5f22898a8475269daa8821c316b"
+          },
+          "raw": {
+            "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/u575-freertos-uart-final-owned-audit.raw",
+            "bytes": 504,
+            "sha256": "e217743401308985d83038a2d8d78679769a4e2d6cea052f4a3b4979741c2dd0"
+          },
+          "full_source_sdk_verified": [
+            {
+              "allocated_upper_bound": 123518976,
+              "directories": 1013,
+              "files": 5376
+            }
+          ],
+          "all_private_temporary_copies_removed": true
+        },
+        "physical_status": "not_executed"
+      }
+    ],
+    "fresh_builds": 16,
+    "actual_network_none_container_commands": 32,
+    "matrix_receipt": {
+      "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-matrix.json",
+      "bytes": 112435,
+      "sha256": "34d6304b79e639d16c950f6dae68e8b9c34087f52c38afc711eb5286721d1e0b"
+    },
+    "outer_execution": {
+      "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00/candidate-driver-outer.json",
+      "bytes": 43741,
+      "sha256": "f6d8e88c15d1325ebb244afc6f2616885b859ac22028f339d4056d96d77a905c"
+    },
+    "scope": "H743 HSI64/Cache off and U575 MSIS4/TZEN0; empty/UART; baremetal/FreeRTOS; unsigned single-image software candidates",
+    "archive_only_independent_review": {
+      "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json",
+      "bytes": 63016,
+      "sha256": "1c127cb2a348b62e07809cfa7ce7b784f57c45cac7cca3f58922c5e973817c12"
+    },
+    "current_independent_candidate_aggregate_complete": true,
+    "producer_archive_totals": {
+      "bytes": 884610912,
+      "members": 168468,
+      "files": 150508,
+      "file_bytes": 3356224498,
+      "scope": "Actual eight archives; metadata and every file byte independently revalidated in main archive-only review."
+    },
+    "independent_archive_totals": {
+      "all_original_live_profiles_absent": true,
+      "all_private_temporary_copies_removed": true,
+      "complete_source_sdk_verifications": 8,
+      "members": 168468,
+      "owned_candidate_verifications": 8,
+      "regular_files": 150508,
+      "uncompressed_file_bytes": 3356224498
+    },
+    "actual_external_process_stages": 49
+  },
+  "python_tools": {
+    "closure_wheels": 15,
+    "cp312": {
+      "offline_install": true,
+      "pep517_build_isolation_enabled": true,
+      "actual_hook_initialization": true,
+      "complete_isolated_runner_results": {
+        "historical_staged_tree": "d79ddc4c4a0e6b31bb7edf26fd86e6cca34f6f5b",
+        "historical_complete_domains": {
+          "testing": 675,
+          "configure": 480,
+          "ci": 361,
+          "workflows": 24
+        },
+        "historical_receipt": {
+          "path": "/workspace/nexus-build-maintenance-20261012/workflow/hook-isolation-final-v2/final-report.json",
+          "bytes": 7025,
+          "sha256": "3b08e087e1f5971e78fba7e3f4ef9c6687173ad8c7c477f962f01c992fdddfe0"
+        },
+        "current_normal_hook_exact_tree": "de0e687f659a22badb55259b2e03646fc7b748d1",
+        "current_normal_hook_domains": {
+          "testing": {
+            "suite": "testing",
+            "discovered": 677,
+            "executed": 677,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "expected_failures": 0,
+            "unexpected_successes": 0,
+            "status": "passed"
+          },
+          "configure": {
+            "suite": "configure",
+            "discovered": 480,
+            "executed": 480,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "expected_failures": 0,
+            "unexpected_successes": 0,
+            "status": "passed"
+          },
+          "ci": {
+            "suite": "ci",
+            "discovered": 369,
+            "executed": 369,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "expected_failures": 0,
+            "unexpected_successes": 0,
+            "status": "passed"
+          },
+          "workflows": {
+            "suite": "workflows",
+            "discovered": 24,
+            "executed": 24,
+            "skipped": 0,
+            "failures": 0,
+            "errors": 0,
+            "expected_failures": 0,
+            "unexpected_successes": 0,
+            "status": "passed"
+          }
+        },
+        "current_normal_hook_receipt": {
+          "path": "/workspace/nexus-build-maintenance-20261012/normal-memory-contract-fix-hook-success/receipt.json",
+          "bytes": 3261,
+          "sha256": "945ca177f92b93c7d60c9feae8387a66b21e8febfff8350c5061905b08cb19df"
+        },
+        "boundary": "Fresh offline installation and hook priming qualify their unchanged locked environment bytes. Current full-source counts come from the current normal hook and independent clean-source wrappers."
+      },
+      "receipt": {
+        "path": "/workspace/nexus-build-maintenance-20261012/workflow/hook-isolation-final-v2/final-report.json",
+        "bytes": 7025,
+        "sha256": "3b08e087e1f5971e78fba7e3f4ef9c6687173ad8c7c477f962f01c992fdddfe0"
+      }
+    },
+    "cp311": {
+      "wheel_bytes_verified": true,
+      "offline_install": "not_executed"
+    }
+  },
+  "environment": {
+    "qualified_artifact_reuse": true,
+    "transport_receipts": [
+      {
+        "path": "/workspace/nexus-build-maintenance-20261012/environment-execution/oci-transport-receipt.json",
+        "bytes": 30836,
+        "sha256": "f140a071e858a70ecc5241b9dd5435ec286b9bbd21ea7269b8542936b1f1b0f9"
+      },
+      {
+        "path": "/workspace/nexus-build-maintenance-20261012/environment-execution/toolchain-transport-receipt.json",
+        "bytes": 16968,
+        "sha256": "2e8a0405afca2b2bea3dd0651a12c73056db4006671a062aca6c9fdada20c47d"
+      }
+    ],
+    "recipe_declared_inputs_verified": true,
+    "recipe_reproducible": false,
+    "windows_integration": "not_executed",
+    "macos_integration": "not_executed",
+    "recipe_python_requirements_sha256": "0c2b01c2ccbe113e21acffb28174805411b454a57849409700c3594a507130f0",
+    "final_recipe_hash_update": {
+      "path": "/workspace/nexus-build-maintenance-20261012/delivery/recipe-hooks15-lock-update.json",
+      "bytes": 502,
+      "sha256": "defda445d18d9fcf112d4193ef1a66f49f35e6f25710ce62b62d24eb0d0ac1e6"
+    }
+  },
+  "qualification_orchestration": {
+    "maintained_software_plan_stages": 72,
+    "complete_software_plan_single_invocation": "not_executed",
+    "actual_candidate_plan_executions": 8,
+    "boundary": "Actual independently executed maintained gates and eight candidate plans are recorded separately from one complete software-plan invocation."
+  },
+  "failed_attempts_preserved": [
+    {
+      "type": "normal_hook",
+      "receipt": {
+        "path": "/workspace/nexus-build-maintenance-20261012/failed-normal-hook-1/receipt.json",
+        "bytes": 1367,
+        "sha256": "ac9badde0abfbc948f234e08d0bba3d9f180f2d721a76bb2fd52480151fe5210"
+      }
+    },
+    {
+      "type": "ci_fix_normal_hook",
+      "receipt": {
+        "path": "/workspace/nexus-build-maintenance-20261012/failed-ci-fix-hook-1/receipt.json",
+        "bytes": 1791,
+        "sha256": "8fba5a9ae5d295a9d36167fcd61e639a441793c2c068ee8664b8bbf609401cf2"
+      }
+    },
+    {
+      "type": "github_ci",
+      "source": "acc70f30ec9eb8aa911e3ce6e6c839bc0577c72d",
+      "run_id": 38280227545,
+      "conclusion": "failure",
+      "summary": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/acc70f30ec9eb8aa911e3ce6e6c839bc0577c72d/summary.json",
+        "bytes": 5990,
+        "sha256": "68b98493aec6df6ff40cebac0f1e667f98bbf71a5240460286084cdc8dd0623b"
+      }
+    },
+    {
+      "type": "github_ci",
+      "source": "3e7c0d50115dd9074c5bebed559005ed33fcfe08",
+      "run_id": 38287851849,
+      "conclusion": "failure",
+      "summary": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/github-ci/3e7c0d50115dd9074c5bebed559005ed33fcfe08/summary.json",
+        "bytes": 4509,
+        "sha256": "68af1636042d5ae2bc73233ad658618afea0312e44dd19b7308e62f1b66299c9"
+      },
+      "substantive_failure": "3 gd32_memory.rejected AttributeError cases out of 196 actual Tool Contracts cases; fixed in cc6a source; passing separate ARM jobs do not erase failed aggregate CI."
+    },
+    {
+      "type": "local_source_sdk_boundary",
+      "attempt": 1,
+      "source": "cc6a065c002041234a212a964be863a69198f9b4",
+      "receipt": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries-receipt.json",
+        "bytes": 3364,
+        "sha256": "2be4190e1c4c6a8f4d32b32880e128f2ec91f77db556ae13b89658ff86a7d66f"
+      },
+      "original_namespace": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/sdk-boundaries",
+      "conclusion": "failed",
+      "discovered": 62,
+      "executed": 62,
+      "failures": 0,
+      "errors": 6,
+      "skipped": 6,
+      "failure_reason": "Initial wrapper invocation did not lock the CMake tool PATH; six FileNotFoundError errors and six unavailable-tool skips retained.",
+      "subsequent_attempt_uses_distinct_directory_and_receipt": true
+    },
+    {
+      "type": "offline_candidate_matrix",
+      "attempt": "v4",
+      "source": "cc6a065c002041234a212a964be863a69198f9b4",
+      "conclusion": "failed",
+      "qualified_profiles": 0,
+      "original_namespace": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c",
+      "matrix": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/candidate-matrix.json",
+        "bytes": 8237,
+        "sha256": "963f72f4d0f77e0bcb29ff772af50544b4c481fa581ef59cc67e419072c398e5"
+      },
+      "failure_reason": "Actual first H743 baremetal empty reproduction failed with errno28 / ENOSPC; no profile or candidate was qualified.",
+      "storage_recovery": "Retire only independently byte-verified ignored historical cache; source stayed frozen. Storage operations do not add platform support.",
+      "subsequent_attempt": "v5 uses a fresh sibling 9-prefix namespace, the same immutable host/SDK proofs and fully verified source SDK bytes; no prior compiled output reused."
+    },
+    {
+      "type": "offline_candidate_matrix",
+      "attempt": "v5-nine-prefix",
+      "source": "cc6a065c002041234a212a964be863a69198f9b4",
+      "conclusion": "failed",
+      "qualified_profiles": 0,
+      "original_namespace": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c0",
+      "matrix": {
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c0/candidate-matrix.json",
+        "bytes": 10578,
+        "sha256": "5c8258f31dccc04ffb8197b327910c874d047947961f301666659c1b415d7dac"
+      },
+      "failure_reason": "Two fresh offline builds passed, but candidate sealing encountered missing original SDK temporary-file references after fixture cleanup. No profile was qualified.",
+      "original_proof_records_unchanged": true,
+      "exact_reference_storage_restoration_review": {
+        "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-closure-failure/actual-sdk-reference-storage-restoration-review.json",
+        "bytes": 3658,
+        "sha256": "3517c18b4dd340e75482ebeabec1c72943cd44adecb21888a1aad5d3bf8616a1"
+      },
+      "failed_live_scratch_archive_and_retirement_review": {
+        "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/both-failed-profile-actual-retirements-review.json",
+        "bytes": 3829,
+        "sha256": "4855a61979fcc99eaa8b3a7530f01da101fd7cf31ef30cc1c199c855af9ce2c7"
+      },
+      "storage_recovery_is_not_software_qualification": true
+    },
+    {
+      "type": "storage_only_retirement",
+      "storage_only": true,
+      "software_qualification": false,
+      "target": "examples-build",
+      "archive": {
+        "bytes": 245795096,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cache-capacity-recovery/examples-build-a501fbd6-v1/cache.tar.gz",
+        "sha256": "cbe83897b9239cd91dfdb44593ef28adcdc0400dcb2940a426ad1e0a56498f4d"
+      },
+      "manifest": {
+        "bytes": 42173344,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cache-capacity-recovery/examples-build-a501fbd6-v1/manifest.json",
+        "sha256": "e3a627c6eb2122d531b39099f6124d05714e74c2b5af2444958db7851bab5d7c"
+      },
+      "actual_retirement": {
+        "bytes": 10994073,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cache-capacity-recovery/examples-build-a501fbd6-v1/retire.json",
+        "sha256": "aaaafa2d2018c18735a4b2ebee390dc5ccd3847fcb0a9477f502f85abbb93384"
+      },
+      "original_live_path_historical_only": "/workspace/nexus-examples/build"
+    },
+    {
+      "type": "storage_only_retirement",
+      "storage_only": true,
+      "software_qualification": false,
+      "target": "automation-native-debug",
+      "archive": {
+        "bytes": 237289041,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cache-capacity-recovery/automation-native-debug-535ca530-v2/cache.tar.gz",
+        "sha256": "de8babf2030a37b61e2a06d708c62175baaab4725f4d5e0fbdfcd018d84d60d3"
+      },
+      "manifest": {
+        "bytes": 9958887,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cache-capacity-recovery/automation-native-debug-535ca530-v2/manifest.json",
+        "sha256": "0b361865f5a2a9afdfb9b0c50a873bfa5e96293a41f15158bdef3a944f002cdc"
+      },
+      "actual_retirement": {
+        "bytes": 10194421,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cache-capacity-recovery/automation-native-debug-535ca530-v2/retire.json",
+        "sha256": "8677702c4334f617b16ae3ffc537e8585459ca48fc294c25cc7424127480156f"
+      },
+      "original_live_path_historical_only": "/workspace/nexus-60-automation-source/build/native-debug"
+    },
+    {
+      "type": "storage_only_retirement",
+      "storage_only": true,
+      "software_qualification": false,
+      "target": "failed-v4",
+      "archive": {
+        "bytes": 30106469,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/failed-profile-capacity-recovery/failed-v4-v1/cache.tar.gz",
+        "sha256": "6dc2a86f2540cb39c1e2d5a686700a41eabd4a7dcf80689520b92032c37b30ba"
+      },
+      "manifest": {
+        "bytes": 8017180,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/failed-profile-capacity-recovery/failed-v4-v1/manifest.json",
+        "sha256": "35c784e47165f8ee6c51a54b25725c66e7614e29c357f9bf55630d675cb5d665"
+      },
+      "actual_retirement": {
+        "bytes": 8640,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/failed-profile-capacity-recovery/failed-v4-v1/retire.json",
+        "sha256": "c2a7014f68771f3f0ba8094804e8bf67b87ed29add520911876c8c3628653506"
+      },
+      "original_live_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/live-profiles/h743-baremetal-empty"
+    },
+    {
+      "type": "storage_only_retirement",
+      "storage_only": true,
+      "software_qualification": false,
+      "target": "failed-v5",
+      "archive": {
+        "bytes": 60962005,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/failed-profile-capacity-recovery/failed-v5-v1/cache.tar.gz",
+        "sha256": "5c16ab377b43b538c6790aacf4c1382c688ecb070df926593556de2163245e39"
+      },
+      "manifest": {
+        "bytes": 16818555,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/failed-profile-capacity-recovery/failed-v5-v1/manifest.json",
+        "sha256": "64398e4f84fa4953e145f4cbabb590c6567ee82c2cea4a927c902610d22ce0ae"
+      },
+      "actual_retirement": {
+        "bytes": 8649,
+        "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/failed-profile-capacity-recovery/failed-v5-v1/retire.json",
+        "sha256": "741433a5720c7071326f0c8082993b3a10274a856e172106a834e493181a7b81"
+      },
+      "original_live_path_historical_only": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c0/live-profiles/h743-baremetal-empty"
+    }
+  ],
+  "independent_review": {
+    "final_code_tree": "de0e687f659a22badb55259b2e03646fc7b748d1",
+    "code_review": {
+      "initial_90_file_implementation": {
+        "path": "/workspace/nexus-build-maintenance-20261012/independent-review/final-implementation-review-v2.json",
+        "bytes": 23350,
+        "sha256": "c10479eb5bec88c112e531fdbc55e70e8b35bb34111b6faa71139f1337c4d924"
+      },
+      "expanded_ci_hook_closure_correction_tree_d79ddc4c": {
+        "path": "/workspace/nexus-build-maintenance-20261012/independent-review/ci-corrections-independent-review-v2.json",
+        "bytes": 24021,
+        "sha256": "f59cb8dde31b0e4eb8de89c291051927468f245e79e68cfaa9c9463859e5e561"
+      },
+      "final_three_file_memory_contract_bridge_tree_de0e687f": {
+        "path": "/workspace/nexus-build-maintenance-20261012/independent-review/gd32-memory-contract-bridge-review.json",
+        "bytes": 9311,
+        "sha256": "980f282cd3a17e336dd48fa236f94814bd86b8607fcccbe42434194a4bc1401a"
+      },
+      "scope": "Independent staged implementation reviews followed by actual normal hooks, clean-source suites, SDK, CI and candidate executions; the separate final archive-only review passed for all eight profiles."
+    },
+    "archive_only_review": {
+      "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-archive-only-independent-review.json",
+      "bytes": 63016,
+      "sha256": "1c127cb2a348b62e07809cfa7ce7b784f57c45cac7cca3f58922c5e973817c12"
+    },
+    "additional_32_container_raw_companion": {
+      "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/final-eight-actual-closure-companion-index.json",
+      "bytes": 1209,
+      "sha256": "69dbabdda15520fa66fbbb5c88f161d7582f0fcd1377647ff19d17076a89e5a4"
+    }
+  },
+  "counting_rule": "Suites overlap; counts are not additive and do not establish exhaustive proof or hardware acceptance.",
+  "physical_hil": {
+    "status": "not_executed",
+    "station_connected": false
+  },
+  "limitations": [
+    "No physical MCU, electrical, cycle/WCET, Flash power-loss, DMA/cache or TrustZone station acceptance.",
+    "No OCI recipe reconstruction or CP311 offline installation.",
+    "No complete 72-stage software-plan invocation.",
+    "No Windows/macOS integrated execution, product release or external-example upgrade."
+  ],
+  "candidate_adapter_review": {
+    "status": "approved_adapter_only",
+    "review": {
+      "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-matrix-v5-independent-review.json",
+      "bytes": 4170,
+      "sha256": "3021710d4b94875646ccf57a58ed3556db36e677b96224968c8395485f10d304"
+    },
+    "explicit_sdk_attempt": 2,
+    "actual_candidate_matrix_aggregate": "software_qualified_and_independently_archive_closed",
+    "selected_source_sdk_manifest": {
+      "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c/publishable-sdk/share/nexus/src/.nexus-source-sdk.json",
+      "sha256": "3563c6f1764f0012a72a77e657fac1124fb1a096ba21d4fba741eb1439eabb8d",
+      "size": 743834
+    }
+  },
+  "execution_namespaces": {
+    "original_current_proofs": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c",
+    "new_current_candidate_execution": "/workspace/nexus-build-maintenance-20261012/final-qualification/cc6a065c00",
+    "rule": "Original current proof stays at 8-prefix cc6a065c; failed 8/9-prefix matrices remain failed; current matrix and final archives use 10-prefix cc6a065c00. No proof relocation or failed-result reuse."
+  },
+  "proof_storage_boundary": {
+    "scope": "Storage restoration only",
+    "restored_original_reference_files": 102,
+    "restored_logical_bytes": 1876044,
+    "all_original_bytes_modes_mtime_from_precaptured_identity": true,
+    "strict_reference_closure_checked": 3216,
+    "review": {
+      "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-closure-failure/actual-sdk-reference-storage-restoration-review.json",
+      "bytes": 3658,
+      "sha256": "3517c18b4dd340e75482ebeabec1c72943cd44adecb21888a1aad5d3bf8616a1"
+    },
+    "failed_archive_retirement_review": {
+      "path": "/workspace/nexus-build-maintenance-20261012/independent-review/candidate-archive-audit/both-failed-profile-actual-retirements-review.json",
+      "bytes": 3829,
+      "sha256": "4855a61979fcc99eaa8b3a7530f01da101fd7cf31ef30cc1c199c855af9ce2c7"
+    },
+    "source_and_original_sdk_records_unchanged": true,
+    "no_new_source_behavior_or_sdk_suite_execution": true,
+    "software_qualification": false
+  },
+  "formal_execution_primary_receipt": {
+    "path": "/workspace/nexus-build-maintenance-20261012/final-qualification/formal-execution-evidence-index-cc6a065c00.json",
+    "bytes": 46202,
+    "sha256": "b42e1857f6802cbabe35d10f515fd9033ee3bb0bbb40368a50222927c5a45e47"
+  },
+  "evidence_navigation": {
+    "primary": "formal_execution_primary_receipt",
+    "candidate_archives": "offline_candidates.profiles[].archive",
+    "candidate_member": "offline_candidates.profiles[].candidate_document.archive_member_relative_path",
+    "firmware_members": "offline_candidates.profiles[].artifacts.{elf,bin,map}.{archive_member_relative_path,packed_member_relative_path}",
+    "all_member_manifest": "offline_candidates.profiles[].archive_review /member_manifest",
+    "original_live_paths": "Historical only: all eight live profile directories are retired.",
+    "local_retention_boundary": "Local immutable archives retained; no off-site replication, published release or product qualification claimed."
+  }
+}
