@@ -1,0 +1,729 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_final_documentation_journal_evidence",
+  "status": "passed",
+  "documentation_commit": "5a7a75c321ea173df8692714f95a8df13715293d",
+  "archive": {
+    "path": "final-journal-evidence.tar.gz",
+    "bytes": 28531727,
+    "sha256": "4670eab7e605be9fab49960cd85ec41a1a0aec7e91716093b4fadc55ef0686d0"
+  },
+  "members": [
+    {
+      "path": "browser/final-journal/acceptance-summary.json",
+      "bytes": 5063,
+      "sha256": "86eeb17f135b17b74794f1f420311a21830b3c12112c7d74d92a9253caee8833",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/acceptance-summary.json"
+    },
+    {
+      "path": "browser/final-journal/browser-progress.json",
+      "bytes": 103099,
+      "sha256": "58225661eba50783aa30018abf0c84939e270fc18541a69bbcb4974198eab7a0",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/browser-progress.json"
+    },
+    {
+      "path": "browser/final-journal/browser-report.json",
+      "bytes": 439057,
+      "sha256": "e4941bce3f16c245cb93e401391bf52665ecaa1b3583ae3f54719da5fe4f80e8",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/browser-report.json"
+    },
+    {
+      "path": "browser/final-journal/desktop-en-explanation-factory.png",
+      "bytes": 240667,
+      "sha256": "1face2e59f4f98ce48d81b35c9ff60267cb6744af3a608d2b86a00b96f94428e",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/desktop-en-explanation-factory.png"
+    },
+    {
+      "path": "browser/final-journal/desktop-en-guides-os-shutdown.png",
+      "bytes": 254115,
+      "sha256": "a43e88152571cac9f74b09c59cde4c68d2ceb79b50c71511d25b3b48c058e029",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/desktop-en-guides-os-shutdown.png"
+    },
+    {
+      "path": "browser/final-journal/desktop-en-index.png",
+      "bytes": 178052,
+      "sha256": "93372426886110bd9da7723ecaae31b5cb16c66326cf84888a204f6852cd7a54",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/desktop-en-index.png"
+    },
+    {
+      "path": "browser/final-journal/desktop-zh_CN-explanation-factory.png",
+      "bytes": 272852,
+      "sha256": "e9cc4f588e2d376331a2ed00b3f99ce9780224f3b80f6f32ad53e53564e459c3",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/desktop-zh_CN-explanation-factory.png"
+    },
+    {
+      "path": "browser/final-journal/desktop-zh_CN-guides-os-shutdown.png",
+      "bytes": 295838,
+      "sha256": "0e670375dbcceecf05cb54b670a354b40bab7874cba3a16d89d838b5d3c8ddd9",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/desktop-zh_CN-guides-os-shutdown.png"
+    },
+    {
+      "path": "browser/final-journal/desktop-zh_CN-index.png",
+      "bytes": 208944,
+      "sha256": "bb624efb6c630434182d6d59b51ce6f8983732e347568b4a56aa68377eae8714",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/desktop-zh_CN-index.png"
+    },
+    {
+      "path": "browser/final-journal/figure-dma-completion.png",
+      "bytes": 184167,
+      "sha256": "d06e3618e9da6295f84d46bf41de2b32066fa62767c8cdc1a229f4be85cee78d",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/figure-dma-completion.png"
+    },
+    {
+      "path": "browser/final-journal/figure-platform-architecture.png",
+      "bytes": 250990,
+      "sha256": "b7d9dded6488f498ffae4ec77b681fed571ccb3cb2a8c0d576bfb168e64f26c3",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/figure-platform-architecture.png"
+    },
+    {
+      "path": "browser/final-journal/figure-request-lifecycle.png",
+      "bytes": 129822,
+      "sha256": "6b5f5f7e6a760880e527756521e0b2bc464ce9dc60faf752a9ea2a559b2a35db",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/figure-request-lifecycle.png"
+    },
+    {
+      "path": "browser/final-journal/figure-u575-security-domains.png",
+      "bytes": 173198,
+      "sha256": "de496da24ed331ef3d7b6ff796cbfe8235d888f3495bd90ec2d436fad6750950",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/figure-u575-security-domains.png"
+    },
+    {
+      "path": "browser/final-journal/figure-zoom200-dma-completion.png",
+      "bytes": 176628,
+      "sha256": "6ba253f9d1e3ed7b1676ed6e5cb742c031fb05c8a38af7f0ab64f213b8efa305",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/figure-zoom200-dma-completion.png"
+    },
+    {
+      "path": "browser/final-journal/figure-zoom200-platform-architecture.png",
+      "bytes": 204166,
+      "sha256": "7a49f3d544d055351d64ecc798819331fe408d4bace82fe5300f0f398e5569e7",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/figure-zoom200-platform-architecture.png"
+    },
+    {
+      "path": "browser/final-journal/figure-zoom200-request-lifecycle.png",
+      "bytes": 195575,
+      "sha256": "bb57bbc1133d35edf79552ccc7baa5e791e1a7d1aa2b0349a4c7da3e45019227",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/figure-zoom200-request-lifecycle.png"
+    },
+    {
+      "path": "browser/final-journal/figure-zoom200-u575-security-domains.png",
+      "bytes": 204745,
+      "sha256": "77868259e0d254d4f095370be250d5a4d49f24bf0c4deb68840a5a0f2ab39861",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/figure-zoom200-u575-security-domains.png"
+    },
+    {
+      "path": "browser/final-journal/narrow-en-explanation-factory.png",
+      "bytes": 87498,
+      "sha256": "919d9574833625f7ec9ce7faec8a720f28e85721939245384437fc9740c71376",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/narrow-en-explanation-factory.png"
+    },
+    {
+      "path": "browser/final-journal/narrow-en-guides-os-shutdown.png",
+      "bytes": 81626,
+      "sha256": "e39d1eb40933f2fcf2b0ea33b32ee63a5d3242c7a9ec599c138b1572b971c844",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/narrow-en-guides-os-shutdown.png"
+    },
+    {
+      "path": "browser/final-journal/narrow-en-index.png",
+      "bytes": 77146,
+      "sha256": "cc0743332522a738ab4482204ef101fc054f1fadd5853b83cefd8cb414a94026",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/narrow-en-index.png"
+    },
+    {
+      "path": "browser/final-journal/narrow-zh_CN-explanation-factory.png",
+      "bytes": 104209,
+      "sha256": "2f675d28f91a325d487b7d33f24a54ab605faad73a0f47118eb023521ac23203",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/narrow-zh_CN-explanation-factory.png"
+    },
+    {
+      "path": "browser/final-journal/narrow-zh_CN-guides-os-shutdown.png",
+      "bytes": 105453,
+      "sha256": "18990034631902f535d038d5d1ad3c088b7f431685bfb89554cda14cc3b896ea",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/narrow-zh_CN-guides-os-shutdown.png"
+    },
+    {
+      "path": "browser/final-journal/narrow-zh_CN-index.png",
+      "bytes": 98091,
+      "sha256": "526609b4b3e3d331e0b88dbea7c04abbeeba918c0887d30b9448276cb5a934d1",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/narrow-zh_CN-index.png"
+    },
+    {
+      "path": "browser/final-journal/print-audit.json",
+      "bytes": 27122,
+      "sha256": "98d839e4d2aa2ecd364f73b84c6732c3b5726b15eabc4a21d27b0eec211f3597",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-audit.json"
+    },
+    {
+      "path": "browser/final-journal/print-en-explanation-factory.pdf",
+      "bytes": 180026,
+      "sha256": "8feb89b4acebe62df28c64f5ca09167f3f0dfdfee719dc812d440848b8b94f1d",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-explanation-factory.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-en-explanation-ownership.pdf",
+      "bytes": 365998,
+      "sha256": "bc6f8a0c0f26ed42bc59a2045a35fcce344b8c1e1c9be7201490ec0780ef5586",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-explanation-ownership.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-en-guides-board-porting.pdf",
+      "bytes": 103027,
+      "sha256": "e4659284d4c6bd51be8ec83e52a7f9c04c578521734d5e732d7df36353577891",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-guides-board-porting.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-en-guides-migration.pdf",
+      "bytes": 76056,
+      "sha256": "5dfc8df6769c3f502fd95dbe155e3984139afafab3f558b9876a0aa400045cae",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-guides-migration.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-en-guides-os-shutdown.pdf",
+      "bytes": 196988,
+      "sha256": "8ee61cc1e8d7b2407dd424df6a34ef820af88185bc9d956c16f7aff6fe2e3c5a",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-guides-os-shutdown.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-en-index.pdf",
+      "bytes": 295550,
+      "sha256": "075ea46a14a2586de536e5240fd3fecdd96ed3bd2808b8d36b025c9ff6442ce5",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-index.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-en-reference-configuration-assembly.pdf",
+      "bytes": 76324,
+      "sha256": "507b69167dba0da80ca434569170345db2320335e797ab3be39329c542c81f86",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-reference-configuration-assembly.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-en-reference-platforms-qualification.pdf",
+      "bytes": 150500,
+      "sha256": "2e32937c6f07c1faa5e5cbd38f0289396ebdb81f373004f0f8d8a8ce18b54cb4",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-reference-platforms-qualification.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-en-reference-platforms-support.pdf",
+      "bytes": 261844,
+      "sha256": "e75fef6f5ef6a7840971c66284a219cc94005ccd7899592542faad0f183a874b",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-reference-platforms-support.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-en-tutorials-async-io.pdf",
+      "bytes": 138793,
+      "sha256": "19e2349cced74167e08e62387184c16921689c8fd6beca436c8d8334b6937521",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-tutorials-async-io.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-en-tutorials-source-sdk.pdf",
+      "bytes": 210114,
+      "sha256": "cda20789868b44b2c2f8cd43a0c99d5a43e966c8f456400cd0df30c2f7c47fb4",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-en-tutorials-source-sdk.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-explanation-factory.pdf",
+      "bytes": 477654,
+      "sha256": "6ee8585d00391187d94035c01bc4cc3ff2e8271060ad4bd97539a6489e8c597c",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-explanation-factory.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-explanation-ownership.pdf",
+      "bytes": 667189,
+      "sha256": "49192e9bfe2c649ae24df3dbb1a689f84c259f89924e77968db87d74b6a2ddfa",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-explanation-ownership.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-guides-board-porting.pdf",
+      "bytes": 388493,
+      "sha256": "044bddd1bb90aab264167b97ada87ccf270c0f056d3405e1d7042a27e9c06edf",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-guides-board-porting.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-guides-migration.pdf",
+      "bytes": 382243,
+      "sha256": "5dbd495c925e3fd3bc73c7b775d124648985edebdac9995f15a0a492c9878325",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-guides-migration.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-guides-os-shutdown.pdf",
+      "bytes": 470601,
+      "sha256": "05ed593a3db72cd7b42b66300e9838f193e3d4af42da8d397dbac60c8c5011a0",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-guides-os-shutdown.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-index.pdf",
+      "bytes": 401703,
+      "sha256": "b929ec5050e1c3e4e79e0f840066407febbbcfae924396b1bdd729d41be4bbc0",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-index.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-reference-configuration-assembly.pdf",
+      "bytes": 371714,
+      "sha256": "31ad3b972118158fa638e775910c7ff6629e5f8bd6ac0d611908dba62d4dde8a",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-reference-configuration-assembly.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-reference-platforms-qualification.pdf",
+      "bytes": 467920,
+      "sha256": "0a4ba200274e733e47506faa85ee152b13af23bf519b03899e7851375a12f66a",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-reference-platforms-qualification.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-reference-platforms-support.pdf",
+      "bytes": 565352,
+      "sha256": "deef8358ac5b56fb0b78a7439aafe0136e9a7d11757fe0a78da1d0ca3e62a29c",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-reference-platforms-support.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-tutorials-async-io.pdf",
+      "bytes": 430320,
+      "sha256": "162ae8becd8c1d2525cb87453085167c4d95a0ba6d41b0c34febcb3ea0567c08",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-tutorials-async-io.pdf"
+    },
+    {
+      "path": "browser/final-journal/print-zh_CN-tutorials-source-sdk.pdf",
+      "bytes": 508553,
+      "sha256": "2c4fec072e25597e9bdc6a8fadb8e2f0bea4358c65557cd71ae7ea8dcaec8b9f",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/print-zh_CN-tutorials-source-sdk.pdf"
+    },
+    {
+      "path": "browser/final-journal/qualified-body-inputs.json",
+      "bytes": 23990,
+      "sha256": "fcee279f62730dc36243056a6292c4ac10cfe4bf18ab7d292828f5486a57986b",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/qualified-body-inputs.json"
+    },
+    {
+      "path": "browser/final-journal/reflow200-en-explanation-factory.png",
+      "bytes": 182396,
+      "sha256": "b02861e50cd4b919fe17ce1a054fce405ef1ba4c64ff8ace6928d73b066b5c1d",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/reflow200-en-explanation-factory.png"
+    },
+    {
+      "path": "browser/final-journal/reflow200-en-guides-os-shutdown.png",
+      "bytes": 194693,
+      "sha256": "8a63340e62a6077ad42627c76cc7c9b71e08c5014b36a97563797d18a4674895",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/reflow200-en-guides-os-shutdown.png"
+    },
+    {
+      "path": "browser/final-journal/reflow200-en-index.png",
+      "bytes": 189025,
+      "sha256": "e354528afd72a39a49b88c069bee52cd78842493745111c95195f1b087aab954",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/reflow200-en-index.png"
+    },
+    {
+      "path": "browser/final-journal/reflow200-zh_CN-explanation-factory.png",
+      "bytes": 193406,
+      "sha256": "00080c5b0bebe19ea41ab6572109fe8da607742a9cb058a696e559430e0d4f13",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/reflow200-zh_CN-explanation-factory.png"
+    },
+    {
+      "path": "browser/final-journal/reflow200-zh_CN-guides-os-shutdown.png",
+      "bytes": 258949,
+      "sha256": "9ec22d87de9f7f425fe9c531a107619474a9ff618f2fe7108932e7f77bbff69d",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/reflow200-zh_CN-guides-os-shutdown.png"
+    },
+    {
+      "path": "browser/final-journal/reflow200-zh_CN-index.png",
+      "bytes": 215956,
+      "sha256": "a3009e8fd8cc19e29bee6c6d24c949fbe75439f0631f09748b95d9c6f8f60c3f",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/reflow200-zh_CN-index.png"
+    },
+    {
+      "path": "browser/final-journal/search-en.png",
+      "bytes": 201355,
+      "sha256": "e4ef9fea4bec21a22308a8a866f35abd5554ef847383ba2c7dac479a6416edfe",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/search-en.png"
+    },
+    {
+      "path": "browser/final-journal/search-zh_CN.png",
+      "bytes": 224561,
+      "sha256": "b32218a9f61275ab230bbd262b1af6c3f78855ad6a39aa4ab01e8d45fe500476",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/search-zh_CN.png"
+    },
+    {
+      "path": "browser/final-journal/supplemental/acceptance-page-1.png",
+      "bytes": 265599,
+      "sha256": "b5a1858e0f0da4bbf848433eb64569a7111c58f829dd0fc72698a80215635ff8",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/acceptance-page-1.png"
+    },
+    {
+      "path": "browser/final-journal/supplemental/desktop-acceptance.png",
+      "bytes": 309768,
+      "sha256": "b337022714d58d3905945a748ec1457078bdc94cc3a17815a0af41b8d5c36feb",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/desktop-acceptance.png"
+    },
+    {
+      "path": "browser/final-journal/supplemental/journal-browser-report.json",
+      "bytes": 53458,
+      "sha256": "2f72a037b65269bd5299f19a8b8645f72d9237e5093cb1aee1b12808ebeff487",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/journal-browser-report.json"
+    },
+    {
+      "path": "browser/final-journal/supplemental/narrow-acceptance.png",
+      "bytes": 121838,
+      "sha256": "a43659fce1efbe8c8d329014710213078127fcab5a7519beb1724af2e580fa75",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/narrow-acceptance.png"
+    },
+    {
+      "path": "browser/final-journal/supplemental/print-en-design-documentation-improvements.pdf",
+      "bytes": 766238,
+      "sha256": "94ffc900178e7b7a32f2d3b80d0831eb5f3779f6e2456a3b59ecc17ff6bf2a3c",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/print-en-design-documentation-improvements.pdf"
+    },
+    {
+      "path": "browser/final-journal/supplemental/print-en-status-documentation-acceptance.pdf",
+      "bytes": 509152,
+      "sha256": "154ff35527d3a04313da164b9d704544b1f686e13863b951c6db2e2f2fea40f8",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/print-en-status-documentation-acceptance.pdf"
+    },
+    {
+      "path": "browser/final-journal/supplemental/print-en-status-ledgers-documentation-system.pdf",
+      "bytes": 1980516,
+      "sha256": "567748ef40c24fb792b41821c4bd629bcd156f7d6929e23561a737037f56ca4d",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/print-en-status-ledgers-documentation-system.pdf"
+    },
+    {
+      "path": "browser/final-journal/supplemental/print-zh_CN-design-documentation-improvements.pdf",
+      "bytes": 766340,
+      "sha256": "ad307e27fb2cdd764aaf3de47b354cb37ea8e1dcac8934d2671c42a028cccdd5",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/print-zh_CN-design-documentation-improvements.pdf"
+    },
+    {
+      "path": "browser/final-journal/supplemental/print-zh_CN-status-documentation-acceptance.pdf",
+      "bytes": 508992,
+      "sha256": "d3e7fb863799a6dd605b0b2e15b89b0cdeba52ffe022eb3b24f793d6f03aee61",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/print-zh_CN-status-documentation-acceptance.pdf"
+    },
+    {
+      "path": "browser/final-journal/supplemental/print-zh_CN-status-ledgers-documentation-system.pdf",
+      "bytes": 1980622,
+      "sha256": "b9d4a6c0741f2895b52abe69c3f844a54e5b5e15310fd3dd9795de2081756ea6",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/print-zh_CN-status-ledgers-documentation-system.pdf"
+    },
+    {
+      "path": "browser/final-journal/supplemental/reflow200-acceptance.png",
+      "bytes": 268224,
+      "sha256": "819d804456c591a0f4e4e23111dd4d67bbc6cd481600bd0b5d6b967c5bd56b7c",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/reflow200-acceptance.png"
+    },
+    {
+      "path": "browser/final-journal/supplemental/zoom200-acceptance.png",
+      "bytes": 197603,
+      "sha256": "309506f42831c5a5e25da25d56da34cf72190411c0bb94bba40cdf1b334476bd",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/supplemental/zoom200-acceptance.png"
+    },
+    {
+      "path": "browser/final-journal/zoom200-en-explanation-factory.png",
+      "bytes": 135347,
+      "sha256": "ef78a2ccb038167b17405aa6c5c1a65fb75ea8bb10fc95823113612b3d7fa23f",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/zoom200-en-explanation-factory.png"
+    },
+    {
+      "path": "browser/final-journal/zoom200-en-guides-os-shutdown.png",
+      "bytes": 162675,
+      "sha256": "d86d974409b2c0ee9e54d2cecc42832fd71953056155b95cb92936255d987a1e",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/zoom200-en-guides-os-shutdown.png"
+    },
+    {
+      "path": "browser/final-journal/zoom200-en-index.png",
+      "bytes": 162387,
+      "sha256": "4ca92e4cb5af6a576f52296c31a293b11376266d083086a6a1c4d516c6b8466b",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/zoom200-en-index.png"
+    },
+    {
+      "path": "browser/final-journal/zoom200-zh_CN-explanation-factory.png",
+      "bytes": 143232,
+      "sha256": "c86937f1ef349e1d3681a594e793eb2eb86350cc59d8a4e80639b86d132458da",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/zoom200-zh_CN-explanation-factory.png"
+    },
+    {
+      "path": "browser/final-journal/zoom200-zh_CN-guides-os-shutdown.png",
+      "bytes": 194707,
+      "sha256": "53027677f249005818471077ffd78cee3f45190c84b6555a5bb2af3bb4c85d41",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/zoom200-zh_CN-guides-os-shutdown.png"
+    },
+    {
+      "path": "browser/final-journal/zoom200-zh_CN-index.png",
+      "bytes": 175612,
+      "sha256": "dae07104e6161f7dccf17986b9551763e0fb6ad029e15e07b479bfac85d2d012",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/final-journal/zoom200-zh_CN-index.png"
+    },
+    {
+      "path": "browser/validate_journal.py",
+      "bytes": 12535,
+      "sha256": "a6388ee8afa3f6f8b7e3ac58b8d0d6214669305547ffcdfe2a948bf06e2cb065",
+      "original_path": "/tmp/nexus-docs-later-evidence/browser/validate_journal.py"
+    },
+    {
+      "path": "final-index-review/README.txt",
+      "bytes": 1283,
+      "sha256": "813a35cf9c9d796c2fb003ab8f641e9025efacfbb0beeaefb6a1aa20c7dca5bd",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/README.txt"
+    },
+    {
+      "path": "final-index-review/audit_inventory.py",
+      "bytes": 6835,
+      "sha256": "86a19396d1b1b1b2fb839437cd0e0aee52376f40095b1b22e5ffaafc9fe56363",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/audit_inventory.py"
+    },
+    {
+      "path": "final-index-review/audit_remote.py",
+      "bytes": 10648,
+      "sha256": "a6fc85f049fcbc2a768b0f585622a253526508b2425d3055410a96089b6d6676",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/audit_remote.py"
+    },
+    {
+      "path": "final-index-review/audit_source_index.py",
+      "bytes": 11298,
+      "sha256": "c348b3b1ebed87936df0c1f9368e1dfbfd6abb57c3f7e58fa8b011dd5c0de2ac",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/audit_source_index.py"
+    },
+    {
+      "path": "final-index-review/bind_final_source.py",
+      "bytes": 4901,
+      "sha256": "416460eef9fc2465ab74a1aef05b8ee4655358b5c65cb2ca97ff0d439a665cbf",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/bind_final_source.py"
+    },
+    {
+      "path": "final-index-review/critical-inputs.json",
+      "bytes": 56804,
+      "sha256": "eb4c83df8c292ee5d0d9d8a7d969c8d57414d921e5547e618c925d2f79787169",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/critical-inputs.json"
+    },
+    {
+      "path": "final-index-review/d3-restore-receipt.json",
+      "bytes": 15315,
+      "sha256": "68c36a43bd3a7fe5d01827cb3c4ac0fb2d86bc518ca7660c7229dcd470b98504",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/d3-restore-receipt.json"
+    },
+    {
+      "path": "final-index-review/final-journal/clean-build.log",
+      "bytes": 52461,
+      "sha256": "8f865f830d170b76b4cc0f97a0a11f501e9ee0d27aaf10b94fa547f5f7f37ec8",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-journal/clean-build.log"
+    },
+    {
+      "path": "final-index-review/final-journal/commit.log",
+      "bytes": 526,
+      "sha256": "4b66f0c9de38b7c70f23f3ff9d7f3c9b03028fd1c0264967bc8b2dd261cdf6ec",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-journal/commit.log"
+    },
+    {
+      "path": "final-index-review/final-journal/documentation-build.json",
+      "bytes": 9078,
+      "sha256": "a840bf2ee929f7d2ed0264c1ffbc8f4d13739c5b17c51dc84bcdeefcb0a6d8fb",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-journal/documentation-build.json"
+    },
+    {
+      "path": "final-index-review/final-journal/documentation-doxygen-receipt.json",
+      "bytes": 1321,
+      "sha256": "55159b66a5913cf3f7f0bdb8290fb7fb579b7b69241db5d30cd2777098c27443",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-journal/documentation-doxygen-receipt.json"
+    },
+    {
+      "path": "final-index-review/final-journal/documentation-gettext-receipt.json",
+      "bytes": 1688,
+      "sha256": "97df730ba31a3843785aa6359ca7d00bc62f123706ab7db4b379ecf7c5506256",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-journal/documentation-gettext-receipt.json"
+    },
+    {
+      "path": "final-index-review/final-journal/documentation-html-en-receipt.json",
+      "bytes": 1646,
+      "sha256": "88c9746e51349db98a0db9b1d2b1c8e354e9fb8b40ce14cc926ea1e1d4245a20",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-journal/documentation-html-en-receipt.json"
+    },
+    {
+      "path": "final-index-review/final-journal/documentation-html-zh_CN-receipt.json",
+      "bytes": 1661,
+      "sha256": "8babb75521fd635d3ad98a038f7731e5298bddff08d8c930d3adc0b7a99e416e",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-journal/documentation-html-zh_CN-receipt.json"
+    },
+    {
+      "path": "final-index-review/final-source-binding.json",
+      "bytes": 4726,
+      "sha256": "f72fdc3fb8d7d35e616d8be4e5b28e70c655781414dccb3fd00012366914ea66",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-source-binding.json"
+    },
+    {
+      "path": "final-index-review/final-source-ci-jobs.json",
+      "bytes": 12867,
+      "sha256": "91abd01f845df1700ade01166b16b2fe3bce4de7196ba1457ae86399ec18ee93",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-source-ci-jobs.json"
+    },
+    {
+      "path": "final-index-review/final-source-ci-review.json",
+      "bytes": 1260,
+      "sha256": "b9a5ed36ceb9193fbea59c0012c621fa70cd9a25f36a30480eff3c1b05e48ab6",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-source-ci-review.json"
+    },
+    {
+      "path": "final-index-review/final-source-ci-runs.json",
+      "bytes": 13686,
+      "sha256": "192ab5fa4dadc588b207c7f0034c015482c8dec4a506ca472f75368eca531f73",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-source-ci-runs.json"
+    },
+    {
+      "path": "final-index-review/final-source-review.json",
+      "bytes": 5773,
+      "sha256": "91652260b0e7b1089cb0b703a57c22c39cf7bf322dec8f8d01d5997a35a3a916",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/final-source-review.json"
+    },
+    {
+      "path": "final-index-review/inventory-review.json",
+      "bytes": 97187,
+      "sha256": "7a616c9f78a2f75d1d367156a5fb0256d063a9bbda2e05c958c8eedb5ed48ecd",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/inventory-review.json"
+    },
+    {
+      "path": "final-index-review/remote-review.json",
+      "bytes": 2010,
+      "sha256": "9bb15e03fb44485be62a685cd835040e8c96ada26602f7b1bcd52dee63545dd0",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/remote-review.json"
+    },
+    {
+      "path": "final-index-review/source-index-review.json",
+      "bytes": 11546,
+      "sha256": "01d6e90519fb1d1ed31bef2ee997d3e6a7845866deb6035415a0ee5ab87d39c4",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/source-index-review.json"
+    },
+    {
+      "path": "final-index-review/supplement-index.json",
+      "bytes": 5797,
+      "sha256": "df48f4db5dc130e9b6c4d96d451d55250922bf104932b3485f5025e7616824b5",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-index-review/supplement-index.json"
+    },
+    {
+      "path": "final-journal-commit.log",
+      "bytes": 526,
+      "sha256": "4b66f0c9de38b7c70f23f3ff9d7f3c9b03028fd1c0264967bc8b2dd261cdf6ec",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-commit.log"
+    },
+    {
+      "path": "final-journal-download/20261014T110949Z-bcb901cb458246c498140363016d11e8/downloaded-final-journal.tar.gz",
+      "bytes": 7099794,
+      "sha256": "79740121a640fa8e829f8110fb3e0fc5900474e7daa6067b5faf7a99f05ae6e6",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-download/20261014T110949Z-bcb901cb458246c498140363016d11e8/downloaded-final-journal.tar.gz"
+    },
+    {
+      "path": "final-journal-download/20261014T110949Z-bcb901cb458246c498140363016d11e8/execution-helper.py",
+      "bytes": 6564,
+      "sha256": "8d7b267d057017b4a88818d6551ced06f2dcdae8c317c65fb8ad3d8f400a3810",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-download/20261014T110949Z-bcb901cb458246c498140363016d11e8/execution-helper.py"
+    },
+    {
+      "path": "final-journal-download/20261014T110949Z-bcb901cb458246c498140363016d11e8/execution.json",
+      "bytes": 5524,
+      "sha256": "adb4ba8f016e3a91075b08ffd6ee92ccfe8156150003de8fbfbbcdd245963e7a",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-download/20261014T110949Z-bcb901cb458246c498140363016d11e8/execution.json"
+    },
+    {
+      "path": "final-journal-download/20261014T110949Z-bcb901cb458246c498140363016d11e8/remote-source-commit.json",
+      "bytes": 1163,
+      "sha256": "be25783b8f7c683dd23524a7c5e74d6a4651a723bdc0652b0ffd078f5e6d4310",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-download/20261014T110949Z-bcb901cb458246c498140363016d11e8/remote-source-commit.json"
+    },
+    {
+      "path": "final-journal-download/20261014T110949Z-bcb901cb458246c498140363016d11e8/remote-source-commit.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-download/20261014T110949Z-bcb901cb458246c498140363016d11e8/remote-source-commit.stderr"
+    },
+    {
+      "path": "final-journal-download/20261014T111045Z-753d27705368453ba1f120920ec3d0cd/downloaded-final-journal.tar.gz",
+      "bytes": 7099794,
+      "sha256": "79740121a640fa8e829f8110fb3e0fc5900474e7daa6067b5faf7a99f05ae6e6",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-download/20261014T111045Z-753d27705368453ba1f120920ec3d0cd/downloaded-final-journal.tar.gz"
+    },
+    {
+      "path": "final-journal-download/20261014T111045Z-753d27705368453ba1f120920ec3d0cd/execution.json",
+      "bytes": 8963,
+      "sha256": "9906625ac987c7f5ab73c8254fc1ac55683bb0f92c61426dbfa7d2b2f59860a7",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-download/20261014T111045Z-753d27705368453ba1f120920ec3d0cd/execution.json"
+    },
+    {
+      "path": "final-journal-download/20261014T111045Z-753d27705368453ba1f120920ec3d0cd/remote-source-commit.json",
+      "bytes": 1163,
+      "sha256": "be25783b8f7c683dd23524a7c5e74d6a4651a723bdc0652b0ffd078f5e6d4310",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-download/20261014T111045Z-753d27705368453ba1f120920ec3d0cd/remote-source-commit.json"
+    },
+    {
+      "path": "final-journal-download/20261014T111045Z-753d27705368453ba1f120920ec3d0cd/remote-source-commit.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-download/20261014T111045Z-753d27705368453ba1f120920ec3d0cd/remote-source-commit.stderr"
+    },
+    {
+      "path": "final-journal-package.log",
+      "bytes": 852,
+      "sha256": "9bea334d6e6b0314bf8ff321c80ea2888c28ae09b7df1daf07f55d1503600a9a",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-package.log"
+    },
+    {
+      "path": "final-journal-publisher-assembly.log",
+      "bytes": 603,
+      "sha256": "37f69c5cee4e7e688f1a34c8ba78baeb3d9624d6173821aff3a4e1a5baa6f6bb",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-publisher-assembly.log"
+    },
+    {
+      "path": "final-journal-publisher-commit.log",
+      "bytes": 157728,
+      "sha256": "1f2097b7cef6338e4a62864e12ebffb24e732d7cb7eed9e206fa40bd9826181d",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-publisher-commit.log"
+    },
+    {
+      "path": "final-journal-publisher-push.log",
+      "bytes": 94,
+      "sha256": "2d1b90ef9fd3cfe15a04e8c208639da981e48c92983dcfffd3a511d72f39e2ed",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-publisher-push.log"
+    },
+    {
+      "path": "final-journal-push.log",
+      "bytes": 170,
+      "sha256": "84a9a736c004143ec0b67b730a6a53b93576080ae9f328fb0b5b0e36269cb736",
+      "original_path": "/tmp/nexus-docs-later-evidence/final-journal-push.log"
+    },
+    {
+      "path": "original-source-sync.json",
+      "bytes": 43369,
+      "sha256": "9c298748e721a0bb4c37cfab7c2522d95ee0634f47f7ca244756c3d5c322bbed",
+      "original_path": "/tmp/nexus-docs-later-evidence/original-source-sync.json"
+    },
+    {
+      "path": "postdeploy-final-journal/20261014T110814Z-663ee06549ec407dbee31fa33b2ddb18/execution.json",
+      "bytes": 3836,
+      "sha256": "85a6258fe2c67f3cc687d4fe035062e1706bd7fb862b5de84cb0aa3fa0b05f73",
+      "original_path": "/tmp/nexus-docs-later-evidence/postdeploy-final-journal/20261014T110814Z-663ee06549ec407dbee31fa33b2ddb18/execution.json"
+    },
+    {
+      "path": "postdeploy-final-journal/20261014T110814Z-663ee06549ec407dbee31fa33b2ddb18/production-post-deploy.json",
+      "bytes": 708492,
+      "sha256": "64835c8ab67a740d7df32dda7f5ace0e682cfe1420314294d820a8cadf910871",
+      "original_path": "/tmp/nexus-docs-later-evidence/postdeploy-final-journal/20261014T110814Z-663ee06549ec407dbee31fa33b2ddb18/production-post-deploy.json"
+    },
+    {
+      "path": "prepare_final_supplement.py",
+      "bytes": 5077,
+      "sha256": "ae5764e85329d2abf813d8a0649e0674dcc7869baa559805f193c88c08d8a7a6",
+      "original_path": "/tmp/nexus-docs-later-evidence/prepare_final_supplement.py"
+    },
+    {
+      "path": "verify_final_journal_download.py",
+      "bytes": 6564,
+      "sha256": "3ad6cbb605b8d90fdc7926131c7e1b1e0070350e4616c942321a9d540bea0deb",
+      "original_path": "/tmp/nexus-docs-later-evidence/verify_final_journal_download.py"
+    },
+    {
+      "path": "verify_remote_evidence.py",
+      "bytes": 17381,
+      "sha256": "817200cd92c6df9f91745b7b5cafc4634d4dbc0d778130ba0f3c3dacbae4e7b9",
+      "original_path": "/tmp/nexus-docs-later-evidence/verify_remote_evidence.py"
+    },
+    {
+      "path": "write_final_results.py",
+      "bytes": 10666,
+      "sha256": "d876334e725e82ea0651172b2d1136eb70e865c1cd78aa7a45643fe7a9aadc87",
+      "original_path": "/tmp/nexus-docs-later-evidence/write_final_results.py"
+    }
+  ],
+  "physical_hil": "not_executed",
+  "boundary": "Final journal strict build/browser/public/download proofs. Source3 primary qualification, original reader scopes and v1 evidence retain their original identities."
+}

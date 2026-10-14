@@ -122,6 +122,31 @@
       "path": "docs-evidence-20261014-source3-v1/nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0003",
       "bytes": 6927764,
       "sha256": "90c18eeaa8bc27ceda17f3dcd6e0b95caa27839bdacf937ec4c6e7a2d9d3435f"
+    },
+    {
+      "path": "docs-final-20261014-5a7a75c3/README.txt",
+      "bytes": 566,
+      "sha256": "b228c1d63458bc6976802e86dc5429f291195d6df96e511829733dafe428cf41"
+    },
+    {
+      "path": "docs-final-20261014-5a7a75c3/docs-20261014-5a7a75c321ea.tar.gz",
+      "bytes": 7099794,
+      "sha256": "79740121a640fa8e829f8110fb3e0fc5900474e7daa6067b5faf7a99f05ae6e6"
+    },
+    {
+      "path": "docs-final-20261014-5a7a75c3/documentation-package.json",
+      "bytes": 444,
+      "sha256": "f74042fb4bbfb7db860679a7aeffaa85ee8a4420ed282c01f34ad8d3c33d60cf"
+    },
+    {
+      "path": "docs-final-20261014-5a7a75c3/final-journal-evidence.json",
+      "bytes": 36792,
+      "sha256": "9d661fe443e92f9c560846fe1ca6059af8edb627c47cc4d3457f3693295a4eab"
+    },
+    {
+      "path": "docs-final-20261014-5a7a75c3/final-journal-evidence.tar.gz",
+      "bytes": 28531727,
+      "sha256": "4670eab7e605be9fab49960cd85ec41a1a0aec7e91716093b4fadc55ef0686d0"
     }
   ],
   "physical_hil": "not_executed",
