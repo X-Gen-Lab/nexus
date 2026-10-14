@@ -10,6 +10,7 @@ from functools import lru_cache
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -90,9 +91,19 @@ def dependency_identity(root, relative, expected=None):
         checkout = root / relative
         if not (checkout / ".git").exists():
             fail(f"Initialize the locked SDK dependency: {relative}")
+        environment = dict(os.environ)
+        local = subprocess.run(["git", "rev-parse", "--local-env-vars"],
+                               cwd=root, capture_output=True, text=True)
+        if local.returncode:
+            fail(f"Cannot verify SDK dependency: {relative}")
+        # Hooks select their parent repository through these variables. Each
+        # explicit -C checkout must instead observe its own Git identity.
+        for name in local.stdout.splitlines():
+            environment.pop(name, None)
         def git(directory, *arguments):
             command = subprocess.run(["git", "-C", str(directory), *arguments],
-                                     capture_output=True, text=True)
+                                     capture_output=True, text=True,
+                                     env=environment)
             if command.returncode:
                 fail(f"Cannot verify SDK dependency: {relative}")
             return command.stdout.strip()

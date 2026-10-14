@@ -1,0 +1,98 @@
+# Chinese translation of canonical Nexus documentation.
+# Review is recorded only after independent semantic inspection.
+msgid ""
+msgstr "Project-Id-Version: Nexus source docs\nReport-Msgid-Bugs-To: \nLanguage: zh_CN\nLanguage-Team: Nexus agent-reviewed documentation\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Source-SHA256: 94106fc151e6e9d78dd55f924d65850e411cf5e5c30ffb8b691dffa293c0a47b\nX-Nexus-Reviewed: true\n"
+
+msgid "Borrow, completion and observer lifetime"
+msgstr "借用、完成与 observer 生命周期"
+
+msgid "The caller owns request and buffer storage. Accepted asynchronous I/O borrows it; rejection does not. Cancellation, a deadline or a failed stop cannot revoke that borrow. This separation prevents IRQ/DMA or an executor from accessing recycled memory. The [lifecycle contract](../design/next-generation-platform.md) and public operation declarations define exact context and result behavior."
+msgstr "调用方拥有请求与缓冲区存储。已接受异步 I/O 借用存储；拒绝不借用。取消、deadline 或失败 stop 都不能撤销借用。这防止 IRQ/DMA 或 executor 访问已复用内存。[生命周期合同](../design/next-generation-platform.md)和公共操作声明定义精确上下文与结果行为。"
+
+msgid "Event"
+msgstr "事件"
+
+msgid "Storage consequence"
+msgstr "存储责任"
+
+msgid "Rejected admission"
+msgstr "拒绝准入"
+
+msgid "No retained request/buffer references or residual hardware effects"
+msgstr "不保留 request/buffer 引用或残留硬件效果"
+
+msgid "Accepted admission"
+msgstr "接受准入"
+
+msgid "Keep request and buffers valid until acquire-observed SETTLED"
+msgstr "保持请求和缓冲区有效，直到 acquire 观察 SETTLED"
+
+msgid "Cancel or deadline"
+msgstr "Cancel 或 deadline"
+
+msgid "Request termination; continue required progress and retain borrow"
+msgstr "请求终止；继续必要进度并保留借用"
+
+msgid "DMA completion"
+msgstr "DMA 完成"
+
+msgid "Memory engine stage complete; wire/publisher references may remain"
+msgstr "内存引擎阶段完成；wire/publisher 引用可能仍存在"
+
+msgid "Failed drain / QUARANTINED"
+msgstr "失败排空 / QUARANTINED"
+
+msgid "Keep storage and explicit recovery responsibility"
+msgstr "保留存储与明确恢复责任"
+
+msgid "SETTLED publication"
+msgstr "SETTLED 发布"
+
+msgid "Provider's final access has ended after necessary reference drain"
+msgstr "必要引用排空后，provider 最终访问已结束"
+
+msgid "Observer/control reuse"
+msgstr "Observer/control 复用"
+
+msgid "Also detach/drain matching epochs and join observers"
+msgstr "还需 detach/drain 匹配 epoch，并 join observer"
+
+msgid "![Current borrowed request state and settlement proof obligations](../assets/diagrams/request-lifecycle.svg)"
+msgstr "![当前借用请求状态与最终结束证明义务](../assets/diagrams/request-lifecycle.svg)"
+
+msgid "Current borrowed request state and settlement proof obligations"
+msgstr "当前借用请求状态与最终结束证明义务"
+
+msgid "FIG-06 does not treat REJECTED/ACCEPTED as request-state enum members. Core helpers cannot observe a peripheral's physical drain; the provider must establish that proof before publishing settlement."
+msgstr "FIG-06 不把 REJECTED/ACCEPTED 当成请求状态枚举。Core helper 不能观察外设物理排空；provider 必须先建立证明，才能发布结束。"
+
+msgid "Three different completion facts"
+msgstr "三种不同的完成事实"
+
+msgid "![Current UART and SPI memory, wire and final-publication order](../assets/diagrams/dma-completion.svg)"
+msgstr "![当前 UART/SPI 内存、线上与最终发布顺序](../assets/diagrams/dma-completion.svg)"
+
+msgid "Current UART and SPI memory, wire and final-publication order"
+msgstr "当前 UART/SPI 内存、线上与最终发布顺序"
+
+msgid "FIG-07 separates memory completion, wire completion and final publication. UART TC is not NDTR zero; SPI idle and CS interval are not a DMA interrupt. Disable and detach the actual IRQ/DMA/queue references before release-publication of SETTLED. The caller's acquire observation then exposes the final result/count. A timeout result can be final only after this lifecycle, not at deadline expiry."
+msgstr "FIG-07 分开内存完成、线上完成与最终发布。UART TC 不是 NDTR 为零；SPI idle 和 CS interval 不是 DMA 中断。Release 发布 SETTLED 前，必须关闭并解除实际 IRQ/DMA/queue 引用。调用方 acquire 观察后才能取得最终 result/count。Timeout 结果只有经过这一生命周期才能最终成立，不能在 deadline 到达时直接认定。"
+
+msgid "Cross-task control and continuous streams"
+msgstr "跨任务控制与连续流"
+
+msgid "Use stable slots plus monotonically increasing epochs for remote control. Do not send a raw pointer to storage another task can recycle. Detach control/observer references and join observers before releasing the slot and preparing the next request. A generation counter detects stale identity but does not itself join a task."
+msgstr "远程控制使用稳定 slot 和单调递增 epoch。不得传递另一任务能够复用存储的裸指针。释放 slot 并准备下一请求前，必须解除 control/observer 引用并 join observer。代次计数可检测过期身份，但自身不会 join 任务。"
+
+msgid "Continuous receive and ADC use explicit caller-owned block loans. A consumer keeps a block immutable until matching release. The producer needs a replacement target before publishing an old hardware bank. No replacement means visible stop/backpressure; it must never overwrite a consumer. Stop waits for filling, ready and borrowed blocks, not just active DMA. [The stream contract](../design/io-observation-recovery.md) records what loss counters and software timestamps do and do not prove."
+msgstr "连续接收与 ADC 使用调用方显式拥有的 block loan。消费者保持 block 不可变，直到匹配 release。Producer 发布旧硬件 bank 前需要 replacement target。没有 replacement 就可见地停止/背压，绝不能覆写消费者。Stop 等待 filling、ready 和 borrowed block，而不仅是 active DMA。[流合同](../design/io-observation-recovery.md)记录 loss counter 和软件 timestamp 能证明与不能证明的范围。"
+
+msgid "![Current continuous block producer, replacement and loan drain](../assets/diagrams/continuous-stream.svg)"
+msgstr "![当前连续 block producer、替换与借用块排空](../assets/diagrams/continuous-stream.svg)"
+
+msgid "Current continuous block producer, replacement and loan drain"
+msgstr "当前连续 block producer、替换与借用块排空"
+
+msgid "FIG-15 includes observable loss and stop/drain responsibilities. Capacity and service-latency budgets are explicit product inputs; arbitrary IRQ delay or consumer speed cannot be promised lossless. The [tutorial](../tutorials/async-io.md) executes rejection and quarantine; [OS shutdown](../guides/os-shutdown.md) explains wait and join responsibilities."
+msgstr "FIG-15 包括可见 loss 和 stop/drain 责任。容量与 service-latency 预算是明确的产品输入；不能承诺任意 IRQ 延迟或消费者速度下无损。[教程](../tutorials/async-io.md)执行拒绝和隔离；[OS 停机](../guides/os-shutdown.md)说明等待与 join 责任。"
+

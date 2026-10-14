@@ -40,6 +40,9 @@ class StyleGateTests(unittest.TestCase):
             "scripts/ci/style_gate.py", "scripts/ci/comment_style.py",
             "scripts/ci/check_commit_message.py", "scripts/tools/format.py",
             "scripts/setup/install_dev_tools.py",
+            "tools/documentation/cli.py", "tools/documentation/check.py",
+            "tools/dev/process.py", "tools/evidence/identity.py",
+            "tools/evidence/common.py",
         ):
             destination = self.root / name
             destination.parent.mkdir(parents=True, exist_ok=True)

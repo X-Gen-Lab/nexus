@@ -12,9 +12,20 @@ from pathlib import Path
 from unittest.mock import patch
 
 from tools.testing.run_tool_tests import execute, ROOT
+from tools.testing import run_tool_tests
 
 
 class ToolRunnerTests(unittest.TestCase):
+    def test_documentation_directory_uses_complete_execution_admission(self):
+        fixture = unittest.TestSuite([unittest.FunctionTestCase(lambda: None)])
+        with patch("unittest.TestLoader.discover", return_value=fixture) as discover, \
+                redirect_stderr(io.StringIO()):
+            record = run_tool_tests.execute_directory(ROOT / "tools/documentation",
+                                                       "documentation")
+        self.assertEqual(record["executed"], 1)
+        self.assertEqual(record["status"], "passed")
+        self.assertEqual(Path(discover.call_args.args[0]), ROOT / "tools/documentation")
+
     def run_fixture(self, tests):
         with patch("unittest.TestLoader.discover", return_value=tests), \
                 redirect_stderr(io.StringIO()):

@@ -39,10 +39,10 @@ def _runtime(block, following, document, temporary):
     destination.write_bytes(contents)
 
 
-def check_document(document, root=configure.ROOT):
+def check_document(document, root=configure.ROOT, *, contents=None):
     """Run production resolution; a fragment marker requires a stated reason."""
     document = Path(document)
-    contents = document.read_text(encoding="utf-8")
+    contents = document.read_text(encoding="utf-8") if contents is None else contents
     openings = len(re.findall(r"^```toml[ \t]*$", contents, re.MULTILINE))
     matches = [match for match in FENCE.finditer(contents)
                if match["language"] == "toml"]

@@ -4,8 +4,8 @@
 版本明确、可离线取得的文档系统。正文使用现有 Markdown 和公开头文件；站点继续
 采用 Sphinx、Doxygen、Breathe，增加 MyST。产品代码和策略仍在外部仓库。
 
-本次交付的是设计、迁移映射和实施台账，未实施新站点、CLI、依赖锁、翻译或发布。
-[58 项实施台账](documentation-system-execution.csv)全部从 planned 开始；
+站点、CLI、依赖锁、正文、翻译和图册已按本方案实现。实际构建、发布和恢复
+以 [58 项实施台账](documentation-system-execution.csv)及对应执行证据为准；
 [迁移映射](documentation-migration.csv)记录当前内容的去向和保留规则。
 这份文档不修改既有平台支持、软件资格或实板状态。
 新增和修改文档遵守 [内容与图示标准](documentation-standards.md)及
@@ -217,10 +217,11 @@ Python unittest 的实际 RED→GREEN；新增 C 行为测试用 GoogleTest/Goog
 
 ## 9. 一个工具入口
 
-以下是目标接口，当前尚未实现：
+统一工具入口如下，安装工具与实际验收见文档维护指南：
 
 ```text
 python tools/dev/dev.py docs check
+python tools/dev/dev.py docs test
 python tools/dev/dev.py docs build --language zh_CN
 python tools/dev/dev.py docs build --language en
 python tools/dev/dev.py docs preview
@@ -267,7 +268,7 @@ Breathe XML 路径由本次输出根注入，不能继续固定读取 docs/api �
 本方案描述的起点是 docs HEAD 7abde0e4、qualified code cc6a065c；历史 SoC
 记录保持独立。计划工具一旦实现变更，按新源码执行其门禁。
 
-目标 URL 如下，尚未发布：
+版本 URL 结构如下；具体已发布版本以实际发布记录为准：
 
 ```text
 /dev/<documentation-commit>/<language>/
@@ -355,7 +356,7 @@ DOC-58逐图审查可以并行推进，但最终关闭必须等待全部15类图
 8. 干净环境生成的离线包可独立浏览验真，下载与实际站点身份匹配。
 9. 发布和恢复有实际结果；未建立的主机、存储或硬件资格继续保留条件。
 10. 全部15类必需图满足各自退出条件并完成图文、视觉及离线审查；当前四个
-    参考视图不替代完整图册，未声明支持的配置和后续扩展仍明确标注边界。
+    图的身份与验证范围分别记录，未声明支持的配置和后续扩展仍明确标注边界。
 
 ## 14. 相关入口
 

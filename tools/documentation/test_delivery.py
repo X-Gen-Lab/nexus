@@ -1,0 +1,448 @@
+"""Documentation packages bind actual bytes and reject unsafe restoration."""
+
+import functools
+import hashlib
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+import io
+import json
+from pathlib import Path
+import subprocess
+import tarfile
+import tempfile
+import threading
+import unittest
+
+from tools.documentation import delivery
+
+
+class DeliveryTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.base = Path(self.temporary.name)
+        self.source = self.base / "source"
+        self.source.mkdir()
+        self.build = self.base / "build"
+        self.build.mkdir()
+        (self.source / "CMakeLists.txt").write_text(
+            "project(nexus VERSION 1.0.0 LANGUAGES C ASM)\n")
+        policy = self.source / "dependencies/platform-compatibility.json"
+        policy.parent.mkdir()
+        policy.write_bytes((Path(__file__).resolve().parents[2] /
+                            "dependencies/platform-compatibility.json").read_bytes())
+        index = self.source / "docs/delivery/build-system-results.json"
+        index.parent.mkdir(parents=True)
+        index.write_text(json.dumps({"schema_version": 1, "source": {
+            "canonical_code_commit": "a" * 40, "code_tree": "b" * 40},
+            "implementation": {"physical_status": "not_executed"}}))
+        self.git("init", "-q")
+        self.git("add", ".")
+        self.git("-c", "user.name=Test", "-c", "user.email=test@example.com",
+                 "commit", "-qm", "Initial fixture")
+        for relative in ("index.html", "en/index.html", "zh_CN/index.html",
+                         "api/index.html"):
+            path = self.build / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('<html><h1 id="overview">Nexus</h1></html>')
+        license_path = self.build / "licenses/LICENSE.txt"
+        license_path.parent.mkdir()
+        license_path.write_text("MIT fixture\n")
+        metadata = {"schema_version": 1, "kind": "nexus_documentation_build",
+                    "status": "passed",
+                    "source": delivery.observe_git_source(self.source),
+                    "tools": {"sphinx": "fixture-test"},
+                    "languages": ["en", "zh_CN"]}
+        (self.build / "documentation-build.json").write_text(
+            json.dumps(metadata))
+
+    def git(self, *arguments):
+        return subprocess.run(["git", "-C", str(self.source), *arguments],
+                              capture_output=True, check=True).stdout
+
+    def package(self):
+        return delivery.package(self.build, self.base / "output",
+                                source_root=self.source,
+                                release_id="1.0.0-docs-test")
+
+    def test_package_records_distinct_source_and_qualification(self):
+        result = self.package()
+        manifest = delivery.verify(result["directory"])
+        self.assertEqual(manifest["version"], "1.0.0")
+        self.assertEqual(manifest["qualified_code"]["commit"], "a" * 40)
+        self.assertNotEqual(manifest["documentation_source"]["commit"],
+                            manifest["qualified_code"]["commit"])
+        self.assertEqual(manifest["physical_status"], "not_executed")
+        paths = [record["path"] for record in manifest["files"]]
+        self.assertNotIn(delivery.MANIFEST, paths)
+        self.assertNotIn(delivery.CHECKSUMS, paths)
+        self.assertIn("api/index.html", paths)
+        self.assertTrue(Path(result["archive"]).is_file())
+
+    def test_source_interface_version_and_epochs_use_checked_policy(self):
+        result = self.package()
+        manifest = delivery.verify(result["directory"])
+        policy = json.loads((self.source /
+                             "dependencies/platform-compatibility.json").read_bytes())
+        self.assertEqual(manifest["source_interface"]["semantic_version"],
+                         policy["semantic_version"])
+        self.assertEqual(manifest["source_interface"]["factory_abi_epoch"],
+                         policy["factory_abi_epoch"])
+        self.assertEqual(manifest["source_interface"]["schemas"], policy["schemas"])
+
+    def test_duplicate_metadata_keys_and_version_policy_disagreement_reject(self):
+        metadata_path = self.build / "documentation-build.json"
+        original = metadata_path.read_text()
+        metadata_path.write_text(original.replace('"schema_version": 1',
+            '"schema_version": 1, "schema_version": 1'))
+        with self.assertRaisesRegex(ValueError, "Duplicate|duplicate"):
+            self.package()
+        policy_path = self.source / "dependencies/platform-compatibility.json"
+        policy = json.loads(policy_path.read_bytes())
+        policy["semantic_version"] = "9.0.0"
+        policy_path.write_text(json.dumps(policy))
+        self.git("add", ".")
+        self.git("-c", "user.name=Test", "-c", "user.email=test@example.com",
+                 "commit", "-qm", "Change policy")
+        metadata = json.loads(original)
+        metadata["source"] = delivery.observe_git_source(self.source)
+        metadata_path.write_text(json.dumps(metadata))
+        with self.assertRaisesRegex(ValueError, "version|policy"):
+            self.package()
+
+    def test_dirty_and_stale_build_sources_cannot_package(self):
+        (self.source / "untracked.md").write_text("Uncommitted source")
+        with self.assertRaisesRegex(ValueError, "clean|dirty"):
+            self.package()
+        (self.source / "untracked.md").unlink()
+        (self.source / "CMakeLists.txt").write_text(
+            "project(nexus VERSION 1.0.1 LANGUAGES C ASM)\n")
+        self.git("add", ".")
+        self.git("-c", "user.name=Test", "-c", "user.email=test@example.com",
+                 "commit", "-qm", "Change fixture")
+        with self.assertRaisesRegex(ValueError, "stale|source"):
+            self.package()
+
+    def test_failed_running_or_stale_success_metadata_cannot_package(self):
+        path = self.build / "documentation-build.json"
+        original = json.loads(path.read_bytes())
+        for status in ("failed", "running", None):
+            metadata = json.loads(json.dumps(original))
+            if status is None:
+                del metadata["status"]
+            else:
+                metadata["status"] = status
+            path.write_text(json.dumps(metadata))
+            with self.assertRaisesRegex(ValueError, "passed|status|successful"):
+                self.package()
+        stale = json.loads(json.dumps(original))
+        stale["source"]["commit"] = "0" * 40
+        path.write_text(json.dumps(stale))
+        with self.assertRaisesRegex(ValueError, "stale|source"):
+            self.package()
+
+    def test_rehashed_failed_build_metadata_cannot_verify(self):
+        result = self.package()
+        directory = Path(result["directory"])
+        metadata_path = directory / "documentation-build.json"
+        metadata = json.loads(metadata_path.read_bytes())
+        metadata["status"] = "failed"
+        metadata_path.write_text(json.dumps(metadata))
+        manifest_path = directory / delivery.MANIFEST
+        manifest = json.loads(manifest_path.read_bytes())
+        record = next(row for row in manifest["files"]
+                      if row["path"] == "documentation-build.json")
+        record["bytes"] = metadata_path.stat().st_size
+        record["sha256"] = hashlib.sha256(metadata_path.read_bytes()).hexdigest()
+        manifest_path.write_text(json.dumps(manifest))
+        checksums = []
+        for path in sorted(directory.rglob("*")):
+            if path.is_file() and path.name != delivery.CHECKSUMS:
+                checksums.append(hashlib.sha256(path.read_bytes()).hexdigest() +
+                                 "  " + path.relative_to(directory).as_posix())
+        (directory / delivery.CHECKSUMS).write_text("\n".join(checksums) + "\n")
+        with self.assertRaisesRegex(ValueError, "passed|status|successful"):
+            delivery.verify(directory)
+
+    def test_missing_language_api_or_license_rejects_incomplete_payload(self):
+        for relative in ("en/index.html", "zh_CN/index.html", "api/index.html",
+                         "licenses/LICENSE.txt"):
+            path = self.build / relative
+            original = path.read_bytes()
+            path.unlink()
+            with self.assertRaisesRegex(ValueError, "required|incomplete"):
+                self.package()
+            path.write_bytes(original)
+
+    def test_required_entries_cannot_be_empty_or_only_whitespace(self):
+        for relative in ("en/index.html", "zh_CN/index.html", "api/index.html",
+                         "licenses/LICENSE.txt"):
+            path = self.build / relative
+            original = path.read_bytes()
+            for contents in (b"", b" \n\t"):
+                path.write_bytes(contents)
+                with self.assertRaisesRegex(ValueError, "empty|nonempty|incomplete"):
+                    self.package()
+            path.write_bytes(original)
+
+    def test_source_and_payload_symlinks_are_rejected(self):
+        link = self.build / "escape.txt"
+        link.symlink_to(self.source / "CMakeLists.txt")
+        with self.assertRaisesRegex(ValueError, "symlink"):
+            self.package()
+        link.unlink()
+        linked_build = self.base / "linked-build"
+        linked_build.symlink_to(self.build, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, "symlink"):
+            delivery.package(linked_build, self.base / "output",
+                             source_root=self.source, release_id="docs-test")
+
+    def test_package_output_cannot_modify_source_inputs(self):
+        source = delivery.observe_git_source(self.source)
+        destination = self.source / "docs/packages"
+        with self.assertRaisesRegex(ValueError, "source|overlap|input"):
+            delivery.package(self.build, destination, source_root=self.source,
+                             release_id="docs-fault")
+        self.assertEqual(delivery.observe_git_source(self.source), source)
+        self.assertFalse(destination.exists())
+
+    def test_publish_webroot_cannot_overlap_input_package(self):
+        result = self.package()
+        directory = Path(result["directory"])
+        with self.assertRaisesRegex(ValueError, "source|overlap|input|payload"):
+            delivery.publish(directory, directory / "webroot")
+        delivery.verify(directory)
+        self.assertFalse((directory / "webroot").exists())
+
+    def test_directory_verification_rejects_changed_unlisted_and_missing_files(self):
+        result = self.package()
+        directory = Path(result["directory"])
+        page = directory / "en/index.html"
+        original = page.read_bytes()
+        page.write_text("Tampered")
+        with self.assertRaisesRegex(ValueError, "digest|bytes|hash"):
+            delivery.verify(directory)
+        page.write_bytes(original)
+        extra = directory / "unlisted.txt"
+        extra.write_text("Unlisted")
+        with self.assertRaisesRegex(ValueError, "unlisted|payload|closure"):
+            delivery.verify(directory)
+        extra.unlink()
+        page.unlink()
+        with self.assertRaisesRegex(ValueError, "missing|payload|closure"):
+            delivery.verify(directory)
+
+    def test_manifest_digest_is_an_external_trust_anchor(self):
+        result = self.package()
+        delivery.verify(result["directory"],
+                        expected_manifest_sha256=result["manifest_sha256"])
+        with self.assertRaisesRegex(ValueError, "manifest.*digest|manifest.*hash"):
+            delivery.verify(result["directory"], expected_manifest_sha256="0" * 64)
+
+    def test_rehashed_malformed_identity_and_self_reference_are_rejected(self):
+        result = self.package()
+        directory = Path(result["directory"])
+        original = json.loads((directory / delivery.MANIFEST).read_bytes())
+        for mutation in ("missing_source", "physical_claim", "self_reference"):
+            manifest = json.loads(json.dumps(original))
+            if mutation == "missing_source":
+                del manifest["documentation_source"]
+            elif mutation == "physical_claim":
+                manifest["physical_status"] = "passed"
+            else:
+                manifest["files"].append({"path": delivery.MANIFEST,
+                    "bytes": 0, "sha256": "0" * 64})
+            (directory / delivery.MANIFEST).write_text(json.dumps(manifest))
+            checksums = []
+            for path in sorted(directory.rglob("*")):
+                if path.is_file() and path.name != delivery.CHECKSUMS:
+                    checksums.append(hashlib.sha256(path.read_bytes()).hexdigest() +
+                                     "  " + path.relative_to(directory).as_posix())
+            (directory / delivery.CHECKSUMS).write_text("\n".join(checksums) + "\n")
+            with self.assertRaisesRegex(ValueError,
+                                        "identity|physical|self-reference"):
+                delivery.verify(directory)
+
+    def test_offline_links_reject_escaping_absolute_and_missing_targets(self):
+        for href in ("../../../escape.html", "/en/index.html", "missing.html",
+                     "javascript:alert(1)", "index.html#missing"):
+            (self.build / "en/index.html").write_text(
+                f'<html><a href="{href}">invalid</a></html>')
+            with self.assertRaisesRegex(ValueError, "link|fragment|relative|escape"):
+                self.package()
+
+    def test_offline_assets_reject_external_dependencies(self):
+        (self.build / "en/index.html").write_text(
+            '<script src="https://cdn.example.invalid/code.js"></script>')
+        with self.assertRaisesRegex(ValueError, "external|offline"):
+            self.package()
+
+    def test_offline_stylesheet_nested_dependencies_must_be_local(self):
+        styles = self.build / "_static/style.css"
+        styles.parent.mkdir()
+        for contents in ('@import "https://cdn.example.invalid/font.css";',
+                         'body{background:url(https://cdn.example.invalid/a.png)}',
+                         'body{background:url(missing.png)}'):
+            styles.write_text(contents)
+            with self.assertRaisesRegex(ValueError, "external|offline|link"):
+                self.package()
+        (styles.parent / "local.png").write_bytes(b"Fixture image")
+        styles.write_text('body{background:url("local.png")}')
+        delivery.verify(self.package()["directory"])
+
+    def test_css_escaped_resource_identifier_cannot_hide_external_dependency(self):
+        styles = self.build / "_static/style.css"
+        styles.parent.mkdir()
+        styles.write_text(r"body{background:\75rl(https://example.invalid/image.png)}")
+        with self.assertRaisesRegex(ValueError, "external|offline|escape|CSS"):
+            self.package()
+
+    def test_offline_svg_rejects_active_and_external_dependencies(self):
+        image = self.build / "_static/diagram.svg"
+        image.parent.mkdir()
+        for contents in ('<svg xmlns="http://www.w3.org/2000/svg">'
+                         '<script>alert(1)</script></svg>',
+                         '<svg xmlns="http://www.w3.org/2000/svg">'
+                         '<image href="https://example.invalid/image.png"/></svg>'):
+            image.write_text(contents)
+            with self.assertRaisesRegex(ValueError, "SVG|external|offline"):
+                self.package()
+
+    def test_valid_relative_links_and_fragments_are_preserved(self):
+        (self.build / "en/index.html").write_text(
+            '<a href="../api/index.html#overview">API</a>')
+        manifest = delivery.verify(self.package()["directory"])
+        self.assertIn("api/index.html", [row["path"] for row in manifest["files"]])
+
+    def test_restore_is_independent_and_archive_bytes_are_reproducible(self):
+        first = self.package()
+        second = delivery.package(self.build, self.base / "other-output",
+                                  source_root=self.source,
+                                  release_id="1.0.0-docs-test")
+        self.assertEqual(Path(first["archive"]).read_bytes(),
+                         Path(second["archive"]).read_bytes())
+        restored = self.base / "independent-root"
+        manifest = delivery.restore(first["archive"], restored,
+                                    expected_manifest_sha256=first["manifest_sha256"])
+        self.assertEqual(manifest, delivery.verify(restored))
+        self.assertEqual((restored / "api/index.html").read_bytes(),
+                         (self.build / "api/index.html").read_bytes())
+
+    def test_archive_traversal_links_and_duplicate_members_are_rejected(self):
+        for name, kind in (("../escape.txt", tarfile.REGTYPE),
+                           ("link.txt", tarfile.SYMTYPE),
+                           ("hard.txt", tarfile.LNKTYPE)):
+            archive = self.base / "bad.tar.gz"
+            with tarfile.open(archive, "w:gz") as output:
+                member = tarfile.TarInfo(name)
+                member.type = kind
+                member.linkname = "../outside"
+                output.addfile(member)
+            with self.assertRaisesRegex(ValueError, "escape|path|link|regular"):
+                delivery.restore(archive, self.base / "bad-restored")
+        archive = self.base / "duplicate.tar.gz"
+        with tarfile.open(archive, "w:gz") as output:
+            for _ in range(2):
+                member = tarfile.TarInfo("same.txt")
+                member.size = 1
+                output.addfile(member, io.BytesIO(b"x"))
+        with self.assertRaisesRegex(ValueError, "duplicate"):
+            delivery.restore(archive, self.base / "duplicate-restored")
+
+    def test_failed_restore_leaves_no_partial_destination(self):
+        archive = self.base / "invalid.tar.gz"
+        archive.write_bytes(b"Not an archive")
+        destination = self.base / "restored"
+        with self.assertRaises(ValueError):
+            delivery.restore(archive, destination)
+        self.assertFalse(destination.exists())
+
+    def test_existing_restore_destination_is_never_replaced(self):
+        result = self.package()
+        destination = self.base / "restore-existing"
+        destination.mkdir()
+        (destination / "keep.txt").write_text("User data")
+        with self.assertRaisesRegex(ValueError, "exists|existing"):
+            delivery.restore(result["archive"], destination)
+        self.assertEqual((destination / "keep.txt").read_text(), "User data")
+
+    def test_publish_is_immutable_and_stable_links_are_relative(self):
+        result = self.package()
+        webroot = self.base / "webroot"
+        receipt = delivery.publish(result["directory"], webroot)
+        self.assertTrue((webroot / "versions/1.0.0-docs-test/api/index.html").exists())
+        self.assertIn("../versions/1.0.0-docs-test/", (webroot /
+                      "stable/index.html").read_text())
+        self.assertEqual(receipt["manifest_sha256"], result["manifest_sha256"])
+        delivery.publish(result["directory"], webroot)
+        existing = webroot / "versions/1.0.0-docs-test/en/index.html"
+        existing.write_text("Changed publication")
+        with self.assertRaisesRegex(ValueError, "digest|bytes|immutable|hash"):
+            delivery.publish(result["directory"], webroot)
+
+    def test_publish_download_is_checked_and_same_id_cannot_change_archive(self):
+        result = self.package()
+        webroot = self.base / "webroot"
+        receipt = delivery.publish(result["directory"], webroot,
+                                   archive=result["archive"])
+        download = webroot / "downloads/1.0.0-docs-test.tar.gz"
+        self.assertEqual(download.read_bytes(), Path(result["archive"]).read_bytes())
+        self.assertEqual(receipt["archive_sha256"], result["archive_sha256"])
+        download.write_bytes(b"Changed archive")
+        with self.assertRaisesRegex(ValueError, "immutable|archive|bytes"):
+            delivery.publish(result["directory"], webroot,
+                             archive=result["archive"])
+
+    def test_invalid_release_identity_cannot_escape_publication(self):
+        for release_id in ("../outside", "/absolute", "docs test", "."):
+            with self.assertRaisesRegex(ValueError, "release"):
+                delivery.package(self.build, self.base / "bad-output",
+                                 source_root=self.source, release_id=release_id)
+
+    def test_post_deploy_fetches_all_bytes_and_detects_live_tampering(self):
+        result = self.package()
+        webroot = self.base / "webroot"
+        delivery.publish(result["directory"], webroot, archive=result["archive"])
+        handler = functools.partial(QuietHandler, directory=str(webroot))
+        server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        receipt = delivery.post_deploy(base_url, "1.0.0-docs-test",
+                                      result["manifest_sha256"],
+                                      receipt_path=self.base / "post-deploy.json",
+                                      expected_archive_sha256=result["archive_sha256"])
+        self.assertEqual(receipt["status"], "verified")
+        self.assertGreater(receipt["verified_files"], 4)
+        self.assertEqual(receipt["archive_sha256"], result["archive_sha256"])
+        self.assertTrue(receipt["stable_verified"])
+        page = webroot / "versions/1.0.0-docs-test/en/index.html"
+        page.write_text("Live tampering")
+        with self.assertRaisesRegex(ValueError, "digest|bytes|hash"):
+            delivery.post_deploy(base_url, "1.0.0-docs-test",
+                                 result["manifest_sha256"],
+                                 receipt_path=self.base / "post-deploy.json")
+        self.assertNotEqual(json.loads((self.base / "post-deploy.json").read_bytes())
+                            ["status"], "verified")
+        page.write_bytes((self.build / "en/index.html").read_bytes())
+        stable = webroot / "stable/index.html"
+        stable.write_text('<a href="/wrong-version/en/index.html">Wrong</a>')
+        with self.assertRaisesRegex(ValueError, "stable|relative"):
+            delivery.post_deploy(base_url, "1.0.0-docs-test",
+                                 result["manifest_sha256"])
+        delivery.publish(result["directory"], webroot)
+        (webroot / "downloads/1.0.0-docs-test.tar.gz").write_bytes(b"Broken")
+        with self.assertRaisesRegex(ValueError, "archive|digest|bytes"):
+            delivery.post_deploy(base_url, "1.0.0-docs-test",
+                                 result["manifest_sha256"],
+                                 expected_archive_sha256=result["archive_sha256"])
+
+
+class QuietHandler(SimpleHTTPRequestHandler):
+    def log_message(self, *arguments):
+        pass
+
+
+if __name__ == "__main__":
+    unittest.main()

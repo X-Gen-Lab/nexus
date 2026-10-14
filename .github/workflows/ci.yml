@@ -61,11 +61,8 @@ jobs:
     needs: changes
     if: needs.changes.outputs.docs == 'true' || needs.changes.outputs.code == 'true' || needs.changes.outputs.workflows == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/docs-build.yml
-    secrets: inherit
     permissions:
       contents: read
-      pages: write
-      id-token: write
 
   status-check:
     name: CI Status

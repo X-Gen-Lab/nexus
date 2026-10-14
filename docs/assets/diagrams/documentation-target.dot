@@ -2,7 +2,7 @@
 // Authority: docs/design/documentation-system.md and documentation-standards.md.
 // Evidence is read; document building does not create platform qualification.
 digraph documentationTarget {
-    graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
+    graph [label="FIG-12 补充：原文档系统目标设计", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
     node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
           color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
           fontsize=13, margin="0.16,0.10"];

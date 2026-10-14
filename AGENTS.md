@@ -64,6 +64,14 @@ design and exact reference configurations. Review arrow meaning, ownership,
 failure paths and source identity; rendering does not establish correctness or
 hardware qualification. Preserve one authoritative contract and existing style.
 
+The offline `nexus-docs` hook checks complete staged documentation inputs and
+production configuration examples without installing tools or using the network.
+Prepare the hash-locked documentation tuple explicitly with
+`python tools/documentation/install.py`; `dev.py docs test` executes the complete
+documentation suite using the same nonzero, no-skip result admission as other
+tool tests. Strict bilingual builds, critical translation checks and immutable
+packages use that tuple. Trusted publication only consumes verified bytes.
+
 Install commit tools with `python scripts/setup/install_dev_tools.py`, then
 `.venv/bin/python -m pip install -r dependencies/environment-tools.txt` (Windows:
 use `.venv/Scripts/python.exe`). This installs pre-commit and commit-msg hooks;

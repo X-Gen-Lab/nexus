@@ -16,6 +16,14 @@ repos:
         entry: python scripts/ci/check_commit_message.py
         language: python
         stages: [commit-msg]
+      - id: nexus-docs
+        name: Nexus offline documentation source and configuration checks
+        entry: python tools/documentation/cli.py check --staged --report build/quality/docs-staged.json
+        language: python
+        stages: [pre-commit]
+        pass_filenames: false
+        always_run: true
+        require_serial: true
       - id: nexus-tdd-gate
         name: Nexus GoogleTest and GoogleMock contract execution
         entry: python scripts/ci/tdd_gate.py --staged

@@ -91,9 +91,10 @@ The original vendor checkout is unchanged.
 
 Development evidence separates 25 GoogleTest cases inside the real official
 kernel, production mechanism tests with mocked external CPU/IRQ/libc boundaries,
-configuration Python tests and actual ARM object size probes. The initial
-[raw evidence record](../../tests/evidence/threadx/README.md) does not qualify
-final clean source, three-board firmware links, SDK consumption or HIL. Follow-up
+configuration Python tests and actual ARM object size probes. The original development record is not retained at its former repository path.
+The retained [integration follow-up](../../tests/evidence/threadx-integration/README.md)
+contains its own actual source snapshots and raw execution; it does not qualify
+final clean source, SDK consumption or HIL and does not replace missing original bytes. Follow-up
 PRIMASK/configuration records retain their own raw bytes and commands; original
 RED/GREEN records are not rewritten as the implementation evolves. The
 [follow-up record](../../tests/evidence/threadx-integration/README.md) contains

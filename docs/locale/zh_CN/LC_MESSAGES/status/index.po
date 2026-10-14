@@ -1,0 +1,19 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 0d821f9713706c25ebdb991984b1df52c95b79063d516ce8a6a695f9f29bd691\n"
+
+msgid "Status and evidence"
+msgstr "状态与证据"
+
+msgid ""
+"Use these maintained records to locate implementation, software verification"
+" and physical work. Their recorded source IDs and configurations remain "
+"unchanged; this website build creates documentation evidence only."
+msgstr "通过维护记录定位实现、软件验证和实板工作。原记录的源码 ID 和配置保持不变；本网站构建只产生文档证据。"

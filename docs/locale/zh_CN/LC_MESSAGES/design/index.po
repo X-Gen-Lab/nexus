@@ -1,0 +1,19 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: ec9b17701cb2965b7808d742da143458b9afa45c259b9cc165e7c35157cf0df3\n"
+
+msgid "Maintained design contracts"
+msgstr "维护中的设计合同"
+
+msgid ""
+"These maintained contracts and active plans describe mechanisms, invariants "
+"and exit conditions. Historical documents are excluded from the current site"
+" and search."
+msgstr "这些合同和当前计划说明机制、不变量与退出条件。历史文档不进入当前站点和搜索。"

@@ -109,9 +109,14 @@ def doctor(environment, native):
     """Diagnose explicit target requirements; tools-only remains available."""
     parser = argparse.ArgumentParser(prog="dev.py doctor")
     parser.add_argument("--target",
-                        choices=("tools", "native", "arm", "candidate"),
+                        choices=("tools", "native", "arm", "candidate", "docs"),
                         default="tools")
-    args = parser.parse_args(native)
+    args, remaining = parser.parse_known_args(native)
+    if args.target == "docs":
+        return execute([sys.executable, "tools/documentation/cli.py", "doctor"]
+                       + remaining, environment)
+    if remaining:
+        raise ValueError("Unknown doctor arguments: " + " ".join(remaining))
     identity = workspace_identity()
     lock_path = ROOT / "dependencies/environment.lock.json"
     lock = json.loads(lock_path.read_text())
@@ -179,7 +184,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("configure", "build", "test",
                                           "check", "doctor", "prepare",
-                                          "qualify", "candidate", "cache"))
+                                          "qualify", "candidate", "cache", "docs"))
     parser.add_argument("--preset", default="native-debug")
     args, native = parser.parse_known_args(argv)
     try:
@@ -188,6 +193,9 @@ def main(argv=None):
         local_bin = ROOT / ".venv" / ("Scripts" if os.name == "nt" else "bin")
         environment["PATH"] = (str(local_bin) + os.pathsep
                                + environment.get("PATH", ""))
+        if args.action == "docs":
+            return execute([sys.executable, "tools/documentation/cli.py"] + native,
+                           environment)
         if args.action == "doctor":
             return doctor(environment, native)
         if args.action in ("prepare", "qualify", "candidate", "cache"):

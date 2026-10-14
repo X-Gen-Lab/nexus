@@ -1,0 +1,19 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 1d97d9b07b93da8e8aab58b7e9d9dd3072b19aa0b28a1d2d89c5f8e5b7dfe377\n"
+
+msgid "Task guides"
+msgstr "操作指南"
+
+msgid ""
+"Each guide defines inputs, ownership, rejection and an observable result. "
+"Hardware commands require an actual connected station; the documentation "
+"build does not access hardware."
+msgstr "每份指南说明输入、所有权、拒绝条件和可观察结果。执行硬件命令需要实际连接的工装；文档构建不访问硬件。"

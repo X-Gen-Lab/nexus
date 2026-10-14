@@ -72,6 +72,7 @@ Board 不复制 SDK、HAL、RTOS port 或链接器脚本。普通 GPIO 初始电
   "schema_version": 1,
   "id": "example-board",
   "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f407",
   "source_revision": "document-revision",
   "physical_pcb_revision": null,
   "clocks": {"hse_hz": 8000000},

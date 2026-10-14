@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_documentation_delivery_results_index",
+  "status": "implementation_development_evidence_formal_acceptance_pending",
+  "task_authority": "docs/design/documentation-system-execution.csv",
+  "source": {
+    "documentation_commit": null,
+    "documentation_tree": null,
+    "clean_execution_receipt": null,
+    "boundary": "Null formal fields have not yet been obtained. Development/preview evidence grants no clean-source release or firmware qualification."
+  },
+  "qualified_code_reference": {
+    "index": "docs/delivery/build-system-results.json",
+    "canonical_code_commit": "cc6a065c002041234a212a964be863a69198f9b4",
+    "boundary": "Original firmware scope only; this documentation iteration does not establish a new execution at its HEAD."
+  },
+  "formal_evidence_required_for": [
+    "DOC-37",
+    "DOC-38",
+    "DOC-39",
+    "DOC-40",
+    "DOC-58"
+  ],
+  "documentation_package": {
+    "release_id": null,
+    "manifest_sha256": null,
+    "archive_sha256": null,
+    "archive_bytes": null,
+    "download_url": null
+  },
+  "evidence_delivery": {
+    "status": "pending_actual_archive_and_publication",
+    "channel": "immutable GitHub documentation release asset",
+    "release_url": null,
+    "archive_url": null,
+    "archive_sha256": null,
+    "archive_bytes": null,
+    "external_receipt_url": null,
+    "expected_member_paths": [
+      "status/final-view/red.log",
+      "status/final-view/green.log",
+      "status/final-view/ledger-update.json",
+      "independent-diagrams/review.json",
+      "independent-diagrams/reader-walk.json",
+      "independent-diagrams/source-output-check.json"
+    ],
+    "boundary": "Expected paths are proposed archive layout, not existing published assets or confirmed member identities."
+  },
+  "actual_scope_receipts": {
+    "clean_source_build": null,
+    "normal_commit_gates": null,
+    "browser_desktop_narrow_zoom_print": null,
+    "published_site_and_download": null,
+    "independent_download_restore": null,
+    "final_independent_review": null
+  },
+  "retention": {
+    "channel": "immutable GitHub documentation release asset",
+    "archive_member_identity": "Record exact member path, bytes and SHA-256 from the actual inventory after export.",
+    "status": "pending_publication_and_independent_retrieval",
+    "not_established": "No claim of off-site restoration or long-term publication until actual receipt is recorded."
+  },
+  "physical_hil": {
+    "status": "not_executed",
+    "changed_by_documentation": false
+  },
+  "qualification_boundary": "Documentation implementation, software preview, source-image review and parser checks remain distinct from formal document publication and MCU HIL."
+}

@@ -17,7 +17,12 @@ def execute(suite):
     """Return actual runner counts; loading or skipping tests is not a pass."""
     if suite not in SUITES:
         raise ValueError("Unknown maintained tool scope")
-    tests = unittest.TestLoader().discover(str(ROOT / SUITES[suite]),
+    return execute_directory(ROOT / SUITES[suite], suite)
+
+
+def execute_directory(directory, suite):
+    """Use the same admission for documentation's separate locked environment."""
+    tests = unittest.TestLoader().discover(str(directory),
                                           pattern="test_*.py")
     expected = tests.countTestCases()
     if expected == 0:

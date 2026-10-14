@@ -53,7 +53,15 @@ Board 不复制 SoC 驱动。GD32 的 I2C/PWM/ADC/EXTI route、STM32 的高级�
 
 ## 构建与配置
 
-```mermaid
+![当前配置链：严格解析与原子bundle进入唯一CMake目标图](../assets/diagrams/configuration-generation.svg)
+
+当前图的输入/产物关系见[FIG-03及源码依据](../assets/diagrams/README.md#fig-03-配置与原子生成)。
+软件证据与物理资格分别取得，见[FIG-11](../assets/diagrams/qualification-evidence.svg)。
+以下简图源仅保留为历史迁移输入，其箭头不能表达当前HIL准入或验证已发生。
+
+**历史构建简图源：**
+
+```text
 flowchart LR
     S[精确 SoC facts/routes] --> R[严格 resolver]
     B[Board board.json] --> R

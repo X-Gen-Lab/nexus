@@ -3,192 +3,124 @@ name: Documentation Build
 on:
   workflow_call:
 
+# A PR or preview build cannot deploy Pages or mint an OIDC token.
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
   build:
     name: Build Docs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          submodules: recursive
 
-      - name: Setup Python
+      - name: Setup the qualified Python tuple
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: '3.12.14'
 
-      - name: Install Dependencies
+      - name: Prepare the complete hash-locked documentation closure
         run: |
-          sudo apt-get update && sudo apt-get install -y doxygen graphviz
-          pip install -r docs/sphinx/requirements.txt
+          python3 tools/documentation/install.py \
+            --prefix "$RUNNER_TEMP/nexus-docs-tools" \
+            --cache "$RUNNER_TEMP/nexus-docs-cache"
 
-      - name: Build Doxygen
-        run: doxygen Doxyfile
-
-      - name: Build Sphinx (English)
-        working-directory: docs/sphinx
-        run: sphinx-build -n -W --keep-going -b html . _build/html/en
-
-      - name: Build Sphinx (Chinese)
-        working-directory: docs/sphinx
-        run: sphinx-build -n -W --keep-going -b html -D language=zh_CN . _build/html/zh_CN
-
-      - name: Prepare Pages
+      - name: Check documentation source and contracts
         run: |
-          mkdir -p public
+          "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" \
+            tools/dev/dev.py docs check \
+            --report build/documentation-check.json
 
-          # Copy API documentation
-          if [ -d "docs/api/html" ]; then
-            cp -r docs/api/html public/api
-          fi
+      - name: Execute the complete documentation regression domain
+        run: |
+          "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" \
+            tools/dev/dev.py docs test \
+            --report build/documentation-tests.json
 
-          # Copy Sphinx documentation
-          cp -r docs/sphinx/_build/html/* public/
+      - name: Build fresh API and bilingual documentation
+        run: |
+          "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" \
+            tools/dev/dev.py docs build \
+            --tool-prefix "$RUNNER_TEMP/nexus-docs-tools" \
+            --output build/documentation --language all --timeout 900
 
-          # Create language selection index page
-          cat > public/index.html << 'EOF'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <meta http-equiv="refresh" content="3; url=en/index.html">
-              <title>Nexus Documentation - Language Selection</title>
-              <style>
-                  * { box-sizing: border-box; margin: 0; padding: 0; }
-                  body {
-                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                      display: flex;
-                      justify-content: center;
-                      align-items: center;
-                      min-height: 100vh;
-                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                  }
-                  .container {
-                      text-align: center;
-                      padding: 60px 40px;
-                      background: white;
-                      border-radius: 16px;
-                      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                      max-width: 500px;
-                      width: 90%;
-                  }
-                  .logo { font-size: 48px; margin-bottom: 20px; }
-                  h1 {
-                      color: #333;
-                      margin-bottom: 10px;
-                      font-size: 28px;
-                      font-weight: 600;
-                  }
-                  .subtitle {
-                      color: #666;
-                      margin-bottom: 30px;
-                      font-size: 16px;
-                  }
-                  .languages {
-                      display: flex;
-                      justify-content: center;
-                      gap: 20px;
-                      flex-wrap: wrap;
-                      margin-bottom: 20px;
-                  }
-                  a {
-                      display: flex;
-                      flex-direction: column;
-                      align-items: center;
-                      padding: 20px 30px;
-                      background: #f8f9fa;
-                      color: #333;
-                      text-decoration: none;
-                      border-radius: 12px;
-                      transition: all 0.3s ease;
-                      border: 2px solid transparent;
-                      min-width: 140px;
-                  }
-                  a:hover {
-                      background: #667eea;
-                      color: white;
-                      transform: translateY(-4px);
-                      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-                  }
-                  a.api {
-                      background: #27ae60;
-                      color: white;
-                  }
-                  a.api:hover {
-                      background: #219a52;
-                  }
-                  .flag { font-size: 32px; margin-bottom: 8px; }
-                  .lang-name { font-weight: 500; font-size: 16px; }
-                  .redirect-notice {
-                      margin-top: 20px;
-                      color: #999;
-                      font-size: 14px;
-                  }
-              </style>
-          </head>
-          <body>
-              <div class="container">
-                  <div class="logo">📚</div>
-                  <h1>Nexus Embedded Platform</h1>
-                  <p class="subtitle">Select your preferred language</p>
-                  <div class="languages">
-                      <a href="en/index.html">
-                          <span class="flag">🇺🇸</span>
-                          <span class="lang-name">English</span>
-                      </a>
-                      <a href="zh_CN/index.html">
-                          <span class="flag">🇨🇳</span>
-                          <span class="lang-name">中文</span>
-                      </a>
-                      <a href="api/index.html" class="api">
-                          <span class="flag">📖</span>
-                          <span class="lang-name">API Docs</span>
-                      </a>
-                  </div>
-                  <p class="redirect-notice">Redirecting to English in 3 seconds...</p>
-              </div>
-          </body>
-          </html>
-          EOF
+      - name: Package verified offline documentation
+        run: |
+          "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" \
+            tools/dev/dev.py docs package \
+            --build build/documentation \
+            --output "$RUNNER_TEMP/nexus-documentation-package"
 
-      - name: Bind the documentation upload to observed execution identity
-        if: always()
+      - name: Stage and compare the verified package for bounded job identity
+        run: |
+          "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import shutil
+          from tools.documentation import delivery
+
+          source = Path(os.environ['RUNNER_TEMP']) / 'nexus-documentation-package'
+          staging = Path('build/documentation-package')
+          if staging.exists() or staging.is_symlink():
+              raise SystemExit('Documentation upload staging must be fresh')
+          archives = list(source.glob('*.tar.gz'))
+          if len(archives) != 1:
+              raise SystemExit('One verified documentation archive is required')
+          manifest = delivery.verify(archives[0])
+          payload = source / manifest['release_id']
+          manifest_digest = hashlib.sha256(
+              (payload / delivery.MANIFEST).read_bytes()).hexdigest()
+          archive_digest = hashlib.sha256(archives[0].read_bytes()).hexdigest()
+          delivery.verify(payload, expected_manifest_sha256=manifest_digest)
+          shutil.copytree(source, staging)
+          copied_archive = staging / archives[0].name
+          if hashlib.sha256(copied_archive.read_bytes()).hexdigest() != archive_digest:
+              raise SystemExit('Staged archive differs from verified publication')
+          delivery.verify(copied_archive, expected_manifest_sha256=manifest_digest)
+          delivery.verify(staging / manifest['release_id'],
+                          expected_manifest_sha256=manifest_digest)
+          (staging / 'staging-copy.json').write_text(json.dumps({
+              'archive_sha256': archive_digest,
+              'manifest_sha256': manifest_digest,
+              'documentation_commit': manifest['documentation_source']['commit'],
+              'status': 'verified_copy'}, indent=2) + '\n')
+          PY
+
+      - name: Bind successful documentation bytes to observed execution
+        if: success()
         uses: ./.github/actions/record-identity
         with:
           job: documentation
           result: ${{ job.status }}
           expected-commit: ${{ github.sha }}
-          output: public/nexus-job-identity
+          output: build/docs-job-identity
           require-dependencies: 'false'
-          artifacts: public/
+          artifacts: |
+            build/documentation/
+            build/documentation-package/
+            build/documentation-check.json
+            build/documentation-tests.json
           tools: |
-            python=python3
-            doxygen=doxygen
-            sphinx=sphinx-build
-      - name: Upload Pages Artifact
-        if: always()
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        with:
-          path: public
+            python=${{ runner.temp }}/nexus-docs-tools/venv/bin/python
+            doxygen=${{ runner.temp }}/nexus-docs-tools/bin/doxygen
+            sphinx=${{ runner.temp }}/nexus-docs-tools/venv/bin/sphinx-build
 
-  deploy:
-    name: Deploy to Pages
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+      - name: Upload successful preview and offline package
+        if: success()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: nexus-documentation-${{ github.sha }}
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            build/documentation/
+            build/documentation-package/
+            build/documentation-check.json
+            build/documentation-tests.json
+            build/docs-job-identity/

@@ -1,0 +1,19 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: abd3a5128d8fb8bb6ea525472d4fea5668e9bbdbb69673a54780e65530235940\n"
+
+msgid "Recorded delivery evidence"
+msgstr "已记录的交付证据"
+
+msgid ""
+"These records retain their original source, configuration and evidence "
+"identities. Rebuilding the website neither reruns them nor grants a new-"
+"source qualification."
+msgstr "这些记录保留原始源码、配置和证据身份。重新构建网站不会重跑这些验证，也不会授予新源码资格。"

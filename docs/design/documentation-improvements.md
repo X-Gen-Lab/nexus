@@ -1,17 +1,38 @@
+---
+id: design.documentation-improvements
+type: status
+audience: maintainer
+source_language: zh_CN
+---
+
 # Nexus 文档系统完整优化清单
 
-本页由 [实施台账](documentation-system-execution.csv) 派生。台账是任务、依赖和
-实际状态的唯一来源；编辑任务后重新生成本视图，自动同步门禁仍待DOC-32实施。
-保留原DOC-01至DOC-40，补充内容标准、模板及图册任务至DOC-58。全部任务目前为
-planned/not_executed；标准文件与四个参考图已创建，不表示全系统、完整图册或
-逐页标准应用已经通过验收。
+本页由 [实施台账](documentation-system-execution.csv) 派生。任务、依赖、
+实现和验收值以该 CSV 为唯一权威；原编号及退出条件不因状态更新改变。
+源 SHA-256：`490f5b52001bf236d76f6407d09ff2266cf4f6d2c7e672fc14b18cff96e9f94b`。同一生成器在 commit／CI 检查缺失或陈旧视图。
 
-P1优先完成，P2完善范围。责任统一为Codex，独立agent参与评审。新增/修改正文
-遵守 [内容与图示标准](documentation-standards.md)和 [模板](documentation-templates.md)。
-参考图与完整15类范围见 [图册](../assets/diagrams/README.md)。
+## 当前实现与验收
 
-D1至D6为工作包分类，执行顺序以台账依赖为准，不按标题顺序承诺周次。
-术语与图工具基线前置；DOC-58最终关闭须等待全部15类图及相关检查完成。
+`implemented` 表示页面、工具、门禁或交付路径已实现；
+`development_passed` 表示实际开发检查，不自动建立正式发布或退出验收。
+`pending_formal_evidence` 要等待精确 clean-source、部署、恢复或独立审查记录。
+实际记录与取得范围见 [文档验收入口](../status/documentation-acceptance.md)；
+[逐项原字段](../status/ledgers/documentation-system.md)保留全部状态和证据定位。
+
+| 实现值 | 验收值 | 源记录数 |
+| --- | --- | --- |
+| `implemented` | `development_passed` | 53 |
+| `implemented` | `pending_formal_evidence` | 5 |
+
+需正式证据、失败或未执行复核的项：DOC-37、DOC-38、DOC-39、DOC-40、DOC-58。
+
+预览、软件模型、图源存在或成功渲染不能替代公开部署、物理 HIL 或产品资格。
+文档包和证据归档分别绑定同一次交付；未实际取得的摘要与 locator 不编造。
+
+P1 优先完成，P2 也属于交付范围。责任统一为 Codex，独立 agent 参与评审。
+新增和修改正文遵守 [内容与图示标准](documentation-standards.md)和
+[页面模板](documentation-templates.md)，图册见 [15 类必需图](../assets/diagrams/README.md)。
+D1 至 D6 是工作包，顺序以依赖为准；不累加其他专项台账的任务或验收次数。
 
 ## D1 入口、权威与正文规则
 
@@ -100,4 +121,3 @@ D1至D6为工作包分类，执行顺序以台账依赖为准，不按标题顺�
 | DOC-39 | P1 | 完成独立恢复与长期存储 | 稳定取得位置和保留策略明确；独立根恢复浏览验真；异地恢复须真实执行 |
 | DOC-40 | P1 | 收尾迁移并独立交付审查 | 映射全部处理；无重复规范/断链/错误资格；原证据保留；58项范围及15类必需图满足退出条件；未声明支持的配置、HIL和后续扩展如实保留边界 |
 | DOC-54 | P2 | 交付发布与独立恢复图 | 文档/SDK/档案交付渠道与身份准确；目标和实际已发布分开；独立取得/恢复/验真边界明确 |
-

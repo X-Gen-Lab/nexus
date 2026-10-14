@@ -1,0 +1,61 @@
+# Chinese translation; independent semantic review pending.
+msgid ""
+msgstr "Project-Id-Version: Nexus source docs\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Source-SHA256: db55124686c53167a34101fdb57ff05ca8c6a14f8a4adea5f2913d88a5a5d065\nX-Nexus-Reviewed: true\n"
+
+msgid "Wait correctly and shut down an explicit owner"
+msgstr "正确等待并停止显式 owner"
+
+msgid "Use this guide for applications selecting an optional Native, FreeRTOS or ThreadX adapter. The application owns tasks, stacks, notifications, queues and execution progress. Baremetal has no scheduler. Platform start never starts a kernel. The [OS contract](../design/os-contracts.md) remains authoritative."
+msgstr "选择可选 Native、FreeRTOS 或 ThreadX adapter 的应用使用本指南。应用拥有 task、stack、notification、queue 和执行进度。Baremetal 没有 scheduler。平台 start 从不启动 kernel。[OS 合同](../design/os-contracts.md)保持权威。"
+
+msgid "Avoid lost completion and unbounded waits"
+msgstr "避免丢失完成和无限等待"
+
+msgid "Use the request's latched predicate as truth. Check the completion predicate, arm the notification sequence, recheck, wait with the same absolute monotonic deadline, then recheck again. Wakes are hints and may be coalesced or unrelated. On timeout, perform the contract's final predicate observation. Do not restart a relative budget after each hint and do not block the only executor that must make progress."
+msgstr "以请求锁存的 predicate 为权威。检查完成 predicate，arm notification sequence，再检查，以同一 absolute monotonic deadline 等待，随后再次检查。Wake 只是提示，可能合并或无关。Timeout 后执行合同要求的最终 predicate 观察。不得每次 hint 后重启相对预算，也不得阻塞唯一需要推进的 executor。"
+
+msgid "![Predicate, wake and explicit shutdown responsibilities](../assets/diagrams/wait-wake-shutdown.svg)"
+msgstr "![Predicate、wake 与显式停机责任](../assets/diagrams/wait-wake-shutdown.svg)"
+
+msgid "Predicate, wake and explicit shutdown responsibilities"
+msgstr "Predicate、wake 与显式停机责任"
+
+msgid "FIG-08 shows the current wait/wake responsibilities. A provider IRQ sink must respect the selected kernel syscall ceiling; an unqualified priority cannot call an ISR kernel API. ThreadX has its own reviewed M4/Native subset and masking policy, not the FreeRTOS port or tickless/isolation capability set."
+msgstr "FIG-08 表示当前 wait/wake 责任。Provider IRQ sink 必须遵守选定 kernel syscall ceiling；不合法 priority 不得调用 ISR kernel API。ThreadX 有自己复核的 M4/Native 子集和 masking policy，不继承 FreeRTOS port 或 tickless/isolation 能力集。"
+
+msgid "Shut down in dependency order"
+msgstr "按依赖顺序停机"
+
+msgid "Close client admission and reject new work without borrowing it."
+msgstr "关闭 client admission，不借用地拒绝新工作。"
+
+msgid "Keep the resource owner/executor running. Request cancellation using stable slots and matching epochs; cancellation does not release accepted storage."
+msgstr "保持资源 owner/executor 运行。通过稳定 slot 与匹配 epoch 请求取消；取消不释放 accepted 存储。"
+
+msgid "Drain transfers and block loans. Acquire-observe SETTLED and read results. A failed drain retains QUARANTINED storage and explicit recovery responsibility."
+msgstr "排空 transfer 和 block loan。Acquire 观察 SETTLED 并读取结果。失败排空保留 QUARANTINED 存储和明确恢复责任。"
+
+msgid "Join producers and detach/join control observers before slot or request reuse."
+msgstr "复用 slot 或 request 前，join producer 并 detach/join control observer。"
+
+msgid "Stop and join the owner. Quiesce hardware IRQ publishers before destroying their notification, queue, guard, stack or TCB storage."
+msgstr "停止并 join owner。销毁 notification、queue、guard、stack 或 TCB 存储前，确保硬件 IRQ publisher 停止访问并完成必要同步。"
+
+msgid "Stop platform providers only when their selected lifetime and kernel clock/Tick ownership permit it. A running scheduler is not stopped by ordinary I/O teardown."
+msgstr "只有选定 lifetime 与 kernel clock/Tick ownership 允许时才能 stop platform provider。普通 I/O teardown 不停止正在运行的 scheduler。"
+
+msgid "A returning adapter task parks until its one external lifecycle owner joins it. Returning from an entry function does not allow stack/TCB reclamation. Raw queues and closable queues have different lifecycle contracts; close is not destruction. Keep all storage on the failure path and retry cleanup only through its real owner."
+msgstr "返回的 adapter task 保持 parked，直到其唯一外部 lifecycle owner join。Entry function 返回不允许回收 stack/TCB。Raw queue 与 closable queue 具有不同 lifecycle contract；close 不是销毁。失败路径保留所有存储，仅由真实 owner 重试 cleanup。"
+
+msgid "Execute maintained software fixtures"
+msgstr "执行维护中的软件夹具"
+
+msgid "From the repository root:"
+msgstr "从仓库根目录执行："
+
+msgid "Both binaries must execute nonempty passing cases. This targeted development scope does not replace the complete TDD gate. The external UART owner application in [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) supplies product workers; its pin/revision must be recorded before claiming consumer execution."
+msgstr "两个 binary 都必须完成非空的通过用例。这一 targeted development scope 不替代完整 TDD gate。[nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) 的外部 UART owner 应用提供产品 workers；声明 consumer 执行前必须记录其 pin/revision。"
+
+msgid "Physical scheduler context, IRQ ceiling, FP/MVE retention, stack peaks and wake latency require real station evidence. Do not inherit POSIX behavior as MCU timing."
+msgstr "物理 scheduler context、IRQ ceiling、FP/MVE 保留、stack 峰值和 wake latency 需要真实 station 证据。不得将 POSIX 行为继承为 MCU 时序。"
+

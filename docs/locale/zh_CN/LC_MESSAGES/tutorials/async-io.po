@@ -1,0 +1,53 @@
+# Chinese translation of canonical Nexus documentation.
+# Review is recorded only after independent semantic inspection.
+msgid ""
+msgstr "Project-Id-Version: Nexus source docs\nReport-Msgid-Bugs-To: \nLanguage: zh_CN\nLanguage-Team: Nexus agent-reviewed documentation\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Source-SHA256: 4991b0339e9e397dda69b345621d7de316b6d13224681648c9ebb6ad1442c0f5\nX-Nexus-Reviewed: true\n"
+
+msgid "Observe rejection, borrow, cancellation and drain"
+msgstr "观察拒绝、借用、取消与排空"
+
+msgid "Run this host tutorial to observe the real public SPI API against a Native provider. It demonstrates software ownership and failure paths, not physical DMA timing. The complete executable fixture is the maintained GoogleTest target; its model controls stand in for external IRQ and wire progress only. GoogleTest/GoogleMock and C++17 are host-only; production firmware remains C11."
+msgstr "执行本 host 教程，观察真实公共 SPI API 与 Native provider 的行为。它说明软件所有权和失败路径，不建立物理 DMA 时序。完整可执行夹具是维护中的 GoogleTest 目标；模型控制仅替代外部 IRQ 与线上进度。GoogleTest/GoogleMock 和 C++17 仅用于 host；生产固件保持 C11。"
+
+msgid "Build and run the complete fixtures"
+msgstr "构建并运行完整夹具"
+
+msgid "From the repository root, with host tools and pinned dependencies available:"
+msgstr "从仓库根目录执行，先具备 host 工具和锁定依赖："
+
+msgid "Run each binary without a filter and retain fresh XML in a new directory:"
+msgstr "不加过滤器运行每个 binary，将 fresh XML 保存在新目录："
+
+msgid "All three commands must exit zero and report passing, nonzero test counts. These complete target executions are a tutorial scope, not the all-target commit TDD qualification. Remove the tutorial directory only after retaining needed reports."
+msgstr "三个命令都必须退出零，并报告非零的通过用例数。这些完整目标执行属于教程范围，不是全部目标的 commit TDD 资格。保留所需报告后才能删除教程目录。"
+
+msgid "Follow the normal and rejected admission path"
+msgstr "观察正常准入与拒绝路径"
+
+msgid "Complete maintained test: same-controller rejection and wire completion."
+msgstr "完整维护测试：同控制器拒绝与线上完成。"
+
+msgid "The first endpoint accepts its request. The caller keeps the request and buffers alive. The second endpoint returns `NX_ERROR_BUSY` while its request stays READY; that rejection retains no borrow. Stepping payload transfer does not publish SETTLED before the simulated wire-completion step. Service and IRQ progress remain explicit; a waiting client cannot assume a hidden worker."
+msgstr "第一个 endpoint 接受请求，调用方保持请求和缓冲区有效。第二个 endpoint 返回 `NX_ERROR_BUSY`，其请求仍为 READY；该拒绝不保留借用。模拟 payload 传输推进后，在模拟线上完成步骤之前不会发布 SETTLED。Service 与 IRQ 进度保持显式；等待客户端不能假设存在隐藏 worker。"
+
+msgid "Follow cancellation and failed drain"
+msgstr "观察取消与失败排空"
+
+msgid "Complete maintained cancellation fixture; held drain retains the borrow."
+msgstr "完整维护取消夹具；保持排空阻塞时保留借用。"
+
+msgid "Cancel requests termination. With drain deliberately held, the request becomes QUARANTINED, stop returns BUSY and prepare rejects reuse. The model then supplies actual drain progress; service publishes SETTLED and result observation exposes the cancelled result and transferred prefix. Removing the model hold is a test control, not a generic production recovery API."
+msgstr "Cancel 请求终止。故意保持排空阻塞时，请求进入 QUARANTINED，stop 返回 BUSY，prepare 拒绝复用。随后模型提供实际排空进度，service 发布 SETTLED，结果观察提供取消结果与已传输前缀。解除模型阻塞是测试控制，不是通用生产恢复 API。"
+
+msgid "The generated factory fixture also tests platform stop with a quarantined UART borrow. The UART owner fixture checks rejected submissions and retained payload against GoogleMock dependency ports. Read [ownership](../explanation/ownership.md) before copying request storage into an application."
+msgstr "生成的 factory 夹具也测试持有隔离 UART 借用时的平台 stop。UART owner 夹具通过 GoogleMock 依赖端口检查拒绝提交和 payload 保留。将请求存储移入应用前先阅读[所有权](../explanation/ownership.md)。"
+
+msgid "![Request admission, drain, quarantine and final settlement](../assets/diagrams/request-lifecycle.svg)"
+msgstr "![请求准入、排空、隔离与最终结束](../assets/diagrams/request-lifecycle.svg)"
+
+msgid "Request admission, drain, quarantine and final settlement"
+msgstr "请求准入、排空、隔离与最终结束"
+
+msgid "FIG-06 expresses current Core helper transitions with provider proof obligations. The [I/O lifecycle matrix](../design/io-lifecycle-matrix.md) limits what these models establish. IRQ hints, stable slot epochs, observer detach and join require the [OS shutdown guide](../guides/os-shutdown.md)."
+msgstr "FIG-06 表示当前 Core helper 转移和 provider 的证明义务。[I/O 生命周期矩阵](../design/io-lifecycle-matrix.md)限定模型建立的范围。IRQ 提示、稳定 slot epoch、observer detach 和 join 需遵循 [OS 停机指南](../guides/os-shutdown.md)。"
+

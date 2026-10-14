@@ -14,6 +14,27 @@ python tools/dev/dev.py check --preset native-debug
 python tools/dev/dev.py configure --preset native-step-debug
 ```
 
+Documentation has its own explicit Linux x86_64 CPython 3.12 tool closure:
+
+```sh
+python tools/documentation/install.py --prefix build/docs-tools --cache build/docs-cache
+build/docs-tools/venv/bin/python tools/dev/dev.py doctor --target docs
+build/docs-tools/venv/bin/python tools/dev/dev.py docs check
+build/docs-tools/venv/bin/python tools/dev/dev.py docs test
+build/docs-tools/venv/bin/python tools/dev/dev.py docs build --language all
+build/docs-tools/venv/bin/python tools/dev/dev.py docs preview
+build/docs-tools/venv/bin/python tools/dev/dev.py docs package --output ../nexus-docs-package
+```
+
+Preparation is explicit; checks and builds never install tools implicitly. The
+offline commit hook checks the same source, configuration and authority rules
+against the complete staged inputs. The dedicated documentation CI executes the
+complete documentation tests in its locked environment and builds fresh XML and
+both language views. The existing Google contract gate retains its four complete
+tool domains. Documentation packaging requires clean source and an output outside
+the source tree. Publication consumes verified bytes on the dedicated delivery
+branch; neither a documentation build nor deployment establishes physical HIL.
+
 `native-debug` retains size optimization and debug symbols. `native-step-debug`
 uses `Og` for interactive stepping. `fixture-stm32-g474-*` names are software
 fixtures; they do not certify their routes or hardware. Public H743/U575 presets

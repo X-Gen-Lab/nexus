@@ -1,5 +1,3 @@
-# Exact documentation tools; platform build tools have a separate lock.
-Sphinx==7.4.7
-breathe==4.35.0
-alabaster==0.7.16
-docutils==0.21.2
+# Linux x86_64 CPython 3.12 documentation closure.
+# Other environments are unqualified; do not resolve a second tool set.
+-r ../../dependencies/docs-python-linux-cp312.txt

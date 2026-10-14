@@ -1,49 +1,52 @@
 # Nexus embedded platform
 
-Nexus is a C11 platform for industrial MCU software. It provides statically
-assembled hardware access, explicit caller-owned resources and reusable components.
-Applications and product policy live in [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples)
-or private product repositories.
+Nexus is a statically assembled C11 platform for industrial MCU software. It
+provides reusable CPU, controller, typed I/O, optional OS and component mechanisms.
+Applications, workers, product roles, private PCB data, Flash reservations and
+recovery policy live in [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples)
+or private product repositories. [中文入口](README_CN.md).
 
-The current implementation retains a typed factory and C polymorphic interfaces.
-One authored TOML assembly creates fixed instances before execution; the factory
-returns their stable identity, while public I/O calls dispatch to the selected
-provider. Kconfig and runtime registries are no longer configuration authorities.
+One authored TOML assembly selects reviewed SoC/Board facts and exact instances.
+The typed factory returns existing immutable polymorphic faces; it does not
+allocate, initialize hardware, lock or discover devices. Ordinary I/O dispatches
+through shared readonly ops to independent private instance contexts. CMake owns
+the source dependency graph. Kconfig and cache macros are not parallel authorities.
 
 | Layer | Responsibility |
 | --- | --- |
-| `core/` | Status, monotonic deadlines, caller-owned requests and stable epochs |
-| `arch/` | Compile-time Cortex-M/Native masks, privilege, exceptions, barriers and cycle snapshots |
-| `soc/` | Exact chip memory, clocks, reset/startup, IRQs and controller drivers |
-| `boards/` | Reviewed pin routes, oscillator facts, initial outputs and provenance |
-| `io/` | GPIO, UART, SPI, I²C, physical Flash, watchdog, EXTI, PWM and ADC contracts |
-| `os/` | Optional per-object baremetal, Native and static FreeRTOS adapters |
-| `components/` | Bounded owner adapters, BMP280, log sinks, Modbus RTU and journals |
-| `tools/` | TOML resolution, atomic output, CLI, resources, HIL and evidence |
-| `tests/contracts/` | Executed behavior, fault, concurrency and tool boundary suites |
+| `core/` | Results, monotonic deadlines, borrowed requests and stable epochs |
+| `arch/` | Compile-time CPU primitives, masks, barriers and optional Cache/MPU/SAU |
+| `soc/` | Exact chip memory, clock, startup, IRQ/DMA and private controllers |
+| `boards/` | Reviewed wiring, oscillator facts, initial levels and explicit unknowns |
+| `io/` | Typed public operation contracts; provider/SDK types remain private |
+| `os/` | Optional caller-owned baremetal, Native, FreeRTOS and maintained ThreadX adapters |
+| `components/` | Bounded reusable algorithms and explicit owner/port adapters |
+| `tools/` | Resolution, build, measurement, HIL preparation and evidence |
+| `tests/` | Actual host, register-model, ARM-link and tool boundary executions |
 
-No default heap, registry, driver worker or maximum instance pool is introduced.
-Products explicitly choose controller modes, queues, stack/TCB storage, component
-ports and shutdown behavior. Polling SPI/I²C/Flash/ADC remains synchronous.
-UART IRQ TX, finite UART/SPI DMA, UART IRQ/IDLE RX blocks and timer-triggered
-ADC DMA blocks are implemented as explicit modes. DMA and wire completion remain
-separate; cancellation preserves borrowed storage until proven settlement.
-Continuous DMA RX, gap-free ADC sampling and product boot/update policy remain
-outside the current support scope.
+There is no default heap, registry, driver worker or maximum instance pool.
+Accepted asynchronous requests retain storage until acquire-observed SETTLED;
+cancel, timeout and failed drain preserve that borrow. Finite and continuous
+IRQ/DMA modes are explicit maintained selections with different buffer/loan and
+progress contracts. No arbitrary load or IRQ delay is promised lossless.
 
-## First platforms
+## Start with a verified task
 
-- STM32F407ZGT6: Qiming Xinxin V3.1 reference.
-- STM32F407VET6: Lichuang Sky Youth reference.
-- GD32F470ZGT6: Lichuang Liangshan reference.
-- Native: deterministic or monotonic host models and real POSIX/FreeRTOS tests.
+- [Build an independent relocated Source SDK consumer](docs/tutorials/source-sdk.md).
+- [Execute rejection, cancellation and drain fixtures](docs/tutorials/async-io.md).
+- [Inspect the complete assembly format](docs/reference/configuration/assembly.md).
+- [Understand layers, factory and ownership](docs/explanation/platform-architecture.md).
+- [Check exact platform support and qualification](docs/reference/platforms/support.md).
+- [Develop with TDD and normal commit gates](docs/development/workflow.md).
 
-Each MCU has baremetal and FreeRTOS assemblies. Default physical Board assemblies
-select reviewed LEDs and UART; additional wiring belongs in a reviewed external
-Board package. Chip implementations, software fixtures and PCB qualification are
-reported separately. **Physical board execution has not been performed.**
+The [document entry](docs/index.md) provides one task navigation; original
+[design contracts](docs/design/README.md) and [delivery records](docs/delivery/README.md)
+retain their authority and historical source identity.
 
-## Build and commit checks
+## Build from the checkout
+
+Run from the repository root with host Python, Git, C/C++ tools and the maintained
+CMake/Ninja versions available:
 
 ```sh
 git submodule update --init --recursive
@@ -55,39 +58,26 @@ python tools/dev/dev.py build --preset native-debug --parallel 4
 python tools/dev/dev.py test --preset native-debug
 ```
 
-Use `stm32-qiming-baremetal`, `stm32-qiming-freertos`, `stm32-sky-baremetal`,
-`stm32-sky-freertos`, `gd32-liangshan-baremetal` or `gd32-liangshan-freertos` for
-MCU builds. Install the SHA-256-locked ARM GNU distribution with
-`scripts/ci/install_arm_toolchain.py` and put its `bin` directory on `PATH`.
-`native-release` and `native-asan` provide additional host contexts.
+Use the exact maintained preset and locked ARM GNU distribution for MCU builds.
+External products consume `Nexus::Platform` and `nexus_add_firmware()` from a
+verified Source SDK. Platform start does not generate tasks or start a scheduler.
+GoogleTest/GoogleMock is pinned and host-only; firmware remains C11.
 
-`NEXUS_ASSEMBLY_FILE` selects one schema-2 TOML input. SoC/Board facts remain
-maintained JSON. The generated bundle contains `resolved.json`, `nexus_config.h`,
-`nexus_bindings.h`, `nexus_factory.h`, binding C, linker memory and resource
-budgets. Unknown options and resource conflicts fail configuration. The resolved
-JSON is output, never an authored input. External applications consume
-`Nexus::Platform` and `nexus_add_firmware()`.
+## Support and evidence boundaries
 
-The [derived capability matrix](docs/delivery/capabilities.md) separates SoC modes,
-reference Board declarations, resolver fixtures and selected implementation
-source. `doctor`, `check` and CI reject a stale generated matrix; source evidence
-does not establish real hardware timing or qualification.
+F407ZG Qiming, F407VE Sky and F470ZG Liangshan maintain explicit first-platform
+assemblies. G474, H743 and U575 have separate narrow reference scopes. CPU-only
+Core/Arch/Runtime profiles cover M0/M0+/M3/M4/M7/M23/M33/M55/M85 without creating
+SoC/Board/factory support. ThreadX maintains its reviewed Native/M4 subset and
+does not inherit FreeRTOS CPU/isolation coverage.
 
-The unchanged root style and Doxygen conventions are enforced at commit time
-and in CI. Hooks validate staged content, preserve unstaged work and never stage
-or auto-fix files. Commit messages use Conventional Commits.
+The [capability matrix](docs/delivery/capabilities.md) separates modes, routes,
+Board declarations, fixtures and implementation source. The
+[qualification guide](docs/reference/platforms/qualification.md) explains exact
+code/configuration/tool/artifact evidence. **Physical MCU HIL remains not executed.**
+Document publication, ARM linking and software candidates do not establish
+hardware timing, electrical safety, signed product release or LTS commitments.
 
-## Contracts and delivery
-
-- [Architecture, engineering handbook and integration contracts](docs/design/README.md)
-- [Software delivery status and reproducible acceptance](docs/delivery/README.md)
-- [Team assignment and review preparation](tools/maintenance/README.md)
-- [Source SDK packaging](cmake/package/README.md)
-- [Contribution workflow](CONTRIBUTING.md)
-- [Historical evidence](docs/archive/README.md)
-
-Software checks bind source/configuration/tool identities and actual artifacts.
-ELF budgets include physical load bytes and every supported RAM reservation.
-Hardware timing, electrical behavior, watchdog accuracy and power-loss behavior
-require a connected HIL station. Software candidate seals are unsigned and do not
-promote a product release.
+Formatting and backslash Doxygen style follow the existing root policies.
+Commit hooks and CI preserve real failures and never stage or silently fix files.
+[Historical material](docs/archive/README.md) does not establish current support.

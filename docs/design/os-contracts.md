@@ -6,7 +6,15 @@ OS 提供有界等待、显式任务和同步存储，设备接口不依赖 sche
 
 ## 分层与依赖
 
-```mermaid
+![当前等待与退出：ready-arm-ready-wait-ready，执行者与join责任由外部管理](../assets/diagrams/wait-wake-shutdown.svg)
+
+当前执行语义见[FIG-08及源码依据](../assets/diagrams/README.md#fig-08-wait-wake与外部退出)。
+后端和完整平台边界见[FIG-01](../assets/diagrams/platform-architecture.svg)。
+以下简图源仅保留为历史分层视图，不替代当前可选后端、执行推进或退出合同。
+
+**历史OS分层简图源：**
+
+```text
 flowchart TD
     Product[外部产品：任务、预算与恢复] --> Owner[显式 BusOwner / UARTOwner]
     Product --> Wait[公共 nx_wait_port_t]

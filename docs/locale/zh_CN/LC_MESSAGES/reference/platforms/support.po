@@ -1,0 +1,107 @@
+# Chinese translation of canonical Nexus documentation.
+# Review is recorded only after independent semantic inspection.
+msgid ""
+msgstr "Project-Id-Version: Nexus source docs\nReport-Msgid-Bugs-To: \nLanguage: zh_CN\nLanguage-Team: Nexus agent-reviewed documentation\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Source-SHA256: 94d307e2388c85b807e6616ae7d2bd2f28553b8d2f18005dc7a09d9cfee2e7e5\nX-Nexus-Reviewed: true\n"
+
+msgid "Read exact platform support"
+msgstr "理解精确平台支持"
+
+msgid "Support has five separate dimensions: chip fact, maintained provider/mode, reviewed Board route, executed software scope and physical station scope. The [derived capability matrix](../../delivery/capabilities.md) owns mode/route/ fixture/source associations. The [support record](../../delivery/support.md) owns current detailed limits; this page explains how to select them."
+msgstr "支持分为五个独立维度：芯片事实、维护的 provider/mode、复核 Board route、实际软件执行范围和物理 station 范围。[派生能力矩阵](../../delivery/capabilities.md)拥有 mode/route/fixture/source 关联。[支持记录](../../delivery/support.md)拥有当前详细限制；本页说明如何选择。"
+
+msgid "Platform"
+msgstr "平台"
+
+msgid "Maintained selection and essential boundary"
+msgstr "维护选择与关键边界"
+
+msgid "Native"
+msgstr "Native"
+
+msgid "Independent host models, POSIX behavior and real selected RTOS host tests; no MCU qualification"
+msgstr "独立 host 模型、POSIX 行为和实际选定 RTOS host 测试；不建立 MCU 资格"
+
+msgid "F407ZG Qiming / F407VE Sky"
+msgstr "F407ZG 启明 / F407VE 天空星"
+
+msgid "Exact M4F parts and separate Board facts; broad explicit F407 modes, baremetal/FreeRTOS and reviewed ThreadX M4 subset"
+msgstr "精确 M4F 料号和各自 Board 事实；明确选择广泛 F407 模式、baremetal/FreeRTOS 与复核 ThreadX M4 子集"
+
+msgid "F470ZG Liangshan"
+msgstr "F470ZG 梁山派"
+
+msgid "Exact GD32 M4F provider and Board; broad explicit modes, baremetal/FreeRTOS and reviewed ThreadX M4 subset"
+msgstr "精确 GD32 M4F provider 与 Board；明确选择广泛模式、baremetal/FreeRTOS 与复核 ThreadX M4 子集"
+
+msgid "G474RE source reference"
+msgstr "G474RE 来源参考"
+
+msgid "GPIO/LPUART baseline plus selected EXTI; no inherited F407 DMA or all-peripheral support"
+msgstr "GPIO/LPUART 基线及 selected EXTI；不继承 F407 DMA 或全外设支持"
+
+msgid "H743ZI NUCLEO reference"
+msgstr "H743ZI NUCLEO 参考"
+
+msgid "Exact fixed HSI32/HSI64 and Cache off/on profiles, GPIO/IRQ UART and finite USART3 TX DMA; no RX DMA or runtime handoff"
+msgstr "精确固定 HSI32/HSI64 与 Cache off/on profile、GPIO/IRQ UART 和有限 USART3 TX DMA；无 RX DMA 或运行态交接"
+
+msgid "U575ZI-Q default reference"
+msgstr "U575ZI-Q 默认参考"
+
+msgid "Externally established TZEN=0/SWAP_BANK=0, MSIS4, GPIO/IRQ UART; no default DMA or dual-domain factory"
+msgstr "外部预先建立 TZEN=0/SWAP_BANK=0、MSIS4、GPIO/IRQ UART；默认无 DMA 或双域 factory"
+
+msgid "U575 separate dual-domain reference"
+msgstr "U575 独立双域参考"
+
+msgid "TZEN=1, no OS, synchronous copied GPIO gateway; no generic asynchronous cross-domain transport"
+msgstr "TZEN=1、无 OS、同步复制 GPIO gateway；无通用异步跨域 transport"
+
+msgid "CPU-only Runtime"
+msgstr "CPU-only Runtime"
+
+msgid "M0/M0+/M3/M4/M7/M23/M33/M55/M85 Core/Arch and selected baremetal/FreeRTOS software profiles; no generated SoC/Board/factory"
+msgstr "M0/M0+/M3/M4/M7/M23/M33/M55/M85 Core/Arch 及选定 baremetal/FreeRTOS 软件 profile；不生成 SoC/Board/factory"
+
+msgid "ThreadX currently maintains Native Linux GNU and M4 GNU profiles; it does not inherit the FreeRTOS Cortex-M, MPU, split-security or tickless matrix. Platform startup does not enter either kernel. The application owns scheduler startup."
+msgstr "ThreadX 当前维护 Native Linux GNU 与 M4 GNU profile；不继承 FreeRTOS Cortex-M、MPU、split-security 或 tickless 矩阵。平台启动不进入任何 kernel。应用拥有 scheduler 启动。"
+
+msgid "![CPU primitive, runtime, SoC and physical qualification boundaries](../../assets/diagrams/cortex-m-capabilities.svg)"
+msgstr "![CPU 原语、runtime、SoC 与物理资格边界](../../assets/diagrams/cortex-m-capabilities.svg)"
+
+msgid "CPU primitive, runtime, SoC and physical qualification boundaries"
+msgstr "CPU 原语、runtime、SoC 与物理资格边界"
+
+msgid "FIG-13 separates CPU software coverage from exact SoC integration and physical acceptance. FPU, DSP, Cache, MVE, SAU and IRQ width are explicit required facts; a CPU name never enables an optional capability automatically."
+msgstr "FIG-13 分开 CPU 软件覆盖、精确 SoC 接入和物理验收。FPU、DSP、Cache、MVE、SAU 和 IRQ width 必须作为明确事实；CPU 名称绝不自动启用可选能力。"
+
+msgid "Check a selection before using it"
+msgstr "使用前核对选择"
+
+msgid "Find the exact full part and Board package, including unknown physical facts."
+msgstr "确认精确完整料号与 Board package，包括未知物理事实。"
+
+msgid "Inspect the selected controller route and mode in the capability matrix."
+msgstr "在能力矩阵核对选定 controller route 与 mode。"
+
+msgid "Resolve the actual complete assembly; unsupported modes and conflicts reject."
+msgstr "解析实际完整 assembly；不支持模式和冲突会拒绝。"
+
+msgid "Check software evidence for its exact source/configuration, not a nearby tuple."
+msgstr "核对精确 source/configuration 的软件证据，不能使用近似 tuple。"
+
+msgid "Check an actual station record before claiming physical behavior."
+msgstr "声明物理行为前核对实际 station record。"
+
+msgid "All maintained MCU physical HIL remains not executed in the current records. Default Board bindings do not cover every connector, transceiver or external part. Finite block modes include rearm gaps. Continuous modes need explicit replacement storage and service budgets; they do not promise losslessness under arbitrary load. Flash geometry is physical, while product partitions and update policy are external."
+msgstr "当前记录中所有维护 MCU 的物理 HIL 仍未执行。默认 Board binding 不涵盖全部 connector、transceiver 或外部器件。有限 block 模式存在 rearm 间隙。连续模式需要显式 replacement 存储和 service 预算，不能承诺任意负载下无损。Flash geometry 是物理机制，产品分区和升级策略属于外部工程。"
+
+msgid "![Selected U575 synchronous Secure/NonSecure reference](../../assets/diagrams/u575-security-domains.svg)"
+msgstr "![选定 U575 同步 Secure/NonSecure 参考](../../assets/diagrams/u575-security-domains.svg)"
+
+msgid "Selected U575 synchronous Secure/NonSecure reference"
+msgstr "选定 U575 同步 Secure/NonSecure 参考"
+
+msgid "FIG-14 applies only to its declared TZEN=1 synchronous reference. It does not change the default TZEN=0 Platform configuration or establish physical isolation. Read [qualification](qualification.md) before treating any software result as a release."
+msgstr "FIG-14 仅适用其声明的 TZEN=1 同步参考。不改变默认 TZEN=0 Platform 配置，也不建立物理隔离。把软件结果视为发布前先阅读[资格](qualification.md)。"
+

@@ -17,6 +17,6 @@
 | 查阅内容迁移规则 | [迁移映射](design/documentation-migration.csv) |
 | 查阅旧方案 | [历史资料](archive/README.md) |
 
-文档系统规划尚未实施。新导航、MyST、统一 CLI、双语与版本发布的验收以 DOC
+新导航、MyST、统一 CLI、双语与版本发布已进入实现；实际验收以 DOC
 台账为准，不从规划文件的存在推断完成。当前平台代码资格由交付记录中的精确
 源码、配置和 scope 决定，不自动随本文档 HEAD 更新。

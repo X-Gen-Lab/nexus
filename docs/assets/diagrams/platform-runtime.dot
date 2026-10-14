@@ -1,8 +1,8 @@
 // FIG-01 current: runtime access, not the complete CMake dependency graph.
-// Code basis: 929a3bd684152fc3d49717bbd51497f554e5e8d5.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
 // Factory lookup and ordinary I/O are separate paths.
 digraph platformRuntime {
-    graph [rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.55];
+    graph [label="FIG-01 补充：当前运行时访问", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.55];
     node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
           color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
           fontsize=13, margin="0.16,0.10"];

@@ -38,15 +38,68 @@ class WorkflowContracts(unittest.TestCase):
         self.assertEqual(seal['with']['require-dependencies'], 'true')
         self.assertEqual(steps[upload]['with']['retention-days'], '30')
 
-    def test_pages_publish_observed_documentation_identity(self):
+    def test_docs_preview_has_no_deployment_permissions(self):
+        document = workflow('docs-build.yml')
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+        caller = workflow('ci.yml')['jobs']['docs']
+        self.assertEqual(caller['permissions'], {'contents': 'read'})
+        self.assertNotIn('secrets', caller)
+        self.assertEqual(set(document['jobs']), {'build'})
+        steps = document['jobs']['build']['steps']
+        checkout = next(step for step in steps if step.get('uses', '').startswith(
+            'actions/checkout@'))
+        self.assertEqual(checkout['with']['submodules'], 'recursive')
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertIn('tools/documentation/install.py', commands)
+        self.assertIn('tools/dev/dev.py docs test', commands)
+        self.assertIn('tools/dev/dev.py docs check', commands)
+        self.assertIn('tools/dev/dev.py docs build', commands)
+        self.assertIn('tools/dev/dev.py docs package', commands)
+        self.assertIn('--output "$RUNNER_TEMP/nexus-documentation-package"',
+                      commands)
+        self.assertIn('shutil.copytree(source, staging)', commands)
+        self.assertIn('delivery.verify', commands)
+        self.assertNotIn('sudo apt-get', commands)
+        self.assertFalse(any('pages' in step.get('uses', '') for step in steps))
+
+    def test_docs_preview_only_uploads_successful_bound_outputs(self):
         steps = workflow('docs-build.yml')['jobs']['build']['steps']
         index = next(index for index, step in enumerate(steps) if step.get(
-            'uses', '').startswith('actions/upload-pages-artifact@'))
+            'uses', '').startswith('actions/upload-artifact@'))
+        upload = steps[index]
+        self.assertEqual(upload['if'], 'success()')
+        self.assertEqual(upload['with']['if-no-files-found'], 'error')
         seal = steps[index - 1]
         self.assertEqual(seal.get('uses'), './.github/actions/record-identity')
-        self.assertEqual(seal['with']['artifacts'], 'public/')
-        self.assertTrue(seal['with']['output'].startswith('public/'))
+        self.assertEqual(seal['if'], 'success()')
+        self.assertEqual(seal['with']['artifacts'].splitlines(), [
+            'build/documentation/', 'build/documentation-package/',
+            'build/documentation-check.json', 'build/documentation-tests.json'])
+        self.assertEqual(seal['with']['output'], 'build/docs-job-identity')
         self.assertEqual(seal['with']['require-dependencies'], 'false')
+        self.assertIn('build/docs-job-identity/', upload['with']['path'])
+
+    def test_docs_publish_only_consumes_verified_trusted_branch_payload(self):
+        document = workflow('docs-publish.yml')
+        self.assertEqual(document['on']['push']['branches'], ['docs-delivery'])
+        self.assertNotIn('pull_request', document['on'])
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+        validate = document['jobs']['validate']
+        self.assertEqual(validate['permissions'], {'contents': 'read'})
+        commands = '\n'.join(step.get('run', '') for step in validate['steps'])
+        self.assertIn('python3 verifier/verify_documentation.py public publication.json', commands)
+        self.assertNotIn('pip install', commands)
+        self.assertNotIn('tools/dev/dev.py', commands)
+        upload = next(step for step in validate['steps'] if step.get(
+            'uses', '').startswith('actions/upload-pages-artifact@'))
+        self.assertEqual(upload['if'], 'success()')
+        self.assertEqual(upload['with']['path'], 'public')
+        deploy = document['jobs']['deploy']
+        self.assertEqual(deploy['needs'], 'validate')
+        self.assertEqual(deploy['permissions'], {'pages': 'write', 'id-token': 'write'})
+        self.assertEqual(deploy['environment']['name'], 'nexus-documentation')
+        self.assertFalse(any(step.get('uses', '').startswith('actions/checkout@')
+                             or 'run' in step for step in deploy['steps']))
 
     def test_source_sdk_attests_only_a_successful_observed_manifest(self):
         job = workflow('release.yml')['jobs']['source-sdk']

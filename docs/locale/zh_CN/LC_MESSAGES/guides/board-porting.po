@@ -1,0 +1,43 @@
+# Chinese translation; independent semantic review pending.
+msgid ""
+msgstr "Project-Id-Version: Nexus source docs\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Source-SHA256: 7d44941df5d86243f0bd82e4437986092956188654335280a92cec718fa791aa\nX-Nexus-Reviewed: true\n"
+
+msgid "Add a reviewed Board package"
+msgstr "接入复核的 Board package"
+
+msgid "Use this guide when the exact SoC already has a maintained provider. A Board adds PCB facts and reviewed bindings; it does not copy a vendor SDK or authorize every silicon route. Actual unobserved PCB revision, bridges and voltage stay unknown."
+msgstr "精确 SoC 已有维护 provider 时使用本指南。Board 增加 PCB 事实与复核 binding，不复制厂商 SDK，也不授权每一条硅片 route。实际未观察的 PCB revision、焊桥和电压保持未知。"
+
+msgid "Gather the minimum facts"
+msgstr "收集最小事实"
+
+msgid "Record the full part, package, source document revision and retained provenance. Record oscillator values, supply conditions, SWD reservations, pins, active levels, jumper conditions and safe initial outputs. Distinguish document defaults from an observation of your particular board. Start with one LED and one console route."
+msgstr "记录完整料号、封装、来源文档 revision 和保留 provenance。记录晶振值、供电条件、SWD reservation、pin、有效电平、跳线条件和安全初始输出。区分文档默认与这块实际板卡的观察。先接入一个 LED 和一条 console route。"
+
+msgid "The following is a complete maintained Board file, including `soc_family`:"
+msgstr "下面是完整维护 Board 文件，包含 `soc_family`："
+
+msgid "Source-reviewed Qiming V3.1 facts; physical PCB revision remains unknown."
+msgstr "来源复核的启明 V3.1 事实；物理 PCB revision 仍未知。"
+
+msgid "The [integration contract](../design/integration-contracts.md) owns field and resource requirements. Keep your Board package in its external product repository when it describes private PCB data. Public reusable packages live under `boards/`; ordinary packages require only `board.json` and a README. Add bounded neutral Board hooks only for electrical actions not expressible by maintained data."
+msgstr "[接入合同](../design/integration-contracts.md)拥有字段与资源要求。描述私有 PCB 数据的 Board package 保留在外部产品仓库。公开可复用 package 位于 `boards/`；普通 package 只需 `board.json` 与 README。仅当维护数据不能表达电气动作时，才增加有界中性 Board hook。"
+
+msgid "Validate through the actual resolver"
+msgstr "通过实际 resolver 验证"
+
+msgid "From the Nexus repository root, inspect a known-good reference before authoring:"
+msgstr "从 Nexus 仓库根目录执行，编写前先检查已知合法参考："
+
+msgid "For your package, select `board_package` in an external complete assembly and run those same commands with its absolute path. Relative package paths resolve from the authored assembly. A JSON syntax check alone cannot prove SoC identity, clock, route or resource compatibility. Unknown fields and unreviewed routes must reject."
+msgstr "自己的 package 在外部完整 assembly 中选择 `board_package`，以绝对 assembly 路径运行同样命令。相对 package 路径从 authored assembly 定位。仅 JSON 语法检查不能证明 SoC identity、clock、route 或资源兼容。未知字段与未复核 route 必须拒绝。"
+
+msgid "Build and record the selected scope"
+msgstr "构建并记录选定范围"
+
+msgid "Configure your external consumer using its assembly and the locked ARM toolchain. Keep baremetal and FreeRTOS in separate output roots. Check resolved claims, vector/startup, strong handlers, ELF/BIN/map and every physical RAM/Flash budget. Factory lookup must be pure before start and instance state must remain isolated. Use a software Board fixture for model/link testing; label its wiring accordingly."
+msgstr "通过自己的 assembly 和锁定 ARM 工具链配置外部 consumer。Baremetal 与 FreeRTOS 使用独立输出根。检查 resolved claim、vector/startup、strong handler、ELF/BIN/map 及每个物理 RAM/Flash 预算。Factory 在 start 前查找必须纯净，实例状态必须独立。模型/链接测试使用软件 Board fixture，并准确标注其接线性质。"
+
+msgid "Prepare [HIL plans](performance-hil.md) without equipment. Physical qualification requires a separately reviewed station, observed Board/part/UID/probe/wiring, exact image and real raw measurements. Source-reviewed pads never establish connector continuity, immunity or safe electrical behavior."
+msgstr "无设备时准备 [HIL plan](performance-hil.md)。物理资格要求独立复核 station、实际 Board/part/UID/probe/wiring、精确 image 和真实 raw measurement。来源复核的 pad 不建立 connector 连通、抗扰或安全电气行为。"
+

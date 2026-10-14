@@ -1,0 +1,50 @@
+name: Nexus Documentation Publish
+
+on:
+  push:
+    branches: [docs-delivery]
+
+# Only the dedicated reviewed delivery branch contains this publisher,
+# its stdlib verifier and ready-built public bytes. It never builds PR sources.
+permissions:
+  contents: read
+
+concurrency:
+  group: nexus-documentation-pages
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Verify prepared publication
+    if: github.repository == 'X-Gen-Lab/nexus' && github.ref == 'refs/heads/docs-delivery'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify manifest, archive identity and every published byte
+        run: python3 verifier/verify_documentation.py public publication.json
+
+      - name: Upload the verified prepared Pages payload
+        if: success()
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: public
+
+  deploy:
+    name: Deploy verified documentation
+    needs: validate
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: nexus-documentation
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy the validated artifact
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
