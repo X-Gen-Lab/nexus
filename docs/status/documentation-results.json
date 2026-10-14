@@ -1,68 +1,1047 @@
 {
   "schema_version": 1,
   "kind": "nexus_documentation_delivery_results_index",
-  "status": "implementation_development_evidence_formal_acceptance_pending",
+  "status": "passed",
+  "validation_scope": "accepted_docs_exit",
   "task_authority": "docs/design/documentation-system-execution.csv",
+  "task_authority_sha256": "d1f5adad33468cb83c2849b9ec5176d10d958db044620943e93fb0d02d6a2c77",
+  "task_count": 58,
+  "formal_evidence_required_for": [],
   "source": {
-    "documentation_commit": null,
-    "documentation_tree": null,
-    "clean_execution_receipt": null,
-    "boundary": "Null formal fields have not yet been obtained. Development/preview evidence grants no clean-source release or firmware qualification."
+    "documentation_commit": "3835e13cd7da34bd75307746859d4514745ae2ff",
+    "documentation_tree": "1d42f685b0c2030d15619e371dc375164cacc911",
+    "clean_execution_receipt": {
+      "member_path": "payload/formal-package-source3/documentation-build.json",
+      "bytes": 9078,
+      "sha256": "50b5e0be0a0e254ec1a994eb2e812169ca3f04ff4879bef181adcff02fad75c2",
+      "scope": "Actual clean Source3 strict Doxygen/gettext/en/zh_CN build; later journal HEAD is separate."
+    },
+    "boundary": "This index reports the actual Source3 qualification. Later acceptance-only documents have their own build manifest and do not rewrite prior execution identities."
   },
   "qualified_code_reference": {
+    "commit": "cc6a065c002041234a212a964be863a69198f9b4",
     "index": "docs/delivery/build-system-results.json",
-    "canonical_code_commit": "cc6a065c002041234a212a964be863a69198f9b4",
-    "boundary": "Original firmware scope only; this documentation iteration does not establish a new execution at its HEAD."
+    "index_sha256": "3b86c0b91dc5fd1b6cd688a4d82d8932a62dc84a85c3c241dbc54e396f288ce4",
+    "tree": "de0e687f659a22badb55259b2e03646fc7b748d1"
   },
-  "formal_evidence_required_for": [
-    "DOC-37",
-    "DOC-38",
-    "DOC-39",
-    "DOC-40",
-    "DOC-58"
-  ],
   "documentation_package": {
-    "release_id": null,
-    "manifest_sha256": null,
-    "archive_sha256": null,
-    "archive_bytes": null,
-    "download_url": null
+    "release_id": "docs-20261014-3835e13cd7da",
+    "manifest_sha256": "21912550daba4d9c7f9c7292c43d44e1b26923dc0b4331544196971c3c9a7aaa",
+    "archive_sha256": "566acb2d7f4a8ec80022364ca6002ec07b93319c1eb150f5df78e5b996b879df",
+    "archive_bytes": 7078685,
+    "payload_files": 1600,
+    "download_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/d8913934e6b296e4a17e6dd50e4ae389da60309f/docs-20261014-3835e13cd7da/docs-20261014-3835e13cd7da.tar.gz",
+    "pages_download_url": "https://x-gen-lab.github.io/nexus/downloads/docs-20261014-3835e13cd7da.tar.gz"
   },
   "evidence_delivery": {
-    "status": "pending_actual_archive_and_publication",
-    "channel": "immutable GitHub documentation release asset",
-    "release_url": null,
-    "archive_url": null,
-    "archive_sha256": null,
-    "archive_bytes": null,
-    "external_receipt_url": null,
-    "expected_member_paths": [
-      "status/final-view/red.log",
-      "status/final-view/green.log",
-      "status/final-view/ledger-update.json",
-      "independent-diagrams/review.json",
-      "independent-diagrams/reader-walk.json",
-      "independent-diagrams/source-output-check.json"
+    "status": "passed",
+    "channel": "immutable Git commit storage",
+    "release_url": "https://github.com/X-Gen-Lab/nexus/releases/tag/docs-20261014-3835e13cd7da",
+    "storage_commit": "ed6835c5caf698f2daa356f72d38c1f0199303eb",
+    "retention_tag": "docs-evidence-20261014-source3-v1",
+    "archive_name": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz",
+    "archive_sha256": "1774f52c323a9544348026195db19773b483da9d053d3f55a91eb49f44b3f098",
+    "archive_bytes": 107591060,
+    "parts_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/evidence-parts.json",
+    "parts_sha256": "14621960f5c040a234986380356bc7a6c2b7311ceb604c7637221e940bca6a75",
+    "parts": [
+      {
+        "bytes": 33554432,
+        "path": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0000",
+        "sha256": "5a3a9695b39464206a7a43fc5dc269cadfa70adbc4e269c26514ff2f3f54d9da"
+      },
+      {
+        "bytes": 33554432,
+        "path": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0001",
+        "sha256": "3c14c20199d32cd51f482eec0fe09ca06a4d59a7abc0c8a6f49fd271c68d5146"
+      },
+      {
+        "bytes": 33554432,
+        "path": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0002",
+        "sha256": "da3fa344a3dbe5a424839a51fa9eac2be41f581a145db0b20457184d5ef913a1"
+      },
+      {
+        "bytes": 6927764,
+        "path": "nexus-docs-evidence-20261014-source3-3835e13-v1.tar.gz.part0003",
+        "sha256": "90c18eeaa8bc27ceda17f3dcd6e0b95caa27839bdacf937ec4c6e7a2d9d3435f"
+      }
     ],
-    "boundary": "Expected paths are proposed archive layout, not existing published assets or confirmed member identities."
+    "inventory_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/EVIDENCE-INVENTORY.json",
+    "inventory_sha256": "88b4f5ee0659b56a44a57a32bcfbcb9de528b7e7dfbc63bbc890cfa350af50b4",
+    "members": 17117,
+    "verifier_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/VERIFY-EVIDENCE.py",
+    "verifier_sha256": "d3d92e12a8765efda2a8b958ec8d74af11cc9e37f3e1657ed24e690286446324",
+    "export_receipt_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/export-receipt.json",
+    "export_receipt_sha256": "ccc66a8200d8922120622a2d8944c5c1a89467596a5e6381700b383c714d54ea",
+    "external_receipt_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0de273ddf7aa191e5d9e19d6d9ec695af574395b/docs-evidence-20261014-source3-v1-restore/restore.json",
+    "external_receipt_sha256": "68c36a43bd3a7fe5d01827cb3c4ac0fb2d86bc518ca7660c7229dcd470b98504",
+    "external_receipt_bytes": 15315,
+    "excluded_duplicate_bodies": {
+      "files": 4451,
+      "bytes": 958047227,
+      "index_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/ed6835c5caf698f2daa356f72d38c1f0199303eb/docs-evidence-20261014-source3-v1/EVIDENCE-EXCLUSIONS.json",
+      "index_sha256": "b1b76b1eb26a64ee2e0f591dc16d650867c2bcdcdf477cea74cf9c7842542eb8",
+      "boundary": "Only byte-identical remotely retained asset bodies are excluded; every receipt, failed attempt and selected original member remains intact."
+    },
+    "boundary": "Release attachment upload returned HTTP 401; these are actually retrieved Git objects, not Release attachments. Inventory excludes itself; archive and outer receipt are outside payload."
+  },
+  "offline_tool_cache": {
+    "storage_commit": "d8913934e6b296e4a17e6dd50e4ae389da60309f",
+    "parts_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/d8913934e6b296e4a17e6dd50e4ae389da60309f/docs-20261014-3835e13cd7da/documentation-tools-parts.json",
+    "parts_sha256": "ef5ac771334134f22f7895a463c871b9764823abd2523a6f90a1b16bcb64612b",
+    "archive_sha256": "87eada76c444233dc33ea5151553ed022ab90f055d7763fbf907a08a59aa4528",
+    "archive_bytes": 164835100,
+    "parts": [
+      {
+        "path": "documentation-tools-linux-x86_64-cp312/part-000.bin",
+        "bytes": 33554432,
+        "sha256": "9445d3ea2de1ef5855fc42264f3deb35e3fc289a84e74fa3372e1cabb6b22b94"
+      },
+      {
+        "path": "documentation-tools-linux-x86_64-cp312/part-001.bin",
+        "bytes": 33554432,
+        "sha256": "9a2fbd059cb9a97700cb15554809f3904b97d172d2364e3782a2a04a64c30ba3"
+      },
+      {
+        "path": "documentation-tools-linux-x86_64-cp312/part-002.bin",
+        "bytes": 33554432,
+        "sha256": "eadd8dc2a661bd4fa49a5079c7927bf095c4af98bcad11f85a8e485a95b009a5"
+      },
+      {
+        "path": "documentation-tools-linux-x86_64-cp312/part-003.bin",
+        "bytes": 33554432,
+        "sha256": "d3e692ff262713c9ad3b1ac09ad401cdb0dac89ceba18e74cbc46ab1f9df7ad8"
+      },
+      {
+        "path": "documentation-tools-linux-x86_64-cp312/part-004.bin",
+        "bytes": 30617372,
+        "sha256": "a350f23cca975ff17add1089166fe4eb2e4a1e910fb9d4d0c019db131bfc8efe"
+      }
+    ],
+    "archive_members": 75,
+    "locked_configuration_members": 2,
+    "qualified_tuple": "Linux x86_64 / CPython 3.12",
+    "actual_installation": {
+      "member_path": "payload/tool-install/installation.json",
+      "bytes": 834800,
+      "sha256": "6eb9ca66414b99533d0b62cb7928994f5bb2046ed431a5e771a519bb821f28a8",
+      "scope": "Actual locked native ELF, font, Python and license closure installation; the remote cache was independently retrieved and validated."
+    }
   },
   "actual_scope_receipts": {
-    "clean_source_build": null,
-    "normal_commit_gates": null,
-    "browser_desktop_narrow_zoom_print": null,
-    "published_site_and_download": null,
-    "independent_download_restore": null,
-    "final_independent_review": null
+    "clean_source_build": {
+      "member_path": "payload/formal-package-source3/documentation-build.json",
+      "bytes": 9078,
+      "sha256": "50b5e0be0a0e254ec1a994eb2e812169ca3f04ff4879bef181adcff02fad75c2",
+      "scope": "Clean Source3 strict bilingual build."
+    },
+    "normal_commit_gates": {
+      "member_path": "payload/pages-hidden-fix/normal-gates/receipt.json",
+      "bytes": 1605083,
+      "sha256": "2add3a6e26b25b06fef543ee422f43af951de75dece03ce65b4d35db1c3cf05a",
+      "scope": "Actual normal pre-commit staged two-file correction at parent3835; 3252 Google cases and 1555 tool cases; not a fresh clean63d64 firmware qualification."
+    },
+    "browser_desktop_narrow_zoom_print": {
+      "member_path": "payload/browser/final-source3/acceptance-summary.json",
+      "bytes": 2090,
+      "sha256": "cd326cd0b2798af14f79307dea3d4512f345cefddae8a0c9aaf66107168657e1",
+      "scope": "Source3 actual162 checks, 22 PDFs, 32 blocks/800 lines, original18 visual pages."
+    },
+    "published_site_and_download": {
+      "member_path": "payload/postdeploy-source3/20261014T101418Z-72db5d74ff344aef97934b8e76c5c144/production-post-deploy.json",
+      "bytes": 708490,
+      "sha256": "4e2474932db504bc2598663a57130c500d761e7a0eba9342286f1b93ae6768e2",
+      "scope": "Actual1895 public HTTP observations,1600payload and290root gateways plus stable/downloads."
+    },
+    "independent_download_restore": {
+      "member_path": "payload/git-assets-restore/20261014T101842Z-00ee87ce697a4d38870a7d4f9b3a5e4a/execution.json",
+      "bytes": 32757,
+      "sha256": "957982dedad97deec4250356403390b2610f533315412bce00fb4cc4d27b0133",
+      "scope": "Real fixed-commit HTTPS retrieval,1600files restored,75tool archives and2configs verified."
+    },
+    "restored_browser": {
+      "member_path": "payload/browser/remote-restored-source3/acceptance-summary.json",
+      "bytes": 3767,
+      "sha256": "607af431da66bafb6664a7c9fac8510c37fa7fce7388db256869966dadf4a6a2",
+      "scope": "Another actual162 browser records and22newPDF completeness checks in remote-restored independent root; original18visual pages reused only through exact render-input SHA equivalence."
+    },
+    "final_independent_review": {
+      "member_path": "payload/final-closure/final-review.json",
+      "bytes": 128027,
+      "sha256": "f1f3bd38e8f26d28e5d65de3d0069f9d61958fe689ecd28e15e8cfa1b80d40f1",
+      "scope": "All58 original documentation exits accepted with original execution scopes preserved."
+    },
+    "accepted_task_records": {
+      "member_path": "payload/final-closure/accepted-task-records.json",
+      "bytes": 116688,
+      "sha256": "81ad61da91d0b1336365635f17c6452b7b13f130ce265be19b5cb1b0730fba8a",
+      "scope": "Full per-task original exit and actual proof member identities; each listed member verified after real archive retrieval."
+    }
   },
+  "evidence": {
+    "status_mapping": {
+      "member_path": "payload/status/final-view/mapping-check.json",
+      "sha256": "193012bd9057ce2e8732083669305aa8eb8f2f71a0b157f584da55d46dc13b66",
+      "bytes": 140,
+      "original_scope": "Original230 authority-source/alias checks; source3 checks are independently embedded in fresh build metadata"
+    },
+    "status_check": {
+      "member_path": "payload/status/final-view/source-check.json",
+      "sha256": "e089d6271efaf45da5a1ba73cd2baf6cc843f37c2ade9c1037da0611f6bcbca2",
+      "bytes": 1490,
+      "original_scope": "Actual original source check; later source3 clean build embeds its own fresh source check"
+    },
+    "docs_ci": {
+      "member_path": "payload/ci-source3-complete.json",
+      "sha256": "7bb170f5de46f800eff99e70d1a63494449585154c512e34bca43ca4db43d75f",
+      "bytes": 5982,
+      "original_scope": "Exact source3 CI: style and Documentation Build success; full firmware jobs skipped under docs-only change classification"
+    },
+    "browser": {
+      "member_path": "payload/browser/final-source3/acceptance-summary.json",
+      "sha256": "cd326cd0b2798af14f79307dea3d4512f345cefddae8a0c9aaf66107168657e1",
+      "bytes": 2090,
+      "original_scope": "Formal clean source3 browser aggregate; verifies its four named component hashes; Linux Chromium local HTTP/offline-byte route; file:// not executed"
+    },
+    "semantic_diagrams": {
+      "member_path": "payload/independent-diagrams/review.json",
+      "sha256": "d7bca09bcc3b32a355840ddab0d9f52a9b4a64fbc7af6cad25a43ebc813971b6",
+      "bytes": 16105,
+      "original_scope": "Independent 17 diagram source/caption/raster review; four findings closed; old source hashes preserved and compared separately to source3"
+    },
+    "clean_reader": {
+      "member_path": "payload/clean-reader/receipt.json",
+      "sha256": "0ca7150390a47da7f423666bc04a5cdc0bbdbffc4b34cd012563d1463a555f36",
+      "bytes": 2261,
+      "original_scope": "Actual clean source2 7aadd347 reader execution, 85 top commands and 28 SDK commands; original source and all reports retained, no invented source3 rerun"
+    },
+    "input_equivalence": {
+      "member_path": "payload/clean-reader/source3-input-equivalence.json",
+      "sha256": "2eac61423f6975f0611ffee3e14a7a60fa83ff68f71e8ab0c3b73d77c0ddb43f",
+      "bytes": 2224,
+      "original_scope": "Actual source2/source3 maintained-code/config/test subtree identity proof; only docs print CSS changes; independent source3 print acceptance remains separate"
+    },
+    "content": {
+      "member_path": "payload/content/execution.json",
+      "sha256": "1233aabca3637e89da987e4ccdb78788dd1431d6071d62e380938f693817607b",
+      "bytes": 11059,
+      "original_scope": "Original development reader fixtures on dirty 0111c8d3 base; actual parser, Native 48 cases, relocated Native C/C++ consumer and unbound HIL preparation; not source3 firmware qualification"
+    },
+    "hook": {
+      "member_path": "payload/commit-gates/initial/receipt.json",
+      "sha256": "044d31bbaff8afd805b5c7e348debca021f1d53f3139213fdd84c8102a6b1b2a",
+      "bytes": 8204,
+      "original_scope": "Actual normal implementation hook bound to clean8f314de4 source: 3252 Native cases and tool domains, not re-executed at3835"
+    },
+    "reader_walk": {
+      "member_path": "payload/independent-diagrams/reader-walk.json",
+      "sha256": "9743a933abe1cfda560848391e4b21ac601790eb188133f32da013f0e3014f05",
+      "bytes": 9415,
+      "original_scope": "Original 32 actual HTML task/qualification/history routes and preserved result JSON bytes; development preview only"
+    },
+    "packaging": {
+      "member_path": "payload/package-source3.log",
+      "sha256": "23de470442c8e18a7f1b9e5f20d86215a4114da2f7ca01603b204bd0af8f96a5",
+      "bytes": 824,
+      "original_scope": "Actual source3 clean package/verify metadata and publication interface; distinct from remote download/restore"
+    },
+    "status": {
+      "member_path": "payload/status/final-view/ledger-update.json",
+      "sha256": "314f52089ac4ac7006ac82f145b955f110dec62fb05342f6c36a1964511712eb",
+      "bytes": 417,
+      "original_scope": "All58 original exit strings preserved; implementation facts and original pending statuses; not a formal qualification receipt"
+    },
+    "alias_review": {
+      "member_path": "payload/independent-review/aliases/review-receipt.json",
+      "sha256": "f7233f94ca9b56ca5758c0e3202325a0f8846fbd0da54f4c721fce4e9088fe14",
+      "bytes": 4811,
+      "original_scope": "Independent exact-alias boundary regressions and fixes, preserved failed attempts"
+    },
+    "site": {
+      "member_path": "payload/site/implementation-report.json",
+      "sha256": "3c3b5cb3e97b81bcf115a3d12c51471d90ddc670e190e290d783babb0204a785",
+      "bytes": 2771,
+      "original_scope": "Original site implementation development validation, relative includes/translation/figures/navigation"
+    },
+    "tests": {
+      "member_path": "payload/docs-tests-final.json",
+      "sha256": "ce1bf7379daac35985f3e4f53a4353bc6e2fc5ca5fff0a60dcf547da27e815fc",
+      "bytes": 196,
+      "original_scope": "Actual local documentation unittest domain 169/169, zero failures/skips; source timestamp and original command scope retained"
+    },
+    "translation": {
+      "member_path": "payload/translation-review/receipt.json",
+      "sha256": "fcb602089c6d4996934cf908b0b2e8d447e707f95736dcd36bbe1afbd4775e56",
+      "bytes": 96112,
+      "original_scope": "Independent message-by-message review of 273 messages / 22 pages; exact authored-source and catalog digests retain identity"
+    },
+    "navigation": {
+      "member_path": "payload/navigation/validation.json",
+      "sha256": "53fa98695abd12965249bb67e48a3508fd2bdfb9e073ebc98f7294115809734f",
+      "bytes": 7041,
+      "original_scope": "Actual gettext and canonical language/source catalog checks; original source references retained"
+    },
+    "nav_translation": {
+      "member_path": "payload/translation-review/status-navigation-update.json",
+      "sha256": "f44a14a0f7587018a61838fce2f761a4d6e77e29883c592a39bfc10d3c9c3235",
+      "bytes": 1211,
+      "original_scope": "Independent approval of status-navigation translation digest update; no firmware changes"
+    },
+    "diagram_bytes": {
+      "member_path": "payload/independent-diagrams/source-output-check.json",
+      "sha256": "1425bdcf353ee4ba5b094aef29514e686709b20ed5ad09522a56de8a1a141bdb",
+      "bytes": 184,
+      "original_scope": "Independent 17 DOT/SVG exact canonical bytes with locked renderer"
+    },
+    "installation": {
+      "member_path": "payload/tool-install/installation.json",
+      "sha256": "6eb9ca66414b99533d0b62cb7928994f5bb2046ed431a5e771a519bb821f28a8",
+      "bytes": 834800,
+      "original_scope": "Actual complete Linux amd64 CPython3.12 installation and tool/lock identities; no Win/mac/CP311 qualification"
+    },
+    "remote_browser_aggregate": {
+      "member_path": "payload/browser/remote-restored-source3/acceptance-summary.json",
+      "sha256": "607af431da66bafb6664a7c9fac8510c37fa7fce7388db256869966dadf4a6a2",
+      "bytes": 3767,
+      "original_scope": "Frozen actual independent remote restored-source3 desktop/narrow/zoom/offline/22A4PDF aggregate; components individually hash checked; original1600payload plus2manifest/checksum controls explicitly separated"
+    },
+    "tool_review": {
+      "member_path": "payload/tool-review/review-receipt.json",
+      "sha256": "82f24943133b6833e4a25e6674b6afda4937101d3fac0ea57b00622bcfc07529",
+      "bytes": 2548,
+      "original_scope": "Independent tool negative-path review; source identities and 14 regressions retained as development evidence"
+    },
+    "dependency_review": {
+      "member_path": "payload/independent-review/dependency-review-receipt.json",
+      "sha256": "3177a58d1c55748a28b375f6bf19c604b59d5962d920df55e31db0053a17257a",
+      "bytes": 2403,
+      "original_scope": "Independent locked dependency preparation and authored-hook boundary regression review"
+    },
+    "publisher": {
+      "member_path": "payload/publisher-source3-ci.json",
+      "sha256": "b988e7c704bbd0faaeca3f0de5a2f616636464b784fb17c7d1b093b3da19992f",
+      "bytes": 1633,
+      "original_scope": "Actual successful prepared-payload verify and Pages deployment run 38546291758; does not substitute public byte verification"
+    },
+    "fixed_publisher": {
+      "member_path": "payload/pages-hidden-fix/publisher-ci-progress.json",
+      "sha256": "4c8659597914d1dee3ed1c18e89da1c35f794fd3c960fe1462fb96eb83cc480d",
+      "bytes": 1580,
+      "original_scope": "Actual successful fixed uploader/publisher run38547751518, include-hidden transport defect corrected and actual verified payload deployed"
+    },
+    "public_passed": {
+      "member_path": "payload/postdeploy-source3/20261014T101418Z-72db5d74ff344aef97934b8e76c5c144/execution.json",
+      "sha256": "ecfcc43e4e07ff89b8d69735c7b9b8bd1996ed6aa2042de9ec43c3d7cad667e4",
+      "bytes": 3824,
+      "original_scope": "Actual independent public HTTPS1600payload/290gateway/stable/archive verification,143.924s; clean unchanged63d64 verifier, source3 package bytes"
+    },
+    "production_public_passed": {
+      "member_path": "payload/postdeploy-source3/20261014T101418Z-72db5d74ff344aef97934b8e76c5c144/production-post-deploy.json",
+      "sha256": "4e2474932db504bc2598663a57130c500d761e7a0eba9342286f1b93ae6768e2",
+      "bytes": 708490,
+      "original_scope": "Production post_deploy verified exact every published payload byte and archive digest, stable entry, root gateways; original first failure retained"
+    },
+    "postdeploy_failed": {
+      "member_path": "payload/postdeploy-source3/20261014T100300Z-ab7d2bb455314569a5267a39738bf023/execution.json",
+      "sha256": "ecceb4bcd25f997b0fd8815f132a12e483e74b82d8a3b2f1cc162cf1d5a171f4",
+      "bytes": 3574,
+      "original_scope": "Actual public verification failed on .nexus-documentation-output.json; retain failure and do not count publisher success as its closure"
+    },
+    "remote_browser": {
+      "member_path": "payload/browser/remote-restored-source3/browser-report.json",
+      "sha256": "da532a14865cec3dad109c4fe352cfb9f21d7857c8c692eb63162cfefa75a522",
+      "bytes": 439109,
+      "original_scope": "Actual162 browser records on newly HTTPS-downloaded/restored root, exact source3 input; no external requests/JS errors; runtime payload1602includes2verificationcontrols, original1600payload hashes independently reread"
+    },
+    "remote_restore_passed": {
+      "member_path": "payload/git-assets-restore/20261014T101842Z-00ee87ce697a4d38870a7d4f9b3a5e4a/execution.json",
+      "sha256": "957982dedad97deec4250356403390b2610f533315412bce00fb4cc4d27b0133",
+      "bytes": 32757,
+      "original_scope": "Actual independent immutable Git asset commit d8913934 raw HTTPS download,1600-file restoration and5-part164835100-byte toolcache full75archives+2configs verification;18.99s; clean unchanged63d64 verifier"
+    },
+    "remote_tool_inventory": {
+      "member_path": "payload/git-assets-restore/20261014T101842Z-00ee87ce697a4d38870a7d4f9b3a5e4a/tool-cache-inventory.json",
+      "sha256": "a2116fd140f75c87fb77c7e80b8df2bcefedd077b4b4e338039bc78da40b5c12",
+      "bytes": 14507,
+      "original_scope": "Actual downloaded/recombined tools archive bytes matched source3 lock,75archives and2config files; no second installation or firmware run claimed"
+    },
+    "independent_review": {
+      "member_path": "payload/independent-review/review-receipt.json",
+      "sha256": "3f192cc923884d2afd4f3f25810846da86d056a927f67a7800660077eca4c12a",
+      "bytes": 9283,
+      "original_scope": "Original independent tool/site development review; dirty snapshot explicitly retained; no final acceptance inference"
+    }
+  },
+  "tasks": [
+    {
+      "task_id": "DOC-01",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "status_mapping",
+        "status_check",
+        "docs_ci",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-02",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "docs_ci",
+        "semantic_diagrams",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-03",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "content",
+        "hook",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-04",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "reader_walk",
+        "browser",
+        "packaging"
+      ]
+    },
+    {
+      "task_id": "DOC-05",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "status",
+        "status_check",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-06",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "status_mapping",
+        "alias_review",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-07",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "site",
+        "tests",
+        "docs_ci",
+        "packaging"
+      ]
+    },
+    {
+      "task_id": "DOC-08",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "site",
+        "docs_ci",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-09",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "site",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-10",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "content",
+        "docs_ci",
+        "semantic_diagrams"
+      ]
+    },
+    {
+      "task_id": "DOC-11",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "translation",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-12",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "site",
+        "docs_ci",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-13",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "content",
+        "hook",
+        "translation",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-14",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "content",
+        "hook",
+        "semantic_diagrams",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-15",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "content",
+        "translation",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-16",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "site",
+        "docs_ci",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-17",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "content",
+        "hook",
+        "semantic_diagrams",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-18",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "content",
+        "alias_review",
+        "translation",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-19",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "content",
+        "docs_ci",
+        "translation"
+      ]
+    },
+    {
+      "task_id": "DOC-20",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "content",
+        "browser",
+        "semantic_diagrams"
+      ]
+    },
+    {
+      "task_id": "DOC-21",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "translation",
+        "navigation",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-22",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "navigation",
+        "tests",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-23",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "translation",
+        "nav_translation",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-24",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "tests",
+        "navigation",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-25",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "installation",
+        "docs_ci",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-26",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "reader_walk",
+        "browser",
+        "translation",
+        "remote_browser_aggregate"
+      ]
+    },
+    {
+      "task_id": "DOC-27",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "tests",
+        "tool_review",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-28",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "tests",
+        "alias_review",
+        "docs_ci",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-29",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "content",
+        "hook",
+        "tests",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-30",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "content",
+        "hook",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-31",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "tests",
+        "tool_review",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-32",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "hook",
+        "tests",
+        "docs_ci",
+        "tool_review"
+      ]
+    },
+    {
+      "task_id": "DOC-33",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "installation",
+        "dependency_review",
+        "docs_ci",
+        "packaging"
+      ]
+    },
+    {
+      "task_id": "DOC-34",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "tool_review",
+        "publisher",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-35",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "packaging",
+        "tool_review",
+        "tests"
+      ]
+    },
+    {
+      "task_id": "DOC-36",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "packaging",
+        "browser",
+        "tests",
+        "remote_browser_aggregate"
+      ]
+    },
+    {
+      "task_id": "DOC-37",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "fixed_publisher",
+        "packaging",
+        "public_passed",
+        "production_public_passed",
+        "postdeploy_failed",
+        "remote_browser_aggregate"
+      ]
+    },
+    {
+      "task_id": "DOC-38",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "public_passed",
+        "production_public_passed",
+        "alias_review",
+        "remote_browser",
+        "postdeploy_failed",
+        "remote_browser_aggregate"
+      ]
+    },
+    {
+      "task_id": "DOC-39",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "remote_restore_passed",
+        "remote_tool_inventory",
+        "remote_browser",
+        "packaging",
+        "remote_browser_aggregate"
+      ]
+    },
+    {
+      "task_id": "DOC-40",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "status_mapping",
+        "semantic_diagrams",
+        "browser",
+        "remote_browser",
+        "alias_review",
+        "public_passed",
+        "remote_restore_passed",
+        "status",
+        "independent_review",
+        "remote_browser_aggregate"
+      ]
+    },
+    {
+      "task_id": "DOC-41",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "translation",
+        "semantic_diagrams",
+        "browser"
+      ]
+    },
+    {
+      "task_id": "DOC-42",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "translation",
+        "browser",
+        "reader_walk"
+      ]
+    },
+    {
+      "task_id": "DOC-43",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-44",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-45",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-46",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-47",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-48",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-49",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-50",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-51",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-52",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "clean_reader",
+        "input_equivalence",
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-53",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-54",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-55",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-56",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-57",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci"
+      ]
+    },
+    {
+      "task_id": "DOC-58",
+      "status": "passed",
+      "validation_scope": "accepted_docs_exit",
+      "evidence_keys": [
+        "semantic_diagrams",
+        "diagram_bytes",
+        "browser",
+        "docs_ci",
+        "remote_browser",
+        "remote_browser_aggregate"
+      ]
+    }
+  ],
   "retention": {
-    "channel": "immutable GitHub documentation release asset",
-    "archive_member_identity": "Record exact member path, bytes and SHA-256 from the actual inventory after export.",
-    "status": "pending_publication_and_independent_retrieval",
-    "not_established": "No claim of off-site restoration or long-term publication until actual receipt is recorded."
+    "status": "remote_retrieved_and_verified",
+    "channel": "immutable Git commit objects",
+    "policy": "Preserve release and evidence tags, prior version paths and original Git assets. Add new identities; do not force-replace retained objects. Keep a verified independent copy using the download instructions.",
+    "restoration_scope": "Actual public remote retrieval into a new independent filesystem root; no claim of a second physical-machine exercise or provider permanence."
+  },
+  "limitations": {
+    "browser_tuple": "Chromium151 on Linux",
+    "file_uri": "not_executed: existing enterprise Chromium policy blocksfile://; policy unchanged; actual localHTTP and server-stopped browser-offline byte reads passed",
+    "translation": "Critical pages/navigation reviewed; other pages retain accurate original/missing/stale states.",
+    "environment_branch_policy_api": "403; existing github-pages policy unchanged. Publisher is guarded by exact repository/ref, a reviewed prepared payload and separate minimal permissions."
   },
   "physical_hil": {
     "status": "not_executed",
     "changed_by_documentation": false
   },
-  "qualification_boundary": "Documentation implementation, software preview, source-image review and parser checks remain distinct from formal document publication and MCU HIL."
+  "qualification_boundary": "Accepted documentation exits and their original actual scopes only. Original firmware/SoC qualification stays bound to its exact sources; no physical MCU HIL is granted."
 }

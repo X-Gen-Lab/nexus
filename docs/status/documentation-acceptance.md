@@ -8,56 +8,70 @@ source_language: zh_CN
 (status-documentation-acceptance)=
 # 文档系统实施与正式验收
 
-本页只解释文档系统的交付证据。平台固件资格仍引用原精确代码索引，MCU HIL
-仍为 `not_executed`。文档渲染、浏览、发布或归档成功不会增加芯片和板卡资格。
+本轮文档系统的 58 项任务已按原退出条件完成独立验收。实现、教程、图示、自动
+门禁、锁定工具、正式构建、公网发布和远端恢复均有实际记录。任务值以
+[58 项源台账](../design/documentation-system-execution.csv)为唯一权威；
+[可读清单](../design/documentation-improvements.md)和
+[逐项原字段](ledgers/documentation-system.md)由该台账自动生成。
 
-[58 项源台账](../design/documentation-system-execution.csv)是任务、实现和验收值的
-唯一权威；[可读清单](../design/documentation-improvements.md)和
-[逐项原字段](ledgers/documentation-system.md)由同一源自动生成。
-[文档交付结果索引](documentation-results.json)定位真实执行及需要正式证据的范围，
-不另维护一份任务完成率。
+[交付结果索引](documentation-results.json)记录精确 commit、归档摘要、下载位置、
+证据成员和逐项接受依据。`passed` 在这里表示对应的文档退出条件已接受；它不改变
+原始测试记录的源码、配置、工具或物理状态，也不表示当前文档提交重新执行了全部
+历史固件测试。
 
-## 按证据范围解释状态
+## 正式交付与实际验证
 
-| 状态或记录 | 能证明的范围 | 不能自动证明 |
-| --- | --- | --- |
-| `implemented` | 当前页面、图源、CLI、门禁和交付机制已落入源文件 | 原退出条件、实板或公开部署全部完成 |
-| `development_passed` | 已发生的开发检查、预览、示例、图文审查或工具回归 | 当前未封存 HEAD 的正式发布资格 |
-| `pending_formal_evidence` | 已准备执行路径，仍待本次准确来源的实际证据 | 可据此升级为 passed |
-| clean-source 文档构建 | 本次干净源码、锁定工具、双语 HTML 和 Doxygen 输出 | 固件重新执行或 MCU HIL |
-| 文档 package／verify | 同字节 payload、三类源码身份与许可闭包 | 已公开部署、下载或独立恢复 |
-| post-deploy 与独立 restore | 真实站点与下载身份、恢复后字节及适用浏览范围 | 全部历史固件 tests、产品安全或长期支持 |
+主要文档资格绑定干净源码 `3835e13cd7da34bd75307746859d4514745ae2ff`，版本为
+`docs-20261014-3835e13cd7da`。后续台账和交付索引提交记录该次实际结果，另有自身
+构建 manifest；不能把它们的 HEAD 填入此前执行记录。
 
-原退出条件完整保留。发布、发布后验证、独立恢复与长期存储、最终独立审查，以及
-浏览器／放大／打印／离线验收要取得各自正式证据后逐项关闭。具体待处理编号和
-实际状态以源台账及同源可读清单为准，不从一张预览截图推断完成。
+| 证据范围 | 实际结果 |
+| --- | --- |
+| 严格构建 | Doxygen、gettext、英文和中文 HTML 完成；Sphinx 零警告 |
+| 内容与翻译 | 99 份维护正文、五类内容模板；22 份关键页和导航 catalog 的 273 条译文独立审查 |
+| 架构图 | 17 对 DOT／SVG，包括 15 类必需图；源码、箭头、状态、说明及本地字体核对通过 |
+| 浏览器与打印 | 162 项检查，15 张 SVG，22 份 A4 PDF；32 个代码块和 800 行代码完整；实际查看 6 份 PDF 的 18 页 |
+| 读者任务 | 干净 `7aadd347` 下执行 85 条主命令及 28 条 SDK 内部命令；实际配置、Native 示例、搬移 consumer 和 ARM 链接通过 |
+| 提交门禁 | 正常钩子通过；177 个 GoogleTest／GoogleMock 程序、3,252 个用例；四个工具域共 1,555 个用例；文档域另执行 169 个用例 |
+| 公网核对 | 1,895 次真实 HTTP 请求全部 200；1,600 个 payload、290 个旧 URL 根入口、stable 和实际下载归档逐字节一致 |
+| 远端恢复 | 从固定 Git commit 实际下载 9 项资产，独立恢复 1,600 个文件；75 个工具归档和 2 份配置一致；恢复后另执行 162 项浏览器检查和 22 份新 PDF 校验 |
+| 逐项收尾 | 独立核对全部 58 项原退出条件、230 条来源迁移、287 个旧 URL 和原资格边界；编号及退出条件逐字保留 |
 
-## 当前源码与既有资格分别定位
+读者任务的执行源码保持 `7aadd347`。实际 Git 比较证明它与主要文档资格源码之间
+只修改了打印 CSS，相关代码、配置和工具子树相同；打印另以 `3835e13c` 实际验收。
+正常提交钩子的记录保留各次暂存范围和原执行身份，不改标为后续干净 HEAD 的新
+固件资格。恢复后的新 PDF 通过机械和完整代码检查；原 18 页视觉结果通过全部
+1,600 个渲染输入逐 SHA 一致性复用，没有声称再次查看这 18 页。
 
-正式文档包的 `documentation-manifest.json` 分开记录 `documentation_source`、
-`code_source` 和 `qualified_code`。前两项由实际干净构建和封存取得，不能预先填入
-将来的 commit 或 tree。预览先读 `documentation-build.json`，修改过的工作树明确
-是开发来源。本站引用的固件资格 `cc6a065c` 及两份原 SoC 索引保持原身份，见
-[软件验证入口](software-verification.md)。
+## 在线阅读、离线包和长期证据
 
-验收结果索引中的空值表示该正式身份、locator 或摘要尚未取得。结果应由实际
-receipt 回填，并核对同一 source/config/tool/output；不能用占位摘要或自行填写
-`passed` 代替执行。
+[在线入口](https://x-gen-lab.github.io/nexus/stable/)选择当前发布版本。不可变
+`versions/<release_id>/` 保留原字节；根目录旧书签显示准确的历史或当前合同说明。
+旧 HAL／OSAL API 不会静默映射为当前接口。
 
-## 长期取得证据
+[文档发行说明](https://github.com/X-Gen-Lab/nexus/releases/tag/docs-20261014-3835e13cd7da)
+提供离线 HTML、完整文档工具缓存和执行证据的固定 commit 取得入口。实际长期
+存储使用独立 Git 资产提交；Release 附件接口曾返回 401，未把 Git 文件写成已上传
+附件。证据索引记录真实上传、重新下载及成员验真的结果，原失败尝试同时保留。
 
-正式证据预期随独立 GitHub 文档发行版本提供：文档离线包、文档执行证据归档、
-外层 receipt 和校验摘要分开交付。索引记录真实 release URL、资产 URL、归档
-SHA-256／bytes 和归档中的 member path。取得后先检查归档字节，再核对指定
-member 的 bytes／SHA-256，最后读取实际命令、退出码和原始结果。
+取得归档先核对 bytes／SHA-256。分片归档按记录顺序取得，每片不超过 32 MiB，
+逐片验证后重组，再验证整包和 inventory 中的每个成员。归档中的 receipt 保留原
+命令、退出码和原主机路径；portable locator 负责将这些路径映射到相对成员。
+已单独保留的工具归档及文档包不在证据包中重复存储，明确的 exclusion 表逐文件
+记录其摘要、不可变下载位置和归档成员，原执行记录完整保留。
 
-当前结果框架不提供尚未发生的 release 或资产下载链接。仅有 `/workspace` 或
-`/tmp` 定位不足以建立长期取得性；短期 CI artifact 也不能替代所需的长期版本。
-索引中的 `expected_member_paths` 只说明待封存目录安排，必须在实际归档生成后
-用其 inventory 确认，才可改为已取得成员。
+原版本和资产 commit 由保留标签及后续提交保持可达；新版本新增身份，不替换同名
+归档。维护者按发行说明保存独立副本。摘要用于检测字节偏离，不是数字签名。
+具体拒绝规则见 [文档交付合同](../reference/documentation-delivery.md)。
 
-独立恢复须从公开取得的同字节包进入新的根目录，使用实际浏览器核对桌面、窄屏、
-放大、打印、离线导航、搜索、本地图和关键读者任务。保存实际观察及失败重试，
-不要把 XML／HTML parser 检查或 PNG 源图审查称为这些浏览器验收。
+## 适用范围和平台资格
 
-交付和拒绝规则见 [文档交付合同](../reference/documentation-delivery.md)。
+文档工具闭包已在 Linux x86_64／Python 3.12 实际安装验证，浏览器为 Linux 上的
+Chromium 151。实际执行了本地 HTTP、停止服务器后的浏览器离线读取、搜索、语言
+切换和本地图示；`file://` 被既有企业策略阻止，策略未改，不声明该路径已验收。
+非关键译文按页面显示 original／missing／stale／reviewed，双语入口不等于所有
+历史页面均已翻译。
+
+平台固件资格仍引用 `cc6a065c` 及原 SoC 精确索引，见
+[软件验证入口](software-verification.md)。MCU HIL 始终为 `not_executed`；文档构建、
+发布、恢复和软件模型检查均不增加芯片、板卡、产品安全或实板资格。

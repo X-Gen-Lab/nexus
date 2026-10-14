@@ -9,7 +9,7 @@ source_language: zh_CN
 
 本页由 [实施台账](documentation-system-execution.csv) 派生。任务、依赖、
 实现和验收值以该 CSV 为唯一权威；原编号及退出条件不因状态更新改变。
-源 SHA-256：`490f5b52001bf236d76f6407d09ff2266cf4f6d2c7e672fc14b18cff96e9f94b`。同一生成器在 commit／CI 检查缺失或陈旧视图。
+源 SHA-256：`d1f5adad33468cb83c2849b9ec5176d10d958db044620943e93fb0d02d6a2c77`。同一生成器在 commit／CI 检查缺失或陈旧视图。
 
 ## 当前实现与验收
 
@@ -21,10 +21,9 @@ source_language: zh_CN
 
 | 实现值 | 验收值 | 源记录数 |
 | --- | --- | --- |
-| `implemented` | `development_passed` | 53 |
-| `implemented` | `pending_formal_evidence` | 5 |
+| `implemented` | `passed` | 58 |
 
-需正式证据、失败或未执行复核的项：DOC-37、DOC-38、DOC-39、DOC-40、DOC-58。
+需正式证据、失败或未执行复核的项：无待处理状态；仍按实际证据范围解释。
 
 预览、软件模型、图源存在或成功渲染不能替代公开部署、物理 HIL 或产品资格。
 文档包和证据归档分别绑定同一次交付；未实际取得的摘要与 locator 不编造。
