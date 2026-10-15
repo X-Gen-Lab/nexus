@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "kind": "source_sdk_0_1_0_software_delivery_completion",
+  "recorded_at_utc": "2026-10-15T05:51:37.198607+00:00",
+  "software_delivery_status": "passed",
+  "source": {
+    "repo": "X-Gen-Lab/nexus",
+    "main_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+    "tree": "06feab8ef3e89df60b4cdc5671c66ab0e3c08c21",
+    "tag": "v0.1.0",
+    "annotated_tag_object": "d4e8395310d0fc5fbc84032513c1b4beb03d5fd5",
+    "merge_pr": 9
+  },
+  "delivery_builder": {
+    "branch": "delivery/0.1.0",
+    "commit": "51bebd47dd63dce90c7fded1efafef27cd20fd3e",
+    "tree": "5d2e40641003aba804ef049c0e93ce678009caed",
+    "normal_hooks_passed": true,
+    "google_cases": 3252,
+    "tool_cases": 1575,
+    "qualification_distinct_from_source_main": true
+  },
+  "release": {
+    "url": "https://github.com/X-Gen-Lab/nexus/releases/tag/v0.1.0",
+    "id": 413457393,
+    "run_id": 38687802092,
+    "run_attempt": 1,
+    "required_jobs_actually_successful": [
+      "guard",
+      "source-sdk",
+      "publish"
+    ],
+    "draft": false,
+    "prerelease": true,
+    "asset_count": 13,
+    "asset_bytes": 155701930
+  },
+  "source_qualification": {
+    "ci_run": 38682470932,
+    "ci_jobs_passed": 29,
+    "security_run": 38682470861,
+    "security_jobs_passed": 4,
+    "skipped_jobs": 0,
+    "complete_alert_inventory_available": false,
+    "zero_vulnerability_claim": false
+  },
+  "independent_downloaded_sdk_acceptance": {
+    "status": "passed",
+    "public_assets_downloaded": 13,
+    "cryptographic_verification": "passed_actual_gh_2_102_0",
+    "certificate_source_and_signer_commit": "51bebd47dd63dce90c7fded1efafef27cd20fd3e",
+    "source_commit_established_separately": "58297516d707fdee117bd27b5df6af09d72edd2e",
+    "committed_source_files_matched": 5415,
+    "nexus_files_matched": 942,
+    "locked_dependency_files_matched": 4473,
+    "locked_dependency_repositories": 9,
+    "generated_cmake_exports_matched": 2,
+    "sdk_identity_files": 5423,
+    "documentation_identity_files": 3360,
+    "original_consumer_files_restored": 944,
+    "original_consumer_directories_restored": 897,
+    "unborn_git_fixtures_retained": 7,
+    "original_command_logs_restored": 28,
+    "actual_relocated_prefix_contains_spaces": true,
+    "fresh_profiles": 7,
+    "fresh_images": 10,
+    "fresh_commands": 28,
+    "all_fresh_command_exit_codes_zero": true,
+    "native_c_and_cpp_actually_executed": true,
+    "phases": {
+      "fetch": 0,
+      "verify": 0,
+      "consumers": 0
+    }
+  },
+  "documentation": {
+    "stable_url": "https://x-gen-lab.github.io/nexus/stable/",
+    "immutable_url": "https://x-gen-lab.github.io/nexus/versions/docs-58297516d707/",
+    "publisher_commit": "b4eb903636fa6b9fa51841e7969309788506993e",
+    "pages_run": 38684298369,
+    "public_http_checks_passed": 1973,
+    "browser_checks_passed": 489,
+    "browser_errors": 0,
+    "original_three_historical_versions_preserved": true
+  },
+  "examples": {
+    "repo": "X-Gen-Lab/nexus-examples",
+    "url": "https://github.com/X-Gen-Lab/nexus-examples",
+    "main_commit": "70593409c8a5afae142ae6fc8e94510903043ae1",
+    "source_pin": "58297516d707fdee117bd27b5df6af09d72edd2e",
+    "merge_pr": 3,
+    "main_ci_run": 38684311021,
+    "main_ci_jobs_passed": 11,
+    "skipped_jobs": 0,
+    "superseded_remote_branches_deleted": 2
+  },
+  "platform_cleanup": {
+    "closed_superseded_prs": [
+      8,
+      7,
+      6,
+      5
+    ],
+    "preserved_merged_prs": [
+      3,
+      4,
+      9
+    ],
+    "exact_lease_remote_deletions": 6,
+    "all_deleted_tips_ancestors_of_source_C": true,
+    "local_heads_unchanged": true,
+    "local_worktree_registrations_unchanged": true,
+    "original_dirty_worktrees_preserved": true,
+    "keep_remote_refs": [
+      "main",
+      "docs-delivery",
+      "documentation-assets",
+      "codex/release-0.1.0",
+      "delivery/0.1.0"
+    ]
+  },
+  "limits": {
+    "physical_hil": "not_executed",
+    "production_qualification": false,
+    "safety_certification": false,
+    "signed_firmware_release": false,
+    "lts_promise": false,
+    "network_disconnected_build_claim": false,
+    "bit_reproducibility_claim": false,
+    "historical_missing_evidence_files": 16,
+    "historical_missing_firmware_archives": 8,
+    "historical_missing_reviews": 8,
+    "historical_records_unchanged": true,
+    "historical_qualification_inherited": false
+  },
+  "receipts": [
+    {
+      "path": "independent-release-restore/independent-release-acceptance.json",
+      "size": 4826,
+      "sha256": "fdd61d76e69461905171c53d005720ead3b67ff49a14a7abeec3cf1705fb5b47"
+    },
+    {
+      "path": "independent-release-restore/independent-release-restore-evidence.tar.gz",
+      "size": 2713360,
+      "sha256": "2d3ba8ad71b189eac9285558f9de9f88e6316d39ba4ea317d1289ac9b4520684"
+    },
+    {
+      "path": "independent-release-restore/local-evidence-files.json",
+      "size": 357503,
+      "sha256": "44a0bab7d36c6eb09df7cd09723a6f4340eefbc0a95f345e734c65ba212064c9"
+    },
+    {
+      "path": "independent-release-restore/local-evidence-capsule.json",
+      "size": 1018,
+      "sha256": "a9215ce374d8fd0b647a6ec9beb5fdb06670564bbbfbc232d99ba3e619de1c43"
+    },
+    {
+      "path": "cleanup-results/platform-cleanup.json",
+      "size": 9809,
+      "sha256": "e8084d6de6db103c12e6560f633e9400a3c9a7eae24998189fa9fd75464be303"
+    },
+    {
+      "path": "cleanup-results/platform-cleanup-execution.log",
+      "size": 143,
+      "sha256": "a3b59830435228c27e489a8f12dca5473bb6f56ca0b526f87af8ed608a59ddab"
+    },
+    {
+      "path": "cleanup-results/complete-platform-cleanup.py",
+      "size": 5606,
+      "sha256": "7ccf7247b55cb5e03f37fb7e8b396f12a978f3ad027edfe3d6c5b6d2850aecb0"
+    },
+    {
+      "path": "cleanup-results/examples-pr-closure.json",
+      "size": 456,
+      "sha256": "4ddf87c63abc7ea21783a367a356685ab2c94451de4a1313899dc12fc6e0f5f6"
+    },
+    {
+      "path": "cleanup-results/examples-branch-cleanup.json",
+      "size": 845,
+      "sha256": "56499a08ee87e4f99dac8bd7dbf9b45d08dca6fbbdda86ebba21c2d15bc9a210"
+    },
+    {
+      "path": "cleanup-plan/platform-cleanup-executor-independent-review.json",
+      "size": 2860,
+      "sha256": "8e8fb644754a3afd30da768d9a608880a5d79ad67d7e7172611f37e64a1af21e"
+    },
+    {
+      "path": "release-monitor/recovery-51bebd47/38687802092-completed-runtime-receipt.json",
+      "size": 15026,
+      "sha256": "23f1903b96ac0908a56372187c36662d61f10ebe34d2695ef1dc322e07ae37c7"
+    },
+    {
+      "path": "pages-publication/final-verification.json",
+      "size": 2987,
+      "sha256": "842d772c543e5630b1096a3089d030dce31772cdff2c4b9f2514491f5d8f8220"
+    },
+    {
+      "path": "examples-delivery-final.json",
+      "size": 8674,
+      "sha256": "37daa9d328ef6d386eff5b61ad58dfe4f4c10fc8d4879be4309c0490a5f68ebb"
+    }
+  ],
+  "final_retention_stage_at_this_snapshot": "Software delivery complete. Final durable tail publication and independent HTTP restoration follow this receipt; their separate proof will name its immutable data commit."
+}

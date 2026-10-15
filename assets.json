@@ -487,6 +487,51 @@
       "path": "docs-release-0.1.0-58297516d707-qualification-restore/verify-remote-restore.py",
       "bytes": 6854,
       "sha256": "fef21daf156337dc614c43011bf511e610658a346eb8040014d2218215188ea9"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/README.txt",
+      "bytes": 4696,
+      "sha256": "c285987ff6bfb3bfd396801c4714307736caa9153d3dd571df40685bfb14a61f"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/SHA256SUMS",
+      "bytes": 732,
+      "sha256": "f4c80d75961f1529bcdc9be96d2c4474ce124b25f156e95d9c62a99523420796"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/final-allowlist.json",
+      "bytes": 26762,
+      "sha256": "36a7037edb9f06df7524a9fffcb4d7b4ea941c53900de95d386d51b91a6f2f95"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/final-evidence.tar.gz",
+      "bytes": 5491976,
+      "sha256": "39a5c59365372a189e2bb64f9f5a4f82ae378697a651dfec29e4f6a3f24fe91e"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/final-retention.json",
+      "bytes": 3227,
+      "sha256": "51a9c018e71673fc8111e268ff301766142afbc1bd24230addf2686ddaa56369"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/independent-allowlist-review.json",
+      "bytes": 1282,
+      "sha256": "cb9ff426a432d33ac425bd602450a17d53b1e0fb8ff7dbdd1ba218ca84b8fd76"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/independent-release-acceptance.json",
+      "bytes": 4826,
+      "sha256": "fdd61d76e69461905171c53d005720ead3b67ff49a14a7abeec3cf1705fb5b47"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/software-delivery-completion.json",
+      "bytes": 6999,
+      "sha256": "6d7349f85ac85886048f318bec2db27c2c5e98b7fa274ab37dbb76bfc894be2a"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/verify-final-delivery.py",
+      "bytes": 8276,
+      "sha256": "14fdef08a790ada95f62dd8b7c17c8d3fbc40bad059126d778059d0dafd7ac4f"
     }
   ],
   "physical_hil": "not_executed",

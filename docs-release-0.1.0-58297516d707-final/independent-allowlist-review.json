@@ -1,0 +1,24 @@
+{
+  "kind": "relayed_independent_final_evidence_subset_reviews",
+  "receipt_writer": "/root/release_branch_audit",
+  "reviewer_task": "/root/release_branch_audit/addendum_allowlist_review",
+  "status": "passed_for_independently_reviewed_frozen_subsets",
+  "findings": [],
+  "scope": "Names completed independent frozen-subset, nested-archive and original-data reviews. Final outer packaging byte closure is separately verified by the included reader; no new SDK test execution or extra semantic source qualification is claimed here.",
+  "independently_checked": {
+    "settled_E1_E2_members": 62,
+    "R3_members": 10,
+    "sealed_restorer_files": 4,
+    "sealed_restorer_regular_members": 1063,
+    "sealed_restorer_directories": 887,
+    "sealed_restorer_size_hash_mode_closure": true,
+    "recognized_signed_url_or_credential_matches": 0
+  },
+  "actual_final_restoration_independent_audit": {
+    "path": "cleanup-plan/final-recovery-capsule-independent-review.json",
+    "sha256": "426d6c699c001d1522f1ae1840c4638e3676bb936ba0a891602bf46665895429"
+  },
+  "final_allowlist_sha256": "36a7037edb9f06df7524a9fffcb4d7b4ea941c53900de95d386d51b91a6f2f95",
+  "final_archive_sha256": "39a5c59365372a189e2bb64f9f5a4f82ae378697a651dfec29e4f6a3f24fe91e",
+  "physical_hil": "not_executed"
+}

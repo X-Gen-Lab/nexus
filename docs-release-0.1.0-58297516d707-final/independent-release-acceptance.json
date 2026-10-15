@@ -1,0 +1,117 @@
+{
+  "actual_publisher_job_required_success": true,
+  "artifact_identity_checks": {
+    "docs_bound_files": 3360,
+    "full_main_CI_jobs": 29,
+    "scope": "Complete SDK and documentation job identities, retained CI run and exact required job outcomes; all other raw CI artifact bytes are retained in the published raw archive.",
+    "sdk_bound_files": 5423
+  },
+  "build_reproducibility_claim": false,
+  "builder_commit": "51bebd47dd63dce90c7fded1efafef27cd20fd3e",
+  "builder_ref": "refs/heads/delivery/0.1.0",
+  "ci_run_attempt": 1,
+  "ci_run_id": 38682470932,
+  "complete_hosted_consumer_transport": {
+    "directories": 897,
+    "files": 944,
+    "git_init_fixtures": 7,
+    "git_metadata_executed": false,
+    "raw_bytes_pruned": false
+  },
+  "completed_at": "2026-10-15T05:49:50.442328+00:00",
+  "cryptographic_verification": {
+    "issuer": "https://token.actions.githubusercontent.com",
+    "runner_environment": "github-hosted",
+    "scope": "Certificate authenticates builder E2, while every packaged raw SDK source byte is independently compared to immutable C and C-pinned dependency Git blobs.",
+    "signer_digest": "51bebd47dd63dce90c7fded1efafef27cd20fd3e",
+    "signer_workflow": "https://github.com/X-Gen-Lab/nexus/.github/workflows/release.yml@refs/heads/delivery/0.1.0",
+    "source_ref": "refs/heads/delivery/0.1.0",
+    "source_repository_digest": "51bebd47dd63dce90c7fded1efafef27cd20fd3e",
+    "status": "passed",
+    "subject": [
+      {
+        "digest": {
+          "sha256": "c057b90b25cf89a7542fcbdca8faa752ff2f367dfba295c94f5f9ac551b8ba01"
+        },
+        "name": "identity.json"
+      }
+    ],
+    "verified_timestamp_count": 1,
+    "verifier": "Official GitHub CLI 2.102.0"
+  },
+  "documentation_archive_sha256": "e1c8a9939e8864a43d2a695bc70ad7b833cffa7df12b07b34d57d8e0cbc98f67",
+  "documentation_manifest_sha256": "928b2154db3dcc48fdbb3569948d45ea0901ac2b2f24278bebd690ad4a0797e4",
+  "evidence_roots": {
+    "SDK_prefix_after_full_original_identity_verification": "relocated downloaded Nexus SDK 0.1.0",
+    "downloaded_public_asset_originals": "public-assets",
+    "fresh_consumer_complete_raw_outputs": "fresh strict downloaded SDK consumers",
+    "restored_original_hosted_consumers": "retained original hosted strict consumers",
+    "restored_raw_verification_archive": "raw"
+  },
+  "fresh_downloaded_SDK_consumers": {
+    "ARM_linked_images": 8,
+    "actual_Native_program_executions": 2,
+    "all_exit_codes_zero": true,
+    "canonical_relocated_path_with_spaces": true,
+    "command_count": 28,
+    "image_count": 10,
+    "physical_status": "not_executed",
+    "profile_count": 7,
+    "profiles": [
+      "gd32",
+      "h743 baremetal",
+      "h743 freertos",
+      "native",
+      "stm32",
+      "u575 baremetal",
+      "u575 freertos"
+    ],
+    "relocated_prefix": "/tmp/nexus-release-0.1.0-20261015/independent-release-restore/relocated downloaded Nexus SDK 0.1.0"
+  },
+  "helper_sha256": "a5660de20621300b6eeb664fbaa7e23b23d54ffeed80681cd2b0b9b2a6b0837e",
+  "historical_gaps": "The independent acceptance qualifies the new 0.1.0 preview; it does not reconstruct or qualify missing historical firmware archives.",
+  "immutable_source_comparison": {
+    "all_raw_source_files": 5415,
+    "fixed_dependency_commits": 9,
+    "generated_CMake_exports": 2,
+    "nexus_C_owned_files": 942,
+    "pinned_dependency_files": 4473
+  },
+  "kind": "nexus_independent_public_release_recovery",
+  "network_disabled_claim": false,
+  "phase_receipts": {
+    "consumers": {
+      "exit_code": 0,
+      "path": "consumers.phase.json",
+      "sha256": "e17f4b00fd95a9e18e343dc51688cd925fe9c0798075e33013938b50d85ffc74"
+    },
+    "fetch": {
+      "exit_code": 0,
+      "path": "fetch.phase.json",
+      "sha256": "91dea4a56a3fcf413b248984baf6aec45640981220c2880d48bd06639badb858"
+    },
+    "verify": {
+      "exit_code": 0,
+      "path": "verify.phase.json",
+      "sha256": "82925dd83851c2b3b2f7e2cd877c2a0fda922412ba6583eac11d3be2c6f11930"
+    }
+  },
+  "physical_hil": "not_executed",
+  "production_qualification": false,
+  "public_asset_bytes": 155701930,
+  "public_asset_count": 13,
+  "raw_evidence_archive_sha256": "285a012cc2b3a3b7f6095e60bc6687290b2b08192e39f7c9fd4f106dd10b473b",
+  "release_id": 413457393,
+  "release_manifest_sha256": "cec563e7391265973efd1b9b852220d97aab8d2f470fa4a2983f413aecad6d12",
+  "release_url": "https://github.com/X-Gen-Lab/nexus/releases/tag/v0.1.0",
+  "schema_version": 1,
+  "sdk_archive_sha256": "b0fd698427ad0338621ec5974b96d3e6c7c488f461a629dd09f462ce11d657d7",
+  "semantic_version": "0.1.0",
+  "software_candidate": false,
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "source_sdk_run_attempt": 1,
+  "source_sdk_run_id": 38687802092,
+  "source_tree": "06feab8ef3e89df60b4cdc5671c66ab0e3c08c21",
+  "status": "passed",
+  "tag": "v0.1.0"
+}

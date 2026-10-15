@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_0_1_0_final_software_delivery_retention",
+  "created_at_utc": "2026-10-15T05:57:02.645741+00:00",
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "source_tree": "06feab8ef3e89df60b4cdc5671c66ab0e3c08c21",
+  "annotated_tag_object": "d4e8395310d0fc5fbc84032513c1b4beb03d5fd5",
+  "builder_commit": "51bebd47dd63dce90c7fded1efafef27cd20fd3e",
+  "builder_ref": "refs/heads/delivery/0.1.0",
+  "asset_baseline": "086d9a6417c004374b573c4fe5e09e8cf91d6e8b",
+  "prior_registry_entries_preserved": 97,
+  "software_delivery_status": "passed",
+  "actual_r3_run": 38687802092,
+  "release_id": 413457393,
+  "release_url": "https://github.com/X-Gen-Lab/nexus/releases/tag/v0.1.0",
+  "public_release_assets": 13,
+  "public_release_asset_bytes": 155701930,
+  "final_evidence_members": 98,
+  "sealed_recovery_regular_files": 1063,
+  "sealed_recovery_directories": 887,
+  "fresh_profiles_images_commands": [
+    7,
+    10,
+    28
+  ],
+  "platform_pr_closures": 4,
+  "platform_exact_lease_deletions": 6,
+  "publications_history": [
+    {
+      "run": 38684283007,
+      "outcome": "SDK failed before attestation/publication; retained in prior qualification capsule"
+    },
+    {
+      "run": 38686564636,
+      "outcome": "SDK and attestation succeeded; publisher skipped; no release by that attempt"
+    },
+    {
+      "run": 38687802092,
+      "outcome": "guard,source-sdk,publish actually succeeded; public software-preview Release"
+    }
+  ],
+  "final_tail_http_restoration_at_this_snapshot": "pending_separate_immutable_proof",
+  "public_release_body_final_evidence_links_at_this_snapshot": "pending_root_metadata_patch_after_HTTP_restore",
+  "files": [
+    {
+      "path": "README.txt",
+      "bytes": 4696,
+      "sha256": "c285987ff6bfb3bfd396801c4714307736caa9153d3dd571df40685bfb14a61f"
+    },
+    {
+      "path": "final-allowlist.json",
+      "bytes": 26762,
+      "sha256": "36a7037edb9f06df7524a9fffcb4d7b4ea941c53900de95d386d51b91a6f2f95"
+    },
+    {
+      "path": "final-evidence.tar.gz",
+      "bytes": 5491976,
+      "sha256": "39a5c59365372a189e2bb64f9f5a4f82ae378697a651dfec29e4f6a3f24fe91e"
+    },
+    {
+      "path": "independent-allowlist-review.json",
+      "bytes": 1282,
+      "sha256": "cb9ff426a432d33ac425bd602450a17d53b1e0fb8ff7dbdd1ba218ca84b8fd76"
+    },
+    {
+      "path": "independent-release-acceptance.json",
+      "bytes": 4826,
+      "sha256": "fdd61d76e69461905171c53d005720ead3b67ff49a14a7abeec3cf1705fb5b47"
+    },
+    {
+      "path": "software-delivery-completion.json",
+      "bytes": 6999,
+      "sha256": "6d7349f85ac85886048f318bec2db27c2c5e98b7fa274ab37dbb76bfc894be2a"
+    },
+    {
+      "path": "verify-final-delivery.py",
+      "bytes": 8276,
+      "sha256": "14fdef08a790ada95f62dd8b7c17c8d3fbc40bad059126d778059d0dafd7ac4f"
+    }
+  ],
+  "limits": {
+    "physical_hil": "not_executed",
+    "production_qualification": false,
+    "safety_certification": false,
+    "signed_firmware_qualification": false,
+    "zero_vulnerability_claim": false,
+    "reproducible_or_network_disconnected_build_claim": false,
+    "missing_historical_firmware_archives": 8,
+    "missing_historical_reviews": 8,
+    "historical_records_unchanged": true
+  }
+}
