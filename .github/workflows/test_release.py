@@ -11,8 +11,7 @@ import subprocess
 import sys
 import tempfile
 import tarfile
-import unittest
-from unittest import mock
+import unittest.mock
 
 import yaml
 
@@ -157,7 +156,7 @@ class ReleaseAdmissionTests(unittest.TestCase):
                                     "sha256": hashlib.sha256(
                                         b"verified archive").hexdigest()}]}
             (root / "release-manifest.json").write_text(json.dumps(manifest))
-            api = mock.Mock()
+            api = unittest.mock.Mock()
             api.get.side_effect = [self.run_record(), self.jobs_record(), {"object": {"sha": COMMIT,
                 "type": "commit"}}, {"object": {"sha": COMMIT, "type": "commit"}},
                 None, []]
@@ -177,7 +176,7 @@ class ReleaseAdmissionTests(unittest.TestCase):
             "tag": "v0.1.0", "source_commit": COMMIT,
             "assets": [{"name": "asset.tar.gz", "size": 16,
                         "sha256": hashlib.sha256(b"verified archive").hexdigest()}]}))
-        api = mock.Mock()
+        api = unittest.mock.Mock()
         uploaded = []
 
         def get(path):
