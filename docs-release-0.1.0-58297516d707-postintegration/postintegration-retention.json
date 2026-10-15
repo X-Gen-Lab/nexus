@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_release_local_postintegration_retention",
+  "created_at_utc": "2026-10-15T04:57:17.362752+00:00",
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "asset_baseline": "0d7ce36cf504717f601890816b3703eb3ca30a31",
+  "scope": "Explicit local validation only; original receipt-specific source, execution and failure scopes remain authoritative.",
+  "full_main_ci": "not established by this addendum",
+  "github_release_publication": "not established by this addendum",
+  "remote_pages_deployment": "not established by this addendum",
+  "physical_hil": "not_executed",
+  "firmware_candidate_qualification": false,
+  "postintegration_archive_members": 52,
+  "examples_archive_members": 139,
+  "examples_archive_sha256": "dcc4e906020a7b240e221795d65dcd925f576f049594d7042e1338b2252b904e",
+  "files": [
+    {
+      "path": "README.txt",
+      "bytes": 1396,
+      "sha256": "a5703364231afb319a7554f9a058191adf34bb7146a620ac656fb7ef49c8a67c"
+    },
+    {
+      "path": "examples-local-validation-manifest.json",
+      "bytes": 44238,
+      "sha256": "a6858f504ebcad57ae244a1923d08abb9610334bf53029a2f5600153b45c41c1"
+    },
+    {
+      "path": "examples-local-validation-receipt.json",
+      "bytes": 3712,
+      "sha256": "cccd3e28c0fac78355878b0207dfd2b23b87bab76f92f75121aa8f9c1eaa6ffc"
+    },
+    {
+      "path": "examples-local-validation.tar.gz",
+      "bytes": 18242646,
+      "sha256": "dcc4e906020a7b240e221795d65dcd925f576f049594d7042e1338b2252b904e"
+    },
+    {
+      "path": "independent-allowlist-review.json",
+      "bytes": 932,
+      "sha256": "bbc99d487674665ed5e7f93511fde9256744d38450607ecc12448d1d6e8d8114"
+    },
+    {
+      "path": "postintegration-allowlist.json",
+      "bytes": 10557,
+      "sha256": "fa6fba3dc5d200bd85db3a5431887e306e7796ff74ef704fbeb90f687b24bf6f"
+    },
+    {
+      "path": "postintegration-evidence.tar.gz",
+      "bytes": 2235475,
+      "sha256": "8c971248c5a1a9692c91d06dea537d6c55a79e5c2667ac17de64029f4e82c0e9"
+    },
+    {
+      "path": "verify-postintegration.py",
+      "bytes": 3187,
+      "sha256": "0757224f57dcd2dca650f9da4add0a52225bfb8a09d4f8b7f99c972a83dbc4b0"
+    }
+  ]
+}

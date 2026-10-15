@@ -1,0 +1,16 @@
+{
+  "kind": "independent_read_only_postintegration_allowlist_review",
+  "reviewer": "/root/release_branch_audit/addendum_allowlist_review",
+  "status": "approved_no_blocking_omissions",
+  "allowlist_sha256": "fa6fba3dc5d200bd85db3a5431887e306e7796ff74ef704fbeb90f687b24bf6f",
+  "archive_members": 52,
+  "archive_file_bytes": 4409250,
+  "standalone_examples": 3,
+  "examples_archive_members_verified": 139,
+  "requested_paths_covered": true,
+  "forbidden_pr_monitor_or_tool_payload_selected": false,
+  "v1_failure_preserved": true,
+  "v2_browser_result": "passed within recorded local scope",
+  "scope_limit": "Full main CI, public Release, remote Pages, firmware candidate qualification and physical HIL are outside this claimed success. Selected command JSON/log files retain original execution receipt fields/stdout; referenced attempt-directory paths are not separately retained.",
+  "reviewer_writes_or_remote_actions": false
+}

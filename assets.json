@@ -322,6 +322,56 @@
       "path": "docs-release-0.1.0-58297516d707-restore/verify-remote-restore.py",
       "bytes": 7463,
       "sha256": "1e7a0b2740cc8215891e7fde45c4e521e43a60a9aabe0bc902d5cbad6e6b99d2"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration/README.txt",
+      "bytes": 1396,
+      "sha256": "a5703364231afb319a7554f9a058191adf34bb7146a620ac656fb7ef49c8a67c"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration/SHA256SUMS",
+      "bytes": 871,
+      "sha256": "43f93d1bba2ee3c82e67e48fb010adc938c46fd1bb30198cf7f3585420e87ecc"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration/examples-local-validation-manifest.json",
+      "bytes": 44238,
+      "sha256": "a6858f504ebcad57ae244a1923d08abb9610334bf53029a2f5600153b45c41c1"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration/examples-local-validation-receipt.json",
+      "bytes": 3712,
+      "sha256": "cccd3e28c0fac78355878b0207dfd2b23b87bab76f92f75121aa8f9c1eaa6ffc"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration/examples-local-validation.tar.gz",
+      "bytes": 18242646,
+      "sha256": "dcc4e906020a7b240e221795d65dcd925f576f049594d7042e1338b2252b904e"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration/independent-allowlist-review.json",
+      "bytes": 932,
+      "sha256": "bbc99d487674665ed5e7f93511fde9256744d38450607ecc12448d1d6e8d8114"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration/postintegration-allowlist.json",
+      "bytes": 10557,
+      "sha256": "fa6fba3dc5d200bd85db3a5431887e306e7796ff74ef704fbeb90f687b24bf6f"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration/postintegration-evidence.tar.gz",
+      "bytes": 2235475,
+      "sha256": "8c971248c5a1a9692c91d06dea537d6c55a79e5c2667ac17de64029f4e82c0e9"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration/postintegration-retention.json",
+      "bytes": 2181,
+      "sha256": "44ab9d14ce7b96c1d3d8e523c10e996540a0f37b3b7139295c0c818e7b46d341"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration/verify-postintegration.py",
+      "bytes": 3187,
+      "sha256": "0757224f57dcd2dca650f9da4add0a52225bfb8a09d4f8b7f99c972a83dbc4b0"
     }
   ],
   "physical_hil": "not_executed",

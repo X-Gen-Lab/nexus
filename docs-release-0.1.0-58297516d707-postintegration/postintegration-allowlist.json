@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "kind": "explicit_postintegration_evidence_allowlist",
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "scope": "Local examples, browser and publisher validation. Preserve v1 browser failure. Full final-main CI, public Release and remote Pages success are not claimed.",
+  "archive_members": [
+    {
+      "path": "actual-main-C-browser-v2.execution.command.json",
+      "bytes": 1832,
+      "sha256": "b9f246d4c0ac11b55b4b1f7ea413aef02712e69f4702cc66e27d9b9c4a7aa119"
+    },
+    {
+      "path": "actual-main-C-browser-v2.execution.json",
+      "bytes": 1853,
+      "sha256": "d9fc819b11ceeaf2831c392a562a810d95854720dbce423a0110528bf54a3422"
+    },
+    {
+      "path": "actual-main-C-browser-v2.execution.log",
+      "bytes": 144,
+      "sha256": "bbf3739e31a1f915f77a28bffe8ce7125f26ea96ad425d7525f88aedd302248c"
+    },
+    {
+      "path": "actual-main-C-browser-v2/acceptance-summary.json",
+      "bytes": 6456,
+      "sha256": "790b4e260da60fc529e6fcd4f250be4459da78087260d78ec82c197ff1f24474"
+    },
+    {
+      "path": "actual-main-C-browser-v2/browser-report.json",
+      "bytes": 489155,
+      "sha256": "04f5eb848277068796c50a2608006a6f04bc40c117d965fb1039ab626bc5a910"
+    },
+    {
+      "path": "actual-main-C-browser-v2/narrow-en-release.png",
+      "bytes": 85253,
+      "sha256": "3a0716374d038f5f9b78cba73be350523b34dd47d9eabbe7c5c525fdf6395130"
+    },
+    {
+      "path": "actual-main-C-browser-v2/narrow-zh_CN-release.png",
+      "bytes": 111730,
+      "sha256": "e1c4e16314c1b433be7f7e6702d361bbd7030f29799fb1aa2d67a5de65512897"
+    },
+    {
+      "path": "actual-main-C-browser-v2/reflow200-zh_CN-reference-documentation-delivery.png",
+      "bytes": 221462,
+      "sha256": "fecaadec5597569c2a3d9f82e55da5e26f6070e0c41be8adb63be3dedaa20184"
+    },
+    {
+      "path": "actual-main-C-browser-v2/search-en.png",
+      "bytes": 168160,
+      "sha256": "c2cda1deb63405e11968fbcc03c93d273c78d77cf0f04dfd4ff78bfb9938c66e"
+    },
+    {
+      "path": "actual-main-C-browser-v2/search-zh_CN.png",
+      "bytes": 231896,
+      "sha256": "31bf3fcd1d60d33d84fdedd09683b84329429374dc8e1c28219816c29cd63ecb"
+    },
+    {
+      "path": "actual-main-C-browser-v2/verified-payload-inventory.json",
+      "bytes": 248328,
+      "sha256": "6a660eaf62f1c1f92fa986970a2b78ebbcc01f0794ffc9181588c6c404186508"
+    },
+    {
+      "path": "actual-main-C-browser-v2/zoom200-en-design-source-compatibility.png",
+      "bytes": 158435,
+      "sha256": "9002cb56a0f0fd56e40a6a9c8a5c2c0780b61585f3bb271053121b26621201d5"
+    },
+    {
+      "path": "actual-main-C-browser.execution.command.json",
+      "bytes": 1815,
+      "sha256": "0958ede3c626096f02bdecfef7543dfbbf5cc1e202542078838738923b288aa7"
+    },
+    {
+      "path": "actual-main-C-browser.execution.json",
+      "bytes": 1530,
+      "sha256": "e1cfb29520805ec013d1fa2656cc9505746fe9f5caa146e3e94f47f6ecf31111"
+    },
+    {
+      "path": "actual-main-C-browser.execution.log",
+      "bytes": 1802,
+      "sha256": "9467427798d8e072ebbc5699a18a3e8eb6397d7832738c3e7fa8b8969228c5ef"
+    },
+    {
+      "path": "actual-main-C-browser/browser-report.json",
+      "bytes": 533767,
+      "sha256": "5a3f3ef83aa9fde43c2daa39b815fe7ac94e346ec22a1787a1b675356df66dae"
+    },
+    {
+      "path": "actual-main-C-browser/narrow-en-release.png",
+      "bytes": 85253,
+      "sha256": "3a0716374d038f5f9b78cba73be350523b34dd47d9eabbe7c5c525fdf6395130"
+    },
+    {
+      "path": "actual-main-C-browser/narrow-zh_CN-release.png",
+      "bytes": 111730,
+      "sha256": "e1c4e16314c1b433be7f7e6702d361bbd7030f29799fb1aa2d67a5de65512897"
+    },
+    {
+      "path": "actual-main-C-browser/reflow200-zh_CN-reference-documentation-delivery.png",
+      "bytes": 221462,
+      "sha256": "fecaadec5597569c2a3d9f82e55da5e26f6070e0c41be8adb63be3dedaa20184"
+    },
+    {
+      "path": "actual-main-C-browser/search-en.png",
+      "bytes": 168160,
+      "sha256": "c2cda1deb63405e11968fbcc03c93d273c78d77cf0f04dfd4ff78bfb9938c66e"
+    },
+    {
+      "path": "actual-main-C-browser/search-zh_CN.png",
+      "bytes": 231896,
+      "sha256": "31bf3fcd1d60d33d84fdedd09683b84329429374dc8e1c28219816c29cd63ecb"
+    },
+    {
+      "path": "actual-main-C-browser/verified-payload-inventory.json",
+      "bytes": 248328,
+      "sha256": "6a660eaf62f1c1f92fa986970a2b78ebbcc01f0794ffc9181588c6c404186508"
+    },
+    {
+      "path": "actual-main-C-browser/zoom200-en-design-source-compatibility.png",
+      "bytes": 158435,
+      "sha256": "9002cb56a0f0fd56e40a6a9c8a5c2c0780b61585f3bb271053121b26621201d5"
+    },
+    {
+      "path": "browser-preparation/help.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "browser-preparation/help.stdout.txt",
+      "bytes": 1030,
+      "sha256": "dc5619abcc35fc55922385f98dbfb55656f47abe20a9f890cd0124fa900928ef"
+    },
+    {
+      "path": "browser-preparation/independent-review.json",
+      "bytes": 2488,
+      "sha256": "73d099f99c80521e1b9c464843450a6be2074f32c5da9ee6b7d73535f8ad8475"
+    },
+    {
+      "path": "browser-preparation/offline-diagnostic-postnavigation.json",
+      "bytes": 9423,
+      "sha256": "3a5af855ce132a6a1a170e4f7fe55d40b56339c0a4fb1b99621a394a39170d03"
+    },
+    {
+      "path": "browser-preparation/offline-diagnostic.json",
+      "bytes": 5038,
+      "sha256": "3a0f0d02f3931b45a144d3a5a9aef6b0965cde8d5093798026483696b63b4875"
+    },
+    {
+      "path": "browser-preparation/offline_diagnostic.py",
+      "bytes": 5193,
+      "sha256": "f0a2eddbb278400d87492164f8c47347d84aa09ae6d89f220b86292b0887b0fb"
+    },
+    {
+      "path": "browser-preparation/offline_diagnostic_postnavigation.py",
+      "bytes": 6142,
+      "sha256": "4f3329aaac8443b16f67caf8d5b244291d51970682d0b3d01dcd54acd1b02ffc"
+    },
+    {
+      "path": "browser-preparation/preparation-receipt.json",
+      "bytes": 2416,
+      "sha256": "21e61d5387ceb44c8e1c82dab7aaa225d50aa2e9f1a14df93af28e22b0de61ff"
+    },
+    {
+      "path": "browser-preparation/v2-help.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "browser-preparation/v2-help.stdout.txt",
+      "bytes": 1042,
+      "sha256": "b827c02b00e87505529bdd5c31f23f8c804ee83d125aeca304e69157770e58ab"
+    },
+    {
+      "path": "browser-preparation/v2-independent-review.json",
+      "bytes": 1610,
+      "sha256": "8886cd8792cf21ea9d0fe1009a8721ac7aa1a1cc9d3c080b307a9b1de7a45e6d"
+    },
+    {
+      "path": "browser-preparation/v2-preparation.json",
+      "bytes": 1051,
+      "sha256": "492e8758940d4296f7617c1d6650ebe0b020f76ee30e199594c5786b2a6561c1"
+    },
+    {
+      "path": "browser-preparation/validate_release_site.py",
+      "bytes": 23217,
+      "sha256": "5ddaad509badc0698470ac22d2252464aa6444372923103e281c63b9169904a2"
+    },
+    {
+      "path": "browser-preparation/validate_release_site_v2.py",
+      "bytes": 24424,
+      "sha256": "2ac50989d194f360c6eefa7343d939b0aa497a7f863e637101f7316373c3e7aa"
+    },
+    {
+      "path": "cleanup-plan/browser-v2-independent-review.json",
+      "bytes": 3253,
+      "sha256": "d4342b530ef8bd7d9a902b81110f76e24d0ebd9560aac0cda9e7d58390fc8bc6"
+    },
+    {
+      "path": "cleanup-plan/browser-v2-independent.diff",
+      "bytes": 5547,
+      "sha256": "e779a2dee9367b62adc1f226fb63aa14267fadb1dee17231ce0fe013069a3bf3"
+    },
+    {
+      "path": "main-documentation/verification.json",
+      "bytes": 1421,
+      "sha256": "dcf5edf7e65d82aa3ea014b2a4aac0eec54a460e696a9fa9f8258783ff14990c"
+    },
+    {
+      "path": "publisher-assembly-58297516d707fdee117bd27b5df6af09d72edd2e.json",
+      "bytes": 1663,
+      "sha256": "e0fee0ec8538a7fb7d116c2386884e2b1dd8e243ca1b9207f3cc106241b98d88"
+    },
+    {
+      "path": "publisher-commit.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "publisher-commit.log",
+      "bytes": 151438,
+      "sha256": "108fb57c876e04a9fd1dbd2e5bdde2ab146bac5244d5832ea3fb0ba9969bc649"
+    },
+    {
+      "path": "publisher-local-commit.json",
+      "bytes": 650,
+      "sha256": "2f4d5c9391b8d4922bc8a6cf51ef4ea3476901e8509c43bf9b8e8d187c359d21"
+    },
+    {
+      "path": "publisher-local-http-58297516d707.json",
+      "bytes": 667268,
+      "sha256": "a1e387885cddd483d2cf83ab7ee2bd272e8a969294aa51f944a923891147717e"
+    },
+    {
+      "path": "publisher-local-http.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "publisher-local-http.log",
+      "bytes": 533,
+      "sha256": "149d8977f94d64f6dca877070494123522aeae8f3cc1e2985b4c546f1778e684"
+    },
+    {
+      "path": "publisher-prepare.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "publisher-prepare.log",
+      "bytes": 1663,
+      "sha256": "e0fee0ec8538a7fb7d116c2386884e2b1dd8e243ca1b9207f3cc106241b98d88"
+    },
+    {
+      "path": "publisher-trusted-source-C.json",
+      "bytes": 1123,
+      "sha256": "4ec582c3e159e63800072b9cf372db3848d40e742e2cc9744f0c9daf776e5611"
+    },
+    {
+      "path": "restore-tools/checksums.txt",
+      "bytes": 1971,
+      "sha256": "afe49e9affa232faa8212aed035417166f6ade9b9470acb53d4dbd28c0504e8d"
+    },
+    {
+      "path": "restore-tools/preparation.json",
+      "bytes": 758,
+      "sha256": "d5cb1500c66b5838c28bbb949c429b1e54ffcb1adcbc477808d42f57c452959e"
+    }
+  ],
+  "standalone_examples": [
+    {
+      "path": "examples-local-validation.tar.gz",
+      "bytes": 18242646,
+      "sha256": "dcc4e906020a7b240e221795d65dcd925f576f049594d7042e1338b2252b904e"
+    },
+    {
+      "path": "examples-local-validation-manifest.json",
+      "bytes": 44238,
+      "sha256": "a6858f504ebcad57ae244a1923d08abb9610334bf53029a2f5600153b45c41c1"
+    },
+    {
+      "path": "examples-integration/local-release-validation-receipt.json",
+      "bytes": 3712,
+      "sha256": "cccd3e28c0fac78355878b0207dfd2b23b87bab76f92f75121aa8f9c1eaa6ffc"
+    }
+  ],
+  "excluded": [
+    "All pr-monitor paths and transport metadata.",
+    "restore-tools/gh_2.102.0_linux_amd64.tar.gz and restored binaries.",
+    "Generated publisher/site payload copies; the evidence records identify exact immutable source/package bytes."
+  ],
+  "signature_and_credential_scan": "passed for all explicit files and nested example archive; no detected signed/token-bearing URL or recognizable credential value"
+}
