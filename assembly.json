@@ -1,27 +1,31 @@
 {
-  "kind": "nexus_documentation_deployment_assembly",
   "schema_version": 1,
-  "publication_sha256": "68f3f4dd05f9786d68bc83bf1c30109dff302141613989bd7be69af54751ca06",
+  "kind": "nexus_documentation_deployment_assembly",
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "ci_run_id": 38682470932,
+  "previous_publisher_commit": "6e07bcbacdf14b724bbde2428ce5a056c8a53361",
+  "publication_sha256": "d69498c70410a1cfb192d8e8ff58e9b1341985ace03815ef38f21b3424c24568",
   "trusted_source_files": {
-    "tools/documentation/delivery.py": "3602c777556a774ca7271e3bc2492c8e48472a122fa5e42f0724036a2a29cccd",
+    "tools/documentation/verify_publication.py": "c1659750a7d4c79a082933e777240fdbd75d76c1fb9099426f7cebba9f3bb12b",
+    "tools/documentation/delivery.py": "48136e07ca7e5fce3553e4f9a55adb681bc1a43bb59fac4aa75febd623ac06c4",
     "tools/evidence/identity.py": "87392736b01456a9dc7875994532147507bd623d21aa18a94eff977371eb4ace",
     "tools/evidence/common.py": "70245d32c0f0dc2746d7f6a5403f5f5c6b426177d4b058ab42bc8434c7c38b7f",
-    "tools/configure/metadata.py": "c52d16ce8e8efa6ad761eb0fea916db14a751e19886bad0c6f00471aaa75f9eb",
-    "tools/documentation/verify_publication.py": "c1659750a7d4c79a082933e777240fdbd75d76c1fb9099426f7cebba9f3bb12b",
+    "tools/configure/metadata.py": "7ec12432a54dbc98d5ef833b93fabe754c1f6eab0ec4b25c9e407986c1d2e193",
     ".github/workflows/docs-publish.yml": "02821fdc987ac59d85c29d66396f92da4981fe62b7c2494c2e49e1f86d052fcb",
     "LICENSE": "b7152bd37691794b676615577f8c2b292288fa0691159c1e04f129e07f322913"
   },
+  "preserved_immutable_files": 4884,
   "verified_publication": {
     "status": "verified",
-    "release_id": "docs-20261014-51e93508f22f",
-    "documentation_commit": "51e93508f22fc1eb540c4ce4dd8713a91cc429f6",
-    "manifest_sha256": "38979748d90b08861eba98f4577192768edf64eebee150f21e133848da38b990",
-    "archive_sha256": "928a1d3f78a2568f955f764b3fa1d1b3ee7e861c7985ea1a31985d0c72da8727",
-    "public_files": 5179,
-    "offline_links": 368119,
+    "release_id": "docs-58297516d707",
+    "documentation_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+    "manifest_sha256": "928b2154db3dcc48fdbb3569948d45ea0901ac2b2f24278bebd690ad4a0797e4",
+    "archive_sha256": "e1c8a9939e8864a43d2a695bc70ad7b833cffa7df12b07b34d57d8e0cbc98f67",
+    "public_files": 6859,
+    "offline_links": 510061,
     "physical_status": "not_executed"
   },
-  "not_performed": [
+  "not_performed_by_assembly": [
     "git_commit",
     "git_push",
     "pages_deploy"

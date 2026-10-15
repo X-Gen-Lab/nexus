@@ -1,0 +1,300 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CPU、原子操作与运行时装配契约 &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="构建系统维护合同" href="build-system.html" />
+    <link rel="prev" title="当前设计与实施台账" href="README.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="zh_CN" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="original"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/arch-contracts.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../../en/design/arch-contracts.html" lang="en">English</a>. 源语言: zh_CN; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>原文</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="cpu">
+<h1>CPU、原子操作与运行时装配契约<a class="headerlink" href="#cpu" title="Link to this heading">¶</a></h1>
+<p>本契约适用于 M0、M0+、M3、M4、M7、M23、M33、M55、M85 的软件机制，以及
+Native 模型。实现入口为 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/arch/README.md">Arch</a>，具体配置例子和整平台边界
+见 <a class="reference internal" href="../delivery/cortex-m.html"><span class="std std-doc">Cortex-M 支持说明</span></a>。CPU 软件支持、具体芯片集成和
+物理验收分别建立证据；增加 CPU profile 不增加 SoC、Board、外设或 HIL 资格。</p>
+<section id="id1">
+<h2>唯一事实与依赖方向<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">tools/configure/cpu.py</span></code> 校验显式 CPU/IRQ 事实，返回不可变 <code class="docutils literal notranslate"><span class="pre">CpuProfileIR</span></code>。
+同一解析器服务完整 SoC 装配与外部 CPU runtime 装配，派生编译选项、原子操作
+后端、IRQ mask 类型和维护的 FreeRTOS port。编译器宏用于验证所选指令集，
+不能替代具体芯片的 DSP、可选 FPU、MVE、cache、MPU、DWT 或 SAU 事实。</p>
+<p>完整平台由精确 SoC facts、Board 接线和一份外部 TOML 生成静态 typed factory。
+CPU runtime 只读取一份 <code class="docutils literal notranslate"><span class="pre">runtime.toml</span></code> 和它指向的 <code class="docutils literal notranslate"><span class="pre">cpu.json</span></code>，不生成厂商驱动、
+链接脚本、向量表、启动、pin route、设备对象或 factory。两种装配都禁止用
+CMake cache、运行时寄存器探测或第二份默认配置覆盖已验证事实。</p>
+<p>Arch 不依赖 SoC、I/O、内核或厂商 SDK。Core 的 acquire/release publication
+直接使用编译器 load/store，不依赖 Arch；OS 与日志的 RMW 使用 Arch 原子端口，
+可选 OS 使用 Arch 的合法上下文与掩码机制。产品提供任务、栈、TCB、缓冲区、内存
+布局、保护策略和恢复责任。CPU runtime 的 <code class="docutils literal notranslate"><span class="pre">clock_hz</span></code> 是配置事实，不设置时钟，
+也不生成可用于 request deadline 的单调时钟源。</p>
+</section>
+<section id="id2">
+<h2>CPU 局部互斥与上下文<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nx_arch_irq_save/restore</span></code> 保存并恢复输入 PRIMASK，token 只在同 CPU/线程内
+严格逆序使用一次。BASEPRI/FAULTMASK 在存在时保持原值。仅允许特权 Thread
+或可配置 IRQ 使用该互斥域；NMI/HardFault 不被 PRIMASK 屏蔽，不得并发访问
+其中的元数据。token 不是内核 critical-section token，也不是跨核/跨安全域锁。
+被屏蔽段只更新有界元数据，不调用内核、回调，不等待、分配或复制 payload。</p>
+<p><code class="docutils literal notranslate"><span class="pre">nx_arch_irq_masks</span></code> 是查询快照，不是 restore token。Baseline M0/M0+/M23
+不读取不存在的 BASEPRI/FAULTMASK。IPSR 身份、特权和安全状态分别查询：异常
+号不等于 SoC IRQ ID，也不证明可以调用 FreeRTOS ISR API。Handler mode 的
+特权不能由被中断线程的 CONTROL.nPRIV 推断。</p>
+<p>DMB、DSB、ISB 保留各自的排序语义，不证明 DMA 排空、外设 idle、缓存一致性或
+request SETTLED。DWT 只读显式允许且已启用的特权周期计数器，不启用、不复位；
+不可用时返回失败且保留输出。频率变化、暂停和 32-bit 回绕使它不能替代单调
+deadline 时钟。真实 IRQ latency、特权切换与周期上界仍需目标芯片测量。</p>
+<p>具体核的外部 IRQ 上限：M0/M0+ 为 32；M3/M4/M7/M23 为 240；
+M33/M55/M85 为 480。SoC 必须给出实际有效 vector 范围，不能以体系结构最大值
+代替芯片事实。M0/M0+/M23 固定 2 个优先级位，Mainline 按事实声明 3～8 位。
+系统异常不计入外部 IRQ；CMSIS 寄存器数组容量不是处理器能力上限。
+M33 的 DSP 是可选实现，必须声明 <code class="docutils literal notranslate"><span class="pre">dsp</span></code>；关闭时生成 <code class="docutils literal notranslate"><span class="pre">+nodsp</span></code>，不能使用
+编译器默认的 DSP 指令能力替代芯片事实。M4/M7/M55/M85 固定具备 DSP，
+M0/M0+/M3/M23 没有该扩展；矛盾事实直接拒绝。</p>
+<p>这些边界核对了 ARM 的 <a class="reference external" href="https://documentation-service.arm.com/static/63dbc7dc53e02459952dba53">M23 TRM</a>、
+<a class="reference external" href="https://documentation-service.arm.com/documentation/100230/0100/Introduction/Component-blocks/Nested-Vectored-Interrupt-Controller">M33 NVIC</a>、
+<a class="reference external" href="https://documentation-service.arm.com/documentation/101051/0101/Nested-Vectored-Interrupt-Controller-/NVIC-features">M55 NVIC</a>
+与 <a class="reference external" href="https://documentation-service.arm.com/documentation/101924/0101/Nested-Vectored-Interrupt-Controller-/NVIC-features">M85 NVIC</a>。
+M7/M55/M85 的 cache line 为 32 bytes，仍须显式声明芯片是否实现对应 cache。</p>
+</section>
+<section id="bit-publication-rmw">
+<h2>32-bit publication 与 RMW<a class="headerlink" href="#bit-publication-rmw" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nexus/arch/atomic.h</span></code> 只操作仍然存活、自然对齐的 <code class="docutils literal notranslate"><span class="pre">uint32_t</span></code>。初始化发生在
+发布前；所有并发访问使用这些 helper 或兼容的编译器原子操作，不能混入普通
+读写。它不用于 MMIO，不保证 DMA 或其他 bus master 的原子性。</p>
+<p>Acquire load/release store 在所有维护的 CPU 上使用编译器原子指令，不屏蔽
+IRQ。成功 compare/exchange 使用 acq_rel、失败使用 acquire；失败会更新调用者
+私有 <code class="docutils literal notranslate"><span class="pre">expected</span></code>，不会伪造 spurious failure。fetch add/sub 返回原值并按 32-bit
+模数运算。发布状态与被发布 payload 的生命周期仍由 owner 负责。</p>
+<p>M0/M0+ 的 RMW 使用固定范围的 saved-PRIMASK 读改写，再恢复输入 mask。
+仅同 CPU 的特权 Thread/可配置 IRQ 可并发参与；NMI、HardFault、非特权线程、
+另一个核、DMA 或另一个安全域不能同时访问该存储。这是 CPU 局部机制，不宣称
+lock-free 或 bus atomic，也不静默链接 libatomic。其 masked 范围没有循环、
+回调、分配、阻塞和 payload copy；有界指令序列不等于已测得最坏 cycles。</p>
+<p>其他核使用编译器 lock-free word RMW。独占指令可能重试，lock-free 不等于固定
+周期上界。M23 属于这一后端，不能依据它没有 BASEPRI 就归为 M0 的 RMW 后端。
+停用对象前必须停止所有访问者；release/acquire 不自动回收 request、通知或队列。</p>
+</section>
+<section id="cache">
+<h2>Cache 与指令同步<a class="headerlink" href="#cache" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cache.h</span></code> 区分 data clean、invalidate、clean-invalidate 和 instruction sync。
+能力来自精确 CPU facts，维护的 cache line 为 32 bytes；零表示没有该能力。
+每次操作要求非零、完整 line 对齐的范围，地址/长度不得溢出 32-bit CPU 地址
+空间，不向外取整。调用者独占每一整条 line，并排除其他 CPU、DMA 和安全域的
+访问，保持 cache 配置稳定。</p>
+<p>只允许特权 Thread/可配置 IRQ；操作不自动屏蔽 IRQ、不启用 cache。存在但关闭
+的 cache 返回 UNSUPPORTED。instruction sync 在任何维护写入前检查全部相关
+cache，调用者还须阻止该范围的执行。函数不 flush 无关 dirty line、不验证代码，
+也不进行全局 branch-predictor 维护。</p>
+<p>Invalidate 可以丢弃 dirty data，调用者明确承担这一后果。DMA receive 的前置和
+排空后的维护由具体 provider/产品协调；cache 操作本身不证明 DMA idle，也不
+结束 request/buffer 借用。工作量随 complete line 数量增加，不能笼统称为 O(1)。</p>
+<p><code class="docutils literal notranslate"><span class="pre">cache_control.h</span></code> 单独提供 reviewed M7 的冷 Cache 启停；其他 CPU profile
+明确返回 UNSUPPORTED，不能从范围维护能力推断全局启停支持。调用者提供零初始化、
+独占且不复制的控制对象，要求特权 Thread、PRIMASK=1、BASEPRI/FAULTMASK=0，
+并排除 DMA、NMI/HardFault 和其他使用相关内存的执行者。可信复位或此前成功完成
+自有 clean/disable 才能建立已知干净的冷状态；CCR 位为零不证明外来 dirty line
+不存在，不允许认领未知 bootloader 状态。内存属性、执行与一致性政策属于调用者。</p>
+<p>实现先核对 M7 身份和维护的实际 set/way 几何，再取得所选 I/D Cache 责任，
+保存并恢复 CSSELR；失败读回不能报告成功。部分失败保留 owned mask 或 selector
+恢复责任，必须保留同一对象并重试 disable，不能根据当前 CCR 重新认领外来状态。
+disable 只在所有 provider/DMA 排空后执行；D-cache 全 set/way clean 到 CCR
+关闭使用无 stack/call 的 leaf，并保留 DSB/ISB，避免最后 clean 后重新产生局部
+dirty line。工作量随实际 set 数量增加，不承诺固定延迟。该机制不改变输入 mask，
+不自动发现设备或分配存储，也不建立 DMA 一致性的完整系统合同。</p>
+</section>
+<section id="mpu">
+<h2>MPU 编码与单区域编程<a class="headerlink" href="#mpu" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">mpu.h</span></code> 保留独立 v7 size/subregion 格式与 v8 base/limit/MAIR 格式。纯 encoder
+在任意 profile 上可用，拒绝非法或保留编码、错位和不完整边界，不截断/取整，
+失败保留输出。输入和输出不能重叠。编码不证明 SoC 可达性、DMA coherency 或
+产品权限正确性。M0+ 的可选 MPU 属于 ARMv6 PMSA，使用兼容 RBAR/RASR 格式；
+这不改变其 ARMv6-M 指令架构。M0 不提供 MPU 编程能力。</p>
+<p>实际 region programming 要求本安全域内特权 Thread、输入 PRIMASK=1、MPU
+已经 disabled，并由调用者独占 selector 和对应状态。实现先校验 profile、字段、
+实际 TYPE region 数量与上下文，再写所选区域；保留 CTRL 和输入 RNR，不自动
+启用、不 clear 所有 region，不访问另一个世界的 alias。Handler 或 enabled MPU
+调用被拒绝，不通过自动关 MPU 改变保护策略。</p>
+<p>v8 MAIR 更新只改变指定 byte，保留相邻属性。调用者拥有使用该 attribute 的
+所有 region 与有效内存策略；实现不做 cache 维护。MPU 的后续 enable、重配和
+上下文切换属于 Arch 层之外的 OS 或产品集成责任。平台已有明确范围的
+<a class="reference internal" href="os-contracts.html"><span class="std std-doc">FreeRTOS MPU 用户任务集成</span></a>，其 CPU、
+任务、存储和系统调用边界由 OS 合同维护；不能只依据 Arch encoder 或单 region
+programming 推导这些能力，也不能扩大到未维护组合。</p>
+</section>
+<section id="sau">
+<h2>安全状态与 SAU<a class="headerlink" href="#sau" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">security.h</span></code> 查询此 image 的显式 single/Secure/NonSecure 状态。查询不授权
+跨世界访问，也不探测或推断真实 SoC IDAU policy。SAU encoder 验证精确的
+32-byte base/inclusive-limit 与 NSC 标志，失败保留输出。</p>
+<p>只有明确 Secure 编译与事实声明了 SAU 的 image 可以进行 SAU MMIO。写/清单个
+region 要求 Secure 特权 Thread、输入 PRIMASK=1、SAU disabled 和独占 ownership；
+实际 TYPE region 数量在写入前校验。保留 CTRL、ALLNS、输入 RNR 和其他区域，
+不 enable SAU，不使用跨世界寄存器。NonSecure/single image 不写 SAU MMIO。</p>
+<p>IDAU、重叠规则、Secure boot、NSC veneers、双世界 gateway、共享资源协议、密钥
+和安全升级由产品/具体 SoC 接入承担。Secure-only 或 standalone NonSecure
+FreeRTOS kernel 编译不代表已支持成对世界 context、Secure task gateway 或用户
+MPU task 隔离。这些项目没有本轮物理验收证据。</p>
+</section>
+<section id="nonsecure">
+<h2>NonSecure 内存权限观察<a class="headerlink" href="#nonsecure" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nonsecure.h</span></code> 只在 Secure 特权 Thread 中观察完整跨度的 NonSecure 非特权
+read 或 read/write 权限，使用真实 CMSE 指令并同时检查安全归属和 NS MPU。
+检查不解引用指针；拒绝空指针、零长度、地址溢出和非法 access，相邻合法区域
+也可能被保守拒绝。Native、single-state 和 NonSecure image 返回 UNSUPPORTED。
+该机制不要求存在可编程 SAU；固定 IDAU 也可以建立供检查的归属。</p>
+<p>成功只是当时的权限观察，不 pin/copy/borrow，不鉴别 gateway 调用者，不证明
+RAM、DMA 可达性、对象生命周期、总线防火墙或实际访问不会 fault，也不屏蔽
+中断或冻结另一世界。集成者必须排除 MMIO、阻止归属和映射变化，并单独复制输入
+快照、在不可逆效果前验证输出。U575 的独立同步双域参考显式提供这些 owner
+前提；它不是任意用户地址空间、异步 DMA 或 NS RTOS 的通用 transport。具体
+边界见 <a class="reference internal" href="u575-trustzone-contract.html"><span class="std std-doc">U575 双域合同</span></a>。</p>
+</section>
+<section id="id3">
+<h2>验证与可支持性<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>GoogleTest/GoogleMock 在窄指令/MMIO 边界替换硬件，运行生产 C 算法，覆盖非法
+字段/上下文在状态变更前拒绝、selector/mask 保存恢复和各可选能力组合。Native
+运行真实递归线程互斥、C11 fence 与 publication/生命周期行为；Native cache/MPU/
+SAU MMIO 返回 absent-hardware 结果，纯 encoder 仍可使用。模型不执行真实 NVIC。</p>
+<p>锁定 ARM 编译器门禁分别验证九核的宏、ABI、对象、指令和未解析符号，再编译
+所选 Core/Arch/OS kernel 组合。FPU/MVE/security 的可选组合按事实单独执行，不
+从一种组合继承到所有组合。每次记录真实命令、返回码、工具身份与输出 hash。</p>
+<p>本轮执行证据由当前源码重新生成；正式 clean-source SDK、离线双构建和 candidate
+封存还须遵循 <a class="reference internal" href="../delivery/qualification.html"><span class="std std-doc">qualification</span></a>。旧 HEAD 的通过数、
+candidate 或硬件状态不能继承。F407/F470 三板维护首发模式，G474/H743/U575
+参考装配另行维护具体 startup、timebase、GPIO 和 IRQ UART；G474 增加 selected
+EXTI，H743 增加固定 Cache 配置和有限 TX DMA，U575 另有独立无 OS 的同步双域
+参考。它们不由 CPU profile 自动生成，也不建立 DMA/cache/security 全功能支持。
+M7 冷 Cache 另有真实 leaf 指令门禁，U575 双域另有实际 SG／BLXNS、双 ELF
+地址和 LOAD 映射门禁；这些结果仍不能证明芯片物理隔离或一致性。全部实板 HIL
+未执行。软件模型或成功编译不提升产品 release。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 首批纵切片</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 同步双域参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

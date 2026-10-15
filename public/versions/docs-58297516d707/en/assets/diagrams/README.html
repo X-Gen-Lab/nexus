@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Nexus platform diagram atlas &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nexus.css?v=4084a1dc" />
+    <script src="../../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Architecture explanations" href="../../explanation/index.html" />
+    <link rel="prev" title="Historical documentation and version migration" href="../../reference/history.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/assets/diagrams/README.md">58297516d707</a>; code reference: 58297516d707. <a href="../../../zh_CN/assets/diagrams/README.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="nexus">
+<h1>Nexus platform diagram atlas<a class="headerlink" href="#nexus" title="Link to this heading">¶</a></h1>
+<p>This atlas delivers 15 required views and two supplementary diagrams. Main views are registered in <a class="reference download internal" download="" href="../../_downloads/f473cb1e0ef03102bef9e545eb308159/diagram-index.csv"><code class="xref download docutils literal notranslate"><span class="pre">the</span> <span class="pre">diagram</span> <span class="pre">index</span></code></a>; maintenance follows the <a class="reference internal" href="../../design/documentation-standards.html"><span class="std std-doc">diagram standards</span></a>. Each view has an exact current/reference identity. Source existence, successful rendering or a software flow does not prove hardware execution or external publication.</p>
+<p>Code references are pinned to <code class="docutils literal notranslate"><span class="pre">0111c8d3b9c7b37d258b9c401070305b13b6f3a1</span></code>; documentation tooling implemented after that commit is bounded by its final execution records. Rendering did not change firmware source relationships. Editable DOT sources produce local SVG. Dark labels, line styles and text jointly express relationships rather than depending on color alone.</p>
+<p>Each of the 17 sources derives Chinese and English views; pages use the local SVG for their selected language. One canonical DOT still owns nodes, edges, attributes and scope; <code class="docutils literal notranslate"><span class="pre">labels.json</span></code> contains complete label translations only and cannot change topology. Checks pair all 34 localized DOT/SVG sets with their originals; missing translations, stale output or illegal resources fail the gate. Graphviz Cairo emits SVG glyph paths so offline readers need no Chinese fonts. Each view includes a title, description and textual alt/caption. The generation host requires locked Graphviz, Cairo and Noto Sans CJK SC; delivery records bind final tool identities and automated results. Source semantics, actual desktop/narrow-screen/zoom/print browser checks and offline acceptance have separate records. The 15 main and two supplementary sources have independent edge-by-edge and PNG review: current is source_reviewed, reference is reference_reviewed, and the supplementary target is design_reviewed. Actual records establish browser and formal-package acceptance separately; these states establish neither HIL nor public-deployment qualification.</p>
+<p>After changing labels, explicitly use the prepared locked tools to generate language views, then run the complete check:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>tools.documentation.diagram_localization<span class="w"> </span>--write<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--tool-prefix<span class="w"> </span>/absolute/path/to/prepared-doc-tools
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>docs<span class="w"> </span>check<span class="w"> </span>--full<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--tool-prefix<span class="w"> </span>/absolute/path/to/prepared-doc-tools
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">localized/en/</span></code> and <code class="docutils literal notranslate"><span class="pre">localized/zh_CN/</span></code> are derived assets. Successful generation proves rendering only. Label semantics, actual browser behavior and offline resource closure are reviewed separately; original diagram code references and historical execution identities remain unchanged.</p>
+<section id="fig-01">
+<h2>FIG-01 Whole-platform layers and external boundaries<a class="headerlink" href="#fig-01" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: current. Scope: Products remain external; components and OS are optional; runtime access and build facts have distinct edges.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/platform-architecture.svg" title="Open SVG at full size"><img alt="FIG-01: Products remain external; components and OS are optional; runtime access and build facts have distinct edges." src="../../_images/platform-architecture.svg" /></a></p>
+<p>Applications own tasks, scheduling, recovery and shutdown coordination. Board contributes build-time authorization. After factory lookup obtains an identity, daily I/O enters the provider through its face. Arch is selected by the compiled target; there is no CPU factory or mandatory OS forwarding. Dashed edges denote explicit optional relationships or build-time facts; solid edge labels identify calls/contracts.</p>
+<p>Sources: <a class="reference internal" href="../../delivery/architecture.html"><span class="std std-doc">current architecture contract</span></a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/CMakeLists.txt">root CMake</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/bindings.py">static assembly generation</a>, <a class="reference download internal" download="" href="../../_downloads/0f5321db7a9d3bf373f15627ed8a7f86/platform-runtime.svg"><span class="xref download myst">runtime supplement</span></a>.  <a class="reference download internal" download="" href="../../_downloads/512458065de661dcb731b604fee9f278/platform-architecture.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-43.</p>
+</section>
+<section id="fig-02">
+<h2>FIG-02 Selected compile-target dependencies<a class="headerlink" href="#fig-02" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: reference. Scope: H743 baremetal IRQ UART; exact PUBLIC/PRIVATE/INTERFACE/OBJECT relationships.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/build-targets.svg" title="Open SVG at full size"><img alt="FIG-02: H743 baremetal IRQ UART; exact PUBLIC/PRIVATE/INTERFACE/OBJECT relationships." src="../../_images/build-targets.svg" /></a></p>
+<p>This reference selects the targets of tools/configure/assemblies/nucleo-h743-baremetal-uart.toml. Arrows run from the dependent to its dependency; dashed edges explicitly identify PRIVATE includes or OBJECT injection. Shared warnings, configuration-option edges and GC policy are omitted and remain managed by real CMake. Vendor headers enter only private implementation/startup scope; generated bindings also consume SDKs through private includes. Optional components are not selected in this assembly.</p>
+<p>Sources: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/CMakeLists.txt">root target graph</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/cmake/platform/Firmware.cmake">firmware helper</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/io/CMakeLists.txt">IO targets</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/arch/CMakeLists.txt">Arch targets</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/os/CMakeLists.txt">OS targets</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32h743/CMakeLists.txt">H743 target</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/cmake/platform/Options.cmake">ABI/Config targets</a>.  <a class="reference download internal" download="" href="../../_downloads/62eb89998686c6d2f0d0351497ea2121/build-targets.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-44.</p>
+</section>
+<section id="fig-03">
+<h2>FIG-03 Configuration and atomic generation<a class="headerlink" href="#fig-03" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: current. Scope: Build-input/artifact chain; generation failure invalidates the owned bundle.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/configuration-generation.svg" title="Open SVG at full size"><img alt="FIG-03: Build-input/artifact chain; generation failure invalidates the owned bundle." src="../../_images/configuration-generation.svg" /></a></p>
+<p>Edges represent build-time input and artifact flow, not runtime calls. Strict parsing cannot repair invalid fields, conflicts or stale inputs. Failure withdraws only owned outputs: it neither clears unowned directories nor exposes partial artifacts. ELF/resource reports do not establish physical-board qualification.</p>
+<p>Sources: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/configure.py">configurator</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/ir.py">immutable IR</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/bundle.py">bundle transaction</a>, <a class="reference internal" href="../../design/build-system.html"><span class="std std-doc">build contract</span></a>.  <a class="reference download internal" download="" href="../../_downloads/e1bb75c4bbd4223e8e3acb579525d48d/configuration-generation.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-45.</p>
+</section>
+<section id="fig-04-factory">
+<h2>FIG-04 Factory and static instances<a class="headerlink" href="#fig-04-factory" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: reference. Scope: Illustrative two selected instances of one class; same-mode ops are shared; controller/endpoint identities remain separate.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/factory-instances.svg" title="Open SVG at full size"><img alt="FIG-04: Illustrative two selected instances of one class; same-mode ops are shared; controller/endpoint identities remain separate." src="../../_images/factory-instances.svg" /></a></p>
+<p>The structure shows configuration-selected layouts supported by the generator; it does not claim every PCB authorizes those combinations. Same-provider, same-mode instances share read-only ops while each context/state/storage remains independent. Different providers or modes can have different ops; a method receives the current context. Controllers and endpoints have distinct factory namespaces, and an endpoint cannot impersonate its controller. IDs are valid only in the current assembly; the default uint16_t typedef does not provide language-level protection against mixing classes.</p>
+<p>Sources: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/factory.py">typed factory generation</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/bindings.py">face/state assembly</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/io/include/nexus/io/spi.h">public SPI interface</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/providers/native/bindings.py">Native provider</a>.  <a class="reference download internal" download="" href="../../_downloads/b5cc07f8c789ea66b3f8dc04cf3bad30/factory-instances.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-46.</p>
+</section>
+<section id="fig-05">
+<h2>FIG-05 Explicit start, stop and failure cleanup<a class="headerlink" href="#fig-05" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: current. Scope: Generated lifecycle skeleton; each SoC retains its own private startup/cleanup contract.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/platform-lifecycle.svg" title="Open SVG at full size"><img alt="FIG-05: Generated lifecycle skeleton; each SoC retains its own private startup/cleanup contract." src="../../_images/platform-lifecycle.svg" /></a></p>
+<p>One external executor serializes start/stop. start does not start a scheduler; failures retain primary, cleanup and remaining_effects separately. Owners of acquired effects participate in reverse-order cleanup. Stop can release some instances successfully before returning BUSY/IO. BUSY cannot imply the platform is still fully running, and timeout does not permit storage reclamation. A concrete start_system failure may clean up inside its private path or retain the failed phase. Retry must satisfy that provider contract; the diagram is not a universal recovery API.</p>
+<p>Sources: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/bindings.py">generated start/stop</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/gpio_phase.py">cold GPIO lease</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32h743/README.md">H743 cold lifecycle</a>, <a class="reference internal" href="../../delivery/architecture.html"><span class="std std-doc">current platform contract</span></a>.  <a class="reference download internal" download="" href="../../_downloads/c2de5868ee989a0c81ce84630f3f37b3/platform-lifecycle.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-47.</p>
+</section>
+<section id="fig-06-core">
+<h2>FIG-06 Core request states and borrows<a class="headerlink" href="#fig-06-core" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: current. Scope: Transitions and preconditions allowed by Core helpers; no promise of a recovery API for every provider.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/request-lifecycle.svg" title="Open SVG at full size"><img alt="FIG-06: Transitions and preconditions allowed by Core helpers; no promise of a recovery API for every provider." src="../../_images/request-lifecycle.svg" /></a></p>
+<p>REJECTED/ACCEPTED are admission results, not request states. After ACCEPTED, request/buffer borrowing continues; cancel/deadline only starts termination progress. The provider first drains every required reference, then release-publishes SETTLED as its final request access; the caller observes with acquire semantics. Related adapters/observers must exit separately. QUARANTINED to SETTLED is legal only after actual recovery and proof of drain. initialize cannot forcibly reset a borrowed object.</p>
+<p>Sources: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/core/include/nexus/core/request.h">public request contract</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/core/src/request.c">actual Core transitions</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/components/bus_owner/src/bus_owner.c">final owner publication</a>.  <a class="reference download internal" download="" href="../../_downloads/52e581dfc0847bdcbf49c141f251a43f/request-lifecycle.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-48.</p>
+</section>
+<section id="fig-07-uartspidma">
+<h2>FIG-07 Finite UART and SPI DMA timing<a class="headerlink" href="#fig-07-uartspidma" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: reference. Scope: Exact finite F407 USART1/SPI1 DMA; Task/IRQ/DMA completion and failure paths.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/dma-completion.svg" title="Open SVG at full size"><img alt="FIG-07: Exact finite F407 USART1/SPI1 DMA; Task/IRQ/DMA completion and failure paths." src="../../_images/dma-completion.svg" /></a></p>
+<p>Top-to-bottom order distinguishes Task, DMA IRQ and UART IRQ. UART DMA TC cannot replace TC for the final serial bit; completion of both SPI DMA streams cannot replace BSY=0/TXE=1. Final drain, error observation and reference withdrawal all precede SETTLED. CS nodes describe software commands and do not prove electrical levels or physical timing. Cancel/error paths require the same actual drain conditions; failure retains QUARANTINED borrowing. NDTR is not a reliable wire-byte count, and this view does not extend to GD32 reset semantics.</p>
+<p>Sources: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32f407/drivers/uart_dma.c">F407 UART DMA</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32f407/drivers/spi_dma.c">F407 SPI DMA</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/io/include/nexus/io/dma.h">DMA drain contract</a>, <a class="reference internal" href="../../design/multiple-dma-controllers.html"><span class="std std-doc">multiple-controller contract</span></a>.  <a class="reference download internal" download="" href="../../_downloads/6e7999504ae6daed57dcef9709f6a2a2/dma-completion.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-49.</p>
+</section>
+<section id="fig-08-wait-wake">
+<h2>FIG-08 Wait, wake and externally owned shutdown<a class="headerlink" href="#fig-08-wait-wake" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: current. Scope: ready-arm-ready-wait-ready and actual execution/join responsibilities.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/wait-wake-shutdown.svg" title="Open SVG at full size"><img alt="FIG-08: ready-arm-ready-wait-ready and actual execution/join responsibilities." src="../../_images/wait-wake-shutdown.svg" /></a></p>
+<p>nx_wait_until only checks a predicate and waits for hints; it neither services hardware nor creates a worker. Rechecking after arm prevents a lost wake. After TIMEOUT, a final true predicate still returns SUCCESS. The notification port requires one waiter. External shutdown first closes admission and requests cancel while keeping owner/IRQ drain progress alive. Join producers after their loans settle; confirm owner idle includes publication exit, then stop and join the executor. Next stop hardware RX/IRQ publishers, detach wake and join other publishers; only then destroy OS synchronization storage. Related observers need their final access to exit independently. A running kernel must retain its clock/Tick, and failed storage remains retained.</p>
+<p>Sources: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/os/include/nexus/os/wait.h">wait contract</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/os/wait.c">production wait algorithm</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/components/bus_owner/include/nexus/components/bus_owner.h">owner interface</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/os/README.md">OS lifecycle</a>.  <a class="reference download internal" download="" href="../../_downloads/3e54dc6f0b4ea5dc769c0b6bbfdc0674/wait-wake-shutdown.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-50.</p>
+</section>
+<section id="fig-09-h743dmacache">
+<h2>FIG-09 H743 memory, DMA and cache<a class="headerlink" href="#fig-09-h743dmacache" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: reference. Scope: Finite H743ZIT6 USART3 TX; complete 32-byte AXI SRAM lines.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/h743-memory-cache.svg" title="Open SVG at full size"><img alt="FIG-09: Finite H743ZIT6 USART3 TX; complete 32-byte AXI SRAM lines." src="../../_images/h743-memory-cache.svg" /></a></p>
+<p>Selected TX DMA authorizes only 512 KiB AXI SRAM; other physical domains and dma_engines reachability facts do not automatically authorize placement or power. Cache-on requires exclusive complete 32-byte lines, with a maximum of 65504 bytes; Cache-off accepts 1..65535 bytes. PREPARING establishes the borrow first; clean executes under the caller’s normal masks, and cancellation cannot reclaim storage before it finishes. This diagram neither implements nor claims H743 RX DMA; future RX needs separate pre- and post-drain maintenance contracts. Trusted reset or a prior successful owned clean/disable establishes cold caches; clear CCR bits cannot claim responsibility for foreign dirty state.</p>
+<p>Sources: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32h743/soc.json">exact physical domains</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32h743/README.md">H743 provider scope</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32h743/drivers/uart_dma.c">TX DMA implementation</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/arch/include/nexus/arch/cache.h">cache range contract</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/arch/include/nexus/arch/cache_control.h">cold-cache contract</a>.  <a class="reference download internal" download="" href="../../_downloads/8b0ebbe2f41c7378e434bbf40b86ad52/h743-memory-cache.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-51.</p>
+</section>
+<section id="fig-10-source-sdk">
+<h2>FIG-10 Independent Source SDK consumption<a class="headerlink" href="#fig-10-source-sdk" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: current. Scope: Actual public entry points and consumers; relocate the complete prefix; Native execution and ARM linking remain separate.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/source-sdk-consumer.svg" title="Open SVG at full size"><img alt="FIG-10: Actual public entry points and consumers; relocate the complete prefix; Native execution and ARM linking remain separate." src="../../_images/source-sdk-consumer.svg" /></a></p>
+<p>Packaging, relocation, verify and consumer execution are separate steps. Move the complete installed prefix; an SDK subtree cannot replace package closure. find_package and resolver boundaries read actual byte identities; fixture opt-in does not bypass checksums. Native consumers actually run; MCU consumers establish compile/link/resource evidence, not physical execution. Platform macros or vendor includes must not contaminate parent targets.</p>
+<p>Sources: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/cmake/package/package_source_sdk.py">Source SDK packaging and verify</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/cmake/package/verify_consumers.py">real independent consumers</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/sdk.py">resolver SDK verification boundary</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/cmake/platform/SDK.cmake">CMake SDK entry</a>.  <a class="reference download internal" download="" href="../../_downloads/59156c76775440fb4ca4880e8fef7c35/source-sdk-consumer.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-52.</p>
+</section>
+<section id="fig-11-hil">
+<h2>FIG-11 Software and HIL evidence relationships<a class="headerlink" href="#fig-11-hil" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: current. Scope: Each scope obtains actual evidence separately; HIL tooling is not a physical measurement.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/qualification-evidence.svg" title="Open SVG at full size"><img alt="FIG-11: Each scope obtains actual evidence separately; HIL tooling is not a physical measurement." src="../../_images/qualification-evidence.svg" /></a></p>
+<p>Host/model, ARM/link/resources, SDK consumption, two network-disabled reproductions and HIL tooling each need actual execution records bound to the same source/config/artifact. Candidate sealing revalidates scope proofs and raw bytes. Physical station measurements additionally bind PCB, silicon, fixture and the same image; absent equipment means not_executed. A software candidate does not automatically become a product release, safety certification or LTS promise.</p>
+<p>Sources: <a class="reference internal" href="../../delivery/qualification.html"><span class="std std-doc">qualification contract</span></a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/evidence/candidate.py">candidate scope validation</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/evidence/proof.py">actual proof verification</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/evidence/reproduce.py">network-disabled reproduction</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/hil/README.md">HIL tooling</a>.  <a class="reference download internal" download="" href="../../_downloads/1eb495e4ce20fe685c7093fe8551b8f6/qualification-evidence.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-53.</p>
+</section>
+<section id="fig-12-sdk">
+<h2>FIG-12 Documentation, SDK and evidence publication and restore<a class="headerlink" href="#fig-12-sdk" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: reference. Scope: Reference delivery flow; public publishing/downloading requires actual receipts and cannot be inferred from a diagram.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/release-recovery.svg" title="Open SVG at full size"><img alt="FIG-12: Reference delivery flow; public publishing/downloading requires actual receipts and cannot be inferred from a diagram." src="../../_images/release-recovery.svg" /></a></p>
+<p>Documentation, SDKs and software candidates retain separate payloads and qualification. Manifest outputs list only payload, excluding the manifest itself, checksums and archive; an outer receipt records the archive hash. An immutable release-id cannot overwrite old directories, and stable does not mean all HIL passed. SDK/candidate/evidence use existing byte verification and restore mechanisms; documentation publication tools are accepted through actual CLI results. Independent restore checks paths, sizes, hashes and applicable consumers. Archiving does not rerun all historical tests. Actual external receipts prove public publishing, downloading and long-term storage; a workflow cannot replace them.</p>
+<p>Sources: <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/documentation/delivery.py">actual documentation sealing and restore</a>, <a class="reference internal" href="../../design/documentation-system.html"><span class="std std-doc">documentation delivery contract</span></a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/cmake/package/package_source_sdk.py">Source SDK closure</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/evidence/candidate.py">candidate sealing</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/evidence/proof.py">scope proof</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/evidence/store.py">archive and independent restore</a>.  <a class="reference download internal" download="" href="../../_downloads/9a6a82752f63d5f2e88e13005f64e54b/release-recovery.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-54.</p>
+</section>
+<section id="fig-13-cortex-m">
+<h2>FIG-13 Cortex-M capability layers<a class="headerlink" href="#fig-13-cortex-m" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: current. Scope: Nine-core CPU software, Runtime, concrete SoC and physical-board scopes remain separate.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/cortex-m-capabilities.svg" title="Open SVG at full size"><img alt="FIG-13: Nine-core CPU software, Runtime, concrete SoC and physical-board scopes remain separate." src="../../_images/cortex-m-capabilities.svg" /></a></p>
+<p>CpuProfileIR explicitly selects legal ABI and optional features; capabilities are not inferred from the core name. Runtime has no SoC/Board/startup/linker/factory; a whole platform additionally needs exact providers and resources. Current M7 cold-cache control does not extend to other cache-equipped cores. Software gates in the view require actual evidence within their own scope and cannot inherit historical counts. Real context preservation, coherency, privilege and waveforms still need physical acceptance.</p>
+<p>Sources: <a class="reference internal" href="../../delivery/cortex-m.html"><span class="std std-doc">nine-core software contract</span></a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/configure/cpu.py">CPU resolver</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/cmake/platform/Runtime.cmake">Runtime CMake entry</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/arch/CMakeLists.txt">Arch source target</a>, <a class="reference internal" href="../../delivery/support.html"><span class="std std-doc">whole-platform support scope</span></a>.  <a class="reference download internal" download="" href="../../_downloads/82daa27870a421961d2c7756a9cae6a0/cortex-m-capabilities.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-55.</p>
+</section>
+<section id="fig-14-u575">
+<h2>FIG-14 U575 synchronous dual-domain reference<a class="headerlink" href="#fig-14-u575" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: reference. Scope: Independent TZEN1 synchronous GPIO without OS; the default TZEN0 provider is unchanged.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/u575-security-domains.svg" title="Open SVG at full size"><img alt="FIG-14: Independent TZEN1 synchronous GPIO without OS; the default TZEN0 provider is unchanged." src="../../_images/u575-security-domains.svg" /></a></p>
+<p>The boot owner supplies and establishes actual option-byte/image-layout preconditions before execution; the mechanism does not write option bytes. GTZC, SAU and NS MPU are distinct boundaries. NSC fetch checks Secure MPU; CMSE observation cannot replace a bus firewall or pinning. This reference requires no NS handlers, RTOS or autonomous masters; its fixed world principal permits only synchronous scalar GPIO. Failure after acquiring irreversible effects must be retained until reset. Synchronous SG pinning derives from static mappings and absence of concurrency. Actual observations of 8/16 MPU regions apply only to this reference and do not alter the exact-eight tuple of the TZEN0 provider. All physical isolation cases remain unexecuted.</p>
+<p>Sources: <a class="reference internal" href="../../design/u575-trustzone-contract.html"><span class="std std-doc">canonical dual-domain contract</span></a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32u575/security.c">production cold owner</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/tree/58297516d707fdee117bd27b5df6af09d72edd2e/tests/contracts/u575_trustzone">actual paired-image fixture</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/components/user_io_broker/README.md">UserIoBroker</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/arch/include/nexus/arch/nonsecure.h">public CMSE observation contract</a>.  <a class="reference download internal" download="" href="../../_downloads/e8a46f9ae2250863719de8af238c0b9a/u575-security-domains.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-56.</p>
+</section>
+<section id="fig-15-rx">
+<h2>FIG-15 Continuous RX and observable block loss<a class="headerlink" href="#fig-15-rx" title="Link to this heading">¶</a></h2>
+<p><strong>Identity: reference. Scope: Continuous F407 USART1 RX; preposted FIFO loans, loss and stop responsibilities.</strong></p>
+<p><a class="nexus-diagram-link reference internal" href="../../_images/continuous-stream.svg" title="Open SVG at full size"><img alt="FIG-15: Continuous F407 USART1 RX; preposted FIFO loans, loss and stop responsibilities." src="../../_images/continuous-stream.svg" /></a></p>
+<p>Do not mix preposted and ordinary producers. Publish an old block in FIFO order only after it disappears completely from both hardware targets and CT/EN/new flags prove withdrawal. On failure, withdraw sources and release future loans in LIFO order; BORROWED consumer blocks must not be overwritten. Missing spare blocks, IDLE and recovery can cause gaps. lost_blocks counts observed boundaries, not exact missing wire bytes. A TC flag cannot count arbitrary coalesced wraps; actual IRQ/address-replacement latency must be shorter than one block fill time. stop closes admission and preserves drain. outstanding=0 still requires caller/observer exit. First-release ADC trigger blocks are explicitly rearmed by service and have gaps between blocks; this view does not claim continuous ADC.</p>
+<p>Sources: <a class="reference internal" href="../../design/uart-dma-rs485.html"><span class="std std-doc">UART DMA/continuous-loan contract</span></a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/io/include/nexus/io/stream.h">stream state contract</a>, <a class="reference internal" href="../../design/io-observation-recovery.html"><span class="std std-doc">capacity and observation contract</span></a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32f407/drivers/uart_receive.c">F407 RX DMA implementation</a>, <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32f407/drivers/adc_stream.c">explicit ADC rearm</a>.  <a class="reference download internal" download="" href="../../_downloads/13b6e0d3eceda8b52305c35d0077ddca/continuous-stream.dot"><code class="xref download docutils literal notranslate"><span class="pre">editable</span> <span class="pre">DOT</span></code></a>; Implementation item: DOC-57.</p>
+</section>
+<section id="id1">
+<h2>Supplementary views<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>The <a class="reference download internal" download="" href="../../_downloads/0f5321db7a9d3bf373f15627ed8a7f86/platform-runtime.svg"><span class="xref download myst">runtime-access supplement</span></a> and <a class="reference download internal" download="" href="../../_downloads/7f21513bdaca037176867b7884dccfea/platform-runtime.dot"><code class="xref download docutils literal notranslate"><span class="pre">DOT</span> <span class="pre">source</span></code></a> distinguish factory lookup from direct I/O. They do not replace the complete FIG-01 layering.</p>
+<p>The <a class="reference download internal" download="" href="../../_downloads/72649b34f09a39f155f70641ac02064d/documentation-target.svg"><span class="xref download myst">original documentation-system target view</span></a> and <a class="reference download internal" download="" href="../../_downloads/799873b92a881a9be0a3df96dbced38b/documentation-target.dot"><code class="xref download docutils literal notranslate"><span class="pre">DOT</span> <span class="pre">source</span></code></a> retain the original planned build-input relationships. Its target identity indicates design provenance, not current tools, public deployment, SDK or physical-board qualification. Current delivery and restore are determined by FIG-12 and actual execution records.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Task guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../reference/index.html">Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../reference/api/index.html">Public C API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/configuration/index.html">Configuration and tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/platforms/index.html">Platforms and qualification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/documentation-delivery.html">Documentation packages, publication and independent restoration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/documentation-tools.html">Documentation tools and preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/history.html">Historical documentation and version migration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Nexus platform diagram atlas</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

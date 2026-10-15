@@ -1,0 +1,28 @@
+var ethernet_8h =
+[
+    [ "nx_eth_tx_request_t", "structnx__eth__tx__request__t.html", "structnx__eth__tx__request__t" ],
+    [ "nx_eth_link_t", "structnx__eth__link__t.html", "structnx__eth__link__t" ],
+    [ "nx_eth_rx_frame_t", "structnx__eth__rx__frame__t.html", "structnx__eth__rx__frame__t" ],
+    [ "nx_eth_state_t", "structnx__eth__state__t.html", "structnx__eth__state__t" ],
+    [ "nx_eth_ops_t", "structnx__eth__ops__t.html", "structnx__eth__ops__t" ],
+    [ "nx_eth_port_t", "structnx__eth__port__t.html", "structnx__eth__port__t" ],
+    [ "NX_ETH_FRAME_MAX", "ethernet_8h.html#a712f42eb813df41cf839e22ef3e4aa31", null ],
+    [ "NX_ETH_FRAME_MIN", "ethernet_8h.html#a3a742fa5b0535c195bf6f72dd4fd8bac", null ],
+    [ "NX_ETH_RX_BACKPRESSURE", "ethernet_8h.html#aa08a93fde34d3a9ee32167c32e5c0f59", null ],
+    [ "NX_ETH_RX_CRC", "ethernet_8h.html#a5e65deadda91a063c79abd6b0140a012", null ],
+    [ "NX_ETH_RX_DMA_ERROR", "ethernet_8h.html#ad52d48fe9b317b646a714ee43aeb350c", null ],
+    [ "NX_ETH_RX_FRAGMENT", "ethernet_8h.html#a96c24b6ebc74bc65af67012113335f1c", null ],
+    [ "NX_ETH_RX_LENGTH", "ethernet_8h.html#ac37d912876ed4b3e5423f7b16661e779", null ],
+    [ "NX_ETH_RX_STORAGE_MIN", "ethernet_8h.html#af19b8edca91e2567c896a71305f46a66", null ],
+    [ "NX_ETH_RX_UNSUPPORTED", "ethernet_8h.html#a76483e7e0420bc5df5240c2b89001e27", null ],
+    [ "nx_eth_port_acquire", "ethernet_8h.html#ac9266a16b22dbb3bb55aa19cd4d89e73", null ],
+    [ "nx_eth_port_apply_link", "ethernet_8h.html#af4c4fd393d1300059719570af2a4b380", null ],
+    [ "nx_eth_port_attach_wake", "ethernet_8h.html#af8feff6e6fc219cb52564ea00ab42710", null ],
+    [ "nx_eth_port_cancel", "ethernet_8h.html#a8e3c5a8fb681b04ec6030987e8f624f3", null ],
+    [ "nx_eth_port_release", "ethernet_8h.html#a905e9417776b3f50e1bfe08339977db2", null ],
+    [ "nx_eth_port_service", "ethernet_8h.html#aa621bd1338c5b04aacfcab86c65b7a55", null ],
+    [ "nx_eth_port_state", "ethernet_8h.html#aac71da13954fe2b191461b35b7eba0f4", null ],
+    [ "nx_eth_port_stop", "ethernet_8h.html#a16ddd1fcc0262de6fc51abdedc1bef0c", null ],
+    [ "nx_eth_port_submit", "ethernet_8h.html#a9780dcec44a500d9a119bc91939d3ef2", null ],
+    [ "nx_eth_tx_prepare", "ethernet_8h.html#acd1842989bc751a37350b81adc5db22b", null ]
+];

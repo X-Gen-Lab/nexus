@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Current design and execution ledgers &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CPU, atomics and runtime assembly contracts" href="arch-contracts.html" />
+    <link rel="prev" title="Maintained design contracts" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/README.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/design/README.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="id1">
+<h1>Current design and execution ledgers<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>Current code uses unified physical directories, TOML static assembly, typed factories and shared polymorphic tables. Public C11 faces contain only read-only ops and private context. Each instance owns independent state; callers supply request and block storage. SDKs/provider storage remain private and product projects external. Use these design contracts together with <a class="reference internal" href="../delivery/README.html"><span class="std std-doc">current delivery</span></a>; historical documents establish no current qualification.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Document</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="documentation-system.html"><span class="std std-doc">Documentation architecture and delivery plan</span></a></p></td>
+<td><p>Target design for reader tasks, one canonical source, MyST/API, bilingual content, gates, versions and offline delivery</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">58-item</span> <span class="pre">documentation</span> <span class="pre">ledger</span></code></a></p></td>
+<td><p>Preserve DOC-01–40 and add content/diagram tasks; separately record dependencies, exit conditions and implementation/verification</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="documentation-improvements.html"><span class="std std-doc">Complete documentation improvement list</span></a></p></td>
+<td><p>Reader list derived from the same ledger without another status authority</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="documentation-standards.html"><span class="std std-doc">Content and diagram standards</span></a></p></td>
+<td><p>Clear writing, normative language, facts/qualification, examples, architecture diagrams and independent review</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="documentation-templates.html"><span class="std std-doc">Page templates</span></a></p></td>
+<td><p>Required questions for tutorial/how-to/reference/explanation/status pages</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../assets/diagrams/README.html"><span class="std std-doc">Current and target reference diagrams</span></a></p></td>
+<td><p>17 local SVG/DOT pairs: 15 required diagram categories and 2 supplements; catalogue owns identity and scope</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference download internal" download="" href="../_downloads/c842ae0910b28a190d5978c12c524a50/documentation-migration.csv"><code class="xref download docutils literal notranslate"><span class="pre">Documentation</span> <span class="pre">migration</span> <span class="pre">mapping</span></code></a></p></td>
+<td><p>Destinations for canonical content, tools and adjacent READMEs; retain original qualification and ledger identities</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="next-generation-platform.html"><span class="std std-doc">Architecture blueprint</span></a></p></td>
+<td><p>Principles, execution, ownership, performance/storage and support boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="engineering-handbook.html"><span class="std std-doc">Engineering handbook</span></a></p></td>
+<td><p>Existing formatting/comments, tools, automation, evidence and publication</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="build-system.html"><span class="std std-doc">Build-system contract</span></a></p></td>
+<td><p>Configuration transactions, incremental dependencies, target policy, developer entry and delivery boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference download internal" download="" href="../_downloads/627f2f57f03b30c8b6242525d8433d77/build-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">48-item</span> <span class="pre">build-system</span> <span class="pre">ledger</span></code></a></p></td>
+<td><p>Original exit conditions, implementation paths and iteration execution evidence</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="integration-contracts.html"><span class="std std-doc">Integration contracts</span></a></p></td>
+<td><p>Strict resource contracts for SoC/Board/devices/components/external projects</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="os-contracts.html"><span class="std std-doc">OS execution and lifecycle contract</span></a></p></td>
+<td><p>Deadlines, IRQ policy, tasks/queues, low power and extension boundaries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="os-backend-integration.html"><span class="std std-doc">Backend integration and execution probe</span></a></p></td>
+<td><p>New RTOS capability contracts, actual execution and prohibition on automatic support expansion</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="threadx.html"><span class="std std-doc">ThreadX configuration and integration</span></a></p></td>
+<td><p>Real official Linux/M4 kernels, independent typed policy, bootstrap, static objects and exact support scope</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="timebase-lowpower.html"><span class="std std-doc">Shallow-sleep timebase</span></a></p></td>
+<td><p>Explicit FreeRTOS selector, fixed clock/compare alarms, quantized phase, retained failure and physical boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="classic-can.html"><span class="std std-doc">Classic CAN</span></a></p></td>
+<td><p>Three mailboxes, shared filter domain, controller-local abort/recovery and Board electrical handoff</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="usb-device.html"><span class="std std-doc">USB FS device</span></a></p></td>
+<td><p>PIO packet/endpoint ownership, independent 48 MHz owner, control epochs and complete stop</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="ethernet.html"><span class="std std-doc">Raw Ethernet / MDIO</span></a></p></td>
+<td><p>Caller descriptors/RX loans, RMII and optional DP83848; external protocols and PHY/Board policy</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="timer-advanced.html"><span class="std std-doc">Advanced timers</span></a></p></td>
+<td><p>Capture events and complementary PWM/deadtime/break; shared resources and actual safety boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="user-io-broker.html"><span class="std std-doc">User I/O broker</span></a></p></td>
+<td><p>Kernel-invoked scalar GPIO and trusted principal/pin/copy; see dual-world contract for separate U575 synchronous reference transport</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="provider-assemblies.html"><span class="std std-doc">Selected assembly qualification gate</span></a></p></td>
+<td><p>Actual ARM builds per authored fixture, resource budgets, link retention and immutable inputs</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="multiple-controllers.html"><span class="std std-doc">Multiple controllers</span></a></p></td>
+<td><p>Independent provider/IRQ/DMA ownership; configuration availability and silicon implementation recorded separately</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="stm32g474.html"><span class="std std-doc">STM32G474 integration</span></a></p></td>
+<td><p>Exact part, MB1367 provenance, clock/startup/time/GPIO/LPUART and PA0/PA1 EXTI software fixtures</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32h743/README.md">STM32H743 integration</a></p></td>
+<td><p>Four fixed HSI/cache configurations, cold-cache ownership and USART3 DMA TX; RX remains IRQ bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="u575-trustzone-contract.html"><span class="std std-doc">U575 dual-world reference contract</span></a></p></td>
+<td><p>Independent Secure/NS Runtime, cold-attribution seal, fixed NS world and synchronous GPIO; no expanded RTOS/factory/async/HIL promise</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="soc-refinement.html"><span class="std std-doc">SoC refinement and 55-item ledger</span></a></p></td>
+<td><p>Separate implementation scope, original exits, software mechanisms and physical acceptance</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="i2c-bus-clear.html"><span class="std std-doc">I2C bus recovery</span></a></p></td>
+<td><p>Caller-exclusive GPIO, finite timing and continued cleanup after failures</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="uart-dma-rs485.html"><span class="std std-doc">UART DMA and RS485</span></a></p></td>
+<td><p>Finite/continuous receive, duplex DMA, flow control and actual TC/DE timing</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference download internal" download="" href="../_downloads/fccd25e37a1c1e4c2119798d61bf4981/os-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">OS01–OS55</span> <span class="pre">ledger</span></code></a></p></td>
+<td><p>Actual mechanisms, evidence and software/physical status per item</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="arch-contracts.html"><span class="std std-doc">Arch and CPU-runtime contract</span></a></p></td>
+<td><p>Nine-core software, atomics, cache/MPU/SAU and security boundaries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference download internal" download="" href="../_downloads/59e7eaa5794f5dfc55a672b8a7ab5730/next-generation-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">33-item</span> <span class="pre">execution</span> <span class="pre">ledger</span></code></a></p></td>
+<td><p>Separate implementation files, evidence entries and software/physical status</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference download internal" download="" href="../_downloads/72b42a64a5ecd225c2eb594f0bceeac8/factory-platform-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">Current</span> <span class="pre">P0–P5</span> <span class="pre">ledger</span></code></a></p></td>
+<td><p>Factory, TOML, TDD, multiple instances and IRQ/DMA/block implementation</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="fault-observation.html"><span class="std std-doc">Fault observation and shutdown</span></a></p></td>
+<td><p>Stateless narrow observation, preserved interrupt masks, external safe outputs and physical boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="io-lifecycle-matrix.html"><span class="std std-doc">I/O lifecycle checks</span></a></p></td>
+<td><p>203 bounded properties, actual production compilation, one test execution and provenance validation</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference download internal" download="" href="../_downloads/246e8cda8dd6ee9354b7967fa0269cc7/platform-refinement-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">60-item</span> <span class="pre">refinement</span> <span class="pre">ledger</span></code></a></p></td>
+<td><p>Separate implementation, software execution, boards and external blockers; Codex owns all maintenance</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../delivery/architecture.html"><span class="std std-doc">Actual architecture</span></a></p></td>
+<td><p>Current directories, public factories/polymorphic interfaces and dependency direction</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../delivery/qualification.html"><span class="std std-doc">Current qualification boundaries</span></a></p></td>
+<td><p>Distinguish development execution, clean software candidates and pending boards</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Ledgers retain B0–B6 and original exit conditions, adding implementation_paths/evidence_paths, software_status and hardware_status. Implemented means mechanisms exist, not every exit passed. Development cannot replace clean-source SDKs, formal offline dual builds or candidate sealing. Formal NG028/030 executions update freshly generated evidence. Hardware is disconnected and all applicable physical items are not_executed. Glob denotes explicit directory families of one mechanism, not recursive discovery or default builds; X-Gen-Lab/nexus-examples paths belong to a separate repository.</p>
+<p>CPU software covers M0/M0+/M3/M4/M7/M23/M33/M55/M85, selecting atomic backends, ABI, optional FPU/MVE/cache/MPU/SAU and baremetal/FreeRTOS ports through explicit CPU/IRQ facts. External CPU runtime generates no SoC/Board/factory. ThreadX maintains a separate explicit Native/M4 subset and inherits no nine-core FreeRTOS scope. See <a class="reference internal" href="../delivery/cortex-m.html"><span class="std std-doc">nine-core support</span></a> for configurations and outstanding conditions. This does not expand whole-platform chip/board scope.</p>
+<p>Launch boards are Qiming STM32F407ZGT6, SkyStar STM32F407VET6 and Liangshan GD32F470ZGT6, with baremetal/FreeRTOS, explicit ThreadX and Native models. New modes and G474/H743/U575 slices use their documented configuration, complete-image and SDK exits; public types do not imply whole-chip integration. G474 adds PA0/PA1 EXTI. H743 supports four HSI 32/64 MHz × Cache off/on startup combinations and finite DMA TX, without runtime reclocking or DMA RX. U575 TZEN0 and independent TZEN1 OS-free synchronous dual-world references remain separate; the latter is not generic dual-world factory, NS RTOS or asynchronous borrowing. SOC-33–35 remain unimplemented; SOC-36 remains partial; SOC-37–55 physical acceptance remains not_executed. Unreviewed physical PCB facts for all three Boards remain unknown; software fixtures are not physical routes. Roles follow the ten-person configuration: TL1, Core/I/O/OS2, BSP2, common applications/communications2, QA/HIL2, build/release1. Codex owns maintenance without named individuals. Remote branch protection needs independent GitHub verification and cannot be inferred from local role files.</p>
+<p>Behavior changes follow RED → GREEN → REFACTOR. Host GoogleTest/GoogleMock tests execute real providers, factories and owners; configuration tools use Python unittest. Commit hooks and CI run the same gate; MCU targets link no test frameworks. Build-time resources, actual register models, ARM ELF budgets and physical HIL establish separate evidence; actual linked images measure method-table overhead.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="source-compatibility.html"><span class="std std-doc">Source compatibility and SDK versions</span></a></p></li>
+</ul>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

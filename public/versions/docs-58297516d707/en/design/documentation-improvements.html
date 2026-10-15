@@ -1,0 +1,549 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Nexus complete documentation-system improvement checklist &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Nexus documentation content and diagram standards" href="documentation-standards.html" />
+    <link rel="prev" title="Explicit clock leases and shallow sleep" href="clock-domain-sleep.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/documentation-improvements.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/design/documentation-improvements.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="nexus">
+<h1>Nexus complete documentation-system improvement checklist<a class="headerlink" href="#nexus" title="Link to this heading">¶</a></h1>
+<p>This page derives from the <a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">implementation</span> <span class="pre">ledger</span></code></a>. That CSV is the sole authority for tasks, dependencies, implementation and acceptance values; status updates do not change original IDs or exit conditions. Source SHA-256: <code class="docutils literal notranslate"><span class="pre">d1f5adad33468cb83c2849b9ec5176d10d958db044620943e93fb0d02d6a2c77</span></code>. The same generator checks missing/stale views at commit and CI.</p>
+<section id="id1">
+<h2>Current implementation and acceptance<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">implemented</span></code> means a page, tool, gate or delivery path exists; <code class="docutils literal notranslate"><span class="pre">development_passed</span></code> records actual development checks without formal release/exit qualification. <code class="docutils literal notranslate"><span class="pre">pending_formal_evidence</span></code> awaits exact clean-source, deployment, restoration or independent-review records. See <a class="reference internal" href="../status/documentation-acceptance.html"><span class="std std-doc">documentation acceptance</span></a> for actual records/scope and <a class="reference internal" href="../status/ledgers/documentation-system.html"><span class="std std-doc">original per-item fields</span></a> for all states/evidence locations.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Implementation value</p></th>
+<th class="head"><p>Acceptance value</p></th>
+<th class="head"><p>Source records</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">implemented</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">passed</span></code></p></td>
+<td><p>58</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Items needing formal evidence, failure or unexecuted review: none pending; interpretation still follows actual evidence scope.</p>
+<p>Previews, software models, diagram sources and successful rendering do not replace public deployment, physical HIL or product qualification. Documentation packages and evidence archives bind the same delivery; never invent unacquired digests or locators.</p>
+<p>Prioritize P1; P2 is also delivery scope. Codex owns responsibility with independent agent review. New/changed prose follows <a class="reference internal" href="documentation-standards.html"><span class="std std-doc">content/diagram standards</span></a> and <a class="reference internal" href="documentation-templates.html"><span class="std std-doc">page templates</span></a>; see the <a class="reference internal" href="../assets/diagrams/README.html"><span class="std std-doc">15 required diagram classes</span></a>. D1–D6 are dependency-ordered work packages, without aggregating other ledgers’ task or acceptance counts.</p>
+</section>
+<section id="d1">
+<h2>D1 Entry points, authorities and prose rules<a class="headerlink" href="#d1" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Priority</p></th>
+<th class="head"><p>Improvement</p></th>
+<th class="head"><p>Exit condition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-01</p></td>
+<td><p>P1</p></td>
+<td><p>Register page authorities and reader tasks</p></td>
+<td><p>Identify authoritative prose, API, support, qualification, ledger and historical sources for every page; directory structure and unique navigation must be reviewable</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-02</p></td>
+<td><p>P1</p></td>
+<td><p>Correct root entries and support statements</p></td>
+<td><p>README statements about typed factory, TOML, ThreadX, continuous modes and exact support are consistent; do not expand physical-board scope</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-03</p></td>
+<td><p>P1</p></td>
+<td><p>Correct executable configuration templates</p></td>
+<td><p>Board examples include soc_family; complete Board and CPU/TOML inputs are actually parsed; fragments explicitly do not establish complete-configuration qualification</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-04</p></td>
+<td><p>P1</p></td>
+<td><p>Unify latest-qualification navigation</p></td>
+<td><p>Current code, documentation HEAD, qualified source and historical records are separately locatable; prior execution is not inherited</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-05</p></td>
+<td><p>P1</p></td>
+<td><p>Map original exit conditions and new evidence for each ledger</p></td>
+<td><p>Map OS48 and outdated statuses by scope; retain original IDs, conditions and failed records; do not bulk-mark passed</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-06</p></td>
+<td><p>P1</p></td>
+<td><p>Create migration-reference and legacy-URL inventories</p></td>
+<td><p>Every current content source has a destination; relative links, anchors, tool inputs and legacy URLs have complete handling rules</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-41</p></td>
+<td><p>P1</p></td>
+<td><p>Apply prose-writing and semantic standards</p></td>
+<td><p>Critical pages specify readers, goals and configurations; terminology, units, normative strength, facts and qualification pass independent review</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="d2-api">
+<h2>D2 Site, architecture and API<a class="headerlink" href="#d2-api" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Priority</p></th>
+<th class="head"><p>Improvement</p></th>
+<th class="head"><p>Exit condition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-07</p></td>
+<td><p>P1</p></td>
+<td><p>Select and integrate MyST</p></td>
+<td><p>Remain compatible with maintained Sphinx/Breathe; actually build complete positive and negative Markdown/RST fixtures; specify the pin</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-08</p></td>
+<td><p>P1</p></td>
+<td><p>Adjust the Sphinx source root and exclusions</p></td>
+<td><p>Use docs as source root and index prose directly; keep archives, generated outputs and large evidence outside the site</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-09</p></td>
+<td><p>P1</p></td>
+<td><p>Implement unique task navigation</p></td>
+<td><p>The home page provides use, integration, maintenance, acceptance and migration entries; current pages are reachable and searchable; do not maintain a second copy of prose</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-10</p></td>
+<td><p>P1</p></td>
+<td><p>Reorganize public API and factory explanations</p></td>
+<td><p>Core/Arch/I/O/OS/Components module pages link to symbols; factory examples use actual generated interfaces</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-11</p></td>
+<td><p>P1</p></td>
+<td><p>Integrate system contracts and architecture explanations</p></td>
+<td><p>Lifecycle and safety restrictions retain their original normative meaning; contracts and explanations each have one authority</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-12</p></td>
+<td><p>P2</p></td>
+<td><p>Integrate source-adjacent READMEs</p></td>
+<td><p>Retain the implementation map and local SoC authorities; include-relative references are correct or source links are bound to the site revision</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-43</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver whole-platform architecture and external-boundary diagrams</p></td>
+<td><p>Core/Arch/SoC/Board/I/O/optional OS components and external-product responsibilities are clear; distinguish factory interface lookup from direct I/O</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-44</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver the actual compilation-target dependency graph</p></td>
+<td><p>Check actual CMake targets and private/public dependencies; vendor implementation remains private; do not treat generation or runtime arrows as compilation dependencies</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-45</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver configuration and generation-flow diagrams</p></td>
+<td><p>TOML/facts/typed IR/atomic bundles/CMake/Ninja artifacts and failure invalidation are accurate; do not turn unknown Board facts into known facts</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-46</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver factory and instance-structure diagrams</p></td>
+<td><p>Static faces/shared ops/independent contexts and controller/endpoint relationships match source; getters allocate or initialize nothing</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-53</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver software and HIL evidence-relationship diagrams</p></td>
+<td><p>Associate source/configuration/tools/receipts with candidate identity; software and HIL evidence are separately acquired through actual execution; no automatic physical qualification</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="d3">
+<h2>D3 Tutorials, integration and execution mechanisms<a class="headerlink" href="#d3" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Priority</p></th>
+<th class="head"><p>Improvement</p></th>
+<th class="head"><p>Exit condition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-13</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver the external SDK introductory tutorial</p></td>
+<td><p>A real external consumer at a fixed revision configures, builds and runs or links successfully; retain actual commands and cleanup steps</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-14</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver the async I/O and cancellation-drain tutorial</p></td>
+<td><p>Real examples cover reject/accept/cancel/drain/settled/quarantine; borrowed storage is not reclaimed early</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-15</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver the Board-integration guide</p></td>
+<td><p>Verifiable templates, route authorization, sources and unknowns are explicit; reuse existing SoCs; separate software and PCB qualification</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-16</p></td>
+<td><p>P2</p></td>
+<td><p>Deliver SoC/provider/component integration guides</p></td>
+<td><p>List facts/startup/time/provider/testing/SDK/HIL conditions by vertical slice; generic devices need not enter the generator</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-17</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver OS waiting and shutdown guidance</p></td>
+<td><p>Backend semantics, execution progress, actual deletion and storage-reclamation conditions are clear; examples are validated on maintained backends</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-18</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver legacy configuration and interface migration guidance</p></td>
+<td><p>Legacy HAL/OSAL/Kconfig has an executable migration path to current TOML/factory; old IDs are not persisted across bundles</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-19</p></td>
+<td><p>P2</p></td>
+<td><p>Deliver configuration and tool references</p></td>
+<td><p>Fields, units, rejection rules and CLI come from maintained implementation; do not manually copy API declarations or duplicate configuration authorities</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-20</p></td>
+<td><p>P2</p></td>
+<td><p>Deliver performance-diagnosis and HIL-preparation guidance</p></td>
+<td><p>Distinguish ELF budgets, measured cycles, stack and HIL; tool preparation does not claim hardware execution</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-42</p></td>
+<td><p>P1</p></td>
+<td><p>Apply five templates and per-page content review</p></td>
+<td><p>Walk through critical tutorial/how-to/reference/explanation/status pages against templates; correct omissions or explain them; metadata does not substitute for acceptable content</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-47</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver initialization, shutdown and failed-start withdrawal diagrams</p></td>
+<td><p>prepare/start/stop/withdraw follow the actual selected sequence; partial effects and reverse-order withdrawal responsibilities are explicit; do not start the scheduler automatically</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-48</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver request-state and borrow diagrams</p></td>
+<td><p>Separate admission outcomes from enum states; cancellation/deadline retain borrowing; SETTLED and observer/slot-release conditions are explicit</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-49</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver UART and SPI DMA execution sequences</p></td>
+<td><p>Show normal and cancellation/drain-failure paths for selected modes; separate Task/IRQ/DMA domains and DMA TC/wire complete/SETTLED</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-50</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver wait/wake and OS-shutdown diagrams</p></td>
+<td><p>ready-arm-ready-wait-ready, deadlines and execution-progress responsibilities are accurate; reclaim storage only after actual join/delete</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-51</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver memory, DMA and Cache reference diagrams</p></td>
+<td><p>Specify exact chip/mode/memory domain/reachability/alignment and whole-line maintenance; do not infer DMA or coherence from a CPU name</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-52</p></td>
+<td><p>P1</p></td>
+<td><p>Deliver Source SDK consumption-flow diagrams</p></td>
+<td><p>Separate actual relocated external consumers from source-tree self-tests; accurately state configuration/build/run-or-link scope</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-55</p></td>
+<td><p>P2</p></td>
+<td><p>Deliver Cortex-M capability-layer diagrams</p></td>
+<td><p>Separate CPU primitives/Runtime/SoC/Board/HIL; FPU/MVE/Cache/security capabilities and actual ports do not inherit qualification from one another</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-56</p></td>
+<td><p>P2</p></td>
+<td><p>Deliver the U575 synchronous two-domain reference diagram</p></td>
+<td><p>Limit scope to an independent TZEN1 synchronous no-OS reference; define SAU/MPU/GTZC/gateway and seal-failure responsibilities; no general NS RTOS/async claim</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-57</p></td>
+<td><p>P2</p></td>
+<td><p>Deliver continuous-stream and visible-loss diagrams</p></td>
+<td><p>producer/block/consumer/loan/overrun/stop are accurate; service and capacity conditions are explicit; do not promise unconditional zero loss</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="d4">
+<h2>D4 Bilingual content, diagrams and reader review<a class="headerlink" href="#d4" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Priority</p></th>
+<th class="head"><p>Improvement</p></th>
+<th class="head"><p>Exit condition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-21</p></td>
+<td><p>P1</p></td>
+<td><p>Define bilingual terminology and release-critical pages</p></td>
+<td><p>Original languages and nontranslatable identifiers are explicit; fix critical-page scope; do not require duplicated CSVs or raw logs</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-22</p></td>
+<td><p>P1</p></td>
+<td><p>Implement gettext and translation-source revision checks</p></td>
+<td><p>Use one translation chain; build English and Chinese originals into en/zh_CN respectively; mark missing fallback and stale/fuzzy according to actual prose language and source revision</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-23</p></td>
+<td><p>P1</p></td>
+<td><p>Complete bilingual review of critical use paths</p></td>
+<td><p>Independently review critical introductory, configuration, factory, borrow, support, qualification and migration prose; do not falsely report missing languages as complete</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-24</p></td>
+<td><p>P1</p></td>
+<td><p>Show actual page language and translation status</p></td>
+<td><p>reviewed/stale/missing/original are visible on pages and entry points; English fallback is not marked as translated Chinese; locale does not override source_language</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-25</p></td>
+<td><p>P2</p></td>
+<td><p>Organize local diagrams and offline resources</p></td>
+<td><p>Diagram sources are reviewable and arrows agree with contracts; images/fonts/scripts do not depend on CDNs; lock new rendering tools; pair DOT/SVG; lock Graphviz and actual fonts; SVG has no external resources/scripts/DOCTYPE</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-26</p></td>
+<td><p>P1</p></td>
+<td><p>Complete reader-task walkthroughs</p></td>
+<td><p>An independent agent completes tasks from their entry points; correct bad steps, inaccessible contracts and revision confusion; record actual results; independently review semantics against content standards</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-58</p></td>
+<td><p>P1</p></td>
+<td><p>Execute diagram/prose consistency and visual/offline review</p></td>
+<td><p>Check every edge and state against sources; include sources/outputs/alt/captions; check SVG-safe resources and fonts; actually verify desktop/narrow-screen zoom/print/offline; do not mark unexecuted checks passed</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="d5-ci">
+<h2>D5 Tools, gates and CI<a class="headerlink" href="#d5-ci" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Priority</p></th>
+<th class="head"><p>Improvement</p></th>
+<th class="head"><p>Exit condition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-27</p></td>
+<td><p>P1</p></td>
+<td><p>Unify the docs CLI and legacy-script forwarding</p></td>
+<td><p>check/build/preview/package/doctor have clear purposes; local and CI strict arguments match; preserve failure codes and diagnostics</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-28</p></td>
+<td><p>P1</p></td>
+<td><p>Create offline link, anchor and navigation checks</p></td>
+<td><p>Deliberately bad files/anchors/duplicate IDs/unreachable pages actually fail; legal cross-page references and migration aliases actually pass</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-29</p></td>
+<td><p>P1</p></td>
+<td><p>Expand actual configuration-fragment validation</p></td>
+<td><p>New paths, RST, complete Board and CPU inputs pass the actual resolver; syntax fragments do not gain executable qualification</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-30</p></td>
+<td><p>P1</p></td>
+<td><p>Associate executable code and consumers</p></td>
+<td><p>literalinclude sources and test identities are traceable; maintained examples actually build; do not arbitrarily execute documentation shell text</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-31</p></td>
+<td><p>P2</p></td>
+<td><p>Create bounded external-link checking</p></td>
+<td><p>Report 404/revision mistakes separately from network failures; bound timeout/retry; commits require no network by default</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-32</p></td>
+<td><p>P1</p></td>
+<td><p>Integrate documentation commit and strict CI gates</p></td>
+<td><p>Execute fast offline commit checks and complete documentation CI; apply TDD to negative tool paths; prose changes do not fabricate firmware acceptance; machine diagram-resource checks and prose/diagram semantic review have explicit separate responsibilities</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-33</p></td>
+<td><p>P1</p></td>
+<td><p>Lock and actually install the documentation-tool closure</p></td>
+<td><p>Lock all transitive Python wheel hashes and Doxygen identity; actually install/build at a clean maintained tuple; actually verify Graphviz and font closure</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-34</p></td>
+<td><p>P1</p></td>
+<td><p>Separate preview builds from publication permissions</p></td>
+<td><p>PR artifacts carry source identity; trusted deployment consumes only verified outputs; do not execute external PR source with elevated privileges</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="d6">
+<h2>D6 Publication, restoration and migration closure<a class="headerlink" href="#d6" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Priority</p></th>
+<th class="head"><p>Improvement</p></th>
+<th class="head"><p>Exit condition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DOC-35</p></td>
+<td><p>P1</p></td>
+<td><p>Generate version and qualification manifests</p></td>
+<td><p>Read platform version from existing policy; separate code/docs/qualified source; outputs list payload only; exclude manifest/checksums/archive and indirect hash self-reference</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-36</p></td>
+<td><p>P1</p></td>
+<td><p>Generate relative-link offline HTML packages</p></td>
+<td><p>Include languages/API/manifest/checksums/licenses; browse and verify outside the workspace; avoid hash self-reference</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-37</p></td>
+<td><p>P1</p></td>
+<td><p>Publish immutable versions and the stable entry</p></td>
+<td><p>Bind release-id to a manifest without overwrite; actual deployment succeeds; stable does not claim all HIL passed</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-38</p></td>
+<td><p>P1</p></td>
+<td><p>Execute post-publication site and download verification</p></td>
+<td><p>Online identity matches the deployed package; critical pages, legacy URLs, diagrams and downloads pass checks; old APIs are not silently mapped to new contracts</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-39</p></td>
+<td><p>P1</p></td>
+<td><p>Complete independent recovery and long-term storage</p></td>
+<td><p>Stable acquisition locations and retention policy are explicit; restore, browse and verify in an independent root; remote recovery must actually execute</p></td>
+</tr>
+<tr class="row-odd"><td><p>DOC-40</p></td>
+<td><p>P1</p></td>
+<td><p>Close migration and independently review delivery</p></td>
+<td><p>All mappings handled; no duplicate standards, broken links or incorrect qualification; original evidence retained; all 58 tasks and 15 required diagram classes meet exit conditions; unclaimed configurations, HIL and later extensions retain accurate boundaries</p></td>
+</tr>
+<tr class="row-even"><td><p>DOC-54</p></td>
+<td><p>P2</p></td>
+<td><p>Deliver release and independent-recovery diagrams</p></td>
+<td><p>Documentation/SDK/archive channels and identities are accurate; distinguish targets from actual publications; clarify independent acquisition/recovery/verification boundaries</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

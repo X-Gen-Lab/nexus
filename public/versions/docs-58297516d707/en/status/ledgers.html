@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Original ledgers, exit conditions and derived views &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Original platform-reconstruction ledger" href="ledgers/next-generation.html" />
+    <link rel="prev" title="HIL and physical-board status" href="hardware.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/status/ledgers.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/status/ledgers.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="status-ledgers">
+<span id="id1"></span><h1>Original ledgers, exit conditions and derived views<a class="headerlink" href="#status-ledgers" title="Link to this heading">¶</a></h1>
+<p>The pages below derive from seven original CSV files and do not establish a second status database. Each task retains its original ID, order, all fields, exit conditions, implementation status, software/physical status and original evidence locators; the source SHA-256 is checkable. When the original CSV has no separate exit field, this is explicitly stated; do not construct a supposedly passed condition from other ledgers.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ledgers/next-generation.html">Original platform-reconstruction ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ledgers/factory-platform.html">Factory and TDD ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ledgers/os.html">Original OS workstream ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ledgers/platform-refinement.html">I/O refinement ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ledgers/soc-refinement.html">Original SoC workstream ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ledgers/build-system.html">Original build-system workstream ledger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ledgers/documentation-system.html">Documentation-system ledger</a></li>
+</ul>
+</div>
+<section id="id2">
+<h2>Interpret statuses correctly<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">implemented</span></code> means implementation exists; it does not guarantee complete software qualification for the current checkout.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">development_passed</span></code> retains its development-validation meaning; do not expand it into formal clean-source archiving.</p></li>
+<li><p>Consult the <a class="reference internal" href="software-verification.html"><span class="std std-doc">exact results index</span></a> for <code class="docutils literal notranslate"><span class="pre">qualification_record_authority</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">implemented_tooling</span></code> only means tooling is implemented; unexecuted physical work remains <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">not_implemented</span></code>, <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>, failures and conditional extensions retain their original values.</p></li>
+<li><p>Different workstreams cover overlapping mechanisms; do not add their counts or calculate project-wide completion percentages.</p></li>
+</ul>
+<p>The old 48-item OS checklist has been expanded. Current CSV IDs are OS01–OS55; OS49–OS55 cover physical tooling/actual acceptance, with all original statuses retained. The 48 build-system tasks form a separate ledger. Historical RF ledgers remain under <code class="docutils literal notranslate"><span class="pre">docs/archive/implementation/</span></code>, reachable through the <a class="reference internal" href="../reference/history.html"><span class="std std-doc">history entry</span></a>, and cannot establish current support qualification.</p>
+</section>
+<section id="id3">
+<h2>Maintain derived pages<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>tools.documentation.status
+python<span class="w"> </span>-m<span class="w"> </span>tools.documentation.status<span class="w"> </span>--check
+</pre></div>
+</div>
+<p>The first command only regenerates views from the same original CSV. The second checks missing/stale output, returns nonzero on failure and writes nothing. Regenerate after changing original ledgers; commit/CI checks the same derivation relationship. Successful generation/checking only proves documentation matches original fields; it executes no firmware and acquires no hardware observations. Actual test evidence is in the original results indexes.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Status and evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="support.html">Support scope and platform selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release-0.1.0.html">Nexus 0.1.0 Source SDK developer preview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software-verification.html">Software verification, source identity and evidence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-acceptance.html">Documentation-system implementation and formal acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hardware.html">HIL and physical-board status</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Original ledgers, exit conditions and derived views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roadmap.html">Iteration directions and admission conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Nexus 平台文档 &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="_static/nexus.css?v=4084a1dc" />
+    <script src="_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="入门教程" href="tutorials/index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/index.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../en/index.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="nexus-platform-documentation">
+<h1>Nexus 平台文档<a class="headerlink" href="#nexus-platform-documentation" title="Link to this heading">¶</a></h1>
+<p>使用当前可复用的 C11 平台完成一项具体任务。产品应用、调度策略、私有 PCB 数据和恢复策略由外部消费工程维护。源码文档、已执行的软件证据和实板资格分别记录。</p>
+<p>当前实现使用生成的类型化工厂和不可变的 C 接口接口面。factory 查找返回已有静态对象；日常 I/O 直接通过对象的操作表调用。平台启动不启动调度器。</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">入门教程</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/source-sdk.html">构建独立的 Source SDK 消费工程</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/async-io.html">观察拒绝、借用、取消与排空</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guides/index.html">操作指南</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/source-checkout.html">取得精确源码与锁定依赖</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/board-porting.html">接入复核的 Board 包</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/provider-porting.html">接入 SoC、提供者或通用组件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/os-shutdown.html">正确等待并停止显式 owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/migration.html">迁移旧配置与接口访问</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/performance-hil.html">测量资源并准备硬件验收</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">参考</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/api/index.html">公共 API 参考</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/configuration/index.html">配置与工具</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/platforms/index.html">平台与资格</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/documentation-delivery.html">文档包、发布与独立恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/documentation-tools.html">文档工具与环境准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/history.html">历史文档与版本迁移</a></li>
+<li class="toctree-l2"><a class="reference internal" href="assets/diagrams/README.html">Nexus 平台图册</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="explanation/index.html">架构解释</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explanation/platform-architecture.html">平台如何装配与执行</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanation/factory.html">类型化 factory、静态实例与多态接口面</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanation/ownership.html">借用、完成与观察者生命周期</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanation/source-map.html">源码旁的权威合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanation/source-map.html#core-contracts">Core 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanation/source-map.html#cpu-local-primitives">CPU 本地原语</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanation/source-map.html#id1">类型化 I/O</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanation/source-map.html#optional-os-adapters">可选 OS 适配器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanation/source-map.html#optional-common-components">可选通用组件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="status/index.html">状态与证据</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="status/support.html">支持范围与选型</a></li>
+<li class="toctree-l2"><a class="reference internal" href="status/release-0.1.0.html">Nexus 0.1.0 Source SDK 开发者预览版</a></li>
+<li class="toctree-l2"><a class="reference internal" href="status/software-verification.html">软件验证、源码身份与证据</a></li>
+<li class="toctree-l2"><a class="reference internal" href="status/documentation-acceptance.html">文档系统实施与正式验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="status/hardware.html">HIL 与实板状态</a></li>
+<li class="toctree-l2"><a class="reference internal" href="status/ledgers.html">原台账、退出条件与派生视图</a></li>
+<li class="toctree-l2"><a class="reference internal" href="status/roadmap.html">迭代方向与进入条件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">维护 Nexus</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development/workflow.html">使用 TDD 与正常提交门禁开发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/documentation.html">维护清晰且可验证的文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development/implementation-map.html">定位实现权威</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sphinx/development/coding_standards.html">代码规范</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="design/index.html">维护中的设计合同</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="design/README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/stm32g474.html">STM32G474RET6／MB1367 首批纵切片</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/u575-trustzone-contract.html">U575 同步双域参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design/user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="delivery/index.html">已记录的交付证据</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="delivery/README.html">当前平台交付</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/architecture.html">当前系统架构</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/build-system-verification.html">构建系统执行记录</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/capabilities.html">派生能力与接入矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/cortex-m.html">Cortex-M 软件支持与平台接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/migration.html">外部工程迁移</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/next-iterations.html">后续迭代与团队执行</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/os.html">OS 交付范围与验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/qualification.html">软件候选与物理资格</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/security-review.html">安全扫描与生命周期边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/soc-extensions-verification.html">SoC 扩展验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/soc-refinement-verification.html">SoC 完善执行记录</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/support.html">精确支持范围</a></li>
+<li class="toctree-l2"><a class="reference internal" href="delivery/verification.html">当前证据与验收边界</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -691,13 +691,7 @@ def package(build_dir, output_dir, *, source_root, release_id, toolchain=None):
         raise ValueError("Stale documentation build source identity")
     if any(line.startswith(("-", "+", "U")) for line in source["submodules"]):
         raise ValueError("Documentation source submodules are incomplete or stale")
-    version_match = re.search(r"project\(nexus\s+VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)",
-                              (source_root / "CMakeLists.txt").read_text())
-    if not version_match:
-        raise ValueError("Documentation version requires the CMake project version")
     policy = load_policy(source_root)
-    if policy["semantic_version"] != version_match[1]:
-        raise ValueError("Documentation CMake and compatibility policy versions differ")
     source_interface = dict(policy)
     source_interface["policy_sha256"] = _digest(
         (source_root / "dependencies/platform-compatibility.json").read_bytes())
@@ -714,7 +708,7 @@ def package(build_dir, output_dir, *, source_root, release_id, toolchain=None):
     code.update(_git_tree(source_root, CODE_PATHS))
     manifest = {
         "schema_version": 1, "kind": "nexus_documentation_package",
-        "release_id": release_id, "version": version_match[1],
+        "release_id": release_id, "version": policy["semantic_version"],
         "source_interface": source_interface,
         "documentation_source": documentation, "code_source": code,
         "qualified_code": {"commit": qualified["canonical_code_commit"],

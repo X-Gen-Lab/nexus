@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>UART receive DMA, duplex DMA and electrical adaptation &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="USB FS device packet ownership and integration boundaries" href="usb-device.html" />
+    <link rel="prev" title="U575 synchronous dual-world reference contract" href="u575-trustzone-contract.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/uart-dma-rs485.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/design/uart-dma-rs485.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="uart-dma-dma">
+<h1>UART receive DMA, duplex DMA and electrical adaptation<a class="headerlink" href="#uart-dma-dma" title="Link to this heading">¶</a></h1>
+<p>UART retains public <code class="docutils literal notranslate"><span class="pre">nx_uart_port_t</span></code> and shared read-only <code class="docutils literal notranslate"><span class="pre">nx_uart_ops_t</span></code>. Configuration generates instances; callers retain only interface and context. New mechanisms are selected by mode; existing IRQ, <code class="docutils literal notranslate"><span class="pre">dma-tx</span></code> and <code class="docutils literal notranslate"><span class="pre">irq-blocks</span></code> state layouts and default operations-slot counts do not grow. Production remains C11 without heap, device scanning, hidden workers or default OS locks.</p>
+<section id="id1">
+<h2>Modes and exact resources<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Mode</p></th>
+<th class="head"><p>TX</p></th>
+<th class="head"><p>RX</p></th>
+<th class="head"><p>Receive behavior</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rx-dma-idle</span></code></p></td>
+<td><p>IRQ</p></td>
+<td><p>NORMAL DMA</p></td>
+<td><p>Finite blocks; IDLE publishes a stable prefix; the owner explicitly services restart</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dma-duplex</span></code></p></td>
+<td><p>DMA</p></td>
+<td><p>NORMAL DMA</p></td>
+<td><p>Independent TX/RX engines; receive retains finite-block restart gaps</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rx-dma-continuous</span></code></p></td>
+<td><p>IRQ</p></td>
+<td><p>Double-buffer DMA</p></td>
+<td><p>Two preposted targets and a third available replacement block</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dma-duplex-continuous</span></code></p></td>
+<td><p>DMA</p></td>
+<td><p>Double-buffer DMA</p></td>
+<td><p>Independent duplex engines; continuous receive uses the same loan protocol</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Initial support is STM32F407 USART1 and GD32F470 USART0 only. STM32 RX is DMA2 stream2 channel4 and TX DMA2 stream7 channel4; GD32 RX is physical DMA1 channel2 selector4 and TX physical DMA1 channel7 selector4. Controller numbers come from chip manuals, not public opaque resource-ID encodings. Configuration must exclusively own UART, DMA targets, vectors, clocks and pins; conflicts are rejected during generation.</p>
+<p>Receive-block capacity is 1–65535 bytes. Continuous mode needs at least three equal-capacity blocks; finite mode permits different capacities. DMA targets must lie within authorized, writable, DMA-reachable regions; CCM on both chips is not receive-DMA-reachable SRAM. Neither MCU has CPU D-cache, and providers perform no invented cache clean/invalidate. Cache-equipped MCUs need new domain/maintenance contracts rather than reuse of these cache-free assumptions.</p>
+<p>RX-only and duplex use separate read-only operations tables and direct TX calls. The TX hot path has no runtime <code class="docutils literal notranslate"><span class="pre">dma_transmit</span></code> branch; RX-only links retain no TX-DMA operations. Current providers share the explicitly selected receive-state layout, so RX-only cold storage still includes TX-DMA base fields; this is not a zero-field-overhead claim.</p>
+</section>
+<section id="id2">
+<h2>Block ownership and continuous receive<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>Callers initialize <code class="docutils literal notranslate"><span class="pre">nx_stream_t</span></code> and slots, then lend them through <code class="docutils literal notranslate"><span class="pre">nx_uart_port_rx_start</span></code>. Devices own producer responsibilities and callers consumer responsibilities. Ordinary producer and <code class="docutils literal notranslate"><span class="pre">nx_stream_post_*</span></code> preposted-producer APIs must not be mixed. Stream, slots, blocks and provider state do not overlap and remain valid until successful <code class="docutils literal notranslate"><span class="pre">rx_stop</span></code> and external-observer drain. Active TX payloads must not overlap the entire RX block pool.</p>
+<p>Finite mode points DMA directly at caller payloads without CPU payload copies. On TC, IDLE or error, it first withdraws UART DMA requests and receive interrupts, then writes DMA disable. Actual EN, request and interrupt readbacks establish quiescence before stable remaining counts are read. Finally it rereads DMA/UART errors and performs the sole status/data clear order. Only reliable positive-length prefixes become READY; unreliable prefixes return FREE and record loss. Stop never falsely publishes an empty, unreceived block as successful data.</p>
+<p>Continuous mode starts double-buffer DMA with two FILLING loans. After TC it reserves a third FREE block before replacing the completed inactive target. Before publishing the old block, it proves replacement address, other-target address, CT, EN, absence of new TC/errors and removal of the old address from both hardware targets. Failure never hands potentially writable memory to consumers: it withdraws sources, drains and rolls back future loans in LIFO order. Successful publication follows FIFO. IRQ copies no payload and performs bounded control with at most three loans.</p>
+<p>Without a replacement FREE block, receive-write sources stop immediately and await actual drain while retaining consumer BORROWED blocks. Stable completed and partial blocks can still publish with one recorded stop gap, never a guessed missing-byte count. Failed disable retains every producer loan; later owner <code class="docutils literal notranslate"><span class="pre">service</span></code> retries boundedly. No block or state may be reused meanwhile.</p>
+<p>TC is a flag, not a wrap counter. Continuous qualification requires worst-case IRQ latency plus target-replacement time below one block-fill interval, measured from actual baud, block size, interrupt priority, masked windows and concurrent DMA load. Software detects observable errors, target changes and CT anomalies but cannot recover arbitrarily many coalesced wraps. Violating latency budgets prevents claims of reliable sequencing even if all targets remain FILLING and consumer memory is untouched.</p>
+<p>IDLE, finite-block restart and capacity-pressure recovery create receive gaps. Owner service periods are explicit resource budgets too. Observed UART overrun/error before restart records loss before status/data clear; software cannot infer exact omissions in gaps without error bits. Loss denotes observed boundaries, not exact wire-byte statistics. Upper protocols decide acceptable gaps and recovery.</p>
+</section>
+<section id="tx">
+<h2>TX, stop and calling context<a class="headerlink" href="#tx" title="Link to this heading">¶</a></h2>
+<p>TX DMA TC proves only payload delivery to the peripheral, not the last bit leaving the pin. TX settlement still waits for actual UART TC; cancellation withdraws sources before proving DMA/peripheral drain. RX DMA and TX DMA use separate targets and vectors; their completions never substitute for each other.</p>
+<p><code class="docutils literal notranslate"><span class="pre">rx_start/rx_stop/service/stop</span></code> run on the sole unmasked task executor. ISRs use only exact generated IRQ entries; protected spans save/restore incoming interrupt state. <code class="docutils literal notranslate"><span class="pre">rx_stop</span></code> closes stream admission and may return BUSY: published or borrowed blocks must be normally returned by consumers. Success requires withdrawn sources, quiescent engines and zero outstanding loans. Closed service never restarts RX. Complete <code class="docutils literal notranslate"><span class="pre">stop</span></code> first closes TX admission too, and may stop underlying clocks only after RX drain. Failure prohibits owner destruction or replacement.</p>
+<p>GD32 IRQ TX cancellation uses shared USART reset and first drains active RX. If RX EN refuses stop, TX/RX loans remain and reset is deferred. Selected hardware-flow-control bits are restored after reset.</p>
+</section>
+<section id="rts-cts-rs485">
+<h2>RTS/CTS and RS485<a class="headerlink" href="#rts-cts-rs485" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">nx_*_uart_flow_configure</span></code> is explicitly optional cold configuration. STM32 sets CR3 RTSE/CTSE and GD32 CTL2 RTSEN/CTSEN, rolling back failed readback. It runs after initialization but before active TX/RX and cannot modify live borrows. Chip signals are PA11 CTS, PA12 RTS, AF7; chip facts do not prove wiring on the three boards or peer handshake support. Board binding needs PCB, GPIO permission, voltage, multiplexing and peer review. Hardware RTS reflects UART data-register receive state, not remaining software-block capacity; it neither replaces protocol backpressure nor guarantees lossless operation without FREE blocks.</p>
+<p>RS485 selects <code class="docutils literal notranslate"><span class="pre">nx_uart_rs485_state_t</span></code>, immutable <code class="docutils literal notranslate"><span class="pre">nx_uart_rs485_config_t</span></code> and <code class="docutils literal notranslate"><span class="pre">nx_uart_rs485_ops</span></code>; default UART state gains no DE, timer or task. Callers bind real GPIO, a uniquely authorized bit, DE polarity, setup/hold time and the exact provider’s pure TX validator. Validator and submit/start share rejection rules; validation writes no GPIO/MMIO, admits nothing and retains no references. Config, both faces, ops/context bindings and electrical facts remain immutable; all cold facts are separate from mutable request/payload/control storage. The same executor exclusively owns underlying TX; bypass submissions or transport changes are prohibited.</p>
+<p>Rejection precedes DE assertion. After acceptance, setup starts only after successful DE assertion; the absolute transfer deadline includes setup and wire completion. Setup timeout never starts UART. Hold starts only after actual underlying SETTLED; successful DE withdrawal then removes internal payload/active references before outer SETTLED publication. Failed drain or DE withdrawal retains QUARANTINED outer loans and DE ownership for owner-service retries. Required drain/hold may extend borrows beyond transfer deadlines; expired deadlines never justify early memory or DE release.</p>
+<p>Setup/hold uses the <code class="docutils literal notranslate"><span class="pre">nx_time_now_us</span></code> monotonic domain; worst-case service gaps determine boundary error. Hold guarantees at least declared duration, not exact-time DE withdrawal. Exact waveforms require explicit hardware-timer/electrical budgets; this implementation invents neither transceiver facts nor timing qualification.</p>
+</section>
+<section id="id3">
+<h2>Software evidence and board acceptance<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>GoogleTest/GoogleMock directly execute production providers, covering rejected bank replacement, CT flips, wrong address writes, new errors in W1C windows, refused disable, terminal DMA/UART errors, status/data-clear races, epoch exhaustion, duplex cancellation, flow configuration, RS485 setup/hold and DE failures. Native adapters additionally verify real request lifecycles. Results establish software contracts, not electrical waveforms, bus arbitration or physical latency.</p>
+<p>Actual ARM ELF comparison before/after table splitting in the same no-LTO Release RX-only development fixture reduced STM32 text by 2310 bytes, GD32 by 2262 bytes, and both bss by 8 bytes. This describes section-GC costs only for that intermediate fixture, not final sources, arbitrary applications or all modes. Final candidates must freshly bind configuration, sources, ELF/map/nm and tool identity.</p>
+<p>After terminal-error fixes, fresh production-graph ARM linking of the same fixture produced STM32 text 7866 bytes and GD32 text 9932 bytes, down 2218 and 2174 bytes from the old baseline; both bss reductions remain 8 bytes. All fourteen final mode fixtures linked; RX-only nm contains no <code class="docutils literal notranslate"><span class="pre">nx_*_uart_dma_*</span></code> symbols, while duplex retains real TX-DMA methods. This remains development-build software evidence; candidate sealing and board validation execute separately.</p>
+<p>No physical boards are connected, and all physical acceptance remains unexecuted. Board exit conditions include both engines’ concurrent maximum baud/load, worst IRQ/service latency, target-replacement/wrap pressure, overflow/recovery after long consumer holds, IDLE/last-DMA-beat races, actual TC wire tails, RTS/CTS stall/resume, DE setup/hold polarity/edges, and drained clocks/vectors/SRAM loans after repeated stop/start. Record PCB revision, probes, UARTs, external wiring, raw logic-analyzer waveforms and the same ELF per board. Unexecuted items cannot pass.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

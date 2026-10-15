@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>架构解释 &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="平台如何装配与执行" href="platform-architecture.html" />
+    <link rel="prev" title="Nexus 平台图册" href="../assets/diagrams/README.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/explanation/index.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../../en/explanation/index.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="architecture-explanations">
+<h1>架构解释<a class="headerlink" href="#architecture-explanations" title="Link to this heading">¶</a></h1>
+<p>修改提供者前，先理解边界、静态装配和必须保留的存储。链接的设计合同仍是规范依据。</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="platform-architecture.html">平台如何装配与执行</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html#build-time-decisions-and-runtime-work">构建期决策与运行时工作</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html#lifecycle-and-failure-responsibility">生命周期与失败责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html#costs-and-tradeoffs">成本与取舍</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="factory.html">类型化 factory、静态实例与多态接口面</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="factory.html#what-generation-owns">生成器拥有的责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html#what-a-call-does">一次调用执行什么</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html#verify-the-generated-design">验证生成设计</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ownership.html">借用、完成与观察者生命周期</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html#three-different-completion-facts">三种不同的完成事实</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html#cross-task-control-and-continuous-streams">跨任务控制与连续流</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html">源码旁的权威合同</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#core">Core</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html#core-contracts">Core 合同</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#arch">Arch</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html#cpu-local-primitives">CPU 本地原语</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#typed-i-o">类型化 I/O</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html#id1">类型化 I/O</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#os-adapters">OS 适配器</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html#optional-os-adapters">可选 OS 适配器</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#maintained-execution-contracts">维护范围内的执行合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#components">组件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source-map.html#optional-common-components">可选通用组件</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#exact-soc-implementations">准确 SoC 实现</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">架构解释</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html">平台如何装配与执行</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">类型化 factory、静态实例与多态接口面</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html">借用、完成与观察者生命周期</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html">源码旁的权威合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#core-contracts">Core 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#cpu-local-primitives">CPU 本地原语</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#id1">类型化 I/O</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-os-adapters">可选 OS 适配器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-common-components">可选通用组件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

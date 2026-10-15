@@ -1,0 +1,1546 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_documentation_build",
+  "status": "passed",
+  "source": {
+    "root": "/home/runner/work/nexus/nexus",
+    "commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+    "tree": "06feab8ef3e89df60b4cdc5671c66ab0e3c08c21",
+    "dirty": false,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (V11.1.0)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (5.9.0-dev-178-g55b19837f)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)"
+    ]
+  },
+  "tools": {
+    "prefix": "/home/runner/work/_temp/nexus-docs-tools",
+    "lock_sha256": "9c33a22690587cd9c02f1b2d78e0f9a70313f4359afa67dd404b449c8f565288",
+    "tools": {
+      "doxygen": "1.14.0 (cbe58f6237b2238c9af7f51c6b7afb8bbf52c866)",
+      "graphviz": "dot - graphviz version 2.42.4 (0)",
+      "font": "NotoSansCJK-Regular.ttc: \"Noto Sans CJK SC\" \"Regular\""
+    },
+    "target": {
+      "system": "Linux",
+      "machine": "x86_64",
+      "python": "3.12",
+      "glibc": "2.41",
+      "qualified_host": "Debian 13 amd64 userland; CPython 3.12.14; kernel recorded by each preparation",
+      "scope": "Preparation closure; a downloaded tool identity does not establish firmware or HIL qualification."
+    },
+    "installation_receipt": "/home/runner/work/_temp/nexus-docs-tools/installation.json",
+    "installation_sha256": "775f248efd0d7de96fd8d3699b026d89d6028e15653731890781078beb719159"
+  },
+  "languages": [
+    "en",
+    "zh_CN"
+  ],
+  "qualification": false,
+  "translations": {
+    "errors": [],
+    "records": [
+      {
+        "page": "assets/diagrams/README",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "assets/diagrams/README",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/README",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/README",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/architecture",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/architecture",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/build-system-verification",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/build-system-verification",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/capabilities",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/capabilities",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/cortex-m",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/cortex-m",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/migration",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/migration",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/next-iterations",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/next-iterations",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/os",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/os",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/qualification",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/qualification",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/security-review",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/security-review",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/soc-extensions-verification",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/soc-extensions-verification",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/soc-refinement-verification",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/soc-refinement-verification",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/support",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/support",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/verification",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "delivery/verification",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/README",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/README",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/arch-contracts",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/arch-contracts",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "original"
+      },
+      {
+        "page": "design/build-system",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/build-system",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/classic-can",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/classic-can",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "original"
+      },
+      {
+        "page": "design/clock-domain-sleep",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/clock-domain-sleep",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "original"
+      },
+      {
+        "page": "design/documentation-improvements",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/documentation-improvements",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/documentation-standards",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/documentation-standards",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/documentation-system",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/documentation-system",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/documentation-templates",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/documentation-templates",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/engineering-handbook",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/engineering-handbook",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/ethernet",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/ethernet",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/fault-observation",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/fault-observation",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "original"
+      },
+      {
+        "page": "design/i2c-bus-clear",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/i2c-bus-clear",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "original"
+      },
+      {
+        "page": "design/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/integration-contracts",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/integration-contracts",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/io-lifecycle-matrix",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/io-lifecycle-matrix",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "original"
+      },
+      {
+        "page": "design/io-observation-recovery",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/io-observation-recovery",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/multiple-controllers",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/multiple-controllers",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/multiple-dma-controllers",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/multiple-dma-controllers",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/next-generation-platform",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/next-generation-platform",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/os-backend-integration",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/os-backend-integration",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/os-contracts",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/os-contracts",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/provider-assemblies",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/provider-assemblies",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/soc-execution-budgets",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/soc-execution-budgets",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/soc-refinement",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/soc-refinement",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/source-compatibility",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/source-compatibility",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/stack-observation-endurance",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/stack-observation-endurance",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/stm32g474",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/stm32g474",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/threadx",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/threadx",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/timebase-lowpower",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/timebase-lowpower",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/timer-advanced",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/timer-advanced",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/u575-trustzone-contract",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/u575-trustzone-contract",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/uart-dma-rs485",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/uart-dma-rs485",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "original"
+      },
+      {
+        "page": "design/usb-device",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "design/usb-device",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "original"
+      },
+      {
+        "page": "design/user-io-broker",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "design/user-io-broker",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "development/documentation",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "development/documentation",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "development/implementation-map",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "development/implementation-map",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "development/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "development/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "development/workflow",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "development/workflow",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "explanation/factory",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "explanation/factory",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "explanation/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "explanation/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "explanation/ownership",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "explanation/ownership",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "explanation/platform-architecture",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "explanation/platform-architecture",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "explanation/source-map",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "explanation/source-map",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "guides/board-porting",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "guides/board-porting",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "guides/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "guides/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "guides/migration",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "guides/migration",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "guides/os-shutdown",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "guides/os-shutdown",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "guides/performance-hil",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "guides/performance-hil",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "guides/provider-porting",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "guides/provider-porting",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "guides/source-checkout",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "guides/source-checkout",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/arch",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/arch",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/components",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/components",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/core",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/core",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/io",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/io",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/os",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/api/os",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/configuration/assembly",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/configuration/assembly",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/configuration/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/configuration/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/configuration/tools",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/configuration/tools",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/documentation-delivery",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/documentation-delivery",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "original"
+      },
+      {
+        "page": "reference/documentation-tools",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/documentation-tools",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/history",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/history",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "original"
+      },
+      {
+        "page": "reference/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/platforms/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/platforms/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/platforms/qualification",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/platforms/qualification",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "reference/platforms/support",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "reference/platforms/support",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "sphinx/development/coding_standards",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "sphinx/development/coding_standards",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/documentation-acceptance",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/documentation-acceptance",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/hardware",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/hardware",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/build-system",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/build-system",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/documentation-system",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/documentation-system",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/factory-platform",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/factory-platform",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/next-generation",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/next-generation",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/os",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/os",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/platform-refinement",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/platform-refinement",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/soc-refinement",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/ledgers/soc-refinement",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/release-0.1.0",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "status/release-0.1.0",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/roadmap",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/roadmap",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/software-verification",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/software-verification",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/support",
+        "source_language": "zh_CN",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "reviewed"
+      },
+      {
+        "page": "status/support",
+        "source_language": "zh_CN",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "tutorials/async-io",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "tutorials/async-io",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "tutorials/index",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "tutorials/index",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      },
+      {
+        "page": "tutorials/source-sdk",
+        "source_language": "en",
+        "requested_language": "en",
+        "actual_language": "en",
+        "status": "original"
+      },
+      {
+        "page": "tutorials/source-sdk",
+        "source_language": "en",
+        "requested_language": "zh_CN",
+        "actual_language": "zh_CN",
+        "status": "reviewed"
+      }
+    ],
+    "status": "passed"
+  },
+  "command_receipts": [
+    "/home/runner/work/nexus/nexus/build/documentation-attempts/b98949b85d184e6f8623bc120f5cbf02/doxygen.attempts/1792039240978557032-60c4b7619fe145eb9f70dbbe068d6baa/receipt.json",
+    "/home/runner/work/nexus/nexus/build/documentation-attempts/b98949b85d184e6f8623bc120f5cbf02/gettext.attempts/1792039241395534915-e4da75ea802141b684245950f795dbf0/receipt.json",
+    "/home/runner/work/nexus/nexus/build/documentation-attempts/b98949b85d184e6f8623bc120f5cbf02/html-en.attempts/1792039255429685762-dd70cf25713d40ba8b67c03898769fd1/receipt.json",
+    "/home/runner/work/nexus/nexus/build/documentation-attempts/b98949b85d184e6f8623bc120f5cbf02/html-zh_CN.attempts/1792039286031577963-ce6001b5c1fd45249d20a8c13fd0948b/receipt.json"
+  ],
+  "source_check": {
+    "schema_version": 1,
+    "kind": "nexus_documentation_source_check",
+    "status": "passed",
+    "errors": [],
+    "pages": 103,
+    "page_ids": 53,
+    "configuration_examples": [
+      {
+        "document": "/home/runner/work/nexus/nexus/docs/delivery/cortex-m.md",
+        "line": 131,
+        "kind": "runtime",
+        "configuration_sha256": "b6f86128ddf21442784f3f756baed5cafa71246280d4b773ade6789e5efb136f"
+      },
+      {
+        "document": "/home/runner/work/nexus/nexus/docs/design/integration-contracts.md",
+        "line": 94,
+        "kind": "fragment",
+        "reason": "external Board paths and clock profile must be supplied."
+      },
+      {
+        "document": "/home/runner/work/nexus/nexus/docs/design/threadx.md",
+        "line": 35,
+        "kind": "assembly",
+        "configuration_sha256": "7e9ee148922fb63151476c2398c87edc90df5aab7a2deac2905e8fec98edeae4"
+      },
+      {
+        "source": "/home/runner/work/nexus/nexus/tests/contracts/native_assembly/multi.toml",
+        "kind": "literalinclude",
+        "resolved": true
+      },
+      {
+        "source": "/home/runner/work/nexus/nexus/tools/configure/assemblies/native-uart.toml",
+        "kind": "literalinclude",
+        "resolved": true
+      },
+      {
+        "source": "/home/runner/work/nexus/nexus/tools/configure/assemblies/native-uart.toml",
+        "kind": "literalinclude",
+        "resolved": true
+      }
+    ],
+    "external_links": [],
+    "qualification": false
+  },
+  "workspace": "/home/runner/work/nexus/nexus/build/documentation-attempts/b98949b85d184e6f8623bc120f5cbf02"
+}

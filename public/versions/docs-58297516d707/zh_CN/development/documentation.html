@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>维护清晰且可验证的文档 &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="定位实现权威" href="implementation-map.html" />
+    <link rel="prev" title="使用 TDD 与正常提交门禁开发" href="workflow.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/development/documentation.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../../en/development/documentation.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="maintain-clear-and-verifiable-documentation">
+<span id="docs-development-documentation"></span><h1>维护清晰且可验证的文档<a class="headerlink" href="#maintain-clear-and-verifiable-documentation" title="Link to this heading">¶</a></h1>
+<p>新增或修改页面时，遵守<a class="reference internal" href="../design/documentation-standards.html"><span class="std std-doc">内容与图示标准</span></a>和<a class="reference internal" href="../design/documentation-templates.html"><span class="std std-doc">五类页面模板</span></a>。保留一份权威合同与一份正文源。当前实现、目标设计与精确参考配置分别表达。</p>
+<section id="write-around-a-reader-task">
+<h2>围绕读者任务写作<a class="headerlink" href="#write-around-a-reader-task" title="Link to this heading">¶</a></h2>
+<p>开头说明结果、前提与限制。解释谁在什么上下文中处理什么输入，以及可以观察到什么结果或失败。使用稳定术语和明确单位。原始摘要／日志保存在证据链接中，不打断操作主线。不得用“完整支持”等结论替代明确范围。</p>
+<p>教程提供完整维护夹具或固定版本外部消费工程，以及实际命令、预期结果和清理步骤。源码拥有的输入使用 literalinclude。片段必须说明不完整原因。普通文档构建不执行任意 Markdown 命令、不获取 latest 示例，也不操作硬件。</p>
+</section>
+<section id="review-diagrams-and-translations">
+<h2>审查图示与翻译<a class="headerlink" href="#review-diagrams-and-translations" title="Link to this heading">¶</a></h2>
+<p>图示具有 ID、范围、caption、alt、可编辑源和本地 SVG。标明箭头含义、可选路径、所有者与失败责任。对照实际代码／合同审查，再渲染并检查文字、交叉线、放大、打印和离线资源。渲染成功本身不证明语义正确。</p>
+<p>英文正文通过 gettext PO 提供中文；中文合同保留其原文语言。翻译绑定实际正文摘要、实际提取消息和独立审查。源变化、fuzzy 或消息缺失时，显示真实状态，不能冒充翻译完整。不得翻译 C 符号、配置键、结果码或原始回执。共享术语使用<a class="reference download internal" download="" href="../_downloads/6e8a1c4b7a6c20973fafcb507322ea78/terminology.csv"><code class="xref download docutils literal notranslate"><span class="pre">已审查双语术语表</span></code></a>；其权威链接维护单一合同。</p>
+</section>
+<section id="apply-the-correct-acceptance-boundary">
+<h2>采用正确验收边界<a class="headerlink" href="#apply-the-correct-acceptance-boundary" title="Link to this heading">¶</a></h2>
+<p>执行当前 CLI 文档中的统一文档命令。源码检查、严格双语构建、真实配置／消费工程执行、图示审查、离线包和实际站点检查分别建立结果。记录命令退出码与精确输入；不能从本地 HTML 声称部署完成，或从准备计划声称硬件通过。</p>
+<p><a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">文档台账</span></code></a>维护实现和验证退出条件。迁移映射保留历史路径；旧 API 转向有版本意识的迁移或历史页面，不能静默解释为另一份新函数合同。资格记录保留原路径和身份。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护 Nexus</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">使用 TDD 与正常提交门禁开发</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">维护清晰且可验证的文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation-map.html">定位实现权威</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html">代码规范</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

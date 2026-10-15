@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>平台如何装配与执行 &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="类型化 factory、静态实例与多态接口面" href="factory.html" />
+    <link rel="prev" title="架构解释" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/explanation/platform-architecture.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../../en/explanation/platform-architecture.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="how-the-platform-is-assembled-and-executed">
+<span id="docs-explanation-platform-architecture"></span><h1>平台如何装配与执行<a class="headerlink" href="#how-the-platform-is-assembled-and-executed" title="Link to this heading">¶</a></h1>
+<p>Nexus 是静态装配的 C11 MCU 平台，将通用机制与外部产品策略分开。一份人工编写的 TOML 选择精确硬件与可选 adapter；不可变 I/O 接口面暴露所选私有提供者。应用负责执行与恢复。这些是当前设计边界，不代表整个平台已经取得物理资格。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/platform-architecture.svg" title="打开 SVG 大图"><img alt="当前平台分层与外部产品边界" src="../_images/platform-architecture.svg" /></a></p>
+<p>FIG-01 表达当前各层责任。箭头描述已标明的依赖或访问，不是初始化顺序。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>层</p></th>
+<th class="head"><p>状态与责任</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Core</p></td>
+<td><p>结果、绝对单调截止时间、请求发布与稳定 epoch</p></td>
+</tr>
+<tr class="row-odd"><td><p>Arch</p></td>
+<td><p>编译期 CPU 原语；输入中断掩码、屏障和可选缓存／MPU／SAU</p></td>
+</tr>
+<tr class="row-even"><td><p>SoC</p></td>
+<td><p>精确芯片时钟、内存、启动、IRQ／DMA 和控制器实现</p></td>
+</tr>
+<tr class="row-odd"><td><p>Board</p></td>
+<td><p>已审查 PCB 路由、晶振／安全电平事实及明确未知项</p></td>
+</tr>
+<tr class="row-even"><td><p>I/O</p></td>
+<td><p>类型化公共接口面与操作合同；不暴露厂商布局</p></td>
+</tr>
+<tr class="row-odd"><td><p>可选 OS／owner</p></td>
+<td><p>显式逐对象等待、任务或共享资源执行存储</p></td>
+</tr>
+<tr class="row-even"><td><p>可选组件</p></td>
+<td><p>通过窄端口实现有界算法</p></td>
+</tr>
+<tr class="row-odd"><td><p>外部产品</p></td>
+<td><p>main、执行任务、角色、私有 PCB、预算、分区与恢复</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<section id="build-time-decisions-and-runtime-work">
+<h2>构建期决策与运行时工作<a class="headerlink" href="#build-time-decisions-and-runtime-work" title="Link to this heading">¶</a></h2>
+<p>解析器将人工编写的 TOML 与已审查 SoC／Board 事实组合为不可变类型化 IR 及原子生成包。它验证模式、资源、时钟、IRQ、ABI、DMA 可达性与预算。CMake 拥有源码依赖图；解析器不根据设备名称发现软件，也不生成产品执行任务。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/build-targets.svg" title="打开 SVG 大图"><img alt="实际编译目标依赖关系" src="../_images/build-targets.svg" /></a></p>
+<p>FIG-02 是已核对的编译图。厂商和提供者包含路径保持私有；公共消费工程获得 Nexus 类型及所选编译／链接策略。</p>
+<p><a class="nexus-diagram-link reference internal" href="../_images/configuration-generation.svg" title="打开 SVG 大图"><img alt="编写的输入、原子生成与固件产物" src="../_images/configuration-generation.svg" /></a></p>
+<p>FIG-03 表达当前生成流程。未知或冲突选择必须失败；不得通过 Kconfig／缓存／旧头文件回退修补。运行时类型化工厂查找返回已有接口面。平台显式启动成功后，普通操作通过共享 ops 表调用该实例上下文。IRQ 分发固定到提供者实例，不为每个字节重复执行工厂查找。</p>
+</section>
+<section id="lifecycle-and-failure-responsibility">
+<h2>生命周期与失败责任<a class="headerlink" href="#lifecycle-and-failure-responsibility" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/platform-lifecycle.svg" title="打开 SVG 大图"><img alt="当前初始化、失败撤回与保留的清理责任" src="../_images/platform-lifecycle.svg" /></a></p>
+<p>FIG-05 表达显式启动与逆序清理。静态接口面可以在启动前和停止后存在；其指针不授予操作未启动硬件的权限。部分失败可能留下不可逆 watchdog 效果或活跃借用。产品必须检查主要结果与清理结果，继续运行真实执行器，并保留隔离资源。平台启动从不启动调度器。</p>
+</section>
+<section id="costs-and-tradeoffs">
+<h2>成本与取舍<a class="headerlink" href="#costs-and-tradeoffs" title="Link to this heading">¶</a></h2>
+<p>32 位接口面包含两个指针，占用八字节只读存储。提供者／模式的 ops 共享；精确可变状态与所选缓冲区分开。间接调用允许同一公共接口服务独立具体提供者与 GoogleMock 端口。成本是一次公共分发以及保留代码／只读表；实际 Flash／RAM 与时序必须在所选链接镜像上测量。</p>
+<p>静态装配提前拒绝冲突，裁剪未选择驱动。它不提供热插拔发现、运行时字符串注册表、任意动态时钟变化或自动恢复策略。可选共享 owner 增加显式预算的槽与同步；直接单执行器路径不需要默认 OS 锁或执行任务。</p>
+<p>阅读<a class="reference internal" href="factory.html"><span class="std std-doc">类型化工厂</span></a>、<a class="reference internal" href="ownership.html"><span class="std std-doc">所有权</span></a>、<a class="reference internal" href="../design/integration-contracts.html"><span class="std std-doc">接入合同</span></a>和<a class="reference internal" href="../reference/platforms/support.html"><span class="std std-doc">精确支持范围</span></a>。架构图解释机制；测试、镜像检查和 HIL 分别建立各自执行范围。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">架构解释</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">平台如何装配与执行</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">类型化 factory、静态实例与多态接口面</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html">借用、完成与观察者生命周期</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html">源码旁的权威合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#core-contracts">Core 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#cpu-local-primitives">CPU 本地原语</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#id1">类型化 I/O</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-os-adapters">可选 OS 适配器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-map.html#optional-common-components">可选通用组件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

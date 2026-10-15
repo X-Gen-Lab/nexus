@@ -1,0 +1,425 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Source-adjacent contracts &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Status and evidence" href="../status/index.html" />
+    <link rel="prev" title="Borrow, completion and observer lifetime" href="ownership.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/explanation/source-map.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/explanation/source-map.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="source-adjacent-contracts">
+<h1>Source-adjacent contracts<a class="headerlink" href="#source-adjacent-contracts" title="Link to this heading">¶</a></h1>
+<p>The layer README files remain canonical beside their implementation. The
+following inclusions read those exact files rather than copying a second contract.
+Relative source links are bound to the website source revision.</p>
+<section id="core">
+<h2>Core<a class="headerlink" href="#core" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="core-contracts">
+<h1>Core contracts<a class="headerlink" href="#core-contracts" title="Link to this heading">¶</a></h1>
+<p>C11 caller-owned request admission, stable control identities, completion state
+and monotonic absolute deadlines. No devices, OS scheduler, allocation or global
+registry. Public interfaces are in <code class="docutils literal notranslate"><span class="pre">include/nexus/core</span></code>.</p>
+<p>REJECTED retains no references. An accepted chain borrows request and buffers
+until acquire-observed SETTLED. SETTLED is its last request access. Cancel/timeouts
+never revoke a borrow; failed drain keeps QUARANTINED storage alive. Producers
+wait on latched state; a single executor services the operation. Queue adapters
+own their outer request and use explicit inner provider metadata where needed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/contracts/core_contract_test.c</span></code> executes publication, admission, wrapping
+time arithmetic and terminal-state invariants. Host results do not prove MCU
+interrupt ordering or worst-case execution time.</p>
+<section id="arch">
+<h2>Arch<a class="headerlink" href="#arch" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="cpu-local-primitives">
+<h1>CPU-local primitives<a class="headerlink" href="#cpu-local-primitives" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">Nexus::Arch</span></code> exposes saved interrupt masks, exact exception identity, current
+privilege, ordering barriers and an optional already-enabled DWT cycle snapshot.
+It does not call I/O, OS or vendor SDK code. One compile-time Cortex-M primitive
+implementation covers M0/M0+/M3/M4/M7/M23/M33/M55/M85, including ARMv8.1-M
+Mainline compiler profiles. STM32F407 and GD32F470 maintain the initial platform
+scope; G474, H743 and U575 provide explicit reference slices described in the
+<a class="reference internal" href="../delivery/support.html"><span class="std std-doc">support matrix</span></a>. CPU support does not extend those
+SoC or Board slices. The separate CPU runtime assembly selects Core/Arch and optional OS
+software for all nine cores without creating a SoC, Board, startup or factory.
+See <a class="reference internal" href="../design/arch-contracts.html"><span class="std std-doc">CPU contracts</span></a> and the
+<a class="reference internal" href="../delivery/cortex-m.html"><span class="std std-doc">runtime assembly example</span></a>.</p>
+<p>Save/restore tokens on the same CPU/thread in strict reverse order. Cortex-M
+preserves incoming PRIMASK and does not overwrite BASEPRI/FAULTMASK where those
+registers exist. Only privileged Task/configurable-IRQ callers may change masks.
+NMI and HardFault remain unmasked and must not access this protected metadata.
+Keep metadata sections short: no blocking, allocation,
+large copies, kernel calls or user callbacks. A saved Arch token is not a kernel
+critical-section token or an SMP lock.</p>
+<p>Mask/context queries let blocking I/O reject contexts that prevent its progress.
+The read-only mask snapshot distinguishes PRIMASK, BASEPRI and FAULTMASK; it is
+not a restore token and does not freeze interrupt or security-world execution.
+Baseline M0/M0+/M23 queries never read absent BASEPRI/FAULTMASK. Handler mode is
+privileged even when CONTROL.nPRIV describes an interrupted unprivileged Thread.
+An exception number identifies the current CPU/security state; it does not grant
+permission to call a kernel ISR API or coordinate another security world.
+DMB/DSB/ISB encode different ordering guarantees; they do not prove peripheral
+or DMA quiescence. DWT snapshots require an explicit reviewed CPU capability and
+privileged access. A disabled capability emits no DWT reads. Snapshots do not
+enable or reset the counter and are not monotonic deadlines. Their wrap/frequency
+limits are documented in the header. Reviewed capabilities are explicit CPU
+facts, never inferred by probing arbitrary registers or enabling optional units.</p>
+<p><code class="docutils literal notranslate"><span class="pre">sleep.h</span></code> exposes two explicit shallow-sleep operations. The masked
+<code class="docutils literal notranslate"><span class="pre">nx_arch_wait_for_interrupt()</span></code> requires privileged Thread mode, PRIMASK=1,
+BASEPRI/FAULTMASK clear and SCR.SLEEPDEEP clear. It executes DSB/WFI/ISB without
+changing masks, clocks or pending interrupts. The caller owns the final readiness
+check and an enabled IRQ wake source; a pending enabled IRQ wakes WFI despite
+PRIMASK and runs after the caller restores its saved mask.
+<code class="docutils literal notranslate"><span class="pre">nx_arch_idle_if_unchanged()</span></code> instead requires all incoming masks clear, saves
+PRIMASK, rechecks an aligned published sequence with acquire semantics and sleeps
+only when it still matches the caller’s snapshot. It restores the exact incoming
+mask; the caller retries the authoritative predicate and supplies an IRQ timer
+for finite deadlines. This is one CPU and one security state’s publication
+domain. NMI/HardFault, DMA, SMP and other security-world publishers are excluded.
+Native reports unsupported. Compiler/model evidence does not qualify a concrete
+timer, clock continuity, physical power behavior or wake latency.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cache.h</span></code> exposes distinct data clean, invalidate, combined maintenance and
+instruction synchronization. Every range must own complete reviewed 32-byte
+lines, fit the CPU address space and be quiescent across CPU/DMA/security users.
+The functions do not round ranges, enable caches or flush unrelated dirty lines.
+<code class="docutils literal notranslate"><span class="pre">cache_control.h</span></code> separately owns cold M7 transitions. The caller supplies one
+zero-initialized control object, masks configurable interrupts and excludes DMA
+and all other memory users. Trusted reset or a prior successful owned
+clean/disable establishes cold state; clear CCR bits alone cannot prove that
+foreign dirty lines are absent. Enable rejects pre-existing caches; disable cleans
+every reviewed data set/way and changes CCR in a leaf that cannot dirty its own
+stack. Failed partial changes retain cache/CSSELR recovery responsibility.
+Actual instruction audits verify addresses, loops and barriers at O0/Os/O2.
+Other CPU profiles remain unsupported by this cold-control API; their range
+maintenance capability does not imply a reviewed global cache transition.
+<code class="docutils literal notranslate"><span class="pre">mpu.h</span></code> retains distinct v7-format and v8 base/limit/MAIR encoders. Single-region
+programming requires an already masked privileged Thread and disabled MPU;
+actual TYPE bounds and fields are checked before writes. CTRL and incoming RNR
+are preserved. Memory policy and any later enable operation belong to the caller.
+The optional M0+ MPU uses the v7-format registers confirmed by CMSIS.</p>
+<p><code class="docutils literal notranslate"><span class="pre">security.h</span></code> identifies the reviewed image state and encodes explicit SAU regions.
+Only a Secure compiler/profile with reviewed SAU regions can program one owned
+region, while SAU is disabled and the privileged Thread has PRIMASK set. No API
+changes SAU CTRL/ALLNS, another region, Secure gateways or another world’s alias.
+NonSecure and single-domain images return unsupported without SAU MMIO. IDAU,
+overlap rules, memory permissions and gateway policy stay outside these mechanisms.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nonsecure.h</span></code> supplies an instantaneous Secure Thread observation of a complete
+span using the actual CMSE NonSecure unprivileged read or read/write check.
+It needs no programmable SAU when an IDAU establishes attribution. Native,
+single-state and NonSecure images return unsupported without crossing domains.
+Success does not pin, copy, authenticate, exclude MMIO or freeze mappings, DMA
+and bus firewall policy. SoC and gateway owners must separately establish these
+conditions before accessing memory or performing an operation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">features.h</span></code> reports immutable reviewed cache/MPU/DWT/security/SAU capabilities,
+not enabled state or hardware qualification. Native exposes the same APIs with
+absent-hardware results; pure encoders remain usable. Extending CPU mechanisms
+does not provide a SoC startup, vector table, clock tree, memory/DMA routes, Board
+wiring or an RTOS FPU/MVE context port. Each new platform must supply and verify
+those boundaries independently. Publication and RMW atomics have separate
+contracts in <code class="docutils literal notranslate"><span class="pre">atomic.h</span></code>; CPU-specific fallback never silently links libatomic.
+Aligned acquire/release word loads and stores do not mask IRQs. M0/M0+ RMW uses
+bounded saved-PRIMASK exclusion and restores the incoming mask; all concurrent
+users must be privileged local Thread/configurable-IRQ callers. NMI, HardFault,
+another core, DMA and another security world are outside this exclusion domain.
+Other maintained cores use compiler lock-free RMW; exclusive retries do not
+establish a fixed cycle bound. Initialize words before publication and retain
+their lifetime until every reader/writer has stopped.</p>
+<p>Native models recursive exclusion and C11 fences; it does not model real NVIC,
+DMA, physical timing or signal-safe interrupts. Invalid restore nesting aborts in
+both Debug and Release. GoogleTest/GoogleMock compiles the real Cortex-M
+algorithm against a narrow register/instruction hardware boundary for nine CPU
+profiles; the normal ARM path inlines that boundary and never links the mocks.
+Native tests exercise real recursive exclusion, strict token nesting and context
+queries. Cache, MPU and security models mock only external CPU/MMIO operations
+and run the production C algorithms, including rejection before state changes.
+Pinned CMSIS <code class="docutils literal notranslate"><span class="pre">core_cm0plus/7/23/33/55/85.h</span></code>, <code class="docutils literal notranslate"><span class="pre">mpu_armv7/8.h</span></code> and
+<code class="docutils literal notranslate"><span class="pre">cachel1_armv7.h</span></code> establish the maintained register layouts. Actual IRQ latency,
+privilege transitions, DMA/cache coherency and CPU timing require HIL.</p>
+<section id="typed-i-o">
+<h2>Typed I/O<a class="headerlink" href="#typed-i-o" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="id1">
+<h1>Typed I/O<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 interfaces.
+Each selected instance has an immutable face with two pointers: shared read-only
+methods and a pointer to private provider state. Generated faces live in read-only
+storage; their state and selected buffers are private static objects in the
+generated translation unit. Manually assembled providers use storage supplied
+by their explicit constructor owner. A 32-bit target spends eight bytes of Flash
+per face; mutable state and exact-capacity buffers are separate. Method pointers are shared per provider and
+mode rather than repeated in every mutable instance.</p>
+<p>Public operations check the face and dispatch its exact context. Different
+provider tables can coexist in one image without redefining public symbols.
+A missing optional method reports <code class="docutils literal notranslate"><span class="pre">NX_ERROR_UNSUPPORTED</span></code>; invalid faces reject
+before provider access. A method must preserve the public operation’s execution,
+deadline, buffer ownership and failure contract. Provider headers, register
+layouts and SDK types stay private.</p>
+<p>Generated typed factory IDs select instances and distinguish SPI/I2C controllers
+from their child endpoints. Lookup returns a static identity. Platform start,
+request admission, service, recovery and stop remain explicit; lookup performs
+no hardware initialization, allocation, name search or locking. Faces remain
+valid while provider storage exists, so stopping requires caller and IRQ
+quiescence rather than promising that a pointer has been revoked.</p>
+<p>Stream reserve, publish, acquire, release, abort and stop access constant
+metadata independent of block count. Stop checks an outstanding-block count;
+filling, ready and borrowed blocks remain counted until proved abort or matching
+release. It never scans the block array or revokes a loan under the interrupt
+mask. Storage overlap validation remains a cold assembly operation whose work
+grows with block count. This complexity contract is not physical IRQ latency or
+cycle qualification.</p>
+<p>Default paths need no OS locks or hidden tasks. Requests and transfer buffers
+remain caller-owned; generated provider buffers are assembly-owned and separate.
+UART tracks physical TC separately from loaded bytes and request release; error-only RX events never invent data. SPI
+and I2C preserve their bounded polling contracts, and controller recovery never
+replays a failed transaction. Flash exposes physical geometry; products provide
+explicit restricted regions.</p>
+<p>The Native model owns independent state per instance. Its explicit default
+fixtures support focused tests; generated assemblies use separate state and
+buffers. Native behavior, production-register fault models and ARM link fixtures
+establish software evidence. Board facts authorize reviewed physical routes;
+software-only fixtures do not establish PCB connectivity or physical timing.</p>
+<section id="os-adapters">
+<h2>OS adapters<a class="headerlink" href="#os-adapters" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="optional-os-adapters">
+<h1>Optional OS adapters<a class="headerlink" href="#optional-os-adapters" title="Link to this heading">¶</a></h1>
+<p>Thin wait/wake and per-object storage contracts. Baremetal has no scheduler;
+Native uses POSIX threads; FreeRTOS uses explicit static TCB, stack and queue
+storage selected by the caller. No universal maximum pool, hidden worker,
+default timer daemon or device dependency on OS.</p>
+<p>Notifications are hints: arm/recheck the authoritative request predicate. Kernel
+ISR operations validate the selected syscall ceiling. Native task return ends the
+pthread; FreeRTOS wrappers publish completion and suspend until external deletion;
+ThreadX wrappers enter the kernel completion path. The one external lifecycle
+owner must successfully join before reclaiming wrapper, TCB or stack storage.
+Completion hints alone do not prove kernel detachment. Applications own scheduler
+start, workers, queue depth, fairness and shutdown progress.</p>
+<p>The real FreeRTOS POSIX scheduler fixture validates host task/queue lifecycle.
+The default privileged runtime selects exact pinned kernel sources from
+validated CPU facts: CM0 for M0/M0+, CM3 integer context for M3 and M4 without FP, CM4F for
+M4 with FP, CM7/r0p1 for M7 with FP, and each CM23/33/55/85 NTZ port with its
+separate assembly file. Integer-only M7 uses a reviewed build-derived CM3 port
+with PRIMASK-preserving errata 837070 guards; pinned vendor files remain unchanged.
+Host execution does not qualify MCU exception priority, FP/MVE context switches,
+stack high-water or timing.</p>
+<p>Running APIs require privileged, unmasked Thread mode. Before scheduler start,
+the pinned Baseline ports may retain PRIMASK=1 and Mainline ports their exact
+syscall BASEPRI; only that port’s canonical mask is permitted in that phase.
+Matching a value cannot identify its owner. Fault masks and other masks reject
+before object mutation; a read-only scheduler query distinguishes bootstrap from
+running/suspended tasks. Baseline IRQ wakes use the PRIMASK kernel contract;
+Mainline IRQ wakes validate implemented bounds, priority width and syscall ceiling.</p>
+<p>Armv8-M supports explicit NTZ, Secure-only, and Nonsecure standalone build modes.
+The selected NTZ kernels do not allocate Secure task contexts or expose cross-world
+Secure function calls. Secure startup owns SAU/IDAU and Nonsecure coprocessor access;
+Nonsecure local masking cannot protect against Secure publishers. The default
+task APIs remain privileged; explicit MPU profiles provide a separate static
+restricted-task lifecycle and two pointer-free user delay/tick SVC services.
+Caller-owned protected metadata and reviewed user linker regions are required;
+no generic user-object pool or privileged I/O API is exposed. M0/M0+ and M7 MPU,
+and MPU combined with split security, are rejected. See the OS contracts and
+current matrix before selecting an optional isolation profile.</p>
+<p>Explicit split mode instead selects the real TrustZone-aware Nonsecure ports and
+a separately linked Secure baremetal Runtime with <code class="docutils literal notranslate"><span class="pre">Nexus::SecureContext</span></code>. Both
+images use matching CPU/ABI facts and the actual CMSE import/SG veneers. Every
+authorized task, including Idle, has caller-owned NS TCB/stack and prepared
+Secure metadata/stack selected by an immutable trusted mapping. No Secure heap
+or maximum context pool is supplied. The NS privileged kernel is trusted;
+SAU/IDAU, startup, vectors, NSC memory attribution and interrupt routing remain
+consumer/SoC responsibilities. See the
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/os/freertos/secure/README.md">Secure companion contract</a> before integration.
+Two-image linking and host lease tests do not qualify physical attribution,
+context retention, stack peaks or adversarial NS-kernel isolation.</p>
+<p>The first scheduler start requires cold privileged Thread/MSP state with FPCA
+clear; applications must not leave active FP context before bootstrap. The MPU
+start guard consumes a protected single-use lease against the real origin/frame.
+For v8-M, authored <code class="docutils literal notranslate"><span class="pre">security</span> <span class="pre">=</span> <span class="pre">&quot;single&quot;</span></code> means Arch state 0, not Nonsecure. It
+uses the traditional FD/F9 port return tuple without CMSE permission; explicit
+Secure uses the same tuple with its separate Secure facts, while explicit
+Nonsecure uses BC/B8. The generated <code class="docutils literal notranslate"><span class="pre">NEXUS_CPU_SECURE_ONLY</span></code> macro selects that
+port encoding and does not grant Secure access to a single-world image.</p>
+<p>M55/M85 use their actual MVE-aware exception/context ports. The kernel’s
+<code class="docutils literal notranslate"><span class="pre">configENABLE_FPU</span></code> switch activates the shared coprocessor register bank and
+extended/lazy exception frame for either FP or MVE; CPU scalar-FP facts remain
+independent. Integer-only MVE compiles with <code class="docutils literal notranslate"><span class="pre">+nofp</span></code> and softfp calling convention.
+Upper shared registers are saved by the port. Complete lower-bank and VPR
+retention depends on hardware extended exception framing and remains part of
+physical context-switch acceptance. This build contract does not qualify that
+behavior or guarantee cross-world payload preservation.</p>
+<p>The host fixture keeps the pinned kernel and POSIX port unchanged, and uses
+<code class="docutils literal notranslate"><span class="pre">tests/contracts/os_freertos_runtime/posix_event.c</span></code> as its owned event support.
+The port cancels cond-waiting pthreads before signalling/joining them; upstream
+event support has no cancellation cleanup and can leave an exited thread’s
+mutex locked. Owned waits unlock on both return and cancellation, preventing
+repeated task-join deadlocks. This host-only correction does not change the MCU
+backend or establish MCU scheduler qualification.</p>
+<section id="maintained-execution-contracts">
+<h2>Maintained execution contracts<a class="headerlink" href="#maintained-execution-contracts" title="Link to this heading">¶</a></h2>
+<p>See <a class="reference internal" href="../design/os-contracts.html"><span class="std std-doc">OS contracts</span></a>,
+<a class="reference internal" href="../delivery/os.html"><span class="std std-doc">delivery scope</span></a> and the
+<a class="reference download internal" download="" href="../_downloads/fccd25e37a1c1e4c2119798d61bf4981/os-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">OS01-OS55</span> <span class="pre">execution</span> <span class="pre">ledger</span></code></a>.
+New-kernel admission uses the
+<a class="reference internal" href="../design/os-backend-integration.html"><span class="std std-doc">backend integration contract</span></a> and its
+active execution probe; a probe pass does not register another supported RTOS.</p>
+<p>Finite notification deadlines are checked even after a coalesced sequence hint;
+continuous unrelated wakes cannot extend a wait. The public predicate receives
+one final observation after timeout, so an observed real completion can win.
+Queue operations keep immediate try semantics and consume an absolute budget only
+when blocking. <code class="docutils literal notranslate"><span class="pre">NX_DEADLINE_NEVER</span></code> uses genuine untimed host waiting.</p>
+<p>Task creation validates the selected port’s startup frame and alignment before
+kernel mutation. Startup minimum and measured runtime stack budget remain distinct.
+One external lifecycle owner joins each returning task. Native tasks must not be
+cancelled or detached behind the adapter. Permanent tasks and direct notifications
+are explicit optional paths with their own storage and receiver/index contracts.</p>
+<p>Closable queues use separate caller-owned controls and per-operation waiter
+storage; raw queues retain their minimal native blocking implementation. Shutdown
+must close admission, keep the owner progressing, settle and join producers, join
+the owner, quiesce hardware IRQ publishers and only then destroy notification,
+queue and guard storage. The external UART owner example demonstrates that flow.</p>
+<p>The optional tickless path needs an explicitly bound timer port and a continuous
+clock; without it, normal Tick remains active. Diagnostics use caller-sized rings
+and weak no-op sinks. Trace, low power and task isolation do not imply physical
+qualification. <code class="docutils literal notranslate"><span class="pre">tools/hil/os_acceptance.py</span></code> prepares or verifies retained OS
+hardware records without operating equipment; all unexecuted physical cases stay
+<code class="docutils literal notranslate"><span class="pre">not_executed</span></code>.</p>
+</section>
+<section id="components">
+<h2>Components<a class="headerlink" href="#components" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+<section id="optional-common-components">
+<h1>Optional common components<a class="headerlink" href="#optional-common-components" title="Link to this heading">¶</a></h1>
+<p>Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART owner,
+BMP280 core and SPI transport, instance-level Log, two-bank commit-last Storage,
+physical Flash region and Native file adapters, and pure Modbus RTU parsing.
+Unreferenced component code does not enter a firmware image.</p>
+<p>Owners have one executor, exact slot capacity, stable cancellation epochs and
+caller-owned operations. Initialization links unused slots before publication.
+Admission removes one free slot and appends one FIFO entry under the metadata
+guard; settlement/rejection returns one reusable slot. Both use constant work
+independent of capacity. The same slot link serves the free or FIFO chain, with
+one free-head index per owner and no extra per-slot storage. A slot reaching its
+final epoch is permanently retired, never rebound with a repeated identity.
+UART’s explicit inner provider request lets the owner release the outer request
+only after its last access. Devices and protocols do
+not choose Board pins, product registers, default workers or global lookup.
+Products supply transports, authorization, regions, task policy and budgets.</p>
+<p>Meaningful regressions in <code class="docutils literal notranslate"><span class="pre">tests/contracts</span></code> cover concurrent producers, late
+cancel/TC, failure quarantine, interrupted persistence and protocol malformed
+inputs. A durable host file is not a physical Flash power-cut qualification.</p>
+<section id="exact-soc-implementations">
+<h2>Exact SoC implementations<a class="headerlink" href="#exact-soc-implementations" title="Link to this heading">¶</a></h2>
+<p>The private implementation boundaries and reference configurations are maintained
+in <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32f407/README.md">STM32F407</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/gd32f470/README.md">GD32F470</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32g474/README.md">STM32G474</a>,
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32h743/README.md">STM32H743</a> and
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32u575/README.md">STM32U575</a>. Their links bind this website revision.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Architecture explanations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="platform-architecture.html">How the platform is assembled and executed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">Typed factory, static instances and polymorphic faces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ownership.html">Borrow, completion and observer lifetime</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Source-adjacent contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#core-contracts">Core contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cpu-local-primitives">CPU-local primitives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Typed I/O</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-os-adapters">Optional OS adapters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-common-components">Optional common components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>操作指南 &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="取得精确源码与锁定依赖" href="source-checkout.html" />
+    <link rel="prev" title="观察拒绝、借用、取消与排空" href="../tutorials/async-io.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/guides/index.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../../en/guides/index.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="task-guides">
+<h1>操作指南<a class="headerlink" href="#task-guides" title="Link to this heading">¶</a></h1>
+<p>每份指南说明输入、所有权、拒绝条件和可观察结果。执行硬件命令需要实际连接的工装；文档构建不访问硬件。</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="source-checkout.html">取得精确源码与锁定依赖</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-checkout.html#select-the-revision-described-by-your-documentation">选择当前文档描述的版本</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-checkout.html#clone-and-initialize-that-exact-revision">克隆并初始化该精确版本</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-checkout.html#prepare-only-the-tools-required-by-your-task">只准备当前任务所需的工具</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="board-porting.html">接入复核的 Board 包</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html#gather-the-minimum-facts">收集最小事实</a></li>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html#validate-through-the-actual-resolver">通过实际解析器验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html#build-and-record-the-selected-scope">构建并记录选定范围</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="provider-porting.html">接入 SoC、提供者或通用组件</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html#keep-the-layer-boundary-narrow">保持清晰而窄的分层边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html#implement-in-a-reviewable-sequence">按可评审的顺序实现</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html#review-performance-and-ownership">审查性能与所有权</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="os-shutdown.html">正确等待并停止显式 owner</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html#avoid-lost-completion-and-unbounded-waits">避免丢失完成和无限等待</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html#shut-down-in-dependency-order">按依赖顺序停机</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html#execute-maintained-software-fixtures">执行维护中的软件夹具</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">迁移旧配置与接口访问</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#move-one-complete-assembly">迁移一份完整装配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#move-access-and-lifecycle-together">同时迁移访问与生命周期</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="performance-hil.html">测量资源并准备硬件验收</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html#measure-an-exact-image">测量精确镜像</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html#prepare-without-operating-equipment">在不操作设备的情况下准备</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html#execute-only-a-real-reviewed-station">只执行真实且经过审查的工位</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">操作指南</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-checkout.html">取得精确源码与锁定依赖</a></li>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html">接入复核的 Board 包</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html">接入 SoC、提供者或通用组件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html">正确等待并停止显式 owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">迁移旧配置与接口访问</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html">测量资源并准备硬件验收</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

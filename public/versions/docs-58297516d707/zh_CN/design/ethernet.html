@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Raw Ethernet MAC、MDIO 与 DP83848 &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="故障观测与保留责任" href="fault-observation.html" />
+    <link rel="prev" title="下一代平台工程运行手册" href="engineering-handbook.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/ethernet.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../../en/design/ethernet.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="raw-ethernet-mac-mdio-and-dp83848">
+<h1>Raw Ethernet MAC、MDIO 与 DP83848<a class="headerlink" href="#raw-ethernet-mac-mdio-and-dp83848" title="Link to this heading">¶</a></h1>
+<p>此可选机制将网络协议、任务、MAC 地址策略、协商策略、PHY 电源／复位电路与产品恢复留在 Nexus 外部。查找返回不可变 Ethernet／MDIO 接口面，绝不启动硬件。默认平台不实例化描述符、缓冲区、PHY 或 worker。</p>
+<p>首模式是 RMII、普通四字 chained 描述符和连续无标签 Ethernet II 帧，不含 FCS 的长度为 14–1514 字节。长度编码 IEEE 802.3、802.1Q/802.1ad 标签、jumbo、checksum offload、PTP 和 scatter/gather 被拒绝或属于独立不支持模式。TX padding／FCS 插入由硬件执行。RX 存储至少 1518 字节；自动 CRC/pad/type 剥离关闭，所以 RX 描述符长度含四字节 FCS。公共借用在完整帧边界校验后精确减去四字节。软件声明不能建立线缆、波形或吞吐资格。</p>
+<section id="static-storage-and-data-ownership">
+<h2>静态存储与数据所有权<a class="headerlink" href="#static-storage-and-data-ownership" title="Link to this heading">¶</a></h2>
+<p>调用方装配提供精确 TX/RX 描述符数组、TX 槽、RX 元数据和缓冲区，不链接 SDK 默认五缓冲池或全局 cursor。提供者在 DMA reset 或 OWN 发布前校验对齐描述符、完整 Ethernet 总线主读写范围、数组／控制／payload 分离及缓冲区独立性。TX payload 需四字节对齐，不得与请求、提供者／控制／描述符／RX 存储或其他借用请求重叠；只读 TX payload 可共享，但各借用均须存活。当前 STM32/GD32 绑定只接纳已审主 SRAM，即 0x20000000 起的 128/192 KiB；排除 STM CCM 和 GD TCM，GD 额外 SRAM 尚未接纳。CPU 可达性或 SPI DMA 选择器不能建立 Ethernet 可达性。</p>
+<p>TX 请求在全部校验和原子准入后才借用。Buffer、length、chained pointer 在 DMB 与 OWN 前写入。正常完成要求单帧 first/last 描述符归 CPU 所有且具有 DMA 写回 TX 状态。两家手册均规定最后描述符在归还所有权前接收 MAC 发送状态。先清缓冲／控制引用，再 DSB，再解除提供者槽，最后 release 发布 SETTLED。成功表示提交字节被 MAC 发出，不代表交付到对端应用。错误状态报 IO，无请求重试。</p>
+<p>每个 RX 描述符有 DMA、READY、HELD 元数据与单调 64 位 incarnation。OWN 返回并执行 acquire 屏障后才发布完整描述符。READY 槽组成调用方元数据 FIFO，enqueue、acquire 和匹配 release 为常数时间，不在掩码内扫描变长环。借出的描述符在环回绕时仍归 CPU。复制池或覆盖不能替代背压。CRC、长度、分片、标签／不支持及其他 DMA 错误帧丢弃并锁存标志和饱和丢弃计数；RBU／overflow 另行观察，不虚构精确丢帧数。旧、外来或重复 token 不能重新装填缓冲。Epoch 跨成功 stop/restart 保留，耗尽关闭准入而非回绕。</p>
+</section>
+<section id="irq-cancellation-and-stop">
+<h2>IRQ、取消与停止<a class="headerlink" href="#irq-cancellation-and-stop" title="Link to this heading">¶</a></h2>
+<p>ISR 最多处理一个 TX 和一个 RX 描述符。如果另一个 CPU-owned 已完成描述符可用，合并完成会重新 pending 所选实际向量。MCU 硬件及描述符直接 volatile 读写，无逐寄存器方法表。可选冷态回调处理 NVIC 源控制、重新 pending 与当前优先级校验，不处理 payload 字节。Wake 是有界仅 IRQ 提示，任务 service 不调用它；实际当前 priority/group 必须满足配置内核 ceiling。已捕获 wake 在回调返回前保持借用。存在发布者时 attach/stop 返回 BUSY；回调不能释放自身活动 context。</p>
+<p>唯一串行特权任务持有控制方法，进入掩码全清。元数据 guard 保存／恢复进入 PRIMASK，不建立任务、RTOS 锁或 worker。消费者在短 guard 外处理借用。冷态存储校验可随描述符数量增长，但运行在硬件取得之前。</p>
+<p>取消关闭共享 TX 引擎，明确影响整个控制器；其他 pending TX 也取消，已经返回的成功线侧状态保留成功。改变 speed/duplex 时，外部所有者先应用 link-down，再观察两个 DMA 进程及 MAC/FIFO 空闲，然后应用新 up 事实。此前 BUSY 保留旧模式；相同 up 事实幂等。同模式重启已排空 TX 不要求丢弃活动 RX，遵循 RM0090 §33.6.1/§33.8 和 GD32F4xx 手册 §27.3.3/§27.4.1 的独立进程及 MAC enable 语义。Link-down、致命 DMA／underflow 错误关闭准入并报 IO，不重放。任务 service 推进绝对请求和排空 deadline。Cancel／timeout 自身从不撤销请求或 payload 所有权。</p>
+<p>撤销清除 DMA ST 与 MAC TE，读取真实状态，要求 TX process 停止，发出 TX FIFO flush 并观察自清确认及 MAC/FIFO 非活动。然后才可软件撤销未执行 OWN，并在解除引用前读回描述符。OWN 拒绝、引擎仍运行或 FIFO flush 卡住时，排空超时保留 QUARANTINED 请求。后续真实静止可完成并排空它们，但不能虚构成功传输。</p>
+<p>Stop 额外关闭 RX/MAC/DMA 准入和源，要求 RX process 停止、MAC 接收路径无活动，检查 MDIO/reset idle 和 DMA interrupt-disable 读回，detach 并清除所选 NVIC 源，再撤销且读回 RX OWN。解除 wake／storage 所有权前清描述符基址与 W1C 状态并校验写入。Consumer 持有的借用禁止 stop 成功且保持不可变。回收装配存储或 Board 时钟／引脚前，调用者 join 全部 task／IRQ 发布者与消费者。部分启动持有残余效果，必须使用同一显式 stop；reset／IRQ-enable 失败绝不替换为虚构清理成功。</p>
+</section>
+<section id="station-management-and-phy-facts">
+<h2>站点管理与 PHY 事实<a class="headerlink" href="#station-management-and-phy-facts" title="Link to this heading">¶</a></h2>
+<p>Clause22 MDIO 是独立窄接口面，使用同一显式持有的 MAC 时钟，地址／寄存器范围 0..31。操作仅限特权任务、掩码全清，绝不在 IRQ／PRIMASK 等待，且要求有限绝对单调 deadline。分频来自实际 HCLK；两组支持绑定使用 168/200 MHz 和 HCLK/102，低于 2.5 MHz。BUSY 拒绝且不发另一个命令。超时保留真实硬件状态，不发布迟到读值；超时写可能已生效，不能盲目重放。</p>
+<p>DP83848 状态包含显式地址和预期型号 ID，显式选择 TI 0x20005ca0 或 NS 0x20005c90，只忽略 revision nibble。未知 ID 不回退为支持 PHY。BMCR 软复位在同一 deadline 下观察实际自清位并作废已配置事实；它重新读取 straps，但不证明 GPIO／电源 reset 或已装 straps。产品选择显式 10/100 半／全双工广告或固定 speed/duplex。配置成功启动协商，不宣称 link。观察两次读取 latch-low BMSR 加 PHYSTS；只有有效 link 且所选协商完成才报告 link。Remote fault、loopback/reset 或固定模式不一致不转换为 link 成功。</p>
+</section>
+<section id="reviewed-sources-and-qualification-limits">
+<h2>已审来源与资格限制<a class="headerlink" href="#reviewed-sources-and-qualification-limits" title="Link to this heading">¶</a></h2>
+<p>生产布局／mask 断言使用锁定 STM CMSIS device 和 GD32 标准外设头文件。机制审查来源为 ST RM0090 Rev22 的 Ethernet 普通描述符、TxDMA 默认流和 DMA process-state／FIFO 控制，以及 GD32F4xx User Manual Rev3.3 第 27 章普通描述符与管理时钟范围。前四个描述符字及公共机制全部寄存器符合这些证明；enhanced descriptor／PTP 保持关闭。</p>
+<p>DP83848 寄存器事实来自 TI SNLS266E（March2015）表 6-9/10/11/12/13/18 和 https://www.ti.com/lit/ds/symlink/dp83848c.pdf。文档中 TI 型号／revision 是 0x20005ca2。Linux v6.12 drivers/net/phy/dp83848.c 独立确认 TI 与 NS ID 区别；该 GPL 源仅用于审阅证据，不链接或复制到生产组件。</p>
+<p>启明 F407ZG 可选 RMII 源配置另行审阅：手册 printed31/physical33 和固定 BSP blob a35e981e8a549e1dbaf84bb4522b2f150bc5d51c 给出 DP83848 address1、外部 50 MHz 晶振和 P5/WiFi 跳帽，引脚 PA1/2/7、PC1/4/5、PG11/13/14 AF11。PG 路由不能授权 VE100 封装。PHY reset GPIO 未证明。天空星和梁山派没有已审 PHY 路由。配置集成接纳显式已审路由前，当前 Board 绑定必须禁用；模型代码不能虚构 PCB 绑定。</p>
+<p>GoogleTest/GoogleMock 执行真实公共算法、两家 SDK 校验绑定及显式 Native ingress/egress/MDIO 硬件，包括 W1C 和卡住 reset／engine／OWN／FIFO／IRQ 源。Native 硬件使用调用方 PHY 寄存器文件、合成 FCS 存储和显式描述符完成注入，不虚构 PHY identity、link、真实 CRC 或远端交付。主机软件、严格 ARM 编译、链接镜像资源和物理／HIL 是独立证据，前三项只建立记录范围。本环境未执行物理 PHY/link/电气、PCB 跳帽、流量丢失、延迟、吞吐或 EMC。</p>
+<p>独立审查回归保护已知不可变 wake-target 范围，防止它与描述符、RX DMA 缓冲、请求元数据及可写 API 输出重叠。不透明 callback-context 大小仍由外部生命周期合同负责。Wake 替换在更换指针的同一排他下复核活动发布者。Stop 在真实 NVIC 撤销后再检查发布者，并在未屏蔽的 ring/table 清理前关闭 IRQ dispatch；清理失败保留控制器。Closing 拒绝新 RX acquire，但既有借出块仍可 release。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 首批纵切片</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 同步双域参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

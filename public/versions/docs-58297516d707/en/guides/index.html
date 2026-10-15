@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Task guides &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Obtain the exact source and pinned dependencies" href="source-checkout.html" />
+    <link rel="prev" title="Observe rejection, borrow, cancellation and drain" href="../tutorials/async-io.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="en" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="original"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/guides/index.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/guides/index.html" lang="zh-CN">中文</a>. Source language: en; requested: en; actual: en; translation: <strong>original</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="task-guides">
+<h1>Task guides<a class="headerlink" href="#task-guides" title="Link to this heading">¶</a></h1>
+<p>Each guide defines inputs, ownership, rejection and an observable result. Hardware commands require an actual connected station; the documentation build does not access hardware.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="source-checkout.html">Obtain the exact source and pinned dependencies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-checkout.html#select-the-revision-described-by-your-documentation">Select the revision described by your documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-checkout.html#clone-and-initialize-that-exact-revision">Clone and initialize that exact revision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-checkout.html#prepare-only-the-tools-required-by-your-task">Prepare only the tools required by your task</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="board-porting.html">Add a reviewed Board package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html#gather-the-minimum-facts">Gather the minimum facts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html#validate-through-the-actual-resolver">Validate through the actual resolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html#build-and-record-the-selected-scope">Build and record the selected scope</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="provider-porting.html">Add a SoC, provider or reusable component</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html#keep-the-layer-boundary-narrow">Keep the layer boundary narrow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html#implement-in-a-reviewable-sequence">Implement in a reviewable sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html#review-performance-and-ownership">Review performance and ownership</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="os-shutdown.html">Wait correctly and shut down an explicit owner</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html#avoid-lost-completion-and-unbounded-waits">Avoid lost completion and unbounded waits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html#shut-down-in-dependency-order">Shut down in dependency order</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html#execute-maintained-software-fixtures">Execute maintained software fixtures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="migration.html">Migrate legacy configuration and interface access</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#move-one-complete-assembly">Move one complete assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html#move-access-and-lifecycle-together">Move access and lifecycle together</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="performance-hil.html">Measure resources and prepare hardware acceptance</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html#measure-an-exact-image">Measure an exact image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html#prepare-without-operating-equipment">Prepare without operating equipment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html#execute-only-a-real-reviewed-station">Execute only a real reviewed station</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Task guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-checkout.html">Obtain the exact source and pinned dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="board-porting.html">Add a reviewed Board package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-porting.html">Add a SoC, provider or reusable component</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-shutdown.html">Wait correctly and shut down an explicit owner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">Migrate legacy configuration and interface access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="performance-hil.html">Measure resources and prepare hardware acceptance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

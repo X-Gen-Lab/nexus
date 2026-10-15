@@ -1,0 +1,398 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>精确支持范围 &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="当前证据与验收边界" href="verification.html" />
+    <link rel="prev" title="SoC 完善执行记录" href="soc-refinement-verification.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="zh_CN" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/delivery/support.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../../en/delivery/support.html" lang="en">English</a>. 源语言: zh_CN; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="id1">
+<h1>精确支持范围<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="capabilities.html"><span class="std std-doc">派生能力矩阵</span></a> 自动核对 SoC/route 的 mode、参考 Board binding
+与实际 resolver/emitter 选择的生产源码。叙述表说明运行合同，派生表说明精确
+身份与有限源码一致性；两者均不继承旧 HEAD 的资格或替代实板执行。</p>
+<section id="id2">
+<h2>芯片、板卡与系统<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>目标</p></th>
+<th class="head"><p>软件实现</p></th>
+<th class="head"><p>未完成的物理事实</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407ZGT6 / 启明欣欣 V3.1</p></td>
+<td><p>Cortex-M4F；1 MiB Flash；主 SRAM 128 KiB、CCM 64 KiB；声明 clock/profile 与 reviewed routes</p></td>
+<td><p>实际 PCB 修订、晶振、供电、连续性、波形与负载</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32F407VET6 / 天空星青春版</p></td>
+<td><p>Cortex-M4F；512 KiB Flash；主 SRAM 128 KiB、CCM 64 KiB；独立 Board 资源</p></td>
+<td><p>相同类别的实际 PCB／电气／HIL 验收</p></td>
+</tr>
+<tr class="row-even"><td><p>GD32F470ZGT6 / 梁山派</p></td>
+<td><p>Cortex-M4F；1 MiB Flash；主 SRAM 192 KiB、ADDSRAM 256 KiB、TCM 64 KiB；25 MHz 声明输入、200 MHz profile；可选 USB 独立 48 MHz owner</p></td>
+<td><p>未观察 PCB/晶振/电气；默认 linker 只用主 SRAM；实际 USB clock/PHY 仍未测量</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32G474RET6 / MB1367 来源参考配置</p></td>
+<td><p>Cortex-M4F；512 KiB Flash；128 KiB 连续 CPU SRAM alias；HSE24/170 MHz、独立 TIM2；GPIOA PA5、LPUART1 PA2/PA3 IRQ bytes；另有 PA0/PA1 selected EXTI 软件夹具；生成 factory 和裸机/FreeRTOS ELF</p></td>
+<td><p>实际 PCB／晶振／焊桥／EXTI 接线未观察；未授权 DMA；软件报告与实际 PCB／电气验收分开</p></td>
+</tr>
+<tr class="row-even"><td><p>STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置</p></td>
+<td><p>Cortex-M7F；2 MiB Flash；默认 AXI SRAM 512 KiB；pre-RAM LDO、固定 HSI32／HSI64 × Cache off/on、TIM2；PB0 GPIO、USART3 PD8/PD9 IRQ bytes 或有限 TX DMA；裸机／FreeRTOS 静态装配</p></td>
+<td><p>PCB／供电／硅片修订／焊桥／Cache 一致性未观察；RX 仍为 IRQ bytes；未实现 RX DMA、其他 RAM 放置或运行状态接管；最终软件资格独立记录</p></td>
+</tr>
+<tr class="row-odd"><td><p>STM32U575ZIT6Q / NUCLEO-U575ZI-Q 单状态参考配置</p></td>
+<td><p>Cortex-M33F；2 MiB Flash；默认 SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；PC7 GPIO、USART1 PA9/PA10 IRQ bytes；裸机／FreeRTOS 静态装配</p></td>
+<td><p>PCB／SMPS／硅片修订／option bytes 未观察；Cache 关闭；此 Platform 配置未开放 DMA、双域 factory 或其他 RAM 放置；最终软件资格独立记录</p></td>
+</tr>
+<tr class="row-even"><td><p>STM32U575 独立 TZEN=1 双域参考</p></td>
+<td><p>外部预先配置 option bytes；两个 Runtime 镜像、冷启动 SAU／MPU／SRAM 归属 owner、真实 CMSE SG；单一非特权 NonSecure Thread 通过同步复制消息访问受限 PC7 GPIO</p></td>
+<td><p>未执行实板隔离验收；无 OS、通用双域 factory、NS 任务身份、异步借用／跨域 DMA 或产品镜像认证；不改变上列 TZEN=0 默认装配</p></td>
+</tr>
+<tr class="row-odd"><td><p>Native</p></td>
+<td><p>Linux/POSIX 行为模型、实际线程与持久化文件故障模型</p></td>
+<td><p>不构成 MCU 或电气资格</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>裸机和锁定 FreeRTOS 均为显式选择的薄适配。启动只建立平台时钟／接口，不创建
+scheduler、产品任务或工作流。FreeRTOS POSIX host 运行验证软件生命周期，不能
+替代对应 MCU 的 IRQ ceiling、FPU context 与 stack high-water 实板验证。</p>
+<p>H743 使用官方 Cortex-M7 启动与有界 LDO 电源入口，在 ACTVOSRDY 前禁止 RAM
+写入；从 HSI64、Cache off 的可信冷状态建立所选固定时钟与 Cache 配置。Cache
+关闭位本身不能证明外来 dirty 数据已经清理；要求可信复位或此前成功完成自有
+clean/disable。U575 默认 Platform 使用官方 Cortex-M33 启动并维护 TZEN=0
+单地址状态；独立 TZEN=1 参考有自己的入口和安全归属 owner。启动后读取 option
+register 不能使不匹配的启动变成合法状态。两者都不修改 option bytes，不自动
+接管 bootloader、DMA 或既有 clock/IRQ owner。原始 CMSIS Device H7/U5 源码、
+许可和版本固定在 source lock。
+精确入口见 <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32h743/README.md">H743</a> 与
+<a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/soc/stm32u575/README.md">U575</a>。</p>
+<p>ThreadX 是额外显式后端，锁定官方 Eclipse ThreadX 6.5.2.202603 release。当前
+配置维护三块 F407/F470 Board 的 Cortex-M4 GNU port，以及 Native Linux GNU。
+独立 CPU runtime 维护 M4 integer、M4F hard/softfp，BASEPRI 或 PRIMASK 政策；
+其他 Cortex-M ThreadX port 明确拒绝。生产 graph、真实 Linux 内核 task/queue/join
+与三板 ARM 链接分别验证，Linux 自身 pthread 栈与内部 host 分配不是 MCU 成本。
+ThreadX 不实现本项目 FreeRTOS 的 MPU、split-security 或 tickless 模式。详见
+<a class="reference internal" href="../design/threadx.html"><span class="std std-doc">ThreadX 接入</span></a>。平台启动不进入任何内核，产品显式进入内核；
+仍运行的 scheduler 不允许普通 I/O shutdown 关闭其 clock/Tick。</p>
+<p>CPU 软件层另支持 M0／M0+／M3／M4／M7／M23／M33／M55／M85，统一严格事实
+解析器选择 Core/Arch、原子操作和裸机/FreeRTOS runtime。M0/M0+ RMW 使用
+bounded saved-PRIMASK；可选 cache/MPU/SAU 有真实 CPU 算法，FPU/MVE 与安全
+状态决定精确 kernel port 和 ABI。CPU-only runtime 自身不生成 SoC/Board/factory；
+上述 H743/U575 纵切片分别拥有独立装配与验收。编译、寄存器模型与真实
+FP/MVE/cache/MPU/安全世界验收分别记录；
+<code class="docutils literal notranslate"><span class="pre">cache.h</span></code> 的范围维护与仅 M7 维护的冷 Cache 启停分别提供；CMSE 范围权限观察
+本身不建立用户内存 pin、复制或 transport。
+可选 restricted MPU task 和 split Secure/NonSecure runtime 已有独立软件实现；
+窄 delay/tick SVC、Secure context lease 与调用者静态存储分别验证。默认仍为
+privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围和配置例子见
+<a class="reference internal" href="cortex-m.html"><span class="std std-doc">Cortex-M 软件支持</span></a> 与 <a class="reference internal" href="../design/arch-contracts.html"><span class="std std-doc">Arch 契约</span></a>。</p>
+</section>
+<section id="id3">
+<h2>首发模式<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>以下完整外设表对应 F407/F470 首发实现。G474 另维护 selected EXTI，H743
+另维护固定 Cache 配置和有限 UART TX DMA；U575 默认装配仍为 GPIO／IRQ UART，
+双域同步 GPIO 参考单独维护。不从芯片型号或通用接口推断其他外设、DMA、
+ThreadX 或低功耗模式。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>接口</p></th>
+<th class="head"><p>已实现模式与限制</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GPIO</p></td>
+<td><p>authorized mask、原子 set/reset、快照 read、single-writer toggle</p></td>
+</tr>
+<tr class="row-odd"><td><p>UART</p></td>
+<td><p>8N1 IRQ TX 或有限 TX DMA；caller-owned request、真实 TC；IRQ RX blocks／IDLE、有限及连续 RX DMA、双向 DMA；显式 RTS/CTS 与外部静态 RS485 适配；STM baud 最低 1282、GD 最低 1526，最高 1 Mbaud</p></td>
+</tr>
+<tr class="row-even"><td><p>SPI</p></td>
+<td><p>8-bit MSB-first；短轮询每笔最多 256 bytes；有限 DMA 最多 65535 bytes；双向递增或调用者单字节固定 dummy/discard；单 wire-active、完整 CS interval；独立 CS endpoint</p></td>
+</tr>
+<tr class="row-odd"><td><p>I2C</p></td>
+<td><p>100 kHz；最多 8 条消息、每条 read/write 1–256 bytes；轮询、中断及 DMA 消息；1/2/末三字节 ACK、repeated START/NACK/仲裁/STOP；恢复检查 BUSY 与所选 SCL/SDA 电平；独立有界 GPIO bus-clear 工具</p></td>
+</tr>
+<tr class="row-even"><td><p>Flash</p></td>
+<td><p>STM 精确 16/64/128 KiB sector 几何与 x32 program（4-byte alignment/length，声明供电 2.7–3.6 V）；GD 官方独立 4 KiB page erase 与 halfword program；全物理空间、外部受限 region</p></td>
+</tr>
+<tr class="row-odd"><td><p>看门狗</p></td>
+<td><p>独立 enable/feed/reset cause；启用不可逆，late failure 不擦除责任；GD IRC32K 物理 timeout bounds 未保证</p></td>
+</tr>
+<tr class="row-even"><td><p>EXTI</p></td>
+<td><p>selected line、共享 vector、caller-sized event queue、丢失／coalescing 可见；无 debounce 政策</p></td>
+</tr>
+<tr class="row-odd"><td><p>PWM</p></td>
+<td><p>固定 timer/channel/base、CCR shadow、0/100%、safe inactive；公共 stop 可以 restart，平台 teardown 释放 owner</p></td>
+</tr>
+<tr class="row-even"><td><p>ADC</p></td>
+<td><p>reviewed channel、single-shot/低速 scan、有限及连续双缓冲定时触发 DMA blocks；显式 sample time/reference；只发布完整扫描；可选外部序列与软件观测时间记录</p></td>
+</tr>
+<tr class="row-odd"><td><p>经典 CAN</p></td>
+<td><p>11/29-bit DATA/RTR、0–8 bytes、真实三邮箱、共享 filter domain、显式 abort/bus-off recovery；没有 CAN FD 或自动重发</p></td>
+</tr>
+<tr class="row-even"><td><p>USB 全速设备</p></td>
+<td><p>internal PHY PIO、EP0 control IN/OUT64、EP1–3 bulk8/16/32/64、packet loan、SETUP epoch、reset/stop drain、独立 48 MHz owner；没有 Host/HS/DMA/ISO/class stack</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>USB 配置/factory 已在两 STM 封装与 GD470 的软件 Board 夹具执行真实 ARM 链接，
+默认参考 Board 不自动暴露 USB connector/VBUS 电气。<code class="docutils literal notranslate"><span class="pre">vbus_sensing=true</span></code> 缺少
+reviewed 电气时拒绝。PA11/PA12 AF10 的硅片路线不证明实际跳帽、供电、VBUS 或
+ESD；它与 CAN1/USART1 flow-control 的资源冲突必须拒绝。详见
+<a class="reference internal" href="../design/usb-device.html"><span class="std std-doc">USB packet 合同</span></a>。</p>
+<p>以下纵切片拥有独立生产机制和开发证据，最终配置、SDK 与完整镜像接入分别验收。
+不能将其中一项的模型通过记为整个平台或参考 PCB 通过。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>可选机制</p></th>
+<th class="head"><p>精确范围与当前边界</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>原始以太网／MDIO／DP83848</p></td>
+<td><p>Native/ST/GD normal chained descriptor、RMII、14–1514-byte untagged Ethernet II、caller-owned RX loan；ETH/MDIO face 共用一个 MAC context；ST ZG/GD ZG 软件夹具已有 factory 与裸机/FreeRTOS ELF；无协议栈、PTP、checksum offload、VLAN、jumbo</p></td>
+</tr>
+<tr class="row-odd"><td><p>输入捕获</p></td>
+<td><p>STM TIM4 CH1 / GD TIMER3 CH0，PB6 AF2、16-bit modulo count、caller event ring；软件观测时间不是 edge aperture；装配接入独立验收</p></td>
+</tr>
+<tr class="row-even"><td><p>互补 PWM／刹车</p></td>
+<td><p>STM TIM1 / GD TIMER0，PA8/PB13/PB12 AF1；不可变精确 deadtime 与 BKIN，禁止自动重启；没有功率级安全资格</p></td>
+</tr>
+<tr class="row-odd"><td><p>用户 I/O 代理</p></td>
+<td><p>特权 kernel 调用的 scalar GPIO read/set-reset、真实 principal/pin/copy/unpin 窄端口；U575 独立无 OS 参考接入同步 CMSE gateway；无通用 SVC、多任务 userspace transport 或异步用户 DMA</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>参考 Board 默认不声明 Ethernet PHY/REFCLK/reset 接线。启明 ZG 可选 RMII 来源
+涉及 PG11/13/14，因此不授权 VE100 封装；天空星和梁山派无 reviewed PHY 路线。
+协议、电缆、PHY power/reset、产品 MAC 地址和恢复策略留在外部。详见
+<a class="reference internal" href="../design/ethernet.html"><span class="std std-doc">Ethernet</span></a>、<a class="reference internal" href="../design/timer-advanced.html"><span class="std std-doc">高级 timer</span></a>、
+<a class="reference internal" href="../design/user-io-broker.html"><span class="std std-doc">用户 I/O broker</span></a> 与 <a class="reference internal" href="../design/stm32g474.html"><span class="std std-doc">G474</span></a>。</p>
+<p>G474 维护真实 generated factory 主机合同、独立 system/provider 回归，以及
+empty／GPIO-UART／selected-EXTI 的裸机／FreeRTOS ARM 夹具；门禁检查预算、
+操作表保留、未选驱动裁剪和向量字节。它们使用 reviewed Board 资料与锁定的
+官方 CMSIS，不能证明某块实物的 MCU、X3 晶振或 VCP／LD2 焊桥。
+<a class="reference internal" href="soc-refinement-verification.html"><span class="std std-doc">初次 SoC 执行记录</span></a> 保留其历史 code revision；
+<a class="reference internal" href="soc-extensions-verification.html"><span class="std std-doc">扩展执行记录</span></a> 单独绑定后续扩展的源码和证据。
+离线复现与候选封存仍有独立
+退出条件，不能继承此前 F407/F470 候选的资格。</p>
+<p>H743 的有限 TX DMA 仅维护 USART3、DMA1 Stream0、DMAMUX1 channel0/request46
+和 AXI SRAM 可达域。Cache on 要求完整 32-byte cache line 的调用者所有权，
+clean 后才启动 DMA；准备和 drain 未完成都不能解除借用。Cache 生命周期在
+平台启停时固定，全部 provider 排空后才能撤回系统时基并 clean/disable Cache。
+不开放 RX DMA、其他 DMA engine、可选 RAM 布局或运行中变频。独立 U575 双域
+参考的分区、固定 principal 和同步借用前提见
+<a class="reference internal" href="../design/u575-trustzone-contract.html"><span class="std std-doc">TrustZone 合同</span></a>。</p>
+<p>Ethernet 生成夹具保留精确 TX/RX descriptors 与 RX buffers，只接纳 STM 主 SRAM
+128 KiB 或 GD 主 SRAM192 KiB。四个 ZG ARM graph 的开发预算/retention 通过不
+授权 GD ADDSRAM/TCM、STM CCM、VE100 的 PG route 或某个产品 PHY。独立 cold
+review、clean-source SDK 与实板资格仍各自建立，参考默认镜像不选入 ETH/MDIO。</p>
+<p>有限 DMA 的精确首发路线如下，其他 controller／通道组合由 resolver 拒绝。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>模式</p></th>
+<th class="head"><p>STM32F407</p></th>
+<th class="head"><p>GD32F470</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>UART TX DMA</p></td>
+<td><p>USART1；DMA2 stream7 channel4</p></td>
+<td><p>USART0；DMA1 channel7 selector4</p></td>
+</tr>
+<tr class="row-odd"><td><p>UART RX DMA／双向 DMA</p></td>
+<td><p>USART1；RX DMA2 stream2 channel4；TX 同上</p></td>
+<td><p>USART0；RX DMA1 channel2 selector4；TX 同上</p></td>
+</tr>
+<tr class="row-even"><td><p>SPI 全双工 DMA</p></td>
+<td><p>SPI1；DMA2 RXstream0／TXstream3 channel3</p></td>
+<td><p>SPI4；DMA1 RXchannel3／TXchannel4 selector2</p></td>
+</tr>
+<tr class="row-odd"><td><p>I2C 消息 DMA</p></td>
+<td><p>I2C1；DMA1 RXstream0／TXstream6 channel1</p></td>
+<td><p>I2C0；DMA0 RXchannel0／TXchannel6 selector1</p></td>
+</tr>
+<tr class="row-even"><td><p>ADC 有限／连续 trigger blocks</p></td>
+<td><p>ADC1；TIM3 TRGO；DMA2 stream4 channel0</p></td>
+<td><p>ADC0；TIMER2 TRGO；DMA1 channel0 selector0</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>已审查的软件 Board 配置支持 STM32F407 I2C1/I2C2 与 GD32F470 I2C0/I2C1 的
+IRQ/DMA 装配及 typed factory；双控制器夹具已有独立实例隔离与真实 SDK 链接证据。
+参考 Board 只开放明确声明的 binding；其他硅片路线与实际接线需单独审查。详见
+<a class="reference internal" href="../design/multiple-controllers.html"><span class="std std-doc">多控制器所有权</span></a>。</p>
+<p>SPI DMA 要求非空、不重叠的 TX／RX 实际访问跨度；固定地址方向只访问调用者的一字节。
+不分配 scratch 或隐式复制池。实际
+memory domain 与读写权限由 provider 再次校验；STM CCM、GD TCM 均不能作为 DMA
+缓冲。DMA TC 表示内存传输事实，UART TC／SPI idle 表示线上事实；两者排空证明
+都满足后才发布 SETTLED。取消、超时或 EN 拒绝关闭保留借用，进入 QUARANTINED。</p>
+<p>UART 的 <code class="docutils literal notranslate"><span class="pre">irq-blocks</span></code> 保留独立 IRQ 接收实现；<code class="docutils literal notranslate"><span class="pre">rx-dma-idle</span></code> 使用有限 DMA 与 IDLE，
+<code class="docutils literal notranslate"><span class="pre">rx-dma-continuous</span></code> 使用硬件双缓冲，另有显式 <code class="docutils literal notranslate"><span class="pre">dma-duplex</span></code> 和
+<code class="docutils literal notranslate"><span class="pre">dma-duplex-continuous</span></code>。块由调用者提供，消费者 acquire 后保持不可变，直到匹配
+epoch 的 release。连续模式必须预留两个硬件目标及替换块；替换地址读回、目标银行
+和新错误检查成立后才能发布旧块。没有替换块就停止，不覆写消费者借用。
+仅接收模式使用独立只读方法表，不保留 TX DMA 方法与对应链接代码；当前共享
+接收状态布局仍包含 TX DMA 基类字段，不能宣称冷态字段开销为零。RTS/CTS 并不代替
+容量和排空合同；RS485 的 DE 引脚、极性及 setup/hold 时间由外部工程明确提供，
+到达真实 UART TC 后才开始 hold 并撤销 DE。详见
+<a class="reference internal" href="../design/uart-dma-rs485.html"><span class="std std-doc">UART DMA 与 RS485</span></a>。</p>
+<p>ADC 的 <code class="docutils literal notranslate"><span class="pre">trigger-dma</span></code> 使用普通有限 DMA；每块停止触发、转换与内存写入，再发布完整块。
+调用者必须显式 service，完成上电稳定／GD 校准后重新触发下一块。无空闲 loan 时
+保持暂停，不覆写、不伪造暂停期间的精确丢样数。该模式有块间间隙，不承诺连续
+无间隙采样。<code class="docutils literal notranslate"><span class="pre">trigger-dma-continuous</span></code> 则显式选择硬件双缓冲及预投递块，地址替换
+成功后发布完整块；至少需要三个调用者 slot。频率需满足精确 timer divider 和
+整段 scan 转换时间；GD 连续模式显式选择 SDK 对应的 sample-time code，有限模式
+保持原有 15-cycle sample。可选 observer 的时间戳是软件发布观测时间，不是采样
+孔径时间。单个锁存 TC/CT 事实无法计算未观测的多轮丢样。stop 在持有 loan 时返回 BUSY。</p>
+<p>I2C 中断及 DMA 共享经过两家 SDK 布局与位定义检查的 V1 寄存器算法，MCU 热路径
+直接访问寄存器。DMA TC 不代表线上完成；最后字节、BTF、STOP/MSL、DMA EN 和
+IRQ 发布者必须排空后才 SETTLED。bus-clear 独立要求静止外设、独占开漏 GPIO 和
+有界等待，最多九个完成的恢复脉冲；STOP 或释放失败保留 lease，可继续清理。
+平台没有为未经审查的 Board 自动切换引脚。详见
+<a class="reference internal" href="../design/i2c-bus-clear.html"><span class="std std-doc">I2C 总线恢复</span></a>。</p>
+<p>这些是 <strong>SoC 实现能力</strong>。参考 Board 默认 binding、软件测试夹具路线、现场测量结果
+各自独立。STM32 默认参考 Board 未声明可资格化的 SPI CS，资源矩阵只测
+empty/GPIO/UART；软件 fixture 的 SPI 不能继承为参考板 SPI 支持。GD32 默认
+Board 的 SPI4 PF6/7/8/9 有公开来源，外接 NOR 具体料号仍未知。</p>
+</section>
+<section id="id4">
+<h2>明确边界<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>连续模式不能承诺任意 IRQ 延迟与消费者速度下无丢失。I2C 超出 256-byte 的 read、
+动态 clock、deep sleep/STOP、安全启动／升级及上述未维护模式明确不提供。
+FreeRTOS 可选 <code class="docutils literal notranslate"><span class="pre">lowpower_port=&quot;timebase&quot;</span></code> 只在固定 F407/GD470 profile 使用浅 Sleep；
+要求 SysTick、tickless、single privileged、无 MPU。默认 <code class="docutils literal notranslate"><span class="pre">custom</span></code> 不新增 sleep
+机制；CPU-only runtime 缺少 SoC timebase 时拒绝该选择。实际相位、clock 连续性、
+wake latency 与功耗保持物理未执行，见<a class="reference internal" href="../design/timebase-lowpower.html"><span class="std std-doc">浅睡眠</span></a>。
+Unsupported 配置明确拒绝，不通过成功 stub 声称支持。</p>
+<p>Flash pulse 不能被 deadline 撤销；BUSY 未清不能释放责任。产品负责 Flash 执行
+停顿、电压、watchdog 窗口、掉电、认证、布局与持久化格式迁移。公共通用 storage
+的 CRC/commit 机制不等于安全升级协议。</p>
+<p>GD32 Flash 的重新上锁读回失败会保留静态 provider 并拒绝继续操作，需要受控
+复位；普通 stop 不能恢复此状态。<code class="docutils literal notranslate"><span class="pre">tests/google/gd32_flash_fault_test.cpp</span></code> 专项模型
+验证故障后拒绝读取／写入／重新取得控制器，不构成实板资格。
+生命周期与扫描诊断的解释见<a class="reference internal" href="security-review.html"><span class="std std-doc">安全审查</span></a>。</p>
+<p>硬件未接入，全部 MCU 目标的 clock、reset、GPIO safe output、UART TC/abort/RX、SPI/I2C
+电气、Flash 掉电、watchdog reset、EXTI 波形、PWM 与 ADC 精度均未执行。当前
+支持声明不能替代物理 HIL 或产品 release promotion。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">已记录的交付证据</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前平台交付</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">当前系统架构</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system-verification.html">构建系统执行记录</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capabilities.html">派生能力与接入矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortex-m.html">Cortex-M 软件支持与平台接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">外部工程迁移</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-iterations.html">后续迭代与团队执行</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html">OS 交付范围与验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qualification.html">软件候选与物理资格</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security-review.html">安全扫描与生命周期边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-extensions-verification.html">SoC 扩展验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement-verification.html">SoC 完善执行记录</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">精确支持范围</a></li>
+<li class="toctree-l2"><a class="reference internal" href="verification.html">当前证据与验收边界</a></li>
+</ul>
+</li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

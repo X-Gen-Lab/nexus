@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>使用 TDD 与正常提交门禁开发 &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="维护清晰且可验证的文档" href="documentation.html" />
+    <link rel="prev" title="维护 Nexus" href="index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/development/workflow.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../../en/development/workflow.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="develop-with-tdd-and-normal-commit-gates">
+<span id="docs-development-workflow"></span><h1>使用 TDD 与正常提交门禁开发<a class="headerlink" href="#develop-with-tdd-and-normal-commit-gates" title="Link to this heading">¶</a></h1>
+<p>本工作流保留当前 C11 架构、格式与显式证据。Codex 负责平台维护；独立 agent 审查高风险变更。虚构人员或本地文件都不能建立 GitHub 分支保护。</p>
+<section id="install-and-check-tools">
+<h2>安装并检查工具<a class="headerlink" href="#install-and-check-tools" title="Link to this heading">¶</a></h2>
+<p>先完成<a class="reference internal" href="../guides/source-checkout.html"><span class="std std-doc">固定源码与递归依赖指南</span></a>。然后从该仓库根目录安装维护工具：</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/setup/install_dev_tools.py
+.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>dependencies/environment-tools.txt
+python<span class="w"> </span>tools/dev/dev.py<span class="w"> </span>doctor
+</pre></div>
+</div>
+<p>Windows 使用 <code class="docutils literal notranslate"><span class="pre">.venv/Scripts/python.exe</span></code>。安装建立 pre-commit 和 commit-msg 钩子。钩子检查暂存输入，不替用户暂存，也不静默修复文件。保留未暂存工作和真实失败诊断；不得绕过钩子。</p>
+</section>
+<section id="execute-red-green-and-review">
+<h2>执行 RED、GREEN 与评审<a class="headerlink" href="#execute-red-green-and-review" title="Link to this heading">¶</a></h2>
+<p>新增 C 行为或修复缺陷时，先添加有意义的 GoogleTest／GoogleMock 回归。执行并保留预期失败原因与原命令。实现最小正确生产变更，执行 GREEN，再重构。Mock 外部端口／MMIO，而不是被测实现。覆盖相关拒绝、取消、排空、溢出、隔离保留和实例隔离。Python 生产工具使用标准库 unittest，遵循相同实际 RED／GREEN 规则。</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/ci/tdd_gate.py<span class="w"> </span>--all<span class="w"> </span>--preset<span class="w"> </span>native-debug
+</pre></div>
+</div>
+<p>完整门禁构建锁定的离线框架，以新报告执行发现的全部用例，不使用 filter／shard。空、跳过、部分、陈旧或变化输入均失败。钩子核对暂存树保持不变；CI 独立执行门禁。框架仅用于主机 C++17；固件保持 C11。自动化证明执行，保留的开发日志记录历史 RED／GREEN 顺序。纯正文或图源修改需要对应文档检查和语义审查，不需要镜像实现测试。</p>
+</section>
+<section id="preserve-style-and-scope">
+<h2>保留风格与范围<a class="headerlink" href="#preserve-style-and-scope" title="Link to this heading">¶</a></h2>
+<p>使用未改变的 <code class="docutils literal notranslate"><span class="pre">.clang-format</span></code> 和 <code class="docutils literal notranslate"><span class="pre">.editorconfig</span></code>：80 列、四空格、附着大括号、类型侧指针星号和反斜杠 Doxygen 注释。公共头文件说明上下文、截止时间、所有权和失败。源注释解释不变量和硬件顺序，不重复声明参数。新增／修改文件通过整文件检查；已有冻结欠账只能减少。</p>
+<p>每次使用 Conventional Commits 提交一个可评审变更。将接口／配置变化与图示、示例、翻译和执行范围一起评审。产品、执行任务、私有 PCB 和恢复策略保留在 Nexus 外。记录实际源码／配置／工具／ELF 身份与物理待执行项；成功 commit 或 CI 不将结果升级为产品发行。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护 Nexus</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">使用 TDD 与正常提交门禁开发</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">维护清晰且可验证的文档</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation-map.html">定位实现权威</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sphinx/development/coding_standards.html">代码规范</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

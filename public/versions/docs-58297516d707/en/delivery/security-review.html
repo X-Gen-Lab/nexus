@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Security scanning and lifecycle boundaries &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SoC extension verification" href="soc-extensions-verification.html" />
+    <link rel="prev" title="Software candidates and physical qualification" href="qualification.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/delivery/security-review.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/delivery/security-review.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="id1">
+<h1>Security scanning and lifecycle boundaries<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>CodeQL analyzes maintained production implementations, current tools and behavior tests in an actual Native build. Python extraction excludes only nonexecuted historical documentation tools under <code class="docutils literal notranslate"><span class="pre">docs/archive/</span></code>, not current tests, configurator, evidence tools or SDK packaging. Queries remain <code class="docutils literal notranslate"><span class="pre">security-and-quality</span></code>; ownership/path checks were not disabled to remove diagnostics. Successful scan execution and diagnostic review are separate results.</p>
+<section id="id2">
+<h2>Findings and fixes in this iteration<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>The comment-check CLI explicitly terminates invalid input rather than printing an unestablished success report; regressions check failure exit code, stderr and empty stdout.</p></li>
+<li><p>Storage fault tests use their own <code class="docutils literal notranslate"><span class="pre">0700</span></code> temporary directory and fixed filename, validate/enter it through the same directory FD, then restore cwd. They do not check a path before resolving it again. Cross-process persistence reexecutes fixed Linux <code class="docutils literal notranslate"><span class="pre">/proc/self/exe</span></code>; the command line cannot select files/programs. Actual tests retain two groups of 315 write/power-cut boundaries and fresh-process reads rather than substituting same-process memory.</p></li>
+<li><p>STM32 GPIO register fixtures restore their borrowed global RCC pointer before exit and then actually verify rejection while unbound, avoiding escaped stack addresses.</p></li>
+<li><p>GD32 watchdog fixtures use static storage. Independent-watchdog enable is irreversible; <code class="docutils literal notranslate"><span class="pre">stop</span></code> returns unsupported and the owner lasts until process/platform reset, not ordinary scope exit.</p></li>
+<li><p>Unused maintenance-tool imports were removed; expected process-cleanup races and polling timeout are documented. Failure still cleans the entire process group and rethrows the exception.</p></li>
+</ul>
+<p>Relevant source/regressions are in <code class="docutils literal notranslate"><span class="pre">scripts/ci/test_comment_style.py</span></code>, <code class="docutils literal notranslate"><span class="pre">tests/contracts/components_storage.c</span></code>, <code class="docutils literal notranslate"><span class="pre">stm32_io_test.c</span></code>, <code class="docutils literal notranslate"><span class="pre">gd32_io_test.c</span></code> and tool contract tests. Current-commit CI and candidate evidence determine final execution status.</p>
+</section>
+<section id="id3">
+<h2>Retained borrow semantics and review responsibility<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>Asynchronous interfaces necessarily borrow caller addresses stored in providers/owners. Stack-address-escape diagnostics require checking actual lifecycle; implicit heap allocation, removal of IRQ tables or removal of barriers cannot bypass them. Generated MCU-provider objects use static storage; private-model local storage follows the same responsibility.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address retention location</p></th>
+<th class="head"><p>Required exit condition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GD32 controller IRQ table</p></td>
+<td><p>Normal stop unbinds IRQ first; failed recovery retains responsibility; irreversible watchdog persists until reset</p></td>
+</tr>
+<tr class="row-odd"><td><p>Native UART request</p></td>
+<td><p>Provider detaches before release-publishing SETTLED; caller releases only after acquire-observation</p></td>
+</tr>
+<tr class="row-even"><td><p>FreeRTOS task context</p></td>
+<td><p>Static stack/TCB/context persist until successful external join; a current task cannot destroy itself</p></td>
+</tr>
+<tr class="row-odd"><td><p>Multi-producer owner slot</p></td>
+<td><p>Reclaim only after executor settles requests, slot detaches and publishers/observers exit</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>GD32 Flash program/erase enters unusable state and retains its static provider when relock readback fails. Ordinary stop cannot claim recovery. Controlled reset is required; the owner cannot be released or writing continued. Current GoogleTest register models inject relock failure, checking that later read/write, erase, geometry, stop and reacquisition cannot bypass isolation, and that later successful locking cannot clear the latched fault. This proves the software failure contract; actual Flash electrical behavior and reset recovery still need hardware verification.</p>
+<p>Long state-machine readability, comments in third-party headers and borrow diagnostics still require path-specific review. Vendor imports retain original bytes/license identity. Ordinary static scanning proves neither absence of vulnerabilities nor actual IRQ, electrical, power-cut, timing, sustained-load or product-safety qualification.</p>
+<p>This factory/DMA/block iteration also tests simultaneous complete block/IDLE, latched error prefix, late ADC TC after error, DMA EN drain refusal and NEVER-deadline tail timeout. The ADC zero-clock-divider path found by static analysis was fixed after an actual failing test. Resource parsing rejects declarations inconsistent with fixed provider DMA channels and aliases bypassing timer/timebase reservations. Same-clean-HEAD execution records determine final status.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Recorded delivery evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current platform delivery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Current system architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system-verification.html">Build system execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capabilities.html">Derived capabilities and integration matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortex-m.html">Cortex-M software support and platform-integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">External-project migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-iterations.html">Next iterations and team execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html">OS delivery scope and verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qualification.html">Software candidates and physical qualification</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Security scanning and lifecycle boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-extensions-verification.html">SoC extension verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement-verification.html">SoC refinement execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support.html">Exact support scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="verification.html">Current evidence and acceptance boundaries</a></li>
+</ul>
+</li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

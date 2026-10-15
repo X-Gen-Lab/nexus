@@ -1,0 +1,51 @@
+// FIG-02 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph BuildTargets {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-02 H743 / baremetal / IRQ UART: selected target dependencies\nArrow: dependent -> dependency, not a runtime call"];
+    firmware [label="External firmware\nnexus_add_firmware()", fillcolor="#f8fafc"];
+    startup [label="firmware_nexus_startup\nOBJECT: official startup + owned system"];
+    platform [label="Nexus::Platform\ngenerated bindings.c"];
+    soc [label="nexus_soc_stm32h743\nselected GPIO / UART drivers"];
+    io [label="Nexus::IO"];
+    arch [label="Nexus::Arch"];
+    core [label="Nexus::Core"];
+    bare [label="Nexus::OSBaremetal"];
+    wait [label="Nexus::OSWait"];
+    abi [label="nexus_abi_options\nselected by the frozen CPU profile"];
+    config [label="Nexus::Config\ngenerated includes / ABI / build policy"];
+    sdk [label="Vendor CMSIS headers\nSYSTEM PRIVATE include", fillcolor="#fefce8"];
+    firmware -> platform [label="PRIVATE link"];
+    firmware -> arch [label="PRIVATE link"];
+    firmware -> bare [label="PRIVATE: selected backend"];
+    firmware -> config [label="PRIVATE link"];
+    firmware -> startup [label="OBJECT injection", style=dashed];
+    platform -> soc [label="PUBLIC link"];
+    platform -> arch [label="PRIVATE link"];
+    platform -> sdk [label="PRIVATE include", style=dashed];
+    soc -> io [label="PUBLIC link"];
+    soc -> arch [label="PRIVATE link"];
+    soc -> sdk [label="PRIVATE include", style=dashed];
+    startup -> sdk [label="PRIVATE include", style=dashed];
+    startup -> io [label="PRIVATE link"];
+    startup -> arch [label="PRIVATE link"];
+    io -> core [label="PUBLIC link"];
+    io -> arch [label="PRIVATE link"];
+    bare -> wait [label="PUBLIC link"];
+    bare -> arch [label="PRIVATE link"];
+    wait -> core [label="PUBLIC link"];
+    core -> abi [label="PUBLIC link"];
+    arch -> abi [label="PUBLIC link"];
+    config -> abi [label="INTERFACE link"];
+    { rank=same; platform; bare; startup; config; }
+    { rank=same; core; arch; }
+}

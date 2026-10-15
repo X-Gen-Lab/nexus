@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>已审浅睡眠 tickless timebase &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="可选 timer 捕获与互补 PWM" href="timer-advanced.html" />
+    <link rel="prev" title="ThreadX 配置与接入" href="threadx.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/timebase-lowpower.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../../en/design/timebase-lowpower.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="reviewed-shallow-tickless-timebase">
+<h1>已审浅睡眠 tickless timebase<a class="headerlink" href="#reviewed-shallow-tickless-timebase" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">[os].lowpower_port</span> <span class="pre">=</span> <span class="pre">&quot;timebase&quot;</span></code> 选择维护中的 STM32F407／GD32F470 私有 FreeRTOS 绑定。默认 <code class="docutils literal notranslate"><span class="pre">&quot;custom&quot;</span></code> 保持既有应用 port 与弱 NULL 回退行为。选择还要求 <code class="docutils literal notranslate"><span class="pre">tickless</span> <span class="pre">=</span> <span class="pre">true</span></code>、SysTick、单一特权安全域且无 MPU profile。纯 CPU Runtime 因缺少已审 SoC timer／clock／IRQ 事实而拒绝此选择。</p>
+<p>此绑定使用浅 Sleep，固定时钟与 1 MHz 单调 timer 持续运行。不进入 STOP、不暂停时钟、不选其他 tick 源、不配置唤醒引脚，也不声明板级电气事实。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>SoC</p></th>
+<th class="head"><p>时钟／timer</p></th>
+<th class="head"><p>私有 compare</p></th>
+<th class="head"><p>既有共享 owner</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407</p></td>
+<td><p>HSE8 / PLL168，TIM2 PSC83</p></td>
+<td><p>CC1，CCR1</p></td>
+<td><p>TIM2 update / 64-bit epoch</p></td>
+</tr>
+<tr class="row-odd"><td><p>GD32F470</p></td>
+<td><p>HXTAL25 / PLL200，TIMER1 PSC99</p></td>
+<td><p>CH0，CH0CV</p></td>
+<td><p>TIMER1 update / 64-bit epoch</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Timer 已由平台 timebase 独占预留，没有输出 channel 接到引脚。Getter 仅检查既定配置：真实 PLL tuple、oscillator/source ready、mux/bus 分频、Flash latency 和 spread spectrum 关闭，以及自由向上计数、prescaler、完整 counter 范围、compare preload/output 关闭、sleep clock、overflow interrupt 和已使能 NVIC 路由。缺失事实返回 NULL，不修复或隐藏初始化。整个平台停机中 clock consumer 必须保持静止。存在 pause 或 alarm 时，还会在任何寄存器／NVIC 效果前拒绝时钟释放。</p>
+<section id="phase-admission-and-failure">
+<h2>Phase、准入与失败<a class="headerlink" href="#phase-admission-and-failure" title="Link to this heading">¶</a></h2>
+<p>通用 Idle 适配持有 scheduler suspend 与进入 PRIMASK 恢复。私有 timer 回调绝不阻塞或调用内核。Alarm IRQ dispatch 在 SoC 保存掩码 guard 下运行。SysTick 每次真实周期中断只调用一次重命名后的真实内核 tick handler。</p>
+<p>Pause 拒绝 pending 周期 tick 与仍活动的首个短间隔。可写快照须与私有保留状态、不可变绑定、MMIO 和不透明 clock-context 存储分离。已知范围、对齐和地址回绕在效果前检查；私有调用方证明不透明 clock-context 大小。成功 pause 保留周期源借用直到 resume。暂停计数记录完整微秒及剩余 core-cycle fraction。每次 capture／restore 均拒绝时钟逆跳或超过四个连续时钟微秒的观察窗口。</p>
+<p>Alarm 使用同一启动域的绝对 deadline；准入要求严格未来时间，距当前最多 <code class="docutils literal notranslate"><span class="pre">UINT32_MAX</span></code> 微秒。低 32 位在一次回绕范围内匹配自由计数器。迟到 arm、compare 读回失败或 disabled-source 读回失败都不能报告准入成功。拒绝 alarm 只移除自身中断源。Timer status 是 W0C：写一保留全部其他源，包括 overflow 读与确认之间到达的 compare。</p>
+<p>Resume 编程一个短 SysTick 间隔，证明 VAL 已消费短 reload 后，在首次 underflow 前恢复完整 LOAD。若只在首 ISR 恢复 LOAD，就可能发生第二个短间隔。包装也在内核 dispatch 前恢复完整 LOAD。亚微秒余数向上取整，误差小于一微秒，而不是依赖无法证明的近零 reload 竞态。</p>
+<p>精度合同是量化的。1 MHz 时钟不能表示任意 core-cycle 时间戳，寄存器操作有延迟。模型在持续推进 timer 下执行 15 种 phase/latency 组合，证明这些执行位于保守的负一到正十一微秒 phase 区间。独立 capture／restore 窗口检查是运行时边界；模型不证明物理 MCU 指令延迟或全部硬件执行。重复睡眠可能累积有界 phase 偏差。更紧同步需求必须另行验证 timer compare 时钟配置，不能假定精确亚微秒 phase。</p>
+<p>Pending tick、COUNTFLAG、迟到首次 underflow、reload 未消费或恢复控制位错误会让 resume fail-stop。Pause 回滚失败且无法恢复源时也 fail-stop。Alarm disable 失败同时保留 pause 与 alarm 所有权。Fault 状态不归还借用源、不让缺失 tick 的内核继续，也不自动回收。</p>
+</section>
+<section id="cost-and-validation-scope">
+<h2>成本与验证范围<a class="headerlink" href="#cost-and-validation-scope" title="Link to this heading">¶</a></h2>
+<p>选择增加一个静态私有 context。维护的 32 位 ABI 中 layout 为 16 字节，只读寄存器绑定和 port 接口面为 52 与 24 字节；这些是结构布局，不是链接镜像成本。既有 timebase、默认 request/stream 状态与 OS 对象不增加字段。默认源码选择省略公共机制、SoC 绑定及所选 IRQ 分支。四个真实生产 CMake ARM 图验证默认无新机制 TU／symbol，而选择后有两个 TU 与 strong getter。在保留 kernel startup 的同一 empty assembly、no-LTO Os/GNUArm14.3.1 下，STM32 增加 Flash 1532／RAM 16 字节，GD32 增加 Flash 1516／RAM 16 字节。这些是开发夹具差值，不是应用或硬件成本。</p>
+<p>GoogleTest／GoogleMock 执行生产公共 C、真实 SDK 寄存器布局、真实 SoC timebase IRQ 与停机代码，覆盖 pending 到达、时钟逆跳、迟到 compare、counter wrap、disable/restore 失败、首 reload 消费、第二 pause 拒绝及共享 IRQ 标志竞态。两芯片 suite 使用外部 CPU、clock-bootstrap 和寄存器语义模型，属于软件证据。</p>
+<p>物理 HIL 未执行。验收仍需真实板与探针：浅 Sleep 时钟连续、NVIC 唤醒、真实 capture/restore 窗口、反复睡眠的 SysTick phase/catch-up、回绕、竞争中断和负载。模型时序或 ARM 链接不能建立功耗收益、物理 WCET、IRQ 延迟或板卡就绪。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">维护中的设计合同</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前设计与实施台账</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU、原子操作与运行时装配契约</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">构建系统维护合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN 的平台机制与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">显式时钟借用与浅睡眠</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus 文档系统完整优化清单</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus 文档内容与图示标准</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus 文档系统架构与交付规划</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus 文档页面模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">下一代平台工程运行手册</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC、MDIO 与 DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">故障观测与保留责任</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">显式 I2C 总线恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">接入、资源装配与源码 SDK 合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">有界 I/O 生命周期属性矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O 观察、容量与保留恢复</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">多控制器所有权</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">独立的有限 UART 与 SPI DMA 控制器</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus 下一代平台：从第一性原理设计</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS 后端接入</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS 执行与生命周期合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">选定提供者装配门禁</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC 执行预算</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC 完善与物理验收</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">源码版本、factory 代际与依赖维护</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">栈观察与所有者生命周期耐久验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6／MB1367 首批纵切片</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX 配置与接入</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">已审浅睡眠 tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">可选 timer 捕获与互补 PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 同步双域参考合同</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART 接收 DMA、双向 DMA 与电气适配</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device 包所有权与接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">内核调用的用户 I/O 准入</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">已记录的交付证据</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,966 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_soc_extensions_validation_index",
+  "status": "software_scopes_validated",
+  "date": "2026-10-12",
+  "source": {
+    "repository": "https://github.com/X-Gen-Lab/nexus",
+    "canonical_code_commit": "98270512ea2ff7eefe8ff79720018e582be3a949",
+    "code_tree": "8d3e69d3179d7b0d2382c5fd074c970dfc9348d9",
+    "branch": "codex/soc-refinement-20261012",
+    "pull_request": "https://github.com/X-Gen-Lab/nexus/pull/5",
+    "clean_before_after": true,
+    "unchanged_during_execution": true,
+    "documentation_boundary": "Later documentation commits record this code snapshot; they do not claim new software execution at their HEAD."
+  },
+  "architecture": {
+    "assembly": "Strict TOML to immutable typed IR and exact static objects",
+    "device_access": "Typed factory returns existing immutable interface faces sharing const operations tables",
+    "runtime_cost_contract": "No allocation, hardware start, lock, runtime string registry or implicit worker during factory lookup",
+    "ownership": "Platform owns selected infrastructure lifecycle; applications own scheduling, policy and recovery; accepted buffers remain borrowed until SETTLED or retained in quarantine",
+    "repository_boundary": "Generic mechanisms here; public applications in X-Gen-Lab/nexus-examples; proprietary products external"
+  },
+  "software_results": {
+    "native": {
+      "ctest_entries": 199,
+      "google_executables": 177,
+      "google_cases": 3252,
+      "failures": 0,
+      "skipped": 0,
+      "receipt": {
+        "path": "/dev/shm/nexus-soc-final-98270512/review-records/native-and-tools-final-98270512-receipt.json",
+        "bytes": 6435,
+        "sha256": "2d0198b39d38178c8d8f474e724c4c361eaaba27cffda728a203507e7fbd4614",
+        "archive_relative_path": "platform/review-records/native-and-tools-final-98270512-receipt.json"
+      }
+    },
+    "tooling": {
+      "configuration_tests": 458,
+      "tool_tests": 585,
+      "ci_tool_tests": 351,
+      "failures": 0,
+      "skipped": 0
+    },
+    "arm": {
+      "linked_images": 121,
+      "provider_assemblies": 105,
+      "expected_rejection_cases": 6,
+      "receipt": {
+        "path": "/dev/shm/nexus-soc-final-98270512/review-records/final-arm-98270512-receipt.json",
+        "bytes": 585,
+        "sha256": "4c780d4dac16070a607bf61c21b635200d5646fca666afe0b46b6e69daf29571",
+        "archive_relative_path": "platform/review-records/final-arm-98270512-receipt.json"
+      }
+    },
+    "arch": {
+      "runtime_variants": 104,
+      "actual_arm_objects": 4359,
+      "cache_profiles": 12,
+      "u575_actual_paired_images": "passed",
+      "paired_image_mutations": 15,
+      "arch_startup_tool_tests": 133,
+      "receipt": {
+        "path": "/dev/shm/nexus-soc-final-98270512/review-records/final-arch-98270512-receipt.json",
+        "bytes": 12162,
+        "sha256": "984265e32f175a53b15c29d118ba092b4536ffd05c7c335c5773c8329a46fce7",
+        "archive_relative_path": "platform/review-records/final-arch-98270512-receipt.json"
+      }
+    },
+    "source_sdk": {
+      "boundary_tests": 59,
+      "actual_child_commands": 258,
+      "linked_arm_consumers": 13,
+      "maps": 13,
+      "generated_bundles": 13,
+      "boundary_fixture_publishable": false,
+      "publishable_sdk_verified_separately": true,
+      "receipt": {
+        "path": "/dev/shm/nexus-soc-final-98270512/review-records/source-sdk-receipt.json",
+        "bytes": 5381,
+        "sha256": "8bb8c937d7b6dd32315795f29ff6f65efc5b201074b692d426d6f482ac5e34e3",
+        "archive_relative_path": "platform/review-records/source-sdk-receipt.json"
+      },
+      "actual_publishable_sdk_check": {
+        "path": "/dev/shm/nexus-soc-final-98270512/additional-scopes/publishable-sdk-verify.json",
+        "bytes": 507,
+        "sha256": "cfe9f7b4eff703dde90458b7ae05830d5966dba9d90d703014a269bd0dcd1cfd",
+        "archive_relative_path": "platform/additional-scopes/publishable-sdk-verify.json"
+      },
+      "manifest": {
+        "path": "/dev/shm/nexus-soc-final-98270512/sdk/share/nexus/src/.nexus-source-sdk.json",
+        "sha256": "34648919540a035b057e7e71621d1059cdd9fa0973e6dc6cfff2887546f5a52c",
+        "size": 739395
+      }
+    },
+    "static_analysis": {
+      "cppcheck_version": "2.13",
+      "clang_tidy_version": "14",
+      "owned_translation_units_each": 358,
+      "report": {
+        "path": "/dev/shm/nexus-soc-final-98270512/verification/static-and-ci-tools/report.json",
+        "bytes": 8409,
+        "sha256": "0560318909e673108377deea77d40edd05870329cc80db3f2cadd47d888e75c8",
+        "archive_relative_path": "platform/verification/static-and-ci-tools/report.json"
+      }
+    },
+    "counting_rule": "Scopes overlap; counts are not additive or a claim of formal proof."
+  },
+  "github_ci": {
+    "run_id": 38256744920,
+    "url": "https://github.com/X-Gen-Lab/nexus/actions/runs/38256744920",
+    "status": "completed",
+    "conclusion": "success",
+    "job_counts": {
+      "success": 29,
+      "failure": 0,
+      "skipped": 1
+    },
+    "normal_skipped_job": "Documentation / Deploy to Pages",
+    "observation": {
+      "path": "/dev/shm/nexus-soc-final-98270512/verification/static-and-ci-tools/github-ci-observation.json",
+      "bytes": 141307,
+      "sha256": "1f8bc58f5dba78134f7347b79af9046b4ca3167f60ffc3d359824365b6bd0bbb"
+    },
+    "native_runs": [
+      {
+        "profile": "native-debug",
+        "job_id": 114836779154,
+        "ctest_entries": 199,
+        "google_test_cases": 3252,
+        "raw_log": {
+          "path": "/dev/shm/nexus-soc-final-98270512/verification/static-and-ci-tools/github-native-debug-success.log",
+          "bytes": 235825,
+          "sha256": "6260651c948bcb3c20ef030545dc3f9fb706572d79c414200515f3c4e1b0e309"
+        }
+      },
+      {
+        "profile": "native-release",
+        "job_id": 114836778972,
+        "ctest_entries": 199,
+        "google_test_cases": 3252,
+        "raw_log": {
+          "path": "/dev/shm/nexus-soc-final-98270512/verification/static-and-ci-tools/github-native-release-success.log",
+          "bytes": 236273,
+          "sha256": "174a782d32a5babe6dbbbe264357954054feb94dc45330f2764facf6a1761132"
+        }
+      },
+      {
+        "profile": "native-asan",
+        "job_id": 114836778991,
+        "ctest_entries": 199,
+        "google_test_cases": 3252,
+        "raw_log": {
+          "path": "/dev/shm/nexus-soc-final-98270512/verification/static-and-ci-tools/github-native-asan-success.log",
+          "bytes": 233991,
+          "sha256": "0fb8adc8b7265c91a37d92b4f6921cef1cbb591171168019f72c63fa30306313"
+        }
+      },
+      {
+        "profile": "native-tsan",
+        "job_id": 114836779082,
+        "ctest_entries": 199,
+        "google_test_cases": 3252,
+        "raw_log": {
+          "path": "/dev/shm/nexus-soc-final-98270512/verification/static-and-ci-tools/github-native-tsan-success.log",
+          "bytes": 235413,
+          "sha256": "19b2e420a4c91ec02239c0c17a1b24a716939448ea7f9c6093e70104e738b2fa"
+        }
+      }
+    ],
+    "artifact_catalog": {
+      "path": "/dev/shm/nexus-soc-final-98270512/verification/static-and-ci-tools/github-artifact-catalog.json",
+      "bytes": 22231,
+      "sha256": "bbce2acc96962d02ee21310d66b12b6c050280759c22c077140ddc8cb6138252"
+    },
+    "artifact_catalog_observed_not_downloaded": true
+  },
+  "offline_candidates": {
+    "status": "software_qualified",
+    "profiles": [
+      {
+        "id": "h743-baremetal-empty",
+        "status": "software_qualified",
+        "candidate": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/h743-baremetal-empty/candidate.json",
+          "bytes": 3227094,
+          "sha256": "dc749cf8d03073b58a46ea5cb6ccaf06c7f32aec4a918ca9e544daeb28e98e26",
+          "archive_relative_path": "platform/offline/candidates/h743-baremetal-empty/candidate.json"
+        },
+        "owned_verification": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/h743-baremetal-empty-verified.json",
+          "bytes": 3227094,
+          "sha256": "dc749cf8d03073b58a46ea5cb6ccaf06c7f32aec4a918ca9e544daeb28e98e26",
+          "archive_relative_path": "platform/offline/candidates/h743-baremetal-empty-verified.json"
+        },
+        "configuration": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-empty/reproduction-runs/run-a/build/generated/resolved.json",
+          "sha256": "5e0eee5acd96b74890dca0b8b81bef4e63aceb9478cf6d990d32ddcf0c92bd1f",
+          "size": 9694
+        },
+        "artifacts": {
+          "bin": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "sha256": "9af78e56acf1306a5c95b385880c539a0338af0ebff9cfa9a50990b6e88499b6",
+            "size": 2440
+          },
+          "elf": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "sha256": "52314b9fc19a13e86df7cfe7ebc7b4f565ace4594f193cff9ba778667ed0563c",
+            "size": 17320
+          },
+          "map": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "2b4d939f0cdbee8bc00226b84aae995b04f88c9acb6b284cc8f893404e538c5d",
+            "size": 33056
+          }
+        },
+        "reproduction": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-empty/reproduction.json",
+          "sha256": "b7680c3194d3297a5262901275ebdbcc3bf54623f7a4efe8e1739c397210bc72",
+          "size": 17309
+        },
+        "maps": [
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "2b4d939f0cdbee8bc00226b84aae995b04f88c9acb6b284cc8f893404e538c5d",
+            "size": 33056
+          },
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-empty/reproduction-runs/different-path-b/build/bin/nexus_firmware.map",
+            "sha256": "2b4d939f0cdbee8bc00226b84aae995b04f88c9acb6b284cc8f893404e538c5d",
+            "size": 33056
+          }
+        ],
+        "linked_resource_observation": {
+          "flash_loaded_bytes": 2437,
+          "flash_footprint_bytes": 2440,
+          "ram_reserved_bytes_by_domain": {
+            "axi-sram": 2104
+          },
+          "msp_reserved_bytes": 2048,
+          "heap_reserved_bytes": 0,
+          "cycles_latency": "not_measured",
+          "dynamic_high_water": "not_measured",
+          "report": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-empty/resources.json",
+            "bytes": 5532,
+            "sha256": "f068e98367bb8daec460fa92b9968e082fa309a76d38e14e565424bbbc533866",
+            "archive_relative_path": "platform/offline/executions/h743-baremetal-empty/resources.json"
+          }
+        }
+      },
+      {
+        "id": "h743-baremetal-uart",
+        "status": "software_qualified",
+        "candidate": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/h743-baremetal-uart/candidate.json",
+          "bytes": 3227093,
+          "sha256": "80f9cd059a5e43344cb7d68ef484a83a06f37a4fe8c824c01609fdc042e93f0b",
+          "archive_relative_path": "platform/offline/candidates/h743-baremetal-uart/candidate.json"
+        },
+        "owned_verification": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/h743-baremetal-uart-verified.json",
+          "bytes": 3227093,
+          "sha256": "80f9cd059a5e43344cb7d68ef484a83a06f37a4fe8c824c01609fdc042e93f0b",
+          "archive_relative_path": "platform/offline/candidates/h743-baremetal-uart-verified.json"
+        },
+        "configuration": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-uart/reproduction-runs/run-a/build/generated/resolved.json",
+          "sha256": "75888bec44e9fbaca5ed3799209eec3edb11dd6fbd8f77a2361d6fde5ff64686",
+          "size": 11158
+        },
+        "artifacts": {
+          "bin": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "sha256": "6ae91bfe067ec561ea1f4208237d3935baffc787fd8ab9adf982106f6fc4ac12",
+            "size": 8708
+          },
+          "elf": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "sha256": "aa9b07730f0846cac3a7404c3376bd2b568fa31d2a86c2c90e6c8a55b94fe36d",
+            "size": 29140
+          },
+          "map": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "cc675a80bdd5c5393d701d9db19c180a4836763f047454d14da75e4776104692",
+            "size": 48940
+          }
+        },
+        "reproduction": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-uart/reproduction.json",
+          "sha256": "61c1a7c60d49d1f9fc61b3297e2eaf48f23dd381939c42fd68e509c3a9d63ec0",
+          "size": 17281
+        },
+        "maps": [
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "cc675a80bdd5c5393d701d9db19c180a4836763f047454d14da75e4776104692",
+            "size": 48940
+          },
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-uart/reproduction-runs/different-path-b/build/bin/nexus_firmware.map",
+            "sha256": "cc675a80bdd5c5393d701d9db19c180a4836763f047454d14da75e4776104692",
+            "size": 48940
+          }
+        ],
+        "linked_resource_observation": {
+          "flash_loaded_bytes": 8708,
+          "flash_footprint_bytes": 8708,
+          "ram_reserved_bytes_by_domain": {
+            "axi-sram": 2360
+          },
+          "msp_reserved_bytes": 2048,
+          "heap_reserved_bytes": 0,
+          "cycles_latency": "not_measured",
+          "dynamic_high_water": "not_measured",
+          "report": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-baremetal-uart/resources.json",
+            "bytes": 5460,
+            "sha256": "6c3ea4ee84c4b8cf2949f78cedb1bc5c69ac149f2aeb83f5a57e35c266d06ecf",
+            "archive_relative_path": "platform/offline/executions/h743-baremetal-uart/resources.json"
+          }
+        }
+      },
+      {
+        "id": "h743-freertos-empty",
+        "status": "software_qualified",
+        "candidate": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/h743-freertos-empty/candidate.json",
+          "bytes": 3227093,
+          "sha256": "0ba66367680d41be458873de2220f6f16c17cc49f6172583184e52e66d2cf569",
+          "archive_relative_path": "platform/offline/candidates/h743-freertos-empty/candidate.json"
+        },
+        "owned_verification": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/h743-freertos-empty-verified.json",
+          "bytes": 3227093,
+          "sha256": "0ba66367680d41be458873de2220f6f16c17cc49f6172583184e52e66d2cf569",
+          "archive_relative_path": "platform/offline/candidates/h743-freertos-empty-verified.json"
+        },
+        "configuration": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-empty/reproduction-runs/run-a/build/generated/resolved.json",
+          "sha256": "6e282c674400072c09e797a1d6dcbba54cce7fe088e3012b0d6b0cbbc5eefaad",
+          "size": 11723
+        },
+        "artifacts": {
+          "bin": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "sha256": "fb9f083134821746971c67081f7e5de812fbe7b75f3c125d8ec360bb08a67a13",
+            "size": 4828
+          },
+          "elf": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "sha256": "8e350d3dec21ad3ad7c5a2d38f454bc70e1f1a18f3c70ccd6fbdf8d37fbb14b2",
+            "size": 24528
+          },
+          "map": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "18a7130a75a7c0354fac5b3708d7f1799827cd9bbdc73046614f88c1b3835f62",
+            "size": 50705
+          }
+        },
+        "reproduction": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-empty/reproduction.json",
+          "sha256": "1fc066ad406e84a98f00b0636640e49f2508d213ccc3a90c2452634a47bd4140",
+          "size": 17285
+        },
+        "maps": [
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "18a7130a75a7c0354fac5b3708d7f1799827cd9bbdc73046614f88c1b3835f62",
+            "size": 50705
+          },
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-empty/reproduction-runs/different-path-b/build/bin/nexus_firmware.map",
+            "sha256": "18a7130a75a7c0354fac5b3708d7f1799827cd9bbdc73046614f88c1b3835f62",
+            "size": 50705
+          }
+        ],
+        "linked_resource_observation": {
+          "flash_loaded_bytes": 4828,
+          "flash_footprint_bytes": 4828,
+          "ram_reserved_bytes_by_domain": {
+            "axi-sram": 3032
+          },
+          "msp_reserved_bytes": 2048,
+          "heap_reserved_bytes": 0,
+          "cycles_latency": "not_measured",
+          "dynamic_high_water": "not_measured",
+          "report": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-empty/resources.json",
+            "bytes": 5460,
+            "sha256": "1a1baffa58f14492dcb0ec2c9b6e1a5656c933341335ceb652f2e375dbf05124",
+            "archive_relative_path": "platform/offline/executions/h743-freertos-empty/resources.json"
+          }
+        }
+      },
+      {
+        "id": "h743-freertos-uart",
+        "status": "software_qualified",
+        "candidate": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/h743-freertos-uart/candidate.json",
+          "bytes": 3227093,
+          "sha256": "f726a0e021b43606b873d5fb927da215877ac4aacaa77b0f3e4920bf2c38cd13",
+          "archive_relative_path": "platform/offline/candidates/h743-freertos-uart/candidate.json"
+        },
+        "owned_verification": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/h743-freertos-uart-verified.json",
+          "bytes": 3227093,
+          "sha256": "f726a0e021b43606b873d5fb927da215877ac4aacaa77b0f3e4920bf2c38cd13",
+          "archive_relative_path": "platform/offline/candidates/h743-freertos-uart-verified.json"
+        },
+        "configuration": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-uart/reproduction-runs/run-a/build/generated/resolved.json",
+          "sha256": "5aae29edd9bd0f99554c88a39e6fc5f1441ef23225e89159942c45e00f8accff",
+          "size": 13187
+        },
+        "artifacts": {
+          "bin": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "sha256": "3edaba8e7732c96442eb5d18158644223b4eba271447b5a03ef93a25b69dab52",
+            "size": 11100
+          },
+          "elf": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "sha256": "0b6823bb0d4588c72884af5f38bb6b2731f84ff34c9092fc842278f160286655",
+            "size": 32256
+          },
+          "map": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "10dfcd1d9d84056b42f77f222633936fa88b6055811f77b3fe9637d25db04b23",
+            "size": 66472
+          }
+        },
+        "reproduction": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-uart/reproduction.json",
+          "sha256": "0d3590e0636f580770e5b521d51677ac5830e1d43728cc51ad88018aabfd3003",
+          "size": 17258
+        },
+        "maps": [
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "10dfcd1d9d84056b42f77f222633936fa88b6055811f77b3fe9637d25db04b23",
+            "size": 66472
+          },
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-uart/reproduction-runs/different-path-b/build/bin/nexus_firmware.map",
+            "sha256": "10dfcd1d9d84056b42f77f222633936fa88b6055811f77b3fe9637d25db04b23",
+            "size": 66472
+          }
+        ],
+        "linked_resource_observation": {
+          "flash_loaded_bytes": 11100,
+          "flash_footprint_bytes": 11100,
+          "ram_reserved_bytes_by_domain": {
+            "axi-sram": 3284
+          },
+          "msp_reserved_bytes": 2048,
+          "heap_reserved_bytes": 0,
+          "cycles_latency": "not_measured",
+          "dynamic_high_water": "not_measured",
+          "report": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/h743-freertos-uart/resources.json",
+            "bytes": 5521,
+            "sha256": "3628a31d295e72864d022d5a6f245b64404d7fafc2e7d8527640a10443014857",
+            "archive_relative_path": "platform/offline/executions/h743-freertos-uart/resources.json"
+          }
+        }
+      },
+      {
+        "id": "u575-baremetal-empty",
+        "status": "software_qualified",
+        "candidate": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/u575-baremetal-empty/candidate.json",
+          "bytes": 3227094,
+          "sha256": "43040ffa77c573d06ca88ec15a0ceca0ed0be3299bc215dd7b9d30c739a6d400",
+          "archive_relative_path": "platform/offline/candidates/u575-baremetal-empty/candidate.json"
+        },
+        "owned_verification": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/u575-baremetal-empty-verified.json",
+          "bytes": 3227094,
+          "sha256": "43040ffa77c573d06ca88ec15a0ceca0ed0be3299bc215dd7b9d30c739a6d400",
+          "archive_relative_path": "platform/offline/candidates/u575-baremetal-empty-verified.json"
+        },
+        "configuration": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-empty/reproduction-runs/run-a/build/generated/resolved.json",
+          "sha256": "94dda86cebdc0aac071fdbb799008b97e024dbb69d63a2dca047fbffcdf6048f",
+          "size": 13739
+        },
+        "artifacts": {
+          "bin": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "sha256": "a8fd34e6becab198fd4dd4a0fcb27c1795a80ef406d6c5d74da7b45e0bcc9e01",
+            "size": 2124
+          },
+          "elf": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "sha256": "36797d537a81fb56a5c35a0d155618b87badb9b9b27ed7a4479057d0ab26b7ff",
+            "size": 16568
+          },
+          "map": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "4919c2889c23f18f56436219fce023e524c4f9dde5b6b4d59efded5847e0116b",
+            "size": 29305
+          }
+        },
+        "reproduction": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-empty/reproduction.json",
+          "sha256": "36bb18d47f2bf69041ed1003d3c0bcb8d800516d5dcda0ac4c96b839bac75a0a",
+          "size": 17308
+        },
+        "maps": [
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "4919c2889c23f18f56436219fce023e524c4f9dde5b6b4d59efded5847e0116b",
+            "size": 29305
+          },
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-empty/reproduction-runs/different-path-b/build/bin/nexus_firmware.map",
+            "sha256": "4919c2889c23f18f56436219fce023e524c4f9dde5b6b4d59efded5847e0116b",
+            "size": 29305
+          }
+        ],
+        "linked_resource_observation": {
+          "flash_loaded_bytes": 2121,
+          "flash_footprint_bytes": 2124,
+          "ram_reserved_bytes_by_domain": {
+            "sram1": 2112
+          },
+          "msp_reserved_bytes": 2048,
+          "heap_reserved_bytes": 0,
+          "cycles_latency": "not_measured",
+          "dynamic_high_water": "not_measured",
+          "report": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-empty/resources.json",
+            "bytes": 4514,
+            "sha256": "bd1f97b5dbf1aa6d12e9fb13e9e47ccc459b7a5d01f7bf7227de11fb92b39bce",
+            "archive_relative_path": "platform/offline/executions/u575-baremetal-empty/resources.json"
+          }
+        }
+      },
+      {
+        "id": "u575-baremetal-uart",
+        "status": "software_qualified",
+        "candidate": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/u575-baremetal-uart/candidate.json",
+          "bytes": 3227093,
+          "sha256": "5ea5ce557b57ee0a5e79828c06676f5e6322c19ec03b3e6cab4d757d48754194",
+          "archive_relative_path": "platform/offline/candidates/u575-baremetal-uart/candidate.json"
+        },
+        "owned_verification": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/u575-baremetal-uart-verified.json",
+          "bytes": 3227093,
+          "sha256": "5ea5ce557b57ee0a5e79828c06676f5e6322c19ec03b3e6cab4d757d48754194",
+          "archive_relative_path": "platform/offline/candidates/u575-baremetal-uart-verified.json"
+        },
+        "configuration": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-uart/reproduction-runs/run-a/build/generated/resolved.json",
+          "sha256": "a6f3cea88d5b7003f885f7119c350aa0db587bad2b3c22cb692fa2571ca519b1",
+          "size": 15212
+        },
+        "artifacts": {
+          "bin": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "sha256": "0a00c911829ee614c5d7ca69b95de04acac533758da81c4199501f6cb7137d3a",
+            "size": 8364
+          },
+          "elf": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "sha256": "cce89b6c26241b747141b1eb53331a19f4669fdbe12b0facd8dc7f5d85878e83",
+            "size": 28296
+          },
+          "map": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "58f8f8fe06fd59757046e348c591fcf9985c4073c7f7119f8ea7a13547a8346a",
+            "size": 44821
+          }
+        },
+        "reproduction": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-uart/reproduction.json",
+          "sha256": "c1afcabe1fc0ce2b259145edcd03193f475362443a0288ef86b6f960f42a1816",
+          "size": 17284
+        },
+        "maps": [
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "58f8f8fe06fd59757046e348c591fcf9985c4073c7f7119f8ea7a13547a8346a",
+            "size": 44821
+          },
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-uart/reproduction-runs/different-path-b/build/bin/nexus_firmware.map",
+            "sha256": "58f8f8fe06fd59757046e348c591fcf9985c4073c7f7119f8ea7a13547a8346a",
+            "size": 44821
+          }
+        ],
+        "linked_resource_observation": {
+          "flash_loaded_bytes": 8364,
+          "flash_footprint_bytes": 8364,
+          "ram_reserved_bytes_by_domain": {
+            "sram1": 2368
+          },
+          "msp_reserved_bytes": 2048,
+          "heap_reserved_bytes": 0,
+          "cycles_latency": "not_measured",
+          "dynamic_high_water": "not_measured",
+          "report": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-baremetal-uart/resources.json",
+            "bytes": 4441,
+            "sha256": "065d9428b1756f79ee82678545a98953dd21b137d3a40124f5d78a4c51d91ccb",
+            "archive_relative_path": "platform/offline/executions/u575-baremetal-uart/resources.json"
+          }
+        }
+      },
+      {
+        "id": "u575-freertos-empty",
+        "status": "software_qualified",
+        "candidate": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/u575-freertos-empty/candidate.json",
+          "bytes": 3227093,
+          "sha256": "ba6d9c2d0b16065779fd96b3b993a9e4d289a2ef50be439f839d279e26031faa",
+          "archive_relative_path": "platform/offline/candidates/u575-freertos-empty/candidate.json"
+        },
+        "owned_verification": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/u575-freertos-empty-verified.json",
+          "bytes": 3227093,
+          "sha256": "ba6d9c2d0b16065779fd96b3b993a9e4d289a2ef50be439f839d279e26031faa",
+          "archive_relative_path": "platform/offline/candidates/u575-freertos-empty-verified.json"
+        },
+        "configuration": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-empty/reproduction-runs/run-a/build/generated/resolved.json",
+          "sha256": "4dfb851f9aefe4bed3e26b396f7d7c39a3770b338206c9efdd6828c49597acb3",
+          "size": 15832
+        },
+        "artifacts": {
+          "bin": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "sha256": "855bbaa9272f172c9af57df2721d72bf9591a9a504dd0c534157275e88434927",
+            "size": 4548
+          },
+          "elf": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "sha256": "f080514eb8c6b84d4c5617817472d20b3a306f98e1f2fb0a436299b3503b7ea3",
+            "size": 23972
+          },
+          "map": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "bc34694b0fb84228a0178b4cd5e447f364573939eeb65ddf36e3654bc78336f3",
+            "size": 48713
+          }
+        },
+        "reproduction": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-empty/reproduction.json",
+          "sha256": "52549e57a5ace463dc95497051dd2fa486ec8a6f6ec6dba3ec2826c8b7d41403",
+          "size": 17284
+        },
+        "maps": [
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-empty/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "bc34694b0fb84228a0178b4cd5e447f364573939eeb65ddf36e3654bc78336f3",
+            "size": 48713
+          },
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-empty/reproduction-runs/different-path-b/build/bin/nexus_firmware.map",
+            "sha256": "bc34694b0fb84228a0178b4cd5e447f364573939eeb65ddf36e3654bc78336f3",
+            "size": 48713
+          }
+        ],
+        "linked_resource_observation": {
+          "flash_loaded_bytes": 4548,
+          "flash_footprint_bytes": 4548,
+          "ram_reserved_bytes_by_domain": {
+            "sram1": 3040
+          },
+          "msp_reserved_bytes": 2048,
+          "heap_reserved_bytes": 0,
+          "cycles_latency": "not_measured",
+          "dynamic_high_water": "not_measured",
+          "report": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-empty/resources.json",
+            "bytes": 4441,
+            "sha256": "9181632c8e4d518134c039a1638d80f436eab9946bbc03980e27582a0f3a5b7f",
+            "archive_relative_path": "platform/offline/executions/u575-freertos-empty/resources.json"
+          }
+        }
+      },
+      {
+        "id": "u575-freertos-uart",
+        "status": "software_qualified",
+        "candidate": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/u575-freertos-uart/candidate.json",
+          "bytes": 3227093,
+          "sha256": "dd16a616301cd2296e6ae0cedeb42bf22f8de83f396387396fb93481b2804819",
+          "archive_relative_path": "platform/offline/candidates/u575-freertos-uart/candidate.json"
+        },
+        "owned_verification": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/candidates/u575-freertos-uart-verified.json",
+          "bytes": 3227093,
+          "sha256": "dd16a616301cd2296e6ae0cedeb42bf22f8de83f396387396fb93481b2804819",
+          "archive_relative_path": "platform/offline/candidates/u575-freertos-uart-verified.json"
+        },
+        "configuration": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-uart/reproduction-runs/run-a/build/generated/resolved.json",
+          "sha256": "74dbf112c27ab6401d9cb87fb6a6dde00126499410eee2856c73ab2e96f9ec10",
+          "size": 17305
+        },
+        "artifacts": {
+          "bin": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.bin",
+            "sha256": "3ab1361834c151768c71cd730fdbce073b48909f6a47ffa5561006ede9d66aa4",
+            "size": 10804
+          },
+          "elf": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.elf",
+            "sha256": "afe572e44953cbb7b1b4dc659d7a19c263aa2f04911c2716d59e99c2c5604fae",
+            "size": 31604
+          },
+          "map": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "4fc7c5e3de8b44949a0561b04cc6f3b321aaa5a2b01469bc20bdde9f6486cacc",
+            "size": 64150
+          }
+        },
+        "reproduction": {
+          "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-uart/reproduction.json",
+          "sha256": "e89452d3bcd1144ddc66ad14d90bbb8fe29213989ac9802646b1bcbe264c3d38",
+          "size": 17258
+        },
+        "maps": [
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-uart/reproduction-runs/run-a/build/bin/nexus_firmware.map",
+            "sha256": "4fc7c5e3de8b44949a0561b04cc6f3b321aaa5a2b01469bc20bdde9f6486cacc",
+            "size": 64150
+          },
+          {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-uart/reproduction-runs/different-path-b/build/bin/nexus_firmware.map",
+            "sha256": "4fc7c5e3de8b44949a0561b04cc6f3b321aaa5a2b01469bc20bdde9f6486cacc",
+            "size": 64150
+          }
+        ],
+        "linked_resource_observation": {
+          "flash_loaded_bytes": 10804,
+          "flash_footprint_bytes": 10804,
+          "ram_reserved_bytes_by_domain": {
+            "sram1": 3292
+          },
+          "msp_reserved_bytes": 2048,
+          "heap_reserved_bytes": 0,
+          "cycles_latency": "not_measured",
+          "dynamic_high_water": "not_measured",
+          "report": {
+            "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/u575-freertos-uart/resources.json",
+            "bytes": 4502,
+            "sha256": "ef798d799e90a69ce8d07098f933b25a98bf022edb4c2ac6a3cfd526c456e78d",
+            "archive_relative_path": "platform/offline/executions/u575-freertos-uart/resources.json"
+          }
+        }
+      }
+    ],
+    "fresh_independent_builds": 16,
+    "network_none_container_commands": 32,
+    "elf_bin_comparison": "All eight pairs are byte-identical; both original maps retained",
+    "required_scopes": [
+      "arm_link",
+      "host_contracts",
+      "source_sdk",
+      "resource_budget",
+      "reproducibility",
+      "hil_tooling"
+    ],
+    "scope_index": {
+      "path": "/dev/shm/nexus-soc-final-98270512/additional-scopes/index.json",
+      "bytes": 7382,
+      "sha256": "fb14e080503294bbd6e09e3b26c411f253d1ecb068997b1b415d7ed76505616d",
+      "archive_relative_path": "platform/additional-scopes/index.json"
+    },
+    "plan": {
+      "path": "/dev/shm/nexus-soc-final-98270512/offline/plan.json",
+      "bytes": 6013,
+      "sha256": "2fbf671d10408e6a71be3325fa0ca1557233db32b4926279971230b8f8679452",
+      "archive_relative_path": "platform/offline/plan.json"
+    },
+    "execution": {
+      "path": "/dev/shm/nexus-soc-final-98270512/offline/executions/report.json",
+      "bytes": 25079,
+      "sha256": "cf2a0e015d8d4e7d61fcd333f990497d5405f0e2248f336021ce652e8a7bd532",
+      "archive_relative_path": "platform/offline/executions/report.json"
+    },
+    "oci_config_identity": "sha256:a1ba03c16d424aef88dad6e5b2ead2892734a0bf909dedc23d8855fa4861fbe0",
+    "toolchain": {
+      "bytes": 1106755364,
+      "files": 7190,
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi",
+      "sha256": "44d2fe14e401730074302ad87bdef9762a6cfe12de4bebc6853d181fd51c74fd"
+    },
+    "build_environment": {
+      "path": "/workspace/nexus-nextgen-oci/environment.json",
+      "sha256": "57ab25b3b778caf5f36674816a5d4587b48a66be38b72b3fa34311e5fd6400a0",
+      "size": 1235
+    },
+    "configuration_boundary": "H743 HSI64 Cache-off IRQ UART and U575 MSIS4 TZEN0; empty/selected by baremetal/FreeRTOS. H743 cache/DMA and U575 paired-image references have separate ARM evidence and are outside these eight single-image candidates.",
+    "product_release": false,
+    "signed": false,
+    "physical_status": "not_executed",
+    "runner_execution_report": {
+      "path": "/dev/shm/nexus-soc-final-98270512/review-records/offline-runner/final-candidates-execution-report.json",
+      "bytes": 30366,
+      "sha256": "24e4a032abffa573ef229a799083cd38d133d39961f419919db629da7da6cfe7",
+      "archive_relative_path": "platform/review-records/offline-runner/final-candidates-execution-report.json"
+    },
+    "independent_review": {
+      "path": "/dev/shm/nexus-soc-final-98270512/verification/independent-candidates/final-independent-review.json",
+      "bytes": 22641,
+      "sha256": "8bc2e12d2d96afd62029dc9a884547fc97d92fbc604d3f231d9d74dd283aa1f7",
+      "archive_relative_path": "platform/verification/independent-candidates/final-independent-review.json"
+    },
+    "relocated_verification": {
+      "candidates": 8,
+      "actual_verifier_exit_codes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_evidence_read_attempts": 0,
+      "original_candidates_unchanged": true
+    }
+  },
+  "external_examples": {
+    "repository": "https://github.com/X-Gen-Lab/nexus-examples",
+    "qualified_code_commit": "3de8523811b00da8bd887abf53e61eedbaf5161e",
+    "qualified_code_tree": "1b9b3245da8a1b5c797479d68bb5001f73f06dbf",
+    "documentation_commit": "a501fbd6ee69172594cd51c15ba7307621cec924",
+    "sdk_commit": "98270512ea2ff7eefe8ff79720018e582be3a949",
+    "ctest_entries": 8,
+    "google_cases": 43,
+    "tool_tests": 44,
+    "arm_images": 20,
+    "resource_checks": 20,
+    "hil_plans": 10,
+    "physical_status": "not_executed",
+    "report": {
+      "path": "/dev/shm/nexus-soc-final-98270512/verification/examples/report.json",
+      "bytes": 170242,
+      "sha256": "84c884b6b14283b53f9b4cba440ac4be8c3f26ad95332c0172ac88c622b9e787",
+      "archive_relative_path": "platform/verification/examples/report.json"
+    },
+    "independent_review": {
+      "path": "/dev/shm/nexus-soc-final-98270512/verification/independent-examples/report.json",
+      "bytes": 10605,
+      "sha256": "9f4a2a3165814ae487eee261fa986390a274714e0b922d845d6e65caf93c00bb",
+      "archive_relative_path": "platform/verification/independent-examples/report.json"
+    },
+    "remote_ci_qualification": "not_established_by_this_local_record"
+  },
+  "support_boundaries": {
+    "baseline_mechanisms_contracts_and_tools": 27,
+    "partial_reference_items": [
+      "SOC-28",
+      "SOC-29",
+      "SOC-30",
+      "SOC-31",
+      "SOC-32",
+      "SOC-36"
+    ],
+    "not_implemented": {
+      "SOC-33": "Bootloader/running-state handoff",
+      "SOC-34": "Dynamic frequency changes",
+      "SOC-35": "Deep STOP with continuous time"
+    },
+    "hardware_pending_items": "SOC-37 through SOC-55: 19 tooling scopes; no physical execution",
+    "silicon_errata_applicability": "SOC-05 remains pending exact silicon/mode review",
+    "original_55_exit_conditions": "unchanged",
+    "full_55_item_acceptance": false
+  },
+  "historical_attempts": [
+    {
+      "source": "3728b334b02eb2eb70bcf5d4caafbb9746837dd3",
+      "scope": "Earlier software baseline only",
+      "qualifies_current_source": false
+    },
+    {
+      "source": "63b3cc9a3213a6f6fd760d4e9447f3707dd5dd4e",
+      "scope": "Earlier failed/incomplete tooling and CI attempt; original archive retained",
+      "qualifies_current_source": false
+    },
+    {
+      "source": "646a331c6b0ccde25ced0694067458acfa23d873",
+      "scope": "Local complete suites passed, but actual GitHub ASan failed on U575 register-mask width. Offline capacity interruption and supplemental GCC13 diagnostic interruption retain original nonzero exits. No candidate qualified.",
+      "ci_failure": {
+        "path": "/dev/shm/nexus-soc-final-98270512/review-records/historical-646-ci-asan-failure.log",
+        "bytes": 188924,
+        "sha256": "a0abb60b5af8aeaa4865cdf1da275b14cd953af096adf3d7c6cf1eab3413ad60",
+        "archive_relative_path": "platform/review-records/historical-646-ci-asan-failure.log"
+      },
+      "diagnostic_interruption": {
+        "path": "/dev/shm/nexus-soc-final-98270512/review-records/historical-gcc13-interruption-receipt.json",
+        "bytes": 3537,
+        "sha256": "3f48411f1775327fb8102923e833fc3a732566a3329f60b8ebef12e933ad9694",
+        "archive_relative_path": "platform/review-records/historical-gcc13-interruption-receipt.json"
+      },
+      "qualifies_current_source": false
+    }
+  ],
+  "regression_and_normal_hook_evidence": {
+    "path": "/dev/shm/nexus-soc-final-98270512/review-records/regression-and-hook-archive.json",
+    "bytes": 733680,
+    "sha256": "0544bba6dd2987101c547f8f9de0f7362290145aac49dbd000e21eac50d5f248",
+    "archive_relative_path": "platform/review-records/regression-and-hook-archive.json"
+  },
+  "native_source_archive": {
+    "path": "/dev/shm/nexus-soc-final-98270512/review-records/native-source-archive-receipt.json",
+    "bytes": 2440,
+    "sha256": "0c7bbf7d1a59d7cc6ef81920b73515085795a68d9deeeec5a006c8f7ebb36bd0",
+    "archive_relative_path": "platform/review-records/native-source-archive-receipt.json"
+  },
+  "limitations": {
+    "physical_hil": "not_executed",
+    "cycles_latency_wcet_power": "not_measured",
+    "formal_proof": false,
+    "product_release": false,
+    "safety_certification": false,
+    "toolchain_and_oci_binaries_embedded": false,
+    "rebuild_prerequisite": "Provision the recorded toolchain and OCI environment; identities and recipes do not replace those external tool binaries.",
+    "native_binary_provenance": "Archive-time fingerprints and original execution records are retained; no historical execution-time binary signature is invented."
+  },
+  "evidence_archive": {
+    "location_scope": "Local durable workspace archive; not a published GitHub Release or product artifact.",
+    "archive": {
+      "path": "/workspace/nexus-soc-delivery-98270512/platform-evidence.tar.gz",
+      "bytes": 1269027807,
+      "sha256": "3aae3a6b96701ce1a042cb4e43078d00d59ba5460ebc4816fa68e2fe4a8fe41c"
+    },
+    "manifest": {
+      "path": "/workspace/nexus-soc-delivery-98270512/platform-evidence-manifest.json",
+      "bytes": 62151996,
+      "sha256": "ef3583cd4b7ceac71f48e3b51a59545540879eeb0a4719d973eb79c61f56ed04"
+    },
+    "embedded_manifest": "delivery-manifest.json",
+    "original_root": "/dev/shm/nexus-soc-final-98270512",
+    "archive_prefix": "platform/",
+    "entries": 216230,
+    "regular_files": 173376,
+    "uncompressed_file_bytes": 3682272631,
+    "original_evidence_unchanged": true,
+    "original_evidence_retained": true,
+    "archive_verification": {
+      "path": "/workspace/nexus-soc-delivery-98270512/platform-archive-verification.json",
+      "bytes": 708,
+      "sha256": "1251d4d81061841e37485e9e7099a94a24c9dc37e49402c8bc21daf98b3ed4db"
+    },
+    "navigation": "Original raw reports retain their execution paths and hashes. Map the recorded root to platform/; extra roots and nested archives have per-file mappings in review-records manifests/copy indexes. Candidate payload verification resolves by SHA and has passed with original evidence roots denied.",
+    "independent_review": {
+      "path": "/workspace/nexus-soc-delivery-98270512/independent-archive-review.json",
+      "bytes": 165419,
+      "sha256": "664653cc90ff3f5712bde019a42c64b7465c224379c7f588df04c03bf4764a44"
+    },
+    "independent_review_clarification": {
+      "path": "/workspace/nexus-soc-delivery-98270512/independent-archive-review-clarification.json",
+      "bytes": 1304,
+      "sha256": "aa0d74a6e2433da1cf7aae305a85e7d227dc545ee83444e1ae4fd33405d154b3"
+    },
+    "independent_streaming_verification": "passed; all outer members, nested archives, candidate closures and source identities verified from archive bytes"
+  }
+}

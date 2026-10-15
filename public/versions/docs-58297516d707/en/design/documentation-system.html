@@ -1,0 +1,579 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Nexus documentation-system architecture and delivery plan &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Nexus documentation page templates" href="documentation-templates.html" />
+    <link rel="prev" title="Nexus documentation content and diagram standards" href="documentation-standards.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/documentation-system.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/design/documentation-system.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="nexus">
+<h1>Nexus documentation-system architecture and delivery plan<a class="headerlink" href="#nexus" title="Link to this heading">¶</a></h1>
+<p>Organize maintained contracts, public APIs, usage guidance and evidence into task-oriented, versioned, independently obtainable offline documentation. Reuse Markdown/public headers with Sphinx, Doxygen and Breathe, adding MyST. Product code/policy stays external.</p>
+<p>The site, CLI, locks, prose, translations and diagram set implement this plan. Actual build/publication/recovery follows the <a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">58-item</span> <span class="pre">implementation</span> <span class="pre">ledger</span></code></a> and execution evidence; the <a class="reference download internal" download="" href="../_downloads/c842ae0910b28a190d5978c12c524a50/documentation-migration.csv"><code class="xref download docutils literal notranslate"><span class="pre">migration</span> <span class="pre">mapping</span></code></a> records destinations/retention. This document changes no platform support, software qualification or physical status. New/changed docs follow <a class="reference internal" href="documentation-standards.html"><span class="std std-doc">content/diagram standards</span></a> and <a class="reference internal" href="documentation-templates.html"><span class="std std-doc">templates</span></a>. The <a class="reference internal" href="documentation-improvements.html"><span class="std std-doc">complete checklist</span></a> derives from that ledger; <a class="reference internal" href="../assets/diagrams/README.html"><span class="std std-doc">diagrams</span></a> distinguish current/target views.</p>
+<section id="id1">
+<h2>1. 目标和边界<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>Help application developers use the platform correctly first, integrators extend it second, and maintainers/reviewers assess changes/evidence third. Readers complete definite tasks without traversing implementation history first.</p>
+<ul class="simple">
+<li><p>Applications use current static instances, typed factories and C polymorphic interfaces.</p></li>
+<li><p>One authored TOML is the default configuration; maintained JSON supplies SoC/Board facts.</p></li>
+<li><p>Integration guidance retains context, deadlines, borrowing, draining and recovery.</p></li>
+<li><p>Production support, software tests, ARM links, candidates and HIL are separate.</p></li>
+<li><p>Documents, source, configuration and qualified baselines have explicit identities.</p></li>
+<li><p>Maintain authoritative contracts once; other pages link/include/derive them.</p></li>
+<li><p>Links/search/offline packages cover current prose; history has visible boundaries.</p></li>
+</ul>
+<p>Docs create no product apps/tasks/private PCBs/Flash partitions/secure-update/recovery policy. Tutorials pin X-Gen-Lab/nexus-examples; platform source keeps only common fixtures/validation code. Publication does not promote models/linking into hardware qualification.</p>
+</section>
+<section id="id2">
+<h2>2. 首页从读者任务进入<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Reader</p></th>
+<th class="head"><p>Home-page path</p></th>
+<th class="head"><p>Outcome</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Application developer</p></td>
+<td><p>Pin source → use SDK → choose Board/OS → configure instances → factory lookup → I/O → shutdown.</p></td>
+<td><p>A buildable external project with correct resource lifecycles.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Platform integrator</p></td>
+<td><p>New Board → SoC/provider → reusable device/component → model/ARM/HIL.</p></td>
+<td><p>An integration slice with explicit scope, resources and validation.</p></td>
+</tr>
+<tr class="row-even"><td><p>Maintainer</p></td>
+<td><p>Pin source → install tools → TDD → review → dependency upgrades → SDK/docs delivery.</p></td>
+<td><p>Traceable changes and recoverable delivery.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Acceptance reviewer</p></td>
+<td><p>Support matrix → exact configuration → software records → candidate → physical status.</p></td>
+<td><p>Qualification judgments for exact baselines.</p></td>
+</tr>
+<tr class="row-even"><td><p>Legacy user</p></td>
+<td><p>Configuration migration → interface migration → ownership changes → revalidation.</p></td>
+<td><p>A new consumer independent of old APIs.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Tutorials follow one verified path; how-to guides solve one goal; references give exact rules; explanations describe principles/tradeoffs. Keep home sidebars two levels deep, using domain indexes for complexity. Search excludes historical tutorials/large raw evidence by default and labels version, page category, actual prose language and translation state. Summaries prioritize tasks/technical content, with source/qualification shown separately so repeated disclaimers do not dominate. First operations reference <a class="reference internal" href="../guides/source-checkout.html"><span class="std std-doc">pinned source/recursive dependencies</span></a>; never assume GitHub branches match the documentation version.</p>
+</section>
+<section id="id3">
+<h2>3. 内容权威和派生关系<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Content</p></th>
+<th class="head"><p>Authority</p></th>
+<th class="head"><p>Site handling</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Public declarations and individual API contracts</p></td>
+<td><p>Public headers in core/arch/io/os/components.</p></td>
+<td><p>Generated Doxygen/Breathe; guides link symbols.</p></td>
+</tr>
+<tr class="row-odd"><td><p>CPU/chip/route/Board facts</p></td>
+<td><p>SoC/Board JSON, production resolver and source review.</p></td>
+<td><p>Reuse capability derivation with explicit human-written limitations.</p></td>
+</tr>
+<tr class="row-even"><td><p>Cross-API lifecycles/execution order</p></td>
+<td><p>Current system-contract prose.</p></td>
+<td><p>Include directly; tutorials do not define norms retroactively.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Configuration syntax/rejections</p></td>
+<td><p>Production resolver, typed IR and contracts.</p></td>
+<td><p>Actually parse complete examples; label fragments.</p></td>
+</tr>
+<tr class="row-even"><td><p>Engineering/style requirements</p></td>
+<td><p>AGENTS, existing style files and engineering contracts.</p></td>
+<td><p>Preserve rules and connect actionable procedures.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Implementation support</p></td>
+<td><p>Production implementation/selection, reviewed facts and explicit boundaries.</p></td>
+<td><p>One authoritative support entry; others summarize/link.</p></td>
+</tr>
+<tr class="row-even"><td><p>Executed qualification</p></td>
+<td><p>Exact-source result indexes and raw receipts.</p></td>
+<td><p>Show scope, configuration, tools and artifact identity.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Plans/exit conditions</p></td>
+<td><p>Domain CSV ledgers.</p></td>
+<td><p>Derived task views, not duplicate status databases.</p></td>
+</tr>
+<tr class="row-even"><td><p>File organization/maintenance map</p></td>
+<td><p>Source-adjacent READMEs.</p></td>
+<td><p>Retain local entries; include/version-link public portions.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Historical designs/counts</p></td>
+<td><p>docs/archive</p></td>
+<td><p>Separate historical entries establish no current qualification.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Chip capability, implemented modes, authorized Board wiring, software execution and HIL passes are distinct facts. Derived tables consume existing authorities without new capability/qualification rules. CSV implemented does not automatically become accepted. Overlapping ledgers cannot sum into completion percentages. Preserve original IDs, exit conditions and failed attempts.</p>
+</section>
+<section id="id4">
+<h2>4. 目标目录与渐进接入<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>docs/
+├── index.md                      任务入口、版本与资格边界
+├── tutorials/                    首次完成一个可验证流程
+├── guides/                       使用、接入、取消/排空、故障处理
+├── reference/
+│   ├── api/                      Core/Arch/I/O/OS/Components
+│   ├── configuration/            TOML、facts、IR、预算、CLI
+│   ├── platforms/                CPU/SoC/Board 精确支持切片
+│   └── contracts/                当前有效系统合同
+├── explanation/                  架构、factory、所有权、资源和取舍
+├── status/                       支持、当前资格、HIL、发布、台账视图
+├── development/                  风格、TDD、评审、依赖与文档维护
+├── design/                       活跃方案、决策和原始专项台账
+├── delivery/                     保留原路径的执行记录与结果索引
+├── locale/                       gettext/PO 翻译
+├── assets/                       本地图片、图源和样式
+├── sphinx/                       迁移期配置与 API/RST 包装页
+└── archive/                      历史资料，不进入默认站点搜索
+</pre></div>
+</div>
+<p>First change the source root to docs/, retaining docs/sphinx/conf.py during migration. MyST makes design/delivery Markdown navigable/searchable pages. Integrate prose/fix entries before moving mutable content by mapping; do not move everything before repairing references.</p>
+<p>toctree is the sole navigation composition; READMEs are repository entry points. Initially navigate existing paths, then retain stable page IDs with a small redirect table. Resolve links by actual source location and check every reference/explicit anchor on moves. Review reorganization separately from normative changes.</p>
+<p>Retain original source paths for:</p>
+<ul class="simple">
+<li><p>Three existing delivery-results JSON indexes and execution records.</p></li>
+<li><p>Six original domain CSV ledgers and this documentation-system ledger.</p></li>
+<li><p>Original archive content, IDs and historical qualification.</p></li>
+<li><p>Tool-input contracts until references/gates migrate together successfully.</p></li>
+</ul>
+<p>Status pages reference/derive these sources without rewriting receipts. External archives preserve original bytes/member locations. New paths do not fabricate old-source execution or change archive identity.</p>
+</section>
+<section id="id5">
+<h2>5. 技术选择<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Decision</p></th>
+<th class="head"><p>Choice/rationale</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Site</p></td>
+<td><p>Reuse Sphinx with existing strict CI/C API cross-references.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Prose</p></td>
+<td><p>Markdown/MyST; keep RST for API directives/transition pages.</p></td>
+</tr>
+<tr class="row-even"><td><p>API</p></td>
+<td><p>Public-only Doxygen XML + Breathe; preserve comment style.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Translation</p></td>
+<td><p>One canonical source plus Sphinx gettext/PO; one translation chain.</p></td>
+</tr>
+<tr class="row-even"><td><p>Navigation</p></td>
+<td><p>toctree/module indexes; no independent content database.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Status</p></td>
+<td><p>Reuse capability derivation, result indexes, CSV and identity tools.</p></td>
+</tr>
+<tr class="row-even"><td><p>Theme</p></td>
+<td><p>Retain current theme first; evaluate separately after content/search acceptance.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Diagrams</p></td>
+<td><p>Editable DOT + local SVG with locked Graphviz; Sphinx graphviz may be used.</p></td>
+</tr>
+<tr class="row-even"><td><p>Delivery</p></td>
+<td><p>Relative-link HTML packages/manifests without CDNs.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>No switch to MkDocs/Docusaurus or extra frontend runtime for basic navigation. Evaluate extensions against real failing examples when MyST/Sphinx is insufficient. Do not maintain a second contents/capabilities table or universal snippet DSL per document.</p>
+<p>Exclude archives, generated Doxygen, _build, raw logs, large archives and fixture outputs. Status pages provide readable summaries/download indexes rather than indexing all evidence. Source-adjacent READMEs are not copied contracts; inclusion verifies relocated links. Other source links bind the site Git revision, avoiding moving development branches.</p>
+</section>
+<section id="api">
+<h2>6. 页面和 API 组织<a class="headerlink" href="#api" title="Link to this heading">¶</a></h2>
+<p>New public pages use standard MyST front matter with a few maintained fields:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">guides.cancel-and-drain</span>
+<span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">how-to</span>
+<span class="nt">audience</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">consumer</span>
+<span class="nt">source_language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">zh_CN</span>
+</pre></div>
+</div>
+<p>id identifies pages/migration but does not automatically create MyST anchors. Public anchors use explicit targets/Sphinx labels retained and actually built after path changes; redirects handle old URLs without another reference framework. Derive versions, updates, source links and validation from Git/execution inputs rather than handwritten timestamps/copied hashes. Add legacy metadata in batches without defaults fabricating language or qualification.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Page type</p></th>
+<th class="head"><p>Required content</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>tutorial</p></td>
+<td><p>Goals, exact prerequisites, pinned configuration, complete steps, expectations and cleanup.</p></td>
+</tr>
+<tr class="row-odd"><td><p>how-to</p></td>
+<td><p>One task, contexts, minimum steps, failure handling and scope.</p></td>
+</tr>
+<tr class="row-even"><td><p>reference</p></td>
+<td><p>Fields/symbols, ranges, units, rejections and authority.</p></td>
+</tr>
+<tr class="row-odd"><td><p>explanation</p></td>
+<td><p>Problems, mechanisms, tradeoffs/boundaries and linked normative contracts.</p></td>
+</tr>
+<tr class="row-even"><td><p>status</p></td>
+<td><p>source/config/scope, actual execution and evidence locations.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Replace one aggregate doxygenindex with Core/Arch/I/O/OS/Components entries. Device pages link contracts/call order before generated symbols. Do not hand-copy declarations.</p>
+<p>Explain factories separately: lookups return generated static objects; ordinary I/O calls providers directly through faces. Examples use actual nexus_factory.h. Default IDs, strong IDs and optional capabilities each bind exact configuration/execution. Public headers and assembly-generated interfaces are not one platform-wide invariant API.</p>
+</section>
+<section id="id6">
+<h2>7. 双语与图示<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p><a class="nexus-diagram-link reference internal" href="../_images/documentation-target.svg" title="Open SVG at full size"><img alt="Target documentation content, API, status, diagrams and delivery chain" src="../_images/documentation-target.svg" /></a></p>
+<p>This is target design, not implementation evidence. Arrows carry inputs/artifacts; software/HIL records are read-only and documentation builds establish no platform qualification. See <a class="reference internal" href="../assets/diagrams/README.html"><span class="std std-doc">FIG-12</span></a> for sources/details.</p>
+<p>Each page has one canonical source declaring its original language. Every current page provides complete English and Chinese prose; Chinese originals generate English through the same gettext chain. Mixed contracts may use reviewed source-language catalogs to translate their other-language passages without duplicating canonical contracts. API identifiers, keys, error codes, CSV/JSON and raw logs retain original bytes or meaning.</p>
+<p>gettext/PO is the sole translation chain. Review binds source versions; after source changes, affected translations become stale/fuzzy rather than appearing complete because locale builds pass. Only reviewed/stale/missing/original states exist, derived per page and visible.</p>
+<p>Use both Chinese/English originals to test en/zh_CN round-trips, missing fallback and stale/fuzzy states. Actual prose language/review state determines labels; build locales cannot override them.</p>
+<p>Visible normative prose on every current page requires independent semantic review with no unresolved fuzzy entries. Fast checks validate source digests/review markers; strict builds also require the fresh complete message set. Missing/stale translations fail. Previews truthfully show actual language/gaps. Archives retain original translation/qualification scope.</p>
+<p>Keep reviewable diagram sources and local outputs without online Mermaid/CDNs/external fonts/scripts. New renderers need locks/actual validation; arrows, lifecycles and support scope are reviewed with prose. Offline checks cover images/search/navigation/bilingual entries, not home pages alone. Content/diagram standards define all fifteen classes and visual/source/failure rules.</p>
+</section>
+<section id="id7">
+<h2>8. 示例与文档门禁<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<p>Prefer literalinclude from real fixtures or pinned external examples instead of unbuildable handwritten copies. Complete tutorials actually consume current source SDKs. Hardware commands state tools/Boards/connections; normal builds never flash or access devices. Fetch/pin external revision/hash/license inputs beforehand; Sphinx reads them without fetching latest or running external scripts.</p>
+<p>Full TOML uses production resolvers. Board/CPU JSON follows actual integration paths, not syntax-only checks. Explained fragments retain syntax checks without complete-configuration qualification. Keep nexus-toml-fragment conventions.</p>
+<p>Only explicitly reviewed fixtures execute maintained shell/CMake flows; never extract/run arbitrary Markdown commands. Complete fragments, illustrations and execution reports state separate scopes.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Layer</p></th>
+<th class="head"><p>Validation</p></th>
+<th class="head"><p>Trigger</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Fast source checks</p></td>
+<td><p>Formatting, metadata, page IDs, local files/anchors and reachability.</p></td>
+<td><p>commit/CI</p></td>
+</tr>
+<tr class="row-odd"><td><p>Configuration examples</p></td>
+<td><p>Actual complete TOML/JSON resolvers and fragment rationale.</p></td>
+<td><p>Relevant changes at commit/CI.</p></td>
+</tr>
+<tr class="row-even"><td><p>Executable examples</p></td>
+<td><p>Real Native/ARM/SDK consumers and failure paths.</p></td>
+<td><p>Relevant behavior changes in CI.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Public API</p></td>
+<td><p>Existing comment contracts + strict Doxygen/Breathe.</p></td>
+<td><p>API/docs CI.</p></td>
+</tr>
+<tr class="row-even"><td><p>Whole site</p></td>
+<td><p>Strict MyST/Sphinx references, navigation, search, translation status and resources.</p></td>
+<td><p>CI/publication.</p></td>
+</tr>
+<tr class="row-odd"><td><p>External links</p></td>
+<td><p>Bounded timeout/retry; distinguish 404 from network failure.</p></td>
+<td><p>Periodic/publication.</p></td>
+</tr>
+<tr class="row-even"><td><p>Post-publication</p></td>
+<td><p>Actual site identity, critical pages, legacy URLs, resources/downloads.</p></td>
+<td><p>After actual deployment.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Commit checks default offline without rerunning complete firmware qualification. New doc tools/gates use actual Python unittest RED→GREEN; C behavior tests use GoogleTest/GoogleMock and examples use existing real builds. Prose changes run applicable checks, without implementation-mirroring tests.</p>
+</section>
+<section id="id8">
+<h2>9. 一个工具入口<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<p>Unified entry below; tool installation/acceptance is in the maintenance guide:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>python tools/dev/dev.py docs check
+python tools/dev/dev.py docs test
+python tools/dev/dev.py docs build --language zh_CN
+python tools/dev/dev.py docs build --language en
+python tools/dev/dev.py docs preview
+python tools/dev/dev.py docs package
+python tools/dev/dev.py doctor --target docs
+</pre></div>
+</div>
+<p>dev.py stays a thin route; docs reuse process runners, timeouts, exits and identity. docs.py/.sh/.ps1/.bat forward or state migration rather than maintaining separate generation.</p>
+<ul class="simple">
+<li><p>check validates maintained sources/configuration examples without platform qualification.</p></li>
+<li><p>build runs Doxygen/Sphinx in fresh outputs with -n -W –keep-going.</p></li>
+<li><p>preview serves successful outputs without implicit installation/dependency replacement.</p></li>
+<li><p>package verifies success/identity and seals outputs, without publishing products/platforms automatically.</p></li>
+<li><p>doctor distinguishes absent tools, wrong versions and unexecuted qualification.</p></li>
+</ul>
+<p>Preserve actual exits, diagnostics and logs. Ownership-controlled outputs cannot overwrite inputs. Old XML/HTML never substitutes for fresh success. Isolate repeated outputs/translation caches. Inject this build’s Breathe XML path rather than reading old docs/api results.</p>
+<p>Python dependencies/wheel hashes form a separate closure, initially the executed Linux x86_64 Python tuple. Doxygen version/bytes are pinned. HAVE_DOT=NO does not mean the docs chain lacks Graphviz; pin rendering Graphviz/actual fonts too. Execute require-hashes installation in clean environments; lock files alone prove no installation. Other hosts qualify separately.</p>
+</section>
+<section id="id9">
+<h2>10. 版本和发布身份<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
+<p>Documentation manifests reuse existing identity and evidence-location structures. The table maps actual schema-1 fields only; the <a class="reference internal" href="../reference/documentation-delivery.html"><span class="std std-doc">single delivery contract</span></a> and production packager define the complete format:</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Origin/meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p></td>
+<td><p>The strict loader reads the sole authored compatibility JSON; CMake derives the same value without another version constant.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">code_source.commit</span></code>、<code class="docutils literal notranslate"><span class="pre">code_source.tree</span></code></p></td>
+<td><p>Actual code described.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">documentation_source.commit</span></code>、<code class="docutils literal notranslate"><span class="pre">documentation_source.tree</span></code></p></td>
+<td><p>Source for this prose, configuration and translation build.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">qualified_code.commit</span></code>、<code class="docutils literal notranslate"><span class="pre">qualified_code.tree</span></code></p></td>
+<td><p>Exact referenced qualification source, retaining its original scope.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">qualified_code.index</span></code>、<code class="docutils literal notranslate"><span class="pre">qualified_code.index_sha256</span></code></p></td>
+<td><p>Existing results-index path and digest, retaining configuration and execution identity.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tool_versions</span></code></p></td>
+<td><p>Actual tools, installation receipts and dependency-lock identities; version strings do not establish execution.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">languages</span></code></p></td>
+<td><p>Actually built locale array; per-page translation-review states are recorded in build results.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">files</span></code></p></td>
+<td><p>Successful payload <code class="docutils literal notranslate"><span class="pre">path</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code> and <code class="docutils literal notranslate"><span class="pre">sha256</span></code>; exclude manifest/checksums/archive/outer receipts.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The three source identities never overwrite one another. Docs may cite verified older code without labeling its execution as current HEAD. Display described/qualified sources separately where different. This plan began at docs HEAD 7abde0e4 and qualified code cc6a065c; historical SoC records remain independent. New implemented tools execute gates on their new source.</p>
+<p>Version URLs follow this structure; actual publication records determine published versions:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/dev/&lt;documentation-commit&gt;/&lt;language&gt;/
+/versions/&lt;release-id&gt;/&lt;language&gt;/
+/stable/&lt;language&gt;/
+/versions/&lt;release-id&gt;/api/
+</pre></div>
+</div>
+<p>release-id binds one manifest; doc updates with unchanged platform versions still cannot overwrite immutable directories. stable is an accepted software-SDK docs entry, not all-HIL-passed. Truthful unexecuted HIL permits software docs publication without invented physical support.</p>
+<p>Initially preview PRs as identified CI artifacts. Trusted deployment consumes verified output without elevated execution of external PR source. Sites/stable become published only after actual deployment; workflows/build success are not public proof. External-link reports bind current inputs and distinguish bad links/network limits. Unverified essential source/standards/download entries prevent delivery passes; optional-reference limitations remain explicit.</p>
+<p>Handle legacy /en, /zh_CN and /api individually. Old HAL/OSAL/Kconfig pages point to versioned history/migration rather than silently redirecting same-named functions to different contracts.</p>
+</section>
+<section id="id10">
+<h2>11. 离线包、下载和恢复<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>nexus-docs-&lt;release-id&gt;/
+├── index.html
+├── en/
+├── zh_CN/
+├── api/
+├── downloads/                 小型索引和独立下载说明
+├── manifest.json
+├── checksums.txt
+└── licenses/
+</pre></div>
+</div>
+<p>Relative HTML/images/search/links need no CDN. Public locations do not depend on original workspace paths; retain receipt paths and provide archive/member retrieval instructions. Publish large evidence separately rather than copying it into sites; unavailable downloads are explicitly local-only.</p>
+<p>Manifests bind inputs/payload; checksums cover payload/manifests but not themselves. Outer archive hashes belong in separate receipts, avoiding self-reference. Reuse archive/verifier tools without another candidate state machine. HTML proves docs delivery, not SDK/MCU/HIL. Pages may display source identity but never their self-covering final manifest hash; manifests/checksums are excluded from <code class="docutils literal notranslate"><span class="pre">manifest.files</span></code> to avoid indirect cycles.</p>
+<p>CI artifacts serve previews; long-term publications need stable locations/retention/verification. Actually retrieve/restore in independent roots, browse key pages and verify. Cross-failure-domain recovery depends on real storage; unexecuted work stays incomplete. Normalize removable path/time differences, but actual dual builds establish reproducibility.</p>
+</section>
+<section id="id11">
+<h2>12. 实施工作包与排程<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h2>
+<p>D1–D6 are categories, not six mandatory sequential periods. Follow ledger dependency DAGs; estimate dates after tooling/content scope is known. DOC-21 terminology and DOC-25 diagram/offline rules precede dependent content. DOC-58 review can run in parallel, but closure waits for all fifteen classes/checks.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Work package</p></th>
+<th class="head"><p>Scope</p></th>
+<th class="head"><p>Delivery/exit conditions</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D1</p></td>
+<td><p>Entry points, authorities and prose rules.</p></td>
+<td><p>Fix entries/examples/evidence navigation; map every source/retained path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>D2</p></td>
+<td><p>Site, architecture and API.</p></td>
+<td><p>MyST/source-root, unique navigation, module APIs and searchable contracts.</p></td>
+</tr>
+<tr class="row-even"><td><p>D3</p></td>
+<td><p>Tutorials, integration and execution.</p></td>
+<td><p>Actual consumers verify SDK/async/integration/shutdown/migration tasks.</p></td>
+</tr>
+<tr class="row-odd"><td><p>D4</p></td>
+<td><p>Bilingual content, diagrams and reader review.</p></td>
+<td><p>Critical bilingual pages, states/offline diagrams and task walkthroughs.</p></td>
+</tr>
+<tr class="row-even"><td><p>D5</p></td>
+<td><p>Tools, gates and CI.</p></td>
+<td><p>Unified CLI, gates, locks and actual CI/preview negative paths.</p></td>
+</tr>
+<tr class="row-odd"><td><p>D6</p></td>
+<td><p>Publication, restoration and migration closure.</p></td>
+<td><p>Versions/offline packages, actual publication checks and independent restoration.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Establish base rules first; tools/prose run in parallel. Publication depends on successful builds, identities, critical content, translations and complete diagram review. Platform main/version integration is external; this plan cannot imply merge/deployment. Codex owns maintenance; other agents perform required independent reviews.</p>
+<p>Each DOC ID records implementation_status, validation_status and exit_condition separately. Do not renumber original ledgers. This documentation ledger differs from the existing 48-item build ledger and conversational 48-item whole-project proposal; that proposal needs its own ledger rather than documentation-completion aggregation.</p>
+</section>
+<section id="id12">
+<h2>13. 最终交付检查<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h2>
+<p>Completion requires all of:</p>
+<ol class="arabic simple">
+<li><p>Explicit authorities for current prose/APIs/support/qualification/history without duplicate norms.</p></li>
+<li><p>Complete use/integration/maintenance/acceptance paths with required actual configuration/consumer execution.</p></li>
+<li><p>Reachable/searchable maintained pages, valid references and accurately bounded legacy URLs.</p></li>
+<li><p>Actual English/Chinese review of every current page, with truthful original/stale/missing previews.</p></li>
+<li><p>Identical strict local/CI rules with real bad-input/missing-tool failures and diagnostics.</p></li>
+<li><p>API/factory/TOML/ThreadX/DMA/reference statements match production selection.</p></li>
+<li><p>Readable/verifiable docs/code/qualification/tool identity and truthful history/HIL.</p></li>
+<li><p>Clean-environment offline packages browse/verify independently; downloads match actual sites.</p></li>
+<li><p>Actual publication/restoration results with unestablished host/storage/hardware conditions explicit.</p></li>
+<li><p>Semantic/visual/offline review of fifteen required plus two supplemental diagrams. Record identity/scope of four historical planned diagrams separately; unclaimed configurations/extensions retain explicit boundaries.</p></li>
+</ol>
+</section>
+<section id="id13">
+<h2>14. 相关入口<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="README.html"><span class="std std-doc">Current design/original ledgers</span></a></p></li>
+<li><p><a class="reference internal" href="../delivery/README.html"><span class="std std-doc">Current delivery/exact source</span></a></p></li>
+<li><p><a class="reference internal" href="source-compatibility.html"><span class="std std-doc">SDK versions/interface generations</span></a></p></li>
+<li><p><a class="reference internal" href="engineering-handbook.html"><span class="std std-doc">Engineering handbook</span></a></p></li>
+<li><p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/sphinx/README.md">Current documentation builds</a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/f245aa53daa68214b38a7ecfdb54bbac/documentation-system-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">documentation-system</span> <span class="pre">ledger</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/c842ae0910b28a190d5978c12c524a50/documentation-migration.csv"><code class="xref download docutils literal notranslate"><span class="pre">migration</span> <span class="pre">mapping</span></code></a></p></li>
+</ul>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

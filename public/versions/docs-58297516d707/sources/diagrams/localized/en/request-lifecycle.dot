@@ -1,0 +1,38 @@
+// FIG-06 current: Core request helper transitions and ownership conditions.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// REJECTED and ACCEPTED are admission results, not request enum states.
+digraph requestLifecycle {
+    graph [label="FIG-06 Current Core request and borrow states", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.55, ranksep=0.70];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+    fresh [shape=point, label="", fillcolor="#0f172a"];
+    ready [label="READY: no provider borrow", fillcolor="#f8fafc"];
+    settled [label="SETTLED: provider's final access is release-publication", fillcolor="#f0fdf4"];
+    subgraph clusterBorrowed {
+        label="provider borrow remains valid"; color="#64748b"; fontname="Noto Sans CJK SC";
+        queued [label="QUEUED"];
+        active [label="ACTIVE"];
+        draining [label="DRAINING"];
+        quarantined [label="QUARANTINED: storage and responsibility retained", fillcolor="#fff7ed"];
+        { rank=same; queued; active; }
+        { rank=same; draining; quarantined; }
+    }
+    fresh -> ready [label="fresh initialize"];
+    ready:w -> ready:w [label="REJECTED / unborrowed prepare: no retained refs or residual effects"];
+    ready -> queued [label="adapter ACCEPTED"];
+    ready -> active [label="direct provider ACCEPTED"];
+    queued -> active [label="executor progress", constraint=false];
+    queued -> draining [label="cancel / shutdown progress"];
+    active -> draining [label="completion / cancel / deadline"];
+    active -> quarantined [label="safe drain not established"];
+    draining -> quarantined [label="drain failure", constraint=false];
+    queued -> settled [label="queue and related references drained"];
+    active -> settled [label="all necessary references drained"];
+    draining -> settled [label="drain then release-publish"];
+    quarantined -> settled [label="only after proven recovery and drain"];
+    settled:e -> ready:e [label="consume and join observers, then prepare",
+                          constraint=false];
+}

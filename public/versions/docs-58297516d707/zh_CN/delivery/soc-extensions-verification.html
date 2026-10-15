@@ -1,0 +1,281 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SoC 扩展验证 &#8212; Nexus Embedded Platform 0.1.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=dfe4d638"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="SoC 完善执行记录" href="soc-refinement-verification.html" />
+    <link rel="prev" title="安全扫描与生命周期边界" href="security-review.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="zh-CN" aria-label="文档身份" data-nexus-source-language="en" data-nexus-requested-language="zh_CN" data-nexus-actual-language="zh_CN" data-nexus-translation-status="reviewed"><p>文档源码: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/delivery/soc-extensions-verification.md">58297516d707</a>; 代码引用: 58297516d707. <a href="../../en/delivery/soc-extensions-verification.html" lang="en">English</a>. 源语言: en; 请求语言: zh_CN; 实际语言: zh_CN; 翻译状态: <strong>已审查</strong>.</p><p>文档交付不授予软件或实板资格。准确范围请查阅支持和资格记录。</p></aside><div class="nexus-canonical-content" lang="zh-CN"><section id="soc-extension-verification">
+<h1>SoC 扩展验证<a class="headerlink" href="#soc-extension-verification" title="Link to this heading">¶</a></h1>
+<p>本记录延续<a class="reference internal" href="soc-refinement-verification.html"><span class="std std-doc">较早 SoC 基线</span></a>。<a class="reference download internal" download="" href="../_downloads/99f801eac159da083b9107f1c02855a6/soc-refinement-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">55</span> <span class="pre">项台账</span></code></a> 保留原始退出条件。已实现软件、实际软件证据和物理验收为不同状态。硬件未连接，全部物理结果保持 <code class="docutils literal notranslate"><span class="pre">not_executed</span></code>。</p>
+<p>已资格化软件源码为 commit <code class="docutils literal notranslate"><span class="pre">98270512ea2ff7eefe8ff79720018e582be3a949</span></code>，tree <code class="docutils literal notranslate"><span class="pre">8d3e69d3179d7b0d2382c5fd074c970dfc9348d9</span></code>。所有正式执行使用干净 canonical checkout，并核对源码输入未变。后续文档提交记录该源码，不声称重新执行软件。</p>
+<section id="executed-software-verification">
+<h2>实际软件验证<a class="headerlink" href="#executed-software-verification" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>范围</p></th>
+<th class="head"><p>完整观察执行</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Native</p></td>
+<td><p>199 项 CTest；177 个 GoogleTest／GoogleMock 程序、3252 个用例；零失败、零跳过</p></td>
+</tr>
+<tr class="row-odd"><td><p>配置与工具</p></td>
+<td><p>458 个配置、585 个工具、351 个 CI 工具测试；完整发现与执行</p></td>
+</tr>
+<tr class="row-even"><td><p>ARM 平台矩阵</p></td>
+<td><p>121 个链接镜像，含全部 105 个 provider 装配；六个预期拒绝用例</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cortex-M runtime</p></td>
+<td><p>104 个 runtime 变体、4359 个实际 ARM 对象</p></td>
+</tr>
+<tr class="row-even"><td><p>Cache 与双世界参考</p></td>
+<td><p>12 个 cache 编译 profile；实际 U575 配对镜像和 15 个 mutation 检查</p></td>
+</tr>
+<tr class="row-odd"><td><p>Arch／启动工具</p></td>
+<td><p>七个完整模块共 133 个测试；包含上述 15 个配对镜像 mutation</p></td>
+</tr>
+<tr class="row-even"><td><p>源码 SDK</p></td>
+<td><p>59 个边界测试、258 条实际子命令、13 个 ARM consumer 及其 map；负路径保留预期非零返回码</p></td>
+</tr>
+<tr class="row-odd"><td><p>静态分析</p></td>
+<td><p>Cppcheck 2.13 与 clang-tidy 14 分别检查全部 358 个自有 translation unit</p></td>
+</tr>
+<tr class="row-even"><td><p>外部示例</p></td>
+<td><p>代码 <code class="docutils literal notranslate"><span class="pre">3de8523811b00da8bd887abf53e61eedbaf5161e</span></code> pin 至本 SDK：8 个 CTest、43 个 Google 用例、44 个工具测试、20 个 ARM 镜像；十个未绑定 HIL 计划</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>这些范围存在重叠，不得相加为独立测试总数。Source SDK 测试有意创建不可发布开发夹具，以执行失败边界。独立打包的干净 SDK 在候选封存前需另行实际校验。</p>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/actions/runs/38256744920">GitHub CI run 38256744920</a> 针对精确源码成功完成：29 个成功 job，一次普通分支条件文档部署跳过。Debug、Release、ASan／UBSan、TSan 分别执行全部 199 个 CTest 和 3252 个 Google 用例。产物目录是 API 观察，不声称已下载并独立校验所有远程归档。</p>
+<p>八个无签名软件候选通过封存及平台完整打包校验；每个候选的六类必需资格均绑定实际 run-a ELF 和配置。十六次独立构建使用 32 条断网容器命令，八组 ELF／BIN 对均逐字节一致。两份 map 和原始日志全部保留。<a class="reference download internal" download="" href="../_downloads/10a6170d26f0f2a371da71fe0925f117/soc-extensions-results.json"><code class="xref download docutils literal notranslate"><span class="pre">源码绑定结果索引</span></code></a> 记录精确候选身份、独立审查和持久归档引用。</p>
+<p>最终闭包检查发现 102 个报告引用指向已清理 SDK 夹具路径。仅从已保留、摘要相同的产物恢复 1,871,287 bytes；原始报告和资格没有重写，首次闭包失败仍保留。八个完整闭包随后通过原始检查器。归档 Native 可执行文件和测试源码也可审计；Native binary 摘要明确在归档时绑定，不冒充执行时签名。</p>
+</section>
+<section id="exact-candidate-image-costs">
+<h2>精确候选镜像成本<a class="headerlink" href="#exact-candidate-image-costs" title="Link to this heading">¶</a></h2>
+<p>以下为 GNU Arm 14.3.rel1 参考镜像记录，测量来自实际链接 ELF 和配置。RAM 包含 2048-byte MSP 预留，八个镜像的 libc heap 均为零。这些值描述所选参考固件，不是产品负载、运行栈峰值、中断延迟或 WCET。结果索引分别保留 Flash LOAD、地址跨度、各域 RAM 和原始预算报告。</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>候选</p></th>
+<th class="head text-right"><p>Flash 地址跨度（bytes）</p></th>
+<th class="head text-right"><p>含 MSP 的预留 RAM（bytes）</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>h743-baremetal-empty</p></td>
+<td class="text-right"><p>2440</p></td>
+<td class="text-right"><p>2104</p></td>
+</tr>
+<tr class="row-odd"><td><p>h743-baremetal-uart</p></td>
+<td class="text-right"><p>8708</p></td>
+<td class="text-right"><p>2360</p></td>
+</tr>
+<tr class="row-even"><td><p>h743-freertos-empty</p></td>
+<td class="text-right"><p>4828</p></td>
+<td class="text-right"><p>3032</p></td>
+</tr>
+<tr class="row-odd"><td><p>h743-freertos-uart</p></td>
+<td class="text-right"><p>11100</p></td>
+<td class="text-right"><p>3284</p></td>
+</tr>
+<tr class="row-even"><td><p>u575-baremetal-empty</p></td>
+<td class="text-right"><p>2124</p></td>
+<td class="text-right"><p>2112</p></td>
+</tr>
+<tr class="row-odd"><td><p>u575-baremetal-uart</p></td>
+<td class="text-right"><p>8364</p></td>
+<td class="text-right"><p>2368</p></td>
+</tr>
+<tr class="row-even"><td><p>u575-freertos-empty</p></td>
+<td class="text-right"><p>4548</p></td>
+<td class="text-right"><p>3040</p></td>
+</tr>
+<tr class="row-odd"><td><p>u575-freertos-uart</p></td>
+<td class="text-right"><p>10804</p></td>
+<td class="text-right"><p>3292</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section id="implemented-scope">
+<h2>已实现范围<a class="headerlink" href="#implemented-scope" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="可横向滚动的表格"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>层</p></th>
+<th class="head"><p>新增行为</p></th>
+<th class="head"><p>精确边界</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Arch</p></td>
+<td><p>调用者拥有的 Cortex-M7 Cache 转换控制</p></td>
+<td><p>冷态特权入口、已核验 Cache 几何、显式所有权和有界清理；其他内核拒绝此控制操作</p></td>
+</tr>
+<tr class="row-odd"><td><p>Arch</p></td>
+<td><p>Cortex-M33 NonSecure 范围权限观察</p></td>
+<td><p>真实 CMSE 检查；观察不 pin 存储、不复制数据、不授权任意外设</p></td>
+</tr>
+<tr class="row-even"><td><p>G474</p></td>
+<td><p>静态 EXTI 事件提供者</p></td>
+<td><p>两条选定软件夹具 line、有界 ring、pending-bit 隔离、溢出顺序和保留清理；PCB 接线及电气未资格化</p></td>
+</tr>
+<tr class="row-odd"><td><p>H743</p></td>
+<td><p>固定 HSI32／HSI64 启动并选择 Cache</p></td>
+<td><p>四个冷 profile；独立 divider、timer、Cache 所有权；并非运行中变频</p></td>
+</tr>
+<tr class="row-even"><td><p>H743</p></td>
+<td><p>USART3 经 DMA1／DMAMUX 有限 TX</p></td>
+<td><p>仅 AXI SRAM；显式 buffer 借用、线上完成、取消和隔离；RX 保持 IRQ bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p>U575</p></td>
+<td><p>精确 Secure／NonSecure 软件参考</p></td>
+<td><p>固定 Flash／RAM 归属、受限 NonSecure MPU、真实 CMSE gateway、同步有界 broker 和实际配对镜像</p></td>
+</tr>
+<tr class="row-even"><td><p>SDK</p></td>
+<td><p>必需私有实现闭包</p></td>
+<td><p>删除必需源码／头后重新计算 manifest 仍无法通过校验</p></td>
+</tr>
+<tr class="row-odd"><td><p>自动化</p></td>
+<td><p>完整依赖初始化与编译器上下文</p></td>
+<td><p>SDK 依赖来自声明 lock；静态分析必须保留实际 translation unit 的 defines 和 forced includes</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>公共设备架构仍为静态类型化工厂与不可变多态接口。Factory 获取不分配、不启动硬件、不加锁。新模式扩展选中的私有 provider 和配置事实，不增加运行时 registry、隐式 worker 或必需 OS 层。</p>
+<p>H743 DMA 借用 request 和 payload 到 acquire-observed SETTLED。启用 Cache 时，调用者须独占完整对齐 cache line；provider 不向外取整触及相邻分配，也不分配 bounce buffer。取消和超时不撤销借用，无法撤回硬件引用时保留隔离中的存储。</p>
+<p>U575 参考只接纳固定 TZEN=1 boot profile 和不可变的非特权 NonSecure Thread，没有 NS 中断、RTOS 或并发 DMA。改变归属前先清零并验证未来 NS RAM，再检查最终保护状态，经实际编译器 CMSE 序列进入。同步 gateway 复制有界输入并在发布前检查输出。它不实现通用异步跨域借用、任意 userspace 任务、产品认证或安全升级。见<a class="reference internal" href="../design/u575-trustzone-contract.html"><span class="std std-doc">完整合同</span></a>。</p>
+</section>
+<section id="evidence-rules">
+<h2>证据规则<a class="headerlink" href="#evidence-rules" title="Link to this heading">¶</a></h2>
+<p>行为变更的普通 commit hooks 执行完整 GoogleTest／GoogleMock、配置和工具测试。正式资格另外绑定干净 canonical commit/tree、实际 compiler 输入、原始命令输出、配置和链接产物。失败尝试保留为失败；源码改变后需要新的源码绑定执行。</p>
+<p>验证发现 H743 ARM 启动测试缺少生成头输入、CPU 配置测试固定虚拟环境路径、串口噪声测试不受控调度假设，以及静态分析丢失 forced-include 上下文。Sanitizer 还发现主机模型寄存器 mask 宽度转换和依赖信号的终止观察者。回归保留真实编译器警告和生产非返回循环；观察者必须不依赖循环中的信号投递点。GCC 13／LP64 sanitizer 主机还要求 U575 生产时钟和 MPU mask 在位操作前明确 32-bit operand。独立比较在归一化 <code class="docutils literal notranslate"><span class="pre">__FILE__</span></code> 后发现被测旧／新 translation unit 的 ARM 已分配 section 相同；这是限定范围的代码和存储比较，不是实测 cycles 或所有编译器保证。回归及最终状态归入交付索引，关闭这些问题不能用 suppression 或跳过测试替代。</p>
+<p>离线候选覆盖 H743／U575 维护中的八个公开组合：empty／IRQ-UART 与裸机／FreeRTOS。各自要求两次全新断网构建和实际 ELF／BIN 字节比较，并保留两份 map 及日志。H743 cache／DMA 夹具和 U575 配对参考具有各自 ARM 证据，不属于八个单镜像候选。无签名软件候选不是产品发布或物理资格。</p>
+</section>
+<section id="durable-evidence">
+<h2>持久证据<a class="headerlink" href="#durable-evidence" title="Link to this heading">¶</a></h2>
+<p>本地归档为 <code class="docutils literal notranslate"><span class="pre">/workspace/nexus-soc-delivery-98270512/platform-evidence.tar.gz</span></code>：1,269,027,807 bytes，SHA-256 <code class="docutils literal notranslate"><span class="pre">3aae3a6b96701ce1a042cb4e43078d00d59ba5460ebc4816fa68e2fe4a8fe41c</span></code>。内嵌 <code class="docutils literal notranslate"><span class="pre">delivery-manifest.json</span></code> 和外部清单描述 216,230 项，含 173,376 个普通文件。原始 raw path 和记录字节不变。在 <code class="docutils literal notranslate"><span class="pre">platform/</span></code> 下解析最终执行根；其他根和嵌套 Native／source 归档有显式成员映射。结果索引绑定归档、清单和校验回执。独立流式审查从保留归档字节检查每个外层成员、八个候选 payload 闭包、三个嵌套 Native／source 归档及精确源码身份，没有完整解包或原始根回退。</p>
+<p>将八个候选复制到独立全新目录并禁止访问原始 evidence、SDK、OCI、ARM 工具根后，均实际通过校验，原始路径读取尝试为零。这验证打包证据闭包；重建仍需提供记录的外部 OCI 和 GNU Arm 工具链，二进制未嵌入。此本地归档不是已发布 GitHub Release asset 或已签名产品发布。</p>
+</section>
+<section id="remaining-acceptance">
+<h2>剩余验收<a class="headerlink" href="#remaining-acceptance" title="Link to this heading">¶</a></h2>
+<p>SOC-28 至 SOC-32 和 SOC-36 是精确的部分参考，原始硬件、外设、隔离退出条件保持开放。SOC-33 bootloader／运行态交接、SOC-34 动态变频、SOC-35 连续计时 deep STOP 未实现。SOC-37 至 SOC-55 提供 station、准入、采集和结果校验工具；物理执行等待设备。</p>
+<p>固定时钟不建立 DVFS，普通 WFI／tickless idle 不建立 deep STOP。主机模型和链接 ARM 镜像不建立电气、硅片 DMA／cache 一致性、TrustZone 隔离、中断延迟、实测功耗或 WCET。应用、PCB 专有政策与恢复由外部工程负责。</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">可复用的静态嵌入式平台机制</p>
+
+
+
+
+
+
+<h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">入门教程</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">操作指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">参考</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">架构解释</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">状态与证据</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">维护 Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">维护中的设计合同</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">已记录的交付证据</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">当前平台交付</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">当前系统架构</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system-verification.html">构建系统执行记录</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capabilities.html">派生能力与接入矩阵</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortex-m.html">Cortex-M 软件支持与平台接入边界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">外部工程迁移</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-iterations.html">后续迭代与团队执行</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html">OS 交付范围与验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qualification.html">软件候选与物理资格</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security-review.html">安全扫描与生命周期边界</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SoC 扩展验证</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement-verification.html">SoC 完善执行记录</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support.html">精确支持范围</a></li>
+<li class="toctree-l2"><a class="reference internal" href="verification.html">当前证据与验收边界</a></li>
+</ul>
+</li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      技术支持：<a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

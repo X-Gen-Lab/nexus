@@ -1,0 +1,36 @@
+// FIG-13 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph CortexMCapabilities {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-13 Cortex-M software capabilities and actual platform integration\nCore name grants no FPU / cache / MPU / security-domain / HIL qualification"];
+    facts [label="Explicit CPU facts\nM0 / M0+ / M3 / M4 / M7 / M23 / M33 / M55 / M85\nABI / DSP / FPU / MVE / cache / MPU / DWT / security / IRQ"];
+    resolver [label="Strict CpuProfileIR\nLegal capability combinations, ABI and exact kernel port"];
+    primitives [label="Arch / Core primitives\nMasks, atomics, barriers, explicit cache / MPU / SAU\nCold cache control is maintained for M7 only"];
+    runtime [label="Nexus::Runtime\nCore + Arch + typed I/O faces + baremetal / FreeRTOS\nNo SoC / Board / startup / linker / factory"];
+    platform [label="Nexus::Platform: actual SoC + Board assembly\nF407/F470 initial platforms; limited G474/H743/U575 reference slices\nDevice ops / IRQ / clock / DMA and resources require separate integration"];
+    owner [label="External product / boot owner\nTasks, mappings, secure boot, private layout and recovery"];
+    software [label="Independent software scope\nHost/model execution and actual ARM/runtime variant compilation"];
+    physical [label="Actual CPU / SoC / PCB station\nContext retention, cache/DMA, MPU/SAU, latency\nWithout hardware: not_executed", fillcolor="#fff7ed"];
+    facts -> resolver [label="Check actual silicon facts"];
+    resolver -> primitives [label="Select compile-time mechanisms"];
+    resolver -> runtime [label="Select production targets / port"];
+    primitives -> runtime [label="Public mechanisms"];
+    resolver -> platform [label="Full platform additionally requires SoC/Board facts"];
+    owner -> runtime [label="Explicit calls and responsibilities"];
+    owner -> platform [label="External assembly / policy"];
+    primitives -> software [label="Actual gate"];
+    runtime -> software [label="Actual gate"];
+    platform -> software [label="Selected whole-image gate"];
+    platform -> physical [label="Independent physical acceptance", style=dashed];
+    runtime -> physical [label="Exact real-silicon acceptance", style=dashed];
+    { rank=same; runtime; platform; }
+}

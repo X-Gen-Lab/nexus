@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Classic CAN mechanisms and integration boundaries &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Explicit clock leases and shallow sleep" href="clock-domain-sleep.html" />
+    <link rel="prev" title="Build system maintenance contract" href="build-system.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/classic-can.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/design/classic-can.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="classic-can">
+<h1>Classic CAN mechanisms and integration boundaries<a class="headerlink" href="#classic-can" title="Link to this heading">¶</a></h1>
+<p>Public interface: <code class="docutils literal notranslate"><span class="pre">nexus/io/can.h</span></code>. Native, STM32F407 and GD32F470 maintain the same classic CAN ownership mechanism. Both SoCs support only CAN 2.0A/B: 11/29-bit IDs, DATA/RTR and 0–8-byte DLC. The interface rejects CAN FD, TX DLC above 8 and out-of-range IDs.</p>
+<section id="id1">
+<h2>Static objects and execution<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>Public <code class="docutils literal notranslate"><span class="pre">nx_can_port_t</span></code> contains only read-only ops and private context. Three physical mailboxes correspond to three static slots, without software TX queues, allocators, global mutable registries, workers or mandatory OS. Assembly supplies the exact receive-ring capacity. Unselected instances generate no state. Current production ARM objects have no <code class="docutils literal notranslate"><span class="pre">.data</span></code>/<code class="docutils literal notranslate"><span class="pre">.bss</span></code>; actual assembly builds establish final unselected-ELF GC/resource results.</p>
+<p>One privileged task executor serializes submit, cancel, service, read, recover and stop. Entries reject Handler, unprivileged or already masked PRIMASK/BASEPRI/FAULTMASK contexts. Four IRQs perform bounded mailbox/receive work: at most three mailboxes and three initially present frames from each of two FIFOs. MCU registers use direct volatile MMIO; Native replaces only external register/NVIC leaves in model builds. Production MCUs carry no model-access tables or runtime-model branches.</p>
+<p>IRQ wake is a hint, never a request-predicate substitute. Binding reads all four actual IRQ priorities/grouping and validates each policy/syscall ceiling without changing global grouping. Sinks support task service/cancel and IRQ notifications. Executor counts retain the borrow after sink capture; stop, detach or recover returns BUSY while notifications have not returned.</p>
+</section>
+<section id="id2">
+<h2>Shared filter domains and hardware facts<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>Each assembly explicitly generates one <code class="docutils literal notranslate"><span class="pre">nx_can_filter_domain_t</span></code> owning primary/secondary clocks, 28 shared filter banks, split and immutable filter plan. Domain stop can release clocks only when no other controller retains an active bit. STM32 CAN2 depends on CAN1 clocks/filter domain; GD32 CAN1 similarly depends on CAN0. Stopping one instance neither resets the primary controller nor overwrites peer filters.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>SoC</p></th>
+<th class="head"><p>Controllers</p></th>
+<th class="head text-right"><p>CAN input clock</p></th>
+<th class="head"><p>TX/RX0/RX1/error IRQ</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>STM32F407</p></td>
+<td><p>CAN1 / CAN2</p></td>
+<td class="text-right"><p>APB1 42 MHz</p></td>
+<td><p>19/20/21/22; 63/64/65/66</p></td>
+</tr>
+<tr class="row-odd"><td><p>GD32F470</p></td>
+<td><p>CAN0 / CAN1</p></td>
+<td class="text-right"><p>APB1 50 MHz</p></td>
+<td><p>19/20/21/22; 63/64/65/66</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Private bindings check actual register offsets, bit masks, mailbox/FIFO/filter strides, CPU IRQ counts and NVIC priority bits against locked SDKs at compile/startup time. CAN input has no APB-timer doubling rule. Prescaler/BS1/BS2/SJW are physical counts and must exactly satisfy <code class="docutils literal notranslate"><span class="pre">clock_hz</span> <span class="pre">=</span> <span class="pre">bitrate</span> <span class="pre">×</span> <span class="pre">prescaler</span> <span class="pre">×</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">BS1</span> <span class="pre">+</span> <span class="pre">BS2)</span></code>; parameters are not searched or substituted. Initial support uses one-shot NART, ABOM off and locked RX FIFOs. Filters provide only 32-bit masks, explicitly match IDE and optionally RTR. Filter ownership and bank/split ranges are validated before writes.</p>
+<p>Safe assembly order is reviewed Board electrical/pin handoff → domain initialize → each controller initialize → external executor start. Cold initialization proves no unknown TXRQ in acknowledged init and drains retained RX FIFO. Failed IER, four-IRQ-enable or priority readbacks retain closing responsibility. Exit is each controller stop succeeds → domain stop succeeds → Board pin/electrical lease release. Failure prohibits reclaiming provider, ring, filter plan or sink.</p>
+</section>
+<section id="id3">
+<h2>Completion, cancellation and recovery<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>Prepare copies value frames into READY/consumed SETTLED storage. ACCEPTED borrows the full request until acquire-observed SETTLED. A fourth request, invalid frame/context/deadline or overlap with controller/ring/domain/filter plan is rejected without borrows.</p>
+<p>Wire completion requires RQCP, TME and cleared TXRQ together; only TXOK proves successful transmission. After W1C completion clearing, RQCP clear is read back before slot detachment and final release-publication of SETTLED; the provider never accesses requests afterward. Cancel/timeout/bus-off/stop requests abort and waits for actual acknowledgement; deadlines do not revoke borrows. Drain timeout or failed W1C clearing retains QUARANTINED. TXOK racing cancel retains actual SUCCESS and cannot guarantee the frame never reached the wire. Successful RTR transferred count is zero; DATA count is DLC.</p>
+<p>Authoritative bus-off/TEC/REC/last-error snapshots are independent of RX-ring space. ABOM is disabled; recover is explicit controller-local init after all TX loans/publishers exit, never replaying original frames or resetting active peers. Stop with incomplete hardware/IRQ/FIFO drain returns BUSY and retains original storage. After successful stop, read_events rejects STATE without touching released rings.</p>
+</section>
+<section id="id4">
+<h2>Receive and loss facts<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>Receive stores value frames, FIFO/filter, raw DLC and IRQ acquisition timestamps. Raw DLC 9–15 is normalized to 8 with a flag and at most eight copied bytes, never interpreted as CAN FD. Time is not a physical SOF timestamp. RFOM release must be read back before publishing one event; stuck release closes admission and retains responsibility rather than repeatedly publishing the same hardware mailbox.</p>
+<p>The event ring never overwrites unconsumed facts. Software loss counts are exact; hardware FIFO overrun reports a lower bound only. Frames previously retained in locked FIFO precede overrun loss markers; pending loss follows old buffered events and precedes future frames. Saturation is explicitly marked. Error state is separately latched; event-queue capacity never decides whether completion or bus-off exists.</p>
+</section>
+<section id="board">
+<h2>Board provenance and software/physical qualification<a class="headerlink" href="#board" title="Link to this heading">¶</a></h2>
+<p>Qiming V3.1 original tree <code class="docutils literal notranslate"><span class="pre">08c5f513f1677388fcacaa519dca0c9ef00b6d2e</span></code> CAN1 example blob <code class="docutils literal notranslate"><span class="pre">8731616cf0d5bf02917c76463c49e722b39eb415</span></code> specifies PA11 RX/PA12 TX AF9; CAN2 blob <code class="docutils literal notranslate"><span class="pre">ef8da679c5e7c7163fe2a48a80b6ce8f9d6ecfaa</span></code> specifies PB12 RX/PB13 TX AF9. The <a class="reference external" href="https://github.com/petercwq/STM32407/blob/08c5f513f1677388fcacaa519dca0c9ef00b6d2e/%E5%90%AF%E6%98%8E%E6%AC%A3%E6%AC%A3407%E5%BC%80%E5%8F%91%E6%9D%BF(%E9%AB%98%E9%85%8D%E7%89%88)V3.1%E4%BE%8B%E7%A8%8B%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C.pdf">manual</a>, printed18/physical20, lists TJA1050 U9/U11, 5 V supply, grounded RS and 120 Ω R35/R49. P21/P15 are manually multiplexed jumpers; no software standby GPIO may be invented, and software pin claims do not prove physical jumper position. CAN1 conflicts with USART1 RTS/CTS and USB FS PA11/PA12 and must reject combined selection. SkyStar and Liangshan currently have no reviewed external CAN-transceiver routes; Board bindings are not guessed.</p>
+<p><a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/tools/testing/evidence/can-iteration/manifest.json">Iteration evidence</a> records genuine RED/GREEN, fresh 30 Native + 8 STM32 + 8 GD32 production register-model cases, the same three ASan/UBSan suites, and six GCC14.3 strict ARM units. Historical API-link RED and early harness-configuration mistakes remain separately retained. Development harnesses outside the maintained checkout cannot replace repository build registration, configuration/factory/vector integration, complete ARM ELFs or clean candidates.</p>
+<p>Physical CAN waveforms, oscillator/propagation/sample-point tolerance, termination, jumpers/voltage, transceivers, arbitration/ACK/error injection, bus-off recovery time and maximum IRQ-masked/WCET timing have no executed HIL. Finite poll_limit is a software-work budget, not proof of longest physical init response; register models prove neither bus faults nor store corruption. External CANopen, product retries and bus-management policy belong to product projects.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

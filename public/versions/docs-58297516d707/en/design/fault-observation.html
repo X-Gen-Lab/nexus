@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Fault observation and retained responsibility &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Explicit I2C bus recovery" href="i2c-bus-clear.html" />
+    <link rel="prev" title="Raw Ethernet MAC, MDIO and DP83848" href="ethernet.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/fault-observation.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/design/fault-observation.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="id1">
+<h1>Fault observation and retained responsibility<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>Core’s <code class="docutils literal notranslate"><span class="pre">nx_fault_observe(domain,</span> <span class="pre">reason,</span> <span class="pre">file,</span> <span class="pre">line)</span></code> is an overridable, bounded observation entry. The weak default implementation has no state, allocation, queue, OS lock or side effect; it introduces no implicit event object, registry, worker or instance RAM. Four scalar parameters avoid lending a temporary event structure to the product. Products that need recording must supply a strong implementation and their own static storage.</p>
+<section id="id2">
+<h2>Terminal call paths<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>The maintained FreeRTOS default assert/stack-overflow hooks call the observation entry before parking. The stack hook does not dereference potentially corrupted task/name pointers. A returning observer does not allow a corrupted kernel to continue or release request, stack, TCB, IRQ or DMA borrows.</p>
+<p>The FreeRTOS terminal path reads current masks through a read-only Arch leaf. Existing PRIMASK, FAULTMASK, or BASEPRI equal to or stronger than the kernel ceiling remains unchanged; otherwise it uses the actual port’s disable operation. This prevents a Mainline port’s direct BASEPRI store from weakening an existing mask. Baseline/POSIX builds still follow their own ports and do not claim MCU IRQs on the host. This is a single-core terminal contract; the observer must preserve incoming masks.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nx_freertos_assert_failed</span></code> and the stack hook can still be strongly overridden. Overriding them replaces default observation, so the product must explicitly retain the <code class="docutils literal notranslate"><span class="pre">nx_fault_observe</span></code> call and guarantee non-returning behavior. Public declarations retain the C11/C++ ABI; returning to a corrupted <code class="docutils literal notranslate"><span class="pre">configASSERT</span></code> caller is outside the permitted behavior.</p>
+<p>ThreadX observes a central adapter fail-stop or M4 external timer setup failure before invoking the product fail-stop port. If that port returns, the adapter retains responsibility and parks; it does not pretend that kernel startup, task borrows or clock effects have been undone. Support remains defined by the ThreadX document and actual targets and does not inherit every FreeRTOS CPU combination.</p>
+</section>
+<section id="id3">
+<h2>Product contract and limits<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>The observer runs in the original task, ISR or interrupt-masked context; privilege and context are not normalized. It must be bounded and allocation-free, acquire no OS locks, enter no provider, alter no accepted request, release no retained storage, and assume neither kernel, clock, stack, transport nor peripheral still works. The filename is only a static source literal or NULL; unknown dynamic memory must not be dereferenced. Observation on a corrupted stack is best effort.</p>
+<p>The kernel ceiling does not prove global quiescence of all interrupts and does not revoke NMI, DMA or external electrical effects. This API implements no safe output, reset, Flash persistence, loan reclamation or safety certification. A product may implement separately reviewed non-returning recovery; responsibility remains in the external project.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nexus-examples/apps/uart_owner_runtime/fault_policy.*</span></code> demonstrates a caller-owned first-fault record and an explicit product output port. It release-publishes diagnostics before calling the port; nested or repeated reports cannot repeat output actions or replace the first fault. A missing or failed port remains unverified, with no cleanup/reset/reclaim. The example selects no GPIO or assumed board-safe level by default. A successful software callback does not prove electrical safety; product/Board/HIL acceptance remains required.</p>
+<p>Google death contracts verify the default hook’s observation→mask→park order, no dereference of bad task/name, loan retention when an observer returns, and strong/equal/weak BASEPRI, PRIMASK and FAULTMASK. They use the actual default production hooks and explicit port/Arch leaf models; recordability after real faults, physical safe outputs and worst-case time have no board qualification.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

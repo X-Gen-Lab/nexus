@@ -1,0 +1,728 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Nexus next-generation platform: design from first principles &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="OS backend integration" href="os-backend-integration.html" />
+    <link rel="prev" title="Independent finite UART and SPI DMA controllers" href="multiple-dma-controllers.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/next-generation-platform.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/design/next-generation-platform.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="nexus">
+<h1>Nexus next-generation platform: design from first principles<a class="headerlink" href="#nexus" title="Link to this heading">¶</a></h1>
+<p>Status: <strong>Current factory + polymorphic platform architecture contract; see <a class="reference internal" href="../delivery/README.html"><span class="std std-doc">current delivery</span></a> for implementation and acceptance mapping.</strong> Code uses TOML static assembly, pure typed factories, shared read-only method tables, separate private instances and explicit ownership boundaries. Pseudocode explains contracts; current public headers/tests define compilable interfaces. Software execution, offline reproducible builds and physical qualification are recorded separately. The <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/archive/strategy/target-architecture.md">historical architecture</a> is migration context only.</p>
+<p>This iteration implements design, engineering rules, integration contracts and the 33-item checklist in new production code/build chains. New source/artifacts establish independent qualification; historical passes do not carry over.</p>
+<p>The user requires existing code formatting/comment style. Architecture may change, while layout, naming and Doxygen retain repository configuration and contribution/comment guides. Better contract content improves maintainability.</p>
+<p>Companion material: <a class="reference internal" href="engineering-handbook.html"><span class="std std-doc">engineering handbook</span></a>, <a class="reference internal" href="integration-contracts.html"><span class="std std-doc">integration contracts</span></a>, <a class="reference download internal" download="" href="../_downloads/59e7eaa5794f5dfc55a672b8a7ab5730/next-generation-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">base</span> <span class="pre">execution</span> <span class="pre">checklist</span></code></a> and <a class="reference download internal" download="" href="../_downloads/72b42a64a5ecd225c2eb594f0bceeac8/factory-platform-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">factory/TOML/TDD</span> <span class="pre">P0–P5</span> <span class="pre">checklist</span></code></a>. Experimental results may revise decisions; architecture proposals do not replace experiments.</p>
+<section id="id1">
+<h2>1. 平台要解决的问题<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>An MCU platform connects fixed hardware, concurrent execution and finite resources so products can reuse trusted implementations. Establish facts/constraints first, then decide which abstractions justify their cost.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>First-principle fact</p></th>
+<th class="head"><p>Design consequence</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Firmware usually targets one exact chip and PCB.</p></td>
+<td><p>Bind CPU, registers, pins, clocks and DMA routes at build time.</p></td>
+</tr>
+<tr class="row-odd"><td><p>RAM, Flash, bandwidth and execution time are finite.</p></td>
+<td><p>Every object has provenance, capacity, lifetime and a budget; allocate only enabled resources.</p></td>
+</tr>
+<tr class="row-even"><td><p>Peripherals and buses are real shared resources.</p></td>
+<td><p>Establish static write authority and one bus executor; arbitrate shared requests within bounds.</p></td>
+</tr>
+<tr class="row-odd"><td><p>IRQ, DMA and deferred work can outlive the calling function.</p></td>
+<td><p>Borrow requests/buffers until every user has settled.</p></td>
+</tr>
+<tr class="row-even"><td><p>CPU time, RAM, Flash and power consumption trade off.</p></td>
+<td><p>Compare Pareto candidates after satisfying constraints; one compiler flag cannot prove absolute optimality in every dimension.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Enterprise projects require parallel maintenance and repeatable delivery.</p></td>
+<td><p>Keep boundaries narrow, facts authoritative, tools pinned, failures diagnosable and artifacts consistent with evidence.</p></td>
+</tr>
+<tr class="row-even"><td><p>C types/static planning do not isolate malicious native code.</p></td>
+<td><p>Programming contracts and hardware isolation are separate promises; MPU/security domains need separate implementations.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Tasks, updates, manufacturing and health policy vary by product.</p></td>
+<td><p>Platforms provide mechanisms/ports; external products own policy and qualification.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Priority: satisfy correctness and hard product constraints; reduce necessary runtime cost; reduce reserved resources; reduce integration/maintenance cost. Premature DMA-buffer return, missing errors and unchecked bounds cannot buy better benchmark numbers.</p>
+<p>First-stage scope: Cortex-M4F, STM32F407ZG Qiming Xinxin V3.1, STM32F407VE Sky Star Youth and GD32F470ZG Liangshan Pi; bare-metal/FreeRTOS backends and Native behavior models. Discovery may remain a development reference without becoming a product dependency. Exact parts, routes, modes and evidence are managed separately.</p>
+<p>Existing controller support, pin sources and fault tests identify requirements only. New implementations may replace poor structures directly. With no connected hardware, first-stage delivery covers software and HIL tooling preparation.</p>
+</section>
+<section id="id2">
+<h2>1.1 Existing systems and selection rationale<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>The following compares common mechanisms and their conditions. Trimming, compilers, configurations and workloads affect cost; performance rankings require equivalent experiments.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>System</p></th>
+<th class="head"><p>Applicable mechanisms</p></th>
+<th class="head"><p>Implications for Nexus</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Vendor SDK + handwritten BSP</p></td>
+<td><p>Direct single-chip control and small handwritten static initialization.</p></td>
+<td><p>Keep hardware-close expression; the platform supplies cross-chip contracts, planning and failure semantics.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Zephyr</p></td>
+<td><p>Devicetree hardware descriptions, configuration and a unified device-driver model.</p></td>
+<td><p>Use build-time resource descriptions/capability checks. Runtime device sets and product needs determine whether a unified device model is useful.</p></td>
+</tr>
+<tr class="row-even"><td><p>FreeRTOS</p></td>
+<td><p>Kernel mechanisms with application-provided static task/object storage.</p></td>
+<td><p>Use real kernels and per-object capacity; HAL, hardware facts and scheduling remain separate rather than making the kernel the device hub.</p></td>
+</tr>
+<tr class="row-odd"><td><p>RT-Thread</p></td>
+<td><p>I/O registration, lookup, open/close and unified access.</p></td>
+<td><p>Pay identity/lifecycle cost only where dynamic access has value; fixed ports use narrower contracts.</p></td>
+</tr>
+<tr class="row-even"><td><p>Embassy/Rust async</p></td>
+<td><p>Compile-time-sized static tasks and explicit asynchronous execution.</p></td>
+<td><p>Use actual-state allocation and explicit execution responsibility. Keep the C ecosystem initially and enforce buffer borrowing/DMA settlement through contracts and fault validation.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Official mechanism references: <a class="reference external" href="https://docs.zephyrproject.org/latest/build/dts/index.html">Zephyr Devicetree</a>, <a class="reference external" href="https://docs.zephyrproject.org/latest/kernel/drivers/index.html">Zephyr device model</a>, <a class="reference external" href="https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/include/task.h">FreeRTOS static task API</a>, <a class="reference external" href="https://www.rt-thread.io/document/site/programming-manual/device/device/">RT-Thread I/O framework</a> and <a class="reference external" href="https://docs.embassy.dev/embassy-executor/">Embassy executor</a>. These guide architectural tradeoffs; formal dependencies still need pinned revisions and separate acceptance.</p>
+<p>Two SoCs, three Boards, fixed BOMs, ten maintainers and C product consumers favor build-time hardware descriptions, link-time implementation selection and only actual execution/borrow state at runtime. High-frequency fixed industrial outputs and enterprise runtime discovery are different problems with different cost models.</p>
+</section>
+<section id="id3">
+<h2>2. 默认运行模型：静态装配、固定绑定、最小驱动<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>Products select resources, components, modes and capacities at build time. Startup configures hardware; RUN keeps port identities, routes and write authority stable. Drivers retain actual peripheral runtime state and request borrows.</p>
+<p>The default has no generic registry, runtime probing, per-pin open/close/ref, global inheritance tree or hidden threads. Fixed resources can still fail; drivers manage BUSY, FAULT, cancellation, draining and controlled recovery.</p>
+<p>Three paths have different costs:</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Path</p></th>
+<th class="head"><p>Work</p></th>
+<th class="head"><p>Cost constraint</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Build time</p></td>
+<td><p>Selection, conflicts, capabilities, static binding, capacity and link layout.</p></td>
+<td><p>Extensive checks are allowed without entering hot firmware paths.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Control path</p></td>
+<td><p>Initialization, calibration, start/stop/recovery and reconfiguration.</p></td>
+<td><p>Bounded behavior, explicit failures/remaining resources; diagnostics allowed.</p></td>
+</tr>
+<tr class="row-even"><td><p>Data path</p></td>
+<td><p>GPIO operations, request starts, IRQ data movement and result publication.</p></td>
+<td><p>No name lookup, allocation, unbounded scans or default application callbacks.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Fixed ports use read-only typed faces: shared <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">ops</span></code> and private contexts. Generated <code class="docutils literal notranslate"><span class="pre">uint16_t</span></code> typed IDs return static identity through factories without construction/startup effects. Production SoC and Native providers implement one public contract; multiple instances share tables but own separate state.</p>
+<p>Hardware interfaces have a consistent typed polymorphic layout; algorithms use narrow transport/time/storage ports. Provider/mode tables are shared rather than copied per instance. IRQs call concrete providers. OS and bounded owners remain optional, without unnecessary forwarding objects.</p>
+<p>Not every call is promised inline, nor every LTO build devirtualized. Judge ordinary functions, shared tables and generated direct bindings through ELF/disassembly and physical measurements. Prefer simple maintainable expression first.</p>
+</section>
+<section id="id4">
+<h2>3. 责任边界与建议源码组织<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>Responsibility boundaries are not a mandatory layer-by-layer call chain. GPIO can enter SoC implementations directly; pure protocols need not traverse OS, Board or system lifecycle.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Part</p></th>
+<th class="head"><p>Owned content</p></th>
+<th class="head"><p>Public dependency boundary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>core</p></td>
+<td><p>Small status/type set and shared time/request rules.</p></td>
+<td><p>Standard C; no generic mutable device tree.</p></td>
+</tr>
+<tr class="row-odd"><td><p>arch</p></td>
+<td><p>Exception context, atomics/barriers, CPU-local critical sections and required cycle support.</p></td>
+<td><p>No vendor, Board or OS dependencies.</p></td>
+</tr>
+<tr class="row-even"><td><p>soc</p></td>
+<td><p>Exact chip capabilities, clocks/IRQs/DMA, controllers, Flash/memory, startup and private SDK.</p></td>
+<td><p>Implements I/O contracts; uses Arch.</p></td>
+</tr>
+<tr class="row-odd"><td><p>board package</p></td>
+<td><p>PCB wiring, oscillators, external-device facts, safe initial values and special electrical actions.</p></td>
+<td><p>Read-only resources/narrow hooks; may live externally.</p></td>
+</tr>
+<tr class="row-even"><td><p>io</p></td>
+<td><p>Separate typed GPIO, UART, SPI, I2C, Flash, timer/ADC and other contracts.</p></td>
+<td><p>Public headers expose no SDK/kernel types.</p></td>
+</tr>
+<tr class="row-odd"><td><p>os</p></td>
+<td><p>Necessary time, notifications, locks and optional task/storage adapters.</p></td>
+<td><p>Bare-metal, FreeRTOS and Native implement capabilities separately.</p></td>
+</tr>
+<tr class="row-even"><td><p>components</p></td>
+<td><p>Reusable device/protocol/storage/logging cores with explicit adapters.</p></td>
+<td><p>Narrow I/O/time/transport/storage ports.</p></td>
+</tr>
+<tr class="row-odd"><td><p>tools</p></td>
+<td><p>Configuration, build orchestration, resources, evidence, packaging and HIL.</p></td>
+<td><p>Standard tools; no generated business execution algorithms.</p></td>
+</tr>
+<tr class="row-even"><td><p>External project</p></td>
+<td><p>main, tasks, roles, private devices/protocols, layouts and recovery/update/manufacturing policy.</p></td>
+<td><p>Consumes source SDKs without reverse platform linking.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The proposed directory layout follows; the first vertical slice fixes actual names once. Migrate directories with interfaces, without permanent duplicate paths.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>core/
+arch/&lt;cpu&gt;/
+soc/&lt;vendor&gt;/&lt;family&gt;/
+io/include/nexus/io/
+os/&lt;backend&gt;/
+components/&lt;component&gt;/{include,src,adapters}/
+boards/&lt;reference-board&gt;/
+tools/{configure,dev,evidence,hil}/
+tests/{contracts,models,integration}/
+docs/{design,contracts,integration}/
+</pre></div>
+</div>
+<p>Startup/linker/clocks belong to selected chip implementations and assemble once in the final image. No platforms forwarding layer is mandatory. Startup/reverse cleanup can be ordinary C functions; directory symmetry does not justify runtime modules.</p>
+<p>Components use standard CMake targets with explicit sources, PUBLIC/PRIVATE dependencies and includes. Vendor/generated-private headers and test fakes stay outside ordinary consumer paths. Tools maintain no parallel dependency graph.</p>
+</section>
+<section id="id5">
+<h2>4. 配置体系：三类输入，一份解析结果<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p>Assemblies use TOML schema 2, while SoC/Board facts remain JSON. Standard Python <code class="docutils literal notranslate"><span class="pre">tomllib</span></code> parses the TOML and resolution produces frozen typed IR. Strict models generate editor schemas. <code class="docutils literal notranslate"><span class="pre">init/list-bindings/check/explain</span></code> lower integration effort; Kconfig/cache do not establish another effective configuration.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Input</p></th>
+<th class="head"><p>Fact owner</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SoC package</p></td>
+<td><p>Exact part/package/density, memory domains, reviewed routes, implemented modes, clock profiles and SDK origins.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Board package</p></td>
+<td><p>Actual HSE, PCB/source revisions, connections, fitted devices, jumpers, electrical facts and safe initial values.</p></td>
+</tr>
+<tr class="row-even"><td><p>External assembly.toml</p></td>
+<td><p>Board/backend, components/instances, routes, modes, capacities and external layout.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Reject unknown fields, unimplemented modes, contradictions and conflicts. The first version has no overlay/inherit merging, topology solving or SDK-macro-derived complete routes. Users explicitly select reviewed resources; diagnostics name field paths, resources and declaration origins.</p>
+<p>Frozen typed IR directly generates resolved.json, headers, read-only faces, shared ops wiring, factories, linker inputs and resource reports. Generators perform deterministic validation/static assembly without business main/workers, schedulers, device state machines or driver algorithms.</p>
+<p>CMake Presets choose assemblies, formal environments, optimization profiles and separate roots. CMake owns sources/dependencies; it reads results and checks component capabilities without rewriting selections. Cache, handwritten CONFIG macros and generated headers cannot jointly decide one fact.</p>
+<p>External C composition maps console/control/sensor roles to generated typed physical ports. Schemas/resolved data generate no role policy. Resource declarer IDs support conflict diagnostics, not automatic C access authority or proof of business ownership.</p>
+<p>Failed resolution blocks builds. Generation commits atomically without old-output success fallback. Separate Board/backend/ABI/instrumentation roots are required; releases record every input and derived identity.</p>
+<p>Plans check pins/AF, electrical constraints, controllers, shared endpoints, DMA streams/requests, IRQ/shared vectors, EXTI lines, timer/channels, timebases, clocks, RTOS-reserved exceptions, memory, layout and ABI. See <a class="reference internal" href="integration-contracts.html"><span class="std std-doc">integration contracts</span></a>.</p>
+</section>
+<section id="controllerendpointrequest">
+<h2>5. 设备抽象：controller、endpoint、request、器件<a class="headerlink" href="#controllerendpointrequest" title="Link to this heading">¶</a></h2>
+<p>Four entities use different models:</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Entity</p></th>
+<th class="head"><p>Required state</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>controller</p></td>
+<td><p>Actual hardware/clock/IRQ/DMA state, active requests and necessary arbitration/recovery.</p></td>
+</tr>
+<tr class="row-odd"><td><p>endpoint</p></td>
+<td><p>Immutable CS/address, rate/mode, electrical actions and connection parameters.</p></td>
+</tr>
+<tr class="row-even"><td><p>request</p></td>
+<td><p>Operation buffers, lengths, absolute deadlines, results, borrow state and required epochs.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Device driver</p></td>
+<td><p>Register protocol, calibration, conversion, initialization/retries and device state.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Controllers own exclusive wire execution. Endpoints do not duplicate controller locks/lifecycles. Sensor drivers use endpoints/narrow transport without choosing PCB pins or creating sampling tasks.</p>
+<p>GPIO/PWM/ADC streams are not forced into byte transactions. SPI CS/full-duplex, I2C repeated START/ACK/arbitration and Flash program/erase geometry retain concrete contracts. Shared request helpers do not become universal transaction executors.</p>
+<p>Factories are generated pure typed getters: fixed <code class="docutils literal notranslate"><span class="pre">uint16_t</span></code> IDs, named constants and static switches; invalid IDs return NULL. They perform no dynamic construction, startup or lifecycle management. Diagnostic names stay outside data paths; SPI/I2C controller/endpoint identities are distinct.</p>
+<p>GPIOs have no default per-pin owner/generation. Build-time planning proves conflicts absent; applications organize one writer/coordinator. C code obeys that contract; configuration cannot prove every user source avoids unauthorized calls.</p>
+<p>Introduce checked sessions/epochs only for runtime owner changes, reclamation, rebinding, revocable observers or independent loans. Shared read-only fixed inputs do not need that cost. Managed modes use the same controller and exclude unmanaged direct calls; adding a token while old static calls bypass revocation is invalid. The first stage has no platform-wide dynamic device manager.</p>
+<p>GPIO batch masks must be disjoint authorized subsets. Runtime out-of-range inputs fail; compiler-proven constants may eliminate repeated checks. Reads snapshot one selected port, not multiple ports simultaneously. Toggle requires an exclusive serial writer or explicit atomic implementation, without implied compatibility with ISR writes. Emergency and ordinary control sharing pins need explicit product arbitration/hardware interlocks; calling both contexts one owner does not remove races.</p>
+</section>
+<section id="id6">
+<h2>6. 默认并发模型<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p>Every fixed controller has one explicit executor. One component controls GPIO outputs; one executor serializes shared buses. Multiple clients may submit through bounded explicit adapter queues. Bare-metal owners can be loops; FreeRTOS owners can be application-declared tasks.</p>
+<p>No automatic bus/log/completion workers. Requests do not duplicate lifecycle metadata in HAL, OS and completion queues. Distinct business queues have product-owned budgets.</p>
+<p>Single-owner paths avoid kernel locks; explicit multi-producer adapters add necessary synchronization. APIs define context/serialization; public async calls still check actual BUSY/FAULT, lengths, request states and capacity.</p>
+<p>One request owner serializes prepare/submit/cancel/result-consume/reuse. Other tasks send adapter cancellation commands instead of using old request pointers. Cross-task controls use stable adapter-owned identity/expected epoch and retain storage until owner acknowledgment. Owners resolve still-valid records before accessing requests; they cannot read epochs from potentially freed pointers.</p>
+<p>Direct submission has the same request owner/controller executor. Shared clients prepare, submit controls, consume results and reclaim storage; the adapter exclusively starts/cancels/services/drains controllers. Clients do not modify ACCEPTED requests or service controllers through waits. Adapters protect cross-task command storage/identity.</p>
+<p>Short critical sections protect admission, active pointers, cancellation flags and IRQ publication. Large copies, waits, blocking vendor calls and user code stay outside. DMA does not hold task mutexes throughout transfers; multi-producer adapters admit controls while owners continue cancellation/drain.</p>
+<p>SPSC requires exactly one nonreentrant producer and one consumer. IRQ, error IRQ and task recovery enqueueing concurrently breaks that condition. Indices use explicit atomics/release-acquire or short critical sections, never volatile as synchronization. Increment/compare wrap avoids mandatory power-of-two capacities wasting RAM.</p>
+<p>IRQs perform prescribed data actions, publish state and issue supported wakeups. No allocation, formatted logs, unbounded lookup, blocking or arbitrary application callbacks. FreeRTOS FromISR obeys syscall ceilings; higher-priority handlers need proven deferred paths.</p>
+<p>CPU metadata PRIMASK, FreeRTOS BASEPRI, bus ownership and DMA lifetimes are distinct mechanisms. Architecture review determines minimum barriers; benchmarks do not justify deleting hardware ordering. Plan kernel/HAL time independently; lower RTOS tick rates require a genuinely usable HAL time source.</p>
+</section>
+<section id="deadline">
+<h2>7. 请求、deadline、取消与完成<a class="headerlink" href="#deadline" title="Link to this heading">¶</a></h2>
+<p>Async defaults use caller-owned requests/payload; queues borrow pointers or small descriptors only. The following illustrates contracts; compilable interfaces are in <code class="docutils literal notranslate"><span class="pre">core/include/nexus/core/request.h</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nx_spi_request_prepare</span><span class="p">(</span><span class="o">&amp;</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">tx</span><span class="p">,</span><span class="w"> </span><span class="n">rx</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">,</span><span class="w"> </span><span class="n">transfer_deadline</span><span class="p">);</span>
+<span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nx_spi_submit</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">request</span><span class="p">);</span>
+<span class="cm">/* status == NX_OK means admitted, not transfer success. */</span>
+<span class="n">nx_spi_cancel</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">request</span><span class="p">);</span>
+<span class="n">wait_status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nx_spi_wait_settled</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">wait_deadline</span><span class="p">);</span>
+<span class="cm">/* A wait timeout retains request and payload lifetime. */</span>
+</pre></div>
+</div>
+<p>The illustration is direct single-executor use. Wait conveniences require adapters with waiting/service capability. Shared adapters expose their own client admission/cancel/wait APIs; shared request helpers are not mandatory universal controller schedulers.</p>
+<p>Submission states admission explicitly:</p>
+<ul class="simple">
+<li><p>REJECTED: no request/buffer borrows and no residual hardware needing settlement.</p></li>
+<li><p>ACCEPTED: borrowing starts; later start/IRQ/timeout/abort failures report through requests rather than relabeling borrowed requests as ordinary rejection.</p></li>
+</ul>
+<p>Queue acceptance is the shared chain’s only admission point, immediately starting borrowing and total deadlines. Temporary controller BUSY retains QUEUED; actual start failures are request results, never retroactive REJECTED. Queued cancellation removes all references before settlement; full-queue rejection leaves no borrow. Direct/adapter paths share request-state rules.</p>
+<p>Default requests have one owner/result consumer. Preparation/reuse requires prior settlement and released consumer/adapter references. Allocate sequences/epochs only for retained delayed identity/control records; identities never repeat and exhaustion fails explicitly. Fully serial requests with no escaping references and drained old sources need no mandatory epoch, nor do fixed pins need extra lifecycles.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Request state</p></th>
+<th class="head"><p>Backend borrows request/buffer</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>READY</p></td>
+<td><p>No</p></td>
+<td><p>May prepare/submit.</p></td>
+</tr>
+<tr class="row-odd"><td><p>QUEUED</p></td>
+<td><p>Yes</p></td>
+<td><p>Admitted, waiting for controller.</p></td>
+</tr>
+<tr class="row-even"><td><p>ACTIVE</p></td>
+<td><p>Yes</p></td>
+<td><p>Hardware/handlers may access.</p></td>
+</tr>
+<tr class="row-odd"><td><p>DRAINING</p></td>
+<td><p>Yes</p></td>
+<td><p>Stopping sources and draining users.</p></td>
+</tr>
+<tr class="row-even"><td><p>SETTLED</p></td>
+<td><p>No</p></td>
+<td><p>Hardware, IRQ and deferred accesses have ended.</p></td>
+</tr>
+<tr class="row-odd"><td><p>QUARANTINED</p></td>
+<td><p>Yes</p></td>
+<td><p>Drain cannot be proven; retain responsibility until controlled recovery/reset.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Transfer deadlines are absolute in an explicit monotonic domain and include queueing. Wait deadlines bound only waiter residence. Cancellation acceptance, transfer timeout and wait timeout do not mean SETTLED.</p>
+<p>Every profile declares deadline observers, service scheduling, cancellation capability and drain bounds. Polling does not claim low-CPU async behavior. C deadlines cannot automatically preempt Flash pulses or abnormal DMA; residual accesses remain owned after timeout.</p>
+<p>Completion is a level state in requests plus single-owner notification. Notifications are wake hints; lost/full notifications cannot erase the sole result. Explicit task adapters execute user callbacks while retaining/returning required borrows. Default drivers retain no application callbacks.</p>
+<p>Optional executor waits must preserve progress: bounded service, request/control checks, arm static notifications, recheck completion/service predicates, then wait for the earliest wait deadline, transfer deadline or maximum service interval. The sole executor cannot block waiting for its own drain. Shared clients observe only their own results and prevent lost wakes; adapter executors retain service/deadline/drain responsibility without client takeover. Bare metal pumps explicitly; absent wait capability never masquerades as successful blocking.</p>
+<p>Notification ports provide level-latched or sequence semantics without lost wakes between arming, rechecking and sleeping. Ports lacking reliable notification use bounded rechecks rather than infinite sleep. IRQ results, controls and deadline expiry can all make owners service again; no generic executor/hidden worker is required.</p>
+<p>Before publishing SETTLED, stop every hardware source that can access the request, prove DMA no longer accesses its storage, drain IRQ/deferred users and apply necessary ordering. Independent continuous RX storage need not stop. Epochs do not replace drain: untagged old IRQs may read new active pointers.</p>
+<p>Default IRQs latch completion/errors and wake owners; owners perform task-context drain. Prepare result fields, detach from controllers and acquire needed notification identities first. Release-publication of SETTLED is the backend’s final request access; callers observe with acquire. Post-publication notification uses pre-acquired still-valid static owner objects. IRQ-direct publication is allowed only by explicit profiles with old sources settled, no later request access and no tail interference with subsequent transfers. Native concurrency models prove the same borrow endpoint.</p>
+<p>Synchronous conveniences obey these rules. Stack requests must settle before return. If wait budgets expire without settlement, returning cannot invalidate their stacks. Use caller-owned long-lived requests or explicit fail-stop/reset policy.</p>
+<p>SETTLED ends backend borrowing; reuse also needs consumed results and exited observers/callback adapters. Driver states cannot revoke independent adapter borrows. Single-owner defaults add no separate completion latch; requests remain the sole result authority.</p>
+</section>
+<section id="id7">
+<h2>8. 启动、故障与停止<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<p>Static assembly provides readable initialization order. Ordinary serial C calls establish CPU/clocks/timebases, safe values, required static kernel objects and selected drivers. External applications start business components/schedulers explicitly. Platforms generate no business main or automatic all-device startup.</p>
+<p>Undo only acquired resources in reverse order; retain original failures, cleanup errors and remaining ownership. Residual DMA/IRQ keeps contexts/requests alive rather than falsely returning to OFFLINE.</p>
+<p>Initialization declares reversible/irreversible effects. Enabled IWDG, Flash option bytes and hardware locks cannot be pretended undone by reverse cleanup. Products explicitly choose watchdog enabling; existing enabling must be detected. Later failures record irreversible effects and leave products to continue feeding in controlled failure states or reset. Rollback never falsely reports watchdog stopped.</p>
+<p>RUN fixes identity/write authority. Controlled recovery restores the same port without changing owner/routes. Stop closes admission and asks producers to stop new operations; executors continue controls/deadlines/drain until requests/adapter borrows settle. Notification publishers also exit; applications then join clients/executors, reclaim OS storage and finally disable clocks/pins. Never stop the sole executor before joining producers waiting for SETTLED.</p>
+<p>Direct GPIO writers without admission, and related ISRs, must quiesce before changing modes/clocks; generic stop flags cannot revoke unchecked calls. Static notification objects cannot be deleted, reused or unregistered while wakeups may still access them. Request SETTLED alone does not prove notification reclamation safe.</p>
+<p>Low-cost fixed hot paths depend on quiescence. The default promises no arbitrary concurrent teardown/rebinding. Products requiring that use separately reviewed managed-binding contracts and pay corresponding state/check costs.</p>
+<p>Boards describe physical initial output levels; products choose stop, degradation or reset on errors. Reset/start levels, external-device timing and output continuity require physical proof. Platform-wide hot restart during kernel execution is not promised by default.</p>
+<p>Board initial values express electrical constraints and known inactive polarity; process-safe valve/heater states belong to products. The word “safe” does not make them interchangeable.</p>
+</section>
+<section id="id8">
+<h2>9. 内存与资源策略<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<p>Default core/I/O has no heap, hidden OS objects or all-resource pools. Controllers, selected-mode state, endpoints, queues and buffers allocate for actual instances. Fixed configurations/bindings/tables live in Flash; mutable zeroed contexts live in BSS.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Resource</p></th>
+<th class="head"><p>Default policy</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Request payload</p></td>
+<td><p>Caller-owned, borrowed until SETTLED; copy APIs are separately selected.</p></td>
+</tr>
+<tr class="row-odd"><td><p>queue</p></td>
+<td><p>Actual depth/item size; only necessary data, explicit overflow policy.</p></td>
+</tr>
+<tr class="row-even"><td><p>task</p></td>
+<td><p>Externally declared stack/TCB storage; budget totals each task.</p></td>
+</tr>
+<tr class="row-odd"><td><p>RX</p></td>
+<td><p>Exact event/byte/block semantics and capacity; no maximum default event pool.</p></td>
+</tr>
+<tr class="row-even"><td><p>DMA</p></td>
+<td><p>State only for DMA modes; check domains, alignment, aliases and borrowing.</p></td>
+</tr>
+<tr class="row-odd"><td><p>trace/stats</p></td>
+<td><p>Separate compile choices; disabled modes leave no permanent formatting or per-operation statistics branch.</p></td>
+</tr>
+<tr class="row-even"><td><p>managed heap</p></td>
+<td><p>Explicit opt-in with domain/capacity/failure/sealing; account libc/kernel heaps separately.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Per-byte UART timestamps, byte streams and DMA block loans are different contracts. Frame-gap applications choose faithful event profiles; block users accept actual provided timing. DMA completion cannot reconstruct each byte’s arrival across gaps.</p>
+<p>Circular DMA loans must prevent overwrite of unreleased windows. Otherwise use bounded copying, flow control, stopping or explicit drop policy. Non-NULL does not mean DMA-reachable. Separate F407 CCM/other CPU-only domains from DMA domains; describe GD domains from exact chip documents.</p>
+<p>Account static RAM from actual ELF regions and independent reservations, without adding BSS stacks/heaps/buffers twice. High-water marks describe use without shrinking reserved allocations. Flash includes vectors, code, rodata, registration/bindings and RAM initialization loads, not text alone.</p>
+<p>Remove large generic metadata first. Preserve actual busy/fault, active-request, IRQ/drain, callback/loan and necessary epoch state. Field sizes alone do not justify removing safety invariants.</p>
+</section>
+<section id="id9">
+<h2>9.1 Industrial-control categories and initial scope<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h2>
+<p>Define category contracts first, then implement reviewed wiring and actual requirements. Public types alone establish no provider support; unimplemented modes fail configuration.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Category</p></th>
+<th class="head"><p>Required abstraction</p></th>
+<th class="head"><p>Required acceptance</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GPIO/EXTI</p></td>
+<td><p>Fixed authorized masks; inputs/outputs; actual line ownership, edges and events.</p></td>
+<td><p>Initial/atomic outputs, shared EXTI vectors, event overflow and shutdown drain.</p></td>
+</tr>
+<tr class="row-odd"><td><p>UART/RS485</p></td>
+<td><p>Byte/event/block RX; TX memory settlement versus wire-idle; explicit DE/RE electrical actions.</p></td>
+<td><p>Errors/loss/TC/cancel, frame gaps, actual transceivers and wiring.</p></td>
+</tr>
+<tr class="row-even"><td><p>SPI</p></td>
+<td><p>Controllers, static CS endpoints, modes/speeds and complete transactions.</p></td>
+<td><p>CS hold/release, synchronized full-duplex, DMA/cancel/deadlines.</p></td>
+</tr>
+<tr class="row-odd"><td><p>I2C</p></td>
+<td><p>Address endpoints, message sequences, repeated START/STOP and errors.</p></td>
+<td><p>NACK/arbitration/stuck buses, recovery and terminal states; no false recovery success.</p></td>
+</tr>
+<tr class="row-even"><td><p>timer/PWM/capture</p></td>
+<td><p>Clock domains, timer/channels, periods/duty, hardware triggers and fixed safe values.</p></td>
+<td><p>Timing precision/bounds, atomic updates, ADC trigger resources and shutdown outputs.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ADC</p></td>
+<td><p>Reviewed channels/scans/triggers, sample formats, calibration, block borrowing/overflow.</p></td>
+<td><p>Rates/accuracy, DMA reachability, sequences/triggers, loss and buffer return.</p></td>
+</tr>
+<tr class="row-even"><td><p>watchdog/reset</p></td>
+<td><p>Hardware ranges, feeding and reset causes.</p></td>
+<td><p>Actual timeout reset, debug freezing and power-on/reset differences.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Internal Flash</p></td>
+<td><p>Physical geometry, regions, programming/erasing and nonpreemptible pulses.</p></td>
+<td><p>Bounds/alignment, hardware terminal states, power loss and pause budgets.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>The first slice establishes GPIO, clocks and requests; UART/SPI/internal Flash provide basic communication/persistence. I2C/watchdog/timer/PWM/ADC/EXTI enter subsequent mode-specific industrial batches. NG-018/031/032/033 separately govern watchdog, EXTI, fixed timer/PWM and single/low-rate ADC scan with fault/resource acceptance and candidate dependencies; aggregate category status cannot close all modes.</p>
+<p>CAN/CANopen, Ethernet, USB, low power, cache/MPU, secure boot and remote updates need explicit product demand, maintained dependencies and independent budgets. Narrow integration ports remain available, but the first candidate need not cover all chip peripherals or expose SDK-only shells.</p>
+<p>RTOS ticks, HAL time, UART timing and ADC/PWM triggers each consume actual timebases. Selection must not accidentally share one timer/channel across incompatible uses. Chip capabilities do not establish unverified Board wiring.</p>
+<p>Maintained modes include bounded EXTI events, fixed PWM, ADC polling/scan and IWDG feed/reset causes. Selected STM32F407/GD32F470 routes also provide UART <code class="docutils literal notranslate"><span class="pre">dma-tx</span></code>, <code class="docutils literal notranslate"><span class="pre">irq-blocks</span></code>, <code class="docutils literal notranslate"><span class="pre">rx-dma-idle</span></code>, <code class="docutils literal notranslate"><span class="pre">rx-dma-continuous</span></code>, <code class="docutils literal notranslate"><span class="pre">dma-duplex</span></code> and <code class="docutils literal notranslate"><span class="pre">dma-duplex-continuous</span></code>, finite full-duplex SPI DMA, ADC <code class="docutils literal notranslate"><span class="pre">trigger-dma</span></code>/<code class="docutils literal notranslate"><span class="pre">trigger-dma-continuous</span></code>, and capture/break/deadtime mechanisms through <code class="docutils literal notranslate"><span class="pre">edge-capture</span></code> and <code class="docutils literal notranslate"><span class="pre">complementary-pwm</span></code>. ADC <code class="docutils literal notranslate"><span class="pre">trigger-dma</span></code> stops and drains each block, then explicit service restarts after consumer release, leaving inter-block gaps. Continuous modes use double buffering and explicit replacement blocks; exhausted capacity or failed hardware drain retains borrows without overwriting consumer storage. They do not promise lossless operation under arbitrary IRQ latency, service intervals or consumer speed. DMA domains, hardware routes, IRQs, stop and consumer-loan drain retain exact-mode contracts and software models. The <a class="reference internal" href="../delivery/capabilities.html"><span class="std std-doc">derived capability matrix</span></a> and corresponding contracts define configuration and production-implementation scope. All related physical timing, electrical and continuous-acquisition qualification remains unexecuted.</p>
+<ul class="simple">
+<li><p>Timers define frequency, tick units, wrap extension, maximum maintenance intervals and clock/stop behavior. PWM checks shared PSC/ARR/base modes and defines 0%/100%, shadow updates, error and start/stop levels.</p></li>
+<li><p>ADC defines resolution, sample time, reference voltage/raw counts, sequences/triggers, overruns, timing information and timeout output validity. DMA streams separately define window overwrite and borrowing.</p></li>
+<li><p>EXTI defines line/port muxing, shared vectors, merged/lost edges, timing precision and pending cleanup. Products choose debounce policy.</p></li>
+<li><p>IWDG defines irreversible enabling, existing state, timeout range including LSI error, fixed feeding responsibility, reset causes and debug freezing. Health decisions stay external.</p></li>
+</ul>
+</section>
+<section id="id10">
+<h2>10. 性能策略与成本验收<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
+<p>Optimize total cost: CPU cycles, maximum observed masking duration, Flash loads, reserved RAM, peak stacks, throughput/loss, energy and marginal per-instance cost.</p>
+<p>Measure minimal bare-metal/FreeRTOS slices first: empty images, GPIO and UART/SPI requests. Board profiles select only slice-essential resources; complete Board configurations are not minimal platform cost.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Operation</p></th>
+<th class="head"><p>Cost target</p></th>
+<th class="head"><p>Validation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Fixed GPIO set/reset</p></td>
+<td><p>No registry lookup/generic refs/OS locks; authorized masks and same-port batches.</p></td>
+<td><p>Disassembly + DWT/logic analyzer.</p></td>
+</tr>
+<tr class="row-odd"><td><p>request admission</p></td>
+<td><p>O(1) or explicit fixed queue bounds; no payload copy, allocation or name lookup.</p></td>
+<td><p>Fault models + boundary inputs + cycles.</p></td>
+</tr>
+<tr class="row-even"><td><p>IRQ data publication</p></td>
+<td><p>Bounded actions without application callbacks/unbounded scans; correct index publication.</p></td>
+<td><p>Race models + priority loads + physical Boards.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Completion observation</p></td>
+<td><p>Read existing request state; notifications are not result authority.</p></td>
+<td><p>Full/lost notifications + cancellation/late IRQ.</p></td>
+</tr>
+<tr class="row-even"><td><p>New instance</p></td>
+<td><p>Only necessary instance context/storage/read-only bindings.</p></td>
+<td><p>Image delta/maps + configuration explanation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Disabled capability</p></td>
+<td><p>No retained RAM or unreachable method references.</p></td>
+<td><p>Symbol/section/actual ELF differences.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Select a few formal profiles by comparing O2/Os/O3/LTO, not CMake defaults or hardcoded publishers. Apply hotspot-local optimizations where proven. No global fast-math or deletion of necessary checks.</p>
+<p>Measurements record clocks/wait states, ABI/FPU, compiler, modes, loads, IRQ interference, overhead and ELF identity. Instruction counts are not cycles; Native wall time is not MCU deadlines; observed maxima are not strict WCET. DWT uses snapshot differences; profilers do not reset driver-shared monotonic clocks.</p>
+<p>Reference benchmarks and products define absolute budgets. The platform establishes structural constraints/software gates first and promises performance only when measured under stated conditions/loads. Architecture cannot prove unconditional global optimality across workloads, compilers and hardware.</p>
+</section>
+<section id="id11">
+<h2>11. 工程工具、风格与管理<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h2>
+<p>Production defaults to C11/public C ABI. C++ may support host tests, not driver object systems. Formal tools use locked ARM/Native compilers, CMake/Ninja/CTest, Python, clang-format/selected clang-tidy and one host framework. Other tools enter only for explicit gaps.</p>
+<p>Lock formal versions/OCI digests and separately source contents/licenses. One thin dev entry orchestrates native commands for local/CI; no second build/test/workflow engine.</p>
+<p>Preserve root .clang-format/.editorconfig: 80 columns, four spaces, attached K&amp;R braces and type-side pointers. Keep module prefixes, _t types and current naming; private code is static, headers self-contained and integer/length/encoding rules explicit. Vendor targets stay separate; global warning suppression never hides owned defects.</p>
+<p>Comments retain backslash Doxygen, file headers and section/inline forms. Public headers define parameters/returns; sources avoid duplication. Existing tags describe context, blocking/deadline origins, ownership, output validity, cancel/settlement and residual failures. Shared rules live on types/modules; functions state differences. Internals explain races, barriers, errata and tradeoffs. Headers retain authors/versions/dates and Git supplements history. See <a class="reference internal" href="engineering-handbook.html#id18"><span class="std std-ref">handbook section 12</span></a>.</p>
+<p>Statuses support actionable caller recovery; vendor diagnostics are optional detail. APIs do not format logs implicitly, write global last errors or call global application handlers in IRQs. Ordinary errors and invariant violations are distinct.</p>
+<p>The ten-person capacity follows responsibilities, not old code boundaries: TL1, core/I/O/OS2, STM/GD BSP2, device/communications2, QA/HIL2, build/release1. Each domain has primary/backup responsibility. Ordinary changes need independent domain review; public contracts, IRQ/DMA, synchronization, persistence and publishing add consumer/cross-layer review.</p>
+<p>Distinguish design, implementation, software, hardware and release qualification. Code lines, PRs, pages and test counts do not close tasks. See <a class="reference internal" href="engineering-handbook.html"><span class="std std-doc">engineering handbook</span></a>.</p>
+</section>
+<section id="id12">
+<h2>12. 验证、交付与平台接入<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h2>
+<p>Validation layers: fast local → PR integration → nightly breadth/load → dedicated HIL → same-artifact promotion. Contracts/risks drive selection; configuration, synchronization, public APIs and linker/toolchain changes trigger cross-layer checks.</p>
+<p>Core invariants: REJECTED retains no borrow; ACCEPTED failures remain owned; after SETTLED no backend/DMA/IRQ/deferred access to the request/buffer remains; reclamation also needs consumer/adapter exit; reuse drains old sources; one wire-active transaction per bus; stop closes admission then drains; overflow/full notifications cannot fake success; waits preserve drain/protect against lost wakes; resource plans match implementations.</p>
+<p>Models cover partial starts, late IRQs, epoch reuse, full queues, cancel/deadline races, failed aborts and stop retries. Actual ARM links cover startup/vectors/strong IRQs, layout, ABI and resources. Physical testing covers TC, DMA drain, electrical behavior, masking duration, high-water marks and sustained loads; currently not executed.</p>
+<p>Provenance binds inputs/commands/outputs; hermeticity proves reading only declared inputs; reproducibility proves identical independent clean-build bytes. Accept them separately. Formal artifacts build from complete locked inputs and seal ELF/BIN/maps/config/manifests. Promote identical hashes without rebuilding at publication.</p>
+<p>Support units include exact part, Board source/PCB revision, routes, modes, backend and resolved configuration. Source review, compile/link, models, physical tests and product loads are separate evidence dimensions. Board names do not imply all-peripheral support.</p>
+<p>New Boards provide small fact sets/electrical hooks; SoCs provide actual providers/startup/clocks/IRQs/memory/SDKs; devices provide narrow transport/logic; protocols provide pure cores/adapters; products provide assembly/main/tasks/policy. See <a class="reference internal" href="integration-contracts.html"><span class="std std-doc">integration contracts</span></a> for workflows and SDK upgrades.</p>
+</section>
+<section id="id13">
+<h2>13. 实施顺序与退出条件<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
+<p>Each batch atomically updates implementations, callers, tests and docs to new contracts. External examples update SDK pins separately. Old interfaces may be deleted directly; deployed persistence still requires migration/rollback policy.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Batch</p></th>
+<th class="head"><p>Content</p></th>
+<th class="head"><p>Software exit condition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>B0</p></td>
+<td><p>Freeze design, requirements/risks, reference workloads and budget schemas.</p></td>
+<td><p>One reviewable contract set with truthful unimplemented/unmeasured states.</p></td>
+</tr>
+<tr class="row-odd"><td><p>B1</p></td>
+<td><p>Formal tools, source packages, schema configuration and minimum images/targets.</p></td>
+<td><p>Actual minimum ELFs for two SoCs; real invalid-input rejection; one resolved configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p>B2</p></td>
+<td><p>CPU/clocks/memory/startup and fixed GPIO.</p></td>
+<td><p>Three-Board base combinations, direct/batch paths, consistent safe values/input identity.</p></td>
+</tr>
+<tr class="row-odd"><td><p>B3</p></td>
+<td><p>Requests, UART/SPI/I2C/Flash and first EXTI/PWM/ADC/IWDG modes.</p></td>
+<td><p>Cancel/deadline/drain and irreversible-effect invariants; actual mode-specific linking/fault regressions.</p></td>
+</tr>
+<tr class="row-even"><td><p>B4</p></td>
+<td><p>Per-object OS storage, shared devices/components and external examples.</p></td>
+<td><p>Actual external consumers, no internal business logic or unused resident resources.</p></td>
+</tr>
+<tr class="row-odd"><td><p>B5</p></td>
+<td><p>Static analysis, resource/performance tools, hermetic/reproducible builds and HIL preparation.</p></td>
+<td><p>Software gates, independent rebuilds and actual artifact admission; physical results still unexecuted.</p></td>
+</tr>
+<tr class="row-even"><td><p>B6</p></td>
+<td><p>New candidates and migration closure.</p></td>
+<td><p>Complete new-source qualification/evidence, removed old entries and truthful support scope.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>See <a class="reference download internal" download="" href="../_downloads/59e7eaa5794f5dfc55a672b8a7ab5730/next-generation-execution.csv"><code class="xref download docutils literal notranslate"><span class="pre">execution</span> <span class="pre">checklist</span></code></a> for dependencies/domain owners. Ten people over 3–6 months deliver controlled scope, not automatically every peripheral, topology solver, dynamic device system, low power, MPU, secure updates or enterprise LTS.</p>
+<p>The following schedule assumes ten-person capacity; dependencies/evidence take precedence over calendars. Each provider’s first slice includes faults, style/warnings and minimal budgets. B5 expands/closes checks rather than deferring them until the end.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Window</p></th>
+<th class="head"><p>Main and parallel work</p></th>
+<th class="head"><p>Stage outcome</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Weeks 1–2</p></td>
+<td><p>B0; tools/QA prepare minimum workloads and locked environments.</p></td>
+<td><p>Explicit initial modes, resource accounting and failure/borrow contracts.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Weeks 3–6</p></td>
+<td><p>B1; BSPs prepare exact startup/memory while interfaces establish request models.</p></td>
+<td><p>Complete external-consumer-to-minimum-ELF slices on two SoCs.</p></td>
+</tr>
+<tr class="row-even"><td><p>Weeks 7–12</p></td>
+<td><p>B2 and base B3; parallel GPIO/UART BSP work with concurrent QA fault models.</p></td>
+<td><p>Three-Board base communications software baseline and resource reports.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Weeks 13–18</p></td>
+<td><p>Industrial B3 and B4; device/communications teams migrate components and six base examples.</p></td>
+<td><p>Initial EXTI/PWM/ADC/IWDG and explicit I2C scope; closed bare-metal/FreeRTOS consumption.</p></td>
+</tr>
+<tr class="row-even"><td><p>Weeks 19–24</p></td>
+<td><p>B5/B6; QA/build close gates, offline rebuilds, HIL preparation and old paths.</p></td>
+<td><p>Controlled-scope software candidates, exact support records and usable tooling.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Month-three baselines and month-six candidates have different scopes. After hardware connects, perform physical acceptance on actual artifacts. Unclosed hardware dependencies remain not executed; do not shrink tests to preserve calendar promises.</p>
+<p>Begin with fixed GPIO and caller-owned request state, then implement one necessary actual UART/SPI path. DMA modes/qualification remain separate; SDK functions do not establish completion. Software candidates and product physical qualification are delivered separately.</p>
+</section>
+<section id="id14">
+<h2>14. 会删除或不引入的默认复杂度<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Per-GPIO generic registration/owner/ref/generation and hot-path string lookup.</p></li>
+<li><p>Per-instance mutable OOP tables and permanent raw-getter/managed-reference coexistence.</p></li>
+<li><p>Unselected DMA handles, maximum legacy copy buffers and all-class maximum pools.</p></li>
+<li><p>Mandatory OSAL traversal for all kernel functions, generic executors, hidden workers and default completion queues.</p></li>
+<li><p>Duplicate configuration facts, multiple overlays, generated business DSLs and all-pin automatic solvers.</p></li>
+<li><p>Duplicate build/release entries, count-only qualification and PASS reports for different artifacts.</p></li>
+<li><p>Repository splits, forwarding directories or multiple build/package systems introduced only to modernize names.</p></li>
+</ul>
+<p>Retain the state/evidence real problems need: fixed planning, genuine borrows, faults/draining, explicit contexts, actual memory/timing and repeatable engineering with external product boundaries.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration-contracts.html">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

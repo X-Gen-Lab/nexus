@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Cortex-M software support and platform-integration boundaries &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="External-project migration" href="migration.html" />
+    <link rel="prev" title="Derived capabilities and integration matrix" href="capabilities.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/delivery/cortex-m.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/delivery/cortex-m.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="cortex-m">
+<h1>Cortex-M software support and platform-integration boundaries<a class="headerlink" href="#cortex-m" title="Link to this heading">¶</a></h1>
+<p>Nexus CPU software supports M0, M0+, M3, M4, M7, M23, M33, M55 and M85. One immutable CPU-profile parser drives Core/Arch/atomics/baremetal-FreeRTOS runtime configuration. DSP, FPU, MVE, cache, MPU, DWT, security and SAU are explicit facts. Core selection generates no new SoC/Board/vector/startup/driver/link layout/typed factory. The three STM32F407/GD32F470 Boards maintain launch modes. G474/H743/U575 have exact GPIO/IRQ-UART/timebase references; G474 adds selected EXTI, H743 fixed Cache and bounded UART TX DMA, U575 an independent OS-free synchronous split-domain GPIO reference. CPU selection alone establishes none of these SoC mechanisms or wider peripheral support. All physical HIL remains unexecuted.</p>
+<p>Detailed ownership/context/rejection semantics are in <a class="reference internal" href="../design/arch-contracts.html"><span class="std std-doc">Arch contracts</span></a>, OS lifecycle in <a class="reference external" href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/os/README.md">OS adaptation</a>, and exact whole-platform scope in <a class="reference internal" href="support.html"><span class="std std-doc">support matrix</span></a>. Previous-HEAD candidates/qualification are not inherited.</p>
+<section id="id1">
+<h2>Nine cores and optional capabilities<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>The table lists capability formats accepted by the parser. Optional capabilities require concrete chip facts, not inference from CPU names. <code class="docutils literal notranslate"><span class="pre">none</span></code>/zero explicitly means undeclared, with no runtime discovery.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>CPU</p></th>
+<th class="head"><p>Atomic RMW / IRQ mask</p></th>
+<th class="head"><p>Optional hardware formats</p></th>
+<th class="head"><p>Maintained FreeRTOS port</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>M0</p></td>
+<td><p>saved-PRIMASK / PRIMASK</p></td>
+<td><p>No FPU/MVE/cache/MPU/SAU</p></td>
+<td><p>GCC/ARM_CM0</p></td>
+</tr>
+<tr class="row-odd"><td><p>M0+</p></td>
+<td><p>saved-PRIMASK / PRIMASK</p></td>
+<td><p>Optional v7-format MPU</p></td>
+<td><p>GCC/ARM_CM0</p></td>
+</tr>
+<tr class="row-even"><td><p>M3</p></td>
+<td><p>compiler exclusive / BASEPRI</p></td>
+<td><p>v7 MPU, DWT</p></td>
+<td><p>GCC/ARM_CM3</p></td>
+</tr>
+<tr class="row-odd"><td><p>M4</p></td>
+<td><p>compiler exclusive / BASEPRI</p></td>
+<td><p>fpv4-sp-d16, v7 MPU, DWT</p></td>
+<td><p>CM3 without FP; CM4F with FP</p></td>
+</tr>
+<tr class="row-even"><td><p>M7</p></td>
+<td><p>compiler exclusive / BASEPRI</p></td>
+<td><p>fpv5-sp-d16/fpv5-d16, 32-byte cache, v7 MPU, DWT</p></td>
+<td><p>Reviewed integer overlay without FP; CM7/r0p1 with FP</p></td>
+</tr>
+<tr class="row-odd"><td><p>M23</p></td>
+<td><p>compiler exclusive / PRIMASK</p></td>
+<td><p>v8 MPU, explicit security state, Secure SAU</p></td>
+<td><p>ARM_CM23_NTZ/non_secure</p></td>
+</tr>
+<tr class="row-even"><td><p>M33</p></td>
+<td><p>compiler exclusive / BASEPRI</p></td>
+<td><p>Optional DSP, fpv5-sp-d16, v8 MPU, DWT, explicit security state, Secure SAU</p></td>
+<td><p>ARM_CM33_NTZ/non_secure</p></td>
+</tr>
+<tr class="row-odd"><td><p>M55</p></td>
+<td><p>compiler exclusive / BASEPRI</p></td>
+<td><p>Explicit FPU/MVE, 32-byte cache, v8 MPU, DWT, security state, Secure SAU</p></td>
+<td><p>ARM_CM55_NTZ/non_secure</p></td>
+</tr>
+<tr class="row-even"><td><p>M85</p></td>
+<td><p>compiler exclusive / BASEPRI</p></td>
+<td><p>Explicit FPU/MVE, 32-byte cache, v8 MPU, DWT, security state, Secure SAU</p></td>
+<td><p>ARM_CM85_NTZ/non_secure</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Cortex-M uses short-enums ABI. Without FPU/MVE use soft; with FPU explicitly choose hard/softfp. M55/M85 MVE is <code class="docutils literal notranslate"><span class="pre">none</span></code>, <code class="docutils literal notranslate"><span class="pre">integer</span></code> or <code class="docutils literal notranslate"><span class="pre">float</span></code>: no MVE adds <code class="docutils literal notranslate"><span class="pre">+nomve</span></code>, no scalar FP adds <code class="docutils literal notranslate"><span class="pre">+nofp</span></code>; integer-only MVE uses softfp while FPU remains <code class="docutils literal notranslate"><span class="pre">none</span></code>. FP-MVE requires a declared available FPU. M55/M85 FPU choices are <code class="docutils literal notranslate"><span class="pre">auto</span></code>, <code class="docutils literal notranslate"><span class="pre">fpv5-sp-d16</span></code> or <code class="docutils literal notranslate"><span class="pre">fpv5-d16</span></code>; <code class="docutils literal notranslate"><span class="pre">auto</span></code> is an explicit compiler option, not hardware detection.</p>
+<p>Security state is <code class="docutils literal notranslate"><span class="pre">single</span></code>, <code class="docutils literal notranslate"><span class="pre">secure</span></code> or <code class="docutils literal notranslate"><span class="pre">nonsecure</span></code>. Only security-extension-capable M23/M33/M55/M85 may declare the latter states; Secure adds <code class="docutils literal notranslate"><span class="pre">-mcmse</span></code>. SAU requires true Secure facts. Cache lines are zero/32 bytes; MPU is zero or maintained v7/v8 format. M0/M0+/M23 forbid DWT capability. Other cores also require explicit facts to read an already enabled cycle counter.</p>
+<p>IRQ priority width, external IRQ count and clock are chip facts. PRIMASK profiles fix two priority bits; BASEPRI supports 3–8. M0/M0+ support at most 32 external IRQs; M3/M4/M7/M23 240; M33/M55/M85 480. SoCs declare actual valid ranges. These limits do not replace vendor facts/electrical verification.</p>
+</section>
+<section id="cpu">
+<h2>CPU mechanisms and ownership<a class="headerlink" href="#cpu" title="Link to this heading">¶</a></h2>
+<p>Arch depends on no SoC/I/O/kernel/vendor SDK. Production algorithms execute through inline-instruction/MMIO boundaries; GoogleTest/GoogleMock replace only that hardware boundary. Native provides actual recursive thread exclusion, C11 fences/publication but models no NVIC, physical IRQ, privilege switching or actual cycles.</p>
+<p>Restore PRIMASK tokens once, in reverse order on the same CPU/thread, preserving input BASEPRI/FAULTMASK. Protected metadata permits privileged Thread/configurable IRQ only; NMI/HardFault, other CPUs/security worlds/DMA are outside exclusion. Context queries authorize no kernel-ISR calls. Barriers prove neither peripheral idle nor DMA drain. DWT enables/resets no counters and is not a monotonic deadline source.</p>
+<p>Aligned-word acquire/release loads/stores do not mask IRQs. M0/M0+ RMW uses bounded saved-PRIMASK exclusion without silent libatomic linkage. Other cores use compiler lock-free RMW; exclusive retries are not fixed cycles. Owners guarantee request/buffer/notification lifetimes; atomic publication reclaims no objects.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cache.h</span></code> maintains exclusive complete 32-byte lines only, without rounding/enabling; all relevant cache capability/enabled checks precede writes. Providers/products own pre-DMA-RX/post-drain maintenance, reachable addresses and buffer loans. <code class="docutils literal notranslate"><span class="pre">cache_control.h</span></code> separately maintains M7 cold enable/disable; other cores reject it. Callers supply owned control objects/exclude other memory users. Trusted reset or prior successful owned clean/disable is required; CCR=0 proves no foreign-dirty cleanliness. Actual set/way geometry is checked, failures retain cache/selector responsibility, and a stack-free leaf cleans all D-cache before disabling. This is neither ordinary live range maintenance nor DMA drain.</p>
+<p>MPU v7/v8 and SAU use distinct exact encoders. Actual single-region programming requires privileged Thread in this domain, input PRIMASK=1 and the unit already disabled. CTRL, other regions and input RNR are preserved; nothing implicitly enables the unit.</p>
+<p>Products own MPU/MAIR policy, SAU/IDAU, NSC veneers, secure boot, shared-resource protocols and recovery. CPU MPU programming alone establishes no user-task isolation. Explicit restricted-task runtime uses an actual FreeRTOS MPU port; software and physical security acceptance remain separate.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nonsecure.h</span></code> provides full-span CMSE permission observation from Secure privileged Thread, checking attribution/MPU as NS-unprivileged read/read-write; other images reject it. Observation neither copies/pins memory, identifies callers, excludes MMIO/DMA nor freezes mapping. The U575 reference adds cold ownership, fixed world principal, synchronous snapshots/output prevalidation for a limited gateway; no NS RTOS/asynchronous user DMA. See <a class="reference internal" href="../design/u575-trustzone-contract.html"><span class="std std-doc">U575 split-domain contract</span></a>.</p>
+</section>
+<section id="freertos">
+<h2>FreeRTOS software contracts<a class="headerlink" href="#freertos" title="Link to this heading">¶</a></h2>
+<p>Every CPU profile selects exact pinned-kernel port sources; M0/v8-M also compile required assembly files. Non-FP M7 uses a reviewed build overlay derived from pinned CM3, adding erratum-837070 PRIMASK-preserving BASEPRI helpers/PendSV handling while vendor files remain locked. Mapping every core to CM4F for convenience is forbidden.</p>
+<p>Armv8-M NTZ, Secure-only and standalone NonSecure defaults are selected by explicit facts with <code class="docutils literal notranslate"><span class="pre">configENABLE_TRUSTZONE=0</span></code>. Optional split profiles use matched Secure/NS images, actual TZ-aware ports and caller Secure-context/Idle storage, without default Secure heaps/pools. External projects still own Secure startup, IDAU/SAU and NS coprocessor access. Optional MPU profiles provide restricted tasks/narrow delay-tick SVC; ordinary APIs remain privileged. MPU-only/split-only are separate; MPU+split is rejected. <a class="reference internal" href="os.html"><span class="std std-doc">OS support</span></a> records exact variants/executed software evidence, not physical-isolation acceptance.</p>
+<p>M55/M85 use actual MVE-aware context ports. <code class="docutils literal notranslate"><span class="pre">configENABLE_FPU</span></code> with FP/MVE enables shared register banks/extended-lazy frames; integer-only MVE gains no scalar FP. Upper-bank save paths are checked separately in source/objects. VPR/lower bank depend on hardware extended exception framing, a port-acceptance assumption requiring architectural/physical checks. Compilation/ELF proves neither complete payload retention nor real FP/MVE switching and cannot replace physical acceptance.</p>
+<p>Callers statically supply tasks, TCBs, stacks, queues and notification storage; kernels link no heap allocator. Applications own scheduler startup, workers, queue depths, fairness, shutdown progress and post-join reclaim. Platform start neither starts schedulers nor generates hidden tasks/daemons.</p>
+<p>Running APIs require privileged unmasked Thread. Only NOT_STARTED permits the pinned port’s canonical bootstrap mask: PRIMASK=1 for Baseline, exact syscall BASEPRI for Mainline. Masks prove no provenance and confer no runtime/suspended permission. Fault/other masks are rejected before object changes. IRQ wake separately checks external exception range, priority width and actual-port syscall rules; notification only prompts request/sequence predicate rechecks.</p>
+</section>
+<section id="cpu-runtime">
+<h2>External CPU-runtime configuration<a class="headerlink" href="#cpu-runtime" title="Link to this heading">¶</a></h2>
+<p>Complete SoC projects retain strict platform assembly. CPU/Core/OS-only reuse takes external <code class="docutils literal notranslate"><span class="pre">runtime.toml</span></code> plus chip-package <code class="docutils literal notranslate"><span class="pre">cpu.json</span></code>. The following is an <strong>M33 NonSecure software-configuration example</strong>, not new chip/Board support. Replace clock/IRQ-count/optional capabilities with reviewed real-chip facts. No Board file is needed and no SoC/device factory is emitted.</p>
+<p><code class="docutils literal notranslate"><span class="pre">runtime.toml</span></code> must contain the following four entries; paths are relative to that TOML. It may also explicitly provide <code class="docutils literal notranslate"><span class="pre">[os]</span></code> policy matching the selected backend. Baremetal accepts no kernel policy; CPU-only configuration rejects low-power timebase selections requiring SoC timer facts:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">schema_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">cpu_facts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"cpu.json"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"freertos"</span>
+<span class="n">optimization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Os"</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">backend</span></code> is <code class="docutils literal notranslate"><span class="pre">baremetal</span></code>, <code class="docutils literal notranslate"><span class="pre">freertos</span></code> or explicitly scoped <code class="docutils literal notranslate"><span class="pre">threadx</span></code>. ThreadX accepts Native/Cortex-M4/M4F only and inherits no nine-core FreeRTOS port scope from this page; see <a class="reference internal" href="../design/threadx.html"><span class="std std-doc">ThreadX integration</span></a>. <code class="docutils literal notranslate"><span class="pre">optimization</span></code> accepts <code class="docutils literal notranslate"><span class="pre">O0</span></code>, <code class="docutils literal notranslate"><span class="pre">Og</span></code>, <code class="docutils literal notranslate"><span class="pre">O2</span></code>, <code class="docutils literal notranslate"><span class="pre">Os</span></code> or <code class="docutils literal notranslate"><span class="pre">O3</span></code>; Debug selections establish no timing or resource qualification. CPU-package/CPU/IRQ fields are complete and unique. Unknown fields, duplicate JSON keys, contradictory feature/ABI, invalid schema/clock and symlink paths are rejected; authored overrides cannot fabricate chip capabilities.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"schema_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"cpu"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"arch"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cortex-m33"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"dsp"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"fpu"</span><span class="p">:</span><span class="w"> </span><span class="s2">"none"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"float_abi"</span><span class="p">:</span><span class="w"> </span><span class="s2">"soft"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"dwt_cyccnt"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"mpu_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"icache_line_bytes"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"dcache_line_bytes"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"security"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nonsecure"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"sau"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"mve"</span><span class="p">:</span><span class="w"> </span><span class="s2">"none"</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"irq"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"priority_bits"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">"external_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">64</span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"clock_hz"</span><span class="p">:</span><span class="w"> </span><span class="mi">64000000</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Validate independently and emit the bundle atomically:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-B<span class="w"> </span>tools/configure/runtime.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--assembly<span class="w"> </span>/path/to/product/runtime.toml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w"> </span>/path/to/build/generated-runtime
+</pre></div>
+</div>
+<p>Outputs are <code class="docutils literal notranslate"><span class="pre">resolved-cpu.json</span></code>, <code class="docutils literal notranslate"><span class="pre">nexus_config.h</span></code>, <code class="docutils literal notranslate"><span class="pre">selection.cmake</span></code>, <code class="docutils literal notranslate"><span class="pre">input_paths.json</span></code> and ownership marker, binding input/config SHA-256. No linker script/bindings/factory is emitted. Failed configuration invalidates existing owned bundles instead of reusing stale selection. Nonowned directories are never cleared; outputs cannot overwrite inputs/parents. <code class="docutils literal notranslate"><span class="pre">clock_hz</span></code> does not set clocks.</p>
+<p>Public CMake entry from a source checkout:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.24</span><span class="p">)</span>
+<span class="nb">project</span><span class="p">(</span><span class="s">product_runtime</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">C</span><span class="w"> </span><span class="s">ASM</span><span class="p">)</span>
+<span class="nb">include</span><span class="p">(</span><span class="s2">"/path/to/nexus/cmake/platform/Runtime.cmake"</span><span class="p">)</span>
+<span class="nb">nexus_add_runtime</span><span class="p">(</span><span class="s">ASSEMBLY</span><span class="w"> </span><span class="s2">"${CMAKE_CURRENT_SOURCE_DIR}/runtime.toml"</span><span class="p">)</span>
+<span class="nb">add_library</span><span class="p">(</span><span class="s">application</span><span class="w"> </span><span class="s">STATIC</span><span class="w"> </span><span class="s">application.c</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">application</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">Nexus::Runtime</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Installed source SDK uses the entry below; the other two target operations are unchanged:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">find_package</span><span class="p">(</span><span class="s">Nexus</span><span class="w"> </span><span class="s">REQUIRED</span><span class="w"> </span><span class="s">COMPONENTS</span><span class="w"> </span><span class="s">Runtime</span><span class="p">)</span>
+<span class="nb">nexus_add_runtime</span><span class="p">(</span><span class="s">ASSEMBLY</span><span class="w"> </span><span class="s2">"${CMAKE_CURRENT_SOURCE_DIR}/runtime.toml"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Nexus::Runtime</span></code> propagates Config/ABI, Core, Arch, typed I/O faces and selected OS adapter without SoC/Board/factory. A CMake build allows one resolved Nexus assembly and no conflicting ABIs; external projects explicitly link extra components. MCU projects select <code class="docutils literal notranslate"><span class="pre">cmake/toolchains/arm-gcc.cmake</span></code> on first configure. External projects still implement startup/vectors/link layout/clocks/hardware/final executable. The example shows a reusable static-library source graph, not runnable-board firmware.</p>
+<p>Installed SDK checks complete source identity before generation/compilation. Development-fixture SDK requires explicit opt-in and is not a publishable candidate; opt-in bypasses no checksum/closure checks. SDK/external consumers must rerun for this new HEAD.</p>
+</section>
+<section id="id2">
+<h2>Execution evidence and remaining acceptance<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>CPU-profile/Runtime-resolver tests cover immutable IR, strict schemas, ABI/feature conflicts, atomic publication, changed inputs and stale outputs. Google models execute actual CPU algorithms. ARM gates retain macros/objects/assembly-disassembly/commands/exits/raw hashes. Runtime gates reuse the <code class="docutils literal notranslate"><span class="pre">nexus_add_runtime</span></code> production graph to build Core/Arch/OS and inspect actual FP/MVE kernel context/ELF rather than maintain another handwritten source graph.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-B<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>discover<span class="w"> </span>-s<span class="w"> </span>tools/configure<span class="w"> </span>-p<span class="w"> </span><span class="s1">'test_*.py'</span>
+python<span class="w"> </span>scripts/ci/tdd_gate.py<span class="w"> </span>--all<span class="w"> </span>--preset<span class="w"> </span>native-debug
+python<span class="w"> </span>-B<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>discover<span class="w"> </span>-s<span class="w"> </span>scripts/ci<span class="w"> </span>-p<span class="w"> </span><span class="s1">'test_*.py'</span>
+python<span class="w"> </span>scripts/ci/arch_compile.py<span class="w"> </span>--compiler<span class="w"> </span>arm-none-eabi-gcc<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w"> </span>build/arch-compiler
+python<span class="w"> </span>scripts/ci/cache_control_compile.py<span class="w"> </span>--compiler<span class="w"> </span>arm-none-eabi-gcc<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w"> </span>build/cache-control-compiler
+python<span class="w"> </span>scripts/ci/cortex_runtime.py<span class="w"> </span>--compiler<span class="w"> </span>arm-none-eabi-gcc<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w"> </span>build/cortex-runtime
+</pre></div>
+</div>
+<p>These commands establish CPU-primitive/runtime software evidence within actually executed scope. Concrete F407/F470 platforms, G474/H743/U575 references and physical stations have their own gates; compilation provides no physical evidence. Optional-feature scope follows actual execution; one passed combination does not qualify every possible combination. Current development output is <code class="docutils literal notranslate"><span class="pre">/workspace/nexus-all-cortex-evidence</span></code>; actual reports establish counts/source identity instead of previous-version counts.</p>
+<p>This iteration adds no actual Board and runs no physical HIL. IRQ latency, FP/MVE switching, cache/DMA coherence, MPU/SAU behavior, security-world cooperation, stack high-water, clocks/waveforms remain unaccepted. Formal clean-source SDK, offline double-build, image hashes and candidate sealing must rerun per <a class="reference internal" href="qualification.html"><span class="std std-doc">qualification</span></a>. Software support does not automatically become production release, hardware qualification, safety certification or LTS.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../design/index.html">Maintained design contracts</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Recorded delivery evidence</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current platform delivery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Current system architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system-verification.html">Build system execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capabilities.html">Derived capabilities and integration matrix</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Cortex-M software support and platform-integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="migration.html">External-project migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-iterations.html">Next iterations and team execution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os.html">OS delivery scope and verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qualification.html">Software candidates and physical qualification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="security-review.html">Security scanning and lifecycle boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-extensions-verification.html">SoC extension verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement-verification.html">SoC refinement execution record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support.html">Exact support scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="verification.html">Current evidence and acceptance boundaries</a></li>
+</ul>
+</li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>

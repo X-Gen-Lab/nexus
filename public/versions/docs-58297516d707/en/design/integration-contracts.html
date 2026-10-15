@@ -1,0 +1,527 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Integration, resource assembly and source-SDK contract &#8212; Nexus Embedded Platform 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/nexus.css?v=4084a1dc" />
+    <script src="../_static/documentation_options.js?v=d74eeac8"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Bounded I/O lifecycle property matrix" href="io-lifecycle-matrix.html" />
+    <link rel="prev" title="Explicit I2C bus recovery" href="i2c-bus-clear.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <aside class="nexus-page-identity" lang="en" aria-label="Document identity" data-nexus-source-language="zh_CN" data-nexus-requested-language="en" data-nexus-actual-language="en" data-nexus-translation-status="reviewed"><p>Document source: <a href="https://github.com/X-Gen-Lab/nexus/blob/58297516d707fdee117bd27b5df6af09d72edd2e/docs/design/integration-contracts.md">58297516d707</a>; code reference: 58297516d707. <a href="../../zh_CN/design/integration-contracts.html" lang="zh-CN">中文</a>. Source language: zh_CN; requested: en; actual: en; translation: <strong>reviewed</strong>.</p><p>Source documentation does not establish software or physical hardware qualification. See the support and qualification records for their exact scope.</p></aside><div class="nexus-canonical-content" lang="en"><section id="sdk">
+<h1>Integration, resource assembly and source-SDK contract<a class="headerlink" href="#sdk" title="Link to this heading">¶</a></h1>
+<blockquote>
+<div><p>Next-generation integration contract. See <a class="reference internal" href="../delivery/README.html"><span class="std std-doc">current delivery</span></a> for implemented modes and actual acceptance. <code class="docutils literal notranslate"><span class="pre">tools/configure/</span></code> and current public headers define exact schemas and APIs. Illustrative commands do not qualify three physical Boards or promise product releases.</p>
+</div></blockquote>
+<p>This document explains integration of CPUs, SoCs, Boards, external devices, protocols and components, and how external projects produce reviewable firmware. See <a class="reference internal" href="next-generation-platform.html"><span class="std std-doc">platform design</span></a> for boundaries and <a class="reference internal" href="engineering-handbook.html"><span class="std std-doc">engineering handbook</span></a> for development, validation and maintenance.</p>
+<p>Initial scope is STM32F407ZGT6 Qiming V3.1, STM32F407VET6 Sky Star Youth and GD32F470ZGT6 Liangshan Pi, with bare-metal and FreeRTOS backends. Hardware is not connected now. Source review, software implementation, compile/link results, model behavior and physical qualification are distinct. Actual PCB revisions, jumper settings, electrical facts and fitted parts remain unknown where unverified.</p>
+<section id="id1">
+<h2>1. 第一原则与工具边界<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>Integration does not turn every hardware description into a runtime device tree. It submits bounded facts, selects maintained capabilities, checks resources and explicitly assembles static objects.</p>
+<ul class="simple">
+<li><p>Use C11, CMake, Ninja, TOML assembly inputs, JSON hardware facts and a narrow Python validator/generator. The default core needs no heap, runtime string lookup, discovery or background workers.</p></li>
+<li><p>The default input is the external project’s <code class="docutils literal notranslate"><span class="pre">assembly.toml</span></code>. SoC, Board and assembly inputs are validated once into frozen typed IR; <code class="docutils literal notranslate"><span class="pre">resolved.json</span></code> is its authoritative JSON projection.</p></li>
+<li><p>CMake remains authoritative for code targets and dependencies. Generators produce no component dependency graph, business threads, product main or scheduling policy.</p></li>
+<li><p>Instance selection uses TOML schema 2; SoC/Board facts remain JSON. Tools parse only that assembly input; Kconfig, CMake cache and old generated headers do not become parallel authorities.</p></li>
+<li><p>Directories may follow <code class="docutils literal notranslate"><span class="pre">core/</span> <span class="pre">arch/</span> <span class="pre">soc/</span> <span class="pre">io/</span> <span class="pre">os/</span> <span class="pre">components/</span> <span class="pre">tools/</span> <span class="pre">tests/</span></code>; Boards may be separate packages. Layer names describe responsibility without requiring each layer, port or object to occupy a separate translation unit.</p></li>
+<li><p>Unmaintained capabilities do not become available merely because the SDK has a macro, a route table has an AF value or another family member has an example. Integrate new routes, DMA modes and controllers separately.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>2. 各类接入拥有的事实<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Category</p></th>
+<th class="head"><p>Owned facts and implementation</p></th>
+<th class="head"><p>Explicitly not owned</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CPU / Arch</p></td>
+<td><p>Instruction set, exception context, barriers, atomics/critical sections, FPU context and ABI conventions.</p></td>
+<td><p>Specific PCBs, controller IRQ/DMA assignments or product devices.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SoC</p></td>
+<td><p>Exact part/package/density, memory domains, controllers, clock constraints, IRQ/EXTI, DMA, pin/AF routes, Flash geometry and private SDK.</p></td>
+<td><p>Board wiring, application roles or product partitions.</p></td>
+</tr>
+<tr class="row-even"><td><p>Board</p></td>
+<td><p>PCB/source revisions, oscillators, electrical levels, fitted devices, connectors, jumper conditions, initial safe levels and reviewed wiring.</p></td>
+<td><p>Overriding chip density, selecting the primary sensor or creating business tasks.</p></td>
+</tr>
+<tr class="row-odd"><td><p>External device driver</p></td>
+<td><p>Device commands/registers, conversion algorithms, initialization order, timing requirements and error semantics.</p></td>
+<td><p>Default GPIOs, default bus numbers or product sampling policy.</p></td>
+</tr>
+<tr class="row-even"><td><p>protocol core</p></td>
+<td><p>Frame formats, parsing/encoding, bounded state machines and protocol timing rules.</p></td>
+<td><p>Default UARTs, RS485 DE pins, threads or customer business logic.</p></td>
+</tr>
+<tr class="row-odd"><td><p>component</p></td>
+<td><p>Reusable algorithms/services, narrow ports, explicit capacity and execution context.</p></td>
+<td><p>Implicit workers, automatic dependency discovery or fixed product storage.</p></td>
+</tr>
+<tr class="row-even"><td><p>product / application</p></td>
+<td><p>main, workers, application roles, private protocols, configuration policy, partitions and update/health/manufacturing policy.</p></td>
+<td><p>Making the shared platform depend on product source.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>SoC providers implement public I/O/core contracts and use Arch. Device drivers use narrow bus/GPIO/time ports; protocol cores depend on neither Board nor OS; component adapters connect I/O/OS. External assemblies wire implementations together. Declaring onboard devices does not make the Board the device-driver owner.</p>
+<p>Vendor SDKs, kernel implementation headers and mutable controller state stay private; public interfaces do not expose their structures. Similar STM32/GD32 names do not prove register compatibility or direct driver reuse.</p>
+</section>
+<section id="id3">
+<h2>3. 三类输入及少量文件模板<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<section id="soc-package">
+<h3>SoC package<a class="headerlink" href="#soc-package" title="Link to this heading">¶</a></h3>
+<p>A maintained SoC package typically includes:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>soc/&lt;family&gt;/
+  soc.json                 # 精确 SKU、内存、时钟与控制器事实
+  routes.json              # 已复核路由及模式的有限 allowlist
+  CMakeLists.txt           # 私有 SDK/provider 的显式目标依赖
+  private/                 # 私有 SDK 接口与硬件实现
+  ...                      # startup、controller、clock/IRQ、linker 实现
+</pre></div>
+</div>
+<p>Family directories may share code, but <code class="docutils literal notranslate"><span class="pre">soc.json</span></code> defines STM32F407VET6, STM32F407ZGT6 and GD32F470ZGT6 separately. A family string cannot replace part, package, Flash, SRAM domains and IRQ tables. Adding a part does not establish support for every existing controller.</p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">routes.json</span></code> record binds at least exact SKU, controller, pin/AF, clock domain, IRQ, allowed transfer modes, DMA routes and sources. Shared records explicitly constrain applicable SKUs/packages. Source review and physical qualification use separate fields.</p>
+</section>
+<section id="board-package">
+<h3>Board package<a class="headerlink" href="#board-package" title="Link to this heading">¶</a></h3>
+<p>With an existing SoC implementation, a new Board normally needs only:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>boards/&lt;board-id&gt;/
+  board.json               # 实际晶振、接线、电气、revision、资料来源
+  README.md                # 跳线/连接器与已知限制
+  board.c                  # 可选：特殊电源/复位/安全初值动作
+</pre></div>
+</div>
+<p>Boards do not copy SDKs, HALs, RTOS ports or linker scripts. Ordinary GPIO initial levels and pin bindings are data. Add <code class="docutils literal notranslate"><span class="pre">board.c</span></code> only for bounded electrical actions not expressible through maintained data contracts; that code still uses neutral hardware ports.</p>
+<p>The following fields are illustrative; <code class="docutils literal notranslate"><span class="pre">example-board</span></code> does not claim a real maintained Board:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"schema_version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example-board"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"soc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"STM32F407ZGT6"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"soc_family"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stm32f407"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"source_revision"</span><span class="p">:</span><span class="w"> </span><span class="s2">"document-revision"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"physical_pcb_revision"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"clocks"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"hse_hz"</span><span class="p">:</span><span class="w"> </span><span class="mi">8000000</span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"bindings"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nt">"reserved_resources"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nt">"unknowns"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"physical PCB identity and connector wiring pending"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"provenance"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Replace oscillator values with the Board’s source facts. Empty <code class="docutils literal notranslate"><span class="pre">bindings</span></code> provide no UART/SPI/I2C/RS485. Before adding real wiring, verify connectors, pins, levels, jumpers and reviewed SoC routes. Boards reference SoC memory facts rather than maintaining a drifting RAM/Flash copy.</p>
+</section>
+<section id="assembly">
+<h3>External assembly<a class="headerlink" href="#assembly" title="Link to this heading">¶</a></h3>
+<p>External <code class="docutils literal notranslate"><span class="pre">nexus-examples</span></code> or private products supply <code class="docutils literal notranslate"><span class="pre">assembly.toml</span></code> selecting Board packages, OS backends, clock profiles, resources and device instances. This minimal illustration declares no peripheral instances:</p>
+<!-- nexus-toml-fragment: external Board paths and clock profile must be supplied. -->
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">board_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"./boards/example-board"</span>
+<span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"baremetal"</span>
+<span class="n">clock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"selected-profile-id"</span>
+
+<span class="k">[memory]</span>
+<span class="n">main_stack_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4096</span>
+<span class="n">libc_heap_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">selected-profile-id</span></code> is an illustrative placeholder; unknown profiles must fail. Category tables such as <code class="docutils literal notranslate"><span class="pre">[uart.link0]</span></code> select only Board-declared, SoC-maintained bindings with explicit polling/IRQ/DMA modes, required ring capacities and IRQ priorities. <code class="docutils literal notranslate"><span class="pre">[spi_device.sensor0]</span></code> and <code class="docutils literal notranslate"><span class="pre">[i2c_device.sensor0]</span></code> explicitly bind controllers and CS/address without workers. Factories return immutable controller and child faces separately.</p>
+<p>Without an external product layout, images use only the maintained full physical Flash default layout. The platform reserves no generic product storage. Selected product layouts become complete declared assembly inputs and enter resolved IR through the same path.</p>
+</section>
+</section>
+<section id="cmake">
+<h2>4. 解析、生成与 CMake 装配<a class="headerlink" href="#cmake" title="Link to this heading">¶</a></h2>
+<p>Configuration must follow this fixed order:</p>
+<ol class="arabic simple">
+<li><p>Read the assembly, locate one Board and its exact SoC part, then check schemas, versions and dependency locks.</p></li>
+<li><p>Check package containment, declared inputs and known/unknown source conditions; expand selected bindings and devices.</p></li>
+<li><p>Build resource claims; check mode capabilities, conflicts, clocks, IRQs, memory, ABI and layout.</p></li>
+<li><p>Atomically write one <code class="docutils literal notranslate"><span class="pre">resolved.json</span></code> recording decisions, rejections and input digests.</p></li>
+<li><p>Derive hardware headers, read-only resource tables and linker inputs from IR; CMake reads necessary selections and builds its declared dependencies.</p></li>
+<li><p>Verify vectors, startup, handlers, region capacities and artifact identity in actual ELF/map/BIN outputs. Results become evidence without posing as hardware qualification.</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">resolved.json</span></code> retains schema, packages/parts/backends, effective options, clock/memory/ABI, resource claims, devices, limitations and input hashes. It is neither a CMake dependency graph nor guessed business threads, roles or domain policy.</p>
+<p>All derived outputs come from that IR. No <code class="docutils literal notranslate"><span class="pre">.config</span></code>, old headers or separate Board default macros become fallback authorities. Failed generation invalidates configuration; never consume the prior bundle. Write to a temporary directory and switch only after complete success. Separate Board/backend/profile combinations use separate roots.</p>
+<p>Each CMake library declares code dependencies, public headers and private SDK compile surfaces explicitly. Assembly selects hardware instances/modes without replacing <code class="docutils literal notranslate"><span class="pre">target_link_libraries()</span></code>. Generators neither infer component needs from arbitrary business source nor link all drivers. Target capability requirements contradicting resolved configuration must fail.</p>
+<p>Tools may generate static descriptors; mutable contexts and actual construction/init still have explicit implementation owners. Product main owns component/device initialization order and scheduler start. A device node does not create a sampling task.</p>
+</section>
+<section id="id4">
+<h2>5. 资源占用与编译前检查<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Resource</p></th>
+<th class="head"><p>Required checks</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pin</p></td>
+<td><p>The exact package has the pin; routes are allowlisted and reviewed; AF/direction/electrical constraints hold; SWD, onboard devices and selected functions do not conflict.</p></td>
+</tr>
+<tr class="row-odd"><td><p>controller</p></td>
+<td><p>The provider implements the selected mode; one owner holds the physical controller; shared-bus children derive from that owner.</p></td>
+</tr>
+<tr class="row-even"><td><p>SPI child</p></td>
+<td><p>Separate CS lines; mode, frequency and word width must fit maintained configurations; explicit serialized arbitration.</p></td>
+</tr>
+<tr class="row-odd"><td><p>I2C child</p></td>
+<td><p>Legal addresses/mux levels; conflicting addresses rejected; controller and mux modes both implemented.</p></td>
+</tr>
+<tr class="row-even"><td><p>DMA</p></td>
+<td><p>Validate the actual DMA controller/stream/channel/request model, legal routes, exclusive-resource conflicts and implemented modes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>IRQ</p></td>
+<td><p>Each vector has one provider or explicit bounded dispatcher; priority, grouping and kernel-call permissions agree.</p></td>
+</tr>
+<tr class="row-even"><td><p>EXTI</p></td>
+<td><p>Check exclusive line/port muxing, edges, shared vectors, event capacity and priority rather than only pin names.</p></td>
+</tr>
+<tr class="row-odd"><td><p>timer/PWM</p></td>
+<td><p>Check timer/channel, timebase, shared PSC/ARR/base mode and triggers. Channels on one timer are not independent timebases.</p></td>
+</tr>
+<tr class="row-even"><td><p>ADC</p></td>
+<td><p>Check channels, sampling time, sequences, triggers, reference-voltage conditions and exact sampling modes; maintain DMA/stream separately.</p></td>
+</tr>
+<tr class="row-odd"><td><p>watchdog</p></td>
+<td><p>Check maintained IWDG range, LSI error and irreversible enabling. Feeding/health policy remains external.</p></td>
+</tr>
+<tr class="row-even"><td><p>clock</p></td>
+<td><p>Oscillators, PLLs, buses, Flash wait states, peripheral frequencies and backend timebase meet maintained profiles.</p></td>
+</tr>
+<tr class="row-odd"><td><p>memory</p></td>
+<td><p>Exact physical domains, DMA reachability, alignment, stack/pool/queue budgets, layout/erase boundaries and image capacity.</p></td>
+</tr>
+<tr class="row-even"><td><p>ABI</p></td>
+<td><p>Consistent CPU/Thumb/FPU/float ABI, correct FreeRTOS port and exact-part macros from resolved configuration.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>Resource claims must identify physical resource keys, owners, modes and origins. Diagnostics say “DMA1 stream X is claimed by A and B”, not merely “invalid configuration”. Tools validate explicit choices without finding alternate streams, changing pins or lowering clocks.</p>
+<p>Sharing SPI/I2C buses does not mean declaring controllers twice. One provider manages the bus; children retain bounded references. Duplicate SPI CS or same-level I2C addresses fail. Direct single-executor calls and explicit queue/service adapters are distinct: only the adapter executor advances shared controllers; waiting clients do not take over. Short locks protect admission/control metadata, never hold task mutexes across DMA lifetimes. Device drivers do not implicitly require kernel locks.</p>
+<p>Real shared IRQs may use SoC-declared static dispatchers with checked handler lists and bounded execution. Two strong symbols cannot compete for one vector; arbitrary runtime registration is excluded. IRQ response/settlement and subsequent task/worker processing have separate owners.</p>
+<p>FreeRTOS reserves port resources including SysTick/PendSV/SVC. Configure priority grouping consistently; kernel-calling ISRs must meet the port’s syscall-priority rules, while higher-priority ISRs cannot use those OS APIs. Alternate timer timebases enter the same claims table.</p>
+<section id="clockmemory-abi">
+<h3>Specific clock, memory and ABI boundaries<a class="headerlink" href="#clockmemory-abi" title="Link to this heading">¶</a></h3>
+<p>Boards supply actual HSE/LSE, electrical and jumper facts; SoCs supply legal constraints and maintained profiles; assemblies choose profiles. Controllers do not reconfigure global clocks independently; drivers do not reset NVIC grouping. Without implemented dynamic-clock switching, runtime switch requests return unsupported.</p>
+<p>Declare each SRAM domain’s address, size, initialization, DMA reachability and usage restrictions separately. STM32 CCM is not default DMA SRAM; all physical SRAM cannot become one unmaintained linker heap. Initially enable only implemented, checked domains; others remain unmaintained.</p>
+<p>Linker sections, alignment and maps validate static DMA buffers; runtime validation still checks caller-provided pointers for reachability/alignment. Compile checks cannot replace borrowing/settlement lifetimes. Budgets distinguish MSP, task stacks, OS objects, I/O buffers, component workspaces and optional libc heaps.</p>
+<p>Flash layouts use exact-part erase geometry and reject out-of-range, overlapping or erase-misaligned regions. Image offsets, VTOR and bootloader/A-B require maintained implementations together; changing link addresses alone does not establish support.</p>
+<p>CPU flags, FPU enabling, exception contexts and kernel ports must agree. Record toolchain and all precompiled-input ABIs in identity. Source SDKs are recommended; installed-binary ABI compatibility across compilers/versions/flags is not promised by default.</p>
+</section>
+<section id="id5">
+<h3>What each stage can establish<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<p>Pregeneration validates fact consistency and conflicts. C11 <code class="docutils literal notranslate"><span class="pre">_Static_assert</span></code> and types establish capacity/type/constant relationships. Linker/map/ELF checks establish layouts, symbols, handlers and retention. Waveforms, electrical levels, clock error, IRQ latency, DMA terminal states and sustained loads need physical evidence.</p>
+</section>
+</section>
+<section id="role">
+<h2>6. 实例名、应用 role 与静态成本<a class="headerlink" href="#role" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">USART1</span></code> names a SoC controller; <code class="docutils literal notranslate"><span class="pre">j1_uart</span></code> and <code class="docutils literal notranslate"><span class="pre">bme280_ext0</span></code> are stable assembly instance names; <code class="docutils literal notranslate"><span class="pre">console</span></code> and <code class="docutils literal notranslate"><span class="pre">ambient_sensor</span></code> are external application roles. Boards supply physical resources without selecting the product’s primary sensor.</p>
+<p>External consumers own role mappings/constraints. Their build steps may read resolved information, validate required interfaces and generate typed aliases/accessors. The platform generates no product role policy. After rebinding hardware, applications still use roles rather than searching business source for UART/GPIO numbers.</p>
+<p>Ordinary data paths need no runtime string lookup. Read-only wiring resides in Flash; required contexts, pools, queues and buffers are static. Role aliases can compile to direct symbols; generic drivers retain one function-pointer layer only where narrow ports require it. Layer names do not justify extra objects or virtual calls.</p>
+<section id="typed-factory">
+<h3>Implemented static instances and typed factories<a class="headerlink" href="#typed-factory" title="Link to this heading">¶</a></h3>
+<p>Factories preserve the typed polymorphic-interface architecture. Generators create static objects; factories return existing identities without creating, initializing, locking or reconfiguring devices. Typed getters include <code class="docutils literal notranslate"><span class="pre">nx_factory_uart(nx_uart_id_t)</span></code>. IDs are <code class="docutils literal notranslate"><span class="pre">uint16_t</span></code> with named constants; out-of-range, COUNT and unselected categories return NULL. IDs are assembly-local, not persistent formats or cross-version binary ABIs.</p>
+<p>Each public face is read-only <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">const</span> <span class="pre">ops*,</span> <span class="pre">void*</span> <span class="pre">context</span> <span class="pre">}</span></code>: two pointers on 32-bit targets, with actual Flash/RAM audited from linked outputs. Each provider/mode shares <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">ops</span></code>; mutable state and exact-capacity arrays are separate. Methods receive instance context, never treating shared ops as an instance. IRQs statically enter providers without per-byte virtual dispatch. Native instances also have separate generated state; singleton fixtures are explicitly test-only.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Object</p></th>
+<th class="head"><p>Implemented static generation responsibility</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>controller port</p></td>
+<td><p>One necessary exclusive-controller state and one read-only public face.</p></td>
+</tr>
+<tr class="row-odd"><td><p>GPIO view</p></td>
+<td><p>Separate authorized masks/directions; validate different pins sharing the GPIO base independently.</p></td>
+</tr>
+<tr class="row-even"><td><p>bus endpoint</p></td>
+<td><p>Each SPI CS or I2C address has its own face/private configuration, without borrowing the first device’s identity.</p></td>
+</tr>
+<tr class="row-odd"><td><p>mode storage</p></td>
+<td><p>Allocate only selected UART/EXTI profiles, capacities and explicit Native register models.</p></td>
+</tr>
+<tr class="row-even"><td><p>typed factory</p></td>
+<td><p>Pure static switch; no registration, string lookup, heap or hidden workers.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ops</p></td>
+<td><p>Instances of the same provider/mode share a read-only table; different implementations keep the same public interface layout.</p></td>
+</tr>
+<tr class="row-even"><td><p>IRQ wiring</p></td>
+<td><p>Fixed instances dispatch directly; genuinely shared EXTI uses bounded static dispatchers.</p></td>
+</tr>
+<tr class="row-odd"><td><p>startup</p></td>
+<td><p>Explicit serial calls and reverse cleanup; BUSY retains progress and all borrowed storage.</p></td>
+</tr>
+<tr class="row-even"><td><p>component</p></td>
+<td><p>External composition provides storage, narrow ports and scheduling without generated business instances.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p><code class="docutils literal notranslate"><span class="pre">nx_binding_&lt;bus&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">nx_factory_spi/i2c</span></code> return actual controller ports; <code class="docutils literal notranslate"><span class="pre">nx_device_&lt;child&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">nx_factory_spi_device/i2c_device</span></code> return endpoints. Public I2C recovery therefore always has bus identity. Applications cannot treat bus aliases as the first endpoint. Polling and asynchronous modes implement resources/capabilities separately; getters never switch modes implicitly.</p>
+<p>Assemblies use TOML schema 2; one <code class="docutils literal notranslate"><span class="pre">authored.py</span></code> field model provides strict parsing and editor schemas. Frozen <code class="docutils literal notranslate"><span class="pre">ControllerIR/EndpointIR/MemoryBudgetIR/ConfigurationIR</span></code> feeds emitters directly; <code class="docutils literal notranslate"><span class="pre">resolved.json</span></code> serializes the decisions. <code class="docutils literal notranslate"><span class="pre">configure.py</span> <span class="pre">init/list-bindings/check/explain/generate</span></code> share the resolver. CMake adds exact reconfiguration dependencies from resolver input paths without reparsing TOML.</p>
+<p>STM32 USART1 <code class="docutils literal notranslate"><span class="pre">dma-tx</span></code> uses fixed DMA2 stream7 channel4; RX retains its separate IRQ ring. DMA domains/runtime pointer validation, memory-engine detach and UART TC wire draining are verified separately; NDTR=0 is not UART completion. Different selectors for one physical stream still conflict. Other DMA/stream modes claim support only within their own code/model/link/physical evidence.</p>
+<p>Obtaining a static face neither changes startup state nor grants concurrent execution rights. Cancel, timeout, stop and restart cannot revoke request borrows early; only acquire-observed SETTLED permits reclamation. Explicit owner executors advance shared paths; products own tasks and recovery policy.</p>
+<p>Source SDKs contain public interfaces, strict configuration tools and exact dependency identities. Code/comments preserve current style. Behavior changes use failing-tests-first TDD; host GoogleTest/GoogleMock links separately from production C11 drivers. Ordinary SDK firmware contains no testing framework.</p>
+</section>
+</section>
+<section id="board">
+<h2>7. 新 Board 接入流程<a class="headerlink" href="#board" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Collect exact MCU, PCB/document revisions, schematic/BOM sources, oscillators, supplies, SWD, connectors, jumpers and default levels. Unknown actual PCB revisions remain null.</p></li>
+<li><p>Confirm maintained SoC implementation and select minimal resources, such as an LED and UART. Review each route without assuming all connectors are supported.</p></li>
+<li><p>Write <code class="docutils literal notranslate"><span class="pre">board.json</span></code> and README; add neutral Board hooks only for special power/reset actions. Identify reviewed sources and unexecuted physical items.</p></li>
+<li><p>Create an external <code class="docutils literal notranslate"><span class="pre">assembly.toml</span></code> and explicit main; begin with bare metal and build actual ARM ELF/map/BIN. Check resource plans, clocks, memory, ABI, vectors and handlers.</p></li>
+<li><p>Create a FreeRTOS assembly for those resources and check port, timebase, IRQ priority and static budgets. Use separate roots for both backends.</p></li>
+<li><p>Record exact tuples and actual software evidence. Without hardware, physical initialization, electrical behavior, IRQ/DMA and long runs remain not executed.</p></li>
+</ol>
+<p>Individually establish maintained MCU I2C/SPI routes/modes and RS485 transceiver/DE/RE wiring on all three initial Boards. Names do not establish availability. This proposal does not automatically remove Qiming’s disabled SPI, unverified RS485 conditions or missing actual PCB revision.</p>
+</section>
+<section id="soc-sku">
+<h2>8. 新 SoC 或精确 SKU 接入流程<a class="headerlink" href="#soc-sku" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Distinguish new packages/densities from new register/clock/IRQ/DMA implementations rather than classifying solely by marketing family.</p></li>
+<li><p>Pin official documents, errata, SDK revisions, licenses and import hashes; record exact part/package/density.</p></li>
+<li><p>Define physical memory, Flash geometry, clock constraints, IRQs and controllers in <code class="docutils literal notranslate"><span class="pre">soc.json</span></code>. Initially include only reviewed routes intended for maintenance.</p></li>
+<li><p>Implement required Arch adapters, reset/startup, clocks, timebase, IRQs, linker and minimum I/O providers. SDK targets stay PRIVATE; no vendor structures leak to consumers.</p></li>
+<li><p>Start with minimal ELF link fixtures, then compile/link actual bare-metal and FreeRTOS ports/configurations. Establish necessary model evidence for behavioral error, terminal-resource and cancellation paths.</p></li>
+<li><p>Expand matrices separately for new controllers/routes/DMA modes. SDK features without providers do not become selectable maintained capabilities.</p></li>
+<li><p>Without physical qualification, delivery reaches only executed software items. Related-chip results do not confer physical support.</p></li>
+</ol>
+</section>
+<section id="driver">
+<h2>9. 新外部器件 driver 接入流程<a class="headerlink" href="#driver" title="Link to this heading">¶</a></h2>
+<p>Consider a BME280 SPI driver; this example does not claim reviewed SPI wiring on the three initial Boards.</p>
+<ol class="arabic simple">
+<li><p>Confirm reviewed SPI bindings, CS and electrical conditions. Otherwise first integrate SoC routes/controllers and Board wiring independently.</p></li>
+<li><p>Create device-core public headers, implementation and CMake; define bounded contexts and narrow transaction/time ports. Drivers own registers, chip-ID, calibration parsing and conversion algorithms.</p></li>
+<li><p>Declare required bus modes/word widths/frequencies, initialization timing, ISR/task restrictions, timeout origins, buffer borrows, post-failure states and recovery conditions.</p></li>
+<li><p>External assemblies create <code class="docutils literal notranslate"><span class="pre">bme280_ext0</span></code> with bus child/CS and fixed capacities; CMake explicitly links drivers and adapters.</p></li>
+<li><p>Consumers map <code class="docutils literal notranslate"><span class="pre">ambient_sensor</span></code> themselves. Bare-metal main calls periodically; FreeRTOS product workers call the same driver. The platform creates no automatic task.</p></li>
+<li><p>Fake ports verify parsing, error responses, deadlines and ownership. Actual ARM links verify interfaces, capacity and assembly. Chip-ID checks belong to instance initialization, not device scanning.</p></li>
+<li><p>Qualify real wiring, waveforms, sensor error and sustained loads separately. Without hardware, record only executed software evidence.</p></li>
+</ol>
+<p>Device drivers do not automatically make Flash-bus storage product Storage or reserve product regions. W25Q, for example, needs actual fitted-part, capacity, erase-geometry facts and external layout policy.</p>
+</section>
+<section id="protocol-component">
+<h2>10. 新 protocol / component 接入流程<a class="headerlink" href="#protocol-component" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Establish reuse value and platform-maintenance worth. Customer-private protocols, product flows and domain control stay external.</p></li>
+<li><p>Define Board/SDK-independent cores with fixed maximum frame lengths, node counts, workspaces and failure semantics. Parsers must not implicitly open UARTs or create tasks.</p></li>
+<li><p>Connect through narrow transport/time/storage ports with separately optional adapters; CMake declares code dependencies explicitly.</p></li>
+<li><p>External assemblies select only transport hardware resources; products explicitly configure protocol roles, scheduling and workers.</p></li>
+<li><p>Verify observable protocol behavior, invalid inputs, boundaries and exhaustion, and link actual firmware. Electrical and frame-timing qualification still needs physical evidence.</p></li>
+</ol>
+<p>RS485 needs Board/external wiring facts for transceivers, levels, DE/RE, isolation and termination. SoC UART providers own maintained transfer terminal states; protocols/adapters define direction-switch timing. Software delays or generic UART success cannot replace actual TC and line qualification.</p>
+</section>
+<section id="id6">
+<h2>11. 外部源码 SDK 消费与升级<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p>An external project normally needs only:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>nexus-examples/&lt;application&gt;/
+  CMakeLists.txt
+  CMakePresets.json
+  assembly.toml
+  dependencies.lock.json
+  main.c
+  ...                      # 产品自己的 role、worker、layout 和策略
+</pre></div>
+</div>
+<p>Pin source SDK/commit and dependency locks, verify packages, integrate through public CMake entry points, then explicitly link platform capabilities/components. CMake presets select toolchains/build modes; assemblies select hardware/backends. Their responsibilities do not overlap.</p>
+<p>SDK preparation/consumption requires complete source with pinned dependencies. Missing submodules or snapshots are not silently releasable SDKs. Packages include manifests, licenses, relative CMake configurations and input identities, followed by actual consumer verification after relocation. Relocatability does not prove ABI compatibility.</p>
+<p>Upgrade PRs change platform pins, callers and necessary assemblies/schemas together. Breaking contracts specify versions and migration instructions, then rerun exact support-tuple software regressions. Old-source/configuration results do not qualify new inputs. Product promotion uses reviewed identical artifact digests without silent rebuilding.</p>
+<p>External products own bootloaders, A/B, signing, rollback, manufacturing and field updates. Layout, image-offset and persistent-format changes need product migration/recovery contracts and qualification; source-SDK upgrades do not do that work automatically.</p>
+</section>
+<section id="id7">
+<h2>12. 版本、路径、摘要与产物身份<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>SoC/Board/assembly/resolved inputs have explicit schema versions. Reject unknown versions/fields and contradictions rather than silently ignoring them. Necessary extensions use controlled namespaces without hiding effective compile options.</p></li>
+<li><p>Packages record API/contract versions, exact dependency revisions and origins. Schema compatibility does not establish hardware or behavioral compatibility.</p></li>
+<li><p>Relative paths are anchored to their owning manifests. Board source stays inside its package; reject <code class="docutils literal notranslate"><span class="pre">..</span></code>, symlink escapes and undeclared source. SDK paths must not inherit consumer-ancestor Git identity accidentally.</p></li>
+<li><p>Declare and hash all build-affecting inputs: routes, Board hooks, layouts, vendor imports, dependency locks, toolchains and compile options. Raw-byte hashes identify inputs; normalized resolved JSON identifies effective configuration. Algorithms/formats are versioned.</p></li>
+<li><p>Do not update dependencies over the network secretly during resolution/build. New effective sources not declared in manifests must fail or be added explicitly; directory additions cannot bypass identity checks.</p></li>
+<li><p>Product and platform identities are separate. Platforms supply neutral part/Board/configuration facts without owning product names, SKUs or manufacturing policy.</p></li>
+<li><p>Artifact manifests bind platform/consumer revisions, dependencies, toolchains, SoC/Board/assembly/resolved/layout hashes, ELF/BIN/map digests and evidence scope.</p></li>
+<li><p>Dirty development builds may be explicitly allowed but are marked <code class="docutils literal notranslate"><span class="pre">publishable=false</span></code>. Missing inputs, hash mismatches, stale evidence and snapshots cannot gain release qualification.</p></li>
+</ul>
+</section>
+<section id="tuple">
+<h2>13. 支持 tuple 与支持等级<a class="headerlink" href="#tuple" title="Link to this heading">¶</a></h2>
+<p>The minimum support unit is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;platform source, consumer source, exact MCU part/package,
+ Board source revision, physical PCB revision or unknown,
+ route, transfer mode, OS backend, resolved config hash,
+ toolchain/ABI, layout hash&gt;
+</pre></div>
+</div>
+<p>Board names are lookup aids, not promises for all onboard peripherals. UART IRQ tuple results do not qualify SPI DMA, I2C, RS485 or another backend on that Board.</p>
+<div class="nexus-table-shell colwidths-auto docutils container">
+<div class="nexus-table-scroll" role="region" tabindex="0" aria-label="Scrollable table"><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Record</p></th>
+<th class="head"><p>Established scope</p></th>
+<th class="head"><p>Not established</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>D: description review</p></td>
+<td><p>Part, wiring and routes reviewed in named source documents.</p></td>
+<td><p>Actual fitted parts, PCBs or usable wiring.</p></td>
+</tr>
+<tr class="row-odd"><td><p>C: compile/link</p></td>
+<td><p>Actual ARM ELF, layout and assembly pass with the specified toolchain.</p></td>
+<td><p>Hardware execution or correct timing.</p></td>
+</tr>
+<tr class="row-even"><td><p>M: model behavior</p></td>
+<td><p>Host/fake behavior passes for exact source/configuration.</p></td>
+<td><p>Electrical behavior or actual IRQ/DMA terminal states.</p></td>
+</tr>
+<tr class="row-odd"><td><p>H: physical paths</p></td>
+<td><p>Actual measurements for exact PCB, route and mode.</p></td>
+<td><p>Arbitrary loads, other peripherals or complete-product qualification.</p></td>
+</tr>
+<tr class="row-even"><td><p>Q: product workload qualification</p></td>
+<td><p>Acceptance under named workloads, budgets and product policy.</p></td>
+<td><p>Other products, unlimited support windows or LTS.</p></td>
+</tr>
+</tbody>
+</table>
+</div></div>
+<p>These are separate evidence dimensions, not one hierarchy letting models replace compilation/hardware. Missing C/M/H/Q evidence is explicitly not executed. Logs, artifacts, source/configuration and budgets bind the same tuple.</p>
+<p>The first stage may establish six base software combinations: three Boards × two backends. Each claims only paths actually selected and executed. Expand I2C/SPI/RS485/DMA columns by maintained facts. Without hardware, H/Q remain empty; role lists, workflows and fixtures do not fill that gap.</p>
+<p>With ten people and 3–6 months, prioritize narrow schemas, six base firmware combinations, needed controllers/drivers and reviewable artifacts. Complete pin databases, all SDK features, automatic topology solving and runtime discovery are not first-stage exit criteria.</p>
+</section>
+</section>
+</div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Nexus Embedded Platform</a></h1>
+
+
+
+<p class="blurb">Static embedded platform mechanisms</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Task guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explanation/index.html">Architecture explanations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../status/index.html">Status and evidence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Maintaining Nexus</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Maintained design contracts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="README.html">Current design and execution ledgers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arch-contracts.html">CPU, atomics and runtime assembly contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-system.html">Build system maintenance contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classic-can.html">Classic CAN mechanisms and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock-domain-sleep.html">Explicit clock leases and shallow sleep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-improvements.html">Nexus complete documentation-system improvement checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-standards.html">Nexus documentation content and diagram standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-system.html">Nexus documentation-system architecture and delivery plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation-templates.html">Nexus documentation page templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="engineering-handbook.html">Next-generation platform engineering handbook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ethernet.html">Raw Ethernet MAC, MDIO and DP83848</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fault-observation.html">Fault observation and retained responsibility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="i2c-bus-clear.html">Explicit I2C bus recovery</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Integration, resource assembly and source-SDK contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-lifecycle-matrix.html">Bounded I/O lifecycle property matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io-observation-recovery.html">I/O observations, capacity and retained recovery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-controllers.html">Multiple controller ownership</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiple-dma-controllers.html">Independent finite UART and SPI DMA controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="next-generation-platform.html">Nexus next-generation platform: design from first principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-backend-integration.html">OS backend integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="os-contracts.html">OS execution and lifecycle contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provider-assemblies.html">Selected provider assembly gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-execution-budgets.html">SoC execution budgets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc-refinement.html">SoC refinement and physical acceptance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-compatibility.html">Source versions, factory generations and dependency maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stack-observation-endurance.html">Stack observations and owner lifecycle endurance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stm32g474.html">STM32G474RET6 / MB1367 initial vertical slice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threadx.html">ThreadX configuration and integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timebase-lowpower.html">Reviewed shallow tickless timebase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer-advanced.html">Optional timer capture and complementary PWM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="u575-trustzone-contract.html">U575 synchronous dual-world reference contract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart-dma-rs485.html">UART receive DMA, duplex DMA and electrical adaptation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usb-device.html">USB FS device packet ownership and integration boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-io-broker.html">Kernel-invoked user I/O admission</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../delivery/index.html">Recorded delivery evidence</a></li>
+</ul>
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  
+  
+    <div class="footer">
+      &#169;2026, Nexus Team.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+
+  </body>
+</html>
