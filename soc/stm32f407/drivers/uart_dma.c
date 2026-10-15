@@ -13,6 +13,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_dma.h"
+#include "stm32f4xx_ll_usart.h"
 
 #ifndef NX_STM32_DMA_DISABLE
 #define NX_STM32_DMA_DISABLE(stream, mask) ((stream)->CR &= ~(uint32_t)(mask))
@@ -82,7 +83,7 @@ static nx_result_t initialize(nx_stm32_uart_dma_state_t* state,
         return NX_ERROR_CONTEXT;
     }
     if ((state->tx->CR & DMA_SxCR_EN) != 0U ||
-        (state->uart.registers->CR1 & USART_CR1_UE) != 0U) {
+        LL_USART_IsEnabled(state->uart.registers) != 0U) {
         return NX_ERROR_BUSY;
     }
 #ifndef NEXUS_STM32_MODEL
@@ -214,7 +215,8 @@ static void begin_drain(nx_stm32_uart_dma_state_t* state,
         nx_deadline_after(nx_time_now_us(), 20000000U / uart->baud + 100U);
     bool untouched = (state->tx->CR & DMA_SxCR_EN) == 0U &&
                      state->tx->NDTR == uart->active->length;
-    uart->tx_complete = untouched || (uart->registers->SR & USART_SR_TC) != 0U;
+    uart->tx_complete =
+        untouched || LL_USART_IsActiveFlag_TC(uart->registers) != 0U;
     if (!uart->tx_complete) {
         uart->registers->CR1 |= USART_CR1_TCIE;
     }

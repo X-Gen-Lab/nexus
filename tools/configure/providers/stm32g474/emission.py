@@ -64,7 +64,7 @@ def start_system(result):
                      '        return result;', '    }']
 
 
-def start_resources(result):
+def start_resources(result, *, cleanup="nx_platform_stop()"):
     source = (['    s_nx_platform_uart_clocks_added = ~NX_G474_READ(&RCC->APB1ENR2) & RCC_APB1ENR2_LPUART1EN;']
               if _uart(result) else [])
     if _exti(result):
@@ -73,13 +73,13 @@ def start_resources(result):
                    '    nx_arch_dsb();',
                    '    if ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_SYSCFGEN) == 0u) {',
                    '        result.primary = NX_ERROR_IO;',
-                   '        result.cleanup = nx_platform_stop();',
+                   f'        result.cleanup = {cleanup};',
                    '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
                    '        return result;', '    }']
     return source
 
 
-def stop_system(result):
+def stop_system(result, *, system_phase=None):
     source = gpio_phase.release(result)
     if _exti(result):
         source += ['    if (s_nx_platform_syscfg_clock_added != 0u) {',
@@ -93,6 +93,8 @@ def stop_system(result):
                    '        nx_arch_dsb();',
                    '        if ((NX_G474_READ(&RCC->APB1ENR2) & s_nx_platform_uart_clocks_added) != 0u) { return NX_ERROR_IO; }',
                    '        s_nx_platform_uart_clocks_added = 0u;', '    }']
+    if system_phase is not None:
+        source.append(f'    {system_phase};')
     return source + ['    if (s_nx_platform_started) {',
                      '        nx_result_t system = nx_stm32g474_system_stop(&g_nx_stm32g474_system, 1000000u);',
                      '        if (system != NX_SUCCESS) { return system; }',

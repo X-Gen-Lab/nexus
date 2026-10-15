@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_provider.h"
+#include "stm32f4xx_ll_spi.h"
 
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))
@@ -59,7 +60,7 @@ static nx_result_t wait_status(nx_stm32_spi_state_t* port, uint32_t mask,
  */
 static void abort_controller(nx_stm32_spi_state_t* port) {
     port->registers->CR2 = 0U;
-    port->registers->CR1 &= ~(uint32_t)SPI_CR1_SPE;
+    LL_SPI_Disable(port->registers);
     reset_controller(port);
     port->fault = true;
 }
@@ -117,7 +118,7 @@ nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
                            ((endpoint->mode & 1U) != 0U ? SPI_CR1_CPHA : 0U) |
                            ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U);
     port->registers->CR2 = 0U;
-    port->registers->CR1 |= SPI_CR1_SPE;
+    LL_SPI_Enable(port->registers);
     nx_result_t result =
         nx_stm32_gpio_write(endpoint->cs, 0U, endpoint->cs_mask);
     if (result == NX_SUCCESS) {
@@ -126,12 +127,13 @@ nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
             if (result != NX_SUCCESS) {
                 break;
             }
-            port->registers->DR = tx != NULL ? tx[index] : 0xFFU;
+            LL_SPI_TransmitData8(port->registers,
+                                 tx != NULL ? tx[index] : 0xFFU);
             result = wait_status(port, SPI_SR_RXNE, SPI_SR_RXNE, deadline);
             if (result != NX_SUCCESS) {
                 break;
             }
-            uint8_t byte = (uint8_t)port->registers->DR;
+            uint8_t byte = LL_SPI_ReceiveData8(port->registers);
             if (rx != NULL) {
                 rx[index] = byte;
             }
@@ -144,7 +146,7 @@ nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
     if (result != NX_SUCCESS) {
         abort_controller(port);
     } else {
-        port->registers->CR1 &= ~(uint32_t)SPI_CR1_SPE;
+        LL_SPI_Disable(port->registers);
     }
     nx_result_t cs_result =
         nx_stm32_gpio_write(endpoint->cs, endpoint->cs_mask, 0U);
@@ -186,7 +188,7 @@ nx_result_t nx_stm32_spi_recover(void* context) {
         return NX_ERROR_BUSY;
     }
     port->registers->CR2 = 0U;
-    port->registers->CR1 &= ~(uint32_t)SPI_CR1_SPE;
+    LL_SPI_Disable(port->registers);
     reset_controller(port);
     if ((port->registers->SR & (SPI_SR_BSY | SPI_SR_MODF | SPI_SR_OVR)) != 0U) {
         return NX_ERROR_IO;

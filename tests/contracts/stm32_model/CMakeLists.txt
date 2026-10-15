@@ -26,6 +26,10 @@ target_include_directories(contract_stm32_constructor_model PRIVATE
     "${CMAKE_CURRENT_BINARY_DIR}")
 foreach(target contract_stm32_system_model contract_stm32_io_model
                contract_stm32_constructor_model)
+    include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+    nexus_stm32f4_official(${target})
+    target_compile_options(${target} PRIVATE
+        "-include${NEXUS_SOURCE_DIR}/tests/google/stm32_official_model.h")
     target_include_directories(${target} PRIVATE
         "${stm32_root}/private" "${NEXUS_SOURCE_DIR}/arch/include")
     target_include_directories(${target} SYSTEM PRIVATE

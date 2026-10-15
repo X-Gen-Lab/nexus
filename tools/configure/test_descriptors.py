@@ -46,7 +46,8 @@ class DescriptorBoundaryTests(unittest.TestCase):
         g4 = descriptor.maintained("stm32g474")
         self.assertEqual(f4.git_dependencies, (
             ("cmsis_core", "vendors/arm/CMSIS_5"),
-            ("cmsis_device_f4", "vendors/st/cmsis_device_f4")))
+            ("cmsis_device_f4", "vendors/st/cmsis_device_f4"),
+            ("hal_driver_f4", "vendors/st/stm32f4_hal")))
         self.assertEqual(g4.git_dependencies[-1], (
             "cmsis_device_g4", "vendors/st/cmsis_device_g4"))
         self.assertEqual(descriptor.maintained("gd32f470").import_lock,

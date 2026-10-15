@@ -13,6 +13,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_stream.h"
+#include "stm32f4xx_ll_tim.h"
 
 #ifndef NX_STM32_DMA_DISABLE
 #define NX_STM32_DMA_DISABLE(stream, mask) ((stream)->CR &= ~(uint32_t)(mask))
@@ -30,7 +31,7 @@ static void acknowledge(nx_stm32_adc_stream_state_t* state) {
 /** \brief Stop trigger/conversion before stopping their memory write source. */
 static void detach(nx_stm32_adc_stream_state_t* state) {
     state->warming = false;
-    state->timer->CR1 &= ~(uint32_t)TIM_CR1_CEN;
+    LL_TIM_DisableCounter(state->timer);
     state->adc.registers->CR2 &=
         ~(uint32_t)(ADC_CR2_EXTEN | ADC_CR2_DMA | ADC_CR2_DDS | ADC_CR2_ADON);
     nx_arch_dsb();
@@ -185,9 +186,9 @@ static void arm(nx_stm32_adc_stream_state_t* state) {
     state->timer->CR1 = 0U;
     state->timer->CR2 = TIM_CR2_MMS_1;
     state->timer->DIER = 0U;
-    state->timer->PSC = state->prescaler;
-    state->timer->ARR = state->period;
-    state->timer->CNT = 0U;
+    LL_TIM_SetPrescaler(state->timer, state->prescaler);
+    LL_TIM_SetAutoReload(state->timer, state->period);
+    LL_TIM_SetCounter(state->timer, 0U);
     state->timer->EGR = TIM_EGR_UG;
     state->timer->SR = 0U;
     acknowledge(state);
@@ -330,7 +331,7 @@ static nx_result_t stream_service(void* context) {
         nx_deadline_expired(state->ready_at, nx_time_now_us())) {
         state->adc.registers->CR2 |= ADC_CR2_EXTEN_0;
         nx_arch_dsb();
-        state->timer->CR1 |= TIM_CR1_CEN;
+        LL_TIM_EnableCounter(state->timer);
         state->warming = false;
     }
     if (state->fault) {

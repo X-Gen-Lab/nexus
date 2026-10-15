@@ -5,10 +5,12 @@ presence, reset, clock, negotiation and network policy remain external facts.
 """
 try:
     from .gpio_phase import withdraw_pin
-    from .providers.common import fail, integer, kernel_policy_constant
+    from .providers.common import (Construction, fail, integer,
+                                   kernel_policy_constant)
 except ImportError:
     from gpio_phase import withdraw_pin
-    from providers.common import fail, integer, kernel_policy_constant
+    from providers.common import (Construction, fail, integer,
+                                  kernel_policy_constant)
 
 
 FIELDS = {"tx_count", "rx_count", "rx_storage_bytes", "address",
@@ -140,12 +142,14 @@ def constructor(item, result, prefix):
               f"void {'ETH' if stm else 'ENET'}_IRQHandler(void);",
               "/** \\brief Bounded progress through the selected RMII MAC. */",
               f"void {'ETH' if stm else 'ENET'}_IRQHandler(void) {{ nx_eth_mac_irq(&{state}); }}"]
-    return {"definitions": lines, "initialize": f"prepare_{name}()",
-            "stop": [f"stop_{name}()"],
-            "pin_snapshots": {pin["pin"]:
-                              f"s_nx_eth_pin_snapshots_{name}[{index}]"
-                              for index, pin in enumerate(pins)},
-            "exports": [f"extern const nx_mdio_port_t* const nx_binding_{name}_mdio;"]}
+    return Construction(
+        state_type="nx_eth_mac_t", definitions=lines,
+        initialize=f"prepare_{name}()", stop=[f"stop_{name}()"],
+        retain_on_failed_init=True,
+        pin_snapshots={pin["pin"]:
+                       f"s_nx_eth_pin_snapshots_{name}[{index}]"
+                       for index, pin in enumerate(pins)},
+        exports=[f"extern const nx_mdio_port_t* const nx_binding_{name}_mdio;"])
 
 
 def selected(result):

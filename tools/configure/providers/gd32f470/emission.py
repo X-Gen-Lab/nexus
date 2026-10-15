@@ -137,7 +137,7 @@ def shared_irqs(result):
     return source
 
 
-def stop_system(result):
+def stop_system(result, *, system_phase=None):
     dma_clock = has_dma(result)
     source = can.stop_domain(result, "gd32")
     source.extend(ethernet.stop_system(result, "gd32"))
@@ -154,6 +154,8 @@ def stop_system(result):
                    '            return NX_ERROR_IO;', '        }',
                    '        s_nx_platform_dma_clocks_added = 0u;',
                    '    }']
+    if system_phase is not None:
+        source.append(f'    {system_phase};')
     source += ['    if (s_nx_platform_started && nx_gd32_soc_stop() != 0) { return NX_ERROR_IO; }']
     return source
 
@@ -176,7 +178,8 @@ def start_system(result):
     return source
 
 
-def start_resources(result):
+def start_resources(result, *, cleanup="nx_platform_stop()"):
+    del cleanup
     source = usb_device.start_resources(result, "gd32")
     source.extend(ethernet.start_resources(result, "gd32"))
     source.extend(timer_advanced.start_resources(result, "gd32"))

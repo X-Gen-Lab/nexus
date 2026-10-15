@@ -13,6 +13,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_dma.h"
+#include "stm32f4xx_ll_spi.h"
 
 #ifndef NX_STM32_DMA_DISABLE
 #define NX_STM32_DMA_DISABLE(stream, mask) ((stream)->CR &= ~(uint32_t)(mask))
@@ -68,8 +69,11 @@ static void acknowledge(nx_stm32_spi_dma_state_t* state, bool receive) {
 /** \brief Withdraw DMA requests before disabling their memory engines. */
 static void detach(nx_stm32_spi_dma_state_t* state, bool receive) {
     DMA_Stream_TypeDef* stream = receive ? state->rx : state->tx;
-    state->spi.registers->CR2 &=
-        ~(uint32_t)(receive ? SPI_CR2_RXDMAEN : SPI_CR2_TXDMAEN);
+    if (receive) {
+        LL_SPI_DisableDMAReq_RX(state->spi.registers);
+    } else {
+        LL_SPI_DisableDMAReq_TX(state->spi.registers);
+    }
     NX_STM32_DMA_DISABLE(stream, DMA_SxCR_EN | DMA_SxCR_TCIE | DMA_SxCR_HTIE |
                                      DMA_SxCR_TEIE | DMA_SxCR_DMEIE);
     nx_arch_dsb();
@@ -269,7 +273,7 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
     state->rx->CR |= DMA_SxCR_EN;
     state->tx->CR |= DMA_SxCR_EN;
     state->spi.registers->CR2 = SPI_CR2_RXDMAEN | SPI_CR2_TXDMAEN;
-    state->spi.registers->CR1 |= SPI_CR1_SPE;
+    LL_SPI_Enable(state->spi.registers);
     nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }
@@ -413,7 +417,7 @@ static void service(void* context) {
     if (terminal && nx_dma_drain_check(&tx) == NX_SUCCESS &&
         nx_dma_drain_check(&rx) == NX_SUCCESS) {
         state->spi.registers->CR2 = 0U;
-        state->spi.registers->CR1 &= ~(uint32_t)SPI_CR1_SPE;
+        LL_SPI_Disable(state->spi.registers);
         (void)state->spi.registers->DR;
         (void)state->spi.registers->SR;
         nx_arch_dsb();
@@ -480,7 +484,7 @@ static nx_result_t stop(void* context) {
     state->wake = NULL;
     state->initialized = false;
     state->spi.registers->CR2 = 0U;
-    state->spi.registers->CR1 &= ~(uint32_t)SPI_CR1_SPE;
+    LL_SPI_Disable(state->spi.registers);
     return NX_SUCCESS;
 }
 

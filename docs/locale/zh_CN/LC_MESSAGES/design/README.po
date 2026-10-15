@@ -1,4 +1,4 @@
-# Same-source-language companion for mixed prose; independent review pending.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: bfcfc7ea8c95ed04b6827344d136249287c042e8899f8c47758980b04de42b93\n"
+"X-Nexus-Source-SHA256: a22633725f3046cd20e1b587d86e0230ae6fee69af14d327bc97d0db0dc9391b\n"
 
 msgid "当前设计与实施台账"
 msgstr "当前设计与实施台账"
@@ -92,6 +92,12 @@ msgstr "{download}`构建系统48项台账 <build-system-execution.csv>`"
 
 msgid "原始退出条件、实现路径与本轮执行证据"
 msgstr "原始退出条件、实现路径与本轮执行证据"
+
+msgid "[官方驱动与 provider 迭代](official-stm32-provider.md)"
+msgstr "[官方驱动与 provider 迭代](official-stm32-provider.md)"
+
+msgid "私有 HAL/LL 复用、typed Construction、工作包退出条件及资格边界"
+msgstr "私有 HAL/LL 复用、typed Construction、工作包退出条件及资格边界"
 
 msgid "[接入契约](integration-contracts.md)"
 msgstr "[接入契约](integration-contracts.md)"

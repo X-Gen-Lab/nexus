@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_provider.h"
+#include "stm32f4xx_ll_usart.h"
 
 /** \brief Initialize 8N1 and only the selected per-instance RX storage. */
 nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
@@ -25,10 +26,21 @@ nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
     if (divisor == 0U || divisor > 0xFFFFU) {
         return NX_ERROR_UNSUPPORTED;
     }
+    /* Disabled silicon may still belong to a retained IRQ or DMA publisher. */
+    if ((port->registers->CR1 &
+         (USART_CR1_UE | USART_CR1_RXNEIE | USART_CR1_TXEIE | USART_CR1_TCIE |
+          USART_CR1_IDLEIE | USART_CR1_PEIE)) != 0U ||
+        (port->registers->CR3 &
+         (USART_CR3_DMAT | USART_CR3_DMAR | USART_CR3_EIE)) != 0U) {
+        return NX_ERROR_BUSY;
+    }
     port->registers->CR1 = 0U;
     port->registers->CR2 = 0U;
     port->registers->CR3 =
         port->profile == NX_UART_RX_BLOCKS ? 0U : (uint32_t)USART_CR3_EIE;
+    /* LL's decimal intermediate truncates selected valid baud divisors.
+     * Keep exact nearest-integer division without a 64-bit helper dependency.
+     */
     port->registers->BRR = divisor;
     (void)port->registers->SR;
     (void)port->registers->DR;
@@ -39,10 +51,14 @@ nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
     port->active = NULL;
     port->closing = false;
     port->initialized = true;
-    port->registers->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE |
-                           (port->profile == NX_UART_RX_BLOCKS
-                                ? 0U
-                                : USART_CR1_RXNEIE | USART_CR1_PEIE);
+    /* Exclusive-loop LL setters are not needed under the cold sole-owner
+     * contract. Keep both cold configuration and IRQ gates finite RMW writes.
+     */
+    port->registers->CR1 = USART_CR1_TE | USART_CR1_RE;
+    if (port->profile != NX_UART_RX_BLOCKS) {
+        port->registers->CR1 |= USART_CR1_RXNEIE | USART_CR1_PEIE;
+    }
+    LL_USART_Enable(port->registers);
 #ifndef NEXUS_STM32_MODEL
     NVIC_SetPriority(port->irq, 5U);
     NVIC_ClearPendingIRQ(port->irq);
@@ -183,7 +199,8 @@ bool nx_stm32_uart_tx_irq(nx_stm32_uart_state_t* port, uint32_t status) {
     bool wrote_byte = false;
     if (request != NULL && (status & USART_SR_TXE) != 0U &&
         (port->registers->CR1 & USART_CR1_TXEIE) != 0U) {
-        port->registers->DR = request->data[port->tx_position++];
+        LL_USART_TransmitData8(port->registers,
+                               request->data[port->tx_position++]);
         wrote_byte = true;
         if (port->tx_position == request->length) {
             port->registers->CR1 &= ~(uint32_t)USART_CR1_TXEIE;
@@ -214,7 +231,7 @@ void nx_stm32_uart_irq(nx_stm32_uart_state_t* port) {
     if ((status & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_ORE |
                    USART_SR_NE)) != 0U) {
         notify = true;
-        uint8_t byte = (uint8_t)port->registers->DR;
+        uint8_t byte = LL_USART_ReceiveData8(port->registers);
         uint32_t flags = rx_flags(status);
         bool has_byte = (status & USART_SR_RXNE) != 0U;
         if (!has_byte) {

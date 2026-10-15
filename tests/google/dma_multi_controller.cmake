@@ -3,10 +3,14 @@
 set(dma_multi_vendor
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
 foreach(dma_multi_family stm32f407 gd32f470)
+    set(dma_multi_official)
+    if(dma_multi_family STREQUAL "stm32f407")
+        set(dma_multi_official STM32F4_LL)
+    endif()
     foreach(dma_multi_kind uart spi)
         set(dma_multi_target
             "nexus_${dma_multi_family}_${dma_multi_kind}_multi_controller_test")
-        nexus_google_test(${dma_multi_target}
+        nexus_google_test(${dma_multi_target} ${dma_multi_official}
             SOURCES "${dma_multi_kind}_multi_controller_test.cpp"
                 "${NEXUS_SOURCE_DIR}/soc/${dma_multi_family}/drivers/${dma_multi_kind}.c"
                 "${NEXUS_SOURCE_DIR}/soc/${dma_multi_family}/drivers/${dma_multi_kind}_dma.c"

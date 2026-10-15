@@ -5,7 +5,7 @@ try:
 except ImportError:
     from emission import dma_regions
     from gpio_phase import rollback_pin, withdraw_pin
-from ..common import controller_ir, mode_traits
+from ..common import Construction, controller_ir, mode_traits
 from .. import hardware
 try:
     from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers
@@ -489,9 +489,12 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                  f"    RCC->AHB1ENR = (RCC->AHB1ENR & ~{mask}u) | saved_ahb1 | retained_gpio_clocks;",
                  "    nx_arch_dsb();", "    return status;"]
     body.append("}")
-    return {"definitions": declarations + body,
-            "initialize": f"prepare_{name}()", "stop": stop,
-            "extra_headers": [], "retain_on_failed_init": kind == "exti"}
+    from . import mode_implementation
+    implementation = mode_implementation(item.kind, item.mode)
+    return Construction(
+        state_type=f"nx_stm32_{implementation}_state_t",
+        definitions=declarations + body, initialize=f"prepare_{name}()",
+        stop=stop, retain_on_failed_init=kind == "exti")
 
 
 def shared_irq_definitions(selections):
@@ -548,8 +551,11 @@ def _gpio_constructor(item):
     definitions += [f'        RCC->AHB1ENR = (RCC->AHB1ENR & ~{1 << index}u) | saved_clock | retained_gpio_clocks;',
                '        nx_arch_dsb();', '    }', '    return status;', '}']
     init = f'prepare_{name}()'
-    return {"definitions": definitions, "initialize": init,
-            "stop": [f"nx_stm32_gpio_stop(&s_nx_port_{name}, {initial}u)"]}
+    return Construction(
+        state_type="nx_stm32_gpio_state_t", definitions=definitions,
+        initialize=init,
+        stop=[f"nx_stm32_gpio_stop(&s_nx_port_{name}, {initial}u)"],
+        retain_on_failed_init=False)
 
 
 def _uart_constructor(item, result):
@@ -662,8 +668,10 @@ def _uart_constructor(item, result):
                             "/** \\brief Exact selected DMA TX observation. */",
                             f"void {tx_vector}_IRQHandler(void) {{ nx_stm32_uart_dma_irq(&{dma_state}); }}"]
         definitions[priority_line + 1:priority_line + 1] = priorities
-    return {"definitions": definitions, "initialize": init,
-            "stop": [f"stop_{name}()"]}
+    return Construction(
+        state_type=f"nx_stm32_{implementation}_state_t",
+        definitions=definitions, initialize=init, stop=[f"stop_{name}()"],
+        retain_on_failed_init=False)
 
 
 def constructor(item, result, board_bindings, routes, devices):

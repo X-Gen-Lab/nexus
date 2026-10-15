@@ -24,12 +24,11 @@ from tools.evidence.common import (EvidenceError, atomic_json, digest, fields,
 
 ROOT = Path(__file__).resolve().parents[2]
 from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES
+from tools.configure.providers import descriptor
 
 MODULES = tuple(dependency.path for dependency in SOURCE_DEPENDENCIES)
-FAMILY_MODULE = {"stm32f407": "vendors/st/cmsis_device_f4",
-                 "stm32g474": "vendors/st/cmsis_device_g4",
-                 "stm32h743": "vendors/st/cmsis_device_h7",
-                 "stm32u575": "vendors/st/cmsis_device_u5", "gd32f470": None}
+FAMILY_MODULE = {item.family: tuple(path for _, path in item.git_dependencies)
+                 for item in descriptor.families() if item.family != "native"}
 
 
 def required_submodules(scope: str, family: str | None = None,
@@ -41,12 +40,12 @@ def required_submodules(scope: str, family: str | None = None,
         return MODULES
     if scope != "arm" or family not in FAMILY_MODULE or backend not in ("baremetal", "freertos", "threadx"):
         raise EvidenceError("unsupported dependency scope/family/backend")
-    selected = ["vendors/arm/CMSIS_5"]
-    if FAMILY_MODULE[family]:
-        selected.append(FAMILY_MODULE[family])
+    # The family descriptor owns its approved Git dependencies. The imported
+    # GD32 source still uses the explicitly shared CMSIS core module.
+    selected = ["vendors/arm/CMSIS_5", *FAMILY_MODULE[family]]
     if backend != "baremetal":
         selected.append("ext/" + backend)
-    return tuple(selected)
+    return tuple(dict.fromkeys(selected))
 
 
 def prepare(root: Path, scope: str, *, family: str | None = None,

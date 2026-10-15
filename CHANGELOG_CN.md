@@ -6,6 +6,32 @@
 项目遵循 [语义化版本](https://semver.org/lang/zh-CN/spec/v2.0.0.html)。
 
 
+## [Unreleased]
+
+开发源码版本为 `0.2.0`。本标题不表示 0.2.0 已公开发行或软件候选已通过验收。
+已发布 0.1.0 的 tag、附件和原始证据保持不变。Factory epoch `1` 与 authored
+assembly schema `2` 是独立身份，本次均保持不变。
+
+### 新增
+
+- 固定官方 STM32F4 HAL Driver 依赖，审查 CMSIS 配对、所选 LL 头与许可证闭包。
+  所选 provider 操作复用 LL，Nexus 继续拥有 request、取消与排空状态机；
+  这不是全平台 HAL Handle/callback 迁移。
+- 可选的调用方存储冷路径生命周期诊断，以及从既有权威派生的只读模式审查
+  工作包视图。该视图不执行测试，也不授予软件或物理资格。
+
+### 变更
+
+- 构造器返回明确冻结的构造合同，声明私有状态、静态定义、初始化与失败清理责任。
+- 当前 Source SDK consumer 使用 exact `0.2.0`；旧 SDK 与资格记录保留原始
+  源码和版本身份。
+
+### 验证与限制
+
+变更后的源码须单独取得新鲜测试、精确链接镜像比较、独立 SDK 消费和候选证据。
+MCU 实板 HIL 继续为 `not_executed`。Bootloader 交接、动态变频、deep STOP 与
+更广的 H743/U575 模式保持既有未实现或部分实现边界。
+
 ## [0.1.0] - 2026-10-15（Asia/Shanghai）
 
 首个公开 Source SDK 开发者预览版。下方一月的第一阶段记录是历史项目里程碑，

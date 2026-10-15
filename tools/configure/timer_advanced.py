@@ -5,10 +5,10 @@ physical break circuit. Capture ring storage remains supplied by the caller.
 """
 try:
     from .gpio_phase import withdraw_pin
-    from .providers.common import fail, integer
+    from .providers.common import Construction, fail, integer
 except ImportError:
     from gpio_phase import withdraw_pin
-    from providers.common import fail, integer
+    from providers.common import Construction, fail, integer
 
 
 KINDS = {"timer_capture", "advanced_pwm"}
@@ -199,11 +199,13 @@ def constructor(item, result, prefix):
               "    return NX_SUCCESS;", "}", f"void {vector}_IRQHandler(void);",
               "/** \\brief Bounded dispatch from the exclusively leased vector. */",
               f"void {vector}_IRQHandler(void) {{ nx_{prefix}_{kind}_irq(&{state}); }}"]
-    return {"definitions": lines, "initialize": f"prepare_{name}()",
-            "stop": [f"stop_{name}()"],
-            "pin_snapshots": {pin["pin"]:
-                              f"s_nx_timer_pin_saved_{name}[{index}]"
-                              for index, pin in enumerate(item["pins"])}}
+    return Construction(
+        state_type=f"nx_{kind}_controller_t", definitions=lines,
+        initialize=f"prepare_{name}()", stop=[f"stop_{name}()"],
+        retain_on_failed_init=True,
+        pin_snapshots={pin["pin"]:
+                       f"s_nx_timer_pin_saved_{name}[{index}]"
+                       for index, pin in enumerate(item["pins"])})
 
 
 def _gpio_mask(result):

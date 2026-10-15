@@ -19,6 +19,10 @@ extern "C" {
 #endif
 nx_platform_start_result_t nx_empty_platform_start(void);
 nx_result_t nx_empty_platform_stop(void);
+nx_platform_start_result_t
+nx_empty_platform_start_diagnosed(nx_platform_diagnostic_t* diagnostic);
+nx_result_t
+nx_empty_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic);
 }
 #include <cstring>
 #include <gmock/gmock.h>
@@ -126,6 +130,15 @@ class PhysicalPlatformFactory : public testing::TestWithParam<bool> {
     }
     nx_result_t stop(void) {
         return GetParam() ? nx_platform_stop() : nx_empty_platform_stop();
+    }
+    nx_platform_start_result_t
+    start_diagnosed(nx_platform_diagnostic_t* diagnostic) {
+        return GetParam() ? nx_platform_start_diagnosed(diagnostic)
+                          : nx_empty_platform_start_diagnosed(diagnostic);
+    }
+    nx_result_t stop_diagnosed(nx_platform_diagnostic_t* diagnostic) {
+        return GetParam() ? nx_platform_stop_diagnosed(diagnostic)
+                          : nx_empty_platform_stop_diagnosed(diagnostic);
     }
     void SetUp() override {
         void* admitted =
@@ -353,6 +366,62 @@ TEST_P(PhysicalPlatformFactory,
     }
     s_refuse_selected_gpio_mode = false;
     EXPECT_EQ(NX_SUCCESS, stop());
+    EXPECT_EQ(3U << (SELECTED_PIN * 2U), selected_gpio(0U));
+    EXPECT_EQ(1U << 2U, selected_gpio_gate());
+}
+
+TEST_P(PhysicalPlatformFactory, DiagnosedPreflightFailureHasNoOuterEffects) {
+    const auto before = register_snapshot();
+    EXPECT_CALL(system, Preflight()).WillOnce(Return(NX_ERROR_BUSY));
+    EXPECT_CALL(system, Start()).Times(0);
+    nx_platform_diagnostic_t diagnostic = {};
+    const auto result = start_diagnosed(&diagnostic);
+    EXPECT_EQ(result.primary, NX_ERROR_BUSY);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_SYSTEM);
+    EXPECT_EQ(diagnostic.controller_index, SIZE_MAX);
+    EXPECT_EQ(diagnostic.cleanup_phase, NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.cleanup_controller_index, SIZE_MAX);
+    EXPECT_EQ(register_snapshot(), before);
+}
+
+TEST_P(PhysicalPlatformFactory, DiagnosedSystemStopFailureRetainsSession) {
+    ASSERT_EQ(start().primary, NX_SUCCESS);
+    ON_CALL(system, Stop()).WillByDefault(Return(1));
+    nx_platform_diagnostic_t diagnostic = {};
+    EXPECT_EQ(stop_diagnosed(&diagnostic), NX_ERROR_IO);
+    EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_SYSTEM);
+    EXPECT_EQ(diagnostic.controller_index, SIZE_MAX);
+    EXPECT_EQ(diagnostic.cleanup_phase, NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.cleanup_controller_index, SIZE_MAX);
+    EXPECT_EQ(start().primary, NX_ERROR_STATE);
+    ON_CALL(system, Stop()).WillByDefault(Return(0));
+    EXPECT_EQ(stop_diagnosed(&diagnostic), NX_SUCCESS);
+    EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.controller_index, SIZE_MAX);
+}
+
+TEST_P(PhysicalPlatformFactory, DiagnosedResourceStopFailureRetainsPinLease) {
+    selected_gpio(0U) = 3U << (SELECTED_PIN * 2U);
+    selected_gpio_gate() = 1U << 2U;
+    ASSERT_EQ(start().primary, NX_SUCCESS);
+    s_refuse_selected_gpio_mode = true;
+    nx_platform_diagnostic_t diagnostic = {};
+    EXPECT_EQ(stop_diagnosed(&diagnostic),
+              GetParam() ? NX_ERROR_IO : NX_SUCCESS);
+    EXPECT_EQ(diagnostic.phase, GetParam() ? NX_PLATFORM_PHASE_RESOURCES
+                                           : NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.controller_index, SIZE_MAX);
+    EXPECT_EQ(diagnostic.cleanup_phase, NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.cleanup_controller_index, SIZE_MAX);
+    if (GetParam()) {
+        EXPECT_NE(0U, selected_gpio_gate() & (1U << SELECTED_GPIO));
+        EXPECT_EQ(start().primary, NX_ERROR_STATE);
+    }
+    s_refuse_selected_gpio_mode = false;
+    EXPECT_EQ(stop_diagnosed(&diagnostic), NX_SUCCESS);
+    EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_NONE);
     EXPECT_EQ(3U << (SELECTED_PIN * 2U), selected_gpio(0U));
     EXPECT_EQ(1U << 2U, selected_gpio_gate());
 }

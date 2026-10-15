@@ -99,7 +99,7 @@ def start_system(result):
         '        return result;', '    }']
 
 
-def start_resources(result):
+def start_resources(result, *, cleanup="nx_platform_stop()"):
     leases = _leases(result)
     if not leases:
         return []
@@ -113,7 +113,7 @@ def start_resources(result):
         source += [f'    {lease}.captured = false;',
             f'    result.primary = nx_stm32u575_gpio_clock_enable({ord(name)-ord("A")}u);',
             '    if (result.primary != NX_SUCCESS) {',
-            '        result.cleanup = nx_platform_stop();',
+            f'        result.cleanup = {cleanup};',
             '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
             '        return result;', '    }']
     for name, bits, fields, af0, af1 in leases:
@@ -128,7 +128,7 @@ def start_resources(result):
                     f'    gpio_{name.lower()}_available = gpio_{name.lower()}_available && (gpio_{name.lower()}_pin{pin}_mode == 0u || gpio_{name.lower()}_pin{pin}_mode == 3u);']
         source += [f'    if (!gpio_{name.lower()}_available) {{',
             '        result.primary = NX_ERROR_BUSY;',
-            '        result.cleanup = nx_platform_stop();',
+            f'        result.cleanup = {cleanup};',
             '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
             '        return result;', '    }']
     # All selected banks and pins are now admitted. A later rejected pin must
@@ -142,7 +142,7 @@ def start_resources(result):
     return source
 
 
-def stop_system(result):
+def stop_system(result, *, system_phase=None):
     source = ['    if (s_nx_platform_started) {']
     for name, *_ in reversed(_leases(result)):
         source += [f'        nx_result_t gpio_{name.lower()} = restore_gpio{name.lower()}();',
@@ -157,5 +157,7 @@ def stop_system(result):
             '        nx_arch_dsb();',
             '        if ((NX_U575_READ(&RCC->AHB2ENR1) & s_nx_platform_gpio_clocks_added) != 0u) { return NX_ERROR_IO; }',
             '        s_nx_platform_gpio_clocks_added = 0u;']
+    if system_phase is not None:
+        source.append(f'        {system_phase};')
     return source + ['        nx_result_t system = nx_stm32u575_system_stop(&g_nx_stm32u575_system, 1000000u);',
         '        if (system != NX_SUCCESS) { return system; }', '    }']

@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_provider.h"
+#include "stm32f4xx_ll_tim.h"
 
 /** \brief Locate the selected fixed channel compare register. */
 static volatile uint32_t* compare(nx_stm32_pwm_state_t* port) {
@@ -44,8 +45,8 @@ nx_result_t nx_stm32_pwm_initialize(nx_stm32_pwm_state_t* port) {
     }
     if ((regs->CR1 & TIM_CR1_CEN) == 0U) {
         regs->CR1 = TIM_CR1_ARPE;
-        regs->PSC = port->prescaler;
-        regs->ARR = port->period_ticks - 1U;
+        LL_TIM_SetPrescaler(regs, port->prescaler);
+        LL_TIM_SetAutoReload(regs, port->period_ticks - 1U);
         regs->EGR = TIM_EGR_UG;
         regs->SR = 0U;
     }
@@ -98,8 +99,9 @@ nx_result_t nx_stm32_pwm_start(void* context) {
     if ((port->registers->CR1 & TIM_CR1_CEN) == 0U) {
         port->registers->EGR = TIM_EGR_UG;
     }
-    port->registers->CCER |= 1U << (((uint32_t)port->channel - 1U) * 4U);
-    port->registers->CR1 |= TIM_CR1_CEN;
+    LL_TIM_CC_EnableChannel(port->registers,
+                            1U << (((uint32_t)port->channel - 1U) * 4U));
+    LL_TIM_EnableCounter(port->registers);
     port->running = true;
     return NX_SUCCESS;
 }
@@ -111,7 +113,8 @@ nx_result_t nx_stm32_pwm_stop(void* context) {
     if (port == NULL || !port->initialized) {
         return NX_ERROR_INVALID;
     }
-    port->registers->CCER &= ~(1U << (((uint32_t)port->channel - 1U) * 4U));
+    LL_TIM_CC_DisableChannel(port->registers,
+                             1U << (((uint32_t)port->channel - 1U) * 4U));
     nx_result_t result = nx_stm32_gpio_write(
         port->inactive_gpio, port->inactive_high ? port->inactive_mask : 0U,
         port->inactive_high ? 0U : port->inactive_mask);
@@ -123,7 +126,7 @@ nx_result_t nx_stm32_pwm_stop(void* context) {
         }
     }
     if ((port->registers->CCER & 0x1111U) == 0U) {
-        port->registers->CR1 &= ~(uint32_t)TIM_CR1_CEN;
+        LL_TIM_DisableCounter(port->registers);
     }
     port->running = false;
     return result;

@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_provider.h"
+#include "stm32f4xx_ll_adc.h"
 
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))
@@ -32,8 +33,7 @@ nx_result_t nx_stm32_adc_initialize(nx_stm32_adc_state_t* port) {
     port->registers->SQR2 = 0U;
     port->registers->SQR3 = 0U;
     port->registers->SR = 0U;
-    port->common->CCR =
-        (port->common->CCR & ~(uint32_t)ADC_CCR_ADCPRE) | ADC_CCR_ADCPRE_0;
+    LL_ADC_SetCommonClock(port->common, LL_ADC_CLOCK_SYNC_PCLK_DIV4);
     port->initialized = true;
     return NX_SUCCESS;
 }
@@ -99,7 +99,7 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
             result = NX_ERROR_TIMEOUT;
             break;
         }
-        port->registers->CR2 |= ADC_CR2_SWSTART;
+        LL_ADC_REG_StartConversionSWStart(port->registers);
         for (;;) {
             NX_STM32_IO_POLL(5U, port);
             if ((port->registers->SR & ADC_SR_OVR) != 0U) {
@@ -111,7 +111,10 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
                 break;
             }
             if ((port->registers->SR & ADC_SR_EOC) != 0U) {
-                samples[(*count)++] = (uint16_t)(port->registers->DR & 0xFFFU);
+                samples[(*count)++] =
+                    (uint16_t)(LL_ADC_REG_ReadConversionData12(
+                                   port->registers) &
+                               0xFFFU);
                 break;
             }
         }

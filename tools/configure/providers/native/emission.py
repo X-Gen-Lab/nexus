@@ -57,9 +57,9 @@ def shared_irqs(result):
     return []
 
 
-def stop_system(result):
+def stop_system(result, *, system_phase=None):
     del result
-    return []
+    return [f"    {system_phase};"] if system_phase is not None else []
 
 
 def start_system(result):
@@ -67,6 +67,6 @@ def start_system(result):
     return []
 
 
-def start_resources(result):
-    del result
+def start_resources(result, *, cleanup="nx_platform_stop()"):
+    del result, cleanup
     return []

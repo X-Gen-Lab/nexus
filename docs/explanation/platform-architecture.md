@@ -50,6 +50,13 @@ existing face. After explicit successful platform start, ordinary operations cal
 its shared ops table with its instance context. IRQ dispatch is fixed to provider
 instances and does not repeat factory lookup for every byte.
 
+The constructor contract names private state, definitions, initialization, stop
+actions and failed-init responsibility explicitly. Common generation does not
+infer these from family names. Selected STM32F4 official LL operations remain
+inside private SoC state machines; factory and public I/O contracts are unchanged.
+Full HAL Handle/callback transport requires separate mode-specific evaluation.
+See [official driver integration](../design/official-stm32-provider.md).
+
 ## Lifecycle and failure responsibility
 
 ![Current initialization, failure withdrawal and retained cleanup responsibility](../assets/diagrams/platform-lifecycle.svg)
@@ -59,6 +66,12 @@ start and after stop; its pointer is not a capability to execute cold hardware.
 Partial failure can retain irreversible watchdog effects or busy borrows. Products
 must inspect primary and cleanup outcomes, continue the real executor, and retain
 quarantined resources. Platform start never starts a scheduler.
+
+Optional generated diagnosed start/stop entries write phase and controller
+location to caller-owned cold-path storage. They retain no diagnostic pointer
+and do not replace the primary/cleanup results or remaining-effect obligations.
+See [the diagnostic contract](../design/official-stm32-provider.md) for index
+meaning and failure responsibilities.
 
 ## Costs and tradeoffs
 

@@ -26,6 +26,7 @@
     "nucleo-u575-freertos-uart.toml",
     "qiming-baremetal-empty.toml",
     "qiming-baremetal-gpio.toml",
+    "qiming-baremetal-uart-dma.toml",
     "qiming-baremetal-uart.toml",
     "qiming-baremetal.toml",
     "qiming-freertos-empty.toml",

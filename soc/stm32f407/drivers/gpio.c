@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_provider.h"
+#include "stm32f4xx_ll_gpio.h"
 
 #ifndef NX_STM32_GPIO_CLOCK_READ
 #define NX_STM32_GPIO_CLOCK_READ(reg) (*(reg))
@@ -19,14 +20,19 @@ nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
         (port->mask & ~0xFFFFU) != 0U || (initial & ~port->mask) != 0U) {
         return NX_ERROR_INVALID;
     }
+    if (port->initialized) {
+        return NX_ERROR_BUSY;
+    }
     GPIO_TypeDef* regs = port->registers;
     regs->BSRR = initial | ((port->mask & ~initial) << 16U);
     for (unsigned pin = 0U; pin < 16U; ++pin) {
         if ((port->mask & (1U << pin)) != 0U) {
-            regs->MODER = (regs->MODER & ~(3U << (pin * 2U))) |
-                          ((port->output ? 1U : 0U) << (pin * 2U));
-            regs->OTYPER &= ~(1U << pin);
-            regs->PUPDR &= ~(3U << (pin * 2U));
+            uint32_t selected = 1U << pin;
+            LL_GPIO_SetPinOutputType(regs, selected, LL_GPIO_OUTPUT_PUSHPULL);
+            LL_GPIO_SetPinPull(regs, selected, LL_GPIO_PULL_NO);
+            LL_GPIO_SetPinMode(regs, selected,
+                               port->output ? LL_GPIO_MODE_OUTPUT
+                                            : LL_GPIO_MODE_INPUT);
         }
     }
     port->initialized = true;
@@ -54,7 +60,7 @@ nx_result_t nx_stm32_gpio_read(const void* context, uint32_t* value) {
     if (port == NULL || !port->initialized || value == NULL) {
         return NX_ERROR_INVALID;
     }
-    *value = port->registers->IDR & port->mask;
+    *value = LL_GPIO_ReadInputPort(port->registers) & port->mask;
     return NX_SUCCESS;
 }
 
@@ -68,7 +74,7 @@ nx_result_t nx_stm32_gpio_toggle(void* context, uint32_t mask) {
     if ((mask & ~port->mask) != 0U) {
         return NX_ERROR_PERMISSION;
     }
-    uint32_t high = port->registers->ODR & mask;
+    uint32_t high = LL_GPIO_ReadOutputPort(port->registers) & mask;
     return nx_stm32_gpio_write(port, mask & ~high, high);
 }
 
@@ -135,17 +141,18 @@ nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* gpio, uint8_t pin,
     if (gpio == NULL || pin > 15U || mode > 3U || af > 15U || pull > 2U) {
         return NX_ERROR_INVALID;
     }
-    uint32_t mode_shift = (uint32_t)pin * 2U;
-    uint32_t af_shift = ((uint32_t)pin % 8U) * 4U;
-    gpio->AFR[pin / 8U] =
-        (gpio->AFR[pin / 8U] & ~(15U << af_shift)) | ((uint32_t)af << af_shift);
-    gpio->PUPDR =
-        (gpio->PUPDR & ~(3U << mode_shift)) | ((uint32_t)pull << mode_shift);
-    gpio->OTYPER =
-        (gpio->OTYPER & ~(1U << pin)) | (open_drain ? 1U << pin : 0U);
-    gpio->OSPEEDR = (gpio->OSPEEDR & ~(3U << mode_shift)) | (2U << mode_shift);
-    gpio->MODER =
-        (gpio->MODER & ~(3U << mode_shift)) | ((uint32_t)mode << mode_shift);
+    uint32_t selected = 1U << pin;
+    if (pin < 8U) {
+        LL_GPIO_SetAFPin_0_7(gpio, selected, af);
+    } else {
+        LL_GPIO_SetAFPin_8_15(gpio, selected, af);
+    }
+    LL_GPIO_SetPinPull(gpio, selected, pull);
+    LL_GPIO_SetPinOutputType(gpio, selected,
+                             open_drain ? LL_GPIO_OUTPUT_OPENDRAIN
+                                        : LL_GPIO_OUTPUT_PUSHPULL);
+    LL_GPIO_SetPinSpeed(gpio, selected, LL_GPIO_SPEED_FREQ_HIGH);
+    LL_GPIO_SetPinMode(gpio, selected, mode);
     return NX_SUCCESS;
 }
 

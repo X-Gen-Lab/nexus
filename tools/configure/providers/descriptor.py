@@ -62,7 +62,8 @@ _DESCRIPTORS = MappingProxyType({
     "native": FamilyDescriptor("native"),
     "stm32f407": FamilyDescriptor("stm32f407", (
         ("cmsis_core", "cmsis5"),
-        ("cmsis_device_f4", "stm32f4_cmsis")),
+        ("cmsis_device_f4", "stm32f4_cmsis"),
+        ("hal_driver_f4", "stm32f4_hal")),
         references="references.json"),
     "gd32f470": FamilyDescriptor("gd32f470",
         import_lock="vendors/gigadevice/gd32f4xx/source.lock.json",

@@ -6,6 +6,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+
+Development source version: `0.2.0`. No 0.2.0 public release or candidate
+qualification is implied by this heading. The published 0.1.0 tag, assets and
+original evidence remain unchanged. Factory epoch `1` and authored assembly
+schema `2` remain separate, unchanged identities.
+
+### Added
+
+- A pinned official STM32F4 HAL Driver dependency with reviewed CMSIS pairing,
+  selected LL headers and license closure. Selected provider operations reuse LL
+  while Nexus retains its request, cancellation and drain state machines; this
+  is not a platform-wide HAL Handle/callback migration.
+- Optional caller-owned cold lifecycle diagnostics and a read-only mode review
+  work-package view derived from existing authorities. The view does not execute
+  tests or grant software or physical qualification.
+
+### Changed
+
+- Constructors return an explicit frozen construction contract for private state,
+  static definitions, initialization and failed-init cleanup responsibility.
+- Current Source SDK consumers request exact version `0.2.0`; old SDK and
+  qualification records keep their original source and version.
+
+### Verification and limitations
+
+Fresh tests, exact linked-image comparisons, independent SDK consumption and
+candidate evidence must qualify the changed source separately. Physical MCU HIL
+remains `not_executed`. Bootloader handoff, dynamic reclocking, deep STOP and
+broader H743/U575 modes retain their existing unimplemented or partial boundaries.
+
 ## [0.1.0] - 2026-10-15 (Asia/Shanghai)
 
 First public Source SDK developer preview. The January Phase 1 entry below is a

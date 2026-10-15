@@ -124,6 +124,7 @@ REQUIRED_FILES = (
     "tools/configure/providers/gd32f470/bindings.py",
     "tools/configure/providers/gd32f470/emission.py",
     "tools/configure/factory.py", "tools/configure/assemblies/native.toml",
+    "tools/configure/assemblies/qiming-baremetal-uart-dma.toml",
     "tools/configure/assemblies/sky-baremetal.toml",
     "tools/configure/assemblies/liangshan-baremetal.toml",
     "tools/measurement/workload.c",

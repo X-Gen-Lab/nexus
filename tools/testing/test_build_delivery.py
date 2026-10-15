@@ -226,6 +226,16 @@ class BuildDeliveryTests(unittest.TestCase):
         with self.assertRaises(EvidenceError):
             dependencies.required_submodules("arm", "unknown", "baremetal")
 
+    def test_f407_scoped_prepare_includes_actual_official_ll_dependency(self):
+        expected = ("vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4",
+                    "vendors/st/stm32f4_hal")
+        for backend in ("baremetal", "freertos", "threadx"):
+            with self.subTest(backend=backend):
+                selected = dependencies.required_submodules("arm", "stm32f407",
+                                                            backend)
+                self.assertEqual(selected, expected + (
+                    () if backend == "baremetal" else ("ext/" + backend,)))
+
     def test_wheel_vendor_metadata_is_not_another_top_level_distribution(self):
         wheel = self.wheel()
         with zipfile.ZipFile(wheel, "a") as archive:

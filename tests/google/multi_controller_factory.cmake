@@ -4,7 +4,9 @@ file(GLOB_RECURSE multi_factory_codegen CONFIGURE_DEPENDS
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     ${multi_factory_codegen})
 foreach(multi_family stm32 gd32)
+    set(multi_official)
     if(multi_family STREQUAL "stm32")
+        set(multi_official STM32F4_LL)
         set(multi_label stm32-zg)
         set(multi_soc stm32f407)
     else()
@@ -30,7 +32,8 @@ foreach(multi_family stm32 gd32)
         set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input_path}")
     endforeach()
     set(multi_target "nexus_${multi_family}_multi_controller_factory_test")
-    nexus_google_test(${multi_target} SOURCES multi_controller_factory_test.cpp
+    nexus_google_test(${multi_target} ${multi_official}
+        SOURCES multi_controller_factory_test.cpp
         "${multi_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/uart_dma.c"
@@ -74,6 +77,8 @@ foreach(multi_family stm32 gd32)
         "${multi_gd}/CMSIS/GD/GD32F4xx/Include"
         "${multi_gd}/GD32F4xx_standard_peripheral/Include")
     if(multi_family STREQUAL "stm32")
+        include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+        nexus_stm32f4_official(${multi_gpio})
         target_include_directories(${multi_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
         target_compile_definitions(${multi_target} PRIVATE
@@ -138,7 +143,8 @@ foreach(multi_family stm32 gd32)
         set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${input_path}")
     endforeach()
     set(single_target "nexus_${multi_family}_single_spi_factory_test")
-    nexus_google_test(${single_target} SOURCES single_spi_factory_test.cpp
+    nexus_google_test(${single_target} ${multi_official}
+        SOURCES single_spi_factory_test.cpp
         "${single_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/spi.c"
         LIBRARIES Nexus::IO Nexus::Arch

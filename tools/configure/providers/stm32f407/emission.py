@@ -107,7 +107,7 @@ def shared_irqs(result):
     return bindings.shared_irq_definitions(result.controllers)
 
 
-def stop_system(result):
+def stop_system(result, *, system_phase=None):
     selections = result.controllers
     dma_clock = has_dma(result)
     source = can.stop_domain(result, "stm32")
@@ -127,6 +127,8 @@ def stop_system(result):
                    '        s_nx_platform_dma_clocks_added = 0u;',
                    '    }']
     source.append('    nx_arch_dsb();')
+    if system_phase is not None:
+        source.append(f'    {system_phase};')
     source += ['    if (s_nx_platform_started && nx_stm32_system_stop(&g_nx_stm32_system, 1000000u) != 0) {',
                '        return NX_ERROR_IO;', '    }']
     return source
@@ -154,7 +156,8 @@ def start_system(result):
     return source
 
 
-def start_resources(result):
+def start_resources(result, *, cleanup="nx_platform_stop()"):
+    del cleanup
     selections = result.controllers
     source = ethernet.start_resources(result, "stm32")
     source.extend(timer_advanced.start_resources(result, "stm32"))

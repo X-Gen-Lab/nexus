@@ -5,10 +5,12 @@ Nexus 是面向工业 MCU 的静态装配 C11 平台，提供 CPU、控制器、
 恢复策略由 [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples)
 或私有产品仓库维护。[English](README.md)。
 
-**Nexus 0.1.0 是首个公开 Source SDK 开发者预览版**，日期为
-2026-10-15（Asia/Shanghai）。消费方须使用精确选择的配置与工具链重新编译源码。
-接入前请阅读[发行范围与核验指南](docs/status/release-0.1.0.md)和
-[更新日志](CHANGELOG_CN.md)。MCU 实板 HIL 状态为 `not_executed`。
+**当前源码使用 Nexus 0.2.0，处于开发与软件候选准备阶段。** 这不是已公开发行的
+0.2.0；版本值不建立软件或硬件资格。消费方须使用精确选择的配置与工具链重新
+编译源码，接入前请阅读[更新日志](CHANGELOG_CN.md)。首个公开 Source SDK
+开发者预览版仍是 2026-10-15（Asia/Shanghai）的 Nexus 0.1.0；其
+[历史发行指南](docs/status/release-0.1.0.md)描述对应不可变发行字节。
+MCU 实板 HIL 状态为 `not_executed`。
 
 一份 TOML 选择经过复核的 SoC／Board 事实和精确实例。当前保留 **typed factory
 与 C 多态接口**：生成器创建已有静态对象，factory 只返回只读 face，不分配、
@@ -46,7 +48,7 @@ IRQ／DMA 的有限与连续模式是明确选择，具有各自的缓冲贷款�
 安装、构建与测试命令见[英文 README](README.md)，命令从仓库根执行。
 
 发行 SDK 需要完整固定依赖和许可证闭包。manifest 记录准确的干净源码 commit／tree、
-递归依赖与全部装包文件。使用 `find_package(Nexus 0.1.0 EXACT CONFIG REQUIRED)`；
+递归依赖与全部装包文件。使用 `find_package(Nexus 0.2.0 EXACT CONFIG REQUIRED)`；
 源码接口 epoch 保持 `1`，authored assembly schema 保持 `2`。兼容性 JSON 是唯一
 人工维护的版本权威。发行 receipt 记录实际执行的工具组合；最低版本声明和旧 CI
 结果不能建立新工具组合或本次发行资格。

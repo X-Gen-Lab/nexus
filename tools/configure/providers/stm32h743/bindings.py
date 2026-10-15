@@ -1,5 +1,5 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
-from ..common import controller_ir, fail, kernel_policy_constant
+from ..common import Construction, controller_ir, fail, kernel_policy_constant
 
 
 def constructor(item, result, board_bindings, routes, devices):
@@ -82,5 +82,9 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"nx_uart_port_stop(&s_nx_face_{name})"
     else:
         raise ValueError("Unmaintained H743 constructor")
-    return {"definitions": definitions, "initialize": f"prepare_{name}()",
-            "stop": [stop], "retain_on_failed_init": True}
+    from . import mode_implementation
+    implementation = mode_implementation(item.kind, item.mode)
+    return Construction(
+        state_type=f"nx_stm32h743_{implementation}_state_t",
+        definitions=definitions, initialize=f"prepare_{name}()",
+        stop=[stop], retain_on_failed_init=True)

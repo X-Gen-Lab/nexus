@@ -3,6 +3,10 @@ file(GLOB_RECURSE i2c_pair_codegen CONFIGURE_DEPENDS
     "${NEXUS_SOURCE_DIR}/tools/configure/*.py")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${i2c_pair_codegen})
 foreach(i2c_pair_family stm32 gd32)
+    set(i2c_pair_official)
+    if(i2c_pair_family STREQUAL "stm32")
+        set(i2c_pair_official STM32F4_LL)
+    endif()
     if(i2c_pair_family STREQUAL "stm32")
         set(i2c_pair_label "stm32-zg")
         set(i2c_pair_soc "stm32f407")
@@ -37,7 +41,8 @@ foreach(i2c_pair_family stm32 gd32)
             set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
                 "${i2c_pair_path}")
         endforeach()
-        nexus_google_test(${i2c_pair_target} SOURCES i2c_pair_factory_test.cpp
+        nexus_google_test(${i2c_pair_target} ${i2c_pair_official}
+            SOURCES i2c_pair_factory_test.cpp
             "${i2c_pair_bundle}/bindings.c"
             "${NEXUS_SOURCE_DIR}/soc/common/i2c_v1_async.c"
             "${NEXUS_SOURCE_DIR}/soc/${i2c_pair_soc}/drivers/i2c_async.c"

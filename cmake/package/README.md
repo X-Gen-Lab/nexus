@@ -1,6 +1,7 @@
 # Relocatable Nexus source SDK
 
-Nexus 0.1.0 is a Source SDK developer preview. The consumer owns its assembly,
+Nexus 0.2.0 is the current development Source SDK version, not a published
+release or a qualification result. The consumer owns its assembly,
 application sources, compiler, ABI, workers and resource budgets. Vendor headers
 and concrete provider storage stay private. No precompiled MCU binary ABI or
 application generator is exported.
@@ -8,7 +9,7 @@ application generator is exported.
 `dependencies/platform-compatibility.json` is the sole authored semantic-version
 policy. CMake, generated headers and the exported package derive their version
 from it. Source interface epoch `1` and authored assembly schema `2` are separate
-identities; they do not change with this initial public version normalization.
+identities; they do not change solely because the semantic version changes.
 
 Prepare from an initialized, clean, committed checkout:
 
@@ -32,7 +33,7 @@ Move the complete prefix, then consume it from an independent project:
 cmake_minimum_required(VERSION 3.31)
 project(my_device LANGUAGES C ASM)
 set(NEXUS_ASSEMBLY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/assembly.toml")
-find_package(Nexus 0.1.0 EXACT CONFIG REQUIRED)
+find_package(Nexus 0.2.0 EXACT CONFIG REQUIRED)
 nexus_add_firmware(my_device SOURCES main.c)
 ```
 
@@ -79,7 +80,8 @@ SDK source, tool tuple, dependency/license closure and consumer results. The
 declared minimum Python/CMake versions do not establish installation or
 integration on every host. Linux is the maintained executed host scope; physical
 MCU HIL remains `not_executed`. Historical software candidates keep their original
-source identity. See the [release scope](../../docs/status/release-0.1.0.md).
+source identity. The [0.1.0 release scope](../../docs/status/release-0.1.0.md)
+is historical and does not qualify this development version.
 
 Release automation verifies an existing publishable installed prefix with the
 same consumer template, without the development opt-in:

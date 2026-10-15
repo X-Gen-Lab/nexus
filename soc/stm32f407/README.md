@@ -26,10 +26,16 @@ Bootstrap clock phases have explicit poll bounds because the final monotonic
 clock does not exist yet. Dynamic reclocking is unsupported.
 
 The official ST device package and Arm CMSIS submodules provide register
-layout, masks and the complete GCC vector/startup. Their pinned Git identities
-are checked by the repository dependency lock. Vendor headers are private to
-the implementation and generated static binding. The HAL driver package is
-not linked into these direct-register typed providers.
+layout, masks and the complete GCC vector/startup. The official STM32F4 HAL
+Driver package supplies selected LL operations inside private provider state
+machines. Its reviewed version, exact Git identity, CMSIS pairing, selected
+header digests and license are recorded in
+[`stm32f4-hal.lock.json`](../../dependencies/stm32f4-hal.lock.json). Vendor
+headers remain private to the implementation and generated static binding.
+This does not select the complete HAL Handle/callback transport state machine
+or establish support for every official module. See
+[official driver integration](../../docs/design/official-stm32-provider.md)
+for ownership, time, cancellation, comparison and delivery requirements.
 
 | Provider | Maintained execution and limits |
 |---|---|

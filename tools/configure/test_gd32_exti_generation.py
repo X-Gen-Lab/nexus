@@ -43,7 +43,8 @@ class Gd32ExtiGenerationTests(unittest.TestCase):
                         initialize)
         self.assertIn("s_nx_port_edge3.initialized ? "
                       "nx_exti_port_stop(&s_nx_face_edge3) : NX_SUCCESS", source)
-        self.assertIn("result.cleanup = nx_platform_stop();", start)
+        self.assertIn("result.cleanup = "
+                      "nx_platform_stop_impl(diagnostic, true);", start)
         self.assertIn("if (status_0 != NX_SUCCESS) { return status_0; }", source)
 
     def test_gpio_does_not_inherit_exti_partial_effect_admission(self):

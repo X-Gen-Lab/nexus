@@ -5,7 +5,7 @@ try:
 except ImportError:
     from emission import dma_regions
     from gpio_phase import rollback_pin, withdraw_pin
-from ..common import controller_ir, mode_traits
+from ..common import Construction, controller_ir, mode_traits
 from .. import hardware
 try:
     from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers
@@ -110,7 +110,6 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     declarations = []
     children = [child for child in devices
                 if child["controller"] == item["id"]]
-    extra_headers = []
     if kind == "uart":
         if item["controller"] not in {"USART0", "USART1"}:
             raise ValueError("GD32 maintains USART0/USART1 IRQ UART")
@@ -403,9 +402,12 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             stop = [f"nx_gd32_adc_stop(&s_nx_port_{name})"]
     else:
         raise ValueError(f"No maintained GD32 constructor for {kind}")
-    return {"definitions": declarations, "initialize": initialize,
-            "stop": stop, "extra_headers": extra_headers,
-            "retain_on_failed_init": kind == "exti"}
+    from . import mode_implementation
+    implementation = mode_implementation(item.kind, item.mode)
+    return Construction(
+        state_type=f"nx_gd32_{implementation}_state_t",
+        definitions=declarations, initialize=initialize, stop=stop,
+        retain_on_failed_init=kind == "exti")
 
 
 def constructor(item, result, board_bindings, routes, devices):
@@ -430,7 +432,9 @@ def constructor(item, result, board_bindings, routes, devices):
                                    for pin in item["pins"])
     initial = item.options.initial
     output = "true" if item.mode == "output" else "false"
-    return {"definitions": [],
-            "initialize": (f"nx_gd32_gpio_initialize(&s_nx_port_{name}, "
-                           f"{index}u, {mask}u, {initial}u, {output})"),
-            "stop": [f"nx_gd32_gpio_stop(&s_nx_port_{name}, {initial}u)"]}
+    return Construction(
+        state_type="nx_gd32_gpio_state_t", definitions=[],
+        initialize=(f"nx_gd32_gpio_initialize(&s_nx_port_{name}, "
+                    f"{index}u, {mask}u, {initial}u, {output})"),
+        stop=[f"nx_gd32_gpio_stop(&s_nx_port_{name}, {initial}u)"],
+        retain_on_failed_init=False)

@@ -42,12 +42,18 @@ Read the [architecture](../explanation/platform-architecture.md),
    shared CPU resolver; do not duplicate CPU flags or infer optional features.
 4. Add the family to the explicit maintained provider map in `tools/configure/`.
    Define supported modes, numerical limits, constructors, rollback and IRQ wiring.
-   Unsupported modes reject; there is no runtime registration or plugin discovery.
+   Return an explicit frozen `Construction` record, including the private state
+   type and failed-init cleanup responsibility; do not require family-name
+   inference in common generation. Unsupported modes reject; there is no runtime
+   registration or plugin discovery.
 5. Add explicit CMake targets and private SDK dependencies. Update declared
    resolver reconfiguration inputs and the Source SDK required-file closure.
 6. Implement the smallest correct production change. Define an immutable public
    face with shared readonly ops and independent context.
    Reuse public Nexus types; keep vendor structures and concrete storage private.
+   Review official HAL/LL reuse before duplicating a vendor state machine. Apply
+   [the official-driver boundary](../design/official-stm32-provider.md) to time,
+   callbacks, cancellation, private dependencies and mode-specific comparison.
 7. Execute GREEN against the real provider. Verify rejection
    without residual effects, accepted borrow, cancel/deadline, failed drain,
    quarantine, stop/restart and instance isolation where the mode needs them.
@@ -58,6 +64,11 @@ Read the [architecture](../explanation/platform-architecture.md),
 For a component, pass explicit bus, GPIO, time and optional OS ports. Do not create
 workers, probe devices, invent application roles or supply a maximum object pool.
 Flash drivers expose physical geometry; persistence and update policy remain external.
+
+The read-only [work-package view](../../tools/maintenance/README.md) connects
+exact maintained modes to resolver fixtures, selected ops sources and reviewed
+lifecycle properties. Its entries are navigation, not executed tests or new
+support declarations. Run actual applicable gates separately.
 
 ## Review performance and ownership
 

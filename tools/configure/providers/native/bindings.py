@@ -1,6 +1,6 @@
 """Emit exact host model storage and wiring, without runtime hardware policy."""
 
-from ..common import controller_ir
+from ..common import Construction, controller_ir
 
 
 def symbol(name):
@@ -102,4 +102,7 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = [f"nx_native_adc_stop_instance({state})"]
     else:
         raise ValueError(f"Native construction is not maintained for {kind}")
-    return {"definitions": definitions, "initialize": initialize, "stop": stop}
+    return Construction(
+        state_type=f"nx_native_{kind}_state_t", definitions=definitions,
+        initialize=initialize, stop=stop,
+        retain_on_failed_init=kind in {"spi", "i2c"})

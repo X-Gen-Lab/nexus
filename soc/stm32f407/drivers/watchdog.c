@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_provider.h"
+#include "stm32f4xx_ll_iwdg.h"
 
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))
@@ -66,13 +67,16 @@ nx_result_t nx_stm32_watchdog_enable(void* context, uint32_t timeout_us,
         divisor *= 2U;
         ++prescaler;
     }
+    bool added_lsi = (port->rcc->CSR & RCC_CSR_LSION) == 0U;
     port->rcc->CSR |= RCC_CSR_LSION;
     uint32_t remaining = port->poll_limit;
     while ((port->rcc->CSR & RCC_CSR_LSIRDY) == 0U && remaining-- != 0U) {
         NX_STM32_IO_POLL(4U, port);
     }
     if ((port->rcc->CSR & RCC_CSR_LSIRDY) == 0U) {
-        port->rcc->CSR &= ~(uint32_t)RCC_CSR_LSION;
+        if (added_lsi) {
+            port->rcc->CSR &= ~(uint32_t)RCC_CSR_LSION;
+        }
         return NX_ERROR_IO;
     }
     if (debug_freeze) {
@@ -84,14 +88,14 @@ nx_result_t nx_stm32_watchdog_enable(void* context, uint32_t timeout_us,
     uint32_t old_prescaler = port->registers->PR & 7U;
     uint32_t old_divisor = old_prescaler > 6U ? 256U : 4U << old_prescaler;
     timeout_bounds(&old, old_divisor, (port->registers->RLR & 0xFFFU) + 1U);
-    port->registers->KR = 0xCCCCU;
+    LL_IWDG_Enable(port->registers);
     port->state.enabled = true;
     port->state.irreversible = true;
     port->state.debug_freeze = debug_freeze;
     timeout_bounds(&port->state, divisor, count);
-    port->registers->KR = 0x5555U;
-    port->registers->PR = prescaler;
-    port->registers->RLR = count - 1U;
+    LL_IWDG_EnableWriteAccess(port->registers);
+    LL_IWDG_SetPrescaler(port->registers, prescaler);
+    LL_IWDG_SetReloadCounter(port->registers, count - 1U);
     remaining = port->poll_limit;
     while (port->registers->SR != 0U && remaining-- != 0U) {
         NX_STM32_IO_POLL(4U, port);
@@ -107,7 +111,7 @@ nx_result_t nx_stm32_watchdog_enable(void* context, uint32_t timeout_us,
         *state = port->state;
         return NX_ERROR_IO;
     }
-    port->registers->KR = 0xAAAAU;
+    LL_IWDG_ReloadCounter(port->registers);
     return NX_SUCCESS;
 }
 
@@ -121,7 +125,7 @@ nx_result_t nx_stm32_watchdog_feed(void* context) {
     if (!port->state.enabled) {
         return NX_ERROR_STATE;
     }
-    port->registers->KR = 0xAAAAU;
+    LL_IWDG_ReloadCounter(port->registers);
     return NX_SUCCESS;
 }
 

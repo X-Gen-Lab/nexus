@@ -1,0 +1,58 @@
+# Explicit Linux-only behavior comparison; never part of firmware or the SDK.
+cmake_minimum_required(VERSION 3.31.6)
+project(nexus_stm32_hal_reference LANGUAGES C CXX)
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_CROSSCOMPILING)
+    message(FATAL_ERROR "The HAL register reference requires a Linux host")
+endif()
+get_filename_component(NEXUS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../.."
+    ABSOLUTE)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+set(official "${NEXUS_SOURCE_DIR}/vendors/st/stm32f4_hal")
+set(cmsis "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+set(device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
+foreach(name uart dma)
+    if(NOT EXISTS "${official}/Src/stm32f4xx_hal_${name}.c")
+        message(FATAL_ERROR "HAL comparison needs the full locked Git checkout")
+    endif()
+endforeach()
+
+file(READ "${NEXUS_SOURCE_DIR}/dependencies/googletest.lock.json" google_lock)
+string(JSON google_archive GET "${google_lock}" archive)
+string(JSON google_commit GET "${google_lock}" commit)
+string(JSON google_sha256 GET "${google_lock}" sha256)
+set(google_archive "${NEXUS_SOURCE_DIR}/${google_archive}")
+file(SHA256 "${google_archive}" google_actual)
+if(NOT google_actual STREQUAL google_sha256)
+    message(FATAL_ERROR "HAL comparison requires the pinned GoogleTest bytes")
+endif()
+set(google_root "${CMAKE_BINARY_DIR}/_deps/googletest-${google_commit}")
+file(REMOVE_RECURSE "${google_root}")
+file(ARCHIVE_EXTRACT INPUT "${google_archive}"
+    DESTINATION "${CMAKE_BINARY_DIR}/_deps")
+set(INSTALL_GTEST OFF CACHE BOOL "Comparison only" FORCE)
+set(BUILD_GMOCK ON CACHE BOOL "Comparison test framework" FORCE)
+add_subdirectory("${google_root}" "${CMAKE_BINARY_DIR}/google-build"
+    EXCLUDE_FROM_ALL)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/reference.cmake")
+add_executable(nexus_stm32_hal_reference reference_test.cpp)
+nexus_stm32_hal_reference(nexus_stm32_hal_reference)
+target_link_libraries(nexus_stm32_hal_reference PRIVATE GTest::gmock_main)
+set(NEXUS_REFERENCE_SANITIZER "none" CACHE STRING "none, address or thread")
+if(NOT NEXUS_REFERENCE_SANITIZER MATCHES "^(none|address|thread)$")
+    message(FATAL_ERROR "Unknown reference sanitizer")
+endif()
+if(NOT NEXUS_REFERENCE_SANITIZER STREQUAL "none")
+    foreach(target nexus_stm32_hal_reference_vendor nexus_stm32_hal_reference
+                   gtest gmock gmock_main)
+        target_compile_options(${target} PRIVATE
+            "-fsanitize=${NEXUS_REFERENCE_SANITIZER}" -fno-omit-frame-pointer)
+    endforeach()
+    target_link_options(nexus_stm32_hal_reference PRIVATE
+        "-fsanitize=${NEXUS_REFERENCE_SANITIZER}")
+endif()
+enable_testing()
+add_test(NAME nexus_stm32_hal_reference COMMAND nexus_stm32_hal_reference
+    "--gtest_output=xml:${CMAKE_BINARY_DIR}/reference.xml")
+set_tests_properties(nexus_stm32_hal_reference PROPERTIES TIMEOUT 30)

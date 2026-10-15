@@ -18,6 +18,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [工程手册](engineering-handbook.md) | 既有格式/注释、工具、自动化、证据与发布 |
 | [构建系统合同](build-system.md) | 配置事务、增量依赖、目标策略、开发入口与交付边界 |
 | [构建系统48项台账](build-system-execution.csv) | 原始退出条件、实现路径与本轮执行证据 |
+| [官方驱动与 provider 迭代](official-stm32-provider.md) | 私有 HAL/LL 复用、typed Construction、工作包退出条件及资格边界 |
 | [接入契约](integration-contracts.md) | SoC/Board/器件/组件/外部工程的严格资源合同 |
 | [OS 执行与生命周期合同](os-contracts.md) | deadline、IRQ policy、任务/队列、低功耗与扩展边界 |
 | [后端接入与执行探针](os-backend-integration.md) | 新 RTOS 的能力合同、实际执行和不得自动扩大支持 |

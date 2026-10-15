@@ -31,13 +31,17 @@ add_subdirectory("${google_root}" "${CMAKE_BINARY_DIR}/_deps/google-build"
 
 add_custom_target(nexus_google_contracts)
 function(nexus_google_test name)
-    cmake_parse_arguments(ARG "" "" "SOURCES;LIBRARIES;INCLUDES" ${ARGN})
+    cmake_parse_arguments(ARG "STM32F4_LL" "" "SOURCES;LIBRARIES;INCLUDES" ${ARGN})
     add_executable(${name} ${ARG_SOURCES})
     target_compile_features(${name} PRIVATE cxx_std_17)
     set_target_properties(${name} PROPERTIES CXX_EXTENSIONS OFF)
     target_link_libraries(${name} PRIVATE nexus_build_options nexus_owned_warnings
         GTest::gmock_main ${ARG_LIBRARIES})
     target_include_directories(${name} PRIVATE ${ARG_INCLUDES})
+    if(ARG_STM32F4_LL)
+        include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+        nexus_stm32f4_official(${name})
+    endif()
     add_dependencies(nexus_google_contracts ${name})
     add_test(NAME ${name} COMMAND ${name})
     set_tests_properties(${name} PROPERTIES TIMEOUT 30 LABELS "GoogleTest")
@@ -118,7 +122,7 @@ nexus_google_test(nexus_native_factory_test SOURCES native_factory_test.cpp
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${native_factory_generated}" "${NEXUS_SOURCE_DIR}/io/native")
 
-nexus_google_test(nexus_stm32_uart_dma_test SOURCES stm32_uart_dma_test.cpp
+nexus_google_test(nexus_stm32_uart_dma_test STM32F4_LL SOURCES stm32_uart_dma_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32f407/private")
@@ -128,7 +132,7 @@ target_include_directories(nexus_stm32_uart_dma_test SYSTEM PRIVATE
 target_compile_definitions(nexus_stm32_uart_dma_test PRIVATE
     NEXUS_STM32_MODEL STM32F407xx)
 
-nexus_google_test(nexus_irq_wake_stm32_test SOURCES irq_wake_stm32_test.cpp
+nexus_google_test(nexus_irq_wake_stm32_test STM32F4_LL SOURCES irq_wake_stm32_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32f407/private")
@@ -177,7 +181,7 @@ target_compile_definitions(nexus_gd32_multi_test PRIVATE GD32F470
 target_compile_options(nexus_gd32_multi_test PRIVATE
     "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
 
-nexus_google_test(nexus_stm32_spi_dma_test
+nexus_google_test(nexus_stm32_spi_dma_test STM32F4_LL
     SOURCES stm32_spi_dma_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/spi.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/gpio.c"
@@ -209,7 +213,7 @@ target_compile_options(nexus_gd32_uart_dma_test PRIVATE
     "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>"
     "$<$<COMPILE_LANGUAGE:C>:-include${CMAKE_CURRENT_SOURCE_DIR}/gd32_uart_dma_model.h>")
 
-nexus_google_test(nexus_stm32_uart_receive_test
+nexus_google_test(nexus_stm32_uart_receive_test STM32F4_LL
     SOURCES stm32_uart_receive_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart_dma.c"
@@ -242,7 +246,7 @@ target_compile_options(nexus_gd32_uart_receive_test PRIVATE
     "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>"
     "$<$<COMPILE_LANGUAGE:C>:-include${CMAKE_CURRENT_SOURCE_DIR}/gd32_uart_receive_model.h>")
 
-nexus_google_test(nexus_stm32_uart_stream_test
+nexus_google_test(nexus_stm32_uart_stream_test STM32F4_LL
     SOURCES stm32_uart_stream_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
@@ -271,7 +275,7 @@ target_compile_options(nexus_gd32_spi_dma_test PRIVATE
     "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>"
     "$<$<COMPILE_LANGUAGE:C>:-include${CMAKE_CURRENT_SOURCE_DIR}/gd32_spi_dma_model.h>")
 
-nexus_google_test(nexus_stm32_adc_stream_test
+nexus_google_test(nexus_stm32_adc_stream_test STM32F4_LL
     SOURCES stm32_adc_stream_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/adc.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
@@ -345,7 +349,7 @@ target_compile_definitions(nexus_gd32_uart_stream_test PRIVATE GD32F470
 target_compile_options(nexus_gd32_uart_stream_test PRIVATE
     "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
 
-nexus_google_test(nexus_stm32_i2c_register_test
+nexus_google_test(nexus_stm32_i2c_register_test STM32F4_LL
     SOURCES i2c_register_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/i2c.c"
     LIBRARIES Nexus::IO
@@ -482,6 +486,7 @@ include(dma_multi_controller.cmake)
 include(soc_system.cmake)
 include(gd32_exti.cmake)
 include(stm32_exti.cmake)
+include(stm32_official.cmake)
 include(h743.cmake)
 include(h743_dma.cmake)
 include(workload_uart3.cmake)

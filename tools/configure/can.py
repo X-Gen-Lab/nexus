@@ -6,10 +6,12 @@ forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
 try:
     from .gpio_phase import withdraw_pin
-    from .providers.common import fail, integer, sequence, kernel_policy_constant
+    from .providers.common import (Construction, fail, integer, sequence,
+                                   kernel_policy_constant)
 except ImportError:
     from gpio_phase import withdraw_pin
-    from providers.common import fail, integer, sequence, kernel_policy_constant
+    from providers.common import (Construction, fail, integer, sequence,
+                                  kernel_policy_constant)
 
 FILTER_FIELDS = {"controller", "bank", "id", "mask", "format", "fifo",
                  "remote", "match_remote"}
@@ -192,11 +194,13 @@ def constructor(item, result, prefix):
         lines += [f"void {vector}_IRQHandler(void);",
                   "/** \\brief Dispatch the exact selected classic CAN hardware source. */",
                   f"void {vector}_IRQHandler(void) {{ nx_can_controller_irq(&{state}); }}"]
-    return {"definitions": lines, "initialize": f"prepare_{name}()",
-            "stop": [f"stop_{name}()"],
-            "pin_snapshots": {pin["pin"]:
-                              f"s_nx_can_pin_snapshots_{name}[{index}]"
-                              for index, pin in enumerate(pins)}}
+    return Construction(
+        state_type="nx_can_controller_t", definitions=lines,
+        initialize=f"prepare_{name}()", stop=[f"stop_{name}()"],
+        retain_on_failed_init=True,
+        pin_snapshots={pin["pin"]:
+                       f"s_nx_can_pin_snapshots_{name}[{index}]"
+                       for index, pin in enumerate(pins)})
 
 
 def stop_domain(result, prefix):

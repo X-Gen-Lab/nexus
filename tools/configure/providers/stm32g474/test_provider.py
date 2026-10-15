@@ -155,7 +155,7 @@ class G474ProviderTests(unittest.TestCase):
         self.assertIn("nx_stm32g474_lpuart1_pins_prepare()", source)
         self.assertIn("170000000u, 1000000u", source)
         self.assertEqual(construction["stop"],
-                         ["nx_uart_port_stop(&s_nx_face_console)"])
+                         ("nx_uart_port_stop(&s_nx_face_console)",))
         self.assertIn("LPUART1_IRQHandler", source)
         self.assertNotIn("DMA", source)
 

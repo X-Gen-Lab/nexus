@@ -11,6 +11,7 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/arch/arch.h"
 #include "nexus/io/native/model.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
@@ -428,6 +429,120 @@ TEST_F(NativeFactory, PlatformStopKeepsADCStreamLoanUntilConsumerRelease) {
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
     nx_adc_info_t info = {};
     EXPECT_EQ(nx_adc_port_info(adc, &info), NX_ERROR_INVALID);
+}
+
+TEST_F(NativeFactory, FailedSPIChildInitializationRevokesOpenedController) {
+    const nx_spi_port_t* port = nx_factory_spi(NX_SPI_ID_BUS_SPI_A);
+    const nx_spi_endpoint_t* endpoint =
+        nx_factory_spi_device(NX_SPI_DEVICE_ID_SENSOR_SPI_A);
+    ASSERT_NE(port, nullptr);
+    ASSERT_NE(endpoint, nullptr);
+    auto* state = static_cast<nx_native_spi_state_t*>(port->context);
+    auto* child =
+        static_cast<nx_native_spi_endpoint_state_t*>(endpoint->context);
+    child->cs = true;
+
+    const nx_platform_start_result_t result = nx_platform_start();
+
+    EXPECT_EQ(result.primary, NX_ERROR_BUSY);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_FALSE(state->opened);
+    child->cs = false;
+}
+
+TEST_F(NativeFactory, FailedSPIInitializationRetainsFailedCleanup) {
+    const nx_spi_port_t* port = nx_factory_spi(NX_SPI_ID_BUS_SPI_A);
+    ASSERT_NE(port, nullptr);
+    auto* state = static_cast<nx_native_spi_state_t*>(port->context);
+    state->active = true;
+
+    const nx_platform_start_result_t result = nx_platform_start();
+
+    EXPECT_EQ(result.primary, NX_ERROR_BUSY);
+    EXPECT_EQ(result.cleanup, NX_ERROR_BUSY);
+    EXPECT_NE(result.remaining_effects, 0U);
+    EXPECT_TRUE(state->active);
+    state->active = false;
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+
+TEST_F(NativeFactory, DiagnosedSuccessClearsOnlyCallerOwnedStorage) {
+    nx_platform_diagnostic_t diagnostic = {NX_PLATFORM_PHASE_CONTROLLER, 17U,
+                                           NX_PLATFORM_PHASE_CONTROLLER, 19U};
+    const nx_platform_start_result_t result =
+        nx_platform_start_diagnosed(&diagnostic);
+    EXPECT_EQ(result.primary, NX_SUCCESS);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.controller_index, SIZE_MAX);
+    EXPECT_EQ(diagnostic.cleanup_phase, NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.cleanup_controller_index, SIZE_MAX);
+    EXPECT_EQ(nx_platform_stop_diagnosed(&diagnostic), NX_SUCCESS);
+    EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.controller_index, SIZE_MAX);
+    EXPECT_EQ(nx_platform_start_diagnosed(nullptr).primary, NX_SUCCESS);
+    EXPECT_EQ(nx_platform_stop_diagnosed(nullptr), NX_SUCCESS);
+}
+
+TEST_F(NativeFactory, DiagnosedContextRejectionDoesNotAcquireResources) {
+    nx_platform_diagnostic_t diagnostic = {};
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    const nx_platform_start_result_t result =
+        nx_platform_start_diagnosed(&diagnostic);
+    nx_arch_irq_restore(saved);
+    EXPECT_EQ(result.primary, NX_ERROR_CONTEXT);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_CONTEXT);
+    EXPECT_EQ(diagnostic.controller_index, SIZE_MAX);
+    EXPECT_EQ(diagnostic.cleanup_phase, NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.cleanup_controller_index, SIZE_MAX);
+}
+
+TEST_F(NativeFactory, DiagnosedFailureKeepsPrimaryAndCleanupIdentity) {
+    const nx_spi_port_t* port = nx_factory_spi(NX_SPI_ID_BUS_SPI_A);
+    ASSERT_NE(port, nullptr);
+    auto* state = static_cast<nx_native_spi_state_t*>(port->context);
+    state->active = true;
+    nx_platform_diagnostic_t diagnostic = {};
+    const nx_platform_start_result_t result =
+        nx_platform_start_diagnosed(&diagnostic);
+    EXPECT_EQ(result.primary, NX_ERROR_BUSY);
+    EXPECT_EQ(result.cleanup, NX_ERROR_BUSY);
+    EXPECT_NE(result.remaining_effects, 0U);
+    EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_CONTROLLER);
+    EXPECT_EQ(diagnostic.controller_index, 8U);
+    EXPECT_EQ(diagnostic.cleanup_phase, NX_PLATFORM_PHASE_CONTROLLER);
+    EXPECT_EQ(diagnostic.cleanup_controller_index, 8U);
+    EXPECT_TRUE(state->active);
+    state->active = false;
+    EXPECT_EQ(nx_platform_stop_diagnosed(&diagnostic), NX_SUCCESS);
+    EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.cleanup_phase, NX_PLATFORM_PHASE_NONE);
+}
+
+TEST_F(NativeFactory, DiagnosedStopPreservesQuarantinedRequestBorrow) {
+    const nx_uart_port_t* uart = nx_factory_uart(NX_UART_ID_LINK_A);
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    uint8_t byte = 1U;
+    nx_uart_tx_request_t request = {};
+    nx_request_initialize(&request.base);
+    ASSERT_EQ(nx_uart_tx_prepare(&request, &byte, 1U, 100U), NX_SUCCESS);
+    nx_native_uart_model_fault(uart, false, true);
+    ASSERT_EQ(nx_uart_port_submit(uart, &request), NX_SUCCESS);
+    nx_platform_diagnostic_t diagnostic = {};
+    EXPECT_EQ(nx_platform_stop_diagnosed(&diagnostic), NX_ERROR_BUSY);
+    EXPECT_EQ(diagnostic.phase, NX_PLATFORM_PHASE_CONTROLLER);
+    EXPECT_EQ(diagnostic.controller_index, 10U);
+    EXPECT_EQ(diagnostic.cleanup_phase, NX_PLATFORM_PHASE_NONE);
+    EXPECT_EQ(diagnostic.cleanup_controller_index, SIZE_MAX);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    nx_native_uart_model_fault(uart, false, false);
+    nx_uart_port_service(uart);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
 }
 
 } /* namespace */

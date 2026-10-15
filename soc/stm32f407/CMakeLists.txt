@@ -1,5 +1,4 @@
-# Fixed providers use official pinned device/CMSIS headers privately. Drivers
-# operate reviewed controller registers, without importing the legacy HAL SDK.
+# Fixed providers reuse official LL privately while preserving Nexus ownership.
 set(stm32_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4")
 set(stm32_cmsis "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
 foreach(required "${stm32_device}/Include/stm32f407xx.h"
@@ -79,6 +78,8 @@ if(stm32_sources)
     target_include_directories(nexus_soc_stm32f407 SYSTEM PRIVATE
         "${stm32_device}/Include" "${stm32_cmsis}")
     target_compile_definitions(nexus_soc_stm32f407 PRIVATE STM32F407xx)
+    include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+    nexus_stm32f4_official(nexus_soc_stm32f407)
 else()
     # Startup/system belong to the firmware; an empty assembly needs no driver.
     add_library(nexus_soc_stm32f407 INTERFACE)

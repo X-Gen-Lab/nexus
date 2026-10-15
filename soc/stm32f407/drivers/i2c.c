@@ -7,13 +7,14 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32f407_provider.h"
+#include "stm32f4xx_ll_i2c.h"
 
 #ifndef NX_STM32_IO_POLL
 #define NX_STM32_IO_POLL(kind, port) ((void)(kind), (void)(port))
 #endif
 
 #ifndef NX_STM32_I2C_READ_DATA
-#define NX_STM32_I2C_READ_DATA(port) ((uint8_t)(port)->registers->DR)
+#define NX_STM32_I2C_READ_DATA(port) LL_I2C_ReceiveData8((port)->registers)
 #endif
 #ifndef NX_STM32_I2C_WRITE_DATA
 #define NX_STM32_I2C_WRITE_DATA(port, value) ((port)->registers->DR = (value))
@@ -36,7 +37,7 @@ nx_result_t nx_stm32_i2c_initialize(nx_stm32_i2c_state_t* port) {
     port->registers->CCR = 210U;
     port->registers->TRISE = 43U;
     port->registers->OAR1 = (1U << 14U);
-    port->registers->CR1 = I2C_CR1_PE;
+    LL_I2C_Enable(port->registers);
     port->active = false;
     port->fault = false;
     port->initialized = true;
@@ -74,15 +75,18 @@ static nx_result_t wait_flag(nx_stm32_i2c_state_t* port, uint32_t mask,
 
 /** \brief Clear ADDR with the RM0090 prescribed SR1/SR2 read sequence. */
 static void clear_address(nx_stm32_i2c_state_t* port) {
-    (void)port->registers->SR1;
-    (void)port->registers->SR2;
+    LL_I2C_ClearFlag_ADDR(port->registers);
     NX_STM32_I2C_ADDRESS_CLEARED(port);
 }
 
 /** \brief Request STOP or the next repeated START at the final receive window.
  */
 static void end_receive(nx_stm32_i2c_state_t* port, bool last) {
-    port->registers->CR1 |= last ? I2C_CR1_STOP : I2C_CR1_START;
+    if (last) {
+        LL_I2C_GenerateStopCondition(port->registers);
+    } else {
+        LL_I2C_GenerateStartCondition(port->registers);
+    }
 }
 
 /** \brief Read with explicit one/two/final-three byte ACK timing. */
@@ -95,7 +99,7 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
     nx_result_t result;
     if (remaining == 1U) {
         nx_arch_irq_state_t mask = nx_arch_irq_save();
-        regs->CR1 &= ~(uint32_t)I2C_CR1_ACK;
+        LL_I2C_AcknowledgeNextData(regs, LL_I2C_NACK);
         clear_address(port);
         end_receive(port, last);
         nx_arch_irq_restore(mask);
@@ -111,7 +115,7 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
         regs->CR1 |= I2C_CR1_POS;
         nx_arch_irq_state_t mask = nx_arch_irq_save();
         clear_address(port);
-        regs->CR1 &= ~(uint32_t)I2C_CR1_ACK;
+        LL_I2C_AcknowledgeNextData(regs, LL_I2C_NACK);
         nx_arch_irq_restore(mask);
         result = wait_flag(port, I2C_SR1_BTF, deadline);
         if (result != NX_SUCCESS) {
@@ -142,7 +146,7 @@ static nx_result_t receive(nx_stm32_i2c_state_t* port,
     /* Keep final-three ACK withdrawal and N-2 consumption in one bounded
      * protected window. Hardware waits remain outside the interrupt mask. */
     nx_arch_irq_state_t mask = nx_arch_irq_save();
-    regs->CR1 &= ~(uint32_t)I2C_CR1_ACK;
+    LL_I2C_AcknowledgeNextData(regs, LL_I2C_NACK);
     message->data[index++] = NX_STM32_I2C_READ_DATA(port);
     nx_arch_irq_restore(mask);
     ++*transferred;
@@ -224,7 +228,7 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
     bool start_requested = false;
     for (size_t message = 0U; message < count; ++message) {
         if (!start_requested) {
-            port->registers->CR1 |= I2C_CR1_START;
+            LL_I2C_GenerateStartCondition(port->registers);
         }
         result = wait_flag(port, I2C_SR1_SB, deadline);
         if (result != NX_SUCCESS) {
@@ -270,7 +274,7 @@ nx_result_t nx_stm32_i2c_endpoint_transaction(void* context,
         /* A successful final receive already requested STOP in its final
          * byte window; do not issue a second STOP after master release. */
         if (result != NX_SUCCESS || !messages[count - 1U].read) {
-            port->registers->CR1 |= I2C_CR1_STOP;
+            LL_I2C_GenerateStopCondition(port->registers);
         }
         if (!drain_stop(port) && result == NX_SUCCESS) {
             result = NX_ERROR_IO;

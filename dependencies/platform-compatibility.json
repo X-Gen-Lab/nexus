@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "nexus-platform-compatibility",
-  "semantic_version": "0.1.0",
+  "semantic_version": "0.2.0",
   "factory_abi_epoch": 1,
   "source_sdk": {
     "delivery": "source_only",

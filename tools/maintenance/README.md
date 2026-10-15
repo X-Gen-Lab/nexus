@@ -13,6 +13,29 @@ python tools/maintenance/capabilities.py --write
 python -B -m unittest tools.testing.test_maintenance -v
 ```
 
+`work_packages.py` derives a review/navigation plan from existing provider,
+capability, resolver fixture, SDK-required-source and reviewed lifecycle-test
+authorities. Each entry has an exact family/controller/mode identity; these are
+mode review entries, not an additional top-level implementation ledger.
+
+Run from the source checkout root, using a fresh output path:
+
+```sh
+python -B tools/maintenance/work_packages.py \
+  --output build/quality/work-packages.json
+```
+
+Success means those source relationships are consistent. The tool does not run
+tests, verify an installed SDK or establish support or qualification. It keeps
+`software_status` and `hardware_status` as `not_executed`, reports unmapped
+properties without guessed aliases, and records the input files it observes.
+Those hashes cover report authorities, not complete Git/configuration/dependency
+provenance. `source_selected` is a resolver source relationship, while
+`reviewed_bounded` identifies a matching existing reviewed property. Neither
+means passed execution. `not_catalogued` does not assert that no other test exists.
+The output is created exclusively; select a new path rather than overwrite a
+prior report. Source authorities cannot be used as output destinations.
+
 `ownership.py` validates `.github/maintainer-roles.json`. The current
 `agent_managed` policy assigns maintenance to Codex across every review domain,
 including security, manufacturing and field interfaces. The ten seats describe

@@ -111,7 +111,7 @@ def start_system(result):
         '        return result;', '    }']
 
 
-def start_resources(result):
+def start_resources(result, *, cleanup="nx_platform_stop()"):
     ports = _ports(result)
     if not ports:
         return []
@@ -127,14 +127,14 @@ def start_resources(result):
                    '    if (!dma_clock_ready || NX_H743_READ(&DMA1_Stream0->CR) != 0u ||',
                    '        NX_H743_READ(&DMAMUX1_Channel0->CCR) != 0u || !NX_H743_IRQ_AVAILABLE(DMA1_Stream0_IRQn)) {',
                    '        result.primary = dma_clock_ready ? NX_ERROR_BUSY : NX_ERROR_IO;',
-                   '        result.cleanup = nx_platform_stop();',
+                   f'        result.cleanup = {cleanup};',
                    '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
                    '        return result;', '    }']
     # Complete admission for every bank before taking any reversible pin lease.
     for bank, _ in ports:
         source += [f'    result.primary = nx_stm32h743_gpio_clock_enable({ord(bank) - ord("A")}u);',
                    '    if (result.primary != NX_SUCCESS) {',
-                   '        result.cleanup = nx_platform_stop();',
+                   f'        result.cleanup = {cleanup};',
                    '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
                    '        return result;', '    }']
     for bank, pins in ports:
@@ -148,7 +148,7 @@ def start_resources(result):
             conditions.append(f'({field} != 0u && {field} != 3u)')
         source += ['    if (' + ' || '.join(conditions) + ') {',
                    '        result.primary = NX_ERROR_BUSY;',
-                   '        result.cleanup = nx_platform_stop();',
+                   f'        result.cleanup = {cleanup};',
                    '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
                    '        return result;', '    }']
     for bank, pins in ports:
@@ -166,7 +166,7 @@ def start_resources(result):
     return source
 
 
-def stop_system(result):
+def stop_system(result, *, system_phase=None):
     source = []
     if _ports(result):
         source += ['    if (s_nx_platform_started) {']
@@ -187,6 +187,8 @@ def stop_system(result):
                    '        nx_arch_dsb();',
                    '        if ((NX_H743_READ(&RCC->AHB4ENR) & s_nx_gpio_clocks_added) != 0u) { return NX_ERROR_IO; }',
                    '        s_nx_gpio_clocks_added = 0u;', '    }']
+    if system_phase is not None:
+        source.append(f'    {system_phase};')
     return source + ['    if (s_nx_platform_started) {',
                      '        nx_result_t system = nx_stm32h743_system_stop(&g_nx_stm32h743_system, 1000000u);',
                      '        if (system != NX_SUCCESS) { return system; }',

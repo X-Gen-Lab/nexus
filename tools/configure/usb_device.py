@@ -5,10 +5,12 @@ physical qualification. Selected endpoints are separate static typed identities.
 """
 try:
     from .gpio_phase import withdraw_pin
-    from .providers.common import fail, integer, kernel_policy_constant
+    from .providers.common import (Construction, fail, integer,
+                                   kernel_policy_constant)
 except ImportError:
     from gpio_phase import withdraw_pin
-    from providers.common import fail, integer, kernel_policy_constant
+    from providers.common import (Construction, fail, integer,
+                                  kernel_policy_constant)
 
 
 FIELDS = {"event_capacity", "rx_fifo_words", "vbus_sensing", "poll_limit",
@@ -175,11 +177,13 @@ def constructor(item, result, prefix):
     lines += [f"void {vector}_IRQHandler(void);",
               "/** \\brief Dispatch the selected internal-PHY FS PIO controller. */",
               f"void {vector}_IRQHandler(void) {{ nx_usb_controller_irq(&{state}); }}"]
-    return {"definitions": lines, "initialize": f"prepare_{name}()",
-            "stop": [f"stop_{name}()"],
-            "pin_snapshots": {pin["pin"]:
-                              f"s_nx_usb_pin_snapshots_{name}[{index}]"
-                              for index, pin in enumerate(pins)}}
+    return Construction(
+        state_type="nx_usb_controller_t", definitions=lines,
+        initialize=f"prepare_{name}()", stop=[f"stop_{name}()"],
+        retain_on_failed_init=True,
+        pin_snapshots={pin["pin"]:
+                       f"s_nx_usb_pin_snapshots_{name}[{index}]"
+                       for index, pin in enumerate(pins)})
 
 
 def gpio_clock_mask(result):

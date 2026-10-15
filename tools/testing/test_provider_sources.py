@@ -22,21 +22,9 @@ class ProviderSourceSelectionTests(unittest.TestCase):
                 "controllers": [{"kind": kind, "mode": mode}
                                 for kind, mode in controllers],
             }))
-            if family == "stm32f407":
-                # Only configure is executed; minimal paths satisfy SDK presence
-                # checks without compiling counterfeit vendor declarations.
-                for name in (
-                    "vendors/st/cmsis_device_f4/Include/stm32f407xx.h",
-                    "vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h",
-                    "vendors/st/cmsis_device_f4/Source/Templates/gcc/"
-                    "startup_stm32f407xx.s",
-                ):
-                    path = source / name
-                    path.parent.mkdir(parents=True, exist_ok=True)
-                    path.touch()
-                sdk_root = source
-            else:
-                sdk_root = ROOT
+            # Every family consumes its actual locked SDK and real CMake
+            # integration. Configuration inspects selection, not ARM behavior.
+            sdk_root = ROOT
             (source / "CMakeLists.txt").write_text(f'''\
 cmake_minimum_required(VERSION 3.31)
 project(provider_source_contract LANGUAGES C ASM)

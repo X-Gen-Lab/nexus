@@ -182,7 +182,12 @@ narrow reference scopes.
 Each family package owns its implemented mode map, CPU/enum ABI, numerical limits,
 fixed DMA/trigger routes, IRQ sharing and built-in CS rules. Its `bindings.py`
 owns constructors, rollback and fixed IRQ wiring; `emission.py` owns system and
-shared-clock lifecycle emission. The public resolver owns schema, reviewed facts,
+shared-clock lifecycle emission. Each constructor returns the frozen
+`Construction` contract with explicit `state_type`, `definitions`, `initialize`,
+`stop`, `retain_on_failed_init`, `exports` and `pin_snapshots`. The common emitter
+consumes those named fields instead of inferring private C types or cleanup
+responsibility from family names. The record exists only during generation;
+no runtime registration or additional dispatch is emitted. The public resolver owns schema, reviewed facts,
 input snapshots and resource conflicts. The public binding emitter owns Nexus
 faces and common lifecycle progress. There is no package discovery or runtime
 provider registration, and unknown families or unimplemented modes fail closed.
@@ -349,3 +354,12 @@ assembly. `--output path.json` emits the derived software support matrix with
 exact selections and `physical_status = not_executed`. Adding an assembly
 requires a catalogue entry; a private integration fixture does not become a
 public Board route or physical qualification through this check.
+
+Generated Platform headers also provide optional caller-owned lifecycle
+diagnostics through `nx_platform_start_diagnosed` and
+`nx_platform_stop_diagnosed`. A null output preserves original start/stop
+behavior. Phases identify context, system, resources or a controller; controller
+indices refer to the zero-based `resolved.json.controllers` order, not per-kind
+factory IDs. No output pointer is retained. Original primary/cleanup results
+and remaining effects remain authoritative. See
+[the lifecycle diagnostic contract](../../docs/design/official-stm32-provider.md).

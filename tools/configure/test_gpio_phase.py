@@ -1,5 +1,6 @@
 """Cold GPIO ownership covers selected pads with one retained snapshot each."""
 import json
+from dataclasses import replace
 from pathlib import Path
 import re
 import tempfile
@@ -91,8 +92,8 @@ class ColdPinStorageTests(unittest.TestCase):
 
         def invalid_slots(*args):
             construction = constructor(*args)
-            construction["pin_snapshots"] = {"PH0": "unowned_storage[0]"}
-            return construction
+            return replace(construction,
+                           pin_snapshots={"PH0": "unowned_storage[0]"})
 
         with patch.object(provider, "constructor", side_effect=invalid_slots):
             with self.assertRaisesRegex(ValueError, "unselected.*pin|pin.*unselected"):

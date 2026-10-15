@@ -6,6 +6,10 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
 set(physical_kinds gpio uart spi i2c flash watchdog exti pwm adc can usb_device
     eth timer_capture advanced_pwm spi_device i2c_device usb_endpoint mdio)
 foreach(physical_family stm32 gd32)
+    set(physical_official)
+    if(physical_family STREQUAL "stm32")
+        set(physical_official STM32F4_LL)
+    endif()
     if(physical_family STREQUAL "stm32")
         set(physical_soc stm32f407)
     else()
@@ -44,7 +48,9 @@ foreach(physical_family stm32 gd32)
         if(physical_mode STREQUAL "empty")
             target_compile_definitions(${physical_object} PRIVATE
                 nx_platform_start=nx_empty_platform_start
-                nx_platform_stop=nx_empty_platform_stop)
+                nx_platform_stop=nx_empty_platform_stop
+                nx_platform_start_diagnosed=nx_empty_platform_start_diagnosed
+                nx_platform_stop_diagnosed=nx_empty_platform_stop_diagnosed)
             foreach(kind IN LISTS physical_kinds)
                 target_compile_definitions(${physical_object} PRIVATE
                     nx_factory_${kind}=nx_empty_factory_${kind}
@@ -61,7 +67,8 @@ foreach(physical_family stm32 gd32)
                 nexus_build_options nexus_owned_warnings)
         endif()
     endforeach()
-    nexus_google_test(${physical_target} SOURCES physical_platform_factory_test.cpp
+    nexus_google_test(${physical_target} ${physical_official}
+        SOURCES physical_platform_factory_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/${physical_soc}/drivers/gpio.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${physical_gpio_bundle}" "${NEXUS_SOURCE_DIR}/soc/${physical_soc}"

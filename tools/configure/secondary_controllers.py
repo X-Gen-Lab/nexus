@@ -9,12 +9,12 @@ from types import MappingProxyType
 try:
     from .gpio_phase import withdraw_pin
     from .emission import dma_regions
-    from .providers.common import fail, mode_traits
+    from .providers.common import Construction, fail, mode_traits
     from .providers import hardware
 except ImportError:
     from gpio_phase import withdraw_pin
     from emission import dma_regions
-    from providers.common import fail, mode_traits
+    from providers.common import Construction, fail, mode_traits
     from providers import hardware
 
 
@@ -340,11 +340,15 @@ def constructor(item, result, prefix):
         definitions += [f"void {vector}_IRQHandler(void);",
                         "/** \\brief Dispatch the exact independently owned controller. */",
                         f"void {vector}_IRQHandler(void) {{ {callback}(&{state}{',' + extra if extra else ''}); }}"]
-    return {"definitions": definitions, "initialize": f"prepare_{name}()",
-            "stop": [f"stop_{name}()"],
-            "pin_snapshots": {pin["pin"]:
-                              f"s_nx_pair_pin_saved_{name}[{index}]"
-                              for index, pin in enumerate(pins)}}
+    implementation = {"uart": "uart_dma", "spi": "spi_dma",
+                      "i2c": "i2c_async"}[item.kind]
+    return Construction(
+        state_type=f"nx_{prefix}_{implementation}_state_t",
+        definitions=definitions, initialize=f"prepare_{name}()",
+        stop=[f"stop_{name}()"], retain_on_failed_init=True,
+        pin_snapshots={pin["pin"]:
+                       f"s_nx_pair_pin_saved_{name}[{index}]"
+                       for index, pin in enumerate(pins)})
 
 
 def _gpio_mask(result, prefix):

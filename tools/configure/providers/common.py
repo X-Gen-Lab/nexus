@@ -1,5 +1,6 @@
 """Shared input checks; provider packages own silicon-specific limits."""
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 import re
 from types import MappingProxyType
 
@@ -12,6 +13,56 @@ class ConfigurationError(ValueError):
 
 def fail(message):
     raise ConfigurationError(message)
+
+
+@dataclass(frozen=True)
+class Construction(Mapping):
+    """One provider's explicit static storage and cold lifecycle contract.
+
+    Mapping reads serve maintained constructor fixtures. Production assembly
+    uses the named fields; no family inference or runtime metadata is emitted.
+    """
+    state_type: str
+    definitions: tuple[str, ...]
+    initialize: str
+    stop: tuple[str, ...]
+    retain_on_failed_init: bool
+    exports: tuple[str, ...] = ()
+    pin_snapshots: Mapping[str, str] = field(default_factory=dict)
+
+    _FIELDS = ("state_type", "definitions", "initialize", "stop",
+               "retain_on_failed_init", "exports", "pin_snapshots")
+
+    def __post_init__(self):
+        if (not isinstance(self.state_type, str) or
+                re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", self.state_type)
+                is None):
+            fail("Construction requires an explicit C state type")
+        if not isinstance(self.initialize, str) or not self.initialize:
+            fail("Construction requires an explicit initializer")
+        if type(self.retain_on_failed_init) is not bool:
+            fail("Construction requires boolean failed-init responsibility")
+        for name in ("definitions", "stop", "exports"):
+            values = tuple(getattr(self, name))
+            if any(not isinstance(value, str) for value in values):
+                fail(f"Construction {name} requires C source strings")
+            object.__setattr__(self, name, values)
+        snapshots = dict(self.pin_snapshots)
+        if any(not isinstance(key, str) or not isinstance(value, str)
+               for key, value in snapshots.items()):
+            fail("Construction pin snapshots require explicit names")
+        object.__setattr__(self, "pin_snapshots", MappingProxyType(snapshots))
+
+    def __getitem__(self, key):
+        if key not in self._FIELDS:
+            raise KeyError(key)
+        return getattr(self, key)
+
+    def __iter__(self):
+        return iter(self._FIELDS)
+
+    def __len__(self):
+        return len(self._FIELDS)
 
 
 def owned_claims(result, owners):

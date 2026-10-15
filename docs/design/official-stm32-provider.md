@@ -1,0 +1,175 @@
+---
+id: design.official_stm32_provider
+type: explanation
+audience: maintainer
+source_language: en
+---
+
+(design-official-stm32-provider)=
+# Official drivers and provider iteration
+
+Use this contract when changing a SoC provider or integrating an official driver.
+Nexus keeps static assembly, typed factories and public C11 I/O contracts. Official
+HAL/LL code is private implementation input. This page defines the integration
+boundary and work-package exits; it does not qualify every external library,
+maintained mode, source revision or physical board.
+
+![Current platform responsibilities and external product boundary](../assets/diagrams/platform-architecture.svg)
+
+FIG-01 remains the current responsibility diagram. Reusing official code changes
+the private SoC implementation, not the public dependency direction. FIG-03 in
+[the architecture explanation](../explanation/platform-architecture.md) shows the
+existing build-time generation path. Neither diagram implies a new runtime
+registry, HAL manager, default worker or mandatory OS layer.
+
+## Implementation boundary
+
+The reviewed F4 dependency is STM32 HAL Driver v1.8.5 at
+`b6f0ed3829f3829eb358a2e7417d80bba1a42db7`. Its CMSIS Device pairing comes from
+STM32CubeF4 v1.28.3. The machine authority is
+[the official-driver lock](../../dependencies/stm32f4-hal.lock.json), checked
+against the selected Git dependency and imported SDK bytes. The lock records the
+reviewed LL headers and license; it is not a declaration that all HAL modules are
+compiled, supported or validated.
+
+The selected production approach uses official LL operations inside existing F407
+provider state machines. It retains request admission, absolute deadlines, wire
+completion, cancellation, drain and quarantine. A full HAL Handle/callback
+transport is a separate evaluation and must not be described as an implemented
+platform-wide HAL migration. G4, H7 and U5 do not inherit F4 support or dependency
+qualification. GD32 remains a separate provider.
+
+| Owner | Responsibility |
+| --- | --- |
+| Official HAL/LL/CMSIS | Reviewed hardware operations and selected vendor algorithms |
+| Family provider | Exact peripheral behavior, private state, IRQ and error bridge |
+| Common I/O | Admission, public results, borrowed storage and final publication contracts |
+| Generated Platform | Static context/face construction, resource acquisition and reverse cleanup |
+| External product | Execution progress, workers, budgets, partitions and recovery policy |
+
+Only one state machine may own a live peripheral operation. An adapter must not
+run a HAL transfer engine and a second independent register engine over the same
+interrupt flags or DMA channel. Mixed LL/register operations require explicit
+ordering and ownership. Vendor types, mutable handles and headers stay out of
+public interfaces. Factory lookup returns an existing face without initializing
+hardware or allocating storage.
+
+## Build-time provider contract
+
+Each constructor returns the frozen `Construction` record from
+[provider common contracts](../../tools/configure/providers/common.py). It names
+`state_type`, `definitions`, `initialize`, `stop`, `retain_on_failed_init`,
+`exports` and `pin_snapshots`. The common emitter consumes these decisions rather
+than reconstructing state types or failed-init responsibility from a family name.
+This is a Python generation contract; no descriptor or dispatch layer is emitted
+into the MCU image.
+
+The family owns numerical limits, supported modes, exact routes and construction
+semantics. The resolver owns strict fields, immutable inputs and resource
+conflicts. CMake owns source selection and target dependencies. Preserve these
+separate authorities: generation must not create a second source build graph,
+and a syntactically valid configuration must not imply unimplemented hardware.
+
+## Conditions for full HAL transport
+
+Before accepting a Handle-based mode, establish a progressing time source for
+every HAL wait it can reach. Review bootstrap clock waits, `HAL_GetTick`, tick
+reinitialization and interrupt-priority grouping. Do not let default HAL startup
+silently acquire SysTick or change OS policy. Public operations consume one
+absolute monotonic deadline, including queue and preparation time.
+
+Establish request identity and borrowed references before enabling hardware or
+calling an API that can invoke a callback synchronously. Callback bridges publish
+bounded facts and optional wake hints; they do not execute arbitrary product
+callbacks. Check the complete HAL call stack before publishing settlement or
+allowing reentrant submission. A HAL lock is not a task mutex or a controller
+ownership policy.
+
+![Reference finite-DMA completion and failure responsibilities](../assets/diagrams/dma-completion.svg)
+
+FIG-07 is the existing F407 finite-DMA reference. DMA completion, wire completion,
+HAL internal readiness and Nexus settlement remain different facts. Preserve the
+[public ownership contract](../explanation/ownership.md): abort or timeout starts
+withdrawal; it does not return storage. Detach every required hardware, IRQ and
+queue reference before the provider's final release-publication of `SETTLED`.
+Failed drain retains `QUARANTINED` storage and an explicit recovery obligation.
+Circular DMA must never overwrite a consumer-owned block to emulate progress.
+
+## Caller-owned lifecycle diagnostics
+
+Generated headers expose `nx_platform_diagnostic_t` and the optional
+`nx_platform_start_diagnosed` / `nx_platform_stop_diagnosed` entries. The original
+start/stop entry points remain available. A null diagnostic pointer uses the
+original behavior; a nonnull pointer supplies caller-owned cold-path output and
+is never retained. It adds no static registry, labels or default instance RAM.
+Cold code/stack cost still belongs in the linked-image comparison.
+
+`phase` and `cleanup_phase` distinguish `NONE`, `CONTEXT`, `SYSTEM`, `RESOURCES`
+and `CONTROLLER`. A controller phase carries its zero-based index in
+`resolved.json.controllers`; it is not a per-kind factory ID. `SIZE_MAX` means
+no controller. Successful calls clear the diagnostic. A failed start records the
+primary location and, if cleanup fails, a separate cleanup location. Existing
+primary result, cleanup result and remaining effects remain authoritative;
+diagnostics neither perform recovery nor establish that a retained borrow ended.
+
+## Work-package exits and existing authorities
+
+The following table assigns exits to the iteration work packages. It is a design
+checklist, not a second support or completion database. Current support continues
+to come from [the derived capability matrix](../delivery/capabilities.md), exact
+provider facts and reviewed fixtures. Existing ledgers retain original IDs,
+statuses and evidence; do not relabel historical results as new-source execution.
+
+| Work package | Exit and maintained authority |
+| --- | --- |
+| Configuration and provider contract | Explicit construction and failed-init responsibility; deterministic generation and rejection tests; [integration contract](integration-contracts.md) |
+| Official driver reuse | Locked source/license/pairing, private build and SDK closure, mode-specific real-driver tests; [source compatibility](source-compatibility.md) |
+| Hardware/resource description | Exact pins, IRQ, DMA, clocks and memory; no invented Board wiring or silent fallback; [SoC ledger](soc-refinement.md) |
+| Lifecycle and diagnostics | Every partial effect either withdrawn or retained; caller-owned cold diagnostics never revoke a borrow; [lifecycle matrix](io-lifecycle-matrix.md) |
+| I/O ownership | Real acceptance, cancel, late IRQ, overflow, instance isolation and drain regressions; [I/O recovery contract](io-observation-recovery.md) |
+| Arch, OS and components | Exact backend/CPU scope, unchanged masks, explicit execution and wait/observer shutdown; [OS contract](os-contracts.md) |
+| Performance and resources | Same configuration/toolchain/workload comparison, actual ELF/RAM/stack reports; [execution budgets](soc-execution-budgets.md) |
+| Test plan and HIL | Reviewed applicability plus fresh executed results; software and physical status separate; [qualification](../delivery/qualification.md) |
+| External consumption and documentation | Relocated Source SDK consumer, external examples and complete reviewed English/Chinese pages; [build ledger](build-system-execution.csv) and [documentation ledger](documentation-system-execution.csv) |
+
+The read-only work-package view joins existing provider, capability, SDK-required
+source and reviewed lifecycle-test authorities. It retains exact scopes and shows
+unmapped properties instead of inventing aliases. It does not execute tests,
+verify a complete installed SDK or establish software/physical qualification.
+See [maintenance tools](../../tools/maintenance/README.md) for the actual command
+and output limits.
+
+## Comparison and replacement
+
+Compare official and existing implementations with the same chip, clock, memory,
+route, mode, capacity, OS, compiler, optimization and workload. Record Flash LOAD
+and footprint separately, per-domain static RAM, caller-owned storage, stack
+reservation versus measured peak, IRQ/service behavior and cleanup failures.
+Operation counts and host timings are not physical cycles, latency or WCET.
+
+Retain an old implementation only while it provides a needed comparison or an
+unreplaced maintained mode. Select one normal production implementation after its
+contract and costs are accepted; remove unused switches and duplicate state.
+A dedicated LL/register path is justified by a demonstrated semantic gap or
+measured budget, not by a general assertion that vendor code is slow.
+
+## Validation and delivery boundary
+
+New behavior follows RED, GREEN and refactor with the normal commit/CI gates.
+Host C tests use GoogleTest/GoogleMock; tool tests use stdlib unittest. Mock an
+external port when checking the adapter contract, then separately execute real
+official code with the adapter. ARM links establish selected image/resource
+properties. Real equipment is required for IRQ timing, DMA/Cache coherence,
+electrical behavior and long-load conclusions.
+
+A software candidate still requires clean source, exact dependency/configuration
+identity, independent SDK consumption and two fresh network-disabled builds of
+the same artifacts. No iteration checklist or derived work-package report grants
+that status. Existing release tags/assets and original evidence remain immutable.
+Without connected boards, HIL stays `not_executed`; do not call a software-only
+iteration a product release or safety qualification.
+
+Bootloader handoff, dynamic reclocking, deep STOP, broader H743 DMA and generic
+U575 cross-domain I/O retain their separate unimplemented or partial exits in the
+[SoC refinement ledger](soc-refinement.md). Official drivers do not automatically
+supply the platform contracts for these features.
