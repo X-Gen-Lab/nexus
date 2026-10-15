@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "members_verified": 385,
+  "actual_pot_members": 194,
+  "archive": {
+    "path": "local-evidence.tar.gz",
+    "bytes": 4978261,
+    "sha256": "7e69bd5d23b8d3653a50923a54904f3635f13c380612dc164bbb83446521a5fc"
+  },
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "git_stage_or_commit_executed": false
+}

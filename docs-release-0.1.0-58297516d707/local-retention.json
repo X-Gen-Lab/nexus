@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_0_1_0_local_evidence_retention",
+  "created_at_utc": "2026-10-15T04:41:38.443640+00:00",
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "source_tree": "06feab8ef3e89df60b4cdc5671c66ab0e3c08c21",
+  "implementation_source_commit": "917d1ae28447288172c48297b9494e1e3b4925c5",
+  "source_review_binding": "15 exact committed files: 14 release/version/doc checker files plus independently reviewed README_CN.md",
+  "asset_baseline": "b195b8cbceacf65fc31109e2fc92cd3aa3c2ab21",
+  "main_ci_qualification": "not claimed; final-main CI was pending during this evidence seal",
+  "release_publication": "not claimed; future publication receipt remains separate",
+  "physical_hil": "not_executed",
+  "software_candidate_qualification": false,
+  "security_scope": {
+    "codeql_check_conclusion": "success",
+    "remaining_annotations": 63,
+    "annotated_c_cpp_files_identical_to_78_baseline": 28,
+    "independent_targeted_triage": "No demonstrated production blocker; read-only inspection, no new tests/builds."
+  },
+  "normal_hook_attempt_archives": 3,
+  "files": [
+    {
+      "path": "README.txt",
+      "bytes": 1749,
+      "sha256": "99e99b095113419e0812451b342ae169e454271947855e881fa29e3b9e41243a"
+    },
+    {
+      "path": "local-evidence-exclusions.json",
+      "bytes": 402285,
+      "sha256": "33d28f13251a57e70d853bc1a3cf61455f3ef01c9561b0869840d5ceca8d629b"
+    },
+    {
+      "path": "local-evidence-index.json",
+      "bytes": 109675,
+      "sha256": "e93dba30a9c446902b8afef673a61d1789d87590c85c7f375550a1f197d57665"
+    },
+    {
+      "path": "local-evidence-verification.json",
+      "bytes": 345,
+      "sha256": "f2aec0c27bae8caecbf4cd397653321fad567a92a7a379859513abfe21ee5ba8"
+    },
+    {
+      "path": "local-evidence.tar.gz",
+      "bytes": 4978261,
+      "sha256": "7e69bd5d23b8d3653a50923a54904f3635f13c380612dc164bbb83446521a5fc"
+    },
+    {
+      "path": "prepare-local-evidence.py",
+      "bytes": 11799,
+      "sha256": "65f6a5009f1789ecb9ee7da6a3dd9722afdca8ecfdaed87ee8434c135eb3b17b"
+    },
+    {
+      "path": "verify-local-evidence.py",
+      "bytes": 2632,
+      "sha256": "d1e4778f64d001bf44724eef99650d9da9cf73a813defd278e332a38cc365cbd"
+    }
+  ]
+}

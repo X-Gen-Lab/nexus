@@ -1,0 +1,2324 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_release_local_evidence_transport",
+  "prepared_at_utc": "2026-10-15T04:40:12.910861+00:00",
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "asset_baseline": "b195b8cbceacf65fc31109e2fc92cd3aa3c2ab21",
+  "status": "sealed_local_evidence",
+  "main_ci_qualification": "not established by this local evidence capsule; final main CI and publication receipts remain separate",
+  "scope": "Original local RED/GREEN, workflow, prose/catalog reviews and historical recovery records; receipt-specific original execution scope remains authoritative. No physical HIL or new firmware candidate qualification.",
+  "members": [
+    {
+      "path": "asset-preparation/hook-installation.json",
+      "bytes": 696,
+      "sha256": "e1f905ff5deef0a1d6108f9283a91ac3de1308eeb770e7354fc86a8d9a42873a",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/asset-preparation/hook-installation.json"
+    },
+    {
+      "path": "asset-preparation/normal-assets-pre-commit",
+      "bytes": 109,
+      "sha256": "b46d4a11a5e74b8d895a15e764704dd2844ff55c4dbdc61269874f8ae61e1408",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/assets/.git/hooks/pre-commit"
+    },
+    {
+      "path": "asset-preparation/preparation.json",
+      "bytes": 1581,
+      "sha256": "95c7eb2a9de325d3ddf0ea0ca3156a9ed19004fe109cfe7360c41ae0d211f6e7",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/asset-preparation/preparation.json"
+    },
+    {
+      "path": "asset-preparation/prepare_local_evidence.py",
+      "bytes": 11799,
+      "sha256": "65f6a5009f1789ecb9ee7da6a3dd9722afdca8ecfdaed87ee8434c135eb3b17b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/asset-preparation/prepare_local_evidence.py"
+    },
+    {
+      "path": "catalogs/Doxyfile",
+      "bytes": 173,
+      "sha256": "ff4236babdc74cb2270a27799f10468388e44f373ce811f3632376d10e1c8e8c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/Doxyfile"
+    },
+    {
+      "path": "catalogs/admission-before.json",
+      "bytes": 37617,
+      "sha256": "d02929a67aac88ec684fbacd585a4148cbe641efc22a861281c1df6e7f67cadb",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/admission-before.json"
+    },
+    {
+      "path": "catalogs/admission-final.json",
+      "bytes": 37372,
+      "sha256": "0b9666653fb0739a0832068dac9c1227f66127cb1d46c32518cd0ba565578480",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/admission-final.json"
+    },
+    {
+      "path": "catalogs/admission-review-pending.json",
+      "bytes": 37633,
+      "sha256": "8f7b543741df12c7368be232421cf195086db769b75132bb94721cc908ff6552",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/admission-review-pending.json"
+    },
+    {
+      "path": "catalogs/catalogs-before/en/design/source-compatibility.po",
+      "bytes": 17707,
+      "sha256": "de0e4b7a79a74eb317a2ad68add145c27a4fedcca7723a7d72bafefb8c8f2831",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/catalogs-before/en/design/source-compatibility.po"
+    },
+    {
+      "path": "catalogs/catalogs-before/en/status/index.po",
+      "bytes": 1012,
+      "sha256": "dee642879915646f0cde2222f371985f0120a826d052fcb859fe31c812892bc4",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/catalogs-before/en/status/index.po"
+    },
+    {
+      "path": "catalogs/catalogs-before/zh_CN/design/source-compatibility.po",
+      "bytes": 16803,
+      "sha256": "2bc74fa104c2e6424878767a81551cabeec84376cf9fa685fc904e989907b13c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/catalogs-before/zh_CN/design/source-compatibility.po"
+    },
+    {
+      "path": "catalogs/catalogs-before/zh_CN/status/index.po",
+      "bytes": 934,
+      "sha256": "2e5d0dac901a7f1b0009f2ebd9dca97b1af9526758fa63134c834b0ea3876206",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/catalogs-before/zh_CN/status/index.po"
+    },
+    {
+      "path": "catalogs/combined-final-catalogs.json",
+      "bytes": 6125,
+      "sha256": "14dce22d61a87dd8531642ed1d9039e4fb450f8841b9bd8b7ad8dcd86ca13650",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/combined-final-catalogs.json"
+    },
+    {
+      "path": "catalogs/doxygen.attempts/1792035811248406830-0478adbce122418299335e1a2644938e/receipt.json",
+      "bytes": 1117,
+      "sha256": "9003563ce41a45556f9c9314d6fa8c5a2b6183eec010f8a7fc443953e96d7746",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/doxygen.attempts/1792035811248406830-0478adbce122418299335e1a2644938e/receipt.json"
+    },
+    {
+      "path": "catalogs/doxygen.attempts/1792035811248406830-0478adbce122418299335e1a2644938e/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/doxygen.attempts/1792035811248406830-0478adbce122418299335e1a2644938e/stderr.txt"
+    },
+    {
+      "path": "catalogs/doxygen.attempts/1792035811248406830-0478adbce122418299335e1a2644938e/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/doxygen.attempts/1792035811248406830-0478adbce122418299335e1a2644938e/stdout.txt"
+    },
+    {
+      "path": "catalogs/doxygen.command.json",
+      "bytes": 1267,
+      "sha256": "4edb98a41ba52faef30d9e7a1e6bb8bd35c88f471c75ab7003c7b60753eef8f8",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/doxygen.command.json"
+    },
+    {
+      "path": "catalogs/doxygen.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/doxygen.log"
+    },
+    {
+      "path": "catalogs/extract.py",
+      "bytes": 3046,
+      "sha256": "c418ba80f80372528cd30f856a3ac10e394132eb90101b7f9a5cf819668c37b8",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/extract.py"
+    },
+    {
+      "path": "catalogs/extraction-commands.json",
+      "bytes": 1045,
+      "sha256": "92e76c798b18573435b97c39209fbe1771b305ee50f69d971855c9dd3e43ba5d",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/extraction-commands.json"
+    },
+    {
+      "path": "catalogs/final-catalogs.json",
+      "bytes": 3070,
+      "sha256": "dcea024103dbbef29b00d0ac90a24fae67e24d72a3ecdf3fee871756ea4b885c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/final-catalogs.json"
+    },
+    {
+      "path": "catalogs/gettext.attempts/1792035811463755458-732b19ca941f4030ab17fefe49d9f577/receipt.json",
+      "bytes": 1402,
+      "sha256": "b3b6689e0a123f6014fe587b6c9d6f187db322c8d3a0823fec4a21f38e6b0bd4",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext.attempts/1792035811463755458-732b19ca941f4030ab17fefe49d9f577/receipt.json"
+    },
+    {
+      "path": "catalogs/gettext.attempts/1792035811463755458-732b19ca941f4030ab17fefe49d9f577/stderr.txt",
+      "bytes": 337,
+      "sha256": "b7a6ca66a9cc9e12b7544f4c7e4df075b4d1498a8b462406760d1deac1cd3e63",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext.attempts/1792035811463755458-732b19ca941f4030ab17fefe49d9f577/stderr.txt"
+    },
+    {
+      "path": "catalogs/gettext.attempts/1792035811463755458-732b19ca941f4030ab17fefe49d9f577/stdout.txt",
+      "bytes": 17714,
+      "sha256": "97801ce1806b41904c56974434671185112495bad0814f1aa0a07790cf16d9cd",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext.attempts/1792035811463755458-732b19ca941f4030ab17fefe49d9f577/stdout.txt"
+    },
+    {
+      "path": "catalogs/gettext.command.json",
+      "bytes": 1552,
+      "sha256": "b0f935cd74deae6c0d17f79350e4c9cd13ee4ff98aa90ff505356c6fdf43e109",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext.command.json"
+    },
+    {
+      "path": "catalogs/gettext.log",
+      "bytes": 18051,
+      "sha256": "c0d9c5058d566956ce31f8ae7d2f643b73ba03f8d25e141c2d934d7a8c9b97e3",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext.log"
+    },
+    {
+      "path": "catalogs/gettext/assets/diagrams/README.pot",
+      "bytes": 33534,
+      "sha256": "fdd6415ff0556350b0577cbd78b3cba77e912b76011682a854dc6c95cf895a09",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/assets/diagrams/README.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/README.pot",
+      "bytes": 10690,
+      "sha256": "c3e3eba3253ae69dc41e41e214fe6fde46c302fd47c2f73ea567da80395adfb4",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/README.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/architecture.pot",
+      "bytes": 31296,
+      "sha256": "b38cc9e8ea817a8892095867f753944be6f5378ea2386eb7f36a8000e4bbebec",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/architecture.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/build-system-verification.pot",
+      "bytes": 23694,
+      "sha256": "1e30bbb57525c0a97bbaec3b9ffb89278a4d4845125b00fc89c5c044f7cc0ca1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/build-system-verification.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/capabilities.pot",
+      "bytes": 43437,
+      "sha256": "92bc36ff7b5ff9e55c8b17363afff4a05d0b7ce325518d1bcf2503335b3698a6",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/capabilities.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/cortex-m.pot",
+      "bytes": 19527,
+      "sha256": "08229fb2826cd483982398d90002ea42ecd6803b83834fb08ef4d99ee0ed93e4",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/cortex-m.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/index.pot",
+      "bytes": 963,
+      "sha256": "8a5e4f9d5d493bbb663009667f4bf92989eefa1281718a77ed02999ad5900321",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/migration.pot",
+      "bytes": 7088,
+      "sha256": "35f290e713e5e7a66d0bcba2fbce29d9601547c9b641debfeea29029587e6b87",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/migration.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/next-iterations.pot",
+      "bytes": 10786,
+      "sha256": "bc389f35ef5f05f6048d4e84fb3db7e6acf2a3d7e5a70d468081683c0ed31c17",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/next-iterations.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/os.pot",
+      "bytes": 14605,
+      "sha256": "8c8b4639bc66208f5de07d1339950fae9e63e56685d6021f855bc4c3fbc68395",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/os.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/qualification.pot",
+      "bytes": 10260,
+      "sha256": "90c909009b99bbc061f0bc81f9ece1548520a3e0a15609b1edbaecce33f98f0e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/qualification.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/security-review.pot",
+      "bytes": 6993,
+      "sha256": "f4ac4c72045e5ca7adf5d75a012f1a7f44541fd7dd30920ec13f3a56dd61b510",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/security-review.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/soc-extensions-verification.pot",
+      "bytes": 23145,
+      "sha256": "c5815dc896b17b1b4a09cf2bf14d9d12a9dd028582c7802d0f019ce06df30aea",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/soc-extensions-verification.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/soc-refinement-verification.pot",
+      "bytes": 27054,
+      "sha256": "f3882cb81dfeb7e9f26525cf84609180d667ecc2e9cf7e4634e145a89cb13e9c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/soc-refinement-verification.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/support.pot",
+      "bytes": 28297,
+      "sha256": "081f98a95a5fdd3a3aa804e618502faf25dcde9cad5420a782b1f59a9798f499",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/support.pot"
+    },
+    {
+      "path": "catalogs/gettext/delivery/verification.pot",
+      "bytes": 13175,
+      "sha256": "e531060194f7a1974c39792da2e400035faca5226a27fa44fe92330bac7274a6",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/delivery/verification.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/README.pot",
+      "bytes": 16501,
+      "sha256": "cd4355b1bf7bc30f7ae36ba900f866b61abc7467d714cae68f27bfb35afc7e7f",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/README.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/arch-contracts.pot",
+      "bytes": 17698,
+      "sha256": "d467f8cd7f58a77fcaa8d6b74ca377cb11adec2ba41cae8ace3ceb9186005f91",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/arch-contracts.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/build-system.pot",
+      "bytes": 17008,
+      "sha256": "4d13b9927af77a326f8ed0678c1c5480f6a23321cffaf46aab328d43d70c927a",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/build-system.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/classic-can.pot",
+      "bytes": 10654,
+      "sha256": "fd26b5bf5d41cb3050a5d7bdde7d462e668bd01fb420a8448f49a255ff3a5a73",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/classic-can.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/clock-domain-sleep.pot",
+      "bytes": 5815,
+      "sha256": "e07f2629e7f022d8852cbce7edb0f64496c65d6fff18c0243542d1463f3a304c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/clock-domain-sleep.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/documentation-improvements.pot",
+      "bytes": 34200,
+      "sha256": "15816fc5c92c38d50089b0cff57817770440e5e43a77cb400e46f8def933424e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/documentation-improvements.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/documentation-standards.pot",
+      "bytes": 33263,
+      "sha256": "ad4eb92ece9e64303c5f0fed598944db6ec68f5efadeb5fd71a6da375866b2a5",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/documentation-standards.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/documentation-system.pot",
+      "bytes": 48064,
+      "sha256": "d9fc691c00aa81969ba8521ada5f018dfd67e2a9b06bc445b5fb12778f5e38da",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/documentation-system.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/documentation-templates.pot",
+      "bytes": 11207,
+      "sha256": "c5b0d59c04fbc554461ccd689c2bdc305ffe855fa0c7e2c48e2a8c3db7de14f3",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/documentation-templates.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/engineering-handbook.pot",
+      "bytes": 69624,
+      "sha256": "975331e0ec92426d8eaf16d6f39f474def0f664736d8be2fce3b5a0302adbdd9",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/engineering-handbook.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/ethernet.pot",
+      "bytes": 13187,
+      "sha256": "e06aebbdb0c50939187836207e5cfb34429b92460467f2ec50615cd9ecde9799",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/ethernet.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/fault-observation.pot",
+      "bytes": 5193,
+      "sha256": "4344842394d9e1ebb44dcc08359ec48ac4e71d2d24d8bcac9ad29141eb667254",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/fault-observation.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/i2c-bus-clear.pot",
+      "bytes": 8687,
+      "sha256": "33dac5a12c7c2d56fdb20c45fd6ae739ae948af6b1b71b06d47a79ec8194ff5e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/i2c-bus-clear.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/index.pot",
+      "bytes": 960,
+      "sha256": "16616c3177058da319173f3927984288501efb5a953f95e707bb0c0ede2452d2",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/integration-contracts.pot",
+      "bytes": 49586,
+      "sha256": "96f76fffbf2fe7ba87ec7fed8bf55920490137e8ef8f77c1be262eabc0e1d5ad",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/integration-contracts.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/io-lifecycle-matrix.pot",
+      "bytes": 7275,
+      "sha256": "9966ae4b46713fba398a5cd83478f36e4c9aac87f3173beec9b67aac9b2c5e64",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/io-lifecycle-matrix.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/io-observation-recovery.pot",
+      "bytes": 11580,
+      "sha256": "4264f529a313404cc18b6fa03129ea29a49929d890f0f99f1835398c06e274db",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/io-observation-recovery.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/multiple-controllers.pot",
+      "bytes": 6763,
+      "sha256": "efc178658cf3d4c7ba51e7726615456e1dd28a3e4202fa96086c27d2d3c52866",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/multiple-controllers.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/multiple-dma-controllers.pot",
+      "bytes": 6441,
+      "sha256": "5b21c65c9b37fcf1348d34b2fda9083cc75667a69ecf0ce54f4943d3532c5b16",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/multiple-dma-controllers.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/next-generation-platform.pot",
+      "bytes": 79281,
+      "sha256": "74be0368f9199b97c61785cfb4bf95a27a8a68dc0447cce456df997afd35d37c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/next-generation-platform.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/os-backend-integration.pot",
+      "bytes": 12457,
+      "sha256": "34066103a6581fbc460d5feafbe9eac1f3341be318f4283974e2a0a9ff3b48d1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/os-backend-integration.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/os-contracts.pot",
+      "bytes": 28755,
+      "sha256": "249c2799168429e905a207b08320dabd5005207a1cf4acdb3f5aedc09b5ec3e2",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/os-contracts.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/provider-assemblies.pot",
+      "bytes": 5393,
+      "sha256": "de9c253dd654a565578868fc58b066842cd9cb2e6936d766dcb17237151576df",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/provider-assemblies.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/soc-execution-budgets.pot",
+      "bytes": 16457,
+      "sha256": "f5238b4e7fecab79fbb35a7b91fdda10b0013f0bc70673bb6ddf977f8b6e47fd",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/soc-execution-budgets.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/soc-refinement.pot",
+      "bytes": 27629,
+      "sha256": "0d01f5c4226f5923ff442474c11a13a20b5c85024c2659d54388256ffb05cc73",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/soc-refinement.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/source-compatibility.pot",
+      "bytes": 15580,
+      "sha256": "3e173018b489babeab5de6a8af3c7cbcdd6973556dc62cef1f0cb7834fc21578",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/source-compatibility.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/stack-observation-endurance.pot",
+      "bytes": 7990,
+      "sha256": "dccd35b0f11c8885703e1fdc502bfd52b1bb44dd0b0d976e012b5218dbcf1dd6",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/stack-observation-endurance.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/stm32g474.pot",
+      "bytes": 16472,
+      "sha256": "3a8ab72a9314e50cf8482e98b025c33ca503ec6a72cd5ed07e70b91e22160efe",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/stm32g474.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/threadx.pot",
+      "bytes": 11919,
+      "sha256": "458726da5be1575cbb6821e862c5225a4e51584ceeee7dd4a50f69cedf8aade2",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/threadx.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/timebase-lowpower.pot",
+      "bytes": 9583,
+      "sha256": "380311e9dee1c65a68143a7aff9154eac1fff713d25f3c2e7a9d52dc4292d689",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/timebase-lowpower.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/timer-advanced.pot",
+      "bytes": 8897,
+      "sha256": "816c2fc6d58c585825ec77268d3acdd690a7e774a2f47ffb91fa43d984baa597",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/timer-advanced.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/u575-trustzone-contract.pot",
+      "bytes": 13994,
+      "sha256": "30582e4f64a5b27f9cf63d5ee691bbe327215e944514d185cab0127046860622",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/u575-trustzone-contract.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/uart-dma-rs485.pot",
+      "bytes": 14540,
+      "sha256": "d7d7e03e89bd5fdcf56e4a8cabb08d589636a283bef623a9053942bd77a0a234",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/uart-dma-rs485.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/usb-device.pot",
+      "bytes": 11220,
+      "sha256": "b08a9d5f4cdf819b3f7df07e6146212c2f5fcd62eac375de9770bb2d2708b0c1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/usb-device.pot"
+    },
+    {
+      "path": "catalogs/gettext/design/user-io-broker.pot",
+      "bytes": 6528,
+      "sha256": "a7f25e0d94d59fe1b0a4a52750721459b68cde97f77aec670cea4b8261e237db",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/design/user-io-broker.pot"
+    },
+    {
+      "path": "catalogs/gettext/development/documentation.pot",
+      "bytes": 4471,
+      "sha256": "c9acc24fbe81138f23a9588855a746afe0ba6163b005f2d7ca6d081da3029050",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/development/documentation.pot"
+    },
+    {
+      "path": "catalogs/gettext/development/implementation-map.pot",
+      "bytes": 8812,
+      "sha256": "a6e15fbd7ef59ee8886a318f0f5dbe032855cdc0af492d48fe6528ed0415580d",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/development/implementation-map.pot"
+    },
+    {
+      "path": "catalogs/gettext/development/index.pot",
+      "bytes": 964,
+      "sha256": "4fc530aaec10ea4c5d932876722c777f98dfefff5a52f1f39da194d845dddb65",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/development/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/development/workflow.pot",
+      "bytes": 4286,
+      "sha256": "9b9a3fddba53606d7d70eee29634e0dd41ee308965b2f34cfb9a6be97fa2ab5b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/development/workflow.pot"
+    },
+    {
+      "path": "catalogs/gettext/explanation/factory.pot",
+      "bytes": 6297,
+      "sha256": "66fcdc20b6a181296bc41388e1db9c2a2f3a925b70b3a69e46a08e3561c01403",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/explanation/factory.pot"
+    },
+    {
+      "path": "catalogs/gettext/explanation/index.pot",
+      "bytes": 941,
+      "sha256": "0b0e901efa64b34ed4cc07dd86fd531968027caa6ff78b44414880bef0057d33",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/explanation/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/explanation/ownership.pot",
+      "bytes": 7197,
+      "sha256": "15dbf7d03afc6967f911791a46ccc9e0e2595f3ae68acb0ec56fdf9d4dd5a464",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/explanation/ownership.pot"
+    },
+    {
+      "path": "catalogs/gettext/explanation/platform-architecture.pot",
+      "bytes": 9321,
+      "sha256": "2cf31ac9c1feecc5e000ae7b0a6b2c21f243e2e4beee92d63e27a929d4c7b027",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/explanation/platform-architecture.pot"
+    },
+    {
+      "path": "catalogs/gettext/explanation/source-map.pot",
+      "bytes": 26454,
+      "sha256": "70942282880c2d232763acc24b789a9ed4c380cb2262626bf0da9b36fb97ecd5",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/explanation/source-map.pot"
+    },
+    {
+      "path": "catalogs/gettext/guides/board-porting.pot",
+      "bytes": 4512,
+      "sha256": "649d2aed9341595f241a9adb0842e4d6abf3413ffd3e28191ae3454c5e7da828",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/guides/board-porting.pot"
+    },
+    {
+      "path": "catalogs/gettext/guides/index.pot",
+      "bytes": 958,
+      "sha256": "2102f51b5b8c7f096bbc900da3fa3dbeb3f18084ecc89b935792b28d1211e025",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/guides/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/guides/migration.pot",
+      "bytes": 6377,
+      "sha256": "b4dd5406e210374fb07715ddaa25fd23b658523882bf7bcc356a532f7eb3d958",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/guides/migration.pot"
+    },
+    {
+      "path": "catalogs/gettext/guides/os-shutdown.pot",
+      "bytes": 7509,
+      "sha256": "104af39f6c367ed678d72f6be84ab3e68cce5f2508f4d452fb4a00daaf2a9bd7",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/guides/os-shutdown.pot"
+    },
+    {
+      "path": "catalogs/gettext/guides/performance-hil.pot",
+      "bytes": 5175,
+      "sha256": "5f86feb459f64663a9fc365493ee50549401f02bcbed8e1fa171b78ec0bab0bb",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/guides/performance-hil.pot"
+    },
+    {
+      "path": "catalogs/gettext/guides/provider-porting.pot",
+      "bytes": 7631,
+      "sha256": "2fd07612b3bdd2cacce9820a82e2a40dd58d0a981f99222b22fadc51a0abba7d",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/guides/provider-porting.pot"
+    },
+    {
+      "path": "catalogs/gettext/guides/source-checkout.pot",
+      "bytes": 7646,
+      "sha256": "bee5b8dc587ba6ffbd327962a477081aeb89f0561fc297d72a59531f413a82ac",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/guides/source-checkout.pot"
+    },
+    {
+      "path": "catalogs/gettext/index.pot",
+      "bytes": 1383,
+      "sha256": "130776f4fe22ee1ea975f74a14b2a1a25c8b913c6ee57c9d0f327a6e8c63d10f",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/reference/configuration/assembly.pot",
+      "bytes": 7203,
+      "sha256": "156b573704b5a4156a973d61b606135594ea748638562426d8bce0d89b478054",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/reference/configuration/assembly.pot"
+    },
+    {
+      "path": "catalogs/gettext/reference/configuration/index.pot",
+      "bytes": 971,
+      "sha256": "6deccb86bcd0e14a7102232be60a6bd836d9560dccac420e4a5105d189f2688e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/reference/configuration/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/reference/configuration/tools.pot",
+      "bytes": 6540,
+      "sha256": "91700bb5abad38023a8820169cbc08ef6ff944283eb10adba5e16f817777d995",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/reference/configuration/tools.pot"
+    },
+    {
+      "path": "catalogs/gettext/reference/documentation-delivery.pot",
+      "bytes": 17946,
+      "sha256": "8bd60501314bc87195d312d0c1133b4d5773c38e8f82c14f619bad71bb215358",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/reference/documentation-delivery.pot"
+    },
+    {
+      "path": "catalogs/gettext/reference/documentation-tools.pot",
+      "bytes": 15854,
+      "sha256": "312260aa06d53c8b3aa8b5ebfeb6b5f5bcd9bd3d28ecd138674c26c3f5e480e1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/reference/documentation-tools.pot"
+    },
+    {
+      "path": "catalogs/gettext/reference/history.pot",
+      "bytes": 7046,
+      "sha256": "193b816af02596df6a66de996cee77aa8b14937b30b1e142801b160a71e02860",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/reference/history.pot"
+    },
+    {
+      "path": "catalogs/gettext/reference/index.pot",
+      "bytes": 1002,
+      "sha256": "6356e7637f77ba3a38797cdf4101d3829b5989a64ab3197ad347a316f12151da",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/reference/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/reference/platforms/index.pot",
+      "bytes": 973,
+      "sha256": "f661d473e69b5900a5aed5b9e9fca6694fea886e39b4f513eddf3e8144c476e7",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/reference/platforms/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/reference/platforms/qualification.pot",
+      "bytes": 6614,
+      "sha256": "8d25bece073130eda061d07967713b2cf16a2a0f306b8383ea837672adaf4672",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/reference/platforms/qualification.pot"
+    },
+    {
+      "path": "catalogs/gettext/reference/platforms/support.pot",
+      "bytes": 7690,
+      "sha256": "25dc4d977e5922b1e56f282e9f82d37d256772cd2408ffefc85d0249a984ac8d",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/reference/platforms/support.pot"
+    },
+    {
+      "path": "catalogs/gettext/sphinx/development/coding_standards.pot",
+      "bytes": 12627,
+      "sha256": "9d67cdb3b64d605ad1433779f8d7526dafcec28b2882045af0773305b438d223",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/sphinx/development/coding_standards.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/documentation-acceptance.pot",
+      "bytes": 9664,
+      "sha256": "9c6474446a5e2afdcb98b69f04b78b41e8379526c801b5ffa52a04f0776d3d2a",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/documentation-acceptance.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/hardware.pot",
+      "bytes": 5429,
+      "sha256": "92e98b8672659e33e8e219a37e51b11311001a255a4d80344688c486fe49a502",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/hardware.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/index.pot",
+      "bytes": 1002,
+      "sha256": "105d22fb9046379f536d773090cf1ead42648f86df00aeeeb3c1333203913fd6",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/ledgers.pot",
+      "bytes": 3376,
+      "sha256": "873d27271cd3212fab8d663d45305818dbe709975928a23b91e51eec174e8c92",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/ledgers.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/ledgers/build-system.pot",
+      "bytes": 81844,
+      "sha256": "c5b27ec2ebdb945abdf646ce0b5aff3c524ff54b08513334349870d3362a28a9",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/ledgers/build-system.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/ledgers/documentation-system.pot",
+      "bytes": 69727,
+      "sha256": "5091fdba2ffbc460b651a0b4ab507b40e3afbd7f47c792b2a8e5b50f91c5326e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/ledgers/documentation-system.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/ledgers/factory-platform.pot",
+      "bytes": 27113,
+      "sha256": "7e69824b9e0d872bafd6fff780748fa8203a31da9e9e9fb4a108ffe447333758",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/ledgers/factory-platform.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/ledgers/next-generation.pot",
+      "bytes": 65873,
+      "sha256": "cc8b53665819b35fd533ed0503bd1859ae2f339fe89f2e1f8e1fc47c589624b4",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/ledgers/next-generation.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/ledgers/os.pot",
+      "bytes": 35087,
+      "sha256": "c84b32459ff41f92e640065c3b2a3978302db0e6423ca09e2656474717b713b6",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/ledgers/os.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/ledgers/platform-refinement.pot",
+      "bytes": 54329,
+      "sha256": "623607bcf699f14ef2c6999f07d9a30ea1e30b1d53f0e6cdceeb1789a0094adf",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/ledgers/platform-refinement.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/ledgers/soc-refinement.pot",
+      "bytes": 49457,
+      "sha256": "f135051750bb9f0bab1092bd3768678092b624820f577835bb0334e889f87ccc",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/ledgers/soc-refinement.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/release-0.1.0.pot",
+      "bytes": 12793,
+      "sha256": "5b9ad7e7b7904a5b849ee03dca5d219abf4f0f7ab025f4509c96fe7bfb88e21d",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/release-0.1.0.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/roadmap.pot",
+      "bytes": 4121,
+      "sha256": "2596daa5dcbc3066b08320c597df7652cd4ebc003acee8906f0a5efdc52b528f",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/roadmap.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/software-verification.pot",
+      "bytes": 9418,
+      "sha256": "1f1f1d1ae06c70d85b948b6e77a2f2259a89f2c46b9cad90270785ae62299803",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/software-verification.pot"
+    },
+    {
+      "path": "catalogs/gettext/status/support.pot",
+      "bytes": 5859,
+      "sha256": "25655d29a2c8041da4092b1ef47196a46b1c8f9339a97df11041826acfc41024",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/status/support.pot"
+    },
+    {
+      "path": "catalogs/gettext/tutorials/async-io.pot",
+      "bytes": 5047,
+      "sha256": "c026eefcb8c13bab785cca96cc4d7473563071598b4d0d117084248216e03f79",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/tutorials/async-io.pot"
+    },
+    {
+      "path": "catalogs/gettext/tutorials/index.pot",
+      "bytes": 926,
+      "sha256": "e65e247f090877191496e565d20c37f770428a1cb4c3072e3558937f9bac9fe0",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/tutorials/index.pot"
+    },
+    {
+      "path": "catalogs/gettext/tutorials/source-sdk.pot",
+      "bytes": 5809,
+      "sha256": "cb389b8553a808817877e1c49f48f7ee645aa2c9bc9ff6cb2fd39a4bf645767b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/gettext/tutorials/source-sdk.pot"
+    },
+    {
+      "path": "catalogs/independent-translation-review.json",
+      "bytes": 7129,
+      "sha256": "7214a425a7add6b00ab2e6f699abb1cd1dfd7964f863fb0c630522e7ccd4a4e1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/independent-translation-review.json"
+    },
+    {
+      "path": "catalogs/pot-inventory.json",
+      "bytes": 15746,
+      "sha256": "ad4e5128f9158347501faac5308e6fe07fd250c15c81feb9a472161861ec19e5",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/pot-inventory.json"
+    },
+    {
+      "path": "catalogs/refresh-2/Doxyfile",
+      "bytes": 183,
+      "sha256": "2879eb92563bdebbff3240541848e9f4344a3d5b7fd2bc004e2428c8d825f685",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/Doxyfile"
+    },
+    {
+      "path": "catalogs/refresh-2/admission-before.json",
+      "bytes": 37550,
+      "sha256": "ad4dd6b48a5a92d7341a6174f5e797c2a9fa0dd854f95903d051388d99d88ec7",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/admission-before.json"
+    },
+    {
+      "path": "catalogs/refresh-2/admission-final.json",
+      "bytes": 37372,
+      "sha256": "0b9666653fb0739a0832068dac9c1227f66127cb1d46c32518cd0ba565578480",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/admission-final.json"
+    },
+    {
+      "path": "catalogs/refresh-2/catalogs-before/en/design/documentation-system.po",
+      "bytes": 68393,
+      "sha256": "5386b54a2ecce0d6acfc14da1905599c023d0b82f59405afc05a7b48fa4bfaa1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/catalogs-before/en/design/documentation-system.po"
+    },
+    {
+      "path": "catalogs/refresh-2/catalogs-before/en/reference/documentation-delivery.po",
+      "bytes": 30699,
+      "sha256": "45a131d5f9d4ae953d739bc5f555a95c4075eeab35b0d0d1d3e2a7cb5103b62d",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/catalogs-before/en/reference/documentation-delivery.po"
+    },
+    {
+      "path": "catalogs/refresh-2/catalogs-before/zh_CN/design/documentation-system.po",
+      "bytes": 67204,
+      "sha256": "4c9a3ffb7ac154aaf1c601a74bd7b7539fe0397652c01f82c685ed82db4667eb",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/catalogs-before/zh_CN/design/documentation-system.po"
+    },
+    {
+      "path": "catalogs/refresh-2/doxygen.attempts/1792036091212395318-8652e5cd7dcb48239e4bd0eb7472b59e/receipt.json",
+      "bytes": 1145,
+      "sha256": "dbd1cc2c8204e3685f09e4d77985eed8f950214ce28390a3a306059ae8f8aa88",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/doxygen.attempts/1792036091212395318-8652e5cd7dcb48239e4bd0eb7472b59e/receipt.json"
+    },
+    {
+      "path": "catalogs/refresh-2/doxygen.attempts/1792036091212395318-8652e5cd7dcb48239e4bd0eb7472b59e/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/doxygen.attempts/1792036091212395318-8652e5cd7dcb48239e4bd0eb7472b59e/stderr.txt"
+    },
+    {
+      "path": "catalogs/refresh-2/doxygen.attempts/1792036091212395318-8652e5cd7dcb48239e4bd0eb7472b59e/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/doxygen.attempts/1792036091212395318-8652e5cd7dcb48239e4bd0eb7472b59e/stdout.txt"
+    },
+    {
+      "path": "catalogs/refresh-2/doxygen.command.json",
+      "bytes": 1305,
+      "sha256": "1252529c4b969feabd84e2109a02ed4769060a7bf53410a95972073928143f7b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/doxygen.command.json"
+    },
+    {
+      "path": "catalogs/refresh-2/doxygen.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/doxygen.log"
+    },
+    {
+      "path": "catalogs/refresh-2/extract.py",
+      "bytes": 3056,
+      "sha256": "e92da607737eb275dfd8ca5be97dae70161cdb83325d2e4223979aff92e8ddf3",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/extract.py"
+    },
+    {
+      "path": "catalogs/refresh-2/extraction-commands.json",
+      "bytes": 1095,
+      "sha256": "d13bb7c7bd3968cb7285680beae68554e4af646169bb086a01447c11e5d7e6cf",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/extraction-commands.json"
+    },
+    {
+      "path": "catalogs/refresh-2/final-catalogs.json",
+      "bytes": 2033,
+      "sha256": "11107a2059effbd7060b1cde83e76e55c101b2cfc016bcf4b69668c907714756",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/final-catalogs.json"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext.attempts/1792036091427615053-c93f8031e488411ea120e18bd69d10ae/receipt.json",
+      "bytes": 1442,
+      "sha256": "1a97cd82f924b3c2b8e25a57d0a8367db943e1640a4e718c77be72ba9b3c9b9e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext.attempts/1792036091427615053-c93f8031e488411ea120e18bd69d10ae/receipt.json"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext.attempts/1792036091427615053-c93f8031e488411ea120e18bd69d10ae/stderr.txt",
+      "bytes": 337,
+      "sha256": "b7a6ca66a9cc9e12b7544f4c7e4df075b4d1498a8b462406760d1deac1cd3e63",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext.attempts/1792036091427615053-c93f8031e488411ea120e18bd69d10ae/stderr.txt"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext.attempts/1792036091427615053-c93f8031e488411ea120e18bd69d10ae/stdout.txt",
+      "bytes": 17724,
+      "sha256": "d1b91eb987917751a7520002c123716cb306ecc1518235743b90f9d3f4b434b7",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext.attempts/1792036091427615053-c93f8031e488411ea120e18bd69d10ae/stdout.txt"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext.command.json",
+      "bytes": 1602,
+      "sha256": "e43f306118926013afacd23176ca757a2d3f7304ab564472f5864491d07109c4",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext.command.json"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext.log",
+      "bytes": 18061,
+      "sha256": "51cdbb3384218baf63dbfa5af724a7e99a7b787c0bdad9b0bce96eea866272a0",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext.log"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/assets/diagrams/README.pot",
+      "bytes": 33831,
+      "sha256": "f874e20eb0df827f57250005ecd7921303d24907464c0cb5fb7fb0c448c5b224",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/assets/diagrams/README.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/README.pot",
+      "bytes": 10837,
+      "sha256": "42d49fcfe816c2f68a2e7cb3979a8599e5be22eca25594cc826f69c70ce2bee2",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/README.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/architecture.pot",
+      "bytes": 31581,
+      "sha256": "29372bd5b0115c33398bda64ec21ff53f45171d80851493f3cf675f0f1d93e69",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/architecture.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/build-system-verification.pot",
+      "bytes": 23943,
+      "sha256": "e766b74f53d7b56cb44811adb97c987cfaa2e86651da4ac9286947c74667dfca",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/build-system-verification.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/capabilities.pot",
+      "bytes": 44247,
+      "sha256": "1e8e76e5f1da1e0e14b17fad035be0a0168a239f4853589a238640b7dd12eae8",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/capabilities.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/cortex-m.pot",
+      "bytes": 19731,
+      "sha256": "c0fe2d66a8dfa03a639310bb954b40b81a2f4ce9ed7e2abdc78d967598781c77",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/cortex-m.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/index.pot",
+      "bytes": 969,
+      "sha256": "2a09c3bf5ad2ab170d1465ead86cc648ae83e6a3899d64cf77132762e7e59535",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/migration.pot",
+      "bytes": 7175,
+      "sha256": "e6ab51789580353f801313f2b60f141e40d607da51c2d9c5eff390af91c92328",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/migration.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/next-iterations.pot",
+      "bytes": 10918,
+      "sha256": "ef6668aeb4ff90f998dd442a304de8c09bf79f3811c0d0a16a179a9628f6b37d",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/next-iterations.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/os.pot",
+      "bytes": 14815,
+      "sha256": "e3770b03f419dcb0d1c2d4aef261e3baf6de2026c2644b78670e02e657fc07cf",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/os.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/qualification.pot",
+      "bytes": 10359,
+      "sha256": "ebebb88ca6e03bceaeac66830f1d37764cede689c7d443723f2a160326055408",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/qualification.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/security-review.pot",
+      "bytes": 7065,
+      "sha256": "a0fe0280bb4c1549e6558bb1ad7bf711b71af5001df85c5b33cf19ac5aa39d47",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/security-review.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/soc-extensions-verification.pot",
+      "bytes": 23433,
+      "sha256": "259bfbb344068770d452def6b479c739d5d525dbb06757791883bffae6785f18",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/soc-extensions-verification.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/soc-refinement-verification.pot",
+      "bytes": 27444,
+      "sha256": "741487b7b63bfa59fa6927b7b0fcbc8242c254633312fa0c38fb27b932e4b021",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/soc-refinement-verification.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/support.pot",
+      "bytes": 28615,
+      "sha256": "b8095c93caca4cb7674d4ecb3b29ef4071df7cc3f0897baa2711d63b0fe2d032",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/support.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/delivery/verification.pot",
+      "bytes": 13355,
+      "sha256": "5b64c35d5268a3e299f1ea5cc759f25de0a51a8943ff7774451a3a0e2077d1b0",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/delivery/verification.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/README.pot",
+      "bytes": 16756,
+      "sha256": "c1f41e060068fe3053d2f636e4bf4a852d41ebca0d53f9d2043d49022c62efd8",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/README.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/arch-contracts.pot",
+      "bytes": 17812,
+      "sha256": "e0ddebbe0247bc469a6cd62bd8784d0ead455efee3c45454d7bbe48d0dc0bc84",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/arch-contracts.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/build-system.pot",
+      "bytes": 17221,
+      "sha256": "e5a029f8e66a0fd9427ebde6360b859899f0e58394d46b0c13df825a647b6aaa",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/build-system.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/classic-can.pot",
+      "bytes": 10750,
+      "sha256": "1fcafb9ed1af621c11e82ba37db588702a9778896f46bb7dc215996a7f63d57b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/classic-can.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/clock-domain-sleep.pot",
+      "bytes": 5842,
+      "sha256": "116589c9f667a6a6711336fb0fa0eb16bb6376827e35746b4fef9bf7daa48e95",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/clock-domain-sleep.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/documentation-improvements.pot",
+      "bytes": 34797,
+      "sha256": "bb4f12fd7cd7550f18814386ff3a7042ea820c029e5460b9e44980d6a5b89b87",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/documentation-improvements.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/documentation-standards.pot",
+      "bytes": 33809,
+      "sha256": "cba8ce90cfbd17d8ba0116155777fce6a8f25b0ee6fd6fec74618568d4b2cde2",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/documentation-standards.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/documentation-system.pot",
+      "bytes": 48823,
+      "sha256": "a30ab5a06089fdfbe522d894e540c70ce528cde6676263a1219f851c96971841",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/documentation-system.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/documentation-templates.pot",
+      "bytes": 11393,
+      "sha256": "d167f2ec5346857cb2ad3e39c84a214978f25050616447b596a6ba690c989b3a",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/documentation-templates.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/engineering-handbook.pot",
+      "bytes": 70398,
+      "sha256": "489cc33d76467cb36693f497ab45cdad4273e72b5a0245bb883339a91de31f02",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/engineering-handbook.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/ethernet.pot",
+      "bytes": 13253,
+      "sha256": "66478bf9ba1393792f1330a9c4e46a9e5ff76292017fdaaa4a78054fe61d71c9",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/ethernet.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/fault-observation.pot",
+      "bytes": 5229,
+      "sha256": "f1a1ea07fbf442026a3604f1547838c2d1a8f5614bf61ea2f796ada21aa6a9fa",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/fault-observation.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/i2c-bus-clear.pot",
+      "bytes": 8750,
+      "sha256": "4729a2856714fccf9f9098eb1932d5e7c5af9aca11bf549cfa15455bf22e7fec",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/i2c-bus-clear.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/index.pot",
+      "bytes": 966,
+      "sha256": "6ebe2fe70a5d27c0c57e733283dbb78fac2ff28fd9fac7c66de95c779a353960",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/integration-contracts.pot",
+      "bytes": 50213,
+      "sha256": "ad03259092faf9efcffff55ae00936cd33b55c895e6fe3a0d9a4cafdf1e475dc",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/integration-contracts.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/io-lifecycle-matrix.pot",
+      "bytes": 7326,
+      "sha256": "6eca561e3e008e0a3e22135a90a1739c73b701dc7710b3a9c9253b9bc8dd14a5",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/io-lifecycle-matrix.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/io-observation-recovery.pot",
+      "bytes": 11682,
+      "sha256": "425d966e17eee9e22f9971c7817d512dea7d5a0edf356fac43c125ea150ab655",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/io-observation-recovery.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/multiple-controllers.pot",
+      "bytes": 6838,
+      "sha256": "4b0921763f357bfaa98ccf4b3bbbbf72eac2da87ae7e0aece9ebbbe579b265a3",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/multiple-controllers.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/multiple-dma-controllers.pot",
+      "bytes": 6507,
+      "sha256": "3b4ef3e9ca6c5217aff2c82fda7fdcd887dacfe866c509806b01a0feb7fdc4aa",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/multiple-dma-controllers.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/next-generation-platform.pot",
+      "bytes": 80328,
+      "sha256": "5d26653ba60c7489f902087c4bcad7a570d3843a5425a69045b2c2b9a43f7765",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/next-generation-platform.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/os-backend-integration.pot",
+      "bytes": 12583,
+      "sha256": "7b86e414b1bf55aff476eef7051d7d7ba38fe651005c372229ad83e3aa9f6711",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/os-backend-integration.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/os-contracts.pot",
+      "bytes": 29010,
+      "sha256": "0c300ce6a472bf1c025f364b245563fff03af0c9846e2d1df9a42f25913881fa",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/os-contracts.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/provider-assemblies.pot",
+      "bytes": 5423,
+      "sha256": "1d82056552e44dc519d83380cef54505d01edc398cee153336eccba940a311e5",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/provider-assemblies.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/soc-execution-budgets.pot",
+      "bytes": 16688,
+      "sha256": "fd4a8295e34d4d777c53eb08b76764e9fe06849f5938958eff8797c45925158c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/soc-execution-budgets.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/soc-refinement.pot",
+      "bytes": 27884,
+      "sha256": "c97ee51c9eca32bbb6c3220afc2b2077177762984b2c8d374d1be69aa07d9ee1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/soc-refinement.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/source-compatibility.pot",
+      "bytes": 15769,
+      "sha256": "f3e40277f8190a39f73453bf8bd1c95b3115e97a213e330a62937569cb143617",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/source-compatibility.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/stack-observation-endurance.pot",
+      "bytes": 8047,
+      "sha256": "6c16176d6cd01524289b6091a54952b55198d63ebeedeb0f8fc89c126602052e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/stack-observation-endurance.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/stm32g474.pot",
+      "bytes": 16643,
+      "sha256": "1ca8ea7fbc11030ff716f4de9c7a4d13ab4d048a117da0f314878464b7a1e138",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/stm32g474.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/threadx.pot",
+      "bytes": 12060,
+      "sha256": "59e8549c6417b090b3b4ea654a74c0339da3cdafe5628f14de455440205ba7ee",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/threadx.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/timebase-lowpower.pot",
+      "bytes": 9664,
+      "sha256": "ae213fadd2485ce879e3661e5192470350e6ef81c851cdbce696ffb40452e9b5",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/timebase-lowpower.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/timer-advanced.pot",
+      "bytes": 8957,
+      "sha256": "d1c8af691d7b34b4e1c1aff2c03ca0d88504f2422c8c6c1c3f06fcb135886ffb",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/timer-advanced.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/u575-trustzone-contract.pot",
+      "bytes": 14081,
+      "sha256": "3b88732493c7db7b88d31f8879d0da31b0f1916a37f214f29d2ecddf18aa7133",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/u575-trustzone-contract.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/uart-dma-rs485.pot",
+      "bytes": 14669,
+      "sha256": "12055e65e396cafb6c693f603904221dc8ee365322cbf55154727846063ca0d3",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/uart-dma-rs485.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/usb-device.pot",
+      "bytes": 11313,
+      "sha256": "4c02e0209a25397d38661794c9134c19f0dcb44d1641b4f934947f781af9f4bf",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/usb-device.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/design/user-io-broker.pot",
+      "bytes": 6558,
+      "sha256": "f19a4490b2b327f763f4defb61738cc82830baa67953ed05cad1feccbb691cd9",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/design/user-io-broker.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/development/documentation.pot",
+      "bytes": 4504,
+      "sha256": "b2ab464b716d63aa0937dd2e0bf96e401a6d2e52041ae8ba89e3732c367fda68",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/development/documentation.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/development/implementation-map.pot",
+      "bytes": 8947,
+      "sha256": "f72525057acdb681d12652dab4cdf8b81d3d9b44f593c856fb0c6b4b2a56978d",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/development/implementation-map.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/development/index.pot",
+      "bytes": 970,
+      "sha256": "ce9f9b431daf6d22f9c1cceaf319a178a6413fc7337692cea79de601068c0785",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/development/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/development/workflow.pot",
+      "bytes": 4319,
+      "sha256": "a53fc07fee0cd7847f5102bd5dd0706f3d76e27df90379308a8a1d32bdc77c19",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/development/workflow.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/explanation/factory.pot",
+      "bytes": 6381,
+      "sha256": "aa5a90d0c9e6a865234b3fd9c4ce639f8494981b2a4044620b5478d489e89f98",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/explanation/factory.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/explanation/index.pot",
+      "bytes": 947,
+      "sha256": "f310f4baba2a401ffbebf7a5006a9891f766ec7c0ff771aa73147ed373c902e3",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/explanation/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/explanation/ownership.pot",
+      "bytes": 7290,
+      "sha256": "1f5e99d6ff037671235cdb8a86f4351f4de0908856438e831aeeee41b87dc3ef",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/explanation/ownership.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/explanation/platform-architecture.pot",
+      "bytes": 9438,
+      "sha256": "fa10dffb22d89e3e6a737ef9530c6c3e23afbd40883b04e251187b52b5120dde",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/explanation/platform-architecture.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/explanation/source-map.pot",
+      "bytes": 26604,
+      "sha256": "08145d8dc8d6d9787f6a6b6f5687e1fcaaeabbbf68217c38dcbc817def22ee7b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/explanation/source-map.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/guides/board-porting.pot",
+      "bytes": 4554,
+      "sha256": "cd6ef75913ea542bc20a8a7c7f46ee867a36c92d51be522abf107fb653056cbb",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/guides/board-porting.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/guides/index.pot",
+      "bytes": 964,
+      "sha256": "682c9c5b5dec079986f5b95115b3f04b9c5de8cb5758f4ac2c1f91da8fe0b2d1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/guides/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/guides/migration.pot",
+      "bytes": 6461,
+      "sha256": "1a13cecfff057e1c442106ea849a9aa74bafdf56c54f15fb3ff354bb98546f6c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/guides/migration.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/guides/os-shutdown.pot",
+      "bytes": 7605,
+      "sha256": "e7053a660c20517d55f874bc44d2483f7e009939b82e35665cb28884238b7051",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/guides/os-shutdown.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/guides/performance-hil.pot",
+      "bytes": 5220,
+      "sha256": "b7afeaba9e24de25b857d5e5a0cc5193f32f9c52ff09cdc0307974f455e44806",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/guides/performance-hil.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/guides/provider-porting.pot",
+      "bytes": 7724,
+      "sha256": "3b99fe2b532ef660f71bed6adfbcc6eb8a3233d11ce27a412ab2b80c52b68402",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/guides/provider-porting.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/guides/source-checkout.pot",
+      "bytes": 7739,
+      "sha256": "48406413bb05d8aa3d6f8d1de6a31ab94097725ec354707eedc753270d9a9b71",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/guides/source-checkout.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/index.pot",
+      "bytes": 1392,
+      "sha256": "9e2d0bff99d9a88ee3ba6abd2e0a85edae1d0372136b956aea528ca99a10c555",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/reference/configuration/assembly.pot",
+      "bytes": 7305,
+      "sha256": "a661e07b89e0267ebd57e1276b166c1d66eba88f1badb0944536ad796190f6e9",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/reference/configuration/assembly.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/reference/configuration/index.pot",
+      "bytes": 977,
+      "sha256": "fd72ac3c53902ffc8c734af39bf121e97b987922cc7241560683162e80b9f2ea",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/reference/configuration/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/reference/configuration/tools.pot",
+      "bytes": 6645,
+      "sha256": "9b4c6429433baa7f66643d10715c944b96187e26d504adcdce838fd8aa4dfad5",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/reference/configuration/tools.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/reference/documentation-delivery.pot",
+      "bytes": 18250,
+      "sha256": "c381b2859a5f476907ddfb100638a455cb80f607584773e8285e3c09c95ca450",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/reference/documentation-delivery.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/reference/documentation-tools.pot",
+      "bytes": 16052,
+      "sha256": "cf256f99135831d48b6ffe92d93576a4e2079bd39f98f78ee7f5d6f7a97670a3",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/reference/documentation-tools.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/reference/history.pot",
+      "bytes": 7136,
+      "sha256": "996bf2a7dbc37a176731a118374eaa1e58ed5ecdd0b4e1187c2aaeee59a978f1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/reference/history.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/reference/index.pot",
+      "bytes": 1008,
+      "sha256": "d35b0c52a9d020a20abb228aa3c02cbb4818b7be03784b368b776d66c99f7bb2",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/reference/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/reference/platforms/index.pot",
+      "bytes": 979,
+      "sha256": "2c43c90455633d79008bb9fdbe24abdd17326110ce738ddffdec8c71a7699ef7",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/reference/platforms/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/reference/platforms/qualification.pot",
+      "bytes": 6704,
+      "sha256": "b8dbfb7e8005b920f8dcd3a8ef319212f0c2e45cf74fe083a1351631a86f3b54",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/reference/platforms/qualification.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/reference/platforms/support.pot",
+      "bytes": 7792,
+      "sha256": "6819f3f204b313199c4f9de03ebb3d39415b0afc5d4f851f22293d9d230e7237",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/reference/platforms/support.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/sphinx/development/coding_standards.pot",
+      "bytes": 12828,
+      "sha256": "585d72460f642dfa0c89e5e88a8e7d4f094daa93ced3830a9b59860bbc9263ca",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/sphinx/development/coding_standards.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/documentation-acceptance.pot",
+      "bytes": 9766,
+      "sha256": "0d31decec908b960b7dae4c5b236e5c02a105c58398269d68d638959cdc3eeef",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/documentation-acceptance.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/hardware.pot",
+      "bytes": 5513,
+      "sha256": "60f8801ed9d77cc52ff204597de107d1868a76d0cace68f58567a2ddf0dcb9f4",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/hardware.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/index.pot",
+      "bytes": 1008,
+      "sha256": "b8f56e3b8ea39d966b64495532a271117e1bf7a17a508618ee487574bd0fafbe",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/ledgers.pot",
+      "bytes": 3412,
+      "sha256": "f99265c5b946392f60422f4298a4bbd27bf463ff7d0362fdc089d80d98b9e598",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/ledgers.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/ledgers/build-system.pot",
+      "bytes": 82765,
+      "sha256": "286a8bbcf352223c3236c8a82a3b625daac9c56c881fee3ca9090588f823f030",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/ledgers/build-system.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/ledgers/documentation-system.pot",
+      "bytes": 70975,
+      "sha256": "e9de736e10eca83d44eba08634bf4dfe765b12e950790570507d4d3a9ca6780a",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/ledgers/documentation-system.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/ledgers/factory-platform.pot",
+      "bytes": 27650,
+      "sha256": "f88ba470b13d35101fa9086ed17065c83ec87c510876f2fc93cbdc8dbe435e4c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/ledgers/factory-platform.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/ledgers/next-generation.pot",
+      "bytes": 67133,
+      "sha256": "e392a66405febb8ca10bf7906e4deee39c3dc2748f3b61dea9f9f23e7047ac98",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/ledgers/next-generation.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/ledgers/os.pot",
+      "bytes": 35882,
+      "sha256": "a25e0c9def011255bb9a688bd9ec5f9870f104dd481d6683adb91476636658b3",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/ledgers/os.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/ledgers/platform-refinement.pot",
+      "bytes": 55370,
+      "sha256": "7741cbe6904ecf2909ac6617abaa0f02be6b08aeaa6a9c4e0f8cafb68fcd9c8a",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/ledgers/platform-refinement.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/ledgers/soc-refinement.pot",
+      "bytes": 50408,
+      "sha256": "3fc42caa731f689155653b4ab409df522691bf1a464d31a0baefb1adee13c64d",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/ledgers/soc-refinement.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/release-0.1.0.pot",
+      "bytes": 12925,
+      "sha256": "e3099cd15b09f80188138216018a7d356ca935314d4a3fae46d980b3342f256c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/release-0.1.0.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/roadmap.pot",
+      "bytes": 4184,
+      "sha256": "28a9f0e9ae0796b39b147d1aa575763f52badb4e3d51accaaa2168c6f8d6fa74",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/roadmap.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/software-verification.pot",
+      "bytes": 9544,
+      "sha256": "d1bbbac7b5ddc524fccb2092b692966dedfc4503cfd3253373b9f38c04346a2b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/software-verification.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/status/support.pot",
+      "bytes": 5955,
+      "sha256": "72512ab5afd7f70b8c6045ecdb39a063c733b8d2d816d89dda0ed3f834127983",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/status/support.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/tutorials/async-io.pot",
+      "bytes": 5098,
+      "sha256": "029ae9109a8585a68b4a3b0127b0bcda449c0130ea7512731a52e4e654062639",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/tutorials/async-io.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/tutorials/index.pot",
+      "bytes": 932,
+      "sha256": "26a45300be7aad36f9e5f66a5b04e7f919f0573a001093d34936e5809641d0d8",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/tutorials/index.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/gettext/tutorials/source-sdk.pot",
+      "bytes": 5863,
+      "sha256": "1351d0e68f18aa4e0c773093dc0f5b7fdaedb9b30b4733aa8b21c89cbde6885e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/gettext/tutorials/source-sdk.pot"
+    },
+    {
+      "path": "catalogs/refresh-2/independent-translation-review.json",
+      "bytes": 3695,
+      "sha256": "1928ef58f6a30c75a2c1b79c3f53bab4ac537c1f4571b9d75e1cc52a55765408",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/independent-translation-review.json"
+    },
+    {
+      "path": "catalogs/refresh-2/pot-inventory.json",
+      "bytes": 15746,
+      "sha256": "be480d142207ebfa634835400b8d46f92fe0267963fca2f328b26e7244ea0088",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/pot-inventory.json"
+    },
+    {
+      "path": "catalogs/refresh-2/source-inputs-after.json",
+      "bytes": 11521,
+      "sha256": "27a829edfe0a6223667a19ae0aea4531d9f563a78e42f225e5759cf171d40c78",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/source-inputs-after.json"
+    },
+    {
+      "path": "catalogs/refresh-2/source-inputs-before.json",
+      "bytes": 11521,
+      "sha256": "27a829edfe0a6223667a19ae0aea4531d9f563a78e42f225e5759cf171d40c78",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/source-inputs-before.json"
+    },
+    {
+      "path": "catalogs/refresh-2/tool-observation.json",
+      "bytes": 927,
+      "sha256": "e723076fcc2b0ddc77ca4e708211974adc922fdc06c770b1f02502b09b000539",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/tool-observation.json"
+    },
+    {
+      "path": "catalogs/refresh-2/translation-review-inputs.json",
+      "bytes": 4696,
+      "sha256": "e0f13813cb9413bb62ae4dcd8d9401104912ecde717b1623abe5f63f8842b173",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/translation-review-inputs.json"
+    },
+    {
+      "path": "catalogs/refresh-2/update-catalogs.log",
+      "bytes": 2408,
+      "sha256": "07002c378750df3e1f94d9118e9bbb5a66aba0793944211bffe04b2b19ba7941",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/update-catalogs.log"
+    },
+    {
+      "path": "catalogs/refresh-2/update_catalogs.py",
+      "bytes": 2176,
+      "sha256": "dc91758379ebabac5ee3d9ca1f2f8bece551d529e44c2cdb6ca29efa8e51c6a5",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/refresh-2/update_catalogs.py"
+    },
+    {
+      "path": "catalogs/source-inputs-after.json",
+      "bytes": 11521,
+      "sha256": "7a7e4dbcc46493fcc9d87ad3849d731cb2f6726b4440004cf073bc2a3a2b3e70",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/source-inputs-after.json"
+    },
+    {
+      "path": "catalogs/source-inputs-before.json",
+      "bytes": 11521,
+      "sha256": "7a7e4dbcc46493fcc9d87ad3849d731cb2f6726b4440004cf073bc2a3a2b3e70",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/source-inputs-before.json"
+    },
+    {
+      "path": "catalogs/tool-observation.json",
+      "bytes": 927,
+      "sha256": "e723076fcc2b0ddc77ca4e708211974adc922fdc06c770b1f02502b09b000539",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/tool-observation.json"
+    },
+    {
+      "path": "catalogs/translation-review-inputs.json",
+      "bytes": 23712,
+      "sha256": "4dd18b7d1c48ff014b6a88a87c1fa9a26c27256edcf18fa6d3c5439228c1e748",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/translation-review-inputs.json"
+    },
+    {
+      "path": "catalogs/update-catalogs.log",
+      "bytes": 20633,
+      "sha256": "9e1b780c2773ec6c5133acd00bd56c3332fa2cdd94d3c30a67c065f298261b31",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/update-catalogs.log"
+    },
+    {
+      "path": "catalogs/update_catalogs.py",
+      "bytes": 12064,
+      "sha256": "c5249491de9cf281e25c6390abbbb6b727065bc01c129eb12ebcd30e426e5c90",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/catalogs/update_catalogs.py"
+    },
+    {
+      "path": "derived-cache-cleanup.json",
+      "bytes": 501431,
+      "sha256": "a7a961fd393abd3fb0b30b2b6aa048d975bb29380554603ba6abd482071547b9",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/derived-cache-cleanup.json"
+    },
+    {
+      "path": "docs/changed-pages.json",
+      "bytes": 3853,
+      "sha256": "7d7ae5f90671babbdc58c65f93571210b5abd94029dc04c78c964a5688a3c2e1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/changed-pages.json"
+    },
+    {
+      "path": "docs/examples-integration-plan.md",
+      "bytes": 4587,
+      "sha256": "78700ac5138e7b0441aa9805a6291967bd36d5c5ffbd84c4be847f4a449fc758",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-integration-plan.md"
+    },
+    {
+      "path": "docs/examples-preparation/command-00.log",
+      "bytes": 82,
+      "sha256": "f21425fe3af03eca0a1f388481cd1f9825b0b9703f7a55b6ed84808af23aad19",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-00.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-01.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-02.log",
+      "bytes": 83,
+      "sha256": "9510b45aa305a8538d90dfc41e92df7ad8e2dc33ca3d511d4b7a878ef59b3cee",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-02.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-03.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-03.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-04.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-04.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-05.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-05.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-06.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-06.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-07.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-07.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-08.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-08.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-09.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-09.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-10.log",
+      "bytes": 1391,
+      "sha256": "a59e7edb3b6593c41115a6458d94e9eaaf0ed8877708910326351985cfe16919",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-10.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-11.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-11.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-12.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-12.log"
+    },
+    {
+      "path": "docs/examples-preparation/command-13.log",
+      "bytes": 516,
+      "sha256": "4c5b4c2afd539fadf7c7f18b15e1d31c7332aac3cdc8a20d8de3cc41707a591c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/command-13.log"
+    },
+    {
+      "path": "docs/examples-preparation/commands.json",
+      "bytes": 6059,
+      "sha256": "88da475e3552c28874a56a41038fe3dd408407e11a3d476c398ecddcf843aad1",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/commands.json"
+    },
+    {
+      "path": "docs/examples-preparation/dependency-preparation.json",
+      "bytes": 2651,
+      "sha256": "ae93b12a54eb8214d75f745a676117e2b8f6e476e30ced6fc4eea7572e88e8c0",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/dependency-preparation.json"
+    },
+    {
+      "path": "docs/examples-preparation/tool-preparation-00.log",
+      "bytes": 4349,
+      "sha256": "9e54cca3243491ae6e71031cc7804af9b055f789ad5b0005141dcedc260f8b7c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/tool-preparation-00.log"
+    },
+    {
+      "path": "docs/examples-preparation/tool-preparation-01.log",
+      "bytes": 844,
+      "sha256": "694a3033c780dc0fa6ce79c5001555ee9ab681c41a54c3aa5337c18b65a31d99",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/tool-preparation-01.log"
+    },
+    {
+      "path": "docs/examples-preparation/tool-preparation-commands.json",
+      "bytes": 798,
+      "sha256": "78f4f3ef8b562deb1747c8eeba8acc187e72ab69d742fcfb73135fc5bd11d100",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/tool-preparation-commands.json"
+    },
+    {
+      "path": "docs/examples-preparation/tool-preparation.json",
+      "bytes": 4719,
+      "sha256": "26a0079a41a506dc4c1fdffb045fee455d45616b98b5ca5b3b27c66c2170c85b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-preparation/tool-preparation.json"
+    },
+    {
+      "path": "docs/examples-remote-audit-0.json",
+      "bytes": 6824,
+      "sha256": "2563d1547d9859433ef0072bbd4b59d37c7b45c4e84aed94ae8aab7a7a547283",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-remote-audit-0.json"
+    },
+    {
+      "path": "docs/examples-remote-audit-1.json",
+      "bytes": 667,
+      "sha256": "95c10b1c59f5803c333f84591d68a201e372e13d39670fb77bade20e0006ddfe",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-remote-audit-1.json"
+    },
+    {
+      "path": "docs/examples-remote-audit-2.json",
+      "bytes": 35593,
+      "sha256": "19a6e34b91d23f98f3abbfc7c3ae0717ecaed0e1a96cb1592e9d97df02fdd652",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-remote-audit-2.json"
+    },
+    {
+      "path": "docs/examples-remote-audit-3.json",
+      "bytes": 196616,
+      "sha256": "b1ef4fc01731e072cdd9d133a0f15f2c641b19bdf31158304de3c8871bc2e48e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-remote-audit-3.json"
+    },
+    {
+      "path": "docs/examples-remote-audit.json",
+      "bytes": 1807,
+      "sha256": "998f3bdabb19c79055f78079bab50d9badc708f14c34fa8920d7d45d2a271c88",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-remote-audit.json"
+    },
+    {
+      "path": "docs/examples-worktree-create.log",
+      "bytes": 135,
+      "sha256": "59dd2f1fdb64f947fa870e5b6d9a3f33cf88b55064e0b8d865d4abc1960b8469",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-worktree-create.log"
+    },
+    {
+      "path": "docs/examples-worktree-preparation.json",
+      "bytes": 1686,
+      "sha256": "c1287960760aeefab9291be58cecde948573d9a8fb46e2e00cfb051d054dac15",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/examples-worktree-preparation.json"
+    },
+    {
+      "path": "docs/independent-prose-review.json",
+      "bytes": 812,
+      "sha256": "7501a7c16bac3f1cf063a5fc5fcf7856e976e20f854533376917712083084557",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/independent-prose-review.json"
+    },
+    {
+      "path": "docs/readme-cn-bilingual-correction-review.json",
+      "bytes": 851,
+      "sha256": "6faef4fa5782d6793356bf200123eebee129a0028b477488aebc785683aa95db",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/readme-cn-bilingual-correction-review.json"
+    },
+    {
+      "path": "docs/readme-cn-bilingual-correction.diff",
+      "bytes": 1033,
+      "sha256": "85422eb34caeac0bafd74d0abc7ff0785d26d36acd7e2c5d2844d2585d22f394",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/readme-cn-bilingual-correction.diff"
+    },
+    {
+      "path": "docs/readme.diff",
+      "bytes": 3761,
+      "sha256": "49c23b8b930f6269d11217008970dfa106c5529d0dd15f4108533126a3604c40",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/readme.diff"
+    },
+    {
+      "path": "docs/release-docs.diff",
+      "bytes": 8278,
+      "sha256": "a56e6cae229d1bacb517cb97588ad53d1fa7b7b8b9b5171bfb6c3c3f9a4c6b0c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/docs/release-docs.diff"
+    },
+    {
+      "path": "dotted-docnames/check-fixed.py",
+      "bytes": 21860,
+      "sha256": "6b547f1046b64f59a7781c857bc9d172ed977edc1b8298f05fdd1edaf1351ee3",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/check-fixed.py"
+    },
+    {
+      "path": "dotted-docnames/check.py",
+      "bytes": 21706,
+      "sha256": "3f47b388b294630e81f83ccf4c954568edd18719471b83437069a702ad2100fc",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/check.py"
+    },
+    {
+      "path": "dotted-docnames/checker-suite-green.log",
+      "bytes": 5705,
+      "sha256": "82f6201c53d2e866465321527275a88b03a4efe494abfd9c379a8c55b0937a94",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/checker-suite-green.log"
+    },
+    {
+      "path": "dotted-docnames/existing-checker-tests-green.log",
+      "bytes": 5127,
+      "sha256": "7fbe1d13497c37debc46cfa97a40874f9a65f9fb38acf24cfe6fa695d48fde3b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/existing-checker-tests-green.log"
+    },
+    {
+      "path": "dotted-docnames/green-isolated.log",
+      "bytes": 610,
+      "sha256": "c346454b36b9f1bc48defd959a952d9f498e60458f7fd7b40641d72e85da9f3a",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/green-isolated.log"
+    },
+    {
+      "path": "dotted-docnames/production-check.json",
+      "bytes": 41728,
+      "sha256": "99a76ba4c2b3581033e70bfc7ab753d7aa6f5e77a7a17d3640a62dccf23e380c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/production-check.json"
+    },
+    {
+      "path": "dotted-docnames/production-check.log",
+      "bytes": 46,
+      "sha256": "1a677bc0ad7fbf07f44c071de5eacc9b63900af885434defaba93b7aea2be782",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/production-check.log"
+    },
+    {
+      "path": "dotted-docnames/proposed-checker.patch",
+      "bytes": 1296,
+      "sha256": "c184e55716700b7bcc7df6c3284f71abf70beab99ab5247ba68a422c16a9bd66",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/proposed-checker.patch"
+    },
+    {
+      "path": "dotted-docnames/red.log",
+      "bytes": 3709,
+      "sha256": "b347f1e021f3e017a6f8a30fbcee9ad1ec09205bdae1de4c1fc105c5eb471e92",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/red.log"
+    },
+    {
+      "path": "dotted-docnames/style-report.json",
+      "bytes": 806,
+      "sha256": "cf7c084cd52915c106178ddbd024f25c82a24f7018e9843e43cec501fc5c2904",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/style-report.json"
+    },
+    {
+      "path": "dotted-docnames/style.log",
+      "bytes": 88,
+      "sha256": "278ffb72220546a0cafa07a489168f888e18a24beeed88ef60f703bbbba8c6f2",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/style.log"
+    },
+    {
+      "path": "dotted-docnames/test_dotted_navigation.py",
+      "bytes": 3035,
+      "sha256": "c8224faa983b98838f51bd5fa32c79ee0364d6f8cb8cd9451e6a7f5c225e5071",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/dotted-docnames/test_dotted_navigation.py"
+    },
+    {
+      "path": "final/codeql-annotated-c-baseline-comparison.json",
+      "bytes": 7217,
+      "sha256": "9908cddadc5d0c33f279f5ef30032bab88a3574c2e92977544d541be8e0ad608",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/pr-monitor/final917d1ae/codeql-annotated-c-baseline-comparison.json"
+    },
+    {
+      "path": "final/codeql-final-checks.json",
+      "bytes": 19375,
+      "sha256": "ae7a73ba2283a16151e735aba3b44d02052f2a181f8a86746cc86c93e47b617f",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/pr-monitor/final917d1ae/codeql-final-checks.json"
+    },
+    {
+      "path": "final/codeql-import-commit.json",
+      "bytes": 311,
+      "sha256": "70fd179432bd9226f93f7832d87ceeb29deea6347e95660467983c1fb9148094",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/codeql-import-commit.json"
+    },
+    {
+      "path": "final/codeql-import-commit.log",
+      "bytes": 491,
+      "sha256": "9b29673c35b0f6197980b373630d28c98d21c591c8bc93f3650436d852ed349e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/codeql-import-commit.log"
+    },
+    {
+      "path": "final/codeql-targeted-triage.json",
+      "bytes": 3508,
+      "sha256": "e10e7ac436e639f5635d188fac7b5f210ef47da5f93e4446c375ec61495f5a58",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/pr-monitor/final917d1ae/codeql-targeted-triage.json"
+    },
+    {
+      "path": "final/commit-attempt-01/docs-staged.json",
+      "bytes": 41917,
+      "sha256": "283dd1dbb73c35eb557cca05e090516c524cdfefa088c330afa99e5aebee4a12",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-01/docs-staged.json"
+    },
+    {
+      "path": "final/commit-attempt-01/hook-tdd.json",
+      "bytes": 613196,
+      "sha256": "6c507ad728f132ebf5d63ffabf780c31b36ae5c82fce5726d6db58d187f1e44b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-01/hook-tdd.json"
+    },
+    {
+      "path": "final/commit-attempt-01/hook-tdd.tar.gz",
+      "bytes": 1146260,
+      "sha256": "27dc0290a72d298b4cd8e57b943faa03becbf5f585c4039687343a5b55ecb42f",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-01/hook-tdd.tar.gz"
+    },
+    {
+      "path": "final/commit-attempt-01/style-gate.json",
+      "bytes": 3764,
+      "sha256": "0ddd2c1290e649d3768f382458c191f061958c07af8f8122322c3f6828f60a5a",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-01/style-gate.json"
+    },
+    {
+      "path": "final/commit-attempt-02/docs-staged.json",
+      "bytes": 41728,
+      "sha256": "99a76ba4c2b3581033e70bfc7ab753d7aa6f5e77a7a17d3640a62dccf23e380c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-02/docs-staged.json"
+    },
+    {
+      "path": "final/commit-attempt-02/hook-tdd.json",
+      "bytes": 613317,
+      "sha256": "4e6cd69c304e30c3880e09af942b613bdd89bf9803ad5261d9464c4d1bfc89c7",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-02/hook-tdd.json"
+    },
+    {
+      "path": "final/commit-attempt-02/hook-tdd.tar.gz",
+      "bytes": 1224626,
+      "sha256": "b60f44cfecfff2a7b5545279bea10dbf929fcb94350e036fed7a25d73e7ff33f",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-02/hook-tdd.tar.gz"
+    },
+    {
+      "path": "final/commit-attempt-02/style-gate.json",
+      "bytes": 3918,
+      "sha256": "da72cc43cca502c012c2bf0a63b50d6457d37b0479e135eaee283b52e6ec7505",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-02/style-gate.json"
+    },
+    {
+      "path": "final/commit-attempt-03/docs-staged.json",
+      "bytes": 41728,
+      "sha256": "99a76ba4c2b3581033e70bfc7ab753d7aa6f5e77a7a17d3640a62dccf23e380c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-03/docs-staged.json"
+    },
+    {
+      "path": "final/commit-attempt-03/hook-tdd.json",
+      "bytes": 613335,
+      "sha256": "4e7473029d87ece13f3e94e987ac78cea7e094460d8d60cc236ed74e5b074e11",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-03/hook-tdd.json"
+    },
+    {
+      "path": "final/commit-attempt-03/hook-tdd.tar.gz",
+      "bytes": 1303271,
+      "sha256": "d6cc6323c992455f3403475eda57f873b6c06eed8737128557f9dfe5ba66324c",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-03/hook-tdd.tar.gz"
+    },
+    {
+      "path": "final/commit-attempt-03/style-gate.json",
+      "bytes": 735,
+      "sha256": "796f764a7c72bfa3aa202ddd2197d8afb0ae62ac9948e88e377875fe63db6aa8",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/commit-attempt-03/style-gate.json"
+    },
+    {
+      "path": "final/documentation-tests-command.json",
+      "bytes": 387,
+      "sha256": "ca6be4794215047ea40b09d964afdc62be71a675f532bdf867a46a7a1c3268e9",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/documentation-tests-command.json"
+    },
+    {
+      "path": "final/documentation-tests.json",
+      "bytes": 196,
+      "sha256": "8c79e0e9d9b6cc56fd56e7fa646ba73f2696d1da22b6db74827bfbcb3f62e3ae",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/documentation-tests.json"
+    },
+    {
+      "path": "final/documentation-tests.log",
+      "bytes": 1055,
+      "sha256": "fbb6599e21f96418e6ab8c334cc046c3b3444630c2ad5f7a15a48b1990e37b35",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/documentation-tests.log"
+    },
+    {
+      "path": "final/merge-preflight.json",
+      "bytes": 177611,
+      "sha256": "35830f7bd75065ed176ba7b01ba4e00aa96efd3a66192b2a9b99bc04c1ac59ea",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/merge-preflight.json"
+    },
+    {
+      "path": "final/merge-request.json",
+      "bytes": 166,
+      "sha256": "8d3c86526048dde8b9a76058b3ef18075d22f6bcac89a48e0b8fcfa18d800eba",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/merge-request.json"
+    },
+    {
+      "path": "final/merge-result.json",
+      "bytes": 109,
+      "sha256": "fcfed4f5f240a2d23e46abd54ded8a3d51fffda12ab24cfd30a862bbcf5b5e7b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/merge-result.json"
+    },
+    {
+      "path": "final/readme-cn-commit.json",
+      "bytes": 311,
+      "sha256": "2ff3b322e5b9c1f46db8671543f46bb1714993a771c11853adcab81e24b5bc33",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/readme-cn-commit.json"
+    },
+    {
+      "path": "final/readme-cn-commit.log",
+      "bytes": 491,
+      "sha256": "b4180ec22c41097a229e95fa1c80ee35194fb6b834e1edd3ea3c40a93169a857",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/readme-cn-commit.log"
+    },
+    {
+      "path": "final/source-commit-01.json",
+      "bytes": 361,
+      "sha256": "e6a8c8a407158b4dd517894d57b5cafbb48b1fefac4691306b9727565538a6c0",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/source-commit-01.json"
+    },
+    {
+      "path": "final/source-commit-01.log",
+      "bytes": 525,
+      "sha256": "1b2ff6dc7a166961fafd588a3d7bfb9bd6936922a596973af2d11c37953fc58a",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/source-commit-01.log"
+    },
+    {
+      "path": "final/source-commit-02.json",
+      "bytes": 361,
+      "sha256": "841e3553ff7c3a38ff1a9d49ddb7a32bcf0ee44baf19198c3bb66b3d8eeca2f6",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/source-commit-02.json"
+    },
+    {
+      "path": "final/source-commit-02.log",
+      "bytes": 776,
+      "sha256": "19003a4289f30b8b9cafe3fad3ff335dd4e0244f7860a315941b7185427a2285",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/source-commit-02.log"
+    },
+    {
+      "path": "recovery/candidate-document-recovery-search.json",
+      "bytes": 2387,
+      "sha256": "1a959808f0b4e1ad1168ac66dbf1c56e2391ab0ed9bc68f1b2f99bf5a2c21d53",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/candidate-document-recovery-search.json"
+    },
+    {
+      "path": "recovery/capsule-verification.json",
+      "bytes": 226,
+      "sha256": "a0e6b1fc7dd9eb08efcbc93cecdfa2d24db9390580b802a6bb56372f0801f701",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/capsule-verification.json"
+    },
+    {
+      "path": "recovery/consolidation-pr-close-plan.json",
+      "bytes": 6617,
+      "sha256": "f0ab76a305f5cce0fdfb87ba14261b5ac41957138dd820848a9e511348550a1e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/consolidation-pr-close-plan.json"
+    },
+    {
+      "path": "recovery/download-observations.json",
+      "bytes": 2011,
+      "sha256": "33e305308ed40c23a653d7f3c3617c85de36408a4881942dfadb95db64629d37",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/download-observations.json"
+    },
+    {
+      "path": "recovery/exclusions.json",
+      "bytes": 1353,
+      "sha256": "a645356abd70168e0720beed74e47a6a938c835ea922bae92d0519de4883d91e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/exclusions.json"
+    },
+    {
+      "path": "recovery/historical-candidate-availability.json",
+      "bytes": 7891,
+      "sha256": "0243aa72eb2f933b1b69c7cc6fd6c87dec69b2660efceeadb3722db0b7d8ff11",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/historical-candidate-availability.json"
+    },
+    {
+      "path": "recovery/independent-release-source-review-v1.json",
+      "bytes": 4808,
+      "sha256": "4e87ac344b0b8d171da1d20fe0abfd95d1ece8939d48826ace48f125d74dc500",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/independent-release-source-review-v1.json"
+    },
+    {
+      "path": "recovery/independent-release-source-review-v2.json",
+      "bytes": 6047,
+      "sha256": "c4a0830038fafb609af13d5480c3c9a399496606beeaa861727d2ea0961f97c4",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/independent-release-source-review-v2.json"
+    },
+    {
+      "path": "recovery/independent-release-source-review-v3.json",
+      "bytes": 7223,
+      "sha256": "29a3f1c1524e459144b59672a658bff2cdb1d757de9aeeb24eb9e6df0f0acf4d",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/independent-release-source-review-v3.json"
+    },
+    {
+      "path": "recovery/independent-release-source-review.json",
+      "bytes": 7847,
+      "sha256": "8ed41ae1f952bc0f8e67349be9755dcd76de4d312832f46bcbc8e397798c7fc8",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/independent-release-source-review.json"
+    },
+    {
+      "path": "recovery/original-relocation.json",
+      "bytes": 8348,
+      "sha256": "b6bfe2e06cd8d9636f2ac84a36e9bf88371f65a1481c3527e94babe9f8c82624",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/original-relocation.json"
+    },
+    {
+      "path": "recovery/qualified-payload-recovery-search.json",
+      "bytes": 24479,
+      "sha256": "d3ceb15a161d6db03e5c262c171f8d72a8d44ff343a13d5303266dd3e60263f2",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/qualified-payload-recovery-search.json"
+    },
+    {
+      "path": "recovery/surviving-original-candidate-receipts.tar.gz",
+      "bytes": 453229,
+      "sha256": "bd221abcac387e54d444e5287ecf97af1cf6975d39e057382351b4ce17227f08",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/surviving-original-candidate-receipts.tar.gz"
+    },
+    {
+      "path": "recovery/surviving-receipts-index.json",
+      "bytes": 151870,
+      "sha256": "2c2a36cf4f46a7aa9dc53d077fde42d966413fbcb085333aa51d24beb52cef73",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/surviving-receipts-index.json"
+    },
+    {
+      "path": "recovery/surviving-receipts-verification.json",
+      "bytes": 412,
+      "sha256": "510d0fff218b02a7d00c27ff0d0e6aa097e268dc68cfcad4c693e0461a7507a6",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/recovery/surviving-receipts-verification.json"
+    },
+    {
+      "path": "reviewed-source/.github/workflows/README.md",
+      "bytes": 8158,
+      "sha256": "71ad2a4d16514dead56b6dfb0d0155c27d02d4005c544a3c39195e60a201fb5b",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:.github/workflows/README.md"
+    },
+    {
+      "path": "reviewed-source/.github/workflows/docs-build.yml",
+      "bytes": 5137,
+      "sha256": "d6c2c0f3003cc4a50c8c970482e3dc3a8736922f058317856d8bab34c30e518d",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:.github/workflows/docs-build.yml"
+    },
+    {
+      "path": "reviewed-source/.github/workflows/release.yml",
+      "bytes": 10104,
+      "sha256": "8d47cd452a30ffeed864b4360881604e35140d3acf689a528eba9924929e007e",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:.github/workflows/release.yml"
+    },
+    {
+      "path": "reviewed-source/.github/workflows/test_release.py",
+      "bytes": 16298,
+      "sha256": "7e90fb3328365ed32e3a27d55c820e2dc8103d13ed36f4ac48fbdeadb90c80e2",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:.github/workflows/test_release.py"
+    },
+    {
+      "path": "reviewed-source/CMakeLists.txt",
+      "bytes": 6509,
+      "sha256": "0dda335be3bc2b8b7d9a99a3998bbcac9d9a87da501580155416683dedaefc26",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:CMakeLists.txt"
+    },
+    {
+      "path": "reviewed-source/Doxyfile",
+      "bytes": 1930,
+      "sha256": "7749c076904f6a03351b4e23f9eaa0c3231e1e08e537436eb990c950bbae5f09",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:Doxyfile"
+    },
+    {
+      "path": "reviewed-source/README_CN.md",
+      "bytes": 4478,
+      "sha256": "abe219533ffaf64ccf46bb792f8bc395b34c793913158717fa2244d86820227f",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:README_CN.md"
+    },
+    {
+      "path": "reviewed-source/cmake/package/package_source_sdk.py",
+      "bytes": 42023,
+      "sha256": "f6472a90b69e9ec6b8f38a2f3aa170c1ab1a5bd7d4c9047ced372cfe9b990704",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:cmake/package/package_source_sdk.py"
+    },
+    {
+      "path": "reviewed-source/cmake/package/verify_consumers.py",
+      "bytes": 15879,
+      "sha256": "856615c6a107dcc3b894536ebd69b9dc8a530ba18f3bd05800bf7be4daded11d",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:cmake/package/verify_consumers.py"
+    },
+    {
+      "path": "reviewed-source/dependencies/platform-compatibility.json",
+      "bytes": 585,
+      "sha256": "8faa8abddd4a77356fa256a41eaad163cd5b2654f5b7d2931cf1ce24cba4f8d3",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:dependencies/platform-compatibility.json"
+    },
+    {
+      "path": "reviewed-source/tools/configure/metadata.py",
+      "bytes": 5036,
+      "sha256": "7ec12432a54dbc98d5ef833b93fabe754c1f6eab0ec4b25c9e407986c1d2e193",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:tools/configure/metadata.py"
+    },
+    {
+      "path": "reviewed-source/tools/documentation/check.py",
+      "bytes": 21860,
+      "sha256": "6b547f1046b64f59a7781c857bc9d172ed977edc1b8298f05fdd1edaf1351ee3",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:tools/documentation/check.py"
+    },
+    {
+      "path": "reviewed-source/tools/documentation/delivery.py",
+      "bytes": 52391,
+      "sha256": "48136e07ca7e5fce3553e4f9a55adb681bc1a43bb59fac4aa75febd623ac06c4",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:tools/documentation/delivery.py"
+    },
+    {
+      "path": "reviewed-source/tools/documentation/test_check.py",
+      "bytes": 14610,
+      "sha256": "b09fb6e360995396c17c76a35d57155e576d37c89660ad37bbe6bbf2de7212ad",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:tools/documentation/test_check.py"
+    },
+    {
+      "path": "reviewed-source/tools/release/delivery.py",
+      "bytes": 23650,
+      "sha256": "eed241bdd85cd40f29f13bfd54fe9419d8cc42fa3cc82efe6b1133c348449c39",
+      "origin_path": "git:58297516d707fdee117bd27b5df6af09d72edd2e:tools/release/delivery.py"
+    },
+    {
+      "path": "source-commit-message.txt",
+      "bytes": 1057,
+      "sha256": "47089d08bf1bf243306cc8bdfe26ab6a580e294b253c38e55567188e7e12daed",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/source-commit-message.txt"
+    },
+    {
+      "path": "version/assigned-unittests.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/assigned-unittests.exit"
+    },
+    {
+      "path": "version/assigned-unittests.log",
+      "bytes": 174,
+      "sha256": "335f4539de2940d713d63b86ec20e963ec57633930a1ef097e28d96ef385cf92",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/assigned-unittests.log"
+    },
+    {
+      "path": "version/green-bootstrap-strict.log",
+      "bytes": 295,
+      "sha256": "df4749f5b0ffa36530fb2d0402c8ca2fe81271c52fb6dfee39670973e38f2d84",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/green-bootstrap-strict.log"
+    },
+    {
+      "path": "version/green-bootstrap.log",
+      "bytes": 295,
+      "sha256": "aac80b7d76fb0bac524b062063716050e17518470754ee890e1cb1dee571a731",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/green-bootstrap.log"
+    },
+    {
+      "path": "version/green-final-sdk.log",
+      "bytes": 491,
+      "sha256": "a165a0e57bf1c792c7bc02f74907ab7355472c5a3df223657142a7614bcfcb8b",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/green-final-sdk.log"
+    },
+    {
+      "path": "version/green-final.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/green-final.exit"
+    },
+    {
+      "path": "version/green-final.log",
+      "bytes": 2623,
+      "sha256": "e14635b9b049645730e56795d017bf1882052a7e20fb7802991cb5a764ca9a97",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/green-final.log"
+    },
+    {
+      "path": "version/green-sdk.log",
+      "bytes": 2623,
+      "sha256": "c42cb2d1e3c37a25ec6bfef77b2f0176593c7b0315fc8d7582666e43f7fcd592",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/green-sdk.log"
+    },
+    {
+      "path": "version/publication-unittests.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/publication-unittests.exit"
+    },
+    {
+      "path": "version/publication-unittests.log",
+      "bytes": 264,
+      "sha256": "589226ebd9c9880f5e73ba31fcaf86c10c685cc55a3baf3c630240c38436a1ab",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/publication-unittests.log"
+    },
+    {
+      "path": "version/red.log",
+      "bytes": 968,
+      "sha256": "0c4f81467d12f81095bace8bcd366e56542767f5db81fb7b1789e0236fa2dfe2",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/version/red.log"
+    },
+    {
+      "path": "workflow/codeql-import-style-report.json",
+      "bytes": 734,
+      "sha256": "b12a48e4b98566cadd3f39e4de42fae38bbbf8f665cbfdc5c70233ef4490f9cc",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/codeql-import-style-report.json"
+    },
+    {
+      "path": "workflow/codeql-import-workflows-green.log",
+      "bytes": 137,
+      "sha256": "22f2de07a1cd91bdddb404807e0cf734c2c01359269adfc322e229bbb5d2cbf4",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/codeql-import-workflows-green.log"
+    },
+    {
+      "path": "workflow/codeql-import-workflows-report.json",
+      "bytes": 190,
+      "sha256": "6e78c0ed8c999642f6ab7d7b6b56cb5f06566e2b02326db875dedee9715eb881",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/codeql-import-workflows-report.json"
+    },
+    {
+      "path": "workflow/full-ci-evidence-red.log",
+      "bytes": 2980,
+      "sha256": "fa15752c3479a04ebb47b0536480b158cb2ad1ebd9f59441f3f63ac27b5bff93",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/full-ci-evidence-red.log"
+    },
+    {
+      "path": "workflow/green-first.log",
+      "bytes": 3583,
+      "sha256": "0b89989ec823bd3fce0330ec0f26edf70e85e3c2f52d915aa8aefb795dea2132",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/green-first.log"
+    },
+    {
+      "path": "workflow/green-second.log",
+      "bytes": 1014,
+      "sha256": "13321642bd5e4a951addc3db0b0f5007bc6c2dbc2df683b549005e80fa77dc5f",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/green-second.log"
+    },
+    {
+      "path": "workflow/hidden-upload-red.log",
+      "bytes": 2200,
+      "sha256": "c5ea8109e53b9de992b85d63c965908fa1d0834a7f916bed71987f033b36fc94",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/hidden-upload-red.log"
+    },
+    {
+      "path": "workflow/prior-ci-artifacts.json",
+      "bytes": 19890,
+      "sha256": "81188b253093caf8720b3810fd1fd39c3fc62c9ccc82d5e5b00c19fce2b0769e",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/prior-ci-artifacts.json"
+    },
+    {
+      "path": "workflow/red.log",
+      "bytes": 3353,
+      "sha256": "20a757ad095fde4f857a673b58f4aca63531c0d678b1798ae64bd14cd42d5b8f",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/red.log"
+    },
+    {
+      "path": "workflow/style-report.json",
+      "bytes": 194,
+      "sha256": "360c8a5411f6a58b19c7275c1c629f40a59ceeabd7097b348219732939984b26",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/style-report.json"
+    },
+    {
+      "path": "workflow/workflows-green.log",
+      "bytes": 137,
+      "sha256": "3adeb8c372d42f78c448d0bc19034e896f5acb369e96946646a523a3a14e0af9",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/workflows-green.log"
+    },
+    {
+      "path": "workflow/workflows-report.json",
+      "bytes": 190,
+      "sha256": "6e78c0ed8c999642f6ab7d7b6b56cb5f06566e2b02326db875dedee9715eb881",
+      "origin_path": "/tmp/nexus-release-0.1.0-20261015/workflow/workflows-report.json"
+    }
+  ],
+  "member_count": 385,
+  "actual_pot_members": 194
+}
