@@ -203,7 +203,7 @@ jobs:
 
   publish:
     needs: [guard, source-sdk]
-    if: inputs.publish && needs.guard.result == 'success' && needs.source-sdk.result == 'success'
+    if: ${{ !cancelled() && inputs.publish && needs.guard.result == 'success' && needs.source-sdk.result == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:

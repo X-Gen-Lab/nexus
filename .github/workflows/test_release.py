@@ -6,6 +6,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import shlex
 import shutil
 import subprocess
@@ -157,6 +158,61 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
                 "GITHUB_SHA": "b" * 40}, capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Standalone qualification", result.stderr)
+
+    def test_publisher_runs_after_qualified_sdk_with_skipped_transitive_jobs(self):
+        document = workflow()["jobs"]
+        condition = document["publish"]["if"].strip()
+        condition = condition.removeprefix("${{").removesuffix("}}").strip()
+        ancestors = set()
+
+        def visit(job):
+            dependencies = document[job].get("needs", [])
+            if isinstance(dependencies, str):
+                dependencies = [dependencies]
+            for dependency in dependencies:
+                if dependency not in ancestors:
+                    ancestors.add(dependency)
+                    visit(dependency)
+
+        visit("publish")
+        # Actual run 38686564636: direct dependencies succeeded, while reusable
+        # qualification ancestors were deliberately skipped after full CI.
+        observed = {job: "success" for job in ancestors}
+        observed.update(platform="skipped", contracts="skipped")
+
+        def admitted(publishing, results, cancelled=False):
+            # GitHub adds success() when an expression has no status function;
+            # skipped transitive dependencies then short-circuit the job.
+            if not re.search(r"\b(?:always|success|failure|cancelled)\s*\(", condition):
+                if any(results[job] != "success" for job in ancestors):
+                    return False
+            for term in re.split(r"\s*&&\s*", condition.strip()):
+                if term == "always()":
+                    continue
+                if term == "!cancelled()":
+                    if cancelled:
+                        return False
+                    continue
+                if term == "inputs.publish":
+                    if not publishing:
+                        return False
+                    continue
+                comparison = re.fullmatch(r"needs\.([\w-]+)\.result == '([\w]+)'", term)
+                self.assertIsNotNone(comparison, "Unsupported workflow condition")
+                job, expected = comparison.groups()
+                if results[job] != expected:
+                    return False
+            return True
+
+        self.assertTrue(admitted(True, observed),
+                        "Qualified SDK must reach publication despite skipped ancestors")
+        self.assertFalse(admitted(False, observed))
+        self.assertFalse(admitted(True, observed, cancelled=True),
+                         "Manual cancellation must prevent publication")
+        for job in ("guard", "source-sdk"):
+            for result in ("failure", "cancelled", "skipped"):
+                with self.subTest(job=job, result=result):
+                    self.assertFalse(admitted(True, {**observed, job: result}))
 
 
 class ConsumerTransportTests(unittest.TestCase):
