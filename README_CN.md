@@ -39,8 +39,9 @@ IRQ／DMA 的有限与连续模式是明确选择，具有各自的缓冲贷款�
 - [精确支持与资格范围](docs/reference/platforms/support.md)。
 - [TDD 和正常 commit 门禁](docs/development/workflow.md)。
 
-网站通过 gettext／PO 提供关键路径中文翻译，并显示真实原文、缺译或过期状态。
-GitHub 正文采用英语 canonical source；[文档入口](docs/index.md)提供统一任务导航。
+当前维护正文通过 gettext／PO 提供完整中英双语，并逐页显示实际语言和翻译状态。
+每页保留一份英语或中文 canonical source，另一语言由已独立审查的 catalog 派生；
+[文档入口](docs/index.md)提供统一任务导航。
 原始[设计合同](docs/design/README.md)和[交付记录](docs/delivery/README.md)保留权威。
 安装、构建与测试命令见[英文 README](README.md)，命令从仓库根执行。
 
