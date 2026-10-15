@@ -397,6 +397,66 @@
       "path": "docs-release-0.1.0-58297516d707-postintegration-restore/verify-remote-restore.py",
       "bytes": 6104,
       "sha256": "cf42c0d7a5551586181a34cc302c0dbc82ea34e2dbb7318b6fa9c393d1966443"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/README.txt",
+      "bytes": 2240,
+      "sha256": "bb1db08e03c164d1e16ae3277ccb51df3d6be6714e001aafaa54bf1d00177cd7"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/SHA256SUMS",
+      "bytes": 1056,
+      "sha256": "4dff7b1f16325e5fb1c16acb036b92da6dfc168c6a91f3d14a18cf4cced37669"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-delivery-final.json",
+      "bytes": 8674,
+      "sha256": "37daa9d328ef6d386eff5b61ad58dfe4f4c10fc8d4879be4309c0490a5f68ebb"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-main-ci-evidence-manifest.json",
+      "bytes": 11132,
+      "sha256": "d530b9ce8484428f88dc7d1e13293913d979dec161afebed85992080f82b707a"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-main-ci-evidence.tar.gz",
+      "bytes": 2163380,
+      "sha256": "3a6e286f3ccfd2dbbfb18ecf63871ebf3d71ae046db7b06f64925ef2f6156d3e"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-pr3-ci-evidence-manifest.json",
+      "bytes": 11288,
+      "sha256": "b31a1500f6e135682ce7bdee668b9cdcd62bdea209ae03a649e0e23420f2a786"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-pr3-ci-evidence.tar.gz",
+      "bytes": 2172960,
+      "sha256": "370afb8a8766101623201506a064e0ad792d38123c1b9b6c8d46bc521f5494e3"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/independent-allowlist-review.json",
+      "bytes": 810,
+      "sha256": "8da7a4638e7618adc4528d14f0d170b24a7eec7012253341ea2a49cedab47d8e"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/qualification-allowlist.json",
+      "bytes": 13858,
+      "sha256": "c2e5180813007c2c1f4f30e14d4926e51a6859cb36654ec48e9f1ca3d50e830f"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/qualification-evidence.tar.gz",
+      "bytes": 225281,
+      "sha256": "2c04d546f3403b0dbd67dd23fe8259c7266adbf821a0e7c103c75a280a8323a8"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/qualification-retention.json",
+      "bytes": 3062,
+      "sha256": "bbbaef812aab2842ba1b0203cdf57029ecf4990455f095d82c47bb4d1ee14222"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/verify-qualification.py",
+      "bytes": 4798,
+      "sha256": "ccd29536d45ade421422bc801be199af052f5c9d9e2d46b579c288548c4d9718"
     }
   ],
   "physical_hil": "not_executed",

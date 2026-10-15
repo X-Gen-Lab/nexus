@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_0_1_0_examples_completed_delivery",
+  "status": "completed",
+  "created_at": "2026-10-15T05:12:30.533044+00:00",
+  "repository": "X-Gen-Lab/nexus-examples",
+  "pull_request": {
+    "number": 3,
+    "url": "https://github.com/X-Gen-Lab/nexus-examples/pull/3",
+    "release_branch": "codex/release-0.1.0",
+    "reviewed_head": "601580990df0e8232c3b6f3cc641cc3a8ee30ab8",
+    "merge_performed_by": "root",
+    "preserving_history_merge": true
+  },
+  "actual_main": {
+    "commit": "70593409c8a5afae142ae6fc8e94510903043ae1",
+    "tree": "aa78bbf2df0bdebb523a9d03f93a4ddaa24fd5c1",
+    "matches_reviewed_source_and_local_matrix": true
+  },
+  "nexus_source_sdk": {
+    "version": "0.1.0",
+    "commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+    "tree": "06feab8ef3e89df60b4cdc5671c66ab0e3c08c21",
+    "factory_abi_epoch": 1,
+    "assembly_authoring_schema": 2,
+    "source_version_matching": "exact",
+    "binary_abi": "unsupported"
+  },
+  "examples_independent_project_version": "1.0.0",
+  "validation": {
+    "python_tests": 44,
+    "native_ctest_entries": 8,
+    "google_programs": 3,
+    "google_cases": 43,
+    "all_test_failures_errors_skips_disabled": 0,
+    "arm_presets": 10,
+    "application_elf_bin_map_sets": 20,
+    "explicit_resource_budgets": 20,
+    "unbound_hil_plans": 10,
+    "local_matrix_source_tree": "aa78bbf2df0bdebb523a9d03f93a4ddaa24fd5c1",
+    "normal_hooks": "all_three_enabled_hooks_passed_no_bypass",
+    "local_matrix_rerun_after_merge": false
+  },
+  "ci": [
+    {
+      "role": "selected_pull_request_qualification",
+      "id": 38683631996,
+      "url": "https://github.com/X-Gen-Lab/nexus-examples/actions/runs/38683631996",
+      "event": "pull_request",
+      "head_commit": "601580990df0e8232c3b6f3cc641cc3a8ee30ab8",
+      "actual_checkout": "a35d5a28b21e661c67eb8ee566635cb9e0ef72f5",
+      "actual_checkout_tree": "aa78bbf2df0bdebb523a9d03f93a4ddaa24fd5c1",
+      "conclusion": "success",
+      "expected_jobs": 11,
+      "success": 11,
+      "failed_skipped_cancelled_jobs": 0,
+      "preserved_artifact_zips": 11,
+      "preserved_decoded_job_logs": 11
+    },
+    {
+      "role": "independent_actual_main_qualification",
+      "id": 38684311021,
+      "url": "https://github.com/X-Gen-Lab/nexus-examples/actions/runs/38684311021",
+      "event": "push",
+      "branch": "main",
+      "head_commit": "70593409c8a5afae142ae6fc8e94510903043ae1",
+      "actual_checkout": "70593409c8a5afae142ae6fc8e94510903043ae1",
+      "conclusion": "success",
+      "expected_jobs": 11,
+      "success": 11,
+      "failed_skipped_cancelled_jobs": 0,
+      "preserved_artifact_zips": 11,
+      "preserved_decoded_job_logs": 11
+    },
+    {
+      "role": "redundant_same_head_push",
+      "id": 38683610438,
+      "event": "push",
+      "head_commit": "601580990df0e8232c3b6f3cc641cc3a8ee30ab8",
+      "conclusion": "cancelled",
+      "selection_and_cancel_requested_by": "root",
+      "decision_receipt": "/tmp/nexus-release-0.1.0-20261015/examples-integration/ci-selection.json"
+    }
+  ],
+  "known_failures_preserved": [
+    {
+      "stage": "formal_pin_migration_precondition",
+      "cause": "Before the authorized pin update, formal source checker correctly rejected the old lock against final Nexus C.",
+      "evidence": "/tmp/nexus-release-0.1.0-20261015/examples-integration/preparation-commands.json"
+    },
+    {
+      "stage": "first_local_matrix",
+      "cause": "Independent local dependency clone had local origin URLs; modern CMSIS provenance checker required authored official URLs. Only isolated Git configuration origins were restored.",
+      "evidence": "/tmp/nexus-release-0.1.0-20261015/examples-integration/matrix-execution.json",
+      "repair": "/tmp/nexus-release-0.1.0-20261015/examples-integration/official-dependency-origin-restoration.json"
+    },
+    {
+      "stage": "first_normal_commit",
+      "cause": "Virtualenv hook environment installation failed with missing pip.__main__ before hook execution.",
+      "evidence": "/tmp/nexus-release-0.1.0-20261015/examples-integration/normal-commit.json",
+      "repair": "Unchanged normal hooks passed using fresh isolated VIRTUALENV_OVERRIDE_APP_DATA; successful attempt-2 receipt preserved."
+    }
+  ],
+  "original_dirty_checkout": {
+    "path": "/workspace/nexus-examples",
+    "checkout_status_index_hooks_preserved": true,
+    "receipt": {
+      "path": "/tmp/nexus-release-0.1.0-20261015/examples-main-ci/original-checkout-preservation.json",
+      "bytes": 1645,
+      "sha256": "7ad5f06205eb6e502b99691e052d1ed22807cd37a43df91202a7543c6025d11a"
+    }
+  },
+  "isolated_worktree": {
+    "path": "/tmp/nexus-release-0.1.0-20261015/examples",
+    "head": "70593409c8a5afae142ae6fc8e94510903043ae1",
+    "detached": true,
+    "outer_and_sdk_clean": true
+  },
+  "capsules": [
+    {
+      "kind": "local_source_matrix_hooks",
+      "archive": {
+        "path": "/tmp/nexus-release-0.1.0-20261015/examples-local-validation.tar.gz",
+        "bytes": 18242646,
+        "sha256": "dcc4e906020a7b240e221795d65dcd925f576f049594d7042e1338b2252b904e"
+      },
+      "manifest": {
+        "path": "/tmp/nexus-release-0.1.0-20261015/examples-local-validation-manifest.json",
+        "bytes": 44238,
+        "sha256": "a6858f504ebcad57ae244a1923d08abb9610334bf53029a2f5600153b45c41c1"
+      }
+    },
+    {
+      "kind": "pull_request_ci",
+      "archive": {
+        "path": "/tmp/nexus-release-0.1.0-20261015/examples-pr3-ci-evidence.tar.gz",
+        "bytes": 2172960,
+        "sha256": "370afb8a8766101623201506a064e0ad792d38123c1b9b6c8d46bc521f5494e3"
+      },
+      "manifest": {
+        "path": "/tmp/nexus-release-0.1.0-20261015/examples-pr3-ci-evidence-manifest.json",
+        "bytes": 11288,
+        "sha256": "b31a1500f6e135682ce7bdee668b9cdcd62bdea209ae03a649e0e23420f2a786"
+      }
+    },
+    {
+      "kind": "actual_main_ci",
+      "archive": {
+        "path": "/tmp/nexus-release-0.1.0-20261015/examples-main-ci-evidence.tar.gz",
+        "bytes": 2163380,
+        "sha256": "3a6e286f3ccfd2dbbfb18ecf63871ebf3d71ae046db7b06f64925ef2f6156d3e"
+      },
+      "manifest": {
+        "path": "/tmp/nexus-release-0.1.0-20261015/examples-main-ci-evidence-manifest.json",
+        "bytes": 11132,
+        "sha256": "d530b9ce8484428f88dc7d1e13293913d979dec161afebed85992080f82b707a"
+      }
+    }
+  ],
+  "independent_reviews": [
+    {
+      "path": "/tmp/nexus-release-0.1.0-20261015/cleanup-plan/examples-independent-pin-docs-review.json",
+      "bytes": 3237,
+      "sha256": "c1763e577ea0b943b1f3158c5866fe9f4a323f76d29bb91253a45a9e257953c8"
+    },
+    {
+      "path": "/tmp/nexus-release-0.1.0-20261015/examples-integration/independent-final-review.json",
+      "bytes": 27316,
+      "sha256": "f1a02aaaadf913ab6ee102f4c5456aceeeb69be76d7ce00686b7f1596c53ace2"
+    },
+    {
+      "path": "/tmp/nexus-release-0.1.0-20261015/examples-integration/independent-pr-ci-review.json",
+      "bytes": 9280,
+      "sha256": "b5473202384966ec379746ffa5e026303609950bd7216659684ab95b04aaa016"
+    },
+    {
+      "path": "/tmp/nexus-release-0.1.0-20261015/examples-main-ci/independent-main-ci-review.json",
+      "bytes": 16962,
+      "sha256": "400e9b94d263a384c1846b1b7d3558a8324f34191bba473f448b5c3ffc341bd3"
+    }
+  ],
+  "admission_receipts": [
+    {
+      "path": "/tmp/nexus-release-0.1.0-20261015/examples-integration/pr3-merge-admission.json",
+      "bytes": 5914,
+      "sha256": "8201e10d97cebfc4dfcadecf116338ae590e07a21ec7bd6666fe1d42b84bffb3"
+    },
+    {
+      "path": "/tmp/nexus-release-0.1.0-20261015/examples-main-ci/main-qualification-admission.json",
+      "bytes": 5241,
+      "sha256": "1abb79ab6dce4bf5f699512bddc798effea495bdb522f651a8129bdaed363a51"
+    }
+  ],
+  "semantic_ci_verifications": [
+    {
+      "path": "/tmp/nexus-release-0.1.0-20261015/examples-integration/pr-ci-artifact-verification.json",
+      "bytes": 65043,
+      "sha256": "097f359df66ad82eb2872c29af3960cb4cd82730bba9c13929937afec491618d"
+    },
+    {
+      "path": "/tmp/nexus-release-0.1.0-20261015/examples-main-ci/main-ci-artifact-verification.json",
+      "bytes": 64955,
+      "sha256": "f2e69ee73e0dec80df57d6edcf54fb2243d781ba35eda13922433068136c22ea"
+    }
+  ],
+  "scope_limits": {
+    "physical_hil": "not_executed",
+    "offline_reproducibility": "not_claimed",
+    "local_build_reuse": "Incremental builds reused pinned dependencies/tools; no clean-root claim.",
+    "qualification": "Host software execution, actual ARM linking and static ELF resource admission; no timing/electrical/reset/power-cut/physical-board claim.",
+    "other_pull_requests": "This agent did not merge or close PR1 or PR2; root owns their final management."
+  }
+}

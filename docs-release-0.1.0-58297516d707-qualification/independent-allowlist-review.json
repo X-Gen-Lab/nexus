@@ -1,0 +1,16 @@
+{
+  "kind": "independent_read_only_qualification_allowlist_review",
+  "reviewer": "/root/release_branch_audit/addendum_allowlist_review",
+  "status": "passed",
+  "allowlist_sha256": "c2e5180813007c2c1f4f30e14d4926e51a6859cb36654ec48e9f1ca3d50e830f",
+  "packed_files": 58,
+  "standalone_examples": 5,
+  "all_selected_sizes_and_hashes_match": true,
+  "exactly_eight_authorized_platform_monitor_files": true,
+  "new_examples_ci_members_verified": [
+    51,
+    51
+  ],
+  "scope_findings": "Actual main CI, Security, Pages and examples success are distinguished from failed SDK publication. No physical HIL or zero-alert claim. The optional original failed-attestation ZIP was absent; original safe identity and Python-version file are retained without claiming ZIP retention.",
+  "mutations_by_reviewer": false
+}
