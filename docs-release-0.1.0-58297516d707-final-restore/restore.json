@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "independent_final_delivery_asset_restoration",
+  "status": "passed",
+  "started_at_utc": "2026-10-15T05:58:12.808926+00:00",
+  "finished_at_utc": "2026-10-15T05:58:15.797158+00:00",
+  "input_asset_commit": "0928f73809ca6bd3c9cae1f7d29f308db6bb201f",
+  "input_asset_prefix": "docs-release-0.1.0-58297516d707-final",
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "builder_commit": "51bebd47dd63dce90c7fded1efafef27cd20fd3e",
+  "asset_registry_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/assets.json",
+  "asset_registry_sha256": "22fde6e72362e99c86b3a71ab24d0ac7a9440077c72e826d104a0ca7855f2380",
+  "files": [
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/README.txt",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/docs-release-0.1.0-58297516d707-final/README.txt",
+      "http_status": 200,
+      "bytes": 4696,
+      "sha256": "c285987ff6bfb3bfd396801c4714307736caa9153d3dd571df40685bfb14a61f"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/SHA256SUMS",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/docs-release-0.1.0-58297516d707-final/SHA256SUMS",
+      "http_status": 200,
+      "bytes": 732,
+      "sha256": "f4c80d75961f1529bcdc9be96d2c4474ce124b25f156e95d9c62a99523420796"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/final-allowlist.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/docs-release-0.1.0-58297516d707-final/final-allowlist.json",
+      "http_status": 200,
+      "bytes": 26762,
+      "sha256": "36a7037edb9f06df7524a9fffcb4d7b4ea941c53900de95d386d51b91a6f2f95"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/final-evidence.tar.gz",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/docs-release-0.1.0-58297516d707-final/final-evidence.tar.gz",
+      "http_status": 200,
+      "bytes": 5491976,
+      "sha256": "39a5c59365372a189e2bb64f9f5a4f82ae378697a651dfec29e4f6a3f24fe91e"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/final-retention.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/docs-release-0.1.0-58297516d707-final/final-retention.json",
+      "http_status": 200,
+      "bytes": 3227,
+      "sha256": "51a9c018e71673fc8111e268ff301766142afbc1bd24230addf2686ddaa56369"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/independent-allowlist-review.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/docs-release-0.1.0-58297516d707-final/independent-allowlist-review.json",
+      "http_status": 200,
+      "bytes": 1282,
+      "sha256": "cb9ff426a432d33ac425bd602450a17d53b1e0fb8ff7dbdd1ba218ca84b8fd76"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/independent-release-acceptance.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/docs-release-0.1.0-58297516d707-final/independent-release-acceptance.json",
+      "http_status": 200,
+      "bytes": 4826,
+      "sha256": "fdd61d76e69461905171c53d005720ead3b67ff49a14a7abeec3cf1705fb5b47"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/software-delivery-completion.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/docs-release-0.1.0-58297516d707-final/software-delivery-completion.json",
+      "http_status": 200,
+      "bytes": 6999,
+      "sha256": "6d7349f85ac85886048f318bec2db27c2c5e98b7fa274ab37dbb76bfc894be2a"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-final/verify-final-delivery.py",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/docs-release-0.1.0-58297516d707-final/verify-final-delivery.py",
+      "http_status": 200,
+      "bytes": 8276,
+      "sha256": "14fdef08a790ada95f62dd8b7c17c8d3fbc40bad059126d778059d0dafd7ac4f"
+    }
+  ],
+  "reader_execution": {
+    "returncode": 0,
+    "stdout": "{\"status\": \"passed\", \"source_commit\": \"58297516d707fdee117bd27b5df6af09d72edd2e\", \"builder_commit\": \"51bebd47dd63dce90c7fded1efafef27cd20fd3e\", \"final_evidence_members\": 98, \"raw_hook_members\": [14293, 15733], \"restoration_regular_files\": 1063, \"restoration_directories\": 887, \"actual_r3_required_success_jobs\": 3, \"actual_public_release_assets\": 13, \"fresh_profiles_images_commands\": [7, 10, 28], \"closed_superseded_prs\": 4, \"exact_lease_deletions\": 6, \"scope\": \"Byte restoration and retained software-preview observations only; no SDK test rerun, physical HIL, production qualification or new publication by this reader.\"}\n",
+    "stderr": ""
+  },
+  "final_evidence_members_verified": 98,
+  "sealed_restoration_regular_files_verified": 1063,
+  "sealed_restoration_directories_verified": 887,
+  "normal_hook_raw_archive_members_read": [
+    14293,
+    15733
+  ],
+  "member_observations_sha256": "8d0a37312d2d2ec3768ca17c3a9dca5e727cd4981bcb8333109d8c3f3b9b11b9",
+  "scope": "Actual immutable-URL HTTP download and byte restoration of final software-preview evidence. Retained records establish actual R3 public publication, independent public SDK crypto/C-blob/fresh-consumer acceptance and completed cleanup. This restoration performs no SDK build/test, cryptographic verifier rerun, remote mutation or new release publication.",
+  "public_release_body_final_evidence_link_patch": "separate root metadata receipt follows this HTTP restoration",
+  "physical_hil": "not_executed",
+  "production_qualification": false
+}

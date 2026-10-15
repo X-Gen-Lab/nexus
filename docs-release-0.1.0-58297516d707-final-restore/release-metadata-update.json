@@ -1,0 +1,97 @@
+{
+  "kind": "public_release_bilingual_evidence_links_metadata_update",
+  "status": "passed",
+  "recorded_at_utc": "2026-10-15T05:58:42.463025+00:00",
+  "release_id": 413457393,
+  "release_url": "https://github.com/X-Gen-Lab/nexus/releases/tag/v0.1.0",
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "final_evidence_data_commit": "0928f73809ca6bd3c9cae1f7d29f308db6bb201f",
+  "final_evidence_HTTP_restore_passed_before_update": true,
+  "metadata_only": true,
+  "immutable_assets_unchanged": [
+    {
+      "id": 642824245,
+      "name": "ci-jobs.json",
+      "size": 82701,
+      "digest": "sha256:06e11b66f1eff81ebf553e8c4cb18e669c88fd337aa241c23ec01a6031df8b19"
+    },
+    {
+      "id": 642824289,
+      "name": "ci-run.json",
+      "size": 12989,
+      "digest": "sha256:68a3ff74b6f1883295b0946a82f805ecdddb10c3918810d08762f3ac939702d7"
+    },
+    {
+      "id": 642824964,
+      "name": "delivery-workflow.json",
+      "size": 269831,
+      "digest": "sha256:49a3fa13ce4b6c7086f6ab03a12cfd3cb1d43d2bbdcc26b727429b0fc5e73d2a"
+    },
+    {
+      "id": 642824328,
+      "name": "docs-58297516d707.tar.gz",
+      "size": 8431142,
+      "digest": "sha256:e1c8a9939e8864a43d2a695bc70ad7b833cffa7df12b07b34d57d8e0cbc98f67"
+    },
+    {
+      "id": 642824403,
+      "name": "documentation-identity.json",
+      "size": 715352,
+      "digest": "sha256:4c33658d8e3759b1e7e3d77b222c621af9377a4fc47c573c552f433096ffaeaa"
+    },
+    {
+      "id": 642824443,
+      "name": "documentation-manifest.json",
+      "size": 289799,
+      "digest": "sha256:928b2154db3dcc48fdbb3569948d45ea0901ac2b2f24278bebd690ad4a0797e4"
+    },
+    {
+      "id": 642824473,
+      "name": "nexus-source-sdk-0.1.0.tar.gz",
+      "size": 29713849,
+      "digest": "sha256:b0fd698427ad0338621ec5974b96d3e6c7c488f461a629dd09f462ce11d657d7"
+    },
+    {
+      "id": 642824554,
+      "name": "nexus-verification-evidence-0.1.0.tar.gz",
+      "size": 114068057,
+      "digest": "sha256:285a012cc2b3a3b7f6095e60bc6687290b2b08192e39f7c9fd4f106dd10b473b"
+    },
+    {
+      "id": 642824988,
+      "name": "release-manifest.json",
+      "size": 2634,
+      "digest": "sha256:cec563e7391265973efd1b9b852220d97aab8d2f470fa4a2983f413aecad6d12"
+    },
+    {
+      "id": 642824827,
+      "name": "source-sdk-attestation.json",
+      "size": 10991,
+      "digest": "sha256:9507137296f8baefc636040c496d9e69b99c4a46db81b8780793372da65d04f1"
+    },
+    {
+      "id": 642824848,
+      "name": "source-sdk-consumers.json",
+      "size": 12727,
+      "digest": "sha256:5a1428df41055961b22d63e3069ab2bffd4815ce296e82f6941b0e272f323a68"
+    },
+    {
+      "id": 642824887,
+      "name": "source-sdk-identity.json",
+      "size": 1343190,
+      "digest": "sha256:c057b90b25cf89a7542fcbdca8faa752ff2f367dfba295c94f5f9ac551b8ba01"
+    },
+    {
+      "id": 642824930,
+      "name": "source-sdk-manifest.json",
+      "size": 748668,
+      "digest": "sha256:34ad1d538d2bac8cb92c1f64808df34723398f909da0b9e738f9e38de5783966"
+    }
+  ],
+  "asset_count": 13,
+  "tag_source_and_preview_flags_unchanged": true,
+  "before_body_sha256": "bced885f0c7253e9c328e46f75e4a9562b11e9f9452d936ca0388853af32e126",
+  "after_body_sha256": "d5428bb0412da3d30fe38a20d7a6255304a627c502c6d716d6b9dc4811517f50",
+  "actual_readback_body_matches": true,
+  "body": "Nexus 0.1.0 是嵌入式通用平台的 **Source SDK 开发者软件预览**。平台源码固定在 [`58297516d707`](https://github.com/X-Gen-Lab/nexus/commit/58297516d707fdee117bd27b5df6af09d72edd2e)，应用示例独立维护。\n\n- [双语在线文档](https://x-gen-lab.github.io/nexus/stable/) · [固定版本文档](https://x-gen-lab.github.io/nexus/versions/docs-58297516d707/)\n- [应用示例](https://github.com/X-Gen-Lab/nexus-examples) · [平台集成 PR #9](https://github.com/X-Gen-Lab/nexus/pull/9)\n- [源码 CI：29/29](https://github.com/X-Gen-Lab/nexus/actions/runs/38682470932) · [安全分析执行：4/4](https://github.com/X-Gen-Lab/nexus/actions/runs/38682470861) · [示例 CI：11/11](https://github.com/X-Gen-Lab/nexus-examples/actions/runs/38684311021)\n\n本页 13 个附件包含源码 SDK、双语离线文档、来源证明和原始软件证据。`release-manifest.json` 记录完整附件集合及 SHA-256。\n\n**独立下载验收已通过：**13 个附件全部核对；来源证明完成实际密码学验证；5,415 个原始源文件匹配固定源码与 9 个锁定依赖；SDK 移到包含空格的新路径后，7 个配置、10 个镜像、28 条命令全部成功，Native C／C++ 程序实际运行。\n\n[交付与独立恢复证据](https://github.com/X-Gen-Lab/nexus/tree/0928f73809ca6bd3c9cae1f7d29f308db6bb201f/docs-release-0.1.0-58297516d707-final) · [发布运行](https://github.com/X-Gen-Lab/nexus/actions/runs/38687802092)\n\n源码与发布构建器分开固定。`delivery-workflow.json` 记录两者身份；来源证明的签名工作流属于[构建器 `51bebd47`](https://github.com/X-Gen-Lab/nexus/commit/51bebd47dd63dce90c7fded1efafef27cd20fd3e)，SDK 源码另按固定提交逐项核验。\n\n物理实板 HIL 为 `not_executed`。本版本是软件预览，不构成生产资格、安全认证、签名固件或 LTS 承诺。详细范围和历史证据缺口见交付记录。\n\n---\n\nNexus 0.1.0 is a **Source SDK developer/software preview** of the common embedded platform. Source is fixed at `58297516d707fdee117bd27b5df6af09d72edd2e`; application examples live in a separate repository. The 13 assets include the SDK, bilingual offline documentation, provenance and raw software evidence. `release-manifest.json` binds the complete asset set and SHA-256 identities.\n\nIndependent public-download acceptance passed: all 13 assets matched; provenance was cryptographically verified; 5,415 original source files matched the fixed platform commit and nine locked dependencies. After relocating the downloaded SDK to a path containing spaces, seven configurations, ten images and all 28 commands succeeded, including actual execution of the Native C/C++ programs. See the evidence link above for raw records and restoration instructions.\n\n`delivery-workflow.json` distinguishes immutable SDK source from the independently versioned delivery builder. The provenance signer identifies builder `51bebd47dd63dce90c7fded1efafef27cd20fd3e`; SDK source is established separately against the fixed source commit.\n\nPhysical HIL remains `not_executed`. This preview is not production qualification, safety certification, signed firmware or an LTS promise. Detailed scope and historical evidence gaps remain explicit in the delivery records.\n"
+}
