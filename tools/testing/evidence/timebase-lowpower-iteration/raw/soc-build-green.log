@@ -1,0 +1,14 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/uart-iteration/generated/resolved.json
+-- Configuring done (1.1s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus/build/uart-iteration
+[1/7] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_test.dir/__/__/soc/stm32f407/timebase_lowpower.c.o
+[2/7] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_test.dir/timebase_soc_test.cpp.o
+[3/7] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_test.dir/timebase_soc_test.cpp.o
+[4/7] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_test.dir/__/__/soc/gd32f470/timebase_lowpower.c.o
+[5/7] Linking CXX executable bin/nexus_stm32f407_lowpower_test
+[6/7] Linking CXX executable bin/nexus_gd32f470_lowpower_test

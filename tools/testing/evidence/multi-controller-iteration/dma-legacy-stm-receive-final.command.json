@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-multi-controller-iteration/stm-uart_receive-legacy-test",
+    "--gtest_output=xml:tools/testing/evidence/multi-controller-iteration/stm-receive-legacy-final.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:26:55.765965+00:00",
+  "ended_at": "2026-10-11T19:26:55.769053+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-legacy-stm-receive-final.log"
+}

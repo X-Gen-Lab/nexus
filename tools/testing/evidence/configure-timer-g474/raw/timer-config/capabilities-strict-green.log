@@ -1,0 +1,12 @@
+test_actual_selected_timer_faces_use_real_public_types (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_actual_selected_timer_faces_use_real_public_types) ... ok
+test_commented_specialization_does_not_claim_a_definition (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_commented_specialization_does_not_claim_a_definition) ... ok
+test_conditional_duplicate_and_ambiguous_projection_are_not_guessed (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_conditional_duplicate_and_ambiguous_projection_are_not_guessed) ... ok
+test_conflicting_macro_identity_and_escaped_template_fail_closed (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_conflicting_macro_identity_and_escaped_template_fail_closed) ... ok
+test_literal_specialization_binds_actual_const_table_only (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_literal_specialization_binds_actual_const_table_only) ... ok
+test_macro_mentions_without_actual_table_definition_are_rejected (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_macro_mentions_without_actual_table_definition_are_rejected) ... ok
+test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 1.527s
+
+OK

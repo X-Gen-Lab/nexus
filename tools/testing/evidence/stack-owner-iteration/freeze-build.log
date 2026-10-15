@@ -1,0 +1,19 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/native-debug/generated/resolved.json
+-- Configuring done (0.9s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus/build/native-debug
+[1/12] Building C object core/CMakeFiles/nexus_core.dir/src/stack_observation.c.o
+[2/12] Linking C static library lib/libnexus_core.a
+[3/12] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_services_kernel_test.dir/freertos_stack_kernel_test.cpp.o
+[4/12] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_services_kernel_test.dir/__/__/os/freertos/stack_snapshot.c.o
+[5/12] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_services_kernel_test.dir/freertos_owner_endurance_test.cpp.o
+[6/12] Building CXX object tests/contracts/google/CMakeFiles/nexus_stack_observation_test.dir/stack_observation_test.cpp.o
+[7/12] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_stack_test.dir/__/__/os/freertos/stack_snapshot.c.o
+[8/12] Linking CXX executable bin/nexus_freertos_services_kernel_test
+[9/12] Linking CXX executable bin/nexus_stack_observation_test
+[10/12] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_stack_test.dir/freertos_stack_test.cpp.o
+[11/12] Linking CXX executable bin/nexus_freertos_stack_test

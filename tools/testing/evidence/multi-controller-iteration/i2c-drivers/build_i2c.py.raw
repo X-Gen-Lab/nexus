@@ -1,0 +1,21 @@
+from pathlib import Path
+import subprocess,sys
+root=Path('/workspace/nexus');out=Path('/workspace/nexus-multi-controller-iteration');mode,label,*option=sys.argv[1:]; sanitized=option==['san']
+config=out/('config-'+mode);config.mkdir(exist_ok=True)
+(config/'nexus_config.h').write_text('/* Explicit host-only CPU/IRQ probe; no platform or factory configuration. */\n#define NEXUS_IRQ_KERNEL_POLICY 2U\n#define NEXUS_IRQ_PRIORITY_BITS 4U\n#define NEXUS_IRQ_SYSCALL_PRIORITY 5U\n#define NEXUS_CPU_EXTERNAL_IRQ_COUNT '+('82U' if mode=='stm' else '91U')+'\n')
+family='stm32f407' if mode=='stm' else 'gd32f470'
+flags=(['-fsanitize=address,undefined','-fno-omit-frame-pointer','-g'] if sanitized else [])+['-Wall','-Wextra','-Werror','-Wpedantic','-Wconversion','-Wshadow','-include','tests/google/i2c_multi_controller_model.h']
+inc=['-Icore/include','-Iarch/include','-Iio/include','-Iio/private','-Isoc/common','-Isoc/'+family+'/private','-Itests/google','-Itests/contracts/gd32_model','-Itests/contracts/multi_controller']
+if mode=='stm':
+ flags+=['-DSTM32F407xx','-DNX_I2C_MULTI_STM32'];inc+=['-isystem','vendors/st/cmsis_device_f4/Include']
+else:
+ flags+=['-DGD32F470','-DHXTAL_VALUE=25000000','-Wno-int-to-pointer-cast'];inc+=['-isystem','vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include','-isystem','vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include']
+google=['-isystem','build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include','-isystem','build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include']
+objects=[]
+cflags=['-std=c11','-Wstrict-prototypes','-Wmissing-prototypes']
+extra_sources=[(p,'gcc',cflags) for p in ['core/src/request.c','core/src/time.c','io/src/i2c.c','io/src/dma.c','io/src/wake.c']]
+for source,compiler,extra in [('tests/google/i2c_multi_controller_test.cpp','g++',['-std=c++17',*google]),('soc/'+family+'/drivers/i2c_async.c','gcc',['-std=c11','-Wstrict-prototypes','-Wmissing-prototypes']),('soc/common/i2c_v1_async.c','gcc',['-std=c11','-Wstrict-prototypes','-Wmissing-prototypes'])]+extra_sources:
+ obj=out/(mode+('-san-' if sanitized else '-')+source.replace('/','-')+'.o')
+ subprocess.run([sys.executable,str(out/'run.py'),label+'-'+source.replace('/','-'),compiler,*flags,*inc,*extra,'-c',source,'-o',str(obj)],cwd=root,check=True);objects.append(str(obj))
+libs=['build/adc-iteration/lib/libgmock_main.a','build/adc-iteration/lib/libgmock.a','build/adc-iteration/lib/libgtest.a']
+subprocess.run([sys.executable,str(out/'run.py'),label+'-link','g++',*(['-fsanitize=address,undefined'] if sanitized else []),*objects,*libs,'-pthread','-o',str(out/(mode+('-i2c-san-test' if sanitized else '-i2c-test')))],cwd=root,check=True)

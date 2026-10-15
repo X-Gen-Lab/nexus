@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "python",
+    "/workspace/nexus-adc-iteration/cost.py"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T16:31:37.414453+00:00",
+  "ended_at": "2026-10-11T16:31:37.610150+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost.log"
+}

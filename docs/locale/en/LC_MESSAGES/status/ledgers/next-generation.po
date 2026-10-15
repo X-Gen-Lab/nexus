@@ -1,0 +1,1482 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 0e051631b1eb352f43bd868c61bb3e0efebc642dc7ec938570d4761e65454e43\n"
+
+msgid "原平台重构台账"
+msgstr "Original platform-reconstruction ledger"
+
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/next-generation-execution.csv>`。 源文件：`docs/design/next-"
+"generation-"
+"execution.csv`；SHA-256：`7ac51ba75151159ac854db5e5f5791652fab48827ea8d1373d87432ae5ad93e1`。"
+msgstr ""
+"This page is derived from the original CSV; it is not a new status "
+"authority, execution record or software qualification. Original IDs, order "
+"and all fields come from the {download}`original ledger <../../design/next-"
+"generation-execution.csv>`. Source: `docs/design/next-generation-"
+"execution.csv`; SHA-256: "
+"`7ac51ba75151159ac854db5e5f5791652fab48827ea8d1373d87432ae5ad93e1`."
+
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"Different ledgers overlap in scope; do not add their counts or calculate a "
+"project-wide completion rate. Interpret implementation, software and "
+"physical status separately. `development_passed` does not mean execution at "
+"the current documentation HEAD. Consult the exact results index for the "
+"source and scope of `qualification_record_authority`. Absolute `/workspace` "
+"and `/dev/shm` locators retain their original bytes and only identify the "
+"original execution host. See the [software-evidence entry](../software-"
+"verification.md) for retrievable archives and member locations."
+
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr ""
+"**Original exit fields** are only fields actually present in the original "
+"CSV. Tasks, qualification prerequisites and contract links also retain their"
+" original wording; they cannot be used to invent an execution."
+
+msgid "本表包含 33 条原记录，仅表示来源行数。"
+msgstr ""
+"This table contains 33 original records; this is only the source row count."
+
+msgid "NG-001"
+msgstr "NG-001"
+
+msgid "原字段"
+msgstr "Original field"
+
+msgid "原值"
+msgstr "Original value"
+
+msgid "`task_id`"
+msgstr "`task_id`"
+
+msgid "`batch`"
+msgstr "`batch`"
+
+msgid "B0"
+msgstr "B0"
+
+msgid "`priority`"
+msgstr "`priority`"
+
+msgid "P0"
+msgstr "P0"
+
+msgid "`area`"
+msgstr "`area`"
+
+msgid "architecture"
+msgstr "architecture"
+
+msgid "`task`"
+msgstr "`task`"
+
+msgid "冻结第一性原理契约与范围"
+msgstr "Freeze first-principles contracts and scope"
+
+msgid "`depends_on`"
+msgstr "`depends_on`"
+
+msgid "（原字段为空）"
+msgstr "(original field empty)"
+
+msgid "`primary_role`"
+msgstr "`primary_role`"
+
+msgid "TL"
+msgstr "TL"
+
+msgid "`review_roles`"
+msgstr "`review_roles`"
+
+msgid "K1;B1;I1;Q1;R1"
+msgstr "K1;B1;I1;Q1;R1"
+
+msgid "`deliverables`"
+msgstr "`deliverables`"
+
+msgid "ADR;架构蓝图;接入/工程契约"
+msgstr "ADRs; architecture blueprint; integration/engineering contracts"
+
+msgid "`software_exit`"
+msgstr "`software_exit`"
+
+msgid ""
+"默认静态模型与managed边界一致;所有能力区分planned/implemented/qualified;冻结EXTI边沿/PWM/ADC单次scan/IWDG首发模式及deferred扩展"
+msgstr ""
+"Default static model agrees with the managed boundary; distinguish "
+"planned/implemented/qualified for all capabilities; freeze initial EXTI "
+"edge/PWM/ADC single scan/IWDG modes and deferred extensions"
+
+msgid "`hardware_exit`"
+msgstr "`hardware_exit`"
+
+msgid "不适用;不以设计计硬件资格"
+msgstr "Not applicable; design does not count as hardware qualification"
+
+msgid "`status`"
+msgstr "`status`"
+
+msgid "implemented"
+msgstr "implemented"
+
+msgid "`legacy_rf_refs`"
+msgstr "`legacy_rf_refs`"
+
+msgid "RF-ARC-01"
+msgstr "RF-ARC-01"
+
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+msgid ""
+"docs/design/next-generation-platform.md;docs/design/integration-"
+"contracts.md;docs/delivery/architecture.md"
+msgstr ""
+"docs/design/next-generation-platform.md;docs/design/integration-"
+"contracts.md;docs/delivery/architecture.md"
+
+msgid "`evidence_paths`"
+msgstr "`evidence_paths`"
+
+msgid "docs/delivery/architecture.md;docs/delivery/support.md"
+msgstr "docs/delivery/architecture.md;docs/delivery/support.md"
+
+msgid "`software_status`"
+msgstr "`software_status`"
+
+msgid "qualification_record_authority"
+msgstr "qualification_record_authority"
+
+msgid "`hardware_status`"
+msgstr "`hardware_status`"
+
+msgid "not_applicable"
+msgstr "not_applicable"
+
+msgid "NG-002"
+msgstr "NG-002"
+
+msgid "measurement"
+msgstr "measurement"
+
+msgid "定义最小workload与资源/时序预算schema"
+msgstr "Define minimum workloads and resource/timing budget schema"
+
+msgid "Q1"
+msgstr "Q1"
+
+msgid "TL;K2;B1;B2"
+msgstr "TL;K2;B1;B2"
+
+msgid "最小GPIO/UART/SPI workload;成本口径;预算schema"
+msgstr "Minimum GPIO/UART/SPI workloads; cost definitions; budget schema"
+
+msgid "真实基线输入和工具/配置/产物可绑定;不能以旧完整Board镜像代替最小成本"
+msgstr ""
+"Bind actual baseline inputs, tools, configuration and artifacts; do not "
+"substitute an old complete Board image for minimum-cost measurements"
+
+msgid "cycles/IRQ/端到端预算在真实station校准;当前未执行"
+msgstr ""
+"Calibrate cycles/IRQ/end-to-end budgets at a real station; currently "
+"unexecuted"
+
+msgid "RF-BAS-01;RF-HIL-03"
+msgstr "RF-BAS-01;RF-HIL-03"
+
+msgid ""
+"tools/measurement/compare.py;tools/measurement/resources.py;tools/measurement/workload.c"
+msgstr ""
+"tools/measurement/compare.py;tools/measurement/resources.py;tools/measurement/workload.c"
+
+msgid ""
+"build/measurement-qiming-v3/matrix.json;build/measurement-"
+"sky-v1/matrix.json;build/measurement-liangshan-v5/matrix.json"
+msgstr ""
+"build/measurement-qiming-v3/matrix.json;build/measurement-"
+"sky-v1/matrix.json;build/measurement-liangshan-v5/matrix.json"
+
+msgid "not_executed"
+msgstr "not_executed"
+
+msgid "NG-003"
+msgstr "NG-003"
+
+msgid "B1"
+msgstr "B1"
+
+msgid "tooling"
+msgstr "tooling"
+
+msgid "锁定正式工具环境与唯一dev入口"
+msgstr "Lock the formal tool environment and unique dev entry"
+
+msgid "R1"
+msgstr "R1"
+
+msgid "K1;Q1"
+msgstr "K1;Q1"
+
+msgid "工具/源依赖锁;OCI环境;薄dev入口;基础formatter/warning/local checks"
+msgstr ""
+"Tool/source dependency locks; OCI environment; thin dev entry; basic "
+"formatter/warning/local checks"
+
+msgid ""
+"fresh "
+"checkout用同一入口configure/build/test;原生命令与退出码保留;首个owned切片即执行格式与基础warning门禁;使用根.clang-"
+"format/.editorconfig现有80列风格而非另起配置"
+msgstr ""
+"A fresh checkout uses one configure/build/test entry; preserve native "
+"commands and exit codes; enforce formatting and basic warning gates from the"
+" first owned slice; retain the root .clang-format/.editorconfig 80-column "
+"style rather than creating new configuration"
+
+msgid "不适用"
+msgstr "Not applicable"
+
+msgid "RF-BLD-01;RF-CI-01"
+msgstr "RF-BLD-01;RF-CI-01"
+
+msgid ""
+"tools/dev/dev.py;tools/dev/Dockerfile;dependencies/environment.lock.json;scripts/setup/install_dev_tools.py"
+msgstr ""
+"tools/dev/dev.py;tools/dev/Dockerfile;dependencies/environment.lock.json;scripts/setup/install_dev_tools.py"
+
+msgid ""
+"dependencies/environment.lock.json;tools/dev/dev.py doctor;Git hooks/style "
+"gate"
+msgstr ""
+"dependencies/environment.lock.json;tools/dev/dev.py doctor;Git hooks/style "
+"gate"
+
+msgid "NG-004"
+msgstr "NG-004"
+
+msgid "configuration"
+msgstr "configuration"
+
+msgid "实现SoC/Board/assembly到单resolved校验"
+msgstr "Implement single resolved validation from SoC/Board/assembly"
+
+msgid "NG-001;NG-003"
+msgstr "NG-001;NG-003"
+
+msgid "B1;B2;K1;Q1"
+msgstr "B1;B2;K1;Q1"
+
+msgid "schema;窄resolver;负配置用例;原子生成"
+msgstr ""
+"Schema; narrow resolver; negative configuration cases; atomic generation"
+
+msgid "未知键/非法模式/资源冲突/失效输入真实拒绝;CMake代码依赖仍唯一权威"
+msgstr ""
+"Actually reject unknown keys/illegal modes/resource conflicts/invalid "
+"inputs; CMake remains the sole authority for code dependencies"
+
+msgid "资料与实际PCB一致性待实板"
+msgstr "Document/physical-PCB consistency awaits hardware"
+
+msgid "RF-BRD-01;RF-BLD-01"
+msgstr "RF-BRD-01;RF-BLD-01"
+
+msgid ""
+"tools/configure/configure.py;soc/*/soc.json;soc/*/routes.json;boards/*/board.json"
+msgstr ""
+"tools/configure/configure.py;soc/*/soc.json;soc/*/routes.json;boards/*/board.json"
+
+msgid ""
+"tests/contracts:contract_configuration_rejection;tools/configure/test_configure.py"
+msgstr ""
+"tests/contracts:contract_configuration_rejection;tools/configure/test_configure.py"
+
+msgid "NG-005"
+msgstr "NG-005"
+
+msgid "build"
+msgstr "build"
+
+msgid "实现静态绑定与最小firmware target"
+msgstr "Implement static bindings and minimum firmware targets"
+
+msgid "K1;B1;B2"
+msgstr "K1;B1;B2"
+
+msgid "配置头;binding C;linker输入;显式targets"
+msgstr "Configuration header; binding C; linker inputs; explicit targets"
+
+msgid ""
+"两SoC最小bootstrap链接ELF含正确startup/vector/ABI;不冒充完整clock/rollback;生成器不生成业务或软件依赖图;最小Flash"
+" LOAD/RAM/MSP报告与预算比较"
+msgstr ""
+"Minimum bootstrap ELF for both SoCs links with correct startup/vector/ABI; "
+"do not claim complete clock/rollback support; generator does not generate "
+"business logic or the software dependency graph; compare minimum Flash "
+"LOAD/RAM/MSP reports against budgets"
+
+msgid "启动时序和电气待实板"
+msgstr "Startup timing and electrical behavior await hardware"
+
+msgid "RF-BLD-01;RF-BLD-02"
+msgstr "RF-BLD-01;RF-BLD-02"
+
+msgid ""
+"tools/configure/bindings.py;cmake/platform/Firmware.cmake;CMakeLists.txt"
+msgstr ""
+"tools/configure/bindings.py;cmake/platform/Firmware.cmake;CMakeLists.txt"
+
+msgid "six ARM preset ELF/BIN/map/resource reports;tests/contracts/*_assembly"
+msgstr ""
+"six ARM preset ELF/BIN/map/resource reports;tests/contracts/*_assembly"
+
+msgid "NG-006"
+msgstr "NG-006"
+
+msgid "P1"
+msgstr "P1"
+
+msgid "sdk"
+msgstr "sdk"
+
+msgid "定义外部源码SDK消费与依赖锁合同"
+msgstr "Define external source-SDK consumption and dependency-lock contracts"
+
+msgid "NG-003;NG-005"
+msgstr "NG-003;NG-005"
+
+msgid "I1;Q1"
+msgstr "I1;Q1"
+
+msgid "源码package入口;输入/许可manifest;外部consumer"
+msgstr "Source-package entry; input/license manifest; external consumer"
+
+msgid "独立移动路径consumer真实build/run/link;dirty包标不可发布"
+msgstr ""
+"An independently relocated consumer actually builds/runs/links; mark dirty "
+"packages unpublishable"
+
+msgid "不适用;包消费不构成硬件资格"
+msgstr "Not applicable; package consumption is not hardware qualification"
+
+msgid "RF-SDK-01;RF-SDK-02"
+msgstr "RF-SDK-01;RF-SDK-02"
+
+msgid ""
+"cmake/package/package_source_sdk.py;cmake/package/NexusConfig.cmake.in;tests/contracts/test_source_sdk.py"
+msgstr ""
+"cmake/package/package_source_sdk.py;cmake/package/NexusConfig.cmake.in;tests/contracts/test_source_sdk.py"
+
+msgid ""
+"tests/contracts/test_source_sdk.py;clean SDK relocated consumer pending"
+msgstr ""
+"tests/contracts/test_source_sdk.py;clean SDK relocated consumer pending"
+
+msgid "NG-007"
+msgstr "NG-007"
+
+msgid "B2"
+msgstr "B2"
+
+msgid "arch"
+msgstr "arch"
+
+msgid "实现最小Cortex-M4原语与monotonic时间合同"
+msgstr "Implement minimum Cortex-M4 primitives and monotonic-time contracts"
+
+msgid "K1"
+msgstr "K1"
+
+msgid "K2;B1;B2;Q1"
+msgstr "K2;B1;B2;Q1"
+
+msgid "异常/临界区/atomic边界;cycle snapshot;时钟域"
+msgstr ""
+"Exception/critical-section/atomic boundaries; cycle snapshots; clock domains"
+
+msgid "保存恢复incoming mask;时间wrap/clock变化语义;无假时钟/未审屏障删除"
+msgstr ""
+"Save and restore incoming masks; define time wrap/clock-change semantics; no"
+" fake clocks or unreviewed barrier removal"
+
+msgid "测量mask/cycle开销;timer精度;IRQ抢占"
+msgstr "Measure mask/cycle overhead, timer accuracy and IRQ preemption"
+
+msgid "RF-ARC-01;RF-OS-01"
+msgstr "RF-ARC-01;RF-OS-01"
+
+msgid ""
+"arch/include/nexus/arch/arch.h;arch/cortex_m/nx_arch_cortex_m.c;core/src/time.c"
+msgstr ""
+"arch/include/nexus/arch/arch.h;arch/cortex_m/nx_arch_cortex_m.c;core/src/time.c"
+
+msgid ""
+"tests/contracts/core_contract_test.c;tests/google/arch_cortex_test.cpp;tests/google/arch_native_test.cpp;tests/google/gd32_arch_test.cpp;tests/contracts/gd32_system_test.c;tests/contracts/stm32_model"
+msgstr ""
+"tests/contracts/core_contract_test.c;tests/google/arch_cortex_test.cpp;tests/google/arch_native_test.cpp;tests/google/gd32_arch_test.cpp;tests/contracts/gd32_system_test.c;tests/contracts/stm32_model"
+
+msgid "NG-008"
+msgstr "NG-008"
+
+msgid "soc"
+msgstr "soc"
+
+msgid "接入STM32F407精确variant基础设施"
+msgstr "Integrate exact STM32F407 variant infrastructure"
+
+msgid "K1;Q2"
+msgstr "K1;Q2"
+
+msgid "VE/ZG memory/clock/IRQ/startup;私有SDK;失败回滚"
+msgstr "VE/ZG memory/clock/IRQ/startup; private SDK; failure rollback"
+
+msgid "精确density/ABI输入闭合;真实ELF;partial-init故障可回滚或保留责任"
+msgstr ""
+"Close exact density/ABI inputs; produce actual ELF; partial-init failures "
+"can roll back or retain responsibility"
+
+msgid "复位/clock/Flash density/safe-output资格"
+msgstr "Reset/clock/Flash-density/safe-output qualification"
+
+msgid "RF-BOOT-01;RF-FIX-01;RF-FIX-02"
+msgstr "RF-BOOT-01;RF-FIX-01;RF-FIX-02"
+
+msgid ""
+"soc/stm32f407/system.c;soc/stm32f407/soc.json;soc/stm32f407/CMakeLists.txt"
+msgstr ""
+"soc/stm32f407/system.c;soc/stm32f407/soc.json;soc/stm32f407/CMakeLists.txt"
+
+msgid ""
+"tests/contracts/stm32_io_test.c;tests/contracts/stm32_model;tests/contracts/stm32_assembly"
+msgstr ""
+"tests/contracts/stm32_io_test.c;tests/contracts/stm32_model;tests/contracts/stm32_assembly"
+
+msgid "NG-009"
+msgstr "NG-009"
+
+msgid "接入GD32F470ZG基础设施"
+msgstr "Integrate GD32F470ZG infrastructure"
+
+msgid "memory/clock/IRQ/startup;官方SDK lock;失败回滚"
+msgstr "Memory/clock/IRQ/startup; official SDK lock; failure rollback"
+
+msgid "真实ELF;精确芯片模式;时钟/IRQ/reset错误可诊断"
+msgstr "Actual ELF; exact chip modes; diagnosable clock/IRQ/reset errors"
+
+msgid "RF-BRD-02"
+msgstr "RF-BRD-02"
+
+msgid ""
+"soc/gd32f470/system.c;soc/gd32f470/timebase.c;soc/gd32f470/soc.json;vendors/gigadevice/gd32f4xx/source.lock.json"
+msgstr ""
+"soc/gd32f470/system.c;soc/gd32f470/timebase.c;soc/gd32f470/soc.json;vendors/gigadevice/gd32f4xx/source.lock.json"
+
+msgid ""
+"tests/contracts/gd32_system_test.c;tests/contracts/gd32_io_test.c;tests/contracts/gd32_assembly"
+msgstr ""
+"tests/contracts/gd32_system_test.c;tests/contracts/gd32_io_test.c;tests/contracts/gd32_assembly"
+
+msgid "NG-010"
+msgstr "NG-010"
+
+msgid "board"
+msgstr "board"
+
+msgid "重建三首发Board只读资源包"
+msgstr "Rebuild readonly resource packages for the three initial Boards"
+
+msgid "NG-004;NG-008;NG-009"
+msgstr "NG-004;NG-008;NG-009"
+
+msgid "B1;B2"
+msgstr "B1;B2"
+
+msgid "Q2;R1"
+msgstr "Q2;R1"
+
+msgid "三Board facts/provenance;特殊电气hook;输入摘要"
+msgstr "Three-Board facts/provenance; special electrical hooks; input digests"
+
+msgid "同SoC已审路线换板无需修改controller;声明与实际操作一致;未知PCB/route显式"
+msgstr ""
+"Changing Boards on reviewed routes for the same SoC does not require "
+"controller changes; declarations agree with operations; unknown PCB/routes "
+"are explicit"
+
+msgid "实际PCB/晶振/接线/初值复核;当前未执行"
+msgstr ""
+"Review actual PCB/oscillator/wiring/initial levels; currently unexecuted"
+
+msgid "RF-BRD-01;RF-HIL-01"
+msgstr "RF-BRD-01;RF-HIL-01"
+
+msgid ""
+"boards/stm32f407_qiming_v31/board.json;boards/stm32f407ve_sky_qingchun/board.json;boards/gd32f470_liangshan/board.json"
+msgstr ""
+"boards/stm32f407_qiming_v31/board.json;boards/stm32f407ve_sky_qingchun/board.json;boards/gd32f470_liangshan/board.json"
+
+msgid "boards/*/README.md;tools/hil/fixtures;unknown PCB remains explicit"
+msgstr "boards/*/README.md;tools/hil/fixtures;unknown PCB remains explicit"
+
+msgid "NG-011"
+msgstr "NG-011"
+
+msgid "gpio"
+msgstr "gpio"
+
+msgid "实现固定typed GPIO与授权mask批量操作"
+msgstr "Implement fixed typed GPIO and authorized-mask batch operations"
+
+msgid "B1;B2;Q1"
+msgstr "B1;B2;Q1"
+
+msgid "固定GPIO合同;SoC实现;Native模型;batch"
+msgstr "Fixed GPIO contract; SoC implementation; Native model; batch"
+
+msgid ""
+"热路径无注册/字符串/通用ref/OS锁;原子set/reset;停机quiescence前提明确;mask子集与set/reset重叠拒绝;toggle/read语义;首切片map/预算比较"
+msgstr ""
+"No registration/strings/generic references/OS locks in the hot path; atomic "
+"set/reset; explicit shutdown quiescence prerequisites; reject non-subset "
+"masks and overlapping set/reset; define toggle/read semantics; compare "
+"first-slice map/budgets"
+
+msgid "GPIO波形/复位初值/并发电气;批量cycles"
+msgstr ""
+"GPIO waveforms/reset levels/concurrent electrical behavior; batch cycles"
+
+msgid "RF-HAL-01;RF-FIX-02"
+msgstr "RF-HAL-01;RF-FIX-02"
+
+msgid "io/include/nexus/io/gpio.h;soc/*/drivers/gpio.c;io/native/gpio.c"
+msgstr "io/include/nexus/io/gpio.h;soc/*/drivers/gpio.c;io/native/gpio.c"
+
+msgid ""
+"tests/contracts/native_io_test.c;tests/contracts/stm32_io_test.c;tests/contracts/gd32_io_test.c;actual"
+" resource matrices"
+msgstr ""
+"tests/contracts/native_io_test.c;tests/contracts/stm32_io_test.c;tests/contracts/gd32_io_test.c;actual"
+" resource matrices"
+
+msgid "NG-012"
+msgstr "NG-012"
+
+msgid "B3"
+msgstr "B3"
+
+msgid "request"
+msgstr "request"
+
+msgid "实现caller-owned请求规则与通知port"
+msgstr "Implement caller-owned request rules and notification ports"
+
+msgid "NG-007;NG-011"
+msgstr "NG-007;NG-011"
+
+msgid "K2"
+msgstr "K2"
+
+msgid "K1;Q1;I1"
+msgstr "K1;Q1;I1"
+
+msgid "admission/borrow/deadline/result合同;必要state helper"
+msgstr "Admission/borrow/deadline/result contracts; necessary state helpers"
+
+msgid ""
+"REJECTED零借用;单owner取消/跨任务token寿命;全链唯一admission;SETTLED最后访问;wait进展/arm-"
+"recheck;必要最小竞态回归在首个切片执行;共享client不service;stop期间执行者持续drain后才join"
+msgstr ""
+"REJECTED borrows nothing; single-owner cancellation/cross-task token "
+"lifetime; one admission throughout the chain; SETTLED marks final provider "
+"access; wait progress/arm-recheck; minimum necessary race regressions "
+"execute in the first slice; shared clients do not service; executors "
+"continue draining during stop before joining"
+
+msgid "真实IRQ/DMA drain证明在各provider验收"
+msgstr "Verify actual IRQ/DMA drain when accepting each provider"
+
+msgid "RF-HAL-01;RF-OS-01"
+msgstr "RF-HAL-01;RF-OS-01"
+
+msgid "core/include/nexus/core/request.h;core/src/request.c;os/wait.c"
+msgstr "core/include/nexus/core/request.h;core/src/request.c;os/wait.c"
+
+msgid ""
+"tests/contracts/core_contract_test.c;tests/contracts/components_owner.c"
+msgstr ""
+"tests/contracts/core_contract_test.c;tests/contracts/components_owner.c"
+
+msgid "NG-013"
+msgstr "NG-013"
+
+msgid "uart"
+msgstr "uart"
+
+msgid "重建STM32 UART IRQ与接收profile"
+msgstr "Rebuild STM32 UART IRQ and receive profiles"
+
+msgid "NG-008;NG-012"
+msgstr "NG-008;NG-012"
+
+msgid "K2;I1;Q2"
+msgstr "K2;I1;Q2"
+
+msgid "直接typed UART;byte/event profile;按实例storage"
+msgstr "Direct typed UART; byte/event profiles; per-instance storage"
+
+msgid "真实IRQ实现编译;partial start/cancel/late IRQ/通知丢失模型;无闲置DMA/legacy池"
+msgstr ""
+"Compile actual IRQ implementations; model partial start/cancel/late IRQ/lost"
+" notifications; no idle DMA/legacy pool"
+
+msgid "TC/abort/RX丢失/时间精度/吞吐;未执行"
+msgstr "TC/abort/RX loss/time accuracy/throughput; unexecuted"
+
+msgid "RF-HAL-02;RF-FIX-03;RF-HIL-02"
+msgstr "RF-HAL-02;RF-FIX-03;RF-HIL-02"
+
+msgid "soc/stm32f407/drivers/uart.c;io/include/nexus/io/uart.h"
+msgstr "soc/stm32f407/drivers/uart.c;io/include/nexus/io/uart.h"
+
+msgid ""
+"tests/contracts/stm32_io_test.c;tests/contracts/stm32_model;actual ARM "
+"presets"
+msgstr ""
+"tests/contracts/stm32_io_test.c;tests/contracts/stm32_model;actual ARM "
+"presets"
+
+msgid "NG-014"
+msgstr "NG-014"
+
+msgid "重建GD32 UART IRQ与接收profile"
+msgstr "Rebuild GD32 UART IRQ and receive profiles"
+
+msgid "NG-009;NG-012"
+msgstr "NG-009;NG-012"
+
+msgid "错误/取消/TC合同与STM公共行为一致;能力差异显式"
+msgstr ""
+"Error/cancellation/TC contracts match STM public behavior; capability "
+"differences are explicit"
+
+msgid "RF-BRD-02;RF-HIL-02"
+msgstr "RF-BRD-02;RF-HIL-02"
+
+msgid "soc/gd32f470/drivers/uart.c;io/include/nexus/io/uart.h"
+msgstr "soc/gd32f470/drivers/uart.c;io/include/nexus/io/uart.h"
+
+msgid "tests/contracts/gd32_io_test.c;contract_gd32_io;actual ARM preset"
+msgstr "tests/contracts/gd32_io_test.c;contract_gd32_io;actual ARM preset"
+
+msgid "NG-015"
+msgstr "NG-015"
+
+msgid "spi"
+msgstr "spi"
+
+msgid "实现单总线执行者与SPI真实执行模式"
+msgstr "Implement a single bus executor and actual SPI execution modes"
+
+msgid "NG-010;NG-012"
+msgstr "NG-010;NG-012"
+
+msgid "K2;I2;Q2"
+msgstr "K2;I2;Q2"
+
+msgid "静态endpoint;短polling;按需求IRQ/DMA;无固定copy池"
+msgstr ""
+"Static endpoints; short polling; IRQ/DMA on demand; no fixed copy pool"
+
+msgid "一个wire-active;CS/config稳定;绝对deadline包含排队;service不伪异步"
+msgstr ""
+"One wire-active owner; stable CS/configuration; absolute deadlines include "
+"queuing; service does not pretend to be asynchronous"
+
+msgid "CS/clock/MISO/DMA abort/drain;只对实测模式资格化"
+msgstr "CS/clock/MISO/DMA abort/drain; qualify only actually measured modes"
+
+msgid "RF-HAL-01;RF-HAL-04;RF-HIL-02"
+msgstr "RF-HAL-01;RF-HAL-04;RF-HIL-02"
+
+msgid ""
+"soc/*/drivers/spi.c;components/bus_owner/src/spi_owner.c;io/native/spi.c"
+msgstr ""
+"soc/*/drivers/spi.c;components/bus_owner/src/spi_owner.c;io/native/spi.c"
+
+msgid ""
+"tests/contracts/components_spi.c;tests/contracts/*_io_test.c;tests/contracts/*_assembly/*spi.json"
+msgstr ""
+"tests/contracts/components_spi.c;tests/contracts/*_io_test.c;tests/contracts/*_assembly/*spi.json"
+
+msgid "NG-016"
+msgstr "NG-016"
+
+msgid "i2c"
+msgstr "i2c"
+
+msgid "实现明确范围的MCU I2C provider"
+msgstr "Implement MCU I2C providers with explicit scope"
+
+msgid "I2C endpoint;reviewed routes;transaction/STOP/recovery"
+msgstr "I2C endpoint;reviewed routes;transaction/STOP/recovery"
+
+msgid "ACK/NACK/STOP/repeated START/故障范围明确;实际ARM链接;无成功stub"
+msgstr ""
+"ACK/NACK/STOP/repeated START/failure scope is explicit; actual ARM linking; "
+"no success stubs"
+
+msgid "真实连线/总线挂死/recovery/波形;未执行"
+msgstr "Actual wiring/stuck bus/recovery/waveforms; unexecuted"
+
+msgid "RF-HAL-03;RF-HIL-02"
+msgstr "RF-HAL-03;RF-HIL-02"
+
+msgid "soc/*/drivers/i2c.c;tools/configure/*_bindings.py;io/native/i2c.c"
+msgstr "soc/*/drivers/i2c.c;tools/configure/*_bindings.py;io/native/i2c.c"
+
+msgid "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*i2c.json"
+msgstr "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*i2c.json"
+
+msgid "NG-017"
+msgstr "NG-017"
+
+msgid "flash"
+msgstr "flash"
+
+msgid "重建全物理Flash与受限region接口"
+msgstr "Rebuild whole physical-Flash and restricted-region interfaces"
+
+msgid "NG-008;NG-009;NG-012"
+msgstr "NG-008;NG-009;NG-012"
+
+msgid "B1;B2;I2;Q2"
+msgstr "B1;B2;I2;Q2"
+
+msgid "精确几何;region端口;脉冲deadline/错误合同"
+msgstr "Exact geometry; region ports; pulse deadline/error contracts"
+
+msgid "范围/overflow/erase alignment拒绝;不预留产品区;结束前硬件不再访问"
+msgstr ""
+"Reject range/overflow/erase-alignment errors; reserve no product region; "
+"hardware stops accessing before completion"
+
+msgid "erase/program/功耗电压/掉电;未执行"
+msgstr "Erase/program/power and voltage/power loss; unexecuted"
+
+msgid "RF-FLS-01;RF-FLS-02;RF-FLS-03"
+msgstr "RF-FLS-01;RF-FLS-02;RF-FLS-03"
+
+msgid ""
+"soc/*/drivers/flash.c;io/src/flash_region.c;io/include/nexus/io/flash.h"
+msgstr ""
+"soc/*/drivers/flash.c;io/src/flash_region.c;io/include/nexus/io/flash.h"
+
+msgid ""
+"tests/contracts/*_io_test.c;tests/contracts/components_flash_storage.c;tests/contracts/components_storage.c"
+msgstr ""
+"tests/contracts/*_io_test.c;tests/contracts/components_flash_storage.c;tests/contracts/components_storage.c"
+
+msgid "NG-018"
+msgstr "NG-018"
+
+msgid "watchdog"
+msgstr "watchdog"
+
+msgid "实现watchdog与reset-cause垂直合同"
+msgstr "Implement vertical watchdog and reset-cause contracts"
+
+msgid "K1;I2;Q2"
+msgstr "K1;I2;Q2"
+
+msgid "IWDG配置/feed/reset cause;真实SoC实现;Native模型"
+msgstr ""
+"IWDG configuration/feed/reset cause; actual SoC implementation; Native model"
+
+msgid ""
+"两个SoC真实provider和ELF;范围/时钟/调试冻结语义;产品feed政策留外部;启用不可逆/已有状态/启动失败的remaining-"
+"effect正确记录"
+msgstr ""
+"Actual providers and ELF for both SoCs; range/clock/debug-freeze semantics; "
+"product feed policy stays external; correctly record remaining effects for "
+"irreversible enable/existing state/startup failure"
+
+msgid "真实超时复位/调试冻结/上电reset cause;未执行"
+msgstr "Actual timeout reset/debug freeze/power-on reset cause; unexecuted"
+
+msgid "RF-ARC-01;RF-HIL-02;RF-HIL-03"
+msgstr "RF-ARC-01;RF-HIL-02;RF-HIL-03"
+
+msgid ""
+"soc/*/drivers/watchdog.c;io/native/watchdog.c;io/include/nexus/io/watchdog.h"
+msgstr ""
+"soc/*/drivers/watchdog.c;io/native/watchdog.c;io/include/nexus/io/watchdog.h"
+
+msgid ""
+"tests/contracts/*_io_test.c;contract_gd32_watchdog-late-"
+"failure;contract_gd32_watchdog-hardware-enabled"
+msgstr ""
+"tests/contracts/*_io_test.c;contract_gd32_watchdog-late-"
+"failure;contract_gd32_watchdog-hardware-enabled"
+
+msgid "NG-031"
+msgstr "NG-031"
+
+msgid "exti"
+msgstr "exti"
+
+msgid "实现静态EXTI line与共享vector事件"
+msgstr "Implement static EXTI lines and shared-vector events"
+
+msgid "NG-010;NG-011;NG-012"
+msgstr "NG-010;NG-011;NG-012"
+
+msgid "K1;Q1;Q2"
+msgstr "K1;Q1;Q2"
+
+msgid "reviewed line/edge;共享vector;有界事件;停止合同"
+msgstr "Reviewed lines/edges; shared vectors; bounded events; stop contract"
+
+msgid "真实SoC provider/ELF;重复line拒绝;事件溢出/排序/stop排空;未实现模式拒绝"
+msgstr ""
+"Actual SoC providers/ELF; reject duplicate lines; event overflow/order/stop "
+"drain; reject unimplemented modes"
+
+msgid "真实edge/去抖策略边界/优先级/丢失与排空;未执行"
+msgstr ""
+"Actual edges/debounce-policy boundaries/priorities/loss and drain; "
+"unexecuted"
+
+msgid "RF-HAL-01;RF-HIL-02"
+msgstr "RF-HAL-01;RF-HIL-02"
+
+msgid "soc/*/drivers/exti.c;io/include/nexus/io/exti.h;io/native/exti.c"
+msgstr "soc/*/drivers/exti.c;io/include/nexus/io/exti.h;io/native/exti.c"
+
+msgid "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*exti.json"
+msgstr "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*exti.json"
+
+msgid "NG-032"
+msgstr "NG-032"
+
+msgid "timer"
+msgstr "timer"
+
+msgid "实现固定timer时基与PWM输出"
+msgstr "Implement fixed timer timebases and PWM outputs"
+
+msgid "NG-007;NG-010;NG-012"
+msgstr "NG-007;NG-010;NG-012"
+
+msgid "选定timer/channel;period/duty;电气初值;后续capture/trigger资源边界"
+msgstr ""
+"Selected timer/channel; period/duty; electrical initial values; later "
+"capture/trigger resource boundaries"
+
+msgid ""
+"首发固定timer/PWM真实provider/ELF;overflow/range/原子更新;timebase冲突拒绝;共享PSC/ARR/base "
+"mode与0/100pct/shadow更新明确;capture/advanced模式另立项不计首发退出"
+msgstr ""
+"Actual providers/ELF for initial fixed timer/PWM; overflow/range/atomic "
+"update; reject timebase conflicts; specify shared PSC/ARR/base modes and "
+"0/100-percent/shadow updates; capture/advanced modes are separate tasks, "
+"outside initial exit conditions"
+
+msgid "真实周期/占空比/停止输出;首发模式未执行;capture/advanced另验收"
+msgstr ""
+"Actual period/duty/stopped output; initial modes unexecuted; "
+"capture/advanced separately accepted"
+
+msgid "RF-HAL-01;RF-HIL-02;RF-HIL-03"
+msgstr "RF-HAL-01;RF-HIL-02;RF-HIL-03"
+
+msgid "soc/*/drivers/timer.c;io/include/nexus/io/timer.h;io/native/timer.c"
+msgstr "soc/*/drivers/timer.c;io/include/nexus/io/timer.h;io/native/timer.c"
+
+msgid "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*pwm.json"
+msgstr "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*pwm.json"
+
+msgid "NG-033"
+msgstr "NG-033"
+
+msgid "adc"
+msgstr "adc"
+
+msgid "实现ADC单次与低速scan"
+msgstr "Implement ADC single-shot and low-rate scan"
+
+msgid "NG-010;NG-012;NG-032"
+msgstr "NG-010;NG-012;NG-032"
+
+msgid "reviewed ADC channel/sequence;选定采样模式;校准;buffer合同"
+msgstr ""
+"Reviewed ADC channels/sequences; selected sampling modes; calibration; "
+"buffer contracts"
+
+msgid ""
+"首发single-"
+"shot/低速scan真实provider/ELF;样本格式/range/overflow;未选模式不驻留;参考电压/计数/sample "
+"time/超时输出有效性明确;trigger/DMA/block合同另立项不计首发退出"
+msgstr ""
+"Actual providers/ELF for initial single-shot/low-rate scan; sample "
+"format/range/overflow; unselected modes are absent; reference "
+"voltage/counts/sample time/timeout-output validity explicit; "
+"trigger/DMA/block contracts are separate tasks, outside initial exit "
+"conditions"
+
+msgid "首发真实计数/精度/采样率/超时;未执行;高频trigger/DMA/block独立验收"
+msgstr ""
+"Actual initial counts/accuracy/sample rate/timeout; unexecuted; high-rate "
+"trigger/DMA/block separately accepted"
+
+msgid "soc/*/drivers/adc.c;io/include/nexus/io/adc.h;io/native/adc.c"
+msgstr "soc/*/drivers/adc.c;io/include/nexus/io/adc.h;io/native/adc.c"
+
+msgid "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*adc*.json"
+msgstr "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*adc*.json"
+
+msgid "NG-019"
+msgstr "NG-019"
+
+msgid "B4"
+msgstr "B4"
+
+msgid "os"
+msgstr "os"
+
+msgid "实现薄wait/wake与逐对象静态OS storage"
+msgstr "Implement thin wait/wake and per-object static OS storage"
+
+msgid "NG-007;NG-012"
+msgstr "NG-007;NG-012"
+
+msgid "K2;Q1;R1"
+msgstr "K2;Q1;R1"
+
+msgid "裸机/FreeRTOS/Native能力;静态task/queue参数"
+msgstr "Baremetal/FreeRTOS/Native capabilities; static task/queue parameters"
+
+msgid "不强制driver依赖OS;无统一最大池;delete/join回收时点正确;ISR ceiling拒绝"
+msgstr ""
+"Drivers need not depend on OS; no universal maximum pool; correct "
+"delete/join reclamation timing; reject ISR-ceiling violations"
+
+msgid "真实scheduler/IRQ wake/stack/FPU;未执行"
+msgstr "Actual scheduler/IRQ wake/stack/FPU; unexecuted"
+
+msgid "RF-OS-01;RF-OS-02"
+msgstr "RF-OS-01;RF-OS-02"
+
+msgid ""
+"os/baremetal/notify.c;os/native/native.c;os/freertos/freertos.c;os/README.md"
+msgstr ""
+"os/baremetal/notify.c;os/native/native.c;os/freertos/freertos.c;os/README.md"
+
+msgid ""
+"tests/contracts/os_wait.c;tests/contracts/os_freertos_runtime;build/ng-"
+"agent-cmake/evidence/freertos-100-fresh-processes.log"
+msgstr ""
+"tests/contracts/os_wait.c;tests/contracts/os_freertos_runtime;build/ng-"
+"agent-cmake/evidence/freertos-100-fresh-processes.log"
+
+msgid "NG-020"
+msgstr "NG-020"
+
+msgid "integration"
+msgstr "integration"
+
+msgid "实现有界多producer适配与总线owner样例"
+msgstr "Implement bounded multiproducer adapters and bus-owner examples"
+
+msgid "NG-015;NG-019"
+msgstr "NG-015;NG-019"
+
+msgid "I1"
+msgstr "I1"
+
+msgid "K2;Q1"
+msgstr "K2;Q1"
+
+msgid "显式queue/service adapter;可选callback adapter"
+msgstr "Explicit queue/service adapters; optional callback adapters"
+
+msgid ""
+"无隐藏worker;adapter已admit后start失败仍有归属;旧cancel不命中新epoch;SETTLED后通知不访问request;唯一owner等待仍drain;通知满/丢失无lost-"
+"wake;client等待不接管执行;producer等待SETTLED时stop不死锁;wake发布者退出后才回收通知storage"
+msgstr ""
+"No hidden workers; admitted work retains ownership if adapter start fails; "
+"old cancellation cannot hit a new epoch; notifications after SETTLED do not "
+"access the request; the unique waiting owner still drains; full/lost "
+"notifications cause no lost wake; client waiting does not take execution "
+"ownership; stopping does not deadlock producers waiting for SETTLED; reclaim"
+" notification storage only after wake publishers exit"
+
+msgid "最长service间隔/负载队列/公平性按产品实测"
+msgstr "Measure maximum service intervals/loaded queues/fairness per product"
+
+msgid "RF-HAL-02;RF-CMP-01"
+msgstr "RF-HAL-02;RF-CMP-01"
+
+msgid ""
+"components/bus_owner/src/bus_owner.c;components/bus_owner/src/uart_owner.c;components/bus_owner/src/spi_owner.c"
+msgstr ""
+"components/bus_owner/src/bus_owner.c;components/bus_owner/src/uart_owner.c;components/bus_owner/src/spi_owner.c"
+
+msgid ""
+"tests/contracts/components_owner.c;tests/contracts/components_uart.c;tests/contracts/components_spi.c"
+msgstr ""
+"tests/contracts/components_owner.c;tests/contracts/components_uart.c;tests/contracts/components_spi.c"
+
+msgid "NG-021"
+msgstr "NG-021"
+
+msgid "devices"
+msgstr "devices"
+
+msgid "实现一个可复用外部器件driver垂直切片"
+msgstr "Implement one reusable external-device driver vertical slice"
+
+msgid "NG-015;NG-020"
+msgstr "NG-015;NG-020"
+
+msgid "I2"
+msgstr "I2"
+
+msgid "一个SPI器件的core/transport;外部composition;I2C器件按实际需要另选"
+msgstr ""
+"Core/transport for one SPI device; external composition; select I2C devices "
+"separately as actually needed"
+
+msgid "无Board pin/默认任务;chip-ID/解析/失败/请求寿命正确;无未reviewed route假支持"
+msgstr ""
+"No Board pins/default tasks; correct chip-ID/parsing/failure/request "
+"lifetime; no invented support for unreviewed routes"
+
+msgid "连接/波形/测量误差/长期负载;未执行"
+msgstr "Connection/waveforms/measurement error/endurance load; unexecuted"
+
+msgid "RF-CMP-01"
+msgstr "RF-CMP-01"
+
+msgid "components/bmp280/src/bmp280.c;components/bmp280/src/spi_transport.c"
+msgstr "components/bmp280/src/bmp280.c;components/bmp280/src/spi_transport.c"
+
+msgid "tests/contracts/components_bmp280.c;tests/contracts/components_spi.c"
+msgstr "tests/contracts/components_bmp280.c;tests/contracts/components_spi.c"
+
+msgid "NG-022"
+msgstr "NG-022"
+
+msgid "components"
+msgstr "components"
+
+msgid "重建通用协议/存储/日志窄端口边界"
+msgstr "Rebuild narrow-port boundaries for generic protocols/storage/logging"
+
+msgid "NG-017;NG-019;NG-020"
+msgstr "NG-017;NG-019;NG-020"
+
+msgid "I1;I2"
+msgstr "I1;I2"
+
+msgid "实际选入组件core和adapter;删除默认worker与全局发现"
+msgstr ""
+"Actually selected component cores and adapters; remove default workers and "
+"global discovery"
+
+msgid "协议与OS/Board解耦;格式/恢复正确;错误可释放;未用组件不驻留"
+msgstr ""
+"Decouple protocols from OS/Board; correct formats/recovery; errors permit "
+"release; unused components are absent"
+
+msgid "wire timing/持久化掉电/负载按组件资格"
+msgstr ""
+"Wire timing/persistent-storage power loss/load qualified per component"
+
+msgid "RF-HAL-02;RF-CMP-01;RF-FIX-04;RF-FIX-05"
+msgstr "RF-HAL-02;RF-CMP-01;RF-FIX-04;RF-FIX-05"
+
+msgid ""
+"components/modbus;components/storage;components/log;components/README.md"
+msgstr ""
+"components/modbus;components/storage;components/log;components/README.md"
+
+msgid ""
+"tests/contracts/components_modbus.c;tests/contracts/components_storage.c;tests/contracts/components_log.c"
+msgstr ""
+"tests/contracts/components_modbus.c;tests/contracts/components_storage.c;tests/contracts/components_log.c"
+
+msgid "NG-023"
+msgstr "NG-023"
+
+msgid "examples"
+msgstr "examples"
+
+msgid "迁移三Board裸机/FreeRTOS外部examples"
+msgstr "Migrate external baremetal/FreeRTOS examples for three Boards"
+
+msgid "NG-006;NG-013;NG-014;NG-019"
+msgstr "NG-006;NG-013;NG-014;NG-019"
+
+msgid "I2;R1;Q1"
+msgstr "I2;R1;Q1"
+
+msgid "六基础firmware配置;SDK pin/callers;说明"
+msgstr "Six baseline firmware configurations; SDK pins/callers; explanations"
+
+msgid "真实外部build/Native运行/六基础ARM ELF;功能仅按支持route扩展"
+msgstr ""
+"Actual external builds/Native execution/six baseline ARM ELFs; extend "
+"functions only along supported routes"
+
+msgid "实物启动/UART及选择用例;未执行"
+msgstr "Physical startup/UART and selected cases; unexecuted"
+
+msgid "RF-EX-01;RF-BLD-02"
+msgstr "RF-EX-01;RF-BLD-02"
+
+msgid ""
+"X-Gen-Lab/nexus-examples:assemblies;X-Gen-Lab/nexus-examples:apps;X-Gen-"
+"Lab/nexus-examples:scripts"
+msgstr ""
+"X-Gen-Lab/nexus-examples:assemblies;X-Gen-Lab/nexus-examples:apps;X-Gen-"
+"Lab/nexus-examples:scripts"
+
+msgid ""
+"external build/nextgen-development/native/ctest-results.xml;external "
+"build/nextgen-development/arm-development.json;clean pin pending"
+msgstr ""
+"external build/nextgen-development/native/ctest-results.xml;external "
+"build/nextgen-development/arm-development.json;clean pin pending"
+
+msgid "NG-024"
+msgstr "NG-024"
+
+msgid "B5"
+msgstr "B5"
+
+msgid "engineering"
+msgstr "engineering"
+
+msgid "扩展本地/PR/nightly风险门禁与证据"
+msgstr "Expand local/PR/nightly risk gates and evidence"
+
+msgid "NG-003;NG-004;NG-012"
+msgstr "NG-003;NG-004;NG-012"
+
+msgid "TL;K1;Q1"
+msgstr "TL;K1;Q1"
+
+msgid "精选analyzer;现有Doxygen合同模板;完整CI风险矩阵;既有formatter/warning门禁扩展;格式目录和入口一致"
+msgstr ""
+"Selected analyzers; existing Doxygen contract templates; complete CI risk "
+"matrix; extend existing formatter/warning gates; consistent formatting "
+"directories and entries"
+
+msgid ""
+"owned "
+"warning阻断;public/private隔离;不以路径过滤漏高风险;失效报告拒绝;新旧owned目录均纳入相同格式范围;反斜杠Doxygen/文件头/header-"
+"source分工复核;第三方排除"
+msgstr ""
+"Block owned-code warnings; public/private isolation; path filtering must not"
+" omit high risk; reject invalid reports; apply the same formatting scope to "
+"old and new owned directories; review backslash Doxygen/file headers/header-"
+"source responsibilities; exclude third parties"
+
+msgid "RF-CI-01;RF-REL-02"
+msgstr "RF-CI-01;RF-REL-02"
+
+msgid ""
+"scripts/ci/style_gate.py;scripts/ci/quality_tools.py;.github/workflows;Doxyfile;docs/sphinx"
+msgstr ""
+"scripts/ci/style_gate.py;scripts/ci/quality_tools.py;.github/workflows;Doxyfile;docs/sphinx"
+
+msgid ""
+"whole-file format/comments;compile_commands analyzer;actual "
+"Doxygen/Sphinx;CI workflow tests"
+msgstr ""
+"whole-file format/comments;compile_commands analyzer;actual "
+"Doxygen/Sphinx;CI workflow tests"
+
+msgid "NG-025"
+msgstr "NG-025"
+
+msgid "verification"
+msgstr "verification"
+
+msgid "建立新契约故障/并发/边界回归"
+msgstr "Create new-contract failure/concurrency/boundary regressions"
+
+msgid ""
+"NG-012;NG-013;NG-014;NG-015;NG-017;NG-019;NG-018;NG-031;NG-032;NG-033;NG-016;NG-021;NG-022"
+msgstr ""
+"NG-012;NG-013;NG-014;NG-015;NG-017;NG-019;NG-018;NG-031;NG-032;NG-033;NG-016;NG-021;NG-022"
+
+msgid "K2;B1;B2"
+msgstr "K2;B1;B2"
+
+msgid "host/model/fuzz;sanitizer;边界和late-event用例"
+msgstr "Host/model/fuzz; sanitizers; boundary and late-event cases"
+
+msgid "非零真实执行;partial start/abort失败/timeout/notification满/stop竞争;失败不释放借用"
+msgstr ""
+"Actual nonempty execution; partial start/abort failure/timeout/full "
+"notification/stop races; failures do not release borrowed storage"
+
+msgid "模型不升格硬件;具体物理项在HIL"
+msgstr ""
+"Models do not become hardware qualification; specific physical cases remain "
+"in HIL"
+
+msgid ""
+"tests/contracts;tests/contracts/os_freertos_runtime;tests/contracts/stm32_model;tests/contracts/gd32_model"
+msgstr ""
+"tests/contracts;tests/contracts/os_freertos_runtime;tests/contracts/stm32_model;tests/contracts/gd32_model"
+
+msgid "actual Native/model CTest and sanitizer JUnit;tools unit suites"
+msgstr "actual Native/model CTest and sanitizer JUnit;tools unit suites"
+
+msgid "NG-026"
+msgstr "NG-026"
+
+msgid "performance"
+msgstr "performance"
+
+msgid "实现ELF资源预算与受控benchmark工具"
+msgstr "Implement ELF resource budgets and controlled benchmark tools"
+
+msgid "NG-002;NG-011;NG-023;NG-018;NG-031;NG-032;NG-033;NG-016;NG-021;NG-022"
+msgstr "NG-002;NG-011;NG-023;NG-018;NG-031;NG-032;NG-033;NG-016;NG-021;NG-022"
+
+msgid "Q1;R1"
+msgstr "Q1;R1"
+
+msgid "资源schema报告;最小image delta;O2/Os/O3/LTO比较"
+msgstr ""
+"Resource-schema reports; minimum image deltas; O2/Os/O3/LTO comparisons"
+
+msgid "静态预算越界真实阻断;stack/instruction与cycles分开;同artifact身份"
+msgstr ""
+"Static-budget overruns actually block; separate stack/instructions from "
+"cycles; same artifact identity"
+
+msgid "专用station测cycles/latency/high-water/丢失/负载;未执行"
+msgstr ""
+"Dedicated stations measure cycles/latency/high-water/loss/load; unexecuted"
+
+msgid "RF-HIL-03;RF-BLD-02"
+msgstr "RF-HIL-03;RF-BLD-02"
+
+msgid ""
+"tools/measurement/resources.py;tools/measurement/compare.py;tools/schemas/resource-"
+"budget.schema.json"
+msgstr ""
+"tools/measurement/resources.py;tools/measurement/compare.py;tools/schemas/resource-"
+"budget.schema.json"
+
+msgid ""
+"60 actual O2/Os/O3 with/without LTO images;18 GC "
+"checks;tests/contracts/test_measurement_*.py"
+msgstr ""
+"60 actual O2/Os/O3 with/without LTO images;18 GC "
+"checks;tests/contracts/test_measurement_*.py"
+
+msgid "NG-027"
+msgstr "NG-027"
+
+msgid "hil"
+msgstr "hil"
+
+msgid "重建HIL准入与三Board工装准备"
+msgstr "Rebuild HIL admission and prepare tooling for three Boards"
+
+msgid "NG-010;NG-023;NG-026"
+msgstr "NG-010;NG-023;NG-026"
+
+msgid "Q2"
+msgstr "Q2"
+
+msgid "B1;B2;R1"
+msgstr "B1;B2;R1"
+
+msgid "station/fixture/probe/serial工具;raw evidence schema"
+msgstr "Station/fixture/probe/serial tools; raw-evidence schema"
+
+msgid "错Board/ELF/config/空station真实拒绝;软件工具准备完成;不执行未接入设备"
+msgstr ""
+"Actually reject wrong Board/ELF/configuration/empty station; software-tool "
+"preparation complete; do not execute disconnected devices"
+
+msgid "真实probe/刷写/读回/waveform/断电/负载需接入后验收"
+msgstr ""
+"Actual probes/flashing/readback/waveforms/power cuts/load require acceptance"
+" after connection"
+
+msgid "RF-HIL-01;RF-HIL-02;RF-HIL-03"
+msgstr "RF-HIL-01;RF-HIL-02;RF-HIL-03"
+
+msgid ""
+"tools/hil/admit.py;tools/hil/fixtures;tests/contracts/test_hil_admission.py"
+msgstr ""
+"tools/hil/admit.py;tools/hil/fixtures;tests/contracts/test_hil_admission.py"
+
+msgid ""
+"tests/contracts/test_hil_admission.py;three fixtures;incomplete station "
+"rejection;physical not executed"
+msgstr ""
+"tests/contracts/test_hil_admission.py;three fixtures;incomplete station "
+"rejection;physical not executed"
+
+msgid "NG-028"
+msgstr "NG-028"
+
+msgid "reproducibility"
+msgstr "reproducibility"
+
+msgid "独立验收hermetic与可复现构建"
+msgstr "Independently accept hermetic and reproducible builds"
+
+msgid "NG-003;NG-006;NG-024"
+msgstr "NG-003;NG-006;NG-024"
+
+msgid "Q1;TL"
+msgstr "Q1;TL"
+
+msgid "离线正式build;路径归一;独立clean rebuild比较"
+msgstr ""
+"Formal offline builds; normalized paths; independent clean-rebuild "
+"comparison"
+
+msgid "网络关闭与声明输入边界;双clean ELF/BIN确定性比较;不把hash称可复现"
+msgstr ""
+"Network disabled and declared input boundaries; compare two clean ELF/BIN "
+"builds for determinism; do not call hashing reproducibility"
+
+msgid "RF-SDK-02;RF-REL-01"
+msgstr "RF-SDK-02;RF-REL-01"
+
+msgid ""
+"tools/evidence/container.py;tools/evidence/reproduce.py;tests/contracts/test_repro_execution.py"
+msgstr ""
+"tools/evidence/container.py;tools/evidence/reproduce.py;tests/contracts/test_repro_execution.py"
+
+msgid ""
+"tools/evidence/reproduce.py;delivery bundle/reproducibility*.json;two "
+"offline source SDK builds"
+msgstr ""
+"tools/evidence/reproduce.py;delivery bundle/reproducibility*.json;two "
+"offline source SDK builds"
+
+msgid "NG-029"
+msgstr "NG-029"
+
+msgid "B6"
+msgstr "B6"
+
+msgid "migration"
+msgstr "migration"
+
+msgid "删除旧运行架构并原子迁移消费路径"
+msgstr ""
+"Remove the old runtime architecture and atomically migrate consumption paths"
+
+msgid "NG-023;NG-024;NG-025;NG-026"
+msgstr "NG-023;NG-024;NG-025;NG-026"
+
+msgid "TL;K1"
+msgstr "TL;K1"
+
+msgid "I1;B1;B2;R1;Q1"
+msgstr "I1;B1;B2;R1;Q1"
+
+msgid "旧API/targets/scripts/docs清理;源码迁移说明"
+msgstr "Clean old APIs/targets/scripts/docs; source-migration guidance"
+
+msgid "无长期双注册/对象/OS队列/配置入口;外部pin一致;持久化迁移另立合同"
+msgstr ""
+"No permanent dual registries/objects/OS queues/configuration entries; "
+"external pins agree; persistent-data migration has a separate contract"
+
+msgid "已部署产品需独立迁移/恢复与物理回归"
+msgstr ""
+"Deployed products require independent migration/recovery and physical "
+"regression"
+
+msgid "RF-HAL-01;RF-HAL-02;RF-ARC-01"
+msgstr "RF-HAL-01;RF-HAL-02;RF-ARC-01"
+
+msgid "docs/delivery/migration.md;CMakeLists.txt;tools/configure;docs/archive"
+msgstr ""
+"docs/delivery/migration.md;CMakeLists.txt;tools/configure;docs/archive"
+
+msgid ""
+"current target/include/script graph;docs/archive;external caller migration "
+"development builds"
+msgstr ""
+"current target/include/script graph;docs/archive;external caller migration "
+"development builds"
+
+msgid "NG-030"
+msgstr "NG-030"
+
+msgid "delivery"
+msgstr "delivery"
+
+msgid "封存新软件候选及精确支持证据"
+msgstr "Archive new software candidates and exact support evidence"
+
+msgid ""
+"NG-006;NG-023;NG-025;NG-026;NG-027;NG-028;NG-029;NG-018;NG-031;NG-032;NG-033"
+msgstr ""
+"NG-006;NG-023;NG-025;NG-026;NG-027;NG-028;NG-029;NG-018;NG-031;NG-032;NG-033"
+
+msgid "R1;Q1"
+msgstr "R1;Q1"
+
+msgid "TL;Q2;I1"
+msgstr "TL;Q2;I1"
+
+msgid "source/config/tool/dependency/ELF包;支持tuple;known limits"
+msgstr ""
+"Source/configuration/tools/dependencies/ELF packages; supported tuples; "
+"known limits"
+
+msgid "当前完整源码资格;源码SDK干净外部消费;同hash候选;软件/物理资格分列"
+msgstr ""
+"Current complete-source qualification; clean external source-SDK "
+"consumption; same-hash candidates; separate software and physical "
+"qualification"
+
+msgid "实板资格与产品release promotion另验收;当前未执行"
+msgstr ""
+"Physical qualification and product-release promotion require separate "
+"acceptance; currently unexecuted"
+
+msgid "RF-REL-01;RF-REL-02"
+msgstr "RF-REL-01;RF-REL-02"
+
+msgid ""
+"tools/evidence/candidate.py;tools/evidence/proof.py;tools/evidence/qualification.py;docs/delivery/qualification.md"
+msgstr ""
+"tools/evidence/candidate.py;tools/evidence/proof.py;tools/evidence/qualification.py;docs/delivery/qualification.md"
+
+msgid ""
+"tools/evidence/candidate.py;delivery bundle/candidate/candidate.json;six "
+"actual qualification scopes"
+msgstr ""
+"tools/evidence/candidate.py;delivery bundle/candidate/candidate.json;six "
+"actual qualification scopes"

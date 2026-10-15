@@ -1,0 +1,411 @@
+# Authored translation; independent review pending.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: bfcfc7ea8c95ed04b6827344d136249287c042e8899f8c47758980b04de42b93\n"
+
+msgid "当前设计与实施台账"
+msgstr "Current design and execution ledgers"
+
+msgid ""
+"当前代码采用统一物理目录、TOML 静态装配、typed factory 和共享多态方法表。 公共 C11 face 只保存 readonly ops "
+"与私有 context；每个实例拥有独立状态，request 和 block storage 由调用者提供。SDK 和 provider storage"
+" 私有，应用产品工程独立。 这里的设计合同与 [当前交付](../delivery/README.md) 一起使用，历史文档不建立当前资格。"
+msgstr ""
+"Current code uses unified physical directories, TOML static assembly, typed "
+"factories and shared polymorphic tables. Public C11 faces contain only read-"
+"only ops and private context. Each instance owns independent state; callers "
+"supply request and block storage. SDKs/provider storage remain private and "
+"product projects external. Use these design contracts together with [current"
+" delivery](../delivery/README.md); historical documents establish no current"
+" qualification."
+
+msgid "文档"
+msgstr "Document"
+
+msgid "用途"
+msgstr "Purpose"
+
+msgid "[文档系统架构与交付规划](documentation-system.md)"
+msgstr ""
+"[Documentation architecture and delivery plan](documentation-system.md)"
+
+msgid "读者任务、单一正文、MyST/API、双语、门禁、版本与离线交付的目标方案"
+msgstr ""
+"Target design for reader tasks, one canonical source, MyST/API, bilingual "
+"content, gates, versions and offline delivery"
+
+msgid "{download}`文档系统58项台账 <documentation-system-execution.csv>`"
+msgstr ""
+"{download}`58-item documentation ledger <documentation-system-"
+"execution.csv>`"
+
+msgid "保留DOC-01至40并补内容/图示任务；依赖、退出条件与实施/验证分别记录"
+msgstr ""
+"Preserve DOC-01–40 and add content/diagram tasks; separately record "
+"dependencies, exit conditions and implementation/verification"
+
+msgid "[完整文档优化清单](documentation-improvements.md)"
+msgstr ""
+"[Complete documentation improvement list](documentation-improvements.md)"
+
+msgid "从同一台账派生的读者清单，不建立第二份状态权威"
+msgstr ""
+"Reader list derived from the same ledger without another status authority"
+
+msgid "[内容与图示标准](documentation-standards.md)"
+msgstr "[Content and diagram standards](documentation-standards.md)"
+
+msgid "清晰表达、规范用语、事实/资格、示例、架构图和独立审查约束"
+msgstr ""
+"Clear writing, normative language, facts/qualification, examples, "
+"architecture diagrams and independent review"
+
+msgid "[页面模板](documentation-templates.md)"
+msgstr "[Page templates](documentation-templates.md)"
+
+msgid "tutorial/how-to/reference/explanation/status必需问题"
+msgstr ""
+"Required questions for tutorial/how-to/reference/explanation/status pages"
+
+msgid "[当前与目标参考图](../assets/diagrams/README.md)"
+msgstr "[Current and target reference diagrams](../assets/diagrams/README.md)"
+
+msgid "17 对本地 SVG/DOT：15 类必需图与 2 张补充图；身份与范围由图册清单维护"
+msgstr ""
+"17 local SVG/DOT pairs: 15 required diagram categories and 2 supplements; "
+"catalogue owns identity and scope"
+
+msgid "{download}`文档迁移映射 <documentation-migration.csv>`"
+msgstr ""
+"{download}`Documentation migration mapping <documentation-migration.csv>`"
+
+msgid "当前正文、工具和相邻 README 的去向；保留原资格与台账身份"
+msgstr ""
+"Destinations for canonical content, tools and adjacent READMEs; retain "
+"original qualification and ledger identities"
+
+msgid "[架构蓝图](next-generation-platform.md)"
+msgstr "[Architecture blueprint](next-generation-platform.md)"
+
+msgid "原理、执行、所有权、性能/空间与支持边界"
+msgstr ""
+"Principles, execution, ownership, performance/storage and support boundaries"
+
+msgid "[工程手册](engineering-handbook.md)"
+msgstr "[Engineering handbook](engineering-handbook.md)"
+
+msgid "既有格式/注释、工具、自动化、证据与发布"
+msgstr ""
+"Existing formatting/comments, tools, automation, evidence and publication"
+
+msgid "[构建系统合同](build-system.md)"
+msgstr "[Build-system contract](build-system.md)"
+
+msgid "配置事务、增量依赖、目标策略、开发入口与交付边界"
+msgstr ""
+"Configuration transactions, incremental dependencies, target policy, "
+"developer entry and delivery boundaries"
+
+msgid "{download}`构建系统48项台账 <build-system-execution.csv>`"
+msgstr "{download}`48-item build-system ledger <build-system-execution.csv>`"
+
+msgid "原始退出条件、实现路径与本轮执行证据"
+msgstr ""
+"Original exit conditions, implementation paths and iteration execution "
+"evidence"
+
+msgid "[接入契约](integration-contracts.md)"
+msgstr "[Integration contracts](integration-contracts.md)"
+
+msgid "SoC/Board/器件/组件/外部工程的严格资源合同"
+msgstr ""
+"Strict resource contracts for SoC/Board/devices/components/external projects"
+
+msgid "[OS 执行与生命周期合同](os-contracts.md)"
+msgstr "[OS execution and lifecycle contract](os-contracts.md)"
+
+msgid "deadline、IRQ policy、任务/队列、低功耗与扩展边界"
+msgstr ""
+"Deadlines, IRQ policy, tasks/queues, low power and extension boundaries"
+
+msgid "[后端接入与执行探针](os-backend-integration.md)"
+msgstr "[Backend integration and execution probe](os-backend-integration.md)"
+
+msgid "新 RTOS 的能力合同、实际执行和不得自动扩大支持"
+msgstr ""
+"New RTOS capability contracts, actual execution and prohibition on automatic"
+" support expansion"
+
+msgid "[ThreadX 配置与接入](threadx.md)"
+msgstr "[ThreadX configuration and integration](threadx.md)"
+
+msgid "官方真实 Linux/M4 内核、独立 typed policy、bootstrap、静态对象与精确支持范围"
+msgstr ""
+"Real official Linux/M4 kernels, independent typed policy, bootstrap, static "
+"objects and exact support scope"
+
+msgid "[浅睡眠 timebase](timebase-lowpower.md)"
+msgstr "[Shallow-sleep timebase](timebase-lowpower.md)"
+
+msgid "显式 FreeRTOS selector、固定 clock/compare alarm、量化 phase、失败保留与物理边界"
+msgstr ""
+"Explicit FreeRTOS selector, fixed clock/compare alarms, quantized phase, "
+"retained failure and physical boundaries"
+
+msgid "[Classic CAN](classic-can.md)"
+msgstr "[Classic CAN](classic-can.md)"
+
+msgid ""
+"三邮箱、共享 filter domain、controller-local abort/recovery 与 Board 电气 handoff"
+msgstr ""
+"Three mailboxes, shared filter domain, controller-local abort/recovery and "
+"Board electrical handoff"
+
+msgid "[USB FS device](usb-device.md)"
+msgstr "[USB FS device](usb-device.md)"
+
+msgid "PIO packet/endpoint 所有权、独立 48 MHz owner、control epoch 与完整停止"
+msgstr ""
+"PIO packet/endpoint ownership, independent 48 MHz owner, control epochs and "
+"complete stop"
+
+msgid "[Raw Ethernet / MDIO](ethernet.md)"
+msgstr "[Raw Ethernet / MDIO](ethernet.md)"
+
+msgid "caller descriptor/RX loan、RMII、可选 DP83848；协议与 PHY/Board 政策外置"
+msgstr ""
+"Caller descriptors/RX loans, RMII and optional DP83848; external protocols "
+"and PHY/Board policy"
+
+msgid "[高级 timer](timer-advanced.md)"
+msgstr "[Advanced timers](timer-advanced.md)"
+
+msgid "capture 事件、complementary PWM/deadtime/break；共享资源与实际安全边界"
+msgstr ""
+"Capture events and complementary PWM/deadtime/break; shared resources and "
+"actual safety boundaries"
+
+msgid "[用户 I/O broker](user-io-broker.md)"
+msgstr "[User I/O broker](user-io-broker.md)"
+
+msgid ""
+"kernel-invoked scalar GPIO、可信 principal/pin/copy；U575 同步参考 transport 另见双域合同"
+msgstr ""
+"Kernel-invoked scalar GPIO and trusted principal/pin/copy; see dual-world "
+"contract for separate U575 synchronous reference transport"
+
+msgid "[选定装配资格门禁](provider-assemblies.md)"
+msgstr "[Selected assembly qualification gate](provider-assemblies.md)"
+
+msgid "逐个 authored fixture 实际 ARM 构建、资源预算、链接保留和不可变输入"
+msgstr ""
+"Actual ARM builds per authored fixture, resource budgets, link retention and"
+" immutable inputs"
+
+msgid "[多控制器](multiple-controllers.md)"
+msgstr "[Multiple controllers](multiple-controllers.md)"
+
+msgid "独立 provider/IRQ/DMA 所有权；配置开放与硅片实现分别记录"
+msgstr ""
+"Independent provider/IRQ/DMA ownership; configuration availability and "
+"silicon implementation recorded separately"
+
+msgid "[STM32G474 接入](stm32g474.md)"
+msgstr "[STM32G474 integration](stm32g474.md)"
+
+msgid "精确型号、MB1367 来源、clock/startup/time/GPIO/LPUART 与 PA0/PA1 EXTI 软件夹具"
+msgstr ""
+"Exact part, MB1367 provenance, clock/startup/time/GPIO/LPUART and PA0/PA1 "
+"EXTI software fixtures"
+
+msgid ""
+"[STM32H743 接入](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32h743/README.md)"
+msgstr ""
+"[STM32H743 integration](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/soc/stm32h743/README.md)"
+
+msgid "四种固定 HSI/cache 配置、冷态 cache 所有权与 USART3 DMA TX；RX 仍为 IRQ bytes"
+msgstr ""
+"Four fixed HSI/cache configurations, cold-cache ownership and USART3 DMA TX;"
+" RX remains IRQ bytes"
+
+msgid "[U575 双域参考合同](u575-trustzone-contract.md)"
+msgstr "[U575 dual-world reference contract](u575-trustzone-contract.md)"
+
+msgid ""
+"独立 Secure/NS Runtime、冷态归属封存、固定 NS world 与同步 GPIO；无 RTOS/factory/async/HIL "
+"扩大承诺"
+msgstr ""
+"Independent Secure/NS Runtime, cold-attribution seal, fixed NS world and "
+"synchronous GPIO; no expanded RTOS/factory/async/HIL promise"
+
+msgid "[SoC 完善与 55 项台账](soc-refinement.md)"
+msgstr "[SoC refinement and 55-item ledger](soc-refinement.md)"
+
+msgid "实现范围、原始退出条件、软件机制与实板验收分列"
+msgstr ""
+"Separate implementation scope, original exits, software mechanisms and "
+"physical acceptance"
+
+msgid "[I2C 总线恢复](i2c-bus-clear.md)"
+msgstr "[I2C bus recovery](i2c-bus-clear.md)"
+
+msgid "调用者独占 GPIO、有限时序与失败后继续清理的合同"
+msgstr ""
+"Caller-exclusive GPIO, finite timing and continued cleanup after failures"
+
+msgid "[UART DMA 与 RS485](uart-dma-rs485.md)"
+msgstr "[UART DMA and RS485](uart-dma-rs485.md)"
+
+msgid "有限/连续接收、双向 DMA、流控和真实 TC/DE 时序"
+msgstr ""
+"Finite/continuous receive, duplex DMA, flow control and actual TC/DE timing"
+
+msgid "{download}`OS01–OS55 台账 <os-execution.csv>`"
+msgstr "{download}`OS01–OS55 ledger <os-execution.csv>`"
+
+msgid "每项实际机制、证据及软件/物理状态"
+msgstr "Actual mechanisms, evidence and software/physical status per item"
+
+msgid "[Arch 与 CPU runtime 契约](arch-contracts.md)"
+msgstr "[Arch and CPU-runtime contract](arch-contracts.md)"
+
+msgid "九核软件、原子操作、cache/MPU/SAU 和安全边界"
+msgstr "Nine-core software, atomics, cache/MPU/SAU and security boundaries"
+
+msgid "{download}`33项实施台账 <next-generation-execution.csv>`"
+msgstr "{download}`33-item execution ledger <next-generation-execution.csv>`"
+
+msgid "实现文件、证据入口、软件与物理状态分列"
+msgstr ""
+"Separate implementation files, evidence entries and software/physical status"
+
+msgid "{download}`本次 P0–P5 台账 <factory-platform-execution.csv>`"
+msgstr "{download}`Current P0–P5 ledger <factory-platform-execution.csv>`"
+
+msgid "factory、TOML、TDD、多实例与 IRQ/DMA/block 实现"
+msgstr ""
+"Factory, TOML, TDD, multiple instances and IRQ/DMA/block implementation"
+
+msgid "[故障观察与停机](fault-observation.md)"
+msgstr "[Fault observation and shutdown](fault-observation.md)"
+
+msgid "无状态观察窄端口、保持中断屏蔽、外部安全输出与实板边界"
+msgstr ""
+"Stateless narrow observation, preserved interrupt masks, external safe "
+"outputs and physical boundaries"
+
+msgid "[I/O 生命周期检查](io-lifecycle-matrix.md)"
+msgstr "[I/O lifecycle checks](io-lifecycle-matrix.md)"
+
+msgid "203 项有界性质、真实生产编译、同一测试执行和来源校验"
+msgstr ""
+"203 bounded properties, actual production compilation, one test execution "
+"and provenance validation"
+
+msgid "{download}`60项完善台账 <platform-refinement-execution.csv>`"
+msgstr ""
+"{download}`60-item refinement ledger <platform-refinement-execution.csv>`"
+
+msgid "本轮实现、软件执行、实板与外部阻塞分别记录；全部维护责任由Codex承担"
+msgstr ""
+"Separate implementation, software execution, boards and external blockers; "
+"Codex owns all maintenance"
+
+msgid "[实际架构](../delivery/architecture.md)"
+msgstr "[Actual architecture](../delivery/architecture.md)"
+
+msgid "当前目录、公共 factory 和多态接口、依赖方向"
+msgstr ""
+"Current directories, public factories/polymorphic interfaces and dependency "
+"direction"
+
+msgid "[当前资格边界](../delivery/qualification.md)"
+msgstr "[Current qualification boundaries](../delivery/qualification.md)"
+
+msgid "开发执行、clean软件候选、实板pending的区别"
+msgstr ""
+"Distinguish development execution, clean software candidates and pending "
+"boards"
+
+msgid ""
+"台账保留B0–B6和原始退出条件，新增implementation_paths/evidence_paths、software_status、 "
+"hardware_status。implemented表示机制已经存在，不表示所有退出条件已passed；开发验证 不能替代clean-source "
+"SDK、正式离线双构建和候选封存。NG028/030的正式执行以新生成 "
+"证据更新，硬件未接入，全部适用物理项not_executed。Glob表示同一机制的明确目录族， 不代表递归发现或缺省构建；X-Gen-"
+"Lab/nexus-examples路径是独立外部仓库。"
+msgstr ""
+"Ledgers retain B0–B6 and original exit conditions, adding "
+"implementation_paths/evidence_paths, software_status and hardware_status. "
+"Implemented means mechanisms exist, not every exit passed. Development "
+"cannot replace clean-source SDKs, formal offline dual builds or candidate "
+"sealing. Formal NG028/030 executions update freshly generated evidence. "
+"Hardware is disconnected and all applicable physical items are not_executed."
+" Glob denotes explicit directory families of one mechanism, not recursive "
+"discovery or default builds; X-Gen-Lab/nexus-examples paths belong to a "
+"separate repository."
+
+msgid ""
+"CPU 软件层覆盖 M0/M0+/M3/M4/M7/M23/M33/M55/M85，通过显式 CPU/IRQ facts 选择原子后端、ABI、可选 "
+"FPU/MVE/cache/MPU/SAU 与裸机/FreeRTOS port。外部 CPU runtime 不生成 "
+"SoC/Board/factory；ThreadX 另有明确的 Native/M4 子集，不能继承 九核 FreeRTOS port "
+"范围。配置示例与剩余条件见 [九核支持说明](../delivery/cortex-m.md)。这不扩大完整平台的芯片/板卡范围。"
+msgstr ""
+"CPU software covers M0/M0+/M3/M4/M7/M23/M33/M55/M85, selecting atomic "
+"backends, ABI, optional FPU/MVE/cache/MPU/SAU and baremetal/FreeRTOS ports "
+"through explicit CPU/IRQ facts. External CPU runtime generates no "
+"SoC/Board/factory. ThreadX maintains a separate explicit Native/M4 subset "
+"and inherits no nine-core FreeRTOS scope. See [nine-core "
+"support](../delivery/cortex-m.md) for configurations and outstanding "
+"conditions. This does not expand whole-platform chip/board scope."
+
+msgid ""
+"首发为启明STM32F407ZGT6、天空星STM32F407VET6和梁山派GD32F470ZGT6，裸机/ FreeRTOS、显式 ThreadX "
+"及Native模型。新增模式和 G474／H743／U575 纵切片按各文档的配置、 完整镜像与 SDK "
+"退出条件验收，不从公共类型推断全芯片接入。G474 的新增范围是 PA0/PA1 EXTI 事件；H743 支持 HSI 32/64 MHz 与 "
+"Cache off/on 的四种固定启动组合、 有限 DMA TX，未实现运行时调频或 DMA RX。U575 现有 TZEN0 平台与独立 TZEN1"
+" 无 OS 同步 GPIO 双域参考保持分开，后者不代表通用双域 factory、NS RTOS 或异步借用。 SOC-33–35 "
+"仍未实现；SOC-36 保留 partial，SOC-37–55 的物理验收仍为 not_executed。 "
+"三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实 "
+"Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应用/通信2、QA/HIL2、 "
+"构建发布1；维护责任由Codex全部承担，无需实名人员。远程branch protection状态 须通过GitHub独立核实，不能从本地角色文件推断。"
+msgstr ""
+"Launch boards are Qiming STM32F407ZGT6, SkyStar STM32F407VET6 and Liangshan "
+"GD32F470ZGT6, with baremetal/FreeRTOS, explicit ThreadX and Native models. "
+"New modes and G474/H743/U575 slices use their documented configuration, "
+"complete-image and SDK exits; public types do not imply whole-chip "
+"integration. G474 adds PA0/PA1 EXTI. H743 supports four HSI 32/64 MHz × "
+"Cache off/on startup combinations and finite DMA TX, without runtime "
+"reclocking or DMA RX. U575 TZEN0 and independent TZEN1 OS-free synchronous "
+"dual-world references remain separate; the latter is not generic dual-world "
+"factory, NS RTOS or asynchronous borrowing. SOC-33–35 remain unimplemented; "
+"SOC-36 remains partial; SOC-37–55 physical acceptance remains not_executed. "
+"Unreviewed physical PCB facts for all three Boards remain unknown; software "
+"fixtures are not physical routes. Roles follow the ten-person configuration:"
+" TL1, Core/I/O/OS2, BSP2, common applications/communications2, QA/HIL2, "
+"build/release1. Codex owns maintenance without named individuals. Remote "
+"branch protection needs independent GitHub verification and cannot be "
+"inferred from local role files."
+
+msgid ""
+"行为变更采用 RED → GREEN → REFACTOR；主机 GoogleTest/GoogleMock 测试真实生产 "
+"provider、factory 与 owner，配置工具用 Python unittest。commit hook 和 CI 执行同一 门禁，生产 "
+"MCU target 不链接测试框架。构建期资源验证、实际寄存器模型、ARM ELF 预算与物理 HIL 分别建立证据，方法表开销由实际 linked "
+"image 测量。"
+msgstr ""
+"Behavior changes follow RED → GREEN → REFACTOR. Host GoogleTest/GoogleMock "
+"tests execute real providers, factories and owners; configuration tools use "
+"Python unittest. Commit hooks and CI run the same gate; MCU targets link no "
+"test frameworks. Build-time resources, actual register models, ARM ELF "
+"budgets and physical HIL establish separate evidence; actual linked images "
+"measure method-table overhead."
+
+msgid "[Source compatibility and SDK versions](source-compatibility.md)"
+msgstr "[Source compatibility and SDK versions](source-compatibility.md)"

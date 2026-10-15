@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python",
+    "-B",
+    "tools/dev/dev.py",
+    "configure",
+    "--preset",
+    "native-debug"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0
+}

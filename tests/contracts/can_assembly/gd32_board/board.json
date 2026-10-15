@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "gd32f470-can-software-pin-contract",
+  "soc": "GD32F470ZGT6",
+  "soc_family": "gd32f470",
+  "source_revision": "software-pin-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 25000000
+  },
+  "bindings": [
+    {
+      "id": "can0",
+      "controller": "CAN0",
+      "route": "can0-pa11-pa12"
+    },
+    {
+      "id": "can1",
+      "controller": "CAN1",
+      "route": "can1-pb12-pb13"
+    }
+  ],
+  "reserved_resources": [
+    "timer:TIMER1"
+  ],
+  "unknowns": [
+    "Software pin contract, not a physical Board schematic or fitted transceiver binding",
+    "External transceiver, voltage, termination, jumpers and physical CAN not validated"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.gd32mcu.com/en/download",
+      "scope": "GD32F470xx Datasheet Rev2.2 Tables 2-7 / 2-8 AF9, exact ZG LQFP144 pins; software pad fixture only"
+    }
+  ]
+}

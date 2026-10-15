@@ -1,0 +1,26 @@
+{
+  "command": [
+    "python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_tdd_gate",
+    "tools.testing.test_io_lifecycle_matrix",
+    "tools.testing.test_tdd_matrix_integration",
+    "tools.testing.test_google_report",
+    "tools.testing.test_staged_execution"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0,
+  "source_before": {
+    "scripts/ci/tdd_gate.py": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b",
+    "tools/testing/test_tdd_gate.py": "534bb7e1fd6aa45ff12625eae997215a36e1f5621f808c6a21ec59847301ba67",
+    "scripts/ci/io_lifecycle_matrix.py": "4d22ca42533656f36e8d3840e5e6369ae1aa8f2b343780ecf3668d1709be7c8e"
+  },
+  "source_after": {
+    "scripts/ci/tdd_gate.py": "4f507a8f92450bbb9593c7313dba373c06579eb31ca1f08b8f54b2a43ce1692b",
+    "tools/testing/test_tdd_gate.py": "534bb7e1fd6aa45ff12625eae997215a36e1f5621f808c6a21ec59847301ba67",
+    "scripts/ci/io_lifecycle_matrix.py": "4d22ca42533656f36e8d3840e5e6369ae1aa8f2b343780ecf3668d1709be7c8e"
+  },
+  "source_unchanged": true
+}

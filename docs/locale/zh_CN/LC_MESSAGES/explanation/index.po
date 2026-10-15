@@ -1,0 +1,19 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: f6be73ad4175b5847b46a6f8958d8efb0a1952b5a6b0f062cbd0b25ccd9042b3\n"
+
+msgid "Architecture explanations"
+msgstr "架构解释"
+
+msgid ""
+"Understand boundaries, static assembly and retained storage before changing "
+"a provider. The linked design contracts remain authoritative."
+msgstr "修改提供者前，先理解边界、静态装配和必须保留的存储。链接的设计合同仍是规范依据。"

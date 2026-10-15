@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "tools.testing.test_threadx_lock",
+    "tools.testing.test_dependency_proposals",
+    "-v"
+  ],
+  "returncode": 0,
+  "source_HEAD": "6017b50b867e32b15fc7f3e98e9a37505d21aca9",
+  "scope": "Actual committed four-Gitlink inventory plus real tempGit fixtures and CLI regression"
+}

@@ -1,0 +1,120 @@
+{
+  "board": "stm32f407zg-controller-link-fixture",
+  "budget": {
+    "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-clock-review/stm32f407-custom/build/nexus-sdk/generated/resource-budget.json",
+    "sha256": "93aa9ca0082cd8774bf63793072672a7647ba81398cebb1abbd0abf8e79439f4",
+    "size": 189
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-clock-review/stm32f407-custom/assembly.toml",
+        "sha256": "157621d9d4233d7c58cbd5e60784d9eec8a4dc7207cc9882ed0e9ab14befb1d0",
+        "size": 293
+      },
+      "label": "external/assembly.toml"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+        "size": 585
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/routes.json",
+        "sha256": "5d3f57aca4a937e155ddc8c077d6d60cdba3ae7e6d3861cd3f61183fb25cbcf1",
+        "size": 11441
+      },
+      "label": "soc/stm32f407/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/soc.json",
+        "sha256": "4581bc0b75ede90883ba2b43781c642ba2eda955f0eb99cf266f2e1412966811",
+        "size": 7877
+      },
+      "label": "soc/stm32f407/soc.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tests/contracts/stm32_assembly/zg_board/board.json",
+        "sha256": "937936cecd900c6dfff2545c3df9e6bcedf37756cc01d265de0f2c9fe3aeca9a",
+        "size": 1866
+      },
+      "label": "tests/contracts/stm32_assembly/zg_board/board.json"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-clock-review/stm32f407-custom/build/bin/lowpower_fixture.elf",
+    "sha256": "b29f1f7a3251fbbf45d878db243316ed83abc65aa9cf6896d354c3e5b3687913",
+    "size": 23480
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 1048576,
+      "footprint_bytes": 6012,
+      "loaded_bytes": 6012,
+      "ranges": [
+        [
+          134217728,
+          134223740
+        ]
+      ]
+    },
+    "ram": {
+      "ccm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 131072,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536871888
+          ],
+          [
+            536999936,
+            537001984
+          ]
+        ],
+        "reserved_bytes": 3024
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536871888,
+        "start": 536871888
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537001984,
+        "start": 536999936
+      }
+    }
+  },
+  "part": "STM32F407ZGT6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-clock-review/stm32f407-custom/build/nexus-sdk/generated/resolved.json",
+    "sha256": "2d8d829d3ecaa00d82affa0e17bc5f1eba86657dda37a5a5a891e360e67ba6d9",
+    "size": 20978
+  },
+  "schema_version": 1,
+  "soc_family": "stm32f407",
+  "status": "passed",
+  "violations": []
+}

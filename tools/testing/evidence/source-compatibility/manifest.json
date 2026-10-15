@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "kind": "source_compatibility_dependency_maintenance_development_tdd",
+  "status": "development_passed",
+  "physical_status": "not_executed",
+  "software_candidate_qualification": false,
+  "current_factory_source_epoch": 1,
+  "binary_abi_supported": false,
+  "final_tests": 44,
+  "final_test_exit_code": 0,
+  "test_argv": [
+    ".venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_compatibility",
+    "tools.testing.test_dependency_proposals",
+    "-v"
+  ],
+  "environment": "PATH prefixes checkout .venv/bin, real installed CMake/Git; no test sharding/skips",
+  "red_scope": "Prototype missing implementation (17 compatibility/15 proposal tests executed), actual snapshot-change, upstream-request, local-config isolation and parent-traversal regressions; logs preserve real failure events, not an assertion every case failed",
+  "actual_upstream": {
+    "dependency": "freertos",
+    "status": "observed",
+    "refs": 104,
+    "exit_code": 0,
+    "requests": 1,
+    "scope": "Public read-only metadata; other dependencies and weekly scheduled workflow not executed by this record"
+  },
+  "production_sources": [
+    {
+      "path": "dependencies/platform-compatibility.json",
+      "sha256": "b3551672d2fae2619674aaa5444c53cec6238fdd53d378bb8d095edbd204c54d",
+      "size": 492
+    },
+    {
+      "path": "tools/configure/metadata.py",
+      "sha256": "9d5b96c46a8e4fe4ef7b969f937ee1e3c8562b12d403eb4bea6ecbeed53ba2ff",
+      "size": 3713
+    },
+    {
+      "path": "tools/maintenance/compatibility.py",
+      "sha256": "066c234630f35c94f8f8fdb04aec5a089594ccea58adb46c8fde0dc9a86d0f94",
+      "size": 11091
+    },
+    {
+      "path": "tools/maintenance/dependency_proposals.py",
+      "sha256": "a85ccb39d6ab2746d19c31846bd5414d96a8fa26cd71be878211dc0548990e47",
+      "size": 19418
+    },
+    {
+      "path": "tools/testing/test_compatibility.py",
+      "sha256": "3a905cf1b0e29c9a80494be8ee9448a20b78d1832518658722d8d180365886e9",
+      "size": 9411
+    },
+    {
+      "path": "tools/testing/test_dependency_proposals.py",
+      "sha256": "c4796b205d5b1b4bcd8af215d390d45b36fb8c118bb7608cf7c07387b05e3a9f",
+      "size": 12167
+    },
+    {
+      "path": "docs/design/source-compatibility.md",
+      "sha256": "edf0c13fcd8d8ab56e095988798b4a8db452ff331d5daeec8311e1b01d6326c9",
+      "size": 8411
+    },
+    {
+      "path": "tools/maintenance/README.md",
+      "sha256": "03e901baeb8555ac9df82cf91f140b4fc129730d0d5cdedbeb688120c30f2fc1",
+      "size": 5412
+    }
+  ],
+  "records": [
+    {
+      "path": "tools/testing/evidence/source-compatibility/compatibility-red.log",
+      "sha256": "e597a05b86bf23f3fdef97cb585c557ca26b4ffad733ea553a6af7e1dc9ca23c",
+      "size": 20278
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/compatibility-first-green.log",
+      "sha256": "87fbf5a50fbe79258b059a9b654d47608714249b753222ca6c092ab39e2c1973",
+      "size": 2744
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/snapshot-red.log",
+      "sha256": "2efe2d139263f70ed407e6d496429cb42c645c812578d8c1b92211ae9bd32feb",
+      "size": 4101
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/snapshot-green.log",
+      "sha256": "ef64d0327a18ae117ed54a0bc50f97efff581126556250e5efd970802540828b",
+      "size": 3466
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/proposals-red.log",
+      "sha256": "cf295a148a5ea6bd8d733b51c72bb302745588594f490e7c9b4e4d6f9dd26575",
+      "size": 5779
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/proposals-first-green.log",
+      "sha256": "60e28964ecd2cc3a2c0931b3788ecdd819300beb265d6a077862b4b6da13b58c",
+      "size": 2562
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/upstream-red.log",
+      "sha256": "f88ced8d6d6478c50ee823db555450b614141c61893833cf69952628d3b8b057",
+      "size": 7310
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/upstream-green.log",
+      "sha256": "10ccb3271bae38a1be8be5d97af893b6f50732495b3c36227221cbc6f14ff89b",
+      "size": 3712
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/local-config-red.log",
+      "sha256": "36c1c4a8d40fa88b6618b46833f92bf82e9002974ff3d1a9762ea5596fad544a",
+      "size": 5222
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/local-config-green.log",
+      "sha256": "94fda7272448a4acda5009efd0066c32e084d3d1c25b6659dc9ce9fd8e8b48df",
+      "size": 3933
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/canonical-path-red.log",
+      "sha256": "895c8b1638f1f4b28787b749ce499092f19e767ce947fb375ff9c4d391ef041a",
+      "size": 1454
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/final-green.log",
+      "sha256": "6f826efd5694c75c1becd3b1933ab3e0049fc0290b150354f76e3dae1722fa04",
+      "size": 7489
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/text-check.json",
+      "sha256": "6514089b27780d7dfea1d64e6bdd8d571e8fba1b11fb5ef28319b24aff6bfa57",
+      "size": 144
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/actual-upstream-source-bound.json",
+      "sha256": "f4571b45d614ac1f4a19c695b2d184172936136185c6e6ae28e90d0173261903",
+      "size": 18457
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/upstream-observations.json",
+      "sha256": "e838d5b75d57eff587f3bedbc74bdafee79990c163af23925cf5c3ca01a3f04e",
+      "size": 15161
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/upstream-request-0000.stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "tools/testing/evidence/source-compatibility/upstream-request-0000.stdout.bin",
+      "sha256": "a61093bb97db5734ee3f0075d6a03941b3a5bdaa0a24039ca39e290b5f21eb4d",
+      "size": 6196
+    }
+  ],
+  "limits": [
+    "Default inventory is offline and never changes Gitlinks/locks.",
+    "Provided gate references remain unreviewed; no dependency upgrade is approved or software-qualified.",
+    "Production configure/runtime macro and input-closure integration plus SDK required-file/package gates are owned by their integration changes, not asserted complete by this tool-only evidence.",
+    "Normal index style/hooks require root staging; production check_text/compiler checks passed before staging.",
+    "No firmware, probes, serial device, signal measurement or physical HIL executed."
+  ]
+}

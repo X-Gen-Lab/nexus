@@ -1,0 +1,37 @@
+Running main() from gmock_main.cc
+[==========] Running 14 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 14 tests from TimebaseLowpower
+[ RUN      ] TimebaseLowpower.PendingTickRejectsWithoutChangingSource
+[       OK ] TimebaseLowpower.PendingTickRejectsWithoutChangingSource (0 ms)
+[ RUN      ] TimebaseLowpower.CapturePreservesFractionAndHasADeclaredSampleBound
+[       OK ] TimebaseLowpower.CapturePreservesFractionAndHasADeclaredSampleBound (0 ms)
+[ RUN      ] TimebaseLowpower.PendingArrivalDuringDisableRollsBackControl
+[       OK ] TimebaseLowpower.PendingArrivalDuringDisableRollsBackControl (0 ms)
+[ RUN      ] TimebaseLowpower.ExcessiveOrReversedSampleWindowRejects
+[       OK ] TimebaseLowpower.ExcessiveOrReversedSampleWindowRejects (0 ms)
+[ RUN      ] TimebaseLowpower.AlarmUsesAbsoluteLowWordAcrossCounterWrap
+[       OK ] TimebaseLowpower.AlarmUsesAbsoluteLowWordAcrossCounterWrap (0 ms)
+[ RUN      ] TimebaseLowpower.ExpiredAndOverHorizonAlarmsHaveNoEffects
+[       OK ] TimebaseLowpower.ExpiredAndOverHorizonAlarmsHaveNoEffects (0 ms)
+[ RUN      ] TimebaseLowpower.LateArmRejectsAndPreservesOverflow
+[       OK ] TimebaseLowpower.LateArmRejectsAndPreservesOverflow (0 ms)
+[ RUN      ] TimebaseLowpower.DisarmNeverStealsSharedOverflowFlag
+[       OK ] TimebaseLowpower.DisarmNeverStealsSharedOverflowFlag (0 ms)
+[ RUN      ] TimebaseLowpower.FailedInterruptDisableCannotResumeAndForgetOwnership
+[       OK ] TimebaseLowpower.FailedInterruptDisableCannotResumeAndForgetOwnership (0 ms)
+[ RUN      ] TimebaseLowpower.FirstCounterConsumesShortLoadBeforeFutureFullReload
+[       OK ] TimebaseLowpower.FirstCounterConsumesShortLoadBeforeFutureFullReload (0 ms)
+[ RUN      ] TimebaseLowpower.NearZeroRemainderQuantizationAddsAtMostOneMicrosecond
+[       OK ] TimebaseLowpower.NearZeroRemainderQuantizationAddsAtMostOneMicrosecond (0 ms)
+[ RUN      ] TimebaseLowpower.UnprovenReloadIsAnExplicitRetainedFault
+[       OK ] TimebaseLowpower.UnprovenReloadIsAnExplicitRetainedFault (0 ms)
+[ RUN      ] TimebaseLowpower.AlarmDispatchClearsOnlyTheReservedCompareSource
+[       OK ] TimebaseLowpower.AlarmDispatchClearsOnlyTheReservedCompareSource (0 ms)
+[ RUN      ] TimebaseLowpower.TickHandlerRestoresFullPeriodBeforeKernelDispatch
+[       OK ] TimebaseLowpower.TickHandlerRestoresFullPeriodBeforeKernelDispatch (0 ms)
+[----------] 14 tests from TimebaseLowpower (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 14 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 14 tests.

@@ -1,0 +1,207 @@
+{
+  "schema": 1,
+  "passed": 33,
+  "suites": [
+    {
+      "target": "nexus_stm32_i2c_register_test",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 17,
+      "cases": [
+        {
+          "name": "ReceivesThreeFourAndMaximumLengthWithExactPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MixedReadsUseRepeatedStartWithoutIntermediateStop",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NackArbitrationAndBusErrorPreserveCompletedReadPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ContextAndOversizedMessagesRejectBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NeverDeadlineRejectsBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StuckStopCannotReportSuccessAndRequiresRecovery",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "EightMessageBoundIsValidatedBeforeTheFirstStart",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedStopDoesNotIssueAnotherStopAfterMasterRelease",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StopBitClearWithoutMasterReleaseCannotReportSuccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveRestartIsRequestedOnlyOnceEvenWhenHardwareClearsIt",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MissingLineFactsRejectInitializationAndRecovery",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ColdChildrenMatchExactControllerWithoutPortAccess",
+          "classname": "I2CPollingIdentity",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignControllerMethodsAndMissingBindingsReject",
+          "classname": "I2CPollingIdentity",
+          "status": "passed"
+        },
+        {
+          "name": "FixedNonreservedAddressIsValidatedWithoutStartup",
+          "classname": "I2CPollingIdentity",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "4abb6956b21ff660f4df2df44ea85de46e8fcba59fe4ea7bcc56cf49206e8397"
+    },
+    {
+      "target": "nexus_gd32_i2c_register_test",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 16,
+      "cases": [
+        {
+          "name": "ReceivesThreeFourAndMaximumLengthWithExactPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MixedReadsUseRepeatedStartWithoutIntermediateStop",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NackArbitrationAndBusErrorPreserveCompletedReadPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ContextAndOversizedMessagesRejectBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NeverDeadlineRejectsBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StuckStopCannotReportSuccessAndRequiresRecovery",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "EightMessageBoundIsValidatedBeforeTheFirstStart",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedStopDoesNotIssueAnotherStopAfterMasterRelease",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StopBitClearWithoutMasterReleaseCannotReportSuccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveRestartIsRequestedOnlyOnceEvenWhenHardwareClearsIt",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ColdChildrenMatchExactControllerWithoutPortAccess",
+          "classname": "I2CPollingIdentity",
+          "status": "passed"
+        },
+        {
+          "name": "ForeignControllerMethodsAndMissingBindingsReject",
+          "classname": "I2CPollingIdentity",
+          "status": "passed"
+        },
+        {
+          "name": "FixedNonreservedAddressIsValidatedWithoutStartup",
+          "classname": "I2CPollingIdentity",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "ebdf9bfb1a6c4b95ef1cc85b467f79d67f20de1369c5b11c0d9eec04afe76811"
+    }
+  ],
+  "source_before": {
+    "io/native/i2c.c": "8f06647793d623bb6e46b234f1e42b81ff6947c7e59db22762a07d4c1e82c4c2",
+    "soc/stm32f407/drivers/i2c.c": "abf23c627dc69edebf1fcc685c32e4542ba8d123550d701d5f7d993792f4c7d2",
+    "soc/gd32f470/drivers/i2c.c": "25ee035c32ea99b1bfffd1d09bee7c6c386c25f0b528bbfc7bb651160980675c",
+    "tests/google/i2c_register_test.cpp": "5bfe9b7b12d30f315718306afa20f52cf53f7aad3b46340e5379080cec01be6f"
+  },
+  "source_after": {
+    "io/native/i2c.c": "8f06647793d623bb6e46b234f1e42b81ff6947c7e59db22762a07d4c1e82c4c2",
+    "soc/stm32f407/drivers/i2c.c": "abf23c627dc69edebf1fcc685c32e4542ba8d123550d701d5f7d993792f4c7d2",
+    "soc/gd32f470/drivers/i2c.c": "25ee035c32ea99b1bfffd1d09bee7c6c386c25f0b528bbfc7bb651160980675c",
+    "tests/google/i2c_register_test.cpp": "5bfe9b7b12d30f315718306afa20f52cf53f7aad3b46340e5379080cec01be6f"
+  },
+  "source_unchanged": true,
+  "scope": "Dirty-source development provider regression; no clean candidate or hardware qualification."
+}

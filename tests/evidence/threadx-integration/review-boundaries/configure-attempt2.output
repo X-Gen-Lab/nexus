@@ -1,0 +1,8 @@
+-- Building standard ThreadX version
+-- THREADX_ARCH: linux
+-- THREADX_TOOLCHAIN: gnu
+-- POSIX compatibility layer not available for linux
+-- Using custom tx_user.h file from /workspace/nexus/os/threadx/config/tx_user.h
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-threadx-probe/build

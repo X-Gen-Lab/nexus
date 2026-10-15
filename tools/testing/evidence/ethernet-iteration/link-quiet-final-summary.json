@@ -1,0 +1,59 @@
+{
+  "scope": "Isolated developer software regression after original snapshot; physical not executed; factory/firmware integration by parent",
+  "red_failures": 2,
+  "suites": {
+    "link-quiet-final-green-ethernet_native_test.xml": {
+      "tests": 7,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0
+    },
+    "link-quiet-final-green-ethernet_api_test.xml": {
+      "tests": 3,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0
+    },
+    "link-quiet-final-green-dp83848_test.xml": {
+      "tests": 8,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0
+    },
+    "link-quiet-final-green-ethernet_mac_test.xml": {
+      "tests": 28,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0
+    },
+    "link-quiet-final-green-ethernet_gd32_test.xml": {
+      "tests": 29,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0
+    },
+    "link-quiet-final-green-ethernet_stm32_test.xml": {
+      "tests": 29,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0
+    }
+  },
+  "production_sha256": {
+    "io/native/ethernet.h": "2568cc442903e8b1fdd1c405046f61fe52be95691209d35c91161cd622ba872d",
+    "io/native/ethernet.c": "1db19fa0ab10e062d5c0ec8b82740bc2820d641d652982cfb662bea041eca6a2",
+    "io/native/ethernet_access.h": "2a2f63a1ee285f9dd748d93c140b1d3d2b59f9485cb34d0d7b28f8719dc8c307",
+    "io/private/eth_mac.h": "979e672eb814ac0736e09f714c71df86e4237078846c7d94f00ab94ae574d4c5",
+    "io/src/eth_mac.c": "f9c101066c53cc3888f06ed0e15e9e52d3fcc81696ca10a43b7cce43ed474e40",
+    "io/src/ethernet.c": "d0e0f23108ef0afa5ba1bf7240e18c1d3b5a3412ff86966ba9e7101be1996381",
+    "io/src/mdio.c": "6b19c9f91d8eda0205893bb929e8d117cb31e22cbe6246fc603193fed02d0a2f",
+    "io/include/nexus/io/mdio.h": "08dc907823ee68dfacb97065c58fbc2086e9fd39039d845cedbc94b21a781636",
+    "io/include/nexus/io/ethernet.h": "eb84797a309e6511535af610945cb4306b338d10b6519644f65bdc06fba56891",
+    "soc/gd32f470/drivers/ethernet.c": "befdeb0084e868422c40fe31b5673e8da356352c252ce457a3319ffb3e0ea491",
+    "soc/gd32f470/private/gd32f470_eth.h": "f70201e209d3295a1ad14feff35d7514d63f3c65807ba8deac138a72196c17c4",
+    "soc/stm32f407/drivers/ethernet.c": "ff4edd1671aac5dc0a85ff5554f1a54a0735f513ca447e69c093e46db887dbd3",
+    "soc/stm32f407/private/stm32f407_eth.h": "6ea3b2626831ff6d94f1cfa731e9c1608ebbfb3908ee16e12ef7ed8c913c3230",
+    "components/dp83848/src/dp83848.c": "0227aa4b39556c6dddb1670e8c78f380e6004b6b19c32f733df211a29f33b75f",
+    "components/dp83848/include/nexus/dp83848/dp83848.h": "74e13d6a404b333adb9b349981997460fd7e8c354c96428e75b6ceeb694474ca"
+  }
+}

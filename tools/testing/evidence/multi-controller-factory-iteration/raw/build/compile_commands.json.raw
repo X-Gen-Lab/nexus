@@ -1,0 +1,182 @@
+[
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build",
+  "command": "/usr/bin/cc  -I/workspace/nexus/io/include -I/workspace/nexus/core/include -std=gnu11 -o CMakeFiles/timer_api.dir/workspace/nexus/io/src/uart.c.o -c /workspace/nexus/io/src/uart.c",
+  "file": "/workspace/nexus/io/src/uart.c",
+  "output": "CMakeFiles/timer_api.dir/workspace/nexus/io/src/uart.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build",
+  "command": "/usr/bin/cc  -I/workspace/nexus/io/include -I/workspace/nexus/core/include -std=gnu11 -o CMakeFiles/timer_api.dir/workspace/nexus/io/src/spi.c.o -c /workspace/nexus/io/src/spi.c",
+  "file": "/workspace/nexus/io/src/spi.c",
+  "output": "CMakeFiles/timer_api.dir/workspace/nexus/io/src/spi.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build",
+  "command": "/usr/bin/cc  -I/workspace/nexus/io/include -I/workspace/nexus/core/include -std=gnu11 -o CMakeFiles/timer_api.dir/workspace/nexus/io/src/i2c.c.o -c /workspace/nexus/io/src/i2c.c",
+  "file": "/workspace/nexus/io/src/i2c.c",
+  "output": "CMakeFiles/timer_api.dir/workspace/nexus/io/src/i2c.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build",
+  "command": "/usr/bin/cc  -I/workspace/nexus/io/include -I/workspace/nexus/core/include -std=gnu11 -o CMakeFiles/timer_api.dir/workspace/nexus/io/src/dma.c.o -c /workspace/nexus/io/src/dma.c",
+  "file": "/workspace/nexus/io/src/dma.c",
+  "output": "CMakeFiles/timer_api.dir/workspace/nexus/io/src/dma.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build",
+  "command": "/usr/bin/cc  -I/workspace/nexus/io/include -I/workspace/nexus/core/include -std=gnu11 -o CMakeFiles/timer_api.dir/workspace/nexus/io/src/wake.c.o -c /workspace/nexus/io/src/wake.c",
+  "file": "/workspace/nexus/io/src/wake.c",
+  "output": "CMakeFiles/timer_api.dir/workspace/nexus/io/src/wake.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build",
+  "command": "/usr/bin/cc  -I/workspace/nexus/io/include -I/workspace/nexus/core/include -std=gnu11 -o CMakeFiles/timer_api.dir/workspace/nexus/core/src/request.c.o -c /workspace/nexus/core/src/request.c",
+  "file": "/workspace/nexus/core/src/request.c",
+  "output": "CMakeFiles/timer_api.dir/workspace/nexus/core/src/request.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build",
+  "command": "/usr/bin/cc  -I/workspace/nexus/io/include -I/workspace/nexus/core/include -std=gnu11 -o CMakeFiles/timer_api.dir/workspace/nexus/core/src/time.c.o -c /workspace/nexus/core/src/time.c",
+  "file": "/workspace/nexus/core/src/time.c",
+  "output": "CMakeFiles/timer_api.dir/workspace/nexus/core/src/time.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build",
+  "command": "/usr/bin/cc  -I/workspace/nexus/arch/include -std=gnu11 -o CMakeFiles/timer_arch.dir/workspace/nexus/arch/native/nx_arch_native.c.o -c /workspace/nexus/arch/native/nx_arch_native.c",
+  "file": "/workspace/nexus/arch/native/nx_arch_native.c",
+  "output": "CMakeFiles/timer_arch.dir/workspace/nexus/arch/native/nx_arch_native.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DNX_MULTI_FACTORY_STM32 -DSTM32F407xx -Dnx_stm32_gpio_clock_enable=nx_multi_actual_gpio_clock_enable -Dnx_stm32_pin_capture=nx_multi_actual_pin_capture -Dnx_stm32_pin_configure=nx_multi_actual_pin_configure -Dnx_stm32_pin_restore=nx_multi_actual_pin_restore -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32 -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -std=gnu11 -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_stm32_multi_controller_factory_test_gpio.dir/workspace/nexus/soc/stm32f407/drivers/gpio.c.o -c /workspace/nexus/soc/stm32f407/drivers/gpio.c",
+  "file": "/workspace/nexus/soc/stm32f407/drivers/gpio.c",
+  "output": "test-import/CMakeFiles/nexus_stm32_multi_controller_factory_test_gpio.dir/workspace/nexus/soc/stm32f407/drivers/gpio.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/c++ -DNX_MULTI_FACTORY_STM32 -DSTM32F407xx -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -o CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/tests/google/multi_controller_factory_test.cpp.o -c /workspace/nexus/tests/google/multi_controller_factory_test.cpp",
+  "file": "/workspace/nexus/tests/google/multi_controller_factory_test.cpp",
+  "output": "test-import/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/tests/google/multi_controller_factory_test.cpp.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DNX_MULTI_FACTORY_STM32 -DSTM32F407xx -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/multi-controller-factory-stm32/bindings.c.o -c /workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32/bindings.c",
+  "file": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32/bindings.c",
+  "output": "test-import/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/multi-controller-factory-stm32/bindings.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DNX_MULTI_FACTORY_STM32 -DSTM32F407xx -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/uart.c.o -c /workspace/nexus/soc/stm32f407/drivers/uart.c",
+  "file": "/workspace/nexus/soc/stm32f407/drivers/uart.c",
+  "output": "test-import/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/uart.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DNX_MULTI_FACTORY_STM32 -DSTM32F407xx -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/uart_dma.c.o -c /workspace/nexus/soc/stm32f407/drivers/uart_dma.c",
+  "file": "/workspace/nexus/soc/stm32f407/drivers/uart_dma.c",
+  "output": "test-import/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/uart_dma.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DNX_MULTI_FACTORY_STM32 -DSTM32F407xx -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/spi.c.o -c /workspace/nexus/soc/stm32f407/drivers/spi.c",
+  "file": "/workspace/nexus/soc/stm32f407/drivers/spi.c",
+  "output": "test-import/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/spi.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DNX_MULTI_FACTORY_STM32 -DSTM32F407xx -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/spi_dma.c.o -c /workspace/nexus/soc/stm32f407/drivers/spi_dma.c",
+  "file": "/workspace/nexus/soc/stm32f407/drivers/spi_dma.c",
+  "output": "test-import/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/spi_dma.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DNX_MULTI_FACTORY_STM32 -DSTM32F407xx -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/i2c_async.c.o -c /workspace/nexus/soc/stm32f407/drivers/i2c_async.c",
+  "file": "/workspace/nexus/soc/stm32f407/drivers/i2c_async.c",
+  "output": "test-import/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/i2c_async.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DNX_MULTI_FACTORY_STM32 -DSTM32F407xx -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-stm32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/common/i2c_v1_async.c.o -c /workspace/nexus/soc/common/i2c_v1_async.c",
+  "file": "/workspace/nexus/soc/common/i2c_v1_async.c",
+  "output": "test-import/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/workspace/nexus/soc/common/i2c_v1_async.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -Dnx_gd32_gpio_clock_enable=nx_multi_actual_gpio_clock_enable -Dnx_gd32_pin_capture=nx_multi_actual_pin_capture -Dnx_gd32_pin_configure=nx_multi_actual_pin_configure -Dnx_gd32_pin_restore=nx_multi_actual_pin_restore -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32 -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test_gpio.dir/workspace/nexus/soc/gd32f470/drivers/gpio.c.o -c /workspace/nexus/soc/gd32f470/drivers/gpio.c",
+  "file": "/workspace/nexus/soc/gd32f470/drivers/gpio.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test_gpio.dir/workspace/nexus/soc/gd32f470/drivers/gpio.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/soc/gd32f470/private -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.o -c /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c",
+  "file": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/soc/gd32f470/private -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c.o -c /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c",
+  "file": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/soc/gd32f470/private -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_usart.c.o -c /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_usart.c",
+  "file": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_usart.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_usart.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/soc/gd32f470/private -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_spi.c.o -c /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_spi.c",
+  "file": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_spi.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_spi.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/c++ -DGD32F470 -DHXTAL_VALUE=25000000 -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -o CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/tests/google/multi_controller_factory_test.cpp.o -c /workspace/nexus/tests/google/multi_controller_factory_test.cpp",
+  "file": "/workspace/nexus/tests/google/multi_controller_factory_test.cpp",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/tests/google/multi_controller_factory_test.cpp.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/multi-controller-factory-gd32/bindings.c.o -c /workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32/bindings.c",
+  "file": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32/bindings.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/multi-controller-factory-gd32/bindings.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/uart.c.o -c /workspace/nexus/soc/gd32f470/drivers/uart.c",
+  "file": "/workspace/nexus/soc/gd32f470/drivers/uart.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/uart.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/uart_dma.c.o -c /workspace/nexus/soc/gd32f470/drivers/uart_dma.c",
+  "file": "/workspace/nexus/soc/gd32f470/drivers/uart_dma.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/uart_dma.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/spi.c.o -c /workspace/nexus/soc/gd32f470/drivers/spi.c",
+  "file": "/workspace/nexus/soc/gd32f470/drivers/spi.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/spi.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/spi_dma.c.o -c /workspace/nexus/soc/gd32f470/drivers/spi_dma.c",
+  "file": "/workspace/nexus/soc/gd32f470/drivers/spi_dma.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/spi_dma.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/i2c_async.c.o -c /workspace/nexus/soc/gd32f470/drivers/i2c_async.c",
+  "file": "/workspace/nexus/soc/gd32f470/drivers/i2c_async.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/i2c_async.c.o"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/multi-factory-tests/build/test-import",
+  "command": "/usr/bin/cc -DGD32F470 -DHXTAL_VALUE=25000000 -D_fini=nx_multi_fixture_fini -D_init=nx_multi_fixture_init -I/workspace/nexus-industrial-design/multi-factory-tests/build/test-import/multi-controller-factory-gd32 -I/workspace/nexus/io/private -I/workspace/nexus/soc/common -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu11 -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus-industrial-design/multi-factory-tests/test-import/multi_controller_factory_model.h -Wno-int-to-pointer-cast -o CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/common/i2c_v1_async.c.o -c /workspace/nexus/soc/common/i2c_v1_async.c",
+  "file": "/workspace/nexus/soc/common/i2c_v1_async.c",
+  "output": "test-import/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/workspace/nexus/soc/common/i2c_v1_async.c.o"
+}
+]

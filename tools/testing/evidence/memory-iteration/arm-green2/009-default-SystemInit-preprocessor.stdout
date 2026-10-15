@@ -1,0 +1,2314 @@
+typedef signed char __int8_t;
+typedef unsigned char __uint8_t;
+typedef short int __int16_t;
+typedef short unsigned int __uint16_t;
+typedef long int __int32_t;
+typedef long unsigned int __uint32_t;
+typedef long long int __int64_t;
+typedef long long unsigned int __uint64_t;
+typedef signed char __int_least8_t;
+typedef unsigned char __uint_least8_t;
+typedef short int __int_least16_t;
+typedef short unsigned int __uint_least16_t;
+typedef long int __int_least32_t;
+typedef long unsigned int __uint_least32_t;
+typedef long long int __int_least64_t;
+typedef long long unsigned int __uint_least64_t;
+typedef long long int __intmax_t;
+typedef long long unsigned int __uintmax_t;
+typedef int __intptr_t;
+typedef unsigned int __uintptr_t;
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+typedef __int8_t int8_t ;
+typedef __uint8_t uint8_t ;
+typedef __int16_t int16_t ;
+typedef __uint16_t uint16_t ;
+typedef __int32_t int32_t ;
+typedef __uint32_t uint32_t ;
+typedef __int64_t int64_t ;
+typedef __uint64_t uint64_t ;
+typedef __intmax_t intmax_t;
+typedef __uintmax_t uintmax_t;
+typedef __intptr_t intptr_t;
+typedef __uintptr_t uintptr_t;
+typedef __int_least8_t int_least8_t;
+typedef __uint_least8_t uint_least8_t;
+typedef __int_least16_t int_least16_t;
+typedef __uint_least16_t uint_least16_t;
+typedef __int_least32_t int_least32_t;
+typedef __uint_least32_t uint_least32_t;
+typedef __int_least64_t int_least64_t;
+typedef __uint_least64_t uint_least64_t;
+  typedef int int_fast8_t;
+  typedef unsigned int uint_fast8_t;
+  typedef int int_fast16_t;
+  typedef unsigned int uint_fast16_t;
+  typedef int int_fast32_t;
+  typedef unsigned int uint_fast32_t;
+  typedef long long int int_fast64_t;
+  typedef long long unsigned int uint_fast64_t;
+typedef struct {
+    uint32_t value;
+} nx_arch_irq_state_t;
+typedef struct {
+    uint32_t primask;
+    uint32_t basepri;
+    uint32_t faultmask;
+} nx_arch_irq_masks_t;
+nx_arch_irq_state_t nx_arch_irq_save(void);
+void nx_arch_irq_restore(nx_arch_irq_state_t previous);
+nx_arch_irq_masks_t nx_arch_irq_masks(void);
+_Bool nx_arch_irq_is_masked(void);
+uint32_t nx_arch_exception_number(void);
+_Bool nx_arch_is_privileged(void);
+_Bool nx_arch_in_isr(void);
+void nx_arch_dmb(void);
+void nx_arch_dsb(void);
+void nx_arch_isb(void);
+_Bool nx_arch_cycle_snapshot(uint32_t* cycles);
+typedef int ptrdiff_t;
+typedef unsigned int size_t;
+typedef unsigned int wchar_t;
+typedef struct {
+  long long __max_align_ll __attribute__((__aligned__(__alignof__(long long))));
+  long double __max_align_ld __attribute__((__aligned__(__alignof__(long double))));
+} max_align_t;
+typedef enum {
+    NX_SUCCESS = 0,
+    NX_ERROR_INVALID,
+    NX_ERROR_BUSY,
+    NX_ERROR_STATE,
+    NX_ERROR_TIMEOUT,
+    NX_ERROR_CANCELLED,
+    NX_ERROR_IO,
+    NX_ERROR_UNSUPPORTED,
+    NX_ERROR_OVERFLOW,
+    NX_ERROR_EMPTY,
+    NX_ERROR_PERMISSION,
+    NX_ERROR_NACK,
+    NX_ERROR_ARBITRATION,
+    NX_ERROR_EXHAUSTED,
+    NX_ERROR_CONTEXT
+} nx_result_t;
+typedef uint64_t nx_time_us_t;
+typedef struct {
+    nx_time_us_t (*read)(void* context);
+    void* context;
+} nx_clock_t;
+typedef struct {
+    uint64_t ticks;
+    uint32_t previous;
+    uint32_t frequency_hz;
+    _Bool initialized;
+} nx_clock32_t;
+nx_time_us_t nx_time_now_us(void);
+_Bool nx_deadline_expired(nx_time_us_t deadline, nx_time_us_t now);
+nx_time_us_t nx_deadline_after(nx_time_us_t now, uint64_t duration_us);
+nx_result_t nx_clock32_initialize(nx_clock32_t* clock, uint32_t counter,
+                                  uint32_t frequency_hz);
+nx_result_t nx_clock32_observe(nx_clock32_t* clock, uint32_t counter,
+                               nx_time_us_t* time_us);
+int nx_gd32_soc_start(void);
+int nx_gd32_soc_stop(void);
+uint64_t nx_gd32_now_us(void);
+static inline uint32_t nx_gd32_critical_enter(void) {
+    return nx_arch_irq_save().value;
+}
+static inline void nx_gd32_critical_leave(uint32_t mask) {
+    nx_arch_irq_state_t previous = {mask};
+    nx_arch_irq_restore(previous);
+}
+static inline _Bool nx_gd32_in_isr(void) {
+    return nx_arch_in_isr();
+}
+static inline _Bool nx_gd32_irq_masked(void) {
+    return nx_arch_irq_is_masked();
+}
+static inline void nx_gd32_peripheral_barrier(void) {
+    nx_arch_dsb();
+    nx_arch_isb();
+}
+int nx_gd32_clock_start(void);
+int nx_gd32_clock_stop(void);
+void TIMER1_IRQHandler(void);
+typedef enum IRQn
+{
+    NonMaskableInt_IRQn = -14,
+    HardFault_IRQn = -13,
+    MemoryManagement_IRQn = -12,
+    BusFault_IRQn = -11,
+    UsageFault_IRQn = -10,
+    SVCall_IRQn = -5,
+    DebugMonitor_IRQn = -4,
+    PendSV_IRQn = -2,
+    SysTick_IRQn = -1,
+    WWDGT_IRQn = 0,
+    LVD_IRQn = 1,
+    TAMPER_STAMP_IRQn = 2,
+    RTC_WKUP_IRQn = 3,
+    FMC_IRQn = 4,
+    RCU_CTC_IRQn = 5,
+    EXTI0_IRQn = 6,
+    EXTI1_IRQn = 7,
+    EXTI2_IRQn = 8,
+    EXTI3_IRQn = 9,
+    EXTI4_IRQn = 10,
+    DMA0_Channel0_IRQn = 11,
+    DMA0_Channel1_IRQn = 12,
+    DMA0_Channel2_IRQn = 13,
+    DMA0_Channel3_IRQn = 14,
+    DMA0_Channel4_IRQn = 15,
+    DMA0_Channel5_IRQn = 16,
+    DMA0_Channel6_IRQn = 17,
+    ADC_IRQn = 18,
+    CAN0_TX_IRQn = 19,
+    CAN0_RX0_IRQn = 20,
+    CAN0_RX1_IRQn = 21,
+    CAN0_EWMC_IRQn = 22,
+    EXTI5_9_IRQn = 23,
+    TIMER0_BRK_TIMER8_IRQn = 24,
+    TIMER0_UP_TIMER9_IRQn = 25,
+    TIMER0_TRG_CMT_TIMER10_IRQn = 26,
+    TIMER0_Channel_IRQn = 27,
+    TIMER1_IRQn = 28,
+    TIMER2_IRQn = 29,
+    TIMER3_IRQn = 30,
+    I2C0_EV_IRQn = 31,
+    I2C0_ER_IRQn = 32,
+    I2C1_EV_IRQn = 33,
+    I2C1_ER_IRQn = 34,
+    SPI0_IRQn = 35,
+    SPI1_IRQn = 36,
+    USART0_IRQn = 37,
+    USART1_IRQn = 38,
+    USART2_IRQn = 39,
+    EXTI10_15_IRQn = 40,
+    RTC_Alarm_IRQn = 41,
+    USBFS_WKUP_IRQn = 42,
+    TIMER7_BRK_TIMER11_IRQn = 43,
+    TIMER7_UP_TIMER12_IRQn = 44,
+    TIMER7_TRG_CMT_TIMER13_IRQn = 45,
+    TIMER7_Channel_IRQn = 46,
+    DMA0_Channel7_IRQn = 47,
+    EXMC_IRQn = 48,
+    SDIO_IRQn = 49,
+    TIMER4_IRQn = 50,
+    SPI2_IRQn = 51,
+    UART3_IRQn = 52,
+    UART4_IRQn = 53,
+    TIMER5_DAC_IRQn = 54,
+    TIMER6_IRQn = 55,
+    DMA1_Channel0_IRQn = 56,
+    DMA1_Channel1_IRQn = 57,
+    DMA1_Channel2_IRQn = 58,
+    DMA1_Channel3_IRQn = 59,
+    DMA1_Channel4_IRQn = 60,
+    ENET_IRQn = 61,
+    ENET_WKUP_IRQn = 62,
+    CAN1_TX_IRQn = 63,
+    CAN1_RX0_IRQn = 64,
+    CAN1_RX1_IRQn = 65,
+    CAN1_EWMC_IRQn = 66,
+    USBFS_IRQn = 67,
+    DMA1_Channel5_IRQn = 68,
+    DMA1_Channel6_IRQn = 69,
+    DMA1_Channel7_IRQn = 70,
+    USART5_IRQn = 71,
+    I2C2_EV_IRQn = 72,
+    I2C2_ER_IRQn = 73,
+    USBHS_EP1_Out_IRQn = 74,
+    USBHS_EP1_In_IRQn = 75,
+    USBHS_WKUP_IRQn = 76,
+    USBHS_IRQn = 77,
+    DCI_IRQn = 78,
+    TRNG_IRQn = 80,
+    FPU_IRQn = 81,
+    UART6_IRQn = 82,
+    UART7_IRQn = 83,
+    SPI3_IRQn = 84,
+    SPI4_IRQn = 85,
+    SPI5_IRQn = 86,
+    TLI_IRQn = 88,
+    TLI_ER_IRQn = 89,
+    IPA_IRQn = 90,
+} IRQn_Type;
+__attribute__( ( always_inline ) ) static inline void __NOP(void)
+{
+  __asm volatile ("nop");
+}
+__attribute__( ( always_inline ) ) static inline void __WFI(void)
+{
+  __asm volatile ("wfi");
+}
+__attribute__( ( always_inline ) ) static inline void __WFE(void)
+{
+  __asm volatile ("wfe");
+}
+__attribute__( ( always_inline ) ) static inline void __SEV(void)
+{
+  __asm volatile ("sev");
+}
+__attribute__( ( always_inline ) ) static inline void __ISB(void)
+{
+  __asm volatile ("isb");
+}
+__attribute__( ( always_inline ) ) static inline void __DSB(void)
+{
+  __asm volatile ("dsb");
+}
+__attribute__( ( always_inline ) ) static inline void __DMB(void)
+{
+  __asm volatile ("dmb");
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __REV(uint32_t value)
+{
+  uint32_t result;
+  __asm volatile ("rev %0, %1" : "=r" (result) : "r" (value) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __REV16(uint32_t value)
+{
+  uint32_t result;
+  __asm volatile ("rev16 %0, %1" : "=r" (result) : "r" (value) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline int32_t __REVSH(int32_t value)
+{
+  uint32_t result;
+  __asm volatile ("revsh %0, %1" : "=r" (result) : "r" (value) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __ROR(uint32_t op1, uint32_t op2)
+{
+  __asm volatile ("ror %0, %0, %1" : "+r" (op1) : "r" (op2) );
+  return(op1);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __RBIT(uint32_t value)
+{
+  uint32_t result;
+   __asm volatile ("rbit %0, %1" : "=r" (result) : "r" (value) );
+   return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint8_t __LDREXB(volatile uint8_t *addr)
+{
+    uint8_t result;
+   __asm volatile ("ldrexb %0, [%1]" : "=r" (result) : "r" (addr) );
+   return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint16_t __LDREXH(volatile uint16_t *addr)
+{
+    uint16_t result;
+   __asm volatile ("ldrexh %0, [%1]" : "=r" (result) : "r" (addr) );
+   return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __LDREXW(volatile uint32_t *addr)
+{
+    uint32_t result;
+   __asm volatile ("ldrex %0, [%1]" : "=r" (result) : "r" (addr) );
+   return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __STREXB(uint8_t value, volatile uint8_t *addr)
+{
+   uint32_t result;
+   __asm volatile ("strexb %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+   return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __STREXH(uint16_t value, volatile uint16_t *addr)
+{
+   uint32_t result;
+   __asm volatile ("strexh %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+   return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __STREXW(uint32_t value, volatile uint32_t *addr)
+{
+   uint32_t result;
+   __asm volatile ("strex %0, %2, [%1]" : "=&r" (result) : "r" (addr), "r" (value) );
+   return(result);
+}
+__attribute__( ( always_inline ) ) static inline void __CLREX(void)
+{
+  __asm volatile ("clrex");
+}
+__attribute__( ( always_inline ) ) static inline uint8_t __CLZ(uint32_t value)
+{
+  uint8_t result;
+  __asm volatile ("clz %0, %1" : "=r" (result) : "r" (value) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline void __enable_irq(void)
+{
+  __asm volatile ("cpsie i");
+}
+__attribute__( ( always_inline ) ) static inline void __disable_irq(void)
+{
+  __asm volatile ("cpsid i");
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __get_CONTROL(void)
+{
+  uint32_t result;
+  __asm volatile ("MRS %0, control" : "=r" (result) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline void __set_CONTROL(uint32_t control)
+{
+  __asm volatile ("MSR control, %0" : : "r" (control) );
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __get_IPSR(void)
+{
+  uint32_t result;
+  __asm volatile ("MRS %0, ipsr" : "=r" (result) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __get_APSR(void)
+{
+  uint32_t result;
+  __asm volatile ("MRS %0, apsr" : "=r" (result) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __get_xPSR(void)
+{
+  uint32_t result;
+  __asm volatile ("MRS %0, xpsr" : "=r" (result) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __get_PSP(void)
+{
+  register uint32_t result;
+  __asm volatile ("MRS %0, psp\n" : "=r" (result) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline void __set_PSP(uint32_t topOfProcStack)
+{
+  __asm volatile ("MSR psp, %0\n" : : "r" (topOfProcStack) );
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __get_MSP(void)
+{
+  register uint32_t result;
+  __asm volatile ("MRS %0, msp\n" : "=r" (result) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline void __set_MSP(uint32_t topOfMainStack)
+{
+  __asm volatile ("MSR msp, %0\n" : : "r" (topOfMainStack) );
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __get_PRIMASK(void)
+{
+  uint32_t result;
+  __asm volatile ("MRS %0, primask" : "=r" (result) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline void __set_PRIMASK(uint32_t priMask)
+{
+  __asm volatile ("MSR primask, %0" : : "r" (priMask) );
+}
+__attribute__( ( always_inline ) ) static inline void __enable_fault_irq(void)
+{
+  __asm volatile ("cpsie f");
+}
+__attribute__( ( always_inline ) ) static inline void __disable_fault_irq(void)
+{
+  __asm volatile ("cpsid f");
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __get_BASEPRI(void)
+{
+  uint32_t result;
+  __asm volatile ("MRS %0, basepri_max" : "=r" (result) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline void __set_BASEPRI(uint32_t value)
+{
+  __asm volatile ("MSR basepri, %0" : : "r" (value) );
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __get_FAULTMASK(void)
+{
+  uint32_t result;
+  __asm volatile ("MRS %0, faultmask" : "=r" (result) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline void __set_FAULTMASK(uint32_t faultMask)
+{
+  __asm volatile ("MSR faultmask, %0" : : "r" (faultMask) );
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __get_FPSCR(void)
+{
+  uint32_t result;
+  __asm volatile ("VMRS %0, fpscr" : "=r" (result) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline void __set_FPSCR(uint32_t fpscr)
+{
+  __asm volatile ("VMSR fpscr, %0" : : "r" (fpscr) );
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SADD8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("sadd8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __QADD8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("qadd8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SHADD8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("shadd8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UADD8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uadd8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UQADD8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uqadd8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UHADD8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uhadd8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SSUB8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("ssub8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __QSUB8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("qsub8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SHSUB8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("shsub8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __USUB8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("usub8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UQSUB8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uqsub8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UHSUB8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uhsub8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SADD16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("sadd16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __QADD16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("qadd16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SHADD16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("shadd16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UADD16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uadd16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UQADD16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uqadd16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UHADD16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uhadd16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SSUB16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("ssub16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __QSUB16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("qsub16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SHSUB16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("shsub16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __USUB16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("usub16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UQSUB16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uqsub16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UHSUB16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uhsub16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SASX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("sasx %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __QASX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("qasx %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SHASX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("shasx %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UASX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uasx %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UQASX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uqasx %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UHASX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uhasx %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SSAX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("ssax %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __QSAX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("qsax %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SHSAX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("shsax %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __USAX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("usax %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UQSAX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uqsax %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UHSAX(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uhsax %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __USAD8(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("usad8 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __USADA8(uint32_t op1, uint32_t op2, uint32_t op3)
+{
+  uint32_t result;
+  __asm volatile ("usada8 %0, %1, %2, %3" : "=r" (result) : "r" (op1), "r" (op2), "r" (op3) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UXTB16(uint32_t op1)
+{
+  uint32_t result;
+  __asm volatile ("uxtb16 %0, %1" : "=r" (result) : "r" (op1));
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __UXTAB16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("uxtab16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SXTB16(uint32_t op1)
+{
+  uint32_t result;
+  __asm volatile ("sxtb16 %0, %1" : "=r" (result) : "r" (op1));
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SXTAB16(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("sxtab16 %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SMUAD (uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("smuad %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SMUADX (uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("smuadx %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SMLAD (uint32_t op1, uint32_t op2, uint32_t op3)
+{
+  uint32_t result;
+  __asm volatile ("smlad %0, %1, %2, %3" : "=r" (result) : "r" (op1), "r" (op2), "r" (op3) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SMLADX (uint32_t op1, uint32_t op2, uint32_t op3)
+{
+  uint32_t result;
+  __asm volatile ("smladx %0, %1, %2, %3" : "=r" (result) : "r" (op1), "r" (op2), "r" (op3) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint64_t __SMLALD (uint32_t op1, uint32_t op2, uint64_t acc)
+{
+  union llreg_u{
+    uint32_t w32[2];
+    uint64_t w64;
+  } llr;
+  llr.w64 = acc;
+  __asm volatile ("smlald %0, %1, %2, %3" : "=r" (llr.w32[0]), "=r" (llr.w32[1]): "r" (op1), "r" (op2) , "0" (llr.w32[0]), "1" (llr.w32[1]) );
+  return(llr.w64);
+}
+__attribute__( ( always_inline ) ) static inline uint64_t __SMLALDX (uint32_t op1, uint32_t op2, uint64_t acc)
+{
+  union llreg_u{
+    uint32_t w32[2];
+    uint64_t w64;
+  } llr;
+  llr.w64 = acc;
+  __asm volatile ("smlaldx %0, %1, %2, %3" : "=r" (llr.w32[0]), "=r" (llr.w32[1]): "r" (op1), "r" (op2) , "0" (llr.w32[0]), "1" (llr.w32[1]) );
+  return(llr.w64);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SMUSD (uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("smusd %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SMUSDX (uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("smusdx %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SMLSD (uint32_t op1, uint32_t op2, uint32_t op3)
+{
+  uint32_t result;
+  __asm volatile ("smlsd %0, %1, %2, %3" : "=r" (result) : "r" (op1), "r" (op2), "r" (op3) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SMLSDX (uint32_t op1, uint32_t op2, uint32_t op3)
+{
+  uint32_t result;
+  __asm volatile ("smlsdx %0, %1, %2, %3" : "=r" (result) : "r" (op1), "r" (op2), "r" (op3) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint64_t __SMLSLD (uint32_t op1, uint32_t op2, uint64_t acc)
+{
+  union llreg_u{
+    uint32_t w32[2];
+    uint64_t w64;
+  } llr;
+  llr.w64 = acc;
+  __asm volatile ("smlsld %0, %1, %2, %3" : "=r" (llr.w32[0]), "=r" (llr.w32[1]): "r" (op1), "r" (op2) , "0" (llr.w32[0]), "1" (llr.w32[1]) );
+  return(llr.w64);
+}
+__attribute__( ( always_inline ) ) static inline uint64_t __SMLSLDX (uint32_t op1, uint32_t op2, uint64_t acc)
+{
+  union llreg_u{
+    uint32_t w32[2];
+    uint64_t w64;
+  } llr;
+  llr.w64 = acc;
+  __asm volatile ("smlsldx %0, %1, %2, %3" : "=r" (llr.w32[0]), "=r" (llr.w32[1]): "r" (op1), "r" (op2) , "0" (llr.w32[0]), "1" (llr.w32[1]) );
+  return(llr.w64);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SEL (uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("sel %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __QADD(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("qadd %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __QSUB(uint32_t op1, uint32_t op2)
+{
+  uint32_t result;
+  __asm volatile ("qsub %0, %1, %2" : "=r" (result) : "r" (op1), "r" (op2) );
+  return(result);
+}
+__attribute__( ( always_inline ) ) static inline uint32_t __SMMLA (int32_t op1, int32_t op2, int32_t op3)
+{
+ int32_t result;
+ __asm volatile ("smmla %0, %1, %2, %3" : "=r" (result): "r" (op1), "r" (op2), "r" (op3) );
+ return(result);
+}
+typedef union
+{
+  struct
+  {
+    uint32_t _reserved0:16;
+    uint32_t GE:4;
+    uint32_t _reserved1:7;
+    uint32_t Q:1;
+    uint32_t V:1;
+    uint32_t C:1;
+    uint32_t Z:1;
+    uint32_t N:1;
+  } b;
+  uint32_t w;
+} APSR_Type;
+typedef union
+{
+  struct
+  {
+    uint32_t ISR:9;
+    uint32_t _reserved0:23;
+  } b;
+  uint32_t w;
+} IPSR_Type;
+typedef union
+{
+  struct
+  {
+    uint32_t ISR:9;
+    uint32_t _reserved0:7;
+    uint32_t GE:4;
+    uint32_t _reserved1:4;
+    uint32_t T:1;
+    uint32_t IT:2;
+    uint32_t Q:1;
+    uint32_t V:1;
+    uint32_t C:1;
+    uint32_t Z:1;
+    uint32_t N:1;
+  } b;
+  uint32_t w;
+} xPSR_Type;
+typedef union
+{
+  struct
+  {
+    uint32_t nPRIV:1;
+    uint32_t SPSEL:1;
+    uint32_t FPCA:1;
+    uint32_t _reserved0:29;
+  } b;
+  uint32_t w;
+} CONTROL_Type;
+typedef struct
+{
+  volatile uint32_t ISER[8];
+       uint32_t RESERVED0[24];
+  volatile uint32_t ICER[8];
+       uint32_t RSERVED1[24];
+  volatile uint32_t ISPR[8];
+       uint32_t RESERVED2[24];
+  volatile uint32_t ICPR[8];
+       uint32_t RESERVED3[24];
+  volatile uint32_t IABR[8];
+       uint32_t RESERVED4[56];
+  volatile uint8_t IP[240];
+       uint32_t RESERVED5[644];
+  volatile uint32_t STIR;
+} NVIC_Type;
+typedef struct
+{
+  volatile const uint32_t CPUID;
+  volatile uint32_t ICSR;
+  volatile uint32_t VTOR;
+  volatile uint32_t AIRCR;
+  volatile uint32_t SCR;
+  volatile uint32_t CCR;
+  volatile uint8_t SHP[12];
+  volatile uint32_t SHCSR;
+  volatile uint32_t CFSR;
+  volatile uint32_t HFSR;
+  volatile uint32_t DFSR;
+  volatile uint32_t MMFAR;
+  volatile uint32_t BFAR;
+  volatile uint32_t AFSR;
+  volatile const uint32_t PFR[2];
+  volatile const uint32_t DFR;
+  volatile const uint32_t ADR;
+  volatile const uint32_t MMFR[4];
+  volatile const uint32_t ISAR[5];
+       uint32_t RESERVED0[5];
+  volatile uint32_t CPACR;
+} SCB_Type;
+typedef struct
+{
+       uint32_t RESERVED0[1];
+  volatile const uint32_t ICTR;
+  volatile uint32_t ACTLR;
+} SCnSCB_Type;
+typedef struct
+{
+  volatile uint32_t CTRL;
+  volatile uint32_t LOAD;
+  volatile uint32_t VAL;
+  volatile const uint32_t CALIB;
+} SysTick_Type;
+typedef struct
+{
+  volatile union
+  {
+    volatile uint8_t u8;
+    volatile uint16_t u16;
+    volatile uint32_t u32;
+  } PORT [32];
+       uint32_t RESERVED0[864];
+  volatile uint32_t TER;
+       uint32_t RESERVED1[15];
+  volatile uint32_t TPR;
+       uint32_t RESERVED2[15];
+  volatile uint32_t TCR;
+       uint32_t RESERVED3[29];
+  volatile uint32_t IWR;
+  volatile const uint32_t IRR;
+  volatile uint32_t IMCR;
+       uint32_t RESERVED4[43];
+  volatile uint32_t LAR;
+  volatile const uint32_t LSR;
+       uint32_t RESERVED5[6];
+  volatile const uint32_t PID4;
+  volatile const uint32_t PID5;
+  volatile const uint32_t PID6;
+  volatile const uint32_t PID7;
+  volatile const uint32_t PID0;
+  volatile const uint32_t PID1;
+  volatile const uint32_t PID2;
+  volatile const uint32_t PID3;
+  volatile const uint32_t CID0;
+  volatile const uint32_t CID1;
+  volatile const uint32_t CID2;
+  volatile const uint32_t CID3;
+} ITM_Type;
+typedef struct
+{
+  volatile uint32_t CTRL;
+  volatile uint32_t CYCCNT;
+  volatile uint32_t CPICNT;
+  volatile uint32_t EXCCNT;
+  volatile uint32_t SLEEPCNT;
+  volatile uint32_t LSUCNT;
+  volatile uint32_t FOLDCNT;
+  volatile const uint32_t PCSR;
+  volatile uint32_t COMP0;
+  volatile uint32_t MASK0;
+  volatile uint32_t FUNCTION0;
+       uint32_t RESERVED0[1];
+  volatile uint32_t COMP1;
+  volatile uint32_t MASK1;
+  volatile uint32_t FUNCTION1;
+       uint32_t RESERVED1[1];
+  volatile uint32_t COMP2;
+  volatile uint32_t MASK2;
+  volatile uint32_t FUNCTION2;
+       uint32_t RESERVED2[1];
+  volatile uint32_t COMP3;
+  volatile uint32_t MASK3;
+  volatile uint32_t FUNCTION3;
+} DWT_Type;
+typedef struct
+{
+  volatile uint32_t SSPSR;
+  volatile uint32_t CSPSR;
+       uint32_t RESERVED0[2];
+  volatile uint32_t ACPR;
+       uint32_t RESERVED1[55];
+  volatile uint32_t SPPR;
+       uint32_t RESERVED2[131];
+  volatile const uint32_t FFSR;
+  volatile uint32_t FFCR;
+  volatile const uint32_t FSCR;
+       uint32_t RESERVED3[759];
+  volatile const uint32_t TRIGGER;
+  volatile const uint32_t FIFO0;
+  volatile const uint32_t ITATBCTR2;
+       uint32_t RESERVED4[1];
+  volatile const uint32_t ITATBCTR0;
+  volatile const uint32_t FIFO1;
+  volatile uint32_t ITCTRL;
+       uint32_t RESERVED5[39];
+  volatile uint32_t CLAIMSET;
+  volatile uint32_t CLAIMCLR;
+       uint32_t RESERVED7[8];
+  volatile const uint32_t DEVID;
+  volatile const uint32_t DEVTYPE;
+} TPI_Type;
+typedef struct
+{
+  volatile const uint32_t TYPE;
+  volatile uint32_t CTRL;
+  volatile uint32_t RNR;
+  volatile uint32_t RBAR;
+  volatile uint32_t RASR;
+  volatile uint32_t RBAR_A1;
+  volatile uint32_t RASR_A1;
+  volatile uint32_t RBAR_A2;
+  volatile uint32_t RASR_A2;
+  volatile uint32_t RBAR_A3;
+  volatile uint32_t RASR_A3;
+} MPU_Type;
+typedef struct
+{
+       uint32_t RESERVED0[1];
+  volatile uint32_t FPCCR;
+  volatile uint32_t FPCAR;
+  volatile uint32_t FPDSCR;
+  volatile const uint32_t MVFR0;
+  volatile const uint32_t MVFR1;
+} FPU_Type;
+typedef struct
+{
+  volatile uint32_t DHCSR;
+  volatile uint32_t DCRSR;
+  volatile uint32_t DCRDR;
+  volatile uint32_t DEMCR;
+} CoreDebug_Type;
+static inline void NVIC_SetPriorityGrouping(uint32_t PriorityGroup)
+{
+  uint32_t reg_value;
+  uint32_t PriorityGroupTmp = (PriorityGroup & (uint32_t)0x07);
+  reg_value = ((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->AIRCR;
+  reg_value &= ~((0xFFFFUL << 16) | (7UL << 8));
+  reg_value = (reg_value |
+                ((uint32_t)0x5FA << 16) |
+                (PriorityGroupTmp << 8));
+  ((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->AIRCR = reg_value;
+}
+static inline uint32_t NVIC_GetPriorityGrouping(void)
+{
+  return ((((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->AIRCR & (7UL << 8)) >> 8);
+}
+static inline void NVIC_EnableIRQ(IRQn_Type IRQn)
+{
+  ((NVIC_Type *) ((0xE000E000UL) + 0x0100UL) )->ISER[(uint32_t)((int32_t)IRQn) >> 5] = (uint32_t)(1 << ((uint32_t)((int32_t)IRQn) & (uint32_t)0x1F));
+}
+static inline void NVIC_DisableIRQ(IRQn_Type IRQn)
+{
+  ((NVIC_Type *) ((0xE000E000UL) + 0x0100UL) )->ICER[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
+}
+static inline uint32_t NVIC_GetPendingIRQ(IRQn_Type IRQn)
+{
+  return((uint32_t) ((((NVIC_Type *) ((0xE000E000UL) + 0x0100UL) )->ISPR[(uint32_t)(IRQn) >> 5] & (1 << ((uint32_t)(IRQn) & 0x1F)))?1:0));
+}
+static inline void NVIC_SetPendingIRQ(IRQn_Type IRQn)
+{
+  ((NVIC_Type *) ((0xE000E000UL) + 0x0100UL) )->ISPR[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
+}
+static inline void NVIC_ClearPendingIRQ(IRQn_Type IRQn)
+{
+  ((NVIC_Type *) ((0xE000E000UL) + 0x0100UL) )->ICPR[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
+}
+static inline uint32_t NVIC_GetActive(IRQn_Type IRQn)
+{
+  return((uint32_t)((((NVIC_Type *) ((0xE000E000UL) + 0x0100UL) )->IABR[(uint32_t)(IRQn) >> 5] & (1 << ((uint32_t)(IRQn) & 0x1F)))?1:0));
+}
+static inline void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
+{
+  if(IRQn < 0) {
+    ((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SHP[((uint32_t)(IRQn) & 0xF)-4] = ((priority << (8 - 4)) & 0xff); }
+  else {
+    ((NVIC_Type *) ((0xE000E000UL) + 0x0100UL) )->IP[(uint32_t)(IRQn)] = ((priority << (8 - 4)) & 0xff); }
+}
+static inline uint32_t NVIC_GetPriority(IRQn_Type IRQn)
+{
+  if(IRQn < 0) {
+    return((uint32_t)(((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->SHP[((uint32_t)(IRQn) & 0xF)-4] >> (8 - 4))); }
+  else {
+    return((uint32_t)(((NVIC_Type *) ((0xE000E000UL) + 0x0100UL) )->IP[(uint32_t)(IRQn)] >> (8 - 4))); }
+}
+static inline uint32_t NVIC_EncodePriority (uint32_t PriorityGroup, uint32_t PreemptPriority, uint32_t SubPriority)
+{
+  uint32_t PriorityGroupTmp = (PriorityGroup & 0x07);
+  uint32_t PreemptPriorityBits;
+  uint32_t SubPriorityBits;
+  PreemptPriorityBits = ((7 - PriorityGroupTmp) > 4) ? 4 : 7 - PriorityGroupTmp;
+  SubPriorityBits = ((PriorityGroupTmp + 4) < 7) ? 0 : PriorityGroupTmp - 7 + 4;
+  return (
+           ((PreemptPriority & ((1 << (PreemptPriorityBits)) - 1)) << SubPriorityBits) |
+           ((SubPriority & ((1 << (SubPriorityBits )) - 1)))
+         );
+}
+static inline void NVIC_DecodePriority (uint32_t Priority, uint32_t PriorityGroup, uint32_t* pPreemptPriority, uint32_t* pSubPriority)
+{
+  uint32_t PriorityGroupTmp = (PriorityGroup & 0x07);
+  uint32_t PreemptPriorityBits;
+  uint32_t SubPriorityBits;
+  PreemptPriorityBits = ((7 - PriorityGroupTmp) > 4) ? 4 : 7 - PriorityGroupTmp;
+  SubPriorityBits = ((PriorityGroupTmp + 4) < 7) ? 0 : PriorityGroupTmp - 7 + 4;
+  *pPreemptPriority = (Priority >> SubPriorityBits) & ((1 << (PreemptPriorityBits)) - 1);
+  *pSubPriority = (Priority ) & ((1 << (SubPriorityBits )) - 1);
+}
+static inline void NVIC_SystemReset(void)
+{
+  __DSB();
+  ((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->AIRCR = ((0x5FA << 16) |
+                 (((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->AIRCR & (7UL << 8)) |
+                 (1UL << 2));
+  __DSB();
+  while(1);
+}
+static inline uint32_t SysTick_Config(uint32_t ticks)
+{
+  if ((ticks - 1) > (0xFFFFFFUL << 0)) return (1);
+  ((SysTick_Type *) ((0xE000E000UL) + 0x0010UL) )->LOAD = ticks - 1;
+  NVIC_SetPriority (SysTick_IRQn, (1<<4) - 1);
+  ((SysTick_Type *) ((0xE000E000UL) + 0x0010UL) )->VAL = 0;
+  ((SysTick_Type *) ((0xE000E000UL) + 0x0010UL) )->CTRL = (1UL << 2) |
+                   (1UL << 1) |
+                   (1UL << 0);
+  return (0);
+}
+extern volatile int32_t ITM_RxBuffer;
+static inline uint32_t ITM_SendChar (uint32_t ch)
+{
+  if ((((ITM_Type *) (0xE0000000UL) )->TCR & (1UL << 0)) &&
+      (((ITM_Type *) (0xE0000000UL) )->TER & (1UL << 0) ) )
+  {
+    while (((ITM_Type *) (0xE0000000UL) )->PORT[0].u32 == 0);
+    ((ITM_Type *) (0xE0000000UL) )->PORT[0].u8 = (uint8_t) ch;
+  }
+  return (ch);
+}
+static inline int32_t ITM_ReceiveChar (void) {
+  int32_t ch = -1;
+  if (ITM_RxBuffer != 0x5AA55AA5) {
+    ch = ITM_RxBuffer;
+    ITM_RxBuffer = 0x5AA55AA5;
+  }
+  return (ch);
+}
+static inline int32_t ITM_CheckChar (void) {
+  if (ITM_RxBuffer == 0x5AA55AA5) {
+    return (0);
+  } else {
+    return (1);
+  }
+}
+extern uint32_t SystemCoreClock;
+extern void SystemInit (void);
+extern void SystemCoreClockUpdate (void);
+extern uint32_t gd32f4xx_firmware_version_get(void);
+typedef enum {DISABLE = 0, ENABLE = !DISABLE} EventStatus, ControlStatus;
+typedef enum {RESET = 0, SET = !RESET} FlagStatus;
+typedef enum {ERROR = 0, SUCCESS = !ERROR} ErrStatus;
+void adc_deinit(void);
+void adc_clock_config(uint32_t prescaler);
+void adc_special_function_config(uint32_t adc_periph , uint32_t function , ControlStatus newvalue);
+void adc_data_alignment_config(uint32_t adc_periph , uint32_t data_alignment);
+void adc_enable(uint32_t adc_periph);
+void adc_disable(uint32_t adc_periph);
+void adc_calibration_enable(uint32_t adc_periph);
+void adc_channel_16_to_18(uint32_t function, ControlStatus newvalue);
+void adc_resolution_config(uint32_t adc_periph, uint32_t resolution);
+void adc_oversample_mode_config(uint32_t adc_periph, uint32_t mode, uint16_t shift, uint8_t ratio);
+void adc_oversample_mode_enable(uint32_t adc_periph);
+void adc_oversample_mode_disable(uint32_t adc_periph);
+void adc_dma_mode_enable(uint32_t adc_periph);
+void adc_dma_mode_disable(uint32_t adc_periph);
+void adc_dma_request_after_last_enable(uint32_t adc_periph);
+void adc_dma_request_after_last_disable(uint32_t adc_periph);
+void adc_discontinuous_mode_config(uint32_t adc_periph , uint8_t adc_sequence , uint8_t length);
+void adc_channel_length_config(uint32_t adc_periph , uint8_t adc_sequence , uint32_t length);
+void adc_routine_channel_config(uint32_t adc_periph , uint8_t rank , uint8_t adc_channel , uint32_t sample_time);
+void adc_inserted_channel_config(uint32_t adc_periph , uint8_t rank , uint8_t adc_channel , uint32_t sample_time);
+void adc_inserted_channel_offset_config(uint32_t adc_periph , uint8_t inserted_channel , uint16_t offset);
+void adc_external_trigger_source_config(uint32_t adc_periph , uint8_t adc_sequence , uint32_t external_trigger_source);
+void adc_external_trigger_config(uint32_t adc_periph , uint8_t adc_sequence , uint32_t trigger_mode);
+void adc_software_trigger_enable(uint32_t adc_periph , uint8_t adc_sequence);
+void adc_end_of_conversion_config(uint32_t adc_periph , uint8_t end_selection);
+uint16_t adc_routine_data_read(uint32_t adc_periph);
+uint16_t adc_inserted_data_read(uint32_t adc_periph , uint8_t inserted_channel);
+void adc_watchdog_single_channel_disable(uint32_t adc_periph );
+void adc_watchdog_single_channel_enable(uint32_t adc_periph , uint8_t adc_channel);
+void adc_watchdog_sequence_channel_enable(uint32_t adc_periph , uint8_t adc_sequence);
+void adc_watchdog_disable(uint32_t adc_periph , uint8_t adc_sequence);
+void adc_watchdog_threshold_config(uint32_t adc_periph , uint16_t low_threshold , uint16_t high_threshold);
+FlagStatus adc_flag_get(uint32_t adc_periph , uint32_t adc_flag);
+void adc_flag_clear(uint32_t adc_periph , uint32_t adc_flag);
+FlagStatus adc_routine_software_startconv_flag_get(uint32_t adc_periph);
+FlagStatus adc_inserted_software_startconv_flag_get(uint32_t adc_periph);
+FlagStatus adc_interrupt_flag_get(uint32_t adc_periph , uint32_t adc_interrupt);
+void adc_interrupt_flag_clear(uint32_t adc_periph , uint32_t adc_interrupt);
+void adc_interrupt_enable(uint32_t adc_periph , uint32_t adc_interrupt);
+void adc_interrupt_disable(uint32_t adc_periph , uint32_t adc_interrupt);
+void adc_sync_mode_config(uint32_t sync_mode);
+void adc_sync_delay_config(uint32_t sample_delay);
+void adc_sync_dma_config(uint32_t dma_mode );
+void adc_sync_dma_request_after_last_enable(void);
+void adc_sync_dma_request_after_last_disable(void);
+uint32_t adc_sync_routine_data_read(void);
+enum dbg_reg_idx
+{
+    DBG_IDX_CTL0 = 0x04U,
+    DBG_IDX_CTL1 = 0x08U,
+    DBG_IDX_CTL2 = 0x0CU
+};
+typedef enum
+{
+    DBG_TIMER1_HOLD = (((DBG_IDX_CTL1) << 6) | (0U)),
+    DBG_TIMER2_HOLD = (((DBG_IDX_CTL1) << 6) | (1U)),
+    DBG_TIMER3_HOLD = (((DBG_IDX_CTL1) << 6) | (2U)),
+    DBG_TIMER4_HOLD = (((DBG_IDX_CTL1) << 6) | (3U)),
+    DBG_TIMER5_HOLD = (((DBG_IDX_CTL1) << 6) | (4U)),
+    DBG_TIMER6_HOLD = (((DBG_IDX_CTL1) << 6) | (5U)),
+    DBG_TIMER11_HOLD = (((DBG_IDX_CTL1) << 6) | (6U)),
+    DBG_TIMER12_HOLD = (((DBG_IDX_CTL1) << 6) | (7U)),
+    DBG_TIMER13_HOLD = (((DBG_IDX_CTL1) << 6) | (8U)),
+    DBG_RTC_HOLD = (((DBG_IDX_CTL1) << 6) | (10U)),
+    DBG_WWDGT_HOLD = (((DBG_IDX_CTL1) << 6) | (11U)),
+    DBG_FWDGT_HOLD = (((DBG_IDX_CTL1) << 6) | (12U)),
+    DBG_I2C0_HOLD = (((DBG_IDX_CTL1) << 6) | (21U)),
+    DBG_I2C1_HOLD = (((DBG_IDX_CTL1) << 6) | (22U)),
+    DBG_I2C2_HOLD = (((DBG_IDX_CTL1) << 6) | (23U)),
+    DBG_CAN0_HOLD = (((DBG_IDX_CTL1) << 6) | (25U)),
+    DBG_CAN1_HOLD = (((DBG_IDX_CTL1) << 6) | (26U)),
+    DBG_TIMER0_HOLD = (((DBG_IDX_CTL2) << 6) | (0U)),
+    DBG_TIMER7_HOLD = (((DBG_IDX_CTL2) << 6) | (1U)),
+    DBG_TIMER8_HOLD = (((DBG_IDX_CTL2) << 6) | (16U)),
+    DBG_TIMER9_HOLD = (((DBG_IDX_CTL2) << 6) | (17U)),
+    DBG_TIMER10_HOLD = (((DBG_IDX_CTL2) << 6) | (18U))
+}dbg_periph_enum;
+void dbg_deinit(void);
+uint32_t dbg_id_get(void);
+void dbg_low_power_enable(uint32_t dbg_low_power);
+void dbg_low_power_disable(uint32_t dbg_low_power);
+void dbg_periph_enable(dbg_periph_enum dbg_periph);
+void dbg_periph_disable(dbg_periph_enum dbg_periph);
+void dbg_trace_pin_enable(void);
+void dbg_trace_pin_disable(void);
+typedef enum
+{
+    DMA_CH0 = 0,
+    DMA_CH1,
+    DMA_CH2,
+    DMA_CH3,
+    DMA_CH4,
+    DMA_CH5,
+    DMA_CH6,
+    DMA_CH7
+} dma_channel_enum;
+typedef enum
+{
+    DMA_SUBPERI0 = 0,
+    DMA_SUBPERI1,
+    DMA_SUBPERI2,
+    DMA_SUBPERI3,
+    DMA_SUBPERI4,
+    DMA_SUBPERI5,
+    DMA_SUBPERI6,
+    DMA_SUBPERI7
+} dma_subperipheral_enum;
+typedef struct
+{
+    uint32_t periph_addr;
+    uint32_t periph_width;
+    uint32_t periph_inc;
+    uint32_t memory0_addr;
+    uint32_t memory_width;
+    uint32_t memory_inc;
+    uint32_t memory_burst_width;
+    uint32_t periph_burst_width;
+    uint32_t critical_value;
+    uint32_t circular_mode;
+    uint32_t direction;
+    uint32_t number;
+    uint32_t priority;
+}dma_multi_data_parameter_struct;
+typedef struct
+{
+    uint32_t periph_addr;
+    uint32_t periph_inc;
+    uint32_t memory0_addr;
+    uint32_t memory_inc;
+    uint32_t periph_memory_width;
+    uint32_t circular_mode;
+    uint32_t direction;
+    uint32_t number;
+    uint32_t priority;
+} dma_single_data_parameter_struct;
+void dma_deinit(uint32_t dma_periph, dma_channel_enum channelx);
+void dma_single_data_para_struct_init(dma_single_data_parameter_struct* init_struct);
+void dma_multi_data_para_struct_init(dma_multi_data_parameter_struct* init_struct);
+void dma_single_data_mode_init(uint32_t dma_periph, dma_channel_enum channelx, dma_single_data_parameter_struct* init_struct);
+void dma_multi_data_mode_init(uint32_t dma_periph, dma_channel_enum channelx, dma_multi_data_parameter_struct* init_struct);
+void dma_periph_address_config(uint32_t dma_periph, dma_channel_enum channelx, uint32_t address);
+void dma_memory_address_config(uint32_t dma_periph, dma_channel_enum channelx, uint8_t memory_flag, uint32_t address);
+void dma_transfer_number_config(uint32_t dma_periph,dma_channel_enum channelx, uint32_t number);
+uint32_t dma_transfer_number_get(uint32_t dma_periph, dma_channel_enum channelx);
+void dma_priority_config(uint32_t dma_periph, dma_channel_enum channelx, uint32_t priority);
+void dma_memory_burst_beats_config (uint32_t dma_periph, dma_channel_enum channelx, uint32_t mbeat);
+void dma_periph_burst_beats_config (uint32_t dma_periph, dma_channel_enum channelx, uint32_t pbeat);
+void dma_memory_width_config (uint32_t dma_periph, dma_channel_enum channelx, uint32_t msize);
+void dma_periph_width_config (uint32_t dma_periph, dma_channel_enum channelx, uint32_t psize);
+void dma_memory_address_generation_config(uint32_t dma_periph, dma_channel_enum channelx, uint8_t generation_algorithm);
+void dma_peripheral_address_generation_config(uint32_t dma_periph, dma_channel_enum channelx, uint8_t generation_algorithm);
+void dma_circulation_enable(uint32_t dma_periph, dma_channel_enum channelx);
+void dma_circulation_disable(uint32_t dma_periph, dma_channel_enum channelx);
+void dma_channel_enable(uint32_t dma_periph, dma_channel_enum channelx);
+void dma_channel_disable(uint32_t dma_periph, dma_channel_enum channelx);
+void dma_transfer_direction_config(uint32_t dma_periph, dma_channel_enum channelx, uint8_t direction);
+void dma_switch_buffer_mode_config(uint32_t dma_periph, dma_channel_enum channelx, uint32_t memory1_addr, uint32_t memory_select);
+uint32_t dma_using_memory_get(uint32_t dma_periph, dma_channel_enum channelx);
+void dma_channel_subperipheral_select(uint32_t dma_periph, dma_channel_enum channelx, dma_subperipheral_enum sub_periph);
+void dma_flow_controller_config(uint32_t dma_periph, dma_channel_enum channelx, uint32_t controller);
+void dma_switch_buffer_mode_enable(uint32_t dma_periph, dma_channel_enum channelx, ControlStatus newvalue);
+uint32_t dma_fifo_status_get(uint32_t dma_periph, dma_channel_enum channelx);
+FlagStatus dma_flag_get(uint32_t dma_periph, dma_channel_enum channelx, uint32_t flag);
+void dma_flag_clear(uint32_t dma_periph, dma_channel_enum channelx, uint32_t flag);
+void dma_interrupt_enable(uint32_t dma_periph, dma_channel_enum channelx, uint32_t source);
+void dma_interrupt_disable(uint32_t dma_periph, dma_channel_enum channelx, uint32_t source);
+FlagStatus dma_interrupt_flag_get(uint32_t dma_periph, dma_channel_enum channelx, uint32_t interrupt);
+void dma_interrupt_flag_clear(uint32_t dma_periph, dma_channel_enum channelx, uint32_t interrupt);
+typedef enum {
+    EXTI_0 = ((uint32_t)((uint32_t)0x01U<<(0))),
+    EXTI_1 = ((uint32_t)((uint32_t)0x01U<<(1))),
+    EXTI_2 = ((uint32_t)((uint32_t)0x01U<<(2))),
+    EXTI_3 = ((uint32_t)((uint32_t)0x01U<<(3))),
+    EXTI_4 = ((uint32_t)((uint32_t)0x01U<<(4))),
+    EXTI_5 = ((uint32_t)((uint32_t)0x01U<<(5))),
+    EXTI_6 = ((uint32_t)((uint32_t)0x01U<<(6))),
+    EXTI_7 = ((uint32_t)((uint32_t)0x01U<<(7))),
+    EXTI_8 = ((uint32_t)((uint32_t)0x01U<<(8))),
+    EXTI_9 = ((uint32_t)((uint32_t)0x01U<<(9))),
+    EXTI_10 = ((uint32_t)((uint32_t)0x01U<<(10))),
+    EXTI_11 = ((uint32_t)((uint32_t)0x01U<<(11))),
+    EXTI_12 = ((uint32_t)((uint32_t)0x01U<<(12))),
+    EXTI_13 = ((uint32_t)((uint32_t)0x01U<<(13))),
+    EXTI_14 = ((uint32_t)((uint32_t)0x01U<<(14))),
+    EXTI_15 = ((uint32_t)((uint32_t)0x01U<<(15))),
+    EXTI_16 = ((uint32_t)((uint32_t)0x01U<<(16))),
+    EXTI_17 = ((uint32_t)((uint32_t)0x01U<<(17))),
+    EXTI_18 = ((uint32_t)((uint32_t)0x01U<<(18))),
+    EXTI_19 = ((uint32_t)((uint32_t)0x01U<<(19))),
+    EXTI_20 = ((uint32_t)((uint32_t)0x01U<<(20))),
+    EXTI_21 = ((uint32_t)((uint32_t)0x01U<<(21))),
+    EXTI_22 = ((uint32_t)((uint32_t)0x01U<<(22)))
+} exti_line_enum;
+typedef enum {
+    EXTI_INTERRUPT = 0,
+    EXTI_EVENT
+} exti_mode_enum;
+typedef enum {
+    EXTI_TRIG_RISING = 0,
+    EXTI_TRIG_FALLING,
+    EXTI_TRIG_BOTH,
+    EXTI_TRIG_NONE
+} exti_trig_type_enum;
+void exti_deinit(void);
+void exti_init(exti_line_enum linex, exti_mode_enum mode, exti_trig_type_enum trig_type);
+void exti_interrupt_enable(exti_line_enum linex);
+void exti_interrupt_disable(exti_line_enum linex);
+void exti_event_enable(exti_line_enum linex);
+void exti_event_disable(exti_line_enum linex);
+void exti_software_interrupt_enable(exti_line_enum linex);
+void exti_software_interrupt_disable(exti_line_enum linex);
+FlagStatus exti_flag_get(exti_line_enum linex);
+void exti_flag_clear(exti_line_enum linex);
+FlagStatus exti_interrupt_flag_get(exti_line_enum linex);
+void exti_interrupt_flag_clear(exti_line_enum linex);
+typedef enum {
+    FMC_READY = 0,
+    FMC_BUSY,
+    FMC_RDDERR,
+    FMC_PGSERR,
+    FMC_PGMERR,
+    FMC_WPERR,
+    FMC_OPERR,
+    FMC_TOERR
+} fmc_state_enum;
+void fmc_wscnt_set(uint32_t wscnt);
+void fmc_unlock(void);
+void fmc_lock(void);
+fmc_state_enum fmc_page_erase(uint32_t page_addr);
+fmc_state_enum fmc_sector_erase(uint32_t fmc_sector);
+fmc_state_enum fmc_mass_erase(void);
+fmc_state_enum fmc_bank0_erase(void);
+fmc_state_enum fmc_bank1_erase(void);
+fmc_state_enum fmc_word_program(uint32_t address, uint32_t data);
+fmc_state_enum fmc_halfword_program(uint32_t address, uint16_t data);
+fmc_state_enum fmc_byte_program(uint32_t address, uint8_t data);
+void ob_unlock(void);
+void ob_lock(void);
+void ob_start(void);
+void ob_erase(void);
+ErrStatus ob_write_protection_enable(uint32_t ob_wp);
+ErrStatus ob_write_protection_disable(uint32_t ob_wp);
+void ob_drp_enable(uint32_t ob_drp);
+void ob_drp_disable(void);
+void ob_security_protection_config(uint8_t ob_spc);
+void ob_user_write(uint32_t ob_fwdgt, uint32_t ob_deepsleep, uint32_t ob_stdby);
+void ob_user_bor_threshold(uint32_t ob_bor_th);
+void ob_boot_mode_config(uint32_t boot_mode);
+void ob_double_bank_select(uint32_t double_bank);
+uint8_t ob_user_get(void);
+uint16_t ob_write_protection0_get(void);
+uint16_t ob_write_protection1_get(void);
+uint16_t ob_drp0_get(void);
+uint16_t ob_drp1_get(void);
+FlagStatus ob_spc_get(void);
+uint8_t ob_user_bor_threshold_get(void);
+FlagStatus fmc_flag_get(uint32_t fmc_flag);
+void fmc_flag_clear(uint32_t fmc_flag);
+void fmc_interrupt_enable(uint32_t fmc_int);
+void fmc_interrupt_disable(uint32_t fmc_int);
+FlagStatus fmc_interrupt_flag_get(uint32_t fmc_int_flag);
+void fmc_interrupt_flag_clear(uint32_t fmc_int_flag);
+fmc_state_enum fmc_state_get(void);
+fmc_state_enum fmc_ready_wait(uint32_t timeout);
+void fwdgt_write_enable(void);
+void fwdgt_write_disable(void);
+void fwdgt_enable(void);
+ErrStatus fwdgt_prescaler_value_config(uint16_t prescaler_value);
+ErrStatus fwdgt_reload_value_config(uint16_t reload_value);
+void fwdgt_counter_reload(void);
+ErrStatus fwdgt_config(uint16_t reload_value, uint8_t prescaler_value);
+FlagStatus fwdgt_flag_get(uint16_t flag);
+typedef FlagStatus bit_status;
+void gpio_deinit(uint32_t gpio_periph);
+void gpio_mode_set(uint32_t gpio_periph, uint32_t mode, uint32_t pull_up_down, uint32_t pin);
+void gpio_output_options_set(uint32_t gpio_periph, uint8_t otype, uint32_t speed, uint32_t pin);
+void gpio_bit_set(uint32_t gpio_periph, uint32_t pin);
+void gpio_bit_reset(uint32_t gpio_periph, uint32_t pin);
+void gpio_bit_write(uint32_t gpio_periph, uint32_t pin, bit_status bit_value);
+void gpio_port_write(uint32_t gpio_periph, uint16_t data);
+FlagStatus gpio_input_bit_get(uint32_t gpio_periph, uint32_t pin);
+uint16_t gpio_input_port_get(uint32_t gpio_periph);
+FlagStatus gpio_output_bit_get(uint32_t gpio_periph, uint32_t pin);
+uint16_t gpio_output_port_get(uint32_t gpio_periph);
+void gpio_af_set(uint32_t gpio_periph, uint32_t alt_func_num, uint32_t pin);
+void gpio_pin_lock(uint32_t gpio_periph, uint32_t pin);
+void gpio_bit_toggle(uint32_t gpio_periph, uint32_t pin);
+void gpio_port_toggle(uint32_t gpio_periph);
+typedef enum {
+    I2C_FLAG_SBSEND = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(0U)),
+    I2C_FLAG_ADDSEND = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(1U)),
+    I2C_FLAG_BTC = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(2U)),
+    I2C_FLAG_ADD10SEND = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(3U)),
+    I2C_FLAG_STPDET = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(4U)),
+    I2C_FLAG_RBNE = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(6U)),
+    I2C_FLAG_TBE = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(7U)),
+    I2C_FLAG_BERR = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(8U)),
+    I2C_FLAG_LOSTARB = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(9U)),
+    I2C_FLAG_AERR = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(10U)),
+    I2C_FLAG_OUERR = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(11U)),
+    I2C_FLAG_PECERR = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(12U)),
+    I2C_FLAG_SMBTO = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(14U)),
+    I2C_FLAG_SMBALT = (((uint32_t)(((uint32_t)0x00000014U)) << 6) | (uint32_t)(15U)),
+    I2C_FLAG_MASTER = (((uint32_t)(((uint32_t)0x00000018U)) << 6) | (uint32_t)(0U)),
+    I2C_FLAG_I2CBSY = (((uint32_t)(((uint32_t)0x00000018U)) << 6) | (uint32_t)(1U)),
+    I2C_FLAG_TR = (((uint32_t)(((uint32_t)0x00000018U)) << 6) | (uint32_t)(2U)),
+    I2C_FLAG_RXGC = (((uint32_t)(((uint32_t)0x00000018U)) << 6) | (uint32_t)(4U)),
+    I2C_FLAG_DEFSMB = (((uint32_t)(((uint32_t)0x00000018U)) << 6) | (uint32_t)(5U)),
+    I2C_FLAG_HSTSMB = (((uint32_t)(((uint32_t)0x00000018U)) << 6) | (uint32_t)(6U)),
+    I2C_FLAG_DUMOD = (((uint32_t)(((uint32_t)0x00000018U)) << 6) | (uint32_t)(7U)),
+    I2C_FLAG_TFF = (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(12U)),
+    I2C_FLAG_TFR = (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(13U)),
+    I2C_FLAG_RFF = (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(14U)),
+    I2C_FLAG_RFR = (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(15U))
+} i2c_flag_enum;
+typedef enum {
+    I2C_INT_FLAG_SBSEND = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((0U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(9U))),
+    I2C_INT_FLAG_ADDSEND = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((1U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(9U))),
+    I2C_INT_FLAG_BTC = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((2U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(9U))),
+    I2C_INT_FLAG_ADD10SEND = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((3U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(9U))),
+    I2C_INT_FLAG_STPDET = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((4U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(9U))),
+    I2C_INT_FLAG_RBNE = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((6U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(9U))),
+    I2C_INT_FLAG_TBE = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((7U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(9U))),
+    I2C_INT_FLAG_BERR = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((8U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(8U))),
+    I2C_INT_FLAG_LOSTARB = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((9U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(8U))),
+    I2C_INT_FLAG_AERR = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((10U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(8U))),
+    I2C_INT_FLAG_OUERR = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((11U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(8U))),
+    I2C_INT_FLAG_PECERR = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((12U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(8U))),
+    I2C_INT_FLAG_SMBTO = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((14U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(8U))),
+    I2C_INT_FLAG_SMBALT = (((uint32_t)(((uint32_t)0x00000014U)) << 22) | (uint32_t)((15U) << 16) | (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(8U))),
+    I2C_INT_FLAG_TFF = (((uint32_t)(((uint32_t)0x00000080U)) << 22) | (uint32_t)((12U) << 16) | (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(4U))),
+    I2C_INT_FLAG_TFR = (((uint32_t)(((uint32_t)0x00000080U)) << 22) | (uint32_t)((13U) << 16) | (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(5U))),
+    I2C_INT_FLAG_RFF = (((uint32_t)(((uint32_t)0x00000080U)) << 22) | (uint32_t)((14U) << 16) | (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(6U))),
+    I2C_INT_FLAG_RFR = (((uint32_t)(((uint32_t)0x00000080U)) << 22) | (uint32_t)((15U) << 16) | (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(7U)))
+} i2c_interrupt_flag_enum;
+typedef enum {
+    I2C_INT_ERR = (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(8U)),
+    I2C_INT_EV = (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(9U)),
+    I2C_INT_BUF = (((uint32_t)(((uint32_t)0x00000004U)) << 6) | (uint32_t)(10U)),
+    I2C_INT_TFF = (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(4U)),
+    I2C_INT_TFR = (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(5U)),
+    I2C_INT_RFF = (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(6U)),
+    I2C_INT_RFR = (((uint32_t)(((uint32_t)0x00000080U)) << 6) | (uint32_t)(7U))
+} i2c_interrupt_enum;
+typedef enum {
+    I2C_DF_DISABLE = 0,
+    I2C_DF_1PCLK,
+    I2C_DF_2PCLKS,
+    I2C_DF_3PCLKS,
+    I2C_DF_4PCLKS,
+    I2C_DF_5PCLKS,
+    I2C_DF_6PCLKS,
+    I2C_DF_7PCLKS,
+    I2C_DF_8PCLKS,
+    I2C_DF_9PCLKS,
+    I2C_DF_10PCLKS,
+    I2C_DF_11PCLKS,
+    I2C_DF_12PCLKS,
+    I2C_DF_13PCLKS,
+    I2C_DF_14PCLKS,
+    I2C_DF_15PCLKS
+} i2c_digital_filter_enum;
+void i2c_deinit(uint32_t i2c_periph);
+void i2c_clock_config(uint32_t i2c_periph, uint32_t clkspeed, uint32_t dutycyc);
+void i2c_mode_addr_config(uint32_t i2c_periph, uint32_t mode, uint32_t addformat, uint32_t addr);
+void i2c_smbus_type_config(uint32_t i2c_periph, uint32_t type);
+void i2c_ack_config(uint32_t i2c_periph, uint32_t ack);
+void i2c_ackpos_config(uint32_t i2c_periph, uint32_t pos);
+void i2c_master_addressing(uint32_t i2c_periph, uint32_t addr, uint32_t trandirection);
+void i2c_dualaddr_enable(uint32_t i2c_periph, uint32_t addr);
+void i2c_dualaddr_disable(uint32_t i2c_periph);
+void i2c_enable(uint32_t i2c_periph);
+void i2c_disable(uint32_t i2c_periph);
+void i2c_start_on_bus(uint32_t i2c_periph);
+void i2c_stop_on_bus(uint32_t i2c_periph);
+void i2c_data_transmit(uint32_t i2c_periph, uint8_t data);
+uint8_t i2c_data_receive(uint32_t i2c_periph);
+void i2c_dma_config(uint32_t i2c_periph, uint32_t dmastate);
+void i2c_dma_last_transfer_config(uint32_t i2c_periph, uint32_t dmalast);
+void i2c_stretch_scl_low_config(uint32_t i2c_periph, uint32_t stretchpara);
+void i2c_slave_response_to_gcall_config(uint32_t i2c_periph, uint32_t gcallpara);
+void i2c_software_reset_config(uint32_t i2c_periph, uint32_t sreset);
+void i2c_pec_config(uint32_t i2c_periph, uint32_t pecstate);
+void i2c_pec_transfer_config(uint32_t i2c_periph, uint32_t pecpara);
+uint8_t i2c_pec_value_get(uint32_t i2c_periph);
+void i2c_smbus_alert_config(uint32_t i2c_periph, uint32_t smbuspara);
+void i2c_smbus_arp_config(uint32_t i2c_periph, uint32_t arpstate);
+void i2c_analog_noise_filter_disable(uint32_t i2c_periph);
+void i2c_analog_noise_filter_enable(uint32_t i2c_periph);
+void i2c_digital_noise_filter_config(uint32_t i2c_periph, i2c_digital_filter_enum dfilterpara);
+void i2c_sam_enable(uint32_t i2c_periph);
+void i2c_sam_disable(uint32_t i2c_periph);
+void i2c_sam_timeout_enable(uint32_t i2c_periph);
+void i2c_sam_timeout_disable(uint32_t i2c_periph);
+FlagStatus i2c_flag_get(uint32_t i2c_periph, i2c_flag_enum flag);
+void i2c_flag_clear(uint32_t i2c_periph, i2c_flag_enum flag);
+void i2c_interrupt_enable(uint32_t i2c_periph, i2c_interrupt_enum interrupt);
+void i2c_interrupt_disable(uint32_t i2c_periph, i2c_interrupt_enum interrupt);
+FlagStatus i2c_interrupt_flag_get(uint32_t i2c_periph, i2c_interrupt_flag_enum int_flag);
+void i2c_interrupt_flag_clear(uint32_t i2c_periph, i2c_interrupt_flag_enum int_flag);
+void pmu_deinit(void);
+void pmu_lvd_select(uint32_t lvdt_n);
+void pmu_lvd_disable(void);
+void pmu_ldo_output_select(uint32_t ldo_output);
+void pmu_highdriver_mode_enable(void);
+void pmu_highdriver_mode_disable(void);
+void pmu_highdriver_switch_select(uint32_t highdr_switch);
+void pmu_lowdriver_mode_enable(void);
+void pmu_lowdriver_mode_disable(void);
+void pmu_lowpower_driver_config(uint32_t mode);
+void pmu_normalpower_driver_config(uint32_t mode);
+void pmu_to_sleepmode(uint8_t sleepmodecmd);
+void pmu_to_deepsleepmode(uint32_t ldo, uint32_t lowdrive, uint8_t deepsleepmodecmd);
+void pmu_to_standbymode(void);
+void pmu_wakeup_pin_enable(void);
+void pmu_wakeup_pin_disable(void);
+void pmu_backup_ldo_config(uint32_t bkp_ldo);
+void pmu_backup_write_enable(void);
+void pmu_backup_write_disable(void);
+FlagStatus pmu_flag_get(uint32_t flag);
+void pmu_flag_clear(uint32_t flag);
+typedef enum
+{
+    RCU_GPIOA = (((uint32_t)(0x30U) << 6) | (uint32_t)(0U)),
+    RCU_GPIOB = (((uint32_t)(0x30U) << 6) | (uint32_t)(1U)),
+    RCU_GPIOC = (((uint32_t)(0x30U) << 6) | (uint32_t)(2U)),
+    RCU_GPIOD = (((uint32_t)(0x30U) << 6) | (uint32_t)(3U)),
+    RCU_GPIOE = (((uint32_t)(0x30U) << 6) | (uint32_t)(4U)),
+    RCU_GPIOF = (((uint32_t)(0x30U) << 6) | (uint32_t)(5U)),
+    RCU_GPIOG = (((uint32_t)(0x30U) << 6) | (uint32_t)(6U)),
+    RCU_GPIOH = (((uint32_t)(0x30U) << 6) | (uint32_t)(7U)),
+    RCU_GPIOI = (((uint32_t)(0x30U) << 6) | (uint32_t)(8U)),
+    RCU_CRC = (((uint32_t)(0x30U) << 6) | (uint32_t)(12U)),
+    RCU_BKPSRAM = (((uint32_t)(0x30U) << 6) | (uint32_t)(18U)),
+    RCU_TCMSRAM = (((uint32_t)(0x30U) << 6) | (uint32_t)(20U)),
+    RCU_DMA0 = (((uint32_t)(0x30U) << 6) | (uint32_t)(21U)),
+    RCU_DMA1 = (((uint32_t)(0x30U) << 6) | (uint32_t)(22U)),
+    RCU_IPA = (((uint32_t)(0x30U) << 6) | (uint32_t)(23U)),
+    RCU_ENET = (((uint32_t)(0x30U) << 6) | (uint32_t)(25U)),
+    RCU_ENETTX = (((uint32_t)(0x30U) << 6) | (uint32_t)(26U)),
+    RCU_ENETRX = (((uint32_t)(0x30U) << 6) | (uint32_t)(27U)),
+    RCU_ENETPTP = (((uint32_t)(0x30U) << 6) | (uint32_t)(28U)),
+    RCU_USBHS = (((uint32_t)(0x30U) << 6) | (uint32_t)(29U)),
+    RCU_USBHSULPI = (((uint32_t)(0x30U) << 6) | (uint32_t)(30U)),
+    RCU_DCI = (((uint32_t)(0x34U) << 6) | (uint32_t)(0U)),
+    RCU_TRNG = (((uint32_t)(0x34U) << 6) | (uint32_t)(6U)),
+    RCU_USBFS = (((uint32_t)(0x34U) << 6) | (uint32_t)(7U)),
+    RCU_EXMC = (((uint32_t)(0x38U) << 6) | (uint32_t)(0U)),
+    RCU_TIMER1 = (((uint32_t)(0x40U) << 6) | (uint32_t)(0U)),
+    RCU_TIMER2 = (((uint32_t)(0x40U) << 6) | (uint32_t)(1U)),
+    RCU_TIMER3 = (((uint32_t)(0x40U) << 6) | (uint32_t)(2U)),
+    RCU_TIMER4 = (((uint32_t)(0x40U) << 6) | (uint32_t)(3U)),
+    RCU_TIMER5 = (((uint32_t)(0x40U) << 6) | (uint32_t)(4U)),
+    RCU_TIMER6 = (((uint32_t)(0x40U) << 6) | (uint32_t)(5U)),
+    RCU_TIMER11 = (((uint32_t)(0x40U) << 6) | (uint32_t)(6U)),
+    RCU_TIMER12 = (((uint32_t)(0x40U) << 6) | (uint32_t)(7U)),
+    RCU_TIMER13 = (((uint32_t)(0x40U) << 6) | (uint32_t)(8U)),
+    RCU_WWDGT = (((uint32_t)(0x40U) << 6) | (uint32_t)(11U)),
+    RCU_SPI1 = (((uint32_t)(0x40U) << 6) | (uint32_t)(14U)),
+    RCU_SPI2 = (((uint32_t)(0x40U) << 6) | (uint32_t)(15U)),
+    RCU_USART1 = (((uint32_t)(0x40U) << 6) | (uint32_t)(17U)),
+    RCU_USART2 = (((uint32_t)(0x40U) << 6) | (uint32_t)(18U)),
+    RCU_UART3 = (((uint32_t)(0x40U) << 6) | (uint32_t)(19U)),
+    RCU_UART4 = (((uint32_t)(0x40U) << 6) | (uint32_t)(20U)),
+    RCU_I2C0 = (((uint32_t)(0x40U) << 6) | (uint32_t)(21U)),
+    RCU_I2C1 = (((uint32_t)(0x40U) << 6) | (uint32_t)(22U)),
+    RCU_I2C2 = (((uint32_t)(0x40U) << 6) | (uint32_t)(23U)),
+    RCU_CAN0 = (((uint32_t)(0x40U) << 6) | (uint32_t)(25U)),
+    RCU_CAN1 = (((uint32_t)(0x40U) << 6) | (uint32_t)(26U)),
+    RCU_PMU = (((uint32_t)(0x40U) << 6) | (uint32_t)(28U)),
+    RCU_DAC = (((uint32_t)(0x40U) << 6) | (uint32_t)(29U)),
+    RCU_UART6 = (((uint32_t)(0x40U) << 6) | (uint32_t)(30U)),
+    RCU_UART7 = (((uint32_t)(0x40U) << 6) | (uint32_t)(31U)),
+    RCU_RTC = (((uint32_t)(0x70U) << 6) | (uint32_t)(15U)),
+    RCU_TIMER0 = (((uint32_t)(0x44U) << 6) | (uint32_t)(0U)),
+    RCU_TIMER7 = (((uint32_t)(0x44U) << 6) | (uint32_t)(1U)),
+    RCU_USART0 = (((uint32_t)(0x44U) << 6) | (uint32_t)(4U)),
+    RCU_USART5 = (((uint32_t)(0x44U) << 6) | (uint32_t)(5U)),
+    RCU_ADC0 = (((uint32_t)(0x44U) << 6) | (uint32_t)(8U)),
+    RCU_ADC1 = (((uint32_t)(0x44U) << 6) | (uint32_t)(9U)),
+    RCU_ADC2 = (((uint32_t)(0x44U) << 6) | (uint32_t)(10U)),
+    RCU_SDIO = (((uint32_t)(0x44U) << 6) | (uint32_t)(11U)),
+    RCU_SPI0 = (((uint32_t)(0x44U) << 6) | (uint32_t)(12U)),
+    RCU_SPI3 = (((uint32_t)(0x44U) << 6) | (uint32_t)(13U)),
+    RCU_SYSCFG = (((uint32_t)(0x44U) << 6) | (uint32_t)(14U)),
+    RCU_TIMER8 = (((uint32_t)(0x44U) << 6) | (uint32_t)(16U)),
+    RCU_TIMER9 = (((uint32_t)(0x44U) << 6) | (uint32_t)(17U)),
+    RCU_TIMER10 = (((uint32_t)(0x44U) << 6) | (uint32_t)(18U)),
+    RCU_SPI4 = (((uint32_t)(0x44U) << 6) | (uint32_t)(20U)),
+    RCU_SPI5 = (((uint32_t)(0x44U) << 6) | (uint32_t)(21U)),
+    RCU_TLI = (((uint32_t)(0x44U) << 6) | (uint32_t)(26U)),
+    RCU_CTC = (((uint32_t)(0xE4U) << 6) | (uint32_t)(27U)),
+    RCU_IREF = (((uint32_t)(0xE4U) << 6) | (uint32_t)(31U)),
+}rcu_periph_enum;
+typedef enum
+{
+    RCU_GPIOA_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(0U)),
+    RCU_GPIOB_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(1U)),
+    RCU_GPIOC_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(2U)),
+    RCU_GPIOD_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(3U)),
+    RCU_GPIOE_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(4U)),
+    RCU_GPIOF_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(5U)),
+    RCU_GPIOG_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(6U)),
+    RCU_GPIOH_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(7U)),
+    RCU_GPIOI_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(8U)),
+    RCU_CRC_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(12U)),
+    RCU_FMC_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(15U)),
+    RCU_SRAM0_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(16U)),
+    RCU_SRAM1_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(17U)),
+    RCU_BKPSRAM_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(18U)),
+    RCU_SRAM2_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(19U)),
+    RCU_DMA0_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(21U)),
+    RCU_DMA1_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(22U)),
+    RCU_IPA_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(23U)),
+    RCU_ENET_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(25U)),
+    RCU_ENETTX_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(26U)),
+    RCU_ENETRX_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(27U)),
+    RCU_ENETPTP_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(28U)),
+    RCU_USBHS_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(29U)),
+    RCU_USBHSULPI_SLP = (((uint32_t)(0x50U) << 6) | (uint32_t)(30U)),
+    RCU_DCI_SLP = (((uint32_t)(0x54U) << 6) | (uint32_t)(0U)),
+    RCU_TRNG_SLP = (((uint32_t)(0x54U) << 6) | (uint32_t)(6U)),
+    RCU_USBFS_SLP = (((uint32_t)(0x54U) << 6) | (uint32_t)(7U)),
+    RCU_EXMC_SLP = (((uint32_t)(0x58U) << 6) | (uint32_t)(0U)),
+    RCU_TIMER1_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(0U)),
+    RCU_TIMER2_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(1U)),
+    RCU_TIMER3_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(2U)),
+    RCU_TIMER4_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(3U)),
+    RCU_TIMER5_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(4U)),
+    RCU_TIMER6_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(5U)),
+    RCU_TIMER11_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(6U)),
+    RCU_TIMER12_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(7U)),
+    RCU_TIMER13_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(8U)),
+    RCU_WWDGT_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(11U)),
+    RCU_SPI1_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(14U)),
+    RCU_SPI2_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(15U)),
+    RCU_USART1_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(17U)),
+    RCU_USART2_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(18U)),
+    RCU_UART3_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(19U)),
+    RCU_UART4_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(20U)),
+    RCU_I2C0_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(21U)),
+    RCU_I2C1_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(22U)),
+    RCU_I2C2_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(23U)),
+    RCU_CAN0_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(25U)),
+    RCU_CAN1_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(26U)),
+    RCU_PMU_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(28U)),
+    RCU_DAC_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(29U)),
+    RCU_UART6_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(30U)),
+    RCU_UART7_SLP = (((uint32_t)(0x60U) << 6) | (uint32_t)(31U)),
+    RCU_TIMER0_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(0U)),
+    RCU_TIMER7_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(1U)),
+    RCU_USART0_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(4U)),
+    RCU_USART5_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(5U)),
+    RCU_ADC0_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(8U)),
+    RCU_ADC1_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(9U)),
+    RCU_ADC2_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(10U)),
+    RCU_SDIO_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(11U)),
+    RCU_SPI0_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(12U)),
+    RCU_SPI3_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(13U)),
+    RCU_SYSCFG_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(14U)),
+    RCU_TIMER8_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(16U)),
+    RCU_TIMER9_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(17U)),
+    RCU_TIMER10_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(18U)),
+    RCU_SPI4_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(20U)),
+    RCU_SPI5_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(21U)),
+    RCU_TLI_SLP = (((uint32_t)(0x64U) << 6) | (uint32_t)(26U)),
+    RCU_CTC_SLP = (((uint32_t)(0xE8U) << 6) | (uint32_t)(27U)),
+    RCU_IREF_SLP = (((uint32_t)(0xE8U) << 6) | (uint32_t)(31U)),
+}rcu_periph_sleep_enum;
+typedef enum
+{
+    RCU_GPIOARST = (((uint32_t)(0x10U) << 6) | (uint32_t)(0U)),
+    RCU_GPIOBRST = (((uint32_t)(0x10U) << 6) | (uint32_t)(1U)),
+    RCU_GPIOCRST = (((uint32_t)(0x10U) << 6) | (uint32_t)(2U)),
+    RCU_GPIODRST = (((uint32_t)(0x10U) << 6) | (uint32_t)(3U)),
+    RCU_GPIOERST = (((uint32_t)(0x10U) << 6) | (uint32_t)(4U)),
+    RCU_GPIOFRST = (((uint32_t)(0x10U) << 6) | (uint32_t)(5U)),
+    RCU_GPIOGRST = (((uint32_t)(0x10U) << 6) | (uint32_t)(6U)),
+    RCU_GPIOHRST = (((uint32_t)(0x10U) << 6) | (uint32_t)(7U)),
+    RCU_GPIOIRST = (((uint32_t)(0x10U) << 6) | (uint32_t)(8U)),
+    RCU_CRCRST = (((uint32_t)(0x10U) << 6) | (uint32_t)(12U)),
+    RCU_DMA0RST = (((uint32_t)(0x10U) << 6) | (uint32_t)(21U)),
+    RCU_DMA1RST = (((uint32_t)(0x10U) << 6) | (uint32_t)(22U)),
+    RCU_IPARST = (((uint32_t)(0x10U) << 6) | (uint32_t)(23U)),
+    RCU_ENETRST = (((uint32_t)(0x10U) << 6) | (uint32_t)(25U)),
+    RCU_USBHSRST = (((uint32_t)(0x10U) << 6) | (uint32_t)(29U)),
+    RCU_DCIRST = (((uint32_t)(0x14U) << 6) | (uint32_t)(0U)),
+    RCU_TRNGRST = (((uint32_t)(0x14U) << 6) | (uint32_t)(6U)),
+    RCU_USBFSRST = (((uint32_t)(0x14U) << 6) | (uint32_t)(7U)),
+    RCU_EXMCRST = (((uint32_t)(0x18U) << 6) | (uint32_t)(0U)),
+    RCU_TIMER1RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(0U)),
+    RCU_TIMER2RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(1U)),
+    RCU_TIMER3RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(2U)),
+    RCU_TIMER4RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(3U)),
+    RCU_TIMER5RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(4U)),
+    RCU_TIMER6RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(5U)),
+    RCU_TIMER11RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(6U)),
+    RCU_TIMER12RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(7U)),
+    RCU_TIMER13RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(8U)),
+    RCU_WWDGTRST = (((uint32_t)(0x20U) << 6) | (uint32_t)(11U)),
+    RCU_SPI1RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(14U)),
+    RCU_SPI2RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(15U)),
+    RCU_USART1RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(17U)),
+    RCU_USART2RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(18U)),
+    RCU_UART3RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(19U)),
+    RCU_UART4RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(20U)),
+    RCU_I2C0RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(21U)),
+    RCU_I2C1RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(22U)),
+    RCU_I2C2RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(23U)),
+    RCU_CAN0RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(25U)),
+    RCU_CAN1RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(26U)),
+    RCU_PMURST = (((uint32_t)(0x20U) << 6) | (uint32_t)(28U)),
+    RCU_DACRST = (((uint32_t)(0x20U) << 6) | (uint32_t)(29U)),
+    RCU_UART6RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(30U)),
+    RCU_UART7RST = (((uint32_t)(0x20U) << 6) | (uint32_t)(31U)),
+    RCU_TIMER0RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(0U)),
+    RCU_TIMER7RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(1U)),
+    RCU_USART0RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(4U)),
+    RCU_USART5RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(5U)),
+    RCU_ADCRST = (((uint32_t)(0x24U) << 6) | (uint32_t)(8U)),
+    RCU_SDIORST = (((uint32_t)(0x24U) << 6) | (uint32_t)(11U)),
+    RCU_SPI0RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(12U)),
+    RCU_SPI3RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(13U)),
+    RCU_SYSCFGRST = (((uint32_t)(0x24U) << 6) | (uint32_t)(14U)),
+    RCU_TIMER8RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(16U)),
+    RCU_TIMER9RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(17U)),
+    RCU_TIMER10RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(18U)),
+    RCU_SPI4RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(20U)),
+    RCU_SPI5RST = (((uint32_t)(0x24U) << 6) | (uint32_t)(21U)),
+    RCU_TLIRST = (((uint32_t)(0x24U) << 6) | (uint32_t)(26U)),
+    RCU_CTCRST = (((uint32_t)(0xE0U) << 6) | (uint32_t)(27U)),
+    RCU_IREFRST = (((uint32_t)(0xE0U) << 6) | (uint32_t)(31U))
+}rcu_periph_reset_enum;
+typedef enum
+{
+    RCU_FLAG_IRC16MSTB = (((uint32_t)(0x00U) << 6) | (uint32_t)(1U)),
+    RCU_FLAG_HXTALSTB = (((uint32_t)(0x00U) << 6) | (uint32_t)(17U)),
+    RCU_FLAG_PLLSTB = (((uint32_t)(0x00U) << 6) | (uint32_t)(25U)),
+    RCU_FLAG_PLLI2SSTB = (((uint32_t)(0x00U) << 6) | (uint32_t)(27U)),
+    RCU_FLAG_PLLSAISTB = (((uint32_t)(0x00U) << 6) | (uint32_t)(29U)),
+    RCU_FLAG_LXTALSTB = (((uint32_t)(0x70U) << 6) | (uint32_t)(1U)),
+    RCU_FLAG_IRC32KSTB = (((uint32_t)(0x74U) << 6) | (uint32_t)(1U)),
+    RCU_FLAG_IRC48MSTB = (((uint32_t)(0xC0U) << 6) | (uint32_t)(17U)),
+    RCU_FLAG_BORRST = (((uint32_t)(0x74U) << 6) | (uint32_t)(25U)),
+    RCU_FLAG_EPRST = (((uint32_t)(0x74U) << 6) | (uint32_t)(26U)),
+    RCU_FLAG_PORRST = (((uint32_t)(0x74U) << 6) | (uint32_t)(27U)),
+    RCU_FLAG_SWRST = (((uint32_t)(0x74U) << 6) | (uint32_t)(28U)),
+    RCU_FLAG_FWDGTRST = (((uint32_t)(0x74U) << 6) | (uint32_t)(29U)),
+    RCU_FLAG_WWDGTRST = (((uint32_t)(0x74U) << 6) | (uint32_t)(30U)),
+    RCU_FLAG_LPRST = (((uint32_t)(0x74U) << 6) | (uint32_t)(31U)),
+}rcu_flag_enum;
+typedef enum
+{
+    RCU_INT_FLAG_IRC32KSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(0U)),
+    RCU_INT_FLAG_LXTALSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(1U)),
+    RCU_INT_FLAG_IRC16MSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(2U)),
+    RCU_INT_FLAG_HXTALSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(3U)),
+    RCU_INT_FLAG_PLLSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(4U)),
+    RCU_INT_FLAG_PLLI2SSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(5U)),
+    RCU_INT_FLAG_PLLSAISTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(6U)),
+    RCU_INT_FLAG_CKM = (((uint32_t)(0x0CU) << 6) | (uint32_t)(7U)),
+    RCU_INT_FLAG_IRC48MSTB = (((uint32_t)(0xCCU) << 6) | (uint32_t)(6U)),
+}rcu_int_flag_enum;
+typedef enum
+{
+    RCU_INT_FLAG_IRC32KSTB_CLR = (((uint32_t)(0x0CU) << 6) | (uint32_t)(16U)),
+    RCU_INT_FLAG_LXTALSTB_CLR = (((uint32_t)(0x0CU) << 6) | (uint32_t)(17U)),
+    RCU_INT_FLAG_IRC16MSTB_CLR = (((uint32_t)(0x0CU) << 6) | (uint32_t)(18U)),
+    RCU_INT_FLAG_HXTALSTB_CLR = (((uint32_t)(0x0CU) << 6) | (uint32_t)(19U)),
+    RCU_INT_FLAG_PLLSTB_CLR = (((uint32_t)(0x0CU) << 6) | (uint32_t)(20U)),
+    RCU_INT_FLAG_PLLI2SSTB_CLR = (((uint32_t)(0x0CU) << 6) | (uint32_t)(21U)),
+    RCU_INT_FLAG_PLLSAISTB_CLR = (((uint32_t)(0x0CU) << 6) | (uint32_t)(22U)),
+    RCU_INT_FLAG_CKM_CLR = (((uint32_t)(0x0CU) << 6) | (uint32_t)(23U)),
+    RCU_INT_FLAG_IRC48MSTB_CLR = (((uint32_t)(0xCCU) << 6) | (uint32_t)(22U)),
+}rcu_int_flag_clear_enum;
+typedef enum
+{
+    RCU_INT_IRC32KSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(8U)),
+    RCU_INT_LXTALSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(9U)),
+    RCU_INT_IRC16MSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(10U)),
+    RCU_INT_HXTALSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(11U)),
+    RCU_INT_PLLSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(12U)),
+    RCU_INT_PLLI2SSTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(13U)),
+    RCU_INT_PLLSAISTB = (((uint32_t)(0x0CU) << 6) | (uint32_t)(14U)),
+    RCU_INT_IRC48MSTB = (((uint32_t)(0xCCU) << 6) | (uint32_t)(14U)),
+}rcu_int_enum;
+typedef enum
+{
+    RCU_HXTAL = (((uint32_t)(0x00U) << 6) | (uint32_t)(16U)),
+    RCU_LXTAL = (((uint32_t)(0x70U) << 6) | (uint32_t)(0U)),
+    RCU_IRC16M = (((uint32_t)(0x00U) << 6) | (uint32_t)(0U)),
+    RCU_IRC48M = (((uint32_t)(0xC0U) << 6) | (uint32_t)(16U)),
+    RCU_IRC32K = (((uint32_t)(0x74U) << 6) | (uint32_t)(0U)),
+    RCU_PLL_CK = (((uint32_t)(0x00U) << 6) | (uint32_t)(24U)),
+    RCU_PLLI2S_CK = (((uint32_t)(0x00U) << 6) | (uint32_t)(26U)),
+    RCU_PLLSAI_CK = (((uint32_t)(0x00U) << 6) | (uint32_t)(28U)),
+}rcu_osci_type_enum;
+typedef enum
+{
+    CK_SYS = 0,
+    CK_AHB,
+    CK_APB1,
+    CK_APB2,
+}rcu_clock_freq_enum;
+void rcu_deinit(void);
+void rcu_periph_clock_enable(rcu_periph_enum periph);
+void rcu_periph_clock_disable(rcu_periph_enum periph);
+void rcu_periph_clock_sleep_enable(rcu_periph_sleep_enum periph);
+void rcu_periph_clock_sleep_disable(rcu_periph_sleep_enum periph);
+void rcu_periph_reset_enable(rcu_periph_reset_enum periph_reset);
+void rcu_periph_reset_disable(rcu_periph_reset_enum periph_reset);
+void rcu_bkp_reset_enable(void);
+void rcu_bkp_reset_disable(void);
+void rcu_system_clock_source_config(uint32_t ck_sys);
+uint32_t rcu_system_clock_source_get(void);
+void rcu_ahb_clock_config(uint32_t ck_ahb);
+void rcu_apb1_clock_config(uint32_t ck_apb1);
+void rcu_apb2_clock_config(uint32_t ck_apb2);
+void rcu_ckout0_config(uint32_t ckout0_src, uint32_t ckout0_div);
+void rcu_ckout1_config(uint32_t ckout1_src, uint32_t ckout1_div);
+ErrStatus rcu_pll_config(uint32_t pll_src, uint32_t pll_psc, uint32_t pll_n, uint32_t pll_p, uint32_t pll_q);
+ErrStatus rcu_plli2s_config(uint32_t plli2s_n, uint32_t plli2s_r);
+ErrStatus rcu_pllsai_config(uint32_t pllsai_n, uint32_t pllsai_p, uint32_t pllsai_r);
+void rcu_rtc_clock_config(uint32_t rtc_clock_source);
+void rcu_rtc_div_config(uint32_t rtc_div);
+void rcu_i2s_clock_config(uint32_t i2s_clock_source);
+void rcu_ck48m_clock_config(uint32_t ck48m_clock_source);
+void rcu_pll48m_clock_config(uint32_t pll48m_clock_source);
+void rcu_timer_clock_prescaler_config(uint32_t timer_clock_prescaler);
+void rcu_tli_clock_div_config(uint32_t pllsai_r_div);
+void rcu_lxtal_drive_capability_config(uint32_t lxtal_dricap);
+ErrStatus rcu_osci_stab_wait(rcu_osci_type_enum osci);
+void rcu_osci_on(rcu_osci_type_enum osci);
+void rcu_osci_off(rcu_osci_type_enum osci);
+void rcu_osci_bypass_mode_enable(rcu_osci_type_enum osci);
+void rcu_osci_bypass_mode_disable(rcu_osci_type_enum osci);
+void rcu_irc16m_adjust_value_set(uint32_t irc16m_adjval);
+void rcu_spread_spectrum_config(uint32_t spread_spectrum_type, uint32_t modstep, uint32_t modcnt);
+void rcu_spread_spectrum_enable(void);
+void rcu_spread_spectrum_disable(void);
+void rcu_hxtal_clock_monitor_enable(void);
+void rcu_hxtal_clock_monitor_disable(void);
+void rcu_voltage_key_unlock(void);
+void rcu_deepsleep_voltage_set(uint32_t dsvol);
+uint32_t rcu_clock_freq_get(rcu_clock_freq_enum clock);
+FlagStatus rcu_flag_get(rcu_flag_enum flag);
+void rcu_all_reset_flag_clear(void);
+FlagStatus rcu_interrupt_flag_get(rcu_int_flag_enum int_flag);
+void rcu_interrupt_flag_clear(rcu_int_flag_clear_enum int_flag);
+void rcu_interrupt_enable(rcu_int_enum interrupt);
+void rcu_interrupt_disable(rcu_int_enum interrupt);
+typedef struct {
+    uint32_t device_mode;
+    uint32_t trans_mode;
+    uint32_t frame_size;
+    uint32_t nss;
+    uint32_t endian;
+    uint32_t clock_polarity_phase;
+    uint32_t prescale;
+} spi_parameter_struct;
+void spi_i2s_deinit(uint32_t spi_periph);
+void spi_struct_para_init(spi_parameter_struct *spi_struct);
+void spi_init(uint32_t spi_periph, spi_parameter_struct *spi_struct);
+void spi_enable(uint32_t spi_periph);
+void spi_disable(uint32_t spi_periph);
+void i2s_init(uint32_t spi_periph, uint32_t i2s_mode, uint32_t i2s_standard, uint32_t i2s_ckpl);
+void i2s_psc_config(uint32_t spi_periph, uint32_t i2s_audiosample, uint32_t i2s_frameformat, uint32_t i2s_mckout);
+void i2s_enable(uint32_t spi_periph);
+void i2s_disable(uint32_t spi_periph);
+void spi_nss_output_enable(uint32_t spi_periph);
+void spi_nss_output_disable(uint32_t spi_periph);
+void spi_nss_internal_high(uint32_t spi_periph);
+void spi_nss_internal_low(uint32_t spi_periph);
+void spi_dma_enable(uint32_t spi_periph, uint8_t spi_dma);
+void spi_dma_disable(uint32_t spi_periph, uint8_t spi_dma);
+void spi_i2s_data_frame_format_config(uint32_t spi_periph, uint16_t frame_format);
+void spi_i2s_data_transmit(uint32_t spi_periph, uint16_t data);
+uint16_t spi_i2s_data_receive(uint32_t spi_periph);
+void spi_bidirectional_transfer_config(uint32_t spi_periph, uint32_t transfer_direction);
+void i2s_full_duplex_mode_config(uint32_t i2s_add_periph, uint32_t i2s_mode, uint32_t i2s_standard, uint32_t i2s_ckpl, uint32_t i2s_frameformat);
+void spi_i2s_format_error_clear(uint32_t spi_periph, uint32_t flag);
+void spi_crc_polynomial_set(uint32_t spi_periph, uint16_t crc_poly);
+uint16_t spi_crc_polynomial_get(uint32_t spi_periph);
+void spi_crc_on(uint32_t spi_periph);
+void spi_crc_off(uint32_t spi_periph);
+void spi_crc_next(uint32_t spi_periph);
+uint16_t spi_crc_get(uint32_t spi_periph, uint8_t spi_crc);
+void spi_crc_error_clear(uint32_t spi_periph);
+void spi_ti_mode_enable(uint32_t spi_periph);
+void spi_ti_mode_disable(uint32_t spi_periph);
+void spi_quad_enable(uint32_t spi_periph);
+void spi_quad_disable(uint32_t spi_periph);
+void spi_quad_write_enable(uint32_t spi_periph);
+void spi_quad_read_enable(uint32_t spi_periph);
+FlagStatus spi_i2s_flag_get(uint32_t spi_periph, uint32_t flag);
+void spi_i2s_interrupt_enable(uint32_t spi_periph, uint8_t interrupt);
+void spi_i2s_interrupt_disable(uint32_t spi_periph, uint8_t interrupt);
+FlagStatus spi_i2s_interrupt_flag_get(uint32_t spi_periph, uint8_t interrupt);
+void syscfg_deinit(void);
+void syscfg_bootmode_config(uint8_t syscfg_bootmode);
+void syscfg_fmc_swap_config(uint32_t syscfg_fmc_swap);
+void syscfg_exmc_swap_config(uint32_t syscfg_exmc_swap);
+void syscfg_exti_line_config(uint8_t exti_port, uint8_t exti_pin);
+void syscfg_enet_phy_interface_config(uint32_t syscfg_enet_phy_interface);
+void syscfg_compensation_config(uint32_t syscfg_compensation);
+FlagStatus syscfg_flag_get(void);
+typedef struct
+{
+    uint16_t prescaler;
+    uint16_t alignedmode;
+    uint16_t counterdirection;
+    uint16_t clockdivision;
+    uint32_t period;
+    uint8_t repetitioncounter;
+}timer_parameter_struct;
+typedef struct
+{
+    uint16_t runoffstate;
+    uint16_t ideloffstate;
+    uint16_t deadtime;
+    uint16_t breakpolarity;
+    uint16_t outputautostate;
+    uint16_t protectmode;
+    uint16_t breakstate;
+}timer_break_parameter_struct;
+typedef struct
+{
+    uint16_t outputstate;
+    uint16_t outputnstate;
+    uint16_t ocpolarity;
+    uint16_t ocnpolarity;
+    uint16_t ocidlestate;
+    uint16_t ocnidlestate;
+}timer_oc_parameter_struct;
+typedef struct
+{
+    uint16_t icpolarity;
+    uint16_t icselection;
+    uint16_t icprescaler;
+    uint16_t icfilter;
+}timer_ic_parameter_struct;
+void timer_deinit(uint32_t timer_periph);
+void timer_struct_para_init(timer_parameter_struct* initpara);
+void timer_init(uint32_t timer_periph, timer_parameter_struct* initpara);
+void timer_enable(uint32_t timer_periph);
+void timer_disable(uint32_t timer_periph);
+void timer_auto_reload_shadow_enable(uint32_t timer_periph);
+void timer_auto_reload_shadow_disable(uint32_t timer_periph);
+void timer_update_event_enable(uint32_t timer_periph);
+void timer_update_event_disable(uint32_t timer_periph);
+void timer_counter_alignment(uint32_t timer_periph, uint16_t aligned);
+void timer_counter_up_direction(uint32_t timer_periph);
+void timer_counter_down_direction(uint32_t timer_periph);
+void timer_prescaler_config(uint32_t timer_periph, uint16_t prescaler, uint8_t pscreload);
+void timer_repetition_value_config(uint32_t timer_periph, uint16_t repetition);
+void timer_autoreload_value_config(uint32_t timer_periph,uint32_t autoreload);
+void timer_counter_value_config(uint32_t timer_periph , uint32_t counter);
+uint32_t timer_counter_read(uint32_t timer_periph);
+uint16_t timer_prescaler_read(uint32_t timer_periph);
+void timer_single_pulse_mode_config(uint32_t timer_periph, uint32_t spmode);
+void timer_update_source_config(uint32_t timer_periph, uint32_t update);
+void timer_dma_enable(uint32_t timer_periph, uint16_t dma);
+void timer_dma_disable(uint32_t timer_periph, uint16_t dma);
+void timer_channel_dma_request_source_select(uint32_t timer_periph, uint8_t dma_request);
+void timer_dma_transfer_config(uint32_t timer_periph,uint32_t dma_baseaddr, uint32_t dma_lenth);
+void timer_event_software_generate(uint32_t timer_periph, uint16_t event);
+void timer_break_struct_para_init(timer_break_parameter_struct* breakpara);
+void timer_break_config(uint32_t timer_periph, timer_break_parameter_struct* breakpara);
+void timer_break_enable(uint32_t timer_periph);
+void timer_break_disable(uint32_t timer_periph);
+void timer_automatic_output_enable(uint32_t timer_periph);
+void timer_automatic_output_disable(uint32_t timer_periph);
+void timer_primary_output_config(uint32_t timer_periph, ControlStatus newvalue);
+void timer_channel_control_shadow_config(uint32_t timer_periph, ControlStatus newvalue);
+void timer_channel_control_shadow_update_config(uint32_t timer_periph, uint8_t ccuctl);
+void timer_channel_output_struct_para_init(timer_oc_parameter_struct* ocpara);
+void timer_channel_output_config(uint32_t timer_periph,uint16_t channel, timer_oc_parameter_struct* ocpara);
+void timer_channel_output_mode_config(uint32_t timer_periph, uint16_t channel,uint16_t ocmode);
+void timer_channel_output_pulse_value_config(uint32_t timer_periph, uint16_t channel, uint32_t pulse);
+void timer_channel_output_shadow_config(uint32_t timer_periph, uint16_t channel, uint16_t ocshadow);
+void timer_channel_output_fast_config(uint32_t timer_periph, uint16_t channel, uint16_t ocfast);
+void timer_channel_output_clear_config(uint32_t timer_periph,uint16_t channel,uint16_t occlear);
+void timer_channel_output_polarity_config(uint32_t timer_periph, uint16_t channel, uint16_t ocpolarity);
+void timer_channel_complementary_output_polarity_config(uint32_t timer_periph, uint16_t channel, uint16_t ocnpolarity);
+void timer_channel_output_state_config(uint32_t timer_periph, uint16_t channel, uint32_t state);
+void timer_channel_complementary_output_state_config(uint32_t timer_periph, uint16_t channel, uint16_t ocnstate);
+void timer_channel_input_struct_para_init(timer_ic_parameter_struct* icpara);
+void timer_input_capture_config(uint32_t timer_periph, uint16_t channel, timer_ic_parameter_struct* icpara);
+void timer_channel_input_capture_prescaler_config(uint32_t timer_periph, uint16_t channel, uint16_t prescaler);
+uint32_t timer_channel_capture_value_register_read(uint32_t timer_periph, uint16_t channel);
+void timer_input_pwm_capture_config(uint32_t timer_periph, uint16_t channel, timer_ic_parameter_struct* icpwm);
+void timer_hall_mode_config(uint32_t timer_periph, uint32_t hallmode);
+void timer_input_trigger_source_select(uint32_t timer_periph, uint32_t intrigger);
+void timer_master_output_trigger_source_select(uint32_t timer_periph, uint32_t outrigger);
+void timer_slave_mode_select(uint32_t timer_periph,uint32_t slavemode);
+void timer_master_slave_mode_config(uint32_t timer_periph, uint32_t masterslave);
+void timer_external_trigger_config(uint32_t timer_periph, uint32_t extprescaler, uint32_t extpolarity, uint32_t extfilter);
+void timer_quadrature_decoder_mode_config(uint32_t timer_periph, uint32_t decomode, uint16_t ic0polarity, uint16_t ic1polarity);
+void timer_internal_clock_config(uint32_t timer_periph);
+void timer_internal_trigger_as_external_clock_config(uint32_t timer_periph, uint32_t intrigger);
+void timer_external_trigger_as_external_clock_config(uint32_t timer_periph, uint32_t extrigger, uint16_t extpolarity,uint32_t extfilter);
+void timer_external_clock_mode0_config(uint32_t timer_periph, uint32_t extprescaler, uint32_t extpolarity, uint32_t extfilter);
+void timer_external_clock_mode1_config(uint32_t timer_periph, uint32_t extprescaler, uint32_t extpolarity, uint32_t extfilter);
+void timer_external_clock_mode1_disable(uint32_t timer_periph);
+void timer_channel_remap_config(uint32_t timer_periph,uint32_t remap);
+void timer_write_chxval_register_config(uint32_t timer_periph, uint16_t ccsel);
+void timer_output_value_selection_config(uint32_t timer_periph, uint16_t outsel);
+FlagStatus timer_flag_get(uint32_t timer_periph, uint32_t flag);
+void timer_flag_clear(uint32_t timer_periph, uint32_t flag);
+void timer_interrupt_enable(uint32_t timer_periph, uint32_t interrupt);
+void timer_interrupt_disable(uint32_t timer_periph, uint32_t interrupt);
+FlagStatus timer_interrupt_flag_get(uint32_t timer_periph, uint32_t interrupt);
+void timer_interrupt_flag_clear(uint32_t timer_periph, uint32_t interrupt);
+typedef enum {
+    USART_FLAG_CTS = (((uint32_t)(0x00U) << 6) | (uint32_t)(9U)),
+    USART_FLAG_LBD = (((uint32_t)(0x00U) << 6) | (uint32_t)(8U)),
+    USART_FLAG_TBE = (((uint32_t)(0x00U) << 6) | (uint32_t)(7U)),
+    USART_FLAG_TC = (((uint32_t)(0x00U) << 6) | (uint32_t)(6U)),
+    USART_FLAG_RBNE = (((uint32_t)(0x00U) << 6) | (uint32_t)(5U)),
+    USART_FLAG_IDLE = (((uint32_t)(0x00U) << 6) | (uint32_t)(4U)),
+    USART_FLAG_ORERR = (((uint32_t)(0x00U) << 6) | (uint32_t)(3U)),
+    USART_FLAG_NERR = (((uint32_t)(0x00U) << 6) | (uint32_t)(2U)),
+    USART_FLAG_FERR = (((uint32_t)(0x00U) << 6) | (uint32_t)(1U)),
+    USART_FLAG_PERR = (((uint32_t)(0x00U) << 6) | (uint32_t)(0U)),
+    USART_FLAG_BSY = (((uint32_t)(0x88U) << 6) | (uint32_t)(16U)),
+    USART_FLAG_EB = (((uint32_t)(0x88U) << 6) | (uint32_t)(12U)),
+    USART_FLAG_RT = (((uint32_t)(0x88U) << 6) | (uint32_t)(11U)),
+    USART_FLAG_EPERR = (((uint32_t)(0xC0U) << 6) | (uint32_t)(8U)),
+} usart_flag_enum;
+typedef enum {
+    USART_INT_FLAG_PERR = (((uint32_t)(0x00U) << 22) | (uint32_t)((0U) << 16) | (((uint32_t)(0x0CU) << 6) | (uint32_t)(8U))),
+    USART_INT_FLAG_TBE = (((uint32_t)(0x00U) << 22) | (uint32_t)((7U) << 16) | (((uint32_t)(0x0CU) << 6) | (uint32_t)(7U))),
+    USART_INT_FLAG_TC = (((uint32_t)(0x00U) << 22) | (uint32_t)((6U) << 16) | (((uint32_t)(0x0CU) << 6) | (uint32_t)(6U))),
+    USART_INT_FLAG_RBNE = (((uint32_t)(0x00U) << 22) | (uint32_t)((5U) << 16) | (((uint32_t)(0x0CU) << 6) | (uint32_t)(5U))),
+    USART_INT_FLAG_RBNE_ORERR = (((uint32_t)(0x00U) << 22) | (uint32_t)((3U) << 16) | (((uint32_t)(0x0CU) << 6) | (uint32_t)(5U))),
+    USART_INT_FLAG_IDLE = (((uint32_t)(0x00U) << 22) | (uint32_t)((4U) << 16) | (((uint32_t)(0x0CU) << 6) | (uint32_t)(4U))),
+    USART_INT_FLAG_LBD = (((uint32_t)(0x00U) << 22) | (uint32_t)((8U) << 16) | (((uint32_t)(0x10U) << 6) | (uint32_t)(6U))),
+    USART_INT_FLAG_CTS = (((uint32_t)(0x00U) << 22) | (uint32_t)((9U) << 16) | (((uint32_t)(0x14U) << 6) | (uint32_t)(10U))),
+    USART_INT_FLAG_ERR_ORERR = (((uint32_t)(0x00U) << 22) | (uint32_t)((3U) << 16) | (((uint32_t)(0x14U) << 6) | (uint32_t)(0U))),
+    USART_INT_FLAG_ERR_NERR = (((uint32_t)(0x00U) << 22) | (uint32_t)((2U) << 16) | (((uint32_t)(0x14U) << 6) | (uint32_t)(0U))),
+    USART_INT_FLAG_ERR_FERR = (((uint32_t)(0x00U) << 22) | (uint32_t)((1U) << 16) | (((uint32_t)(0x14U) << 6) | (uint32_t)(0U))),
+    USART_INT_FLAG_EB = (((uint32_t)(0x88U) << 22) | (uint32_t)((12U) << 16) | (((uint32_t)(0x80U) << 6) | (uint32_t)(5U))),
+    USART_INT_FLAG_RT = (((uint32_t)(0x88U) << 22) | (uint32_t)((11U) << 16) | (((uint32_t)(0x80U) << 6) | (uint32_t)(4U))),
+} usart_interrupt_flag_enum;
+typedef enum {
+    USART_INT_PERR = (((uint32_t)(0x0CU) << 6) | (uint32_t)(8U)),
+    USART_INT_TBE = (((uint32_t)(0x0CU) << 6) | (uint32_t)(7U)),
+    USART_INT_TC = (((uint32_t)(0x0CU) << 6) | (uint32_t)(6U)),
+    USART_INT_RBNE = (((uint32_t)(0x0CU) << 6) | (uint32_t)(5U)),
+    USART_INT_IDLE = (((uint32_t)(0x0CU) << 6) | (uint32_t)(4U)),
+    USART_INT_LBD = (((uint32_t)(0x10U) << 6) | (uint32_t)(6U)),
+    USART_INT_CTS = (((uint32_t)(0x14U) << 6) | (uint32_t)(10U)),
+    USART_INT_ERR = (((uint32_t)(0x14U) << 6) | (uint32_t)(0U)),
+    USART_INT_EB = (((uint32_t)(0x80U) << 6) | (uint32_t)(5U)),
+    USART_INT_RT = (((uint32_t)(0x80U) << 6) | (uint32_t)(4U)),
+} usart_interrupt_enum;
+typedef enum {
+    USART_DINV_ENABLE,
+    USART_DINV_DISABLE,
+    USART_TXPIN_ENABLE,
+    USART_TXPIN_DISABLE,
+    USART_RXPIN_ENABLE,
+    USART_RXPIN_DISABLE,
+} usart_invert_enum;
+void usart_deinit(uint32_t usart_periph);
+void usart_baudrate_set(uint32_t usart_periph, uint32_t baudval);
+void usart_parity_config(uint32_t usart_periph, uint32_t paritycfg);
+void usart_word_length_set(uint32_t usart_periph, uint32_t wlen);
+void usart_stop_bit_set(uint32_t usart_periph, uint32_t stblen);
+void usart_enable(uint32_t usart_periph);
+void usart_disable(uint32_t usart_periph);
+void usart_transmit_config(uint32_t usart_periph, uint32_t txconfig);
+void usart_receive_config(uint32_t usart_periph, uint32_t rxconfig);
+void usart_data_first_config(uint32_t usart_periph, uint32_t msbf);
+void usart_invert_config(uint32_t usart_periph, usart_invert_enum invertpara);
+void usart_oversample_config(uint32_t usart_periph, uint32_t oversamp);
+void usart_sample_bit_config(uint32_t usart_periph, uint32_t obsm);
+void usart_receiver_timeout_enable(uint32_t usart_periph);
+void usart_receiver_timeout_disable(uint32_t usart_periph);
+void usart_receiver_timeout_threshold_config(uint32_t usart_periph, uint32_t rtimeout);
+void usart_data_transmit(uint32_t usart_periph, uint16_t data);
+uint16_t usart_data_receive(uint32_t usart_periph);
+void usart_address_config(uint32_t usart_periph, uint8_t addr);
+void usart_mute_mode_enable(uint32_t usart_periph);
+void usart_mute_mode_disable(uint32_t usart_periph);
+void usart_mute_mode_wakeup_config(uint32_t usart_periph, uint32_t wmehtod);
+void usart_lin_mode_enable(uint32_t usart_periph);
+void usart_lin_mode_disable(uint32_t usart_periph);
+void usart_lin_break_detection_length_config(uint32_t usart_periph, uint32_t lblen);
+void usart_send_break(uint32_t usart_periph);
+void usart_halfduplex_enable(uint32_t usart_periph);
+void usart_halfduplex_disable(uint32_t usart_periph);
+void usart_synchronous_clock_enable(uint32_t usart_periph);
+void usart_synchronous_clock_disable(uint32_t usart_periph);
+void usart_synchronous_clock_config(uint32_t usart_periph, uint32_t clen, uint32_t cph, uint32_t cpl);
+void usart_guard_time_config(uint32_t usart_periph, uint8_t guat);
+void usart_smartcard_mode_enable(uint32_t usart_periph);
+void usart_smartcard_mode_disable(uint32_t usart_periph);
+void usart_smartcard_mode_nack_enable(uint32_t usart_periph);
+void usart_smartcard_mode_nack_disable(uint32_t usart_periph);
+void usart_smartcard_autoretry_config(uint32_t usart_periph, uint8_t scrtnum);
+void usart_block_length_config(uint32_t usart_periph, uint8_t bl);
+void usart_irda_mode_enable(uint32_t usart_periph);
+void usart_irda_mode_disable(uint32_t usart_periph);
+void usart_prescaler_config(uint32_t usart_periph, uint8_t psc);
+void usart_irda_lowpower_config(uint32_t usart_periph, uint32_t irlp);
+void usart_hardware_flow_rts_config(uint32_t usart_periph, uint32_t rtsconfig);
+void usart_hardware_flow_cts_config(uint32_t usart_periph, uint32_t ctsconfig);
+void usart_break_frame_coherence_config(uint32_t usart_periph, uint32_t bcm);
+void usart_parity_check_coherence_config(uint32_t usart_periph, uint32_t pcm);
+void usart_hardware_flow_coherence_config(uint32_t usart_periph, uint32_t hcm);
+void usart_dma_receive_config(uint32_t usart_periph, uint32_t dmacmd);
+void usart_dma_transmit_config(uint32_t usart_periph, uint32_t dmacmd);
+FlagStatus usart_flag_get(uint32_t usart_periph, usart_flag_enum flag);
+void usart_flag_clear(uint32_t usart_periph, usart_flag_enum flag);
+void usart_interrupt_enable(uint32_t usart_periph, usart_interrupt_enum interrupt);
+void usart_interrupt_disable(uint32_t usart_periph, usart_interrupt_enum interrupt);
+FlagStatus usart_interrupt_flag_get(uint32_t usart_periph, usart_interrupt_flag_enum int_flag);
+void usart_interrupt_flag_clear(uint32_t usart_periph, usart_interrupt_flag_enum int_flag);
+uint32_t SystemCoreClock = 16000000u;
+uint32_t g_gd32_reset_flags;
+volatile uint32_t g_gd32_boot_error;
+static _Bool wait_bits(volatile uint32_t* reg, uint32_t mask,
+                      uint32_t expected) {
+    for (uint32_t n = 0; n < 1000000u; ++n) {
+        if ((*reg & mask) == expected) {
+            return 1;
+        }
+    }
+    return 0;
+}
+void SystemInit(void) {
+    g_gd32_reset_flags = (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x74U));
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x74U)) |= ((uint32_t)((uint32_t)0x01U<<(24)));
+    ((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->CPACR |= (3u << 20) | (3u << 22);
+    __DSB();
+    __ISB();
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)) |= ((uint32_t)((uint32_t)0x01U<<(0)));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)), ((uint32_t)((uint32_t)0x01U<<(1))), ((uint32_t)((uint32_t)0x01U<<(1))))) {
+        g_gd32_boot_error = 1u;
+        for (;;) {
+            __NOP();
+        }
+    }
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) &= ~(uint32_t)((0xFFFFFFFFUL << (0)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(1))));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)), ((0xFFFFFFFFUL << (2)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(3)))), (((0xFFFFFFFFUL << (2)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(3)))) & ((uint32_t)(0) << 2)))) {
+        g_gd32_boot_error = 2u;
+        for (;;) {
+            __NOP();
+        }
+    }
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)) &= ~(((uint32_t)((uint32_t)0x01U<<(24))) | ((uint32_t)((uint32_t)0x01U<<(16))) | ((uint32_t)((uint32_t)0x01U<<(19))));
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) &=
+        ~(uint32_t)(((0xFFFFFFFFUL << (4)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(7)))) | ((0xFFFFFFFFUL << (10)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(12)))) | ((0xFFFFFFFFUL << (13)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(15)))));
+    extern const uint32_t __gVectors[];
+    ((SCB_Type *) ((0xE000E000UL) + 0x0D00UL) )->VTOR = (uint32_t)(uintptr_t)__gVectors;
+    SystemCoreClock = 16000000u;
+}
+void SystemCoreClockUpdate(void) {
+    SystemCoreClock = rcu_clock_freq_get(CK_AHB);
+}
+int nx_gd32_clock_start(void) {
+    if (((*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) & ((0xFFFFFFFFUL << (2)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(3))))) == (((0xFFFFFFFFUL << (2)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(3)))) & ((uint32_t)(2) << 2))) {
+        SystemCoreClockUpdate();
+        rcu_timer_clock_prescaler_config(~((uint32_t)((uint32_t)0x01U<<(24))));
+        return SystemCoreClock == 200000000u &&
+                       rcu_clock_freq_get(CK_APB1) == 50000000u &&
+                       rcu_clock_freq_get(CK_APB2) == 100000000u
+                   ? 0
+                   : -1;
+    }
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)) &= ~((uint32_t)((uint32_t)0x01U<<(24)));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)), ((uint32_t)((uint32_t)0x01U<<(25))), 0u)) {
+        return -1;
+    }
+    rcu_periph_clock_enable(RCU_PMU);
+    (*(volatile uint32_t *)(uint32_t)(((((uint32_t)0x40000000U) + 0x00007000U)) + 0x00000000U)) |= ((0xFFFFFFFFUL << (14)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(15))));
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)) |= ((uint32_t)((uint32_t)0x01U<<(16)));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)), ((uint32_t)((uint32_t)0x01U<<(17))), ((uint32_t)((uint32_t)0x01U<<(17))))) {
+        return -1;
+    }
+    fmc_wscnt_set((((0xFFFFFFFFUL << (0)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(3)))) & ((uint32_t)(7))));
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) = ((*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) & ~(uint32_t)(((0xFFFFFFFFUL << (4)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(7)))) | ((0xFFFFFFFFUL << (10)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(12)))) |
+                                       ((0xFFFFFFFFUL << (13)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(15)))))) |
+               (((0xFFFFFFFFUL << (4)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(7)))) & ((uint32_t)(0) << 4)) | (((0xFFFFFFFFUL << (10)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(12)))) & ((uint32_t)(5) << 10)) | (((0xFFFFFFFFUL << (13)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(15)))) & ((uint32_t)(4) << 13));
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x04U)) = 25u | (400u << 6) | ((uint32_t)((uint32_t)0x01U<<(22))) | (9u << 24);
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)) |= ((uint32_t)((uint32_t)0x01U<<(24)));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)), ((uint32_t)((uint32_t)0x01U<<(25))), ((uint32_t)((uint32_t)0x01U<<(25))))) {
+        return -1;
+    }
+    (*(volatile uint32_t *)(uint32_t)(((((uint32_t)0x40000000U) + 0x00007000U)) + 0x00000000U)) |= ((uint32_t)((uint32_t)0x01U<<(16)));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)(((((uint32_t)0x40000000U) + 0x00007000U)) + 0x00000004U)), ((uint32_t)((uint32_t)0x01U<<(16))), ((uint32_t)((uint32_t)0x01U<<(16))))) {
+        return -1;
+    }
+    (*(volatile uint32_t *)(uint32_t)(((((uint32_t)0x40000000U) + 0x00007000U)) + 0x00000000U)) |= ((uint32_t)((uint32_t)0x01U<<(17)));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)(((((uint32_t)0x40000000U) + 0x00007000U)) + 0x00000004U)), ((uint32_t)((uint32_t)0x01U<<(17))), ((uint32_t)((uint32_t)0x01U<<(17))))) {
+        return -1;
+    }
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) = ((*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) & ~(uint32_t)((0xFFFFFFFFUL << (0)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(1))))) | (((0xFFFFFFFFUL << (0)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(1)))) & ((uint32_t)(2) << 0));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)), ((0xFFFFFFFFUL << (2)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(3)))), (((0xFFFFFFFFUL << (2)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(3)))) & ((uint32_t)(2) << 2)))) {
+        return -1;
+    }
+    SystemCoreClockUpdate();
+    rcu_timer_clock_prescaler_config(~((uint32_t)((uint32_t)0x01U<<(24))));
+    return SystemCoreClock == 200000000u &&
+                   rcu_clock_freq_get(CK_APB1) == 50000000u &&
+                   rcu_clock_freq_get(CK_APB2) == 100000000u
+               ? 0
+               : -1;
+}
+int nx_gd32_clock_stop(void) {
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)) |= ((uint32_t)((uint32_t)0x01U<<(0)));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)), ((uint32_t)((uint32_t)0x01U<<(1))), ((uint32_t)((uint32_t)0x01U<<(1))))) {
+        SystemCoreClockUpdate();
+        return -1;
+    }
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) = ((*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) & ~(uint32_t)((0xFFFFFFFFUL << (0)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(1))))) | (((0xFFFFFFFFUL << (0)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(1)))) & ((uint32_t)(0) << 0));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)), ((0xFFFFFFFFUL << (2)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(3)))), (((0xFFFFFFFFUL << (2)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(3)))) & ((uint32_t)(0) << 2)))) {
+        SystemCoreClockUpdate();
+        return -1;
+    }
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) &=
+        ~(uint32_t)(((0xFFFFFFFFUL << (4)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(7)))) | ((0xFFFFFFFFUL << (10)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(12)))) | ((0xFFFFFFFFUL << (13)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(15)))));
+    SystemCoreClockUpdate();
+    if (((*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x08U)) & (((0xFFFFFFFFUL << (4)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(7)))) | ((0xFFFFFFFFUL << (10)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(12)))) | ((0xFFFFFFFFUL << (13)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(15)))))) !=
+            0u ||
+        SystemCoreClock != 16000000u) {
+        return -1;
+    }
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)) &= ~(((uint32_t)((uint32_t)0x01U<<(24))) | ((uint32_t)((uint32_t)0x01U<<(26))) | ((uint32_t)((uint32_t)0x01U<<(28))));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)),
+                   ((uint32_t)((uint32_t)0x01U<<(24))) | ((uint32_t)((uint32_t)0x01U<<(25))) | ((uint32_t)((uint32_t)0x01U<<(26))) |
+                       ((uint32_t)((uint32_t)0x01U<<(27))) | ((uint32_t)((uint32_t)0x01U<<(28))) | ((uint32_t)((uint32_t)0x01U<<(29))),
+                   0u)) {
+        return -1;
+    }
+    (*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)) &= ~(((uint32_t)((uint32_t)0x01U<<(19))) | ((uint32_t)((uint32_t)0x01U<<(16))));
+    if (!wait_bits(&(*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x00U)), ((uint32_t)((uint32_t)0x01U<<(16))) | ((uint32_t)((uint32_t)0x01U<<(17))), 0u)) {
+        return -1;
+    }
+    return 0;
+}

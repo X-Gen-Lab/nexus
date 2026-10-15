@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/workspace/nexus/build/ci-boundary-memory-tsan2/bin/nexus_gd32_memory_boot_both_test",
+    "--gtest_filter=*",
+    "--gtest_repeat=1",
+    "--gtest_output=xml:/workspace/nexus-ci-boundaries/memory-final-tsan-both/report.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0,
+  "started_ns": 1791752161415648571,
+  "ended_ns": 1791752161431350156,
+  "timeout_seconds": 900,
+  "stdout": {
+    "path": "/workspace/nexus-ci-boundaries/memory-final-tsan-both/stdout.txt",
+    "bytes": 967,
+    "sha256": "890f819289a2ad3dbce4bb45fd1106498db5c7571f8d4bf8fbec8305137e2a7a"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-ci-boundaries/memory-final-tsan-both/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

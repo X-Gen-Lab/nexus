@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "g++",
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Isoc/gd32f470",
+    "-isystem",
+    "build/adc-iteration/_deps/googletest-52eb8108c5bdec04579160ae17225d66034bd723/googletest/include",
+    "-c",
+    "tests/google/gd32_memory_test.cpp",
+    "-o",
+    "/workspace/nexus-memory-iteration/memory_test.o"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T16:45:23.443372+00:00",
+  "ended_at": "2026-10-11T16:45:23.450844+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/memory-iteration/memory-api-red.log"
+}

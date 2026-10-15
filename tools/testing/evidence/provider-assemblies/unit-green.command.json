@@ -1,0 +1,24 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "-m",
+    "unittest",
+    "scripts.ci.test_provider_assemblies",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:54:29.553371+00:00",
+  "ended_at": "2026-10-11T19:54:29.896425+00:00",
+  "exit_code": 0,
+  "sources": [
+    {
+      "path": "/workspace/nexus/scripts/ci/provider_assemblies.py",
+      "sha256": "61fd83d62391a018f8215709299e958be4ef437d497b68e1921e6fbfc843bb01"
+    },
+    {
+      "path": "/workspace/nexus/scripts/ci/test_provider_assemblies.py",
+      "sha256": "af6b8db5e33fbddb32d3f87dd9e2782e17305cdecdefcd54dac2df51526fb419"
+    }
+  ],
+  "log": "/workspace/nexus/tools/testing/evidence/provider-assemblies/unit-green.log"
+}

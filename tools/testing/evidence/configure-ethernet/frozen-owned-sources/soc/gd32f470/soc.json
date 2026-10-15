@@ -1,0 +1,608 @@
+{
+  "schema_version": 1,
+  "id": "gd32f470",
+  "variants": {
+    "GD32F470ZGT6": {
+      "package": "LQFP144",
+      "flash": {
+        "origin": 134217728,
+        "size": 1048576,
+        "erase_blocks": [
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096,
+          4096
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 196608,
+          "dma": true,
+          "linker": true
+        },
+        {
+          "id": "addsram",
+          "origin": 537067520,
+          "size": 262144,
+          "dma": true,
+          "linker": false
+        },
+        {
+          "id": "tcm",
+          "origin": 268435456,
+          "size": 65536,
+          "dma": false,
+          "linker": false
+        }
+      ]
+    }
+  },
+  "cpu": {
+    "arch": "cortex-m4",
+    "fpu": "fpv4-sp-d16",
+    "float_abi": "hard",
+    "dsp": true,
+    "dwt_cyccnt": true,
+    "mpu_version": 7,
+    "mpu_regions": 8,
+    "icache_line_bytes": 0,
+    "dcache_line_bytes": 0,
+    "security": "single",
+    "sau": false,
+    "mve": "none"
+  },
+  "clock_profiles": {
+    "hxtal25-pll200": {
+      "hse_hz": 25000000,
+      "core_hz": 200000000,
+      "apb1_hz": 50000000,
+      "apb2_hz": 100000000
+    }
+  },
+  "controllers": {
+    "GPIOD": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PD7"
+      ]
+    },
+    "USART0": {
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event",
+        "dma-tx",
+        "irq-blocks",
+        "rx-dma-idle",
+        "dma-duplex",
+        "rx-dma-continuous",
+        "dma-duplex-continuous"
+      ],
+      "irq": [
+        "USART0_IRQHandler"
+      ],
+      "pins": [
+        "PA9",
+        "PA10"
+      ]
+    },
+    "SPI4": {
+      "kind": "spi",
+      "modes": [
+        "short-poll",
+        "dma-full-duplex"
+      ],
+      "irq": [],
+      "pins": [
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9"
+      ],
+      "max_hz": 50000000
+    },
+    "I2C0": {
+      "kind": "i2c",
+      "modes": [
+        "poll-messages",
+        "irq-messages",
+        "dma-messages"
+      ],
+      "irq": [
+        "I2C0_EV",
+        "I2C0_ER"
+      ],
+      "pins": [
+        "PB6",
+        "PB7"
+      ],
+      "irq_numbers": {
+        "I2C0_EV": 31,
+        "I2C0_ER": 32
+      }
+    },
+    "FMC": {
+      "kind": "flash",
+      "modes": [
+        "poll-word"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "FWDGT": {
+      "kind": "watchdog",
+      "modes": [
+        "independent"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "EXTI3": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI3_IRQHandler"
+      ],
+      "pins": [
+        "PE3"
+      ]
+    },
+    "TIMER2": {
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "irq": [],
+      "pins": [
+        "PA6"
+      ]
+    },
+    "ADC0": {
+      "kind": "adc",
+      "modes": [
+        "single-shot",
+        "low-rate-scan",
+        "trigger-dma",
+        "trigger-dma-continuous"
+      ],
+      "irq": [],
+      "pins": [
+        "PA0",
+        "PA1"
+      ]
+    },
+    "USART1": {
+      "kind": "uart",
+      "modes": [
+        "irq-byte-event",
+        "irq-blocks"
+      ],
+      "irq": [
+        "USART1_IRQn"
+      ],
+      "pins": [
+        "PA2",
+        "PA3"
+      ],
+      "max_hz": 1000000
+    },
+    "SPI0": {
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "irq": [
+        "SPI0_IRQn"
+      ],
+      "pins": [
+        "PA5",
+        "PA6",
+        "PA7"
+      ],
+      "max_hz": 50000000
+    },
+    "I2C1": {
+      "kind": "i2c",
+      "modes": [
+        "poll-messages"
+      ],
+      "irq": [
+        "I2C1_EV_IRQn",
+        "I2C1_ER_IRQn"
+      ],
+      "pins": [
+        "PB10",
+        "PB11"
+      ],
+      "max_hz": 100000
+    },
+    "GPIOB": {
+      "kind": "gpio",
+      "modes": [
+        "output",
+        "input"
+      ],
+      "irq": [],
+      "pins": [
+        "PB0",
+        "PB1"
+      ]
+    },
+    "CAN0": {
+      "kind": "can",
+      "modes": [
+        "classic-irq"
+      ],
+      "irq": [
+        "CAN0_TX",
+        "CAN0_RX0",
+        "CAN0_RX1",
+        "CAN0_EWMC"
+      ],
+      "irq_numbers": [
+        19,
+        20,
+        21,
+        22
+      ],
+      "clock_hz": 50000000,
+      "pins": [
+        "PA11",
+        "PA12"
+      ]
+    },
+    "CAN1": {
+      "kind": "can",
+      "modes": [
+        "classic-irq"
+      ],
+      "irq": [
+        "CAN1_TX",
+        "CAN1_RX0",
+        "CAN1_RX1",
+        "CAN1_EWMC"
+      ],
+      "irq_numbers": [
+        63,
+        64,
+        65,
+        66
+      ],
+      "clock_hz": 50000000,
+      "pins": [
+        "PB12",
+        "PB13"
+      ]
+    },
+    "USBFS": {
+      "kind": "usb_device",
+      "modes": [
+        "device-fs"
+      ],
+      "irq": [
+        "USBFS"
+      ],
+      "pins": [
+        "PA11",
+        "PA12"
+      ],
+      "resources": [
+        "clock:USBFS48",
+        "clock:CK48",
+        "clock:PLLSAIP"
+      ],
+      "irq_numbers": [
+        67
+      ],
+      "clock_hz": 48000000,
+      "fifo_words": 320,
+      "endpoint_numbers": 4
+    },
+    "ENET": {
+      "kind": "eth",
+      "modes": [
+        "raw-rmii"
+      ],
+      "irq": [
+        "ENET"
+      ],
+      "irq_numbers": [
+        61
+      ],
+      "clock_hz": 200000000,
+      "pins": [
+        "PA1",
+        "PA2",
+        "PA7",
+        "PC1",
+        "PC4",
+        "PC5",
+        "PG11",
+        "PG13",
+        "PG14"
+      ],
+      "resources": [
+        "clock:ETHMAC",
+        "clock:ETHMACTX",
+        "clock:ETHMACRX",
+        "controller:SYSCFG_RMII"
+      ]
+    }
+  },
+  "reserved_resources": [
+    "timer:TIMER1",
+    "irq:TIMER1_IRQn"
+  ],
+  "irq": {
+    "priority_bits": 4,
+    "external_count": 91
+  },
+  "can_domain": {
+    "primary": "CAN0",
+    "controllers": [
+      "CAN0",
+      "CAN1"
+    ],
+    "filter_banks": 28
+  }
+}

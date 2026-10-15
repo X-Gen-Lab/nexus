@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "stm32-physical-entry-software-contract",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f407",
+  "source_revision": "software-only-platform-entry-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "output",
+      "controller": "GPIOE",
+      "route": "gpio-pe3",
+      "initial": 8,
+      "mask": 8
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only existing silicon route; no new PCB, connector, voltage or physical qualification claim."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "Existing reviewed GPIO silicon route only; modeled outer lifecycle entry boundary."
+    }
+  ]
+}

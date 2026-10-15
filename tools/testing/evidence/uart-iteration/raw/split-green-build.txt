@@ -1,0 +1,11 @@
+[1/11] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+[2/11] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_dma.c.o
+[3/11] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_receive.c.o
+[4/11] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/stm32_uart_receive_test.cpp.o
+[5/11] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+[6/11] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/__/soc/gd32f470/drivers/uart_dma.c.o
+[7/11] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/gd32_uart_receive_test.cpp.o
+[8/11] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/contracts/gd32_model/model.c.o
+[9/11] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/__/soc/gd32f470/drivers/uart_receive.c.o
+[10/11] Linking CXX executable bin/nexus_stm32_uart_receive_test
+[11/11] Linking CXX executable bin/nexus_gd32_uart_receive_test

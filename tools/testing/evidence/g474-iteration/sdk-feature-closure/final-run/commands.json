@@ -1,0 +1,2775 @@
+[
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749954100640470,
+    "completed_ns": 1791749954102392248,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-000.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8",
+      "add",
+      "parent-identity.txt"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749954102526357,
+    "completed_ns": 1791749954104524300,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-001.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8",
+      "-c",
+      "user.name=SDK test",
+      "-c",
+      "user.email=sdk-test@local.invalid",
+      "commit",
+      "--quiet",
+      "-m",
+      "unrelated consumer owner"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749954104674042,
+    "completed_ns": 1791749954108170889,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-002.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/workspace/nexus/cmake/package/package_source_sdk.py",
+      "--source",
+      "/workspace/nexus",
+      "--output",
+      "/tmp/nexus installed source sdk jducych8/initial package",
+      "--development-fixture"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749954108367330,
+    "completed_ns": 1791749958788893178,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-003.output",
+      "sha256": "f50560decbab0098dfd045a95b1c50fb02d5aa1f4030e6c394ac19ea641dd1d1",
+      "size": 267
+    },
+    "prepared_sdk_manifest": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/prepared-sdk-003.json",
+      "sha256": "b3200b496ec80cb9a6853e1bbcca0a7170ad6614533b905da371aa72e2826180",
+      "size": 2410873
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749958799648408,
+    "completed_ns": 1791749960866725231,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-004.output",
+      "sha256": "d5738d5a74551fecb4afb8c71ba614bb335ef429e8c63b82261fccfd73d04b96",
+      "size": 74
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749960867039518,
+    "completed_ns": 1791749962873098838,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-005.output",
+      "sha256": "d5738d5a74551fecb4afb8c71ba614bb335ef429e8c63b82261fccfd73d04b96",
+      "size": 74
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/missing dependencies repository"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749962873488125,
+    "completed_ns": 1791749962876066942,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-006.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/missing dependencies repository",
+      "add",
+      "README.md",
+      ".gitmodules"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749962876320258,
+    "completed_ns": 1791749962878102032,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-007.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/missing dependencies repository",
+      "-c",
+      "user.name=SDK test",
+      "-c",
+      "user.email=sdk-test@local.invalid",
+      "commit",
+      "--quiet",
+      "-m",
+      "fixture baseline"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749962878292164,
+    "completed_ns": 1791749962881993847,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-008.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/workspace/nexus/cmake/package/package_source_sdk.py",
+      "--source",
+      "/tmp/nexus installed source sdk jducych8/missing dependencies repository",
+      "--output",
+      "/tmp/nexus installed source sdk jducych8/must not export empty SDK"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749962882200965,
+    "completed_ns": 1791749962937744734,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-009.output",
+      "sha256": "5396188fa7c2c190b13b3dacc631f16cbee191f49e677b1ad7d8f0b37ca04855",
+      "size": 84
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749962938276013,
+    "completed_ns": 1791749964891758575,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-010.output",
+      "sha256": "f50560decbab0098dfd045a95b1c50fb02d5aa1f4030e6c394ac19ea641dd1d1",
+      "size": 267
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/dirty repository"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749964892227732,
+    "completed_ns": 1791749964895102277,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-011.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/dirty repository",
+      "add",
+      "README.md"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749964895400680,
+    "completed_ns": 1791749964897320920,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-012.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/dirty repository",
+      "-c",
+      "user.name=SDK test",
+      "-c",
+      "user.email=sdk-test@local.invalid",
+      "commit",
+      "--quiet",
+      "-m",
+      "fixture baseline"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749964897523140,
+    "completed_ns": 1791749964901485489,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-013.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/workspace/nexus/cmake/package/package_source_sdk.py",
+      "--source",
+      "/tmp/nexus installed source sdk jducych8/dirty repository",
+      "--output",
+      "/tmp/nexus installed source sdk jducych8/must not publish"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749964901740417,
+    "completed_ns": 1791749964953283256,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-014.output",
+      "sha256": "c3c4241856396f7e439148cbf2010adbb201008b87116458bdd00e16e4bc0527",
+      "size": 88
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/contract rejection source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749964953747605,
+    "completed_ns": 1791749964955782965,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-015.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/contract rejection source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/contract rejection build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DNEXUS_BUILD_WORKLOAD=ON",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/configure/assemblies/native.toml"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749964956147876,
+    "completed_ns": 1791749967520361661,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-016.output",
+      "sha256": "a4b1dc3187d4120f9a7e3ed5aaf2ca281a0aab473ec527fc796c38a2bd23b574",
+      "size": 1080
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/version rejection source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749967520848814,
+    "completed_ns": 1791749967523562351,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-017.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/version rejection source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/version rejection build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/configure/assemblies/native.toml"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749967523946612,
+    "completed_ns": 1791749967872851159,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-018.output",
+      "sha256": "e348f02cf9fd352e69ecbdd30e3aa6d854ac3c33c20377164f0ebe41749d060f",
+      "size": 979
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/revision rejection source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749967873342558,
+    "completed_ns": 1791749967875610444,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-019.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/revision rejection source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/revision rejection build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DNEXUS_EXPECTED_SOURCE_REVISION=0000000000000000000000000000000000000000",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/configure/assemblies/native.toml"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749967876095944,
+    "completed_ns": 1791749970252573559,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-020.output",
+      "sha256": "a99caf25fac625b974294b3544b092434dfe24a9818e8a80a109a472568926a1",
+      "size": 1023
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/fixture rejection source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749970253197415,
+    "completed_ns": 1791749970256065722,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-021.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/fixture rejection source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/fixture rejection build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/configure/assemblies/native.toml"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749970256578033,
+    "completed_ns": 1791749972659310982,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-022.output",
+      "sha256": "d7643b4209a2d150d9473d339f68f301acbd2bcd34a049ca368d0e677486b952",
+      "size": 1078
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/workspace/nexus/cmake/package/verify_consumers.py",
+      "--prefix",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces",
+      "--output",
+      "/tmp/nexus installed source sdk jducych8/formal consumer rejection"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749972660046244,
+    "completed_ns": 1791749974695612369,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-023.output",
+      "sha256": "46f7d4f35915e1e7d868f4e22decb5967048ae1ee64b4b44ffd7e4b1b2954a21",
+      "size": 104
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "clone",
+      "--shared",
+      "--no-checkout",
+      "--quiet",
+      "/workspace/nexus/vendors/st/cmsis_device_g4",
+      "/tmp/nexus installed source sdk jducych8/private G4 Git metadata"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749974696387551,
+    "completed_ns": 1791749974932019723,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-024.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/private G4 Git metadata",
+      "remote",
+      "set-url",
+      "origin",
+      "https://github.com/STMicroelectronics/cmsis-device-g4.git"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749974932736819,
+    "completed_ns": 1791749974934412710,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-025.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/private G4 Git metadata",
+      "config",
+      "core.sparseCheckout",
+      "true"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749974934964310,
+    "completed_ns": 1791749974936622996,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-026.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/private G4 Git metadata",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "626ee412334a5ed2e5b320af5a8d77d69f03a558"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749974937068218,
+    "completed_ns": 1791749974943713747,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-027.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/vendors/st/cmsis_device_g4",
+      "status",
+      "--porcelain"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749974944269564,
+    "completed_ns": 1791749974949826024,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-028.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/maintenance/stm32g4_lock.py",
+      "--source",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/vendors/st/cmsis_device_g4",
+      "--lock",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/dependencies/stm32g4.lock.json"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749974950459656,
+    "completed_ns": 1791749975010535876,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-029.output",
+      "sha256": "060a422865869bd8650284d55d23c762136c0be1cbe6f7f9e7f031067ceb42da",
+      "size": 69
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "clone",
+      "--shared",
+      "--no-checkout",
+      "--quiet",
+      "/workspace/nexus/ext/threadx",
+      "/tmp/nexus installed source sdk jducych8/private ThreadX Git metadata"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749975011454842,
+    "completed_ns": 1791749975017623492,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-030.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/private ThreadX Git metadata",
+      "remote",
+      "set-url",
+      "origin",
+      "https://github.com/eclipse-threadx/threadx.git"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749975018294890,
+    "completed_ns": 1791749975020342044,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-031.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/private ThreadX Git metadata",
+      "config",
+      "core.sparseCheckout",
+      "true"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749975020762018,
+    "completed_ns": 1791749975022309799,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-032.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/private ThreadX Git metadata",
+      "checkout",
+      "--quiet",
+      "--detach",
+      "93387b0a60382a29579bbad5045c68328e3751df"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749975022862721,
+    "completed_ns": 1791749975070360081,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-033.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/ext/threadx",
+      "status",
+      "--porcelain"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749975071007293,
+    "completed_ns": 1791749975093096791,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-034.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/maintenance/threadx_lock.py",
+      "--source",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/ext/threadx",
+      "--lock",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/dependencies/threadx.lock.json",
+      "--port",
+      "linux"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749975093778144,
+    "completed_ns": 1791749975159610751,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-035.output",
+      "sha256": "7eac4e4575294230f9702f8b6b66705183a3eff18b4e044c7ba346da8b779a0c",
+      "size": 74
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/maintenance/stm32g4_lock.py",
+      "--source",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/vendors/st/cmsis_device_g4",
+      "--lock",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/dependencies/stm32g4.lock.json"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749975806321381,
+    "completed_ns": 1791749977777486696,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-036.output",
+      "sha256": "4bead68db8d4f16e798d7fee86fbee8078f0a476507c7cd53ee2f301d6b0a6ce",
+      "size": 243
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/maintenance/stm32g4_lock.py",
+      "--source",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/vendors/st/cmsis_device_g4",
+      "--lock",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/dependencies/stm32g4.lock.json"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749978435330680,
+    "completed_ns": 1791749979694721573,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-037.output",
+      "sha256": "ac1b3c599ed5c174c34ee9a899258a2ebad56978e7e8802c27668f78ee70005a",
+      "size": 103
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/maintenance/threadx_lock.py",
+      "--source",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/ext/threadx",
+      "--lock",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/dependencies/threadx.lock.json",
+      "--port",
+      "linux"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749980348571119,
+    "completed_ns": 1791749982395103008,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-038.output",
+      "sha256": "720c2d8d6c24f77dfec57cdf0389caa7f80f87b73d7e9308e09ec1b3d766d3b8",
+      "size": 226
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/maintenance/threadx_lock.py",
+      "--source",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/ext/threadx",
+      "--lock",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/dependencies/threadx.lock.json",
+      "--port",
+      "linux"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749983056364665,
+    "completed_ns": 1791749985030314690,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-039.output",
+      "sha256": "720c2d8d6c24f77dfec57cdf0389caa7f80f87b73d7e9308e09ec1b3d766d3b8",
+      "size": 226
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/maintenance/threadx_lock.py",
+      "--source",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/ext/threadx",
+      "--lock",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/dependencies/threadx.lock.json",
+      "--port",
+      "linux"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749985030998334,
+    "completed_ns": 1791749985178173881,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-040.output",
+      "sha256": "be75a0a42950cf5dfb159c1cbc72647a04457a2580ff8ee83661685988e644d1",
+      "size": 101
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749985179005825,
+    "completed_ns": 1791749985243132451,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-041.output",
+      "sha256": "de28c75f833e318bbd58f8b65164cf321051137ab0637c37010874e4370c323e",
+      "size": 70
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749985243994841,
+    "completed_ns": 1791749987174188434,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-042.output",
+      "sha256": "5f7af7b9ba3564306a963e0b1dc0d0a7e30aa9292153ed9e558331150d5044a5",
+      "size": 61
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749987175369427,
+    "completed_ns": 1791749987241136287,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-043.output",
+      "sha256": "045d70aa6e667406a7e43832252feda15e12bf44b22db98c6d438df5ee6d3a4f",
+      "size": 74
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/workspace/nexus/cmake/package/package_source_sdk.py",
+      "--source",
+      "/workspace/nexus",
+      "--output",
+      "/tmp/nexus installed source sdk jducych8/../nexus installed source sdk jducych8/aliased package",
+      "--development-fixture"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749987242083964,
+    "completed_ns": 1791749987289157870,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-044.output",
+      "sha256": "a863e77357f1c754a7c8a0828512439d4369b4f141aaaa30be64065d344cb692",
+      "size": 109
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749987312935701,
+    "completed_ns": 1791749989279201382,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-045.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749989306546527,
+    "completed_ns": 1791749991276822413,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-046.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749991298017931,
+    "completed_ns": 1791749993311392962,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-047.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749993332155167,
+    "completed_ns": 1791749995352928417,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-048.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749995373999140,
+    "completed_ns": 1791749997388728080,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-049.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749997412385842,
+    "completed_ns": 1791749999386257114,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-050.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749999411308073,
+    "completed_ns": 1791750001337152540,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-051.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750001357381993,
+    "completed_ns": 1791750003376783205,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-052.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750003398831639,
+    "completed_ns": 1791750005413952142,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-053.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750005434490444,
+    "completed_ns": 1791750007349539092,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-054.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750007372614495,
+    "completed_ns": 1791750009317802290,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-055.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750009337944194,
+    "completed_ns": 1791750011238185601,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-056.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750011258071345,
+    "completed_ns": 1791750013134282351,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-057.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750013154254112,
+    "completed_ns": 1791750015128920364,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-058.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750015157994154,
+    "completed_ns": 1791750017235524055,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-059.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750017261396434,
+    "completed_ns": 1791750019190114535,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-060.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750019211194521,
+    "completed_ns": 1791750021140386935,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-061.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750021160462781,
+    "completed_ns": 1791750023235579038,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-062.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750023256095676,
+    "completed_ns": 1791750025234059116,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-063.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750025253972779,
+    "completed_ns": 1791750027220935554,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-064.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750027249109040,
+    "completed_ns": 1791750029172944254,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-065.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750029203299071,
+    "completed_ns": 1791750031123531665,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-066.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750031145105187,
+    "completed_ns": 1791750033090810175,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-067.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750033111774163,
+    "completed_ns": 1791750035047163980,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-068.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750035067535856,
+    "completed_ns": 1791750036991392479,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-069.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750037011602704,
+    "completed_ns": 1791750038985972285,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-070.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750039006708972,
+    "completed_ns": 1791750040921715587,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-071.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750040943492247,
+    "completed_ns": 1791750042892662362,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-072.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750042913176698,
+    "completed_ns": 1791750044855262445,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-073.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750044876114823,
+    "completed_ns": 1791750046784857289,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-074.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750046805346144,
+    "completed_ns": 1791750048707495867,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-075.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750048727850643,
+    "completed_ns": 1791750050676424007,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-076.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750050697408780,
+    "completed_ns": 1791750052707706561,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-077.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750052728160847,
+    "completed_ns": 1791750054773432362,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-078.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750054794498396,
+    "completed_ns": 1791750056714417614,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-079.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750056735920489,
+    "completed_ns": 1791750058673527046,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-080.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750058695238571,
+    "completed_ns": 1791750060579116850,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-081.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750060602820827,
+    "completed_ns": 1791750062648568191,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-082.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750062669125969,
+    "completed_ns": 1791750064644780673,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-083.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750064665272425,
+    "completed_ns": 1791750066594439620,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-084.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750066616407683,
+    "completed_ns": 1791750068493370637,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-085.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750068515298079,
+    "completed_ns": 1791750070392818119,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-086.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750070415435667,
+    "completed_ns": 1791750072381286631,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-087.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750072405235786,
+    "completed_ns": 1791750074344542365,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-088.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750074366494596,
+    "completed_ns": 1791750076275914487,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-089.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750076299905965,
+    "completed_ns": 1791750078190779596,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-090.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750078211100425,
+    "completed_ns": 1791750080146579172,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-091.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750080167040928,
+    "completed_ns": 1791750082025317570,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-092.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750082049123189,
+    "completed_ns": 1791750083932177852,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-093.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750083957296399,
+    "completed_ns": 1791750085947390082,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-094.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750085967706853,
+    "completed_ns": 1791750086015196510,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-095.output",
+      "sha256": "77161700b0316797e88179da3d533712034a1fb626f9144f95ee64f924f580a7",
+      "size": 985
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750086035995666,
+    "completed_ns": 1791750088115950801,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-096.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750088133965622,
+    "completed_ns": 1791750090094301363,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-097.output",
+      "sha256": "dbfc733e835f235fd9a5e35643754c61fd0c9f64bbc457d1bb26694e2897fe76",
+      "size": 76
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750090116109173,
+    "completed_ns": 1791750092084459046,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-098.output",
+      "sha256": "9069cac81870d8bceb5b12e26d1831621c5f06aa0f94cafcb39eb03ee9bfdf18",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750092105331599,
+    "completed_ns": 1791750092151801264,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-099.output",
+      "sha256": "0cf04f72f30adf20930fc765a4d1d9f345700181822c881be2d367af262b34e4",
+      "size": 524
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750092176067944,
+    "completed_ns": 1791750094049420055,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-100.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750094070112260,
+    "completed_ns": 1791750096057317735,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-101.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750096078969687,
+    "completed_ns": 1791750098004842425,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-102.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750098025790253,
+    "completed_ns": 1791750099934940221,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-103.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750099958526934,
+    "completed_ns": 1791750101934176817,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-104.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750101954429762,
+    "completed_ns": 1791750103944869194,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-105.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750103965355576,
+    "completed_ns": 1791750105928111429,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-106.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750105950545840,
+    "completed_ns": 1791750107972683579,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-107.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750107994429508,
+    "completed_ns": 1791750110006325252,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-108.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750110035143456,
+    "completed_ns": 1791750111999404336,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-109.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750112020884901,
+    "completed_ns": 1791750114058455497,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-110.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750114081709112,
+    "completed_ns": 1791750116186352046,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-111.output",
+      "sha256": "7dc75df4c1e5fa33e813e17080437622ce52d88de60616a0a46a4f8894c2c141",
+      "size": 79
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750116203595253,
+    "completed_ns": 1791750118085580197,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-112.output",
+      "sha256": "b8ac9b8064ce4a8361cc5e1aded3b5786109f2d61cd4ed2a2f5d44b59a9f53d4",
+      "size": 81
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py",
+      "--verify",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src"
+    ],
+    "return_code": 1,
+    "started_ns": 1791750118105894001,
+    "completed_ns": 1791750120136071663,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-113.output",
+      "sha256": "3a0f1b361f785146b5ea730a2d9c6a1e8b09bef8da391458a0aa418d0ce83fc9",
+      "size": 92
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/arm source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750120139002913,
+    "completed_ns": 1791750120141154496,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-114.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/arm source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/arm build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/configure/assemblies/sky-baremetal.toml",
+      "-DCMAKE_TOOLCHAIN_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/toolchains/arm-gcc.cmake"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750120142334077,
+    "completed_ns": 1791750127377395961,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-115.output",
+      "sha256": "4f806e5b5d5ab2b19d2fab4854673738ec605d65c43cb650b0e6303b4c29ed2c",
+      "size": 1505
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/tmp/nexus installed source sdk jducych8/arm build",
+      "--parallel",
+      "4",
+      "--target",
+      "installed_c",
+      "installed_cpp"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750127379098117,
+    "completed_ns": 1791750128356956753,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-116.output",
+      "sha256": "f45a31fb4e0de3fb05e9725c4b456aea843f6da38743d58f71cf1e38e1525deb",
+      "size": 5291
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/native source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750128359004492,
+    "completed_ns": 1791750128361375621,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-117.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/native source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/native build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/configure/assemblies/native.toml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750128362438048,
+    "completed_ns": 1791750135589721285,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-118.output",
+      "sha256": "1aba5ff3278d751136476aee4b15775997377c9b850f4694454d95fe270de78d",
+      "size": 1369
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/tmp/nexus installed source sdk jducych8/native build",
+      "--parallel",
+      "4"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750135591301940,
+    "completed_ns": 1791750136703811271,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-119.output",
+      "sha256": "fad89a709cee95cadb9f027f3803a7c2c36b365572509e80a771e0159db15605",
+      "size": 5839
+    }
+  },
+  {
+    "argv": [
+      "/tmp/nexus installed source sdk jducych8/native build/bin/installed_c"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750136705222906,
+    "completed_ns": 1791750136706267337,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-120.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "/tmp/nexus installed source sdk jducych8/native build/bin/installed_cpp"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750136707216525,
+    "completed_ns": 1791750136708091835,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-121.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "/tmp/nexus installed source sdk jducych8/native build/parent_plain"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750136709023608,
+    "completed_ns": 1791750136709797897,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-122.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/g474 baremetal source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750136711147049,
+    "completed_ns": 1791750136713271973,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-123.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/g474 baremetal source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/g474 baremetal build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DCMAKE_TOOLCHAIN_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/g474 baremetal source/g474.toml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750136714576179,
+    "completed_ns": 1791750143106560430,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-124.output",
+      "sha256": "e0b00d3a390dbf534953ad9f9d280822b8d4f9e8495a098ea97780bc3523257a",
+      "size": 1183
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/tmp/nexus installed source sdk jducych8/g474 baremetal build",
+      "--parallel",
+      "4",
+      "--target",
+      "installed_g474"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750143108008269,
+    "completed_ns": 1791750143849539747,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-125.output",
+      "sha256": "af337bd7b03ec32ed397b25efcad3bb42b73313a38a7fee4f0c292f6b79c19e9",
+      "size": 4266
+    },
+    "preserved_artifacts": [
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-125/bindings.c",
+        "sha256": "27c20fe709918a4132128e9dbef2514113e9a1be9f4e79c265a498ca1b9ac98c",
+        "size": 16451
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-125/compile_commands.json",
+        "sha256": "1eae76ef98acc49daa1a8b85b304c0fd7d060bde561583a5fded5ef15e213eef",
+        "size": 72499
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-125/installed_g474.bin",
+        "sha256": "71ebb4251d414ad9bf3f6449354ce8fb562c95678c1ea86a4c56fccbc169ee93",
+        "size": 8424
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-125/installed_g474.elf",
+        "sha256": "df5e3ee5d1c694570f6c663ebbc0da579e382e9c9bd5a4ef78d0741a026f41cc",
+        "size": 27824
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-125/installed_g474.map",
+        "sha256": "8bfbc07927e78d4b28b1e88c8e2cbed9f4ecaca8f658eba5b71674b7cc46de83",
+        "size": 49838
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-125/installed_g474.resources.json",
+        "sha256": "3f2120b5fff1a4dc0d9fd51d09f4b6396b5c829ccb2d47da5ec4a79406a5de66",
+        "size": 4052
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-125/nexus_config.h",
+        "sha256": "e8e7bad5e9c8fb1f74c976304a6da6528fdb0d3e4a9f9de2a3dad2536b1be0cc",
+        "size": 1266
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-125/nexus_factory.h",
+        "sha256": "dc7d1395802a6ef31be6b6519372ae704ee405a1fa9c34c4c4853479d328d193",
+        "size": 14250
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-125/resolved-sdk.txt",
+        "sha256": "0b9d5c98436812532cfa5f6e90c9fef37d45d26809ad0e5cf416718378d6b69c",
+        "size": 85
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-125/resolved.json",
+        "sha256": "69a85b5dbd3f6ca111e342b042293b02c651d8d66a45096239c3763fe0c372dc",
+        "size": 15044
+      }
+    ]
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/measurement/retention.py",
+      "--elf",
+      "/tmp/nexus installed source sdk jducych8/g474 baremetal build/bin/installed_g474.elf",
+      "--bindings",
+      "/tmp/nexus installed source sdk jducych8/g474 baremetal build/nexus-sdk/generated/bindings.c",
+      "--output",
+      "/tmp/nexus installed source sdk jducych8/g474 baremetal build/provider-retention.json"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750143852053328,
+    "completed_ns": 1791750143920940180,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-126.output",
+      "sha256": "10cb680eb9fbb9b6c5d02f218a0d04b10dfcfc298e14fc7167ffb0a936c633fc",
+      "size": 65
+    },
+    "retention": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/actual-retention-126.json",
+      "sha256": "53b9a414b047ace5bdd6e386b660462a592906c6a299c28643150f0e9e2bc7bc",
+      "size": 11088
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/g474 freertos source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750143924714413,
+    "completed_ns": 1791750143927165612,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-127.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/g474 freertos source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/g474 freertos build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DCMAKE_TOOLCHAIN_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/g474 freertos source/g474.toml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750143928530879,
+    "completed_ns": 1791750150789061009,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-128.output",
+      "sha256": "d02d25ac341ad6a9904681a15506ff47b7d73450d25ead8e0563e8b7401b526e",
+      "size": 1180
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/tmp/nexus installed source sdk jducych8/g474 freertos build",
+      "--parallel",
+      "4",
+      "--target",
+      "installed_g474"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750150790815352,
+    "completed_ns": 1791750151717261879,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-129.output",
+      "sha256": "3836629b93cdd8b74fa39f3536ce4d978581e8e9ee0140cb6491a8de5869edc7",
+      "size": 5430
+    },
+    "preserved_artifacts": [
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-129/bindings.c",
+        "sha256": "46b3571985db187bca4d1608e1534609bfd16daa7a1fcff2db932ee5e62497da",
+        "size": 16454
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-129/compile_commands.json",
+        "sha256": "a2e06e1d01b18114037a3a89036768d365433fee33aeeffbdf421430a52c0947",
+        "size": 85346
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-129/installed_g474.bin",
+        "sha256": "fd913c3f17f361d56ac809466e7fbe36a1305f73cc39e6b19bb61706dc92e854",
+        "size": 13844
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-129/installed_g474.elf",
+        "sha256": "43a7415e21851c7e277e51f1b0a7b7c8a26257555f1c6e2fbd32736a56188264",
+        "size": 36872
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-129/installed_g474.map",
+        "sha256": "0434c93d3cbe3a48620b09a30dcec78ea6c7f0d87ea276613dcac9d3ecac2cdd",
+        "size": 82403
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-129/installed_g474.resources.json",
+        "sha256": "70feb17eeb86d07230f5b11fe3b79d67801bf6fbc75de046a57e75b817cef867",
+        "size": 3980
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-129/nexus_config.h",
+        "sha256": "57de468894ad4b673c350a1f6e9d0a83e7fc864ddbcd9c7ee0f3092190028a06",
+        "size": 2031
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-129/nexus_factory.h",
+        "sha256": "dc7d1395802a6ef31be6b6519372ae704ee405a1fa9c34c4c4853479d328d193",
+        "size": 14250
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-129/resolved-sdk.txt",
+        "sha256": "0b9d5c98436812532cfa5f6e90c9fef37d45d26809ad0e5cf416718378d6b69c",
+        "size": 85
+      },
+      {
+        "path": "/workspace/nexus-sdk-feature-closure/final-run/g474-129/resolved.json",
+        "sha256": "fff5d3b7c8c3474f7b533aa1a97ca854a346ebbaf230210dd8ca6840f5943e9b",
+        "size": 17052
+      }
+    ]
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/measurement/retention.py",
+      "--elf",
+      "/tmp/nexus installed source sdk jducych8/g474 freertos build/bin/installed_g474.elf",
+      "--bindings",
+      "/tmp/nexus installed source sdk jducych8/g474 freertos build/nexus-sdk/generated/bindings.c",
+      "--output",
+      "/tmp/nexus installed source sdk jducych8/g474 freertos build/provider-retention.json"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750151720711950,
+    "completed_ns": 1791750151795294200,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-130.output",
+      "sha256": "10cb680eb9fbb9b6c5d02f218a0d04b10dfcfc298e14fc7167ffb0a936c633fc",
+      "size": 65
+    },
+    "retention": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/actual-retention-130.json",
+      "sha256": "cdec3186bd70ae700d18f83c97297ea1a5e7d4a0af815cb7a402b2cc83a6525b",
+      "size": 11086
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/gd32 arm source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750151799770584,
+    "completed_ns": 1791750151802448338,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-131.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/gd32 arm source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/gd32 arm build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/configure/assemblies/liangshan-baremetal.toml",
+      "-DCMAKE_TOOLCHAIN_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/toolchains/arm-gcc.cmake"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750151804277423,
+    "completed_ns": 1791750158837690874,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-132.output",
+      "sha256": "3f6aa2fda0b67f80cdd76a84948de4b0569a0e4ce3bd10cf420214da5ff5646a",
+      "size": 1514
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/tmp/nexus installed source sdk jducych8/gd32 arm build",
+      "--parallel",
+      "4",
+      "--target",
+      "installed_c",
+      "installed_cpp"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750158841297698,
+    "completed_ns": 1791750159839851933,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-133.output",
+      "sha256": "47f2609b0ae138f4d41702c2cf9016ed1d068236e017e7ab35798bcf9f866576",
+      "size": 6772
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/threadx native source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750159842561284,
+    "completed_ns": 1791750159844783362,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-134.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/threadx native source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/threadx native build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/threadx native source/threadx.toml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750159846571416,
+    "completed_ns": 1791750166907367770,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-135.output",
+      "sha256": "aef44ef62766733f1107aacd8ebbff9ff2a33c417382809a24c9c659d974d6a4",
+      "size": 1239
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/tmp/nexus installed source sdk jducych8/threadx native build",
+      "--parallel",
+      "4",
+      "--target",
+      "installed_threadx"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750166909010187,
+    "completed_ns": 1791750170560284158,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-136.output",
+      "sha256": "dedb0ee49aa226840d831207a3c0fdbd9746d36e70e232bf86eec92e2a9dccb0",
+      "size": 46952
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/threadx qiming source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750170572237808,
+    "completed_ns": 1791750170574861777,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-137.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/threadx qiming source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/threadx qiming build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DCMAKE_TOOLCHAIN_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/threadx qiming source/threadx.toml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750170577274538,
+    "completed_ns": 1791750177174682262,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-138.output",
+      "sha256": "8547a04e5f4f086b145b51488d2dc8db1b3eaccbfec93c146e59369812145834",
+      "size": 1181
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/tmp/nexus installed source sdk jducych8/threadx qiming build",
+      "--parallel",
+      "4",
+      "--target",
+      "installed_threadx"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750177176447532,
+    "completed_ns": 1791750179818040002,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-139.output",
+      "sha256": "ac59a0a689afac40a6193a154ea098b29116d465b3180ceba601e12d47987bc8",
+      "size": 46249
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/threadx sky source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750179836667601,
+    "completed_ns": 1791750179839086771,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-140.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/threadx sky source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/threadx sky build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DCMAKE_TOOLCHAIN_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/threadx sky source/threadx.toml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750179840899842,
+    "completed_ns": 1791750186327329156,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-141.output",
+      "sha256": "b450c80e776e0b1be22369399cace31f05d53cd246525d817de7eb87239493b9",
+      "size": 1175
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/tmp/nexus installed source sdk jducych8/threadx sky build",
+      "--parallel",
+      "4",
+      "--target",
+      "installed_threadx"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750186328968038,
+    "completed_ns": 1791750188384248684,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-142.output",
+      "sha256": "83b9b59be0b0d576327e5768b78ece5e8adfd35f3cde0d966850c6f68916f466",
+      "size": 46249
+    }
+  },
+  {
+    "argv": [
+      "git",
+      "init",
+      "--quiet",
+      "/tmp/nexus installed source sdk jducych8/threadx liangshan source"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750188395125826,
+    "completed_ns": 1791750188397570013,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-143.output",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/tmp/nexus installed source sdk jducych8/threadx liangshan source",
+      "-B",
+      "/tmp/nexus installed source sdk jducych8/threadx liangshan build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DNexus_DIR=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus",
+      "-DNEXUS_BUILD_TESTS=OFF",
+      "-DNEXUS_BUILD_WORKLOAD=OFF",
+      "-DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON",
+      "-DCMAKE_TOOLCHAIN_FILE=/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_ASSEMBLY_FILE=/tmp/nexus installed source sdk jducych8/threadx liangshan source/threadx.toml"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750188399404976,
+    "completed_ns": 1791750195007551440,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-144.output",
+      "sha256": "cfaae2459dcd34c217ba270e2410699d96198d01b350053c2e4fa63f0d39803e",
+      "size": 1186
+    }
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/tmp/nexus installed source sdk jducych8/threadx liangshan build",
+      "--parallel",
+      "4",
+      "--target",
+      "installed_threadx"
+    ],
+    "return_code": 0,
+    "started_ns": 1791750195009242379,
+    "completed_ns": 1791750196892668279,
+    "output": {
+      "path": "/workspace/nexus-sdk-feature-closure/final-run/command-145.output",
+      "sha256": "f1840e7424208ec7b022145b243a14131957b62d5de1e36097c5f49aa67a75e6",
+      "size": 47285
+    }
+  }
+]

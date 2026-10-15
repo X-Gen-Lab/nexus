@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-m",
+    "unittest",
+    "tools.configure.test_metadata_binding",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1
+}

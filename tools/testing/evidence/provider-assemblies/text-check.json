@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "kind": "development_owned_text_check",
+  "scope": "actual_style_gate.check_text_only_not_index_or_hooks",
+  "started_at": "2026-10-11T20:11:22.079020+00:00",
+  "files": [
+    {
+      "path": "/workspace/nexus/scripts/ci/provider_assemblies.py",
+      "bytes": 18039,
+      "sha256": "639ff85d4cda01b660136e4a0d8319d4e601e368eb11a310064bf3cb38dd1a7a"
+    },
+    {
+      "path": "/workspace/nexus/scripts/ci/test_provider_assemblies.py",
+      "bytes": 9638,
+      "sha256": "093cd33ee04c21bdd08024d5c0accefcccb25b82ba1a4db80983aadf7e42d911"
+    },
+    {
+      "path": "/workspace/nexus/tools/measurement/retention.py",
+      "bytes": 20078,
+      "sha256": "865f9adc4ea7819ced3c50240e7791c222abcdea895adeb9c8eb9cc6b6312a35"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/test_provider_templates.py",
+      "bytes": 6258,
+      "sha256": "6cc09e655727663a8f6801963f36c2dbdbc2136d58fb6bcbc026ef64830e2070"
+    },
+    {
+      "path": "/workspace/nexus/docs/design/provider-assemblies.md",
+      "bytes": 4021,
+      "sha256": "4e1a6c63d2706a67bfc04919810d43dd4a4da0ae9b3c7b9231604e683d77455b"
+    }
+  ],
+  "errors": [],
+  "ended_at": "2026-10-11T20:11:22.087285+00:00",
+  "status": "passed"
+}

@@ -1,0 +1,37 @@
+Running main() from gmock_main.cc
+Note: Google Test filter = Stm32SpiDma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from Stm32SpiDma
+[ RUN      ] Stm32SpiDma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline
+/workspace/nexus/tests/google/stm32_spi_dma_test.cpp:173: Failure
+Expected equality of these values:
+  nx_request_state(&request.base)
+    Which is: 2
+  NX_REQUEST_QUARANTINED
+    Which is: 5
+
+/workspace/nexus/tests/google/stm32_spi_dma_test.cpp:181: Failure
+Expected equality of these values:
+  request.base.result
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+
+/workspace/nexus/tests/google/stm32_spi_dma_test.cpp:182: Failure
+Expected equality of these values:
+  request.base.transferred
+    Which is: 4
+  0U
+    Which is: 0
+
+[  FAILED  ] Stm32SpiDma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline (0 ms)
+[----------] 1 test from Stm32SpiDma (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Stm32SpiDma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline
+
+ 1 FAILED TEST

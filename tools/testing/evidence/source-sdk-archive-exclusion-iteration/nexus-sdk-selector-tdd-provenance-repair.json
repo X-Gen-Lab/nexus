@@ -1,0 +1,9 @@
+{
+  "source_checkout": "/tmp/nexus-sdk-selector-tdd/source",
+  "scope": "Official dependency provenance restored in isolated local regression checkout",
+  "root_and_stage_unchanged": true,
+  "threadx_tag": "v6.5.2.202603_rel",
+  "tag_commit": "93387b0a60382a29579bbad5045c68328e3751df",
+  "threadx_origin": "https://github.com/eclipse-threadx/threadx.git",
+  "g4_origin": "https://github.com/STMicroelectronics/cmsis-device-g4.git"
+}

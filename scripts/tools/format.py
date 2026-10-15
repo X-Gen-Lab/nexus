@@ -1,270 +1,271 @@
 #!/usr/bin/env python3
-"""
-Nexus Code Formatter
-Cross-platform code formatting script using clang-format.
+"""Format owned C/C++ files using the repository's root .clang-format.
 
-Usage:
-    python format.py [options]
-
-Options:
-    --check, -c     Check only, don't modify files
-    --verbose, -v   Verbose output
-    --config, -f    Path to format config file (default: .clang-format-dirs)
-    --help, -h      Show this help message
+All wrappers delegate here. Default/--all selection uses the Git index (including
+new staged files). Relative --config/--files paths use the caller's working
+directory. Explicit files must belong to the configured owned roots; they never
+override exclusions and may be used in non-Git fixtures. Exit 0 means every file passed, 1
+means a formatter failure, and 2 means invalid input or failed preflight.
+--show-config only reports selection; it does not require clang-format.
 """
 
 import argparse
+import fnmatch
+import os
+from pathlib import Path
+import re
+import shutil
 import subprocess
 import sys
-from pathlib import Path
-from typing import List, Set, Tuple
 
 
-def get_project_root() -> Path:
-    """Get the project root directory."""
-    return Path(__file__).parent.parent.parent.resolve()
+class FormatError(Exception):
+    """A configuration, selection or tool preflight error."""
 
 
-def parse_format_config(config_path: Path) -> Tuple[List[str], List[str], List[str]]:
-    """
-    Parse the format configuration file.
-    
-    Returns:
-        Tuple of (include_dirs, exclude_patterns, extensions)
-    """
-    include_dirs = []
-    exclude_patterns = []
-    extensions = [".c", ".h", ".cpp", ".hpp"]  # defaults
-    
-    if not config_path.exists():
-        # Default configuration if no config file exists
-        return (
-            ["hal", "osal", "platforms", "tests", "applications", "framework"],
-            ["ext", "vendors", "build", "build-*", "_build", "docs", "scripts"],
-            extensions
-        )
-    
-    in_extensions_section = False
-    
-    with open(config_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            line = line.strip()
-            
-            # Skip empty lines and comments
-            if not line or line.startswith('#'):
-                continue
-            
-            # Check for extensions section
-            if line == '[extensions]':
-                in_extensions_section = True
-                extensions = []  # Reset to read from config
-                continue
-            
-            # Handle extensions section
-            if in_extensions_section:
-                if line.startswith('['):
-                    in_extensions_section = False
-                elif line.startswith('.'):
-                    extensions.append(line)
-                continue
-            
-            # Handle exclusion patterns (lines starting with !)
-            if line.startswith('!'):
-                exclude_patterns.append(line[1:].strip())
-            else:
-                include_dirs.append(line)
-    
-    return include_dirs, exclude_patterns, extensions
+def get_project_root():
+    return Path(__file__).resolve().parents[2]
 
 
-def should_exclude(file_path: Path, root: Path, exclude_patterns: List[str]) -> bool:
-    """Check if a file should be excluded based on patterns."""
+def parse_format_config(config_path):
+    """Read the directory allowlist without falling back to another policy."""
+    if not config_path.is_file():
+        raise FormatError(f"Format directory configuration not found: {config_path}")
+    return parse_format_text(config_path.read_text(encoding="utf-8"), config_path)
+
+
+def parse_format_text(contents, label):
+    """Parse the same policy from a trusted Git blob without a temporary file."""
+    config_path = label
+    includes, excludes, extensions = [], [], []
+    in_extensions = False
+    for number, raw in enumerate(contents.splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line == "[extensions]" and not in_extensions:
+            in_extensions = True
+        elif line.startswith("["):
+            raise FormatError(f"{config_path}:{number}: unknown or repeated section")
+        elif in_extensions:
+            if not re.fullmatch(r"\.[A-Za-z0-9]+", line):
+                raise FormatError(f"{config_path}:{number}: invalid extension {line!r}")
+            extensions.append(line)
+        elif line.startswith("!"):
+            pattern = line[1:].strip().replace("\\", "/")
+            if not pattern:
+                raise FormatError(f"{config_path}:{number}: empty exclusion")
+            excludes.append(pattern)
+        else:
+            directory = Path(line.replace("\\", "/"))
+            if directory.is_absolute() or ".." in directory.parts:
+                raise FormatError(f"{config_path}:{number}: directory must stay inside project")
+            includes.append(directory.as_posix())
+    if not includes or not extensions:
+        raise FormatError(f"{config_path}: include directories and extensions are required")
+    return includes, excludes, extensions
+
+
+def should_exclude(file_path, root, exclude_patterns):
+    """Match unqualified patterns at any depth, qualified patterns from root."""
     try:
-        rel_path = file_path.relative_to(root)
-        rel_str = str(rel_path).replace('\\', '/')
-        
-        for pattern in exclude_patterns:
-            pattern = pattern.replace('\\', '/')
-            
-            # Handle wildcard patterns
-            if pattern.endswith('/*'):
-                base_pattern = pattern[:-2]
-                if rel_str.startswith(base_pattern + '/') or rel_str == base_pattern:
-                    return True
-            elif pattern.endswith('*'):
-                base_pattern = pattern[:-1]
-                if rel_str.startswith(base_pattern):
-                    return True
-            else:
-                # Exact match or directory prefix
-                if rel_str.startswith(pattern + '/') or rel_str == pattern:
-                    return True
-                # Check if any parent directory matches
-                parts = rel_path.parts
-                if parts and parts[0] == pattern:
-                    return True
-        
-        return False
+        parts = file_path.relative_to(root).parts
     except ValueError:
-        return False
-
-
-def find_source_files(root: Path, config_path: Path = None) -> List[Path]:
-    """Find all source files to format based on configuration."""
-    if config_path is None:
-        config_path = root / '.clang-format-dirs'
-    
-    include_dirs, exclude_patterns, extensions = parse_format_config(config_path)
-    
-    files = []
-    for dir_name in include_dirs:
-        dir_path = root / dir_name
-        if dir_path.exists() and dir_path.is_dir():
-            for ext in extensions:
-                for file_path in dir_path.rglob(f"*{ext}"):
-                    if not should_exclude(file_path, root, exclude_patterns):
-                        files.append(file_path)
-    
-    return sorted(set(files))
-
-
-def check_clang_format() -> bool:
-    """Check if clang-format is available."""
-    try:
-        result = subprocess.run(
-            ["clang-format", "--version"],
-            capture_output=True, 
-            check=True
-        )
         return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return False
+    prefixes = ["/".join(parts[:index]) for index in range(1, len(parts) + 1)]
+    for pattern in exclude_patterns:
+        candidates = prefixes if "/" in pattern else parts
+        if any(fnmatch.fnmatchcase(candidate, pattern) for candidate in candidates):
+            return True
+    return False
 
 
-def get_clang_format_version() -> str:
-    """Get clang-format version string."""
+def owned_roots(root, include_dirs):
+    roots = []
+    for directory in include_dirs:
+        path = root / directory
+        resolved = path.resolve()
+        if not resolved.is_relative_to(root) or path.is_symlink():
+            raise FormatError(f"Configured directory is not a project-owned directory: {path}")
+        if not path.is_dir():
+            raise FormatError(f"Configured directory not found: {path}")
+        roots.append(resolved)
+    return roots
+
+
+def validate_source(file_path, root, roots, exclude_patterns, extensions):
+    resolved = file_path.resolve()
+    if not resolved.is_relative_to(root):
+        raise FormatError(f"Source escapes the project root: {file_path}")
+    unresolved = file_path.absolute()
+    if unresolved.is_symlink() or any(
+        parent.is_symlink() for parent in unresolved.parents if parent.is_relative_to(root)
+    ):
+        raise FormatError(f"Source must not traverse symlinks: {file_path}")
+    if not resolved.is_file():
+        raise FormatError(f"Source file not found: {file_path}")
+    if should_exclude(resolved, root, exclude_patterns):
+        raise FormatError(f"Source is excluded by formatting policy: {file_path}")
+    if not any(resolved.is_relative_to(directory) for directory in roots):
+        raise FormatError(f"Source is outside configured owned directories: {file_path}")
+    if resolved.suffix not in extensions:
+        raise FormatError(f"Source extension is not configured: {file_path}")
+    return resolved
+
+
+def find_source_files(root, config_path=None, explicit_files=None):
+    root = Path(root).resolve()
+    config_path = config_path or root / ".clang-format-dirs"
+    includes, excludes, extensions = parse_format_config(config_path)
+    roots = owned_roots(root, includes)
+    files = set()
+    if explicit_files is not None:
+        for name in explicit_files:
+            files.add(validate_source(Path(name), root, roots, excludes, extensions))
+    else:
+        for path in tracked_source_files(root):
+            if path.suffix not in extensions or should_exclude(path, root, excludes):
+                continue
+            if any(path.is_relative_to(directory) for directory in roots):
+                files.add(validate_source(path, root, roots, excludes, extensions))
+    if not files:
+        raise FormatError("No owned source files selected; no format check was performed")
+    return sorted(files)
+
+
+def tracked_source_files(root):
+    """Read index paths, never untracked files or a filesystem-scan fallback."""
+    try:
+        result = subprocess.run(["git", "-C", str(root), "ls-files", "--cached", "-z"],
+                                capture_output=True, timeout=30)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise FormatError(f"Failed to read Git index: {error}") from error
+    if result.returncode:
+        raise FormatError(f"Failed to read Git index: {os.fsdecode(result.stderr).strip()}")
+    return [root / os.fsdecode(name) for name in result.stdout.split(b"\0") if name]
+
+
+def run_tool(command, timeout=30):
+    try:
+        return subprocess.run(command, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", timeout=timeout)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise FormatError(f"Failed to execute {command[0]}: {error}") from error
+
+
+def default_tool(root):
+    """Prefer the repository's locked development environment over PATH."""
+    windows_tool = root / ".venv/Scripts/clang-format.exe"
+    posix_tool = root / ".venv/bin/clang-format"
+    candidates = (windows_tool, posix_tool) if os.name == "nt" else (posix_tool, windows_tool)
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+    return "clang-format"
+
+
+def check_tool(tool, style_path):
+    executable = shutil.which(tool)
+    if executable is None:
+        raise FormatError(f"clang-format executable not found: {tool}")
+    version = run_tool([executable, "--version"])
+    if version.returncode or "clang-format" not in version.stdout:
+        detail = version.stderr.strip() or version.stdout.strip() or "empty version output"
+        raise FormatError(f"clang-format version check failed: {detail}")
+    # Validate the root style before any in-place edits. Explicit file: prevents
+    # nested .clang-format files or an implicit LLVM fallback changing policy.
+    style = run_tool([executable, f"--style=file:{style_path}",
+                      "--fallback-style=none", "--dump-config"])
+    if style.returncode or not style.stdout.strip():
+        detail = style.stderr.strip() or "empty style output"
+        raise FormatError(f"Root clang-format configuration rejected: {detail}")
+    return executable, version.stdout.strip()
+
+
+def formatted_source(file_path, tool, style_path):
+    """Return formatter output; callers compare it without editing the source."""
     try:
         result = subprocess.run(
-            ["clang-format", "--version"],
-            capture_output=True,
-            text=True
+            [tool, f"--style=file:{style_path}", "--fallback-style=none", str(file_path)],
+            capture_output=True, timeout=120,
         )
-        return result.stdout.strip()
-    except Exception:
-        return "unknown"
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise FormatError(f"Failed to execute {tool}: {error}") from error
+    if result.returncode:
+        detail = result.stderr.decode("utf-8", "replace").strip()
+        raise FormatError(f"clang-format failed for {file_path}: {detail}")
+    return result.stdout
 
 
-def format_file(file_path: Path, check_only: bool, verbose: bool) -> bool:
-    """Format a single file."""
+def format_file(file_path, check_only, verbose, tool, style_path):
     if verbose:
         print(f"Processing: {file_path}")
-    
-    if check_only:
-        result = subprocess.run(
-            ["clang-format", "--dry-run", "--Werror", str(file_path)],
-            capture_output=True
-        )
-        return result.returncode == 0
-    else:
-        result = subprocess.run(
-            ["clang-format", "-i", str(file_path)],
-            capture_output=True
-        )
-        return result.returncode == 0
+    mode = ["--dry-run", "--Werror"] if check_only else ["-i"]
+    result = run_tool([tool, f"--style=file:{style_path}",
+                       "--fallback-style=none", *mode, str(file_path)], timeout=120)
+    if result.returncode:
+        print(f"FAIL: {file_path}", file=sys.stderr)
+        diagnostics = result.stderr.strip() or result.stdout.strip()
+        if diagnostics:
+            print(diagnostics, file=sys.stderr)
+    return result.returncode == 0
 
 
-def print_config_info(root: Path, config_path: Path):
-    """Print configuration information."""
-    include_dirs, exclude_patterns, extensions = parse_format_config(config_path)
-    
-    print(f"Configuration file: {config_path}")
-    print(f"Include directories: {', '.join(include_dirs)}")
-    print(f"Exclude patterns: {', '.join(exclude_patterns)}")
+def print_config_info(root, config_path, files):
+    includes, excludes, extensions = parse_format_config(config_path)
+    print(f"Project root: {root}")
+    print(f"Style file: {root / '.clang-format'}")
+    print(f"Directory configuration: {config_path}")
+    print(f"Include directories: {', '.join(includes)}")
+    print(f"Exclude patterns: {', '.join(excludes)}")
     print(f"File extensions: {', '.join(extensions)}")
+    print(f"Selected owned files: {len(files)}")
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Nexus Code Formatter")
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("mode", nargs="?", choices=("check",),
+                        help="Legacy wrapper alias for --check")
     parser.add_argument("-c", "--check", action="store_true",
-                        help="Check only, don't modify files")
-    parser.add_argument("-v", "--verbose", action="store_true",
-                        help="Verbose output")
-    parser.add_argument("-f", "--config", type=str, default=None,
-                        help="Path to format config file (default: .clang-format-dirs)")
+                        help="Check only; do not modify files")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("-f", "--config", type=Path,
+                        help="Directory policy (default: repository .clang-format-dirs)")
     parser.add_argument("--show-config", action="store_true",
-                        help="Show configuration and exit")
-    args = parser.parse_args()
-
-    project_root = get_project_root()
-    config_path = Path(args.config) if args.config else project_root / '.clang-format-dirs'
-
-    print("=" * 60)
-    print("Nexus Code Formatter")
-    print("=" * 60)
-
-    if args.show_config:
-        print_config_info(project_root, config_path)
+                        help="Validate and show selection; do not run clang-format")
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--all", action="store_true",
+                           help="Use all owned Git-index files (the default)")
+    selection.add_argument("--files", nargs="+", action="append",
+                           help="Explicit owned files instead of Git selection (repeatable)")
+    parser.add_argument("--tool", help="clang-format executable path or command name")
+    args = parser.parse_args(argv)
+    root = get_project_root()
+    config_path = (args.config or root / ".clang-format-dirs").resolve()
+    style_path = root / ".clang-format"
+    try:
+        if not style_path.is_file() or not style_path.stat().st_size:
+            raise FormatError(f"Root clang-format configuration missing or empty: {style_path}")
+        explicit_files = [name for group in args.files for name in group] if args.files else None
+        files = find_source_files(root, config_path, explicit_files)
+        if args.show_config:
+            print_config_info(root, config_path, files)
+            return 0
+        tool, version = check_tool(args.tool or default_tool(root), style_path)
+        check_only = args.check or args.mode == "check"
+        print(f"{version}\nMode: {'Check' if check_only else 'Format'}; files: {len(files)}")
+        if args.verbose:
+            print_config_info(root, config_path, files)
+        failed = sum(not format_file(path, check_only, args.verbose, tool, style_path)
+                     for path in files)
+        if failed:
+            print(f"FAILED: {failed}/{len(files)} selected files", file=sys.stderr)
+            return 1
+        print(f"{'Checked' if check_only else 'Formatted'} {len(files)} owned files")
         return 0
-
-    if not check_clang_format():
-        print("ERROR: clang-format not found!")
-        print("Please install LLVM/clang-format:")
-        print("  Windows: winget install LLVM.LLVM")
-        print("  Linux:   sudo apt-get install clang-format")
-        print("  macOS:   brew install clang-format")
-        return 1
-
-    print(f"clang-format: {get_clang_format_version()}")
-    print(f"Mode: {'Check' if args.check else 'Format'}")
-    
-    if args.verbose:
-        print_config_info(project_root, config_path)
-    
-    print("-" * 60)
-
-    files = find_source_files(project_root, config_path)
-
-    if not files:
-        print("No source files found!")
-        return 0
-
-    print(f"Found {len(files)} source files to process\n")
-
-    failed_files = []
-    formatted_count = 0
-    
-    for i, file_path in enumerate(files, 1):
-        if args.verbose or (i % 20 == 0):
-            print(f"Progress: {i}/{len(files)} files processed", end='\r')
-        
-        if format_file(file_path, args.check, args.verbose):
-            formatted_count += 1
-        else:
-            failed_files.append(file_path)
-
-    print(f"\nProgress: {len(files)}/{len(files)} files processed")
-    print("\n" + "=" * 60)
-    
-    if failed_files:
-        if args.check:
-            print(f"Format check FAILED for {len(failed_files)} files:")
-            for f in failed_files[:10]:
-                rel_path = f.relative_to(project_root)
-                print(f"  - {rel_path}")
-            if len(failed_files) > 10:
-                print(f"  ... and {len(failed_files) - 10} more")
-            print("\nRun without --check to fix formatting issues.")
-        else:
-            print(f"Failed to format {len(failed_files)} files")
-        return 1
-    else:
-        if args.check:
-            print(f"All {len(files)} files are properly formatted!")
-        else:
-            print(f"Successfully formatted {formatted_count} files!")
-    
-    print("=" * 60)
-    return 0
+    except (FormatError, OSError, UnicodeError) as error:
+        print(f"ERROR: {error}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

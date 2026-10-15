@@ -1,0 +1,28 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus-industrial-design/can-tests",
+      "-B",
+      "/workspace/nexus-industrial-design/can-tests/build-asan",
+      "-DCMAKE_BUILD_TYPE=Debug",
+      "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+      "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+      "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+    ],
+    "exit_code": 0,
+    "log": "asan-configure.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/can-tests/build-asan",
+      "-j",
+      "4"
+    ],
+    "exit_code": 0,
+    "log": "asan-build.log"
+  }
+]

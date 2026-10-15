@@ -1,0 +1,45 @@
+Running main() from gmock_main.cc
+[==========] Running 18 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 18 tests from ClockSleep
+[ RUN      ] ClockSleep.FixedRunDrainedWfiPreservesAllClockRegisters
+[       OK ] ClockSleep.FixedRunDrainedWfiPreservesAllClockRegisters (0 ms)
+[ RUN      ] ClockSleep.ChangedSequenceDoesNotExecuteWfi
+[       OK ] ClockSleep.ChangedSequenceDoesNotExecuteWfi (0 ms)
+[ RUN      ] ClockSleep.PublicationAtMaskBoundaryIsRechecked
+[       OK ] ClockSleep.PublicationAtMaskBoundaryIsRechecked (0 ms)
+[ RUN      ] ClockSleep.OutstandingLeaseCannotBeRevokedBySleep
+[       OK ] ClockSleep.OutstandingLeaseCannotBeRevokedBySleep (0 ms)
+[ RUN      ] ClockSleep.StaleOrOpenBarrierCannotSleep
+[       OK ] ClockSleep.StaleOrOpenBarrierCannotSleep (0 ms)
+[ RUN      ] ClockSleep.ReopenAtFinalMaskBoundaryCannotBypassDrain
+[       OK ] ClockSleep.ReopenAtFinalMaskBoundaryCannotBypassDrain (0 ms)
+[ RUN      ] ClockSleep.MissingCrystalOrChangedDividerRejectsReadOnly
+[       OK ] ClockSleep.MissingCrystalOrChangedDividerRejectsReadOnly (0 ms)
+[ RUN      ] ClockSleep.WrongActualMuxBusOrFlashProfileRejects
+[       OK ] ClockSleep.WrongActualMuxBusOrFlashProfileRejects (0 ms)
+[ RUN      ] ClockSleep.SourceFailureAtMaskBoundaryRejectsBeforeWfi
+[       OK ] ClockSleep.SourceFailureAtMaskBoundaryRejectsBeforeWfi (0 ms)
+[ RUN      ] ClockSleep.StopAndDynamicRunAreExplicitlyUnsupported
+[       OK ] ClockSleep.StopAndDynamicRunAreExplicitlyUnsupported (0 ms)
+[ RUN      ] ClockSleep.DeepScrDoesNotExecuteWfiOrClearCallerControl
+[       OK ] ClockSleep.DeepScrDoesNotExecuteWfiOrClearCallerControl (0 ms)
+[ RUN      ] ClockSleep.PrivilegeAndHandlerRejectBeforeWfi
+[       OK ] ClockSleep.PrivilegeAndHandlerRejectBeforeWfi (0 ms)
+[ RUN      ] ClockSleep.IncomingMaskKindsRejectAndRemainUnchanged
+[       OK ] ClockSleep.IncomingMaskKindsRejectAndRemainUnchanged (0 ms)
+[ RUN      ] ClockSleep.OutputCannotCorruptDomainOrWakeWord
+[       OK ] ClockSleep.OutputCannotCorruptDomainOrWakeWord (0 ms)
+[ RUN      ] ClockSleep.NullOrUnalignedWakeRejectsWithoutObservation
+[       OK ] ClockSleep.NullOrUnalignedWakeRejectsWithoutObservation (0 ms)
+[ RUN      ] ClockSleep.SpreadSpectrumCannotClaimAFixedDeadlineClock
+[       OK ] ClockSleep.SpreadSpectrumCannotClaimAFixedDeadlineClock (0 ms)
+[ RUN      ] ClockSleep.ChangedTimerPrescaleCannotRetainDeadlineDomain
+[       OK ] ClockSleep.ChangedTimerPrescaleCannotRetainDeadlineDomain (0 ms)
+[ RUN      ] ClockSleep.ActiveTokenOutputCannotOverwriteAClockBorrow
+[       OK ] ClockSleep.ActiveTokenOutputCannotOverwriteAClockBorrow (0 ms)
+[----------] 18 tests from ClockSleep (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 18 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 18 tests.

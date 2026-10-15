@@ -1,0 +1,67 @@
+{
+  "paths": [
+    {
+      "path": "soc/stm32g474/system.c",
+      "sha256": "b549ea0108f6346758ebdacc110e8b36c6985ab6a45754ae0cef3e60ad2b2a02"
+    },
+    {
+      "path": "soc/stm32g474/private/stm32g474_system.h",
+      "sha256": "4be3b7f7b41637d3bba990bbedab445fc46e4197a34fddf1671882a1a90ee3a6"
+    },
+    {
+      "path": "soc/stm32g474/private/stm32g474_provider.h",
+      "sha256": "859d8b1bdbd5584c0f5c4c43a4f1b3d6cc3ae0f02a11d5c4d11f0c74f1ffe257"
+    },
+    {
+      "path": "soc/stm32g474/drivers/gpio.c",
+      "sha256": "46656b4ccbb5aba652b2ab3763c3d0bf21af056f53e45068bb15d4a4fa98487b"
+    },
+    {
+      "path": "soc/stm32g474/drivers/uart.c",
+      "sha256": "098256a5e593d2ec16b7d571b9abe5be4528d69935252f12c5bf73fb1b3232ff"
+    },
+    {
+      "path": "soc/stm32g474/README.md",
+      "sha256": "0f4c31a7093356562325bd558492d841b80d96f1262552b39d57538880a7660e"
+    },
+    {
+      "path": "docs/design/stm32g474.md",
+      "sha256": "4231a65b77bf701135742f92bd955ff750a04e0fa8ff46a03da3ed6053104bbf"
+    },
+    {
+      "path": "tests/google/g474_system_test.cpp",
+      "sha256": "8a7ea072297a029d710abfaeb886a9e0b1d4bfcc61b6f4c37abbea92477dd728"
+    },
+    {
+      "path": "tests/google/g474_provider_test.cpp",
+      "sha256": "e01fe6b8ea7b1ade42d0bd1df23e0e8977d1157c5914839faa22ab660bcab2e6"
+    },
+    {
+      "path": "tests/contracts/g474_model.h",
+      "sha256": "982202da04d7bdd657c8c1677fcf7726927396a67207c9abcb75a46174132981"
+    },
+    {
+      "path": "tests/contracts/g474_model.c",
+      "sha256": "634bb8c560eae1afe5a39fe60c965d2f2d53c652fb8d5d259f5c6c20efd441ae"
+    }
+  ],
+  "execution": [
+    {
+      "report": "final-system-green.xml",
+      "tests": 10,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0
+    },
+    {
+      "report": "final-provider-green.xml",
+      "tests": 22,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0
+    }
+  ],
+  "scope": "Developer execution evidence; external development paths; not clean software candidate, actual hardware or platform factory/OS qualification",
+  "source_sdk": "STMicroelectronics/cmsis-device-g4@626ee412334a5ed2e5b320af5a8d77d69f03a558",
+  "physical_status": "not executed"
+}

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="15" failures="7" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:18:08.458" name="AllTests">
+  <testsuite name="Gd32UartReceive" tests="15" failures="7" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:18:08.458">
+    <testcase name="StartProgramsCallerBufferWithoutCpuPayloadCopy" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="105" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive" />
+    <testcase name="InvalidFutureBufferRejectsWithoutLoanOrMmioEffect" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="116" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive" />
+    <testcase name="IdlePublishesOnlyTheStablePartialPrefix" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="125" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive" />
+    <testcase name="RefusedDisableRetainsLoanUntilARealServiceRetryDrains" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="145" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive" />
+    <testcase name="FullDmaBlockRequiresExplicitOwnerRearm" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="164" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive" />
+    <testcase name="TransferErrorAbortsUnreliablePrefixAndLatchesLoss" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="180" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive" />
+    <testcase name="StopClosesTransmitAdmissionWhileConsumerLoanExists" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="193" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive" />
+    <testcase name="PendingIdleThenDmaFlagCannotPublishSameBufferTwice" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="211" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive" />
+    <testcase name="ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="223" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:225&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_rx_start(&amp;port, &amp;stream)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:225
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousSwapsInactiveTargetBeforePublishingAndWraps" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="235" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:237&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_rx_start(&amp;port, &amp;stream)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:237
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="265" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:267&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_rx_start(&amp;port, &amp;stream)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:267
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="288" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:290&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_rx_start(&amp;port, &amp;stream)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:290
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="307" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:309&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_rx_start(&amp;port, &amp;stream)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:309
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousIdleFlushesCompletedHeadThenStablePartialFuture" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="333" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:335&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_rx_start(&amp;port, &amp;stream)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:335
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousUnexpectedParityOfBankStopsAndLatchesLoss" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="352" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:08.458" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:354&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_rx_start(&amp;port, &amp;stream)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:354
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

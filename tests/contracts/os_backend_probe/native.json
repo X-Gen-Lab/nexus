@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "backend": {"name": "native", "kind": "host", "claim_support": false},
+  "contract": {
+    "deadline": "absolute_monotonic_us",
+    "never": "NX_DEADLINE_NEVER",
+    "overflow": "saturating",
+    "clock_continues_while_waiting": true,
+    "hint_is_result": false,
+    "storage": "caller_owned",
+    "lifecycle_owner": "single",
+    "notification_reclaim": "publishers_and_waiter_quiesced",
+    "task_reclaim": "successful_join",
+    "queue_shutdown": "close_then_drain",
+    "irq_policy": "host_thread_only",
+    "mask_policy": "none",
+    "incoming_masks": "not_applicable",
+    "hidden_workers": false,
+    "host_library_allocations": true
+  },
+  "requirements": {
+    "absolute_deadline": [
+      "NativeWait.ChangedSequenceCannotBypassExpiredDeadline",
+      "NativeWait.ContinuousHintsCannotExtendAbsoluteDeadline",
+      "NativeWait.RepeatedHintsDoNotRestartAFutureDeadline"
+    ],
+    "never": ["NativeWait.NeverUsesUntimedWaitAndSecondWaiterIsRejected"],
+    "wake_races": [
+      "OsWaitContract.ArmRecheckCompletionNeverSleeps",
+      "NativeWait.MultiplePublishersPreserveEverySequenceIncrement",
+      "NativeWait.SequenceWrapRemainsObservableBeforeDeadline"
+    ],
+    "single_waiter": ["NativeWait.NeverUsesUntimedWaitAndSecondWaiterIsRejected"],
+    "static_storage": ["NativeTask.SmallStackRejectionRetainsUnusedHandle"],
+    "storage_lifecycle": ["NativeWait.NeverUsesUntimedWaitAndSecondWaiterIsRejected"],
+    "task_join": ["NativeTask.JoinRejectsSelfThenConfirmsEntryExitAndAllowsReuse"],
+    "queue_shutdown": [
+      "NativeQueue.CloseWakesBlockedProducerAndRetainsDrain",
+      "NativeQueue.CloseWakesBlockedConsumerAndPreservesOutputOnRejection"
+    ]
+  },
+  "kernel": null
+}

@@ -1,0 +1,20 @@
+{# Nexus relation labels; parent theme links, titles and credits remain intact. #}
+<nav class="relations" aria-label="{{ nexus_theme_ui.related|e }}">
+  <h3>{{ nexus_theme_ui.related|e }}</h3>
+  <ul>
+    <li><a href="{{ pathto(master_doc)|e }}">{{ nexus_theme_ui.overview|e }}</a></li>
+    {% for parent in parents %}
+    <li><a href="{{ parent.link|e }}">{{ parent.title }}</a></li>
+    {% endfor %}
+    {% if prev %}
+    <li>{{ nexus_theme_ui.previous|e }}:
+      <a href="{{ prev.link|e }}" title="{{ nexus_theme_ui.previous|e }}">{{ prev.title }}</a>
+    </li>
+    {% endif %}
+    {% if next %}
+    <li>{{ nexus_theme_ui.next|e }}:
+      <a href="{{ next.link|e }}" title="{{ nexus_theme_ui.next|e }}">{{ next.title }}</a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>

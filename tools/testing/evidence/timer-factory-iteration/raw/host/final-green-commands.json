@@ -1,0 +1,18 @@
+[
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/timer-factory-tests/build/test-import/nexus_stm32_timer_factory_test",
+      "--gtest_output=xml:/workspace/nexus-industrial-design/timer-factory-tests/stm32-final-green.xml"
+    ],
+    "exit_code": 0,
+    "test_filter_environment": "removed"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/timer-factory-tests/build/test-import/nexus_gd32_timer_factory_test",
+      "--gtest_output=xml:/workspace/nexus-industrial-design/timer-factory-tests/gd32-final-green.xml"
+    ],
+    "exit_code": 0,
+    "test_filter_environment": "removed"
+  }
+]

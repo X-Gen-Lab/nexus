@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="11" failures="1" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:49:22.884" name="AllTests">
+  <testsuite name="MemoryFixture" tests="11" failures="1" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:49:22.884">
+    <testcase name="CopiesDataZerosBssAndPreservesNoInitAndPadding" file="tests/google/gd32_memory_test.cpp" line="63" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture" />
+    <testcase name="EmptyCopyAndZeroRangesDoNotTouchNoInit" file="tests/google/gd32_memory_test.cpp" line="81" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture" />
+    <testcase name="InvalidSecondRegionRejectsBeforeFirstMutation" file="tests/google/gd32_memory_test.cpp" line="90" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture" />
+    <testcase name="EverySectionBoundRequiresWordAlignment" file="tests/google/gd32_memory_test.cpp" line="96" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture" />
+    <testcase name="ReversedAndOutOfRegionBoundsRejectWithoutWrites" file="tests/google/gd32_memory_test.cpp" line="114" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture" />
+    <testcase name="FlashLoadOverflowAndOutOfFlashRejectWithoutWrites" file="tests/google/gd32_memory_test.cpp" line="137" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture" />
+    <testcase name="OverlappingPhysicalRegionsRejectWithoutWrites" file="tests/google/gd32_memory_test.cpp" line="150" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture" />
+    <testcase name="DescriptorInsideTargetRejectsBeforeSelfOverwrite" file="tests/google/gd32_memory_test.cpp" line="156" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture" />
+    <testcase name="FlashAndTargetOverlapRejectsBeforeWrites" file="tests/google/gd32_memory_test.cpp" line="174" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture" />
+    <testcase name="InvalidCountAndFlashBoundsRejectBeforeWrites" file="tests/google/gd32_memory_test.cpp" line="182" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture" />
+    <testcase name="UnalignedDescriptorsRejectBeforeReadingControl" file="tests/google/gd32_memory_test.cpp" line="196" status="run" result="completed" time="0." timestamp="2026-10-11T16:49:22.884" classname="MemoryFixture">
+      <failure message="tests/google/gd32_memory_test.cpp:202&#x0A;Value of: nx_gd32_memory_initialize( reinterpret_cast&lt;const nx_gd32_memory_region_t*&gt;(storage.data() + 1U), regions.size(), origin, origin + sizeof(flash))&#x0A;  Actual: true&#x0A;Expected: false&#x0A;" type=""><![CDATA[tests/google/gd32_memory_test.cpp:202
+Value of: nx_gd32_memory_initialize( reinterpret_cast<const nx_gd32_memory_region_t*>(storage.data() + 1U), regions.size(), origin, origin + sizeof(flash))
+  Actual: true
+Expected: false
+]]></failure>
+      <failure message="tests/google/gd32_memory_test.cpp:55&#x0A;Expected equality of these values:&#x0A;  item&#x0A;    Which is: 11&#x0A;  0xA5A5A5A5U&#x0A;    Which is: 2779096485&#x0A;" type=""><![CDATA[tests/google/gd32_memory_test.cpp:55
+Expected equality of these values:
+  item
+    Which is: 11
+  0xA5A5A5A5U
+    Which is: 2779096485
+]]></failure>
+      <failure message="tests/google/gd32_memory_test.cpp:55&#x0A;Expected equality of these values:&#x0A;  item&#x0A;    Which is: 12&#x0A;  0xA5A5A5A5U&#x0A;    Which is: 2779096485&#x0A;" type=""><![CDATA[tests/google/gd32_memory_test.cpp:55
+Expected equality of these values:
+  item
+    Which is: 12
+  0xA5A5A5A5U
+    Which is: 2779096485
+]]></failure>
+      <failure message="tests/google/gd32_memory_test.cpp:55&#x0A;Expected equality of these values:&#x0A;  item&#x0A;    Which is: 0&#x0A;  0xA5A5A5A5U&#x0A;    Which is: 2779096485&#x0A;" type=""><![CDATA[tests/google/gd32_memory_test.cpp:55
+Expected equality of these values:
+  item
+    Which is: 0
+  0xA5A5A5A5U
+    Which is: 2779096485
+]]></failure>
+      <failure message="tests/google/gd32_memory_test.cpp:55&#x0A;Expected equality of these values:&#x0A;  item&#x0A;    Which is: 0&#x0A;  0xA5A5A5A5U&#x0A;    Which is: 2779096485&#x0A;" type=""><![CDATA[tests/google/gd32_memory_test.cpp:55
+Expected equality of these values:
+  item
+    Which is: 0
+  0xA5A5A5A5U
+    Which is: 2779096485
+]]></failure>
+      <failure message="tests/google/gd32_memory_test.cpp:58&#x0A;Expected equality of these values:&#x0A;  item&#x0A;    Which is: 13&#x0A;  0x5A5A5A5AU&#x0A;    Which is: 1515870810&#x0A;" type=""><![CDATA[tests/google/gd32_memory_test.cpp:58
+Expected equality of these values:
+  item
+    Which is: 13
+  0x5A5A5A5AU
+    Which is: 1515870810
+]]></failure>
+      <failure message="tests/google/gd32_memory_test.cpp:58&#x0A;Expected equality of these values:&#x0A;  item&#x0A;    Which is: 14&#x0A;  0x5A5A5A5AU&#x0A;    Which is: 1515870810&#x0A;" type=""><![CDATA[tests/google/gd32_memory_test.cpp:58
+Expected equality of these values:
+  item
+    Which is: 14
+  0x5A5A5A5AU
+    Which is: 1515870810
+]]></failure>
+      <failure message="tests/google/gd32_memory_test.cpp:58&#x0A;Expected equality of these values:&#x0A;  item&#x0A;    Which is: 0&#x0A;  0x5A5A5A5AU&#x0A;    Which is: 1515870810&#x0A;" type=""><![CDATA[tests/google/gd32_memory_test.cpp:58
+Expected equality of these values:
+  item
+    Which is: 0
+  0x5A5A5A5AU
+    Which is: 1515870810
+]]></failure>
+      <failure message="tests/google/gd32_memory_test.cpp:58&#x0A;Expected equality of these values:&#x0A;  item&#x0A;    Which is: 0&#x0A;  0x5A5A5A5AU&#x0A;    Which is: 1515870810&#x0A;" type=""><![CDATA[tests/google/gd32_memory_test.cpp:58
+Expected equality of these values:
+  item
+    Which is: 0
+  0x5A5A5A5AU
+    Which is: 1515870810
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

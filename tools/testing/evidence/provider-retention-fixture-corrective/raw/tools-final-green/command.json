@@ -1,0 +1,35 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "-B",
+    "tools/testing/run_tool_tests.py",
+    "--suite",
+    "testing",
+    "--report",
+    "/workspace/nexus-retention-fixture-fix/tools-testing-final-green.json"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0,
+  "started_ns": 1791753549661877367,
+  "ended_ns": 1791753586602174859,
+  "source_before": {
+    "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+    "bytes": 20182,
+    "sha256": "75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992"
+  },
+  "source_after": {
+    "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+    "bytes": 20182,
+    "sha256": "75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992"
+  },
+  "stdout": {
+    "path": "/workspace/nexus-retention-fixture-fix/tools-final-green/stdout.txt",
+    "bytes": 545,
+    "sha256": "a257d1fbaffe41259aee5c1f405faebcdca5f9e648223b69480c14a19eff4913"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-retention-fixture-fix/tools-final-green/stderr.txt",
+    "bytes": 1318,
+    "sha256": "ebe3a4243666b5f1c4a978ef5aaba03441d514d3043e0d74771b4c362bfd012e"
+  }
+}

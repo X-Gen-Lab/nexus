@@ -1,0 +1,10 @@
+Running main() from gmock_main.cc
+FreeRTOSFailStop.
+  AssertObservesLocationBeforeMaskAndPark
+  StackOverflowNeverDereferencesTaskOrName
+  ReturningObserverCannotReclaimLoanOrContinueKernel
+  StrongerIncomingBasepriIsNeverWeakenedByPortStore
+  EqualIncomingBasepriStaysMaskedThroughObservation
+  PrimaskIsPreservedWithoutChangingAnotherMask
+  FaultmaskIsPreservedWithoutChangingAnotherMask
+  WeakerIncomingBasepriIsRaisedToActualKernelCeiling

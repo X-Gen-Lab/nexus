@@ -1,0 +1,691 @@
+/**
+ * \file            bindings.c
+ * \brief           Generated fixed typed hardware construction.
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-09
+ * \copyright       Copyright (c) 2026 Nexus Team
+ */
+#include "nexus_bindings.h"
+#include "nexus_factory.h"
+#include "nexus_config.h"
+#include "nexus/arch/arch.h"
+#ifndef NX_PLATFORM_REGISTER_WRITE
+#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))
+#endif
+#ifndef NX_PLATFORM_PRIORITY_WRITE
+#define NX_PLATFORM_PRIORITY_WRITE(reg, value) ((reg) = (uint8_t)(value))
+#endif
+#include "stm32f407_provider.h"
+#include "stm32f407_i2c_async.h"
+void _init(void);
+void _fini(void);
+/** \brief C runtime hooks; constructors use .init_array. */
+void _init(void) {}
+void _fini(void) {}
+static bool s_nx_platform_started;
+static size_t s_nx_platform_initialized;
+static uint32_t s_nx_platform_dma_clocks_added;
+static uint32_t s_nx_platform_gpio_clocks_added;
+static nx_stm32_i2c_async_state_t s_nx_port_primary_i2c;
+static const nx_i2c_port_t s_nx_face_primary_i2c = {
+    &nx_i2c_v1_async_ops, &s_nx_port_primary_i2c
+};
+const nx_i2c_port_t* const nx_binding_primary_i2c = &s_nx_face_primary_i2c;
+static nx_stm32_i2c_async_endpoint_state_t s_nx_endpoint_primary_i2c;
+static const nx_dma_memory_region_t s_nx_dma_regions_primary_i2c[] = {
+    { (uintptr_t)0x20000000u, 131072u, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE },
+    { (uintptr_t)0x08000000u, 1048576u, NX_DMA_MEMORY_READ },
+};
+static uint32_t s_nx_pair_clock_added_primary_i2c;
+static uint16_t s_nx_pair_pin_saved_primary_i2c[2];
+static uint16_t s_nx_pair_pin_leases_primary_i2c;
+static uint8_t s_nx_pair_priorities_primary_i2c[4];
+static bool s_nx_pair_vectors_primary_i2c;
+static bool s_nx_pair_constructed_primary_i2c;
+static const nx_i2c_endpoint_t s_nx_device_face_primary_sensor = {
+    &nx_i2c_v1_async_endpoint_ops, &s_nx_endpoint_primary_i2c
+};
+const nx_i2c_endpoint_t* const nx_device_primary_sensor = &s_nx_device_face_primary_sensor;
+static const nx_i2c_v1_dma_t s_nx_pair_dma_primary_i2c = NX_STM32_I2C1_DMA(s_nx_dma_regions_primary_i2c, 2u);
+static nx_result_t stop_primary_i2c(void) {
+    nx_result_t status;
+    if (s_nx_pair_constructed_primary_i2c) {
+        status = nx_i2c_port_stop(&s_nx_face_primary_i2c);
+        if (status != NX_SUCCESS) { return status; }
+    }
+    if (s_nx_pair_vectors_primary_i2c) {
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[0], 2147483648u);
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[0], 2147483648u);
+        nx_arch_dsb();
+        if (((NVIC->ISER[0] | NVIC->ISPR[0] | NVIC->IABR[0]) & 2147483648u) != 0u) { return NX_ERROR_BUSY; }
+        NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[31], s_nx_pair_priorities_primary_i2c[0]);
+        nx_arch_dsb();
+        if (NVIC->IP[31] != s_nx_pair_priorities_primary_i2c[0]) { return NX_ERROR_IO; }
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[1], 1u);
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[1], 1u);
+        nx_arch_dsb();
+        if (((NVIC->ISER[1] | NVIC->ISPR[1] | NVIC->IABR[1]) & 1u) != 0u) { return NX_ERROR_BUSY; }
+        NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[32], s_nx_pair_priorities_primary_i2c[1]);
+        nx_arch_dsb();
+        if (NVIC->IP[32] != s_nx_pair_priorities_primary_i2c[1]) { return NX_ERROR_IO; }
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[0], 2048u);
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[0], 2048u);
+        nx_arch_dsb();
+        if (((NVIC->ISER[0] | NVIC->ISPR[0] | NVIC->IABR[0]) & 2048u) != 0u) { return NX_ERROR_BUSY; }
+        NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[11], s_nx_pair_priorities_primary_i2c[2]);
+        nx_arch_dsb();
+        if (NVIC->IP[11] != s_nx_pair_priorities_primary_i2c[2]) { return NX_ERROR_IO; }
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[0], 131072u);
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[0], 131072u);
+        nx_arch_dsb();
+        if (((NVIC->ISER[0] | NVIC->ISPR[0] | NVIC->IABR[0]) & 131072u) != 0u) { return NX_ERROR_BUSY; }
+        NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[17], s_nx_pair_priorities_primary_i2c[3]);
+        nx_arch_dsb();
+        if (NVIC->IP[17] != s_nx_pair_priorities_primary_i2c[3]) { return NX_ERROR_IO; }
+        s_nx_pair_vectors_primary_i2c = false;
+    }
+    if ((s_nx_pair_pin_leases_primary_i2c & 2u) != 0u) {
+        nx_stm32_pin_restore(GPIOB, 7u, s_nx_pair_pin_saved_primary_i2c[1]);
+        if (nx_stm32_pin_capture(GPIOB, 7u) != s_nx_pair_pin_saved_primary_i2c[1]) { return NX_ERROR_IO; }
+        s_nx_pair_pin_leases_primary_i2c &= (uint16_t)~2u;
+    }
+    if ((s_nx_pair_pin_leases_primary_i2c & 1u) != 0u) {
+        nx_stm32_pin_restore(GPIOB, 6u, s_nx_pair_pin_saved_primary_i2c[0]);
+        if (nx_stm32_pin_capture(GPIOB, 6u) != s_nx_pair_pin_saved_primary_i2c[0]) { return NX_ERROR_IO; }
+        s_nx_pair_pin_leases_primary_i2c &= (uint16_t)~1u;
+    }
+    if (s_nx_pair_clock_added_primary_i2c != 0u) {
+        NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR & ~s_nx_pair_clock_added_primary_i2c);
+        nx_arch_dsb();
+        if ((RCC->APB1ENR & s_nx_pair_clock_added_primary_i2c) != 0u) { return NX_ERROR_IO; }
+        s_nx_pair_clock_added_primary_i2c = 0u;
+    }
+    s_nx_pair_constructed_primary_i2c = false;
+    return NX_SUCCESS;
+}
+static nx_result_t prepare_primary_i2c(void) {
+    nx_result_t status;
+    if (s_nx_pair_constructed_primary_i2c || s_nx_pair_vectors_primary_i2c || s_nx_pair_pin_leases_primary_i2c != 0u) { return NX_ERROR_BUSY; }
+    if (((NVIC->ISER[0] | NVIC->ISPR[0] | NVIC->IABR[0]) & 2147483648u) != 0u) { return NX_ERROR_BUSY; }
+    if (((NVIC->ISER[1] | NVIC->ISPR[1] | NVIC->IABR[1]) & 1u) != 0u) { return NX_ERROR_BUSY; }
+    if (((NVIC->ISER[0] | NVIC->ISPR[0] | NVIC->IABR[0]) & 2048u) != 0u) { return NX_ERROR_BUSY; }
+    if (((NVIC->ISER[0] | NVIC->ISPR[0] | NVIC->IABR[0]) & 131072u) != 0u) { return NX_ERROR_BUSY; }
+    if ((DMA1_Stream0->CR & 1u) != 0u) { return NX_ERROR_BUSY; }
+    if ((DMA1_Stream6->CR & 1u) != 0u) { return NX_ERROR_BUSY; }
+    s_nx_pair_clock_added_primary_i2c = ~RCC->APB1ENR & RCC_APB1ENR_I2C1EN;
+    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | RCC_APB1ENR_I2C1EN);
+    nx_arch_dsb();
+    if ((RCC->APB1ENR & RCC_APB1ENR_I2C1EN) == 0u) { return NX_ERROR_IO; }
+    if ((I2C1->CR1 & 1u) != 0u) { return NX_ERROR_BUSY; }
+    s_nx_pair_priorities_primary_i2c[0] = NVIC->IP[31];
+    s_nx_pair_priorities_primary_i2c[1] = NVIC->IP[32];
+    s_nx_pair_priorities_primary_i2c[2] = NVIC->IP[11];
+    s_nx_pair_priorities_primary_i2c[3] = NVIC->IP[17];
+    s_nx_pair_vectors_primary_i2c = true;
+    status = nx_stm32_gpio_clock_enable(1u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_pair_pin_saved_primary_i2c[0] = nx_stm32_pin_capture(GPIOB, 6u);
+    s_nx_pair_pin_leases_primary_i2c |= 1u;
+    status = nx_stm32_pin_configure(GPIOB, 6u, 2u, 4u, 0u, true);
+    if (status != NX_SUCCESS) { return status; }
+    status = nx_stm32_gpio_clock_enable(1u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_pair_pin_saved_primary_i2c[1] = nx_stm32_pin_capture(GPIOB, 7u);
+    s_nx_pair_pin_leases_primary_i2c |= 2u;
+    status = nx_stm32_pin_configure(GPIOB, 7u, 2u, 4u, 0u, true);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_port_primary_i2c.registers = (volatile uint32_t*)I2C1;
+    s_nx_port_primary_i2c.line_inputs = &GPIOB->IDR;
+    s_nx_port_primary_i2c.line_mask = 192u;
+    s_nx_port_primary_i2c.peripheral_mhz = 42u;
+    s_nx_port_primary_i2c.dma = &s_nx_pair_dma_primary_i2c;
+    status = nx_stm32_i2c_async_initialize(&s_nx_port_primary_i2c, 5u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_pair_constructed_primary_i2c = true;
+    s_nx_endpoint_primary_i2c.port = &s_nx_port_primary_i2c;
+    s_nx_endpoint_primary_i2c.address = 80u;
+    if ((RCC->APB1ENR & RCC_APB1ENR_I2C1EN) == 0u) { return NX_ERROR_IO; }
+    NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[31], 80u);
+    nx_arch_dsb();
+    if (NVIC->IP[31] != 80u || (NVIC->ISER[0] & 2147483648u) == 0u) { return NX_ERROR_IO; }
+    NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[32], 80u);
+    nx_arch_dsb();
+    if (NVIC->IP[32] != 80u || (NVIC->ISER[1] & 1u) == 0u) { return NX_ERROR_IO; }
+    NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[11], 80u);
+    nx_arch_dsb();
+    if (NVIC->IP[11] != 80u || (NVIC->ISER[0] & 2048u) == 0u) { return NX_ERROR_IO; }
+    NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[17], 80u);
+    nx_arch_dsb();
+    if (NVIC->IP[17] != 80u || (NVIC->ISER[0] & 131072u) == 0u) { return NX_ERROR_IO; }
+    return NX_SUCCESS;
+}
+void I2C1_EV_IRQHandler(void);
+/** \brief Dispatch the exact independently owned controller. */
+void I2C1_EV_IRQHandler(void) { nx_i2c_v1_irq(&s_nx_port_primary_i2c); }
+void I2C1_ER_IRQHandler(void);
+/** \brief Dispatch the exact independently owned controller. */
+void I2C1_ER_IRQHandler(void) { nx_i2c_v1_irq(&s_nx_port_primary_i2c); }
+void DMA1_Stream0_IRQHandler(void);
+/** \brief Dispatch the exact independently owned controller. */
+void DMA1_Stream0_IRQHandler(void) { nx_i2c_v1_dma_irq(&s_nx_port_primary_i2c, true); }
+void DMA1_Stream6_IRQHandler(void);
+/** \brief Dispatch the exact independently owned controller. */
+void DMA1_Stream6_IRQHandler(void) { nx_i2c_v1_dma_irq(&s_nx_port_primary_i2c, false); }
+static nx_stm32_i2c_async_state_t s_nx_port_secondary_i2c;
+static const nx_i2c_port_t s_nx_face_secondary_i2c = {
+    &nx_i2c_v1_async_ops, &s_nx_port_secondary_i2c
+};
+const nx_i2c_port_t* const nx_binding_secondary_i2c = &s_nx_face_secondary_i2c;
+static nx_stm32_i2c_async_endpoint_state_t s_nx_endpoint_secondary_i2c;
+static const nx_dma_memory_region_t s_nx_dma_regions_secondary_i2c[] = {
+    { (uintptr_t)0x20000000u, 131072u, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE },
+    { (uintptr_t)0x08000000u, 1048576u, NX_DMA_MEMORY_READ },
+};
+static uint32_t s_nx_pair_clock_added_secondary_i2c;
+static uint16_t s_nx_pair_pin_saved_secondary_i2c[2];
+static uint16_t s_nx_pair_pin_leases_secondary_i2c;
+static uint8_t s_nx_pair_priorities_secondary_i2c[4];
+static bool s_nx_pair_vectors_secondary_i2c;
+static bool s_nx_pair_constructed_secondary_i2c;
+static const nx_i2c_endpoint_t s_nx_device_face_secondary_sensor = {
+    &nx_i2c_v1_async_endpoint_ops, &s_nx_endpoint_secondary_i2c
+};
+const nx_i2c_endpoint_t* const nx_device_secondary_sensor = &s_nx_device_face_secondary_sensor;
+static const nx_i2c_v1_dma_t s_nx_pair_dma_secondary_i2c = NX_STM32_I2C2_DMA(s_nx_dma_regions_secondary_i2c, 2u);
+static nx_result_t stop_secondary_i2c(void) {
+    nx_result_t status;
+    if (s_nx_pair_constructed_secondary_i2c) {
+        status = nx_i2c_port_stop(&s_nx_face_secondary_i2c);
+        if (status != NX_SUCCESS) { return status; }
+    }
+    if (s_nx_pair_vectors_secondary_i2c) {
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[1], 2u);
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[1], 2u);
+        nx_arch_dsb();
+        if (((NVIC->ISER[1] | NVIC->ISPR[1] | NVIC->IABR[1]) & 2u) != 0u) { return NX_ERROR_BUSY; }
+        NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[33], s_nx_pair_priorities_secondary_i2c[0]);
+        nx_arch_dsb();
+        if (NVIC->IP[33] != s_nx_pair_priorities_secondary_i2c[0]) { return NX_ERROR_IO; }
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[1], 4u);
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[1], 4u);
+        nx_arch_dsb();
+        if (((NVIC->ISER[1] | NVIC->ISPR[1] | NVIC->IABR[1]) & 4u) != 0u) { return NX_ERROR_BUSY; }
+        NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[34], s_nx_pair_priorities_secondary_i2c[1]);
+        nx_arch_dsb();
+        if (NVIC->IP[34] != s_nx_pair_priorities_secondary_i2c[1]) { return NX_ERROR_IO; }
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[0], 8192u);
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[0], 8192u);
+        nx_arch_dsb();
+        if (((NVIC->ISER[0] | NVIC->ISPR[0] | NVIC->IABR[0]) & 8192u) != 0u) { return NX_ERROR_BUSY; }
+        NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[13], s_nx_pair_priorities_secondary_i2c[2]);
+        nx_arch_dsb();
+        if (NVIC->IP[13] != s_nx_pair_priorities_secondary_i2c[2]) { return NX_ERROR_IO; }
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICER[1], 32768u);
+        NX_PLATFORM_REGISTER_WRITE(NVIC->ICPR[1], 32768u);
+        nx_arch_dsb();
+        if (((NVIC->ISER[1] | NVIC->ISPR[1] | NVIC->IABR[1]) & 32768u) != 0u) { return NX_ERROR_BUSY; }
+        NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[47], s_nx_pair_priorities_secondary_i2c[3]);
+        nx_arch_dsb();
+        if (NVIC->IP[47] != s_nx_pair_priorities_secondary_i2c[3]) { return NX_ERROR_IO; }
+        s_nx_pair_vectors_secondary_i2c = false;
+    }
+    if ((s_nx_pair_pin_leases_secondary_i2c & 2u) != 0u) {
+        nx_stm32_pin_restore(GPIOB, 11u, s_nx_pair_pin_saved_secondary_i2c[1]);
+        if (nx_stm32_pin_capture(GPIOB, 11u) != s_nx_pair_pin_saved_secondary_i2c[1]) { return NX_ERROR_IO; }
+        s_nx_pair_pin_leases_secondary_i2c &= (uint16_t)~2u;
+    }
+    if ((s_nx_pair_pin_leases_secondary_i2c & 1u) != 0u) {
+        nx_stm32_pin_restore(GPIOB, 10u, s_nx_pair_pin_saved_secondary_i2c[0]);
+        if (nx_stm32_pin_capture(GPIOB, 10u) != s_nx_pair_pin_saved_secondary_i2c[0]) { return NX_ERROR_IO; }
+        s_nx_pair_pin_leases_secondary_i2c &= (uint16_t)~1u;
+    }
+    if (s_nx_pair_clock_added_secondary_i2c != 0u) {
+        NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR & ~s_nx_pair_clock_added_secondary_i2c);
+        nx_arch_dsb();
+        if ((RCC->APB1ENR & s_nx_pair_clock_added_secondary_i2c) != 0u) { return NX_ERROR_IO; }
+        s_nx_pair_clock_added_secondary_i2c = 0u;
+    }
+    s_nx_pair_constructed_secondary_i2c = false;
+    return NX_SUCCESS;
+}
+static nx_result_t prepare_secondary_i2c(void) {
+    nx_result_t status;
+    if (s_nx_pair_constructed_secondary_i2c || s_nx_pair_vectors_secondary_i2c || s_nx_pair_pin_leases_secondary_i2c != 0u) { return NX_ERROR_BUSY; }
+    if (((NVIC->ISER[1] | NVIC->ISPR[1] | NVIC->IABR[1]) & 2u) != 0u) { return NX_ERROR_BUSY; }
+    if (((NVIC->ISER[1] | NVIC->ISPR[1] | NVIC->IABR[1]) & 4u) != 0u) { return NX_ERROR_BUSY; }
+    if (((NVIC->ISER[0] | NVIC->ISPR[0] | NVIC->IABR[0]) & 8192u) != 0u) { return NX_ERROR_BUSY; }
+    if (((NVIC->ISER[1] | NVIC->ISPR[1] | NVIC->IABR[1]) & 32768u) != 0u) { return NX_ERROR_BUSY; }
+    if ((DMA1_Stream2->CR & 1u) != 0u) { return NX_ERROR_BUSY; }
+    if ((DMA1_Stream7->CR & 1u) != 0u) { return NX_ERROR_BUSY; }
+    s_nx_pair_clock_added_secondary_i2c = ~RCC->APB1ENR & RCC_APB1ENR_I2C2EN;
+    NX_PLATFORM_REGISTER_WRITE(RCC->APB1ENR, RCC->APB1ENR | RCC_APB1ENR_I2C2EN);
+    nx_arch_dsb();
+    if ((RCC->APB1ENR & RCC_APB1ENR_I2C2EN) == 0u) { return NX_ERROR_IO; }
+    if ((I2C2->CR1 & 1u) != 0u) { return NX_ERROR_BUSY; }
+    s_nx_pair_priorities_secondary_i2c[0] = NVIC->IP[33];
+    s_nx_pair_priorities_secondary_i2c[1] = NVIC->IP[34];
+    s_nx_pair_priorities_secondary_i2c[2] = NVIC->IP[13];
+    s_nx_pair_priorities_secondary_i2c[3] = NVIC->IP[47];
+    s_nx_pair_vectors_secondary_i2c = true;
+    status = nx_stm32_gpio_clock_enable(1u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_pair_pin_saved_secondary_i2c[0] = nx_stm32_pin_capture(GPIOB, 10u);
+    s_nx_pair_pin_leases_secondary_i2c |= 1u;
+    status = nx_stm32_pin_configure(GPIOB, 10u, 2u, 4u, 0u, true);
+    if (status != NX_SUCCESS) { return status; }
+    status = nx_stm32_gpio_clock_enable(1u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_pair_pin_saved_secondary_i2c[1] = nx_stm32_pin_capture(GPIOB, 11u);
+    s_nx_pair_pin_leases_secondary_i2c |= 2u;
+    status = nx_stm32_pin_configure(GPIOB, 11u, 2u, 4u, 0u, true);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_port_secondary_i2c.registers = (volatile uint32_t*)I2C2;
+    s_nx_port_secondary_i2c.line_inputs = &GPIOB->IDR;
+    s_nx_port_secondary_i2c.line_mask = 3072u;
+    s_nx_port_secondary_i2c.peripheral_mhz = 42u;
+    s_nx_port_secondary_i2c.dma = &s_nx_pair_dma_secondary_i2c;
+    status = nx_stm32_i2c_async_initialize(&s_nx_port_secondary_i2c, 5u);
+    if (status != NX_SUCCESS) { return status; }
+    s_nx_pair_constructed_secondary_i2c = true;
+    s_nx_endpoint_secondary_i2c.port = &s_nx_port_secondary_i2c;
+    s_nx_endpoint_secondary_i2c.address = 80u;
+    if ((RCC->APB1ENR & RCC_APB1ENR_I2C2EN) == 0u) { return NX_ERROR_IO; }
+    NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[33], 80u);
+    nx_arch_dsb();
+    if (NVIC->IP[33] != 80u || (NVIC->ISER[1] & 2u) == 0u) { return NX_ERROR_IO; }
+    NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[34], 80u);
+    nx_arch_dsb();
+    if (NVIC->IP[34] != 80u || (NVIC->ISER[1] & 4u) == 0u) { return NX_ERROR_IO; }
+    NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[13], 80u);
+    nx_arch_dsb();
+    if (NVIC->IP[13] != 80u || (NVIC->ISER[0] & 8192u) == 0u) { return NX_ERROR_IO; }
+    NX_PLATFORM_PRIORITY_WRITE(NVIC->IP[47], 80u);
+    nx_arch_dsb();
+    if (NVIC->IP[47] != 80u || (NVIC->ISER[1] & 32768u) == 0u) { return NX_ERROR_IO; }
+    return NX_SUCCESS;
+}
+void I2C2_EV_IRQHandler(void);
+/** \brief Dispatch the exact independently owned controller. */
+void I2C2_EV_IRQHandler(void) { nx_i2c_v1_irq(&s_nx_port_secondary_i2c); }
+void I2C2_ER_IRQHandler(void);
+/** \brief Dispatch the exact independently owned controller. */
+void I2C2_ER_IRQHandler(void) { nx_i2c_v1_irq(&s_nx_port_secondary_i2c); }
+void DMA1_Stream2_IRQHandler(void);
+/** \brief Dispatch the exact independently owned controller. */
+void DMA1_Stream2_IRQHandler(void) { nx_i2c_v1_dma_irq(&s_nx_port_secondary_i2c, true); }
+void DMA1_Stream7_IRQHandler(void);
+/** \brief Dispatch the exact independently owned controller. */
+void DMA1_Stream7_IRQHandler(void) { nx_i2c_v1_dma_irq(&s_nx_port_secondary_i2c, false); }
+/** \brief Stop only the initialized selected interfaces. */
+nx_result_t nx_platform_stop(void) {
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked() || !nx_arch_is_privileged()) { return NX_ERROR_CONTEXT; }
+    if (s_nx_platform_initialized >= 2u) {
+        nx_result_t status_0 = stop_secondary_i2c();
+        if (status_0 != NX_SUCCESS) { return status_0; }
+        s_nx_platform_initialized = 1u;
+    }
+    if (s_nx_platform_initialized >= 1u) {
+        nx_result_t status_0 = stop_primary_i2c();
+        if (status_0 != NX_SUCCESS) { return status_0; }
+        s_nx_platform_initialized = 0u;
+    }
+    if (s_nx_platform_started) {
+        NX_PLATFORM_REGISTER_WRITE(RCC->AHB1ENR,
+            RCC->AHB1ENR & ~s_nx_platform_gpio_clocks_added);
+        nx_arch_dsb();
+        if ((RCC->AHB1ENR & s_nx_platform_gpio_clocks_added) != 0u) {
+            return NX_ERROR_IO;
+        }
+        s_nx_platform_gpio_clocks_added = 0u;
+    }
+    if (s_nx_platform_started) { RCC->AHB1ENR &= ~s_nx_platform_dma_clocks_added; }
+    nx_arch_dsb();
+    if (s_nx_platform_started && nx_stm32_system_stop(&g_nx_stm32_system, 1000000u) != 0) {
+        return NX_ERROR_IO;
+    }
+    s_nx_platform_started = false;
+    s_nx_platform_initialized = 0u;
+    return NX_SUCCESS;
+}
+/** \brief Start explicit hardware only; rollback retains error facts. */
+nx_platform_start_result_t nx_platform_start(void) {
+    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, 0u };
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked() || !nx_arch_is_privileged()) {
+        result.primary = NX_ERROR_CONTEXT; return result; }
+    if (s_nx_platform_started) { result.primary = NX_ERROR_STATE; return result; }
+    s_nx_platform_dma_clocks_added = 0u;
+    s_nx_platform_gpio_clocks_added = 0u;
+    result.primary = nx_stm32_validate_identity(1048576u);
+    if (result.primary != NX_SUCCESS) { return result; }
+    nx_stm32_start_result_t system = nx_stm32_system_start(&g_nx_stm32_system, 1000000u);
+    if (system.primary != 0) {
+        result.primary = NX_ERROR_IO;
+        result.cleanup = system.cleanup == 0 ? NX_SUCCESS : NX_ERROR_IO;
+        result.remaining_effects = system.remaining_effects;
+        s_nx_platform_started = result.remaining_effects != 0u;
+        return result;
+    }
+    s_nx_platform_started = true;
+    s_nx_platform_dma_clocks_added = ~RCC->AHB1ENR & (RCC_AHB1ENR_DMA1EN);
+    RCC->AHB1ENR |= (RCC_AHB1ENR_DMA1EN);
+    (void)RCC->AHB1ENR;
+    nx_arch_dsb();
+    s_nx_platform_gpio_clocks_added = ~RCC->AHB1ENR & 2u;
+    s_nx_platform_initialized = 1u;
+    result.primary = prepare_primary_i2c();
+    if (result.primary != NX_SUCCESS) {
+        result.cleanup = nx_platform_stop();
+        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;
+        return result;
+    }
+    s_nx_platform_initialized = 1u;
+    s_nx_platform_initialized = 2u;
+    result.primary = prepare_secondary_i2c();
+    if (result.primary != NX_SUCCESS) {
+        result.cleanup = nx_platform_stop();
+        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;
+        return result;
+    }
+    s_nx_platform_initialized = 2u;
+    return result;
+}
+
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_gpio_port_t* nx_factory_gpio(nx_gpio_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_uart_port_t* nx_factory_uart(nx_uart_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_spi_port_t* nx_factory_spi(nx_spi_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_i2c_port_t* nx_factory_i2c(nx_i2c_id_t id) {
+    switch (id) {
+        case NX_I2C_ID_PRIMARY_I2C:
+            return nx_binding_primary_i2c;
+        case NX_I2C_ID_SECONDARY_I2C:
+            return nx_binding_secondary_i2c;
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_flash_port_t* nx_factory_flash(nx_flash_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_watchdog_port_t* nx_factory_watchdog(nx_watchdog_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_exti_port_t* nx_factory_exti(nx_exti_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_pwm_port_t* nx_factory_pwm(nx_pwm_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_adc_port_t* nx_factory_adc(nx_adc_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_can_port_t* nx_factory_can(nx_can_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_usb_device_port_t* nx_factory_usb_device(nx_usb_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_eth_port_t* nx_factory_eth(nx_eth_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_timer_capture_t* nx_factory_timer_capture(nx_timer_capture_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_advanced_pwm_t* nx_factory_advanced_pwm(nx_advanced_pwm_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_spi_endpoint_t* nx_factory_spi_device(nx_spi_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_i2c_endpoint_t* nx_factory_i2c_device(nx_i2c_device_id_t id) {
+    switch (id) {
+        case NX_I2C_DEVICE_ID_PRIMARY_SENSOR:
+            return nx_device_primary_sensor;
+        case NX_I2C_DEVICE_ID_SECONDARY_SENSOR:
+            return nx_device_secondary_sensor;
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_usb_endpoint_port_t* nx_factory_usb_endpoint(nx_usb_endpoint_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_mdio_port_t* nx_factory_mdio(nx_mdio_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_gpio_capability(
+    nx_gpio_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_uart_capability(
+    nx_uart_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_spi_capability(
+    nx_spi_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+static const nx_factory_io_capability_t s_nx_capability_i2c_primary_i2c = {
+    NX_FACTORY_CAP_IRQ | NX_FACTORY_CAP_TX_DMA | NX_FACTORY_CAP_RX_DMA, NX_I2C_MAX_MESSAGE_BYTES, 1U, 1U, NX_I2C_MAX_MESSAGES
+};
+static const nx_factory_io_capability_t s_nx_capability_i2c_secondary_i2c = {
+    NX_FACTORY_CAP_IRQ | NX_FACTORY_CAP_TX_DMA | NX_FACTORY_CAP_RX_DMA, NX_I2C_MAX_MESSAGE_BYTES, 1U, 1U, NX_I2C_MAX_MESSAGES
+};
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_i2c_capability(
+    nx_i2c_id_t id) {
+    switch (id) {
+        case NX_I2C_ID_PRIMARY_I2C:
+            return &s_nx_capability_i2c_primary_i2c;
+        case NX_I2C_ID_SECONDARY_I2C:
+            return &s_nx_capability_i2c_secondary_i2c;
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_flash_capability(
+    nx_flash_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_watchdog_capability(
+    nx_watchdog_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_exti_capability(
+    nx_exti_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_pwm_capability(
+    nx_pwm_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_adc_capability(
+    nx_adc_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_can_capability(
+    nx_can_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_usb_device_capability(
+    nx_usb_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_eth_capability(
+    nx_eth_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_timer_capture_capability(
+    nx_timer_capture_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_advanced_pwm_capability(
+    nx_advanced_pwm_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_spi_device_capability(
+    nx_spi_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+static const nx_factory_io_capability_t s_nx_capability_i2c_device_primary_sensor = {
+    NX_FACTORY_CAP_IRQ | NX_FACTORY_CAP_TX_DMA | NX_FACTORY_CAP_RX_DMA, NX_I2C_MAX_MESSAGE_BYTES, 1U, 1U, NX_I2C_MAX_MESSAGES
+};
+static const nx_factory_io_capability_t s_nx_capability_i2c_device_secondary_sensor = {
+    NX_FACTORY_CAP_IRQ | NX_FACTORY_CAP_TX_DMA | NX_FACTORY_CAP_RX_DMA, NX_I2C_MAX_MESSAGE_BYTES, 1U, 1U, NX_I2C_MAX_MESSAGES
+};
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_i2c_device_capability(
+    nx_i2c_device_id_t id) {
+    switch (id) {
+        case NX_I2C_DEVICE_ID_PRIMARY_SENSOR:
+            return &s_nx_capability_i2c_device_primary_sensor;
+        case NX_I2C_DEVICE_ID_SECONDARY_SENSOR:
+            return &s_nx_capability_i2c_device_secondary_sensor;
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_usb_endpoint_capability(
+    nx_usb_endpoint_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_mdio_capability(
+    nx_mdio_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}

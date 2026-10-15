@@ -1,0 +1,9 @@
+CMake Error at /workspace/nexus/cmake/platform/Configure.cmake:45 (message):
+  Configuration rejected: Nexus configuration rejected: SDK dependency
+  differs from the locked Gitlink: ext/threadx
+
+Call Stack (most recent call first):
+  /workspace/nexus/CMakeLists.txt:32 (nexus_resolve_assembly)
+
+
+-- Configuring incomplete, errors occurred!

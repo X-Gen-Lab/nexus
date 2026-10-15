@@ -1,0 +1,2 @@
+   text	   data	    bss	    dec	    hex	filename
+   7866	     40	   2264	  10170	   27ba	/workspace/nexus-config-iteration-evidence/mode-arm-expanded/stm32f407vet6-baremetal-rx-dma-idle/bin/stm32_controller_fixture.elf

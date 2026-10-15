@@ -1,0 +1,3056 @@
+{
+  "evidence_files": [
+    {
+      "bytes": 23601,
+      "path": "baseline-asan/CMakeCache.txt",
+      "sha256": "0ba7981c71135903ff4af3808bb5e0b6696f75182726248476e6a2417e07a34e"
+    },
+    {
+      "bytes": 1419,
+      "path": "baseline-asan/binary-preservation.json",
+      "sha256": "e628b3e42845ddb22b0e5f9aa5edcbdbae415ca89280db0443627126a5c3d0a5"
+    },
+    {
+      "bytes": 5843,
+      "path": "baseline-asan/build.log",
+      "sha256": "a7e14538d1af0ca5c561c3ee64a19e9b931a2cdd12693a0fa7766195a6492103"
+    },
+    {
+      "bytes": 1734701,
+      "path": "baseline-asan/build.ninja",
+      "sha256": "38c233fc7eafe06e44ee438f94b5efab4364ff6dea15e569c6e527d04f582d29"
+    },
+    {
+      "bytes": 4808,
+      "path": "baseline-asan/commands.json",
+      "sha256": "d6404d16e64aff3e08edff403f317c8f06abdc5d98a2e04dc9e22e07852a40cf"
+    },
+    {
+      "bytes": 930875,
+      "path": "baseline-asan/compile_commands.json",
+      "sha256": "883af478f42cb2f10afe4af6c6bf16fae9c02e3e58f4a7a399df2fe04c6cfa04"
+    },
+    {
+      "bytes": 4098,
+      "path": "baseline-asan/compiled-inputs/source/arch/cortex_m/nx_arch_cache.c",
+      "sha256": "0556810dac343f65da20922a9c897a3cab061f22b1a5a41a4dbc8c4bf267b59b"
+    },
+    {
+      "bytes": 6993,
+      "path": "baseline-asan/compiled-inputs/source/arch/cortex_m/nx_arch_mpu.c",
+      "sha256": "ae07d4beba4f6f47eb4bc6f2a24e4e3342d36e6c8db8ab850755fd7d24fd552e"
+    },
+    {
+      "bytes": 3667,
+      "path": "baseline-asan/compiled-inputs/source/arch/cortex_m/nx_arch_security.c",
+      "sha256": "926e4ad07454a59397763bdca2c2cbbbeacdd9fdab564062936425dfb4df90d7"
+    },
+    {
+      "bytes": 2259,
+      "path": "baseline-asan/compiled-inputs/source/arch/cortex_m/nx_arch_sleep.c",
+      "sha256": "c1f87ad482c11f41b785fdbded2ec4a96a59fdbd9db52e3417033ae8d1c33b4b"
+    },
+    {
+      "bytes": 4596,
+      "path": "baseline-asan/compiled-inputs/source/arch/cortex_m/private/mechanisms.h",
+      "sha256": "be5a62c74ff05a5cd25493b3e975475280a65d06e7ac15e51e2a755f235045c2"
+    },
+    {
+      "bytes": 876,
+      "path": "baseline-asan/compiled-inputs/source/arch/cortex_m/private/sleep.h",
+      "sha256": "db07a270e35ffdaac8c84e63192593399a01d10fc0f6b5a8495f5bec13f629be"
+    },
+    {
+      "bytes": 5929,
+      "path": "baseline-asan/compiled-inputs/source/arch/include/nexus/arch/arch.h",
+      "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289"
+    },
+    {
+      "bytes": 4025,
+      "path": "baseline-asan/compiled-inputs/source/arch/include/nexus/arch/cache.h",
+      "sha256": "9775bdf517de342cc7d0cbd131cee57d6ce9697b602f55e6938bf1b51e357a26"
+    },
+    {
+      "bytes": 1546,
+      "path": "baseline-asan/compiled-inputs/source/arch/include/nexus/arch/features.h",
+      "sha256": "046631eae25a7143ee1ce8c553fbe5e80074810dfdedf0d2e3405464c21851ac"
+    },
+    {
+      "bytes": 5956,
+      "path": "baseline-asan/compiled-inputs/source/arch/include/nexus/arch/mpu.h",
+      "sha256": "c652c608a734178568d5aa63eb2a823b48200e7f8d5a9a2a5e32c2e5a0681304"
+    },
+    {
+      "bytes": 3226,
+      "path": "baseline-asan/compiled-inputs/source/arch/include/nexus/arch/security.h",
+      "sha256": "3fd3f594ba22aefd65cea7c16114b36fbd25f7925f0e449037a6cbeb623e9e4f"
+    },
+    {
+      "bytes": 2281,
+      "path": "baseline-asan/compiled-inputs/source/arch/include/nexus/arch/sleep.h",
+      "sha256": "ec14761abc18ba0405e5edc88743869dc955c275a57ca40164edb67526bb96a2"
+    },
+    {
+      "bytes": 3260,
+      "path": "baseline-asan/compiled-inputs/source/arch/native/nx_arch_native.c",
+      "sha256": "a1bf35f6cbcfc6f5d2ec72ebfae1040728055d4bd52aba98757729a7e82da93e"
+    },
+    {
+      "bytes": 2026,
+      "path": "baseline-asan/compiled-inputs/source/core/include/nexus/core/fault.h",
+      "sha256": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b"
+    },
+    {
+      "bytes": 7004,
+      "path": "baseline-asan/compiled-inputs/source/core/include/nexus/core/request.h",
+      "sha256": "c27686b1fc578d88e1f4638c3939c1409171ba6267e59e4c64eb72449ffb7e55"
+    },
+    {
+      "bytes": 3381,
+      "path": "baseline-asan/compiled-inputs/source/core/include/nexus/core/request_observer.h",
+      "sha256": "2d7cb6cf7447556a4deb6cdf8c027224ab04210f4bc0daa568cf3688ac7bdafd"
+    },
+    {
+      "bytes": 1799,
+      "path": "baseline-asan/compiled-inputs/source/core/include/nexus/core/stack_observation.h",
+      "sha256": "6452a9d540a08dadb0b17062a40e945369a60439d85bc2bb6e3f1417b5aa5f21"
+    },
+    {
+      "bytes": 789,
+      "path": "baseline-asan/compiled-inputs/source/core/include/nexus/core/status.h",
+      "sha256": "2aed38f391159a2bfb32f475c81967e3eec01beedde97b33a276ee0dd85d32fd"
+    },
+    {
+      "bytes": 3477,
+      "path": "baseline-asan/compiled-inputs/source/core/include/nexus/core/time.h",
+      "sha256": "51b54ef6ff434cc473162f215933b3cd992cc2efb89d9c3b72a4e2f7c9d839b1"
+    },
+    {
+      "bytes": 639,
+      "path": "baseline-asan/compiled-inputs/source/core/src/fault.c",
+      "sha256": "976a3af81cfefa6d7185b7328162825eb08fc4ae25042a543de1fc8369a8367f"
+    },
+    {
+      "bytes": 6864,
+      "path": "baseline-asan/compiled-inputs/source/core/src/request.c",
+      "sha256": "6fdc85b08c7e479cc943e77036912fb7313a4c690dd32c85a9f632d2380f03d8"
+    },
+    {
+      "bytes": 4377,
+      "path": "baseline-asan/compiled-inputs/source/core/src/request_observer.c",
+      "sha256": "dc2f96ee8517682d9e853b87fddbc5a4a3d6dc2e3b52f33b7a3cd2b4465ac82d"
+    },
+    {
+      "bytes": 1202,
+      "path": "baseline-asan/compiled-inputs/source/core/src/stack_observation.c",
+      "sha256": "8362739439edcc5ec632f10a7fead09a702e2dbe4cdd47c743a3b1d58cbd96b6"
+    },
+    {
+      "bytes": 2199,
+      "path": "baseline-asan/compiled-inputs/source/core/src/time.c",
+      "sha256": "67b6bdab6428845f8c8aa99d7a173e232e491f3909dbe0c3c78cf19cb017c1fe"
+    },
+    {
+      "bytes": 9218,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/adc.h",
+      "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1"
+    },
+    {
+      "bytes": 4193,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/adc_observer.h",
+      "sha256": "e95ab349207a44d8ae86c74325a49eb82fd9ce991ea940fff8e4b40dd21a7788"
+    },
+    {
+      "bytes": 3514,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/advanced_pwm.h",
+      "sha256": "2b9bbfbb94b834ed25964f5aa6495abc4e5cbc5f5d5bb48d106e951f37f52410"
+    },
+    {
+      "bytes": 7325,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/can.h",
+      "sha256": "b50f5356966dcda90d1b1c67edf018b740a082e3f0813bc8ec695cc7f907b084"
+    },
+    {
+      "bytes": 4114,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/dma.h",
+      "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b"
+    },
+    {
+      "bytes": 7906,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/ethernet.h",
+      "sha256": "4549314a06f7a6e8d2c3033384fae3ad8abf7b4964833bc96eb6f7aef32881c6"
+    },
+    {
+      "bytes": 4106,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/exti.h",
+      "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6"
+    },
+    {
+      "bytes": 6868,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/flash.h",
+      "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c"
+    },
+    {
+      "bytes": 2676,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/gpio.h",
+      "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778"
+    },
+    {
+      "bytes": 9481,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/i2c.h",
+      "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3"
+    },
+    {
+      "bytes": 8046,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/i2c_bus_clear.h",
+      "sha256": "e1c188d2f093fdbb79664cde94736bd9a900edad64e290221e9e706dbb4b524f"
+    },
+    {
+      "bytes": 2150,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/mdio.h",
+      "sha256": "08dc907823ee68dfacb97065c58fbc2086e9fd39039d845cedbc94b21a781636"
+    },
+    {
+      "bytes": 25516,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/native/model.h",
+      "sha256": "0fb71e8344a27598ec64552dec45b9b5376dd09ed5f10a217cdcb34833fa55a2"
+    },
+    {
+      "bytes": 11660,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/spi.h",
+      "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a"
+    },
+    {
+      "bytes": 11194,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/stream.h",
+      "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a"
+    },
+    {
+      "bytes": 3252,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/stream_budget.h",
+      "sha256": "1034a90c6c09e2c6d10af139c93d50113ead058af898bfcac0acd3a2db32dc8a"
+    },
+    {
+      "bytes": 3191,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/timer.h",
+      "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a"
+    },
+    {
+      "bytes": 3989,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/timer_capture.h",
+      "sha256": "6fb9f2e812cee50a3077e50b697e072e66152dc02c073c3204ee23928d7deee4"
+    },
+    {
+      "bytes": 10872,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/uart.h",
+      "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc"
+    },
+    {
+      "bytes": 3247,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/uart_rs485.h",
+      "sha256": "58f684a10fa8647e5c55b970e74c8f753a3817e93103d12945788617442fa89e"
+    },
+    {
+      "bytes": 8447,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/usb_device.h",
+      "sha256": "759d26c0d51e28ca566a5ef5ca7e7d7fa86533812af40160abbbc216ab01fd6e"
+    },
+    {
+      "bytes": 3440,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/wake.h",
+      "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9"
+    },
+    {
+      "bytes": 3724,
+      "path": "baseline-asan/compiled-inputs/source/io/include/nexus/io/watchdog.h",
+      "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c"
+    },
+    {
+      "bytes": 5790,
+      "path": "baseline-asan/compiled-inputs/source/io/native/adc.c",
+      "sha256": "da6bdfc1c499be71457d62650a6a2315b578f61bc748d0d32c50561437ec110a"
+    },
+    {
+      "bytes": 7817,
+      "path": "baseline-asan/compiled-inputs/source/io/native/can.c",
+      "sha256": "79207262998ccb28ba49952b05f28d2ab882c71085829fd7fd74bc5b60e82fe3"
+    },
+    {
+      "bytes": 2572,
+      "path": "baseline-asan/compiled-inputs/source/io/native/can.h",
+      "sha256": "6d2fa0b173f5f86331212de77b41a443adca47c98cb30f777963165b415417ad"
+    },
+    {
+      "bytes": 1298,
+      "path": "baseline-asan/compiled-inputs/source/io/native/can_access.h",
+      "sha256": "ae4361e990c016caf8312ee27d6aba47f0b74a712ada45aac56d22d03c07b649"
+    },
+    {
+      "bytes": 7429,
+      "path": "baseline-asan/compiled-inputs/source/io/native/ethernet.c",
+      "sha256": "1db19fa0ab10e062d5c0ec8b82740bc2820d641d652982cfb662bea041eca6a2"
+    },
+    {
+      "bytes": 2920,
+      "path": "baseline-asan/compiled-inputs/source/io/native/ethernet.h",
+      "sha256": "2568cc442903e8b1fdd1c405046f61fe52be95691209d35c91161cd622ba872d"
+    },
+    {
+      "bytes": 876,
+      "path": "baseline-asan/compiled-inputs/source/io/native/ethernet_access.h",
+      "sha256": "2a2f63a1ee285f9dd748d93c140b1d3d2b59f9485cb34d0d7b28f8719dc8c307"
+    },
+    {
+      "bytes": 7543,
+      "path": "baseline-asan/compiled-inputs/source/io/native/exti.c",
+      "sha256": "780b90a9b0ccf8bbaf007e21ad85667b0b35329cb31e569c8f87ca12ae71dd8d"
+    },
+    {
+      "bytes": 9441,
+      "path": "baseline-asan/compiled-inputs/source/io/native/flash.c",
+      "sha256": "bd20872557c98bb9b8513676521baca738fdab771d0b0398231ca576fd156238"
+    },
+    {
+      "bytes": 5407,
+      "path": "baseline-asan/compiled-inputs/source/io/native/gpio.c",
+      "sha256": "992407510c763fc6f5726a95895dba445a635ab9ad6c21ebddf3d1d137608384"
+    },
+    {
+      "bytes": 8052,
+      "path": "baseline-asan/compiled-inputs/source/io/native/i2c.c",
+      "sha256": "8f06647793d623bb6e46b234f1e42b81ff6947c7e59db22762a07d4c1e82c4c2"
+    },
+    {
+      "bytes": 12330,
+      "path": "baseline-asan/compiled-inputs/source/io/native/provider.h",
+      "sha256": "628c6ca46264e2521c7fcec2cddcc8ac2571442f08820a5f9910aeb10550620b"
+    },
+    {
+      "bytes": 8170,
+      "path": "baseline-asan/compiled-inputs/source/io/native/spi.c",
+      "sha256": "2a399db21828d8b23eb57d979a0321863bdd1ad1af2102ed8151ac4fe1376247"
+    },
+    {
+      "bytes": 11911,
+      "path": "baseline-asan/compiled-inputs/source/io/native/spi_async.c",
+      "sha256": "969435be3a65f18a61a300633be7abdbedfc70a23db5a430aa74e7f0e89ddba4"
+    },
+    {
+      "bytes": 10517,
+      "path": "baseline-asan/compiled-inputs/source/io/native/stream.c",
+      "sha256": "1eedd1a09a5adc520965e7ddc5d88c0bbc816065435ffbc667144325f15c98ec"
+    },
+    {
+      "bytes": 1942,
+      "path": "baseline-asan/compiled-inputs/source/io/native/time.c",
+      "sha256": "f8944160cd932376c4fc0af2f1db95d8f7b09bb59166e2c225488b552faa3e22"
+    },
+    {
+      "bytes": 4051,
+      "path": "baseline-asan/compiled-inputs/source/io/native/timer.c",
+      "sha256": "fe026222f339257cb3537b954721ec6b1b7efaf153137017892b61a8bc448b33"
+    },
+    {
+      "bytes": 20720,
+      "path": "baseline-asan/compiled-inputs/source/io/native/uart.c",
+      "sha256": "82dc0e7923dc2f38c6bc54d66a288e3cc7de0ffc53ef725a8f562510ecf10b33"
+    },
+    {
+      "bytes": 11210,
+      "path": "baseline-asan/compiled-inputs/source/io/native/usb_device.c",
+      "sha256": "1ab60c470762567e0d7fcee9cb308c344fa964405f70ad3217978869f9827e4a"
+    },
+    {
+      "bytes": 2179,
+      "path": "baseline-asan/compiled-inputs/source/io/native/usb_device.h",
+      "sha256": "f5a28d5a8c61d268f2a1f3d76bae5e73ee57dbc7ac898cbe1d9543e2119c34f2"
+    },
+    {
+      "bytes": 1298,
+      "path": "baseline-asan/compiled-inputs/source/io/native/usb_device_access.h",
+      "sha256": "fc824b75afae99e990bda75a209d83c04412fc748fdbfad64d77e2fb830b32a2"
+    },
+    {
+      "bytes": 5156,
+      "path": "baseline-asan/compiled-inputs/source/io/native/watchdog.c",
+      "sha256": "2dbca5f92e0c60113deb681934fe7693662712c3b91d5f1a6383a7ab1c343dc2"
+    },
+    {
+      "bytes": 3541,
+      "path": "baseline-asan/compiled-inputs/source/io/private/can_controller.h",
+      "sha256": "39a3e29a654f8141b3a46547ab083c79f41623e06e0e0ca8134f58dad00277ec"
+    },
+    {
+      "bytes": 3500,
+      "path": "baseline-asan/compiled-inputs/source/io/private/eth_mac.h",
+      "sha256": "979e672eb814ac0736e09f714c71df86e4237078846c7d94f00ab94ae574d4c5"
+    },
+    {
+      "bytes": 2861,
+      "path": "baseline-asan/compiled-inputs/source/io/private/usb_device_controller.h",
+      "sha256": "6a8006cc5b8d8bce56c84f46f5a52da3863555b43ac3c2ed1b93becdc3f1e39c"
+    },
+    {
+      "bytes": 4646,
+      "path": "baseline-asan/compiled-inputs/source/io/src/adc.c",
+      "sha256": "2a43862372a66b5258ec0a28256b78925b0bdc5b0f5a68a62bdf6b872de7e97c"
+    },
+    {
+      "bytes": 7132,
+      "path": "baseline-asan/compiled-inputs/source/io/src/adc_observer.c",
+      "sha256": "48fbc20045b5acc945d5533db881545c2a5f9e026fdb30273e7cce3b2e5ab6a3"
+    },
+    {
+      "bytes": 2805,
+      "path": "baseline-asan/compiled-inputs/source/io/src/advanced_pwm.c",
+      "sha256": "9505b6a8913d23978defb59e18eabc4c0dfa43252104e526205b8528b3cf28c5"
+    },
+    {
+      "bytes": 4880,
+      "path": "baseline-asan/compiled-inputs/source/io/src/can.c",
+      "sha256": "b4dd7e349b8a4db76c2723e259899dd28764690f43673014784568cfd01c1d31"
+    },
+    {
+      "bytes": 37366,
+      "path": "baseline-asan/compiled-inputs/source/io/src/can_controller.c",
+      "sha256": "93b1ba8bd618259a53f07e02054e3977ad8cb8feb00dc107065a5c1ee1fe67fb"
+    },
+    {
+      "bytes": 2975,
+      "path": "baseline-asan/compiled-inputs/source/io/src/dma.c",
+      "sha256": "98c3edf4a206ede42ecf314a7f9c1b7e892d71318604fc87e4aad18703b3bcbb"
+    },
+    {
+      "bytes": 35844,
+      "path": "baseline-asan/compiled-inputs/source/io/src/eth_mac.c",
+      "sha256": "06b3acd40a24f9875a75e315bab18176b0379b26caf5bef24cd4c3555f71a1cb"
+    },
+    {
+      "bytes": 4151,
+      "path": "baseline-asan/compiled-inputs/source/io/src/ethernet.c",
+      "sha256": "d0e0f23108ef0afa5ba1bf7240e18c1d3b5a3412ff86966ba9e7101be1996381"
+    },
+    {
+      "bytes": 1718,
+      "path": "baseline-asan/compiled-inputs/source/io/src/exti.c",
+      "sha256": "2b25b04b35965bc32596fddb9823105bf98e8746c1a6a58a5aff16e0831d28d7"
+    },
+    {
+      "bytes": 2096,
+      "path": "baseline-asan/compiled-inputs/source/io/src/flash.c",
+      "sha256": "4c0eb780eb87d6ce90b82ab4ab387f752ae15347057f90154252d5f22b4750cd"
+    },
+    {
+      "bytes": 2953,
+      "path": "baseline-asan/compiled-inputs/source/io/src/flash_region.c",
+      "sha256": "4a14b9330342c6cda18431db6c0fb3a6ba823579c4d33bf18eeffd85d866b2a9"
+    },
+    {
+      "bytes": 1483,
+      "path": "baseline-asan/compiled-inputs/source/io/src/gpio.c",
+      "sha256": "cfa133514adbae4a42e9e39c83921f9e885117b4cf251f6325dc300b19a4b0e0"
+    },
+    {
+      "bytes": 7617,
+      "path": "baseline-asan/compiled-inputs/source/io/src/i2c.c",
+      "sha256": "14a9e4f1728dd5b28e4525c83d77ea05903bdcc0645d6e9b824775ec21b22f9f"
+    },
+    {
+      "bytes": 10355,
+      "path": "baseline-asan/compiled-inputs/source/io/src/i2c_bus_clear.c",
+      "sha256": "b88cc7b5ec47eaea1684312737d69a2aae48d0a25f59106ff1e19915af6ad8df"
+    },
+    {
+      "bytes": 1200,
+      "path": "baseline-asan/compiled-inputs/source/io/src/mdio.c",
+      "sha256": "6b19c9f91d8eda0205893bb929e8d117cb31e22cbe6246fc603193fed02d0a2f"
+    },
+    {
+      "bytes": 5789,
+      "path": "baseline-asan/compiled-inputs/source/io/src/spi.c",
+      "sha256": "933d438eee528cb00aa24aaf4c2d974ec18d47facc57d9c54a791d5c76161a5f"
+    },
+    {
+      "bytes": 14946,
+      "path": "baseline-asan/compiled-inputs/source/io/src/stream.c",
+      "sha256": "693292c7b185bd64004507bb7341d1311f122f84ea608c40cb5a72718253676e"
+    },
+    {
+      "bytes": 4434,
+      "path": "baseline-asan/compiled-inputs/source/io/src/stream_budget.c",
+      "sha256": "5aca444c08926de7bbd47c24aa4ded2d8e1f89b5fa0c56077b8425352ed69eed"
+    },
+    {
+      "bytes": 1847,
+      "path": "baseline-asan/compiled-inputs/source/io/src/timer.c",
+      "sha256": "4d2eba552c2aa8065ec6767711a5b045bbe2649c69975503ea5135c6d691a5ac"
+    },
+    {
+      "bytes": 3102,
+      "path": "baseline-asan/compiled-inputs/source/io/src/timer_capture.c",
+      "sha256": "65845a51610421f6fd1072ffe06eb726bbaabe950ca4a8d47bdb16e78cd2a945"
+    },
+    {
+      "bytes": 5259,
+      "path": "baseline-asan/compiled-inputs/source/io/src/uart.c",
+      "sha256": "974704075e9bac9f80873862fcc49945e54e4cee43515c1bd61a8e6d8ab776a9"
+    },
+    {
+      "bytes": 14081,
+      "path": "baseline-asan/compiled-inputs/source/io/src/uart_rs485.c",
+      "sha256": "867bdec68729f028d8f5513e93f6656b5ec772568dfc117baf95b6c130dcc8e7"
+    },
+    {
+      "bytes": 5932,
+      "path": "baseline-asan/compiled-inputs/source/io/src/usb_device.c",
+      "sha256": "ce6a9771275e7e8f3f9da320de9cf5f71b410ff836616aa1a2e88e88ed5dd773"
+    },
+    {
+      "bytes": 45696,
+      "path": "baseline-asan/compiled-inputs/source/io/src/usb_device_controller.c",
+      "sha256": "caac78c495a36886c76c69a60e52745140f7f7c2a5ebf52ae5af2d6ebe2275d3"
+    },
+    {
+      "bytes": 2662,
+      "path": "baseline-asan/compiled-inputs/source/io/src/wake.c",
+      "sha256": "227718bd6f7a31e3469d60fa4d09fd264bd0a7a9ae13bf30bfc069b376ffca6c"
+    },
+    {
+      "bytes": 1620,
+      "path": "baseline-asan/compiled-inputs/source/io/src/watchdog.c",
+      "sha256": "ea3ec3f1cbc3dc1ebbba796760083a377356708532526d9354c5032b656cf357"
+    },
+    {
+      "bytes": 9663,
+      "path": "baseline-asan/compiled-inputs/source/soc/gd32f470/drivers/adc.c",
+      "sha256": "91138076b826167aa03a3cba530e46adf7b0e9217a818ef834682d588ccafb32"
+    },
+    {
+      "bytes": 20238,
+      "path": "baseline-asan/compiled-inputs/source/soc/gd32f470/drivers/adc_continuous.c",
+      "sha256": "ac35e0ecc0ffb85f5a2d2e37866e4167ae568c1ad534cd03dbeed87253e0a181"
+    },
+    {
+      "bytes": 16230,
+      "path": "baseline-asan/compiled-inputs/source/soc/gd32f470/drivers/adc_stream.c",
+      "sha256": "1b8297da3fd09a63e94c13b442de0f2b366a294315efc60c01592fb5b394d512"
+    },
+    {
+      "bytes": 12955,
+      "path": "baseline-asan/compiled-inputs/source/soc/gd32f470/drivers/flash.c",
+      "sha256": "affedf6bce4d59c7255c543ac713c46042ff9bc1a3347053af4d8362aa7ada8c"
+    },
+    {
+      "bytes": 5450,
+      "path": "baseline-asan/compiled-inputs/source/soc/gd32f470/private/gd32f470_adc_stream.h",
+      "sha256": "039c4add217243e2cfa9ab0a99cfaba96067d351cfd212db5d6ea29369f8fb6a"
+    },
+    {
+      "bytes": 22822,
+      "path": "baseline-asan/compiled-inputs/source/soc/gd32f470/private/gd32f470_provider.h",
+      "sha256": "4a865f646cd9565806959186ce6c3a591c6302b1543ad0bc7def741431663226"
+    },
+    {
+      "bytes": 839,
+      "path": "baseline-asan/compiled-inputs/source/soc/gd32f470/private/gd32f4xx_libopt.h",
+      "sha256": "64afa1aa962f93bc9cad8a23244b39b383dd4aa29c0056c20d9a4cd2537f10db"
+    },
+    {
+      "bytes": 2710,
+      "path": "baseline-asan/compiled-inputs/source/soc/gd32f470/private/system.h",
+      "sha256": "ea3ae416c653f9abbfb42da62a1aa832290594cdd95a4bb98bb709601ee181bc"
+    },
+    {
+      "bytes": 3548,
+      "path": "baseline-asan/compiled-inputs/source/tests/contracts/gd32_model/core_cm4.h",
+      "sha256": "9e0b5a20eba1e1d694b5e48af4eedf37fe228d203a888442e3c33c97409958ca"
+    },
+    {
+      "bytes": 8442,
+      "path": "baseline-asan/compiled-inputs/source/tests/contracts/gd32_model/model.c",
+      "sha256": "21d4b0d674f620364097a73ec17d1fa78bfdafe3b2c6b49bdfe4093307387053"
+    },
+    {
+      "bytes": 19775,
+      "path": "baseline-asan/compiled-inputs/source/tests/google/can_controller_test.cpp",
+      "sha256": "173563d1b1fb6f43c4177fc86378e0ced974e5516b66b16230bd35f5970d7a2d"
+    },
+    {
+      "bytes": 1069,
+      "path": "baseline-asan/compiled-inputs/source/tests/google/gd32_adc_stream_model.h",
+      "sha256": "1e65ce15ed5d6a896a769a876d323b0ff705f63d5969bf80cb649f5b161be59a"
+    },
+    {
+      "bytes": 24323,
+      "path": "baseline-asan/compiled-inputs/source/tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "c0ee34378acfd389637d509a48d3d8495119a07a434fcaf7058d530c1546b692"
+    },
+    {
+      "bytes": 3572,
+      "path": "baseline-asan/compiled-inputs/source/tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "60c330b8b5ba8f7735b90f8d73831c804ebba010ed071be5094cbc349f3b8b95"
+    },
+    {
+      "bytes": 28917,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h",
+      "sha256": "db6de53203fa053d6e789ef86908195f84b7664753bdf0aa7ca74f62025573ef"
+    },
+    {
+      "bytes": 2740,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/system_gd32f4xx.h",
+      "sha256": "6077ccbeff029a0058465172607481158b202d5687e2e87a0ed13ff6a9b2633a"
+    },
+    {
+      "bytes": 41521,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_adc.h",
+      "sha256": "9fa1a80b64d18512729af4d22602d5761ec0758d970fb5d15f7f8a96244607d3"
+    },
+    {
+      "bytes": 9890,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dbg.h",
+      "sha256": "0a403f37714cbb585a26cb54c7c5cc6776fa9ec23459a70369d9342805713998"
+    },
+    {
+      "bytes": 32675,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dma.h",
+      "sha256": "b5796d1e0017994a232a53613f2d50566b8c00dd43d4049eab26cee1e04f37eb"
+    },
+    {
+      "bytes": 20470,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exti.h",
+      "sha256": "dd78502366ba631e32841db28711976d51f7e71417bb2006ba82dc89404eba66"
+    },
+    {
+      "bytes": 28322,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fmc.h",
+      "sha256": "a6bd45fe828fda8cc19b3b1958470ac1bb115cc162b89963f5391028c9bdc192"
+    },
+    {
+      "bytes": 5863,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fwdgt.h",
+      "sha256": "e83161e6700a28f9f0d475405c4a94a03a88e9576b6d8f41c5a9bd96daf5ff08"
+    },
+    {
+      "bytes": 29164,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h",
+      "sha256": "6551fd3fb673b3e34d5f62b72cba8a0482ce051bf29ed475015b1f9ad178a57a"
+    },
+    {
+      "bytes": 29826,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_i2c.h",
+      "sha256": "42498aa2016958a5d351577f3caeca0f7c8334ab25b704a95acb7b73001a1019"
+    },
+    {
+      "bytes": 11878,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_pmu.h",
+      "sha256": "0275375eff0d339ec2b16c1a0d4c67721be6bff63c1516bdc4a614bb5ed98b03"
+    },
+    {
+      "bytes": 95768,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rcu.h",
+      "sha256": "38d97fe3994cefdcb1109192a5854c29ad2af364558f499878c4a5510b26e45d"
+    },
+    {
+      "bytes": 25504,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_spi.h",
+      "sha256": "e2bc6524ff9fc2604f3e947c68ca419ff35bc029904ea8163c10510f85728c10"
+    },
+    {
+      "bytes": 11558,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_syscfg.h",
+      "sha256": "0e37ca2af26c3563712cf33aca9cf85b0489df10526c8336e0e75518a86f3cd2"
+    },
+    {
+      "bytes": 59717,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_timer.h",
+      "sha256": "b22f7cc8d1a7cf16326163982b9d6a34829ca55f6491fdea21d07b6e6dcd5668"
+    },
+    {
+      "bytes": 31652,
+      "path": "baseline-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_usart.h",
+      "sha256": "7adb26fb6e10f5ce29612aff5f580eafb787311bc982c629ffdf415ddf3dc973"
+    },
+    {
+      "bytes": 298205,
+      "path": "baseline-asan/compiled-inputs.json",
+      "sha256": "55a2d0889d5bbdea4cb795f967fe6c72726426100afe92af086566d65143a7e8"
+    },
+    {
+      "bytes": 1619,
+      "path": "baseline-asan/configure.log",
+      "sha256": "ef6c1c608e4a64751ba6ea68f9e18e9add9ba4627ace50a62337e4980fa4ac02"
+    },
+    {
+      "bytes": 19108,
+      "path": "baseline-asan/development.json",
+      "sha256": "378bc60bd8a1e8dad944a015996c1275836b94027f9b716fb3daf03facf15720"
+    },
+    {
+      "bytes": 1637,
+      "path": "baseline-asan/nexus_can_controller_test-discovery.log",
+      "sha256": "6224b997e64fc7129917ffebbfe38333a84c919f3727078cc343521c3c4b16ba"
+    },
+    {
+      "bytes": 5058,
+      "path": "baseline-asan/nexus_can_controller_test-execution.log",
+      "sha256": "e5a1997b1cff43834e9d4dff6cfddadaeca1a1d411b1b603c41d27f72d4bc946"
+    },
+    {
+      "bytes": 7772,
+      "path": "baseline-asan/nexus_can_controller_test.xml",
+      "sha256": "f1e289d3e3b46e87cf768971c107c6343a896321d8eca93605f76e8f2a2433f4"
+    },
+    {
+      "bytes": 1342,
+      "path": "baseline-asan/nexus_gd32_adc_stream_test-discovery.log",
+      "sha256": "b83652899a54a2354b0839c01fa9f68e27c1794ae3159df37e47daa1234184dc"
+    },
+    {
+      "bytes": 4557,
+      "path": "baseline-asan/nexus_gd32_adc_stream_test-execution.log",
+      "sha256": "7cc1edd85242dccac7db06d91a47fd5d1fb582b45d236c95bcbb79b996dbbff9"
+    },
+    {
+      "bytes": 6807,
+      "path": "baseline-asan/nexus_gd32_adc_stream_test.xml",
+      "sha256": "f3fbbbb0c49dadadd6d3b61067e6a70fcc831d4eed2b887faf9b5e710346e099"
+    },
+    {
+      "bytes": 100,
+      "path": "baseline-asan/nexus_gd32_flash_fault_test-discovery.log",
+      "sha256": "fd68edf21bb1763a02354c10382117d00f4c86a1316a457293015ec51ad84a3a"
+    },
+    {
+      "bytes": 503,
+      "path": "baseline-asan/nexus_gd32_flash_fault_test-execution.log",
+      "sha256": "92afaf8248d784f98cc72d4f620a0278e7f48723c0fd24bf52e267061f8df067"
+    },
+    {
+      "bytes": 581,
+      "path": "baseline-asan/nexus_gd32_flash_fault_test.xml",
+      "sha256": "91e794be1ba42d88276f88aa267f72397a1b2cd306d3c0dcc6a76d0a1d4f9a90"
+    },
+    {
+      "bytes": 236568,
+      "path": "baseline-asan/ninja-dependencies.txt",
+      "sha256": "7bbb6f26a2ec82ab5bae11e0acdf2f84c726a0e66abe1ddef0c6dac99555b377"
+    },
+    {
+      "bytes": 19775,
+      "path": "baseline-asan/owned-source/tests/google/can_controller_test.cpp",
+      "sha256": "173563d1b1fb6f43c4177fc86378e0ced974e5516b66b16230bd35f5970d7a2d"
+    },
+    {
+      "bytes": 24323,
+      "path": "baseline-asan/owned-source/tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "c0ee34378acfd389637d509a48d3d8495119a07a434fcaf7058d530c1546b692"
+    },
+    {
+      "bytes": 3572,
+      "path": "baseline-asan/owned-source/tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "60c330b8b5ba8f7735b90f8d73831c804ebba010ed071be5094cbc349f3b8b95"
+    },
+    {
+      "bytes": 23632,
+      "path": "baseline-regular/CMakeCache.txt",
+      "sha256": "3712ab3974e3ee44aeb4795847984f5fa88181d492ecb7cf128706b65113b77f"
+    },
+    {
+      "bytes": 5843,
+      "path": "baseline-regular/build.log",
+      "sha256": "36bafd2c0d75773249020fa6bdd661bbd8f4e2643c09a36813064484615d7b67"
+    },
+    {
+      "bytes": 1699528,
+      "path": "baseline-regular/build.ninja",
+      "sha256": "4ee0a4267b49dec9fca69fa8e2510fb5e9bd825b151b2da300ea260fa8a2d732"
+    },
+    {
+      "bytes": 4870,
+      "path": "baseline-regular/commands.json",
+      "sha256": "752e258f8fcc3377e21e75f66222b776a2f7001b91e6be4c86195e3aecde9114"
+    },
+    {
+      "bytes": 902478,
+      "path": "baseline-regular/compile_commands.json",
+      "sha256": "df7557301853e8129679c6df21b70f97899ebb7056c1ac3921e09503d7af9b29"
+    },
+    {
+      "bytes": 4098,
+      "path": "baseline-regular/compiled-inputs/source/arch/cortex_m/nx_arch_cache.c",
+      "sha256": "0556810dac343f65da20922a9c897a3cab061f22b1a5a41a4dbc8c4bf267b59b"
+    },
+    {
+      "bytes": 6993,
+      "path": "baseline-regular/compiled-inputs/source/arch/cortex_m/nx_arch_mpu.c",
+      "sha256": "ae07d4beba4f6f47eb4bc6f2a24e4e3342d36e6c8db8ab850755fd7d24fd552e"
+    },
+    {
+      "bytes": 3667,
+      "path": "baseline-regular/compiled-inputs/source/arch/cortex_m/nx_arch_security.c",
+      "sha256": "926e4ad07454a59397763bdca2c2cbbbeacdd9fdab564062936425dfb4df90d7"
+    },
+    {
+      "bytes": 2259,
+      "path": "baseline-regular/compiled-inputs/source/arch/cortex_m/nx_arch_sleep.c",
+      "sha256": "c1f87ad482c11f41b785fdbded2ec4a96a59fdbd9db52e3417033ae8d1c33b4b"
+    },
+    {
+      "bytes": 4596,
+      "path": "baseline-regular/compiled-inputs/source/arch/cortex_m/private/mechanisms.h",
+      "sha256": "be5a62c74ff05a5cd25493b3e975475280a65d06e7ac15e51e2a755f235045c2"
+    },
+    {
+      "bytes": 876,
+      "path": "baseline-regular/compiled-inputs/source/arch/cortex_m/private/sleep.h",
+      "sha256": "db07a270e35ffdaac8c84e63192593399a01d10fc0f6b5a8495f5bec13f629be"
+    },
+    {
+      "bytes": 5929,
+      "path": "baseline-regular/compiled-inputs/source/arch/include/nexus/arch/arch.h",
+      "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289"
+    },
+    {
+      "bytes": 4025,
+      "path": "baseline-regular/compiled-inputs/source/arch/include/nexus/arch/cache.h",
+      "sha256": "9775bdf517de342cc7d0cbd131cee57d6ce9697b602f55e6938bf1b51e357a26"
+    },
+    {
+      "bytes": 1546,
+      "path": "baseline-regular/compiled-inputs/source/arch/include/nexus/arch/features.h",
+      "sha256": "046631eae25a7143ee1ce8c553fbe5e80074810dfdedf0d2e3405464c21851ac"
+    },
+    {
+      "bytes": 5956,
+      "path": "baseline-regular/compiled-inputs/source/arch/include/nexus/arch/mpu.h",
+      "sha256": "c652c608a734178568d5aa63eb2a823b48200e7f8d5a9a2a5e32c2e5a0681304"
+    },
+    {
+      "bytes": 3226,
+      "path": "baseline-regular/compiled-inputs/source/arch/include/nexus/arch/security.h",
+      "sha256": "3fd3f594ba22aefd65cea7c16114b36fbd25f7925f0e449037a6cbeb623e9e4f"
+    },
+    {
+      "bytes": 2281,
+      "path": "baseline-regular/compiled-inputs/source/arch/include/nexus/arch/sleep.h",
+      "sha256": "ec14761abc18ba0405e5edc88743869dc955c275a57ca40164edb67526bb96a2"
+    },
+    {
+      "bytes": 3260,
+      "path": "baseline-regular/compiled-inputs/source/arch/native/nx_arch_native.c",
+      "sha256": "a1bf35f6cbcfc6f5d2ec72ebfae1040728055d4bd52aba98757729a7e82da93e"
+    },
+    {
+      "bytes": 2026,
+      "path": "baseline-regular/compiled-inputs/source/core/include/nexus/core/fault.h",
+      "sha256": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b"
+    },
+    {
+      "bytes": 7004,
+      "path": "baseline-regular/compiled-inputs/source/core/include/nexus/core/request.h",
+      "sha256": "c27686b1fc578d88e1f4638c3939c1409171ba6267e59e4c64eb72449ffb7e55"
+    },
+    {
+      "bytes": 3381,
+      "path": "baseline-regular/compiled-inputs/source/core/include/nexus/core/request_observer.h",
+      "sha256": "2d7cb6cf7447556a4deb6cdf8c027224ab04210f4bc0daa568cf3688ac7bdafd"
+    },
+    {
+      "bytes": 1799,
+      "path": "baseline-regular/compiled-inputs/source/core/include/nexus/core/stack_observation.h",
+      "sha256": "6452a9d540a08dadb0b17062a40e945369a60439d85bc2bb6e3f1417b5aa5f21"
+    },
+    {
+      "bytes": 789,
+      "path": "baseline-regular/compiled-inputs/source/core/include/nexus/core/status.h",
+      "sha256": "2aed38f391159a2bfb32f475c81967e3eec01beedde97b33a276ee0dd85d32fd"
+    },
+    {
+      "bytes": 3477,
+      "path": "baseline-regular/compiled-inputs/source/core/include/nexus/core/time.h",
+      "sha256": "51b54ef6ff434cc473162f215933b3cd992cc2efb89d9c3b72a4e2f7c9d839b1"
+    },
+    {
+      "bytes": 639,
+      "path": "baseline-regular/compiled-inputs/source/core/src/fault.c",
+      "sha256": "976a3af81cfefa6d7185b7328162825eb08fc4ae25042a543de1fc8369a8367f"
+    },
+    {
+      "bytes": 6864,
+      "path": "baseline-regular/compiled-inputs/source/core/src/request.c",
+      "sha256": "6fdc85b08c7e479cc943e77036912fb7313a4c690dd32c85a9f632d2380f03d8"
+    },
+    {
+      "bytes": 4377,
+      "path": "baseline-regular/compiled-inputs/source/core/src/request_observer.c",
+      "sha256": "dc2f96ee8517682d9e853b87fddbc5a4a3d6dc2e3b52f33b7a3cd2b4465ac82d"
+    },
+    {
+      "bytes": 1202,
+      "path": "baseline-regular/compiled-inputs/source/core/src/stack_observation.c",
+      "sha256": "8362739439edcc5ec632f10a7fead09a702e2dbe4cdd47c743a3b1d58cbd96b6"
+    },
+    {
+      "bytes": 2199,
+      "path": "baseline-regular/compiled-inputs/source/core/src/time.c",
+      "sha256": "67b6bdab6428845f8c8aa99d7a173e232e491f3909dbe0c3c78cf19cb017c1fe"
+    },
+    {
+      "bytes": 9218,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/adc.h",
+      "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1"
+    },
+    {
+      "bytes": 4193,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/adc_observer.h",
+      "sha256": "e95ab349207a44d8ae86c74325a49eb82fd9ce991ea940fff8e4b40dd21a7788"
+    },
+    {
+      "bytes": 3514,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/advanced_pwm.h",
+      "sha256": "2b9bbfbb94b834ed25964f5aa6495abc4e5cbc5f5d5bb48d106e951f37f52410"
+    },
+    {
+      "bytes": 7325,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/can.h",
+      "sha256": "b50f5356966dcda90d1b1c67edf018b740a082e3f0813bc8ec695cc7f907b084"
+    },
+    {
+      "bytes": 4114,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/dma.h",
+      "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b"
+    },
+    {
+      "bytes": 7906,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/ethernet.h",
+      "sha256": "4549314a06f7a6e8d2c3033384fae3ad8abf7b4964833bc96eb6f7aef32881c6"
+    },
+    {
+      "bytes": 4106,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/exti.h",
+      "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6"
+    },
+    {
+      "bytes": 6868,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/flash.h",
+      "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c"
+    },
+    {
+      "bytes": 2676,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/gpio.h",
+      "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778"
+    },
+    {
+      "bytes": 9481,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/i2c.h",
+      "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3"
+    },
+    {
+      "bytes": 8046,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/i2c_bus_clear.h",
+      "sha256": "e1c188d2f093fdbb79664cde94736bd9a900edad64e290221e9e706dbb4b524f"
+    },
+    {
+      "bytes": 2150,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/mdio.h",
+      "sha256": "08dc907823ee68dfacb97065c58fbc2086e9fd39039d845cedbc94b21a781636"
+    },
+    {
+      "bytes": 25516,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/native/model.h",
+      "sha256": "0fb71e8344a27598ec64552dec45b9b5376dd09ed5f10a217cdcb34833fa55a2"
+    },
+    {
+      "bytes": 11660,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/spi.h",
+      "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a"
+    },
+    {
+      "bytes": 11194,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/stream.h",
+      "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a"
+    },
+    {
+      "bytes": 3252,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/stream_budget.h",
+      "sha256": "1034a90c6c09e2c6d10af139c93d50113ead058af898bfcac0acd3a2db32dc8a"
+    },
+    {
+      "bytes": 3191,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/timer.h",
+      "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a"
+    },
+    {
+      "bytes": 3989,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/timer_capture.h",
+      "sha256": "6fb9f2e812cee50a3077e50b697e072e66152dc02c073c3204ee23928d7deee4"
+    },
+    {
+      "bytes": 10872,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/uart.h",
+      "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc"
+    },
+    {
+      "bytes": 3247,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/uart_rs485.h",
+      "sha256": "58f684a10fa8647e5c55b970e74c8f753a3817e93103d12945788617442fa89e"
+    },
+    {
+      "bytes": 8447,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/usb_device.h",
+      "sha256": "759d26c0d51e28ca566a5ef5ca7e7d7fa86533812af40160abbbc216ab01fd6e"
+    },
+    {
+      "bytes": 3440,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/wake.h",
+      "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9"
+    },
+    {
+      "bytes": 3724,
+      "path": "baseline-regular/compiled-inputs/source/io/include/nexus/io/watchdog.h",
+      "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c"
+    },
+    {
+      "bytes": 5790,
+      "path": "baseline-regular/compiled-inputs/source/io/native/adc.c",
+      "sha256": "da6bdfc1c499be71457d62650a6a2315b578f61bc748d0d32c50561437ec110a"
+    },
+    {
+      "bytes": 7817,
+      "path": "baseline-regular/compiled-inputs/source/io/native/can.c",
+      "sha256": "79207262998ccb28ba49952b05f28d2ab882c71085829fd7fd74bc5b60e82fe3"
+    },
+    {
+      "bytes": 2572,
+      "path": "baseline-regular/compiled-inputs/source/io/native/can.h",
+      "sha256": "6d2fa0b173f5f86331212de77b41a443adca47c98cb30f777963165b415417ad"
+    },
+    {
+      "bytes": 1298,
+      "path": "baseline-regular/compiled-inputs/source/io/native/can_access.h",
+      "sha256": "ae4361e990c016caf8312ee27d6aba47f0b74a712ada45aac56d22d03c07b649"
+    },
+    {
+      "bytes": 7429,
+      "path": "baseline-regular/compiled-inputs/source/io/native/ethernet.c",
+      "sha256": "1db19fa0ab10e062d5c0ec8b82740bc2820d641d652982cfb662bea041eca6a2"
+    },
+    {
+      "bytes": 2920,
+      "path": "baseline-regular/compiled-inputs/source/io/native/ethernet.h",
+      "sha256": "2568cc442903e8b1fdd1c405046f61fe52be95691209d35c91161cd622ba872d"
+    },
+    {
+      "bytes": 876,
+      "path": "baseline-regular/compiled-inputs/source/io/native/ethernet_access.h",
+      "sha256": "2a2f63a1ee285f9dd748d93c140b1d3d2b59f9485cb34d0d7b28f8719dc8c307"
+    },
+    {
+      "bytes": 7543,
+      "path": "baseline-regular/compiled-inputs/source/io/native/exti.c",
+      "sha256": "780b90a9b0ccf8bbaf007e21ad85667b0b35329cb31e569c8f87ca12ae71dd8d"
+    },
+    {
+      "bytes": 9441,
+      "path": "baseline-regular/compiled-inputs/source/io/native/flash.c",
+      "sha256": "bd20872557c98bb9b8513676521baca738fdab771d0b0398231ca576fd156238"
+    },
+    {
+      "bytes": 5407,
+      "path": "baseline-regular/compiled-inputs/source/io/native/gpio.c",
+      "sha256": "992407510c763fc6f5726a95895dba445a635ab9ad6c21ebddf3d1d137608384"
+    },
+    {
+      "bytes": 8052,
+      "path": "baseline-regular/compiled-inputs/source/io/native/i2c.c",
+      "sha256": "8f06647793d623bb6e46b234f1e42b81ff6947c7e59db22762a07d4c1e82c4c2"
+    },
+    {
+      "bytes": 12330,
+      "path": "baseline-regular/compiled-inputs/source/io/native/provider.h",
+      "sha256": "628c6ca46264e2521c7fcec2cddcc8ac2571442f08820a5f9910aeb10550620b"
+    },
+    {
+      "bytes": 8170,
+      "path": "baseline-regular/compiled-inputs/source/io/native/spi.c",
+      "sha256": "2a399db21828d8b23eb57d979a0321863bdd1ad1af2102ed8151ac4fe1376247"
+    },
+    {
+      "bytes": 11911,
+      "path": "baseline-regular/compiled-inputs/source/io/native/spi_async.c",
+      "sha256": "969435be3a65f18a61a300633be7abdbedfc70a23db5a430aa74e7f0e89ddba4"
+    },
+    {
+      "bytes": 10517,
+      "path": "baseline-regular/compiled-inputs/source/io/native/stream.c",
+      "sha256": "1eedd1a09a5adc520965e7ddc5d88c0bbc816065435ffbc667144325f15c98ec"
+    },
+    {
+      "bytes": 1942,
+      "path": "baseline-regular/compiled-inputs/source/io/native/time.c",
+      "sha256": "f8944160cd932376c4fc0af2f1db95d8f7b09bb59166e2c225488b552faa3e22"
+    },
+    {
+      "bytes": 4051,
+      "path": "baseline-regular/compiled-inputs/source/io/native/timer.c",
+      "sha256": "fe026222f339257cb3537b954721ec6b1b7efaf153137017892b61a8bc448b33"
+    },
+    {
+      "bytes": 20720,
+      "path": "baseline-regular/compiled-inputs/source/io/native/uart.c",
+      "sha256": "82dc0e7923dc2f38c6bc54d66a288e3cc7de0ffc53ef725a8f562510ecf10b33"
+    },
+    {
+      "bytes": 11210,
+      "path": "baseline-regular/compiled-inputs/source/io/native/usb_device.c",
+      "sha256": "1ab60c470762567e0d7fcee9cb308c344fa964405f70ad3217978869f9827e4a"
+    },
+    {
+      "bytes": 2179,
+      "path": "baseline-regular/compiled-inputs/source/io/native/usb_device.h",
+      "sha256": "f5a28d5a8c61d268f2a1f3d76bae5e73ee57dbc7ac898cbe1d9543e2119c34f2"
+    },
+    {
+      "bytes": 1298,
+      "path": "baseline-regular/compiled-inputs/source/io/native/usb_device_access.h",
+      "sha256": "fc824b75afae99e990bda75a209d83c04412fc748fdbfad64d77e2fb830b32a2"
+    },
+    {
+      "bytes": 5156,
+      "path": "baseline-regular/compiled-inputs/source/io/native/watchdog.c",
+      "sha256": "2dbca5f92e0c60113deb681934fe7693662712c3b91d5f1a6383a7ab1c343dc2"
+    },
+    {
+      "bytes": 3541,
+      "path": "baseline-regular/compiled-inputs/source/io/private/can_controller.h",
+      "sha256": "39a3e29a654f8141b3a46547ab083c79f41623e06e0e0ca8134f58dad00277ec"
+    },
+    {
+      "bytes": 3500,
+      "path": "baseline-regular/compiled-inputs/source/io/private/eth_mac.h",
+      "sha256": "979e672eb814ac0736e09f714c71df86e4237078846c7d94f00ab94ae574d4c5"
+    },
+    {
+      "bytes": 2861,
+      "path": "baseline-regular/compiled-inputs/source/io/private/usb_device_controller.h",
+      "sha256": "6a8006cc5b8d8bce56c84f46f5a52da3863555b43ac3c2ed1b93becdc3f1e39c"
+    },
+    {
+      "bytes": 4646,
+      "path": "baseline-regular/compiled-inputs/source/io/src/adc.c",
+      "sha256": "2a43862372a66b5258ec0a28256b78925b0bdc5b0f5a68a62bdf6b872de7e97c"
+    },
+    {
+      "bytes": 7132,
+      "path": "baseline-regular/compiled-inputs/source/io/src/adc_observer.c",
+      "sha256": "48fbc20045b5acc945d5533db881545c2a5f9e026fdb30273e7cce3b2e5ab6a3"
+    },
+    {
+      "bytes": 2805,
+      "path": "baseline-regular/compiled-inputs/source/io/src/advanced_pwm.c",
+      "sha256": "9505b6a8913d23978defb59e18eabc4c0dfa43252104e526205b8528b3cf28c5"
+    },
+    {
+      "bytes": 4880,
+      "path": "baseline-regular/compiled-inputs/source/io/src/can.c",
+      "sha256": "b4dd7e349b8a4db76c2723e259899dd28764690f43673014784568cfd01c1d31"
+    },
+    {
+      "bytes": 37366,
+      "path": "baseline-regular/compiled-inputs/source/io/src/can_controller.c",
+      "sha256": "93b1ba8bd618259a53f07e02054e3977ad8cb8feb00dc107065a5c1ee1fe67fb"
+    },
+    {
+      "bytes": 2975,
+      "path": "baseline-regular/compiled-inputs/source/io/src/dma.c",
+      "sha256": "98c3edf4a206ede42ecf314a7f9c1b7e892d71318604fc87e4aad18703b3bcbb"
+    },
+    {
+      "bytes": 35844,
+      "path": "baseline-regular/compiled-inputs/source/io/src/eth_mac.c",
+      "sha256": "06b3acd40a24f9875a75e315bab18176b0379b26caf5bef24cd4c3555f71a1cb"
+    },
+    {
+      "bytes": 4151,
+      "path": "baseline-regular/compiled-inputs/source/io/src/ethernet.c",
+      "sha256": "d0e0f23108ef0afa5ba1bf7240e18c1d3b5a3412ff86966ba9e7101be1996381"
+    },
+    {
+      "bytes": 1718,
+      "path": "baseline-regular/compiled-inputs/source/io/src/exti.c",
+      "sha256": "2b25b04b35965bc32596fddb9823105bf98e8746c1a6a58a5aff16e0831d28d7"
+    },
+    {
+      "bytes": 2096,
+      "path": "baseline-regular/compiled-inputs/source/io/src/flash.c",
+      "sha256": "4c0eb780eb87d6ce90b82ab4ab387f752ae15347057f90154252d5f22b4750cd"
+    },
+    {
+      "bytes": 2953,
+      "path": "baseline-regular/compiled-inputs/source/io/src/flash_region.c",
+      "sha256": "4a14b9330342c6cda18431db6c0fb3a6ba823579c4d33bf18eeffd85d866b2a9"
+    },
+    {
+      "bytes": 1483,
+      "path": "baseline-regular/compiled-inputs/source/io/src/gpio.c",
+      "sha256": "cfa133514adbae4a42e9e39c83921f9e885117b4cf251f6325dc300b19a4b0e0"
+    },
+    {
+      "bytes": 7617,
+      "path": "baseline-regular/compiled-inputs/source/io/src/i2c.c",
+      "sha256": "14a9e4f1728dd5b28e4525c83d77ea05903bdcc0645d6e9b824775ec21b22f9f"
+    },
+    {
+      "bytes": 10355,
+      "path": "baseline-regular/compiled-inputs/source/io/src/i2c_bus_clear.c",
+      "sha256": "b88cc7b5ec47eaea1684312737d69a2aae48d0a25f59106ff1e19915af6ad8df"
+    },
+    {
+      "bytes": 1200,
+      "path": "baseline-regular/compiled-inputs/source/io/src/mdio.c",
+      "sha256": "6b19c9f91d8eda0205893bb929e8d117cb31e22cbe6246fc603193fed02d0a2f"
+    },
+    {
+      "bytes": 5789,
+      "path": "baseline-regular/compiled-inputs/source/io/src/spi.c",
+      "sha256": "933d438eee528cb00aa24aaf4c2d974ec18d47facc57d9c54a791d5c76161a5f"
+    },
+    {
+      "bytes": 14946,
+      "path": "baseline-regular/compiled-inputs/source/io/src/stream.c",
+      "sha256": "693292c7b185bd64004507bb7341d1311f122f84ea608c40cb5a72718253676e"
+    },
+    {
+      "bytes": 4434,
+      "path": "baseline-regular/compiled-inputs/source/io/src/stream_budget.c",
+      "sha256": "5aca444c08926de7bbd47c24aa4ded2d8e1f89b5fa0c56077b8425352ed69eed"
+    },
+    {
+      "bytes": 1847,
+      "path": "baseline-regular/compiled-inputs/source/io/src/timer.c",
+      "sha256": "4d2eba552c2aa8065ec6767711a5b045bbe2649c69975503ea5135c6d691a5ac"
+    },
+    {
+      "bytes": 3102,
+      "path": "baseline-regular/compiled-inputs/source/io/src/timer_capture.c",
+      "sha256": "65845a51610421f6fd1072ffe06eb726bbaabe950ca4a8d47bdb16e78cd2a945"
+    },
+    {
+      "bytes": 5259,
+      "path": "baseline-regular/compiled-inputs/source/io/src/uart.c",
+      "sha256": "974704075e9bac9f80873862fcc49945e54e4cee43515c1bd61a8e6d8ab776a9"
+    },
+    {
+      "bytes": 14081,
+      "path": "baseline-regular/compiled-inputs/source/io/src/uart_rs485.c",
+      "sha256": "867bdec68729f028d8f5513e93f6656b5ec772568dfc117baf95b6c130dcc8e7"
+    },
+    {
+      "bytes": 5932,
+      "path": "baseline-regular/compiled-inputs/source/io/src/usb_device.c",
+      "sha256": "ce6a9771275e7e8f3f9da320de9cf5f71b410ff836616aa1a2e88e88ed5dd773"
+    },
+    {
+      "bytes": 45696,
+      "path": "baseline-regular/compiled-inputs/source/io/src/usb_device_controller.c",
+      "sha256": "caac78c495a36886c76c69a60e52745140f7f7c2a5ebf52ae5af2d6ebe2275d3"
+    },
+    {
+      "bytes": 2662,
+      "path": "baseline-regular/compiled-inputs/source/io/src/wake.c",
+      "sha256": "227718bd6f7a31e3469d60fa4d09fd264bd0a7a9ae13bf30bfc069b376ffca6c"
+    },
+    {
+      "bytes": 1620,
+      "path": "baseline-regular/compiled-inputs/source/io/src/watchdog.c",
+      "sha256": "ea3ec3f1cbc3dc1ebbba796760083a377356708532526d9354c5032b656cf357"
+    },
+    {
+      "bytes": 9663,
+      "path": "baseline-regular/compiled-inputs/source/soc/gd32f470/drivers/adc.c",
+      "sha256": "91138076b826167aa03a3cba530e46adf7b0e9217a818ef834682d588ccafb32"
+    },
+    {
+      "bytes": 20238,
+      "path": "baseline-regular/compiled-inputs/source/soc/gd32f470/drivers/adc_continuous.c",
+      "sha256": "ac35e0ecc0ffb85f5a2d2e37866e4167ae568c1ad534cd03dbeed87253e0a181"
+    },
+    {
+      "bytes": 16230,
+      "path": "baseline-regular/compiled-inputs/source/soc/gd32f470/drivers/adc_stream.c",
+      "sha256": "1b8297da3fd09a63e94c13b442de0f2b366a294315efc60c01592fb5b394d512"
+    },
+    {
+      "bytes": 12955,
+      "path": "baseline-regular/compiled-inputs/source/soc/gd32f470/drivers/flash.c",
+      "sha256": "affedf6bce4d59c7255c543ac713c46042ff9bc1a3347053af4d8362aa7ada8c"
+    },
+    {
+      "bytes": 5450,
+      "path": "baseline-regular/compiled-inputs/source/soc/gd32f470/private/gd32f470_adc_stream.h",
+      "sha256": "039c4add217243e2cfa9ab0a99cfaba96067d351cfd212db5d6ea29369f8fb6a"
+    },
+    {
+      "bytes": 22822,
+      "path": "baseline-regular/compiled-inputs/source/soc/gd32f470/private/gd32f470_provider.h",
+      "sha256": "4a865f646cd9565806959186ce6c3a591c6302b1543ad0bc7def741431663226"
+    },
+    {
+      "bytes": 839,
+      "path": "baseline-regular/compiled-inputs/source/soc/gd32f470/private/gd32f4xx_libopt.h",
+      "sha256": "64afa1aa962f93bc9cad8a23244b39b383dd4aa29c0056c20d9a4cd2537f10db"
+    },
+    {
+      "bytes": 2710,
+      "path": "baseline-regular/compiled-inputs/source/soc/gd32f470/private/system.h",
+      "sha256": "ea3ae416c653f9abbfb42da62a1aa832290594cdd95a4bb98bb709601ee181bc"
+    },
+    {
+      "bytes": 3548,
+      "path": "baseline-regular/compiled-inputs/source/tests/contracts/gd32_model/core_cm4.h",
+      "sha256": "9e0b5a20eba1e1d694b5e48af4eedf37fe228d203a888442e3c33c97409958ca"
+    },
+    {
+      "bytes": 8442,
+      "path": "baseline-regular/compiled-inputs/source/tests/contracts/gd32_model/model.c",
+      "sha256": "21d4b0d674f620364097a73ec17d1fa78bfdafe3b2c6b49bdfe4093307387053"
+    },
+    {
+      "bytes": 19775,
+      "path": "baseline-regular/compiled-inputs/source/tests/google/can_controller_test.cpp",
+      "sha256": "173563d1b1fb6f43c4177fc86378e0ced974e5516b66b16230bd35f5970d7a2d"
+    },
+    {
+      "bytes": 1069,
+      "path": "baseline-regular/compiled-inputs/source/tests/google/gd32_adc_stream_model.h",
+      "sha256": "1e65ce15ed5d6a896a769a876d323b0ff705f63d5969bf80cb649f5b161be59a"
+    },
+    {
+      "bytes": 24323,
+      "path": "baseline-regular/compiled-inputs/source/tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "c0ee34378acfd389637d509a48d3d8495119a07a434fcaf7058d530c1546b692"
+    },
+    {
+      "bytes": 3572,
+      "path": "baseline-regular/compiled-inputs/source/tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "60c330b8b5ba8f7735b90f8d73831c804ebba010ed071be5094cbc349f3b8b95"
+    },
+    {
+      "bytes": 28917,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h",
+      "sha256": "db6de53203fa053d6e789ef86908195f84b7664753bdf0aa7ca74f62025573ef"
+    },
+    {
+      "bytes": 2740,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/system_gd32f4xx.h",
+      "sha256": "6077ccbeff029a0058465172607481158b202d5687e2e87a0ed13ff6a9b2633a"
+    },
+    {
+      "bytes": 41521,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_adc.h",
+      "sha256": "9fa1a80b64d18512729af4d22602d5761ec0758d970fb5d15f7f8a96244607d3"
+    },
+    {
+      "bytes": 9890,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dbg.h",
+      "sha256": "0a403f37714cbb585a26cb54c7c5cc6776fa9ec23459a70369d9342805713998"
+    },
+    {
+      "bytes": 32675,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dma.h",
+      "sha256": "b5796d1e0017994a232a53613f2d50566b8c00dd43d4049eab26cee1e04f37eb"
+    },
+    {
+      "bytes": 20470,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exti.h",
+      "sha256": "dd78502366ba631e32841db28711976d51f7e71417bb2006ba82dc89404eba66"
+    },
+    {
+      "bytes": 28322,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fmc.h",
+      "sha256": "a6bd45fe828fda8cc19b3b1958470ac1bb115cc162b89963f5391028c9bdc192"
+    },
+    {
+      "bytes": 5863,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fwdgt.h",
+      "sha256": "e83161e6700a28f9f0d475405c4a94a03a88e9576b6d8f41c5a9bd96daf5ff08"
+    },
+    {
+      "bytes": 29164,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h",
+      "sha256": "6551fd3fb673b3e34d5f62b72cba8a0482ce051bf29ed475015b1f9ad178a57a"
+    },
+    {
+      "bytes": 29826,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_i2c.h",
+      "sha256": "42498aa2016958a5d351577f3caeca0f7c8334ab25b704a95acb7b73001a1019"
+    },
+    {
+      "bytes": 11878,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_pmu.h",
+      "sha256": "0275375eff0d339ec2b16c1a0d4c67721be6bff63c1516bdc4a614bb5ed98b03"
+    },
+    {
+      "bytes": 95768,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rcu.h",
+      "sha256": "38d97fe3994cefdcb1109192a5854c29ad2af364558f499878c4a5510b26e45d"
+    },
+    {
+      "bytes": 25504,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_spi.h",
+      "sha256": "e2bc6524ff9fc2604f3e947c68ca419ff35bc029904ea8163c10510f85728c10"
+    },
+    {
+      "bytes": 11558,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_syscfg.h",
+      "sha256": "0e37ca2af26c3563712cf33aca9cf85b0489df10526c8336e0e75518a86f3cd2"
+    },
+    {
+      "bytes": 59717,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_timer.h",
+      "sha256": "b22f7cc8d1a7cf16326163982b9d6a34829ca55f6491fdea21d07b6e6dcd5668"
+    },
+    {
+      "bytes": 31652,
+      "path": "baseline-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_usart.h",
+      "sha256": "7adb26fb6e10f5ce29612aff5f580eafb787311bc982c629ffdf415ddf3dc973"
+    },
+    {
+      "bytes": 298855,
+      "path": "baseline-regular/compiled-inputs.json",
+      "sha256": "1ab89dc5656e834d83c0aaa73711cf1291359f1a07bf908878177cb4115931a9"
+    },
+    {
+      "bytes": 1598,
+      "path": "baseline-regular/configure.log",
+      "sha256": "7a6fa968cfe4366432524aad2a667e4e90eb3f4ef8baccf618a5b5490c987f29"
+    },
+    {
+      "bytes": 19194,
+      "path": "baseline-regular/development.json",
+      "sha256": "fefa2ed3e345595d6efeb9c9273db7da05576cce3ef59ae6ee62e23b10e7aeba"
+    },
+    {
+      "bytes": 1637,
+      "path": "baseline-regular/nexus_can_controller_test-discovery.log",
+      "sha256": "6224b997e64fc7129917ffebbfe38333a84c919f3727078cc343521c3c4b16ba"
+    },
+    {
+      "bytes": 5058,
+      "path": "baseline-regular/nexus_can_controller_test-execution.log",
+      "sha256": "c677d58f074f7337152aa849e99cb8ca7e3a1a71bdc3fa4fe36b471aac5fb48a"
+    },
+    {
+      "bytes": 7766,
+      "path": "baseline-regular/nexus_can_controller_test.xml",
+      "sha256": "a64e7217c0f34cbb96d9cc2820e417656fca7f285142e00231d29558aa208c1f"
+    },
+    {
+      "bytes": 1342,
+      "path": "baseline-regular/nexus_gd32_adc_stream_test-discovery.log",
+      "sha256": "b83652899a54a2354b0839c01fa9f68e27c1794ae3159df37e47daa1234184dc"
+    },
+    {
+      "bytes": 4557,
+      "path": "baseline-regular/nexus_gd32_adc_stream_test-execution.log",
+      "sha256": "00380cd716d315efcec54741c20060d1428a4b156424e51cacc0a898e26fff60"
+    },
+    {
+      "bytes": 6804,
+      "path": "baseline-regular/nexus_gd32_adc_stream_test.xml",
+      "sha256": "6bbf9ebb8d4f73c435b28b6e9fa9413a2aa0c33816161232c9c02ada316053ea"
+    },
+    {
+      "bytes": 100,
+      "path": "baseline-regular/nexus_gd32_flash_fault_test-discovery.log",
+      "sha256": "fd68edf21bb1763a02354c10382117d00f4c86a1316a457293015ec51ad84a3a"
+    },
+    {
+      "bytes": 503,
+      "path": "baseline-regular/nexus_gd32_flash_fault_test-execution.log",
+      "sha256": "92afaf8248d784f98cc72d4f620a0278e7f48723c0fd24bf52e267061f8df067"
+    },
+    {
+      "bytes": 581,
+      "path": "baseline-regular/nexus_gd32_flash_fault_test.xml",
+      "sha256": "d3703be5dccdafdeeb5f205c2a8fc0a9817347d603ccdf91439994647b246749"
+    },
+    {
+      "bytes": 236640,
+      "path": "baseline-regular/ninja-dependencies.txt",
+      "sha256": "24dbf4eb44eec1dabbf39ef37461e71fab6943603e572f0af4ab53d0681dd778"
+    },
+    {
+      "bytes": 19775,
+      "path": "baseline-regular/owned-source/tests/google/can_controller_test.cpp",
+      "sha256": "173563d1b1fb6f43c4177fc86378e0ced974e5516b66b16230bd35f5970d7a2d"
+    },
+    {
+      "bytes": 24323,
+      "path": "baseline-regular/owned-source/tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "c0ee34378acfd389637d509a48d3d8495119a07a434fcaf7058d530c1546b692"
+    },
+    {
+      "bytes": 3572,
+      "path": "baseline-regular/owned-source/tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "60c330b8b5ba8f7735b90f8d73831c804ebba010ed071be5094cbc349f3b8b95"
+    },
+    {
+      "bytes": 23601,
+      "path": "fixed-asan/CMakeCache.txt",
+      "sha256": "0ba7981c71135903ff4af3808bb5e0b6696f75182726248476e6a2417e07a34e"
+    },
+    {
+      "bytes": 1410,
+      "path": "fixed-asan/binary-preservation.json",
+      "sha256": "12e85930d5e1aa3b8a3378deaed23b9c915571b80a2b24929aaa0c4f68bb040e"
+    },
+    {
+      "bytes": 575,
+      "path": "fixed-asan/build.log",
+      "sha256": "ecab454822b89efecb3c1b64bc18aa83babdb108d637338802f8311a2d4dc055"
+    },
+    {
+      "bytes": 1734701,
+      "path": "fixed-asan/build.ninja",
+      "sha256": "38c233fc7eafe06e44ee438f94b5efab4364ff6dea15e569c6e527d04f582d29"
+    },
+    {
+      "bytes": 4233,
+      "path": "fixed-asan/commands.json",
+      "sha256": "19aefc302ab69262b917634215cd55f3d7a758a0028b0129bedf081aba000963"
+    },
+    {
+      "bytes": 930875,
+      "path": "fixed-asan/compile_commands.json",
+      "sha256": "883af478f42cb2f10afe4af6c6bf16fae9c02e3e58f4a7a399df2fe04c6cfa04"
+    },
+    {
+      "bytes": 4098,
+      "path": "fixed-asan/compiled-inputs/source/arch/cortex_m/nx_arch_cache.c",
+      "sha256": "0556810dac343f65da20922a9c897a3cab061f22b1a5a41a4dbc8c4bf267b59b"
+    },
+    {
+      "bytes": 6993,
+      "path": "fixed-asan/compiled-inputs/source/arch/cortex_m/nx_arch_mpu.c",
+      "sha256": "ae07d4beba4f6f47eb4bc6f2a24e4e3342d36e6c8db8ab850755fd7d24fd552e"
+    },
+    {
+      "bytes": 3667,
+      "path": "fixed-asan/compiled-inputs/source/arch/cortex_m/nx_arch_security.c",
+      "sha256": "926e4ad07454a59397763bdca2c2cbbbeacdd9fdab564062936425dfb4df90d7"
+    },
+    {
+      "bytes": 2259,
+      "path": "fixed-asan/compiled-inputs/source/arch/cortex_m/nx_arch_sleep.c",
+      "sha256": "c1f87ad482c11f41b785fdbded2ec4a96a59fdbd9db52e3417033ae8d1c33b4b"
+    },
+    {
+      "bytes": 4596,
+      "path": "fixed-asan/compiled-inputs/source/arch/cortex_m/private/mechanisms.h",
+      "sha256": "be5a62c74ff05a5cd25493b3e975475280a65d06e7ac15e51e2a755f235045c2"
+    },
+    {
+      "bytes": 876,
+      "path": "fixed-asan/compiled-inputs/source/arch/cortex_m/private/sleep.h",
+      "sha256": "db07a270e35ffdaac8c84e63192593399a01d10fc0f6b5a8495f5bec13f629be"
+    },
+    {
+      "bytes": 5929,
+      "path": "fixed-asan/compiled-inputs/source/arch/include/nexus/arch/arch.h",
+      "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289"
+    },
+    {
+      "bytes": 4025,
+      "path": "fixed-asan/compiled-inputs/source/arch/include/nexus/arch/cache.h",
+      "sha256": "9775bdf517de342cc7d0cbd131cee57d6ce9697b602f55e6938bf1b51e357a26"
+    },
+    {
+      "bytes": 1546,
+      "path": "fixed-asan/compiled-inputs/source/arch/include/nexus/arch/features.h",
+      "sha256": "046631eae25a7143ee1ce8c553fbe5e80074810dfdedf0d2e3405464c21851ac"
+    },
+    {
+      "bytes": 5956,
+      "path": "fixed-asan/compiled-inputs/source/arch/include/nexus/arch/mpu.h",
+      "sha256": "c652c608a734178568d5aa63eb2a823b48200e7f8d5a9a2a5e32c2e5a0681304"
+    },
+    {
+      "bytes": 3226,
+      "path": "fixed-asan/compiled-inputs/source/arch/include/nexus/arch/security.h",
+      "sha256": "3fd3f594ba22aefd65cea7c16114b36fbd25f7925f0e449037a6cbeb623e9e4f"
+    },
+    {
+      "bytes": 2281,
+      "path": "fixed-asan/compiled-inputs/source/arch/include/nexus/arch/sleep.h",
+      "sha256": "ec14761abc18ba0405e5edc88743869dc955c275a57ca40164edb67526bb96a2"
+    },
+    {
+      "bytes": 3260,
+      "path": "fixed-asan/compiled-inputs/source/arch/native/nx_arch_native.c",
+      "sha256": "a1bf35f6cbcfc6f5d2ec72ebfae1040728055d4bd52aba98757729a7e82da93e"
+    },
+    {
+      "bytes": 2026,
+      "path": "fixed-asan/compiled-inputs/source/core/include/nexus/core/fault.h",
+      "sha256": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b"
+    },
+    {
+      "bytes": 7004,
+      "path": "fixed-asan/compiled-inputs/source/core/include/nexus/core/request.h",
+      "sha256": "c27686b1fc578d88e1f4638c3939c1409171ba6267e59e4c64eb72449ffb7e55"
+    },
+    {
+      "bytes": 3381,
+      "path": "fixed-asan/compiled-inputs/source/core/include/nexus/core/request_observer.h",
+      "sha256": "2d7cb6cf7447556a4deb6cdf8c027224ab04210f4bc0daa568cf3688ac7bdafd"
+    },
+    {
+      "bytes": 1799,
+      "path": "fixed-asan/compiled-inputs/source/core/include/nexus/core/stack_observation.h",
+      "sha256": "6452a9d540a08dadb0b17062a40e945369a60439d85bc2bb6e3f1417b5aa5f21"
+    },
+    {
+      "bytes": 789,
+      "path": "fixed-asan/compiled-inputs/source/core/include/nexus/core/status.h",
+      "sha256": "2aed38f391159a2bfb32f475c81967e3eec01beedde97b33a276ee0dd85d32fd"
+    },
+    {
+      "bytes": 3477,
+      "path": "fixed-asan/compiled-inputs/source/core/include/nexus/core/time.h",
+      "sha256": "51b54ef6ff434cc473162f215933b3cd992cc2efb89d9c3b72a4e2f7c9d839b1"
+    },
+    {
+      "bytes": 639,
+      "path": "fixed-asan/compiled-inputs/source/core/src/fault.c",
+      "sha256": "976a3af81cfefa6d7185b7328162825eb08fc4ae25042a543de1fc8369a8367f"
+    },
+    {
+      "bytes": 6864,
+      "path": "fixed-asan/compiled-inputs/source/core/src/request.c",
+      "sha256": "6fdc85b08c7e479cc943e77036912fb7313a4c690dd32c85a9f632d2380f03d8"
+    },
+    {
+      "bytes": 4377,
+      "path": "fixed-asan/compiled-inputs/source/core/src/request_observer.c",
+      "sha256": "dc2f96ee8517682d9e853b87fddbc5a4a3d6dc2e3b52f33b7a3cd2b4465ac82d"
+    },
+    {
+      "bytes": 1202,
+      "path": "fixed-asan/compiled-inputs/source/core/src/stack_observation.c",
+      "sha256": "8362739439edcc5ec632f10a7fead09a702e2dbe4cdd47c743a3b1d58cbd96b6"
+    },
+    {
+      "bytes": 2199,
+      "path": "fixed-asan/compiled-inputs/source/core/src/time.c",
+      "sha256": "67b6bdab6428845f8c8aa99d7a173e232e491f3909dbe0c3c78cf19cb017c1fe"
+    },
+    {
+      "bytes": 9218,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/adc.h",
+      "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1"
+    },
+    {
+      "bytes": 4193,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/adc_observer.h",
+      "sha256": "e95ab349207a44d8ae86c74325a49eb82fd9ce991ea940fff8e4b40dd21a7788"
+    },
+    {
+      "bytes": 3514,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/advanced_pwm.h",
+      "sha256": "2b9bbfbb94b834ed25964f5aa6495abc4e5cbc5f5d5bb48d106e951f37f52410"
+    },
+    {
+      "bytes": 7325,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/can.h",
+      "sha256": "b50f5356966dcda90d1b1c67edf018b740a082e3f0813bc8ec695cc7f907b084"
+    },
+    {
+      "bytes": 4114,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/dma.h",
+      "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b"
+    },
+    {
+      "bytes": 7906,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/ethernet.h",
+      "sha256": "4549314a06f7a6e8d2c3033384fae3ad8abf7b4964833bc96eb6f7aef32881c6"
+    },
+    {
+      "bytes": 4106,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/exti.h",
+      "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6"
+    },
+    {
+      "bytes": 6868,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/flash.h",
+      "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c"
+    },
+    {
+      "bytes": 2676,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/gpio.h",
+      "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778"
+    },
+    {
+      "bytes": 9481,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/i2c.h",
+      "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3"
+    },
+    {
+      "bytes": 8046,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/i2c_bus_clear.h",
+      "sha256": "e1c188d2f093fdbb79664cde94736bd9a900edad64e290221e9e706dbb4b524f"
+    },
+    {
+      "bytes": 2150,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/mdio.h",
+      "sha256": "08dc907823ee68dfacb97065c58fbc2086e9fd39039d845cedbc94b21a781636"
+    },
+    {
+      "bytes": 25516,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/native/model.h",
+      "sha256": "0fb71e8344a27598ec64552dec45b9b5376dd09ed5f10a217cdcb34833fa55a2"
+    },
+    {
+      "bytes": 11660,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/spi.h",
+      "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a"
+    },
+    {
+      "bytes": 11194,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/stream.h",
+      "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a"
+    },
+    {
+      "bytes": 3252,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/stream_budget.h",
+      "sha256": "1034a90c6c09e2c6d10af139c93d50113ead058af898bfcac0acd3a2db32dc8a"
+    },
+    {
+      "bytes": 3191,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/timer.h",
+      "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a"
+    },
+    {
+      "bytes": 3989,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/timer_capture.h",
+      "sha256": "6fb9f2e812cee50a3077e50b697e072e66152dc02c073c3204ee23928d7deee4"
+    },
+    {
+      "bytes": 10872,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/uart.h",
+      "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc"
+    },
+    {
+      "bytes": 3247,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/uart_rs485.h",
+      "sha256": "58f684a10fa8647e5c55b970e74c8f753a3817e93103d12945788617442fa89e"
+    },
+    {
+      "bytes": 8447,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/usb_device.h",
+      "sha256": "759d26c0d51e28ca566a5ef5ca7e7d7fa86533812af40160abbbc216ab01fd6e"
+    },
+    {
+      "bytes": 3440,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/wake.h",
+      "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9"
+    },
+    {
+      "bytes": 3724,
+      "path": "fixed-asan/compiled-inputs/source/io/include/nexus/io/watchdog.h",
+      "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c"
+    },
+    {
+      "bytes": 5790,
+      "path": "fixed-asan/compiled-inputs/source/io/native/adc.c",
+      "sha256": "da6bdfc1c499be71457d62650a6a2315b578f61bc748d0d32c50561437ec110a"
+    },
+    {
+      "bytes": 7817,
+      "path": "fixed-asan/compiled-inputs/source/io/native/can.c",
+      "sha256": "79207262998ccb28ba49952b05f28d2ab882c71085829fd7fd74bc5b60e82fe3"
+    },
+    {
+      "bytes": 2572,
+      "path": "fixed-asan/compiled-inputs/source/io/native/can.h",
+      "sha256": "6d2fa0b173f5f86331212de77b41a443adca47c98cb30f777963165b415417ad"
+    },
+    {
+      "bytes": 1298,
+      "path": "fixed-asan/compiled-inputs/source/io/native/can_access.h",
+      "sha256": "ae4361e990c016caf8312ee27d6aba47f0b74a712ada45aac56d22d03c07b649"
+    },
+    {
+      "bytes": 7429,
+      "path": "fixed-asan/compiled-inputs/source/io/native/ethernet.c",
+      "sha256": "1db19fa0ab10e062d5c0ec8b82740bc2820d641d652982cfb662bea041eca6a2"
+    },
+    {
+      "bytes": 2920,
+      "path": "fixed-asan/compiled-inputs/source/io/native/ethernet.h",
+      "sha256": "2568cc442903e8b1fdd1c405046f61fe52be95691209d35c91161cd622ba872d"
+    },
+    {
+      "bytes": 876,
+      "path": "fixed-asan/compiled-inputs/source/io/native/ethernet_access.h",
+      "sha256": "2a2f63a1ee285f9dd748d93c140b1d3d2b59f9485cb34d0d7b28f8719dc8c307"
+    },
+    {
+      "bytes": 7543,
+      "path": "fixed-asan/compiled-inputs/source/io/native/exti.c",
+      "sha256": "780b90a9b0ccf8bbaf007e21ad85667b0b35329cb31e569c8f87ca12ae71dd8d"
+    },
+    {
+      "bytes": 9441,
+      "path": "fixed-asan/compiled-inputs/source/io/native/flash.c",
+      "sha256": "bd20872557c98bb9b8513676521baca738fdab771d0b0398231ca576fd156238"
+    },
+    {
+      "bytes": 5407,
+      "path": "fixed-asan/compiled-inputs/source/io/native/gpio.c",
+      "sha256": "992407510c763fc6f5726a95895dba445a635ab9ad6c21ebddf3d1d137608384"
+    },
+    {
+      "bytes": 8052,
+      "path": "fixed-asan/compiled-inputs/source/io/native/i2c.c",
+      "sha256": "8f06647793d623bb6e46b234f1e42b81ff6947c7e59db22762a07d4c1e82c4c2"
+    },
+    {
+      "bytes": 12330,
+      "path": "fixed-asan/compiled-inputs/source/io/native/provider.h",
+      "sha256": "628c6ca46264e2521c7fcec2cddcc8ac2571442f08820a5f9910aeb10550620b"
+    },
+    {
+      "bytes": 8170,
+      "path": "fixed-asan/compiled-inputs/source/io/native/spi.c",
+      "sha256": "2a399db21828d8b23eb57d979a0321863bdd1ad1af2102ed8151ac4fe1376247"
+    },
+    {
+      "bytes": 11911,
+      "path": "fixed-asan/compiled-inputs/source/io/native/spi_async.c",
+      "sha256": "969435be3a65f18a61a300633be7abdbedfc70a23db5a430aa74e7f0e89ddba4"
+    },
+    {
+      "bytes": 10517,
+      "path": "fixed-asan/compiled-inputs/source/io/native/stream.c",
+      "sha256": "1eedd1a09a5adc520965e7ddc5d88c0bbc816065435ffbc667144325f15c98ec"
+    },
+    {
+      "bytes": 1942,
+      "path": "fixed-asan/compiled-inputs/source/io/native/time.c",
+      "sha256": "f8944160cd932376c4fc0af2f1db95d8f7b09bb59166e2c225488b552faa3e22"
+    },
+    {
+      "bytes": 4051,
+      "path": "fixed-asan/compiled-inputs/source/io/native/timer.c",
+      "sha256": "fe026222f339257cb3537b954721ec6b1b7efaf153137017892b61a8bc448b33"
+    },
+    {
+      "bytes": 20720,
+      "path": "fixed-asan/compiled-inputs/source/io/native/uart.c",
+      "sha256": "82dc0e7923dc2f38c6bc54d66a288e3cc7de0ffc53ef725a8f562510ecf10b33"
+    },
+    {
+      "bytes": 11210,
+      "path": "fixed-asan/compiled-inputs/source/io/native/usb_device.c",
+      "sha256": "1ab60c470762567e0d7fcee9cb308c344fa964405f70ad3217978869f9827e4a"
+    },
+    {
+      "bytes": 2179,
+      "path": "fixed-asan/compiled-inputs/source/io/native/usb_device.h",
+      "sha256": "f5a28d5a8c61d268f2a1f3d76bae5e73ee57dbc7ac898cbe1d9543e2119c34f2"
+    },
+    {
+      "bytes": 1298,
+      "path": "fixed-asan/compiled-inputs/source/io/native/usb_device_access.h",
+      "sha256": "fc824b75afae99e990bda75a209d83c04412fc748fdbfad64d77e2fb830b32a2"
+    },
+    {
+      "bytes": 5156,
+      "path": "fixed-asan/compiled-inputs/source/io/native/watchdog.c",
+      "sha256": "2dbca5f92e0c60113deb681934fe7693662712c3b91d5f1a6383a7ab1c343dc2"
+    },
+    {
+      "bytes": 3541,
+      "path": "fixed-asan/compiled-inputs/source/io/private/can_controller.h",
+      "sha256": "39a3e29a654f8141b3a46547ab083c79f41623e06e0e0ca8134f58dad00277ec"
+    },
+    {
+      "bytes": 3500,
+      "path": "fixed-asan/compiled-inputs/source/io/private/eth_mac.h",
+      "sha256": "979e672eb814ac0736e09f714c71df86e4237078846c7d94f00ab94ae574d4c5"
+    },
+    {
+      "bytes": 2861,
+      "path": "fixed-asan/compiled-inputs/source/io/private/usb_device_controller.h",
+      "sha256": "6a8006cc5b8d8bce56c84f46f5a52da3863555b43ac3c2ed1b93becdc3f1e39c"
+    },
+    {
+      "bytes": 4646,
+      "path": "fixed-asan/compiled-inputs/source/io/src/adc.c",
+      "sha256": "2a43862372a66b5258ec0a28256b78925b0bdc5b0f5a68a62bdf6b872de7e97c"
+    },
+    {
+      "bytes": 7132,
+      "path": "fixed-asan/compiled-inputs/source/io/src/adc_observer.c",
+      "sha256": "48fbc20045b5acc945d5533db881545c2a5f9e026fdb30273e7cce3b2e5ab6a3"
+    },
+    {
+      "bytes": 2805,
+      "path": "fixed-asan/compiled-inputs/source/io/src/advanced_pwm.c",
+      "sha256": "9505b6a8913d23978defb59e18eabc4c0dfa43252104e526205b8528b3cf28c5"
+    },
+    {
+      "bytes": 4880,
+      "path": "fixed-asan/compiled-inputs/source/io/src/can.c",
+      "sha256": "b4dd7e349b8a4db76c2723e259899dd28764690f43673014784568cfd01c1d31"
+    },
+    {
+      "bytes": 37366,
+      "path": "fixed-asan/compiled-inputs/source/io/src/can_controller.c",
+      "sha256": "93b1ba8bd618259a53f07e02054e3977ad8cb8feb00dc107065a5c1ee1fe67fb"
+    },
+    {
+      "bytes": 2975,
+      "path": "fixed-asan/compiled-inputs/source/io/src/dma.c",
+      "sha256": "98c3edf4a206ede42ecf314a7f9c1b7e892d71318604fc87e4aad18703b3bcbb"
+    },
+    {
+      "bytes": 35844,
+      "path": "fixed-asan/compiled-inputs/source/io/src/eth_mac.c",
+      "sha256": "06b3acd40a24f9875a75e315bab18176b0379b26caf5bef24cd4c3555f71a1cb"
+    },
+    {
+      "bytes": 4151,
+      "path": "fixed-asan/compiled-inputs/source/io/src/ethernet.c",
+      "sha256": "d0e0f23108ef0afa5ba1bf7240e18c1d3b5a3412ff86966ba9e7101be1996381"
+    },
+    {
+      "bytes": 1718,
+      "path": "fixed-asan/compiled-inputs/source/io/src/exti.c",
+      "sha256": "2b25b04b35965bc32596fddb9823105bf98e8746c1a6a58a5aff16e0831d28d7"
+    },
+    {
+      "bytes": 2096,
+      "path": "fixed-asan/compiled-inputs/source/io/src/flash.c",
+      "sha256": "4c0eb780eb87d6ce90b82ab4ab387f752ae15347057f90154252d5f22b4750cd"
+    },
+    {
+      "bytes": 2953,
+      "path": "fixed-asan/compiled-inputs/source/io/src/flash_region.c",
+      "sha256": "4a14b9330342c6cda18431db6c0fb3a6ba823579c4d33bf18eeffd85d866b2a9"
+    },
+    {
+      "bytes": 1483,
+      "path": "fixed-asan/compiled-inputs/source/io/src/gpio.c",
+      "sha256": "cfa133514adbae4a42e9e39c83921f9e885117b4cf251f6325dc300b19a4b0e0"
+    },
+    {
+      "bytes": 7617,
+      "path": "fixed-asan/compiled-inputs/source/io/src/i2c.c",
+      "sha256": "14a9e4f1728dd5b28e4525c83d77ea05903bdcc0645d6e9b824775ec21b22f9f"
+    },
+    {
+      "bytes": 10355,
+      "path": "fixed-asan/compiled-inputs/source/io/src/i2c_bus_clear.c",
+      "sha256": "b88cc7b5ec47eaea1684312737d69a2aae48d0a25f59106ff1e19915af6ad8df"
+    },
+    {
+      "bytes": 1200,
+      "path": "fixed-asan/compiled-inputs/source/io/src/mdio.c",
+      "sha256": "6b19c9f91d8eda0205893bb929e8d117cb31e22cbe6246fc603193fed02d0a2f"
+    },
+    {
+      "bytes": 5789,
+      "path": "fixed-asan/compiled-inputs/source/io/src/spi.c",
+      "sha256": "933d438eee528cb00aa24aaf4c2d974ec18d47facc57d9c54a791d5c76161a5f"
+    },
+    {
+      "bytes": 14946,
+      "path": "fixed-asan/compiled-inputs/source/io/src/stream.c",
+      "sha256": "693292c7b185bd64004507bb7341d1311f122f84ea608c40cb5a72718253676e"
+    },
+    {
+      "bytes": 4434,
+      "path": "fixed-asan/compiled-inputs/source/io/src/stream_budget.c",
+      "sha256": "5aca444c08926de7bbd47c24aa4ded2d8e1f89b5fa0c56077b8425352ed69eed"
+    },
+    {
+      "bytes": 1847,
+      "path": "fixed-asan/compiled-inputs/source/io/src/timer.c",
+      "sha256": "4d2eba552c2aa8065ec6767711a5b045bbe2649c69975503ea5135c6d691a5ac"
+    },
+    {
+      "bytes": 3102,
+      "path": "fixed-asan/compiled-inputs/source/io/src/timer_capture.c",
+      "sha256": "65845a51610421f6fd1072ffe06eb726bbaabe950ca4a8d47bdb16e78cd2a945"
+    },
+    {
+      "bytes": 5259,
+      "path": "fixed-asan/compiled-inputs/source/io/src/uart.c",
+      "sha256": "974704075e9bac9f80873862fcc49945e54e4cee43515c1bd61a8e6d8ab776a9"
+    },
+    {
+      "bytes": 14081,
+      "path": "fixed-asan/compiled-inputs/source/io/src/uart_rs485.c",
+      "sha256": "867bdec68729f028d8f5513e93f6656b5ec772568dfc117baf95b6c130dcc8e7"
+    },
+    {
+      "bytes": 5932,
+      "path": "fixed-asan/compiled-inputs/source/io/src/usb_device.c",
+      "sha256": "ce6a9771275e7e8f3f9da320de9cf5f71b410ff836616aa1a2e88e88ed5dd773"
+    },
+    {
+      "bytes": 45696,
+      "path": "fixed-asan/compiled-inputs/source/io/src/usb_device_controller.c",
+      "sha256": "caac78c495a36886c76c69a60e52745140f7f7c2a5ebf52ae5af2d6ebe2275d3"
+    },
+    {
+      "bytes": 2662,
+      "path": "fixed-asan/compiled-inputs/source/io/src/wake.c",
+      "sha256": "227718bd6f7a31e3469d60fa4d09fd264bd0a7a9ae13bf30bfc069b376ffca6c"
+    },
+    {
+      "bytes": 1620,
+      "path": "fixed-asan/compiled-inputs/source/io/src/watchdog.c",
+      "sha256": "ea3ec3f1cbc3dc1ebbba796760083a377356708532526d9354c5032b656cf357"
+    },
+    {
+      "bytes": 9663,
+      "path": "fixed-asan/compiled-inputs/source/soc/gd32f470/drivers/adc.c",
+      "sha256": "91138076b826167aa03a3cba530e46adf7b0e9217a818ef834682d588ccafb32"
+    },
+    {
+      "bytes": 20238,
+      "path": "fixed-asan/compiled-inputs/source/soc/gd32f470/drivers/adc_continuous.c",
+      "sha256": "ac35e0ecc0ffb85f5a2d2e37866e4167ae568c1ad534cd03dbeed87253e0a181"
+    },
+    {
+      "bytes": 16230,
+      "path": "fixed-asan/compiled-inputs/source/soc/gd32f470/drivers/adc_stream.c",
+      "sha256": "1b8297da3fd09a63e94c13b442de0f2b366a294315efc60c01592fb5b394d512"
+    },
+    {
+      "bytes": 12955,
+      "path": "fixed-asan/compiled-inputs/source/soc/gd32f470/drivers/flash.c",
+      "sha256": "affedf6bce4d59c7255c543ac713c46042ff9bc1a3347053af4d8362aa7ada8c"
+    },
+    {
+      "bytes": 5450,
+      "path": "fixed-asan/compiled-inputs/source/soc/gd32f470/private/gd32f470_adc_stream.h",
+      "sha256": "039c4add217243e2cfa9ab0a99cfaba96067d351cfd212db5d6ea29369f8fb6a"
+    },
+    {
+      "bytes": 22822,
+      "path": "fixed-asan/compiled-inputs/source/soc/gd32f470/private/gd32f470_provider.h",
+      "sha256": "4a865f646cd9565806959186ce6c3a591c6302b1543ad0bc7def741431663226"
+    },
+    {
+      "bytes": 839,
+      "path": "fixed-asan/compiled-inputs/source/soc/gd32f470/private/gd32f4xx_libopt.h",
+      "sha256": "64afa1aa962f93bc9cad8a23244b39b383dd4aa29c0056c20d9a4cd2537f10db"
+    },
+    {
+      "bytes": 2710,
+      "path": "fixed-asan/compiled-inputs/source/soc/gd32f470/private/system.h",
+      "sha256": "ea3ae416c653f9abbfb42da62a1aa832290594cdd95a4bb98bb709601ee181bc"
+    },
+    {
+      "bytes": 3548,
+      "path": "fixed-asan/compiled-inputs/source/tests/contracts/gd32_model/core_cm4.h",
+      "sha256": "9e0b5a20eba1e1d694b5e48af4eedf37fe228d203a888442e3c33c97409958ca"
+    },
+    {
+      "bytes": 8442,
+      "path": "fixed-asan/compiled-inputs/source/tests/contracts/gd32_model/model.c",
+      "sha256": "21d4b0d674f620364097a73ec17d1fa78bfdafe3b2c6b49bdfe4093307387053"
+    },
+    {
+      "bytes": 19853,
+      "path": "fixed-asan/compiled-inputs/source/tests/google/can_controller_test.cpp",
+      "sha256": "20112c02371f3ebf721607c8178cab1a8580dbb34c92d8099b8c1cad49503ab1"
+    },
+    {
+      "bytes": 1069,
+      "path": "fixed-asan/compiled-inputs/source/tests/google/gd32_adc_stream_model.h",
+      "sha256": "1e65ce15ed5d6a896a769a876d323b0ff705f63d5969bf80cb649f5b161be59a"
+    },
+    {
+      "bytes": 24402,
+      "path": "fixed-asan/compiled-inputs/source/tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "a6e4ae4e090a8872c267b2c2d8095714622b725bf8b0917d1e0013e59e158cc6"
+    },
+    {
+      "bytes": 3654,
+      "path": "fixed-asan/compiled-inputs/source/tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "2ced97e02049557f807f09d2d9ec1eca31fed505d674c4d073278c2ae525570f"
+    },
+    {
+      "bytes": 28917,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h",
+      "sha256": "db6de53203fa053d6e789ef86908195f84b7664753bdf0aa7ca74f62025573ef"
+    },
+    {
+      "bytes": 2740,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/system_gd32f4xx.h",
+      "sha256": "6077ccbeff029a0058465172607481158b202d5687e2e87a0ed13ff6a9b2633a"
+    },
+    {
+      "bytes": 41521,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_adc.h",
+      "sha256": "9fa1a80b64d18512729af4d22602d5761ec0758d970fb5d15f7f8a96244607d3"
+    },
+    {
+      "bytes": 9890,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dbg.h",
+      "sha256": "0a403f37714cbb585a26cb54c7c5cc6776fa9ec23459a70369d9342805713998"
+    },
+    {
+      "bytes": 32675,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dma.h",
+      "sha256": "b5796d1e0017994a232a53613f2d50566b8c00dd43d4049eab26cee1e04f37eb"
+    },
+    {
+      "bytes": 20470,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exti.h",
+      "sha256": "dd78502366ba631e32841db28711976d51f7e71417bb2006ba82dc89404eba66"
+    },
+    {
+      "bytes": 28322,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fmc.h",
+      "sha256": "a6bd45fe828fda8cc19b3b1958470ac1bb115cc162b89963f5391028c9bdc192"
+    },
+    {
+      "bytes": 5863,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fwdgt.h",
+      "sha256": "e83161e6700a28f9f0d475405c4a94a03a88e9576b6d8f41c5a9bd96daf5ff08"
+    },
+    {
+      "bytes": 29164,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h",
+      "sha256": "6551fd3fb673b3e34d5f62b72cba8a0482ce051bf29ed475015b1f9ad178a57a"
+    },
+    {
+      "bytes": 29826,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_i2c.h",
+      "sha256": "42498aa2016958a5d351577f3caeca0f7c8334ab25b704a95acb7b73001a1019"
+    },
+    {
+      "bytes": 11878,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_pmu.h",
+      "sha256": "0275375eff0d339ec2b16c1a0d4c67721be6bff63c1516bdc4a614bb5ed98b03"
+    },
+    {
+      "bytes": 95768,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rcu.h",
+      "sha256": "38d97fe3994cefdcb1109192a5854c29ad2af364558f499878c4a5510b26e45d"
+    },
+    {
+      "bytes": 25504,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_spi.h",
+      "sha256": "e2bc6524ff9fc2604f3e947c68ca419ff35bc029904ea8163c10510f85728c10"
+    },
+    {
+      "bytes": 11558,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_syscfg.h",
+      "sha256": "0e37ca2af26c3563712cf33aca9cf85b0489df10526c8336e0e75518a86f3cd2"
+    },
+    {
+      "bytes": 59717,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_timer.h",
+      "sha256": "b22f7cc8d1a7cf16326163982b9d6a34829ca55f6491fdea21d07b6e6dcd5668"
+    },
+    {
+      "bytes": 31652,
+      "path": "fixed-asan/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_usart.h",
+      "sha256": "7adb26fb6e10f5ce29612aff5f580eafb787311bc982c629ffdf415ddf3dc973"
+    },
+    {
+      "bytes": 296327,
+      "path": "fixed-asan/compiled-inputs.json",
+      "sha256": "7902b5467532f81ab3b8c0134e6147b060bdbd581ac6ce69de43ff592458f3f6"
+    },
+    {
+      "bytes": 18476,
+      "path": "fixed-asan/development.json",
+      "sha256": "6765263aed6f6fc2f143a0c41aae39a85085f90aa0ad6dd6a93f9276472566b6"
+    },
+    {
+      "bytes": 1637,
+      "path": "fixed-asan/nexus_can_controller_test-discovery.log",
+      "sha256": "6224b997e64fc7129917ffebbfe38333a84c919f3727078cc343521c3c4b16ba"
+    },
+    {
+      "bytes": 5058,
+      "path": "fixed-asan/nexus_can_controller_test-execution.log",
+      "sha256": "e5a1997b1cff43834e9d4dff6cfddadaeca1a1d411b1b603c41d27f72d4bc946"
+    },
+    {
+      "bytes": 7773,
+      "path": "fixed-asan/nexus_can_controller_test.xml",
+      "sha256": "8c2d2afdd09ec36b370edf847bc6d41e2dc89c3a9b3cb855ed7035e7f538c69a"
+    },
+    {
+      "bytes": 1342,
+      "path": "fixed-asan/nexus_gd32_adc_stream_test-discovery.log",
+      "sha256": "b83652899a54a2354b0839c01fa9f68e27c1794ae3159df37e47daa1234184dc"
+    },
+    {
+      "bytes": 4557,
+      "path": "fixed-asan/nexus_gd32_adc_stream_test-execution.log",
+      "sha256": "7cc1edd85242dccac7db06d91a47fd5d1fb582b45d236c95bcbb79b996dbbff9"
+    },
+    {
+      "bytes": 6807,
+      "path": "fixed-asan/nexus_gd32_adc_stream_test.xml",
+      "sha256": "45518a475ac49b22bcc1a079c4e29f279f112a9ad438ae4e25166f1d6e2935f4"
+    },
+    {
+      "bytes": 100,
+      "path": "fixed-asan/nexus_gd32_flash_fault_test-discovery.log",
+      "sha256": "fd68edf21bb1763a02354c10382117d00f4c86a1316a457293015ec51ad84a3a"
+    },
+    {
+      "bytes": 503,
+      "path": "fixed-asan/nexus_gd32_flash_fault_test-execution.log",
+      "sha256": "92afaf8248d784f98cc72d4f620a0278e7f48723c0fd24bf52e267061f8df067"
+    },
+    {
+      "bytes": 581,
+      "path": "fixed-asan/nexus_gd32_flash_fault_test.xml",
+      "sha256": "66ac1726dff78edbed21d342f0a9bd62fa314be0211e84a4690a9db51bb498a3"
+    },
+    {
+      "bytes": 236568,
+      "path": "fixed-asan/ninja-dependencies.txt",
+      "sha256": "a56e5c3e94c24f6419df49fa21867c22d00d08e51c809050c4b494e6fc465aa4"
+    },
+    {
+      "bytes": 19853,
+      "path": "fixed-asan/owned-source/tests/google/can_controller_test.cpp",
+      "sha256": "20112c02371f3ebf721607c8178cab1a8580dbb34c92d8099b8c1cad49503ab1"
+    },
+    {
+      "bytes": 24402,
+      "path": "fixed-asan/owned-source/tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "a6e4ae4e090a8872c267b2c2d8095714622b725bf8b0917d1e0013e59e158cc6"
+    },
+    {
+      "bytes": 3654,
+      "path": "fixed-asan/owned-source/tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "2ced97e02049557f807f09d2d9ec1eca31fed505d674c4d073278c2ae525570f"
+    },
+    {
+      "bytes": 23632,
+      "path": "fixed-regular/CMakeCache.txt",
+      "sha256": "3712ab3974e3ee44aeb4795847984f5fa88181d492ecb7cf128706b65113b77f"
+    },
+    {
+      "bytes": 1428,
+      "path": "fixed-regular/binary-preservation.json",
+      "sha256": "ff5380f8b532c3622590ef3fd2830f36b69bc6ba1bfbfc32718fdc1da316cc1a"
+    },
+    {
+      "bytes": 575,
+      "path": "fixed-regular/build.log",
+      "sha256": "ecab454822b89efecb3c1b64bc18aa83babdb108d637338802f8311a2d4dc055"
+    },
+    {
+      "bytes": 1699528,
+      "path": "fixed-regular/build.ninja",
+      "sha256": "4ee0a4267b49dec9fca69fa8e2510fb5e9bd825b151b2da300ea260fa8a2d732"
+    },
+    {
+      "bytes": 4289,
+      "path": "fixed-regular/commands.json",
+      "sha256": "90645e9db04ba172a20d6091ea94e1866cf02ec92df3675f2ffc502197a7ce8b"
+    },
+    {
+      "bytes": 902478,
+      "path": "fixed-regular/compile_commands.json",
+      "sha256": "df7557301853e8129679c6df21b70f97899ebb7056c1ac3921e09503d7af9b29"
+    },
+    {
+      "bytes": 4098,
+      "path": "fixed-regular/compiled-inputs/source/arch/cortex_m/nx_arch_cache.c",
+      "sha256": "0556810dac343f65da20922a9c897a3cab061f22b1a5a41a4dbc8c4bf267b59b"
+    },
+    {
+      "bytes": 6993,
+      "path": "fixed-regular/compiled-inputs/source/arch/cortex_m/nx_arch_mpu.c",
+      "sha256": "ae07d4beba4f6f47eb4bc6f2a24e4e3342d36e6c8db8ab850755fd7d24fd552e"
+    },
+    {
+      "bytes": 3667,
+      "path": "fixed-regular/compiled-inputs/source/arch/cortex_m/nx_arch_security.c",
+      "sha256": "926e4ad07454a59397763bdca2c2cbbbeacdd9fdab564062936425dfb4df90d7"
+    },
+    {
+      "bytes": 2259,
+      "path": "fixed-regular/compiled-inputs/source/arch/cortex_m/nx_arch_sleep.c",
+      "sha256": "c1f87ad482c11f41b785fdbded2ec4a96a59fdbd9db52e3417033ae8d1c33b4b"
+    },
+    {
+      "bytes": 4596,
+      "path": "fixed-regular/compiled-inputs/source/arch/cortex_m/private/mechanisms.h",
+      "sha256": "be5a62c74ff05a5cd25493b3e975475280a65d06e7ac15e51e2a755f235045c2"
+    },
+    {
+      "bytes": 876,
+      "path": "fixed-regular/compiled-inputs/source/arch/cortex_m/private/sleep.h",
+      "sha256": "db07a270e35ffdaac8c84e63192593399a01d10fc0f6b5a8495f5bec13f629be"
+    },
+    {
+      "bytes": 5929,
+      "path": "fixed-regular/compiled-inputs/source/arch/include/nexus/arch/arch.h",
+      "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289"
+    },
+    {
+      "bytes": 4025,
+      "path": "fixed-regular/compiled-inputs/source/arch/include/nexus/arch/cache.h",
+      "sha256": "9775bdf517de342cc7d0cbd131cee57d6ce9697b602f55e6938bf1b51e357a26"
+    },
+    {
+      "bytes": 1546,
+      "path": "fixed-regular/compiled-inputs/source/arch/include/nexus/arch/features.h",
+      "sha256": "046631eae25a7143ee1ce8c553fbe5e80074810dfdedf0d2e3405464c21851ac"
+    },
+    {
+      "bytes": 5956,
+      "path": "fixed-regular/compiled-inputs/source/arch/include/nexus/arch/mpu.h",
+      "sha256": "c652c608a734178568d5aa63eb2a823b48200e7f8d5a9a2a5e32c2e5a0681304"
+    },
+    {
+      "bytes": 3226,
+      "path": "fixed-regular/compiled-inputs/source/arch/include/nexus/arch/security.h",
+      "sha256": "3fd3f594ba22aefd65cea7c16114b36fbd25f7925f0e449037a6cbeb623e9e4f"
+    },
+    {
+      "bytes": 2281,
+      "path": "fixed-regular/compiled-inputs/source/arch/include/nexus/arch/sleep.h",
+      "sha256": "ec14761abc18ba0405e5edc88743869dc955c275a57ca40164edb67526bb96a2"
+    },
+    {
+      "bytes": 3260,
+      "path": "fixed-regular/compiled-inputs/source/arch/native/nx_arch_native.c",
+      "sha256": "a1bf35f6cbcfc6f5d2ec72ebfae1040728055d4bd52aba98757729a7e82da93e"
+    },
+    {
+      "bytes": 2026,
+      "path": "fixed-regular/compiled-inputs/source/core/include/nexus/core/fault.h",
+      "sha256": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b"
+    },
+    {
+      "bytes": 7004,
+      "path": "fixed-regular/compiled-inputs/source/core/include/nexus/core/request.h",
+      "sha256": "c27686b1fc578d88e1f4638c3939c1409171ba6267e59e4c64eb72449ffb7e55"
+    },
+    {
+      "bytes": 3381,
+      "path": "fixed-regular/compiled-inputs/source/core/include/nexus/core/request_observer.h",
+      "sha256": "2d7cb6cf7447556a4deb6cdf8c027224ab04210f4bc0daa568cf3688ac7bdafd"
+    },
+    {
+      "bytes": 1799,
+      "path": "fixed-regular/compiled-inputs/source/core/include/nexus/core/stack_observation.h",
+      "sha256": "6452a9d540a08dadb0b17062a40e945369a60439d85bc2bb6e3f1417b5aa5f21"
+    },
+    {
+      "bytes": 789,
+      "path": "fixed-regular/compiled-inputs/source/core/include/nexus/core/status.h",
+      "sha256": "2aed38f391159a2bfb32f475c81967e3eec01beedde97b33a276ee0dd85d32fd"
+    },
+    {
+      "bytes": 3477,
+      "path": "fixed-regular/compiled-inputs/source/core/include/nexus/core/time.h",
+      "sha256": "51b54ef6ff434cc473162f215933b3cd992cc2efb89d9c3b72a4e2f7c9d839b1"
+    },
+    {
+      "bytes": 639,
+      "path": "fixed-regular/compiled-inputs/source/core/src/fault.c",
+      "sha256": "976a3af81cfefa6d7185b7328162825eb08fc4ae25042a543de1fc8369a8367f"
+    },
+    {
+      "bytes": 6864,
+      "path": "fixed-regular/compiled-inputs/source/core/src/request.c",
+      "sha256": "6fdc85b08c7e479cc943e77036912fb7313a4c690dd32c85a9f632d2380f03d8"
+    },
+    {
+      "bytes": 4377,
+      "path": "fixed-regular/compiled-inputs/source/core/src/request_observer.c",
+      "sha256": "dc2f96ee8517682d9e853b87fddbc5a4a3d6dc2e3b52f33b7a3cd2b4465ac82d"
+    },
+    {
+      "bytes": 1202,
+      "path": "fixed-regular/compiled-inputs/source/core/src/stack_observation.c",
+      "sha256": "8362739439edcc5ec632f10a7fead09a702e2dbe4cdd47c743a3b1d58cbd96b6"
+    },
+    {
+      "bytes": 2199,
+      "path": "fixed-regular/compiled-inputs/source/core/src/time.c",
+      "sha256": "67b6bdab6428845f8c8aa99d7a173e232e491f3909dbe0c3c78cf19cb017c1fe"
+    },
+    {
+      "bytes": 9218,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/adc.h",
+      "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1"
+    },
+    {
+      "bytes": 4193,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/adc_observer.h",
+      "sha256": "e95ab349207a44d8ae86c74325a49eb82fd9ce991ea940fff8e4b40dd21a7788"
+    },
+    {
+      "bytes": 3514,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/advanced_pwm.h",
+      "sha256": "2b9bbfbb94b834ed25964f5aa6495abc4e5cbc5f5d5bb48d106e951f37f52410"
+    },
+    {
+      "bytes": 7325,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/can.h",
+      "sha256": "b50f5356966dcda90d1b1c67edf018b740a082e3f0813bc8ec695cc7f907b084"
+    },
+    {
+      "bytes": 4114,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/dma.h",
+      "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b"
+    },
+    {
+      "bytes": 7906,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/ethernet.h",
+      "sha256": "4549314a06f7a6e8d2c3033384fae3ad8abf7b4964833bc96eb6f7aef32881c6"
+    },
+    {
+      "bytes": 4106,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/exti.h",
+      "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6"
+    },
+    {
+      "bytes": 6868,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/flash.h",
+      "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c"
+    },
+    {
+      "bytes": 2676,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/gpio.h",
+      "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778"
+    },
+    {
+      "bytes": 9481,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/i2c.h",
+      "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3"
+    },
+    {
+      "bytes": 8046,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/i2c_bus_clear.h",
+      "sha256": "e1c188d2f093fdbb79664cde94736bd9a900edad64e290221e9e706dbb4b524f"
+    },
+    {
+      "bytes": 2150,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/mdio.h",
+      "sha256": "08dc907823ee68dfacb97065c58fbc2086e9fd39039d845cedbc94b21a781636"
+    },
+    {
+      "bytes": 25516,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/native/model.h",
+      "sha256": "0fb71e8344a27598ec64552dec45b9b5376dd09ed5f10a217cdcb34833fa55a2"
+    },
+    {
+      "bytes": 11660,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/spi.h",
+      "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a"
+    },
+    {
+      "bytes": 11194,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/stream.h",
+      "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a"
+    },
+    {
+      "bytes": 3252,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/stream_budget.h",
+      "sha256": "1034a90c6c09e2c6d10af139c93d50113ead058af898bfcac0acd3a2db32dc8a"
+    },
+    {
+      "bytes": 3191,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/timer.h",
+      "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a"
+    },
+    {
+      "bytes": 3989,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/timer_capture.h",
+      "sha256": "6fb9f2e812cee50a3077e50b697e072e66152dc02c073c3204ee23928d7deee4"
+    },
+    {
+      "bytes": 10872,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/uart.h",
+      "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc"
+    },
+    {
+      "bytes": 3247,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/uart_rs485.h",
+      "sha256": "58f684a10fa8647e5c55b970e74c8f753a3817e93103d12945788617442fa89e"
+    },
+    {
+      "bytes": 8447,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/usb_device.h",
+      "sha256": "759d26c0d51e28ca566a5ef5ca7e7d7fa86533812af40160abbbc216ab01fd6e"
+    },
+    {
+      "bytes": 3440,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/wake.h",
+      "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9"
+    },
+    {
+      "bytes": 3724,
+      "path": "fixed-regular/compiled-inputs/source/io/include/nexus/io/watchdog.h",
+      "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c"
+    },
+    {
+      "bytes": 5790,
+      "path": "fixed-regular/compiled-inputs/source/io/native/adc.c",
+      "sha256": "da6bdfc1c499be71457d62650a6a2315b578f61bc748d0d32c50561437ec110a"
+    },
+    {
+      "bytes": 7817,
+      "path": "fixed-regular/compiled-inputs/source/io/native/can.c",
+      "sha256": "79207262998ccb28ba49952b05f28d2ab882c71085829fd7fd74bc5b60e82fe3"
+    },
+    {
+      "bytes": 2572,
+      "path": "fixed-regular/compiled-inputs/source/io/native/can.h",
+      "sha256": "6d2fa0b173f5f86331212de77b41a443adca47c98cb30f777963165b415417ad"
+    },
+    {
+      "bytes": 1298,
+      "path": "fixed-regular/compiled-inputs/source/io/native/can_access.h",
+      "sha256": "ae4361e990c016caf8312ee27d6aba47f0b74a712ada45aac56d22d03c07b649"
+    },
+    {
+      "bytes": 7429,
+      "path": "fixed-regular/compiled-inputs/source/io/native/ethernet.c",
+      "sha256": "1db19fa0ab10e062d5c0ec8b82740bc2820d641d652982cfb662bea041eca6a2"
+    },
+    {
+      "bytes": 2920,
+      "path": "fixed-regular/compiled-inputs/source/io/native/ethernet.h",
+      "sha256": "2568cc442903e8b1fdd1c405046f61fe52be95691209d35c91161cd622ba872d"
+    },
+    {
+      "bytes": 876,
+      "path": "fixed-regular/compiled-inputs/source/io/native/ethernet_access.h",
+      "sha256": "2a2f63a1ee285f9dd748d93c140b1d3d2b59f9485cb34d0d7b28f8719dc8c307"
+    },
+    {
+      "bytes": 7543,
+      "path": "fixed-regular/compiled-inputs/source/io/native/exti.c",
+      "sha256": "780b90a9b0ccf8bbaf007e21ad85667b0b35329cb31e569c8f87ca12ae71dd8d"
+    },
+    {
+      "bytes": 9441,
+      "path": "fixed-regular/compiled-inputs/source/io/native/flash.c",
+      "sha256": "bd20872557c98bb9b8513676521baca738fdab771d0b0398231ca576fd156238"
+    },
+    {
+      "bytes": 5407,
+      "path": "fixed-regular/compiled-inputs/source/io/native/gpio.c",
+      "sha256": "992407510c763fc6f5726a95895dba445a635ab9ad6c21ebddf3d1d137608384"
+    },
+    {
+      "bytes": 8052,
+      "path": "fixed-regular/compiled-inputs/source/io/native/i2c.c",
+      "sha256": "8f06647793d623bb6e46b234f1e42b81ff6947c7e59db22762a07d4c1e82c4c2"
+    },
+    {
+      "bytes": 12330,
+      "path": "fixed-regular/compiled-inputs/source/io/native/provider.h",
+      "sha256": "628c6ca46264e2521c7fcec2cddcc8ac2571442f08820a5f9910aeb10550620b"
+    },
+    {
+      "bytes": 8170,
+      "path": "fixed-regular/compiled-inputs/source/io/native/spi.c",
+      "sha256": "2a399db21828d8b23eb57d979a0321863bdd1ad1af2102ed8151ac4fe1376247"
+    },
+    {
+      "bytes": 11911,
+      "path": "fixed-regular/compiled-inputs/source/io/native/spi_async.c",
+      "sha256": "969435be3a65f18a61a300633be7abdbedfc70a23db5a430aa74e7f0e89ddba4"
+    },
+    {
+      "bytes": 10517,
+      "path": "fixed-regular/compiled-inputs/source/io/native/stream.c",
+      "sha256": "1eedd1a09a5adc520965e7ddc5d88c0bbc816065435ffbc667144325f15c98ec"
+    },
+    {
+      "bytes": 1942,
+      "path": "fixed-regular/compiled-inputs/source/io/native/time.c",
+      "sha256": "f8944160cd932376c4fc0af2f1db95d8f7b09bb59166e2c225488b552faa3e22"
+    },
+    {
+      "bytes": 4051,
+      "path": "fixed-regular/compiled-inputs/source/io/native/timer.c",
+      "sha256": "fe026222f339257cb3537b954721ec6b1b7efaf153137017892b61a8bc448b33"
+    },
+    {
+      "bytes": 20720,
+      "path": "fixed-regular/compiled-inputs/source/io/native/uart.c",
+      "sha256": "82dc0e7923dc2f38c6bc54d66a288e3cc7de0ffc53ef725a8f562510ecf10b33"
+    },
+    {
+      "bytes": 11210,
+      "path": "fixed-regular/compiled-inputs/source/io/native/usb_device.c",
+      "sha256": "1ab60c470762567e0d7fcee9cb308c344fa964405f70ad3217978869f9827e4a"
+    },
+    {
+      "bytes": 2179,
+      "path": "fixed-regular/compiled-inputs/source/io/native/usb_device.h",
+      "sha256": "f5a28d5a8c61d268f2a1f3d76bae5e73ee57dbc7ac898cbe1d9543e2119c34f2"
+    },
+    {
+      "bytes": 1298,
+      "path": "fixed-regular/compiled-inputs/source/io/native/usb_device_access.h",
+      "sha256": "fc824b75afae99e990bda75a209d83c04412fc748fdbfad64d77e2fb830b32a2"
+    },
+    {
+      "bytes": 5156,
+      "path": "fixed-regular/compiled-inputs/source/io/native/watchdog.c",
+      "sha256": "2dbca5f92e0c60113deb681934fe7693662712c3b91d5f1a6383a7ab1c343dc2"
+    },
+    {
+      "bytes": 3541,
+      "path": "fixed-regular/compiled-inputs/source/io/private/can_controller.h",
+      "sha256": "39a3e29a654f8141b3a46547ab083c79f41623e06e0e0ca8134f58dad00277ec"
+    },
+    {
+      "bytes": 3500,
+      "path": "fixed-regular/compiled-inputs/source/io/private/eth_mac.h",
+      "sha256": "979e672eb814ac0736e09f714c71df86e4237078846c7d94f00ab94ae574d4c5"
+    },
+    {
+      "bytes": 2861,
+      "path": "fixed-regular/compiled-inputs/source/io/private/usb_device_controller.h",
+      "sha256": "6a8006cc5b8d8bce56c84f46f5a52da3863555b43ac3c2ed1b93becdc3f1e39c"
+    },
+    {
+      "bytes": 4646,
+      "path": "fixed-regular/compiled-inputs/source/io/src/adc.c",
+      "sha256": "2a43862372a66b5258ec0a28256b78925b0bdc5b0f5a68a62bdf6b872de7e97c"
+    },
+    {
+      "bytes": 7132,
+      "path": "fixed-regular/compiled-inputs/source/io/src/adc_observer.c",
+      "sha256": "48fbc20045b5acc945d5533db881545c2a5f9e026fdb30273e7cce3b2e5ab6a3"
+    },
+    {
+      "bytes": 2805,
+      "path": "fixed-regular/compiled-inputs/source/io/src/advanced_pwm.c",
+      "sha256": "9505b6a8913d23978defb59e18eabc4c0dfa43252104e526205b8528b3cf28c5"
+    },
+    {
+      "bytes": 4880,
+      "path": "fixed-regular/compiled-inputs/source/io/src/can.c",
+      "sha256": "b4dd7e349b8a4db76c2723e259899dd28764690f43673014784568cfd01c1d31"
+    },
+    {
+      "bytes": 37366,
+      "path": "fixed-regular/compiled-inputs/source/io/src/can_controller.c",
+      "sha256": "93b1ba8bd618259a53f07e02054e3977ad8cb8feb00dc107065a5c1ee1fe67fb"
+    },
+    {
+      "bytes": 2975,
+      "path": "fixed-regular/compiled-inputs/source/io/src/dma.c",
+      "sha256": "98c3edf4a206ede42ecf314a7f9c1b7e892d71318604fc87e4aad18703b3bcbb"
+    },
+    {
+      "bytes": 35844,
+      "path": "fixed-regular/compiled-inputs/source/io/src/eth_mac.c",
+      "sha256": "06b3acd40a24f9875a75e315bab18176b0379b26caf5bef24cd4c3555f71a1cb"
+    },
+    {
+      "bytes": 4151,
+      "path": "fixed-regular/compiled-inputs/source/io/src/ethernet.c",
+      "sha256": "d0e0f23108ef0afa5ba1bf7240e18c1d3b5a3412ff86966ba9e7101be1996381"
+    },
+    {
+      "bytes": 1718,
+      "path": "fixed-regular/compiled-inputs/source/io/src/exti.c",
+      "sha256": "2b25b04b35965bc32596fddb9823105bf98e8746c1a6a58a5aff16e0831d28d7"
+    },
+    {
+      "bytes": 2096,
+      "path": "fixed-regular/compiled-inputs/source/io/src/flash.c",
+      "sha256": "4c0eb780eb87d6ce90b82ab4ab387f752ae15347057f90154252d5f22b4750cd"
+    },
+    {
+      "bytes": 2953,
+      "path": "fixed-regular/compiled-inputs/source/io/src/flash_region.c",
+      "sha256": "4a14b9330342c6cda18431db6c0fb3a6ba823579c4d33bf18eeffd85d866b2a9"
+    },
+    {
+      "bytes": 1483,
+      "path": "fixed-regular/compiled-inputs/source/io/src/gpio.c",
+      "sha256": "cfa133514adbae4a42e9e39c83921f9e885117b4cf251f6325dc300b19a4b0e0"
+    },
+    {
+      "bytes": 7617,
+      "path": "fixed-regular/compiled-inputs/source/io/src/i2c.c",
+      "sha256": "14a9e4f1728dd5b28e4525c83d77ea05903bdcc0645d6e9b824775ec21b22f9f"
+    },
+    {
+      "bytes": 10355,
+      "path": "fixed-regular/compiled-inputs/source/io/src/i2c_bus_clear.c",
+      "sha256": "b88cc7b5ec47eaea1684312737d69a2aae48d0a25f59106ff1e19915af6ad8df"
+    },
+    {
+      "bytes": 1200,
+      "path": "fixed-regular/compiled-inputs/source/io/src/mdio.c",
+      "sha256": "6b19c9f91d8eda0205893bb929e8d117cb31e22cbe6246fc603193fed02d0a2f"
+    },
+    {
+      "bytes": 5789,
+      "path": "fixed-regular/compiled-inputs/source/io/src/spi.c",
+      "sha256": "933d438eee528cb00aa24aaf4c2d974ec18d47facc57d9c54a791d5c76161a5f"
+    },
+    {
+      "bytes": 14946,
+      "path": "fixed-regular/compiled-inputs/source/io/src/stream.c",
+      "sha256": "693292c7b185bd64004507bb7341d1311f122f84ea608c40cb5a72718253676e"
+    },
+    {
+      "bytes": 4434,
+      "path": "fixed-regular/compiled-inputs/source/io/src/stream_budget.c",
+      "sha256": "5aca444c08926de7bbd47c24aa4ded2d8e1f89b5fa0c56077b8425352ed69eed"
+    },
+    {
+      "bytes": 1847,
+      "path": "fixed-regular/compiled-inputs/source/io/src/timer.c",
+      "sha256": "4d2eba552c2aa8065ec6767711a5b045bbe2649c69975503ea5135c6d691a5ac"
+    },
+    {
+      "bytes": 3102,
+      "path": "fixed-regular/compiled-inputs/source/io/src/timer_capture.c",
+      "sha256": "65845a51610421f6fd1072ffe06eb726bbaabe950ca4a8d47bdb16e78cd2a945"
+    },
+    {
+      "bytes": 5259,
+      "path": "fixed-regular/compiled-inputs/source/io/src/uart.c",
+      "sha256": "974704075e9bac9f80873862fcc49945e54e4cee43515c1bd61a8e6d8ab776a9"
+    },
+    {
+      "bytes": 14081,
+      "path": "fixed-regular/compiled-inputs/source/io/src/uart_rs485.c",
+      "sha256": "867bdec68729f028d8f5513e93f6656b5ec772568dfc117baf95b6c130dcc8e7"
+    },
+    {
+      "bytes": 5932,
+      "path": "fixed-regular/compiled-inputs/source/io/src/usb_device.c",
+      "sha256": "ce6a9771275e7e8f3f9da320de9cf5f71b410ff836616aa1a2e88e88ed5dd773"
+    },
+    {
+      "bytes": 45696,
+      "path": "fixed-regular/compiled-inputs/source/io/src/usb_device_controller.c",
+      "sha256": "caac78c495a36886c76c69a60e52745140f7f7c2a5ebf52ae5af2d6ebe2275d3"
+    },
+    {
+      "bytes": 2662,
+      "path": "fixed-regular/compiled-inputs/source/io/src/wake.c",
+      "sha256": "227718bd6f7a31e3469d60fa4d09fd264bd0a7a9ae13bf30bfc069b376ffca6c"
+    },
+    {
+      "bytes": 1620,
+      "path": "fixed-regular/compiled-inputs/source/io/src/watchdog.c",
+      "sha256": "ea3ec3f1cbc3dc1ebbba796760083a377356708532526d9354c5032b656cf357"
+    },
+    {
+      "bytes": 9663,
+      "path": "fixed-regular/compiled-inputs/source/soc/gd32f470/drivers/adc.c",
+      "sha256": "91138076b826167aa03a3cba530e46adf7b0e9217a818ef834682d588ccafb32"
+    },
+    {
+      "bytes": 20238,
+      "path": "fixed-regular/compiled-inputs/source/soc/gd32f470/drivers/adc_continuous.c",
+      "sha256": "ac35e0ecc0ffb85f5a2d2e37866e4167ae568c1ad534cd03dbeed87253e0a181"
+    },
+    {
+      "bytes": 16230,
+      "path": "fixed-regular/compiled-inputs/source/soc/gd32f470/drivers/adc_stream.c",
+      "sha256": "1b8297da3fd09a63e94c13b442de0f2b366a294315efc60c01592fb5b394d512"
+    },
+    {
+      "bytes": 12955,
+      "path": "fixed-regular/compiled-inputs/source/soc/gd32f470/drivers/flash.c",
+      "sha256": "affedf6bce4d59c7255c543ac713c46042ff9bc1a3347053af4d8362aa7ada8c"
+    },
+    {
+      "bytes": 5450,
+      "path": "fixed-regular/compiled-inputs/source/soc/gd32f470/private/gd32f470_adc_stream.h",
+      "sha256": "039c4add217243e2cfa9ab0a99cfaba96067d351cfd212db5d6ea29369f8fb6a"
+    },
+    {
+      "bytes": 22822,
+      "path": "fixed-regular/compiled-inputs/source/soc/gd32f470/private/gd32f470_provider.h",
+      "sha256": "4a865f646cd9565806959186ce6c3a591c6302b1543ad0bc7def741431663226"
+    },
+    {
+      "bytes": 839,
+      "path": "fixed-regular/compiled-inputs/source/soc/gd32f470/private/gd32f4xx_libopt.h",
+      "sha256": "64afa1aa962f93bc9cad8a23244b39b383dd4aa29c0056c20d9a4cd2537f10db"
+    },
+    {
+      "bytes": 2710,
+      "path": "fixed-regular/compiled-inputs/source/soc/gd32f470/private/system.h",
+      "sha256": "ea3ae416c653f9abbfb42da62a1aa832290594cdd95a4bb98bb709601ee181bc"
+    },
+    {
+      "bytes": 3548,
+      "path": "fixed-regular/compiled-inputs/source/tests/contracts/gd32_model/core_cm4.h",
+      "sha256": "9e0b5a20eba1e1d694b5e48af4eedf37fe228d203a888442e3c33c97409958ca"
+    },
+    {
+      "bytes": 8442,
+      "path": "fixed-regular/compiled-inputs/source/tests/contracts/gd32_model/model.c",
+      "sha256": "21d4b0d674f620364097a73ec17d1fa78bfdafe3b2c6b49bdfe4093307387053"
+    },
+    {
+      "bytes": 19853,
+      "path": "fixed-regular/compiled-inputs/source/tests/google/can_controller_test.cpp",
+      "sha256": "20112c02371f3ebf721607c8178cab1a8580dbb34c92d8099b8c1cad49503ab1"
+    },
+    {
+      "bytes": 1069,
+      "path": "fixed-regular/compiled-inputs/source/tests/google/gd32_adc_stream_model.h",
+      "sha256": "1e65ce15ed5d6a896a769a876d323b0ff705f63d5969bf80cb649f5b161be59a"
+    },
+    {
+      "bytes": 24402,
+      "path": "fixed-regular/compiled-inputs/source/tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "a6e4ae4e090a8872c267b2c2d8095714622b725bf8b0917d1e0013e59e158cc6"
+    },
+    {
+      "bytes": 3654,
+      "path": "fixed-regular/compiled-inputs/source/tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "2ced97e02049557f807f09d2d9ec1eca31fed505d674c4d073278c2ae525570f"
+    },
+    {
+      "bytes": 28917,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h",
+      "sha256": "db6de53203fa053d6e789ef86908195f84b7664753bdf0aa7ca74f62025573ef"
+    },
+    {
+      "bytes": 2740,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/system_gd32f4xx.h",
+      "sha256": "6077ccbeff029a0058465172607481158b202d5687e2e87a0ed13ff6a9b2633a"
+    },
+    {
+      "bytes": 41521,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_adc.h",
+      "sha256": "9fa1a80b64d18512729af4d22602d5761ec0758d970fb5d15f7f8a96244607d3"
+    },
+    {
+      "bytes": 9890,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dbg.h",
+      "sha256": "0a403f37714cbb585a26cb54c7c5cc6776fa9ec23459a70369d9342805713998"
+    },
+    {
+      "bytes": 32675,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dma.h",
+      "sha256": "b5796d1e0017994a232a53613f2d50566b8c00dd43d4049eab26cee1e04f37eb"
+    },
+    {
+      "bytes": 20470,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exti.h",
+      "sha256": "dd78502366ba631e32841db28711976d51f7e71417bb2006ba82dc89404eba66"
+    },
+    {
+      "bytes": 28322,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fmc.h",
+      "sha256": "a6bd45fe828fda8cc19b3b1958470ac1bb115cc162b89963f5391028c9bdc192"
+    },
+    {
+      "bytes": 5863,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fwdgt.h",
+      "sha256": "e83161e6700a28f9f0d475405c4a94a03a88e9576b6d8f41c5a9bd96daf5ff08"
+    },
+    {
+      "bytes": 29164,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h",
+      "sha256": "6551fd3fb673b3e34d5f62b72cba8a0482ce051bf29ed475015b1f9ad178a57a"
+    },
+    {
+      "bytes": 29826,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_i2c.h",
+      "sha256": "42498aa2016958a5d351577f3caeca0f7c8334ab25b704a95acb7b73001a1019"
+    },
+    {
+      "bytes": 11878,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_pmu.h",
+      "sha256": "0275375eff0d339ec2b16c1a0d4c67721be6bff63c1516bdc4a614bb5ed98b03"
+    },
+    {
+      "bytes": 95768,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rcu.h",
+      "sha256": "38d97fe3994cefdcb1109192a5854c29ad2af364558f499878c4a5510b26e45d"
+    },
+    {
+      "bytes": 25504,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_spi.h",
+      "sha256": "e2bc6524ff9fc2604f3e947c68ca419ff35bc029904ea8163c10510f85728c10"
+    },
+    {
+      "bytes": 11558,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_syscfg.h",
+      "sha256": "0e37ca2af26c3563712cf33aca9cf85b0489df10526c8336e0e75518a86f3cd2"
+    },
+    {
+      "bytes": 59717,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_timer.h",
+      "sha256": "b22f7cc8d1a7cf16326163982b9d6a34829ca55f6491fdea21d07b6e6dcd5668"
+    },
+    {
+      "bytes": 31652,
+      "path": "fixed-regular/compiled-inputs/source/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_usart.h",
+      "sha256": "7adb26fb6e10f5ce29612aff5f580eafb787311bc982c629ffdf415ddf3dc973"
+    },
+    {
+      "bytes": 296986,
+      "path": "fixed-regular/compiled-inputs.json",
+      "sha256": "1f9fe4a438b9b675d2f2891159e80bc6c376877546f711a3638dbdc006eb8428"
+    },
+    {
+      "bytes": 18556,
+      "path": "fixed-regular/development.json",
+      "sha256": "92ca9e01a445ca809025a8f38ed79fb6d127fb84065c067a685b2e39c63ab19d"
+    },
+    {
+      "bytes": 1637,
+      "path": "fixed-regular/nexus_can_controller_test-discovery.log",
+      "sha256": "6224b997e64fc7129917ffebbfe38333a84c919f3727078cc343521c3c4b16ba"
+    },
+    {
+      "bytes": 5058,
+      "path": "fixed-regular/nexus_can_controller_test-execution.log",
+      "sha256": "c677d58f074f7337152aa849e99cb8ca7e3a1a71bdc3fa4fe36b471aac5fb48a"
+    },
+    {
+      "bytes": 7767,
+      "path": "fixed-regular/nexus_can_controller_test.xml",
+      "sha256": "428eea218b8fa0861286a73b89e2dbd86a1c6d9b57cf8df812ff5e40f4449465"
+    },
+    {
+      "bytes": 1342,
+      "path": "fixed-regular/nexus_gd32_adc_stream_test-discovery.log",
+      "sha256": "b83652899a54a2354b0839c01fa9f68e27c1794ae3159df37e47daa1234184dc"
+    },
+    {
+      "bytes": 4557,
+      "path": "fixed-regular/nexus_gd32_adc_stream_test-execution.log",
+      "sha256": "00380cd716d315efcec54741c20060d1428a4b156424e51cacc0a898e26fff60"
+    },
+    {
+      "bytes": 6804,
+      "path": "fixed-regular/nexus_gd32_adc_stream_test.xml",
+      "sha256": "ed35c64948ddca2b3789f0140760ede393df530e93edabd29cb4dadfb1343852"
+    },
+    {
+      "bytes": 100,
+      "path": "fixed-regular/nexus_gd32_flash_fault_test-discovery.log",
+      "sha256": "fd68edf21bb1763a02354c10382117d00f4c86a1316a457293015ec51ad84a3a"
+    },
+    {
+      "bytes": 503,
+      "path": "fixed-regular/nexus_gd32_flash_fault_test-execution.log",
+      "sha256": "92afaf8248d784f98cc72d4f620a0278e7f48723c0fd24bf52e267061f8df067"
+    },
+    {
+      "bytes": 581,
+      "path": "fixed-regular/nexus_gd32_flash_fault_test.xml",
+      "sha256": "721e03ebee787bbee4705b715596c07d836797583af74e0cc5d8333e3a4a2bf2"
+    },
+    {
+      "bytes": 236640,
+      "path": "fixed-regular/ninja-dependencies.txt",
+      "sha256": "b8a2e5ca51975e26850c9a8387505499b8ace61b770c95eb13777a9d0a515c00"
+    },
+    {
+      "bytes": 19853,
+      "path": "fixed-regular/owned-source/tests/google/can_controller_test.cpp",
+      "sha256": "20112c02371f3ebf721607c8178cab1a8580dbb34c92d8099b8c1cad49503ab1"
+    },
+    {
+      "bytes": 24402,
+      "path": "fixed-regular/owned-source/tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "a6e4ae4e090a8872c267b2c2d8095714622b725bf8b0917d1e0013e59e158cc6"
+    },
+    {
+      "bytes": 3654,
+      "path": "fixed-regular/owned-source/tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "2ced97e02049557f807f09d2d9ec1eca31fed505d674c4d073278c2ae525570f"
+    },
+    {
+      "bytes": 3783,
+      "path": "independent-lifetime-review.json",
+      "sha256": "17b3421623168c21294a124b055fc1ccff40bf6646d304d7b32b94c2c320cc14"
+    },
+    {
+      "bytes": 3857,
+      "path": "manifest.json",
+      "sha256": "964137fcca7e7259f2af23ed0582bc9c1d4a9e3e8954bcd7bfd1ab1e067a0119"
+    },
+    {
+      "bytes": 2905,
+      "path": "owned-diff.patch.raw",
+      "sha256": "e42eac2e4259267e5676285b6dab859575a649df74f37f5b80b24848c9f78a7b"
+    },
+    {
+      "bytes": 7461,
+      "path": "runner.py.raw",
+      "sha256": "c75f414c50b91ecc744ff4d241db47e4d7c679204a010c363800130be2ff411d"
+    },
+    {
+      "bytes": 6664,
+      "path": "style-gate.json",
+      "sha256": "a9a1c97c346a5702f986eb78ff2f130408cc8963a48bf04fe61e6e70c926983d"
+    },
+    {
+      "bytes": 88,
+      "path": "style.log.raw",
+      "sha256": "567a8fdcc26dced628250b5173d0d7ec034c54146ef9de000470b76f7e1f4df4"
+    }
+  ],
+  "evidence_root": "/workspace/nexus-fixture-lifetime-iteration",
+  "freeze_root": "/workspace/nexus-fixture-lifetime-iteration/final-owned-source",
+  "kind": "owned_fixture_lifetime_freeze",
+  "owned_files": [
+    {
+      "bytes": 19853,
+      "frozen_copy": "/workspace/nexus-fixture-lifetime-iteration/final-owned-source/tests/google/can_controller_test.cpp",
+      "path": "tests/google/can_controller_test.cpp",
+      "sha256": "20112c02371f3ebf721607c8178cab1a8580dbb34c92d8099b8c1cad49503ab1"
+    },
+    {
+      "bytes": 3654,
+      "frozen_copy": "/workspace/nexus-fixture-lifetime-iteration/final-owned-source/tests/google/gd32_flash_fault_test.cpp",
+      "path": "tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "2ced97e02049557f807f09d2d9ec1eca31fed505d674c4d073278c2ae525570f"
+    },
+    {
+      "bytes": 24402,
+      "frozen_copy": "/workspace/nexus-fixture-lifetime-iteration/final-owned-source/tests/google/gd32_adc_stream_test.cpp",
+      "path": "tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "a6e4ae4e090a8872c267b2c2d8095714622b725bf8b0917d1e0013e59e158cc6"
+    }
+  ],
+  "physical_status": "not_executed",
+  "retained_executable_payloads": "External forensic binaries and binary link inputs excluded from repository source evidence; not candidate payload",
+  "retained_external_only": {
+    "authority": "Original full forensic dependency and binary capsules retained unchanged outside repository; source evidence selects actual owned source/model/generated headers plus raw executions and XML.",
+    "bytes": 170099996,
+    "files": 1986
+  },
+  "schema_version": 1,
+  "source_root": "/workspace/nexus",
+  "status": "frozen",
+  "supersedes_selection_only": {
+    "path": "/workspace/nexus-fixture-lifetime-iteration/owned-final-freeze.json",
+    "sha256": "8710ce6fb496710c3768af79ad33ea95e900cf790a62e6a9eba57e089cded5f5"
+  }
+}

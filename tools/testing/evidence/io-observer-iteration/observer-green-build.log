@@ -1,0 +1,16 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/uart-iteration/generated/resolved.json
+-- Configuring done (0.8s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus/build/uart-iteration
+[1/9] Building C object io/CMakeFiles/nexus_io.dir/src/stream_budget.c.o
+[2/9] Building C object core/CMakeFiles/nexus_core.dir/src/request_observer.c.o
+[3/9] Linking C static library lib/libnexus_core.a
+[4/9] Linking C static library lib/libnexus_io.a
+[5/9] Building C object components/owner_observer/CMakeFiles/nexus_owner_observer.dir/src/owner_observer.c.o
+[6/9] Linking C static library lib/libnexus_owner_observer.a
+[7/9] Linking CXX executable bin/nexus_io_state_machine_test
+[8/9] Linking CXX executable bin/nexus_io_observer_test

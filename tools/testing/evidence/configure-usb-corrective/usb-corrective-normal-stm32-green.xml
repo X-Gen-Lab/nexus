@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="12" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T19:08:17.218" name="AllTests">
+  <testsuite name="UsbFactory" tests="12" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T19:08:17.219">
+    <testcase name="PureFactoryDoesNotStartAndControllerIsNotAnEndpoint" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="230" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="CapabilityDescribesExactlyOneSelectedPioPacket" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="241" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="RealSelectedDirectionsFifoPlanAndClockConsumerAreBound" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="250" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="263" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="FailedClockReleaseKeepsBothPinLeases" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="279" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="FailedPinReadbackRetainsOnlyTheUnreleasedLease" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="291" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="PartialPinConfigurationRestoresExactlyCapturedPins" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="304" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="313" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="SuccessfulDrainAllowsTheSameStaticIdentityToRestart" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="331" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="RestartCannotReuseAStaleSetupEpochForSetAddress" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="339" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="352" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+    <testcase name="RefusedOwnedGpioGateWithdrawalRetainsPlatformUntilReadback" file="/workspace/nexus/tests/google/usb_factory_test.cpp" line="365" status="run" result="completed" time="0." timestamp="2026-10-11T19:08:17.219" classname="UsbFactory" />
+  </testsuite>
+</testsuites>

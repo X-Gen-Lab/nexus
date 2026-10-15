@@ -1,0 +1,2 @@
+[1/2] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/freertos_failstop_test.cpp.o
+[2/2] Linking CXX executable bin/nexus_freertos_failstop_test

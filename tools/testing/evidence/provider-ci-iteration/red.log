@@ -1,0 +1,21 @@
+F
+======================================================================
+FAIL: test_all_arm_provider_fixtures_use_the_source_bound_audit_gate (__main__.WorkflowContracts.test_all_arm_provider_fixtures_use_the_source_bound_audit_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/.github/workflows/test_platform_ci.py", line 178, in test_all_arm_provider_fixtures_use_the_source_bound_audit_gate
+    self.assertEqual(selected, {
+AssertionError: Items in the second set but not the first:
+'multi_controller_assembly'
+'ethernet_assembly'
+'g474_assembly'
+'usb_assembly'
+'stm32_assembly'
+'timer_assembly'
+'gd32_assembly'
+'can_assembly'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.013s
+
+FAILED (failures=1)

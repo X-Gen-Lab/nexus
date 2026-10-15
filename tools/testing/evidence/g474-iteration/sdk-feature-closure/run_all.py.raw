@@ -1,0 +1,97 @@
+"""Observe actual SDK unittest execution without replacing its subprocesses."""
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import sys
+import time
+import unittest
+
+ROOT = Path('/workspace/nexus')
+OUTPUT = Path('/workspace/nexus-sdk-feature-closure/final-run')
+OUTPUT.mkdir(parents=True, exist_ok=False)
+sys.path.insert(0, str(ROOT / 'tests/contracts'))
+sys.path.insert(0, str(ROOT))
+import test_source_sdk
+
+
+def identity(path):
+    data = path.read_bytes()
+    return {'path': str(path), 'sha256': hashlib.sha256(data).hexdigest(),
+            'size': len(data)}
+
+
+owned = ('cmake/package/package_source_sdk.py', 'tests/contracts/test_source_sdk.py')
+before = {name: identity(ROOT / name) for name in owned}
+original = test_source_sdk.SourceSDKTests.run_process
+records = []
+
+
+def observe(arguments, **kwargs):
+    started = time.time_ns()
+    result = original(arguments, **kwargs)
+    index = len(records)
+    log = OUTPUT / f'command-{index:03d}.output'
+    log.write_text(result.stdout + result.stderr)
+    records.append({'argv': [str(value) for value in arguments],
+                    'return_code': result.returncode, 'started_ns': started,
+                    'completed_ns': time.time_ns(), 'output': identity(log)})
+    if '--output' in arguments and '--source' in arguments:
+        target = Path(arguments[arguments.index('--output') + 1])
+        manifest = target / 'share/nexus/src/.nexus-source-sdk.json'
+        if result.returncode == 0 and manifest.is_file():
+            destination = OUTPUT / f'prepared-sdk-{index:03d}.json'
+            shutil.copyfile(manifest, destination)
+            records[-1]['prepared_sdk_manifest'] = identity(destination)
+    # Preserve actual installed images and generated inputs before test cleanup.
+    if '--target' in arguments and 'installed_g474' in arguments:
+        build = Path(arguments[arguments.index('--build') + 1])
+        if result.returncode == 0:
+            leaf = OUTPUT / ('g474-' + str(index))
+            leaf.mkdir()
+            for filename in ('installed_g474.elf', 'installed_g474.bin',
+                             'installed_g474.map', 'installed_g474.resources.json'):
+                source = build / 'bin' / filename
+                if source.is_file():
+                    shutil.copyfile(source, leaf / filename)
+            for filename in ('compile_commands.json', 'resolved-sdk.txt'):
+                source = build / filename
+                if source.is_file():
+                    shutil.copyfile(source, leaf / filename)
+            config = Path((build / 'resolved-config.txt').read_text())
+            for filename in ('resolved.json', 'bindings.c', 'nexus_config.h',
+                             'nexus_factory.h', 'source-lock.json'):
+                source = config / filename
+                if source.is_file():
+                    shutil.copyfile(source, leaf / filename)
+            records[-1]['preserved_artifacts'] = [identity(p)
+                for p in sorted(leaf.iterdir()) if p.is_file()]
+    if '--bindings' in arguments and '--output' in arguments and result.returncode == 0:
+        path = Path(arguments[arguments.index('--output') + 1])
+        if path.is_file():
+            destination = OUTPUT / f'actual-retention-{index:03d}.json'
+            shutil.copyfile(path, destination)
+            records[-1]['retention'] = identity(destination)
+    (OUTPUT / 'commands.json').write_text(json.dumps(records, indent=2) + '\n')
+    return result
+
+
+test_source_sdk.SourceSDKTests.run_process = staticmethod(observe)
+suite = unittest.defaultTestLoader.discover(str(ROOT / 'tests/contracts'),
+                                          pattern='test_source_sdk.py')
+started = time.time_ns()
+result = unittest.TextTestRunner(verbosity=2).run(suite)
+after = {name: identity(ROOT / name) for name in owned}
+report = {'schema_version': 1, 'kind': 'actual-sdk-contract-development-execution',
+          'scope': 'All discovered SDK tests, real subprocess observation only. Dirty development source SDK; no clean candidate or physical qualification.',
+          'physical_status': 'not_executed', 'driver': identity(Path(__file__)),
+          'started_ns': started, 'completed_ns': time.time_ns(),
+          'tests_run': result.testsRun, 'failures': len(result.failures),
+          'errors': len(result.errors), 'skips': len(result.skipped),
+          'source_before': before, 'source_after': after,
+          'owned_source_unchanged': before == after,
+          'commands': identity(OUTPUT / 'commands.json')}
+report['status'] = 'passed' if (result.wasSuccessful() and result.testsRun > 0
+                                  and not result.skipped and before == after) else 'failed'
+(OUTPUT / 'manifest.json').write_text(json.dumps(report, indent=2) + '\n')
+raise SystemExit(0 if report['status'] == 'passed' else 1)

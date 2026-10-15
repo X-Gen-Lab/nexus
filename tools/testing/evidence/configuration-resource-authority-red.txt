@@ -1,0 +1,107 @@
+FFFFFFFFFFF
+======================================================================
+FAIL: test_fixed_dma_providers_reject_other_valid_physical_routes (test_toml.TomlConfigurationTests.test_fixed_dma_providers_reject_other_valid_physical_routes) (provider=('stm32f407', 'USART1'))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 436, in test_fixed_dma_providers_reject_other_valid_physical_routes
+    with self.assertRaisesRegex(gate.ConfigurationError, "DMA route differs from fixed provider"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_fixed_dma_providers_reject_other_valid_physical_routes (test_toml.TomlConfigurationTests.test_fixed_dma_providers_reject_other_valid_physical_routes) (provider=('stm32f407', 'SPI1'))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 436, in test_fixed_dma_providers_reject_other_valid_physical_routes
+    with self.assertRaisesRegex(gate.ConfigurationError, "DMA route differs from fixed provider"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_fixed_dma_providers_reject_other_valid_physical_routes (test_toml.TomlConfigurationTests.test_fixed_dma_providers_reject_other_valid_physical_routes) (provider=('stm32f407', 'ADC1'))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 436, in test_fixed_dma_providers_reject_other_valid_physical_routes
+    with self.assertRaisesRegex(gate.ConfigurationError, "DMA route differs from fixed provider"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_fixed_dma_providers_reject_other_valid_physical_routes (test_toml.TomlConfigurationTests.test_fixed_dma_providers_reject_other_valid_physical_routes) (provider=('gd32f470', 'USART0'))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 436, in test_fixed_dma_providers_reject_other_valid_physical_routes
+    with self.assertRaisesRegex(gate.ConfigurationError, "DMA route differs from fixed provider"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_fixed_dma_providers_reject_other_valid_physical_routes (test_toml.TomlConfigurationTests.test_fixed_dma_providers_reject_other_valid_physical_routes) (provider=('gd32f470', 'SPI4'))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 436, in test_fixed_dma_providers_reject_other_valid_physical_routes
+    with self.assertRaisesRegex(gate.ConfigurationError, "DMA route differs from fixed provider"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_fixed_dma_providers_reject_other_valid_physical_routes (test_toml.TomlConfigurationTests.test_fixed_dma_providers_reject_other_valid_physical_routes) (provider=('gd32f470', 'ADC0'))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 436, in test_fixed_dma_providers_reject_other_valid_physical_routes
+    with self.assertRaisesRegex(gate.ConfigurationError, "DMA route differs from fixed provider"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_timer_reservation_alias_excludes_adc_and_pwm (test_toml.TomlConfigurationTests.test_timer_reservation_alias_excludes_adc_and_pwm) (family='stm32_assembly', kind='blocks')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 457, in test_timer_reservation_alias_excludes_adc_and_pwm
+    with self.assertRaisesRegex(gate.ConfigurationError, "Resource conflict controller:" + timer):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_timer_reservation_alias_excludes_adc_and_pwm (test_toml.TomlConfigurationTests.test_timer_reservation_alias_excludes_adc_and_pwm) (family='stm32_assembly', kind='pwm')
+----------------------------------------------------------------------
+configure.ConfigurationError: Resource conflict timer:TIM3: board-reserved versus pwm0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 457, in test_timer_reservation_alias_excludes_adc_and_pwm
+    with self.assertRaisesRegex(gate.ConfigurationError, "Resource conflict controller:" + timer):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Resource conflict controller:TIM3" does not match "Resource conflict timer:TIM3: board-reserved versus pwm0"
+
+======================================================================
+FAIL: test_timer_reservation_alias_excludes_adc_and_pwm (test_toml.TomlConfigurationTests.test_timer_reservation_alias_excludes_adc_and_pwm) (family='gd32_assembly', kind='blocks')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 457, in test_timer_reservation_alias_excludes_adc_and_pwm
+    with self.assertRaisesRegex(gate.ConfigurationError, "Resource conflict controller:" + timer):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_timer_reservation_alias_excludes_adc_and_pwm (test_toml.TomlConfigurationTests.test_timer_reservation_alias_excludes_adc_and_pwm) (family='gd32_assembly', kind='pwm')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 457, in test_timer_reservation_alias_excludes_adc_and_pwm
+    with self.assertRaisesRegex(gate.ConfigurationError, "Resource conflict controller:" + timer):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_gd32_timebase_is_reserved_by_soc_for_every_board (test_toml.TomlConfigurationTests.test_gd32_timebase_is_reserved_by_soc_for_every_board)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 472, in test_gd32_timebase_is_reserved_by_soc_for_every_board
+    self.assertEqual(claims.get("controller:TIMER1"), "soc-timebase")
+AssertionError: None != 'soc-timebase'
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.212s
+
+FAILED (failures=11)

@@ -1,0 +1,322 @@
+test_development_snapshot_includes_staged_and_untracked_sources (test_source_sdk.SourceSDKDevelopmentSnapshotTests.test_development_snapshot_includes_staged_and_untracked_sources) ... ok
+test_publishable_snapshot_uses_only_original_committed_blobs (test_source_sdk.SourceSDKDevelopmentSnapshotTests.test_publishable_snapshot_uses_only_original_committed_blobs) ... ok
+test_g4_lock_verifier_and_all_five_files_are_required_without_board_feature (test_source_sdk.SourceSDKG4SelectionTests.test_g4_lock_verifier_and_all_five_files_are_required_without_board_feature) ... ok
+test_g4_snapshot_contains_only_five_reviewed_sources_and_original_notice (test_source_sdk.SourceSDKG4SelectionTests.test_g4_snapshot_contains_only_five_reviewed_sources_and_original_notice) ... ok
+test_consumer_uses_authored_toml_for_each_maintained_family (test_source_sdk.SourceSDKSelectionTests.test_consumer_uses_authored_toml_for_each_maintained_family) ... ok
+test_exposed_io_core_clock_and_provider_closures_are_required (test_source_sdk.SourceSDKSelectionTests.test_exposed_io_core_clock_and_provider_closures_are_required) ... FAIL
+test_metadata_and_memory_generation_are_required_sdk_payload (test_source_sdk.SourceSDKSelectionTests.test_metadata_and_memory_generation_are_required_sdk_payload) ... ok
+test_test_framework_payload_is_not_a_firmware_sdk_dependency (test_source_sdk.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) ... ok
+test_additional_file_and_symlink_are_rejected (test_source_sdk.SourceSDKTests.test_additional_file_and_symlink_are_rejected) ... ok
+test_clean_checkout_with_missing_dependency_gitlinks_is_rejected (test_source_sdk.SourceSDKTests.test_clean_checkout_with_missing_dependency_gitlinks_is_rejected) ... ok
+test_cli_summary_cannot_be_confused_with_complete_manifest (test_source_sdk.SourceSDKTests.test_cli_summary_cannot_be_confused_with_complete_manifest) ... ok
+test_default_preparation_rejects_dirty_checkout (test_source_sdk.SourceSDKTests.test_default_preparation_rejects_dirty_checkout) ... ok
+test_development_contracts_are_explicitly_rejected (test_source_sdk.SourceSDKTests.test_development_contracts_are_explicitly_rejected) ... ok
+test_different_source_package_version_is_rejected (test_source_sdk.SourceSDKTests.test_different_source_package_version_is_rejected) ... ok
+test_expected_revision_conflict_is_rejected (test_source_sdk.SourceSDKTests.test_expected_revision_conflict_is_rejected) ... ok
+test_fixture_requires_explicit_consumer_opt_in (test_source_sdk.SourceSDKTests.test_fixture_requires_explicit_consumer_opt_in) ... ok
+test_formal_consumer_cli_rejects_nonpublishable_fixture (test_source_sdk.SourceSDKTests.test_formal_consumer_cli_rejects_nonpublishable_fixture) ... ok
+test_git_checkout_inside_sdk_cannot_bypass_whole_manifest (test_source_sdk.SourceSDKTests.test_git_checkout_inside_sdk_cannot_bypass_whole_manifest) ... ok
+test_installed_g4_cli_verifies_manifest_readonly_without_git_fallback (test_source_sdk.SourceSDKTests.test_installed_g4_cli_verifies_manifest_readonly_without_git_fallback) ... ok
+test_installed_threadx_cli_does_not_write_into_readonly_sdk (test_source_sdk.SourceSDKTests.test_installed_threadx_cli_does_not_write_into_readonly_sdk) ... ok
+test_installed_threadx_cli_requires_verified_manifest_not_missing_git_fallback (test_source_sdk.SourceSDKTests.test_installed_threadx_cli_requires_verified_manifest_not_missing_git_fallback) ... ok
+test_missing_license_is_rejected (test_source_sdk.SourceSDKTests.test_missing_license_is_rejected) ... ok
+test_modified_exported_config_is_rejected (test_source_sdk.SourceSDKTests.test_modified_exported_config_is_rejected) ... ok
+test_modified_required_file_is_rejected (test_source_sdk.SourceSDKTests.test_modified_required_file_is_rejected) ... ok
+test_output_parent_alias_cannot_bypass_source_boundary (test_source_sdk.SourceSDKTests.test_output_parent_alias_cannot_bypass_source_boundary) ... ok
+test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) ... 
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='core/src/fault.c') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='core/include/nexus/core/fault.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/include/nexus/io/usb_device.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/src/usb_device_controller.c') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/private/usb_device_controller.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/native/usb_device_access.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/include/nexus/io/ethernet.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/src/eth_mac.c') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/private/eth_mac.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/include/nexus/io/mdio.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/stm32f407/drivers/usb_device.c') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/gd32f470/drivers/ethernet.c') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/stm32f407/private/stm32f407_can.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/src/can_controller.c') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/private/can_controller.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/include/nexus/io/advanced_pwm.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/private/timer_advanced_controller.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/gd32f470/drivers/timer_capture.c') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='os/freertos/timebase_lowpower.c') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='os/freertos/private/timebase_lowpower.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/stm32f407/timebase_lowpower.c') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/gd32f470/usb_clock.c') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='tools/configure/usb_device.py') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='tools/configure/ethernet.py') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='tools/configure/timer_advanced.py') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='tools/configure/bindings.py') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='cmake/platform/ControllerModes.cmake') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='components/clock_domain/private/clock_domain_impl.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='components/user_io_broker/include/nexus/components/user_io_broker.h') ... FAIL
+  test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='components/dp83848/include/nexus/dp83848/dp83848.h') ... FAIL
+test_rehashed_g4_source_notice_lock_and_verifier_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_g4_source_notice_lock_and_verifier_omissions_reject) ... ok
+test_rehashed_g4_wrong_commit_changed_source_or_reduced_graph_reject (test_source_sdk.SourceSDKTests.test_rehashed_g4_wrong_commit_changed_source_or_reduced_graph_reject) ... ok
+test_rehashed_missing_arch_source_is_rejected (test_source_sdk.SourceSDKTests.test_rehashed_missing_arch_source_is_rejected) ... ok
+test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_threadx_kernel_header_license_and_owned_source_omissions_reject) ... ok
+test_rehashed_threadx_wrong_commit_or_source_identity_reject (test_source_sdk.SourceSDKTests.test_rehashed_threadx_wrong_commit_or_source_identity_reject) ... ok
+test_relocated_arm_consumer_compiles_real_startup_and_linker (test_source_sdk.SourceSDKTests.test_relocated_arm_consumer_compiles_real_startup_and_linker) ... ok
+test_relocated_c_and_cpp_consumer_build_and_run_without_original_source (test_source_sdk.SourceSDKTests.test_relocated_c_and_cpp_consumer_build_and_run_without_original_source) ... ok
+test_relocated_gd32_consumer_compiles_real_startup_and_linker (test_source_sdk.SourceSDKTests.test_relocated_gd32_consumer_compiles_real_startup_and_linker) ... ok
+test_relocated_threadx_native_consumer_links_actual_official_kernel (test_source_sdk.SourceSDKTests.test_relocated_threadx_native_consumer_links_actual_official_kernel) ... ok
+test_relocated_threadx_three_board_consumers_link_actual_official_kernel (test_source_sdk.SourceSDKTests.test_relocated_threadx_three_board_consumers_link_actual_official_kernel) ... ok
+test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required (test_source_sdk.SourceSDKThreadXSelectionTests.test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required) ... ok
+test_approved_origin_declaration_is_required_and_packaged (test_source_sdk.SourceSDKThreadXSelectionTests.test_approved_origin_declaration_is_required_and_packaged) ... ok
+test_threadx_dependency_snapshot_is_exact_reviewed_source_closure (test_source_sdk.SourceSDKThreadXSelectionTests.test_threadx_dependency_snapshot_is_exact_reviewed_source_closure) ... ok
+
+======================================================================
+FAIL: test_exposed_io_core_clock_and_provider_closures_are_required (test_source_sdk.SourceSDKSelectionTests.test_exposed_io_core_clock_and_provider_closures_are_required)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 80, in test_exposed_io_core_clock_and_provider_closures_are_required
+    self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+AssertionError: False is not true : ['cmake/platform/Configure.cmake', 'cmake/platform/ControllerModes.cmake', 'components/clock_domain/src/clock_domain.c', 'components/dp83848/src/dp83848.c', 'components/user_io_broker/src/user_io_broker.c', 'core/include/nexus/core/fault.h', 'core/include/nexus/core/stack_observation.h', 'core/src/fault.c', 'core/src/stack_observation.c', 'io/CMakeLists.txt', 'io/include/nexus/io/advanced_pwm.h', 'io/include/nexus/io/ethernet.h', 'io/include/nexus/io/mdio.h', 'io/include/nexus/io/timer_capture.h', 'io/include/nexus/io/usb_device.h', 'io/native/ethernet.c', 'io/native/ethernet_access.h', 'io/native/usb_device.c', 'io/native/usb_device_access.h', 'io/private/can_controller.h', 'io/private/eth_mac.h', 'io/private/timer_advanced_controller.h', 'io/private/usb_device_controller.h', 'io/src/can_controller.c', 'io/src/eth_mac.c', 'io/src/usb_device.c', 'io/src/usb_device_controller.c', 'os/freertos/include/nexus/os/freertos_stack.h', 'os/freertos/private/timebase_lowpower.h', 'os/freertos/stack_snapshot.c', 'os/freertos/timebase_lowpower.c', 'scripts/ci/vendor_import_identity.py', 'scripts/ci/verify_vendor_source.py', 'soc/gd32f470/CMakeLists.txt', 'soc/gd32f470/drivers/advanced_pwm.c', 'soc/gd32f470/drivers/can.c', 'soc/gd32f470/drivers/ethernet.c', 'soc/gd32f470/drivers/timer_capture.c', 'soc/gd32f470/drivers/usb_device.c', 'soc/gd32f470/routes.json', 'soc/gd32f470/system.c', 'soc/gd32f470/timebase_lowpower.c', 'soc/gd32f470/usb_clock.c', 'soc/stm32f407/CMakeLists.txt', 'soc/stm32f407/drivers/advanced_pwm.c', 'soc/stm32f407/drivers/can.c', 'soc/stm32f407/drivers/ethernet.c', 'soc/stm32f407/drivers/timer_capture.c', 'soc/stm32f407/drivers/usb_device.c', 'soc/stm32f407/routes.json', 'soc/stm32f407/system.c', 'soc/stm32f407/timebase_lowpower.c', 'soc/stm32f407/usb_clock.c', 'tools/configure/bindings.py', 'tools/configure/emission.py', 'tools/configure/ethernet.py', 'tools/configure/timer_advanced.py', 'tools/configure/usb_device.py']
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='core/src/fault.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: core/src/fault.c
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='core/include/nexus/core/fault.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: core/include/nexus/core/fault.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/include/nexus/io/usb_device.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/include/nexus/io/usb_device.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/src/usb_device_controller.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/src/usb_device_controller.c
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/private/usb_device_controller.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/private/usb_device_controller.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/native/usb_device_access.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/native/usb_device_access.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/include/nexus/io/ethernet.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/include/nexus/io/ethernet.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/src/eth_mac.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/src/eth_mac.c
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/private/eth_mac.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/private/eth_mac.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/include/nexus/io/mdio.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/include/nexus/io/mdio.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/stm32f407/drivers/usb_device.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: soc/stm32f407/drivers/usb_device.c
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/gd32f470/drivers/ethernet.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: soc/gd32f470/drivers/ethernet.c
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/stm32f407/private/stm32f407_can.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: soc/stm32f407/private/stm32f407_can.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/src/can_controller.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/src/can_controller.c
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/private/can_controller.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/private/can_controller.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/include/nexus/io/advanced_pwm.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/include/nexus/io/advanced_pwm.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='io/private/timer_advanced_controller.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: io/private/timer_advanced_controller.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/gd32f470/drivers/timer_capture.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: soc/gd32f470/drivers/timer_capture.c
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='os/freertos/timebase_lowpower.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: os/freertos/timebase_lowpower.c
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='os/freertos/private/timebase_lowpower.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: os/freertos/private/timebase_lowpower.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/stm32f407/timebase_lowpower.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: soc/stm32f407/timebase_lowpower.c
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='soc/gd32f470/usb_clock.c')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: soc/gd32f470/usb_clock.c
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='tools/configure/usb_device.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: tools/configure/usb_device.py
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='tools/configure/ethernet.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: tools/configure/ethernet.py
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='tools/configure/timer_advanced.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: tools/configure/timer_advanced.py
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='tools/configure/bindings.py')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: tools/configure/bindings.py
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='cmake/platform/ControllerModes.cmake')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: cmake/platform/ControllerModes.cmake
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='components/clock_domain/private/clock_domain_impl.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: components/clock_domain/private/clock_domain_impl.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='components/user_io_broker/include/nexus/components/user_io_broker.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: components/user_io_broker/include/nexus/components/user_io_broker.h
+
+======================================================================
+FAIL: test_rehashed_exposed_io_clock_and_cold_source_omissions_reject (test_source_sdk.SourceSDKTests.test_rehashed_exposed_io_clock_and_cold_source_omissions_reject) (name='components/dp83848/include/nexus/dp83848/dp83848.h')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 479, in test_rehashed_exposed_io_clock_and_cold_source_omissions_reject
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed exposed source omission accepted: components/dp83848/include/nexus/dp83848/dp83848.h
+
+----------------------------------------------------------------------
+Ran 39 tests in 183.488s
+
+FAILED (failures=31)

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "cmake",
+    "--build",
+    "/workspace/nexus/build/usb-config-model",
+    "--target",
+    "nexus_stm32_usb_factory_test",
+    "nexus_gd32_usb_factory_test",
+    "-j",
+    "4"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0,
+  "log": "/workspace/nexus-config-iteration-evidence/usb-corrective-green-0.log",
+  "sha256": "8448d6ea03396f5b54b341e6e61d14d715fcf6af0949cb908bb4940ce17d41aa"
+}

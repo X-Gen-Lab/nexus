@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "documents": {
+    "datasheet": {
+      "document_id": "GD32F470xx Datasheet",
+      "revision": "2.2",
+      "document_date": "Jan. 2026",
+      "kind": "datasheet",
+      "url": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
+      "sha256": "19b76c644705999f5062cc780009ade9bd662fc7db4d122029fd8efcf8b73888",
+      "bytes": 4049822,
+      "anchors": {
+        "package_gpio": "Table2-4 printed pp29\u201337 (PDF pp30\u201338), Section2.6.2; Figure2-3 printedp12 (PDFp13)",
+        "alternate_functions": "Section2.6.5 pp52\u201360, Tables2-7 through2-15",
+        "device_features": "Table2-1 pp8\u20139",
+        "memory": "Table2-2 pp14\u201316",
+        "clock": "Section2.5 p17"
+      }
+    },
+    "reference_manual": {
+      "document_id": "GD32F4xx User Manual",
+      "revision": "3.3",
+      "document_date": "Aug. 2025",
+      "kind": "reference_manual",
+      "url": "https://www.gd32mcu.com/data/documents/userManual/GD32F4xx_User_Manual_Rev3.3.pdf",
+      "sha256": "c8e1d20d7cde338892d08dcb233345e03f7960256a60a36c755c576d9cd65c13",
+      "bytes": 28637073,
+      "anchors": {
+        "memory": "Section1.3.2\u20131.3.3 p42; FMC Section2.3.1 p54ff; 4KiB page erase Section2.3.4 pp57\u201358, registers2.4.8/2.4.9 pp75\u201376",
+        "clock": "RCU Chapter4 p91ff; Figure4-2 p93",
+        "irq": "NVIC Chapter6 p160ff; Table6-2 p162ff",
+        "dma_mapping": "Chapter10 p199ff; Tables10-2/10-3 p203"
+      }
+    },
+    "errata": {
+      "document_id": "Device limitations of GD32F47x/F42x",
+      "revision": "1.6",
+      "document_date": "Apr. 2026",
+      "kind": "errata",
+      "url": "https://www.gd32mcu.com/data/documents/errataSheet/Device%20limitations%20of%20GD32F47x.F42x_Rev1.6.pdf",
+      "sha256": "d03edb909ad7c857fa00359a1490c8e1910c9292c4e8d0b9682ce3adb1086fdf",
+      "bytes": 257376,
+      "anchors": {
+        "applicability": "Table1-1 p6; Section1.1/Figure1-1 p6 top marking; Table1-2 pp6\u20138 per revision code A/B/C"
+      }
+    }
+  },
+  "package_review": {
+    "document": "datasheet",
+    "variants": [
+      "GD32F470ZGT6"
+    ],
+    "status": "package_gpio_reviewed",
+    "scope": "GPIO package matrix independently agrees with the official pinout diagram; Board routes and mode support remain independent."
+  },
+  "errata_review": {
+    "document": "errata",
+    "status": "applicability_only",
+    "silicon_revision": "not_observed",
+    "mode_workarounds": "not_fully_audited",
+    "hardware_qualification": "not_executed",
+    "identification": "Section1.1: first character of line3 top package marking; Table1-2 revision-specific limitations"
+  },
+  "limitations": [
+    "Reference sections are a source index, not a complete register or errata implementation audit.",
+    "Observed silicon revision and mode-specific applicability are required before hardware qualification."
+  ]
+}

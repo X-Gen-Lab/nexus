@@ -1,0 +1,6 @@
+..................................................................................Nexus configuration rejected: init refuses to overwrite an existing authored configuration
+................
+----------------------------------------------------------------------
+Ran 98 tests in 0.774s
+
+OK

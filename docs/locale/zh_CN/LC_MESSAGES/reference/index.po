@@ -1,0 +1,22 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 77282b9d99d51b7741b2a597292cb111f2f2e1cf73c1517cf7943f8031ee48bb\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/reference/index.md:8
+msgid "Reference"
+msgstr "参考"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/reference/index.md:10
+msgid ""
+"Public headers define API contracts. Configuration and platform references "
+"connect the actual resolver and maintained records; a symbol in the API "
+"index does not establish Board authorization or physical qualification."
+msgstr "公共头文件定义 API 合同。配置和平台参考连接实际解析器及维护记录；API 索引中出现一个符号，不代表板级授权或实板资格。"

@@ -1,0 +1,31 @@
+Running main() from gmock_main.cc
+[==========] Running 11 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 11 tests from Stm32SpiDma
+[ RUN      ] Stm32SpiDma.BothDmaCompletionsKeepCsAndBorrowUntilSpiIsIdle
+[       OK ] Stm32SpiDma.BothDmaCompletionsKeepCsAndBorrowUntilSpiIsIdle (0 ms)
+[ RUN      ] Stm32SpiDma.ExplicitDiscardBorrowsOneCellAndDisablesRxIncrement
+[       OK ] Stm32SpiDma.ExplicitDiscardBorrowsOneCellAndDisablesRxIncrement (0 ms)
+[ RUN      ] Stm32SpiDma.ExplicitDummyBorrowsOneCellAndDisablesTxIncrement
+[       OK ] Stm32SpiDma.ExplicitDummyBorrowsOneCellAndDisablesTxIncrement (0 ms)
+[ RUN      ] Stm32SpiDma.FixedMemoryRejectsUnknownOverlapAndMissingDomains
+[       OK ] Stm32SpiDma.FixedMemoryRejectsUnknownOverlapAndMissingDomains (0 ms)
+[ RUN      ] Stm32SpiDma.FollowingOrdinaryAdmissionRestoresBothMemoryIncrements
+[       OK ] Stm32SpiDma.FollowingOrdinaryAdmissionRestoresBothMemoryIncrements (0 ms)
+[ RUN      ] Stm32SpiDma.CancelledPartialDmaRetainsCsAndNeverInventsWireByteCount
+[       OK ] Stm32SpiDma.CancelledPartialDmaRetainsCsAndNeverInventsWireByteCount (0 ms)
+[ RUN      ] Stm32SpiDma.RefusedEngineDisableRetainsBorrowEvenWhenWireIsIdle
+[       OK ] Stm32SpiDma.RefusedEngineDisableRetainsBorrowEvenWhenWireIsIdle (0 ms)
+[ RUN      ] Stm32SpiDma.WrongBusIdentityAndInvalidDomainsFailBeforeAdmission
+[       OK ] Stm32SpiDma.WrongBusIdentityAndInvalidDomainsFailBeforeAdmission (0 ms)
+[ RUN      ] Stm32SpiDma.PollingEndpointsProveSharedControllerWithoutDmaAlias
+[       OK ] Stm32SpiDma.PollingEndpointsProveSharedControllerWithoutDmaAlias (0 ms)
+[ RUN      ] Stm32SpiDma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline
+[       OK ] Stm32SpiDma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline (0 ms)
+[ RUN      ] Stm32SpiDma.LateServiceWithRealCompletionProofPreservesSuccess
+[       OK ] Stm32SpiDma.LateServiceWithRealCompletionProofPreservesSuccess (0 ms)
+[----------] 11 tests from Stm32SpiDma (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 11 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 11 tests.

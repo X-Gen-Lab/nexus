@@ -1,0 +1,53 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/uart-iteration/generated/resolved.json
+-- Configuring done (0.9s)
+-- Generating done (0.2s)
+-- Build files have been written to: /workspace/nexus/build/uart-iteration
+[1/46] Building C object os/CMakeFiles/nexus_os_wait.dir/wait.c.o
+[2/46] Linking C static library lib/libnexus_os_wait.a
+[3/46] Building C object io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.o
+[4/46] Linking C static library lib/libnexus_io.a
+[5/46] Building C object components/CMakeFiles/nexus_bus_owner.dir/bus_owner/src/bus_owner.c.o
+[6/46] Linking C static library lib/libnexus_bus_owner.a
+[7/46] Building C object components/CMakeFiles/nexus_uart_owner.dir/bus_owner/src/uart_owner.c.o
+[8/46] Linking C static library lib/libnexus_uart_owner.a
+[9/46] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[10/46] Linking C static library lib/libnexus_io_native.a
+[11/46] Building CXX object tests/contracts/google/CMakeFiles/nexus_uart_owner_mock_test.dir/uart_owner_test.cpp.o
+[12/46] Building CXX object tests/contracts/google/CMakeFiles/nexus_native_async_test.dir/native_async_test.cpp.o
+[13/46] Building CXX object tests/contracts/google/CMakeFiles/nexus_uart_rs485_test.dir/uart_rs485_test.cpp.o
+[14/46] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+[15/46] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/__/__/soc/stm32f407/drivers/uart_dma.c.o
+[16/46] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o
+[17/46] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+[18/46] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/__/__/soc/gd32f470/drivers/uart_dma.c.o
+[19/46] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/__/contracts/gd32_model/model.c.o
+[20/46] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/gd32_uart_dma_test.cpp.o
+[21/46] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+[22/46] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_dma.c.o
+[23/46] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_receive.c.o
+[24/46] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/stm32_uart_receive_test.cpp.o
+[25/46] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+[26/46] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/__/soc/gd32f470/drivers/uart_dma.c.o
+[27/46] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/__/soc/gd32f470/drivers/uart_receive.c.o
+[28/46] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/contracts/gd32_model/model.c.o
+[29/46] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/gd32_uart_receive_test.cpp.o
+[30/46] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+[31/46] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/__/__/soc/stm32f407/drivers/uart_stream.c.o
+[32/46] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/stm32_uart_stream_test.cpp.o
+[33/46] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_stream_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+[34/46] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_stream_test.dir/__/__/soc/gd32f470/drivers/uart_stream.c.o
+[35/46] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_stream_test.dir/__/contracts/gd32_model/model.c.o
+[36/46] Linking CXX executable bin/nexus_uart_owner_mock_test
+[37/46] Linking CXX executable bin/nexus_uart_rs485_test
+[38/46] Linking CXX executable bin/nexus_native_async_test
+[39/46] Linking CXX executable bin/nexus_stm32_uart_dma_test
+[40/46] Linking CXX executable bin/nexus_gd32_uart_dma_test
+[41/46] Linking CXX executable bin/nexus_stm32_uart_receive_test
+[42/46] Linking CXX executable bin/nexus_gd32_uart_receive_test
+[43/46] Linking CXX executable bin/nexus_stm32_uart_stream_test
+[44/46] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_uart_stream_test.dir/gd32_uart_stream_test.cpp.o
+[45/46] Linking CXX executable bin/nexus_gd32_uart_stream_test

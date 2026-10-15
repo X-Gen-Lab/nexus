@@ -1,0 +1,16 @@
+{
+  "scope": "exact two-source overlay into root-authorized isolated TDD checkout",
+  "source": "/tmp/nexus-sdk-selector-tdd/source",
+  "files": [
+    {
+      "path": "cmake/package/package_source_sdk.py",
+      "bytes": 35577,
+      "sha256": "832a3bdeeeb7975e29d5245bfaba81c52c1dcd429e1a928830daa57c9fdaab12"
+    },
+    {
+      "path": "tests/contracts/test_source_sdk.py",
+      "bytes": 50946,
+      "sha256": "6a1811724fbcee4960bb1788c1748b5681e325f481be9c72d92c2b9d1750850d"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+Running main() from gmock_main.cc
+[==========] Running 27 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 27 tests from UserIoBroker
+[ RUN      ] UserIoBroker.AuthorizedScalarWriteUsesRealTypedProvider
+[       OK ] UserIoBroker.AuthorizedScalarWriteUsesRealTypedProvider (0 ms)
+[ RUN      ] UserIoBroker.ReadReturnsOnlyRequestedAuthorizedInputBits
+[       OK ] UserIoBroker.ReadReturnsOnlyRequestedAuthorizedInputBits (0 ms)
+[ RUN      ] UserIoBroker.AuthenticPrincipalCannotBeSuppliedByUser
+[       OK ] UserIoBroker.AuthenticPrincipalCannotBeSuppliedByUser (0 ms)
+[ RUN      ] UserIoBroker.UnauthorizedMasksRejectBeforeAnyDeviceEffect
+[       OK ] UserIoBroker.UnauthorizedMasksRejectBeforeAnyDeviceEffect (0 ms)
+[ RUN      ] UserIoBroker.BadAbiReservedOperationAndOverlappingMasksReject
+[       OK ] UserIoBroker.BadAbiReservedOperationAndOverlappingMasksReject (0 ms)
+[ RUN      ] UserIoBroker.ContextRejectsBeforeIdentityOrPins
+[       OK ] UserIoBroker.ContextRejectsBeforeIdentityOrPins (0 ms)
+[ RUN      ] UserIoBroker.WholeSpanBoundsPermissionsAndOverflowAreChecked
+[       OK ] UserIoBroker.WholeSpanBoundsPermissionsAndOverflowAreChecked (0 ms)
+[ RUN      ] UserIoBroker.InputReplyAndKernelCallAliasesRejectBeforePins
+[       OK ] UserIoBroker.InputReplyAndKernelCallAliasesRejectBeforePins (0 ms)
+[ RUN      ] UserIoBroker.FailedUnpinRetainsCallAndFinishNeverReplaysWrite
+/workspace/nexus/tests/google/user_io_broker_test.cpp:224: Failure
+Expected equality of these values:
+  result.cleanup_result
+    Which is: 0
+  NX_ERROR_BUSY
+    Which is: 2
+
+[  FAILED  ] UserIoBroker.FailedUnpinRetainsCallAndFinishNeverReplaysWrite (0 ms)
+[ RUN      ] UserIoBroker.SecondPinFailureRetainsFirstIfRollbackCannotUnpin
+[       OK ] UserIoBroker.SecondPinFailureRetainsFirstIfRollbackCannotUnpin (0 ms)
+[ RUN      ] UserIoBroker.RevokeDuringPinPreventsAnyDeviceEffectAndKeepsCleanup
+[       OK ] UserIoBroker.RevokeDuringPinPreventsAnyDeviceEffectAndKeepsCleanup (0 ms)
+[ RUN      ] UserIoBroker.SnapshotDoesNotReReadAChangedUserMessage
+[       OK ] UserIoBroker.SnapshotDoesNotReReadAChangedUserMessage (0 ms)
+[ RUN      ] UserIoBroker.GenericLoanRequiresActualSettlementAndObserverJoin
+[       OK ] UserIoBroker.GenericLoanRequiresActualSettlementAndObserverJoin (0 ms)
+[ RUN      ] UserIoBroker.CloseCannotRevokePinnedOutstandingLoan
+[       OK ] UserIoBroker.CloseCannotRevokePinnedOutstandingLoan (0 ms)
+[ RUN      ] UserIoBroker.CopiedAndStaleLoanTicketsCannotUnpinOriginal
+[       OK ] UserIoBroker.CopiedAndStaleLoanTicketsCannotUnpinOriginal (0 ms)
+[ RUN      ] UserIoBroker.FailedUnpinKeepsPinnedLoanAndExactIdentity
+[       OK ] UserIoBroker.FailedUnpinKeepsPinnedLoanAndExactIdentity (0 ms)
+[ RUN      ] UserIoBroker.PinFailureRejectsWithoutBorrowAndEpochCannotWrap
+[       OK ] UserIoBroker.PinFailureRejectsWithoutBorrowAndEpochCannotWrap (0 ms)
+[ RUN      ] UserIoBroker.WritablePeerOverlapRejectsButReadOnlySharingIsLegal
+[       OK ] UserIoBroker.WritablePeerOverlapRejectsButReadOnlySharingIsLegal (0 ms)
+[ RUN      ] UserIoBroker.UserLoanAndDrainControlsCannotResideInUserWindow
+[       OK ] UserIoBroker.UserLoanAndDrainControlsCannotResideInUserWindow (0 ms)
+[ RUN      ] UserIoBroker.ExactCapacityDoesNotCreateHiddenLoans
+[       OK ] UserIoBroker.ExactCapacityDoesNotCreateHiddenLoans (0 ms)
+[ RUN      ] UserIoBroker.ConstructionRejectsUserWindowsCoveringKnownKernelControls
+[       OK ] UserIoBroker.ConstructionRejectsUserWindowsCoveringKnownKernelControls (0 ms)
+[ RUN      ] UserIoBroker.KernelCallAndLoanCannotAliasKnownProviderContext
+[       OK ] UserIoBroker.KernelCallAndLoanCannotAliasKnownProviderContext (0 ms)
+[ RUN      ] UserIoBroker.LoanCannotOverwriteItsOwnTrustedDrainControl
+[       OK ] UserIoBroker.LoanCannotOverwriteItsOwnTrustedDrainControl (0 ms)
+[ RUN      ] UserIoBroker.NewCallCannotOverwriteAnotherRetainedDrainContext
+[       OK ] UserIoBroker.NewCallCannotOverwriteAnotherRetainedDrainContext (0 ms)
+[ RUN      ] UserIoBroker.ConstructCannotOverlayKnownMutableProviderStorage
+[       OK ] UserIoBroker.ConstructCannotOverlayKnownMutableProviderStorage (0 ms)
+[ RUN      ] UserIoBroker.OpenAdmissionIsNotAStableQuiescenceBarrier
+[       OK ] UserIoBroker.OpenAdmissionIsNotAStableQuiescenceBarrier (0 ms)
+[ RUN      ] UserIoBroker.IncomingMaskedThreadCannotCallMemoryGateway
+[       OK ] UserIoBroker.IncomingMaskedThreadCannotCallMemoryGateway (0 ms)
+[----------] 27 tests from UserIoBroker (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 27 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 26 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] UserIoBroker.FailedUnpinRetainsCallAndFinishNeverReplaysWrite
+
+ 1 FAILED TEST

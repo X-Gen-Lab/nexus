@@ -1,0 +1,65 @@
+Running main() from gmock_main.cc
+[==========] Running 28 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 28 tests from BusClear
+[ RUN      ] BusClear.BindingHasNoGPIOClockOrLeaseEffects
+[       OK ] BusClear.BindingHasNoGPIOClockOrLeaseEffects (0 ms)
+[ RUN      ] BusClear.IncompletePortsOrZeroTimingRejectWithoutChangingStorage
+[       OK ] BusClear.IncompletePortsOrZeroTimingRejectWithoutChangingStorage (0 ms)
+[ RUN      ] BusClear.InvalidArgumentsAndUnboundedDeadlinesHaveNoEffects
+[       OK ] BusClear.InvalidArgumentsAndUnboundedDeadlinesHaveNoEffects (0 ms)
+[ RUN      ] BusClear.ExpiredDeadlineRejectsBeforeAcquiringOrSamplingPins
+[       OK ] BusClear.ExpiredDeadlineRejectsBeforeAcquiringOrSamplingPins (0 ms)
+[ RUN      ] BusClear.FailedLeaseHasNoPinOrReleaseEffects
+[       OK ] BusClear.FailedLeaseHasNoPinOrReleaseEffects (0 ms)
+[ RUN      ] BusClear.IdleBusNeedsNoRecoveryPulsesAndProducesPhysicalSTOP
+[       OK ] BusClear.IdleBusNeedsNoRecoveryPulsesAndProducesPhysicalSTOP (0 ms)
+[ RUN      ] BusClear.SDAReleaseStopsRecoveryAfterExactlyThreeCompletedPulses
+[       OK ] BusClear.SDAReleaseStopsRecoveryAfterExactlyThreeCompletedPulses (0 ms)
+[ RUN      ] BusClear.StuckSDAStopsAtNineAndFailedSTOPRetainsExclusiveLease
+[       OK ] BusClear.StuckSDAStopsAtNineAndFailedSTOPRetainsExclusiveLease (0 ms)
+[ RUN      ] BusClear.ClockStretchUsesPhysicalSCLAndFiniteSeparateBudgets
+[       OK ] BusClear.ClockStretchUsesPhysicalSCLAndFiniteSeparateBudgets (0 ms)
+[ RUN      ] BusClear.FiniteInitialStretchCompletesWithoutRecoveryPulses
+[       OK ] BusClear.FiniteInitialStretchCompletesWithoutRecoveryPulses (0 ms)
+[ RUN      ] BusClear.DeadlineDuringPulsePreservesTimeoutAndIndependentSTOPSuccess
+[       OK ] BusClear.DeadlineDuringPulsePreservesTimeoutAndIndependentSTOPSuccess (0 ms)
+[ RUN      ] BusClear.PrimaryPinErrorIsPreservedAfterSuccessfulSTOPAndRelease
+[       OK ] BusClear.PrimaryPinErrorIsPreservedAfterSuccessfulSTOPAndRelease (0 ms)
+[ RUN      ] BusClear.STOPErrorRetainsLeaseAndRetryNeverReplaysRecoveryPulses
+[       OK ] BusClear.STOPErrorRetainsLeaseAndRetryNeverReplaysRecoveryPulses (0 ms)
+[ RUN      ] BusClear.FailedReleaseRetriesOnlyOwnershipReturnAfterProvedSTOP
+[       OK ] BusClear.FailedReleaseRetriesOnlyOwnershipReturnAfterProvedSTOP (0 ms)
+[ RUN      ] BusClear.RetryPreservesOriginalPrimaryFailureAfterBusRecovers
+[       OK ] BusClear.RetryPreservesOriginalPrimaryFailureAfterBusRecovers (0 ms)
+[ RUN      ] BusClear.RetainedLeaseRejectsNewClearAndRebindingWithoutEffects
+[       OK ] BusClear.RetainedLeaseRejectsNewClearAndRebindingWithoutEffects (0 ms)
+[ RUN      ] BusClear.FinishingWithoutLeaseOrWithInfiniteBudgetHasNoEffects
+[       OK ] BusClear.FinishingWithoutLeaseOrWithInfiniteBudgetHasNoEffects (0 ms)
+[ RUN      ] BusClear.FrozenClockExitsRatherThanRepeatingStretchSamplesForever
+[       OK ] BusClear.FrozenClockExitsRatherThanRepeatingStretchSamplesForever (0 ms)
+[ RUN      ] BusClear.ReversedClockIsRejectedBeforeASecondPinHandoff
+[       OK ] BusClear.ReversedClockIsRejectedBeforeASecondPinHandoff (0 ms)
+[ RUN      ] BusClear.ExhaustedClockDomainCannotAcquireOrDrivePins
+[       OK ] BusClear.ExhaustedClockDomainCannotAcquireOrDrivePins (0 ms)
+[ RUN      ] BusClear.WaitFailurePreservesItsPrimaryAndAllowsBoundedSTOPCleanup
+[       OK ] BusClear.WaitFailurePreservesItsPrimaryAndAllowsBoundedSTOPCleanup (0 ms)
+[ RUN      ] BusClear.SuccessfulLateLeaseReturnReportsTimeoutWithoutInventingLease
+[       OK ] BusClear.SuccessfulLateLeaseReturnReportsTimeoutWithoutInventingLease (0 ms)
+[ RUN      ] BusClear.ExpiredFinishRetainsLeaseWithoutPinOrReturnEffects
+[       OK ] BusClear.ExpiredFinishRetainsLeaseWithoutPinOrReturnEffects (0 ms)
+[ RUN      ] BusClear.DistinctSessionsDoNotAcquireOrModifyAnotherInstancesLease
+[       OK ] BusClear.DistinctSessionsDoNotAcquireOrModifyAnotherInstancesLease (0 ms)
+[ RUN      ] BusClear.FailedPhysicalSCLLowCannotCountAPulseOrReturnTheLease
+[       OK ] BusClear.FailedPhysicalSCLLowCannotCountAPulseOrReturnTheLease (0 ms)
+[ RUN      ] BusClear.STOPRequiresObservedSDALowBeforeReleasingItsClock
+[       OK ] BusClear.STOPRequiresObservedSDALowBeforeReleasingItsClock (0 ms)
+[ RUN      ] BusClear.SCLFallingDuringSTOPSetupDoesNotReleaseSDAOrInventSTOP
+[       OK ] BusClear.SCLFallingDuringSTOPSetupDoesNotReleaseSDAOrInventSTOP (0 ms)
+[ RUN      ] BusClear.ShortenedPhysicalHighPeriodDoesNotCountACompletedPulse
+[       OK ] BusClear.ShortenedPhysicalHighPeriodDoesNotCountACompletedPulse (0 ms)
+[----------] 28 tests from BusClear (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 28 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 28 tests.

@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "id": "gpio-pa0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "Host virtual model; no physical wiring"
+    },
+    {
+      "id": "uart0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "UART0",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "tx",
+          "af": 0
+        },
+        {
+          "pin": "PA2",
+          "function": "rx",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "Host virtual model; no physical timing"
+    },
+    {
+      "id": "spi0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "SPI0",
+      "kind": "spi",
+      "pins": [],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "Host virtual model; no physical timing"
+    },
+    {
+      "id": "gpio-pa3",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "Host independent virtual GPIO view; no physical wiring"
+    },
+    {
+      "id": "uart1",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "UART1",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "tx",
+          "af": 0
+        },
+        {
+          "pin": "PA5",
+          "function": "rx",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "irq-byte-event"
+      ],
+      "source": "Host independent UART model; no physical timing"
+    },
+    {
+      "id": "spi1",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "SPI1",
+      "kind": "spi",
+      "pins": [],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "Host independent SPI model; no physical timing"
+    },
+    {
+      "id": "i2c0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "I2C0",
+      "kind": "i2c",
+      "pins": [],
+      "modes": [
+        "poll-messages"
+      ],
+      "source": "Host independent I2C model; no physical timing"
+    },
+    {
+      "id": "i2c1",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "I2C1",
+      "kind": "i2c",
+      "pins": [],
+      "modes": [
+        "poll-messages"
+      ],
+      "source": "Host independent I2C model; no physical timing"
+    },
+    {
+      "id": "flash0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "FLASH0",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "poll-byte"
+      ],
+      "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification"
+    },
+    {
+      "id": "watchdog0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "IWDG",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "independent"
+      ],
+      "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification"
+    },
+    {
+      "id": "exti0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "EXTI6",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification"
+    },
+    {
+      "id": "pwm0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "PWM0",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification"
+    },
+    {
+      "id": "adc0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "ADC0",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA8",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA9",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "low-rate-scan"
+      ],
+      "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification"
+    }
+  ]
+}

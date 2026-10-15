@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "command": [
+    "build/native-debug/bin/nexus_stm32_uart_stream_test",
+    "--gtest_output=xml:build/quality/stm32-uart-stream-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

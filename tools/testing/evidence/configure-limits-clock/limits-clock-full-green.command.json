@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/configure",
+    "-p",
+    "test_*.py"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

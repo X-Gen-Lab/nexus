@@ -1,0 +1,101 @@
+[
+  {
+    "name": "observer-freeze-build",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus/build/uart-iteration",
+      "--target",
+      "nexus_io_observer_test",
+      "nexus_io_state_machine_test",
+      "--parallel",
+      "2"
+    ],
+    "cwd": "/workspace/nexus",
+    "returncode": 0,
+    "start": 1791740574.0072846,
+    "end": 1791740578.601234
+  },
+  {
+    "name": "io_observer-freeze",
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_io_observer_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/observer-tdd/io_observer-freeze.xml"
+    ],
+    "cwd": "/workspace/nexus",
+    "returncode": 0,
+    "start": 1791740578.601246,
+    "end": 1791740578.6041348
+  },
+  {
+    "name": "io_state_machine-freeze",
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_io_state_machine_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/observer-tdd/io_state_machine-freeze.xml"
+    ],
+    "cwd": "/workspace/nexus",
+    "returncode": 0,
+    "start": 1791740578.6041381,
+    "end": 1791740578.6063259
+  },
+  {
+    "name": "examples-freeze-build",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-examples/build/quarantine-iteration",
+      "--parallel",
+      "2"
+    ],
+    "cwd": "/workspace/nexus-examples",
+    "returncode": 0,
+    "start": 1791740578.6063302,
+    "end": 1791740588.3223846
+  },
+  {
+    "name": "examples-freeze-ctest",
+    "command": [
+      "/workspace/nexus/.venv/bin/ctest",
+      "--test-dir",
+      "/workspace/nexus-examples/build/quarantine-iteration",
+      "--output-on-failure",
+      "--timeout",
+      "45"
+    ],
+    "cwd": "/workspace/nexus-examples",
+    "returncode": 0,
+    "start": 1791740588.3223934,
+    "end": 1791740588.526734
+  },
+  {
+    "name": "examples-quarantine-freeze",
+    "command": [
+      "/workspace/nexus-examples/build/quarantine-iteration/tests/owner_lifecycle_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/observer-tdd/examples-quarantine-freeze.xml"
+    ],
+    "cwd": "/workspace/nexus-examples",
+    "returncode": 0,
+    "start": 1791740588.5267417,
+    "end": 1791740588.5485613
+  },
+  {
+    "name": "examples-style-freeze",
+    "command": [
+      "/workspace/nexus-examples/.venv/bin/python",
+      "scripts/check_style.py",
+      "apps/uart_owner_runtime/main.c",
+      "apps/uart_owner_runtime/quarantine_policy.c",
+      "apps/uart_owner_runtime/quarantine_policy.h",
+      "tests/quarantine_policy_test.cpp",
+      "docs/os-owner-example.md",
+      "CMakeLists.txt",
+      "tests/CMakeLists.txt",
+      "--report",
+      "/workspace/nexus-io-implementation-evidence/observer-tdd/examples-style-freeze.report.json"
+    ],
+    "cwd": "/workspace/nexus-examples",
+    "returncode": 0,
+    "start": 1791740588.5485706,
+    "end": 1791740588.7723503
+  }
+]

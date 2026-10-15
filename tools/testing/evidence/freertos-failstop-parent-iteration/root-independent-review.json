@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "reviewer": "root independent frozen-source/evidence review",
+  "scope": "fixture only; original eight names preserved; no firmware/compiler timeout/sanitizer/selector changes",
+  "source": [
+    {
+      "bytes": 13106,
+      "path": "/workspace/nexus/tests/google/freertos_failstop_test.cpp",
+      "sha256": "b0a221a133145eaa21b229d9b56fef0f10ded43c825f40420c7a37daae618111"
+    }
+  ],
+  "production_files_byte_verified": 10,
+  "frozen_records_byte_verified": 67,
+  "limits": "Targeted actual8/8/8 passes and old timeout evidence; final canonical whole170CTest and hardware not asserted"
+}

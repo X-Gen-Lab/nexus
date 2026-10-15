@@ -1,0 +1,25 @@
+.........................workload report cannot overwrite instruments
+.workload report path cannot contain symlinks
+workload report path cannot contain symlinks
+.workload report requires an unused destination
+workload report requires an unused destination
+workload report requires an unused destination
+workload report requires an unused destination
+workload report requires an unused destination
+....................................................OS report requires an unused destination
+OS report requires an unused destination
+OS report requires an unused destination
+OS report requires an unused destination
+OS report requires an unused destination
+OS report requires an unused destination
+OS report requires an unused destination
+.OS report requires an unused destination
+......................Serial capture rejected: fresh serial capture must not overwrite inputs or old output
+..................................
+----------------------------------------------------------------------
+Ran 136 tests in 14.952s
+
+OK
+HIL workloads: failed; equipment not operated
+HIL workloads: prepared_unbound; equipment not operated
+OS HIL: passed; equipment not operated

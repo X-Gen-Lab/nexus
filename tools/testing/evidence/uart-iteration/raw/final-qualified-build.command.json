@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/cmake",
+    "--build",
+    "/workspace/nexus/build/uart-iteration",
+    "--target",
+    "nexus_stm32_uart_receive_test",
+    "nexus_gd32_uart_receive_test",
+    "nexus_uart_rs485_test",
+    "nexus_stm32_uart_dma_test",
+    "nexus_gd32_uart_dma_test",
+    "nexus_stm32_uart_stream_test",
+    "nexus_gd32_uart_stream_test",
+    "nexus_native_async_test",
+    "nexus_uart_owner_mock_test",
+    "--parallel",
+    "2"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T17:00:46.405852+00:00",
+  "ended_at": "2026-10-11T17:00:47.629248+00:00",
+  "returncode": 0,
+  "log": "/workspace/nexus-io-implementation-evidence/uart-receive-tdd/final-qualified-build.txt"
+}

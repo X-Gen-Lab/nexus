@@ -1,0 +1,11 @@
++ /workspace/nexus/.venv/bin/cmake --version
++ /workspace/nexus/.venv/bin/cmake --build /workspace/nexus/build/ci-boundary-memory --parallel 2 --target nexus_os_wait_test --verbose
++ /workspace/nexus/build/ci-boundary-memory/bin/nexus_os_wait_test --gtest_list_tests
++ /workspace/nexus/build/ci-boundary-memory/bin/nexus_os_wait_test --gtest_filter=* --gtest_repeat=1 --gtest_also_run_disabled_tests --gtest_output=xml:/workspace/nexus-ci-boundaries/backend-native-green/nexus_os_wait_test.xml
++ /usr/bin/size --version
++ /usr/bin/nm --version
++ /usr/bin/readelf --version
++ /usr/bin/readelf -h /workspace/nexus/build/ci-boundary-memory/bin/nexus_os_wait_test
++ /usr/bin/nm --defined-only /workspace/nexus/build/ci-boundary-memory/bin/nexus_os_wait_test
++ /usr/bin/size /workspace/nexus/build/ci-boundary-memory/bin/nexus_os_wait_test
+{"status": "passed", "report": "/workspace/nexus-ci-boundaries/backend-native-green/report.json", "error": null}

@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "kind": "prestage-owned-format-comments-and-text-check",
+  "status": "passed",
+  "commands": [
+    {
+      "argv": [
+        "/workspace/nexus/.venv/bin/clang-format",
+        "--dry-run",
+        "--Werror",
+        "tests/google/i2c_pair_factory_test.cpp",
+        "tests/google/i2c_pair_factory_model.h",
+        "tests/google/native_factory_test.cpp",
+        "tests/google/g474_factory_test.cpp"
+      ],
+      "return_code": 0,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/final-owned-style/format.output",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus/.venv/bin/python",
+        "scripts/ci/comment_style.py",
+        "--root",
+        ".",
+        "--files",
+        "tests/google/i2c_pair_factory_test.cpp",
+        "tests/google/i2c_pair_factory_model.h",
+        "tests/google/native_factory_test.cpp",
+        "tests/google/g474_factory_test.cpp",
+        "--json"
+      ],
+      "return_code": 0,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/final-owned-style/comments.output",
+        "sha256": "f255541cb625bbbecec132da2c173cb2f95379ed4e58f71bbd66274e09bce6e6",
+        "bytes": 1459
+      }
+    }
+  ],
+  "text_files": 5,
+  "text_errors": [],
+  "sources": [
+    {
+      "path": "/workspace/nexus/tests/google/i2c_pair_factory_test.cpp",
+      "sha256": "b60fe127db8b27eb8a4516f756cc1e41438f140c67b0cab0f02ac6a71cfc4db2",
+      "bytes": 25281
+    },
+    {
+      "path": "/workspace/nexus/tests/google/i2c_pair_factory_model.h",
+      "sha256": "822f3cee1ca67c51df2a1e8de08c2bd4bdf577b03fb87055ec84399e2451284a",
+      "bytes": 1928
+    },
+    {
+      "path": "/workspace/nexus/tests/google/native_factory_test.cpp",
+      "sha256": "25912a5b716f5f09d3db53e41d90a6be28cac2065ae18d1c9d22fb8d219fad1d",
+      "bytes": 20109
+    },
+    {
+      "path": "/workspace/nexus/tests/google/g474_factory_test.cpp",
+      "sha256": "323910a84889b474aa0f85b9cc5b73914b54a44387379c52820a9e62964c7d1f",
+      "bytes": 11123
+    },
+    {
+      "path": "/workspace/nexus/tests/google/i2c_pair_factory.cmake",
+      "sha256": "fbc0534ceb2922912f40294d19b0018d034811104ea042ce35c787a92e38c3ba",
+      "bytes": 4249
+    }
+  ],
+  "limits": [
+    "This checks whole current owned files before Git staging; it does not claim normal index-bound commit hook or clean software qualification. Root performs normal hooks after explicit staging."
+  ]
+}

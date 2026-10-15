@@ -1,0 +1,20 @@
+schema = 2
+board_package = "software_board"
+backend = "baremetal"
+clock = "hxtal25-pll200"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 16384
+libc_heap_bytes = 0
+
+[exti.edge3]
+binding = "edge3"
+mode = "edge-event"
+edge = "both"
+event_capacity = 8
+
+[exti.edge3.irq]
+priority = 6

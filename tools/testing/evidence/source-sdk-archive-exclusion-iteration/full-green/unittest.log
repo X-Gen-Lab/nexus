@@ -1,0 +1,31 @@
+test_development_snapshot_includes_staged_and_untracked_sources (__main__.SourceSDKDevelopmentSnapshotTests.test_development_snapshot_includes_staged_and_untracked_sources) ... ok
+test_publishable_snapshot_uses_only_original_committed_blobs (__main__.SourceSDKDevelopmentSnapshotTests.test_publishable_snapshot_uses_only_original_committed_blobs) ... ok
+test_real_git_snapshots_exclude_archives_in_both_package_modes (__main__.SourceSDKDevelopmentSnapshotTests.test_real_git_snapshots_exclude_archives_in_both_package_modes) ... ok
+test_closed_g4_owned_platform_and_reference_sources_are_required (__main__.SourceSDKG4SelectionTests.test_closed_g4_owned_platform_and_reference_sources_are_required) ... ok
+test_g4_lock_verifier_and_all_five_official_files_are_required (__main__.SourceSDKG4SelectionTests.test_g4_lock_verifier_and_all_five_official_files_are_required) ... ok
+test_g4_snapshot_contains_only_five_reviewed_sources_and_original_notice (__main__.SourceSDKG4SelectionTests.test_g4_snapshot_contains_only_five_reviewed_sources_and_original_notice) ... ok
+test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) ... ok
+test_consumer_uses_authored_toml_for_each_maintained_family (__main__.SourceSDKSelectionTests.test_consumer_uses_authored_toml_for_each_maintained_family) ... ok
+test_exposed_io_core_clock_and_provider_closures_are_required (__main__.SourceSDKSelectionTests.test_exposed_io_core_clock_and_provider_closures_are_required) ... ok
+test_metadata_and_memory_generation_are_required_sdk_payload (__main__.SourceSDKSelectionTests.test_metadata_and_memory_generation_are_required_sdk_payload) ... ok
+test_test_framework_payload_is_not_a_firmware_sdk_dependency (__main__.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) ... ok
+setUpClass (__main__.SourceSDKTests) ... ERROR
+test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required (__main__.SourceSDKThreadXSelectionTests.test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required) ... ok
+test_approved_origin_declaration_is_required_and_packaged (__main__.SourceSDKThreadXSelectionTests.test_approved_origin_declaration_is_required_and_packaged) ... ok
+test_threadx_dependency_snapshot_is_exact_reviewed_source_closure (__main__.SourceSDKThreadXSelectionTests.test_threadx_dependency_snapshot_is_exact_reviewed_source_closure) ... ok
+
+======================================================================
+ERROR: setUpClass (__main__.SourceSDKTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-sdk-selector-tdd/source/tests/contracts/test_source_sdk.py", line 266, in setUpClass
+    cls.run_ok([sys.executable, "-B", str(ROOT / "cmake/package/package_source_sdk.py"),
+  File "/tmp/nexus-sdk-selector-tdd/source/tests/contracts/test_source_sdk.py", line 285, in run_ok
+    raise AssertionError(result.stdout + result.stderr)
+AssertionError: Source SDK rejected: ThreadX checkout differs from exact official locked revision
+
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.498s
+
+FAILED (errors=1)

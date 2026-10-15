@@ -1,0 +1,1606 @@
+{
+  "schema_version": 1,
+  "kind": "industrial-platform-software-evidence",
+  "captured_at_utc": "2026-10-08T18:13:12.434790+00:00",
+  "source": {
+    "commit": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+    "tree": "ff04e505e860d579e5891879d33f39d3e4829001",
+    "clean": true
+  },
+  "scope": "native-release-host-contracts-and-eight-arm-release-static-contracts",
+  "hardware_verified": false,
+  "native": {
+    "preset": "linux-gcc-release",
+    "counts": {
+      "tests": 1781,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "report": {
+      "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/ctest-results.xml",
+      "sha256": "b39cda1b3078e653f5038bbbd5996981fb69f543a35a4ca34e37722a19cc1324",
+      "bytes": 1388335
+    },
+    "last_test_log": {
+      "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/Testing/Temporary/LastTest.log",
+      "sha256": "b89b430236e78c48968960fb7d0f6b4aec7b0e73b8c8e9919c4a60a1b0b15653",
+      "bytes": 121
+    },
+    "configuration": {
+      "effective.config": {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/generated/effective.config",
+        "sha256": "5778a05f31b614d5bdd7afce8f931db75ee75d3fa7fa1b22aab56833bb93e99f",
+        "bytes": 12404
+      },
+      "nexus_config.h": {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/generated/nexus_config.h",
+        "sha256": "211291a7695b3603b6cd19b201955c6ab8da5a73369c781f2317c2f682ceed80",
+        "bytes": 154167
+      },
+      "config.cmake": {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/generated/config.cmake",
+        "sha256": "3158260b02bf1af50ff4fc445b141c8bbd147e3802231999de814eb8e1c72a55",
+        "bytes": 174086
+      }
+    },
+    "compile_commands": {
+      "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/compile_commands.json",
+      "sha256": "cfd500a0837a0cca861c16c0e313d162d06445db496e5c1f643da74138cb99ce",
+      "bytes": 486365
+    },
+    "cache": {
+      "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/CMakeCache.txt",
+      "sha256": "b73d5673f30d48e5f911787ad6c41e198fb0fd75d777662136109b723d1e4002",
+      "bytes": 28008
+    },
+    "compiler": {
+      "file": {
+        "path": "gcc",
+        "sha256": "a23ecab8ff08f09ad8c80602c2c5df7f49e09c25905cb8975902e101bf72635f",
+        "bytes": 1162264
+      },
+      "version": "gcc (Debian 14.2.0-19) 14.2.0"
+    },
+    "dependency_commits": [
+      {
+        "path": "ext/freertos",
+        "commit": "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0"
+      },
+      {
+        "path": "ext/freertos/portable/ThirdParty/Community-Supported-Ports",
+        "commit": "9c5bad7b2f42b4e8420f12290b9bc085d3309e8b"
+      },
+      {
+        "path": "ext/freertos/portable/ThirdParty/Partner-Supported-Ports",
+        "commit": "dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9"
+      },
+      {
+        "path": "ext/googletest",
+        "commit": "ff6133ab49b364a883a55ba75c39e520fea6245b"
+      }
+    ],
+    "executed_compiled_test_programs": [
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/arch_contract_tests",
+        "sha256": "fd7f78ca5ccbbde983b35f651816c451cefc4747e39b03c164fbf1a21d6f7f7f",
+        "bytes": 86904
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/baremetal_contract_tests",
+        "sha256": "7026ff1d950ea8ca4ac84012b03351faae18dd1391cc545cab0be6b5f5829bd7",
+        "bytes": 58568
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/blinky",
+        "sha256": "58a570b6774c0d12a3336a0fedf39d646a25bd99dabd3e2bbee7383c66db77b0",
+        "bytes": 216864
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/config_demo",
+        "sha256": "ec8e331b5f537ebb498dedb5fb776f5d159920af1015d05646e75dab7426655f",
+        "bytes": 305944
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/config_persistence_tests",
+        "sha256": "0bfdd61b466df7f21e68582b1cccd085ab64530ccbfb48336df1f2ea0d843163",
+        "bytes": 102328
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/config_tests",
+        "sha256": "fe86cd75489f8d2ddeff191858714f6ae4c93c5b0eee6204786640c41e498129",
+        "bytes": 3233448
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/crypto_partial_tests",
+        "sha256": "37e51b4e9bd26d5137de89836c7c2978bc8aeb1b05d26d441e4962e0384a0435",
+        "bytes": 22520
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/crypto_tests",
+        "sha256": "ec212e64784401bed1e45376052a640f362eb3f5e01926d89b4f8290f048d082",
+        "bytes": 27072
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/crypto_unconfigured_tests",
+        "sha256": "72fe5aec645879eebf3d6b7fcd25f9401b0ed07d493b2fbde1645a745802dfab",
+        "bytes": 16776
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/freertos_boot_kernel_mask_tests",
+        "sha256": "9631e084cf8624c28334e4a1d01d4e1eb2531e175c8455d5f44472e60610b4d4",
+        "bytes": 153808
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/freertos_contract_tests",
+        "sha256": "264f082810df22dfd9e12d0ce0b9c20f58574da829a447592753a2e35b395ef9",
+        "bytes": 166704
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/freertos_demo",
+        "sha256": "0557d94899bf6fd76b1021b7387178aa3cd606421144728e931b5a23fac51fb9",
+        "bytes": 217208
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/freertos_task_mutex_quarantine_tests",
+        "sha256": "78279fd8dd0ff7533be850eb4890c1e1584c74720eba9872e7faaa3900085124",
+        "bytes": 153816
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/hal_native_tests",
+        "sha256": "df21a5c9b250838dba3310ce237c709965be328a49901e61a31f80bd4b976ca4",
+        "bytes": 3852416
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/init_registry_tests",
+        "sha256": "88165978d583b61f8cd7cd7d62bb58872d786e3f260af6700d180369f2c498d0",
+        "bytes": 16960
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/init_tests",
+        "sha256": "1ba0775c564cbc5f01c0df7766c827ee549b47d4548f4179c3fced053ad46341",
+        "bytes": 1215272
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/integration_tests",
+        "sha256": "d94e7d844847f1d2c771799562d03665cf14807d292455d5f40a75b8b7b64030",
+        "bytes": 1217560
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/log_contract_tests",
+        "sha256": "46cd883a50a4e2db02f533c8e5884e0c746a1609002a2af00a9ff5f1d89aed02",
+        "bytes": 115008
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/log_tests",
+        "sha256": "f8430cdd79f9443a56d3ccf73c60f06063c968b98340988852adeb8103ee0954",
+        "bytes": 1652680
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/native_registry_contract_tests",
+        "sha256": "372485b92188d555ae60642d86fb84874234240335a18ad93c8afd479b6473cf",
+        "bytes": 216568
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/nexus_industrial_controller",
+        "sha256": "65a82d5c3d81f3edaf1b35754466fd360636db73324dbef740cede7d5f77ad8c",
+        "bytes": 25384
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/nexus_industrial_tests",
+        "sha256": "e300decdc0bab2003beb9f31d75d29533d4d736c82671f0ede21b74c43058976",
+        "bytes": 47640
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/osal_contract_tests",
+        "sha256": "d5abf7fce192c5bff1972c0c256afd11c1ed988ecc3212eed05a96f7b9935717",
+        "bytes": 119440
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/osal_task_mutex_quarantine_tests",
+        "sha256": "03b6c47b0eda9edec0bc44c451e986b017a444724810dbbd9b3b4d6902f7f88e",
+        "bytes": 77008
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/osal_tests",
+        "sha256": "31f96ce13c2687c017fe080ad276b37aed58f85b6bf65ee2f35f5da56f9f7ff0",
+        "bytes": 2508864
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/posix_event_contract_tests",
+        "sha256": "385697f8d9967e7eb865724ab609ff8430db965fc21a38f9c43a210b51ee09de",
+        "bytes": 18168
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/product_boot_contract_tests",
+        "sha256": "5f32b3cb2231849f431d863fa291670675f50db4368a7eb355a4da157bb0df89",
+        "bytes": 17192
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/product_native_smoke",
+        "sha256": "8fcca5393b0ae007eddb39a323806bc3c8e245c05e1251f6159518d4822dbe34",
+        "bytes": 216768
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/shell_demo",
+        "sha256": "c4504b3a25bbe925d69c69a8ca42a92fe9374e3e2e550ba1541de9603c031192",
+        "bytes": 242248
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/shell_tests",
+        "sha256": "5b76f133518b3f6ad6ef5835da9ec2a7cb916671ce158e41dd8c411538ee61d3",
+        "bytes": 2389968
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/storage_tests",
+        "sha256": "36ae979ded7eda89015a015563030f0ed5260766ac576051015d49f7b5e7e664",
+        "bytes": 30304
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_board_stm32f407_qiming_v31",
+        "sha256": "d77c94c99a0cb3a88728cf765d60a29daf98e2d4b7ec0e4c7a52789fa3fa1945",
+        "bytes": 17128
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_board_stm32f407ve_sky_qingchun",
+        "sha256": "954896cf83a2d39f87bbd7cd3410c2f15a34417d59f2c7e23c9681ec43bed767",
+        "bytes": 17128
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_gd32_flash",
+        "sha256": "0ed033436785f86c250cf4dfdcbe17ac8d717a3da4c2a24f109af7de6129b839",
+        "bytes": 17504
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_gd32_spi",
+        "sha256": "cc3431bbc2700fc776813d06416a96529d8fcaa0a7e5b9cd3239d7dd8c57e530",
+        "bytes": 33232
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_gd32_timebase",
+        "sha256": "775762d223fe1f41de10a75b37c177b485114625665830f324137ab67bd0392c",
+        "bytes": 20128
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_gd32_typed_spi",
+        "sha256": "c5fb2259c9daf8337e391640a6fe88baf907658502529936a9a3b48007ae7801",
+        "bytes": 65520
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_gd32_uart",
+        "sha256": "15c7f819f95a4fd23392a5e58f93ffe72d3d1e00a08c9e88a4606c02d891923f",
+        "bytes": 28864
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_flash_1m",
+        "sha256": "49631fafad97d9adbf3e286c11c3eec70353d36e79415b2595dd5d4b32dc68ec",
+        "bytes": 26296
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_flash_512k",
+        "sha256": "7e1179e2cbb1067b69687e8cdb538c04241e267dfdea0db0508ca830e8ca7d6c",
+        "bytes": 26296
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_flash_geometry",
+        "sha256": "ed4b5637e4950c3f131e8c94dcf0f10bbad728049b2c2838405273a66129027f",
+        "bytes": 15976
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_flash_mismatched",
+        "sha256": "5ae742724022cd894df08d1fc2e0c7976521dea67804b4f28450d19c02e93a4c",
+        "bytes": 17744
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_gpio",
+        "sha256": "88d125fafcd71464436826bfa5d85c8dda2b1b5a2419d7a62a4d00f74f77a44a",
+        "bytes": 27728
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_spi_bare",
+        "sha256": "30644450ef3faefd7cd6388e66529fe62b0293142afe344ebcbe0a55efbe925d",
+        "bytes": 61968
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_spi_osal",
+        "sha256": "c3d3b3e0ea245aa368133b68f958522bc277394fefa0fabf8a074d4cb6cd06b0",
+        "bytes": 62048
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_uart",
+        "sha256": "16832133c072c2a4f75d33961d63891a68b44edd7c2a0ed8e981afecd747f734",
+        "bytes": 56048
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_uart_clock",
+        "sha256": "6fee19824c1ff236b57d6d2180bddc341f26c5ad78df7522e0d76951864e61b5",
+        "bytes": 16840
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/typed_device_contract_tests",
+        "sha256": "4874256180c3846c27a77ed2012d548de75df76d517e1b70931830f918b4ac76",
+        "bytes": 890800
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/typed_native_spi_tests",
+        "sha256": "cac93b490be68dcc7e49be90c163bfc0d8651114b5b0e42a883e3afbd17e5218",
+        "bytes": 810296
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/typed_stm32_gpio_registration",
+        "sha256": "bca7b73aaa3a555154cd0321c0cb1039496f178d15545227a03256f8030ea9ef",
+        "bytes": 43112
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/unbound_platform_contract_tests",
+        "sha256": "46e632b7f9c032d5ed1b6a2c33e95c3cdaef6d8a3f926ef70b593700e1d8c7c6",
+        "bytes": 16424
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/update_storage_tests",
+        "sha256": "70236fbaf897c0b8a7b3b7af15ca539a431f8fa39f7eed292cf6033987043aa7",
+        "bytes": 49944
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/update_tests",
+        "sha256": "38f186437221ae64731341a0bdef0ae09be83795755cbd2aa48a2b9d2c715d59",
+        "bytes": 49200
+      }
+    ],
+    "linked_images": [
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/arch_contract_tests",
+        "sha256": "fd7f78ca5ccbbde983b35f651816c451cefc4747e39b03c164fbf1a21d6f7f7f",
+        "bytes": 86904
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/baremetal_contract_tests",
+        "sha256": "7026ff1d950ea8ca4ac84012b03351faae18dd1391cc545cab0be6b5f5829bd7",
+        "bytes": 58568
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/blinky",
+        "sha256": "58a570b6774c0d12a3336a0fedf39d646a25bd99dabd3e2bbee7383c66db77b0",
+        "bytes": 216864
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/config_demo",
+        "sha256": "ec8e331b5f537ebb498dedb5fb776f5d159920af1015d05646e75dab7426655f",
+        "bytes": 305944
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/config_persistence_tests",
+        "sha256": "0bfdd61b466df7f21e68582b1cccd085ab64530ccbfb48336df1f2ea0d843163",
+        "bytes": 102328
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/config_tests",
+        "sha256": "fe86cd75489f8d2ddeff191858714f6ae4c93c5b0eee6204786640c41e498129",
+        "bytes": 3233448
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/crypto_partial_tests",
+        "sha256": "37e51b4e9bd26d5137de89836c7c2978bc8aeb1b05d26d441e4962e0384a0435",
+        "bytes": 22520
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/crypto_tests",
+        "sha256": "ec212e64784401bed1e45376052a640f362eb3f5e01926d89b4f8290f048d082",
+        "bytes": 27072
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/crypto_unconfigured_tests",
+        "sha256": "72fe5aec645879eebf3d6b7fcd25f9401b0ed07d493b2fbde1645a745802dfab",
+        "bytes": 16776
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/freertos_boot_kernel_mask_tests",
+        "sha256": "9631e084cf8624c28334e4a1d01d4e1eb2531e175c8455d5f44472e60610b4d4",
+        "bytes": 153808
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/freertos_contract_tests",
+        "sha256": "264f082810df22dfd9e12d0ce0b9c20f58574da829a447592753a2e35b395ef9",
+        "bytes": 166704
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/freertos_demo",
+        "sha256": "0557d94899bf6fd76b1021b7387178aa3cd606421144728e931b5a23fac51fb9",
+        "bytes": 217208
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/freertos_task_mutex_quarantine_tests",
+        "sha256": "78279fd8dd0ff7533be850eb4890c1e1584c74720eba9872e7faaa3900085124",
+        "bytes": 153816
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/hal_native_tests",
+        "sha256": "df21a5c9b250838dba3310ce237c709965be328a49901e61a31f80bd4b976ca4",
+        "bytes": 3852416
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/init_registry_tests",
+        "sha256": "88165978d583b61f8cd7cd7d62bb58872d786e3f260af6700d180369f2c498d0",
+        "bytes": 16960
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/init_tests",
+        "sha256": "1ba0775c564cbc5f01c0df7766c827ee549b47d4548f4179c3fced053ad46341",
+        "bytes": 1215272
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/integration_tests",
+        "sha256": "d94e7d844847f1d2c771799562d03665cf14807d292455d5f40a75b8b7b64030",
+        "bytes": 1217560
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/log_contract_tests",
+        "sha256": "46cd883a50a4e2db02f533c8e5884e0c746a1609002a2af00a9ff5f1d89aed02",
+        "bytes": 115008
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/log_tests",
+        "sha256": "f8430cdd79f9443a56d3ccf73c60f06063c968b98340988852adeb8103ee0954",
+        "bytes": 1652680
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/native_registry_contract_tests",
+        "sha256": "372485b92188d555ae60642d86fb84874234240335a18ad93c8afd479b6473cf",
+        "bytes": 216568
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/nexus_industrial_controller",
+        "sha256": "65a82d5c3d81f3edaf1b35754466fd360636db73324dbef740cede7d5f77ad8c",
+        "bytes": 25384
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/nexus_industrial_tests",
+        "sha256": "e300decdc0bab2003beb9f31d75d29533d4d736c82671f0ede21b74c43058976",
+        "bytes": 47640
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/osal_contract_tests",
+        "sha256": "d5abf7fce192c5bff1972c0c256afd11c1ed988ecc3212eed05a96f7b9935717",
+        "bytes": 119440
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/osal_task_mutex_quarantine_tests",
+        "sha256": "03b6c47b0eda9edec0bc44c451e986b017a444724810dbbd9b3b4d6902f7f88e",
+        "bytes": 77008
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/osal_tests",
+        "sha256": "31f96ce13c2687c017fe080ad276b37aed58f85b6bf65ee2f35f5da56f9f7ff0",
+        "bytes": 2508864
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/posix_event_contract_tests",
+        "sha256": "385697f8d9967e7eb865724ab609ff8430db965fc21a38f9c43a210b51ee09de",
+        "bytes": 18168
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/product_boot_contract_tests",
+        "sha256": "5f32b3cb2231849f431d863fa291670675f50db4368a7eb355a4da157bb0df89",
+        "bytes": 17192
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/product_native_smoke",
+        "sha256": "8fcca5393b0ae007eddb39a323806bc3c8e245c05e1251f6159518d4822dbe34",
+        "bytes": 216768
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/shell_demo",
+        "sha256": "c4504b3a25bbe925d69c69a8ca42a92fe9374e3e2e550ba1541de9603c031192",
+        "bytes": 242248
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/shell_tests",
+        "sha256": "5b76f133518b3f6ad6ef5835da9ec2a7cb916671ce158e41dd8c411538ee61d3",
+        "bytes": 2389968
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/storage_tests",
+        "sha256": "36ae979ded7eda89015a015563030f0ed5260766ac576051015d49f7b5e7e664",
+        "bytes": 30304
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_board_stm32f407_qiming_v31",
+        "sha256": "d77c94c99a0cb3a88728cf765d60a29daf98e2d4b7ec0e4c7a52789fa3fa1945",
+        "bytes": 17128
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_board_stm32f407ve_sky_qingchun",
+        "sha256": "954896cf83a2d39f87bbd7cd3410c2f15a34417d59f2c7e23c9681ec43bed767",
+        "bytes": 17128
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_gd32_flash",
+        "sha256": "0ed033436785f86c250cf4dfdcbe17ac8d717a3da4c2a24f109af7de6129b839",
+        "bytes": 17504
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_gd32_spi",
+        "sha256": "cc3431bbc2700fc776813d06416a96529d8fcaa0a7e5b9cd3239d7dd8c57e530",
+        "bytes": 33232
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_gd32_timebase",
+        "sha256": "775762d223fe1f41de10a75b37c177b485114625665830f324137ab67bd0392c",
+        "bytes": 20128
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_gd32_typed_spi",
+        "sha256": "c5fb2259c9daf8337e391640a6fe88baf907658502529936a9a3b48007ae7801",
+        "bytes": 65520
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_gd32_uart",
+        "sha256": "15c7f819f95a4fd23392a5e58f93ffe72d3d1e00a08c9e88a4606c02d891923f",
+        "bytes": 28864
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_flash_1m",
+        "sha256": "49631fafad97d9adbf3e286c11c3eec70353d36e79415b2595dd5d4b32dc68ec",
+        "bytes": 26296
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_flash_512k",
+        "sha256": "7e1179e2cbb1067b69687e8cdb538c04241e267dfdea0db0508ca830e8ca7d6c",
+        "bytes": 26296
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_flash_geometry",
+        "sha256": "ed4b5637e4950c3f131e8c94dcf0f10bbad728049b2c2838405273a66129027f",
+        "bytes": 15976
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_flash_mismatched",
+        "sha256": "5ae742724022cd894df08d1fc2e0c7976521dea67804b4f28450d19c02e93a4c",
+        "bytes": 17744
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_gpio",
+        "sha256": "88d125fafcd71464436826bfa5d85c8dda2b1b5a2419d7a62a4d00f74f77a44a",
+        "bytes": 27728
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_spi_bare",
+        "sha256": "30644450ef3faefd7cd6388e66529fe62b0293142afe344ebcbe0a55efbe925d",
+        "bytes": 61968
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_spi_osal",
+        "sha256": "c3d3b3e0ea245aa368133b68f958522bc277394fefa0fabf8a074d4cb6cd06b0",
+        "bytes": 62048
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_uart",
+        "sha256": "16832133c072c2a4f75d33961d63891a68b44edd7c2a0ed8e981afecd747f734",
+        "bytes": 56048
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/test_driver_stm32_uart_clock",
+        "sha256": "6fee19824c1ff236b57d6d2180bddc341f26c5ad78df7522e0d76951864e61b5",
+        "bytes": 16840
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/typed_device_contract_tests",
+        "sha256": "4874256180c3846c27a77ed2012d548de75df76d517e1b70931830f918b4ac76",
+        "bytes": 890800
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/typed_native_spi_tests",
+        "sha256": "cac93b490be68dcc7e49be90c163bfc0d8651114b5b0e42a883e3afbd17e5218",
+        "bytes": 810296
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/typed_stm32_gpio_registration",
+        "sha256": "bca7b73aaa3a555154cd0321c0cb1039496f178d15545227a03256f8030ea9ef",
+        "bytes": 43112
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/unbound_platform_contract_tests",
+        "sha256": "46e632b7f9c032d5ed1b6a2c33e95c3cdaef6d8a3f926ef70b593700e1d8c7c6",
+        "bytes": 16424
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/update_storage_tests",
+        "sha256": "70236fbaf897c0b8a7b3b7af15ca539a431f8fa39f7eed292cf6033987043aa7",
+        "bytes": 49944
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/update_tests",
+        "sha256": "38f186437221ae64731341a0bdef0ae09be83795755cbd2aa48a2b9d2c715d59",
+        "bytes": 49200
+      }
+    ],
+    "linked_maps": [
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/blinky.map",
+        "sha256": "11c03be0255b29e62e08c460514c761e68d2d1b19f8f17e364218bef35e292dd",
+        "bytes": 252993
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/config_demo.map",
+        "sha256": "293e725cdc12506dfd8c68a00aa57a1305aaba72a889bcec6ffa4786dd6f144b",
+        "bytes": 311333
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/freertos_demo.map",
+        "sha256": "ae3be438da28498e62c7f473da3eee9f7d60b3a32379a1afad3135933e7b57c0",
+        "bytes": 255142
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/nexus_industrial_controller.map",
+        "sha256": "33c835be7c2c0d33e20c2a73fd4503cbf1ee34c877587e549435a73e59f69f32",
+        "bytes": 28207
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/product_native_smoke.map",
+        "sha256": "86efe833e4a68593e6ab95aa8e0d79e40f0db319de471fb917fc126f73077926",
+        "bytes": 252737
+      },
+      {
+        "path": "build/platform-delivery/3129550d12fc/linux-gcc-release/bin/shell_demo.map",
+        "sha256": "8399ab792d521ca973caf25c05a014c15ed6fbb86fbc88f820b503138a92b4e3",
+        "bytes": 284775
+      }
+    ]
+  },
+  "arm": {
+    "schema_version": 1,
+    "kind": "clean-arm-release-matrix",
+    "hardware_verified": false,
+    "source": {
+      "commit": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+      "tree": "ff04e505e860d579e5891879d33f39d3e4829001",
+      "clean_start": true,
+      "clean_finish": true
+    },
+    "toolchain": {
+      "compiler": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+      "version": "arm-none-eabi-gcc (Arm GNU Toolchain 14.3.Rel1 (Build arm-14.174)) 14.3.1 20250623",
+      "compiler_sha256": "510c55cfeed7328ade1eb8cb23808fcce1ba6c52dac8d4ebfe033ae4b2534385",
+      "lock_sha256": "1393be450d4d1ba3e182807ae0236f968cf9773f2e43a14ce3a57f9251387170",
+      "distribution_archive_sha256": "8f6903f8ceb084d9227b9ef991490413014d991874a1e34074443c2a72b14dbd"
+    },
+    "profiles": [
+      {
+        "preset": "stm32-armgcc-release",
+        "build_dir": "build/platform-delivery/3129550d12fc/stm32-armgcc-release",
+        "configuration_sha256": "7da77820f97ca3534666e2f7bac61a8640ce870427f566ce8be63b74b7c1b05c",
+        "configuration_bundle_sha256": {
+          "effective.config": "7da77820f97ca3534666e2f7bac61a8640ce870427f566ce8be63b74b7c1b05c",
+          "nexus_config.h": "77b648cf50b43b5965b9d7fc49614b64ac7b048191dfb3fde1f0649d8c546263",
+          "config.cmake": "85e83878ea5e91d290423862505fa5032d7b5008790d576c2e48401ba333e9ba"
+        },
+        "compiler": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "platform": "stm32",
+        "product": "stm32f407-discovery",
+        "board": "stm32f4discovery-mb997",
+        "backend": "baremetal",
+        "source_revision_recorded": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+        "images": [
+          {
+            "file": "blinky.elf",
+            "sha256": "c3951be3dd92239cf05c84bb05ba0cc9b882d3399dbac2ac042cf2c68109d121",
+            "entry": 134218841,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SysTick_Handler",
+              "SPI1_IRQHandler",
+              "USART2_IRQHandler",
+              "DMA2_Stream0_IRQHandler",
+              "DMA2_Stream3_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 43416,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 26832,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          },
+          {
+            "file": "config_demo.elf",
+            "sha256": "6abb18f7695e179970d9dbef34e5d057fa7fcae5ee2badf4f4f7da94ff99fb49",
+            "entry": 134223865,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SysTick_Handler",
+              "SPI1_IRQHandler",
+              "USART2_IRQHandler",
+              "DMA2_Stream0_IRQHandler",
+              "DMA2_Stream3_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 83164,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 68072,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          },
+          {
+            "file": "stm32_blinky.elf",
+            "sha256": "90fdf3b1a2fa8f0541be67d3e033be499a453e43881da5223d5d293f4cd3b4a5",
+            "entry": 134218545,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SysTick_Handler",
+              "SPI1_IRQHandler",
+              "USART2_IRQHandler",
+              "DMA2_Stream0_IRQHandler",
+              "DMA2_Stream3_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 37516,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 26344,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          },
+          {
+            "file": "stm32_config_test.elf",
+            "sha256": "c8e28d56dab1db2c7d7908d5e8319f7babf02fbf7a1ae1dce573374e39102f13",
+            "entry": 134219193,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SysTick_Handler",
+              "SPI1_IRQHandler",
+              "USART2_IRQHandler",
+              "DMA2_Stream0_IRQHandler",
+              "DMA2_Stream3_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 43396,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 26768,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          }
+        ],
+        "portable_application_private_dependencies_checked": [
+          "applications/blinky/main.c",
+          "applications/config_demo/main.c"
+        ],
+        "target_compile_commands_checked": 179,
+        "dependency_commits": [
+          {
+            "path": "vendors/arm/CMSIS_5",
+            "commit": "55b19837f5703e418ca37894d5745b1dc05e4c91"
+          },
+          {
+            "path": "vendors/st/cmsis_device_f4",
+            "commit": "3c77349ce04c8af401454cc51f85ea9a50e34fc1"
+          },
+          {
+            "path": "vendors/st/stm32f4xx_hal_driver",
+            "commit": "b5c4d27f41c0ffbde135c0560d882b8a8eecb88e"
+          }
+        ],
+        "artifact_checker_tests": 7,
+        "artifact_negative_paths_per_image": 4,
+        "cmake_cache_sha256": "06393314e8ec7b84044c0c8af6c645710278101d2ec4d7a8646d629f322ae572",
+        "compile_commands_sha256": "be2cfa0e2ba673375996954d8912a2145aa223ea03bd6da6734985c9815a1786",
+        "static_report_sha256": "553f8c9bb856317b9e272f6df1cd5f4895415df9523fc9f390bc4d7feeba6c50",
+        "evidence_log_sha256": {
+          "configure": "70a17358874362658871ef287d431a6c52ca76ae13e2eba3576dddb0c9bfbbfc",
+          "build": "d6dd5fdfd41c0a3e83413e4d758a639acc0402965e6f86bbde27942f66ccea46",
+          "elf": "5f6b327c5096606c048585d8c336cec5e95242c0b5beb5166327d7345d86ec22",
+          "rejection": "44ebe0c88f0572fdce3eb921745a9bad6146c3a7b335442415ab667d39b91ae7"
+        },
+        "elapsed_seconds": 13.299
+      },
+      {
+        "preset": "stm32-armgcc-freertos-release",
+        "build_dir": "build/platform-delivery/3129550d12fc/stm32-armgcc-freertos-release",
+        "configuration_sha256": "376399a0b1581dd49933c78ae847bc18f0695bf3cecbe37605b5bef37fe2bdb7",
+        "configuration_bundle_sha256": {
+          "effective.config": "376399a0b1581dd49933c78ae847bc18f0695bf3cecbe37605b5bef37fe2bdb7",
+          "nexus_config.h": "f1637546d7088a695d70704ad00e19cc32c0054a6d43556c3017ab70fa0ebd8c",
+          "config.cmake": "39fce27e17cd54474745140e43048b15dbbd2021a0179246af10ed574e45ff04"
+        },
+        "compiler": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "platform": "stm32",
+        "product": "stm32f407-discovery",
+        "board": "stm32f4discovery-mb997",
+        "backend": "freertos",
+        "source_revision_recorded": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+        "images": [
+          {
+            "file": "blinky.elf",
+            "sha256": "f802060394313ad9096220310a01cb74c8a99321537c109852265f327417e5ad",
+            "entry": 134218949,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SVC_Handler",
+              "PendSV_Handler",
+              "SysTick_Handler",
+              "SPI1_IRQHandler",
+              "USART2_IRQHandler",
+              "DMA2_Stream0_IRQHandler",
+              "DMA2_Stream3_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 59516,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 82904,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          },
+          {
+            "file": "config_demo.elf",
+            "sha256": "0b8f391e8a4aa13968487181a8982d9c998d0aa278a8c7487641e1b57fd98a26",
+            "entry": 134225697,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SVC_Handler",
+              "PendSV_Handler",
+              "SysTick_Handler",
+              "SPI1_IRQHandler",
+              "USART2_IRQHandler",
+              "DMA2_Stream0_IRQHandler",
+              "DMA2_Stream3_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 101180,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 124176,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          },
+          {
+            "file": "freertos_demo.elf",
+            "sha256": "7208a74421c74359757dc034b2ac5eff7da44508cd58d2e4d0866d7761756f44",
+            "entry": 134219805,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SVC_Handler",
+              "PendSV_Handler",
+              "SysTick_Handler",
+              "SPI1_IRQHandler",
+              "USART2_IRQHandler",
+              "DMA2_Stream0_IRQHandler",
+              "DMA2_Stream3_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 65300,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 91432,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          },
+          {
+            "file": "stm32_blinky.elf",
+            "sha256": "4e07051da03de7324b8f75ad96bc84530dc6addafdcbb2f9eae153264dde8587",
+            "entry": 134218541,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SVC_Handler",
+              "PendSV_Handler",
+              "SysTick_Handler",
+              "SPI1_IRQHandler",
+              "USART2_IRQHandler",
+              "DMA2_Stream0_IRQHandler",
+              "DMA2_Stream3_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 46956,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 63720,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          },
+          {
+            "file": "stm32_config_test.elf",
+            "sha256": "9a8b25d7a1cbadd92b92862434647c5270702ee1eab100a6333e70af8e5f1e27",
+            "entry": 134219181,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SVC_Handler",
+              "PendSV_Handler",
+              "SysTick_Handler",
+              "SPI1_IRQHandler",
+              "USART2_IRQHandler",
+              "DMA2_Stream0_IRQHandler",
+              "DMA2_Stream3_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 52844,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 64144,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          }
+        ],
+        "portable_application_private_dependencies_checked": [
+          "applications/blinky/main.c",
+          "applications/config_demo/main.c",
+          "applications/freertos_demo/main.c"
+        ],
+        "target_compile_commands_checked": 189,
+        "dependency_commits": [
+          {
+            "path": "ext/freertos",
+            "commit": "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0"
+          },
+          {
+            "path": "ext/freertos/portable/ThirdParty/Community-Supported-Ports",
+            "commit": "9c5bad7b2f42b4e8420f12290b9bc085d3309e8b"
+          },
+          {
+            "path": "ext/freertos/portable/ThirdParty/Partner-Supported-Ports",
+            "commit": "dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9"
+          },
+          {
+            "path": "vendors/arm/CMSIS_5",
+            "commit": "55b19837f5703e418ca37894d5745b1dc05e4c91"
+          },
+          {
+            "path": "vendors/st/cmsis_device_f4",
+            "commit": "3c77349ce04c8af401454cc51f85ea9a50e34fc1"
+          },
+          {
+            "path": "vendors/st/stm32f4xx_hal_driver",
+            "commit": "b5c4d27f41c0ffbde135c0560d882b8a8eecb88e"
+          }
+        ],
+        "artifact_checker_tests": 7,
+        "artifact_negative_paths_per_image": 4,
+        "cmake_cache_sha256": "3354990c9b5bfaa4c342540f0dc57f2bc9d5923779ebb25261ebbefbb0ed2550",
+        "compile_commands_sha256": "de6ba75bfeb5472a28979fb966bd181a5fc184c4735ad114a931685a4e5ff1db",
+        "static_report_sha256": "e70b8db8cd483efeff670f6a5380435fdca9542affc99662ef788b5a0bebb4d7",
+        "evidence_log_sha256": {
+          "configure": "61db0b4d319908e1ec6d670cf6d89ba137e4858163a498127396caeb3f03b93b",
+          "build": "a47ed89ed34ff2d991fdce6eb9221953565b16423ae4dbdcda936c49dad6c1f8",
+          "elf": "e7c9266ae8b916feb83c85fb63b5a6efe1d4515db3c2157933c633f7ed6fc9cb",
+          "rejection": "43fe7cd1a706ff555316f9643ea869284f7a5bdd5550ff21e6be0f410d3834c9"
+        },
+        "elapsed_seconds": 14.486
+      },
+      {
+        "preset": "stm32-qiming-armgcc-baremetal-release",
+        "build_dir": "build/platform-delivery/3129550d12fc/stm32-qiming-armgcc-baremetal-release",
+        "configuration_sha256": "2427283510ff9559a9816c441556eedf0285701f7e21462b82547735b1bdb543",
+        "configuration_bundle_sha256": {
+          "effective.config": "2427283510ff9559a9816c441556eedf0285701f7e21462b82547735b1bdb543",
+          "nexus_config.h": "cbbd9c3c3914a53bb2b279ad5bc97ef24a5aca13b2b9f0db0bd983096c72e885",
+          "config.cmake": "513978caa5c68a9673e5dec57e5de456da2a47644fea0b920dd928ae06829d48"
+        },
+        "compiler": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "platform": "stm32",
+        "product": "stm32f407zg-qiming-v31",
+        "board": "stm32f407zg-qiming-v31",
+        "backend": "baremetal",
+        "source_revision_recorded": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+        "images": [
+          {
+            "file": "blinky.elf",
+            "sha256": "33f029db200941e8cfd9bbdfaba2f7e4ba4086a946295bcb8b537a08ff03daf4",
+            "entry": 134218825,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SysTick_Handler",
+              "USART1_IRQHandler"
+            ],
+            "board_initializers": [
+              "HAL_MspInit"
+            ],
+            "device_descriptor_bytes": 32,
+            "device_records": 2,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 26184,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 13024,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          }
+        ],
+        "portable_application_private_dependencies_checked": [
+          "applications/blinky/main.c"
+        ],
+        "target_compile_commands_checked": 138,
+        "dependency_commits": [
+          {
+            "path": "vendors/arm/CMSIS_5",
+            "commit": "55b19837f5703e418ca37894d5745b1dc05e4c91"
+          },
+          {
+            "path": "vendors/st/cmsis_device_f4",
+            "commit": "3c77349ce04c8af401454cc51f85ea9a50e34fc1"
+          },
+          {
+            "path": "vendors/st/stm32f4xx_hal_driver",
+            "commit": "b5c4d27f41c0ffbde135c0560d882b8a8eecb88e"
+          }
+        ],
+        "artifact_checker_tests": 7,
+        "artifact_negative_paths_per_image": 4,
+        "cmake_cache_sha256": "86b53e2b12e3b0832f7bbf5573aecb7f311407270e2db000ac242ac8dea539b7",
+        "compile_commands_sha256": "2b745e5a77548d9ffedfd4722e23aa490ffb5b33ca26b203531d8f4ee79352ca",
+        "static_report_sha256": "d93d46fac6edac20f5d922e0e53073d62ef55fefb324a4315cf46a366b54abd8",
+        "evidence_log_sha256": {
+          "configure": "76f69731ab9ebde336a0e6b555075cd93904f0ecf0a42ab7110d8290edf1c6f9",
+          "build": "aa2c68ebb8a15c8bfcccb3d62c323c1bb01b7ef56374f69a0d08817ae7319370",
+          "elf": "139c6186a766dfd3a1f7f0485d97b50b368ca2d760deed7e605a08caf19f540c",
+          "rejection": "a079ba332ae3109b87ed9b5d9177d90a398afe9be889d1598580fb40cdc832de"
+        },
+        "elapsed_seconds": 10.62
+      },
+      {
+        "preset": "stm32-qiming-armgcc-freertos-release",
+        "build_dir": "build/platform-delivery/3129550d12fc/stm32-qiming-armgcc-freertos-release",
+        "configuration_sha256": "10498ffb2fd14717583cd64625621743b6c31d660acd81183b99e6ffaacd193d",
+        "configuration_bundle_sha256": {
+          "effective.config": "10498ffb2fd14717583cd64625621743b6c31d660acd81183b99e6ffaacd193d",
+          "nexus_config.h": "5541b457df3514e4ad86c7c39f5e11868bf814dade5db589e8f64cec57b4f24c",
+          "config.cmake": "008a3d8d822080063249d830e4d64f809a1e655de4b465bcd0a7d36ecf8b82d7"
+        },
+        "compiler": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "platform": "stm32",
+        "product": "stm32f407zg-qiming-v31",
+        "board": "stm32f407zg-qiming-v31",
+        "backend": "freertos",
+        "source_revision_recorded": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+        "images": [
+          {
+            "file": "blinky.elf",
+            "sha256": "7c6c35ac1330ba3a59a4b6272a2fc428435dffeabbadd9953c74ef27482ea875",
+            "entry": 134218961,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SVC_Handler",
+              "PendSV_Handler",
+              "SysTick_Handler",
+              "USART1_IRQHandler"
+            ],
+            "board_initializers": [
+              "HAL_MspInit"
+            ],
+            "device_descriptor_bytes": 32,
+            "device_records": 2,
+            "application_flash_bytes": 786432,
+            "flash_loaded_bytes": 36288,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 41680,
+            "storage_start": 135004160,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          }
+        ],
+        "portable_application_private_dependencies_checked": [
+          "applications/blinky/main.c"
+        ],
+        "target_compile_commands_checked": 147,
+        "dependency_commits": [
+          {
+            "path": "ext/freertos",
+            "commit": "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0"
+          },
+          {
+            "path": "ext/freertos/portable/ThirdParty/Community-Supported-Ports",
+            "commit": "9c5bad7b2f42b4e8420f12290b9bc085d3309e8b"
+          },
+          {
+            "path": "ext/freertos/portable/ThirdParty/Partner-Supported-Ports",
+            "commit": "dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9"
+          },
+          {
+            "path": "vendors/arm/CMSIS_5",
+            "commit": "55b19837f5703e418ca37894d5745b1dc05e4c91"
+          },
+          {
+            "path": "vendors/st/cmsis_device_f4",
+            "commit": "3c77349ce04c8af401454cc51f85ea9a50e34fc1"
+          },
+          {
+            "path": "vendors/st/stm32f4xx_hal_driver",
+            "commit": "b5c4d27f41c0ffbde135c0560d882b8a8eecb88e"
+          }
+        ],
+        "artifact_checker_tests": 7,
+        "artifact_negative_paths_per_image": 4,
+        "cmake_cache_sha256": "aa07752ce71e73359fba9f84846708b3a195a28f182dba21a3392cc7d1b928d3",
+        "compile_commands_sha256": "ff1befebfe7dafd65c64a06e158cc7a77a5f89acd0cbbc180780695ca59fea6e",
+        "static_report_sha256": "4b1fa5705874e9bebc98ed1987a1e93e8b883eeefbcdae26687443b21a3d1be8",
+        "evidence_log_sha256": {
+          "configure": "23eb6acc5e6478715a50dfd199a337d428401ae6bf44d19c01821f494acdaf47",
+          "build": "f8f2daac6ea9a3537a693e7def7185f3e6aa3736e1e82778f7195450d2cada99",
+          "elf": "139c6186a766dfd3a1f7f0485d97b50b368ca2d760deed7e605a08caf19f540c",
+          "rejection": "59556b5f857b8d4802f69e174582a57e7e47b1139565260c8c81d0d8175f3fb3"
+        },
+        "elapsed_seconds": 13.975
+      },
+      {
+        "preset": "stm32-sky-armgcc-baremetal-release",
+        "build_dir": "build/platform-delivery/3129550d12fc/stm32-sky-armgcc-baremetal-release",
+        "configuration_sha256": "2bd0dc7d7f20d78b316565b1450eee8bed72a3bd2f91ef6ca8d563e6a1e72651",
+        "configuration_bundle_sha256": {
+          "effective.config": "2bd0dc7d7f20d78b316565b1450eee8bed72a3bd2f91ef6ca8d563e6a1e72651",
+          "nexus_config.h": "7d07af750deb7f8286acd2dd7112fa7cac4292a6eac7e9cd27601bc19f2c68ea",
+          "config.cmake": "789d5ab213836793116f0c8450efe9fdd3c3b52dc62b88ca57d14c87ff90f16c"
+        },
+        "compiler": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "platform": "stm32",
+        "product": "stm32f407ve-sky-qingchun",
+        "board": "stm32f407ve-sky-qingchun",
+        "backend": "baremetal",
+        "source_revision_recorded": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+        "images": [
+          {
+            "file": "blinky.elf",
+            "sha256": "789a3fb5e8ede551c93def57d9f8aa5380f70067bbc5824b9b3f7914eb801f4c",
+            "entry": 134218837,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SysTick_Handler",
+              "USART1_IRQHandler"
+            ],
+            "board_initializers": [
+              "HAL_MspInit"
+            ],
+            "device_descriptor_bytes": 32,
+            "device_records": 2,
+            "application_flash_bytes": 262144,
+            "flash_loaded_bytes": 26144,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 13024,
+            "storage_start": 134479872,
+            "storage_end": 134742016,
+            "writable_executable_segments": 0
+          }
+        ],
+        "portable_application_private_dependencies_checked": [
+          "applications/blinky/main.c"
+        ],
+        "target_compile_commands_checked": 138,
+        "dependency_commits": [
+          {
+            "path": "vendors/arm/CMSIS_5",
+            "commit": "55b19837f5703e418ca37894d5745b1dc05e4c91"
+          },
+          {
+            "path": "vendors/st/cmsis_device_f4",
+            "commit": "3c77349ce04c8af401454cc51f85ea9a50e34fc1"
+          },
+          {
+            "path": "vendors/st/stm32f4xx_hal_driver",
+            "commit": "b5c4d27f41c0ffbde135c0560d882b8a8eecb88e"
+          }
+        ],
+        "artifact_checker_tests": 7,
+        "artifact_negative_paths_per_image": 4,
+        "cmake_cache_sha256": "a24672eac2ad6157c2128ea27cf3583f25e9b1a21b88523baf22d84a4c47dbc4",
+        "compile_commands_sha256": "b2d6fd3d3d215ac623fd24aa02e3900bb05050ecf3a9ad16714a73b491e7668d",
+        "static_report_sha256": "95b0a7f2a681018e41cf72e202cde563d480222e90afcaac9de693b597cdb6fe",
+        "evidence_log_sha256": {
+          "configure": "887f3e105aa915041317e3138f9d1f83708152e0a61376e1bc4879bf4c1b0e29",
+          "build": "19adf2339c48ff8cffaba2093b27efe51bbca5ff8222b7381e62a34e01d30fe9",
+          "elf": "139c6186a766dfd3a1f7f0485d97b50b368ca2d760deed7e605a08caf19f540c",
+          "rejection": "e2afe2653f1e61d95d27a82ab7c6a1ba3d1128a36046594d3bc8cda7d0235fb5"
+        },
+        "elapsed_seconds": 22.467
+      },
+      {
+        "preset": "stm32-sky-armgcc-freertos-release",
+        "build_dir": "build/platform-delivery/3129550d12fc/stm32-sky-armgcc-freertos-release",
+        "configuration_sha256": "b7dea8c99e95c79b7aa28efc91fd1a4b307e0da727de2ce4187ddd9cfd873695",
+        "configuration_bundle_sha256": {
+          "effective.config": "b7dea8c99e95c79b7aa28efc91fd1a4b307e0da727de2ce4187ddd9cfd873695",
+          "nexus_config.h": "25140293cf4ecaa113a25ba37cf91dbeebc930f93afc5ba30791d9dc2ff6a486",
+          "config.cmake": "ea36f070b097189d1a12674f5d163a05d84110def757dfe93fa7b4b309b57438"
+        },
+        "compiler": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "platform": "stm32",
+        "product": "stm32f407ve-sky-qingchun",
+        "board": "stm32f407ve-sky-qingchun",
+        "backend": "freertos",
+        "source_revision_recorded": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+        "images": [
+          {
+            "file": "blinky.elf",
+            "sha256": "7854d760d6bf2baeccd49925b803230c80c3aed9029ebbb0413435e25c1a4560",
+            "entry": 134218945,
+            "vector_bytes": 392,
+            "strong_interrupts": [
+              "SVC_Handler",
+              "PendSV_Handler",
+              "SysTick_Handler",
+              "USART1_IRQHandler"
+            ],
+            "board_initializers": [
+              "HAL_MspInit"
+            ],
+            "device_descriptor_bytes": 32,
+            "device_records": 2,
+            "application_flash_bytes": 262144,
+            "flash_loaded_bytes": 36208,
+            "main_ram_bytes": 131072,
+            "main_ram_reserved_bytes": 41680,
+            "storage_start": 134479872,
+            "storage_end": 134742016,
+            "writable_executable_segments": 0
+          }
+        ],
+        "portable_application_private_dependencies_checked": [
+          "applications/blinky/main.c"
+        ],
+        "target_compile_commands_checked": 147,
+        "dependency_commits": [
+          {
+            "path": "ext/freertos",
+            "commit": "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0"
+          },
+          {
+            "path": "ext/freertos/portable/ThirdParty/Community-Supported-Ports",
+            "commit": "9c5bad7b2f42b4e8420f12290b9bc085d3309e8b"
+          },
+          {
+            "path": "ext/freertos/portable/ThirdParty/Partner-Supported-Ports",
+            "commit": "dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9"
+          },
+          {
+            "path": "vendors/arm/CMSIS_5",
+            "commit": "55b19837f5703e418ca37894d5745b1dc05e4c91"
+          },
+          {
+            "path": "vendors/st/cmsis_device_f4",
+            "commit": "3c77349ce04c8af401454cc51f85ea9a50e34fc1"
+          },
+          {
+            "path": "vendors/st/stm32f4xx_hal_driver",
+            "commit": "b5c4d27f41c0ffbde135c0560d882b8a8eecb88e"
+          }
+        ],
+        "artifact_checker_tests": 7,
+        "artifact_negative_paths_per_image": 4,
+        "cmake_cache_sha256": "f4f9f8bc64a4f1a6e44204e93f47e92cefcbba7224954efaa4376d340bc68532",
+        "compile_commands_sha256": "4aff4c6e766699f26775da83d38452e43ce01da8db1a463d87eb9210b37c0689",
+        "static_report_sha256": "455e59a75858357827434ca16510ab85abc0cb6fcdc78d3b70074980e8d0ef7e",
+        "evidence_log_sha256": {
+          "configure": "7d8404c3c2152796cd37dd3e64c68e1c7391bd2dd7cc56f78084527d606ff180",
+          "build": "953679b651382736be206a2647796e1a1d0cc8fd1f5f089c83996d1ccc8bfc55",
+          "elf": "139c6186a766dfd3a1f7f0485d97b50b368ca2d760deed7e605a08caf19f540c",
+          "rejection": "ec83b3c456c77fbfd941032cee006c132ed17c1cb01117189f1e28836e31cb7b"
+        },
+        "elapsed_seconds": 26.032
+      },
+      {
+        "preset": "gd32f470-armgcc-baremetal-release",
+        "build_dir": "build/platform-delivery/3129550d12fc/gd32f470-armgcc-baremetal-release",
+        "configuration_sha256": "5ea9edda4edfff2fe5b83636436f63e7dc685ab03684e9e4409f72f775be8e9d",
+        "configuration_bundle_sha256": {
+          "effective.config": "5ea9edda4edfff2fe5b83636436f63e7dc685ab03684e9e4409f72f775be8e9d",
+          "nexus_config.h": "162817a6dbb212cb070dc83ecd3399ab09333699d3bf5236b7d1d428eee087d5",
+          "config.cmake": "2e849317a212594238142a2bb089b54ffc389b49e384a2ef1a8b5fc2afa7752a"
+        },
+        "compiler": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "platform": "gd32f470",
+        "product": "gd32f470-liangshan",
+        "board": "gd32f470zg-liangshan",
+        "backend": "baremetal",
+        "source_revision_recorded": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+        "images": [
+          {
+            "file": "blinky.elf",
+            "sha256": "b86b058cbbe20200967ff41aece52deb3faa7c4d115c8db313989109e69cf6cd",
+            "entry": 134218665,
+            "vector_bytes": 428,
+            "strong_interrupts": [
+              "SysTick_Handler",
+              "TIMER1_IRQHandler",
+              "USART0_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 1032192,
+            "flash_loaded_bytes": 17924,
+            "main_ram_bytes": 196608,
+            "main_ram_reserved_bytes": 8440,
+            "storage_start": 135249920,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          }
+        ],
+        "portable_application_private_dependencies_checked": [
+          "applications/blinky/main.c"
+        ],
+        "target_compile_commands_checked": 34,
+        "dependency_commits": [],
+        "artifact_checker_tests": 7,
+        "artifact_negative_paths_per_image": 4,
+        "cmake_cache_sha256": "cb7f2174a94d38cb23567d77459355be09f85c40743f2a06a58fb2b69e37e70a",
+        "compile_commands_sha256": "acd55f1082d00f2f50bd97662958fe3269fea40c83019eaec3509883a455847f",
+        "static_report_sha256": "7198c4329f942726f2bf3951e7a3c75f1587c482526be5fb42547dac21d48122",
+        "evidence_log_sha256": {
+          "configure": "875dfac04d02e0ba0e98ff9101d124d04683036850f5583799001b0463edb261",
+          "build": "dbe6247023ecd3092b9f3275b266957a78b2a9d01834ad27e2a6d9bbe552eaf4",
+          "elf": "139c6186a766dfd3a1f7f0485d97b50b368ca2d760deed7e605a08caf19f540c",
+          "rejection": "0591f8633e7eeb516a97264ed56e19e184aa1323b974b3edcb3af6c306d1af58"
+        },
+        "elapsed_seconds": 7.398,
+        "reviewed_source_imports": [
+          {
+            "kind": "vendor-source-import",
+            "path": "vendors/gigadevice/gd32f4xx",
+            "source_commit": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+            "source_tree": "ff04e505e860d579e5891879d33f39d3e4829001",
+            "lock_sha256": "f0ebc062ec85d04d4fa0a00bb7b33719f2dc6020b64d92407c0cad0ea732c065",
+            "upstream": {
+              "vendor": "GigaDevice",
+              "package": "GD32F4xx Firmware Library",
+              "version": "3.3.3",
+              "source_url": "https://www.gd32mcu.com/download/down/document_id/247/path_type/1",
+              "download_sha256": "17cbe7e0d03b00255109197bb320ca4d4f796f6df937deeab997e214961753d3",
+              "nested_archive_sha256": "8dd2fd5f310ec175082074a656143dfaecd1159dd7e7eae1bf038d1c924595a5"
+            },
+            "files": 157,
+            "bytes": 3004046,
+            "notices": [
+              {
+                "path": "README.md",
+                "sha256": "20ccb2220642359e9e301a84ae7db39f53bd171e0d1e1d3550fee3745a435325",
+                "bytes": 1487
+              },
+              {
+                "path": "LICENSES/Apache-2.0.txt",
+                "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+                "bytes": 11357
+              },
+              {
+                "path": "LICENSES/Arm-Cortex-M-2012.txt",
+                "sha256": "af54d3e00154a26c2fe42ec0134ee94d8f3125cc8aa74d1f665e77384a6cc5fc",
+                "bytes": 973
+              },
+              {
+                "path": "LICENSES/BSD-3-Clause.txt",
+                "sha256": "289cc4c5cea047fca06bcd6ab97fa7c8b090d6817149582010bc0a509fa69840",
+                "bytes": 1542
+              },
+              {
+                "path": "LICENSES/GigaDevice-SLA.txt",
+                "sha256": "2e2a7af20c9cbde93a76e2b9ff100e5e54a3340e96f6bfb5ea14a02c94f0d805",
+                "bytes": 33833
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "preset": "gd32f470-armgcc-freertos-release",
+        "build_dir": "build/platform-delivery/3129550d12fc/gd32f470-armgcc-freertos-release",
+        "configuration_sha256": "ecb31f1f5e5048fa7bf0de41ef03eb35c5971cba579e46e71bcef829927c7045",
+        "configuration_bundle_sha256": {
+          "effective.config": "ecb31f1f5e5048fa7bf0de41ef03eb35c5971cba579e46e71bcef829927c7045",
+          "nexus_config.h": "d31acb1a28a923370c15cd6a9f61b556ee58357138a4989401caa2596ecbeaab",
+          "config.cmake": "a39f782fc09abbb27dd74f3df3395e017fbcbbe63525a4501e7cbe8a10e8a1bf"
+        },
+        "compiler": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "platform": "gd32f470",
+        "product": "gd32f470-liangshan",
+        "board": "gd32f470zg-liangshan",
+        "backend": "freertos",
+        "source_revision_recorded": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+        "images": [
+          {
+            "file": "blinky.elf",
+            "sha256": "d6d66314d288ca5d4c3e83b32b2160d1237d1afe2869818ea735eea9b775838c",
+            "entry": 134218769,
+            "vector_bytes": 428,
+            "strong_interrupts": [
+              "SVC_Handler",
+              "PendSV_Handler",
+              "SysTick_Handler",
+              "TIMER1_IRQHandler",
+              "USART0_IRQHandler"
+            ],
+            "board_initializers": [],
+            "device_descriptor_bytes": 32,
+            "device_records": 3,
+            "application_flash_bytes": 1032192,
+            "flash_loaded_bytes": 27972,
+            "main_ram_bytes": 196608,
+            "main_ram_reserved_bytes": 28904,
+            "storage_start": 135249920,
+            "storage_end": 135266304,
+            "writable_executable_segments": 0
+          }
+        ],
+        "portable_application_private_dependencies_checked": [
+          "applications/blinky/main.c"
+        ],
+        "target_compile_commands_checked": 43,
+        "dependency_commits": [
+          {
+            "path": "ext/freertos",
+            "commit": "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0"
+          },
+          {
+            "path": "ext/freertos/portable/ThirdParty/Community-Supported-Ports",
+            "commit": "9c5bad7b2f42b4e8420f12290b9bc085d3309e8b"
+          },
+          {
+            "path": "ext/freertos/portable/ThirdParty/Partner-Supported-Ports",
+            "commit": "dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9"
+          }
+        ],
+        "artifact_checker_tests": 7,
+        "artifact_negative_paths_per_image": 4,
+        "cmake_cache_sha256": "91e597b074d7e77dd0d9798e7baf17b545eb99606464fb3381ebf6cfd3c56596",
+        "compile_commands_sha256": "996d742e43a522d73c002a6ae691b56aed0fd77d02897f6a89aa20920997b199",
+        "static_report_sha256": "1694801dc194958d369b6147c8f76fdc9b159c8e5ce6f00beaa3f6f648c8b95d",
+        "evidence_log_sha256": {
+          "configure": "007649f1a0dddc06e8d9b1ccc4161f768cae068bae270b94f4cb92b3a06d8dd5",
+          "build": "03cd06cdcbecfaa6e7c1ffd1747cba16cf7e120bc9b0934f4bd4a4a2f713bc40",
+          "elf": "139c6186a766dfd3a1f7f0485d97b50b368ca2d760deed7e605a08caf19f540c",
+          "rejection": "60727e36075d646d1285aee80e93756346f06c0fee27c2430dfd562fdbb09dea"
+        },
+        "elapsed_seconds": 7.989,
+        "reviewed_source_imports": [
+          {
+            "kind": "vendor-source-import",
+            "path": "vendors/gigadevice/gd32f4xx",
+            "source_commit": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+            "source_tree": "ff04e505e860d579e5891879d33f39d3e4829001",
+            "lock_sha256": "f0ebc062ec85d04d4fa0a00bb7b33719f2dc6020b64d92407c0cad0ea732c065",
+            "upstream": {
+              "vendor": "GigaDevice",
+              "package": "GD32F4xx Firmware Library",
+              "version": "3.3.3",
+              "source_url": "https://www.gd32mcu.com/download/down/document_id/247/path_type/1",
+              "download_sha256": "17cbe7e0d03b00255109197bb320ca4d4f796f6df937deeab997e214961753d3",
+              "nested_archive_sha256": "8dd2fd5f310ec175082074a656143dfaecd1159dd7e7eae1bf038d1c924595a5"
+            },
+            "files": 157,
+            "bytes": 3004046,
+            "notices": [
+              {
+                "path": "README.md",
+                "sha256": "20ccb2220642359e9e301a84ae7db39f53bd171e0d1e1d3550fee3745a435325",
+                "bytes": 1487
+              },
+              {
+                "path": "LICENSES/Apache-2.0.txt",
+                "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+                "bytes": 11357
+              },
+              {
+                "path": "LICENSES/Arm-Cortex-M-2012.txt",
+                "sha256": "af54d3e00154a26c2fe42ec0134ee94d8f3125cc8aa74d1f665e77384a6cc5fc",
+                "bytes": 973
+              },
+              {
+                "path": "LICENSES/BSD-3-Clause.txt",
+                "sha256": "289cc4c5cea047fca06bcd6ab97fa7c8b090d6817149582010bc0a509fa69840",
+                "bytes": 1542
+              },
+              {
+                "path": "LICENSES/GigaDevice-SLA.txt",
+                "sha256": "2e2a7af20c9cbde93a76e2b9ff100e5e54a3340e96f6bfb5ea14a02c94f0d805",
+                "bytes": 33833
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "passed": true,
+    "image_count": 15,
+    "actual_artifact_negative_paths": 60,
+    "checker_test_runs": 56
+  },
+  "arm_report": {
+    "path": "build/platform-delivery/3129550d12fc/arm-delivery-summary.json",
+    "sha256": "0a320dd1bd42a6c7e2ebcb37a58fafe320e6533e892be36a16ce62256b8ae0b7",
+    "bytes": 36685
+  },
+  "limitations": [
+    "No physical board, probe, electrical, timing or power-fail execution",
+    "Unsigned integrity records; no reproducible-build attestation or firmware signing",
+    "Release assembly/tag/draft publication not executed; actual configuration, dependency and ELF validators were executed",
+    "Typed I2C, installed SDK package, Native UART ticket provider and MCU security/complete shutdown remain unavailable"
+  ],
+  "identity_location": "source/config are bound by recorded compiler inputs and external artifact evidence; their hashes are not guaranteed embedded in ELF",
+  "local_helper_suites": {
+    "ci": {
+      "tests": 156,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log_sha256": "ef6a1c3afd02054acbe3ae1841e7a472c0b4ab2cf510c9cbc0873b38674214f3",
+      "actual_elf_and_release_database": true
+    },
+    "enterprise": {
+      "tests": 78,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log_sha256": "3c2961c7066d9198031a70d71e0a2e724a8526bb6fe07ce20a94a25a2342e56b"
+    },
+    "kconfig": {
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log_sha256": "dda40cd6e7daf80c499c54d6805c0c6c7b0c8e6180c1c2119ba60ab770378bb7"
+    }
+  },
+  "online_checkpoint": {
+    "pull_request": 3,
+    "head_commit": "3129550d12fcf67a7da52dcb2713ee634bae5415",
+    "tested_pr_merge_commit": "2ff199fe7b3afd90536ca0d857838a6b2393bfba",
+    "ci": {
+      "run_id": 37818767223,
+      "conclusion": "success",
+      "url": "https://github.com/X-Gen-Lab/nexus/actions/runs/37818767223"
+    },
+    "security": {
+      "run_id": 37818766787,
+      "conclusion": "success",
+      "url": "https://github.com/X-Gen-Lab/nexus/actions/runs/37818766787",
+      "scope": "CodeQL, dependency audit and secret scan execution; no zero-alert or product-security claim"
+    },
+    "enterprise": {
+      "run_id": 37818766764,
+      "conclusion": "success",
+      "url": "https://github.com/X-Gen-Lab/nexus/actions/runs/37818766764"
+    },
+    "static_analysis": {
+      "owned_translation_units": 170,
+      "clang_tidy_exit_code": 0,
+      "cppcheck_exit_code": 0,
+      "artifact_id": 11567714103,
+      "artifact_zip_sha256": "a103e897257841f7924c867ca3e63aba7f8f818274dfa60fab3d68db7b4671a9",
+      "reviewed_profile": "docs/implementation/quality-gates.md"
+    },
+    "sanitizers": {
+      "tests": 87,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "artifact_id": 11568167369,
+      "artifact_zip_sha256": "a50b2bea2e072c333395ee43c5df6c220a414064c9934d43c8f40bedc8af9c10",
+      "scope": "selected host contracts under ASan/UBSan and configured LeakSanitizer; not the full Native or MCU suite"
+    },
+    "legal_skips": [
+      "Documentation / Deploy to Pages on pull request"
+    ]
+  }
+}

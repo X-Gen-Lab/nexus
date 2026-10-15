@@ -1,0 +1,44 @@
+[
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus",
+      "-B",
+      "/workspace/nexus-g474-iteration-evidence/host-asan-build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Debug",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tools/configure/assemblies/native.toml",
+      "-DNEXUS_BUILD_TESTS=ON",
+      "-DNEXUS_ENABLE_SANITIZERS=ON"
+    ],
+    "return_code": 0,
+    "started_ns": 1791749018660435961,
+    "completed_ns": 1791749020994259927,
+    "output": {
+      "path": "/workspace/nexus-g474-iteration-evidence/sanitizer-final/configure.output",
+      "sha256": "b0208f3c907938dd9512547711c8cd57bb21f093d02df06da1ac8b3d6e2a64ed",
+      "bytes": 1365
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-g474-iteration-evidence/host-asan-build",
+      "--target",
+      "nexus_g474_factory_test",
+      "--parallel",
+      "1"
+    ],
+    "return_code": 1,
+    "started_ns": 1791749020994560824,
+    "completed_ns": 1791749033461341107,
+    "output": {
+      "path": "/workspace/nexus-g474-iteration-evidence/sanitizer-final/build.output",
+      "sha256": "eb812d26261442071c77ac15787b48f03fa9f11317423c1daf30a6812bf52960",
+      "bytes": 5531
+    }
+  }
+]

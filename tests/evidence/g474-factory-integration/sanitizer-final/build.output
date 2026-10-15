@@ -1,0 +1,52 @@
+[1/49] Building CXX object _deps/google-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+[2/49] Building C object core/CMakeFiles/nexus_core.dir/src/time.c.o
+[3/49] Building C object core/CMakeFiles/nexus_core.dir/src/request.c.o
+[4/49] Building C object core/CMakeFiles/nexus_core.dir/src/request_observer.c.o
+[5/49] Building C object core/CMakeFiles/nexus_core.dir/src/stack_observation.c.o
+[6/49] Building C object core/CMakeFiles/nexus_core.dir/src/fault.c.o
+[7/49] Building C object arch/CMakeFiles/nexus_arch.dir/native/nx_arch_native.c.o
+[8/49] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.o
+[9/49] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.o
+[10/49] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.o
+[11/49] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.o
+[12/49] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+[13/49] Linking CXX static library lib/libgtest.a
+[14/49] Linking C static library lib/libnexus_core.a
+[15/49] Linking C static library lib/libnexus_arch.a
+[16/49] Building C object io/CMakeFiles/nexus_io.dir/src/gpio.c.o
+[17/49] Building C object io/CMakeFiles/nexus_io.dir/src/uart.c.o
+[18/49] Building C object io/CMakeFiles/nexus_io.dir/src/spi.c.o
+[19/49] Building C object io/CMakeFiles/nexus_io.dir/src/i2c.c.o
+[20/49] Building C object io/CMakeFiles/nexus_io.dir/src/flash.c.o
+[21/49] Building C object io/CMakeFiles/nexus_io.dir/src/watchdog.c.o
+[22/49] Building C object io/CMakeFiles/nexus_io.dir/src/exti.c.o
+[23/49] Building C object io/CMakeFiles/nexus_io.dir/src/timer.c.o
+[24/49] Building C object io/CMakeFiles/nexus_io.dir/src/adc.c.o
+[25/49] Building C object io/CMakeFiles/nexus_io.dir/src/flash_region.c.o
+[26/49] Building C object io/CMakeFiles/nexus_io.dir/src/dma.c.o
+[27/49] Building C object io/CMakeFiles/nexus_io.dir/src/stream.c.o
+[28/49] Building C object io/CMakeFiles/nexus_io.dir/src/wake.c.o
+[29/49] Building C object io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.o
+[30/49] Building C object io/CMakeFiles/nexus_io.dir/src/adc_observer.c.o
+[31/49] Building C object io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.o
+[32/49] Building C object io/CMakeFiles/nexus_io.dir/src/stream_budget.c.o
+[33/49] Building C object io/CMakeFiles/nexus_io.dir/src/can.c.o
+[34/49] Building C object io/CMakeFiles/nexus_io.dir/src/ethernet.c.o
+[35/49] Building C object io/CMakeFiles/nexus_io.dir/src/mdio.c.o
+[36/49] Building C object io/CMakeFiles/nexus_io.dir/src/usb_device.c.o
+[37/49] Building C object io/CMakeFiles/nexus_io.dir/src/timer_capture.c.o
+[38/49] Building C object io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.o
+[39/49] Linking CXX static library lib/libgmock.a
+[40/49] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o
+[41/49] Linking C static library lib/libnexus_io.a
+[42/49] Building CXX object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/g474_factory_test.cpp.o
+[43/49] Building C object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/g474-factory/bindings.c.o
+[44/49] Building C object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/__/contracts/g474_model.c.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/__/contracts/g474_model.c.o 
+/usr/bin/cc -DSTM32G474xx -D_fini=nx_g474_fixture_fini -D_init=nx_g474_fixture_init -I/workspace/nexus-g474-iteration-evidence/host-asan-build/tests/contracts/google/g474-factory -I/workspace/nexus/soc/stm32g474/private -I/workspace/nexus/tests/contracts -I/workspace/nexus-g474-iteration-evidence/host-asan-build/generated -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/vendors/st/cmsis_device_g4/Include -isystem /workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include -isystem /workspace/nexus-g474-iteration-evidence/host-asan-build/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus-g474-iteration-evidence/host-asan-build/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus-g474-iteration-evidence/host-asan-build/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus-g474-iteration-evidence/host-asan-build/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c11 -include/workspace/nexus/tests/google/g474_factory_model.h -Os -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -MD -MT tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/__/contracts/g474_model.c.o -MF tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/__/contracts/g474_model.c.o.d -o tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/__/contracts/g474_model.c.o -c /workspace/nexus/tests/contracts/g474_model.c
+/workspace/nexus/tests/contracts/g474_model.c: In function ‘nx_g474_model_system_poll’:
+/workspace/nexus/tests/contracts/g474_model.c:95:19: error: conversion from ‘long unsigned int’ to ‘uint32_t’ {aka ‘unsigned int’} may change value [-Werror=conversion]
+   95 |         r->CFGR = (r->CFGR & ~(uint32_t)RCC_CFGR_SWS) |
+      |                   ^
+cc1: all warnings being treated as errors
+ninja: build stopped: subcommand failed.

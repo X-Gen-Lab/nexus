@@ -1,0 +1,14 @@
+test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call (tools.configure.test_g474.G474ConfigurationTests.test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call) ... FAIL
+
+======================================================================
+FAIL: test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call (tools.configure.test_g474.G474ConfigurationTests.test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_g474.py", line 58, in test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call
+    self.assertLess(source.index(f"s_nx_platform_initialized = {index}u;", start),
+AssertionError: 7998 not less than 7773
+
+----------------------------------------------------------------------
+Ran 1 test in 0.030s
+
+FAILED (failures=1)

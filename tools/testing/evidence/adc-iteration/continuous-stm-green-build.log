@@ -1,0 +1,13 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/adc-iteration/generated/resolved.json
+-- Configuring done (0.8s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus/build/adc-iteration
+[1/6] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc.c.o
+[2/6] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc_stream.c.o
+[3/6] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc_continuous.c.o
+[4/6] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o
+[5/6] Linking CXX executable bin/nexus_stm32_adc_stream_test

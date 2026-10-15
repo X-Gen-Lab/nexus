@@ -1,0 +1,2 @@
+   text	   data	    bss	    dec	    hex	filename
+  10316	     32	   3112	  13460	   3494	/workspace/nexus-config-iteration-evidence/can-arm-matrix-final/gd32-both-baremetal/bin/can_controller_fixture.elf

@@ -1,0 +1,388 @@
+# Current common-platform software evidence and physical qualification are separate.
+schema_version: 1
+review_date: '2026-10-09'
+focus: common_industrial_embedded_platform
+team_size: approximately_10
+horizon_months:
+- 3
+- 6
+scope:
+  platform_repository: X-Gen-Lab/nexus
+  external_examples_repository: X-Gen-Lab/nexus-examples
+  product_composition: external_only
+  physical_execution: deferred_by_user_not_executed
+  binary_sdk: not_implemented
+  lts: not_promised
+levels:
+- planned
+- experimental
+- validated
+- enterprise_supported
+- lts
+validation_rule: exact_profile_acceptance_actual_execution_and_bound_source_config_artifact_evidence
+current_delivery:
+  software_status: external_bound_execution_record_authoritative
+  identity_authority: external_exact_source_pair_and_frozen_execution_reports
+  validation_record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
+  examples_dependency_lock: https://github.com/X-Gen-Lab/nexus-examples/blob/main/dependencies/nexus.lock.json
+  execution_record: docs/implementation/refactor-execution.csv
+  directory_layout:
+    stm32_family: soc/stm32f407
+    gd32_family: soc/gd32f470
+    host_virtual_model: soc/native
+    platform_responsibility: startup_lifecycle_object_assembly_only
+  current_source_rule: A later source change requires fresh exact-pair reports; historical counts are not inherited.
+  physical_status: deferred_by_user_not_executed
+  hardware_verified: false
+historical_targeted_snapshot_f2d2cf8:
+  platform_observed_head: f2d2cf89f437ad69bf73a8d9eb068d600d53081f
+  source_worktree_clean: false
+  record: docs/implementation/refactor-execution.csv
+  note: Scoped working-tree checks are real; later commits require their own final integration records.
+  exact_committed_component_scope:
+    source_commit: c5aa06d92787540bcf4d521fa5d6fa7fa7c5e5a7
+    ctest_passed: 735
+    skipped: 0
+    snapshot: build/refactor-commit-checks/components/snapshot.json
+    junit: build/refactor-commit-checks/components/junit.xml
+  exact_committed_runtime_board_scope:
+    source_commit: 61530942f1618ad20140f46004350ef36b454393
+    ctest_passed: 187
+    skipped: 0
+    snapshot: build/refactor-commit-checks/runtime-board/snapshot.json
+    junit: build/refactor-commit-checks/runtime-board/junit.xml
+historical_evidence:
+- scope: complete_software_delivery_before_directory_lifecycle_unification_not_inherited
+  platform_source_commit: 5498b2b6988cc1cf28cf4255c5c281d56394d614
+  platform_source_tree: ea178ba746a991c7feb21242215aa1a18e6afb05
+  examples_tested_commit: 272200f40eca5b414e4aa97f5c5be67a0659bc78
+  examples_tested_tree: 38d8bd2920af45d806ef97ba5e9c6648ed1ba3ee
+  native_ctest_passed: 1810
+  platform_arm_release_configurations: 8
+  platform_contract_elf_images: 8
+  examples_native_checks: 6
+  examples_arm_elf_images: 38
+  strict_clean_source_sdk: publishable_verified_and_actual_relocated_consumers_passed
+  record: https://github.com/X-Gen-Lab/nexus-examples/tree/main/evidence/reports/5498b2b
+  hardware_verified: false
+- scope: before_current_RF_refactor_not_inherited
+  source_commit: 3129550d12fcf67a7da52dcb2713ee634bae5415
+  native_ctest_passed: 1781
+  arm_release_configurations: 8
+  arm_elf_images: 15
+  checker_checks: 56
+  actual_corruption_rejections: 60
+  record: docs/implementation/platform-validation.json
+  hardware_verified: false
+- scope: older_software_checkpoint_not_current_support
+  source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
+  native_ctest_passed: 1711
+  online_sanitizer_with_leak_detection: 23
+  local_sanitizer_subset: 37
+  local_leak_detection: disabled_due_to_ptrace_not_passed
+  archived_checkpoint:
+    source_implementation: maintained
+    configure_build_link: executed
+    effective_config_regressions: 18_passed
+    spi_contracts: 43_passed
+    i2c_contracts: 36_passed
+    config_independent_subset: 119_passed
+    industrial_contracts: 19_passed_with_fuzz_and_sanitizers
+    enterprise_tools: 68_passed_models_and_real_openssl_signature_verification
+    persistence_fault_boundaries: 630_storage_763_rotation_3659_update
+    source_commit: 4a283ebf6c2fa44162014d6bc7e263c7525775f4
+    full_suite: 1711_passed_zero_failures_errors_or_skips
+    full_suite_seconds: 48.82
+    full_suite_report: build/linux-gcc-debug/ctest-final-source.xml
+    online_native_profiles: three_profiles_each_1711_passed_at_4a283eb
+    production_entry_smokes: blinky_industrial_controller_config_demo_shell_demo_freertos_demo_passed
+    release_application_checks: 5_passed_zero_failures_errors_or_skips
+    release_application_report: build/linux-gcc-release/ctest-final-applications.xml
+    release_application_seconds: 1.01
+    expanded_sanitizer_subset: 37_passed_zero_failures_errors_or_skips
+    sanitizer_report: build/linux-gcc-sanitizers/ctest-final-contracts.xml
+    sanitizer_seconds: 12.33
+    sanitizer_scope: selected_local_contracts_regressions_and_5_finite_apps
+    local_leak_detection: disabled_due_to_ptrace_no_passing_leak_claim
+    online_sanitizer_subset: 23_passed_with_leak_detection_enabled_at_4a283eb
+    source_config_artifact_binding: build/evidence/final-source-4a283ebf6c2f-identity.json
+    required_static_analysis: clang_tidy_and_cppcheck_136_owned_translation_units_passed_at_4a283eb
+    ci_helpers: 107_passed_at_e15df5c
+    tracked_python_syntax: 130_sources_zero_errors_at_e15df5c
+    coverage_export_and_final_documentation_head: see_live_PR_3_checks
+    hardware: not_applicable
+    records:
+    - docs/implementation/build-config.md
+    - docs/implementation/native-i2c.md
+    - docs/implementation/native-hal-validation.md
+    - docs/implementation/industrial-reference.md
+    - docs/implementation/independent-review.md
+    - docs/implementation/enterprise-delivery.md
+- scope: external_old_API_baseline_new_pin_requires_validation
+  platform_source_commit: 069dcf14f9cb1cd6fc4a869d87bf9827b91ce306
+  examples_source_commit: 24ef09c36ca32362749691e7524c2d7b48177690
+  native_application_checks: 3
+  arm_release_configurations: 8
+  arm_elf_images: 20
+  record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/docs/validation.md
+  hardware_verified: false
+capability_limits:
+  typed_i2c:
+    native: implemented_and_executed
+    stm32: modern_hardware_provider_not_implemented_explicit_unsupported
+    gd32f470: modern_hardware_provider_not_implemented_explicit_unsupported
+  flash_layout:
+    default: whole_physical_flash_image_no_reserved_storage_regions
+    image_offset: zero_only_no_bootloader_or_VTOR_relocation
+    regions: consumer_owned_validated_permissions_and_full_erase_blocks
+  board_validation: reviewed_GPIO_UART_SPI_routes_not_complete_topology_solver
+  memory_info: main_SRAM_and_internal_Flash_only_not_all_domains_or_DMA_map
+  mcu_crypto: no_provider_entropy_vault_binding_explicit_unsupported
+  platform_lifecycle: bounded_idle_baremetal_or_pre_scheduler_cleanup_reinit_partial_failures_retain_ownership_and_admission_fence
+  kernel_restart: not_supported_running_or_suspended_MCU_FreeRTOS_shutdown_is_BUSY
+  cache_mpu: not_implemented_or_qualified
+  hal_completion: implemented_caller_owned_bounded_terminal_dispatch_no_auto_device_callback_or_worker
+  relocatable_source_sdk: strict_clean_5498b2b_delivery_passed_current_source_requires_fresh_prepare_verify_consume
+  physical_workloads: IRQ_DMA_power_loss_long_load_full_runners_and_measured_budgets_pending
+profiles:
+- id: native-contracts
+  architecture: native
+  host: linux
+  board: native-reference
+  osal: native
+  toolchain: GCC_14.2_or_Clang_per_preset
+  config: platforms/native/defconfig
+  presets:
+  - linux-gcc-debug
+  - linux-gcc-release
+  - linux-clang-debug
+  - linux-clang-release
+  - linux-gcc-sanitizers
+  status: experimental
+  evidence:
+    production: maintained_host_typed_contracts_OSAL_and_explicit_components
+    current_unified_source_matrix: see_current_delivery_validation_record
+    record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
+    historical_targeted_scopes: docs/implementation/refactor-execution.csv
+    hardware: not_applicable
+  limits:
+  - Counts refer to distinct scoped snapshots and can overlap; do not sum them as a new full-suite total.
+  - OpenSSL requires explicit Native configuration, link and provider binding.
+  - Host models do not establish MCU IRQ/DMA/electrical or real-time behavior.
+- id: freertos-posix-contracts
+  architecture: host
+  board: not_applicable
+  osal: freertos_pinned_kernel_posix_port
+  config: tests/osal/freertos_runtime/FreeRTOSConfig.h
+  status: experimental
+  evidence:
+    kernel: actual_pinned_source_initialized_and_executed
+    record: docs/implementation/osal-refactor-validation.json
+    finite_token_budget: production_limit_six_exhaustion_and_slot_diagnostics_executed
+    hardware: not_applicable
+    arm_interrupt_port: not_executed
+  limits:
+  - Real POSIX kernel execution is not ARM scheduler or interrupt qualification.
+- id: windows-macos-native
+  host:
+  - windows
+  - macos
+  status: experimental
+  evidence:
+    presets_and_wrappers: retained_updated
+    current_execution: not_executed
+  limits:
+  - Linux execution does not qualify retained cross-host presets.
+- id: stm32-discovery-reference
+  soc: STM32F407VGT6
+  architecture: cortex_m4f
+  board: stm32f4discovery-mb997
+  board_revision: null
+  user_board_selection: confirmed_model_actual_PCB_pending
+  osal:
+  - baremetal
+  - freertos
+  toolchain: ARM_GNU_14.3.rel1
+  configs:
+  - configs/stm32f407_baremetal_defconfig
+  - configs/stm32f407_freertos_defconfig
+  presets:
+  - stm32-armgcc-release
+  - stm32-armgcc-freertos-release
+  board_manifest: boards/stm32f4discovery/board.json
+  status: experimental
+  physical_flash_bytes: 1048576
+  default_image_bytes: 1048576
+  default_storage_regions: []
+  physical_erase_geometry: 12_nonuniform_sectors
+  evidence:
+    production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
+    software: see_current_delivery_validation_record
+    current_unified_source_matrix: see_current_delivery_validation_record
+    contract_image: nexus_contract_firmware_not_business_application
+    record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
+    hardware: not_executed
+  limits:
+  - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
+  - Modern MCU typed I2C and crypto provider are unsupported.
+  - No complete kernel hot restart, MPU/cache qualification, bootloader or nonzero image relocation.
+  - Board route validation is scoped; disabled/unreviewed controllers are not advertised as ready.
+  - External layout chooses storage regions; SoC imposes no product partition.
+  - Main SRAM/Flash info is not an exhaustive memory-domain or DMA-capability declaration.
+  remaining_acceptance:
+  - RF-CI-01
+  - RF-HIL-01
+  - RF-HIL-02
+  - RF-HIL-03
+  - RF-REL-01
+- id: stm32-qiming-v31
+  soc: STM32F407ZGT6
+  architecture: cortex_m4f
+  board: stm32f407zg-qiming-v31
+  board_revision: null
+  user_board_selection: confirmed_model_actual_PCB_pending
+  osal:
+  - baremetal
+  - freertos
+  toolchain: ARM_GNU_14.3.rel1
+  configs:
+  - configs/stm32f407zg_qiming_v31_baremetal_defconfig
+  - configs/stm32f407zg_qiming_v31_freertos_defconfig
+  presets:
+  - stm32-qiming-armgcc-baremetal-release
+  - stm32-qiming-armgcc-freertos-release
+  board_manifest: boards/stm32f407_qiming_v31/board.json
+  status: experimental
+  physical_flash_bytes: 1048576
+  default_image_bytes: 1048576
+  default_storage_regions: []
+  physical_erase_geometry: 12_nonuniform_sectors
+  evidence:
+    production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
+    software: see_current_delivery_validation_record
+    current_unified_source_matrix: see_current_delivery_validation_record
+    contract_image: nexus_contract_firmware_not_business_application
+    record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
+    hardware: not_executed
+  limits:
+  - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
+  - Modern MCU typed I2C and crypto provider are unsupported.
+  - No complete kernel hot restart, MPU/cache qualification, bootloader or nonzero image relocation.
+  - Board route validation is scoped; disabled/unreviewed controllers are not advertised as ready.
+  - External layout chooses storage regions; SoC imposes no product partition.
+  - Main SRAM/Flash info is not an exhaustive memory-domain or DMA-capability declaration.
+  remaining_acceptance:
+  - RF-CI-01
+  - RF-HIL-01
+  - RF-HIL-02
+  - RF-HIL-03
+  - RF-REL-01
+- id: stm32-sky-youth
+  soc: STM32F407VET6
+  architecture: cortex_m4f
+  board: stm32f407ve-sky-qingchun
+  board_revision: null
+  user_board_selection: confirmed_model_actual_PCB_pending
+  osal:
+  - baremetal
+  - freertos
+  toolchain: ARM_GNU_14.3.rel1
+  configs:
+  - configs/stm32f407ve_sky_qingchun_baremetal_defconfig
+  - configs/stm32f407ve_sky_qingchun_freertos_defconfig
+  presets:
+  - stm32-sky-armgcc-baremetal-release
+  - stm32-sky-armgcc-freertos-release
+  board_manifest: boards/stm32f407ve_sky_qingchun/board.json
+  status: experimental
+  physical_flash_bytes: 524288
+  default_image_bytes: 524288
+  default_storage_regions: []
+  physical_erase_geometry: 8_nonuniform_sectors
+  evidence:
+    production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
+    software: see_current_delivery_validation_record
+    current_unified_source_matrix: see_current_delivery_validation_record
+    contract_image: nexus_contract_firmware_not_business_application
+    record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
+    hardware: not_executed
+  limits:
+  - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
+  - Modern MCU typed I2C and crypto provider are unsupported.
+  - No complete kernel hot restart, MPU/cache qualification, bootloader or nonzero image relocation.
+  - Board route validation is scoped; disabled/unreviewed controllers are not advertised as ready.
+  - External layout chooses storage regions; SoC imposes no product partition.
+  - Main SRAM/Flash info is not an exhaustive memory-domain or DMA-capability declaration.
+  remaining_acceptance:
+  - RF-CI-01
+  - RF-HIL-01
+  - RF-HIL-02
+  - RF-HIL-03
+  - RF-REL-01
+- id: gd32-liangshan
+  soc: GD32F470ZGT6
+  architecture: cortex_m4f
+  board: gd32f470zg-liangshan
+  board_revision: null
+  user_board_selection: confirmed_model_actual_PCB_pending
+  osal:
+  - baremetal
+  - freertos
+  toolchain: ARM_GNU_14.3.rel1
+  configs:
+  - configs/gd32f470_baremetal_defconfig
+  - configs/gd32f470_freertos_defconfig
+  presets:
+  - gd32f470-armgcc-baremetal-release
+  - gd32f470-armgcc-freertos-release
+  board_manifest: boards/gd32f470_liangshan/board.json
+  status: experimental
+  physical_flash_bytes: 1048576
+  default_image_bytes: 1048576
+  default_storage_regions: []
+  physical_erase_geometry: 256_four_KiB_independent_erase_pages
+  evidence:
+    production: real_startup_clock_GPIO_UART_SPI_Flash_identity_time_implemented_with_scoped_capabilities
+    software: see_current_delivery_validation_record
+    current_unified_source_matrix: see_current_delivery_validation_record
+    contract_image: nexus_contract_firmware_not_business_application
+    record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
+    hardware: not_executed
+  limits:
+  - Physical PCB clock/supply/safe levels IRQ/TC DMA SPI/Flash power loss and worst-load timing unqualified.
+  - Modern MCU typed I2C and crypto provider are unsupported.
+  - No complete kernel hot restart, MPU/cache qualification, bootloader or nonzero image relocation.
+  - Board route validation is scoped; disabled/unreviewed controllers are not advertised as ready.
+  - External layout chooses storage regions; SoC imposes no product partition.
+  - Main SRAM/Flash info is not an exhaustive memory-domain or DMA-capability declaration.
+  remaining_acceptance:
+  - RF-CI-01
+  - RF-HIL-01
+  - RF-HIL-02
+  - RF-HIL-03
+  - RF-REL-01
+hil_tooling:
+  status: tooling_ready_not_physical_qualification
+  board_fixture_templates: 4
+  station_observed_identity: not_bound
+  board_probe_tty_leases: implemented
+  elf_bin_board_layout_admission: implemented_current_artifacts_require_fresh_readonly_admission
+  historical_artifact_tampering_cases_rejected: 6
+  new_board_model_tests: 23
+  legacy_adapter_model_tests: 20
+  hardware_verified: false
+  record: https://github.com/X-Gen-Lab/nexus-examples/blob/main/evidence/platform-refactor-validation.json
+  workload_budgets: null_unmeasured
+  uart_challenge_runner: implemented_not_physically_executed
+promotion_requires:
+- clean_source_dependency_and_exact_external_source_pair
+- fresh_nonzero_executed_required_suites_and_final_profile_matrix
+- effective_config_Board_layout_toolchain_ELF_BIN_map_identity
+- whole_artifact_license_security_and_inventory_review
+- exact_PCB_probe_readback_physical_HIL_for_product_qualification
+- measured_workload_resource_and_deadline_budgets
+- external_product_trust_signing_health_manufacturing_policy
+- named_primary_backup_reviewers_support_window_and_regression_resources
+enterprise_supported_profiles: []
+lts_profiles: []
+target_change: User replaced GD32F303 with GD32F470ZGT6 Liangshan. No F303 support claim.

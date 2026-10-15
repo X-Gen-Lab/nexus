@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/can-tests/build",
+      "-j",
+      "4"
+    ],
+    "exit_code": 0,
+    "log": "final-build.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/can-tests/build/can_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/can_contract-final.xml"
+    ],
+    "exit_code": 0,
+    "log": "can_contract-final.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/can-tests/build/can_stm32f407_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/can_stm32f407_contract-final.xml"
+    ],
+    "exit_code": 0,
+    "log": "can_stm32f407_contract-final.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/can-tests/build/can_gd32f470_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/can_gd32f470_contract-final.xml"
+    ],
+    "exit_code": 0,
+    "log": "can_gd32f470_contract-final.log"
+  }
+]

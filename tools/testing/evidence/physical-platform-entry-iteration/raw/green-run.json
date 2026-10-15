@@ -1,0 +1,46 @@
+[
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/physical-factory-tests/build/test-import/nexus_stm32_physical_platform_factory_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-industrial-design/physical-factory-tests/stm32-green.xml"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "binary_sha256": "d67c70a9f8ab8f59f1b623855be205b03895bf92eefd3c051e46eb466cc50ea1",
+    "log_sha256": "1d3c9d678305e2bd0211718f55f1723e111febff2c7cfa484281df152ec837f5",
+    "xml": {
+      "tests": "12",
+      "failures": "0",
+      "disabled": "0",
+      "errors": "0",
+      "time": "0.003",
+      "timestamp": "2026-10-11T20:55:59.237",
+      "name": "AllTests"
+    }
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/physical-factory-tests/build/test-import/nexus_gd32_physical_platform_factory_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-industrial-design/physical-factory-tests/gd32-green.xml"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "binary_sha256": "913fbb7d5199dd41e50d98767e11f31e1e607c3a35791f272c7ed98b0a3e460f",
+    "log_sha256": "37823ff2d51368f70d83c47a7e03a7a9cda6d38c472a85b68722128db71ab16f",
+    "xml": {
+      "tests": "12",
+      "failures": "0",
+      "disabled": "0",
+      "errors": "0",
+      "time": "0.002",
+      "timestamp": "2026-10-11T20:55:59.248",
+      "name": "AllTests"
+    }
+  }
+]

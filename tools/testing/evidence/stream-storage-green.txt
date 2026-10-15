@@ -1,0 +1,21 @@
+Running main() from gmock_main.cc
+[==========] Running 6 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 6 tests from StreamStorage
+[ RUN      ] StreamStorage.RejectsPayloadInsideStreamControlBeforeMutation
+[       OK ] StreamStorage.RejectsPayloadInsideStreamControlBeforeMutation (0 ms)
+[ RUN      ] StreamStorage.RejectsPayloadInsideSlotMetadataBeforeMutation
+[       OK ] StreamStorage.RejectsPayloadInsideSlotMetadataBeforeMutation (0 ms)
+[ RUN      ] StreamStorage.RejectsControlAndSlotArrayOverlap
+[       OK ] StreamStorage.RejectsControlAndSlotArrayOverlap (0 ms)
+[ RUN      ] StreamStorage.ValidAdjacentBlocksKeepIndependentLoans
+[       OK ] StreamStorage.ValidAdjacentBlocksKeepIndependentLoans (0 ms)
+[ RUN      ] StreamStorage.RejectsSlotCountOverflowBeforeReadingArray
+[       OK ] StreamStorage.RejectsSlotCountOverflowBeforeReadingArray (0 ms)
+[ RUN      ] StreamStorage.RejectsPayloadAddressOverflowWithoutAccess
+[       OK ] StreamStorage.RejectsPayloadAddressOverflowWithoutAccess (0 ms)
+[----------] 6 tests from StreamStorage (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 6 tests.

@@ -1,0 +1,19 @@
+[
+  {
+    "command": [
+      ".venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/user-io-tests/build"
+    ],
+    "exit_code": 0,
+    "log": "boundary-build-green.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/user-io-tests/build/user_io_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/user-io-broker-iteration/boundary-green.xml"
+    ],
+    "exit_code": 0,
+    "log": "boundary-green.log"
+  }
+]

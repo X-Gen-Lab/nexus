@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "command": [
+    "build/native-debug/bin/nexus_stm32_adc_stream_test",
+    "--gtest_filter=Stm32AdcStream.ObservedDmaFaultCannotBeReplacedByLateTransferComplete"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1
+}

@@ -1,0 +1,57 @@
+name: Dependency Maintenance
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  observe:
+    name: Observe locked dependencies and propose review
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Retain actual compatibility and upstream observations
+        run: |
+          mkdir -p build/dependency-maintenance
+          python3 -B tools/maintenance/compatibility.py \
+            > build/dependency-maintenance/compatibility.json
+          python3 -B tools/maintenance/dependency_proposals.py --observe-upstream \
+            --upstream-output build/dependency-maintenance/upstream \
+            > build/dependency-maintenance/inventory.json
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: dependency-maintenance
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/dependency-maintenance
+          require-dependencies: 'true'
+          artifacts: |
+            build/dependency-maintenance/
+          tools: |
+            python=python3
+            git=git
+      - name: Preserve the read-only dependency review
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dependency-maintenance
+          path: |
+            build/dependency-maintenance/
+            build/job-identities/dependency-maintenance/
+          retention-days: 30
+          include-hidden-files: true
+          if-no-files-found: error

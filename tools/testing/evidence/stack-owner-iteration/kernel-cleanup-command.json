@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/workspace/nexus/build/native-debug/bin/nexus_freertos_services_kernel_test",
+    "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/stack-tdd/kernel-cleanup.xml"
+  ],
+  "returncode": 0,
+  "start": 1791742582.3342955,
+  "end": 1791742583.9636343,
+  "timeout_s": 45,
+  "source_sha256": "6bfb61e309ce2ba1ec48873c97a6127f15231daaccf1c8bac85d300d6a4651a4"
+}

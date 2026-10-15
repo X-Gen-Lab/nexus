@@ -1,0 +1,15 @@
+{
+  "command": [
+    "cmake",
+    "--build",
+    "build/uart-iteration",
+    "--target",
+    "nexus_freertos_failstop_test",
+    "nexus_stm32_uart_dma_test",
+    "nexus_gd32_uart_dma_test",
+    "--parallel",
+    "2"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

@@ -1,0 +1,8 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 86fdc35c55e0409c49ea48c3bb690874d10ae688e854b4bd036ee00ae17f4f77\nX-Nexus-Reviewed: true\n"
+
+msgid "Public C API"
+msgstr "公共 API 参考"
+
+msgid "Doxygen reads only current public header trees. The module pages render real declarations through Breathe; vendor SDKs, mutable provider storage, tests and historical APIs are excluded. Generated nexus_factory.h belongs to one resolved assembly and is described in the factory explanation."
+msgstr "Doxygen 只读取当前公共头文件目录。各模块页面通过 Breathe 呈现实际声明；厂商 SDK、可变提供者存储、测试和历史 API 均被排除。生成的 nexus_factory.h 属于某一已解析装配，其合同见工厂架构说明。"

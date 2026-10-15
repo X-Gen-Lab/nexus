@@ -1,0 +1,17 @@
+F
+======================================================================
+FAIL: test_untracked_behavior_cannot_certify_staged_snapshot (tools.testing.test_google_report.GateBoundaryTests.test_untracked_behavior_cannot_certify_staged_snapshot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/mock.py", line 1396, in patched
+    return func(*newargs, **newkeywargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/testing/test_google_report.py", line 110, in test_untracked_behavior_cannot_certify_staged_snapshot
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

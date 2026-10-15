@@ -1,0 +1,13 @@
+-- The C compiler identification is GNU 14.3.1
+-- The ASM compiler identification is GNU
+-- Found assembler: /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Found Python3: /workspace/nexus/.venv/bin/python (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Nexus CPU runtime: cortex-m0/freertos
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-os-resource-iteration/run1/cortex-m0-standard-O2/build

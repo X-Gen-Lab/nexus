@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="8" failures="0" disabled="0" errors="0" time="0.019" timestamp="2026-10-11T20:58:26.802" name="AllTests">
+  <testsuite name="ThreadXBootstrap" tests="8" failures="0" disabled="0" skipped="0" errors="0" time="0.019" timestamp="2026-10-11T20:58:26.802">
+    <testcase name="RejectsISRCallbackBeforeProduct" file="/workspace/nexus/tests/google/threadx_bootstrap_test.cpp" line="30" status="run" result="completed" time="0.002" timestamp="2026-10-11T20:58:26.802" classname="ThreadXBootstrap" />
+    <testcase name="RejectsUnprivilegedCallbackBeforeProduct" file="/workspace/nexus/tests/google/threadx_bootstrap_test.cpp" line="33" status="run" result="completed" time="0.002" timestamp="2026-10-11T20:58:26.805" classname="ThreadXBootstrap" />
+    <testcase name="RejectsFaultMaskBeforeProduct" file="/workspace/nexus/tests/google/threadx_bootstrap_test.cpp" line="36" status="run" result="completed" time="0.002" timestamp="2026-10-11T20:58:26.807" classname="ThreadXBootstrap" />
+    <testcase name="RejectsUnselectedBasepriBeforeProduct" file="/workspace/nexus/tests/google/threadx_bootstrap_test.cpp" line="39" status="run" result="completed" time="0.002" timestamp="2026-10-11T20:58:26.809" classname="ThreadXBootstrap" />
+    <testcase name="CanonicalUnmaskedCallbackInvokesProduct" file="/workspace/nexus/tests/google/threadx_bootstrap_test.cpp" line="42" status="run" result="completed" time="0.002" timestamp="2026-10-11T20:58:26.812" classname="ThreadXBootstrap" />
+    <testcase name="CanonicalPrimaskCallbackInvokesProduct" file="/workspace/nexus/tests/google/threadx_bootstrap_test.cpp" line="45" status="run" result="completed" time="0.002" timestamp="2026-10-11T20:58:26.814" classname="ThreadXBootstrap" />
+    <testcase name="ObserverPrecedesOverriddenProductHookForContextFault" file="/workspace/nexus/tests/google/threadx_bootstrap_test.cpp" line="48" status="run" result="completed" time="0.002" timestamp="2026-10-11T20:58:26.816" classname="ThreadXBootstrap" />
+    <testcase name="ObserverPrecedesProductHookForMaskedBootstrapFault" file="/workspace/nexus/tests/google/threadx_bootstrap_test.cpp" line="51" status="run" result="completed" time="0.002" timestamp="2026-10-11T20:58:26.819" classname="ThreadXBootstrap" />
+  </testsuite>
+</testsuites>

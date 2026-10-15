@@ -1,0 +1,31 @@
+Running main() from gmock_main.cc
+[==========] Running 11 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 11 tests from GD32SPIDMA
+[ RUN      ] GD32SPIDMA.ProgramsExactIndependentDmaRoutesWithoutCopying
+[       OK ] GD32SPIDMA.ProgramsExactIndependentDmaRoutesWithoutCopying (0 ms)
+[ RUN      ] GD32SPIDMA.BothDmaCompletionsRetainCsUntilIndependentWireIdle
+[       OK ] GD32SPIDMA.BothDmaCompletionsRetainCsUntilIndependentWireIdle (0 ms)
+[ RUN      ] GD32SPIDMA.RejectedDomainsOverlapAndExpiredDeadlineHaveZeroEffects
+[       OK ] GD32SPIDMA.RejectedDomainsOverlapAndExpiredDeadlineHaveZeroEffects (0 ms)
+[ RUN      ] GD32SPIDMA.EndpointIdentityAndBusySecondChildCannotAcquireCs
+[       OK ] GD32SPIDMA.EndpointIdentityAndBusySecondChildCannotAcquireCs (0 ms)
+[ RUN      ] GD32SPIDMA.CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains
+[       OK ] GD32SPIDMA.CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains (0 ms)
+[ RUN      ] GD32SPIDMA.RefusedEngineDisableKeepsBorrowDespiteIdleWire
+[       OK ] GD32SPIDMA.RefusedEngineDisableKeepsBorrowDespiteIdleWire (0 ms)
+[ RUN      ] GD32SPIDMA.DmaErrorRequiresExplicitIdleRecoveryAndNeverReplays
+[       OK ] GD32SPIDMA.DmaErrorRequiresExplicitIdleRecoveryAndNeverReplays (0 ms)
+[ RUN      ] GD32SPIDMA.WakeFollowsLatchedFactsAndLateIrqsNeverReplayCompletion
+[       OK ] GD32SPIDMA.WakeFollowsLatchedFactsAndLateIrqsNeverReplayCompletion (0 ms)
+[ RUN      ] GD32SPIDMA.BothActualIrqPrioritiesMustPermitKernelCallingWake
+[       OK ] GD32SPIDMA.BothActualIrqPrioritiesMustPermitKernelCallingWake (0 ms)
+[ RUN      ] GD32SPIDMA.FalseTransferCompleteCounterIsAnErrorAndCannotSettleSuccess
+[       OK ] GD32SPIDMA.FalseTransferCompleteCounterIsAnErrorAndCannotSettleSuccess (0 ms)
+[ RUN      ] GD32SPIDMA.CompletedMemoryWithUnboundedRequestStillHasBoundedDrain
+[       OK ] GD32SPIDMA.CompletedMemoryWithUnboundedRequestStillHasBoundedDrain (0 ms)
+[----------] 11 tests from GD32SPIDMA (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 11 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 11 tests.

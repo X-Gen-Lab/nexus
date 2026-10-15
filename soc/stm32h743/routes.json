@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "id": "gpio-pb0",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS12110 Rev11 LQFP144 PB0; UM2407 Rev6 MB1364 LED1 active high, SB39 ON and SB47 OFF; physical fitting unknown."
+    },
+    {
+      "id": "usart3-pd8-pd9",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "USART3",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PD8",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PD9",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-bytes",
+        "dma-tx"
+      ],
+      "source": "DS12110 Rev11 alternate-function table PD8/PD9 AF7 USART3; actual CMSIS IRQ39; UM2407 Rev6 VCP default SB19/SB12 ON. Physical fitting unknown. RM0433 DMA1 stream0/DMAMUX1 channel0, USART3_TX request46; official ST H7 HAL v1.11.5 DMA request table.",
+      "mode_dma": {
+        "dma-tx": [
+          "DMA1:stream0:channel46"
+        ]
+      }
+    }
+  ]
+}

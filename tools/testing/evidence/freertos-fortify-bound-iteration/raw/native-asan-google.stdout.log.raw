@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "passed": 8,
+  "report": {
+    "path": "/workspace/nexus-freertos-failstop-fortify-iteration/native-asan-execution/manifest.json",
+    "sha256": "1f7bd1221ccd9697838d2c3846db8a8509b7258e5348c36024c5f9c071604bb8",
+    "bytes": 3021
+  }
+}

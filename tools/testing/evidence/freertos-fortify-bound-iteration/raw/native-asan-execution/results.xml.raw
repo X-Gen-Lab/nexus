@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="8" failures="0" disabled="0" errors="0" time="5.047" timestamp="2026-10-11T23:31:28.808" name="AllTests">
+  <testsuite name="FreeRTOSFailStop" tests="8" failures="0" disabled="0" skipped="0" errors="0" time="5.047" timestamp="2026-10-11T23:31:28.808">
+    <testcase name="AssertObservesLocationBeforeMaskAndPark" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="314" status="run" result="completed" time="0.001" timestamp="2026-10-11T23:31:28.808" classname="FreeRTOSFailStop" />
+    <testcase name="StackOverflowNeverDereferencesTaskOrName" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="322" status="run" result="completed" time="0.001" timestamp="2026-10-11T23:31:28.810" classname="FreeRTOSFailStop" />
+    <testcase name="ReturningObserverCannotReclaimLoanOrContinueKernel" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="331" status="run" result="completed" time="1.004" timestamp="2026-10-11T23:31:28.811" classname="FreeRTOSFailStop" />
+    <testcase name="StrongerIncomingBasepriIsNeverWeakenedByPortStore" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="336" status="run" result="completed" time="1.011" timestamp="2026-10-11T23:31:29.816" classname="FreeRTOSFailStop" />
+    <testcase name="EqualIncomingBasepriStaysMaskedThroughObservation" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="341" status="run" result="completed" time="1.001" timestamp="2026-10-11T23:31:30.827" classname="FreeRTOSFailStop" />
+    <testcase name="PrimaskIsPreservedWithoutChangingAnotherMask" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="346" status="run" result="completed" time="1.011" timestamp="2026-10-11T23:31:31.829" classname="FreeRTOSFailStop" />
+    <testcase name="FaultmaskIsPreservedWithoutChangingAnotherMask" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="351" status="run" result="completed" time="1.012" timestamp="2026-10-11T23:31:32.841" classname="FreeRTOSFailStop" />
+    <testcase name="WeakerIncomingBasepriIsRaisedToActualKernelCeiling" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="356" status="run" result="completed" time="0.002" timestamp="2026-10-11T23:31:33.854" classname="FreeRTOSFailStop" />
+  </testsuite>
+</testsuites>

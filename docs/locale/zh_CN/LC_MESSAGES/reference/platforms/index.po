@@ -1,0 +1,21 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: b1776273449d8e99fc2b9b131420382e8bf09658239241c45df61edfd304b12a\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/reference/platforms/index.md:8
+msgid "Platforms and qualification"
+msgstr "平台与资格"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/reference/platforms/index.md:10
+msgid ""
+"Read the support scope and exact evidence identity separately. A documented "
+"capability is not a current-source software candidate or a physical result."
+msgstr "分别阅读支持范围和精确证据身份。文档描述的能力不等于当前源码的软件候选，也不等于实板结果。"

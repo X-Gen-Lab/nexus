@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "unittest",
+    "tools.configure.test_i2c_modes",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1
+}

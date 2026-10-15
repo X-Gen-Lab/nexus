@@ -1,0 +1,7 @@
+{
+  "command": [
+    "/workspace/nexus/build/uart-iteration/bin/nexus_uart_rs485_test",
+    "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/uart-receive-tdd/rs485-binding-red-corrected.xml"
+  ],
+  "returncode": 1
+}

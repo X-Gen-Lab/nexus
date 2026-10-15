@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "gd32f470zg-liangshan",
+  "soc": "GD32F470ZGT6",
+  "soc_family": "gd32f470",
+  "source_revision": "first-party-reference-pages-retrieved-2026-10-09",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 25000000
+  },
+  "bindings": [
+    {
+      "id": "status_led",
+      "controller": "GPIOD",
+      "route": "gpiod7",
+      "initial": 0,
+      "mask": 128
+    },
+    {
+      "id": "console",
+      "controller": "USART0",
+      "route": "usart0-pa9-pa10"
+    },
+    {
+      "id": "spi_flash",
+      "controller": "SPI4",
+      "route": "spi4-pf6-pf9",
+      "initial": 1
+    },
+    {
+      "id": "internal_flash",
+      "controller": "FMC",
+      "route": "physical-flash"
+    },
+    {
+      "id": "watchdog",
+      "controller": "FWDGT",
+      "route": "independent-watchdog"
+    }
+  ],
+  "reserved_resources": [
+    "timer:TIMER1"
+  ],
+  "unknowns": [
+    "Physical PCB revision, oscillator and connector continuity are unobserved.",
+    "SPI external NOR fitted part is unknown; no product partition is reserved.",
+    "I2C, PWM, ADC and EXTI external connector/electrical routes are not Board bindings.",
+    "All physical IRQ, timing, reset, power-cut and electrical qualification is unexecuted."
+  ],
+  "provenance": [
+    {
+      "url": "https://wiki.lckfb.com/zh-hans/lspi/beginner/led-lib.html",
+      "scope": "LED2 PD7 active high"
+    },
+    {
+      "url": "https://wiki.lckfb.com/zh-hans/lspi/beginner/uart.html",
+      "scope": "USART0 PA9/PA10 AF7"
+    },
+    {
+      "url": "https://wiki.lckfb.com/zh-hans/lspi/beginner/spi-flash.html",
+      "scope": "SPI4 PF6 CS, PF7/PF8/PF9 AF5"
+    }
+  ]
+}

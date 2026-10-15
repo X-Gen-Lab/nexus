@@ -1,0 +1,28 @@
+$ build/native-debug/bin/nexus_stm32_uart_dma_test --gtest_output=xml:build/quality/stm32-uart-dma-green.xml
+Running main() from gmock_main.cc
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from Stm32UartDma
+[ RUN      ] Stm32UartDma.DmaTransferCompleteCannotSettleUntilUartTc
+[       OK ] Stm32UartDma.DmaTransferCompleteCannotSettleUntilUartTc (0 ms)
+[ RUN      ] Stm32UartDma.CancellationCountsOnlyProvenWireBytesAndRetainsDrainBorrow
+[       OK ] Stm32UartDma.CancellationCountsOnlyProvenWireBytesAndRetainsDrainBorrow (0 ms)
+[ RUN      ] Stm32UartDma.InvalidDomainRejectsWithoutBorrowOrRegisterWrites
+[       OK ] Stm32UartDma.InvalidDomainRejectsWithoutBorrowOrRegisterWrites (0 ms)
+[ RUN      ] Stm32UartDma.ExpiredDrainQuarantinesUntilActualWireIdle
+[       OK ] Stm32UartDma.ExpiredDrainQuarantinesUntilActualWireIdle (0 ms)
+[ RUN      ] Stm32UartDma.WireIdleCannotReleaseMemoryWhenEngineRefusesDisable
+[       OK ] Stm32UartDma.WireIdleCannotReleaseMemoryWhenEngineRefusesDisable (0 ms)
+[ RUN      ] Stm32UartDma.DmaCompletionBoundsWireDrainWithoutRequestDeadline
+[       OK ] Stm32UartDma.DmaCompletionBoundsWireDrainWithoutRequestDeadline (0 ms)
+[ RUN      ] Stm32UartDma.LateServiceWithWireAndEngineProofPreservesSuccess
+[       OK ] Stm32UartDma.LateServiceWithWireAndEngineProofPreservesSuccess (0 ms)
+[ RUN      ] Stm32UartDma.BlockRxRequiresTheSeparateStreamProvider
+[       OK ] Stm32UartDma.BlockRxRequiresTheSeparateStreamProvider (0 ms)
+[----------] 8 tests from Stm32UartDma (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 8 tests.
+
+exit_code=0

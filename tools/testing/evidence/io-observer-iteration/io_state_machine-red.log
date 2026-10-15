@@ -1,0 +1,42 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from IODescriptorSequences
+[ RUN      ] IODescriptorSequences.UartCancellationAndEpochDoNotRevokeBorrow
+/workspace/nexus/tests/google/io_state_machine_test.cpp:22: Failure
+Expected equality of these values:
+  nx_request_observer_bind(&observer, &slot, epoch)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] IODescriptorSequences.UartCancellationAndEpochDoNotRevokeBorrow (0 ms)
+[ RUN      ] IODescriptorSequences.SpiCancellationAndEpochDoNotRevokeBorrow
+/workspace/nexus/tests/google/io_state_machine_test.cpp:22: Failure
+Expected equality of these values:
+  nx_request_observer_bind(&observer, &slot, epoch)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] IODescriptorSequences.SpiCancellationAndEpochDoNotRevokeBorrow (0 ms)
+[ RUN      ] IODescriptorSequences.I2cCancellationAndEpochDoNotRevokeBorrow
+/workspace/nexus/tests/google/io_state_machine_test.cpp:22: Failure
+Expected equality of these values:
+  nx_request_observer_bind(&observer, &slot, epoch)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] IODescriptorSequences.I2cCancellationAndEpochDoNotRevokeBorrow (0 ms)
+[----------] 3 tests from IODescriptorSequences (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 3 tests, listed below:
+[  FAILED  ] IODescriptorSequences.UartCancellationAndEpochDoNotRevokeBorrow
+[  FAILED  ] IODescriptorSequences.SpiCancellationAndEpochDoNotRevokeBorrow
+[  FAILED  ] IODescriptorSequences.I2cCancellationAndEpochDoNotRevokeBorrow
+
+ 3 FAILED TESTS

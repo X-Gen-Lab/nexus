@@ -1,0 +1,127 @@
+Running main() from gmock_main.cc
+[==========] Running 11 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 11 tests from EthernetFactory
+[ RUN      ] EthernetFactory.PairedTypedGettersArePureAndShareOneMacIdentity
+[       OK ] EthernetFactory.PairedTypedGettersArePureAndShareOneMacIdentity (0 ms)
+[ RUN      ] EthernetFactory.ExactChosenStorageReviewedPadsAndNoGuessedPhyLink
+[       OK ] EthernetFactory.ExactChosenStorageReviewedPadsAndNoGuessedPhyLink (0 ms)
+[ RUN      ] EthernetFactory.PairedCapabilitiesDescribeBusMasterAndPollingMdio
+[       OK ] EthernetFactory.PairedCapabilitiesDescribeBusMasterAndPollingMdio (0 ms)
+[ RUN      ] EthernetFactory.RefusedMacClockWithdrawalRetainsPlatformUntilReadback
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:365: Failure
+Expected equality of these values:
+  0x0e000000U
+    Which is: 234881024
+  ahb() & 0x0e000000U
+    Which is: 0
+
+[  FAILED  ] EthernetFactory.RefusedMacClockWithdrawalRetainsPlatformUntilReadback (0 ms)
+[ RUN      ] EthernetFactory.RefusedRmiiSelectorRestoreRetainsLeaseAndBlocksRestart
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:376: Failure
+Expected equality of these values:
+  NX_ERROR_IO
+    Which is: 6
+  Stop()
+    Which is: 0
+
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:377: Failure
+Expected equality of these values:
+  0x00800000U
+    Which is: 8388608
+  mux() & 0x00800000U
+    Which is: 0
+
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:378: Failure
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  nx_platform_start().primary
+    Which is: 0
+
+[  FAILED  ] EthernetFactory.RefusedRmiiSelectorRestoreRetainsLeaseAndBlocksRestart (0 ms)
+[ RUN      ] EthernetFactory.ForeignMacClockAndRmiiSelectionSurviveOwnedShutdown
+[       OK ] EthernetFactory.ForeignMacClockAndRmiiSelectionSurviveOwnedShutdown (0 ms)
+[ RUN      ] EthernetFactory.FailedPartialPinConfigurationRestoresAcquiredPads
+unknown file: Failure
+
+Unexpected mock function call - taking default action specified at:
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:265:
+    Function call: Configure(0, 1)
+          Returns: 0
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:392: EXPECT_CALL(ports, Configure(2U, 4U))...
+  Expected arg #0: is equal to 2
+           Actual: 0
+  Expected arg #1: is equal to 4
+           Actual: 1
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+unknown file: Failure
+
+Unexpected mock function call - taking default action specified at:
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:265:
+    Function call: Configure(0, 2)
+          Returns: 0
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:392: EXPECT_CALL(ports, Configure(2U, 4U))...
+  Expected arg #0: is equal to 2
+           Actual: 0
+  Expected arg #1: is equal to 4
+           Actual: 2
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+unknown file: Failure
+
+Unexpected mock function call - taking default action specified at:
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:265:
+    Function call: Configure(0, 7)
+          Returns: 0
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:392: EXPECT_CALL(ports, Configure(2U, 4U))...
+  Expected arg #0: is equal to 2
+           Actual: 0
+  Expected arg #1: is equal to 4
+           Actual: 7
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+unknown file: Failure
+
+Unexpected mock function call - taking default action specified at:
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:265:
+    Function call: Configure(2, 1)
+          Returns: 0
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/ethernet_factory_test.cpp:392: EXPECT_CALL(ports, Configure(2U, 4U))...
+  Expected arg #1: is equal to 4
+           Actual: 1
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+[  FAILED  ] EthernetFactory.FailedPartialPinConfigurationRestoresAcquiredPads (0 ms)
+[ RUN      ] EthernetFactory.FailedPinRestoreKeepsClocksAndStorageUntilRetry
+[       OK ] EthernetFactory.FailedPinRestoreKeepsClocksAndStorageUntilRetry (0 ms)
+[ RUN      ] EthernetFactory.ActualResetFailureIsCountedBeforeColdCallAndDrained
+[       OK ] EthernetFactory.ActualResetFailureIsCountedBeforeColdCallAndDrained (0 ms)
+[ RUN      ] EthernetFactory.HeldReceiveLoanPreventsDestructiveStopAndStaleRestartToken
+[       OK ] EthernetFactory.HeldReceiveLoanPreventsDestructiveStopAndStaleRestartToken (0 ms)
+[ RUN      ] EthernetFactory.FiniteMdioUsesPairedFaceWithoutInventingPhyNegotiation
+[       OK ] EthernetFactory.FiniteMdioUsesPairedFaceWithoutInventingPhyNegotiation (0 ms)
+[----------] 11 tests from EthernetFactory (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 11 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 8 tests.
+[  FAILED  ] 3 tests, listed below:
+[  FAILED  ] EthernetFactory.RefusedMacClockWithdrawalRetainsPlatformUntilReadback
+[  FAILED  ] EthernetFactory.RefusedRmiiSelectorRestoreRetainsLeaseAndBlocksRestart
+[  FAILED  ] EthernetFactory.FailedPartialPinConfigurationRestoresAcquiredPads
+
+ 3 FAILED TESTS

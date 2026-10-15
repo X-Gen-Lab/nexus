@@ -1,0 +1,1136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "backend": {
+            "const": "freertos"
+          }
+        },
+        "required": [
+          "backend"
+        ]
+      },
+      "then": {
+        "properties": {
+          "os": {
+            "additionalProperties": false,
+            "properties": {
+              "counting_semaphores": {
+                "type": "boolean"
+              },
+              "idle_stack_words": {
+                "maximum": 65536,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "lowpower_port": {
+                "enum": [
+                  "custom",
+                  "timebase"
+                ]
+              },
+              "max_priorities": {
+                "maximum": 32,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "max_task_name_len": {
+                "maximum": 64,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "memory_protection": {
+                "type": "boolean"
+              },
+              "mutexes": {
+                "type": "boolean"
+              },
+              "notification_slots": {
+                "maximum": 8,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "profile": {
+                "enum": [
+                  "diagnostic",
+                  "lowpower",
+                  "minimal",
+                  "standard"
+                ]
+              },
+              "runtime_stats": {
+                "type": "boolean"
+              },
+              "secure_idle_stack_bytes": {
+                "maximum": 65536,
+                "minimum": 64,
+                "type": "integer"
+              },
+              "security_model": {
+                "enum": [
+                  "single",
+                  "split"
+                ]
+              },
+              "syscall_priority": {
+                "maximum": 255,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "system_call_stack_words": {
+                "maximum": 65536,
+                "minimum": 64,
+                "type": "integer"
+              },
+              "task_notifications": {
+                "type": "boolean"
+              },
+              "tick_hz": {
+                "maximum": 1000000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "tick_source": {
+                "enum": [
+                  "external",
+                  "systick"
+                ]
+              },
+              "tickless": {
+                "type": "boolean"
+              },
+              "trace": {
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "backend": {
+            "const": "threadx"
+          }
+        },
+        "required": [
+          "backend"
+        ]
+      },
+      "then": {
+        "properties": {
+          "os": {
+            "additionalProperties": false,
+            "properties": {
+              "interrupt_mask": {
+                "enum": [
+                  "none",
+                  "basepri",
+                  "primask"
+                ]
+              },
+              "max_priorities": {
+                "const": 32
+              },
+              "syscall_priority": {
+                "maximum": 255,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "tick_hz": {
+                "maximum": 1000000,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "tick_source": {
+                "enum": [
+                  "host",
+                  "systick",
+                  "external"
+                ]
+              }
+            },
+            "type": "object"
+          }
+        }
+      }
+    }
+  ],
+  "oneOf": [
+    {
+      "not": {
+        "required": [
+          "board_package"
+        ]
+      },
+      "required": [
+        "board"
+      ]
+    },
+    {
+      "not": {
+        "required": [
+          "board"
+        ]
+      },
+      "required": [
+        "board_package"
+      ]
+    }
+  ],
+  "properties": {
+    "abi": {
+      "additionalProperties": false,
+      "properties": {
+        "arch": {
+          "type": "string"
+        },
+        "float_abi": {
+          "type": "string"
+        },
+        "fpu": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "arch",
+        "float_abi",
+        "fpu"
+      ],
+      "type": "object"
+    },
+    "adc": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "channels": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "reference_mv": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "sample_times": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "timeout_ms": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "backend": {
+      "enum": [
+        "native",
+        "baremetal",
+        "freertos",
+        "threadx"
+      ],
+      "type": "string"
+    },
+    "board": {
+      "type": "string"
+    },
+    "board_package": {
+      "type": "string"
+    },
+    "can": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "bitrate": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "drain_timeout_us": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "event_capacity": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "fifo_order": {
+            "type": "boolean"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "poll_limit": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "timing": {
+            "additionalProperties": false,
+            "properties": {
+              "prescaler": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "segment1": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "segment2": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "sjw": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "prescaler",
+              "segment1",
+              "segment2",
+              "sjw"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "can_domain": {
+      "additionalProperties": false,
+      "properties": {
+        "filters": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "bank": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "controller": {
+                "type": "string"
+              },
+              "fifo": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "format": {
+                "type": "string"
+              },
+              "id": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "mask": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "match_remote": {
+                "type": "boolean"
+              },
+              "remote": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "bank",
+              "controller",
+              "fifo",
+              "format",
+              "id",
+              "mask",
+              "match_remote",
+              "remote"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "split": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "filters",
+        "split"
+      ],
+      "type": "object"
+    },
+    "clock": {
+      "type": "string"
+    },
+    "components": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "eth": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "items": {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "maxItems": 6,
+            "minItems": 6,
+            "type": "array"
+          },
+          "binding": {
+            "type": "string"
+          },
+          "drain_timeout_us": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "init_timeout_us": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "rx_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "rx_storage_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "tx_count": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "exti": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "edge": {
+            "type": "string"
+          },
+          "event_capacity": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "factory": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "flash": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "gpio": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "i2c": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "max_hz": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "i2c_device": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "address": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "controller": {
+            "type": "string"
+          },
+          "driver": {
+            "type": "string"
+          },
+          "model_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "controller"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "layout": {
+      "type": "string"
+    },
+    "memory": {
+      "additionalProperties": false,
+      "properties": {
+        "flash_load_limit_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "libc_heap_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "main_stack_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "regions": {
+          "additionalProperties": {
+            "additionalProperties": false,
+            "properties": {
+              "limit_bytes": {
+                "minimum": 4,
+                "multipleOf": 4,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "limit_bytes"
+            ],
+            "type": "object"
+          },
+          "type": "object"
+        },
+        "static_ram_limit_bytes": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "main_stack_bytes"
+      ],
+      "type": "object"
+    },
+    "optimization": {
+      "enum": [
+        "O2",
+        "Os",
+        "O3",
+        "O2-lto",
+        "Os-lto",
+        "O3-lto"
+      ],
+      "type": "string"
+    },
+    "os": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "counting_semaphores": {
+              "type": "boolean"
+            },
+            "idle_stack_words": {
+              "maximum": 65536,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "lowpower_port": {
+              "enum": [
+                "custom",
+                "timebase"
+              ]
+            },
+            "max_priorities": {
+              "maximum": 32,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "max_task_name_len": {
+              "maximum": 64,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "memory_protection": {
+              "type": "boolean"
+            },
+            "mutexes": {
+              "type": "boolean"
+            },
+            "notification_slots": {
+              "maximum": 8,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "profile": {
+              "enum": [
+                "diagnostic",
+                "lowpower",
+                "minimal",
+                "standard"
+              ]
+            },
+            "runtime_stats": {
+              "type": "boolean"
+            },
+            "secure_idle_stack_bytes": {
+              "maximum": 65536,
+              "minimum": 64,
+              "type": "integer"
+            },
+            "security_model": {
+              "enum": [
+                "single",
+                "split"
+              ]
+            },
+            "syscall_priority": {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "system_call_stack_words": {
+              "maximum": 65536,
+              "minimum": 64,
+              "type": "integer"
+            },
+            "task_notifications": {
+              "type": "boolean"
+            },
+            "tick_hz": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "tick_source": {
+              "enum": [
+                "external",
+                "systick"
+              ]
+            },
+            "tickless": {
+              "type": "boolean"
+            },
+            "trace": {
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "interrupt_mask": {
+              "enum": [
+                "none",
+                "basepri",
+                "primask"
+              ]
+            },
+            "max_priorities": {
+              "const": 32
+            },
+            "syscall_priority": {
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "tick_hz": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "tick_source": {
+              "enum": [
+                "host",
+                "systick",
+                "external"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "pwm": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "duty_ticks": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "period_ticks": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "tick_hz": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "schema": {
+      "const": 2
+    },
+    "spi": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "max_hz": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "spi_device": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "controller": {
+            "type": "string"
+          },
+          "cs_binding": {
+            "type": "string"
+          },
+          "driver": {
+            "type": "string"
+          },
+          "max_hz": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "mode": {
+            "maximum": 3,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "model_bytes": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "controller"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "uart": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "baud": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "binding": {
+            "type": "string"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "rx": {
+            "additionalProperties": false,
+            "properties": {
+              "capacity": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "format": {
+                "enum": [
+                  "bytes",
+                  "events",
+                  "blocks"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "format"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "usb_device": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "clock_timeout_us": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "drain_timeout_us": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "event_capacity": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "poll_limit": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "rx_fifo_words": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "vbus_sensing": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "usb_endpoint": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "controller": {
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "in",
+              "out"
+            ]
+          },
+          "fifo_words": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "max_packet": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "number": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "transfer": {
+            "enum": [
+              "control",
+              "bulk"
+            ]
+          }
+        },
+        "required": [
+          "controller",
+          "direction",
+          "max_packet",
+          "number",
+          "transfer"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
+    "watchdog": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "backend",
+    "clock",
+    "memory",
+    "schema"
+  ],
+  "title": "Nexus authored assembly schema 2",
+  "type": "object"
+}

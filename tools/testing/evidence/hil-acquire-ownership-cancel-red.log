@@ -1,0 +1,55 @@
+test_identify_losing_lock_ownership_prevents_all_later_device_actions (tools.testing.test_hil_acquire.HilAcquireTests.test_identify_losing_lock_ownership_prevents_all_later_device_actions) ... FAIL
+test_capture_reader_failure_reaps_process_before_timeout (tools.testing.test_hil_acquire.HilAcquireTests.test_capture_reader_failure_reaps_process_before_timeout) ... FAIL
+test_interrupt_reaps_process_and_keeps_station_quarantine (tools.testing.test_hil_acquire.HilAcquireTests.test_interrupt_reaps_process_and_keeps_station_quarantine) ... FAIL
+
+======================================================================
+FAIL: test_identify_losing_lock_ownership_prevents_all_later_device_actions (tools.testing.test_hil_acquire.HilAcquireTests.test_identify_losing_lock_ownership_prevents_all_later_device_actions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 205, in test_identify_losing_lock_ownership_prevents_all_later_device_actions
+    self.assertEqual([step["name"] for step in result["operations"]],
+AssertionError: Lists differ: ['identify', 'flash', 'verify_flash', 'reset', 'serial', 'cleanup'] != ['identify']
+
+First list contains 5 additional elements.
+First extra element 1:
+'flash'
+
+- ['identify', 'flash', 'verify_flash', 'reset', 'serial', 'cleanup']
++ ['identify']
+
+======================================================================
+FAIL: test_capture_reader_failure_reaps_process_before_timeout (tools.testing.test_hil_acquire.HilAcquireTests.test_capture_reader_failure_reaps_process_before_timeout)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 233, in test_capture_reader_failure_reaps_process_before_timeout
+    self.assertLess(time.monotonic() - started, 3)
+AssertionError: 5.588270813983399 not less than 3
+
+======================================================================
+FAIL: test_interrupt_reaps_process_and_keeps_station_quarantine (tools.testing.test_hil_acquire.HilAcquireTests.test_interrupt_reaps_process_and_keeps_station_quarantine)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 254, in test_interrupt_reaps_process_and_keeps_station_quarantine
+    result = execute_acquisition(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/hil/acquire.py", line 277, in execute_acquisition
+    result = _command(step, {
+             ^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/hil/acquire.py", line 164, in _command
+    events = selector.select(min(remaining, 0.05))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 249, in interrupt_capture
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 257, in test_interrupt_reaps_process_and_keeps_station_quarantine
+    self.fail("capture interrupt escaped bounded process cleanup")
+AssertionError: capture interrupt escaped bounded process cleanup
+
+----------------------------------------------------------------------
+Ran 3 tests in 8.354s
+
+FAILED (failures=3)

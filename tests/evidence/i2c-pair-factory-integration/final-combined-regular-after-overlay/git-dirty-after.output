@@ -1,0 +1,516 @@
+ M .github/workflows/build-matrix.yml
+ M .github/workflows/test_platform_ci.py
+ M cmake/package/package_source_sdk.py
+ M cmake/platform/Configure.cmake
+ M components/clock_domain/src/clock_domain.c
+ M components/user_io_broker/src/user_io_broker.c
+ M docs/delivery/architecture.md
+ M docs/delivery/capabilities.md
+ M docs/delivery/qualification.md
+ M docs/delivery/support.md
+ M docs/design/io-lifecycle-matrix.md
+ M io/CMakeLists.txt
+ M io/native/i2c.c
+ M io/src/eth_mac.c
+ M io/src/usb_device_controller.c
+ M os/threadx/prepare_linux.py
+ M scripts/ci/io_lifecycle_matrix.py
+ M scripts/ci/os_backend_probe.py
+ M soc/common/i2c_v1_async.c
+ M soc/gd32f470/CMakeLists.txt
+ M soc/gd32f470/drivers/i2c.c
+ M soc/gd32f470/routes.json
+ M soc/gd32f470/soc.json
+ M soc/stm32f407/CMakeLists.txt
+ M soc/stm32f407/drivers/i2c.c
+ M soc/stm32f407/routes.json
+ M soc/stm32f407/soc.json
+ M tests/contracts/CMakeLists.txt
+ M tests/contracts/stm32_model/generate_constructors.py
+ M tests/contracts/test_hil_admission.py
+ M tests/contracts/test_hil_prepare.py
+ M tests/contracts/test_source_sdk.py
+ M tests/google/CMakeLists.txt
+ M tests/google/gd32_memory.cmake
+ M tests/google/gd32_memory_boot_test.cpp
+ M tests/google/i2c_register_test.cpp
+ M tests/google/native_factory_test.cpp
+ M tests/google/threadx.cmake
+ M tests/google/threadx_linux_port_test.cpp
+ M tools/configure/assembly.schema.json
+ M tools/configure/authored.py
+ M tools/configure/bindings.py
+ M tools/configure/configure.py
+ M tools/configure/factory.py
+ M tools/configure/ir.py
+ M tools/configure/providers/__init__.py
+ M tools/configure/providers/common.py
+ M tools/configure/providers/gd32f470/__init__.py
+ M tools/configure/providers/gd32f470/bindings.py
+ M tools/configure/providers/gd32f470/emission.py
+ M tools/configure/providers/native/emission.py
+ M tools/configure/providers/stm32f407/__init__.py
+ M tools/configure/providers/stm32f407/bindings.py
+ M tools/configure/providers/stm32f407/emission.py
+ M tools/configure/test_toml.py
+ M tools/hil/README.md
+ M tools/hil/acquire.py
+ M tools/hil/admit.py
+ M tools/hil/measure.py
+ M tools/hil/os_acceptance.py
+ M tools/hil/templates/workload.json
+ M tools/hil/workloads.py
+ M tools/maintenance/capabilities.py
+ M tools/maintenance/stm32g4_lock.py
+ M tools/maintenance/threadx_lock.py
+ M tools/measurement/retention.py
+ M tools/schemas/hil-fixture.schema.json
+ M tools/testing/evidence/g474-iteration/arm/startup-empty.elf
+ M tools/testing/evidence/g474-iteration/arm/startup-led.elf
+ M tools/testing/evidence/g474-iteration/arm/startup-mixed.elf
+ M tools/testing/evidence/g474-iteration/arm/startup-uart.elf
+ M tools/testing/io_lifecycle_matrix.json
+ M tools/testing/test_hil_acquire.py
+ M tools/testing/test_hil_measurements.py
+ M tools/testing/test_hil_workloads.py
+ M tools/testing/test_io_lifecycle_matrix.py
+ M tools/testing/test_os_acceptance.py
+ M tools/testing/test_stm32g4_lock.py
+ M tools/testing/test_threadx_linux_overlay.py
+ M tools/testing/test_threadx_lock.py
+?? .github/security/
+?? boards/stm32g474re_hse24_reference/
+?? docs/design/provider-assemblies.md
+?? docs/design/stm32g474.md
+?? docs/design/timer-advanced.md
+?? io/include/nexus/io/advanced_pwm.h
+?? io/include/nexus/io/timer_capture.h
+?? io/private/advanced_pwm_impl.h
+?? io/private/timer_advanced_controller.h
+?? io/private/timer_capture_impl.h
+?? io/src/advanced_pwm.c
+?? io/src/timer_capture.c
+?? scripts/ci/provider_assemblies.py
+?? scripts/ci/secret_scan.py
+?? scripts/ci/test_provider_assemblies.py
+?? soc/gd32f470/drivers/advanced_pwm.c
+?? soc/gd32f470/drivers/timer_capture.c
+?? soc/gd32f470/private/gd32f470_timer_advanced.h
+?? soc/stm32f407/drivers/advanced_pwm.c
+?? soc/stm32f407/drivers/timer_capture.c
+?? soc/stm32f407/private/stm32f407_timer_advanced.h
+?? soc/stm32g474/
+?? tests/contracts/ethernet_assembly/gd32-freertos.toml
+?? tests/contracts/ethernet_assembly/stm32-zg-freertos.toml
+?? tests/contracts/g474_assembly/
+?? tests/contracts/g474_model.c
+?? tests/contracts/g474_model.h
+?? tests/contracts/multi_controller_assembly/
+?? tests/contracts/physical_platform_assembly/
+?? tests/contracts/threadx_linux_port_predecessor.c.raw
+?? tests/contracts/timer_assembly/
+?? tests/contracts/usb_assembly/gd32-freertos.toml
+?? tests/contracts/usb_assembly/stm32-ve-freertos.toml
+?? tests/contracts/usb_assembly/stm32-zg-freertos.toml
+?? tests/evidence/g474-factory-integration/
+?? tests/evidence/threadx/
+?? tests/google/g474.cmake
+?? tests/google/g474_factory.cmake
+?? tests/google/g474_factory_model.h
+?? tests/google/g474_factory_test.cpp
+?? tests/google/g474_provider_test.cpp
+?? tests/google/g474_system_test.cpp
+?? tests/google/i2c_pair_factory.cmake
+?? tests/google/i2c_pair_factory_model.h
+?? tests/google/i2c_pair_factory_test.cpp
+?? tests/google/multi_controller_factory.cmake
+?? tests/google/multi_controller_factory_model.h
+?? tests/google/multi_controller_factory_test.cpp
+?? tests/google/physical_platform_factory.cmake
+?? tests/google/physical_platform_factory_model.h
+?? tests/google/physical_platform_factory_test.cpp
+?? tests/google/timer_advanced.cmake
+?? tests/google/timer_advanced_model.h
+?? tests/google/timer_advanced_test.cpp
+?? tests/google/timer_factory.cmake
+?? tests/google/timer_factory_model.h
+?? tests/google/timer_factory_test.cpp
+?? tools/configure/providers/stm32g474/
+?? tools/configure/secondary_controllers.py
+?? tools/configure/test_g474.py
+?? tools/configure/test_secondary_controllers.py
+?? tools/configure/test_timer_advanced.py
+?? tools/configure/test_timer_capabilities.py
+?? tools/configure/timer_advanced.py
+?? tools/hil/fixtures/stm32g474re_hse24_reference.json
+?? tools/testing/evidence/clock-domain-iteration/integration/fixture-before-public-link/main.c
+?? tools/testing/evidence/clock-domain-iteration/integration/fixture/main.c
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default-final2/compile_commands.json
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default-final2/generated/bindings.c
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default-final2/generated/nexus_bindings.h
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default-final2/generated/nexus_config.h
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default-final2/generated/nexus_factory.h
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default-final2/generated/nexus_factory_strong.h
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default-final2/generated/selection.cmake
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default/compile_commands.json
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default/generated/bindings.c
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default/generated/nexus_bindings.h
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-default/generated/nexus_config.h
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-selected-final2/compile_commands.json
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-selected-final2/generated/bindings.c
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-selected-final2/generated/nexus_bindings.h
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-selected-final2/generated/nexus_config.h
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-selected-final2/generated/nexus_factory.h
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-selected-final2/generated/nexus_factory_strong.h
+?? tools/testing/evidence/clock-domain-iteration/integration/gd32-selected-final2/generated/selection.cmake
+?? tools/testing/evidence/clock-domain-iteration/integration/red-compile-graphs/gd32.json
+?? tools/testing/evidence/clock-domain-iteration/integration/red-compile-graphs/stm32.json
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default-final2/compile_commands.json
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default-final2/generated/bindings.c
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default-final2/generated/nexus_bindings.h
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default-final2/generated/nexus_config.h
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default-final2/generated/nexus_factory.h
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default-final2/generated/nexus_factory_strong.h
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default-final2/generated/selection.cmake
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default/compile_commands.json
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default/generated/bindings.c
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default/generated/nexus_bindings.h
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-default/generated/nexus_config.h
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-selected-final2/compile_commands.json
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-selected-final2/generated/bindings.c
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-selected-final2/generated/nexus_bindings.h
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-selected-final2/generated/nexus_config.h
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-selected-final2/generated/nexus_factory.h
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-selected-final2/generated/nexus_factory_strong.h
+?? tools/testing/evidence/clock-domain-iteration/integration/stm32-selected-final2/generated/selection.cmake
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/green-cmake-0-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/green-cmake-1-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/green-cmake-2-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/green-cmake-3-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/red-cmake-0-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/red-cmake-1-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/red-cmake-2-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/red-cmake-3-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/setup-red-cmake-0-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/setup-red-cmake-1-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/setup-red-cmake-2-fixture/generated/resolved.json
+?? tools/testing/evidence/clock-domain-iteration/tool-regression/setup-red-cmake-3-fixture/generated/resolved.json
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-baremetal/nexus-sdk/generated/selection.cmake
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-freertos/compile_commands.json
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-first/gd32-freertos/nexus-sdk/generated/selection.cmake
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-baremetal/nexus-sdk/generated/selection.cmake
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-freertos/compile_commands.json
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-first/stm32-zg-freertos/nexus-sdk/generated/selection.cmake
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-baremetal/nexus-sdk/generated/selection.cmake
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-freertos/compile_commands.json
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-green/gd32-freertos/nexus-sdk/generated/selection.cmake
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-baremetal/nexus-sdk/generated/selection.cmake
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-freertos/compile_commands.json
+?? tools/testing/evidence/configure-ethernet/ethernet-arm-green/stm32-zg-freertos/nexus-sdk/generated/selection.cmake
+?? tools/testing/evidence/configure-ethernet/frozen-owned-sources/tests/google/ethernet_factory.cmake
+?? tools/testing/evidence/configure-ethernet/host/ethernet-config-model/compile_commands.json
+?? tools/testing/evidence/configure-ethernet/host/ethernet-config-model/gd32/selection.cmake
+?? tools/testing/evidence/configure-ethernet/host/ethernet-config-model/stm32/selection.cmake
+?? tools/testing/evidence/configure-ethernet/host/ethernet-config-san/compile_commands.json
+?? tools/testing/evidence/configure-ethernet/host/ethernet-config-san/gd32/selection.cmake
+?? tools/testing/evidence/configure-ethernet/host/ethernet-config-san/stm32/selection.cmake
+?? tools/testing/evidence/configure-kernel-assembly/
+?? tools/testing/evidence/configure-timer-g474/
+?? tools/testing/evidence/configure-usb-corrective/usb-arm-corrective-green/gd32-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-usb-corrective/usb-arm-corrective-green/gd32-freertos/compile_commands.json
+?? tools/testing/evidence/configure-usb-corrective/usb-arm-corrective-green/stm32-ve-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-usb-corrective/usb-arm-corrective-green/stm32-ve-freertos/compile_commands.json
+?? tools/testing/evidence/configure-usb-corrective/usb-arm-corrective-green/stm32-zg-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-usb-corrective/usb-arm-corrective-green/stm32-zg-freertos/compile_commands.json
+?? tools/testing/evidence/configure-usb-corrective/usb-default-corrective-green/gd32/compile_commands.json
+?? tools/testing/evidence/configure-usb-corrective/usb-default-corrective-green/stm32-zg/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix-green/gd32-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix-green/gd32-freertos/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix-green/stm32-ve-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix-green/stm32-ve-freertos/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix-green/stm32-zg-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix-green/stm32-zg-freertos/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix/gd32-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix/gd32-freertos/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix/stm32-ve-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix/stm32-ve-freertos/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix/stm32-zg-baremetal/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-arm-matrix/stm32-zg-freertos/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-default-arm-green/gd32/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-default-arm-green/stm32-zg/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-default-arm/gd32/compile_commands.json
+?? tools/testing/evidence/configure-usb/usb-default-arm/stm32-zg/compile_commands.json
+?? tools/testing/evidence/g474-iteration/arm/sizes.c
+?? tools/testing/evidence/g474-iteration/arm/startup-entry.c
+?? tools/testing/evidence/g474-iteration/provider-module/
+?? tools/testing/evidence/g474-iteration/runtime-current-sanitizer/
+?? tools/testing/evidence/g474-iteration/sdk-dangling-manifest/
+?? tools/testing/evidence/g474-iteration/sdk-feature-closure/
+?? tools/testing/evidence/hil-platform-iteration/
+?? tools/testing/evidence/i2c-polling-identity-iteration/
+?? tools/testing/evidence/io-lifecycle-binary-boundary/
+?? tools/testing/evidence/io-lifecycle-platform-extension/
+?? tools/testing/evidence/memory-iteration/arm-green/default/.ninja_deps
+?? tools/testing/evidence/memory-iteration/arm-green/default/.ninja_log
+?? tools/testing/evidence/memory-iteration/arm-green/default/CMakeCache.txt
+?? tools/testing/evidence/memory-iteration/arm-green/default/CMakeFiles/3.31.6/CMakeASMCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green/default/CMakeFiles/3.31.6/CMakeCCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green/default/CMakeFiles/3.31.6/CMakeSystem.cmake
+?? tools/testing/evidence/memory-iteration/arm-green/default/CMakeFiles/CMakeConfigureLog.yaml
+?? tools/testing/evidence/memory-iteration/arm-green/default/CMakeFiles/TargetDirectories.txt
+?? tools/testing/evidence/memory-iteration/arm-green/default/CMakeFiles/cmake.check_cache
+?? tools/testing/evidence/memory-iteration/arm-green/default/CMakeFiles/rules.ninja
+?? tools/testing/evidence/memory-iteration/arm-green/default/build.ninja
+?? tools/testing/evidence/memory-iteration/arm-green/default/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green/default/compile_commands.json
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/arch/
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/components/
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/core/
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/generated/.nexus-config-bundle
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/generated/input_paths.json
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/generated/memory.ld
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/generated/resolved.json
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/generated/resource-budget.json
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/generated/selection.cmake
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/io/
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/os/
+?? tools/testing/evidence/memory-iteration/arm-green/default/nexus/soc/
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/.ninja_deps
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/.ninja_log
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/CMakeCache.txt
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/CMakeFiles/3.31.6/CMakeASMCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/CMakeFiles/3.31.6/CMakeCCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/CMakeFiles/3.31.6/CMakeSystem.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/CMakeFiles/CMakeConfigureLog.yaml
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/CMakeFiles/TargetDirectories.txt
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/CMakeFiles/cmake.check_cache
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/CMakeFiles/rules.ninja
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/build.ninja
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/compile_commands.json
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/arch/
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/components/
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/core/
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/generated/.nexus-config-bundle
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/generated/input_paths.json
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/generated/memory.ld
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/generated/resolved.json
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/generated/resource-budget.json
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/generated/selection.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/io/
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/os/
+?? tools/testing/evidence/memory-iteration/arm-green2/addsram/nexus/soc/
+?? tools/testing/evidence/memory-iteration/arm-green2/default/.ninja_deps
+?? tools/testing/evidence/memory-iteration/arm-green2/default/.ninja_log
+?? tools/testing/evidence/memory-iteration/arm-green2/default/CMakeCache.txt
+?? tools/testing/evidence/memory-iteration/arm-green2/default/CMakeFiles/3.31.6/CMakeASMCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/default/CMakeFiles/3.31.6/CMakeCCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/default/CMakeFiles/3.31.6/CMakeSystem.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/default/CMakeFiles/CMakeConfigureLog.yaml
+?? tools/testing/evidence/memory-iteration/arm-green2/default/CMakeFiles/TargetDirectories.txt
+?? tools/testing/evidence/memory-iteration/arm-green2/default/CMakeFiles/cmake.check_cache
+?? tools/testing/evidence/memory-iteration/arm-green2/default/CMakeFiles/rules.ninja
+?? tools/testing/evidence/memory-iteration/arm-green2/default/bin/
+?? tools/testing/evidence/memory-iteration/arm-green2/default/build.ninja
+?? tools/testing/evidence/memory-iteration/arm-green2/default/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/default/compile_commands.json
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/arch/
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/components/
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/core/
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/generated/.nexus-config-bundle
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/generated/input_paths.json
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/generated/memory.ld
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/generated/resolved.json
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/generated/resource-budget.json
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/generated/selection.cmake
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/io/
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/os/
+?? tools/testing/evidence/memory-iteration/arm-green2/default/nexus/soc/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/.ninja_deps
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/.ninja_log
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/CMakeCache.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/CMakeFiles/3.31.6/CMakeASMCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/CMakeFiles/3.31.6/CMakeCCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/CMakeFiles/3.31.6/CMakeSystem.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/CMakeFiles/CMakeConfigureLog.yaml
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/CMakeFiles/TargetDirectories.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/CMakeFiles/cmake.check_cache
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/CMakeFiles/rules.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/build.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/compile_commands.json
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/arch/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/components/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/core/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/generated/.nexus-config-bundle
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/generated/input_paths.json
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/generated/memory.ld
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/generated/resolved.json
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/generated/resource-budget.json
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/generated/selection.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/io/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/os/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram-unselected/nexus/soc/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/.ninja_deps
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/.ninja_log
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/CMakeCache.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/CMakeFiles/3.31.6/CMakeASMCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/CMakeFiles/3.31.6/CMakeCCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/CMakeFiles/3.31.6/CMakeSystem.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/CMakeFiles/CMakeConfigureLog.yaml
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/CMakeFiles/TargetDirectories.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/CMakeFiles/cmake.check_cache
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/CMakeFiles/rules.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/build.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/arch/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/components/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/core/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/generated/.nexus-config-bundle
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/generated/input_paths.json
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/generated/selection.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/io/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/os/
+?? tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/soc/
+?? tools/testing/evidence/memory-iteration/arm-green3/both/.ninja_deps
+?? tools/testing/evidence/memory-iteration/arm-green3/both/.ninja_log
+?? tools/testing/evidence/memory-iteration/arm-green3/both/CMakeCache.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/both/CMakeFiles/3.31.6/CMakeASMCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/both/CMakeFiles/3.31.6/CMakeCCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/both/CMakeFiles/3.31.6/CMakeSystem.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/both/CMakeFiles/CMakeConfigureLog.yaml
+?? tools/testing/evidence/memory-iteration/arm-green3/both/CMakeFiles/TargetDirectories.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/both/CMakeFiles/cmake.check_cache
+?? tools/testing/evidence/memory-iteration/arm-green3/both/CMakeFiles/rules.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/both/build.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/both/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/both/nexus/arch/
+?? tools/testing/evidence/memory-iteration/arm-green3/both/nexus/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/both/nexus/components/
+?? tools/testing/evidence/memory-iteration/arm-green3/both/nexus/core/
+?? tools/testing/evidence/memory-iteration/arm-green3/both/nexus/generated/.nexus-config-bundle
+?? tools/testing/evidence/memory-iteration/arm-green3/both/nexus/generated/input_paths.json
+?? tools/testing/evidence/memory-iteration/arm-green3/both/nexus/generated/selection.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/both/nexus/io/
+?? tools/testing/evidence/memory-iteration/arm-green3/both/nexus/os/
+?? tools/testing/evidence/memory-iteration/arm-green3/both/nexus/soc/
+?? tools/testing/evidence/memory-iteration/arm-green3/default/.ninja_deps
+?? tools/testing/evidence/memory-iteration/arm-green3/default/.ninja_log
+?? tools/testing/evidence/memory-iteration/arm-green3/default/CMakeCache.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/default/CMakeFiles/3.31.6/CMakeASMCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/default/CMakeFiles/3.31.6/CMakeCCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/default/CMakeFiles/3.31.6/CMakeSystem.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/default/CMakeFiles/CMakeConfigureLog.yaml
+?? tools/testing/evidence/memory-iteration/arm-green3/default/CMakeFiles/TargetDirectories.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/default/CMakeFiles/cmake.check_cache
+?? tools/testing/evidence/memory-iteration/arm-green3/default/CMakeFiles/rules.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/default/build.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/default/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/default/nexus/arch/
+?? tools/testing/evidence/memory-iteration/arm-green3/default/nexus/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/default/nexus/components/
+?? tools/testing/evidence/memory-iteration/arm-green3/default/nexus/core/
+?? tools/testing/evidence/memory-iteration/arm-green3/default/nexus/generated/.nexus-config-bundle
+?? tools/testing/evidence/memory-iteration/arm-green3/default/nexus/generated/input_paths.json
+?? tools/testing/evidence/memory-iteration/arm-green3/default/nexus/generated/selection.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/default/nexus/io/
+?? tools/testing/evidence/memory-iteration/arm-green3/default/nexus/os/
+?? tools/testing/evidence/memory-iteration/arm-green3/default/nexus/soc/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/.ninja_deps
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/.ninja_log
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/CMakeCache.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/CMakeFiles/3.31.6/CMakeASMCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/CMakeFiles/3.31.6/CMakeCCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/CMakeFiles/3.31.6/CMakeSystem.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/CMakeFiles/CMakeConfigureLog.yaml
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/CMakeFiles/TargetDirectories.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/CMakeFiles/cmake.check_cache
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/CMakeFiles/rules.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/build.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/compile_commands.json
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/arch/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/components/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/core/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/generated/.nexus-config-bundle
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/generated/input_paths.json
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/generated/memory.ld
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/generated/resolved.json
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/generated/resource-budget.json
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/generated/selection.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/io/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/os/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm-unselected/nexus/soc/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/.ninja_deps
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/.ninja_log
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/CMakeCache.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/CMakeFiles/3.31.6/CMakeASMCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/CMakeFiles/3.31.6/CMakeCCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/CMakeFiles/3.31.6/CMakeSystem.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/CMakeFiles/CMakeConfigureLog.yaml
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/CMakeFiles/TargetDirectories.txt
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/CMakeFiles/cmake.check_cache
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/CMakeFiles/rules.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/build.ninja
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/arch/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/components/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/core/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/generated/.nexus-config-bundle
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/generated/input_paths.json
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/generated/selection.cmake
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/io/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/os/
+?? tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/soc/
+?? tools/testing/evidence/memory-iteration/arm-red/default/.ninja_deps
+?? tools/testing/evidence/memory-iteration/arm-red/default/.ninja_log
+?? tools/testing/evidence/memory-iteration/arm-red/default/CMakeCache.txt
+?? tools/testing/evidence/memory-iteration/arm-red/default/CMakeFiles/3.31.6/CMakeASMCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-red/default/CMakeFiles/3.31.6/CMakeCCompiler.cmake
+?? tools/testing/evidence/memory-iteration/arm-red/default/CMakeFiles/3.31.6/CMakeSystem.cmake
+?? tools/testing/evidence/memory-iteration/arm-red/default/CMakeFiles/CMakeConfigureLog.yaml
+?? tools/testing/evidence/memory-iteration/arm-red/default/CMakeFiles/TargetDirectories.txt
+?? tools/testing/evidence/memory-iteration/arm-red/default/CMakeFiles/cmake.check_cache
+?? tools/testing/evidence/memory-iteration/arm-red/default/CMakeFiles/rules.ninja
+?? tools/testing/evidence/memory-iteration/arm-red/default/bin/
+?? tools/testing/evidence/memory-iteration/arm-red/default/build.ninja
+?? tools/testing/evidence/memory-iteration/arm-red/default/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-red/default/compile_commands.json
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/arch/
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/cmake_install.cmake
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/components/
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/core/
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/generated/.nexus-config-bundle
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/generated/input_paths.json
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/generated/memory.ld
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/generated/resolved.json
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/generated/resource-budget.json
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/generated/selection.cmake
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/io/
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/os/
+?? tools/testing/evidence/memory-iteration/arm-red/default/nexus/soc/
+?? tools/testing/evidence/memory-iteration/artifact-relocation.json.original.raw
+?? tools/testing/evidence/memory-iteration/development.json.original.raw
+?? tools/testing/evidence/multi-controller-factory-iteration/
+?? tools/testing/evidence/multi-controller-iteration/i2c-independent-review.md
+?? tools/testing/evidence/os-resource-refresh/
+?? tools/testing/evidence/provider-assemblies/
+?? tools/testing/evidence/provider-ci-iteration/
+?? tools/testing/evidence/static-analysis-iteration/
+?? tools/testing/evidence/timer-factory-iteration/
+?? tools/testing/evidence/timer-iteration/
+?? tools/testing/test_hil_platform_extensions.py
+?? tools/testing/test_hil_protocol_admission.py
+?? tools/testing/test_provider_templates.py
+?? tools/testing/test_secret_scan.py

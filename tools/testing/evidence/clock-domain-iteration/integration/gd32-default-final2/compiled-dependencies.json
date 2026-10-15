@@ -1,0 +1,667 @@
+[
+  {
+    "path": "arch/cortex_m/nx_arch_cache.c",
+    "sha256": "0556810dac343f65da20922a9c897a3cab061f22b1a5a41a4dbc8c4bf267b59b",
+    "size": 4098
+  },
+  {
+    "path": "arch/cortex_m/nx_arch_cortex_m.c",
+    "sha256": "0f0074a66d1c3ef41d7359381c9b2d3308a4cee0ed1fe9a21d060ccf88795941",
+    "size": 2330
+  },
+  {
+    "path": "arch/cortex_m/nx_arch_mpu.c",
+    "sha256": "ae07d4beba4f6f47eb4bc6f2a24e4e3342d36e6c8db8ab850755fd7d24fd552e",
+    "size": 6993
+  },
+  {
+    "path": "arch/cortex_m/nx_arch_security.c",
+    "sha256": "926e4ad07454a59397763bdca2c2cbbbeacdd9fdab564062936425dfb4df90d7",
+    "size": 3667
+  },
+  {
+    "path": "arch/cortex_m/nx_arch_sleep.c",
+    "sha256": "c1f87ad482c11f41b785fdbded2ec4a96a59fdbd9db52e3417033ae8d1c33b4b",
+    "size": 2259
+  },
+  {
+    "path": "arch/cortex_m/private/compiler.h",
+    "sha256": "0d798d7b8fc3332e79468220509de17e68db407856b8f6e46b360c6fd9857807",
+    "size": 4784
+  },
+  {
+    "path": "arch/cortex_m/private/mechanisms.h",
+    "sha256": "be5a62c74ff05a5cd25493b3e975475280a65d06e7ac15e51e2a755f235045c2",
+    "size": 4596
+  },
+  {
+    "path": "arch/cortex_m/private/sleep.h",
+    "sha256": "db07a270e35ffdaac8c84e63192593399a01d10fc0f6b5a8495f5bec13f629be",
+    "size": 876
+  },
+  {
+    "path": "arch/include/nexus/arch/arch.h",
+    "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289",
+    "size": 5929
+  },
+  {
+    "path": "arch/include/nexus/arch/atomic.h",
+    "sha256": "c7f1fb355c18bac4b61fdcbe3059a7fc4cd824e4eb379744f56bf1a7a67de5c2",
+    "size": 6668
+  },
+  {
+    "path": "arch/include/nexus/arch/cache.h",
+    "sha256": "9775bdf517de342cc7d0cbd131cee57d6ce9697b602f55e6938bf1b51e357a26",
+    "size": 4025
+  },
+  {
+    "path": "arch/include/nexus/arch/features.h",
+    "sha256": "046631eae25a7143ee1ce8c553fbe5e80074810dfdedf0d2e3405464c21851ac",
+    "size": 1546
+  },
+  {
+    "path": "arch/include/nexus/arch/mpu.h",
+    "sha256": "c652c608a734178568d5aa63eb2a823b48200e7f8d5a9a2a5e32c2e5a0681304",
+    "size": 5956
+  },
+  {
+    "path": "arch/include/nexus/arch/security.h",
+    "sha256": "3fd3f594ba22aefd65cea7c16114b36fbd25f7925f0e449037a6cbeb623e9e4f",
+    "size": 3226
+  },
+  {
+    "path": "arch/include/nexus/arch/sleep.h",
+    "sha256": "ec14761abc18ba0405e5edc88743869dc955c275a57ca40164edb67526bb96a2",
+    "size": 2281
+  },
+  {
+    "path": "core/include/nexus/core/request.h",
+    "sha256": "c27686b1fc578d88e1f4638c3939c1409171ba6267e59e4c64eb72449ffb7e55",
+    "size": 7004
+  },
+  {
+    "path": "core/include/nexus/core/request_observer.h",
+    "sha256": "2d7cb6cf7447556a4deb6cdf8c027224ab04210f4bc0daa568cf3688ac7bdafd",
+    "size": 3381
+  },
+  {
+    "path": "core/include/nexus/core/stack_observation.h",
+    "sha256": "6452a9d540a08dadb0b17062a40e945369a60439d85bc2bb6e3f1417b5aa5f21",
+    "size": 1799
+  },
+  {
+    "path": "core/include/nexus/core/status.h",
+    "sha256": "2aed38f391159a2bfb32f475c81967e3eec01beedde97b33a276ee0dd85d32fd",
+    "size": 789
+  },
+  {
+    "path": "core/include/nexus/core/time.h",
+    "sha256": "51b54ef6ff434cc473162f215933b3cd992cc2efb89d9c3b72a4e2f7c9d839b1",
+    "size": 3477
+  },
+  {
+    "path": "core/src/request.c",
+    "sha256": "6fdc85b08c7e479cc943e77036912fb7313a4c690dd32c85a9f632d2380f03d8",
+    "size": 6864
+  },
+  {
+    "path": "core/src/request_observer.c",
+    "sha256": "dc2f96ee8517682d9e853b87fddbc5a4a3d6dc2e3b52f33b7a3cd2b4465ac82d",
+    "size": 4377
+  },
+  {
+    "path": "core/src/stack_observation.c",
+    "sha256": "8362739439edcc5ec632f10a7fead09a702e2dbe4cdd47c743a3b1d58cbd96b6",
+    "size": 1202
+  },
+  {
+    "path": "core/src/time.c",
+    "sha256": "67b6bdab6428845f8c8aa99d7a173e232e491f3909dbe0c3c78cf19cb017c1fe",
+    "size": 2199
+  },
+  {
+    "path": "io/include/nexus/io/adc.h",
+    "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1",
+    "size": 9218
+  },
+  {
+    "path": "io/include/nexus/io/adc_observer.h",
+    "sha256": "e95ab349207a44d8ae86c74325a49eb82fd9ce991ea940fff8e4b40dd21a7788",
+    "size": 4193
+  },
+  {
+    "path": "io/include/nexus/io/advanced_pwm.h",
+    "sha256": "2b9bbfbb94b834ed25964f5aa6495abc4e5cbc5f5d5bb48d106e951f37f52410",
+    "size": 3514
+  },
+  {
+    "path": "io/include/nexus/io/can.h",
+    "sha256": "b50f5356966dcda90d1b1c67edf018b740a082e3f0813bc8ec695cc7f907b084",
+    "size": 7325
+  },
+  {
+    "path": "io/include/nexus/io/dma.h",
+    "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b",
+    "size": 4114
+  },
+  {
+    "path": "io/include/nexus/io/ethernet.h",
+    "sha256": "4549314a06f7a6e8d2c3033384fae3ad8abf7b4964833bc96eb6f7aef32881c6",
+    "size": 7906
+  },
+  {
+    "path": "io/include/nexus/io/exti.h",
+    "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6",
+    "size": 4106
+  },
+  {
+    "path": "io/include/nexus/io/flash.h",
+    "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c",
+    "size": 6868
+  },
+  {
+    "path": "io/include/nexus/io/gpio.h",
+    "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778",
+    "size": 2676
+  },
+  {
+    "path": "io/include/nexus/io/i2c.h",
+    "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3",
+    "size": 9481
+  },
+  {
+    "path": "io/include/nexus/io/i2c_bus_clear.h",
+    "sha256": "e1c188d2f093fdbb79664cde94736bd9a900edad64e290221e9e706dbb4b524f",
+    "size": 8046
+  },
+  {
+    "path": "io/include/nexus/io/mdio.h",
+    "sha256": "08dc907823ee68dfacb97065c58fbc2086e9fd39039d845cedbc94b21a781636",
+    "size": 2150
+  },
+  {
+    "path": "io/include/nexus/io/spi.h",
+    "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a",
+    "size": 11660
+  },
+  {
+    "path": "io/include/nexus/io/stream.h",
+    "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a",
+    "size": 11194
+  },
+  {
+    "path": "io/include/nexus/io/stream_budget.h",
+    "sha256": "1034a90c6c09e2c6d10af139c93d50113ead058af898bfcac0acd3a2db32dc8a",
+    "size": 3252
+  },
+  {
+    "path": "io/include/nexus/io/timer.h",
+    "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a",
+    "size": 3191
+  },
+  {
+    "path": "io/include/nexus/io/timer_capture.h",
+    "sha256": "68af76fbd4961d6fd9fd2a158cbdb4f2e0e04562e1996e5c02c8035a25269816",
+    "size": 3958
+  },
+  {
+    "path": "io/include/nexus/io/uart.h",
+    "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc",
+    "size": 10872
+  },
+  {
+    "path": "io/include/nexus/io/uart_rs485.h",
+    "sha256": "58f684a10fa8647e5c55b970e74c8f753a3817e93103d12945788617442fa89e",
+    "size": 3247
+  },
+  {
+    "path": "io/include/nexus/io/usb_device.h",
+    "sha256": "759d26c0d51e28ca566a5ef5ca7e7d7fa86533812af40160abbbc216ab01fd6e",
+    "size": 8447
+  },
+  {
+    "path": "io/include/nexus/io/wake.h",
+    "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9",
+    "size": 3440
+  },
+  {
+    "path": "io/include/nexus/io/watchdog.h",
+    "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c",
+    "size": 3724
+  },
+  {
+    "path": "io/private/can_controller.h",
+    "sha256": "39a3e29a654f8141b3a46547ab083c79f41623e06e0e0ca8134f58dad00277ec",
+    "size": 3541
+  },
+  {
+    "path": "io/src/../private/eth_mac.h",
+    "sha256": "979e672eb814ac0736e09f714c71df86e4237078846c7d94f00ab94ae574d4c5",
+    "size": 3500
+  },
+  {
+    "path": "io/src/adc.c",
+    "sha256": "2a43862372a66b5258ec0a28256b78925b0bdc5b0f5a68a62bdf6b872de7e97c",
+    "size": 4646
+  },
+  {
+    "path": "io/src/adc_observer.c",
+    "sha256": "48fbc20045b5acc945d5533db881545c2a5f9e026fdb30273e7cce3b2e5ab6a3",
+    "size": 7132
+  },
+  {
+    "path": "io/src/advanced_pwm.c",
+    "sha256": "9505b6a8913d23978defb59e18eabc4c0dfa43252104e526205b8528b3cf28c5",
+    "size": 2805
+  },
+  {
+    "path": "io/src/can.c",
+    "sha256": "b4dd7e349b8a4db76c2723e259899dd28764690f43673014784568cfd01c1d31",
+    "size": 4880
+  },
+  {
+    "path": "io/src/dma.c",
+    "sha256": "98c3edf4a206ede42ecf314a7f9c1b7e892d71318604fc87e4aad18703b3bcbb",
+    "size": 2975
+  },
+  {
+    "path": "io/src/ethernet.c",
+    "sha256": "d0e0f23108ef0afa5ba1bf7240e18c1d3b5a3412ff86966ba9e7101be1996381",
+    "size": 4151
+  },
+  {
+    "path": "io/src/exti.c",
+    "sha256": "2b25b04b35965bc32596fddb9823105bf98e8746c1a6a58a5aff16e0831d28d7",
+    "size": 1718
+  },
+  {
+    "path": "io/src/flash.c",
+    "sha256": "4c0eb780eb87d6ce90b82ab4ab387f752ae15347057f90154252d5f22b4750cd",
+    "size": 2096
+  },
+  {
+    "path": "io/src/flash_region.c",
+    "sha256": "4a14b9330342c6cda18431db6c0fb3a6ba823579c4d33bf18eeffd85d866b2a9",
+    "size": 2953
+  },
+  {
+    "path": "io/src/gpio.c",
+    "sha256": "cfa133514adbae4a42e9e39c83921f9e885117b4cf251f6325dc300b19a4b0e0",
+    "size": 1483
+  },
+  {
+    "path": "io/src/i2c.c",
+    "sha256": "14a9e4f1728dd5b28e4525c83d77ea05903bdcc0645d6e9b824775ec21b22f9f",
+    "size": 7617
+  },
+  {
+    "path": "io/src/i2c_bus_clear.c",
+    "sha256": "b88cc7b5ec47eaea1684312737d69a2aae48d0a25f59106ff1e19915af6ad8df",
+    "size": 10355
+  },
+  {
+    "path": "io/src/mdio.c",
+    "sha256": "6b19c9f91d8eda0205893bb929e8d117cb31e22cbe6246fc603193fed02d0a2f",
+    "size": 1200
+  },
+  {
+    "path": "io/src/spi.c",
+    "sha256": "933d438eee528cb00aa24aaf4c2d974ec18d47facc57d9c54a791d5c76161a5f",
+    "size": 5789
+  },
+  {
+    "path": "io/src/stream.c",
+    "sha256": "693292c7b185bd64004507bb7341d1311f122f84ea608c40cb5a72718253676e",
+    "size": 14946
+  },
+  {
+    "path": "io/src/stream_budget.c",
+    "sha256": "5aca444c08926de7bbd47c24aa4ded2d8e1f89b5fa0c56077b8425352ed69eed",
+    "size": 4434
+  },
+  {
+    "path": "io/src/timer.c",
+    "sha256": "4d2eba552c2aa8065ec6767711a5b045bbe2649c69975503ea5135c6d691a5ac",
+    "size": 1847
+  },
+  {
+    "path": "io/src/timer_capture.c",
+    "sha256": "65845a51610421f6fd1072ffe06eb726bbaabe950ca4a8d47bdb16e78cd2a945",
+    "size": 3102
+  },
+  {
+    "path": "io/src/uart.c",
+    "sha256": "974704075e9bac9f80873862fcc49945e54e4cee43515c1bd61a8e6d8ab776a9",
+    "size": 5259
+  },
+  {
+    "path": "io/src/uart_rs485.c",
+    "sha256": "867bdec68729f028d8f5513e93f6656b5ec772568dfc117baf95b6c130dcc8e7",
+    "size": 14081
+  },
+  {
+    "path": "io/src/usb_device.c",
+    "sha256": "ce6a9771275e7e8f3f9da320de9cf5f71b410ff836616aa1a2e88e88ed5dd773",
+    "size": 5932
+  },
+  {
+    "path": "io/src/wake.c",
+    "sha256": "227718bd6f7a31e3469d60fa4d09fd264bd0a7a9ae13bf30bfc069b376ffca6c",
+    "size": 2662
+  },
+  {
+    "path": "io/src/watchdog.c",
+    "sha256": "ea3ec3f1cbc3dc1ebbba796760083a377356708532526d9354c5032b656cf357",
+    "size": 1620
+  },
+  {
+    "path": "os/baremetal/notify.c",
+    "sha256": "ebbde6ca1a0dfb361c1b2f0fec3972c641b769f5f37cdffb89bbed8ae9748281",
+    "size": 2198
+  },
+  {
+    "path": "os/include/nexus/os/baremetal.h",
+    "sha256": "9e6f682741ecce580ef1ff2229700f8e007f9cfbb75cc69fdc6c3b78d5db1c75",
+    "size": 2005
+  },
+  {
+    "path": "os/include/nexus/os/wait.h",
+    "sha256": "18303be665773f592fd4644c78a0a90ea6779cbfe034744617d0a9a6fcef2b71",
+    "size": 3248
+  },
+  {
+    "path": "os/wait.c",
+    "sha256": "400d6748cd5ce1b634d0a8df8d59486bfc6a343345767712da0a6b00f6c933eb",
+    "size": 1081
+  },
+  {
+    "path": "soc/gd32f470/private/gd32f470_provider.h",
+    "sha256": "4a865f646cd9565806959186ce6c3a591c6302b1543ad0bc7def741431663226",
+    "size": 22822
+  },
+  {
+    "path": "soc/gd32f470/private/gd32f4xx_libopt.h",
+    "sha256": "64afa1aa962f93bc9cad8a23244b39b383dd4aa29c0056c20d9a4cd2537f10db",
+    "size": 839
+  },
+  {
+    "path": "soc/gd32f470/private/system.h",
+    "sha256": "ea3ae416c653f9abbfb42da62a1aa832290594cdd95a4bb98bb709601ee181bc",
+    "size": 2710
+  },
+  {
+    "path": "soc/gd32f470/system.c",
+    "sha256": "711d6e4f5a4a673360523697b875e1c47d91a44a4ac974be056ecafe6cdb8f76",
+    "size": 8430
+  },
+  {
+    "path": "soc/gd32f470/timebase.c",
+    "sha256": "2f28edea77098b4c2783ce6b94e4f5a3b2b0570c1c9c4e351225db91a3218802",
+    "size": 5730
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h",
+    "sha256": "db6de53203fa053d6e789ef86908195f84b7664753bdf0aa7ca74f62025573ef",
+    "size": 28917
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/system_gd32f4xx.h",
+    "sha256": "6077ccbeff029a0058465172607481158b202d5687e2e87a0ed13ff6a9b2633a",
+    "size": 2740
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4.h",
+    "sha256": "4756546e1449d17b1a7dee2f3307f2c92c9f1d669c3f5dfc3ee1dec8aee9a8f7",
+    "size": 109878
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4_simd.h",
+    "sha256": "0c2a0c2d66c7791b82ca19d10336c96518830ef359f6bfd9da7477bc2cbccbbb",
+    "size": 22959
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cmFunc.h",
+    "sha256": "5075ff67c8e264b83d9b391c07c6512e26abbc189e321de0d8b4375476980e5e",
+    "size": 15828
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cmInstr.h",
+    "sha256": "c35ddca16ca04646dc70acf2d592ad9eaeaaecd8125a32abb710069648266eb5",
+    "size": 17205
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_adc.h",
+    "sha256": "9fa1a80b64d18512729af4d22602d5761ec0758d970fb5d15f7f8a96244607d3",
+    "size": 41521
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dbg.h",
+    "sha256": "0a403f37714cbb585a26cb54c7c5cc6776fa9ec23459a70369d9342805713998",
+    "size": 9890
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dma.h",
+    "sha256": "b5796d1e0017994a232a53613f2d50566b8c00dd43d4049eab26cee1e04f37eb",
+    "size": 32675
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exti.h",
+    "sha256": "dd78502366ba631e32841db28711976d51f7e71417bb2006ba82dc89404eba66",
+    "size": 20470
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fmc.h",
+    "sha256": "a6bd45fe828fda8cc19b3b1958470ac1bb115cc162b89963f5391028c9bdc192",
+    "size": 28322
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fwdgt.h",
+    "sha256": "e83161e6700a28f9f0d475405c4a94a03a88e9576b6d8f41c5a9bd96daf5ff08",
+    "size": 5863
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h",
+    "sha256": "6551fd3fb673b3e34d5f62b72cba8a0482ce051bf29ed475015b1f9ad178a57a",
+    "size": 29164
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_i2c.h",
+    "sha256": "42498aa2016958a5d351577f3caeca0f7c8334ab25b704a95acb7b73001a1019",
+    "size": 29826
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_pmu.h",
+    "sha256": "0275375eff0d339ec2b16c1a0d4c67721be6bff63c1516bdc4a614bb5ed98b03",
+    "size": 11878
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rcu.h",
+    "sha256": "38d97fe3994cefdcb1109192a5854c29ad2af364558f499878c4a5510b26e45d",
+    "size": 95768
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_spi.h",
+    "sha256": "e2bc6524ff9fc2604f3e947c68ca419ff35bc029904ea8163c10510f85728c10",
+    "size": 25504
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_syscfg.h",
+    "sha256": "0e37ca2af26c3563712cf33aca9cf85b0489df10526c8336e0e75518a86f3cd2",
+    "size": 11558
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_timer.h",
+    "sha256": "b22f7cc8d1a7cf16326163982b9d6a34829ca55f6491fdea21d07b6e6dcd5668",
+    "size": 59717
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_usart.h",
+    "sha256": "7adb26fb6e10f5ce29612aff5f580eafb787311bc982c629ffdf415ddf3dc973",
+    "size": 31652
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fmc.c",
+    "sha256": "9d92cc681c71045bdf0df8ebd132626ca598f52f6d0a43abfd72bdcb930daafc",
+    "size": 34974
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c",
+    "sha256": "25b11ab26ecbe945a485e6fe263d6a346648f1d1ffbbe563b21cde5af6f704d3",
+    "size": 50221
+  },
+  {
+    "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_timer.c",
+    "sha256": "d8df83299f14b69aa91be785b455cdfeb28e5bd26709b99195998cb208355ebe",
+    "size": 89569
+  },
+  {
+    "path": "/workspace/nexus-industrial-design/sleep-consumer/build-gd32-default-final2/nexus-sdk/generated/bindings.c",
+    "sha256": "4f10a3ee439de7ac1681d61bb5dba175eb4738f84de6455597590f3ade59ba18",
+    "size": 4910
+  },
+  {
+    "path": "/workspace/nexus-industrial-design/sleep-consumer/build-gd32-default-final2/nexus-sdk/generated/nexus_bindings.h",
+    "sha256": "0e8c5b401875fe661be0985b09f768e441f69494a8006da4251dbdd94b5ac95d",
+    "size": 903
+  },
+  {
+    "path": "/workspace/nexus-industrial-design/sleep-consumer/build-gd32-default-final2/nexus-sdk/generated/nexus_config.h",
+    "sha256": "11fc19f897803fa9239bd076e9e806965f396ad7d5ed63d5390314bceb3d0a28",
+    "size": 1064
+  },
+  {
+    "path": "/workspace/nexus-industrial-design/sleep-consumer/build-gd32-default-final2/nexus-sdk/generated/nexus_factory.h",
+    "sha256": "aa0c55da6551b48c66468812cb13619918acd1bc5eddba381761b4dc91b5564d",
+    "size": 9434
+  },
+  {
+    "path": "/workspace/nexus-industrial-design/sleep-consumer/main.c",
+    "sha256": "9a15b33fea4d63291fceffadf77bcf716f31a55a62788c6c3983cef33e4e6853",
+    "size": 1526
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/_ansi.h",
+    "sha256": "5c6403b471ee897c9a6c12e00a58617247804eb3ee72d7baeb7c08616090dd1d",
+    "size": 2625
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/_newlib_version.h",
+    "sha256": "f4c14dfb59c9eb36181455ef077c4ec7a0571ed64f79947094ac1cd9a96d3fae",
+    "size": 336
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/limits.h",
+    "sha256": "16b91bb4b4f7053ddfbbe6ec0925d901093499468151289d5c224d718ec25e44",
+    "size": 3888
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/machine/_default_types.h",
+    "sha256": "5d8f9f7ead7927e4b8b7ed00172e84f2ae82ea7f5f6ba3240ff813a9236771b3",
+    "size": 6650
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/machine/_types.h",
+    "sha256": "44544ecbbc10c8aa58ca2da6d0617ffeee5af847af24515ab108c8218d6d92c8",
+    "size": 112
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/machine/ieeefp.h",
+    "sha256": "ec1e7f9f068ef40e2ec360681a4bbc7e2f3f1e3bb9e141a254a1f1ccdc4af195",
+    "size": 11416
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/newlib.h",
+    "sha256": "7de3c0c43deda9748c7a14ab10dcf469841e762627409120b0cb01b5e8f240b4",
+    "size": 12020
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/stdint.h",
+    "sha256": "99fe201684856075ccd92704f63b702f6fa882b9dab61bd7a9bcce2588275861",
+    "size": 12432
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/string.h",
+    "sha256": "79722fe25a7d01447fee06a0b8efe7535c1b891568730ba154a139c59c068ffc",
+    "size": 5555
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/_intsup.h",
+    "sha256": "1af8abe244b43a3a5b5a85f6c834aa206930b6938e8109fbec430bc140b68df5",
+    "size": 5741
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/_stdint.h",
+    "sha256": "49f8328943afa2a83ed4a35fcb808ed08b8c9fcb55373c786fb1b1d3a21952d7",
+    "size": 1824
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/_types.h",
+    "sha256": "1abe39aca5104bafbde2e0219e7cdc3e96129b22ce1ef5cd58b66d8d147d3fb7",
+    "size": 5094
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/cdefs.h",
+    "sha256": "9dcd9f554b32c40791b8f081f34c83767c61c0bc567b4a486066edda39812f3e",
+    "size": 24504
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/config.h",
+    "sha256": "583e381e7184a477bcea569149f6154ccf4f0faa0829a9d8363954adb7aecf14",
+    "size": 7342
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/features.h",
+    "sha256": "c580ee2a628857e7ebeb0484d078b16cf61049f14b2492b0cac5b54ed1f34cca",
+    "size": 16935
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/lock.h",
+    "sha256": "f5cad9196ce745967fd2673e085b5c03df7887d4d11d7544aff05ff6679be6b8",
+    "size": 2455
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/reent.h",
+    "sha256": "1631214a7fb5c26f8b6ce1c1d317af9863afd8109a811dc72f9ec1afd2c0789b",
+    "size": 30279
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/string.h",
+    "sha256": "b7164ee36ccb0a08bc27c7e381ea417c97d8c3fd3157de62b75d2a6bf7a0a589",
+    "size": 116
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/syslimits.h",
+    "sha256": "780971936dd4b8f3b192669e693430c204a72c7fb05e7a1db67d48f02cd9aec4",
+    "size": 2974
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/limits.h",
+    "sha256": "bc572350077d8caa24f82d5439119aa2dc184e72cc4ea325b4cd0137db51580f",
+    "size": 6507
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/stdatomic.h",
+    "sha256": "0aefe7b9013b2fcb7020c41e97d03ff11439d9a0d5bc27bf1233cbd091283ac0",
+    "size": 9726
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/stdbool.h",
+    "sha256": "7b9c438a5b2f082a560a72da8d752da51062cc6f84d1c4acec45ff0a68e8d037",
+    "size": 1490
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/stddef.h",
+    "sha256": "bac7ab773a3e3d9568d5cbe61632cfb96292ef5039df54a7ffaf15ba54af0ba0",
+    "size": 14135
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/stdint.h",
+    "sha256": "86a7914ab7d6a18465a6fb9a7b54f945cad604fdbf3ca0d10e4e0254e0037911",
+    "size": 328
+  },
+  {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/syslimits.h",
+    "sha256": "22dd0ab81baadd5a8d455b445855f341d419c7b0267beca235de00b7ec78e529",
+    "size": 330
+  }
+]

@@ -1,0 +1,26 @@
+test_actual_package_template_cannot_widen_equal_version_ranges (tools.testing.test_compatibility.CompatibilityTests.test_actual_package_template_cannot_widen_equal_version_ranges) ... ok
+test_actual_project_semantic_version_must_match (tools.testing.test_compatibility.CompatibilityTests.test_actual_project_semantic_version_must_match) ... ok
+test_actual_schema_change_is_detected_without_mocking_resolver (tools.testing.test_compatibility.CompatibilityTests.test_actual_schema_change_is_detected_without_mocking_resolver) ... ok
+test_boolean_epoch_or_schema_are_not_integer_versions (tools.testing.test_compatibility.CompatibilityTests.test_boolean_epoch_or_schema_are_not_integer_versions) ... ok
+test_changed_policy_during_observation_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_changed_policy_during_observation_is_rejected) ... ok
+test_current_policy_matches_actual_authorities (tools.testing.test_compatibility.CompatibilityTests.test_current_policy_matches_actual_authorities) ... ok
+test_duplicate_json_policy_keys_are_rejected (tools.testing.test_compatibility.CompatibilityTests.test_duplicate_json_policy_keys_are_rejected) ... ok
+test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) ... ok
+test_exact_source_generation_is_accepted (tools.testing.test_compatibility.CompatibilityTests.test_exact_source_generation_is_accepted) ... ok
+test_generated_factory_macro_mismatch_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_generated_factory_macro_mismatch_is_rejected) ... ok
+test_generated_factory_matching_macros_are_accepted (tools.testing.test_compatibility.CompatibilityTests.test_generated_factory_matching_macros_are_accepted) ... ok
+test_generated_factory_version_mismatch_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_generated_factory_version_mismatch_is_rejected) ... ok
+test_missing_policy_is_fail_closed (tools.testing.test_compatibility.CompatibilityTests.test_missing_policy_is_fail_closed) ... ok
+test_new_schema_requires_explicit_policy_review (tools.testing.test_compatibility.CompatibilityTests.test_new_schema_requires_explicit_policy_review) ... ok
+test_package_inspection_verifies_real_manifest_not_marker (tools.testing.test_compatibility.CompatibilityTests.test_package_inspection_verifies_real_manifest_not_marker) ... ok
+test_policy_symlink_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_policy_symlink_is_rejected) ... ok
+test_real_package_cannot_accept_version_ranges (tools.testing.test_compatibility.CompatibilityTests.test_real_package_cannot_accept_version_ranges) ... ok
+test_source_only_exact_policy_cannot_claim_binary_compatibility (tools.testing.test_compatibility.CompatibilityTests.test_source_only_exact_policy_cannot_claim_binary_compatibility) ... ok
+test_unknown_or_missing_policy_fields_are_rejected (tools.testing.test_compatibility.CompatibilityTests.test_unknown_or_missing_policy_fields_are_rejected) ... ok
+test_unknown_requested_epoch_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_unknown_requested_epoch_is_rejected) ... ok
+test_zero_semantic_version_still_uses_distinct_negative_probe (tools.testing.test_compatibility.CompatibilityTests.test_zero_semantic_version_still_uses_distinct_negative_probe) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 1.463s
+
+OK

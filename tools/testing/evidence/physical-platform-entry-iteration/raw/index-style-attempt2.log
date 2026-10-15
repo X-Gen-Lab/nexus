@@ -1,0 +1,1 @@
+Style check failed: Files are not in the Git index: ['tests/google/physical_platform_factory_model.h', 'tests/google/physical_platform_factory_test.cpp']

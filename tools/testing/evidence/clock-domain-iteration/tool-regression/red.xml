@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="soc_sleep_selection" tests="4" failures="2" errors="0" skipped="0"><testcase name="sleep_selection.SocSleepSelectionTests.test_gd32_default_declares_no_automatic_sleep_target" time="0.28191225801128894" /><testcase name="sleep_selection.SocSleepSelectionTests.test_gd32_external_selection_uses_private_checked_sdk_paths" time="0.2550922150257975"><failure>Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_soc_sleep_selection.py", line 148, in test_gd32_external_selection_uses_private_checked_sdk_paths
+    self.assert_selected_private_imports("gd32f470")
+  File "/workspace/nexus/tools/testing/test_soc_sleep_selection.py", line 130, in assert_selected_private_imports
+    self.assertEqual(set(properties["INCLUDE_DIRECTORIES"].split(";")),
+AssertionError: Items in the first set but not the second:
+'/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include'
+'/vendors/gigadevice/gd32f4xx/Firmware/CMSIS'
+'/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include'
+'/components/clock_domain/private'
+Items in the second set but not the first:
+'/tmp/nexus-pre-fix-soc-bge33wmc/vendors/gigadevice/gd32f4xx/Firmware/CMSIS'
+'/tmp/nexus-pre-fix-soc-bge33wmc/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include'
+'/tmp/nexus-pre-fix-soc-bge33wmc/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include'
+'/tmp/nexus-pre-fix-soc-bge33wmc/components/clock_domain/private'
+</failure></testcase><testcase name="sleep_selection.SocSleepSelectionTests.test_stm32_default_declares_no_automatic_sleep_target" time="0.20390195498475805" /><testcase name="sleep_selection.SocSleepSelectionTests.test_stm32_external_selection_uses_private_checked_sdk_paths" time="0.20147186797112226"><failure>Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_soc_sleep_selection.py", line 145, in test_stm32_external_selection_uses_private_checked_sdk_paths
+    self.assert_selected_private_imports("stm32f407")
+  File "/workspace/nexus/tools/testing/test_soc_sleep_selection.py", line 130, in assert_selected_private_imports
+    self.assertEqual(set(properties["INCLUDE_DIRECTORIES"].split(";")),
+AssertionError: Items in the first set but not the second:
+'/vendors/st/cmsis_device_f4/Include'
+'/vendors/arm/CMSIS_5/CMSIS/Core/Include'
+'/components/clock_domain/private'
+Items in the second set but not the first:
+'/tmp/nexus-pre-fix-soc-bge33wmc/vendors/st/cmsis_device_f4/Include'
+'/tmp/nexus-pre-fix-soc-bge33wmc/vendors/arm/CMSIS_5/CMSIS/Core/Include'
+'/tmp/nexus-pre-fix-soc-bge33wmc/components/clock_domain/private'
+</failure></testcase></testsuite>

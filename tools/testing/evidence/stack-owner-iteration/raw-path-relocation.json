@@ -1,0 +1,19 @@
+{
+  "scope": "archive filename navigation only; original commands remain raw historical bytes",
+  "records": [
+    {
+      "original_path": "arm-profile-selection/diagnostic/linked/compile_commands.json",
+      "archived_path": "arm-profile-selection/diagnostic/linked/compile_commands.json.raw",
+      "sha256": "ed833db6008ad3c9e12954bd6c92283b632198f4468eb5d45d5c62a1a561da5b",
+      "bytes": 51290,
+      "byte_modification": false
+    },
+    {
+      "original_path": "arm-profile-selection/standard/linked/compile_commands.json",
+      "archived_path": "arm-profile-selection/standard/linked/compile_commands.json.raw",
+      "sha256": "a1c2f7ded81335d010879881192fb8af42913a481743ac3ed46af56f0a88ad51",
+      "bytes": 49972,
+      "byte_modification": false
+    }
+  ]
+}

@@ -1,0 +1,228 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Thread                                                              */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+#define TX_SOURCE_CODE
+
+
+/* Include necessary system files.  */
+
+#include "tx_api.h"
+#include "tx_thread.h"
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_stack_analyze                            PORTABLE C      */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function analyzes the stack to calculate the highest stack     */
+/*    pointer in the thread's stack. This can then be used to derive the  */
+/*    minimum amount of stack left for any given thread.                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Thread control block pointer  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    ThreadX internal code                                               */
+/*                                                                        */
+/**************************************************************************/
+VOID  _tx_thread_stack_analyze(TX_THREAD *thread_ptr)
+{
+
+TX_INTERRUPT_SAVE_AREA
+
+ULONG       *stack_ptr;
+ULONG       *stack_lowest;
+ULONG       *stack_highest;
+ULONG       *probe_ptr;
+ULONG       *stack_limit;
+ULONG       probe_count;
+UINT        fill_present;
+ULONG       size;
+
+
+    /* Disable interrupts.  */
+    TX_DISABLE
+
+    /* Determine if the thread pointer is NULL.  */
+    if (thread_ptr != TX_NULL)
+    {
+
+        /* Determine if the thread ID is invalid.  */
+        if (thread_ptr -> tx_thread_id == TX_THREAD_ID)
+        {
+
+            /* Pickup the current stack variables.  */
+            stack_lowest =   TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_start);
+
+            /* Determine if the pointer is null.  */
+            if (stack_lowest != TX_NULL)
+            {
+
+                /* Pickup the highest stack pointer.  */
+                stack_highest =  TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_highest_ptr);
+
+                /* Determine if the pointer is null or if the highest stack pointer is not above the
+                   start of the stack. The latter indicates a stack overflow or a corrupted thread
+                   control block, and the unsigned pointer arithmetic in the binary search below would
+                   wrap around and never converge, hanging the caller.  */
+                if ((stack_highest != TX_NULL) && (stack_highest > stack_lowest))
+                {
+
+                    /* Remember the upper bound of the search so the scan below cannot run past it.  */
+                    stack_limit =  stack_highest;
+
+                    /* Restore interrupts.  */
+                    TX_RESTORE
+
+                    /* We need to binary search the remaining stack for missing 0xEFEFEFEF 32-bit data pattern.
+                       This is a best effort algorithm to find the highest stack usage. */
+                    do
+                    {
+
+                        /* Calculate the size again. */
+                        size =  (ULONG) (TX_ULONG_POINTER_DIF(stack_highest, stack_lowest))/((ULONG) 2);
+                        stack_ptr =  TX_ULONG_POINTER_ADD(stack_lowest, size);
+
+                        /* Determine if the pattern is still there.  To avoid stopping on an
+                           unwritten hole inside an otherwise used region, require several
+                           consecutive fill words, working towards the lowest address.  The scan
+                           stops at the lowest known fill location, since everything at or below
+                           that point is already known to hold the fill pattern.  */
+                        fill_present =  TX_TRUE;
+                        probe_ptr =     stack_ptr;
+                        probe_count =   TX_THREAD_STACK_ANALYZE_FILL_WORDS;
+                        while (probe_count != ((ULONG) 0))
+                        {
+
+                            /* Determine if this word still holds the fill pattern.  */
+                            if (*probe_ptr != TX_STACK_FILL)
+                            {
+
+                                /* No, the probe location is in use.  */
+                                fill_present =  TX_FALSE;
+                                probe_count =   ((ULONG) 0);
+                            }
+                            else
+                            {
+
+                                /* Yes, account for this word.  */
+                                probe_count--;
+
+                                /* Determine if the lowest known fill location has been reached.  */
+                                if (probe_ptr <= stack_lowest)
+                                {
+
+                                    /* Yes, nothing further to check.  */
+                                    probe_count =  ((ULONG) 0);
+                                }
+                                else
+                                {
+
+                                    /* Position to the previous word in the stack.  */
+                                    probe_ptr =  TX_ULONG_POINTER_SUB(probe_ptr, 1);
+                                }
+                            }
+                        }
+
+                        /* Determine if the probe location is in use.  */
+                        if (fill_present == TX_FALSE)
+                        {
+
+                            /* Update the stack highest, since we need to look in the upper half now.  */
+                            stack_highest =  stack_ptr;
+                        }
+                        else
+                        {
+
+                            /* Update the stack lowest, since we need to look in the lower half now.  */
+                            stack_lowest =  stack_ptr;
+                        }
+
+                    } while(size > ((ULONG) 1));
+
+                    /* Position to first used word - at this point we are within a few words.  */
+                    while ((stack_ptr < stack_limit) && (*stack_ptr == TX_STACK_FILL))
+                    {
+
+                        /* Position to next word in stack.  */
+                        stack_ptr =  TX_ULONG_POINTER_ADD(stack_ptr, 1);
+                    }
+
+                    /* Optional processing extension.  */
+                    TX_THREAD_STACK_ANALYZE_EXTENSION
+
+                    /* Disable interrupts.  */
+                    TX_DISABLE
+
+                    /* Check to see if the thread is still created.  */
+                    if (thread_ptr -> tx_thread_id == TX_THREAD_ID)
+                    {
+
+                        /* Yes, thread is still created.  */
+
+                        /* Now check the new highest stack pointer is past the stack start.  */
+                        if (stack_ptr > (TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_start)))
+                        {
+
+                            /* Yes, now check that the new highest stack pointer is less than the previous highest stack pointer.  */
+                            if (stack_ptr < (TX_VOID_TO_ULONG_POINTER_CONVERT(thread_ptr -> tx_thread_stack_highest_ptr)))
+                            {
+
+                                /* Yes, is the current highest stack pointer pointing at used memory?  */
+                                if (*stack_ptr != TX_STACK_FILL)
+                                {
+
+                                    /* Yes, setup the highest stack usage.  */
+                                    thread_ptr -> tx_thread_stack_highest_ptr =  stack_ptr;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* Restore interrupts.  */
+    TX_RESTORE
+}
+

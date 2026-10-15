@@ -1,0 +1,8 @@
+[ 52%] Built target can_engine
+[ 64%] Built target can_contract
+[ 70%] Building C object CMakeFiles/can_stm32f407_contract.dir/workspace/nexus/soc/stm32f407/drivers/can.c.o
+[ 76%] Linking CXX executable can_stm32f407_contract
+[ 82%] Built target can_stm32f407_contract
+[ 88%] Building C object CMakeFiles/can_gd32f470_contract.dir/workspace/nexus/soc/gd32f470/drivers/can.c.o
+[ 94%] Linking CXX executable can_gd32f470_contract
+[100%] Built target can_gd32f470_contract

@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_tdd_matrix_integration",
+    "tools.testing.test_staged_execution",
+    "tools.testing.test_io_lifecycle_matrix"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

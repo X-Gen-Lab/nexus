@@ -1,0 +1,138 @@
+[
+  {
+    "target": "nexus_ethernet_mac_test",
+    "argv": [
+      "/workspace/nexus-60-automation-source/build/native-debug/bin/nexus_ethernet_mac_test",
+      "--gtest_output=xml:/workspace/nexus-60-automation-source/tools/testing/evidence/static-analysis-iteration/ethernet_mac.xml"
+    ],
+    "returncode": 0,
+    "xml": {
+      "tests": "35",
+      "failures": "0",
+      "disabled": "0",
+      "errors": "0",
+      "time": "0.",
+      "timestamp": "2026-10-11T20:54:06.503",
+      "name": "AllTests"
+    }
+  },
+  {
+    "target": "nexus_stm32_ethernet_test",
+    "argv": [
+      "/workspace/nexus-60-automation-source/build/native-debug/bin/nexus_stm32_ethernet_test",
+      "--gtest_output=xml:/workspace/nexus-60-automation-source/tools/testing/evidence/static-analysis-iteration/stm32_ethernet.xml"
+    ],
+    "returncode": 0,
+    "xml": {
+      "tests": "36",
+      "failures": "0",
+      "disabled": "0",
+      "errors": "0",
+      "time": "0.001",
+      "timestamp": "2026-10-11T20:54:06.506",
+      "name": "AllTests"
+    }
+  },
+  {
+    "target": "nexus_gd32_ethernet_test",
+    "argv": [
+      "/workspace/nexus-60-automation-source/build/native-debug/bin/nexus_gd32_ethernet_test",
+      "--gtest_output=xml:/workspace/nexus-60-automation-source/tools/testing/evidence/static-analysis-iteration/gd32_ethernet.xml"
+    ],
+    "returncode": 0,
+    "xml": {
+      "tests": "36",
+      "failures": "0",
+      "disabled": "0",
+      "errors": "0",
+      "time": "0.001",
+      "timestamp": "2026-10-11T20:54:06.511",
+      "name": "AllTests"
+    }
+  },
+  {
+    "target": "nexus_usb_device_test",
+    "argv": [
+      "/workspace/nexus-60-automation-source/build/native-debug/bin/nexus_usb_device_test",
+      "--gtest_output=xml:/workspace/nexus-60-automation-source/tools/testing/evidence/static-analysis-iteration/usb_device.xml"
+    ],
+    "returncode": 0,
+    "xml": {
+      "tests": "43",
+      "failures": "0",
+      "disabled": "0",
+      "errors": "0",
+      "time": "0.",
+      "timestamp": "2026-10-11T20:54:06.514",
+      "name": "AllTests"
+    }
+  },
+  {
+    "target": "nexus_stm32f407_usb_device_test",
+    "argv": [
+      "/workspace/nexus-60-automation-source/build/native-debug/bin/nexus_stm32f407_usb_device_test",
+      "--gtest_output=xml:/workspace/nexus-60-automation-source/tools/testing/evidence/static-analysis-iteration/stm32f407_usb_device.xml"
+    ],
+    "returncode": 0,
+    "xml": {
+      "tests": "7",
+      "failures": "0",
+      "disabled": "0",
+      "errors": "0",
+      "time": "0.001",
+      "timestamp": "2026-10-11T20:54:06.518",
+      "name": "AllTests"
+    }
+  },
+  {
+    "target": "nexus_gd32f470_usb_device_test",
+    "argv": [
+      "/workspace/nexus-60-automation-source/build/native-debug/bin/nexus_gd32f470_usb_device_test",
+      "--gtest_output=xml:/workspace/nexus-60-automation-source/tools/testing/evidence/static-analysis-iteration/gd32f470_usb_device.xml"
+    ],
+    "returncode": 0,
+    "xml": {
+      "tests": "7",
+      "failures": "0",
+      "disabled": "0",
+      "errors": "0",
+      "time": "0.001",
+      "timestamp": "2026-10-11T20:54:06.521",
+      "name": "AllTests"
+    }
+  },
+  {
+    "target": "nexus_clock_domain_test",
+    "argv": [
+      "/workspace/nexus-60-automation-source/build/native-debug/bin/nexus_clock_domain_test",
+      "--gtest_output=xml:/workspace/nexus-60-automation-source/tools/testing/evidence/static-analysis-iteration/clock_domain.xml"
+    ],
+    "returncode": 0,
+    "xml": {
+      "tests": "17",
+      "failures": "0",
+      "disabled": "0",
+      "errors": "0",
+      "time": "0.006",
+      "timestamp": "2026-10-11T20:54:06.524",
+      "name": "AllTests"
+    }
+  },
+  {
+    "target": "nexus_user_io_broker_test",
+    "argv": [
+      "/workspace/nexus-60-automation-source/build/native-debug/bin/nexus_user_io_broker_test",
+      "--gtest_output=xml:/workspace/nexus-60-automation-source/tools/testing/evidence/static-analysis-iteration/user_io_broker.xml"
+    ],
+    "returncode": 0,
+    "xml": {
+      "tests": "28",
+      "failures": "0",
+      "disabled": "0",
+      "errors": "0",
+      "time": "0.",
+      "timestamp": "2026-10-11T20:54:06.536",
+      "name": "AllTests"
+    }
+  }
+]

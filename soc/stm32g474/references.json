@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "documents": {
+    "datasheet": {
+      "kind": "datasheet",
+      "document_id": "DS12288",
+      "revision": "6",
+      "document_date": "November 2021",
+      "url": "https://www.st.com/resource/en/datasheet/stm32g474rc.pdf",
+      "sha256": "b018e20dbe34b63a43e49365518b186ef0e0e8e899deeabc1c9f53a3a10c1add",
+      "bytes": 3062163,
+      "anchors": {
+        "package_gpio": "Table12, Section4.10 printed pp57ff; independent LQFP64 Figure7 p50; Table2 p16 gives52 GPIOs",
+        "nrst_gpio_condition": "PG10 shares NRST; inventory does not authorize reset-pin option changes or Board wiring"
+      }
+    },
+    "reference_manual": {
+      "kind": "reference_manual",
+      "document_id": "RM0440",
+      "revision": "9",
+      "document_date": "March 2025",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "sha256": "7f8c15bc667c46614e2c5ad0341b9eaa20e8d417f21b819b9f2dde7dfe1ae564",
+      "bytes": 39045335,
+      "anchors": {
+        "applicability": "Introduction p1, exact memory/peripheral categories Section1.5/Table1 pp75ff; selected G474 is Category3, not all STM32G4 devices.",
+        "revision_identification": "Section47.6.1 p2095: DBGMCU_IDCODE at0xE0042000 read-only, 32-bit access; REV_ID occupies31:16, DEV_ID11:0; category3 DEV_ID0x469.",
+        "silicon_revision_information": "Family-wide RM includes other-category revision codes. Apply ES0430Table2 exactselectedfamily revision codes, not an unqualified union of all RM codes."
+      }
+    },
+    "errata": {
+      "kind": "errata",
+      "document_id": "ES0430",
+      "revision": "9",
+      "document_date": "June 2024",
+      "url": "https://www.st.com/resource/en/errata_sheet/es0430-stm32g471xx473xx474xx483xx484xx-device-errata-stmicroelectronics.pdf",
+      "sha256": "72194383290900475df60f464dfa382e8c84ae79e15fb6392c7707a397436586",
+      "bytes": 1760543,
+      "anchors": {
+        "exact_part": "Table1 p1 lists STM32G474RE within STM32G474xx (T6 ordering/package suffix does not expand applicability).",
+        "silicon_revisions": "Table2 p1: device markingZ ->0x2001, Y ->0x2002, X ->0x2003; REV_ID[15:0] field of DBGMCU_IDCODE (register bits31:16).",
+        "limitations": "Table3 pp2ff provides per-revision applicability; detailed workaround/application conditions must be reviewed for each used mode."
+      }
+    }
+  },
+  "package_review": {
+    "document": "datasheet",
+    "variants": [
+      "STM32G474RET6"
+    ],
+    "status": "package_gpio_reviewed",
+    "scope": "GPIO package matrix independently agrees with the official pinout diagram; Board routes and mode support remain independent."
+  },
+  "errata_review": {
+    "document": "errata",
+    "status": "applicability_only",
+    "silicon_revision": "not_observed",
+    "mode_workarounds": "not_fully_audited",
+    "hardware_qualification": "not_executed",
+    "identification": "ES0430 Table1/2 p1: G474RE; markingZ/Y/X corresponds to REV_ID0x2001/0x2002/0x2003, respectively. RM0440 Section47.6.1 p2095: REV_ID field occupies DBGMCU_IDCODE register bits31:16; Category3 DEV_ID0x469. Observed hardware revision remains unknown."
+  },
+  "limitations": [
+    "Reference sections are a source index, not a complete register or errata implementation audit.",
+    "Observed silicon revision and mode-specific applicability are required before hardware qualification.",
+    "RM0440 identity comes from the complete official-source PDF already retained locally and rehashed; current HEAD and partial-prefix observations do not claim a newly fetched complete remote identity."
+  ]
+}

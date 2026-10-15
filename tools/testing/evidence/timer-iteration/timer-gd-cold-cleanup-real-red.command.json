@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-timer-iteration/gd-test",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/timer-iteration/timer-gd-cold-cleanup-real-red.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:44:26.137224+00:00",
+  "ended_at": "2026-10-11T19:44:26.144814+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/timer-iteration/timer-gd-cold-cleanup-real-red.log"
+}

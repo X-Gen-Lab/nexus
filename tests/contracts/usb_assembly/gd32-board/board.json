@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "gd32-usb-software-pin-contract",
+  "soc": "GD32F470ZGT6",
+  "soc_family": "gd32f470",
+  "source_revision": "software-only-internal-FS-PHY-PA11-PA12-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 25000000
+  },
+  "bindings": [
+    {
+      "id": "usbfs",
+      "controller": "USBFS",
+      "route": "usbfs-pa11-pa12"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only pad contract; connector, electrical device role, VBUS/power wiring and crystal tolerance are not measured.",
+    "VBUS sensing false is explicit software policy, not a claim of a reviewed self-powered board.",
+    "No physical USB waveform, enumeration or attach/detach qualification was executed."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.gd32mcu.com/en/download",
+      "scope": "SoC internal FS PHY only; PA11/PA12 AF10 pad route. GPIO and physical connector are distinct contracts."
+    }
+  ]
+}

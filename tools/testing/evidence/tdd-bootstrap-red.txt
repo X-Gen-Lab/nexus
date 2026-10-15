@@ -1,0 +1,16 @@
+.E......
+======================================================================
+ERROR: test_executed_google_case_passes (test_google_report.GoogleReportTests.test_executed_google_case_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_google_report.py", line 27, in test_executed_google_case_passes
+    self.assertEqual(validate_google_report(self.report)["passed"], 1)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/scripts/ci/tdd_gate.py", line 7, in validate_google_report
+    raise ValueError("GoogleTest report validation has not been implemented")
+ValueError: GoogleTest report validation has not been implemented
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.002s
+
+FAILED (errors=1)

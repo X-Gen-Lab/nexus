@@ -1,0 +1,75 @@
+[ 33%] Building CXX object CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o
+[ 66%] Building C object CMakeFiles/clock_contract.dir/workspace/nexus/arch/native/nx_arch_native.c.o
+[100%] Linking CXX executable clock_contract
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain::SetUp()':
+clock_domain_test.cpp:(.text+0x25): undefined reference to `nx_clock_domain_construct'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_CloseRetainsConsumerUntilExactRelease_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x18e): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x2a7): undefined reference to `nx_clock_domain_close'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x3b9): undefined reference to `nx_clock_domain_quiescent'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x4b8): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x667): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x81c): undefined reference to `nx_clock_domain_quiescent'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_CopiedTokenCannotRemoveOriginalBorrow_Test::TestBody()':
+clock_domain_test.cpp:(.text+0xb54): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0xc78): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0xee9): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_ReopenInvalidatesOldControlWithoutEpochReuse_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x1152): undefined reference to `nx_clock_domain_close'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x1261): undefined reference to `nx_clock_domain_reopen'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x1351): undefined reference to `nx_clock_domain_quiescent'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x142b): undefined reference to `nx_clock_domain_reopen'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x151e): undefined reference to `nx_clock_domain_close'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_ExhaustedEpochCannotReopen_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x18b5): undefined reference to `nx_clock_domain_close'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x19b7): undefined reference to `nx_clock_domain_reopen'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_ExactCapacityAndDuplicateAdmissionReject_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x1db1): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x1eca): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x1fc9): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x20c5): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x2267): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x2348): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_ForeignDomainAndDoubleReleaseKeepOwnership_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x2647): undefined reference to `nx_clock_domain_construct'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x2760): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x285c): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x2939): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x2a1a): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x2b11): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_CloseOutputCannotOverwriteDomainOrLease_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x2dbe): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x2ed7): undefined reference to `nx_clock_domain_close'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x2fd6): undefined reference to `nx_clock_domain_close'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x3284): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_UnalignedAndWrappingTokenRejectBeforeAccess_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x35a3): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x3685): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_LiveConstructAndZeroCapacityRejectUnchanged_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x3929): undefined reference to `nx_clock_domain_construct'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x3aed): undefined reference to `nx_clock_domain_construct'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_CloseIsIdempotentButOpenControlIsNotQuiescent_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x3e1d): undefined reference to `nx_clock_domain_quiescent'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x3efe): undefined reference to `nx_clock_domain_close'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x4007): undefined reference to `nx_clock_domain_close'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x41a4): undefined reference to `nx_clock_domain_quiescent'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_ReopenWithConsumerIsBusyAndRetainsClosedState_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x440c): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x4525): undefined reference to `nx_clock_domain_close'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x4637): undefined reference to `nx_clock_domain_reopen'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x48ca): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_GuardNestingRestoresIncomingMask_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x4cb6): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x4ebc): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_ConcurrentConsumersCannotCrossClosedAdmission_Test::TestBody()::{lambda()#1}::operator()() const':
+clock_domain_test.cpp:(.text+0x53b8): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x542f): undefined reference to `nx_clock_domain_release'
+/usr/bin/ld: CMakeFiles/clock_contract.dir/workspace/nexus/tests/google/clock_domain_test.cpp.o: in function `(anonymous namespace)::ClockDomain_ConcurrentConsumersCannotCrossClosedAdmission_Test::TestBody()':
+clock_domain_test.cpp:(.text+0x581e): undefined reference to `nx_clock_domain_close'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x5939): undefined reference to `nx_clock_domain_quiescent'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x5a45): undefined reference to `nx_clock_domain_acquire'
+/usr/bin/ld: clock_domain_test.cpp:(.text+0x5b97): undefined reference to `nx_clock_domain_quiescent'
+collect2: error: ld returned 1 exit status
+gmake[2]: *** [CMakeFiles/clock_contract.dir/build.make:120: clock_contract] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:87: CMakeFiles/clock_contract.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2

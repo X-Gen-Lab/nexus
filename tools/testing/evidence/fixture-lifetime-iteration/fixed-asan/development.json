@@ -1,0 +1,534 @@
+{
+  "behavioral_red": "not_claimed",
+  "compiled_inputs": {
+    "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/compiled-inputs.json",
+    "sha256": "7902b5467532f81ab3b8c0134e6147b060bdbd581ac6ce69de43ff592458f3f6",
+    "size": 296327
+  },
+  "executions": [
+    {
+      "argv": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "--build",
+        "/tmp/nexus-fixture-lifetime-builds/asan",
+        "--parallel",
+        "2",
+        "--target",
+        "nexus_can_controller_test",
+        "nexus_gd32_flash_fault_test",
+        "nexus_gd32_adc_stream_test"
+      ],
+      "elapsed_s": 6.7069448420079425,
+      "exit_code": 0,
+      "failure": null,
+      "name": "build",
+      "raw": {
+        "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/build.log",
+        "sha256": "ecab454822b89efecb3c1b64bc18aa83babdb108d637338802f8311a2d4dc055",
+        "size": 575
+      }
+    },
+    {
+      "argv": [
+        "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_can_controller_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "elapsed_s": 0.015751466038636863,
+      "exit_code": 0,
+      "failure": null,
+      "name": "nexus_can_controller_test-discovery",
+      "raw": {
+        "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_can_controller_test-discovery.log",
+        "sha256": "6224b997e64fc7129917ffebbfe38333a84c919f3727078cc343521c3c4b16ba",
+        "size": 1637
+      }
+    },
+    {
+      "argv": [
+        "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_can_controller_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_can_controller_test.xml"
+      ],
+      "elapsed_s": 0.01566959999036044,
+      "exit_code": 0,
+      "failure": null,
+      "name": "nexus_can_controller_test-execution",
+      "raw": {
+        "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_can_controller_test-execution.log",
+        "sha256": "e5a1997b1cff43834e9d4dff6cfddadaeca1a1d411b1b603c41d27f72d4bc946",
+        "size": 5058
+      }
+    },
+    {
+      "argv": [
+        "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_gd32_flash_fault_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "elapsed_s": 0.01583145000040531,
+      "exit_code": 0,
+      "failure": null,
+      "name": "nexus_gd32_flash_fault_test-discovery",
+      "raw": {
+        "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_gd32_flash_fault_test-discovery.log",
+        "sha256": "fd68edf21bb1763a02354c10382117d00f4c86a1316a457293015ec51ad84a3a",
+        "size": 100
+      }
+    },
+    {
+      "argv": [
+        "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_gd32_flash_fault_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_gd32_flash_fault_test.xml"
+      ],
+      "elapsed_s": 0.015795907995197922,
+      "exit_code": 0,
+      "failure": null,
+      "name": "nexus_gd32_flash_fault_test-execution",
+      "raw": {
+        "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_gd32_flash_fault_test-execution.log",
+        "sha256": "92afaf8248d784f98cc72d4f620a0278e7f48723c0fd24bf52e267061f8df067",
+        "size": 503
+      }
+    },
+    {
+      "argv": [
+        "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_gd32_adc_stream_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "elapsed_s": 0.01575377001427114,
+      "exit_code": 0,
+      "failure": null,
+      "name": "nexus_gd32_adc_stream_test-discovery",
+      "raw": {
+        "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_gd32_adc_stream_test-discovery.log",
+        "sha256": "b83652899a54a2354b0839c01fa9f68e27c1794ae3159df37e47daa1234184dc",
+        "size": 1342
+      }
+    },
+    {
+      "argv": [
+        "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_gd32_adc_stream_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_gd32_adc_stream_test.xml"
+      ],
+      "elapsed_s": 0.015644222032278776,
+      "exit_code": 0,
+      "failure": null,
+      "name": "nexus_gd32_adc_stream_test-execution",
+      "raw": {
+        "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_gd32_adc_stream_test-execution.log",
+        "sha256": "7cc1edd85242dccac7db06d91a47fd5d1fb582b45d236c95bcbb79b996dbbff9",
+        "size": 4557
+      }
+    }
+  ],
+  "google_cases": 56,
+  "kind": "fixture_lifetime_existing_contract_execution",
+  "phase": "fixed",
+  "physical_status": "not_executed",
+  "profile": "asan",
+  "results": [
+    {
+      "binary": {
+        "path": "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_can_controller_test",
+        "sha256": "12d0e326718418118771c8c804a2fb163fb92d2df3f52115e18daeb1f06fba6d",
+        "size": 6365560
+      },
+      "cases": [
+        {
+          "classname": "ClassicCan",
+          "name": "RejectsNonClassicFramesWithoutMutatingPreparedStorage",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "MailboxEmptyAloneNeverSettlesTheWireRequest",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "TxokAndCompletionDetachBeforeSettlement",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "RemoteFrameUsesRequestedDlcAndZeroTransferredBytes",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "CancellationWaitsForActualAbortAcknowledgement",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "CompletionRacingCancellationPreservesWireSuccess",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "DeadlineExpiredRejectsWithNoMailboxEffect",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "ReceiveDlcFifteenCopiesOnlyEightBytesWithRawMetadata",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "HardwareOverrunReportsLowerBoundWithoutInventedExactCount",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "BusOffRemainsAuthoritativeWhenTheRingIsFull",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "FourthVectorPriorityCannotBypassKernelWakeCeiling",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "CompletionClearFailureCannotReleaseCallerStorage",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "StuckIrqDisableRetainsRingAndWakeUntilStopReadback",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "IncomingMaskRejectsTaskControlsWithoutAdmission",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "FiltersUseExactIdentifierIdeRtrAndImmutableBankSplit",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "WrongFilterOwnerAndNonintegralTimingRejectBeforeEffects",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "PrimaryClockIsActuallyAcquiredForTheFilterDomain",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "SecondControllerKeepsPrimaryClockAndPeerFiltersAlive",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "ColdUnownedTransmitCannotEscapeInitializationMode",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "UnownedHardwareAbortFailureRetainsDomainAndWakeLoans",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "StoppedReaderNeverTouchesReleasedReceiveStorage",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "LockedHardwareFifoOlderFramesPrecedeItsOverrunBoundary",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "FailedVectorEnableCannotReportSuccessfulInitialization",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "StopDrainsRetainedHardwareFifoBeforeReleasingTheRing",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "StuckFifoReleaseKeepsControllerAndRingResponsibility",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "AdmissionRejectsMutableRequestAliasingTheFilterPlan",
+          "status": "passed"
+        },
+        {
+          "classname": "ClassicCan",
+          "name": "StopJoinsAnInFlightNativeWakePublisherBeforeRelease",
+          "status": "passed"
+        }
+      ],
+      "errors": 0,
+      "failures": 0,
+      "passed": 30,
+      "report": {
+        "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_can_controller_test.xml",
+        "sha256": "8c2d2afdd09ec36b370edf847bc6d41e2dc89c3a9b3cb855ed7035e7f538c69a",
+        "size": 7773
+      },
+      "report_sha256": "8c2d2afdd09ec36b370edf847bc6d41e2dc89c3a9b3cb855ed7035e7f538c69a",
+      "skipped": 0,
+      "tests": 30
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_gd32_flash_fault_test",
+        "sha256": "08366323d9e1ce5130f83dc838a11cc14265c7bebfe3f6cf115a2abfc52097c6",
+        "size": 4810784
+      },
+      "cases": [
+        {
+          "classname": "GD32FlashFault",
+          "name": "RelockFailureCannotReleaseOrReacquireController",
+          "status": "passed"
+        }
+      ],
+      "errors": 0,
+      "failures": 0,
+      "passed": 1,
+      "report": {
+        "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_gd32_flash_fault_test.xml",
+        "sha256": "66ac1726dff78edbed21d342f0a9bd62fa314be0211e84a4690a9db51bb498a3",
+        "size": 581
+      },
+      "report_sha256": "66ac1726dff78edbed21d342f0a9bd62fa314be0211e84a4690a9db51bb498a3",
+      "skipped": 0,
+      "tests": 1
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_gd32_adc_stream_test",
+        "sha256": "370d7abfdd5765fe8e46e3615d4d0ad61b37589218bfd98eb1ffa580872dc943",
+        "size": 6395968
+      },
+      "cases": [
+        {
+          "classname": "GD32ADCStream",
+          "name": "FullScanPublicationRequiresEngineDetach",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCStream",
+          "name": "BackpressureNeverOverwritesAndResumeIsExplicit",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCStream",
+          "name": "InvalidDomainAndRateRejectBeforeLoanOrEffects",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCStream",
+          "name": "StopRetainsProducerUntilEngineStopsAndLateIRQIsHarmless",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCStream",
+          "name": "WakeUsesActualDmaPriorityAndLatchedPublication",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCStream",
+          "name": "EveryBlockRequiresStabilityAndRecalibrationBeforeTrigger",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCStream",
+          "name": "CalibrationTimeoutReleasesOnlyQuiescentProducer",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCStream",
+          "name": "DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCStream",
+          "name": "StabilityClockStartsAfterPowerStoreHasCompleted",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "SwappedBankPublishesWhileOtherBankKeepsAcquiring",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "StarvationStopsAndNeverOverwritesBorrowedBlock",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "FailedDisableRetainsBothTargetsUntilReadback",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "InvalidLateDomainAndUnequalScanCapacityNeverLoan",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "WrongBankPhaseStopsInsteadOfPublishingUnknownScan",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "RefusedAddressWriteAndDrainRetainThreeLoans",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "BankSwitchDuringTargetWriteRejectsPublication",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "ExplicitSampleTimeCostsLimitTheCompleteScanRate",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "IncorrectReplacementAddressNeverPublishesOldBlock",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "DmaErrorAtTargetStoreRejectsPublication",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "SequenceFactsReportSelectedCyclesAndNominalClocks",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "ObserverEpochTracksBlockAndRejectsReleasedLoan",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "CalibrationTimeoutDoesNotInventCompletedBlockLoss",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "ErrorBeforeW1cCompletionStoreRemainsAuthoritative",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "ExhaustedEpochRejectsBeforePartialDoubleTargetAdmission",
+          "status": "passed"
+        },
+        {
+          "classname": "GD32ADCContinuous",
+          "name": "EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
+          "status": "passed"
+        }
+      ],
+      "errors": 0,
+      "failures": 0,
+      "passed": 25,
+      "report": {
+        "path": "/workspace/nexus-fixture-lifetime-iteration/fixed-asan/nexus_gd32_adc_stream_test.xml",
+        "sha256": "45518a475ac49b22bcc1a079c4e29f279f112a9ad438ae4e25166f1d6e2935f4",
+        "size": 6807
+      },
+      "report_sha256": "45518a475ac49b22bcc1a079c4e29f279f112a9ad438ae4e25166f1d6e2935f4",
+      "skipped": 0,
+      "tests": 25
+    }
+  ],
+  "schema_version": 1,
+  "scope": "Complete three existing executables; fixture storage lifetime only, no production change, no full Native/final qualification",
+  "source_before": [
+    {
+      "path": "/workspace/nexus/tests/google/can_controller_test.cpp",
+      "sha256": "20112c02371f3ebf721607c8178cab1a8580dbb34c92d8099b8c1cad49503ab1",
+      "size": 19853
+    },
+    {
+      "path": "/workspace/nexus/tests/google/gd32_flash_fault_test.cpp",
+      "sha256": "2ced97e02049557f807f09d2d9ec1eca31fed505d674c4d073278c2ae525570f",
+      "size": 3654
+    },
+    {
+      "path": "/workspace/nexus/tests/google/gd32_adc_stream_test.cpp",
+      "sha256": "a6e4ae4e090a8872c267b2c2d8095714622b725bf8b0917d1e0013e59e158cc6",
+      "size": 24402
+    }
+  ],
+  "source_unchanged": true,
+  "status": "passed",
+  "tools": [
+    {
+      "path": "/usr/bin/x86_64-linux-gnu-gcc-14",
+      "sha256": "a23ecab8ff08f09ad8c80602c2c5df7f49e09c25905cb8975902e101bf72635f",
+      "size": 1162264,
+      "version": "x86_64-linux-gnu-gcc-14 (Debian 14.2.0-19) 14.2.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
+    },
+    {
+      "path": "/usr/bin/x86_64-linux-gnu-g++-14",
+      "sha256": "6b3696e4dcb85e1c949c732a02befa50e3983ecf94ce7e8e58d9d503b954b79d",
+      "size": 1166360,
+      "version": "x86_64-linux-gnu-g++-14 (Debian 14.2.0-19) 14.2.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
+    },
+    {
+      "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12",
+      "sha256": "fa67443527ed9647f760d807e2a38f26340757123e643c4639cf273ed15d5ea7",
+      "size": 30894944,
+      "version": "Python 3.12.14\n"
+    },
+    {
+      "path": "/workspace/nexus/.venv/bin/cmake",
+      "sha256": "e3eeed7e9fe7fe10cea561eda40fdae67337d6f94068ce0da2add7cbb88b9492",
+      "size": 223,
+      "version": "cmake version 3.31.6\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n"
+    },
+    {
+      "path": "/workspace/nexus/.venv/bin/ninja",
+      "sha256": "08639e194fffa7f08b259fc4abfa4803aff66b64de52549cee42ec527d55cea6",
+      "size": 370448,
+      "version": "1.13.2.git.kitware.jobserver-pipe-1\n"
+    }
+  ]
+}

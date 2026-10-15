@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-memory-iteration/both/memory_boot_test",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/memory-iteration/memory-boot-red.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T16:54:31.933189+00:00",
+  "ended_at": "2026-10-11T16:54:31.936081+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/memory-iteration/memory-boot-red.log"
+}

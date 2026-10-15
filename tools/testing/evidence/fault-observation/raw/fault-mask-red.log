@@ -1,0 +1,30 @@
+Running main() from gmock_main.cc
+[==========] Running 5 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 5 tests from FreeRTOSFailStop
+[ RUN      ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark
+[       OK ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark (0 ms)
+[ RUN      ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName
+[       OK ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName (0 ms)
+[ RUN      ] FreeRTOSFailStop.ReturningObserverCannotReclaimLoanOrContinueKernel
+[       OK ] FreeRTOSFailStop.ReturningObserverCannotReclaimLoanOrContinueKernel (1000 ms)
+[ RUN      ] FreeRTOSFailStop.StrongerIncomingBasepriIsNeverWeakenedByPortStore
+/workspace/nexus/tests/google/freertos_failstop_test.cpp:86: Failure
+Death test: { prepare(NX_FAULT_FREERTOS_ASSERT, false); model_masks.basepri = (5u << (8u - 4u)) - 16U; expected_basepri = model_masks.basepri; nx_freertos_assert_failed("owned-static-source", 73U); }
+    Result: died but not with expected exit code:
+            Exited with exit status 91
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] FreeRTOSFailStop.StrongerIncomingBasepriIsNeverWeakenedByPortStore (1000 ms)
+[ RUN      ] FreeRTOSFailStop.EqualIncomingBasepriStaysMaskedThroughObservation
+[       OK ] FreeRTOSFailStop.EqualIncomingBasepriStaysMaskedThroughObservation (1000 ms)
+[----------] 5 tests from FreeRTOSFailStop (3002 ms total)
+
+[----------] Global test environment tear-down
+[==========] 5 tests from 1 test suite ran. (3002 ms total)
+[  PASSED  ] 4 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] FreeRTOSFailStop.StrongerIncomingBasepriIsNeverWeakenedByPortStore
+
+ 1 FAILED TEST

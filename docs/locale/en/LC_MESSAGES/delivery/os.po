@@ -1,0 +1,409 @@
+# Authored translation; independent semantic review pending.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: d517f0aa6020f72cc49579e57073fa1132ab457528a39c09ea034ff8d655f3ac\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:1
+msgid "OS 交付范围与验证"
+msgstr "OS delivery scope and verification"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:3
+msgid ""
+"当前 OS 保持公共 Wait + 后端专属显式存储。平台不创建默认 worker、不启动 scheduler、 不隐式占用 task-notification "
+"index，也不创建最大对象池。产品 composition 和恢复策略 位于独立 examples/product 工程。"
+msgstr ""
+"The OS retains public Wait plus backend-specific explicit storage. The platform creates no default"
+" workers, starts no scheduler, implicitly occupies no task-notification index and creates no "
+"maximum object pools. Product composition/recovery policy live in independent examples/product "
+"projects."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:7
+msgid ""
+"当前机制的完整合同在 [OS contracts](../design/os-contracts.md)，逐项实际状态在 {download}`OS01–OS55 台账 "
+"<../design/os-execution.csv>`。`implemented` 只表示代码存在，只有 与当前 clean "
+"Git/配置/dependency/工具身份绑定的实际执行才建立软件资格。"
+msgstr ""
+"Full contracts are in [OS contracts](../design/os-contracts.md); per-item actual status is in "
+"{download}`OS01–OS55 ledger <../design/os-execution.csv>`. `implemented` means code exists. "
+"Software qualification requires actual execution bound to current clean Git/config/dependency/tool"
+" identities."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "机制"
+msgstr "Mechanism"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "交付边界"
+msgstr "Delivery boundary"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "Wait"
+msgstr "Wait"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "单 waiter、多个合法 publisher、绝对同域 deadline、业务 predicate 权威"
+msgstr ""
+"One waiter, multiple legal publishers, absolute same-domain deadlines and authoritative business "
+"predicates"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "Baremetal"
+msgstr "Baremetal"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "有界轮询，无任务仿真；睡眠须使用显式 Arch 合同"
+msgstr "Bounded polling without task emulation; sleep uses explicit Arch contracts"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "Native"
+msgstr "Native"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "调用方栈、join、closable byte-copy queue、真实 monotonic 条件等待"
+msgstr "Caller stacks, join, closable byte-copy queues and real monotonic condition waits"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "FreeRTOS"
+msgstr "FreeRTOS"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "受维护九核 Port、静态对象、合法 task/IRQ 上下文、可 join 生命周期"
+msgstr "Maintained nine-core ports, static objects, legal task/IRQ contexts and joinable lifecycle"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "direct notify"
+msgstr "direct notify"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "明示 receiver/index/生命周期，减少可选二值信号量成本"
+msgstr "Explicit receiver/index/lifecycle reduce optional binary-semaphore costs"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "permanent task"
+msgstr "permanent task"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "无 join semaphore，entry 不返回且存储保留到 reset"
+msgstr "No join semaphore; entry never returns and storage remains until reset"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "closable queue"
+msgstr "closable queue"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "独立 opt-in storage/waiters；raw queue 不承担默认关闭成本"
+msgstr "Separate opt-in storage/waiters; raw queues pay no default close cost"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "Tick/profile"
+msgstr "Tick/profile"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "SoC IRQ/CPU facts 与运行时政策分离，合法 Tick 来源明确"
+msgstr "SoC IRQ/CPU facts separate from runtime policy; explicit legal Tick sources"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "low power"
+msgstr "low power"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "浅睡眠＋显式 timer port；无 port 不自动睡眠"
+msgstr "Shallow sleep plus explicit timer port; no automatic sleep without a port"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "trace"
+msgstr "trace"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "调用方 bounded ring＋weak hook，无默认大型 trace buffer"
+msgstr "Caller bounded ring plus weak hook; no default large trace buffer"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "MPU"
+msgstr "MPU"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "独立 restricted-task profile，protected metadata、显式 user linker/regions、窄 delay/tick SVC"
+msgstr ""
+"Separate restricted-task profile, protected metadata, explicit user linker/regions and narrow "
+"delay/tick SVC"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "split security"
+msgstr "split security"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "匹配 Secure/NS Runtime、实际 TZ-aware port、caller Secure contexts 和 Idle 存储"
+msgstr "Matched Secure/NS Runtime, actual TZ-aware port, caller Secure contexts and Idle storage"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:26
+msgid "外部应用交付"
+msgstr "External application delivery"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:28
+msgid ""
+"`nexus-examples/apps/uart_owner_runtime` 使用生成 typed factory 的 UART face。Native 创建两个 producer 和一个 "
+"owner 的真实 pthread；FreeRTOS 创建 producer/owner/stop coordinator 的显式静态任务；裸机用同一 owner 进行 cooperative "
+"service。三板引用 已有 console route，不定义新的接线或 provider。"
+msgstr ""
+"`nexus-examples/apps/uart_owner_runtime` uses generated typed-factory UART faces. Native creates "
+"actual pthreads for two producers/one owner. FreeRTOS creates explicit static producer/owner/stop-"
+"coordinator tasks. Baremetal cooperatively services the same owner. Three Boards reuse existing "
+"console routes without defining new wiring/providers."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:33
+msgid ""
+"关闭流程包含 stop admission、active cancel/drain、producer join、owner join、IRQ wake quiescence "
+"和通知销毁。GoogleTest/GoogleMock 测试真实 BusOwner 和应用 shutdown 模块， mock 只替代外部 join/硬件 "
+"quiescence；覆盖阶段顺序、超时、错误、提前回收和重试。"
+msgstr ""
+"Shutdown includes admission stop, active cancel/drain, producer join, owner join, IRQ-wake "
+"quiescence and notification destruction. GoogleTest/GoogleMock exercise actual "
+"BusOwner/application-shutdown modules, mocking only external join/hardware quiescence. Coverage "
+"includes stage order, timeout, errors, premature reclaim and retries."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:37
+msgid ""
+"部分启动失败分别回收已取得的资源。Native 先关闭提交、保持 owner 排空并 join 已运行任务。FreeRTOS 启动前使用 "
+"`nx_freertos_task_discard_before_scheduler`，先 suspend 移除内核候选 TCB 引用，再同步删除任务和完成 latch。它要求特权启动 "
+"上下文、NOT_STARTED、wrapper 尚未执行且没有未配对的 scheduler suspension； 成功后才允许复用栈、TCB 和 context。运行中任务继续使用 "
+"cooperative stop/join。 真实 POSIX kernel 回归验证逆序回收、回收存储毒化后复用、真实 scheduler 执行， 以及 scheduler 结束后拒绝 "
+"discard 已执行 wrapper，不能替代 MCU 实板验证。"
+msgstr ""
+"Partial startup failures reclaim acquired resources separately. Native closes submission, keeps "
+"the owner draining and joins running tasks. Pre-scheduler FreeRTOS uses "
+"`nx_freertos_task_discard_before_scheduler`: suspend removes kernel candidate-TCB references "
+"before synchronous task/completion-latch deletion. It requires privileged bootstrap, NOT_STARTED, "
+"an unexecuted wrapper and no unmatched scheduler suspension. Successful discard alone permits "
+"stack/TCB/context reuse; running tasks use cooperative stop/join. Actual POSIX-kernel regressions "
+"verify reverse reclaim, poisoned-storage reuse, actual scheduler execution and refusal to discard "
+"executed wrappers after scheduler end; they replace no MCU validation."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:45
+msgid ""
+"Native 的显式 host 栈为三个 64 KiB buffer；应用预算相应独立增加。这是 host thread fixture 的资源，不是 MCU 栈成本。MCU 采用各 256 "
+"StackType_t word 的四任务参考预算， 声明 8-byte 对齐，仍需实板测量运行峰值，不能从启动最低容量推导。 FreeRTOS 示例停止 I/O 与发布者后保留 "
+"scheduler 所需平台时钟/Tick，coordinator 挂起； Native/裸机可继续 platform stop。产品 reset/scheduler-stop 策略单独拥有。"
+msgstr ""
+"Native explicitly provides three 64 KiB host-stack buffers, separately increasing application "
+"budgets; this is host-fixture cost, not MCU stacks. MCU references use four tasks of 256 "
+"StackType_t words each with 8-byte alignment; physical peak measurement remains required and is "
+"not inferred from startup minimums. After I/O/publisher stop, FreeRTOS retains scheduler "
+"clock/Tick and suspends the coordinator. Native/baremetal may continue platform stop. Products "
+"separately own reset/scheduler-stop policy."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:51
+msgid "软件验证与实板边界"
+msgstr "Software verification and physical boundaries"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:53
+msgid ""
+"软件执行应包含 deadline 持续 wake、最终完成竞争、端口启动栈拒绝、Baseline IRQ 完整绑定、close/drain、任务复用、direct notification "
+"receiver/index、tickless 失败 和 trace overflow。GoogleMock 上下文模型、真实 POSIX kernel、Native 多任务示例、 九核 ABI "
+"链接和安装 SDK 消费分别建立自己的证据。"
+msgstr ""
+"Software execution should cover continuously waking deadlines, final-completion races, startup-"
+"stack rejection, complete Baseline IRQ binding, close/drain, task reuse, direct-notification "
+"receiver/index, tickless failures and trace overflow. GoogleMock context models, actual POSIX "
+"kernel, Native multitasking, nine-core ABI links and installed SDK consumption each establish "
+"separate evidence."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:58
+msgid ""
+"可选 MPU 的十二个实际 ARM 软件变体和 V7/V8 host contract 已执行；当前拒绝 M0/M0+、 M7 kernel MPU 及 MPU+split。可选 split 的 "
+"31 个 Secure/NS 配对（62 ELF）覆盖当前 M23/M33/M55/M85 CPU authority 组合，并核对七个真实 SG veneers、import、上下文 ASM 与"
+" caller Idle callback，没有默认 Secure heap/pool。split 的两个 host lease targets 分别覆盖整数和共享 FP/MVE bank "
+"软件合同。两类都需要消费者提供明确 linker、存储 和可信生命周期；软件 fixture 的地址是 synthetic，未执行实际 MPU fault、安全归属、 跨世界启动或真实 "
+"context switch。细节见 [OS contracts](../design/os-contracts.md)。"
+msgstr ""
+"Twelve actual ARM MPU variants and V7/V8 host contracts were executed; M0/M0+, M7-kernel-MPU and "
+"MPU+split are rejected. Optional split has 31 Secure/NS pairs (62 ELFs), covering maintained "
+"M23/M33/M55/M85 CPU-authority combinations and checking seven real SG veneers/imports/context "
+"ASM/caller Idle callbacks without default Secure heaps/pools. Two host lease targets cover "
+"integer/shared-FP-MVE-bank software contracts. Both require explicit consumer "
+"linkers/storage/trusted lifecycles. Fixture addresses are synthetic; actual MPU faults, security "
+"attribution, cross-world startup/context switches remain unexecuted. See [OS "
+"contracts](../design/os-contracts.md)."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:66
+msgid ""
+"OS49–55 的物理工装定义已经可执行为 prepare/validate 工具，但硬件尚未连接，未运行 实际 IRQ→task 延迟、FP/MVE register "
+"retention、MSP/task peaks、Tick/deadline 误差、 满载生命周期、睡眠恢复或异常安全输出。准备计划保持 `prepared_unbound`，物理状态 保持 "
+"`not_executed`。计划不是测量结果，更不是 WCET、安全认证或产品 release。"
+msgstr ""
+"OS49–55 physical fixtures execute as prepare/validate tools, but disconnected hardware means no "
+"actual IRQ→task latency, FP/MVE retention, MSP/task peaks, Tick/deadline error, full-load "
+"lifecycle, sleep recovery or exception-safe outputs. Plans remain `prepared_unbound`, physical "
+"status `not_executed`. Plans are not measurements, WCET, safety certification or product releases."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:77
+msgid ""
+"实板接入后由 station owner 配置五项明确预算 `os_irq_latency`、`os_deadline_lateness`、 "
+"`os_low_power_lateness`、`os_lifecycle`、`os_fail_response`；分别使用 us/us/us/count/us。 生命周期必须提供正 "
+"minimum，其他四项使用 maximum。记录与 station admission 绑定， 不能在 acquisition context 内放宽预算。"
+msgstr ""
+"After hardware connection, station owners set five budgets: `os_irq_latency`, "
+"`os_deadline_lateness`, `os_low_power_lateness`, `os_lifecycle`, `os_fail_response`, with "
+"us/us/us/count/us units. Lifecycle requires positive minimum; the other four use maximum. Records "
+"bind station admission and budgets cannot be relaxed inside acquisition context."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:82
+msgid ""
+"OS context 严格字段为 schema_version=1/kind=os_hil_context、admission_sha256、 workload/instrument file "
+"identities、实际 load/executor/irq_priorities/cpu_clock_hz、 features.fpu/mve、完整 `stack_names` 和 "
+"requirements。stack_names 列出 MSP 及该 workload 每个选定任务，raw stack trace 必须完全对应，不能只提交一个示例任务。features 与已 "
+"admission 的 CPU ABI 完全一致。 每项独立 raw trace 绑定 context SHA，保留逐样本/寄存器/stack/lifecycle/fail-stop 数据， "
+"不能传入一个自行填写 `status=passed` 的摘要替代。采集时间需 fresh UTC offset。"
+msgstr ""
+"Strict OS-context fields are schema_version=1/kind=os_hil_context, admission_sha256, "
+"workload/instrument file identities, actual load/executor/irq_priorities/cpu_clock_hz, "
+"features.fpu/mve, complete `stack_names` and requirements. Names include MSP/every selected "
+"workload task and raw stack traces must match exactly, not one example task. Features exactly "
+"match admitted CPU ABI. Each independent raw trace binds context SHA and retains per-"
+"sample/register/stack/lifecycle/fail-stop data. A self-authored `status=passed` summary cannot "
+"replace it. Acquisition time needs a fresh UTC offset."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:97
+msgid ""
+"报告要求未使用的输出目标，旧证据与输入永不覆盖。 这些命令只读取已保留记录，绝不自动操作硬件。测量方法、观测 load、供电、安全输出和 产品验收预算由实际 station/workload "
+"审核，不能继承主机模型或旧提交的物理资格。"
+msgstr ""
+"Reports require unused output targets and never overwrite old evidence/inputs. These commands read"
+" retained records only and never operate hardware automatically. Actual station/workload review "
+"owns measurement method, observed load, power, safe outputs and product budgets; host models/old "
+"commits confer no physical qualification."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:101
+msgid "显式优化成本"
+msgstr "Explicit optimization costs"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:103
+msgid ""
+"32-bit ABI 的 `standard` development resource probe 已测得下列对象尺寸；具体 profile、 CPU Port、枚举 ABI "
+"和编译器改变后须重新执行成本门禁。这些是实际 ELF 对象大小， 不表示运行 cycles 或最终软件候选资格。"
+msgstr ""
+"The 32-bit-ABI `standard` development resource probe measured the object sizes below. Changed "
+"profile/CPU port/enum ABI/compiler requires fresh cost gates. These are actual ELF object sizes, "
+"not runtime cycles/final software-candidate qualification."
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "对象"
+msgstr "Object"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "RAM bytes"
+msgstr "RAM bytes"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "成本责任"
+msgstr "Cost responsibility"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "Wait face"
+msgstr "Wait face"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "16"
+msgstr "16"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "保持现有公共 ABI"
+msgstr "Retains existing public ABI"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "普通 notify"
+msgstr "Ordinary notification"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "84"
+msgstr "84"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "每对象静态 latch"
+msgstr "Per-object static latch"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "receiver/index 明示，省 68 B"
+msgstr "Explicit receiver/index; saves 68 B"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "可 join 任务"
+msgstr "Joinable task"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "172"
+msgstr "172"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "不含 caller stack"
+msgstr "Excludes caller stack"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "永久任务"
+msgstr "Permanent task"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "88"
+msgstr "88"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "不含 caller stack，省 84 B"
+msgstr "Excludes caller stack; saves 84 B"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "raw queue"
+msgstr "raw queue"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "80"
+msgstr "80"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "不含 payload"
+msgstr "Excludes payload"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "96"
+msgstr "96"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "比 raw 多 16 B，不含 payload/waiters"
+msgstr "16 B above raw; excludes payload/waiters"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "每个 concurrent queue waiter"
+msgstr "Each concurrent queue waiter"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "调用方按实际并发数提供"
+msgstr "Caller provides actual concurrency capacity"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "Idle TCB＋默认栈"
+msgstr "Idle TCB plus default stack"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "596"
+msgstr "596"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:0
+msgid "默认 84＋512 B；profile 可以改变"
+msgstr "Default 84+512 B; profiles may change it"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/os.md:119
+msgid ""
+"`maximum_waiters` 控制 close 的 scheduler-pause 遍历预算，payload item size 控制内核 单次复制的临界区预算。不可把整个 close "
+"遍历的时间宣称为 IRQ 屏蔽时间，也不可用 静态 instruction 数代替测量延迟。成本门禁保留各自 argv、ELF/nm/disassembly 和尺寸； 资源最小 profile "
+"与完整能力 profile 分别比较，禁止把不同负载的图像作为同一基线。"
+msgstr ""
+"`maximum_waiters` bounds close traversal while the scheduler is paused; payload item size bounds "
+"each kernel-copy critical section. Entire close traversal is not IRQ-masked time and static "
+"instruction counts are not measured latency. Cost gates retain argv, ELF/nm/disassembly/sizes. "
+"Compare minimal-resource/complete-capability profiles separately; different-workload images are "
+"not one baseline."

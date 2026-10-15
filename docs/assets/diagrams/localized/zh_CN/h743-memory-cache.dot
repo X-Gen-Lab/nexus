@@ -1,0 +1,43 @@
+// FIG-09 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph H743MemoryCache {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-09 STM32H743ZIT6：有限 UART TX DMA 与 Cache\n仅 AXI SRAM 被选为首发 linker / TX 域；不是 RX DMA 支持"];
+    subgraph clusterMemory {
+        label="SoC 物理域事实（事实不等于已授权放置）"; color="#64748b";
+        cpu [label="Cortex-M7 CPU\n所选 D-cache off / on"];
+        axi [label="AXI SRAM：0x24000000 / 512 KiB\n唯一首发 linker 与 TX payload 域", fillcolor="#f0fdf4"];
+        dma [label="USART3 TX\nDMA1 stream0 / DMAMUX request46"];
+        tcm [label="ITCM 64 KiB / DTCM 128 KiB\nDMA1/2 不可达；MDMA 物理可达\n首发 linker 不选", fillcolor="#fefce8"];
+        d2 [label="D2 SRAM1/2/3、D3 SRAM4、backup\n按 dma_engines 分别记录可达性\n首发 linker 不选", fillcolor="#fefce8"];
+        cpu -> axi [label="load / store（可能经 cache）"];
+        axi -> dma [label="DMA 读取实际 SRAM 字节"];
+        cpu -> tcm [label="物理 CPU 路径", style=dashed];
+        cpu -> d2 [label="物理域，未授权本 TX", style=dashed];
+    }
+    subgraph clusterLoan {
+        label="Cache-on：每条完整 32-byte line 独占借用"; color="#64748b";
+        validate [label="验证 AXI 域 / overflow / 独占完整 lines\n地址 32-byte 对齐；长度 32 倍数，≤65504"];
+        preparing [label="admit → provider PREPARING 标记\n借用先成立，cancel 不能回收"];
+        clean [label="正常输入 mask 下 clean + barriers\n不 outward rounding，不 bounce buffer"];
+        launch [label="重新检查 cancel / deadline / policy\n未终止才配置并启动 DMA"];
+        detach [label="检查 DMA / UART wire / IRQ 引用排空\n全部成立才最后观察并发布 SETTLED"];
+        fail [label="clean / detach 失败或未完成\n保留借用，按实际终止路径推进", fillcolor="#fff7ed"];
+        validate -> preparing [label="admission 通过"];
+        preparing -> clean [label="长维护不在长 IRQ mask 内"];
+        clean -> launch [label="维护完成"];
+        launch -> detach [label="实际完成 / drain"];
+        clean -> fail [label="拒绝 / 失败"];
+        detach -> fail [label="无法证明排空"];
+    }
+    axi -> validate [label="选定 DMA TX 域", style=dashed];
+}

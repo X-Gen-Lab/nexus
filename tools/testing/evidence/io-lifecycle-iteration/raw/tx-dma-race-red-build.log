@@ -1,0 +1,30 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/uart-iteration/generated/resolved.json
+-- Configuring done (2.0s)
+-- Generating done (0.2s)
+-- Build files have been written to: /workspace/nexus/build/uart-iteration
+[1/21] Building C object io/CMakeFiles/nexus_io.dir/src/mdio.c.o
+[2/21] Building C object io/CMakeFiles/nexus_io.dir/src/ethernet.c.o
+[3/21] Building C object io/CMakeFiles/nexus_io.dir/src/usb_device.c.o
+[4/21] Building C object io/CMakeFiles/nexus_io.dir/src/timer_capture.c.o
+[5/21] Building C object io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.o
+[6/21] Linking C static library lib/libnexus_io.a
+[7/21] Building C object io/CMakeFiles/nexus_io_native.dir/native/ethernet.c.o
+[8/21] Building C object io/CMakeFiles/nexus_io_native.dir/native/usb_device.c.o
+[9/21] Building C object io/CMakeFiles/nexus_eth_native_engine.dir/src/eth_mac.c.o
+[10/21] Building C object io/CMakeFiles/nexus_usb_native_engine.dir/src/usb_device_controller.c.o
+[11/21] Linking C static library lib/libnexus_io_native.a
+[12/21] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+[13/21] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/__/__/soc/stm32f407/drivers/uart_dma.c.o
+[14/21] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o
+[15/21] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+[16/21] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/__/__/soc/gd32f470/drivers/uart_dma.c.o
+[17/21] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/__/contracts/gd32_model/model.c.o
+[18/21] Linking CXX executable bin/nexus_stm32_uart_dma_test
+[19/21] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/gd32_uart_dma_test.cpp.o
+[20/21] Linking CXX executable bin/nexus_gd32_uart_dma_test

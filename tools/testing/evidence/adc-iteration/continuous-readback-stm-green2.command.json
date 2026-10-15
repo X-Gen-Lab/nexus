@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "build/adc-iteration/bin/nexus_stm32_adc_stream_test",
+    "--gtest_output=xml:tools/testing/evidence/adc-iteration/continuous-readback-stm-green2.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T16:24:44.156612+00:00",
+  "ended_at": "2026-10-11T16:24:44.159412+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-stm-green2.log"
+}

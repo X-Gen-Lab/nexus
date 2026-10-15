@@ -1,0 +1,2 @@
+CMake Error: CMake was unable to find a build program corresponding to "Ninja".  CMAKE_MAKE_PROGRAM is not set.  You probably need to select a different build tool.
+-- Configuring incomplete, errors occurred!

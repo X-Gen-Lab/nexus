@@ -1,0 +1,36 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "-m",
+    "unittest",
+    "scripts.ci.test_provider_assemblies.OutputAdmission.test_alternate_source_root_cannot_qualify_current_tool_code",
+    "scripts.ci.test_provider_assemblies.OutputAdmission.test_imported_compiler_identity_helper_is_a_snapshotted_input",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T20:08:53.238758+00:00",
+  "source_inputs": [
+    {
+      "path": "/workspace/nexus/scripts/ci/provider_assemblies.py",
+      "bytes": 17864,
+      "sha256": "56b750d1c2d41e0d8b15ebada474e8ff9f95244ee6790fec39f6e18188b19523"
+    },
+    {
+      "path": "/workspace/nexus/scripts/ci/test_provider_assemblies.py",
+      "bytes": 9638,
+      "sha256": "093cd33ee04c21bdd08024d5c0accefcccb25b82ba1a4db80983aadf7e42d911"
+    },
+    {
+      "path": "/workspace/nexus/scripts/ci/arch_compile.py",
+      "bytes": 19488,
+      "sha256": "1494a66186d916e0740bf6954e21de0406434e61fa7b5454433d58324ce74ffe"
+    }
+  ],
+  "returncode": 1,
+  "ended_at": "2026-10-11T20:08:53.396783+00:00",
+  "log": {
+    "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/tool-source-red.log",
+    "bytes": 24641,
+    "sha256": "f9c39c1f46b67e4415941397633d366e903181ed566ce7306f214a3a5752507f"
+  }
+}

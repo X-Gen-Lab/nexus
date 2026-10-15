@@ -1,0 +1,80 @@
+Running main() from gmock_main.cc
+[==========] Running 28 tests from 6 test suites.
+[----------] Global test environment set-up.
+[----------] 3 tests from OsWaitContract
+[ RUN      ] OsWaitContract.ArmRecheckCompletionNeverSleeps
+[       OK ] OsWaitContract.ArmRecheckCompletionNeverSleeps (0 ms)
+[ RUN      ] OsWaitContract.NotificationOnlyRechecksAuthoritativePredicate
+[       OK ] OsWaitContract.NotificationOnlyRechecksAuthoritativePredicate (0 ms)
+[ RUN      ] OsWaitContract.InvalidPortDoesNotCallPredicate
+[       OK ] OsWaitContract.InvalidPortDoesNotCallPredicate (0 ms)
+[----------] 3 tests from OsWaitContract (0 ms total)
+
+[----------] 5 tests from BaremetalWait
+[ RUN      ] BaremetalWait.ChangedSequenceCannotBypassExpiredDeadline
+[       OK ] BaremetalWait.ChangedSequenceCannotBypassExpiredDeadline (0 ms)
+[ RUN      ] BaremetalWait.ContinuousHintsCannotExtendAbsoluteDeadline
+[       OK ] BaremetalWait.ContinuousHintsCannotExtendAbsoluteDeadline (0 ms)
+[ RUN      ] BaremetalWait.NeverAndFiniteDeadlinesDoNotWrap
+[       OK ] BaremetalWait.NeverAndFiniteDeadlinesDoNotWrap (0 ms)
+[ RUN      ] BaremetalWait.RepeatedHintsDoNotRestartAFutureDeadline
+[       OK ] BaremetalWait.RepeatedHintsDoNotRestartAFutureDeadline (0 ms)
+[ RUN      ] BaremetalWait.SequenceWrapIsAnObservedHint
+[       OK ] BaremetalWait.SequenceWrapIsAnObservedHint (0 ms)
+[----------] 5 tests from BaremetalWait (0 ms total)
+
+[----------] 9 tests from NativeWait
+[ RUN      ] NativeWait.ChangedSequenceCannotBypassExpiredDeadline
+[       OK ] NativeWait.ChangedSequenceCannotBypassExpiredDeadline (0 ms)
+[ RUN      ] NativeWait.ContinuousHintsCannotExtendAbsoluteDeadline
+[       OK ] NativeWait.ContinuousHintsCannotExtendAbsoluteDeadline (0 ms)
+[ RUN      ] NativeWait.RepeatedHintsDoNotRestartAFutureDeadline
+[       OK ] NativeWait.RepeatedHintsDoNotRestartAFutureDeadline (0 ms)
+[ RUN      ] NativeWait.NeverUsesUntimedWaitAndSecondWaiterIsRejected
+[       OK ] NativeWait.NeverUsesUntimedWaitAndSecondWaiterIsRejected (0 ms)
+[ RUN      ] NativeWait.MultiplePublishersPreserveEverySequenceIncrement
+[       OK ] NativeWait.MultiplePublishersPreserveEverySequenceIncrement (0 ms)
+[ RUN      ] NativeWait.SequenceWrapRemainsObservableBeforeDeadline
+[       OK ] NativeWait.SequenceWrapRemainsObservableBeforeDeadline (0 ms)
+[ RUN      ] NativeWait.ActualTimeoutPreservesFinalPredicateCompletion
+[       OK ] NativeWait.ActualTimeoutPreservesFinalPredicateCompletion (0 ms)
+[ RUN      ] NativeWait.PastDeadlineNeverEntersAPosixBlockingOperation
+[       OK ] NativeWait.PastDeadlineNeverEntersAPosixBlockingOperation (0 ms)
+[ RUN      ] NativeWait.PublisherBetweenRecheckAndSleepCannotLoseWake
+[       OK ] NativeWait.PublisherBetweenRecheckAndSleepCannotLoseWake (0 ms)
+[----------] 9 tests from NativeWait (0 ms total)
+
+[----------] 5 tests from NativeQueue
+[ RUN      ] NativeQueue.CloseWakesBlockedProducerAndRetainsDrain
+[       OK ] NativeQueue.CloseWakesBlockedProducerAndRetainsDrain (0 ms)
+[ RUN      ] NativeQueue.CloseWakesBlockedConsumerAndPreservesOutputOnRejection
+[       OK ] NativeQueue.CloseWakesBlockedConsumerAndPreservesOutputOnRejection (0 ms)
+[ RUN      ] NativeQueue.ImmediateOperationsUseAvailableCapacityAtExpiredDeadline
+[       OK ] NativeQueue.ImmediateOperationsUseAvailableCapacityAtExpiredDeadline (0 ms)
+[ RUN      ] NativeQueue.MultipleProducersCloseThenDrainWithoutLosingItems
+[       OK ] NativeQueue.MultipleProducersCloseThenDrainWithoutLosingItems (21 ms)
+[ RUN      ] NativeQueue.RepeatedCloseIsIdempotentAndRejectsFutureAdmission
+[       OK ] NativeQueue.RepeatedCloseIsIdempotentAndRejectsFutureAdmission (0 ms)
+[----------] 5 tests from NativeQueue (22 ms total)
+
+[----------] 2 tests from NativeTask
+[ RUN      ] NativeTask.JoinRejectsSelfThenConfirmsEntryExitAndAllowsReuse
+[       OK ] NativeTask.JoinRejectsSelfThenConfirmsEntryExitAndAllowsReuse (0 ms)
+[ RUN      ] NativeTask.SmallStackRejectionRetainsUnusedHandle
+[       OK ] NativeTask.SmallStackRejectionRetainsUnusedHandle (0 ms)
+[----------] 2 tests from NativeTask (0 ms total)
+
+[----------] 4 tests from BackendErrors/OsWaitFinalObservation
+[ RUN      ] BackendErrors/OsWaitFinalObservation.CompletionWinsFinalErrorObservation/0
+[       OK ] BackendErrors/OsWaitFinalObservation.CompletionWinsFinalErrorObservation/0 (0 ms)
+[ RUN      ] BackendErrors/OsWaitFinalObservation.CompletionWinsFinalErrorObservation/1
+[       OK ] BackendErrors/OsWaitFinalObservation.CompletionWinsFinalErrorObservation/1 (0 ms)
+[ RUN      ] BackendErrors/OsWaitFinalObservation.CompletionWinsFinalErrorObservation/2
+[       OK ] BackendErrors/OsWaitFinalObservation.CompletionWinsFinalErrorObservation/2 (0 ms)
+[ RUN      ] BackendErrors/OsWaitFinalObservation.CompletionWinsFinalErrorObservation/3
+[       OK ] BackendErrors/OsWaitFinalObservation.CompletionWinsFinalErrorObservation/3 (0 ms)
+[----------] 4 tests from BackendErrors/OsWaitFinalObservation (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 28 tests from 6 test suites ran. (23 ms total)
+[  PASSED  ] 28 tests.

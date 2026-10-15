@@ -1,0 +1,45 @@
+HIL workloads: failed; equipment not operated
+HIL workloads: prepared_unbound; equipment not operated
+test_authored_case_cannot_promote_unselected_or_unsupported_mode (tools.testing.test_hil_workloads.HilWorkloadTests.test_authored_case_cannot_promote_unselected_or_unsupported_mode) ... ok
+test_authored_success_flags_and_unknown_fields_are_rejected (tools.testing.test_hil_workloads.HilWorkloadTests.test_authored_success_flags_and_unknown_fields_are_rejected) ... ok
+test_baremetal_does_not_claim_freertos_task_cases (tools.testing.test_hil_workloads.HilWorkloadTests.test_baremetal_does_not_claim_freertos_task_cases) ... ok
+test_blank_descriptions_and_invalid_types_fail (tools.testing.test_hil_workloads.HilWorkloadTests.test_blank_descriptions_and_invalid_types_fail) ... ok
+test_chip_capability_is_not_selected_board_route (tools.testing.test_hil_workloads.HilWorkloadTests.test_chip_capability_is_not_selected_board_route) ... ok
+test_cli_failed_configuration_never_creates_physical_success (tools.testing.test_hil_workloads.HilWorkloadTests.test_cli_failed_configuration_never_creates_physical_success) ... ok
+test_cli_preserves_declared_instrument_when_bytes_are_missing (tools.testing.test_hil_workloads.HilWorkloadTests.test_cli_preserves_declared_instrument_when_bytes_are_missing) ... workload report cannot overwrite instruments
+ok
+test_cli_rejects_symlink_report_and_parent_without_replacing (tools.testing.test_hil_workloads.HilWorkloadTests.test_cli_rejects_symlink_report_and_parent_without_replacing) ... workload report path cannot contain symlinks
+workload report path cannot contain symlinks
+ok
+test_cli_requires_unused_report_and_preserves_all_inputs (tools.testing.test_hil_workloads.HilWorkloadTests.test_cli_requires_unused_report_and_preserves_all_inputs) ... workload report requires an unused destination
+workload report requires an unused destination
+workload report requires an unused destination
+workload report requires an unused destination
+workload report requires an unused destination
+ok
+test_cli_writes_exact_input_identities_and_does_not_run_equipment (tools.testing.test_hil_workloads.HilWorkloadTests.test_cli_writes_exact_input_identities_and_does_not_run_equipment) ... ok
+test_context_requires_selected_m4f_freertos_tuple (tools.testing.test_hil_workloads.HilWorkloadTests.test_context_requires_selected_m4f_freertos_tuple) ... ok
+test_empty_authored_workload_cannot_become_unreviewed_plan (tools.testing.test_hil_workloads.HilWorkloadTests.test_empty_authored_workload_cannot_become_unreviewed_plan) ... ok
+test_endurance_and_power_cut_require_reviewed_lower_bounds (tools.testing.test_hil_workloads.HilWorkloadTests.test_endurance_and_power_cut_require_reviewed_lower_bounds) ... ok
+test_exact_fixture_build_and_workload_board_part_must_match (tools.testing.test_hil_workloads.HilWorkloadTests.test_exact_fixture_build_and_workload_board_part_must_match) ... ok
+test_instrument_and_safety_inventory_cannot_be_weakened (tools.testing.test_hil_workloads.HilWorkloadTests.test_instrument_and_safety_inventory_cannot_be_weakened) ... ok
+test_instrument_bytes_are_verified_and_cannot_be_symlink (tools.testing.test_hil_workloads.HilWorkloadTests.test_instrument_bytes_are_verified_and_cannot_be_symlink) ... ok
+test_limits_require_reviewed_numbers_units_and_exact_metric_names (tools.testing.test_hil_workloads.HilWorkloadTests.test_limits_require_reviewed_numbers_units_and_exact_metric_names) ... ok
+test_missing_raw_definition_or_unreviewed_extra_is_rejected (tools.testing.test_hil_workloads.HilWorkloadTests.test_missing_raw_definition_or_unreviewed_extra_is_rejected) ... ok
+test_missing_unknown_repeated_and_empty_cases_fail (tools.testing.test_hil_workloads.HilWorkloadTests.test_missing_unknown_repeated_and_empty_cases_fail) ... ok
+test_native_backend_never_establishes_physical_workload_selection (tools.testing.test_hil_workloads.HilWorkloadTests.test_native_backend_never_establishes_physical_workload_selection) ... ok
+test_plan_preserves_only_selected_routes_and_modes (tools.testing.test_hil_workloads.HilWorkloadTests.test_plan_preserves_only_selected_routes_and_modes) ... ok
+test_polling_adc_does_not_promise_unselected_trigger_capture (tools.testing.test_hil_workloads.HilWorkloadTests.test_polling_adc_does_not_promise_unselected_trigger_capture) ... ok
+test_polling_modes_do_not_establish_dma_selection (tools.testing.test_hil_workloads.HilWorkloadTests.test_polling_modes_do_not_establish_dma_selection) ... ok
+test_preparation_never_operates_subprocess_or_devices (tools.testing.test_hil_workloads.HilWorkloadTests.test_preparation_never_operates_subprocess_or_devices) ... ok
+test_reviewed_protocol_is_still_unbound_and_input_is_unchanged (tools.testing.test_hil_workloads.HilWorkloadTests.test_reviewed_protocol_is_still_unbound_and_input_is_unchanged) ... ok
+test_template_is_explicitly_unreviewed_and_not_a_board_fixture (tools.testing.test_hil_workloads.HilWorkloadTests.test_template_is_explicitly_unreviewed_and_not_a_board_fixture) ... ok
+test_thirteen_cases_cover_requested_items_without_measurements (tools.testing.test_hil_workloads.HilWorkloadTests.test_thirteen_cases_cover_requested_items_without_measurements) ... ok
+test_tickless_plan_does_not_install_timer_port (tools.testing.test_hil_workloads.HilWorkloadTests.test_tickless_plan_does_not_install_timer_port) ... ok
+test_unknown_mode_containing_dma_does_not_establish_dma_support (tools.testing.test_hil_workloads.HilWorkloadTests.test_unknown_mode_containing_dma_does_not_establish_dma_support) ... ok
+test_unselected_duplicate_and_insufficient_bindings_fail (tools.testing.test_hil_workloads.HilWorkloadTests.test_unselected_duplicate_and_insufficient_bindings_fail) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 0.042s
+
+OK

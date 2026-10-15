@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="6" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:57:56.127" name="AllTests">
+  <testsuite name="CanFactory" tests="6" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:57:56.127">
+    <testcase name="PureLookupPreservesSeparateIdentityBeforeStartup" file="/workspace/nexus/tests/google/can_factory_test.cpp" line="161" status="run" result="completed" time="0." timestamp="2026-10-11T17:57:56.127" classname="CanFactory" />
+    <testcase name="BothInstancesUseOneDomainAndDistinctRingsAndMailboxes" file="/workspace/nexus/tests/google/can_factory_test.cpp" line="178" status="run" result="completed" time="0." timestamp="2026-10-11T17:57:56.127" classname="CanFactory" />
+    <testcase name="StuckSecondControllerRetainsPinsAndSharedDomainUntilDrain" file="/workspace/nexus/tests/google/can_factory_test.cpp" line="190" status="run" result="completed" time="0." timestamp="2026-10-11T17:57:56.127" classname="CanFactory" />
+    <testcase name="FailedSecondStartupIsIncludedInReverseCleanup" file="/workspace/nexus/tests/google/can_factory_test.cpp" line="206" status="run" result="completed" time="0." timestamp="2026-10-11T17:57:56.127" classname="CanFactory" />
+    <testcase name="FirstPinFailureHasNoDomainOrUncapturedPinRelease" file="/workspace/nexus/tests/google/can_factory_test.cpp" line="224" status="run" result="completed" time="0." timestamp="2026-10-11T17:57:56.128" classname="CanFactory" />
+    <testcase name="SecondPinFailureRestoresOnlyTheCapturedLeases" file="/workspace/nexus/tests/google/can_factory_test.cpp" line="234" status="run" result="completed" time="0." timestamp="2026-10-11T17:57:56.128" classname="CanFactory" />
+  </testsuite>
+</testsuites>

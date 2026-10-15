@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="15" failures="4" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:18:38.039" name="AllTests">
+  <testsuite name="Stm32UartReceive" tests="15" failures="4" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:18:38.039">
+    <testcase name="StartProgramsCallerBufferWithoutCpuPayloadCopy" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="95" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+    <testcase name="InvalidFutureBufferRejectsWithoutLoanOrMmioEffect" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="106" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+    <testcase name="IdlePublishesOnlyTheStablePartialPrefix" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="115" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+    <testcase name="RefusedDisableRetainsLoanUntilARealServiceRetryDrains" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="135" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+    <testcase name="FullDmaBlockRequiresExplicitOwnerRearm" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="154" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+    <testcase name="TransferErrorAbortsUnreliablePrefixAndLatchesLoss" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="170" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+    <testcase name="StopClosesTransmitAdmissionWhileConsumerLoanExists" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="183" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+    <testcase name="PendingIdleThenDmaFlagCannotPublishSameBufferTwice" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="201" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+    <testcase name="ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="213" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+    <testcase name="ContinuousSwapsInactiveTargetBeforePublishingAndWraps" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="225" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive">
+      <failure message="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:240&#x0A;Expected equality of these values:&#x0A;  nx_stream_acquire(&amp;stream, &amp;block)&#x0A;    Which is: 9&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:240
+Expected equality of these values:
+  nx_stream_acquire(&stream, &block)
+    Which is: 9
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:229&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(hardware, Target(0U, address(payload[2])))...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:229
+Actual function call count doesn't match EXPECT_CALL(hardware, Target(0U, address(payload[2])))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:234&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(hardware, Target(1U, address(payload[0])))...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:234
+Actual function call count doesn't match EXPECT_CALL(hardware, Target(1U, address(payload[0])))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="255" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive">
+      <failure message="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:258&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(hardware, Target(0U, address(payload[2])))...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:258
+Actual function call count doesn't match EXPECT_CALL(hardware, Target(0U, address(payload[2])))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="278" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive">
+      <failure message="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:281&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(hardware, Target(0U, address(payload[2])))...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:281
+Actual function call count doesn't match EXPECT_CALL(hardware, Target(0U, address(payload[2])))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="297" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive">
+      <failure message="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:305&#x0A;Expected equality of these values:&#x0A;  nx_stream_acquire(&amp;stream, &amp;borrowed)&#x0A;    Which is: 9&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:305
+Expected equality of these values:
+  nx_stream_acquire(&stream, &borrowed)
+    Which is: 9
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ContinuousIdleFlushesCompletedHeadThenStablePartialFuture" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="323" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+    <testcase name="ContinuousUnexpectedParityOfBankStopsAndLatchesLoss" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="342" status="run" result="completed" time="0." timestamp="2026-10-11T16:18:38.039" classname="Stm32UartReceive" />
+  </testsuite>
+</testsuites>

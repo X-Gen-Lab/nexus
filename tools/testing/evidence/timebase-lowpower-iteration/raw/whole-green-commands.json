@@ -1,0 +1,75 @@
+[
+  {
+    "command": [
+      ".venv/bin/cmake",
+      "--build",
+      "build/uart-iteration",
+      "--target",
+      "nexus_timebase_lowpower_test",
+      "nexus_stm32f407_lowpower_test",
+      "nexus_gd32f470_lowpower_test",
+      "nexus_stm32f407_lowpower_integration_test",
+      "nexus_gd32f470_lowpower_integration_test",
+      "nexus_gd32_arch_test",
+      "--parallel",
+      "2"
+    ],
+    "returncode": 0,
+    "start": 1791744676.526673,
+    "end": 1791744680.0109248
+  },
+  {
+    "command": [
+      "build/uart-iteration/bin/nexus_timebase_lowpower_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/nexus_timebase_lowpower_test-whole-green.xml"
+    ],
+    "returncode": 0,
+    "start": 1791744680.010938,
+    "end": 1791744680.0144336
+  },
+  {
+    "command": [
+      "build/uart-iteration/bin/nexus_stm32f407_lowpower_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/nexus_stm32f407_lowpower_test-whole-green.xml"
+    ],
+    "returncode": 0,
+    "start": 1791744680.0144389,
+    "end": 1791744680.0168953
+  },
+  {
+    "command": [
+      "build/uart-iteration/bin/nexus_gd32f470_lowpower_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/nexus_gd32f470_lowpower_test-whole-green.xml"
+    ],
+    "returncode": 0,
+    "start": 1791744680.0168989,
+    "end": 1791744680.0193865
+  },
+  {
+    "command": [
+      "build/uart-iteration/bin/nexus_stm32f407_lowpower_integration_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/nexus_stm32f407_lowpower_integration_test-whole-green.xml"
+    ],
+    "returncode": 0,
+    "start": 1791744680.01939,
+    "end": 1791744680.0218897
+  },
+  {
+    "command": [
+      "build/uart-iteration/bin/nexus_gd32f470_lowpower_integration_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/nexus_gd32f470_lowpower_integration_test-whole-green.xml"
+    ],
+    "returncode": 0,
+    "start": 1791744680.0218942,
+    "end": 1791744680.025134
+  },
+  {
+    "command": [
+      "build/uart-iteration/bin/nexus_gd32_arch_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/nexus_gd32_arch_test-whole-green.xml"
+    ],
+    "returncode": 0,
+    "start": 1791744680.025138,
+    "end": 1791744680.0274963
+  }
+]

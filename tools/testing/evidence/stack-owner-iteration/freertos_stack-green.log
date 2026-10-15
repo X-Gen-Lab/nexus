@@ -1,0 +1,23 @@
+Running main() from gmock_main.cc
+[==========] Running 7 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 7 tests from FreeRTOSStack
+[ RUN      ] FreeRTOSStack.RejectsInvalidBindingsBeforeAnyKernelOrMemoryAccess
+[       OK ] FreeRTOSStack.RejectsInvalidBindingsBeforeAnyKernelOrMemoryAccess (0 ms)
+[ RUN      ] FreeRTOSStack.HandlerRejectsWithoutCallingTheKernel
+[       OK ] FreeRTOSStack.HandlerRejectsWithoutCallingTheKernel (0 ms)
+[ RUN      ] FreeRTOSStack.MaskedThreadRejectsWithoutCallingTheKernel
+[       OK ] FreeRTOSStack.MaskedThreadRejectsWithoutCallingTheKernel (0 ms)
+[ RUN      ] FreeRTOSStack.StoppedSchedulerDoesNotQueryAnUnstartedTask
+[       OK ] FreeRTOSStack.StoppedSchedulerDoesNotQueryAnUnstartedTask (0 ms)
+[ RUN      ] FreeRTOSStack.ActualKernelBufferMismatchCannotProduceASnapshot
+[       OK ] FreeRTOSStack.ActualKernelBufferMismatchCannotProduceASnapshot (0 ms)
+[ RUN      ] FreeRTOSStack.AllPaintedSpanTerminatesWithoutTheKernelUnboundedScan
+[       OK ] FreeRTOSStack.AllPaintedSpanTerminatesWithoutTheKernelUnboundedScan (0 ms)
+[ RUN      ] FreeRTOSStack.ReadOnlyObservedPrefixUsesOriginalCapacity
+[       OK ] FreeRTOSStack.ReadOnlyObservedPrefixUsesOriginalCapacity (0 ms)
+[----------] 7 tests from FreeRTOSStack (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 7 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 7 tests.

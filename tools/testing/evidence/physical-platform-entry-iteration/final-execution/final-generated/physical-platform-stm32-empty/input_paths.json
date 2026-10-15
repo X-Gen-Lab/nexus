@@ -1,0 +1,7 @@
+{
+  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
+  "soc/stm32f407/routes.json": "/workspace/nexus/soc/stm32f407/routes.json",
+  "soc/stm32f407/soc.json": "/workspace/nexus/soc/stm32f407/soc.json",
+  "tests/contracts/physical_platform_assembly/stm32-board/board.json": "/workspace/nexus/tests/contracts/physical_platform_assembly/stm32-board/board.json",
+  "tests/contracts/physical_platform_assembly/stm32-empty.toml": "/workspace/nexus/tests/contracts/physical_platform_assembly/stm32-empty.toml"
+}

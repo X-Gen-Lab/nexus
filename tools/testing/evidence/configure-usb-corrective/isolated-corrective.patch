@@ -1,0 +1,165 @@
+--- a/tools/configure/usb_device.py
++++ b/tools/configure/usb_device.py
+@@ -151,6 +151,7 @@
+     lines += [f"    {state} = (nx_usb_controller_t){{",
+               f"        .endpoints = s_nx_usb_endpoints_{name}, .endpoint_count = {len(children)}u,",
+               f"        .events = s_nx_usb_events_{name}, .capacity = {options.event_capacity}u,",
++              f"        .snapshot = {{ .epoch = {state}.snapshot.epoch }},",
+               f"        .irq_policy = {{ {kernel}, {policy['external_count']}u, {policy['priority_bits']}u, {ceiling}u }},",
+               f"        .irq = {{ .priority = {options.irq.priority}u }},",
+               f"        .poll_limit = {options.poll_limit}u, .drain_timeout_us = {options.drain_timeout_us}u,",
+--- a/tools/configure/bindings.py
++++ b/tools/configure/bindings.py
+@@ -44,6 +44,9 @@
+               '#include "nexus_bindings.h"', '#include "nexus_factory.h"',
+               '#include "nexus_config.h"',
+               '#include "nexus/arch/arch.h"']
++    source += ["#ifndef NX_PLATFORM_REGISTER_WRITE",
++               "#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))",
++               "#endif"]
+     source.extend(provider.includes(result))
+     source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
+     source.extend(provider.state_declarations(result))
+--- a/tools/configure/providers/stm32f407/emission.py
++++ b/tools/configure/providers/stm32f407/emission.py
+@@ -107,7 +107,14 @@
+     source = can.stop_domain(result, "stm32")
+     gpio_clock_mask = _gpio_clock_mask(result)
+     if gpio_clock_mask:
+-        source += ['    if (s_nx_platform_started) { RCC->AHB1ENR &= ~s_nx_platform_gpio_clocks_added; }']
++        source += ['    if (s_nx_platform_started) {',
++                   '        NX_PLATFORM_REGISTER_WRITE(RCC->AHB1ENR,',
++                   '            RCC->AHB1ENR & ~s_nx_platform_gpio_clocks_added);',
++                   '        nx_arch_dsb();',
++                   '        if ((RCC->AHB1ENR & s_nx_platform_gpio_clocks_added) != 0u) {',
++                   '            return NX_ERROR_IO;', '        }',
++                   '        s_nx_platform_gpio_clocks_added = 0u;',
++                   '    }']
+     if any(item["kind"] == "exti" for item in selections):
+         source += ['    if (s_nx_platform_started) { RCC->APB2ENR &= ~s_nx_platform_syscfg_clock_added; }']
+     if dma_clock:
+--- a/tests/google/usb_factory_test.cpp
++++ b/tests/google/usb_factory_test.cpp
+@@ -42,6 +42,18 @@
+ static std::array<uint16_t, 16> s_pins;
+ static bool s_hold_restore;
+ static bool s_hold_clock_stop;
++static bool s_hold_gpio_stop;
++
++extern "C" void nx_usb_factory_register_write(volatile uint32_t* address,
++                                              uint32_t value) {
++#ifdef NX_USB_FACTORY_STM32
++    if (s_hold_gpio_stop && address == &RCC->AHB1ENR &&
++        (value & RCC_AHB1ENR_GPIOAEN) == 0U) {
++        return;
++    }
++#endif
++    *address = value;
++}
+ 
+ #ifdef NX_USB_FACTORY_STM32
+ extern "C" {
+@@ -154,7 +166,7 @@
+ 
+     void SetUp() override {
+         s_ports = &ports;
+-        s_hold_restore = s_hold_clock_stop = false;
++        s_hold_restore = s_hold_clock_stop = s_hold_gpio_stop = false;
+         s_pins.fill(0x123U);
+         ON_CALL(ports, EnableClock(_)).WillByDefault(Return(NX_SUCCESS));
+         ON_CALL(ports, Configure(_, _)).WillByDefault(Return(NX_SUCCESS));
+@@ -189,7 +201,7 @@
+     }
+     void TearDown() override {
+         if (hardware != nullptr) {
+-            s_hold_restore = s_hold_clock_stop = false;
++            s_hold_restore = s_hold_clock_stop = s_hold_gpio_stop = false;
+             hardware->hold_reset = hardware->hold_flush = false;
+             hardware->hold_disable = hardware->hold_clear = false;
+             hardware->hold_irq_disable = hardware->hold_gonak = false;
+@@ -200,6 +212,18 @@
+             EXPECT_EQ(munmap(clocks, 0x80000U), 0);
+         }
+         s_ports = nullptr;
++    }
++    void ReceiveAddressSetup() {
++        ASSERT_EQ(hardware->rx_count, 0U);
++        hardware->rx_head = 0U;
++        hardware->rx[0] = {};
++        hardware->rx[0].status = (8U << 4U) | (6U << 17U);
++        hardware->rx[0].words[0] = UINT32_C(0x00070500);
++        hardware->rx_count = 1U;
++        hardware->registers[0x14U / 4U] |= 16U;
++        nx_usb_controller_irq(state);
++        ASSERT_TRUE(state->snapshot.control_pending);
++        ASSERT_EQ(state->snapshot.setup.request, 5U);
+     }
+ };
+ 
+@@ -312,3 +336,41 @@
+     EXPECT_EQ(nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_BULK_IN), bulk);
+     EXPECT_TRUE(state->clock_retained);
+ }
++TEST_F(UsbFactory, RestartCannotReuseAStaleSetupEpochForSetAddress) {
++    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
++    ReceiveAddressSetup();
++    const uint64_t old_epoch = state->snapshot.epoch;
++    ASSERT_EQ(nx_usb_device_address(face, old_epoch, 7U), NX_SUCCESS);
++    ASSERT_EQ(nx_platform_stop(), NX_SUCCESS);
++    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
++    ReceiveAddressSetup();
++    EXPECT_GT(state->snapshot.epoch, old_epoch);
++    EXPECT_EQ(nx_usb_device_address(face, old_epoch, 7U), NX_ERROR_STATE);
++    EXPECT_EQ(nx_usb_device_address(face, state->snapshot.epoch, 7U),
++              NX_SUCCESS);
++}
++TEST_F(UsbFactory, ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction) {
++    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
++    ASSERT_EQ(nx_platform_stop(), NX_SUCCESS);
++    const uint64_t original = state->snapshot.epoch;
++    state->snapshot.epoch = UINT64_MAX;
++    nx_platform_start_result_t result = nx_platform_start();
++    EXPECT_EQ(result.primary, NX_ERROR_INVALID);
++    EXPECT_EQ(result.cleanup, NX_SUCCESS);
++    EXPECT_EQ(state->snapshot.epoch, UINT64_MAX);
++    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
++    state->snapshot.epoch = original;
++}
++#ifdef NX_USB_FACTORY_STM32
++TEST_F(UsbFactory, RefusedOwnedGpioGateWithdrawalRetainsPlatformUntilReadback) {
++    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
++    ASSERT_NE(RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN, 0U);
++    s_hold_gpio_stop = true;
++    EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
++    EXPECT_NE(RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN, 0U);
++    EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
++    s_hold_gpio_stop = false;
++    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
++    EXPECT_EQ(RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN, 0U);
++}
++#endif
+--- /dev/null
++++ b/tests/google/usb_factory_model.h
+@@ -0,0 +1,22 @@
++/**
++ * \file            usb_factory_model.h
++ * \brief           External generated cold MMIO store failure boundary
++ * \author          Nexus Team
++ */
++#ifndef NEXUS_USB_FACTORY_MODEL_H
++#define NEXUS_USB_FACTORY_MODEL_H
++/* This forced Native-only header must not include libc before a production
++ * source selects its POSIX feature level. GCC/Clang supply the exact ABI type.
++ */
++typedef __UINT32_TYPE__ nx_usb_factory_register_t;
++#ifdef __cplusplus
++extern "C" {
++#endif
++void nx_usb_factory_register_write(volatile nx_usb_factory_register_t* address,
++                                   nx_usb_factory_register_t value);
++#ifdef __cplusplus
++}
++#endif
++#define NX_PLATFORM_REGISTER_WRITE(reg, value)                                 \
++    nx_usb_factory_register_write(&(reg), (nx_usb_factory_register_t)(value))
++#endif

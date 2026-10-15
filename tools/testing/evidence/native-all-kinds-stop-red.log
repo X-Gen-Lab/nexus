@@ -1,0 +1,60 @@
+In file included from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/internal/gmock-internal-utils.h:51,
+                 from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock-actions.h:146,
+                 from build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock.h:56,
+                 from tests/google/native_instances_test.cpp:15:
+tests/google/native_instances_test.cpp: In member function ‘virtual void {anonymous}::NativeInstances_PlatformStopWithdrawsFlashADCAndPWMAdmission_Test::TestBody()’:
+tests/google/native_instances_test.cpp:356:15: error: ‘nx_native_flash_stop_instance’ was not declared in this scope; did you mean ‘nx_native_spi_stop_instance’?
+  356 |     ASSERT_EQ(nx_native_flash_stop_instance(&flash), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:356:5: note: in expansion of macro ‘ASSERT_EQ’
+  356 |     ASSERT_EQ(nx_native_flash_stop_instance(&flash), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:365:15: error: ‘nx_native_adc_stop_instance’ was not declared in this scope; did you mean ‘nx_native_i2c_stop_instance’?
+  365 |     ASSERT_EQ(nx_native_adc_stop_instance(&adc), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:365:5: note: in expansion of macro ‘ASSERT_EQ’
+  365 |     ASSERT_EQ(nx_native_adc_stop_instance(&adc), NX_SUCCESS);
+      |     ^~~~~~~~~
+tests/google/native_instances_test.cpp:376:15: error: ‘nx_native_pwm_stop_instance’ was not declared in this scope; did you mean ‘nx_native_spi_stop_instance’?
+  376 |     ASSERT_EQ(nx_native_pwm_stop_instance(&pwm), NX_SUCCESS);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:79:52: note: in definition of macro ‘GTEST_ASSERT_’
+   79 |   if (const ::testing::AssertionResult gtest_ar = (expression)) \
+      |                                                    ^~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest_pred_impl.h:148:3: note: in expansion of macro ‘GTEST_PRED_FORMAT2_’
+  148 |   GTEST_PRED_FORMAT2_(pred_format, v1, v2, GTEST_FATAL_FAILURE_)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1898:3: note: in expansion of macro ‘ASSERT_PRED_FORMAT2’
+ 1898 |   ASSERT_PRED_FORMAT2(::testing::internal::EqHelper::Compare, val1, val2)
+      |   ^~~~~~~~~~~~~~~~~~~
+build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:1914:31: note: in expansion of macro ‘GTEST_ASSERT_EQ’
+ 1914 | #define ASSERT_EQ(val1, val2) GTEST_ASSERT_EQ(val1, val2)
+      |                               ^~~~~~~~~~~~~~~
+tests/google/native_instances_test.cpp:376:5: note: in expansion of macro ‘ASSERT_EQ’
+  376 |     ASSERT_EQ(nx_native_pwm_stop_instance(&pwm), NX_SUCCESS);
+      |     ^~~~~~~~~

@@ -1,0 +1,1514 @@
+{
+  "schema_version": 1,
+  "kind": "adc_arm_development_cost",
+  "status": "passed",
+  "source_head": "8aa60740d95b93a51b10b816942f459635e2d406",
+  "baseline_commit": "20281b9f9f5870c55b3e9e3ad3a22a1c730ea891",
+  "scope": "ARM AAPCS type ELF + strict production object compilation; not complete firmware cost or cycle/timing qualification",
+  "compiler": {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+    "bytes": 2421736,
+    "sha256": "510c55cfeed7328ade1eb8cb23808fcce1ba6c52dac8d4ebfe033ae4b2534385"
+  },
+  "driver": {
+    "path": "/workspace/nexus-adc-iteration/cost_v5.py",
+    "bytes": 9421,
+    "sha256": "d2fc62906d1842889179c959b637df8a8794512fc2d09992bd580b4bcb25735c"
+  },
+  "rows": [
+    {
+      "soc": "stm32f407",
+      "variant": "baseline",
+      "elf": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.elf",
+        "bytes": 5476,
+        "sha256": "128d74ddb7f2220d17b68502674771538dd00c16d9ca2f32fbfff5ca762ed343"
+      },
+      "type_bytes": {
+        "cost_adc_face": 8,
+        "cost_adc_finite": 128,
+        "cost_adc_ops": 24,
+        "cost_adc_poll": 28,
+        "cost_stream": 40,
+        "cost_stream_slot": 40
+      }
+    },
+    {
+      "soc": "stm32f407",
+      "variant": "current",
+      "elf": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.elf",
+        "bytes": 5688,
+        "sha256": "99c7a76e27555c586dca4c42f1128f205e76d20afb9e24a0a316cb8ebd5a7f10"
+      },
+      "type_bytes": {
+        "cost_adc_continuous": 200,
+        "cost_adc_face": 8,
+        "cost_adc_finite": 128,
+        "cost_adc_ops": 36,
+        "cost_adc_poll": 28,
+        "cost_observation": 32,
+        "cost_observer": 32,
+        "cost_posted_producer": 12,
+        "cost_stream": 40,
+        "cost_stream_slot": 40
+      },
+      "default_ram_delta_bytes": 0,
+      "default_ops_rodata_delta_bytes": 12,
+      "continuous_vs_finite_ram_bytes": 72
+    },
+    {
+      "soc": "gd32f470",
+      "variant": "baseline",
+      "elf": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.elf",
+        "bytes": 5476,
+        "sha256": "cf9d012a60bc30f595cb26a83fe4ef9ca8fbe0a001affd0e0bd072d0c666329a"
+      },
+      "type_bytes": {
+        "cost_adc_face": 8,
+        "cost_adc_finite": 80,
+        "cost_adc_ops": 24,
+        "cost_adc_poll": 16,
+        "cost_stream": 40,
+        "cost_stream_slot": 40
+      }
+    },
+    {
+      "soc": "gd32f470",
+      "variant": "current",
+      "elf": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.elf",
+        "bytes": 5688,
+        "sha256": "6213e9e1f385255863e13ac3416793abb7cda713244f752daa16ee3adf036d97"
+      },
+      "type_bytes": {
+        "cost_adc_continuous": 160,
+        "cost_adc_face": 8,
+        "cost_adc_finite": 80,
+        "cost_adc_ops": 36,
+        "cost_adc_poll": 16,
+        "cost_observation": 32,
+        "cost_observer": 32,
+        "cost_posted_producer": 12,
+        "cost_stream": 40,
+        "cost_stream_slot": 40
+      },
+      "default_ram_delta_bytes": 0,
+      "default_ops_rodata_delta_bytes": 12,
+      "continuous_vs_finite_ram_bytes": 80
+    }
+  ],
+  "objects": [
+    {
+      "soc": "stm32f407",
+      "source": "/workspace/nexus/soc/stm32f407/drivers/adc.c",
+      "object": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc.o",
+        "bytes": 2264,
+        "sha256": "51c6c42661c551bae8ff0176418486573a11e0b42789f533a01c012c1824ab48"
+      },
+      "section_bytes": {
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.nx_stm32_adc_info": 28,
+        ".text.nx_stm32_adc_sample": 410,
+        ".text.nx_stm32_adc_initialize": 96,
+        ".rodata.nx_stm32_adc_ops": 36,
+        ".comment": 71,
+        ".ARM.attributes": 52
+      },
+      "disassembled_instruction_count": 213
+    },
+    {
+      "soc": "stm32f407",
+      "source": "/workspace/nexus/soc/stm32f407/drivers/adc_stream.c",
+      "object": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream.o",
+        "bytes": 6332,
+        "sha256": "52d5fd2a47de2cbae454cde73bfce1e91fc12c1db91a2a3d229388c72d5e071f"
+      },
+      "section_bytes": {
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.quiescent": 52,
+        ".text.finish": 94,
+        ".text.attach_wake": 124,
+        ".text.detach.constprop.0": 76,
+        ".text.stream_stop": 104,
+        ".text.nx_stm32_adc_stream_initialize": 212,
+        ".text.nx_stm32_adc_stream_rate": 152,
+        ".text.nx_stm32_adc_stream_blocks": 94,
+        ".text.nx_stm32_adc_stream_sequence": 136,
+        ".text.arm.constprop.0": 164,
+        ".text.stream_start": 228,
+        ".text.stream_service": 246,
+        ".text.nx_stm32_adc_stream_irq": 92,
+        ".rodata.sample_cycles.0": 16,
+        ".rodata.nx_stm32_adc_stream_ops": 36,
+        ".comment": 71,
+        ".ARM.attributes": 52
+      },
+      "disassembled_instruction_count": 680
+    },
+    {
+      "soc": "stm32f407",
+      "source": "/workspace/nexus/soc/stm32f407/drivers/adc_continuous.c",
+      "object": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous.o",
+        "bytes": 6508,
+        "sha256": "c1ef85c1ec110f8c2cf7d10e1258f06ce82408989e55bf6a70070f3e07321306"
+      },
+      "section_bytes": {
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.attach_wake": 24,
+        ".text.block_observation": 20,
+        ".text.arm": 284,
+        ".text.start": 278,
+        ".text.sequence_info": 80,
+        ".text.rollback": 224,
+        ".text.halt": 50,
+        ".text.attach_observer": 82,
+        ".text.service": 198,
+        ".text.stop": 98,
+        ".text.nx_stm32_adc_continuous_initialize": 10,
+        ".text.nx_stm32_adc_continuous_irq": 424,
+        ".rodata.cycles.0": 16,
+        ".rodata.nx_stm32_adc_continuous_ops": 36,
+        ".comment": 71,
+        ".ARM.attributes": 52
+      },
+      "disassembled_instruction_count": 680
+    },
+    {
+      "soc": "gd32f470",
+      "source": "/workspace/nexus/soc/gd32f470/drivers/adc.c",
+      "object": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc.o",
+        "bytes": 4496,
+        "sha256": "cce07bd3d9f4b9fa9a11bc67bba151a4c83afb694c9827373db260a1939c04fe"
+      },
+      "section_bytes": {
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.wait_clear": 64,
+        ".text.nx_gd32_peripheral_barrier": 14,
+        ".text.power_on": 152,
+        ".text.nx_gd32_adc_info": 40,
+        ".text.nx_gd32_adc_sample": 344,
+        ".text.nx_gd32_adc_initialize": 600,
+        ".text.nx_gd32_adc_stop": 80,
+        ".rodata.nx_gd32_adc_ops": 36,
+        ".bss.s_adc": 4,
+        ".comment": 71,
+        ".ARM.attributes": 52
+      },
+      "disassembled_instruction_count": 454
+    },
+    {
+      "soc": "gd32f470",
+      "source": "/workspace/nexus/soc/gd32f470/drivers/adc_stream.c",
+      "object": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream.o",
+        "bytes": 6712,
+        "sha256": "4a860091d03717a4cd712328368fa925730db6137cec887f35f516fa6e8dc5d1"
+      },
+      "section_bytes": {
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.quiescent": 68,
+        ".text.finish": 96,
+        ".text.detach": 120,
+        ".text.stop": 118,
+        ".text.attach_wake": 128,
+        ".text.nx_gd32_adc_stream_timing": 128,
+        ".text.nx_gd32_adc_stream_sequence": 156,
+        ".text.arm": 240,
+        ".text.service": 316,
+        ".text.start": 276,
+        ".text.nx_gd32_adc_stream_initialize": 200,
+        ".text.nx_gd32_adc_stream_stop": 36,
+        ".text.nx_gd32_adc_stream_irq": 124,
+        ".rodata.cycles.0": 16,
+        ".rodata.nx_gd32_adc_stream_ops": 36,
+        ".comment": 71,
+        ".ARM.attributes": 52
+      },
+      "disassembled_instruction_count": 709
+    },
+    {
+      "soc": "gd32f470",
+      "source": "/workspace/nexus/soc/gd32f470/drivers/adc_continuous.c",
+      "object": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous.o",
+        "bytes": 7228,
+        "sha256": "fc7ed3345e2a0ad8905a02d608e660078043c88db08fb97b65d0312db9782403"
+      },
+      "section_bytes": {
+        ".text": 0,
+        ".data": 0,
+        ".bss": 0,
+        ".text.attach_wake": 24,
+        ".text.block_observation": 20,
+        ".text.sequence_info": 88,
+        ".text.arm": 324,
+        ".text.rollback": 260,
+        ".text.halt": 42,
+        ".text.stop": 102,
+        ".text.start": 336,
+        ".text.service": 300,
+        ".text.attach_observer": 82,
+        ".text.nx_gd32_adc_continuous_initialize": 62,
+        ".text.nx_gd32_adc_continuous_irq": 460,
+        ".text.nx_gd32_adc_continuous_stop": 34,
+        ".rodata.cycles.0": 16,
+        ".rodata.nx_gd32_adc_continuous_ops": 36,
+        ".comment": 71,
+        ".ARM.attributes": 52
+      },
+      "disassembled_instruction_count": 752
+    }
+  ],
+  "source_inputs": [
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.c",
+      "bytes": 407,
+      "sha256": "a5f58c6d151874c3c3fa3044361a473c7eee9f33eb18924fad370639a5bce097"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_stream.h",
+      "bytes": 3441,
+      "sha256": "7711f9b4156f232901994cd0f65b03b6b639e23f8b1d43a9554c2a18886e6fb9"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_dma.h",
+      "bytes": 4407,
+      "sha256": "5733649756bb2fb383501a304c10ca0bf8e7f1fce21bd4cbf726b187f27a0959"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/dma.h",
+      "bytes": 4114,
+      "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b"
+    },
+    {
+      "path": "/workspace/nexus/core/include/nexus/core/status.h",
+      "bytes": 789,
+      "sha256": "2aed38f391159a2bfb32f475c81967e3eec01beedde97b33a276ee0dd85d32fd"
+    },
+    {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/stdbool.h",
+      "bytes": 1490,
+      "sha256": "7b9c438a5b2f082a560a72da8d752da51062cc6f84d1c4acec45ff0a68e8d037"
+    },
+    {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/stddef.h",
+      "bytes": 14135,
+      "sha256": "bac7ab773a3e3d9568d5cbe61632cfb96292ef5039df54a7ffaf15ba54af0ba0"
+    },
+    {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/14.3.1/include/stdint.h",
+      "bytes": 328,
+      "sha256": "86a7914ab7d6a18465a6fb9a7b54f945cad604fdbf3ca0d10e4e0254e0037911"
+    },
+    {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/stdint.h",
+      "bytes": 12432,
+      "sha256": "99fe201684856075ccd92704f63b702f6fa882b9dab61bd7a9bcce2588275861"
+    },
+    {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/machine/_default_types.h",
+      "bytes": 6650,
+      "sha256": "5d8f9f7ead7927e4b8b7ed00172e84f2ae82ea7f5f6ba3240ff813a9236771b3"
+    },
+    {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/features.h",
+      "bytes": 16935,
+      "sha256": "c580ee2a628857e7ebeb0484d078b16cf61049f14b2492b0cac5b54ed1f34cca"
+    },
+    {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/_newlib_version.h",
+      "bytes": 336,
+      "sha256": "f4c14dfb59c9eb36181455ef077c4ec7a0571ed64f79947094ac1cd9a96d3fae"
+    },
+    {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/_intsup.h",
+      "bytes": 5741,
+      "sha256": "1af8abe244b43a3a5b5a85f6c834aa206930b6938e8109fbec430bc140b68df5"
+    },
+    {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/arm-none-eabi/include/sys/_stdint.h",
+      "bytes": 1824,
+      "sha256": "49f8328943afa2a83ed4a35fcb808ed08b8c9fcb55373c786fb1b1d3a21952d7"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_provider.h",
+      "bytes": 11328,
+      "sha256": "edf2d5bebde43eba0a7e3da35d22a955fe9ad9f3be1f63c79934308d87bc2e2c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/adc.h",
+      "bytes": 6200,
+      "sha256": "4c11f9e9de71457df9034fa427632f0c59ad620c2b789445edd01958072c8098"
+    },
+    {
+      "path": "/workspace/nexus/core/include/nexus/core/time.h",
+      "bytes": 3477,
+      "sha256": "51b54ef6ff434cc473162f215933b3cd992cc2efb89d9c3b72a4e2f7c9d839b1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/stream.h",
+      "bytes": 7683,
+      "sha256": "6d8baced785fa7237becba850529797db8c33eabd24ece434f31db0fa152bc85"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/wake.h",
+      "bytes": 3440,
+      "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/exti.h",
+      "bytes": 4106,
+      "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/flash.h",
+      "bytes": 6868,
+      "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/gpio.h",
+      "bytes": 2676,
+      "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/i2c.h",
+      "bytes": 3856,
+      "sha256": "b9021b1784ffaab02e159200ad11c09bd714ec99ba2ff0aba5d5b1ffe9452a9b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/spi.h",
+      "bytes": 10019,
+      "sha256": "8dd74638c243d4d376b14aab679b356c15ff34a26771186d19e343e98b1bca39"
+    },
+    {
+      "path": "/workspace/nexus/core/include/nexus/core/request.h",
+      "bytes": 7004,
+      "sha256": "c27686b1fc578d88e1f4638c3939c1409171ba6267e59e4c64eb72449ffb7e55"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/timer.h",
+      "bytes": 3191,
+      "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/uart.h",
+      "bytes": 10872,
+      "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/watchdog.h",
+      "bytes": 3724,
+      "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_system.h",
+      "bytes": 3327,
+      "sha256": "72c4a5b774453c6a62e8bc2fdc058f2e1356dac4021b197ee998b128ac939e47"
+    },
+    {
+      "path": "/workspace/nexus/arch/include/nexus/arch/arch.h",
+      "bytes": 5929,
+      "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289"
+    },
+    {
+      "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f407xx.h",
+      "bytes": 1193992,
+      "sha256": "ae1ab57d8ab750f64f04fd73476bc2760c761e18e45bde648e0bc350c9a1d9ac"
+    },
+    {
+      "path": "/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm4.h",
+      "bytes": 122776,
+      "sha256": "6b355b3974b13104dac0c987aff54795a2c64e6e268c9a0e058fb3443b3406a3"
+    },
+    {
+      "path": "/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/cmsis_version.h",
+      "bytes": 1680,
+      "sha256": "184c19fd3ee73632edf35a0b4d49cd48be75fbf49e6ccb19d9db05fa83bea4b3"
+    },
+    {
+      "path": "/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/cmsis_compiler.h",
+      "bytes": 10265,
+      "sha256": "747c5edd04a88d4e228c7856750ec475908545c77464a162a305b38d9e362d82"
+    },
+    {
+      "path": "/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/cmsis_gcc.h",
+      "bytes": 63620,
+      "sha256": "2f92cd832b6f58e4d4803b28d7340443f5e46b0f357a307cda76a42a0e530108"
+    },
+    {
+      "path": "/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include/mpu_armv7.h",
+      "bytes": 11731,
+      "sha256": "29206b52ee02290ed6f5a5415ebd4187de802cf176d9b3cb844390d8e5571372"
+    },
+    {
+      "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/system_stm32f4xx.h",
+      "bytes": 2214,
+      "sha256": "02c067d5a135f540c03215dc834b1e60a97bbd4e55bfd3994b0c82a15ea3012a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/nexus_config.h",
+      "bytes": 1125,
+      "sha256": "ccaa44e495b369a4e9d3ead4ed9822f24cdd5962d71f8c71d41e5b51169bf939"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.c",
+      "bytes": 668,
+      "sha256": "66d5b199455473a4a997c857278a2e525f9e7e51b999fc4e464c5be8f0817671"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_stream.h",
+      "bytes": 5348,
+      "sha256": "a34e2d0e2455f428f909f73f32eeb023fb912b8e8ba90390dc89c05834c004dd"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_dma.h",
+      "bytes": 5574,
+      "sha256": "10bf3b20fa3c1dde3aba3789b4182f0183e34ee2417b878aeb29bd92bd477351"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/dma.h",
+      "bytes": 4114,
+      "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_provider.h",
+      "bytes": 12591,
+      "sha256": "cf5b4e099c48ca75f6cf9308724148e044331e1055cccda04a4325ecd8c2e989"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/adc.h",
+      "bytes": 9218,
+      "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/adc_observer.h",
+      "bytes": 4193,
+      "sha256": "e95ab349207a44d8ae86c74325a49eb82fd9ce991ea940fff8e4b40dd21a7788"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/stream.h",
+      "bytes": 11194,
+      "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/wake.h",
+      "bytes": 3440,
+      "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/exti.h",
+      "bytes": 4106,
+      "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/flash.h",
+      "bytes": 6868,
+      "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/gpio.h",
+      "bytes": 2676,
+      "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/i2c.h",
+      "bytes": 3856,
+      "sha256": "b9021b1784ffaab02e159200ad11c09bd714ec99ba2ff0aba5d5b1ffe9452a9b"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/spi.h",
+      "bytes": 11660,
+      "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/timer.h",
+      "bytes": 3191,
+      "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/uart.h",
+      "bytes": 10872,
+      "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/watchdog.h",
+      "bytes": 3724,
+      "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_system.h",
+      "bytes": 3327,
+      "sha256": "72c4a5b774453c6a62e8bc2fdc058f2e1356dac4021b197ee998b128ac939e47"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/adc.c",
+      "bytes": 4911,
+      "sha256": "d10f7c0df236765296c5a598e4504d0559dada030b8f27c39602302e72070217"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/adc_stream.c",
+      "bytes": 14753,
+      "sha256": "b7e15782abd9b4d7126efe55761cdb4364ad8ef73336154e9970485fbc4210b6"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/adc_continuous.c",
+      "bytes": 17996,
+      "sha256": "25506290b03308aa8417e4cf5735e9ce17cdab5b4cd6c81021088e35fee6e61e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.c",
+      "bytes": 408,
+      "sha256": "1f6545a20b25f8ec2a44686ba306b32413c6d59c802b3e3dd0aed35832c44303"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_adc_stream.h",
+      "bytes": 3236,
+      "sha256": "ded256119a5c570aa2030315fe92c7fadbe7b2505579d129f45a14d68e0c7838"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_provider.h",
+      "bytes": 21482,
+      "sha256": "4987faee662fc25062f8584cf12caf16d477ed296f9fbb93d0e4ffee03b78aa8"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h",
+      "bytes": 28917,
+      "sha256": "db6de53203fa053d6e789ef86908195f84b7664753bdf0aa7ca74f62025573ef"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4.h",
+      "bytes": 109878,
+      "sha256": "4756546e1449d17b1a7dee2f3307f2c92c9f1d669c3f5dfc3ee1dec8aee9a8f7"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cmInstr.h",
+      "bytes": 17205,
+      "sha256": "c35ddca16ca04646dc70acf2d592ad9eaeaaecd8125a32abb710069648266eb5"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cmFunc.h",
+      "bytes": 15828,
+      "sha256": "5075ff67c8e264b83d9b391c07c6512e26abbc189e321de0d8b4375476980e5e"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/core_cm4_simd.h",
+      "bytes": 22959,
+      "sha256": "0c2a0c2d66c7791b82ca19d10336c96518830ef359f6bfd9da7477bc2cbccbbb"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/system_gd32f4xx.h",
+      "bytes": 2740,
+      "sha256": "6077ccbeff029a0058465172607481158b202d5687e2e87a0ed13ff6a9b2633a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f4xx_libopt.h",
+      "bytes": 839,
+      "sha256": "64afa1aa962f93bc9cad8a23244b39b383dd4aa29c0056c20d9a4cd2537f10db"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_adc.h",
+      "bytes": 41521,
+      "sha256": "9fa1a80b64d18512729af4d22602d5761ec0758d970fb5d15f7f8a96244607d3"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dbg.h",
+      "bytes": 9890,
+      "sha256": "0a403f37714cbb585a26cb54c7c5cc6776fa9ec23459a70369d9342805713998"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dma.h",
+      "bytes": 32675,
+      "sha256": "b5796d1e0017994a232a53613f2d50566b8c00dd43d4049eab26cee1e04f37eb"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exti.h",
+      "bytes": 20470,
+      "sha256": "dd78502366ba631e32841db28711976d51f7e71417bb2006ba82dc89404eba66"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fmc.h",
+      "bytes": 28322,
+      "sha256": "a6bd45fe828fda8cc19b3b1958470ac1bb115cc162b89963f5391028c9bdc192"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fwdgt.h",
+      "bytes": 5863,
+      "sha256": "e83161e6700a28f9f0d475405c4a94a03a88e9576b6d8f41c5a9bd96daf5ff08"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h",
+      "bytes": 29164,
+      "sha256": "6551fd3fb673b3e34d5f62b72cba8a0482ce051bf29ed475015b1f9ad178a57a"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_i2c.h",
+      "bytes": 29826,
+      "sha256": "42498aa2016958a5d351577f3caeca0f7c8334ab25b704a95acb7b73001a1019"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_pmu.h",
+      "bytes": 11878,
+      "sha256": "0275375eff0d339ec2b16c1a0d4c67721be6bff63c1516bdc4a614bb5ed98b03"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rcu.h",
+      "bytes": 95768,
+      "sha256": "38d97fe3994cefdcb1109192a5854c29ad2af364558f499878c4a5510b26e45d"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_spi.h",
+      "bytes": 25504,
+      "sha256": "e2bc6524ff9fc2604f3e947c68ca419ff35bc029904ea8163c10510f85728c10"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_syscfg.h",
+      "bytes": 11558,
+      "sha256": "0e37ca2af26c3563712cf33aca9cf85b0489df10526c8336e0e75518a86f3cd2"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_timer.h",
+      "bytes": 59717,
+      "sha256": "b22f7cc8d1a7cf16326163982b9d6a34829ca55f6491fdea21d07b6e6dcd5668"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_usart.h",
+      "bytes": 31652,
+      "sha256": "7adb26fb6e10f5ce29612aff5f580eafb787311bc982c629ffdf415ddf3dc973"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/nexus_config.h",
+      "bytes": 1127,
+      "sha256": "fb3e83992d18dab13dee7a23255efe192ab518f3b5f24d92efbb82b376a9e6af"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.c",
+      "bytes": 668,
+      "sha256": "5d5317f0567d1b22e10f07597843e11d386f3b208085aa342a42fbc1d3791e20"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_adc_stream.h",
+      "bytes": 5450,
+      "sha256": "039c4add217243e2cfa9ab0a99cfaba96067d351cfd212db5d6ea29369f8fb6a"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_provider.h",
+      "bytes": 22742,
+      "sha256": "f8be6cd6e6ce5e4818c5dc2846cd7481278baea70a8eb8bfbd7e3d5fd6a3e360"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/private/gd32f4xx_libopt.h",
+      "bytes": 839,
+      "sha256": "64afa1aa962f93bc9cad8a23244b39b383dd4aa29c0056c20d9a4cd2537f10db"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/adc.c",
+      "bytes": 9663,
+      "sha256": "91138076b826167aa03a3cba530e46adf7b0e9217a818ef834682d588ccafb32"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/private/system.h",
+      "bytes": 2710,
+      "sha256": "ea3ae416c653f9abbfb42da62a1aa832290594cdd95a4bb98bb709601ee181bc"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/adc_stream.c",
+      "bytes": 16230,
+      "sha256": "1b8297da3fd09a63e94c13b442de0f2b366a294315efc60c01592fb5b394d512"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/adc_continuous.c",
+      "bytes": 20238,
+      "sha256": "ac35e0ecc0ffb85f5a2d2e37866e4167ae568c1ad534cd03dbeed87253e0a181"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/workspace/nexus/.venv/bin/python",
+        "-B",
+        "/workspace/nexus/tools/configure/configure.py",
+        "--source-root",
+        "/workspace/nexus",
+        "--assembly",
+        "/workspace/nexus/tools/configure/assemblies/qiming-baremetal.toml",
+        "--output",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:08.993967+00:00",
+      "ended_at": "2026-10-11T16:33:09.088312+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-fresh-authority.log",
+        "bytes": 122,
+        "sha256": "cb2ccbccbcac24aa4403aaa5717496609dee1674a483a7185ed1b288ba300244"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus/.venv/bin/python",
+        "-B",
+        "/workspace/nexus/tools/configure/configure.py",
+        "--source-root",
+        "/workspace/nexus",
+        "--assembly",
+        "/workspace/nexus/tools/configure/assemblies/liangshan-baremetal.toml",
+        "--output",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.088395+00:00",
+      "ended_at": "2026-10-11T16:33:09.163962+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-fresh-authority.log",
+        "bytes": 119,
+        "sha256": "e1119649d33cd6ef88492d9b5726bb61646ea80851ea4c0e42156141175ce3ee"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "-mcpu=cortex-m4",
+        "-mthumb",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
+        "-std=c11",
+        "-Os",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wshadow",
+        "-Wstrict-prototypes",
+        "-Wmissing-prototypes",
+        "-MD",
+        "-DSTM32F407xx",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include",
+        "-I/workspace/nexus/soc/stm32f407",
+        "-I/workspace/nexus/core/include",
+        "-I/workspace/nexus/arch/include",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407",
+        "-isystem",
+        "/workspace/nexus/vendors/st/cmsis_device_f4/Include",
+        "-isystem",
+        "/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include",
+        "-MF",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.d",
+        "-nostdlib",
+        "-Wl,-e,main",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.c",
+        "-o",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.elf"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.164374+00:00",
+      "ended_at": "2026-10-11T16:33:09.196635+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-S",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.elf"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.196698+00:00",
+      "ended_at": "2026-10-11T16:33:09.198123+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline-nm.log",
+        "bytes": 419,
+        "sha256": "fb89876ed21d3d6e6c4be0f140a2ec149e39a0821898d29e6c36515c25400a7a"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "-mcpu=cortex-m4",
+        "-mthumb",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
+        "-std=c11",
+        "-Os",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wshadow",
+        "-Wstrict-prototypes",
+        "-Wmissing-prototypes",
+        "-MD",
+        "-DSTM32F407xx",
+        "-I/workspace/nexus/soc/stm32f407/private",
+        "-I/workspace/nexus/io/include",
+        "-I/workspace/nexus/soc/stm32f407",
+        "-I/workspace/nexus/core/include",
+        "-I/workspace/nexus/arch/include",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407",
+        "-isystem",
+        "/workspace/nexus/vendors/st/cmsis_device_f4/Include",
+        "-isystem",
+        "/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include",
+        "-MF",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.d",
+        "-nostdlib",
+        "-Wl,-e,main",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.c",
+        "-o",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.elf"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.200653+00:00",
+      "ended_at": "2026-10-11T16:33:09.231583+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-S",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.elf"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.231642+00:00",
+      "ended_at": "2026-10-11T16:33:09.232973+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current-nm.log",
+        "bytes": 571,
+        "sha256": "25f9fbf7fafbef5abc82fdf2a421f1090f4f9d307483a7126943e0c28abb04d3"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "-mcpu=cortex-m4",
+        "-mthumb",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
+        "-std=c11",
+        "-Os",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wshadow",
+        "-Wstrict-prototypes",
+        "-Wmissing-prototypes",
+        "-MD",
+        "-DSTM32F407xx",
+        "-I/workspace/nexus/soc/stm32f407/private",
+        "-I/workspace/nexus/soc/stm32f407",
+        "-I/workspace/nexus/io/include",
+        "-I/workspace/nexus/core/include",
+        "-I/workspace/nexus/arch/include",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407",
+        "-isystem",
+        "/workspace/nexus/vendors/st/cmsis_device_f4/Include",
+        "-isystem",
+        "/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include",
+        "-MF",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc.d",
+        "-c",
+        "/workspace/nexus/soc/stm32f407/drivers/adc.c",
+        "-o",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.235169+00:00",
+      "ended_at": "2026-10-11T16:33:09.293892+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+        "-A",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.293952+00:00",
+      "ended_at": "2026-10-11T16:33:09.295395+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc-sections.log",
+        "bytes": 564,
+        "sha256": "4a3e7e3567a4e43dc26612c18baf9f83a98bcbff40ef8e32c11166e9fa06bf3f"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+        "-d",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.295428+00:00",
+      "ended_at": "2026-10-11T16:33:09.296826+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc-disassembly.log",
+        "bytes": 8443,
+        "sha256": "cb761451740a5e86c7c9b03319f6544c562ef2b3a2a691cbfc1e5f3444de4a66"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "-mcpu=cortex-m4",
+        "-mthumb",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
+        "-std=c11",
+        "-Os",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wshadow",
+        "-Wstrict-prototypes",
+        "-Wmissing-prototypes",
+        "-MD",
+        "-DSTM32F407xx",
+        "-I/workspace/nexus/soc/stm32f407/private",
+        "-I/workspace/nexus/soc/stm32f407",
+        "-I/workspace/nexus/io/include",
+        "-I/workspace/nexus/core/include",
+        "-I/workspace/nexus/arch/include",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407",
+        "-isystem",
+        "/workspace/nexus/vendors/st/cmsis_device_f4/Include",
+        "-isystem",
+        "/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include",
+        "-MF",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream.d",
+        "-c",
+        "/workspace/nexus/soc/stm32f407/drivers/adc_stream.c",
+        "-o",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.298971+00:00",
+      "ended_at": "2026-10-11T16:33:09.402659+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+        "-A",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.402721+00:00",
+      "ended_at": "2026-10-11T16:33:09.404108+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream-sections.log",
+        "bytes": 1209,
+        "sha256": "e3e157990dc4a00e7f5f6c82376a97fd37e0f444701bd2f76e60be399a1dc619"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+        "-d",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.404137+00:00",
+      "ended_at": "2026-10-11T16:33:09.406119+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream-disassembly.log",
+        "bytes": 28820,
+        "sha256": "b4faeed6a1c861c4989aff18ae6a54be531ef0f79d5992110fae0b0b9abbf25b"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "-mcpu=cortex-m4",
+        "-mthumb",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
+        "-std=c11",
+        "-Os",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wshadow",
+        "-Wstrict-prototypes",
+        "-Wmissing-prototypes",
+        "-MD",
+        "-DSTM32F407xx",
+        "-I/workspace/nexus/soc/stm32f407/private",
+        "-I/workspace/nexus/soc/stm32f407",
+        "-I/workspace/nexus/io/include",
+        "-I/workspace/nexus/core/include",
+        "-I/workspace/nexus/arch/include",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407",
+        "-isystem",
+        "/workspace/nexus/vendors/st/cmsis_device_f4/Include",
+        "-isystem",
+        "/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include",
+        "-MF",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous.d",
+        "-c",
+        "/workspace/nexus/soc/stm32f407/drivers/adc_continuous.c",
+        "-o",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.408510+00:00",
+      "ended_at": "2026-10-11T16:33:09.515857+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+        "-A",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.515918+00:00",
+      "ended_at": "2026-10-11T16:33:09.517174+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous-sections.log",
+        "bytes": 1246,
+        "sha256": "44512b58a80b5343ed25ea05a89b925baf6903d81585972a82ff4e813a4579cf"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+        "-d",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.517224+00:00",
+      "ended_at": "2026-10-11T16:33:09.519166+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous-disassembly.log",
+        "bytes": 27152,
+        "sha256": "1fc4c04ddfcefb2aab8931437216c0dd0a467bbcc3570342109783b73ece0b54"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "-mcpu=cortex-m4",
+        "-mthumb",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
+        "-std=c11",
+        "-Os",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wshadow",
+        "-Wstrict-prototypes",
+        "-Wmissing-prototypes",
+        "-MD",
+        "-DGD32F470",
+        "-DHXTAL_VALUE=25000000",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include",
+        "-I/workspace/nexus/soc/gd32f470",
+        "-I/workspace/nexus/core/include",
+        "-I/workspace/nexus/arch/include",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include",
+        "-MF",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.d",
+        "-nostdlib",
+        "-Wl,-e,main",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.c",
+        "-o",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.elf"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.522628+00:00",
+      "ended_at": "2026-10-11T16:33:09.553423+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-S",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.elf"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.553483+00:00",
+      "ended_at": "2026-10-11T16:33:09.554914+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline-nm.log",
+        "bytes": 419,
+        "sha256": "d4d106203f0055cc9e47ddef5ba507bdfb04cfde4df7639a29aacef2c67cbc7e"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "-mcpu=cortex-m4",
+        "-mthumb",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
+        "-std=c11",
+        "-Os",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wshadow",
+        "-Wstrict-prototypes",
+        "-Wmissing-prototypes",
+        "-MD",
+        "-DGD32F470",
+        "-DHXTAL_VALUE=25000000",
+        "-I/workspace/nexus/soc/gd32f470/private",
+        "-I/workspace/nexus/io/include",
+        "-I/workspace/nexus/soc/gd32f470",
+        "-I/workspace/nexus/core/include",
+        "-I/workspace/nexus/arch/include",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include",
+        "-MF",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.d",
+        "-nostdlib",
+        "-Wl,-e,main",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.c",
+        "-o",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.elf"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.556534+00:00",
+      "ended_at": "2026-10-11T16:33:09.585636+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-S",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.elf"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.585695+00:00",
+      "ended_at": "2026-10-11T16:33:09.587319+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current-nm.log",
+        "bytes": 571,
+        "sha256": "dcb222ad89ce8fe5abe68d2460837c6f907daf12850ca0fb6da9f21b3cba6967"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "-mcpu=cortex-m4",
+        "-mthumb",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
+        "-std=c11",
+        "-Os",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wshadow",
+        "-Wstrict-prototypes",
+        "-Wmissing-prototypes",
+        "-MD",
+        "-DGD32F470",
+        "-DHXTAL_VALUE=25000000",
+        "-I/workspace/nexus/soc/gd32f470/private",
+        "-I/workspace/nexus/soc/gd32f470",
+        "-I/workspace/nexus/io/include",
+        "-I/workspace/nexus/core/include",
+        "-I/workspace/nexus/arch/include",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include",
+        "-MF",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc.d",
+        "-c",
+        "/workspace/nexus/soc/gd32f470/drivers/adc.c",
+        "-o",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.588812+00:00",
+      "ended_at": "2026-10-11T16:33:09.671887+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+        "-A",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.671948+00:00",
+      "ended_at": "2026-10-11T16:33:09.673248+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc-sections.log",
+        "bytes": 831,
+        "sha256": "7e4356395f7109f1c47c9beb5da64e3755b1b467ab61c27df3a5d639a5c8caff"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+        "-d",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.673277+00:00",
+      "ended_at": "2026-10-11T16:33:09.675394+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc-disassembly.log",
+        "bytes": 19062,
+        "sha256": "966f231a1a310f2a9fa0131bf2727faafbe014a335bf9395449cb40c6bda1e38"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "-mcpu=cortex-m4",
+        "-mthumb",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
+        "-std=c11",
+        "-Os",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wshadow",
+        "-Wstrict-prototypes",
+        "-Wmissing-prototypes",
+        "-MD",
+        "-DGD32F470",
+        "-DHXTAL_VALUE=25000000",
+        "-I/workspace/nexus/soc/gd32f470/private",
+        "-I/workspace/nexus/soc/gd32f470",
+        "-I/workspace/nexus/io/include",
+        "-I/workspace/nexus/core/include",
+        "-I/workspace/nexus/arch/include",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include",
+        "-MF",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream.d",
+        "-c",
+        "/workspace/nexus/soc/gd32f470/drivers/adc_stream.c",
+        "-o",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.678700+00:00",
+      "ended_at": "2026-10-11T16:33:09.786967+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+        "-A",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.787025+00:00",
+      "ended_at": "2026-10-11T16:33:09.788381+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream-sections.log",
+        "bytes": 1186,
+        "sha256": "8a0086e90e04b148e6de51830eb5fd75d6a42072566f46d1a731dea53f3fca49"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+        "-d",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.788410+00:00",
+      "ended_at": "2026-10-11T16:33:09.790449+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream-disassembly.log",
+        "bytes": 29777,
+        "sha256": "41d0b3813254bba4c676e05f383f652cefc7986b85c00075c0f1c0d764946c14"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "-mcpu=cortex-m4",
+        "-mthumb",
+        "-mfpu=fpv4-sp-d16",
+        "-mfloat-abi=hard",
+        "-std=c11",
+        "-Os",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wshadow",
+        "-Wstrict-prototypes",
+        "-Wmissing-prototypes",
+        "-MD",
+        "-DGD32F470",
+        "-DHXTAL_VALUE=25000000",
+        "-I/workspace/nexus/soc/gd32f470/private",
+        "-I/workspace/nexus/soc/gd32f470",
+        "-I/workspace/nexus/io/include",
+        "-I/workspace/nexus/core/include",
+        "-I/workspace/nexus/arch/include",
+        "-I/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include",
+        "-isystem",
+        "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include",
+        "-MF",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous.d",
+        "-c",
+        "/workspace/nexus/soc/gd32f470/drivers/adc_continuous.c",
+        "-o",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.792442+00:00",
+      "ended_at": "2026-10-11T16:33:09.900959+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous-compile.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+        "-A",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.901019+00:00",
+      "ended_at": "2026-10-11T16:33:09.902339+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous-sections.log",
+        "bytes": 1278,
+        "sha256": "27a33f0282c3e51f4def0222c78f697c168bbc4b2b493877af39fc379af37ca7"
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+        "-d",
+        "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous.o"
+      ],
+      "returncode": 0,
+      "started_at": "2026-10-11T16:33:09.902366+00:00",
+      "ended_at": "2026-10-11T16:33:09.906622+00:00",
+      "log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous-disassembly.log",
+        "bytes": 31406,
+        "sha256": "62ef7212d788e8efc8dd0848ca633ff86734170ed28e5bf0a2bd76bd3e8715da"
+      }
+    }
+  ],
+  "physical_status": "not_executed"
+}

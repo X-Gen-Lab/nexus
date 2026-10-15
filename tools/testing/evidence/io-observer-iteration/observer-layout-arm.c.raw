@@ -1,0 +1,16 @@
+#include "nexus/core/request_observer.h"
+#include "nexus/io/stream_budget.h"
+#include "nexus/components/owner_observer.h"
+unsigned char __bytes_request[sizeof(nx_request_t)];
+unsigned char __bytes_request_slot[sizeof(nx_request_slot_t)];
+unsigned char __bytes_request_observer[sizeof(nx_request_observer_t)];
+unsigned char __bytes_request_observation[sizeof(nx_request_observation_t)];
+unsigned char __bytes_stream[sizeof(nx_stream_t)];
+unsigned char __bytes_stream_slot[sizeof(nx_stream_slot_t)];
+unsigned char __bytes_stream_observation[sizeof(nx_stream_observation_t)];
+unsigned char __bytes_stream_budget[sizeof(nx_stream_budget_t)];
+unsigned char __bytes_stream_budget_result[sizeof(nx_stream_budget_result_t)];
+unsigned char __bytes_owner[sizeof(nx_bus_owner_t)];
+unsigned char __bytes_owner_slot[sizeof(nx_owner_slot_t)];
+unsigned char __bytes_owner_observer[sizeof(nx_owner_observer_t)];
+unsigned char __bytes_owner_observation[sizeof(nx_owner_observation_t)];

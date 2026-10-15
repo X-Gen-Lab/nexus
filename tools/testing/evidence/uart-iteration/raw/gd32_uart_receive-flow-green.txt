@@ -1,0 +1,57 @@
+Running main() from gmock_main.cc
+[==========] Running 24 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 24 tests from Gd32UartReceive
+[ RUN      ] Gd32UartReceive.StartProgramsCallerBufferWithoutCpuPayloadCopy
+[       OK ] Gd32UartReceive.StartProgramsCallerBufferWithoutCpuPayloadCopy (0 ms)
+[ RUN      ] Gd32UartReceive.InvalidFutureBufferRejectsWithoutLoanOrMmioEffect
+[       OK ] Gd32UartReceive.InvalidFutureBufferRejectsWithoutLoanOrMmioEffect (0 ms)
+[ RUN      ] Gd32UartReceive.IdlePublishesOnlyTheStablePartialPrefix
+[       OK ] Gd32UartReceive.IdlePublishesOnlyTheStablePartialPrefix (0 ms)
+[ RUN      ] Gd32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains
+[       OK ] Gd32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains (0 ms)
+[ RUN      ] Gd32UartReceive.FullDmaBlockRequiresExplicitOwnerRearm
+[       OK ] Gd32UartReceive.FullDmaBlockRequiresExplicitOwnerRearm (0 ms)
+[ RUN      ] Gd32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss
+[       OK ] Gd32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss (0 ms)
+[ RUN      ] Gd32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists
+[       OK ] Gd32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists (0 ms)
+[ RUN      ] Gd32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice
+[       OK ] Gd32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer
+[       OK ] Gd32UartReceive.ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousSwapsInactiveTargetBeforePublishingAndWraps
+[       OK ] Gd32UartReceive.ContinuousSwapsInactiveTargetBeforePublishingAndWraps (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory
+[       OK ] Gd32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget
+[       OK ] Gd32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock
+[       OK ] Gd32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousIdleFlushesCompletedHeadThenStablePartialFuture
+[       OK ] Gd32UartReceive.ContinuousIdleFlushesCompletedHeadThenStablePartialFuture (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousUnexpectedParityOfBankStopsAndLatchesLoss
+[       OK ] Gd32UartReceive.ContinuousUnexpectedParityOfBankStopsAndLatchesLoss (0 ms)
+[ RUN      ] Gd32UartReceive.DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan
+[       OK ] Gd32UartReceive.DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan (0 ms)
+[ RUN      ] Gd32UartReceive.TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart
+[       OK ] Gd32UartReceive.TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart (0 ms)
+[ RUN      ] Gd32UartReceive.ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan
+[       OK ] Gd32UartReceive.ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan (0 ms)
+[ RUN      ] Gd32UartReceive.ReceiveStopOnFreshStateFailsWithoutDereferencingHardware
+[       OK ] Gd32UartReceive.ReceiveStopOnFreshStateFailsWithoutDereferencingHardware (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousRejectsUnequalOrTooFewBuffersWithoutAdmission
+[       OK ] Gd32UartReceive.ContinuousRejectsUnequalOrTooFewBuffersWithoutAdmission (0 ms)
+[ RUN      ] Gd32UartReceive.IrqTransmitAbortMustDrainRxBeforeResettingSharedUsart
+[       OK ] Gd32UartReceive.IrqTransmitAbortMustDrainRxBeforeResettingSharedUsart (0 ms)
+[ RUN      ] Gd32UartReceive.HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam
+[       OK ] Gd32UartReceive.HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam (0 ms)
+[ RUN      ] Gd32UartReceive.HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters
+[       OK ] Gd32UartReceive.HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters (0 ms)
+[ RUN      ] Gd32UartReceive.HardwareFlowSurvivesIrqTransmitAbortControllerReset
+[       OK ] Gd32UartReceive.HardwareFlowSurvivesIrqTransmitAbortControllerReset (0 ms)
+[----------] 24 tests from Gd32UartReceive (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 24 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 24 tests.

@@ -1,0 +1,122 @@
+Running main() from gmock_main.cc
+[==========] Running 55 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from TimerContracts
+[ RUN      ] TimerContracts.InterfacesKeepOptionalModesSeparate
+[       OK ] TimerContracts.InterfacesKeepOptionalModesSeparate (0 ms)
+[----------] 1 test from TimerContracts (0 ms total)
+
+[----------] 54 tests from TimerHardware
+[ RUN      ] TimerHardware.CaptureAuthorityRejectsBeforeMmio
+[       OK ] TimerHardware.CaptureAuthorityRejectsBeforeMmio (0 ms)
+[ RUN      ] TimerHardware.CaptureRejectsUnrepresentableClockAndFilter
+[       OK ] TimerHardware.CaptureRejectsUnrepresentableClockAndFilter (0 ms)
+[ RUN      ] TimerHardware.CaptureCannotReplaceEnabledController
+[       OK ] TimerHardware.CaptureCannotReplaceEnabledController (0 ms)
+[ RUN      ] TimerHardware.CaptureReportsRawModuloTicksAndSeparateObservation
+[       OK ] TimerHardware.CaptureReportsRawModuloTicksAndSeparateObservation (0 ms)
+[ RUN      ] TimerHardware.CaptureOverflowIsObservableWithoutOverwritingConsumer
+[       OK ] TimerHardware.CaptureOverflowIsObservableWithoutOverwritingConsumer (0 ms)
+[ RUN      ] TimerHardware.CaptureStopRetainsQueuedRingUntilTaskDrain
+[       OK ] TimerHardware.CaptureStopRetainsQueuedRingUntilTaskDrain (0 ms)
+[ RUN      ] TimerHardware.CaptureFailedDetachRetainsRingAndIncomingMask
+[       OK ] TimerHardware.CaptureFailedDetachRetainsRingAndIncomingMask (0 ms)
+[ RUN      ] TimerHardware.CaptureRejectsRingControlOutputAndOverflowAliases
+[       OK ] TimerHardware.CaptureRejectsRingControlOutputAndOverflowAliases (0 ms)
+[ RUN      ] TimerHardware.CaptureW0cPreservesUnrelatedObservedFacts
+[       OK ] TimerHardware.CaptureW0cPreservesUnrelatedObservedFacts (0 ms)
+[ RUN      ] TimerHardware.CaptureErrorOnlyDoesNotInventAnEdge
+[       OK ] TimerHardware.CaptureErrorOnlyDoesNotInventAnEdge (0 ms)
+[ RUN      ] TimerHardware.AdvancedAuthorityRejectsBeforeMmio
+[       OK ] TimerHardware.AdvancedAuthorityRejectsBeforeMmio (0 ms)
+[ RUN      ] TimerHardware.AdvancedDeadtimeRepresentabilityFollowsActualEncoding
+[       OK ] TimerHardware.AdvancedDeadtimeRepresentabilityFollowsActualEncoding (0 ms)
+[ RUN      ] TimerHardware.AdvancedDoesNotRoundUnrepresentableDeadtime
+[       OK ] TimerHardware.AdvancedDoesNotRoundUnrepresentableDeadtime (0 ms)
+[ RUN      ] TimerHardware.AdvancedRejectsIrreversibleExistingLock
+[       OK ] TimerHardware.AdvancedRejectsIrreversibleExistingLock (0 ms)
+[ RUN      ] TimerHardware.AdvancedDutyCannotModifyFixedBase
+[       OK ] TimerHardware.AdvancedDutyCannotModifyFixedBase (0 ms)
+[ RUN      ] TimerHardware.AdvancedDeadtimeClockIsIndependentOfPsc
+[       OK ] TimerHardware.AdvancedDeadtimeClockIsIndependentOfPsc (0 ms)
+[ RUN      ] TimerHardware.AdvancedHardwareBreakLatchesAndNeverAutorestarts
+[       OK ] TimerHardware.AdvancedHardwareBreakLatchesAndNeverAutorestarts (0 ms)
+[ RUN      ] TimerHardware.AdvancedLateBreakBeforeMoeReadbackFailsStart
+[       OK ] TimerHardware.AdvancedLateBreakBeforeMoeReadbackFailsStart (0 ms)
+[ RUN      ] TimerHardware.AdvancedFailedMoeDetachKeepsOwnerResponsibility
+[       OK ] TimerHardware.AdvancedFailedMoeDetachKeepsOwnerResponsibility (0 ms)
+[ RUN      ] TimerHardware.AdvancedRejectsOutputThatOverwritesControl
+[       OK ] TimerHardware.AdvancedRejectsOutputThatOverwritesControl (0 ms)
+[ RUN      ] TimerHardware.AdvancedClearsOnlyObservedBreakFlag
+[       OK ] TimerHardware.AdvancedClearsOnlyObservedBreakFlag (0 ms)
+[ RUN      ] TimerHardware.AdvancedRejectsWrongPhysicalBreakBitBeforeWrites
+[       OK ] TimerHardware.AdvancedRejectsWrongPhysicalBreakBitBeforeWrites (0 ms)
+[ RUN      ] TimerHardware.AdvancedCannotEnableAlteredDeadtimeOrBreakPolarity
+[       OK ] TimerHardware.AdvancedCannotEnableAlteredDeadtimeOrBreakPolarity (0 ms)
+[ RUN      ] TimerHardware.AdvancedCannotEnableAlteredDtsClockDivider
+[       OK ] TimerHardware.AdvancedCannotEnableAlteredDtsClockDivider (0 ms)
+[ RUN      ] TimerHardware.AdvancedColdConfigurationCannotAliasMutableState
+[       OK ] TimerHardware.AdvancedColdConfigurationCannotAliasMutableState (6 ms)
+[ RUN      ] TimerHardware.CaptureProtectsActualInterfaceTableFromRingOverwrite
+[       OK ] TimerHardware.CaptureProtectsActualInterfaceTableFromRingOverwrite (0 ms)
+[ RUN      ] TimerHardware.CaptureRejectsInterfaceFaceAndMethodsOutputAliases
+[       OK ] TimerHardware.CaptureRejectsInterfaceFaceAndMethodsOutputAliases (0 ms)
+[ RUN      ] TimerHardware.CaptureRejectsAlteredInputSelectionAtStart
+[       OK ] TimerHardware.CaptureRejectsAlteredInputSelectionAtStart (0 ms)
+[ RUN      ] TimerHardware.BothColdConstructorsRequireActualSelectedClockGates
+[       OK ] TimerHardware.BothColdConstructorsRequireActualSelectedClockGates (0 ms)
+[ RUN      ] TimerHardware.CaptureFailedIrqAdmissionReturnsNoBorrow
+[       OK ] TimerHardware.CaptureFailedIrqAdmissionReturnsNoBorrow (0 ms)
+[ RUN      ] TimerHardware.CaptureRestartCannotReplaceAnExistingBorrow
+[       OK ] TimerHardware.CaptureRestartCannotReplaceAnExistingBorrow (0 ms)
+[ RUN      ] TimerHardware.CaptureAndAdvancedTaskControlsRejectIsrMutation
+[       OK ] TimerHardware.CaptureAndAdvancedTaskControlsRejectIsrMutation (0 ms)
+[ RUN      ] TimerHardware.AdvancedDoesNotClearAFaultUntilHardwareAcknowledge
+[       OK ] TimerHardware.AdvancedDoesNotClearAFaultUntilHardwareAcknowledge (0 ms)
+[ RUN      ] TimerHardware.AdvancedPhysicalActiveLowBreakUsesActualPolarity
+[       OK ] TimerHardware.AdvancedPhysicalActiveLowBreakUsesActualPolarity (0 ms)
+[ RUN      ] TimerHardware.AdvancedRefusedDutyNeverChangesStagedValue
+[       OK ] TimerHardware.AdvancedRefusedDutyNeverChangesStagedValue (0 ms)
+[ RUN      ] TimerHardware.AdvancedRefusedChannelWithdrawPreventsCleanStop
+[       OK ] TimerHardware.AdvancedRefusedChannelWithdrawPreventsCleanStop (0 ms)
+[ RUN      ] TimerHardware.CaptureUsesClockOnlyForActualPublishedValues
+[       OK ] TimerHardware.CaptureUsesClockOnlyForActualPublishedValues (0 ms)
+[ RUN      ] TimerHardware.CaptureCannotInheritGatedClockOrXorInputSelection
+[       OK ] TimerHardware.CaptureCannotInheritGatedClockOrXorInputSelection (0 ms)
+[ RUN      ] TimerHardware.AdvancedCannotInheritSlaveModeOrRepetitionCounter
+[       OK ] TimerHardware.AdvancedCannotInheritSlaveModeOrRepetitionCounter (0 ms)
+[ RUN      ] TimerHardware.CaptureColdReleaseRequiresDrainAndSupportsNewSession
+[       OK ] TimerHardware.CaptureColdReleaseRequiresDrainAndSupportsNewSession (0 ms)
+[ RUN      ] TimerHardware.AdvancedColdReleaseQuiescesSourceBeforeNewSession
+[       OK ] TimerHardware.AdvancedColdReleaseQuiescesSourceBeforeNewSession (0 ms)
+[ RUN      ] TimerHardware.CaptureFailedStopAcknowledgesLateSourceWithoutRingWrite
+[       OK ] TimerHardware.CaptureFailedStopAcknowledgesLateSourceWithoutRingWrite (0 ms)
+[ RUN      ] TimerHardware.AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled
+[       OK ] TimerHardware.AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled (0 ms)
+[ RUN      ] TimerHardware.CaptureReadClearPreservesNewUnreadEdge
+[       OK ] TimerHardware.CaptureReadClearPreservesNewUnreadEdge (0 ms)
+[ RUN      ] TimerHardware.CaptureObservesOvercaptureAfterActualDataRead
+[       OK ] TimerHardware.CaptureObservesOvercaptureAfterActualDataRead (0 ms)
+[ RUN      ] TimerHardware.FailedCaptureConstructorRetainsCleanupSession
+[       OK ] TimerHardware.FailedCaptureConstructorRetainsCleanupSession (0 ms)
+[ RUN      ] TimerHardware.FailedAdvancedConstructorRetainsCleanupSession
+[       OK ] TimerHardware.FailedAdvancedConstructorRetainsCleanupSession (0 ms)
+[ RUN      ] TimerHardware.FailedCaptureCleanupRetainsIdentityUntilRealReadback
+[       OK ] TimerHardware.FailedCaptureCleanupRetainsIdentityUntilRealReadback (0 ms)
+[ RUN      ] TimerHardware.FailedAdvancedCleanupRetainsIdentityUntilRealReadback
+[       OK ] TimerHardware.FailedAdvancedCleanupRetainsIdentityUntilRealReadback (0 ms)
+[ RUN      ] TimerHardware.UntouchedReleaseNeverWithdrawsForeignActiveTimer
+[       OK ] TimerHardware.UntouchedReleaseNeverWithdrawsForeignActiveTimer (0 ms)
+[ RUN      ] TimerHardware.UntouchedAdmissionRejectionsReleaseWithoutEffects
+[       OK ] TimerHardware.UntouchedAdmissionRejectionsReleaseWithoutEffects (0 ms)
+[ RUN      ] TimerHardware.FailedSessionReleaseChecksAllOwnedSourceBits
+[       OK ] TimerHardware.FailedSessionReleaseChecksAllOwnedSourceBits (0 ms)
+[ RUN      ] TimerHardware.FailedColdCaptureStopClosesSourceBeforePublisherJoin
+[       OK ] TimerHardware.FailedColdCaptureStopClosesSourceBeforePublisherJoin (0 ms)
+[ RUN      ] TimerHardware.FailedColdAdvancedStopClosesSourceBeforePublisherJoin
+[       OK ] TimerHardware.FailedColdAdvancedStopClosesSourceBeforePublisherJoin (0 ms)
+[----------] 54 tests from TimerHardware (9 ms total)
+
+[----------] Global test environment tear-down
+[==========] 55 tests from 2 test suites ran. (9 ms total)
+[  PASSED  ] 55 tests.

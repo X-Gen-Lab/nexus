@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "kind": "native-identity-red-exact-source-copies",
+  "rows": [
+    {
+      "source": {
+        "path": "/workspace/nexus/tests/google/native_factory_test.cpp",
+        "sha256": "25912a5b716f5f09d3db53e41d90a6be28cac2065ae18d1c9d22fb8d219fad1d",
+        "bytes": 20109
+      },
+      "copy": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-identity-red-source/tests/google/native_factory_test.cpp",
+        "sha256": "25912a5b716f5f09d3db53e41d90a6be28cac2065ae18d1c9d22fb8d219fad1d",
+        "bytes": 20109
+      }
+    },
+    {
+      "source": {
+        "path": "/workspace/nexus/io/native/i2c.c",
+        "sha256": "fe6d546164f974e9f74d4eaa7832d7d2d8196abc2a3102cf79018893bd86666d",
+        "bytes": 7566
+      },
+      "copy": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-identity-red-source/io/native/i2c.c",
+        "sha256": "fe6d546164f974e9f74d4eaa7832d7d2d8196abc2a3102cf79018893bd86666d",
+        "bytes": 7566
+      }
+    },
+    {
+      "source": {
+        "path": "/workspace/nexus/tools/configure/providers/native/emission.py",
+        "sha256": "e16c9d2f32b1ffdcf640f4b3b26e38812ee21218af979f76a8e606646635550a",
+        "bytes": 1748
+      },
+      "copy": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-identity-red-source/tools/configure/providers/native/emission.py",
+        "sha256": "e16c9d2f32b1ffdcf640f4b3b26e38812ee21218af979f76a8e606646635550a",
+        "bytes": 1748
+      }
+    },
+    {
+      "source": {
+        "path": "/workspace/nexus/tools/configure/providers/native/bindings.py",
+        "sha256": "94f48411c94687d63a1b08af7810967eb214375d415c5d6edd90310edd85fb0a",
+        "bytes": 5647
+      },
+      "copy": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-identity-red-source/tools/configure/providers/native/bindings.py",
+        "sha256": "94f48411c94687d63a1b08af7810967eb214375d415c5d6edd90310edd85fb0a",
+        "bytes": 5647
+      }
+    },
+    {
+      "source": {
+        "path": "/workspace/nexus/tools/configure/providers/stm32f407/emission.py",
+        "sha256": "7fac80d84ef5f5d916d6e6f07a16c291369467f776694ba61de39fb8b28214f4",
+        "bytes": 8485
+      },
+      "copy": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-identity-red-source/tools/configure/providers/stm32f407/emission.py",
+        "sha256": "7fac80d84ef5f5d916d6e6f07a16c291369467f776694ba61de39fb8b28214f4",
+        "bytes": 8485
+      }
+    },
+    {
+      "source": {
+        "path": "/workspace/nexus/tools/configure/providers/stm32f407/bindings.py",
+        "sha256": "da5dc8ab4e5bfea1513ce54ffc4e34246cee2747cc95200963dc85d5b9002f83",
+        "bytes": 38599
+      },
+      "copy": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-identity-red-source/tools/configure/providers/stm32f407/bindings.py",
+        "sha256": "da5dc8ab4e5bfea1513ce54ffc4e34246cee2747cc95200963dc85d5b9002f83",
+        "bytes": 38599
+      }
+    },
+    {
+      "source": {
+        "path": "/workspace/nexus/tools/configure/providers/gd32f470/emission.py",
+        "sha256": "7c7f8b560b04d01d7d206b1359bc90f398c3bb801f10f129850d432a7c611e65",
+        "bytes": 6633
+      },
+      "copy": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-identity-red-source/tools/configure/providers/gd32f470/emission.py",
+        "sha256": "7c7f8b560b04d01d7d206b1359bc90f398c3bb801f10f129850d432a7c611e65",
+        "bytes": 6633
+      }
+    },
+    {
+      "source": {
+        "path": "/workspace/nexus/tools/configure/providers/gd32f470/bindings.py",
+        "sha256": "77b2e58cdfcc7d98c7821fcd47c3cea9e4deea82b3f721b0247cb5f9aa908376",
+        "bytes": 24286
+      },
+      "copy": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-identity-red-source/tools/configure/providers/gd32f470/bindings.py",
+        "sha256": "77b2e58cdfcc7d98c7821fcd47c3cea9e4deea82b3f721b0247cb5f9aa908376",
+        "bytes": 24286
+      }
+    },
+    {
+      "source": {
+        "path": "/workspace/nexus/tools/configure/secondary_controllers.py",
+        "sha256": "c1205631b453f7381a5e3bc9a2f6f8f2c1b9943151bcae7869c920d0a64f50b3",
+        "bytes": 21761
+      },
+      "copy": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-identity-red-source/tools/configure/secondary_controllers.py",
+        "sha256": "c1205631b453f7381a5e3bc9a2f6f8f2c1b9943151bcae7869c920d0a64f50b3",
+        "bytes": 21761
+      }
+    }
+  ]
+}

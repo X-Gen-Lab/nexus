@@ -1,0 +1,6 @@
+[ 52%] Built target can_engine
+[ 58%] Building CXX object CMakeFiles/can_contract.dir/workspace/nexus/tests/google/can_controller_test.cpp.o
+[ 64%] Linking CXX executable can_contract
+[ 64%] Built target can_contract
+[ 82%] Built target can_stm32f407_contract
+[100%] Built target can_gd32f470_contract

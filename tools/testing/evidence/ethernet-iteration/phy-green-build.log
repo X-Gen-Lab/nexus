@@ -1,0 +1,7 @@
+[0/1] Re-running CMake...
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-iteration-bus-design/eth-build
+[1/4] Building C object CMakeFiles/dp83848_test.dir/components/dp83848/src/dp83848.c.o
+[2/4] Building CXX object CMakeFiles/dp83848_test.dir/tests/google/dp83848_test.cpp.o
+[3/4] Linking CXX executable dp83848_test

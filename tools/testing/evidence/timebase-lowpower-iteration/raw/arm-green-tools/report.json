@@ -1,0 +1,551 @@
+{
+  "qualification": false,
+  "scope": "fresh dirty-development actual firmware CMake graph; no physical execution",
+  "commands": [
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+        "--version"
+      ],
+      "returncode": 0,
+      "start": 1791745177.7537477,
+      "end": 1791745177.7554698,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/tool-gcc.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "-S",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/fixture",
+        "-B",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/build",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/assembly.toml"
+      ],
+      "returncode": 0,
+      "start": 1791745177.7558222,
+      "end": 1791745178.202256,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom-configure.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "--build",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/build",
+        "--parallel",
+        "2"
+      ],
+      "returncode": 0,
+      "start": 1791745178.2022784,
+      "end": 1791745179.4232328,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom-build.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-S",
+        "--defined-only",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745179.4235096,
+      "end": 1791745179.4250774,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom-nm.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-u",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745179.4250884,
+      "end": 1791745179.4263299,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom-undefined.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745179.426341,
+      "end": 1791745179.4276626,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom-size.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+        "-d",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745179.4276721,
+      "end": 1791745179.4308498,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom-disassembly.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "-S",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/fixture",
+        "-B",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/build",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/assembly.toml"
+      ],
+      "returncode": 0,
+      "start": 1791745179.4327536,
+      "end": 1791745179.8973582,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase-configure.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "--build",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/build",
+        "--parallel",
+        "2"
+      ],
+      "returncode": 0,
+      "start": 1791745179.8973794,
+      "end": 1791745181.1855612,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase-build.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-S",
+        "--defined-only",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745181.1856499,
+      "end": 1791745181.1872454,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase-nm.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-u",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745181.1872566,
+      "end": 1791745181.188421,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase-undefined.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745181.188432,
+      "end": 1791745181.1899447,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase-size.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+        "-d",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745181.189955,
+      "end": 1791745181.1949098,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase-disassembly.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "-S",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/fixture",
+        "-B",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/assembly.toml"
+      ],
+      "returncode": 0,
+      "start": 1791745181.196736,
+      "end": 1791745181.6926048,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom-configure.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "--build",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build",
+        "--parallel",
+        "2"
+      ],
+      "returncode": 0,
+      "start": 1791745181.6926258,
+      "end": 1791745183.1337748,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom-build.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-S",
+        "--defined-only",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745183.133861,
+      "end": 1791745183.1356287,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom-nm.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-u",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745183.1356404,
+      "end": 1791745183.1388626,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom-undefined.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745183.138874,
+      "end": 1791745183.1400619,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom-size.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+        "-d",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745183.140072,
+      "end": 1791745183.1440866,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom-disassembly.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "-S",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/fixture",
+        "-B",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/build",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/assembly.toml"
+      ],
+      "returncode": 0,
+      "start": 1791745183.1460822,
+      "end": 1791745183.6446288,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase-configure.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "--build",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/build",
+        "--parallel",
+        "2"
+      ],
+      "returncode": 0,
+      "start": 1791745183.6446571,
+      "end": 1791745185.1443367,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase-build.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-S",
+        "--defined-only",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745185.1444182,
+      "end": 1791745185.1462908,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase-nm.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+        "-u",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745185.1463025,
+      "end": 1791745185.1476564,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase-undefined.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745185.1476665,
+      "end": 1791745185.1487646,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase-size.log"
+    },
+    {
+      "command": [
+        "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+        "-d",
+        "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/build/bin/lowpower_fixture.elf"
+      ],
+      "returncode": 0,
+      "start": 1791745185.1487732,
+      "end": 1791745185.152728,
+      "log": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase-disassembly.log"
+    }
+  ],
+  "variants": [
+    {
+      "name": "stm32f407-custom",
+      "family": "stm32f407",
+      "port": "custom",
+      "status": "passed",
+      "source_hashes": {
+        "os/freertos/timebase_lowpower.c": "098462e97ebd374d7adeed6855ba2601ea2f3ca2518bc4f3d309f2ae5178f0ca",
+        "os/freertos/private/timebase_lowpower.h": "138382ee32623a8bfa83d68fc78d84c724b97c1b92b9d8ab4b23c80610740064",
+        "os/freertos/CMakeLists.txt": "26a64d419ae9ac14fe208dab4f363ffee3b9d04fdb52ba99c6d5651ede409011",
+        "os/freertos/include/FreeRTOSConfig.h": "eb23e5cdefb36c31ba7121ee4bfe36607f090b6b5c40ead0fdb1b62ef96fda34",
+        "soc/stm32f407/timebase_lowpower.c": "8ff8f2dce95f27f3e036a5b8976e8f2945e4b9b8522fd1a7fe565f2fc895a962",
+        "soc/stm32f407/CMakeLists.txt": "0fa7acb5559eb3c738d051c74e7242a88ba9fb2c2f75b1ce37e870ba8d3749f1",
+        "soc/stm32f407/system.c": "7b38fb8d2308c94fb8cf74b1430fcac39dc165e86728c238a6a3a6769adcc1c8"
+      },
+      "selected_mechanism_TUs": 0,
+      "layouts": {},
+      "size": {
+        "text": 5960,
+        "data": 44,
+        "bss": 2980,
+        "flash_text_data": 6004,
+        "ram_data_bss": 3024
+      },
+      "artifacts": [
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/build/bin/lowpower_fixture.bin",
+          "bytes": 6012,
+          "sha256": "2c2c92f4a30c9a7077d105a155edf6373181b60ef1883dd41fcfba7fe1cd2119"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/build/bin/lowpower_fixture.elf",
+          "bytes": 23480,
+          "sha256": "e70f92370eb250ea5ffb4c1b16ca37d1dc53fbf72d7a657fc6a4242875c3cc11"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/build/bin/lowpower_fixture.map",
+          "bytes": 51747,
+          "sha256": "d7ad916ceca485c62ce14bc71902558db426dba63fdacf29ec015a0c279236d0"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-custom/build/bin/lowpower_fixture.resources.json",
+          "bytes": 3715,
+          "sha256": "151f461c556ad8c76f1fd88abac71282b589f9da9f34b93192b93a1e6c55b8ea"
+        }
+      ],
+      "assembly_sha256": "157621d9d4233d7c58cbd5e60784d9eec8a4dc7207cc9882ed0e9ab14befb1d0",
+      "fixture_sha256": {
+        "main.c": "d1ae6fac19f7a48f9106c4d89270703591687d369db83c8248e6376e95640185",
+        "CMakeLists.txt": "ec7019eb882f82f9e67d8ee71d7a6070cece4a8e362778c80b462b7e42122e58"
+      }
+    },
+    {
+      "name": "stm32f407-timebase",
+      "family": "stm32f407",
+      "port": "timebase",
+      "status": "passed",
+      "source_hashes": {
+        "os/freertos/timebase_lowpower.c": "098462e97ebd374d7adeed6855ba2601ea2f3ca2518bc4f3d309f2ae5178f0ca",
+        "os/freertos/private/timebase_lowpower.h": "138382ee32623a8bfa83d68fc78d84c724b97c1b92b9d8ab4b23c80610740064",
+        "os/freertos/CMakeLists.txt": "26a64d419ae9ac14fe208dab4f363ffee3b9d04fdb52ba99c6d5651ede409011",
+        "os/freertos/include/FreeRTOSConfig.h": "eb23e5cdefb36c31ba7121ee4bfe36607f090b6b5c40ead0fdb1b62ef96fda34",
+        "soc/stm32f407/timebase_lowpower.c": "8ff8f2dce95f27f3e036a5b8976e8f2945e4b9b8522fd1a7fe565f2fc895a962",
+        "soc/stm32f407/CMakeLists.txt": "0fa7acb5559eb3c738d051c74e7242a88ba9fb2c2f75b1ce37e870ba8d3749f1",
+        "soc/stm32f407/system.c": "7b38fb8d2308c94fb8cf74b1430fcac39dc165e86728c238a6a3a6769adcc1c8"
+      },
+      "selected_mechanism_TUs": 2,
+      "layouts": {
+        "s_context": 16,
+        "s_registers": 52,
+        "s_port": 24
+      },
+      "size": {
+        "text": 7316,
+        "data": 60,
+        "bss": 2980,
+        "flash_text_data": 7376,
+        "ram_data_bss": 3040
+      },
+      "artifacts": [
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/build/bin/lowpower_fixture.bin",
+          "bytes": 7384,
+          "sha256": "916cc3e56e3d6b3b90b537f1a85415407579562f0b6fe23ddb79ae33150c6ccc"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/build/bin/lowpower_fixture.elf",
+          "bytes": 24432,
+          "sha256": "0accc8291d9a48b822880be858a6f5c6c6f868b62085f9de6f98b758204a30d8"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/build/bin/lowpower_fixture.map",
+          "bytes": 56316,
+          "sha256": "0604e92b3e265a106485905003836a92ec47e8100abd3be5e6eeeb37b9660c73"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/stm32f407-timebase/build/bin/lowpower_fixture.resources.json",
+          "bytes": 3723,
+          "sha256": "cc0d2c55bce76bcb4ae54d895f35f9a220ebe717ca85987add40be33a7adb552"
+        }
+      ],
+      "assembly_sha256": "7f52be683d65fda31c8139b1bd557a8df758b207dcc5366d827329e29a49a26f",
+      "fixture_sha256": {
+        "main.c": "d1ae6fac19f7a48f9106c4d89270703591687d369db83c8248e6376e95640185",
+        "CMakeLists.txt": "ec7019eb882f82f9e67d8ee71d7a6070cece4a8e362778c80b462b7e42122e58"
+      }
+    },
+    {
+      "name": "gd32f470-custom",
+      "family": "gd32f470",
+      "port": "custom",
+      "status": "passed",
+      "source_hashes": {
+        "os/freertos/timebase_lowpower.c": "098462e97ebd374d7adeed6855ba2601ea2f3ca2518bc4f3d309f2ae5178f0ca",
+        "os/freertos/private/timebase_lowpower.h": "138382ee32623a8bfa83d68fc78d84c724b97c1b92b9d8ab4b23c80610740064",
+        "os/freertos/CMakeLists.txt": "26a64d419ae9ac14fe208dab4f363ffee3b9d04fdb52ba99c6d5651ede409011",
+        "os/freertos/include/FreeRTOSConfig.h": "eb23e5cdefb36c31ba7121ee4bfe36607f090b6b5c40ead0fdb1b62ef96fda34",
+        "soc/gd32f470/timebase_lowpower.c": "1a260516f799c505bb942280e2832e662c54501e777472e0694674afe4c388ec",
+        "soc/gd32f470/CMakeLists.txt": "343e000d50a2ab0513e3689924ca5ff9d8fcdb6367aa3554ee1d223a0158568b",
+        "soc/gd32f470/timebase.c": "2f28edea77098b4c2783ce6b94e4f5a3b2b0570c1c9c4e351225db91a3218802"
+      },
+      "selected_mechanism_TUs": 0,
+      "layouts": {},
+      "size": {
+        "text": 7364,
+        "data": 8,
+        "bss": 2992,
+        "flash_text_data": 7372,
+        "ram_data_bss": 3000
+      },
+      "artifacts": [
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/bin/lowpower_fixture.bin",
+          "bytes": 7376,
+          "sha256": "8902c4f271c174abc3b689881fe6bda6e95ef827211fb4d5cf7bbd05dea8740d"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/bin/lowpower_fixture.elf",
+          "bytes": 24916,
+          "sha256": "71a8c082068673375bbfb793d285c4f9fdb6f96f0abea6ebb0285739b5b6a67e"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/bin/lowpower_fixture.map",
+          "bytes": 76670,
+          "sha256": "f0a859bee206f41fadc74d360e9c595c7685aa2a112f570e35fa1f1bcb4d2c47"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/bin/lowpower_fixture.resources.json",
+          "bytes": 3860,
+          "sha256": "92271de64cc2bd58652a013c8ed2ac1ab9c75496c67fef4c03198f9a5b8fed6f"
+        }
+      ],
+      "assembly_sha256": "1aef561365c91557f1cdd60f0b81d881741568112de963a1660395dc89496e07",
+      "fixture_sha256": {
+        "main.c": "d1ae6fac19f7a48f9106c4d89270703591687d369db83c8248e6376e95640185",
+        "CMakeLists.txt": "ec7019eb882f82f9e67d8ee71d7a6070cece4a8e362778c80b462b7e42122e58"
+      }
+    },
+    {
+      "name": "gd32f470-timebase",
+      "family": "gd32f470",
+      "port": "timebase",
+      "status": "passed",
+      "source_hashes": {
+        "os/freertos/timebase_lowpower.c": "098462e97ebd374d7adeed6855ba2601ea2f3ca2518bc4f3d309f2ae5178f0ca",
+        "os/freertos/private/timebase_lowpower.h": "138382ee32623a8bfa83d68fc78d84c724b97c1b92b9d8ab4b23c80610740064",
+        "os/freertos/CMakeLists.txt": "26a64d419ae9ac14fe208dab4f363ffee3b9d04fdb52ba99c6d5651ede409011",
+        "os/freertos/include/FreeRTOSConfig.h": "eb23e5cdefb36c31ba7121ee4bfe36607f090b6b5c40ead0fdb1b62ef96fda34",
+        "soc/gd32f470/timebase_lowpower.c": "1a260516f799c505bb942280e2832e662c54501e777472e0694674afe4c388ec",
+        "soc/gd32f470/CMakeLists.txt": "343e000d50a2ab0513e3689924ca5ff9d8fcdb6367aa3554ee1d223a0158568b",
+        "soc/gd32f470/timebase.c": "2f28edea77098b4c2783ce6b94e4f5a3b2b0570c1c9c4e351225db91a3218802"
+      },
+      "selected_mechanism_TUs": 2,
+      "layouts": {
+        "s_context": 16,
+        "s_registers": 52,
+        "s_port": 24
+      },
+      "size": {
+        "text": 8720,
+        "data": 24,
+        "bss": 2992,
+        "flash_text_data": 8744,
+        "ram_data_bss": 3016
+      },
+      "artifacts": [
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/build/bin/lowpower_fixture.bin",
+          "bytes": 8748,
+          "sha256": "c3b4e0cbfe1af820541fba39a1b55497fa0dfbdd2e388fd0d0e0c30134b2cccc"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/build/bin/lowpower_fixture.elf",
+          "bytes": 30028,
+          "sha256": "d92775d4d853a13d778a085ad5386aa98910e28483c6a78cd930013d54212ae9"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/build/bin/lowpower_fixture.map",
+          "bytes": 81227,
+          "sha256": "97e6b59cb4219c8d6228828ecaf05cb935b3d285b0424a045627833db396792a"
+        },
+        {
+          "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-timebase/build/bin/lowpower_fixture.resources.json",
+          "bytes": 3868,
+          "sha256": "d040dd0c21143a87c1ca396315a83805d11e21076da7a171959b79e7301a278c"
+        }
+      ],
+      "assembly_sha256": "b6f3becf3bae543bf5e5763c97c212411e92e8247a38cb4adc01b7b462e93b4e",
+      "fixture_sha256": {
+        "main.c": "d1ae6fac19f7a48f9106c4d89270703591687d369db83c8248e6376e95640185",
+        "CMakeLists.txt": "ec7019eb882f82f9e67d8ee71d7a6070cece4a8e362778c80b462b7e42122e58"
+      }
+    }
+  ],
+  "deltas": {
+    "stm32f407": {
+      "text": 1356,
+      "data": 16,
+      "bss": 0,
+      "flash_text_data": 1372,
+      "ram_data_bss": 16
+    },
+    "gd32f470": {
+      "text": 1356,
+      "data": 16,
+      "bss": 0,
+      "flash_text_data": 1372,
+      "ram_data_bss": 16
+    }
+  },
+  "status": "passed"
+}

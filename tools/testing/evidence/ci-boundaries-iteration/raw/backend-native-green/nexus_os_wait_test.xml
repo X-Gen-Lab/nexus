@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="28" failures="0" disabled="0" errors="0" time="0.023" timestamp="2026-10-11T20:45:57.485" name="AllTests">
+  <testsuite name="OsWaitContract" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T20:45:57.485">
+    <testcase name="ArmRecheckCompletionNeverSleeps" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="139" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="OsWaitContract" />
+    <testcase name="NotificationOnlyRechecksAuthoritativePredicate" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="150" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="OsWaitContract" />
+    <testcase name="InvalidPortDoesNotCallPredicate" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="186" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="OsWaitContract" />
+  </testsuite>
+  <testsuite name="BaremetalWait" tests="5" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T20:45:57.485">
+    <testcase name="ChangedSequenceCannotBypassExpiredDeadline" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="197" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="BaremetalWait" />
+    <testcase name="ContinuousHintsCannotExtendAbsoluteDeadline" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="208" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="BaremetalWait" />
+    <testcase name="NeverAndFiniteDeadlinesDoNotWrap" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="219" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="BaremetalWait" />
+    <testcase name="RepeatedHintsDoNotRestartAFutureDeadline" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="234" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="BaremetalWait" />
+    <testcase name="SequenceWrapIsAnObservedHint" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="257" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="BaremetalWait" />
+  </testsuite>
+  <testsuite name="NativeWait" tests="9" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T20:45:57.485">
+    <testcase name="ChangedSequenceCannotBypassExpiredDeadline" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="270" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="NativeWait" />
+    <testcase name="ContinuousHintsCannotExtendAbsoluteDeadline" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="280" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="NativeWait" />
+    <testcase name="RepeatedHintsDoNotRestartAFutureDeadline" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="290" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="NativeWait" />
+    <testcase name="NeverUsesUntimedWaitAndSecondWaiterIsRejected" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="309" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="NativeWait" />
+    <testcase name="MultiplePublishersPreserveEverySequenceIncrement" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="331" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.485" classname="NativeWait" />
+    <testcase name="SequenceWrapRemainsObservableBeforeDeadline" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="356" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.486" classname="NativeWait" />
+    <testcase name="ActualTimeoutPreservesFinalPredicateCompletion" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="368" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.486" classname="NativeWait" />
+    <testcase name="PastDeadlineNeverEntersAPosixBlockingOperation" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="386" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.486" classname="NativeWait" />
+    <testcase name="PublisherBetweenRecheckAndSleepCannotLoseWake" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="399" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.486" classname="NativeWait" />
+  </testsuite>
+  <testsuite name="NativeQueue" tests="5" failures="0" disabled="0" skipped="0" errors="0" time="0.022" timestamp="2026-10-11T20:45:57.486">
+    <testcase name="CloseWakesBlockedProducerAndRetainsDrain" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="444" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.486" classname="NativeQueue" />
+    <testcase name="CloseWakesBlockedConsumerAndPreservesOutputOnRejection" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="473" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.486" classname="NativeQueue" />
+    <testcase name="ImmediateOperationsUseAvailableCapacityAtExpiredDeadline" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="496" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.486" classname="NativeQueue" />
+    <testcase name="MultipleProducersCloseThenDrainWithoutLosingItems" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="513" status="run" result="completed" time="0.021" timestamp="2026-10-11T20:45:57.486" classname="NativeQueue" />
+    <testcase name="RepeatedCloseIsIdempotentAndRejectsFutureAdmission" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="563" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.508" classname="NativeQueue" />
+  </testsuite>
+  <testsuite name="NativeTask" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T20:45:57.508">
+    <testcase name="JoinRejectsSelfThenConfirmsEntryExitAndAllowsReuse" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="581" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.508" classname="NativeTask" />
+    <testcase name="SmallStackRejectionRetainsUnusedHandle" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="618" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.508" classname="NativeTask" />
+  </testsuite>
+  <testsuite name="BackendErrors/OsWaitFinalObservation" tests="4" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T20:45:57.508">
+    <testcase name="CompletionWinsFinalErrorObservation/0" value_param="4" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="169" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.508" classname="BackendErrors/OsWaitFinalObservation" />
+    <testcase name="CompletionWinsFinalErrorObservation/1" value_param="2" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="169" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.508" classname="BackendErrors/OsWaitFinalObservation" />
+    <testcase name="CompletionWinsFinalErrorObservation/2" value_param="14" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="169" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.508" classname="BackendErrors/OsWaitFinalObservation" />
+    <testcase name="CompletionWinsFinalErrorObservation/3" value_param="6" file="/workspace/nexus/tests/google/os_wait_test.cpp" line="169" status="run" result="completed" time="0." timestamp="2026-10-11T20:45:57.508" classname="BackendErrors/OsWaitFinalObservation" />
+  </testsuite>
+</testsuites>

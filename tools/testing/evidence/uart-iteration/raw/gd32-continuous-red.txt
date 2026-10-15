@@ -1,0 +1,98 @@
+Running main() from gmock_main.cc
+[==========] Running 15 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 15 tests from Gd32UartReceive
+[ RUN      ] Gd32UartReceive.StartProgramsCallerBufferWithoutCpuPayloadCopy
+[       OK ] Gd32UartReceive.StartProgramsCallerBufferWithoutCpuPayloadCopy (0 ms)
+[ RUN      ] Gd32UartReceive.InvalidFutureBufferRejectsWithoutLoanOrMmioEffect
+[       OK ] Gd32UartReceive.InvalidFutureBufferRejectsWithoutLoanOrMmioEffect (0 ms)
+[ RUN      ] Gd32UartReceive.IdlePublishesOnlyTheStablePartialPrefix
+[       OK ] Gd32UartReceive.IdlePublishesOnlyTheStablePartialPrefix (0 ms)
+[ RUN      ] Gd32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains
+[       OK ] Gd32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains (0 ms)
+[ RUN      ] Gd32UartReceive.FullDmaBlockRequiresExplicitOwnerRearm
+[       OK ] Gd32UartReceive.FullDmaBlockRequiresExplicitOwnerRearm (0 ms)
+[ RUN      ] Gd32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss
+[       OK ] Gd32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss (0 ms)
+[ RUN      ] Gd32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists
+[       OK ] Gd32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists (0 ms)
+[ RUN      ] Gd32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice
+[       OK ] Gd32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:225: Failure
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] Gd32UartReceive.ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousSwapsInactiveTargetBeforePublishingAndWraps
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:237: Failure
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] Gd32UartReceive.ContinuousSwapsInactiveTargetBeforePublishingAndWraps (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:267: Failure
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] Gd32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:290: Failure
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] Gd32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:309: Failure
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] Gd32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousIdleFlushesCompletedHeadThenStablePartialFuture
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:335: Failure
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] Gd32UartReceive.ContinuousIdleFlushesCompletedHeadThenStablePartialFuture (0 ms)
+[ RUN      ] Gd32UartReceive.ContinuousUnexpectedParityOfBankStopsAndLatchesLoss
+/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:354: Failure
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] Gd32UartReceive.ContinuousUnexpectedParityOfBankStopsAndLatchesLoss (0 ms)
+[----------] 15 tests from Gd32UartReceive (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 15 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 8 tests.
+[  FAILED  ] 7 tests, listed below:
+[  FAILED  ] Gd32UartReceive.ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer
+[  FAILED  ] Gd32UartReceive.ContinuousSwapsInactiveTargetBeforePublishingAndWraps
+[  FAILED  ] Gd32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory
+[  FAILED  ] Gd32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget
+[  FAILED  ] Gd32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock
+[  FAILED  ] Gd32UartReceive.ContinuousIdleFlushesCompletedHeadThenStablePartialFuture
+[  FAILED  ] Gd32UartReceive.ContinuousUnexpectedParityOfBankStopsAndLatchesLoss
+
+ 7 FAILED TESTS

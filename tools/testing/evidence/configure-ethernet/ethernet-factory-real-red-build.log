@@ -1,0 +1,21 @@
+[0/1] Re-running CMake...
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/ethernet-config-model/generated/resolved.json
+-- Configuring done (1.5s)
+-- Generating done (0.2s)
+-- Build files have been written to: /workspace/nexus/build/ethernet-config-model
+[1/14] Linking CXX static library lib/libgtest.a
+[2/14] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/__/__/soc/stm32f407/drivers/ethernet.c.o
+[3/14] Linking CXX static library lib/libgmock.a
+[4/14] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/eth-factory-stm32/bindings.c.o
+[5/14] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_eth_factory_test.dir/eth-factory-gd32/bindings.c.o
+[6/14] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_eth_factory_test.dir/__/__/soc/gd32f470/drivers/ethernet.c.o
+[7/14] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/__/__/io/src/eth_mac.c.o
+[8/14] Linking CXX static library lib/libgmock_main.a
+[9/14] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_eth_factory_test.dir/__/__/io/src/eth_mac.c.o
+[10/14] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/ethernet_factory_test.cpp.o
+[11/14] Linking CXX executable bin/nexus_stm32_eth_factory_test
+[12/14] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_eth_factory_test.dir/ethernet_factory_test.cpp.o
+[13/14] Linking CXX executable bin/nexus_gd32_eth_factory_test

@@ -1,0 +1,18 @@
+test_platform_scope_does_not_turn_arbitrary_board_into_support (test_threadx.ThreadXPolicyTests.test_platform_scope_does_not_turn_arbitrary_board_into_support) ... ERROR
+
+======================================================================
+ERROR: test_platform_scope_does_not_turn_arbitrary_board_into_support (test_threadx.ThreadXPolicyTests.test_platform_scope_does_not_turn_arbitrary_board_into_support)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_threadx.py", line 173, in test_platform_scope_does_not_turn_arbitrary_board_into_support
+    module.validate_platform(board, family)
+  File "/workspace/nexus/tools/configure/threadx.py", line 25, in validate_platform
+    fail("Unsupported maintained ThreadX platform")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+providers.common.ConfigurationError: Unsupported maintained ThreadX platform
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (errors=1)

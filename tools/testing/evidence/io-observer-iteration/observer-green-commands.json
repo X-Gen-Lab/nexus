@@ -1,0 +1,32 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_io_observer_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/observer-tdd/io_observer-green.xml"
+    ],
+    "cwd": "/workspace/nexus",
+    "returncode": 0,
+    "started_at": "2026-10-11T17:22:19.134352+00:00",
+    "ended_at": "2026-10-11T17:22:19.137067+00:00"
+  },
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_io_state_machine_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/observer-tdd/io_state_machine-green.xml"
+    ],
+    "cwd": "/workspace/nexus",
+    "returncode": 0,
+    "started_at": "2026-10-11T17:22:19.137109+00:00",
+    "ended_at": "2026-10-11T17:22:19.139316+00:00"
+  },
+  {
+    "command": [
+      "/workspace/nexus-examples/build/quarantine-iteration/tests/owner_lifecycle_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/observer-tdd/examples-quarantine-green.xml"
+    ],
+    "cwd": "/workspace/nexus-examples",
+    "returncode": 0,
+    "started_at": "2026-10-11T17:22:19.139354+00:00",
+    "ended_at": "2026-10-11T17:22:19.160005+00:00"
+  }
+]

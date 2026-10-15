@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "kind": "timer_sdk_arm_object_cost",
+  "status": "passed",
+  "scope": "Actual strict ARM SDK compilation and selected object/type costs; not full firmware linkage or physical qualification.",
+  "source_inputs": [
+    {
+      "path": "/workspace/nexus/io/src/timer_capture.c",
+      "bytes": 3102,
+      "sha256": "65845a51610421f6fd1072ffe06eb726bbaabe950ca4a8d47bdb16e78cd2a945"
+    },
+    {
+      "path": "/workspace/nexus/io/src/advanced_pwm.c",
+      "bytes": 2805,
+      "sha256": "9505b6a8913d23978defb59e18eabc4c0dfa43252104e526205b8528b3cf28c5"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/timer_capture.c",
+      "bytes": 1809,
+      "sha256": "decb30804b049687cd755c11b1e53b3a5a6471e30736f785326b38c793ee12db"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/timer_capture.c",
+      "bytes": 1546,
+      "sha256": "3cdbaaaae4eed8fd5b3c1f26690000e0cb808bfeac8b5bbf999fe94d08b14da4"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/advanced_pwm.c",
+      "bytes": 2143,
+      "sha256": "e3008f26eef7f868770a21d24532dc43e67dd5ef5109d7ef5f97d76644618a3a"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/advanced_pwm.c",
+      "bytes": 1776,
+      "sha256": "d41e0e9312446aaf4391d7c709e398439e4c7686227758741e066329f093744f"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_timer_advanced.h",
+      "bytes": 1830,
+      "sha256": "b865ef153518445378d36cc72544fb0a99503c1d59decb76180c88519a18b689"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_timer_advanced.h",
+      "bytes": 1843,
+      "sha256": "40af97908cbb09db80f8a70a950c334fd881aa0e288e74036ba7007fef8ab3da"
+    },
+    {
+      "path": "/workspace/nexus/io/private/timer_advanced_controller.h",
+      "bytes": 2530,
+      "sha256": "bd4cc4f7c704b8f3cc8016e2845c8bb546a51b610c0e2c4fc72b5747498bbd77"
+    },
+    {
+      "path": "/workspace/nexus/io/private/timer_capture_impl.h",
+      "bytes": 11446,
+      "sha256": "0bd15afdbcfbaac66f44541779d4cc72308204f73af8d78b6dbc1b5f3afeacff"
+    },
+    {
+      "path": "/workspace/nexus/io/private/advanced_pwm_impl.h",
+      "bytes": 11820,
+      "sha256": "72e4202d65cfabeb2a1ba354a8e85addb68e8323b00a03a84c56cb7e453b2a6a"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/timer_capture.h",
+      "bytes": 3958,
+      "sha256": "68af76fbd4961d6fd9fd2a158cbdb4f2e0e04562e1996e5c02c8035a25269816"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/advanced_pwm.h",
+      "bytes": 3514,
+      "sha256": "2b9bbfbb94b834ed25964f5aa6495abc4e5cbc5f5d5bb48d106e951f37f52410"
+    }
+  ],
+  "compiler": {
+    "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+    "bytes": 2421736,
+    "sha256": "510c55cfeed7328ade1eb8cb23808fcce1ba6c52dac8d4ebfe033ae4b2534385"
+  },
+  "physical_status": "not_executed",
+  "cycles_status": "not_measured",
+  "families": [
+    {
+      "family": "stm32f407",
+      "objects": [
+        {
+          "source": "soc/stm32f407/drivers/timer_capture.c",
+          "object": {
+            "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/stm32f407-soc-stm32f407-drivers-timer_capture.c.o",
+            "bytes": 4840,
+            "sha256": "73f762caadab34fae6acf457e3190eb278a3c2523f905a2fd9445a1ff69db5ef"
+          },
+          "text_rodata_bytes": 1518,
+          "global_data_bss_bytes": 0
+        },
+        {
+          "source": "soc/stm32f407/drivers/advanced_pwm.c",
+          "object": {
+            "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/stm32f407-soc-stm32f407-drivers-advanced_pwm.c.o",
+            "bytes": 5468,
+            "sha256": "d8b8cbd78ce1585c33d5c7b415880d37f65cb76f5749f5944fc5ba5678258517"
+          },
+          "text_rodata_bytes": 1662,
+          "global_data_bss_bytes": 0
+        },
+        {
+          "source": "io/src/timer_capture.c",
+          "object": {
+            "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/stm32f407-io-src-timer_capture.c.o",
+            "bytes": 1780,
+            "sha256": "d9bbb4fc17ece1cb1e449ca378c8197b846cda2f3af8de7ce4c598b21d95a36f"
+          },
+          "text_rodata_bytes": 208,
+          "global_data_bss_bytes": 0
+        },
+        {
+          "source": "io/src/advanced_pwm.c",
+          "object": {
+            "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/stm32f407-io-src-advanced_pwm.c.o",
+            "bytes": 1620,
+            "sha256": "268c997628ddaefdcb6f99169b02f4c4367e550d38c4dc5859948148f47a0ba0"
+          },
+          "text_rodata_bytes": 176,
+          "global_data_bss_bytes": 0
+        }
+      ],
+      "layout": {
+        "advanced_config_size": 28,
+        "advanced_face_size": 8,
+        "advanced_ops_size": 20,
+        "advanced_state_size": 12,
+        "capture_config_size": 12,
+        "capture_face_size": 8,
+        "capture_ops_size": 16,
+        "capture_state_size": 36,
+        "event_size": 16,
+        "existing_pwm_ops_size": 16
+      },
+      "types_object": {
+        "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/stm32f407-types.o",
+        "bytes": 2044,
+        "sha256": "2405ecfbbf2c09dff128440425c6bd60687e4d9e79e062672990ce6ae71ef354"
+      },
+      "fixture": {
+        "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/stm32f407-types.c.raw",
+        "bytes": 721,
+        "sha256": "5cc265cf8074c52053b5d6d2da524c0373b1d98bb9eb4e20a6fb71181eac516f"
+      },
+      "nm": {
+        "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/stm32f407-types.nm.raw",
+        "bytes": 385,
+        "sha256": "cff7333b132560e34b36208795f01d2ea01cc8d711a35cac5b00241a926ecd28"
+      }
+    },
+    {
+      "family": "gd32f470",
+      "objects": [
+        {
+          "source": "soc/gd32f470/drivers/timer_capture.c",
+          "object": {
+            "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/gd32f470-soc-gd32f470-drivers-timer_capture.c.o",
+            "bytes": 4948,
+            "sha256": "40459ab119131aeffc83e3d1d95d4e2fae946852cfe7d999cd8a3fcb64a8f7fe"
+          },
+          "text_rodata_bytes": 1680,
+          "global_data_bss_bytes": 0
+        },
+        {
+          "source": "soc/gd32f470/drivers/advanced_pwm.c",
+          "object": {
+            "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/gd32f470-soc-gd32f470-drivers-advanced_pwm.c.o",
+            "bytes": 5488,
+            "sha256": "252c92450ff900ce48243f8dc9d10e9bc8d786b401a2367db2d89a677d05227f"
+          },
+          "text_rodata_bytes": 1690,
+          "global_data_bss_bytes": 0
+        },
+        {
+          "source": "io/src/timer_capture.c",
+          "object": {
+            "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/gd32f470-io-src-timer_capture.c.o",
+            "bytes": 1780,
+            "sha256": "d9bbb4fc17ece1cb1e449ca378c8197b846cda2f3af8de7ce4c598b21d95a36f"
+          },
+          "text_rodata_bytes": 208,
+          "global_data_bss_bytes": 0
+        },
+        {
+          "source": "io/src/advanced_pwm.c",
+          "object": {
+            "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/gd32f470-io-src-advanced_pwm.c.o",
+            "bytes": 1620,
+            "sha256": "268c997628ddaefdcb6f99169b02f4c4367e550d38c4dc5859948148f47a0ba0"
+          },
+          "text_rodata_bytes": 176,
+          "global_data_bss_bytes": 0
+        }
+      ],
+      "layout": {
+        "advanced_config_size": 28,
+        "advanced_face_size": 8,
+        "advanced_ops_size": 20,
+        "advanced_state_size": 12,
+        "capture_config_size": 12,
+        "capture_face_size": 8,
+        "capture_ops_size": 16,
+        "capture_state_size": 36,
+        "event_size": 16,
+        "existing_pwm_ops_size": 16
+      },
+      "types_object": {
+        "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/gd32f470-types.o",
+        "bytes": 2044,
+        "sha256": "146c3aa1a4b93bc26d3dbe640c14163f0083da78132f3fc9802c758d306afe26"
+      },
+      "fixture": {
+        "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/gd32f470-types.c.raw",
+        "bytes": 720,
+        "sha256": "ca10800d355232904fa08c337479197d90bc5a3f0508ce3a262f028e9f34169f"
+      },
+      "nm": {
+        "path": "/workspace/nexus/tools/testing/evidence/timer-iteration/arm-freeze/gd32f470-types.nm.raw",
+        "bytes": 385,
+        "sha256": "cff7333b132560e34b36208795f01d2ea01cc8d711a35cac5b00241a926ecd28"
+      }
+    }
+  ],
+  "source_inputs_stable": true
+}

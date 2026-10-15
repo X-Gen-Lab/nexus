@@ -1,0 +1,20 @@
+In file included from /tmp/nexus-gcc13-ubuntu-toolchain/root/usr/include/features.h:502,
+                 from /tmp/nexus-gcc13-ubuntu-toolchain/root/usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,
+                 from /tmp/nexus-gcc13-ubuntu-toolchain/root/usr/include/stdint.h:26,
+                 from /tmp/nexus-gcc13-ubuntu-toolchain/root/usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h:9,
+                 from /workspace/nexus-60-automation-source/arch/include/nexus/arch/arch.h:12,
+                 from /workspace/nexus-60-automation-source/tests/google/freertos_failstop_test.cpp:9:
+In function ‘ssize_t read(int, void*, size_t)’,
+    inlined from ‘void {anonymous}::read_evidence(int, Capture&)’ at /workspace/nexus-60-automation-source/tests/google/freertos_failstop_test.cpp:156:13,
+    inlined from ‘bool {anonymous}::observe_terminal(nx_arch_irq_masks_t, bool, bool, Probe)’ at /workspace/nexus-60-automation-source/tests/google/freertos_failstop_test.cpp:270:26:
+/tmp/nexus-gcc13-ubuntu-toolchain/root/usr/include/x86_64-linux-gnu/bits/unistd.h:28:10: error: ‘ssize_t __read_alias(int, void*, size_t)’ writing 168 or more bytes into a region of size 32 overflows the destination [-Werror=stringop-overflow=]
+   28 |   return __glibc_fortify (read, __nbytes, sizeof (char),
+      |          ^~~~~~~~~~~~~~~
+/workspace/nexus-60-automation-source/tests/google/freertos_failstop_test.cpp: In function ‘bool {anonymous}::observe_terminal(nx_arch_irq_masks_t, bool, bool, Probe)’:
+/workspace/nexus-60-automation-source/tests/google/freertos_failstop_test.cpp:148:14: note: destination object ‘{anonymous}::Capture::partial’ of size 32
+  148 |     Evidence partial{};
+      |              ^~~~~~~
+/tmp/nexus-gcc13-ubuntu-toolchain/root/usr/include/x86_64-linux-gnu/bits/unistd-decl.h:29:16: note: in a call to function ‘ssize_t __read_alias(int, void*, size_t)’ declared with attribute ‘access (write_only, 2, 3)’
+   29 | extern ssize_t __REDIRECT_FORTIFY (__read_alias, (int __fd, void *__buf,
+      |                ^~~~~~~~~~~~~~~~~~
+cc1plus: all warnings being treated as errors

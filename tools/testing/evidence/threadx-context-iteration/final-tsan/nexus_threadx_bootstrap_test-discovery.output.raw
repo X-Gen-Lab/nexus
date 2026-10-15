@@ -1,0 +1,10 @@
+Running main() from gmock_main.cc
+ThreadXBootstrap.
+  RejectsISRCallbackBeforeProduct
+  RejectsUnprivilegedCallbackBeforeProduct
+  RejectsFaultMaskBeforeProduct
+  RejectsUnselectedBasepriBeforeProduct
+  CanonicalUnmaskedCallbackInvokesProduct
+  CanonicalPrimaskCallbackInvokesProduct
+  ObserverPrecedesOverriddenProductHookForContextFault
+  ObserverPrecedesProductHookForMaskedBootstrapFault

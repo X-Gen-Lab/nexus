@@ -1,0 +1,23 @@
+test_consumer_uses_authored_toml_for_each_maintained_family (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_consumer_uses_authored_toml_for_each_maintained_family) ... ok
+test_test_framework_payload_is_not_a_firmware_sdk_dependency (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) ... ok
+test_additional_file_and_symlink_are_rejected (tests.contracts.test_source_sdk.SourceSDKTests.test_additional_file_and_symlink_are_rejected) ... ok
+test_clean_checkout_with_missing_dependency_gitlinks_is_rejected (tests.contracts.test_source_sdk.SourceSDKTests.test_clean_checkout_with_missing_dependency_gitlinks_is_rejected) ... ok
+test_cli_summary_cannot_be_confused_with_complete_manifest (tests.contracts.test_source_sdk.SourceSDKTests.test_cli_summary_cannot_be_confused_with_complete_manifest) ... ok
+test_default_preparation_rejects_dirty_checkout (tests.contracts.test_source_sdk.SourceSDKTests.test_default_preparation_rejects_dirty_checkout) ... ok
+test_development_contracts_are_explicitly_rejected (tests.contracts.test_source_sdk.SourceSDKTests.test_development_contracts_are_explicitly_rejected) ... ok
+test_different_source_package_version_is_rejected (tests.contracts.test_source_sdk.SourceSDKTests.test_different_source_package_version_is_rejected) ... ok
+test_expected_revision_conflict_is_rejected (tests.contracts.test_source_sdk.SourceSDKTests.test_expected_revision_conflict_is_rejected) ... ok
+test_fixture_requires_explicit_consumer_opt_in (tests.contracts.test_source_sdk.SourceSDKTests.test_fixture_requires_explicit_consumer_opt_in) ... ok
+test_formal_consumer_cli_rejects_nonpublishable_fixture (tests.contracts.test_source_sdk.SourceSDKTests.test_formal_consumer_cli_rejects_nonpublishable_fixture) ... ok
+test_missing_license_is_rejected (tests.contracts.test_source_sdk.SourceSDKTests.test_missing_license_is_rejected) ... ok
+test_modified_exported_config_is_rejected (tests.contracts.test_source_sdk.SourceSDKTests.test_modified_exported_config_is_rejected) ... ok
+test_modified_required_file_is_rejected (tests.contracts.test_source_sdk.SourceSDKTests.test_modified_required_file_is_rejected) ... ok
+test_output_parent_alias_cannot_bypass_source_boundary (tests.contracts.test_source_sdk.SourceSDKTests.test_output_parent_alias_cannot_bypass_source_boundary) ... ok
+test_relocated_arm_consumer_compiles_real_startup_and_linker (tests.contracts.test_source_sdk.SourceSDKTests.test_relocated_arm_consumer_compiles_real_startup_and_linker) ... ok
+test_relocated_c_and_cpp_consumer_build_and_run_without_original_source (tests.contracts.test_source_sdk.SourceSDKTests.test_relocated_c_and_cpp_consumer_build_and_run_without_original_source) ... ok
+test_relocated_gd32_consumer_compiles_real_startup_and_linker (tests.contracts.test_source_sdk.SourceSDKTests.test_relocated_gd32_consumer_compiles_real_startup_and_linker) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 21.133s
+
+OK

@@ -1,0 +1,252 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 33331456654162e38e2d743a62c82dd606ea6795f8fdb6565ec8b89b31927946\n"
+
+msgid "Coding Standards"
+msgstr "代码规范"
+
+msgid "Nexus follows strict coding standards for quality and safety."
+msgstr "Nexus 遵循严格的代码规范，以保障质量与安全。"
+
+msgid "C Standard"
+msgstr "C 语言标准"
+
+msgid "C11 for source code"
+msgstr "源码采用 C11"
+
+msgid "C11 for production code and maintained C contract fixtures"
+msgstr "生产代码及维护范围内的 C 合同夹具采用 C11"
+
+msgid ""
+"C++17 for host GoogleTest/GoogleMock and external ABI consumer checks; "
+"neither the test framework nor its C++ runtime enters firmware"
+msgstr "主机 GoogleTest/GoogleMock 及外部 ABI 消费验证采用 C++17；测试框架和其 C++ 运行时均不进入固件"
+
+msgid "Code Formatting"
+msgstr "代码格式"
+
+msgid ""
+"The project uses clang-format for automatic code formatting. Run ``clang-"
+"format`` before committing code."
+msgstr "项目使用 clang-format 自动格式化代码。提交代码前运行 ``clang-format``。"
+
+msgid ""
+"See also: ``.kiro/steering/comment-standards.md`` for detailed comment "
+"guidelines."
+msgstr "详细注释规则另见 ``.kiro/steering/comment-standards.md``。"
+
+msgid "Indentation"
+msgstr "缩进"
+
+msgid "Use 4 spaces for indentation (no tabs)"
+msgstr "使用 4 个空格缩进，不使用制表符"
+
+msgid "Indent case labels inside switch statements"
+msgstr "switch 语句中的 case 标签需要缩进"
+
+msgid "Do not indent preprocessor directives"
+msgstr "预处理指令不缩进"
+
+msgid "Line Length"
+msgstr "行长度"
+
+msgid "Maximum line length: 80 characters"
+msgstr "每行最长 80 个字符"
+
+msgid "Break long lines at appropriate points"
+msgstr "在适当位置拆分长行"
+
+msgid "Braces"
+msgstr "花括号"
+
+msgid "Use attached braces (K&R style)::"
+msgstr "使用附着式花括号（K&R 风格）::"
+
+msgid "Spaces"
+msgstr "空格"
+
+msgid "Space after control keywords: ``if (``, ``for (``, ``while (``"
+msgstr "控制关键字后加空格：``if (``、``for (``、``while (``"
+
+msgid "No space after function names: ``func()``"
+msgstr "函数名后不加空格：``func()``"
+
+msgid "No space after casts: ``(int)value``"
+msgstr "类型转换后不加空格：``(int)value``"
+
+msgid "Two spaces before trailing comments"
+msgstr "行尾注释之前保留两个空格"
+
+msgid "Space around binary operators: ``a + b``, ``x = y``"
+msgstr "二元运算符两侧加空格：``a + b``、``x = y``"
+
+msgid "Pointer Alignment"
+msgstr "指针对齐"
+
+msgid "Pointers align to the left (with the type)::"
+msgstr "指针星号靠左，与类型连接::"
+
+msgid "Empty Lines"
+msgstr "空行"
+
+msgid "Maximum one consecutive empty line"
+msgstr "最多保留一个连续空行"
+
+msgid "Use empty lines to separate logical sections"
+msgstr "使用空行分隔逻辑段落"
+
+msgid "Naming Conventions"
+msgstr "命名约定"
+
+msgid "Functions: ``module_action_object()`` (e.g., ``nx_gpio_port_write()``)"
+msgstr "函数：``module_action_object()``，例如 ``nx_gpio_port_write()``"
+
+msgid "Types: ``module_type_t`` (e.g., ``nx_result_t``)"
+msgstr "类型：``module_type_t``，例如 ``nx_result_t``"
+
+msgid "Macros: ``MODULE_MACRO_NAME`` (e.g., ``NX_SUCCESS``)"
+msgstr "宏：``MODULE_MACRO_NAME``，例如 ``NX_SUCCESS``"
+
+msgid "Constants: ``MODULE_CONSTANT`` (e.g., ``NEXUS_UART0_SELECTED``)"
+msgstr "常量：``MODULE_CONSTANT``，例如 ``NEXUS_UART0_SELECTED``"
+
+msgid "Static variables: ``s_variable_name`` prefix"
+msgstr "静态变量：使用 ``s_variable_name`` 前缀"
+
+msgid "Global variables: ``g_variable_name`` prefix (avoid when possible)"
+msgstr "全局变量：使用 ``g_variable_name`` 前缀，尽可能避免全局变量"
+
+msgid "Documentation"
+msgstr "文档注释"
+
+msgid ""
+"All public APIs must have Doxygen comments. This project uses ``\\\\`` style"
+" Doxygen tags (not ``@`` style)."
+msgstr "全部公共 API 必须带 Doxygen 注释。本项目使用 ``\\\\`` 风格 Doxygen 标签，不使用 ``@`` 风格。"
+
+msgid "Tag Alignment"
+msgstr "标签对齐"
+
+msgid ""
+"Align the description after each Doxygen tag as shown below. Excluding any "
+"surrounding code indentation, the description starts at column 21: the tag "
+"and its padding occupy 17 characters after the opening comment star::"
+msgstr ""
+"按下方示例对齐每个 Doxygen 标签后的说明。不计外围代码缩进，说明从第 21 列开始：注释起始星号之后，标签及其填充共占 17 个字符::"
+
+msgid "File Header Format"
+msgstr "文件头格式"
+
+msgid "Every source file must have a file header comment."
+msgstr "每个源文件必须包含文件头注释。"
+
+msgid "**Header files (.h)** - Minimal format::"
+msgstr "**头文件 (.h)**：最小格式::"
+
+msgid "**Source files (.c)** - Full format with version and copyright::"
+msgstr "**源文件 (.c)**：包含版本与版权的完整格式::"
+
+msgid "Header Files (.h)"
+msgstr "头文件 (.h)"
+
+msgid ""
+"Header files contain full API documentation including parameters and return "
+"values::"
+msgstr "头文件包含完整 API 文档，包括参数与返回值::"
+
+msgid "Source Files (.c)"
+msgstr "源文件 (.c)"
+
+msgid ""
+"Source definitions explain hardware ordering and invariants without "
+"duplicating ``\\param`` or ``\\return`` from the header. Use ``\\brief``, "
+"``\\details`` and ``\\note`` as needed::"
+msgstr ""
+"源文件定义应解释硬件顺序与不变量，不重复头文件中的 ``\\param`` 或 ``\\return``。按需要使用 "
+"``\\brief``、``\\details`` 与 ``\\note``::"
+
+msgid "Section Comments"
+msgstr "章节注释"
+
+msgid ""
+"Use section comments to organize code into logical blocks. The separator "
+"line must be exactly 79 characters (``/*`` + 75 characters + ``*/``), "
+"preserving the existing template::"
+msgstr "使用章节注释将代码分为逻辑块。分隔线必须准确包含 79 个字符，即 ``/*`` + 75 个字符 + ``*/``，保持既有模板::"
+
+msgid ""
+"**Important**: Do NOT use ``/*===...===*/`` style separators. Always use "
+"``/*---...---*/`` for consistency."
+msgstr "**要求**：不得使用 ``/*===...===*/`` 分隔线。统一使用 ``/*---...---*/``。"
+
+msgid "Inline Comments"
+msgstr "行内注释"
+
+msgid "Use ``/* comment */`` style for inline comments, not ``//``::"
+msgstr "行内注释使用 ``/* comment */`` 风格，不使用 ``//``::"
+
+msgid "Macro Comments"
+msgstr "宏注释"
+
+msgid "Use Doxygen block comments or inline comments for macros::"
+msgstr "宏使用 Doxygen 块注释或行内注释::"
+
+msgid "Static Functions"
+msgstr "静态函数"
+
+msgid "Static functions use simplified comments with only ``\\brief``::"
+msgstr "静态函数使用仅包含 ``\\brief`` 的简化注释::"
+
+msgid "Prohibited Practices"
+msgstr "禁止事项"
+
+msgid "The following practices are NOT allowed:"
+msgstr "禁止以下做法："
+
+msgid "Using ``@`` style Doxygen tags (use ``\\\\`` instead)"
+msgstr "使用 ``@`` 风格 Doxygen 标签；必须改用 ``\\\\``"
+
+msgid "Using ``//`` single-line comments (use ``/* */`` instead)"
+msgstr "使用 ``//`` 单行注释；必须改用 ``/* */``"
+
+msgid ""
+"Using ``/*===...===*/`` section separators (use ``/*---...---*/`` instead)"
+msgstr "使用 ``/*===...===*/`` 章节分隔线；必须改用 ``/*---...---*/``"
+
+msgid "Duplicating ``\\param`` and ``\\return`` in source files (only in headers)"
+msgstr "在源文件重复 ``\\param`` 和 ``\\return``；它们只能位于头文件"
+
+msgid "Ownership and evidence"
+msgstr "所有权与证据"
+
+msgid ""
+"Public declarations specify context, deadlines, retained storage and failure"
+" state. Describe why a volatile read, ordering barrier or drain is "
+"necessary. ``SETTLED`` is the provider's final request access. Cancellation "
+"never permits reclaiming a borrowed buffer before settlement or proved "
+"controlled recovery."
+msgstr ""
+"公共声明必须说明上下文、截止时间、保留的存储及失败状态。解释为何必须执行 volatile 读取、顺序屏障或排空。``SETTLED`` "
+"的发布是提供者对请求的最后一次访问。取消绝不允许在完成并排空或证明受控恢复之前回收借用缓冲区。"
+
+msgid ""
+"Changed files pass whole-file formatting and mechanical comment checks. "
+"Install local Git hooks with ``python scripts/setup/install_dev_tools.py``. "
+"The commit and CI gates share ``scripts/ci/style_gate.py``; no hook bypass "
+"is a validation result. Actual warning/analyzer and behavioral evidence is "
+"separate from style."
+msgstr ""
+"修改的文件必须通过全文件格式及机械注释检查。使用 ``python scripts/setup/install_dev_tools.py`` 安装本地 "
+"Git 钩子。commit 与 CI 门禁共享 "
+"``scripts/ci/style_gate.py``；绕过钩子不构成验证结果。实际编译警告／分析器与行为证据独立于风格检查。"
+
+msgid ""
+"Selected analyzer checks do not establish MISRA certification or industrial "
+"functional-safety qualification."
+msgstr "选定分析器检查不建立 MISRA 认证或工业功能安全资格。"

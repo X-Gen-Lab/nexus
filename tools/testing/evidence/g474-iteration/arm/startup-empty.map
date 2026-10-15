@@ -1,0 +1,543 @@
+Archive member included to satisfy reference by file (symbol)
+
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+                              /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o (__aeabi_uldivmod)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+                              /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o) (__udivmoddi4)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+                              /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o) (__aeabi_ldiv0)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+                              /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o (__libc_init_array)
+
+Discarded input sections
+
+ .text          0x00000000       0x14 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+ .text          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+ .text.nx_stm32g474_system_now
+                0x00000000       0x3e /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+ .text.nx_time_now_us
+                0x00000000        0xc /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+ .text          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .text.read     0x00000000       0x46 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .text.write    0x00000000       0x3e /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .text.toggle   0x00000000       0x40 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .text.nx_stm32g474_gpio_initialize
+                0x00000000       0xf4 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .text.nx_stm32g474_gpio_stop
+                0x00000000       0x62 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .text.nx_stm32g474_gpio_clock_enable
+                0x00000000       0x48 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .text.nx_stm32g474_lpuart1_pins_prepare
+                0x00000000       0xc0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .rodata.nx_stm32g474_gpio_ops
+                0x00000000        0xc /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .comment       0x00000000       0x47 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .ARM.attributes
+                0x00000000       0x34 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+ .text          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.__NVIC_GetPriority
+                0x00000000       0x24 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.protected_span
+                0x00000000       0x50 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.output_alias
+                0x00000000       0x40 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.observe_tc
+                0x00000000       0x4c /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.task_context
+                0x00000000       0x24 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.read_bytes
+                0x00000000       0xba /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.begin_drain
+                0x00000000       0x58 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.service  0x00000000       0xb0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.cancel   0x00000000       0x6a /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.attach_wake
+                0x00000000       0x98 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.stop     0x00000000      0x122 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.start    0x00000000      0x106 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.start_admitted
+                0x00000000       0x24 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.submit   0x00000000        0x6 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.nx_stm32g474_uart_irq
+                0x00000000      0x138 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text.nx_stm32g474_uart_initialize
+                0x00000000      0x2a0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .rodata.nx_stm32g474_uart_ops
+                0x00000000       0x28 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .comment       0x00000000       0x47 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .ARM.attributes
+                0x00000000       0x34 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+ .text          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .text.nx_arch_irq_save
+                0x00000000       0x10 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .text.nx_arch_irq_restore
+                0x00000000        0xe /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .text.nx_arch_irq_masks
+                0x00000000       0x16 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .text.nx_arch_exception_number
+                0x00000000        0x6 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .text.nx_arch_dmb
+                0x00000000        0x6 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .text.nx_arch_cycle_snapshot
+                0x00000000       0x40 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .text          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text.nx_request_initialize
+                0x00000000       0x1a /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text.nx_request_state
+                0x00000000       0x10 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text.nx_request_prepare
+                0x00000000       0x28 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text.nx_request_admit
+                0x00000000       0x22 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text.nx_request_transition
+                0x00000000       0x38 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text.nx_request_settle
+                0x00000000       0x1e /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text.nx_request_result
+                0x00000000       0x2c /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text.nx_request_slot_bind
+                0x00000000       0x3c /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text.nx_request_slot_lookup
+                0x00000000       0x1e /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text.nx_request_slot_release
+                0x00000000       0x20 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .comment       0x00000000       0x47 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .ARM.attributes
+                0x00000000       0x34 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+ .text          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/time.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/time.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/time.o
+ .text.nx_deadline_expired
+                0x00000000       0x1e /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/time.o
+ .text.nx_deadline_after
+                0x00000000       0x1e /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/time.o
+ .text.nx_clock32_initialize
+                0x00000000       0x1e /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/time.o
+ .text.nx_clock32_observe
+                0x00000000       0xc4 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/time.o
+ .comment       0x00000000       0x47 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/time.o
+ .ARM.attributes
+                0x00000000       0x34 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/time.o
+ .text          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/wake.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/wake.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/wake.o
+ .text.nx_irq_wake_validate
+                0x00000000       0x9e /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/wake.o
+ .text.nx_irq_wake_signal
+                0x00000000        0xe /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/wake.o
+ .comment       0x00000000       0x47 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/wake.o
+ .ARM.attributes
+                0x00000000       0x34 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/wake.o
+ .text          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_port_attach_wake
+                0x00000000       0x18 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_tx_prepare
+                0x00000000       0x22 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_port_submit
+                0x00000000       0x18 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_port_start_admitted
+                0x00000000       0x18 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_port_cancel
+                0x00000000       0x18 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_port_service
+                0x00000000       0x12 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_port_read_events
+                0x00000000       0x24 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_port_read_bytes
+                0x00000000       0x24 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_port_stop
+                0x00000000       0x18 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_port_rx_start
+                0x00000000       0x18 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text.nx_uart_port_rx_stop
+                0x00000000       0x18 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .comment       0x00000000       0x47 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .ARM.attributes
+                0x00000000       0x34 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+ .text          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio-face.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio-face.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio-face.o
+ .text.nx_gpio_port_write
+                0x00000000       0x18 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio-face.o
+ .text.nx_gpio_port_read
+                0x00000000       0x18 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio-face.o
+ .text.nx_gpio_port_toggle
+                0x00000000       0x18 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio-face.o
+ .comment       0x00000000       0x47 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio-face.o
+ .ARM.attributes
+                0x00000000       0x34 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio-face.o
+ .text          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/entry-empty.o
+ .data          0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/entry-empty.o
+ .bss           0x00000000        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/entry-empty.o
+ .text          0x00000000       0x30 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .debug_line_str
+                0x00000000       0xc2 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .debug_frame   0x00000000       0x2c /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .ARM.attributes
+                0x00000000       0x22 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_aeabi_uldivmod.o)
+ .text          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .text.__udivmoddi4
+                0x00000000      0x2f8 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .ARM.extab.text.__udivmoddi4
+                0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .ARM.exidx.text.__udivmoddi4
+                0x00000000        0x8 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .debug_frame   0x00000000       0x34 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .ARM.attributes
+                0x00000000       0x34 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_udivmoddi4.o)
+ .text          0x00000000        0x4 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+ .debug_line_str
+                0x00000000       0xc6 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+ .ARM.attributes
+                0x00000000       0x22 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a(_dvmd_tls.o)
+ .text          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         xr
+RAM              0x20000000         0x00020000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio.o
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart.o
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/request.o
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/time.o
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/wake.o
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/uart-face.o
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/gpio-face.o
+LOAD /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/entry-empty.o
+START GROUP
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+END GROUP
+START GROUP
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a
+END GROUP
+START GROUP
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a
+END GROUP
+                0x08000000                        __nx_flash_start = ORIGIN (FLASH)
+                0x08080000                        __nx_flash_end = (ORIGIN (FLASH) + LENGTH (FLASH))
+                0x20020000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+                0x20020000                        _sp = _estack
+                0x00000800                        _Min_Stack_Size = 0x800
+                0x00000000                        _Min_Heap_Size = 0x0
+                0x2001f800                        __nx_msp_start = (_estack - _Min_Stack_Size)
+                0x20020000                        __nx_msp_end = _estack
+
+.isr_vector     0x08000000      0x1d8
+ *(.isr_vector)
+ .isr_vector    0x08000000      0x1d8 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+                0x08000000                g_pfnVectors
+ *(.vectors)
+
+.text           0x080001d8      0x768
+ *(.text*)
+ .text.Reset_Handler
+                0x080001d8       0x50 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+                0x080001d8                Reset_Handler
+ .text.Default_Handler
+                0x08000228        0x2 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+                0x08000228                RTC_Alarm_IRQHandler
+                0x08000228                EXTI2_IRQHandler
+                0x08000228                TIM8_TRG_COM_IRQHandler
+                0x08000228                TIM8_CC_IRQHandler
+                0x08000228                HRTIM1_Master_IRQHandler
+                0x08000228                DebugMon_Handler
+                0x08000228                SPI4_IRQHandler
+                0x08000228                FDCAN3_IT0_IRQHandler
+                0x08000228                TIM1_CC_IRQHandler
+                0x08000228                HardFault_Handler
+                0x08000228                HRTIM1_FLT_IRQHandler
+                0x08000228                HRTIM1_TIMF_IRQHandler
+                0x08000228                USB_HP_IRQHandler
+                0x08000228                CORDIC_IRQHandler
+                0x08000228                SysTick_Handler
+                0x08000228                HRTIM1_TIMD_IRQHandler
+                0x08000228                PendSV_Handler
+                0x08000228                DMA2_Channel8_IRQHandler
+                0x08000228                NMI_Handler
+                0x08000228                EXTI3_IRQHandler
+                0x08000228                I2C3_ER_IRQHandler
+                0x08000228                EXTI0_IRQHandler
+                0x08000228                I2C2_EV_IRQHandler
+                0x08000228                FPU_IRQHandler
+                0x08000228                FDCAN1_IT1_IRQHandler
+                0x08000228                TIM1_UP_TIM16_IRQHandler
+                0x08000228                UsageFault_Handler
+                0x08000228                ADC1_2_IRQHandler
+                0x08000228                HRTIM1_TIME_IRQHandler
+                0x08000228                SPI1_IRQHandler
+                0x08000228                TIM6_DAC_IRQHandler
+                0x08000228                HRTIM1_TIMC_IRQHandler
+                0x08000228                TIM8_UP_IRQHandler
+                0x08000228                DMA2_Channel2_IRQHandler
+                0x08000228                DMA1_Channel4_IRQHandler
+                0x08000228                TIM20_TRG_COM_IRQHandler
+                0x08000228                USART3_IRQHandler
+                0x08000228                DMA1_Channel7_IRQHandler
+                0x08000228                UART5_IRQHandler
+                0x08000228                ADC3_IRQHandler
+                0x08000228                TIM4_IRQHandler
+                0x08000228                DMA2_Channel1_IRQHandler
+                0x08000228                QUADSPI_IRQHandler
+                0x08000228                I2C1_EV_IRQHandler
+                0x08000228                DMA1_Channel6_IRQHandler
+                0x08000228                UART4_IRQHandler
+                0x08000228                DMA2_Channel4_IRQHandler
+                0x08000228                TIM3_IRQHandler
+                0x08000228                RCC_IRQHandler
+                0x08000228                TIM20_UP_IRQHandler
+                0x08000228                DMA1_Channel1_IRQHandler
+                0x08000228                Default_Handler
+                0x08000228                DMA2_Channel7_IRQHandler
+                0x08000228                RTC_TAMP_LSECSS_IRQHandler
+                0x08000228                FMAC_IRQHandler
+                0x08000228                EXTI15_10_IRQHandler
+                0x08000228                DMA1_Channel8_IRQHandler
+                0x08000228                HRTIM1_TIMA_IRQHandler
+                0x08000228                TIM7_DAC_IRQHandler
+                0x08000228                FDCAN3_IT1_IRQHandler
+                0x08000228                TIM5_IRQHandler
+                0x08000228                UCPD1_IRQHandler
+                0x08000228                I2C3_EV_IRQHandler
+                0x08000228                EXTI9_5_IRQHandler
+                0x08000228                RTC_WKUP_IRQHandler
+                0x08000228                PVD_PVM_IRQHandler
+                0x08000228                SPI2_IRQHandler
+                0x08000228                MemManage_Handler
+                0x08000228                ADC5_IRQHandler
+                0x08000228                SVC_Handler
+                0x08000228                DMA2_Channel5_IRQHandler
+                0x08000228                CRS_IRQHandler
+                0x08000228                DMA1_Channel5_IRQHandler
+                0x08000228                USB_LP_IRQHandler
+                0x08000228                EXTI4_IRQHandler
+                0x08000228                RNG_IRQHandler
+                0x08000228                HRTIM1_TIMB_IRQHandler
+                0x08000228                TIM1_TRG_COM_TIM17_IRQHandler
+                0x08000228                FDCAN2_IT1_IRQHandler
+                0x08000228                DMA1_Channel3_IRQHandler
+                0x08000228                ADC4_IRQHandler
+                0x08000228                WWDG_IRQHandler
+                0x08000228                I2C4_EV_IRQHandler
+                0x08000228                FDCAN2_IT0_IRQHandler
+                0x08000228                LPUART1_IRQHandler
+                0x08000228                DMA2_Channel6_IRQHandler
+                0x08000228                FDCAN1_IT0_IRQHandler
+                0x08000228                COMP7_IRQHandler
+                0x08000228                COMP1_2_3_IRQHandler
+                0x08000228                EXTI1_IRQHandler
+                0x08000228                USART2_IRQHandler
+                0x08000228                COMP4_5_6_IRQHandler
+                0x08000228                TIM20_BRK_IRQHandler
+                0x08000228                I2C2_ER_IRQHandler
+                0x08000228                DMA1_Channel2_IRQHandler
+                0x08000228                TIM8_BRK_IRQHandler
+                0x08000228                FLASH_IRQHandler
+                0x08000228                TIM20_CC_IRQHandler
+                0x08000228                BusFault_Handler
+                0x08000228                USART1_IRQHandler
+                0x08000228                SPI3_IRQHandler
+                0x08000228                I2C1_ER_IRQHandler
+                0x08000228                FMC_IRQHandler
+                0x08000228                LPTIM1_IRQHandler
+                0x08000228                DMAMUX_OVR_IRQHandler
+                0x08000228                I2C4_ER_IRQHandler
+                0x08000228                USBWakeUp_IRQHandler
+                0x08000228                SAI1_IRQHandler
+                0x08000228                DMA2_Channel3_IRQHandler
+                0x08000228                TIM1_BRK_TIM15_IRQHandler
+ .text.task_context
+                0x0800022a       0x24 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+ *fill*         0x0800024e        0x2 
+ .text.SystemInit
+                0x08000250       0x38 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+                0x08000250                SystemInit
+ .text.nx_stm32g474_validate_identity
+                0x08000288       0x40 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+                0x08000288                nx_stm32g474_validate_identity
+ .text.nx_stm32g474_system_stop
+                0x080002c8      0x1f4 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+                0x080002c8                nx_stm32g474_system_stop
+ .text.nx_stm32g474_system_start
+                0x080004bc      0x398 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+                0x080004bc                nx_stm32g474_system_start
+ .text.nx_stm32g474_system_timer_irq
+                0x08000854       0x1e /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+                0x08000854                nx_stm32g474_system_timer_irq
+ *fill*         0x08000872        0x2 
+ .text.TIM2_IRQHandler
+                0x08000874        0xc /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+                0x08000874                TIM2_IRQHandler
+ .text.nx_arch_irq_is_masked
+                0x08000880       0x20 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+                0x08000880                nx_arch_irq_is_masked
+ .text.nx_arch_is_privileged
+                0x080008a0       0x16 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+                0x080008a0                nx_arch_is_privileged
+ .text.nx_arch_in_isr
+                0x080008b6        0xc /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+                0x080008b6                nx_arch_in_isr
+ .text.nx_arch_dsb
+                0x080008c2        0x6 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+                0x080008c2                nx_arch_dsb
+ .text.nx_arch_isb
+                0x080008c8        0x6 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+                0x080008c8                nx_arch_isb
+ .text._init    0x080008ce        0x2 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/entry-empty.o
+                0x080008ce                _init
+ .text._fini    0x080008d0        0x2 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/entry-empty.o
+                0x080008d0                _fini
+ *fill*         0x080008d2        0x2 
+ .text.startup.main
+                0x080008d4       0x24 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/entry-empty.o
+                0x080008d4                main
+ .text.__libc_init_array
+                0x080008f8       0x48 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+                0x080008f8                __libc_init_array
+ *(.rodata*)
+ *(.init)
+ *(.fini)
+
+.glue_7         0x08000940        0x0
+ .glue_7        0x08000940        0x0 linker stubs
+
+.glue_7t        0x08000940        0x0
+ .glue_7t       0x08000940        0x0 linker stubs
+
+.vfp11_veneer   0x08000940        0x0
+ .vfp11_veneer  0x08000940        0x0 linker stubs
+
+.v4_bx          0x08000940        0x0
+ .v4_bx         0x08000940        0x0 linker stubs
+
+.iplt           0x08000940        0x0
+ .iplt          0x08000940        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+
+.rel.dyn        0x08000940        0x0
+ .rel.iplt      0x08000940        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+
+.ARM.extab
+ *(.ARM.extab*)
+
+.ARM.exidx      0x08000940        0x0
+                0x08000940                        __exidx_start = .
+ *(.ARM.exidx*)
+                0x08000940                        __exidx_end = .
+
+.preinit_array  0x08000940        0x0
+                0x08000940                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array*)
+                0x08000940                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x08000940        0x0
+                0x08000940                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_NAME(.init_array.*))
+ *(.init_array*)
+                0x08000940                        PROVIDE (__init_array_end = .)
+
+.fini_array     0x08000940        0x0
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_NAME(.fini_array.*))
+ *(.fini_array*)
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.nx_ccm_unselected
+ *(.nx_ccm_data .nx_ccm_data.*)
+ *(.bss.nx_ccm_noinit .bss.nx_ccm_noinit.*)
+ *(.bss.nx_ccm .bss.nx_ccm.*)
+                0x00000001                        ASSERT ((SIZEOF (.nx_ccm_unselected) == 0x0), memory region is not selected)
+                0x08000940                        _sidata = LOADADDR (.data)
+
+.data           0x20000000       0x38 load address 0x08000940
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data*)
+ .data.g_nx_stm32g474_system
+                0x20000000       0x38 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+                0x20000000                g_nx_stm32g474_system
+                0x20000038                        . = ALIGN (0x4)
+                0x20000038                        _edata = .
+
+.igot.plt       0x20000038        0x0 load address 0x08000978
+ .igot.plt      0x20000038        0x0 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+
+.bss            0x20000038        0x0
+                0x20000038                        . = ALIGN (0x4)
+                0x20000038                        _sbss = .
+ *(.bss*)
+ *(COMMON)
+                0x20000038                        . = ALIGN (0x4)
+                0x20000038                        _ebss = .
+
+.reserved       0x20000038        0x0
+                0x20000038                        . = ALIGN (0x8)
+                0x20000038                        __heap_start = .
+                0x20000038                        __nx_heap_start = .
+                0x20000038                        . = (. + _Min_Heap_Size)
+                0x20000038                        __heap_end = .
+                0x20000038                        __nx_heap_end = .
+
+.msp            0x2001f800      0x800
+                0x20020000                        . = (. + _Min_Stack_Size)
+ *fill*         0x2001f800      0x800 
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+                0x00000001                        ASSERT (((_ebss + _Min_Heap_Size) <= (_estack - _Min_Stack_Size)), RAM stack/heap overlap)
+OUTPUT(/workspace/nexus-iteration-bus-design/g474-src/evidence/arm/startup-empty.elf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x35
+ .ARM.attributes
+                0x00000000       0x21 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/official-startup.o
+ .ARM.attributes
+                0x00000021       0x34 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+ .ARM.attributes
+                0x00000055       0x34 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .ARM.attributes
+                0x00000089       0x34 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/entry-empty.o
+ .ARM.attributes
+                0x000000bd       0x34 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+
+.comment        0x00000000       0x46
+ .comment       0x00000000       0x46 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/system.o
+                                 0x47 (size before relaxing)
+ .comment       0x00000046       0x47 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/arch.o
+ .comment       0x00000046       0x47 /workspace/nexus-iteration-bus-design/g474-src/evidence/arm/entry-empty.o
+
+.debug_frame    0x00000000       0x2c
+ .debug_frame   0x00000000       0x2c /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)

@@ -1,0 +1,323 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Thread                                                              */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+#define TX_SOURCE_CODE
+
+
+/* Include necessary system files.  */
+
+#include "tx_api.h"
+#include "tx_trace.h"
+#include "tx_thread.h"
+#include "tx_timer.h"
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_terminate                                PORTABLE C      */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function handles application thread terminate requests.  Once  */
+/*    a thread is terminated, it cannot be executed again unless it is    */
+/*    deleted and recreated.                                              */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    thread_ptr                            Pointer to thread to suspend  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    status                                Return completion status      */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_timer_system_deactivate           Timer deactivate function     */
+/*    _tx_thread_system_suspend             Actual thread suspension      */
+/*    _tx_thread_system_ni_suspend          Non-interruptable suspend     */
+/*                                            thread                      */
+/*    _tx_thread_system_preempt_check       Check for preemption          */
+/*    Suspend Cleanup Routine               Suspension cleanup function   */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application code                                                    */
+/*                                                                        */
+/**************************************************************************/
+UINT  _tx_thread_terminate(TX_THREAD *thread_ptr)
+{
+
+TX_INTERRUPT_SAVE_AREA
+
+VOID        (*suspend_cleanup)(struct TX_THREAD_STRUCT *suspend_thread_ptr, ULONG suspension_sequence);
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
+VOID        (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT id);
+#endif
+UINT        status;
+ULONG       suspension_sequence;
+
+
+    /* Default to successful completion.  */
+    status =  TX_SUCCESS;
+
+    /* Lockout interrupts while the thread is being terminated.  */
+    TX_DISABLE
+
+    /* Deactivate thread timer, if active.  */
+    _tx_timer_system_deactivate(&thread_ptr -> tx_thread_timer);
+
+    /* If trace is enabled, insert this event into the trace buffer.  */
+    TX_TRACE_IN_LINE_INSERT(TX_TRACE_THREAD_TERMINATE, thread_ptr, thread_ptr -> tx_thread_state, TX_POINTER_TO_ULONG_CONVERT(&suspend_cleanup), 0, TX_TRACE_THREAD_EVENTS)
+
+    /* Log this kernel call.  */
+    TX_EL_THREAD_TERMINATE_INSERT
+
+    /* Is the thread already terminated?  */
+    if (thread_ptr -> tx_thread_state == TX_TERMINATED)
+    {
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+
+        /* Return success since thread is already terminated.  */
+        status =  TX_SUCCESS;
+    }
+
+    /* Check the specified thread's current status.  */
+    else if (thread_ptr -> tx_thread_state != TX_COMPLETED)
+    {
+
+        /* Disable preemption.  */
+        _tx_thread_preempt_disable++;
+
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
+
+        /* Pickup the entry/exit application callback routine.  */
+        entry_exit_notify =  thread_ptr -> tx_thread_entry_exit_notify;
+#endif
+
+        /* Check to see if the thread is currently ready.  */
+        if (thread_ptr -> tx_thread_state == TX_READY)
+        {
+
+            /* Set the state to terminated.  */
+            thread_ptr -> tx_thread_state =  TX_TERMINATED;
+
+            /* Thread state change.  */
+            TX_THREAD_STATE_CHANGE(thread_ptr, TX_TERMINATED)
+
+#ifdef TX_NOT_INTERRUPTABLE
+
+            /* Set the suspending flag, so that the termination transition is marked
+               as in progress for the same interval it is marked in the interruptable
+               configuration below.  Nothing in this configuration needs the flag to
+               cancel an interrupted suspension -- interrupts stay disabled through
+               the whole transition -- but the notification callback below is
+               application code, reached by a direct call, and interrupt lockout does
+               not stop it from calling a thread lifecycle service on this same
+               control block.  The flag is cleared in the common tail below.  */
+            thread_ptr -> tx_thread_suspending =  TX_TRUE;
+
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
+
+            /* Determine if an application callback routine is specified.  */
+            if (entry_exit_notify != TX_NULL)
+            {
+
+                /* Yes, notify application that this thread has exited!  */
+                (entry_exit_notify)(thread_ptr, TX_THREAD_EXIT);
+            }
+#endif
+
+            /* Call actual non-interruptable thread suspension routine.  */
+            _tx_thread_system_ni_suspend(thread_ptr, ((ULONG) 0));
+#else
+
+            /* Set the suspending flag.  */
+            thread_ptr -> tx_thread_suspending =  TX_TRUE;
+
+            /* Setup for no timeout period.  */
+            thread_ptr -> tx_thread_timer.tx_timer_internal_remaining_ticks =  ((ULONG) 0);
+
+            /* Disable preemption.  */
+            _tx_thread_preempt_disable++;
+
+            /* Since the thread is currently ready, we don't need to
+               worry about calling the suspend cleanup routine!  */
+
+            /* Restore interrupts.  */
+            TX_RESTORE
+
+            /* Perform any additional activities for tool or user purpose.  */
+            TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
+
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
+
+            /* Determine if an application callback routine is specified.  */
+            if (entry_exit_notify != TX_NULL)
+            {
+
+                /* Yes, notify application that this thread has exited!  */
+                (entry_exit_notify)(thread_ptr, TX_THREAD_EXIT);
+            }
+#endif
+
+            /* Call actual thread suspension routine.  */
+            _tx_thread_system_suspend(thread_ptr);
+
+            /* Disable interrupts.  */
+            TX_DISABLE
+#endif
+        }
+        else
+        {
+
+            /* Change the state to terminated.  */
+            thread_ptr -> tx_thread_state =    TX_TERMINATED;
+
+            /* Thread state change.  */
+            TX_THREAD_STATE_CHANGE(thread_ptr, TX_TERMINATED)
+
+            /* Set the suspending flag.  This prevents the thread from being
+               resumed before the cleanup routine is executed.  */
+            thread_ptr -> tx_thread_suspending =  TX_TRUE;
+
+            /* Pickup the cleanup routine address.  */
+            suspend_cleanup =  thread_ptr -> tx_thread_suspend_cleanup;
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+            /* Pickup the suspension sequence number that is used later to verify that the
+               cleanup is still necessary.  */
+            suspension_sequence =  thread_ptr -> tx_thread_suspension_sequence;
+#else
+
+            /* When not interruptable is selected, the suspension sequence is not used - just set to 0.  */
+            suspension_sequence =  ((ULONG) 0);
+#endif
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+            /* Restore interrupts.  */
+            TX_RESTORE
+#endif
+
+            /* Call any cleanup routines.  */
+            if (suspend_cleanup != TX_NULL)
+            {
+
+                /* Yes, there is a function to call.  */
+                (suspend_cleanup)(thread_ptr, suspension_sequence);
+            }
+
+            /* The suspending flag deliberately stays set here.  It used to be
+               cleared at this point, which left the terminated extension and the
+               notification callback below -- both application code -- free to delete
+               or reset this control block while this service still held a pointer to
+               it and still had mutex-release processing to do.  It is now cleared
+               once, in the common tail below, after the last dereference of the
+               target.  */
+
+            /* Perform any additional activities for tool or user purpose.  */
+            TX_THREAD_TERMINATED_EXTENSION(thread_ptr)
+
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
+
+            /* Determine if an application callback routine is specified.  */
+            if (entry_exit_notify != TX_NULL)
+            {
+
+                /* Yes, notify application that this thread has exited!  */
+                (entry_exit_notify)(thread_ptr, TX_THREAD_EXIT);
+            }
+#endif
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+            /* Disable interrupts.  */
+            TX_DISABLE
+#endif
+        }
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+#endif
+
+        /* Determine if the application is using mutexes.  */
+        if (_tx_thread_mutex_release != TX_NULL)
+        {
+
+            /* Yes, call the mutex release function via a function pointer that
+               is setup during initialization.  */
+            (_tx_thread_mutex_release)(thread_ptr);
+        }
+
+#ifndef TX_NOT_INTERRUPTABLE
+
+        /* Disable interrupts.  */
+        TX_DISABLE
+#endif
+
+        /* Clear the suspending flag.  This is the one place the end of the
+           termination transition is published, and it is reached from both branches
+           above, after the notification callback and after the mutex-release
+           processing, which is the last thing in this service to dereference the
+           target.  Until this store, _tx_thread_delete and _tx_thread_reset refuse
+           the target.  In the interruptable ready branch the flag is already false,
+           because _tx_thread_system_suspend cleared it when it detached the thread,
+           so this is a second store of a value the flag already holds; that is
+           cheaper than testing for it and it keeps the transition to a single clear
+           site.  No suspension-initiating service can have set it again in between:
+           every one of them acts on a thread that is ready or suspended, and this
+           thread is terminated.  */
+        thread_ptr -> tx_thread_suspending =  TX_FALSE;
+
+        /* Enable preemption.  */
+        _tx_thread_preempt_disable--;
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+    }
+    else
+    {
+
+        /* Restore interrupts.  */
+        TX_RESTORE
+    }
+
+    /* Check for preemption.  */
+    _tx_thread_system_preempt_check();
+
+    /* Return completion status.  */
+    return(status);
+}
+

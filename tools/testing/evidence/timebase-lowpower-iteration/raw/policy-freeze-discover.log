@@ -1,0 +1,13 @@
+test_default_keeps_custom_port (test_lowpower.LowpowerPortTests.test_default_keeps_custom_port) ... ok
+test_explicit_custom_keeps_existing_external_hook_contract (test_lowpower.LowpowerPortTests.test_explicit_custom_keeps_existing_external_hook_contract) ... ok
+test_timebase_is_a_distinct_explicit_selection (test_lowpower.LowpowerPortTests.test_timebase_is_a_distinct_explicit_selection) ... ok
+test_timebase_never_silently_replaces_an_external_tick (test_lowpower.LowpowerPortTests.test_timebase_never_silently_replaces_an_external_tick) ... ok
+test_timebase_rejects_mpu_domain (test_lowpower.LowpowerPortTests.test_timebase_rejects_mpu_domain) ... ok
+test_timebase_rejects_split_security (test_lowpower.LowpowerPortTests.test_timebase_rejects_split_security) ... ok
+test_timebase_requires_tickless (test_lowpower.LowpowerPortTests.test_timebase_requires_tickless) ... ok
+test_unknown_port_or_nonstring_is_rejected (test_lowpower.LowpowerPortTests.test_unknown_port_or_nonstring_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+OK

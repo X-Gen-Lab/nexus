@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-m",
+    "unittest",
+    "test_lowpower"
+  ],
+  "cwd": "/workspace/nexus/tools/configure",
+  "returncode": 1,
+  "start": 1791742746.4822736,
+  "end": 1791742746.542519,
+  "source_sha256": "d5aea05c167b210ab8a67fe023973085f8540289c391bea39fd687b590ed1d0e"
+}

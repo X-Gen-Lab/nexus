@@ -1,0 +1,14 @@
+{
+  "argv": [
+    ".venv/bin/cmake",
+    "--preset",
+    "native-debug",
+    "-B",
+    "build/adc-iteration"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T15:26:53.796267+00:00",
+  "ended_at": "2026-10-11T15:26:55.023791+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/adc-iteration/configure.log"
+}

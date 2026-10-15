@@ -1,0 +1,452 @@
+{
+  "schema": 1,
+  "scope": "Classic CAN public face and real shared mechanism; Native plus locked STM32F407/GD32F470 production register models",
+  "qualification": "development execution; not a clean software candidate or physical qualification",
+  "source": {
+    "clean_git_candidate": false,
+    "files": [
+      {
+        "path": "io/include/nexus/io/can.h",
+        "sha256": "b50f5356966dcda90d1b1c67edf018b740a082e3f0813bc8ec695cc7f907b084"
+      },
+      {
+        "path": "io/private/can_controller.h",
+        "sha256": "39a3e29a654f8141b3a46547ab083c79f41623e06e0e0ca8134f58dad00277ec"
+      },
+      {
+        "path": "io/src/can.c",
+        "sha256": "b4dd7e349b8a4db76c2723e259899dd28764690f43673014784568cfd01c1d31"
+      },
+      {
+        "path": "io/src/can_controller.c",
+        "sha256": "93b1ba8bd618259a53f07e02054e3977ad8cb8feb00dc107065a5c1ee1fe67fb"
+      },
+      {
+        "path": "io/native/can.h",
+        "sha256": "6d2fa0b173f5f86331212de77b41a443adca47c98cb30f777963165b415417ad"
+      },
+      {
+        "path": "io/native/can_access.h",
+        "sha256": "ae4361e990c016caf8312ee27d6aba47f0b74a712ada45aac56d22d03c07b649"
+      },
+      {
+        "path": "io/native/can.c",
+        "sha256": "79207262998ccb28ba49952b05f28d2ab882c71085829fd7fd74bc5b60e82fe3"
+      },
+      {
+        "path": "soc/stm32f407/private/stm32f407_can.h",
+        "sha256": "2bc9a507357e871ba45b59c4146cc6858fa2e69f245fcc953ed27f4883b8edd4"
+      },
+      {
+        "path": "soc/stm32f407/drivers/can.c",
+        "sha256": "0962e0f364a84f4baab4d88a58bb3a2d993d6fe3d70c1c832a8115413f4453ed"
+      },
+      {
+        "path": "soc/gd32f470/private/gd32f470_can.h",
+        "sha256": "eebcec1e65d7066607289cba2ab60ec2d96ba34e1d24f9cb5bb814a99ece3744"
+      },
+      {
+        "path": "soc/gd32f470/drivers/can.c",
+        "sha256": "ea96e8d5dbb9e058390bab1c6a55e95c806a6c66098deb57eed696d343642c13"
+      },
+      {
+        "path": "tests/google/can_controller_test.cpp",
+        "sha256": "173563d1b1fb6f43c4177fc86378e0ced974e5516b66b16230bd35f5970d7a2d"
+      },
+      {
+        "path": "tests/google/can_soc_test.cpp",
+        "sha256": "fe933320917f4c40ed04b15e951242186b9b5448285ec6720330e4ecd934ff71"
+      },
+      {
+        "path": "tests/google/can_soc_model.h",
+        "sha256": "6a3b396a35c2489b4af8a36380887272b0c556682617ae3c2bbc881870cf02c6"
+      },
+      {
+        "path": "docs/design/classic-can.md",
+        "sha256": "fdd0ea4542bddfbdf9251bfd3aa81abe887781c08cec110d2e9126025bf44c71"
+      }
+    ],
+    "execution_dependencies": [
+      {
+        "path": "core/src/request.c",
+        "sha256": "6fdc85b08c7e479cc943e77036912fb7313a4c690dd32c85a9f632d2380f03d8"
+      },
+      {
+        "path": "core/src/time.c",
+        "sha256": "67b6bdab6428845f8c8aa99d7a173e232e491f3909dbe0c3c78cf19cb017c1fe"
+      },
+      {
+        "path": "io/src/wake.c",
+        "sha256": "227718bd6f7a31e3469d60fa4d09fd264bd0a7a9ae13bf30bfc069b376ffca6c"
+      },
+      {
+        "path": "io/native/time.c",
+        "sha256": "f8944160cd932376c4fc0af2f1db95d8f7b09bb59166e2c225488b552faa3e22"
+      },
+      {
+        "path": "arch/native/nx_arch_native.c",
+        "sha256": "a1bf35f6cbcfc6f5d2ec72ebfae1040728055d4bd52aba98757729a7e82da93e"
+      },
+      {
+        "path": "vendors/st/cmsis_device_f4/Include/stm32f407xx.h",
+        "sha256": "ae1ab57d8ab750f64f04fd73476bc2760c761e18e45bde648e0bc350c9a1d9ac"
+      },
+      {
+        "path": "vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h",
+        "sha256": "db6de53203fa053d6e789ef86908195f84b7664753bdf0aa7ca74f62025573ef"
+      },
+      {
+        "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_can.h",
+        "sha256": "f760aeda3aec42af2b2f8013ac4dc8c9949e3ba079db41ff0b1932ec9d1a3662"
+      }
+    ]
+  },
+  "tools": [
+    {
+      "name": "arm-gcc",
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+      "sha256": "510c55cfeed7328ade1eb8cb23808fcce1ba6c52dac8d4ebfe033ae4b2534385",
+      "version": "arm-none-eabi-gcc (Arm GNU Toolchain 14.3.Rel1 (Build arm-14.174)) 14.3.1 20250623",
+      "version_exit_code": 0
+    },
+    {
+      "name": "host-gcc",
+      "path": "/usr/bin/gcc",
+      "sha256": "a23ecab8ff08f09ad8c80602c2c5df7f49e09c25905cb8975902e101bf72635f",
+      "version": "gcc (Debian 14.2.0-19) 14.2.0",
+      "version_exit_code": 0
+    },
+    {
+      "name": "cmake",
+      "path": "/workspace/nexus/.venv/bin/cmake",
+      "sha256": "e3eeed7e9fe7fe10cea561eda40fdae67337d6f94068ce0da2add7cbb88b9492",
+      "version": "cmake version 3.31.6",
+      "version_exit_code": 0
+    },
+    {
+      "name": "clang-format",
+      "path": "/workspace/nexus/.venv/bin/clang-format",
+      "sha256": "08f69d2cb1df634999c8a5b415d5f33af5a521dd10eb0c4f1e256ab4bfc3d0c6",
+      "version": "clang-format version 14.0.6 (https://github.com/ssciwr/clang-format-wheel e79d44a98fc6eeb3e9751220e441da03812564c1)",
+      "version_exit_code": 0
+    }
+  ],
+  "fresh_executions": [
+    {
+      "execution": "final",
+      "suite": "can_contract",
+      "report": "tools/testing/evidence/can-iteration/can_contract-final.xml",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "disabled": 0,
+      "skipped": 0
+    },
+    {
+      "execution": "asan",
+      "suite": "can_contract",
+      "report": "tools/testing/evidence/can-iteration/can_contract-asan.xml",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "disabled": 0,
+      "skipped": 0
+    },
+    {
+      "execution": "final",
+      "suite": "can_stm32f407_contract",
+      "report": "tools/testing/evidence/can-iteration/can_stm32f407_contract-final.xml",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "disabled": 0,
+      "skipped": 0
+    },
+    {
+      "execution": "asan",
+      "suite": "can_stm32f407_contract",
+      "report": "tools/testing/evidence/can-iteration/can_stm32f407_contract-asan.xml",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "disabled": 0,
+      "skipped": 0
+    },
+    {
+      "execution": "final",
+      "suite": "can_gd32f470_contract",
+      "report": "tools/testing/evidence/can-iteration/can_gd32f470_contract-final.xml",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "disabled": 0,
+      "skipped": 0
+    },
+    {
+      "execution": "asan",
+      "suite": "can_gd32f470_contract",
+      "report": "tools/testing/evidence/can-iteration/can_gd32f470_contract-asan.xml",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "disabled": 0,
+      "skipped": 0
+    }
+  ],
+  "tdd_stages": [
+    {
+      "name": "domain",
+      "red": {
+        "command_record": "tools/testing/evidence/can-iteration/domain-red.command.json",
+        "actual_exit_code": 1,
+        "tests": 21,
+        "failures": 2
+      },
+      "green": {
+        "command_record": "tools/testing/evidence/can-iteration/domain-green.command.json",
+        "actual_exit_code": 0,
+        "tests": 21,
+        "failures": 0
+      }
+    },
+    {
+      "name": "stm32f407-preflight",
+      "red": {
+        "command_record": "tools/testing/evidence/can-iteration/stm32f407-preflight-red.command.json",
+        "actual_exit_code": 1,
+        "tests": 8,
+        "failures": 2
+      },
+      "green": {
+        "command_record": "tools/testing/evidence/can-iteration/stm32f407-preflight-green.command.json",
+        "actual_exit_code": 0,
+        "tests": 8,
+        "failures": 0
+      }
+    },
+    {
+      "name": "gd32f470-preflight",
+      "red": {
+        "command_record": "tools/testing/evidence/can-iteration/gd32f470-preflight-red.command.json",
+        "actual_exit_code": 1,
+        "tests": 8,
+        "failures": 2
+      },
+      "green": {
+        "command_record": "tools/testing/evidence/can-iteration/gd32f470-preflight-green.command.json",
+        "actual_exit_code": 0,
+        "tests": 8,
+        "failures": 0
+      }
+    },
+    {
+      "name": "unowned",
+      "red": {
+        "command_record": "tools/testing/evidence/can-iteration/unowned-red.command.json",
+        "actual_exit_code": 1,
+        "tests": 23,
+        "failures": 2
+      },
+      "green": {
+        "command_record": "tools/testing/evidence/can-iteration/unowned-green.command.json",
+        "actual_exit_code": 0,
+        "tests": 23,
+        "failures": 0
+      }
+    },
+    {
+      "name": "receive",
+      "red": {
+        "command_record": "tools/testing/evidence/can-iteration/receive-red.command.json",
+        "actual_exit_code": 1,
+        "tests": 25,
+        "failures": 2
+      },
+      "green": {
+        "command_record": "tools/testing/evidence/can-iteration/receive-green.command.json",
+        "actual_exit_code": 0,
+        "tests": 25,
+        "failures": 0
+      }
+    },
+    {
+      "name": "drain",
+      "red": {
+        "command_record": "tools/testing/evidence/can-iteration/drain-red.command.json",
+        "actual_exit_code": 1,
+        "tests": 28,
+        "failures": 3
+      },
+      "green": {
+        "command_record": "tools/testing/evidence/can-iteration/drain-green.command.json",
+        "actual_exit_code": 0,
+        "tests": 28,
+        "failures": 0
+      }
+    },
+    {
+      "name": "filter-alias",
+      "red": {
+        "command_record": "tools/testing/evidence/can-iteration/filter-alias-red.command.json",
+        "actual_exit_code": 1,
+        "tests": 29,
+        "failures": 1
+      },
+      "green": {
+        "command_record": "tools/testing/evidence/can-iteration/filter-alias-green.command.json",
+        "actual_exit_code": 0,
+        "tests": 29,
+        "failures": 0
+      }
+    },
+    {
+      "name": "publisher",
+      "red": {
+        "command_record": "tools/testing/evidence/can-iteration/publisher-red.command.json",
+        "actual_exit_code": 1,
+        "tests": 30,
+        "failures": 1
+      },
+      "green": {
+        "command_record": "tools/testing/evidence/can-iteration/publisher-green.command.json",
+        "actual_exit_code": 0,
+        "tests": 30,
+        "failures": 0
+      }
+    }
+  ],
+  "api_red": {
+    "command_record": "tools/testing/evidence/can-iteration/api-red2.command.json",
+    "reason": "Public API test links failed with the new production methods undefined before implementation",
+    "excluded_initial_harness_error": "api-red.command.json preserves the earlier stale library-path error; that run is not behavioral RED"
+  },
+  "command_records": [
+    "final-commands.json",
+    "asan-build-commands.json",
+    "asan-commands.json",
+    "arm-final-commands.json",
+    "headers-commands.json",
+    "style-final-commands.json"
+  ],
+  "arm_compile": {
+    "units": 6,
+    "strict_warning_errors": true,
+    "real_sdk_headers": true,
+    "selected_firmware_link_executed": false,
+    "mutable_data_bss_per_object": 0,
+    "size_log": "arm-final-size.log"
+  },
+  "sanitizers": {
+    "instrumented": "CAN provider/API/model/SoC binding and other linked Nexus production translation units plus Google fixtures",
+    "google_runtime": "Pinned prebuilt Google libraries are linked, not rebuilt with sanitizer instrumentation",
+    "address": true,
+    "undefined": true,
+    "leak_detection": true,
+    "thread_sanitizer": false
+  },
+  "build_registration": {
+    "development_harness": "/workspace/nexus-industrial-design/can-tests/CMakeLists.txt",
+    "maintained_cmake_config_factory_and_vector_integration": "Parent-owned; not established by this manifest"
+  },
+  "independent_reviews": [
+    "ADC exact replacement address and observed-only DMA ACK findings closed by owner genuine RED/GREEN",
+    "I2C owner reciprocal CAN review: filter alias closed; no remaining shared domain/abort/FIFO/publisher blocker"
+  ],
+  "not_executed": [
+    "Physical CAN station/HIL",
+    "Physical transceiver voltage/termination/jumpers and safe output qualification",
+    "SOF timestamp or measured IRQ/WCET/oscillator/propagation constraints",
+    "Clean network-disabled reproducible full firmware candidate",
+    "Generated assembly factory/resolver/vector and selected/unselected ARM ELF checks in this provider-only development execution"
+  ],
+  "current_freeze": {
+    "files": [
+      {
+        "path": "io/include/nexus/io/can.h",
+        "sha256": "b50f5356966dcda90d1b1c67edf018b740a082e3f0813bc8ec695cc7f907b084",
+        "bytes": 7325
+      },
+      {
+        "path": "io/private/can_controller.h",
+        "sha256": "39a3e29a654f8141b3a46547ab083c79f41623e06e0e0ca8134f58dad00277ec",
+        "bytes": 3541
+      },
+      {
+        "path": "io/src/can.c",
+        "sha256": "b4dd7e349b8a4db76c2723e259899dd28764690f43673014784568cfd01c1d31",
+        "bytes": 4880
+      },
+      {
+        "path": "io/src/can_controller.c",
+        "sha256": "93b1ba8bd618259a53f07e02054e3977ad8cb8feb00dc107065a5c1ee1fe67fb",
+        "bytes": 37366
+      },
+      {
+        "path": "io/native/can.h",
+        "sha256": "6d2fa0b173f5f86331212de77b41a443adca47c98cb30f777963165b415417ad",
+        "bytes": 2572
+      },
+      {
+        "path": "io/native/can_access.h",
+        "sha256": "ae4361e990c016caf8312ee27d6aba47f0b74a712ada45aac56d22d03c07b649",
+        "bytes": 1298
+      },
+      {
+        "path": "io/native/can.c",
+        "sha256": "79207262998ccb28ba49952b05f28d2ab882c71085829fd7fd74bc5b60e82fe3",
+        "bytes": 7817
+      },
+      {
+        "path": "soc/stm32f407/private/stm32f407_can.h",
+        "sha256": "2bc9a507357e871ba45b59c4146cc6858fa2e69f245fcc953ed27f4883b8edd4",
+        "bytes": 1158
+      },
+      {
+        "path": "soc/stm32f407/drivers/can.c",
+        "sha256": "0962e0f364a84f4baab4d88a58bb3a2d993d6fe3d70c1c832a8115413f4453ed",
+        "bytes": 4957
+      },
+      {
+        "path": "soc/gd32f470/private/gd32f470_can.h",
+        "sha256": "eebcec1e65d7066607289cba2ab60ec2d96ba34e1d24f9cb5bb814a99ece3744",
+        "bytes": 1152
+      },
+      {
+        "path": "soc/gd32f470/drivers/can.c",
+        "sha256": "ea96e8d5dbb9e058390bab1c6a55e95c806a6c66098deb57eed696d343642c13",
+        "bytes": 4753
+      },
+      {
+        "path": "tests/google/can_controller_test.cpp",
+        "sha256": "173563d1b1fb6f43c4177fc86378e0ced974e5516b66b16230bd35f5970d7a2d",
+        "bytes": 19775
+      },
+      {
+        "path": "tests/google/can_soc_test.cpp",
+        "sha256": "25211e8844de940cd7db699b52aad38e46e212c7df5e4556a9d5618918079354",
+        "bytes": 9099
+      },
+      {
+        "path": "tests/google/can_soc_model.h",
+        "sha256": "6a3b396a35c2489b4af8a36380887272b0c556682617ae3c2bbc881870cf02c6",
+        "bytes": 265
+      },
+      {
+        "path": "docs/design/classic-can.md",
+        "sha256": "fdd0ea4542bddfbdf9251bfd3aa81abe887781c08cec110d2e9126025bf44c71",
+        "bytes": 6881
+      }
+    ],
+    "integration_execution": "root fresh maintained full hook pending; no replacement of historical execution counts",
+    "supersession": {
+      "path": "tests/google/can_soc_test.cpp",
+      "change": "host SDK uint64/UL complement now explicitly uint32_t to satisfy Wconversion; production unchanged",
+      "current_sha256": "25211e8844de940cd7db699b52aad38e46e212c7df5e4556a9d5618918079354",
+      "root_raw_logs": [
+        "/workspace/nexus-60-iteration-evidence/can-diagnostic-build2.log",
+        "/workspace/nexus-60-iteration-evidence/can-diagnostic-build3.log",
+        "/workspace/nexus-60-iteration-evidence/can-diagnostic-run1.log"
+      ]
+    }
+  }
+}

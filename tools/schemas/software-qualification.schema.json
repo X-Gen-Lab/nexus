@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nexus software-qualification",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "software_qualification"
+    },
+    "scope": {
+      "enum": [
+        "host_contracts",
+        "arm_link",
+        "resource_budget",
+        "source_sdk",
+        "reproducibility",
+        "hil_tooling"
+      ]
+    },
+    "status": {
+      "const": "passed"
+    },
+    "source": {
+      "type": "object"
+    },
+    "configuration_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "elf_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "executed_checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "status",
+          "exit_code",
+          "raw"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "status": {
+            "const": "passed"
+          },
+          "exit_code": {
+            "const": 0
+          },
+          "raw": {
+            "type": "object",
+            "required": [
+              "path",
+              "sha256",
+              "size"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "size": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "argv": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "path",
+                "sha256",
+                "size"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "sha256",
+          "size"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "physical_status": {
+      "const": "not_executed"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "scope",
+    "status",
+    "source",
+    "configuration_sha256",
+    "elf_sha256",
+    "executed_checks"
+  ]
+}

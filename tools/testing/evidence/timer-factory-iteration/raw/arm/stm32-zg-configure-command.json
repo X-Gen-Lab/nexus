@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/cmake",
+    "-S",
+    "/workspace/nexus/tests/contracts/timer_assembly",
+    "-B",
+    "/workspace/nexus-industrial-design/timer-arm/stm32-zg",
+    "-G",
+    "Ninja",
+    "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+    "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+    "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/timer_assembly/stm32-zg.toml"
+  ],
+  "exit_code": 1
+}

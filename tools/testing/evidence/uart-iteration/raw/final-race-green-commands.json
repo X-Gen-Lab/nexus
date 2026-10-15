@@ -1,0 +1,23 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_stm32_uart_receive_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/uart-receive-tdd/stm32_uart_receive-final-race-green.xml"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_gd32_uart_receive_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/uart-receive-tdd/gd32_uart_receive-final-race-green.xml"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_uart_rs485_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/uart-receive-tdd/uart_rs485-final-race-green.xml"
+    ],
+    "returncode": 0
+  }
+]

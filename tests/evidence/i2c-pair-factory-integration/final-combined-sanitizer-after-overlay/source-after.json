@@ -1,0 +1,2092 @@
+[
+  {
+    "path": "/workspace/nexus/CMakeLists.txt",
+    "sha256": "5572c145588aca7ae9bff21f8259f5de3bf33f59ff6e730ac453ef95af827052",
+    "bytes": 5722
+  },
+  {
+    "path": "/workspace/nexus/arch/CMakeLists.txt",
+    "sha256": "f5ba2e55207302e7ef4c1f33f6379adf888d95b26534e7fd276b997260338768",
+    "bytes": 2101
+  },
+  {
+    "path": "/workspace/nexus/arch/cortex_m/nx_arch_cache.c",
+    "sha256": "0556810dac343f65da20922a9c897a3cab061f22b1a5a41a4dbc8c4bf267b59b",
+    "bytes": 4098
+  },
+  {
+    "path": "/workspace/nexus/arch/cortex_m/nx_arch_cortex_m.c",
+    "sha256": "0f0074a66d1c3ef41d7359381c9b2d3308a4cee0ed1fe9a21d060ccf88795941",
+    "bytes": 2330
+  },
+  {
+    "path": "/workspace/nexus/arch/cortex_m/nx_arch_mpu.c",
+    "sha256": "ae07d4beba4f6f47eb4bc6f2a24e4e3342d36e6c8db8ab850755fd7d24fd552e",
+    "bytes": 6993
+  },
+  {
+    "path": "/workspace/nexus/arch/cortex_m/nx_arch_security.c",
+    "sha256": "926e4ad07454a59397763bdca2c2cbbbeacdd9fdab564062936425dfb4df90d7",
+    "bytes": 3667
+  },
+  {
+    "path": "/workspace/nexus/arch/cortex_m/nx_arch_sleep.c",
+    "sha256": "c1f87ad482c11f41b785fdbded2ec4a96a59fdbd9db52e3417033ae8d1c33b4b",
+    "bytes": 2259
+  },
+  {
+    "path": "/workspace/nexus/arch/cortex_m/private/compiler.h",
+    "sha256": "0d798d7b8fc3332e79468220509de17e68db407856b8f6e46b360c6fd9857807",
+    "bytes": 4784
+  },
+  {
+    "path": "/workspace/nexus/arch/cortex_m/private/mechanisms.h",
+    "sha256": "be5a62c74ff05a5cd25493b3e975475280a65d06e7ac15e51e2a755f235045c2",
+    "bytes": 4596
+  },
+  {
+    "path": "/workspace/nexus/arch/cortex_m/private/sleep.h",
+    "sha256": "db07a270e35ffdaac8c84e63192593399a01d10fc0f6b5a8495f5bec13f629be",
+    "bytes": 876
+  },
+  {
+    "path": "/workspace/nexus/arch/include/nexus/arch/arch.h",
+    "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289",
+    "bytes": 5929
+  },
+  {
+    "path": "/workspace/nexus/arch/include/nexus/arch/atomic.h",
+    "sha256": "c7f1fb355c18bac4b61fdcbe3059a7fc4cd824e4eb379744f56bf1a7a67de5c2",
+    "bytes": 6668
+  },
+  {
+    "path": "/workspace/nexus/arch/include/nexus/arch/cache.h",
+    "sha256": "9775bdf517de342cc7d0cbd131cee57d6ce9697b602f55e6938bf1b51e357a26",
+    "bytes": 4025
+  },
+  {
+    "path": "/workspace/nexus/arch/include/nexus/arch/features.h",
+    "sha256": "046631eae25a7143ee1ce8c553fbe5e80074810dfdedf0d2e3405464c21851ac",
+    "bytes": 1546
+  },
+  {
+    "path": "/workspace/nexus/arch/include/nexus/arch/mpu.h",
+    "sha256": "c652c608a734178568d5aa63eb2a823b48200e7f8d5a9a2a5e32c2e5a0681304",
+    "bytes": 5956
+  },
+  {
+    "path": "/workspace/nexus/arch/include/nexus/arch/security.h",
+    "sha256": "3fd3f594ba22aefd65cea7c16114b36fbd25f7925f0e449037a6cbeb623e9e4f",
+    "bytes": 3226
+  },
+  {
+    "path": "/workspace/nexus/arch/include/nexus/arch/sleep.h",
+    "sha256": "ec14761abc18ba0405e5edc88743869dc955c275a57ca40164edb67526bb96a2",
+    "bytes": 2281
+  },
+  {
+    "path": "/workspace/nexus/arch/native/nx_arch_native.c",
+    "sha256": "a1bf35f6cbcfc6f5d2ec72ebfae1040728055d4bd52aba98757729a7e82da93e",
+    "bytes": 3260
+  },
+  {
+    "path": "/workspace/nexus/boards/stm32g474re_hse24_reference/board.json",
+    "sha256": "6db394749153f691d43343eb78e105aa329dabe9ea1d65ed7f3bcb449f1bfa1c",
+    "bytes": 1776
+  },
+  {
+    "path": "/workspace/nexus/cmake/CTestConfig.cmake",
+    "sha256": "026fa5be3039f47e8e1bedea9e48d6f7d7fac03d5498e91e71aa25f6b7dc9ca5",
+    "bytes": 1122
+  },
+  {
+    "path": "/workspace/nexus/cmake/package/package_source_sdk.py",
+    "sha256": "896d4a18754848d0e405e2a84d750a2bc116edbf1bec9db4d47ab3a74f9d4f70",
+    "bytes": 35427
+  },
+  {
+    "path": "/workspace/nexus/cmake/package/verify_consumers.py",
+    "sha256": "8e0d7bab6c47d545c51cb95b44c9800eac13fa312ae24dcc9469ff391a5dbdeb",
+    "bytes": 8849
+  },
+  {
+    "path": "/workspace/nexus/cmake/platform/Configure.cmake",
+    "sha256": "a81157961a5cee80c3ba34c122ba052f6bf7d425e3adf67c58f4430fa28418ab",
+    "bytes": 4980
+  },
+  {
+    "path": "/workspace/nexus/cmake/platform/ControllerModes.cmake",
+    "sha256": "410fe63fce519121d3063765ea8111e61d0fb1b12fa7352d286c56687166d481",
+    "bytes": 764
+  },
+  {
+    "path": "/workspace/nexus/cmake/platform/Firmware.cmake",
+    "sha256": "0f00c0864fc0f48261f8514083b2b74e1034af3e42441e70d25279754c43d880",
+    "bytes": 2991
+  },
+  {
+    "path": "/workspace/nexus/cmake/platform/Options.cmake",
+    "sha256": "2d441bee08094f3deba82c2589e46ba16ff5e2faa5b19f14d836f61138407656",
+    "bytes": 4120
+  },
+  {
+    "path": "/workspace/nexus/cmake/platform/Runtime.cmake",
+    "sha256": "94e6227c577f0b5e1871242e0057c9f87baa99411d4eb7796786e9a3a4e3cec9",
+    "bytes": 4916
+  },
+  {
+    "path": "/workspace/nexus/cmake/platform/SDK.cmake",
+    "sha256": "6ae597f896a0667b8f69c51d471d1a940fa66496031c6d28a70c3a0ceeef0fab",
+    "bytes": 2017
+  },
+  {
+    "path": "/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+    "sha256": "0d8ac681c4d5363cef240125b5a8e93db1b94f98c48e5d46ec62c7065860e973",
+    "bytes": 629
+  },
+  {
+    "path": "/workspace/nexus/core/CMakeLists.txt",
+    "sha256": "f55c899853d41b868b353fe89ab481b1552814106142a15fc203b72967741b9e",
+    "bytes": 420
+  },
+  {
+    "path": "/workspace/nexus/core/include/nexus/core/fault.h",
+    "sha256": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b",
+    "bytes": 2026
+  },
+  {
+    "path": "/workspace/nexus/core/include/nexus/core/memory.h",
+    "sha256": "d38dc78859c5796672427590ed836d65bfd09daaac3009ef04f27a3ce73b31d1",
+    "bytes": 3064
+  },
+  {
+    "path": "/workspace/nexus/core/include/nexus/core/request.h",
+    "sha256": "c27686b1fc578d88e1f4638c3939c1409171ba6267e59e4c64eb72449ffb7e55",
+    "bytes": 7004
+  },
+  {
+    "path": "/workspace/nexus/core/include/nexus/core/request_observer.h",
+    "sha256": "2d7cb6cf7447556a4deb6cdf8c027224ab04210f4bc0daa568cf3688ac7bdafd",
+    "bytes": 3381
+  },
+  {
+    "path": "/workspace/nexus/core/include/nexus/core/stack_observation.h",
+    "sha256": "6452a9d540a08dadb0b17062a40e945369a60439d85bc2bb6e3f1417b5aa5f21",
+    "bytes": 1799
+  },
+  {
+    "path": "/workspace/nexus/core/include/nexus/core/status.h",
+    "sha256": "2aed38f391159a2bfb32f475c81967e3eec01beedde97b33a276ee0dd85d32fd",
+    "bytes": 789
+  },
+  {
+    "path": "/workspace/nexus/core/include/nexus/core/time.h",
+    "sha256": "51b54ef6ff434cc473162f215933b3cd992cc2efb89d9c3b72a4e2f7c9d839b1",
+    "bytes": 3477
+  },
+  {
+    "path": "/workspace/nexus/core/src/fault.c",
+    "sha256": "976a3af81cfefa6d7185b7328162825eb08fc4ae25042a543de1fc8369a8367f",
+    "bytes": 639
+  },
+  {
+    "path": "/workspace/nexus/core/src/request.c",
+    "sha256": "6fdc85b08c7e479cc943e77036912fb7313a4c690dd32c85a9f632d2380f03d8",
+    "bytes": 6864
+  },
+  {
+    "path": "/workspace/nexus/core/src/request_observer.c",
+    "sha256": "dc2f96ee8517682d9e853b87fddbc5a4a3d6dc2e3b52f33b7a3cd2b4465ac82d",
+    "bytes": 4377
+  },
+  {
+    "path": "/workspace/nexus/core/src/stack_observation.c",
+    "sha256": "8362739439edcc5ec632f10a7fead09a702e2dbe4cdd47c743a3b1d58cbd96b6",
+    "bytes": 1202
+  },
+  {
+    "path": "/workspace/nexus/core/src/time.c",
+    "sha256": "67b6bdab6428845f8c8aa99d7a173e232e491f3909dbe0c3c78cf19cb017c1fe",
+    "bytes": 2199
+  },
+  {
+    "path": "/workspace/nexus/dependencies/actions.lock.json",
+    "sha256": "bbc658f79f12fc1daf069ab56c60ccc572589c29431e4c9d0506f8012eed4c09",
+    "bytes": 5118
+  },
+  {
+    "path": "/workspace/nexus/dependencies/development-tools.txt",
+    "sha256": "ec369eef06a87082723b82321827296fb0059e36b6eddd41223ade4d73bb5994",
+    "bytes": 122
+  },
+  {
+    "path": "/workspace/nexus/dependencies/environment-tools.txt",
+    "sha256": "1e965d2ecb655a6d65d775a62cc5e2948da8a176b092f9f1c9e88aebd8d3357a",
+    "bytes": 101
+  },
+  {
+    "path": "/workspace/nexus/dependencies/environment.lock.json",
+    "sha256": "ba90902e9048279fc38121fbcab003e8fed07dfd17044637d4aed979a7e966cd",
+    "bytes": 1181
+  },
+  {
+    "path": "/workspace/nexus/dependencies/googletest.lock.json",
+    "sha256": "31b213daa3c19b7ab4efa987c75a6bfdfdf717f9a8bed27c67620f3e4d129e68",
+    "bytes": 497
+  },
+  {
+    "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+    "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+    "bytes": 585
+  },
+  {
+    "path": "/workspace/nexus/dependencies/source/googletest-1.16.0.tar.gz",
+    "sha256": "bde221be7f3841fcbc3971665d77d717116394a42155d988ee6407dfc39f1f09",
+    "bytes": 877456
+  },
+  {
+    "path": "/workspace/nexus/dependencies/source/googletest-LICENSE.txt",
+    "sha256": "9702de7e4117a8e2b20dafab11ffda58c198aede066406496bef670d40a22138",
+    "bytes": 1475
+  },
+  {
+    "path": "/workspace/nexus/dependencies/stm32g4.lock.json",
+    "sha256": "17a79ace0ac3626f5631da4e79b211390237de7e7bf0c7bd9878c3c98d6ca9a3",
+    "bytes": 1058
+  },
+  {
+    "path": "/workspace/nexus/dependencies/style-baseline.json",
+    "sha256": "46b2a878e8aee3e4ef9cdd894a720f272b724f5b4b92d752f556acc717ea4b92",
+    "bytes": 228
+  },
+  {
+    "path": "/workspace/nexus/dependencies/threadx.lock.json",
+    "sha256": "a9785a8be298555fc93aa09e714bf4ff3047936c5214b0aead5898d83f22ed12",
+    "bytes": 43594
+  },
+  {
+    "path": "/workspace/nexus/dependencies/toolchains.lock.json",
+    "sha256": "1393be450d4d1ba3e182807ae0236f968cf9773f2e43a14ce3a57f9251387170",
+    "bytes": 469
+  },
+  {
+    "path": "/workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_initialize_low_level.c",
+    "sha256": "760b2e8e341b7fcdd2b5984eb9724100c562ccd27b79a18673f9fe45dd93b1da",
+    "bytes": 15951
+  },
+  {
+    "path": "/workspace/nexus/io/CMakeLists.txt",
+    "sha256": "b1657ead12aeac7f2b7d949c972d1e280cd234af3d3ede6b1957f8ba74d776c5",
+    "bytes": 3076
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/adc.h",
+    "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1",
+    "bytes": 9218
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/adc_observer.h",
+    "sha256": "e95ab349207a44d8ae86c74325a49eb82fd9ce991ea940fff8e4b40dd21a7788",
+    "bytes": 4193
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/advanced_pwm.h",
+    "sha256": "2b9bbfbb94b834ed25964f5aa6495abc4e5cbc5f5d5bb48d106e951f37f52410",
+    "bytes": 3514
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/can.h",
+    "sha256": "b50f5356966dcda90d1b1c67edf018b740a082e3f0813bc8ec695cc7f907b084",
+    "bytes": 7325
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/dma.h",
+    "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b",
+    "bytes": 4114
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/ethernet.h",
+    "sha256": "4549314a06f7a6e8d2c3033384fae3ad8abf7b4964833bc96eb6f7aef32881c6",
+    "bytes": 7906
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/exti.h",
+    "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6",
+    "bytes": 4106
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/flash.h",
+    "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c",
+    "bytes": 6868
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/gpio.h",
+    "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778",
+    "bytes": 2676
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/i2c.h",
+    "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3",
+    "bytes": 9481
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/i2c_bus_clear.h",
+    "sha256": "e1c188d2f093fdbb79664cde94736bd9a900edad64e290221e9e706dbb4b524f",
+    "bytes": 8046
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/mdio.h",
+    "sha256": "08dc907823ee68dfacb97065c58fbc2086e9fd39039d845cedbc94b21a781636",
+    "bytes": 2150
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/native/model.h",
+    "sha256": "0fb71e8344a27598ec64552dec45b9b5376dd09ed5f10a217cdcb34833fa55a2",
+    "bytes": 25516
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/spi.h",
+    "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a",
+    "bytes": 11660
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/stream.h",
+    "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a",
+    "bytes": 11194
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/stream_budget.h",
+    "sha256": "1034a90c6c09e2c6d10af139c93d50113ead058af898bfcac0acd3a2db32dc8a",
+    "bytes": 3252
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/timer.h",
+    "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a",
+    "bytes": 3191
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/timer_capture.h",
+    "sha256": "6fb9f2e812cee50a3077e50b697e072e66152dc02c073c3204ee23928d7deee4",
+    "bytes": 3989
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/uart.h",
+    "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc",
+    "bytes": 10872
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/uart_rs485.h",
+    "sha256": "58f684a10fa8647e5c55b970e74c8f753a3817e93103d12945788617442fa89e",
+    "bytes": 3247
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/usb_device.h",
+    "sha256": "759d26c0d51e28ca566a5ef5ca7e7d7fa86533812af40160abbbc216ab01fd6e",
+    "bytes": 8447
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/wake.h",
+    "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9",
+    "bytes": 3440
+  },
+  {
+    "path": "/workspace/nexus/io/include/nexus/io/watchdog.h",
+    "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c",
+    "bytes": 3724
+  },
+  {
+    "path": "/workspace/nexus/io/native/adc.c",
+    "sha256": "da6bdfc1c499be71457d62650a6a2315b578f61bc748d0d32c50561437ec110a",
+    "bytes": 5790
+  },
+  {
+    "path": "/workspace/nexus/io/native/can.c",
+    "sha256": "79207262998ccb28ba49952b05f28d2ab882c71085829fd7fd74bc5b60e82fe3",
+    "bytes": 7817
+  },
+  {
+    "path": "/workspace/nexus/io/native/can.h",
+    "sha256": "6d2fa0b173f5f86331212de77b41a443adca47c98cb30f777963165b415417ad",
+    "bytes": 2572
+  },
+  {
+    "path": "/workspace/nexus/io/native/can_access.h",
+    "sha256": "ae4361e990c016caf8312ee27d6aba47f0b74a712ada45aac56d22d03c07b649",
+    "bytes": 1298
+  },
+  {
+    "path": "/workspace/nexus/io/native/ethernet.c",
+    "sha256": "1db19fa0ab10e062d5c0ec8b82740bc2820d641d652982cfb662bea041eca6a2",
+    "bytes": 7429
+  },
+  {
+    "path": "/workspace/nexus/io/native/ethernet.h",
+    "sha256": "2568cc442903e8b1fdd1c405046f61fe52be95691209d35c91161cd622ba872d",
+    "bytes": 2920
+  },
+  {
+    "path": "/workspace/nexus/io/native/ethernet_access.h",
+    "sha256": "2a2f63a1ee285f9dd748d93c140b1d3d2b59f9485cb34d0d7b28f8719dc8c307",
+    "bytes": 876
+  },
+  {
+    "path": "/workspace/nexus/io/native/exti.c",
+    "sha256": "780b90a9b0ccf8bbaf007e21ad85667b0b35329cb31e569c8f87ca12ae71dd8d",
+    "bytes": 7543
+  },
+  {
+    "path": "/workspace/nexus/io/native/flash.c",
+    "sha256": "bd20872557c98bb9b8513676521baca738fdab771d0b0398231ca576fd156238",
+    "bytes": 9441
+  },
+  {
+    "path": "/workspace/nexus/io/native/gpio.c",
+    "sha256": "992407510c763fc6f5726a95895dba445a635ab9ad6c21ebddf3d1d137608384",
+    "bytes": 5407
+  },
+  {
+    "path": "/workspace/nexus/io/native/i2c.c",
+    "sha256": "8f06647793d623bb6e46b234f1e42b81ff6947c7e59db22762a07d4c1e82c4c2",
+    "bytes": 8052
+  },
+  {
+    "path": "/workspace/nexus/io/native/provider.h",
+    "sha256": "628c6ca46264e2521c7fcec2cddcc8ac2571442f08820a5f9910aeb10550620b",
+    "bytes": 12330
+  },
+  {
+    "path": "/workspace/nexus/io/native/spi.c",
+    "sha256": "2a399db21828d8b23eb57d979a0321863bdd1ad1af2102ed8151ac4fe1376247",
+    "bytes": 8170
+  },
+  {
+    "path": "/workspace/nexus/io/native/spi_async.c",
+    "sha256": "969435be3a65f18a61a300633be7abdbedfc70a23db5a430aa74e7f0e89ddba4",
+    "bytes": 11911
+  },
+  {
+    "path": "/workspace/nexus/io/native/stream.c",
+    "sha256": "1eedd1a09a5adc520965e7ddc5d88c0bbc816065435ffbc667144325f15c98ec",
+    "bytes": 10517
+  },
+  {
+    "path": "/workspace/nexus/io/native/time.c",
+    "sha256": "f8944160cd932376c4fc0af2f1db95d8f7b09bb59166e2c225488b552faa3e22",
+    "bytes": 1942
+  },
+  {
+    "path": "/workspace/nexus/io/native/timer.c",
+    "sha256": "fe026222f339257cb3537b954721ec6b1b7efaf153137017892b61a8bc448b33",
+    "bytes": 4051
+  },
+  {
+    "path": "/workspace/nexus/io/native/uart.c",
+    "sha256": "82dc0e7923dc2f38c6bc54d66a288e3cc7de0ffc53ef725a8f562510ecf10b33",
+    "bytes": 20720
+  },
+  {
+    "path": "/workspace/nexus/io/native/usb_device.c",
+    "sha256": "1ab60c470762567e0d7fcee9cb308c344fa964405f70ad3217978869f9827e4a",
+    "bytes": 11210
+  },
+  {
+    "path": "/workspace/nexus/io/native/usb_device.h",
+    "sha256": "f5a28d5a8c61d268f2a1f3d76bae5e73ee57dbc7ac898cbe1d9543e2119c34f2",
+    "bytes": 2179
+  },
+  {
+    "path": "/workspace/nexus/io/native/usb_device_access.h",
+    "sha256": "fc824b75afae99e990bda75a209d83c04412fc748fdbfad64d77e2fb830b32a2",
+    "bytes": 1298
+  },
+  {
+    "path": "/workspace/nexus/io/native/watchdog.c",
+    "sha256": "2dbca5f92e0c60113deb681934fe7693662712c3b91d5f1a6383a7ab1c343dc2",
+    "bytes": 5156
+  },
+  {
+    "path": "/workspace/nexus/io/private/advanced_pwm_impl.h",
+    "sha256": "76d769d7d2e7b4a4fc2d41f54c02222606768619c010330a61bb8e38b38274e1",
+    "bytes": 13065
+  },
+  {
+    "path": "/workspace/nexus/io/private/can_controller.h",
+    "sha256": "39a3e29a654f8141b3a46547ab083c79f41623e06e0e0ca8134f58dad00277ec",
+    "bytes": 3541
+  },
+  {
+    "path": "/workspace/nexus/io/private/eth_mac.h",
+    "sha256": "979e672eb814ac0736e09f714c71df86e4237078846c7d94f00ab94ae574d4c5",
+    "bytes": 3500
+  },
+  {
+    "path": "/workspace/nexus/io/private/timer_advanced_controller.h",
+    "sha256": "54fa5f7705fd516c909688c2ff56849545db1e917343fdfa5d4a7f671e864807",
+    "bytes": 3161
+  },
+  {
+    "path": "/workspace/nexus/io/private/timer_capture_impl.h",
+    "sha256": "a143f88faed8688888747ba2487abc7e62a8cd0abf978cef7cb4bc0ca484e626",
+    "bytes": 13380
+  },
+  {
+    "path": "/workspace/nexus/io/private/usb_device_controller.h",
+    "sha256": "6a8006cc5b8d8bce56c84f46f5a52da3863555b43ac3c2ed1b93becdc3f1e39c",
+    "bytes": 2861
+  },
+  {
+    "path": "/workspace/nexus/io/src/adc.c",
+    "sha256": "2a43862372a66b5258ec0a28256b78925b0bdc5b0f5a68a62bdf6b872de7e97c",
+    "bytes": 4646
+  },
+  {
+    "path": "/workspace/nexus/io/src/adc_observer.c",
+    "sha256": "48fbc20045b5acc945d5533db881545c2a5f9e026fdb30273e7cce3b2e5ab6a3",
+    "bytes": 7132
+  },
+  {
+    "path": "/workspace/nexus/io/src/advanced_pwm.c",
+    "sha256": "9505b6a8913d23978defb59e18eabc4c0dfa43252104e526205b8528b3cf28c5",
+    "bytes": 2805
+  },
+  {
+    "path": "/workspace/nexus/io/src/can.c",
+    "sha256": "b4dd7e349b8a4db76c2723e259899dd28764690f43673014784568cfd01c1d31",
+    "bytes": 4880
+  },
+  {
+    "path": "/workspace/nexus/io/src/can_controller.c",
+    "sha256": "93b1ba8bd618259a53f07e02054e3977ad8cb8feb00dc107065a5c1ee1fe67fb",
+    "bytes": 37366
+  },
+  {
+    "path": "/workspace/nexus/io/src/dma.c",
+    "sha256": "98c3edf4a206ede42ecf314a7f9c1b7e892d71318604fc87e4aad18703b3bcbb",
+    "bytes": 2975
+  },
+  {
+    "path": "/workspace/nexus/io/src/eth_mac.c",
+    "sha256": "06b3acd40a24f9875a75e315bab18176b0379b26caf5bef24cd4c3555f71a1cb",
+    "bytes": 35844
+  },
+  {
+    "path": "/workspace/nexus/io/src/ethernet.c",
+    "sha256": "d0e0f23108ef0afa5ba1bf7240e18c1d3b5a3412ff86966ba9e7101be1996381",
+    "bytes": 4151
+  },
+  {
+    "path": "/workspace/nexus/io/src/exti.c",
+    "sha256": "2b25b04b35965bc32596fddb9823105bf98e8746c1a6a58a5aff16e0831d28d7",
+    "bytes": 1718
+  },
+  {
+    "path": "/workspace/nexus/io/src/flash.c",
+    "sha256": "4c0eb780eb87d6ce90b82ab4ab387f752ae15347057f90154252d5f22b4750cd",
+    "bytes": 2096
+  },
+  {
+    "path": "/workspace/nexus/io/src/flash_region.c",
+    "sha256": "4a14b9330342c6cda18431db6c0fb3a6ba823579c4d33bf18eeffd85d866b2a9",
+    "bytes": 2953
+  },
+  {
+    "path": "/workspace/nexus/io/src/gpio.c",
+    "sha256": "cfa133514adbae4a42e9e39c83921f9e885117b4cf251f6325dc300b19a4b0e0",
+    "bytes": 1483
+  },
+  {
+    "path": "/workspace/nexus/io/src/i2c.c",
+    "sha256": "14a9e4f1728dd5b28e4525c83d77ea05903bdcc0645d6e9b824775ec21b22f9f",
+    "bytes": 7617
+  },
+  {
+    "path": "/workspace/nexus/io/src/i2c_bus_clear.c",
+    "sha256": "b88cc7b5ec47eaea1684312737d69a2aae48d0a25f59106ff1e19915af6ad8df",
+    "bytes": 10355
+  },
+  {
+    "path": "/workspace/nexus/io/src/mdio.c",
+    "sha256": "6b19c9f91d8eda0205893bb929e8d117cb31e22cbe6246fc603193fed02d0a2f",
+    "bytes": 1200
+  },
+  {
+    "path": "/workspace/nexus/io/src/spi.c",
+    "sha256": "933d438eee528cb00aa24aaf4c2d974ec18d47facc57d9c54a791d5c76161a5f",
+    "bytes": 5789
+  },
+  {
+    "path": "/workspace/nexus/io/src/stream.c",
+    "sha256": "693292c7b185bd64004507bb7341d1311f122f84ea608c40cb5a72718253676e",
+    "bytes": 14946
+  },
+  {
+    "path": "/workspace/nexus/io/src/stream_budget.c",
+    "sha256": "5aca444c08926de7bbd47c24aa4ded2d8e1f89b5fa0c56077b8425352ed69eed",
+    "bytes": 4434
+  },
+  {
+    "path": "/workspace/nexus/io/src/timer.c",
+    "sha256": "4d2eba552c2aa8065ec6767711a5b045bbe2649c69975503ea5135c6d691a5ac",
+    "bytes": 1847
+  },
+  {
+    "path": "/workspace/nexus/io/src/timer_capture.c",
+    "sha256": "65845a51610421f6fd1072ffe06eb726bbaabe950ca4a8d47bdb16e78cd2a945",
+    "bytes": 3102
+  },
+  {
+    "path": "/workspace/nexus/io/src/uart.c",
+    "sha256": "974704075e9bac9f80873862fcc49945e54e4cee43515c1bd61a8e6d8ab776a9",
+    "bytes": 5259
+  },
+  {
+    "path": "/workspace/nexus/io/src/uart_rs485.c",
+    "sha256": "867bdec68729f028d8f5513e93f6656b5ec772568dfc117baf95b6c130dcc8e7",
+    "bytes": 14081
+  },
+  {
+    "path": "/workspace/nexus/io/src/usb_device.c",
+    "sha256": "ce6a9771275e7e8f3f9da320de9cf5f71b410ff836616aa1a2e88e88ed5dd773",
+    "bytes": 5932
+  },
+  {
+    "path": "/workspace/nexus/io/src/usb_device_controller.c",
+    "sha256": "caac78c495a36886c76c69a60e52745140f7f7c2a5ebf52ae5af2d6ebe2275d3",
+    "bytes": 45696
+  },
+  {
+    "path": "/workspace/nexus/io/src/wake.c",
+    "sha256": "227718bd6f7a31e3469d60fa4d09fd264bd0a7a9ae13bf30bfc069b376ffca6c",
+    "bytes": 2662
+  },
+  {
+    "path": "/workspace/nexus/io/src/watchdog.c",
+    "sha256": "ea3ec3f1cbc3dc1ebbba796760083a377356708532526d9354c5032b656cf357",
+    "bytes": 1620
+  },
+  {
+    "path": "/workspace/nexus/os/threadx/Kernel.cmake",
+    "sha256": "385cec2019fc1e78af258c58feaa8b404a5d66d6812870dd8f29ea6e72b89eb4",
+    "bytes": 4710
+  },
+  {
+    "path": "/workspace/nexus/os/threadx/prepare_linux.py",
+    "sha256": "704791c42414d948cc301d9f9a6869307a092f47ef808b44065b0d71fbb21a5d",
+    "bytes": 4885
+  },
+  {
+    "path": "/workspace/nexus/soc/common/i2c_v1_async.c",
+    "sha256": "9af2523ce33944c9202c9d800a4527b35d71b6179147e62b8593dee1269b0437",
+    "bytes": 26226
+  },
+  {
+    "path": "/workspace/nexus/soc/common/i2c_v1_async.h",
+    "sha256": "673387cb4ad4c00917ba0701a517086ae0e586c849aaaa100c381f8024fa545a",
+    "bytes": 3047
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/CMakeLists.txt",
+    "sha256": "826c58a000176a95c070a4f4c8667beb2f38ac67d0ff30e36c64719722c88ac7",
+    "bytes": 8162
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/adc.c",
+    "sha256": "91138076b826167aa03a3cba530e46adf7b0e9217a818ef834682d588ccafb32",
+    "bytes": 9663
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/adc_continuous.c",
+    "sha256": "ac35e0ecc0ffb85f5a2d2e37866e4167ae568c1ad534cd03dbeed87253e0a181",
+    "bytes": 20238
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/adc_stream.c",
+    "sha256": "1b8297da3fd09a63e94c13b442de0f2b366a294315efc60c01592fb5b394d512",
+    "bytes": 16230
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/advanced_pwm.c",
+    "sha256": "e3008f26eef7f868770a21d24532dc43e67dd5ef5109d7ef5f97d76644618a3a",
+    "bytes": 2143
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/can.c",
+    "sha256": "ea96e8d5dbb9e058390bab1c6a55e95c806a6c66098deb57eed696d343642c13",
+    "bytes": 4753
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/ethernet.c",
+    "sha256": "befdeb0084e868422c40fe31b5673e8da356352c252ce457a3319ffb3e0ea491",
+    "bytes": 11696
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/exti.c",
+    "sha256": "74254f37d5cbdca5419e7a797581f572784d6e0a8bad96579447ccca91b6e603",
+    "bytes": 8382
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/flash.c",
+    "sha256": "affedf6bce4d59c7255c543ac713c46042ff9bc1a3347053af4d8362aa7ada8c",
+    "bytes": 12955
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/gpio.c",
+    "sha256": "85f4f9eff2c016a4d3d70be3f0df4f32e66fa9841701f99425e8247df4ec3140",
+    "bytes": 6951
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/i2c.c",
+    "sha256": "25ee035c32ea99b1bfffd1d09bee7c6c386c25f0b528bbfc7bb651160980675c",
+    "bytes": 15319
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/i2c_async.c",
+    "sha256": "3e4c1918f6718ef00159f8883bed715b7affa1a268a5ea0bd08aba8fee803271",
+    "bytes": 9489
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/spi.c",
+    "sha256": "1dfbb4e22d75da90e1d52f05f2b6edfbbe8c0c2a87825db2539483826b952794",
+    "bytes": 10500
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/spi_dma.c",
+    "sha256": "93750f13a2c377aa9c68d22c005410cf479060afd67d89815656e66dbf9c396f",
+    "bytes": 25925
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/timer.c",
+    "sha256": "b4d0d13c4baeb77904d8e0e15379b4b483cd8363316927e07c5674179818116f",
+    "bytes": 4478
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/timer_capture.c",
+    "sha256": "decb30804b049687cd755c11b1e53b3a5a6471e30736f785326b38c793ee12db",
+    "bytes": 1809
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/uart.c",
+    "sha256": "3759de1117f6d952a5dbbfd1af1ec66b3675a1feb97e853e0253ea576b12469b",
+    "bytes": 19683
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/uart_dma.c",
+    "sha256": "ada4692deda20e644b8d08581e0701ed280e8988ee9b42686f9afa2e89251acb",
+    "bytes": 19426
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/uart_receive.c",
+    "sha256": "f9b8babd5f5f24a859ebe6361ecc32232a6ac934a47e7a7c9aff6d91c6bfc6b6",
+    "bytes": 30851
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/uart_stream.c",
+    "sha256": "b27fbeddbfef75e0dd4e8ba8627f6148a24143986045c8ab42e53e9d79f94f3b",
+    "bytes": 9479
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/usb_device.c",
+    "sha256": "7e97eb795e84df0c3726fc1762dab5ac05df167f8aa8c17bf793da6338e09432",
+    "bytes": 3330
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/drivers/watchdog.c",
+    "sha256": "e43405f572c443d74630adec1650458f759d44cf2ad69106d93deba1dda14f82",
+    "bytes": 5327
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/memory_init.c",
+    "sha256": "0f3502565b87febe4ed3e833fdf5ac9eef6f91f09ec52a356a1ba4b2d6bcbe87",
+    "bytes": 3565
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_adc_stream.h",
+    "sha256": "039c4add217243e2cfa9ab0a99cfaba96067d351cfd212db5d6ea29369f8fb6a",
+    "bytes": 5450
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_can.h",
+    "sha256": "eebcec1e65d7066607289cba2ab60ec2d96ba34e1d24f9cb5bb814a99ece3744",
+    "bytes": 1152
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_dma.h",
+    "sha256": "7b8c3b160c6b851f70114fda40b261df1ea5b3461169c96f915f16e00bdb572e",
+    "bytes": 5123
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_eth.h",
+    "sha256": "f70201e209d3295a1ad14feff35d7514d63f3c65807ba8deac138a72196c17c4",
+    "bytes": 861
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_i2c_async.h",
+    "sha256": "ecc221ba46d15fd7930332de3b3c2d6d3d07c05bfabdf67bb1cf370945d9f2cf",
+    "bytes": 5248
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_lowpower.h",
+    "sha256": "cb99f1a393a9b8136c3e8a9fd158f366fcf76681e8bf766315abd2bcacca48c3",
+    "bytes": 618
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_provider.h",
+    "sha256": "4a865f646cd9565806959186ce6c3a591c6302b1543ad0bc7def741431663226",
+    "bytes": 22822
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_sleep.h",
+    "sha256": "783c4e48cb31cb5818bdc30dc4cc5625ac3ef7bcbd616405e38879476b2839ad",
+    "bytes": 1872
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_spi_dma.h",
+    "sha256": "1c8fb7dff0745fd4f47dc00bcdb6d1c618a55a47addea0060abf9057141291e6",
+    "bytes": 4364
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_timer_advanced.h",
+    "sha256": "b865ef153518445378d36cc72544fb0a99503c1d59decb76180c88519a18b689",
+    "bytes": 1830
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_uart_receive.h",
+    "sha256": "ccc318d028f0c2527600d4586750cbd4640561c2c4bcecb0060700099d073abf",
+    "bytes": 3935
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_uart_stream.h",
+    "sha256": "15fa379dea5de9a61efabaf0de414e739623387f8547ac7f564a218bc698185f",
+    "bytes": 1966
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_usb_clock.h",
+    "sha256": "d6cac5a6262036a36c23dd1b6d5aae36c9ebd4fa6d1f3b1cb32c635aa722ace3",
+    "bytes": 2533
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_usb_device.h",
+    "sha256": "563d2250fbcf735e62c8acca8eec34535f4d6d9e718f1a0d60bf8f6dfc51846c",
+    "bytes": 854
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/gd32f4xx_libopt.h",
+    "sha256": "64afa1aa962f93bc9cad8a23244b39b383dd4aa29c0056c20d9a4cd2537f10db",
+    "bytes": 839
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/memory_init.h",
+    "sha256": "31a96ed0a74cd5f41f1906aa87aaee449a6affadc3505f081b4cc52f9531bd0b",
+    "bytes": 1991
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/system.h",
+    "sha256": "ea3ae416c653f9abbfb42da62a1aa832290594cdd95a4bb98bb709601ee181bc",
+    "bytes": 2710
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/private/usb_conf.h",
+    "sha256": "3f35497bd86d170cf0501b9addcffa184c66e1856793d7f7d7c8a8f1b350af5f",
+    "bytes": 259
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/routes.json",
+    "sha256": "e6b68f987a61d08b9044b63dc4891b9e13941137c9382abaf364899ce45c25ae",
+    "bytes": 12762
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/sleep.c",
+    "sha256": "165534059ec5087170e5f30e2235d28a71e233d77ef850a2af3d9b52a4b3320f",
+    "bytes": 3817
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/soc.json",
+    "sha256": "0fbdc271b34227f0dfd3e4aaf7fa7daf702f3fc3d5989915de88cff382167f2d",
+    "bytes": 10877
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/system.c",
+    "sha256": "711d6e4f5a4a673360523697b875e1c47d91a44a4ac974be056ecafe6cdb8f76",
+    "bytes": 8430
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/timebase.c",
+    "sha256": "2f28edea77098b4c2783ce6b94e4f5a3b2b0570c1c9c4e351225db91a3218802",
+    "bytes": 5730
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/timebase_lowpower.c",
+    "sha256": "4e746f2e5573483799ad4f8f561f70299c279577ca9a3d8c67c9a8ec6006625d",
+    "bytes": 4011
+  },
+  {
+    "path": "/workspace/nexus/soc/gd32f470/usb_clock.c",
+    "sha256": "fca632154fd0cb985780382d107dead46993a3f5278c88b201f7ad59737cc5dc",
+    "bytes": 7883
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/CMakeLists.txt",
+    "sha256": "9dcb911530044acc96714f765bec6f005398688d15f58348b5d09e7b2c737763",
+    "bytes": 6425
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/adc.c",
+    "sha256": "d10f7c0df236765296c5a598e4504d0559dada030b8f27c39602302e72070217",
+    "bytes": 4911
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/adc_continuous.c",
+    "sha256": "25506290b03308aa8417e4cf5735e9ce17cdab5b4cd6c81021088e35fee6e61e",
+    "bytes": 17996
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/adc_stream.c",
+    "sha256": "b7e15782abd9b4d7126efe55761cdb4364ad8ef73336154e9970485fbc4210b6",
+    "bytes": 14753
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/advanced_pwm.c",
+    "sha256": "d41e0e9312446aaf4391d7c709e398439e4c7686227758741e066329f093744f",
+    "bytes": 1776
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/can.c",
+    "sha256": "0962e0f364a84f4baab4d88a58bb3a2d993d6fe3d70c1c832a8115413f4453ed",
+    "bytes": 4957
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/ethernet.c",
+    "sha256": "ff4edd1671aac5dc0a85ff5554f1a54a0735f513ca447e69c093e46db887dbd3",
+    "bytes": 7762
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/exti.c",
+    "sha256": "8160540d30f14858eb0cc8e34cab162cee5acbcefc9fc6b2d0901d3e58149c9f",
+    "bytes": 7270
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/flash.c",
+    "sha256": "e5f41d03873077a8cc7436d8b0d4e11c67a81baf108b4aafe03184145de85f0b",
+    "bytes": 8904
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/gpio.c",
+    "sha256": "cc9f96ded9b52f11f15fc24552dfebfc2bbd45b66b293ae55bfa6f9e6f954559",
+    "bytes": 7466
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/i2c.c",
+    "sha256": "abf23c627dc69edebf1fcc685c32e4542ba8d123550d701d5f7d993792f4c7d2",
+    "bytes": 12254
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/i2c_async.c",
+    "sha256": "3577634c493a8afd3f54afe5be700f6dc26bcb571d062d75013a8de7a64bf6d0",
+    "bytes": 9539
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/spi.c",
+    "sha256": "900a93cf28e9f85fe35063078609fac433a232ac7a1d12c13721e4e31a474d2b",
+    "bytes": 7532
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/spi_dma.c",
+    "sha256": "49bee3167e8663fe0e90ec451cbc9552d89fdfdb312662fe23b62816c7873ca9",
+    "bytes": 21505
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/timer.c",
+    "sha256": "b4bdbcf1861b84412d7f0a5c1240be20b4042ef5dd2c565cfe30a7c15841c671",
+    "bytes": 5645
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/timer_capture.c",
+    "sha256": "3cdbaaaae4eed8fd5b3c1f26690000e0cb808bfeac8b5bbf999fe94d08b14da4",
+    "bytes": 1546
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/uart.c",
+    "sha256": "3d89f535de8c89708155df99d6ca10283e94fa67f037c78f09a4505e26d4816d",
+    "bytes": 17121
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/uart_dma.c",
+    "sha256": "aac5943bb0a6e4b958934d7350fefa56468140bfa5907d6ce539918a9bced4d2",
+    "bytes": 16492
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/uart_receive.c",
+    "sha256": "6a9a0c68a5346fd785b15e705614a17d6fff1154649d4080333e5d35a072d390",
+    "bytes": 29026
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/uart_stream.c",
+    "sha256": "ab37eb506ad3ec3f9c8676d48dfab801aa463269889a2267cf3a8856c1751bfe",
+    "bytes": 7749
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/usb_device.c",
+    "sha256": "98f80491c5a7f872bf32070b9bda3a5208e5f3c0f12a3ce474d850297927d24a",
+    "bytes": 3862
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/drivers/watchdog.c",
+    "sha256": "417d8d124afbd0df03123362996e918556013b72e86fdf8bba1bfac7daee9248",
+    "bytes": 6503
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_can.h",
+    "sha256": "2bc9a507357e871ba45b59c4146cc6858fa2e69f245fcc953ed27f4883b8edd4",
+    "bytes": 1158
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_dma.h",
+    "sha256": "9d34afa6b97aa4e71852cede594e96bdfd7ef9a4347d6f0d2d2df65f74dd94b7",
+    "bytes": 6647
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_eth.h",
+    "sha256": "6ea3b2626831ff6d94f1cfa731e9c1608ebbfb3908ee16e12ef7ed8c913c3230",
+    "bytes": 871
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_i2c_async.h",
+    "sha256": "d7c45f44497bd07572911be5e0d0d06e285493dace5da9ae8bca241b38764988",
+    "bytes": 5258
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_lowpower.h",
+    "sha256": "55936c7826a6943cfce4a636c2ddf4969467e01fa88ef830311b7ae2d6a39ee7",
+    "bytes": 622
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_provider.h",
+    "sha256": "e54b8fde0df5f0f813982e4c1835d8676bc76f9898d3034ad0c662b9649b8062",
+    "bytes": 12673
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_sleep.h",
+    "sha256": "9ff409d52ffdd3dfc12f8cb335adf2fcb1346f6c437efb669a11d61aae5d27ee",
+    "bytes": 1880
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_stream.h",
+    "sha256": "a34e2d0e2455f428f909f73f32eeb023fb912b8e8ba90390dc89c05834c004dd",
+    "bytes": 5348
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_system.h",
+    "sha256": "72c4a5b774453c6a62e8bc2fdc058f2e1356dac4021b197ee998b128ac939e47",
+    "bytes": 3327
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_timer_advanced.h",
+    "sha256": "40af97908cbb09db80f8a70a950c334fd881aa0e288e74036ba7007fef8ab3da",
+    "bytes": 1843
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_uart_receive.h",
+    "sha256": "35bbc606b2285a35a83490751ef79a30f5f554466faec5ab97655ac695ce67bf",
+    "bytes": 3833
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_usb_clock.h",
+    "sha256": "2babdc574d9e8514eb122a2ed49300bab684bd043ba407cf357ff4f611dd39d6",
+    "bytes": 2168
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_usb_device.h",
+    "sha256": "93234d9fa1d01f6023e8afb08b39f7f677eba8e3d1ed4e4ba451a308e8695ab4",
+    "bytes": 861
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/routes.json",
+    "sha256": "2e222fbec8a95265651e62ef7b027f719c406a7b468e466048d5324e429bd1b2",
+    "bytes": 14670
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/sleep.c",
+    "sha256": "e57a5a885382abc0b1a8fd079ebafaa0cb14ab96c71205524d9f9b141be229ad",
+    "bytes": 3781
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/soc.json",
+    "sha256": "5d5e651faac4186d9ea955cd40fdbefb7bce188046a0f7ca6afc3654c25a2139",
+    "bytes": 9374
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/system.c",
+    "sha256": "7b38fb8d2308c94fb8cf74b1430fcac39dc165e86728c238a6a3a6769adcc1c8",
+    "bytes": 7908
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/timebase_lowpower.c",
+    "sha256": "c7d3431e7ca69b9d1977641338f5b2a9336ee2ce65642158c41b1c56d9a1f3f7",
+    "bytes": 4012
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32f407/usb_clock.c",
+    "sha256": "11e93443be03983abfa24d952d8c1b9896d7103be8b61d9b70768d338ae5b044",
+    "bytes": 4694
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32g474/CMakeLists.txt",
+    "sha256": "7020d1eef40f533e464ad109f78d8ffdc7b2e58595bc484a6f3ca6e9e934bc7b",
+    "bytes": 2366
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32g474/drivers/gpio.c",
+    "sha256": "b8deb02e97bd97f1363edd84ed82db92e561555d582a3d4535980547a2efb2f8",
+    "bytes": 6967
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32g474/drivers/uart.c",
+    "sha256": "098256a5e593d2ec16b7d571b9abe5be4528d69935252f12c5bf73fb1b3232ff",
+    "bytes": 16954
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32g474/private/stm32g474_provider.h",
+    "sha256": "859d8b1bdbd5584c0f5c4c43a4f1b3d6cc3ae0f02a11d5c4d11f0c74f1ffe257",
+    "bytes": 3120
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32g474/private/stm32g474_system.h",
+    "sha256": "4be3b7f7b41637d3bba990bbedab445fc46e4197a34fddf1671882a1a90ee3a6",
+    "bytes": 4834
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32g474/routes.json",
+    "sha256": "b731f659b0afd3fff78ccefd1f7b410370a3358bfebb5bf412403bab5699c874",
+    "bytes": 1118
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32g474/soc.json",
+    "sha256": "0c8e4ece490edd06190295601139b0182a29249d6734744892c272e74420dd56",
+    "bytes": 6459
+  },
+  {
+    "path": "/workspace/nexus/soc/stm32g474/system.c",
+    "sha256": "b549ea0108f6346758ebdacc110e8b36c6985ab6a45754ae0cef3e60ad2b2a02",
+    "bytes": 12038
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/g474_assembly/CMakeLists.txt",
+    "sha256": "5f27655031b1944906b9c7e57978de74a79d6e740ad84c7b8011143581e28fd3",
+    "bytes": 1400
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/g474_assembly/empty-freertos.toml",
+    "sha256": "cadd56c1ea34d711f1d2e36f1efe26aa783686812a99710276ffcbe56a191806",
+    "bytes": 351
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/g474_assembly/empty.toml",
+    "sha256": "7dcb7d788bd4d88b28274ae3598e0ef37bea7583e0f26fb677b9caf9c7ce0260",
+    "bytes": 265
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/g474_assembly/io-freertos.toml",
+    "sha256": "05061e6ede111edec20c02b8be3335b22afd5d8f3b1792a8f8238495e5b82cd5",
+    "bytes": 561
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/g474_assembly/io.toml",
+    "sha256": "5f92b1e7a22e518cea5b948405a66633408c1f695ce1b7f4c835766315751ab3",
+    "bytes": 475
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/g474_assembly/main.c",
+    "sha256": "0492e7e5711113555a449b99a9971a8b9fdedc8a401fc2cd72c4dd16d8384743",
+    "bytes": 1753
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/g474_model.c",
+    "sha256": "f8fb8dcb7f96af84d5520966c3e7fba042bc821159979580057e2d9f88d62bdc",
+    "bytes": 4881
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/g474_model.h",
+    "sha256": "d215ed0d9f92e2063c078bcb5f1a98d2b0c1f695e0078ec8a2840a29f1b166cb",
+    "bytes": 2613
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/gd32_model/core_cm4.h",
+    "sha256": "9e0b5a20eba1e1d694b5e48af4eedf37fe228d203a888442e3c33c97409958ca",
+    "bytes": 3548
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/gd32_model/model.c",
+    "sha256": "21d4b0d674f620364097a73ec17d1fa78bfdafe3b2c6b49bdfe4093307387053",
+    "bytes": 8442
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/CMakeLists.txt",
+    "sha256": "03618fc0ee79ac211c16a1dd3191141bce7e945f7280e033610f3899cedd08fb",
+    "bytes": 1041
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/controller_main.c",
+    "sha256": "442f78b47ae0b7d5d9e4dac598beea24994b96b979febb7a7841f97f7335b985",
+    "bytes": 1466
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32-board/board.json",
+    "sha256": "6659cf31a1834e2ac3145df3ca210e17c0026c3db8d7172a9f70dd271e4d14d6",
+    "bytes": 1616
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32-freertos.toml",
+    "sha256": "263b6f6f5ea42c50c2891da5676811445212c2ab9e09b220fb4ea4ad18ef8294",
+    "bytes": 1318
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32-i2c-pair-freertos.toml",
+    "sha256": "f170bbfdd9c05c84ed4a65ab9f30838c5cb57372a5e36f7eb99846d4e51c2307",
+    "bytes": 665
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml",
+    "sha256": "415675106ba90fb9ca663da58ff84a45d252645cabd7908670f4ddc301b16ce3",
+    "bytes": 665
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml",
+    "sha256": "f6bed31963eeb7690e1e35c16b102444d473f34e54cd6efe94e029a1ee62df22",
+    "bytes": 666
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32-i2c-pair.toml",
+    "sha256": "f513230ecc211fc537de3153856257478c2545ec7317133201e0187d75af73fd",
+    "bytes": 666
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32.toml",
+    "sha256": "67fc58b04fa69a27167fd5f155b1abbd53c529faa92736bf4be2a089fda213a0",
+    "bytes": 1319
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-ve-board/board.json",
+    "sha256": "368900bc01654d4aef7f0a9c4d2a6c7aab1dfb0c8fa2018de5950e8a3e67cd83",
+    "bytes": 1725
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml",
+    "sha256": "2c85daed66f192c4c16dede248701e564b51315aee4e448f48a0802dc748fec4",
+    "bytes": 1321
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml",
+    "sha256": "e9ea49584b739f22d80b31491da8fdfe2f6319fe61b29486226d3821bc3c6382",
+    "bytes": 666
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-freertos.toml",
+    "sha256": "f94eb5bdfd361d33c6c03b14153b4cc1679c9284c11134945189aa626aa5ff45",
+    "bytes": 666
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml",
+    "sha256": "25c090a4ab098ac1ca0a46b72d5a78c2fcb7a78aba74746dcee7d2ff70ee8da3",
+    "bytes": 667
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml",
+    "sha256": "3957a66fa3bf42e4b093ad0f77b0c80900019e10effc2efdb1f44dbd1f5c16c5",
+    "bytes": 667
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-ve.toml",
+    "sha256": "e95a740c3dba6c98863c8a457e24b432af659ed02ba9212cd1c1f9eb44bf9ad6",
+    "bytes": 1322
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-zg-board/board.json",
+    "sha256": "4af5ade0f0aed362841096dd5632a94ee362f46f67c05b70000b530510b3d818",
+    "bytes": 1725
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml",
+    "sha256": "1c0926401cef31fb11ec7a40eed92a90ea6fa7085c4e4cca99246a724e208340",
+    "bytes": 1321
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml",
+    "sha256": "2b114c479f6c543f284c06e5d1934ecbab01f1d92f6cb91502f63b670ca568b5",
+    "bytes": 666
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-freertos.toml",
+    "sha256": "3de61dff75edca7462146630651b5d816b4489892f9c242048ccd9797de524c8",
+    "bytes": 666
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml",
+    "sha256": "5d68fa9bf6441cebc527129510e409395eb6c9d274b17d8b3fd55e2364c50de6",
+    "bytes": 667
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml",
+    "sha256": "d73f6e4c9d0ae105c592371f9b0bff5c2f6ad81d5c685ba5662389d89803fa9c",
+    "bytes": 667
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-zg.toml",
+    "sha256": "82ff6d58fe5cdb10f26d5e4b503994affd625fd7dd23d77deb4de187db2a98d0",
+    "bytes": 1322
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/native_assembly/multi.toml",
+    "sha256": "665973b8773896c1bcd70d46273e63d51859a3d64e145e31878cc29d522f8168",
+    "bytes": 1655
+  },
+  {
+    "path": "/workspace/nexus/tests/contracts/native_assembly/multi_board/board.json",
+    "sha256": "4788e7fadc0548aa2659fac2e7547b12355cde6c67fda4d38b71c7052038b839",
+    "bytes": 1618
+  },
+  {
+    "path": "/workspace/nexus/tests/google/CMakeLists.txt",
+    "sha256": "8c17c704c75381bdecf8246c59f64fa78df1898782de70a4501c0a02ae30196b",
+    "bytes": 22872
+  },
+  {
+    "path": "/workspace/nexus/tests/google/g474_factory.cmake",
+    "sha256": "b5b408ab78f47449dd17c7b9a37825222b64b503b97a272e4dde33c9ea7a90f0",
+    "bytes": 2293
+  },
+  {
+    "path": "/workspace/nexus/tests/google/g474_factory_model.h",
+    "sha256": "754d40e9cbb88841fb343f7228b2bcd9ea6d2950acc0606b3121bdb56b6f1cc9",
+    "bytes": 796
+  },
+  {
+    "path": "/workspace/nexus/tests/google/g474_factory_test.cpp",
+    "sha256": "323910a84889b474aa0f85b9cc5b73914b54a44387379c52820a9e62964c7d1f",
+    "bytes": 11123
+  },
+  {
+    "path": "/workspace/nexus/tests/google/i2c_async_register_model.h",
+    "sha256": "43aa4c517b9c369d3f8c21234e76b1860782c2152e29457641b037bee381c33b",
+    "bytes": 913
+  },
+  {
+    "path": "/workspace/nexus/tests/google/i2c_pair_factory.cmake",
+    "sha256": "fbc0534ceb2922912f40294d19b0018d034811104ea042ce35c787a92e38c3ba",
+    "bytes": 4249
+  },
+  {
+    "path": "/workspace/nexus/tests/google/i2c_pair_factory_model.h",
+    "sha256": "822f3cee1ca67c51df2a1e8de08c2bd4bdf577b03fb87055ec84399e2451284a",
+    "bytes": 1928
+  },
+  {
+    "path": "/workspace/nexus/tests/google/i2c_pair_factory_test.cpp",
+    "sha256": "b60fe127db8b27eb8a4516f756cc1e41438f140c67b0cab0f02ac6a71cfc4db2",
+    "bytes": 25281
+  },
+  {
+    "path": "/workspace/nexus/tests/google/native_factory_test.cpp",
+    "sha256": "25912a5b716f5f09d3db53e41d90a6be28cac2065ae18d1c9d22fb8d219fad1d",
+    "bytes": 20109
+  },
+  {
+    "path": "/workspace/nexus/tests/google/threadx.cmake",
+    "sha256": "7018ca09cb99f52878e5afc16489c0889e880dae24dcdd17aa36524a7e581484",
+    "bytes": 3403
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/liangshan-baremetal-empty.toml",
+    "sha256": "a886c9f8508700edb3e8107b59b1662adef455ae5c919ed30fd18cc34ba4065f",
+    "bytes": 223
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/liangshan-baremetal-gpio.toml",
+    "sha256": "dfffc3ac5c579b9a4757f7582df40e3a7d2f7024e2e6726e751f35377a45be32",
+    "bytes": 275
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/liangshan-baremetal-spi.toml",
+    "sha256": "3eeee54ee146a54ec24c564e3cb6ada9b8875fd8e492feed1b018049f0461de7",
+    "bytes": 357
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/liangshan-baremetal-uart.toml",
+    "sha256": "fabeddc1a75200fbb4f360ee32555070077b27a53bee8c707a0c8886d0f101a9",
+    "bytes": 364
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/liangshan-baremetal.toml",
+    "sha256": "ea82fedab8a33a58d423b64e0a39a6939054a2fe782e513f531db660048fdfc9",
+    "bytes": 416
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/liangshan-freertos-empty.toml",
+    "sha256": "44d8efef5caabede58bb9b5658939d7fe0ca92e65bf266a0dd68b0d8a3ca8ead",
+    "bytes": 222
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/liangshan-freertos-gpio.toml",
+    "sha256": "05ab37a250a908802e7ccb1f487682d6948c1ac35207be9aef82eda283bb1dd4",
+    "bytes": 274
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/liangshan-freertos-spi.toml",
+    "sha256": "dae4d8ad91a6e7525ff43b60702adaf00fb267c1d84ff061b47d0bc8f9dc0a79",
+    "bytes": 356
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/liangshan-freertos-uart.toml",
+    "sha256": "f5a56bb359b256a5f6ff3540b7809ee927fd626c3697297b93b14b317f6de460",
+    "bytes": 363
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/liangshan-freertos.toml",
+    "sha256": "4e81f233c4fd7b6e7d3a78079ddb3477d369257ed67a0025fd8b3bb58787832e",
+    "bytes": 415
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/native-empty.toml",
+    "sha256": "6d23ecc8960e79d0152c5bd02e68a53d9e2c4591ffb52068b4d9d66dbad8a2fb",
+    "bytes": 209
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/native-gpio.toml",
+    "sha256": "a4b2a572fad927f1faaa541dee2146510296afc9af1a43ea6e3db66b4bee9727",
+    "bytes": 255
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/native-spi.toml",
+    "sha256": "6020b70ed3e5364b6e4ab47385625567495d3afa721a2b9e628e67f6f66c89dd",
+    "bytes": 340
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/native-uart.toml",
+    "sha256": "46d80771c3f429b375f78b2720555df1579b943ab5bd2d38fd5348886c23bea7",
+    "bytes": 347
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/native.toml",
+    "sha256": "6d23ecc8960e79d0152c5bd02e68a53d9e2c4591ffb52068b4d9d66dbad8a2fb",
+    "bytes": 209
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/qiming-baremetal-empty.toml",
+    "sha256": "a9e19f944e97cb35c735f14c2aaba3eca7be29eb3adfa897f609fea95540181c",
+    "bytes": 222
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/qiming-baremetal-gpio.toml",
+    "sha256": "9e8754436c39d14640113c4f8e863c061495e014a768167280dc5095ce858d19",
+    "bytes": 268
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/qiming-baremetal-uart.toml",
+    "sha256": "2db64dc7e80e31c7e4b31576601edaee1be1f2e396acb1983537235fe8cd1a85",
+    "bytes": 361
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/qiming-baremetal.toml",
+    "sha256": "f7062593b705f31d70e3b65c9f5b27f63368ced38818a260296e5c1a4eef2f56",
+    "bytes": 407
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/qiming-freertos-empty.toml",
+    "sha256": "4064bec616f0d887411f5f797619d829d04bb732abdaea3600e096c87e7c7d98",
+    "bytes": 221
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/qiming-freertos-gpio.toml",
+    "sha256": "f9cb85c5355433f958e713103408e7303c06fb9132e7a9ac741c4cecc64dab7b",
+    "bytes": 267
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/qiming-freertos-uart.toml",
+    "sha256": "109b1d1c19b91dc8f2d94e5c27d1ef25f83b85d53374aee9256c1ccef73037b2",
+    "bytes": 360
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/qiming-freertos.toml",
+    "sha256": "575e23b55cf84479dfff0e467c5b0a35ae522bd744b87a42362cf1ab5f178292",
+    "bytes": 406
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/sky-baremetal-empty.toml",
+    "sha256": "7cdd2342a4fa6e30fd595f5328167e0d52cdc8ea5b692b62d51ecd1667bd62dc",
+    "bytes": 226
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/sky-baremetal-gpio.toml",
+    "sha256": "022ed9d31ca38e78b74351762a8fb2895e516fc991ae87c35934f94c53a0a263",
+    "bytes": 272
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/sky-baremetal-uart.toml",
+    "sha256": "6f9a8cf810b80ed398b086f192f62ceb0134d7db6b548e29d0250b30fbe0f8e8",
+    "bytes": 365
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/sky-baremetal.toml",
+    "sha256": "3d59a1d8629b3998057a24ddda0fe2ddc223a1718612c51db93d3df4079900bc",
+    "bytes": 411
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/sky-freertos-empty.toml",
+    "sha256": "a6203ed2bb1591c5228141864c1576533b51c22f7fdc343a5a2b9233c88ebe5e",
+    "bytes": 225
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/sky-freertos-gpio.toml",
+    "sha256": "c77b2df1f8ed7af7db3d020e6cdcb46c0b961b6e478b372de847b969fa692d33",
+    "bytes": 271
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/sky-freertos-uart.toml",
+    "sha256": "cc1329995b6fd17a997113b740731fcfed805cda69ebc4e1efbbfcaaa2ff6243",
+    "bytes": 364
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assemblies/sky-freertos.toml",
+    "sha256": "539062cc7819027209c16866cdf207ead964b75bc1bcbd24dcefbff368c26d29",
+    "bytes": 410
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/assembly.schema.json",
+    "sha256": "1ec8fdad8f97f1f00c63beafba2ce7c87faff2bf2cf54f2ad6ee1bf67b1b30c9",
+    "bytes": 28195
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/authored.py",
+    "sha256": "bc95d4e62319ba84b0d6312b294dc4fcb1232b795d60c5b4b867eaaba89ac145",
+    "bytes": 12516
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/bindings.py",
+    "sha256": "89cbc676be933fec6a72e9aa253f5ead3045a5b8e0579ae84f19b50a73ac942b",
+    "bytes": 7964
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/can.py",
+    "sha256": "2a97b5a05a18e9448cb322d9af5865d0c9d99768205c314d3dcbf950dd96aa7b",
+    "bytes": 11248
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/configure.py",
+    "sha256": "b505d432e1833040a5b03b537865f607dee21e3e994e2c8f7bd64a47f977103c",
+    "bytes": 52653
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/cpu.py",
+    "sha256": "f03e51b7ccb72aa4dfa598cbbc8797ca169f97a7a3bf2653720db743d0623c45",
+    "bytes": 18941
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/documentation.py",
+    "sha256": "a8d06417aaf93f9cc74689b57d8f41376bae21d2fafa0746dfda2a9c3acb7470",
+    "bytes": 5150
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/emission.py",
+    "sha256": "e4cf387c840f2a4af8df2191239a18ea85bdfa58a9af48037ebad7a1ec2068d4",
+    "bytes": 767
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/ethernet.py",
+    "sha256": "a5ac645aec49996d7c0635015086d528b4fcb148b6f0823383b2592166918f02",
+    "bytes": 11233
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/factory.py",
+    "sha256": "7955cb1afd372f31c886522a727dca445761013790f0d82c300043baf47e220f",
+    "bytes": 12022
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/ir.py",
+    "sha256": "4e1441bf3cf7aa16957dc7f93bd97d389e4678e79467e5e6a459b0a2a0a0dee7",
+    "bytes": 13692
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/kernel.py",
+    "sha256": "f47fdbdd2c77724e122b97b141bf3fecb637348e27699709478ad412e4fe3377",
+    "bytes": 11250
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/lowpower.py",
+    "sha256": "b2ebe1ddc0e9305a975440c68211329cc083dc24529b1b15cd509a0099823033",
+    "bytes": 998
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/memory.py",
+    "sha256": "daff8e35fc603693ae0a68b8f4efde4c01218159fd759c8b442adfb73d62743e",
+    "bytes": 7581
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/metadata.py",
+    "sha256": "c52d16ce8e8efa6ad761eb0fea916db14a751e19886bad0c6f00471aaa75f9eb",
+    "bytes": 4524
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/__init__.py",
+    "sha256": "3253d01c0edfff856b295be9dee175cd545b07b80aef95b83183c1e7f88edbfc",
+    "bytes": 515
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/common.py",
+    "sha256": "8f0a32f270df3d5647e377eda0694ff13587cbea42a88c5560e6cda8ae1de912",
+    "bytes": 13772
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/gd32f470/__init__.py",
+    "sha256": "7d9a3baaf4c12a8ee837c2be00676af31b8cf246e60472ffaf9b5002611d3efa",
+    "bytes": 5854
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/gd32f470/bindings.py",
+    "sha256": "7d20ddc4cd77355ac7a0c6c9a6989dfa6fdec285ef778e1dc0f99fe378ad5e2b",
+    "bytes": 24138
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/gd32f470/emission.py",
+    "sha256": "cb4ae96bd341b24bd27f80c1df6dae4667c8f8591e5ed06fc7aac4fe4c0c46aa",
+    "bytes": 6623
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/native/__init__.py",
+    "sha256": "ea988d5ecbc0d24e245249b038c1ade8cdec2ab5ab623d25b071e4abb942189e",
+    "bytes": 3037
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/native/bindings.py",
+    "sha256": "94f48411c94687d63a1b08af7810967eb214375d415c5d6edd90310edd85fb0a",
+    "bytes": 5647
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/native/emission.py",
+    "sha256": "414f066d45bd0fe33985782551ac6010813c8996bf77b2d2ae1ba09bf1c2be2d",
+    "bytes": 1970
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/stm32f407/__init__.py",
+    "sha256": "36580820eaab9c41ceba09eccefa00c278a35f83fb8fce453af33e09581da5d0",
+    "bytes": 5214
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/stm32f407/bindings.py",
+    "sha256": "4067d7778aaef4482ac2dd0675a6fc464fb6114cf2b28769fda60b28610320dc",
+    "bytes": 38457
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/stm32f407/emission.py",
+    "sha256": "bfd2c487e6041ccb04adc6a5bd152d83f126a7e53eb9a37230d28c175b2c3dd9",
+    "bytes": 8474
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/stm32g474/__init__.py",
+    "sha256": "ac304aa4ca6d9443044695e17597216e6b90cdeda877015452a2db0eae84c597",
+    "bytes": 3841
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/stm32g474/bindings.py",
+    "sha256": "80eaed6351bfe58c0862d871b8e870efe951f95bc3f82ac420f4fc414cb3b6b3",
+    "bytes": 3219
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/providers/stm32g474/emission.py",
+    "sha256": "dd3af048e2aafa85b87ec20da172a2d60ff0604e6618fb3cac4c9a1452de7303",
+    "bytes": 7032
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/runtime.py",
+    "sha256": "59d0dc6c016a6c748712f7cc9499517461b9141b30745102f5f30b61a951c197",
+    "bytes": 9234
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/secondary_controllers.py",
+    "sha256": "c1205631b453f7381a5e3bc9a2f6f8f2c1b9943151bcae7869c920d0a64f50b3",
+    "bytes": 21761
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/threadx.py",
+    "sha256": "61426fe8d5fe2db68391185e2b8ee7482a6ca632f44a43133c8ab282eefeb620",
+    "bytes": 4451
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/timer_advanced.py",
+    "sha256": "8dffdfabb5841ef78dbfe2d7f0736887e561432f19029df53e3c2abfb4ec2b02",
+    "bytes": 13477
+  },
+  {
+    "path": "/workspace/nexus/tools/configure/usb_device.py",
+    "sha256": "01cf7239797b81f21ff3e2128499e9432e0e298a33a19a2f11ef55d2594b64df",
+    "bytes": 11812
+  },
+  {
+    "path": "/workspace/nexus/tools/maintenance/stm32g4_lock.py",
+    "sha256": "3bd3f728aee55e427ee7027facd6deaa927088d4c4bd92742857f89a53227625",
+    "bytes": 6817
+  },
+  {
+    "path": "/workspace/nexus/tools/maintenance/threadx_lock.py",
+    "sha256": "f26e16b27982ce17bb633cf7fa3e6c5666ec5f192a0d51b88de016b85a8d1af4",
+    "bytes": 11276
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h",
+    "sha256": "db6de53203fa053d6e789ef86908195f84b7664753bdf0aa7ca74f62025573ef",
+    "bytes": 28917
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/system_gd32f4xx.h",
+    "sha256": "6077ccbeff029a0058465172607481158b202d5687e2e87a0ed13ff6a9b2633a",
+    "bytes": 2740
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_adc.h",
+    "sha256": "9fa1a80b64d18512729af4d22602d5761ec0758d970fb5d15f7f8a96244607d3",
+    "bytes": 41521
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_can.h",
+    "sha256": "f760aeda3aec42af2b2f8013ac4dc8c9949e3ba079db41ff0b1932ec9d1a3662",
+    "bytes": 54600
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_crc.h",
+    "sha256": "79255fe26069554b4383663a209f2eb9460d85c4c4da89bdfa5d96f9678519d6",
+    "bytes": 3380
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_ctc.h",
+    "sha256": "cde53f39bc090274d8cd49713b4412628a5dc688bc06bbfd2ff49fb4ee330f0b",
+    "bytes": 11513
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dac.h",
+    "sha256": "d6354a03c6e3964621a16f0fc411692739d8db28e6c4f2baf81c4949ceae963d",
+    "bytes": 18761
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dbg.h",
+    "sha256": "0a403f37714cbb585a26cb54c7c5cc6776fa9ec23459a70369d9342805713998",
+    "bytes": 9890
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dci.h",
+    "sha256": "d81f42dba43cd29e7f9ef27918a181ab06170da47bef4c27cceca905750f394d",
+    "bytes": 13665
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dma.h",
+    "sha256": "b5796d1e0017994a232a53613f2d50566b8c00dd43d4049eab26cee1e04f37eb",
+    "bytes": 32675
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_enet.h",
+    "sha256": "edfac20116c43192c0252516cb5ead60b679c581ec910bbcf918a65a5f154ee5",
+    "bytes": 145037
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exmc.h",
+    "sha256": "d08efc408ec8aa10f274b756c8a3fdab9c467d621b3d6b938c5b5e85066ff96a",
+    "bytes": 64299
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exti.h",
+    "sha256": "dd78502366ba631e32841db28711976d51f7e71417bb2006ba82dc89404eba66",
+    "bytes": 20470
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fmc.h",
+    "sha256": "a6bd45fe828fda8cc19b3b1958470ac1bb115cc162b89963f5391028c9bdc192",
+    "bytes": 28322
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fwdgt.h",
+    "sha256": "e83161e6700a28f9f0d475405c4a94a03a88e9576b6d8f41c5a9bd96daf5ff08",
+    "bytes": 5863
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h",
+    "sha256": "6551fd3fb673b3e34d5f62b72cba8a0482ce051bf29ed475015b1f9ad178a57a",
+    "bytes": 29164
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_i2c.h",
+    "sha256": "42498aa2016958a5d351577f3caeca0f7c8334ab25b704a95acb7b73001a1019",
+    "bytes": 29826
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_ipa.h",
+    "sha256": "4c083fdcd361270cf21b68dccc25c6c9508fc530420de942a39ab2dea57f911d",
+    "bytes": 25918
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_iref.h",
+    "sha256": "534e29fdeb5c62b3fb235cd17447274ef641a9d313a7f02709eadd90bbd7db40",
+    "bytes": 13448
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_misc.h",
+    "sha256": "a9a16e37b061aba51925824c92b6c740516ec40cad60f228207bba5a4f6a1db7",
+    "bytes": 4695
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_pmu.h",
+    "sha256": "0275375eff0d339ec2b16c1a0d4c67721be6bff63c1516bdc4a614bb5ed98b03",
+    "bytes": 11878
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rcu.h",
+    "sha256": "38d97fe3994cefdcb1109192a5854c29ad2af364558f499878c4a5510b26e45d",
+    "bytes": 95768
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rtc.h",
+    "sha256": "8211842f10c7f5c7b50c5819f2da2ae10726d1add65db802b81c9447885db6c6",
+    "bytes": 52407
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_sdio.h",
+    "sha256": "8adfa194b0f4ab40bb366ca4ebb5edf5586e3435ab467c93e5e8c125595bf85e",
+    "bytes": 30655
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_spi.h",
+    "sha256": "e2bc6524ff9fc2604f3e947c68ca419ff35bc029904ea8163c10510f85728c10",
+    "bytes": 25504
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_syscfg.h",
+    "sha256": "0e37ca2af26c3563712cf33aca9cf85b0489df10526c8336e0e75518a86f3cd2",
+    "bytes": 11558
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_timer.h",
+    "sha256": "b22f7cc8d1a7cf16326163982b9d6a34829ca55f6491fdea21d07b6e6dcd5668",
+    "bytes": 59717
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_tli.h",
+    "sha256": "8ace2973fabff0f410464388440bf26f5a7d085e6710e61c6d37d17e32f01d33",
+    "bytes": 23557
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_trng.h",
+    "sha256": "d29fec269c5425815aba65d24b65c617f068adbfb5e7dfef1f17d625789b7daf",
+    "bytes": 4431
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_usart.h",
+    "sha256": "7adb26fb6e10f5ce29612aff5f580eafb787311bc982c629ffdf415ddf3dc973",
+    "bytes": 31652
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_wwdgt.h",
+    "sha256": "9d143557c0ca6a5146c853d9c8e1a53f4dae8c90d10b1af53bfd79a1a86fbe7e",
+    "bytes": 4561
+  },
+  {
+    "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c",
+    "sha256": "d700a902dfec2cdcf4979c675812cd1d3656c53adc288be6c188cab51ed98098",
+    "bytes": 15213
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f401xc.h",
+    "sha256": "95973f02f75e1332038aab85ca92c112b28170c7e16a1adfc2ec53c2da81ddd7",
+    "bytes": 644272
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f401xe.h",
+    "sha256": "9db8f3e317c6029ebdd1538f827885cf538850a20b17ac8491247e783134098c",
+    "bytes": 644272
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f405xx.h",
+    "sha256": "10c3b2dfc2b358d62a55668a7085ef07c44fc01abca8f2a08c2640a538040c7b",
+    "bytes": 1087221
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f407xx.h",
+    "sha256": "ae1ab57d8ab750f64f04fd73476bc2760c761e18e45bde648e0bc350c9a1d9ac",
+    "bytes": 1193992
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f410cx.h",
+    "sha256": "97f187dd74c2bb5f9c385e106f05305a4d57f8ea99809741688af01e6f94f15c",
+    "bytes": 532455
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f410rx.h",
+    "sha256": "99ce3d9d6c79295895b8c5e62bd96336b4d3b2b25cf20779c3aa55808901cff6",
+    "bytes": 532729
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f410tx.h",
+    "sha256": "df9c85850ae219f714516391ec5411a5158a56eb8feb38102f5541f861c36df8",
+    "bytes": 528769
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f411xe.h",
+    "sha256": "37eb4283db7ea17197e6e2b4a855e87fb639c9ca8eaf4777aa389a096235013d",
+    "bytes": 647441
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f412cx.h",
+    "sha256": "4e0bb0a4ceb802588afbd1b00901eebf0aadaa7a06ce3ba8e0ed8452c09c691c",
+    "bytes": 1025541
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f412rx.h",
+    "sha256": "f6f9e3325f00d7ce855620119d0e40b320c3eadd4a7ff6f2d0b122fb1347d60d",
+    "bytes": 1105300
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f412vx.h",
+    "sha256": "c236f631a09d786eb147c337e2f6daa22c458c76bba1b75d8210c77dd1c77326",
+    "bytes": 1106134
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f412zx.h",
+    "sha256": "fa43291ea83bd2cb90aba7c77bff5d115a5cebcaca8304318440b84cc0be5fcf",
+    "bytes": 1107873
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f413xx.h",
+    "sha256": "c95708771e67593cc8a1bcbc479887f5859a6ecb625137dce8ac01910416a951",
+    "bytes": 1181780
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f415xx.h",
+    "sha256": "b3d3a183f097fa8c6590cf85e1ac55f334f115d14cdd1eaa912ffe6a5b153e81",
+    "bytes": 1107328
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f417xx.h",
+    "sha256": "e2f45f99fa4245924aefd7493afda633e24dc6ebc29c470a05f4597a3ae57786",
+    "bytes": 1213775
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f423xx.h",
+    "sha256": "d8807ed9cfaca7db4d6016c6edce156ce4ad7c0ee18e3877eb4561a1fee57604",
+    "bytes": 1192637
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f427xx.h",
+    "sha256": "eaffa1727f6308e959efb89eaec234080b775c2480bb8aba488d53393aea68c1",
+    "bytes": 1286127
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f429xx.h",
+    "sha256": "d0cdc158b50180069860ece77ee91e4ef59c1694361ee1beb4f7bca6fba7e2d5",
+    "bytes": 1311476
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f437xx.h",
+    "sha256": "b2469c20eb317dbe7ad0233e8b87fad7b3fb5979ada251f07aad24794b680ff1",
+    "bytes": 1307491
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f439xx.h",
+    "sha256": "93db23fb0177780eaf153bb2548c2c4feebda337c96f231b0456333b337bf81c",
+    "bytes": 1332176
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f446xx.h",
+    "sha256": "39cf70838356fcd3b3dbdd7ca0542c204b582a9b90a7a31c519651fde7a39a65",
+    "bytes": 1216200
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f469xx.h",
+    "sha256": "e23d90256aaf214bb8ac64e6c3667108553edb3cab899ec0269c8b639cfe58a0",
+    "bytes": 1533995
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f479xx.h",
+    "sha256": "47441656ee21c3ca7591bbeaaa1ffb15e012b5f7d054d311ecd387c33e74893b",
+    "bytes": 1554886
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/stm32f4xx.h",
+    "sha256": "a19edea6b2f4df2ab3c567782c4d313a52319c4303bd56ad7dd1d0e077014657",
+    "bytes": 11928
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Include/system_stm32f4xx.h",
+    "sha256": "02c067d5a135f540c03215dc834b1e60a97bbd4e55bfd3994b0c82a15ea3012a",
+    "bytes": 2214
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g411xb.h",
+    "sha256": "88bb39989ca8f18402e8709afd7d496ddb4f497fa6cd58492af799364b13ab56",
+    "bytes": 864018
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g411xc.h",
+    "sha256": "5f502a2e0fecef6dac79d0aaac8e0ae942b4e40cb132428d6274fb99336d03fe",
+    "bytes": 885281
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g414xx.h",
+    "sha256": "a53b5211b298f3fa5a4d0336e66e013fc6c58f44e5815d35dc567012ada15975",
+    "bytes": 1209976
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g431xx.h",
+    "sha256": "24e2bc3be8a04bb5f2f46e43f52ea9ceeeb003cd8d7b7f38c0f62905d43f1411",
+    "bytes": 989465
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g441xx.h",
+    "sha256": "86a4c3dd2bc5d1ab802246347f1e3127f1cf4bcb87d857cfa2d584ed0a21b0b5",
+    "bytes": 1006367
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g471xx.h",
+    "sha256": "9b9e3347e90539b94cd873d8c4ce777139d5bdfd48677f6bed572d0018728a3f",
+    "bytes": 1052130
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g473xx.h",
+    "sha256": "8c5132b503fa12d56c242aa131cbfd1fa367ca2986be0eed41c29ca39e910932",
+    "bytes": 1099373
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g474xx.h",
+    "sha256": "e7e5851721452c415c627e233d0a617b72ba891718a4f12a495b20dee25d82b0",
+    "bytes": 1392046
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g483xx.h",
+    "sha256": "1a67253d52a306cb4566e8aa1b06c1e25398a236cbe8a66e47715da565d47b34",
+    "bytes": 1116275
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g484xx.h",
+    "sha256": "0fe23cf69721da7f880d50dd57ea6bc2046c8a61c1ba68da29bdd440cfea6524",
+    "bytes": 1408948
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g491xx.h",
+    "sha256": "95f169ccca74a1a90999dc024829a88847d6e2ab8ae5f5444797b195d5d5ca28",
+    "bytes": 1033960
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g4a1xx.h",
+    "sha256": "da4fd1d637dafe9eca16fa1c92f52335503d5d69a281909e8e2c04a078410299",
+    "bytes": 1050862
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32g4xx.h",
+    "sha256": "6c074c8813dce7f1349f99d5f941b75276d44e3983618d4f3773de060adc80ff",
+    "bytes": 8920
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/stm32gbk1cb.h",
+    "sha256": "c24ecaafd69857ce4ced9e8aee5ffc7f1bbf54efba5b8e662dc6bc48a163e8ac",
+    "bytes": 985038
+  },
+  {
+    "path": "/workspace/nexus/vendors/st/cmsis_device_g4/Include/system_stm32g4xx.h",
+    "sha256": "36304c07e9cee84064015ebd7ae517af6f466c466c1bbf5e342c57a296601db2",
+    "bytes": 2252
+  }
+]

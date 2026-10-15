@@ -1,0 +1,54 @@
+{
+  "abi": "C11 M4F hard FPv4-SP-D16 -fshort-enums -Os",
+  "scope": "actual target object layouts; not runtime/boot/HIL or final linked image",
+  "sizes_bytes": {
+    "nx_cost_eth_face": 8,
+    "nx_cost_mdio_face": 8,
+    "nx_cost_tx_slot": 8,
+    "nx_cost_descriptor": 16,
+    "nx_cost_phy": 20,
+    "nx_cost_rx_loan": 32,
+    "nx_cost_tx_request": 32,
+    "nx_cost_rx_slot": 40,
+    "nx_cost_mac": 168
+  },
+  "commands": [
+    [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+      "-std=c11",
+      "-mcpu=cortex-m4",
+      "-mthumb",
+      "-mfpu=fpv4-sp-d16",
+      "-mfloat-abi=hard",
+      "-fshort-enums",
+      "-Os",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wpedantic",
+      "-Wconversion",
+      "-Wshadow",
+      "-Wstrict-prototypes",
+      "-Wmissing-prototypes",
+      "-I/workspace/nexus-iteration-bus-design/eth-src/io/include",
+      "-I/workspace/nexus-iteration-bus-design/eth-src/io/private",
+      "-I/workspace/nexus-iteration-bus-design/eth-src/components/dp83848/include",
+      "-I/workspace/nexus/io/include",
+      "-I/workspace/nexus/core/include",
+      "-I/workspace/nexus/arch/include",
+      "-I/workspace/nexus-iteration-bus-design/i2c-arm",
+      "-c",
+      "/workspace/nexus-iteration-bus-design/eth-src/evidence/arm/sizes.c",
+      "-o",
+      "/workspace/nexus-iteration-bus-design/eth-src/evidence/arm/sizes.o"
+    ],
+    [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+      "-S",
+      "--size-sort",
+      "/workspace/nexus-iteration-bus-design/eth-src/evidence/arm/sizes.o"
+    ]
+  ]
+}

@@ -1,0 +1,3 @@
+# Build tools shared by native CLI, CI and the measured OCI environment.
+cmake==3.31.6
+ninja==1.13.2

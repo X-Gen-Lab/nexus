@@ -1,0 +1,35 @@
+Running main() from gmock_main.cc
+Note: Google Test filter = Stm32AdcStream.WarmupStartsAfterPowerStoreBarrierCompletes
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from Stm32AdcStream
+[ RUN      ] Stm32AdcStream.WarmupStartsAfterPowerStoreBarrierCompletes
+/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:179: Failure
+Value of: s_delay_power_store
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:180: Failure
+Expected equality of these values:
+  nx_time_now_us()
+    Which is: 100
+  105U
+    Which is: 105
+
+/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:181: Failure
+Expected equality of these values:
+  state.ready_at
+    Which is: 103
+  108U
+    Which is: 108
+
+[  FAILED  ] Stm32AdcStream.WarmupStartsAfterPowerStoreBarrierCompletes (0 ms)
+[----------] 1 test from Stm32AdcStream (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] Stm32AdcStream.WarmupStartsAfterPowerStoreBarrierCompletes
+
+ 1 FAILED TEST

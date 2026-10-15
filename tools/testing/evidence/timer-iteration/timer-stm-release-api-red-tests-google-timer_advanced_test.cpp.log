@@ -1,0 +1,25 @@
+In file included from build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/internal/gmock-internal-utils.h:51,
+                 from build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock-actions.h:146,
+                 from build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock.h:56,
+                 from tests/google/timer_advanced_test.cpp:23:
+tests/google/timer_advanced_test.cpp: In member function ‘virtual void TimerHardware_CaptureColdReleaseRequiresDrainAndSupportsNewSession_Test::TestBody()’:
+tests/google/timer_advanced_test.cpp:62:21: error: ‘nx_stm32_timer_capture_release’ was not declared in this scope; did you mean ‘nx_stm32_timer_capture_ops’?
+   62 | #define CAP_RELEASE nx_stm32_timer_capture_release
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/timer_advanced_test.cpp:645:15: note: in expansion of macro ‘CAP_RELEASE’
+  645 |     EXPECT_EQ(CAP_RELEASE(&capture), NX_ERROR_BUSY);
+      |               ^~~~~~~~~~~
+tests/google/timer_advanced_test.cpp:62:21: error: ‘nx_stm32_timer_capture_release’ was not declared in this scope; did you mean ‘nx_stm32_timer_capture_ops’?
+   62 | #define CAP_RELEASE nx_stm32_timer_capture_release
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/timer_advanced_test.cpp:649:15: note: in expansion of macro ‘CAP_RELEASE’
+  649 |     EXPECT_EQ(CAP_RELEASE(&capture), NX_SUCCESS);
+      |               ^~~~~~~~~~~
+tests/google/timer_advanced_test.cpp: In member function ‘virtual void TimerHardware_AdvancedColdReleaseQuiescesSourceBeforeNewSession_Test::TestBody()’:
+tests/google/timer_advanced_test.cpp:66:21: error: ‘nx_stm32_advanced_pwm_release’ was not declared in this scope; did you mean ‘nx_stm32_advanced_pwm_ops’?
+   66 | #define ADV_RELEASE nx_stm32_advanced_pwm_release
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/timer_advanced_test.cpp:658:15: note: in expansion of macro ‘ADV_RELEASE’
+  658 |     EXPECT_EQ(ADV_RELEASE(&advanced), NX_SUCCESS);
+      |               ^~~~~~~~~~~

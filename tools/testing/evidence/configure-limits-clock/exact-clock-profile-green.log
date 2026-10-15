@@ -1,0 +1,21 @@
+test_adc_and_pwm_decisions_preserve_json_projection (test_providers.ProviderContractTests.test_adc_and_pwm_decisions_preserve_json_projection) ... ok
+test_adc_constructor_sequences_are_validated_before_generation (test_providers.ProviderContractTests.test_adc_constructor_sequences_are_validated_before_generation) ... ok
+test_adc_scan_and_single_shot_have_distinct_channel_contracts (test_providers.ProviderContractTests.test_adc_scan_and_single_shot_have_distinct_channel_contracts) ... ok
+test_arch_build_rejects_unmaintained_cpu (test_providers.ProviderContractTests.test_arch_build_rejects_unmaintained_cpu) ... ok
+test_cpu_facts_are_exported_to_the_build_contract (test_providers.ProviderContractTests.test_cpu_facts_are_exported_to_the_build_contract) ... ok
+test_facts_cannot_advertise_an_unimplemented_mode (test_providers.ProviderContractTests.test_facts_cannot_advertise_an_unimplemented_mode) ... ok
+test_family_contract_has_explicit_abi_and_irq_identity (test_providers.ProviderContractTests.test_family_contract_has_explicit_abi_and_irq_identity) ... ok
+test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) ... ok
+test_mode_traits_are_explicit_immutable_and_directional (test_providers.ProviderContractTests.test_mode_traits_are_explicit_immutable_and_directional) ... ok
+test_physical_dma_controller_names_follow_each_vendor (test_providers.ProviderContractTests.test_physical_dma_controller_names_follow_each_vendor) ... ok
+test_physical_key_normalization_has_no_silicon_topology (test_providers.ProviderContractTests.test_physical_key_normalization_has_no_silicon_topology) ... ok
+test_rejected_family_invalidates_previous_bundle (test_providers.ProviderContractTests.test_rejected_family_invalidates_previous_bundle) ... ok
+test_selected_provider_owns_dma_range_and_selector_checks (test_providers.ProviderContractTests.test_selected_provider_owns_dma_range_and_selector_checks) ... ok
+test_uart_decision_is_named_and_immutable (test_providers.ProviderContractTests.test_uart_decision_is_named_and_immutable) ... ok
+test_unknown_emitter_cannot_fall_back_to_native (test_providers.ProviderContractTests.test_unknown_emitter_cannot_fall_back_to_native) ... ok
+test_unknown_family_cannot_inherit_cortex_m4_abi (test_providers.ProviderContractTests.test_unknown_family_cannot_inherit_cortex_m4_abi) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.343s
+
+OK

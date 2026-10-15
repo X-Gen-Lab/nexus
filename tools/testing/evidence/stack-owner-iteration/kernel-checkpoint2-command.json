@@ -1,0 +1,9 @@
+{
+  "command": [
+    "/workspace/nexus/build/native-debug/bin/nexus_freertos_services_kernel_test"
+  ],
+  "returncode": "timeout",
+  "timeout_s": 8,
+  "start": 1791742500.9950256,
+  "end": 1791742509.0079248
+}

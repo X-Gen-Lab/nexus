@@ -1,0 +1,42 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from FreeRTOSFailStop
+[ RUN      ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark
+/workspace/nexus/tests/google/freertos_failstop_test.cpp:44: Failure
+Death test: { prepare(NX_FAULT_FREERTOS_ASSERT, true); nx_freertos_assert_failed("owned-static-source", 73U); }
+    Result: died but not with expected exit code:
+            Exited with exit status 90
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark (0 ms)
+[ RUN      ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName
+/workspace/nexus/tests/google/freertos_failstop_test.cpp:50: Failure
+Death test: { prepare(NX_FAULT_FREERTOS_STACK, true); vApplicationStackOverflowHook(reinterpret_cast<TaskHandle_t>(1U), reinterpret_cast<char*>(1U)); }
+    Result: died but not with expected exit code:
+            Exited with exit status 90
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName (0 ms)
+[ RUN      ] FreeRTOSFailStop.ReturningObserverCannotReclaimLoanOrContinueKernel
+/workspace/nexus/tests/google/freertos_failstop_test.cpp:57: Failure
+Death test: { prepare(NX_FAULT_FREERTOS_ASSERT, false); nx_request_initialize(&retained); if (nx_request_prepare(&retained, (18446744073709551615UL)) != NX_SUCCESS || nx_request_admit(&retained, NX_REQUEST_ACTIVE) != NX_SUCCESS) { std::_Exit(92); } verify_retained = true; nx_freertos_assert_failed("owned-static-source", 73U); std::_Exit(93); }
+    Result: died but not with expected exit code:
+            Exited with exit status 91
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] FreeRTOSFailStop.ReturningObserverCannotReclaimLoanOrContinueKernel (1000 ms)
+[----------] 3 tests from FreeRTOSFailStop (1001 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (1001 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 3 tests, listed below:
+[  FAILED  ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark
+[  FAILED  ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName
+[  FAILED  ] FreeRTOSFailStop.ReturningObserverCannotReclaimLoanOrContinueKernel
+
+ 3 FAILED TESTS

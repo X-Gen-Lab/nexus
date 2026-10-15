@@ -1,0 +1,43 @@
+// FIG-09 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph H743MemoryCache {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-09 STM32H743ZIT6: finite UART TX DMA and cache\nOnly AXI SRAM selected for initial linker / TX domain; no RX DMA claim"];
+    subgraph clusterMemory {
+        label="SoC physical-domain facts do not authorize placement"; color="#64748b";
+        cpu [label="Cortex-M7 CPU\nSelected D-cache off / on"];
+        axi [label="AXI SRAM: 0x24000000 / 512 KiB\nOnly initial linker and TX payload domain", fillcolor="#f0fdf4"];
+        dma [label="USART3 TX\nDMA1 stream0 / DMAMUX request46"];
+        tcm [label="ITCM 64 KiB / DTCM 128 KiB\nUnreachable by DMA1/2; physically reachable by MDMA\nNot selected by the initial linker", fillcolor="#fefce8"];
+        d2 [label="D2 SRAM1/2/3, D3 SRAM4, backup\nReachability recorded separately per dma_engines\nNot selected by the initial linker", fillcolor="#fefce8"];
+        cpu -> axi [label="Load / store, possibly through cache"];
+        axi -> dma [label="DMA reads actual SRAM bytes"];
+        cpu -> tcm [label="Physical CPU path", style=dashed];
+        cpu -> d2 [label="Physical domain, unauthorized for this TX", style=dashed];
+    }
+    subgraph clusterLoan {
+        label="Cache-on: exclusive borrow of every complete 32-byte line"; color="#64748b";
+        validate [label="Validate AXI domain / overflow / exclusive complete lines\n32-byte address alignment; length a multiple of 32, <=65504"];
+        preparing [label="Admit -> provider PREPARING marker\nBorrow already established; cancel cannot reclaim"];
+        clean [label="Clean + barriers under the normal incoming mask\nNo outward rounding or bounce buffer"];
+        launch [label="Recheck cancel / deadline / policy\nConfigure and start DMA only if not terminated"];
+        detach [label="Prove DMA / UART wire / IRQ references drained\nOnly then make final observation and publish SETTLED"];
+        fail [label="Clean / detach failed or incomplete\nRetain borrow; advance the actual termination path", fillcolor="#fff7ed"];
+        validate -> preparing [label="Admission passed"];
+        preparing -> clean [label="Long maintenance outside a long IRQ mask"];
+        clean -> launch [label="Maintenance complete"];
+        launch -> detach [label="Actual completion / drain"];
+        clean -> fail [label="Rejection / failure"];
+        detach -> fail [label="Drain cannot be proven"];
+    }
+    axi -> validate [label="Selected DMA TX domain", style=dashed];
+}

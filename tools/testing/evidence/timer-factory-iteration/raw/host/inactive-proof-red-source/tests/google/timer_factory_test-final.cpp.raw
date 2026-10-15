@@ -1,0 +1,534 @@
+/**
+ * \file            timer_factory_test.cpp
+ * \brief           Actual generated timer lifecycle and retained failure paths
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-11
+ * \copyright       Copyright (c) 2026 Nexus Team
+ */
+extern "C" {
+#include "nexus_bindings.h"
+#include "nexus_factory.h"
+#include "timer_advanced_controller.h"
+#ifdef NX_TIMER_FACTORY_STM32
+#include "stm32f407_provider.h"
+#else
+#include "gd32f470_provider.h"
+#include "gd32f4xx_gpio.h"
+#include "gd32f4xx_rcu.h"
+#include "gd32f4xx_timer.h"
+#endif
+void TIM4_IRQHandler(void);
+void TIM1_BRK_TIM9_IRQHandler(void);
+void TIMER3_IRQHandler(void);
+void TIMER0_BRK_TIMER8_IRQHandler(void);
+}
+#include <array>
+#include <cstring>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <sys/mman.h>
+
+#ifdef NX_TIMER_FACTORY_STM32
+#define CAP_CR1     TIM4->CR1
+#define CAP_PSC     TIM4->PSC
+#define CAP_CCR     TIM4->CCR1
+#define CAP_CCER    TIM4->CCER
+#define CAP_DIER    TIM4->DIER
+#define CAP_SR      TIM4->SR
+#define ADV_CR1     TIM1->CR1
+#define ADV_PSC     TIM1->PSC
+#define ADV_CCER    TIM1->CCER
+#define ADV_DIER    TIM1->DIER
+#define ADV_BDTR    TIM1->BDTR
+#define ADV_SR      TIM1->SR
+#define PEER_DIER   TIM9->DIER
+#define CAP_GATE    RCC->APB1ENR
+#define ADV_GATE    RCC->APB2ENR
+#define GPIO_GATE   RCC->AHB1ENR
+#define BREAK_INPUT GPIOB->IDR
+#define CAP_IRQ     TIM4_IRQHandler
+#define ADV_IRQ     TIM1_BRK_TIM9_IRQHandler
+#else
+#define CAP_CR1     TIMER_CTL0(TIMER3)
+#define CAP_PSC     TIMER_PSC(TIMER3)
+#define CAP_CCR     TIMER_CH0CV(TIMER3)
+#define CAP_CCER    TIMER_CHCTL2(TIMER3)
+#define CAP_DIER    TIMER_DMAINTEN(TIMER3)
+#define CAP_SR      TIMER_INTF(TIMER3)
+#define ADV_CR1     TIMER_CTL0(TIMER0)
+#define ADV_PSC     TIMER_PSC(TIMER0)
+#define ADV_CCER    TIMER_CHCTL2(TIMER0)
+#define ADV_DIER    TIMER_DMAINTEN(TIMER0)
+#define ADV_BDTR    TIMER_CCHP(TIMER0)
+#define ADV_SR      TIMER_INTF(TIMER0)
+#define PEER_DIER   TIMER_DMAINTEN(TIMER8)
+#define CAP_GATE    RCU_APB1EN
+#define ADV_GATE    RCU_APB2EN
+#define GPIO_GATE   RCU_AHB1EN
+#define BREAK_INPUT GPIO_ISTAT(GPIOB)
+#define CAP_IRQ     TIMER3_IRQHandler
+#define ADV_IRQ     TIMER0_BRK_TIMER8_IRQHandler
+#endif
+
+using testing::_;
+using testing::NiceMock;
+using testing::Return;
+class TimerAssemblyPorts {
+  public:
+    MOCK_METHOD(int, Start, ());
+    MOCK_METHOD(int, Stop, ());
+    MOCK_METHOD(nx_result_t, Clock, (unsigned));
+    MOCK_METHOD(nx_result_t, Configure, (unsigned, unsigned, uint8_t));
+    MOCK_METHOD(void, Restore, (unsigned, unsigned));
+};
+extern "C" {
+NVIC_Type g_nx_timer_factory_nvic;
+}
+static TimerAssemblyPorts* s_ports;
+static volatile uint32_t* s_refused;
+static uint32_t s_hold;
+static volatile uint8_t* s_priority_refused;
+static bool s_restore_refused;
+static bool s_gpio_restore_refused;
+static nx_time_us_t s_now;
+static unsigned s_writes;
+
+/** \brief Real GPIO register locations are common to the two reviewed chips.
+ */
+static volatile uint32_t& gpio(unsigned port, unsigned offset) {
+    return *reinterpret_cast<volatile uint32_t*>(UINT32_C(0x40020000) +
+                                                 port * 0x400U + offset);
+}
+/** \brief Pack only selected-pin state, using the public cold port contract. */
+static uint16_t capture_pin(unsigned port, unsigned pin) {
+    uint32_t shift = pin * 2U;
+    uint32_t value =
+        ((gpio(port, 0U) >> shift) & 3U) |
+        (((gpio(port, 4U) >> pin) & 1U) << 2U) |
+        (((gpio(port, 8U) >> shift) & 3U) << 3U) |
+        (((gpio(port, 12U) >> shift) & 3U) << 5U) |
+        (((gpio(port, 32U + pin / 8U * 4U) >> (pin % 8U * 4U)) & 15U) << 7U) |
+        (((gpio(port, 20U) >> pin) & 1U) << 11U);
+    return static_cast<uint16_t>(value);
+}
+/** \brief External pin resource; timer implementation is not replaced. */
+static nx_result_t configure_pin(unsigned port, unsigned pin, uint8_t mode,
+                                 uint8_t af, uint8_t pull, bool drain) {
+    if (port > 1U || pin > 15U || af > 15U || pull != 0U || drain)
+        return NX_ERROR_INVALID;
+    nx_result_t status = s_ports->Configure(port, pin, mode);
+    if (status != NX_SUCCESS)
+        return status;
+    uint32_t shift = pin * 2U;
+    uint32_t af_shift = pin % 8U * 4U;
+    gpio(port, 32U + pin / 8U * 4U) =
+        (gpio(port, 32U + pin / 8U * 4U) & ~(15U << af_shift)) |
+        (static_cast<uint32_t>(af) << af_shift);
+    gpio(port, 4U) &= ~(1U << pin);
+    gpio(port, 12U) &= ~(3U << shift);
+    gpio(port, 0U) = (gpio(port, 0U) & ~(3U << shift)) |
+                     (static_cast<uint32_t>(mode) << shift);
+    return NX_SUCCESS;
+}
+/** \brief Restore selected original fields; refusal keeps the actual facts. */
+static void restore_pin(unsigned port, unsigned pin, uint16_t saved) {
+    s_ports->Restore(port, pin);
+    if (s_restore_refused)
+        return;
+    uint32_t shift = pin * 2U;
+    uint32_t af_shift = pin % 8U * 4U;
+    gpio(port, 20U) = (gpio(port, 20U) & ~(1U << pin)) |
+                      (((static_cast<uint32_t>(saved) >> 11U) & 1U) << pin);
+    gpio(port, 32U + pin / 8U * 4U) =
+        (gpio(port, 32U + pin / 8U * 4U) & ~(15U << af_shift)) |
+        (((static_cast<uint32_t>(saved) >> 7U) & 15U) << af_shift);
+    gpio(port, 4U) = (gpio(port, 4U) & ~(1U << pin)) |
+                     (((static_cast<uint32_t>(saved) >> 2U) & 1U) << pin);
+    gpio(port, 8U) = (gpio(port, 8U) & ~(3U << shift)) |
+                     (((static_cast<uint32_t>(saved) >> 3U) & 3U) << shift);
+    gpio(port, 12U) = (gpio(port, 12U) & ~(3U << shift)) |
+                      (((static_cast<uint32_t>(saved) >> 5U) & 3U) << shift);
+    gpio(port, 0U) = (gpio(port, 0U) & ~(3U << shift)) |
+                     ((static_cast<uint32_t>(saved) & 3U) << shift);
+}
+/** \brief Register leaves model hardware, never generated lifecycle policy. */
+extern "C" void nx_timer_factory_write(volatile uint32_t* address,
+                                       uint32_t value) {
+    ++s_writes;
+    if (address == s_refused)
+        value = (value & ~s_hold) | (*address & s_hold);
+    if (s_gpio_restore_refused && address == &GPIO_GATE && (value & 3U) == 0U)
+        value |= *address & 3U;
+    if (address == &NVIC->ISER[0])
+        *address |= value;
+    else if (address == &NVIC->ICER[0]) {
+        NVIC->ISER[0] &= ~value;
+        *address = value;
+    } else if (address == &NVIC->ICPR[0]) {
+        NVIC->ISPR[0] &= ~value;
+        *address = value;
+    } else if (address == &CAP_SR || address == &ADV_SR)
+        *address &= value;
+    else if (address == &gpio(0U, 24U) || address == &gpio(1U, 24U)) {
+        unsigned port = address == &gpio(0U, 24U) ? 0U : 1U;
+        gpio(port, 20U) =
+            (gpio(port, 20U) | (value & 0xffffU)) & ~(value >> 16U);
+        *address = value;
+    } else
+        *address = value;
+}
+/** \brief Priority byte storage remains independent from NVIC live facts. */
+extern "C" void nx_timer_factory_priority_write(volatile uint8_t* address,
+                                                uint8_t value) {
+    if (address != s_priority_refused)
+        *address = value;
+}
+/** \brief Match input capture read-clear without consuming a second edge. */
+extern "C" uint32_t nx_timer_factory_read(volatile uint32_t* address) {
+    uint32_t value = *address;
+    if (address == &CAP_CCR)
+        CAP_SR &= ~2U;
+    return value;
+}
+extern "C" nx_time_us_t nx_time_now_us(void) {
+    return s_now;
+}
+#ifdef NX_TIMER_FACTORY_STM32
+extern "C" {
+nx_stm32_system_t g_nx_stm32_system;
+}
+extern "C" nx_result_t nx_stm32_validate_identity(uint32_t) {
+    return NX_SUCCESS;
+}
+extern "C" nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t*,
+                                                         uint32_t) {
+    return {s_ports->Start(), 0, 0U};
+}
+extern "C" int nx_stm32_system_stop(nx_stm32_system_t*, uint32_t) {
+    return s_ports->Stop();
+}
+extern "C" nx_result_t nx_stm32_gpio_clock_enable(unsigned index) {
+    nx_result_t status = s_ports->Clock(index);
+    if (status == NX_SUCCESS)
+        GPIO_GATE |= 1U << index;
+    return status;
+}
+static unsigned port_index(const GPIO_TypeDef* port) {
+    return static_cast<unsigned>(
+        (reinterpret_cast<uintptr_t>(port) - GPIOA_BASE) / 0x400U);
+}
+extern "C" uint16_t nx_stm32_pin_capture(const GPIO_TypeDef* port,
+                                         uint8_t pin) {
+    return capture_pin(port_index(port), pin);
+}
+extern "C" void nx_stm32_pin_restore(GPIO_TypeDef* port, uint8_t pin,
+                                     uint16_t saved) {
+    restore_pin(port_index(port), pin, saved);
+}
+extern "C" nx_result_t nx_stm32_pin_configure(GPIO_TypeDef* port, uint8_t pin,
+                                              uint8_t mode, uint8_t af,
+                                              uint8_t pull, bool drain) {
+    return configure_pin(port_index(port), pin, mode, af, pull, drain);
+}
+#else
+extern "C" int nx_gd32_soc_start(void) {
+    return s_ports->Start();
+}
+extern "C" int nx_gd32_soc_stop(void) {
+    return s_ports->Stop();
+}
+extern "C" nx_result_t nx_gd32_gpio_clock_enable(unsigned index) {
+    nx_result_t status = s_ports->Clock(index);
+    if (status == NX_SUCCESS)
+        GPIO_GATE |= 1U << index;
+    return status;
+}
+static unsigned port_index(uint32_t port) {
+    return (port - GPIOA) / 0x400U;
+}
+extern "C" uint16_t nx_gd32_pin_capture(uint32_t port, unsigned pin) {
+    return capture_pin(port_index(port), pin);
+}
+extern "C" void nx_gd32_pin_restore(uint32_t port, unsigned pin,
+                                    uint16_t saved) {
+    restore_pin(port_index(port), pin, saved);
+}
+extern "C" nx_result_t nx_gd32_pin_configure(uint32_t port, unsigned pin,
+                                             uint8_t mode, uint8_t af,
+                                             uint8_t pull, bool drain) {
+    return configure_pin(port_index(port), pin, mode, af, pull, drain);
+}
+#endif
+
+class TimerFactory : public testing::Test {
+  protected:
+    NiceMock<TimerAssemblyPorts> ports;
+    void* mapping = nullptr;
+    const nx_timer_capture_t* cap = nullptr;
+    const nx_advanced_pwm_t* power = nullptr;
+    nx_timer_capture_controller_t* capture = nullptr;
+    nx_advanced_pwm_controller_t* advanced = nullptr;
+    nx_timer_capture_event_t ring[2]{};
+    void SetUp() override {
+        s_ports = &ports;
+        s_refused = nullptr;
+        s_hold = 0U;
+        s_priority_refused = nullptr;
+        s_restore_refused = s_gpio_restore_refused = false;
+        s_now = 100U;
+        s_writes = 0U;
+        std::memset(&g_nx_timer_factory_nvic, 0,
+                    sizeof(g_nx_timer_factory_nvic));
+        mapping =
+            mmap(reinterpret_cast<void*>(UINT32_C(0x40000000)), 0x30000,
+                 PROT_READ | PROT_WRITE,
+                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+        ASSERT_EQ(mapping, reinterpret_cast<void*>(UINT32_C(0x40000000)));
+        ON_CALL(ports, Start()).WillByDefault(Return(0));
+        ON_CALL(ports, Stop()).WillByDefault(Return(0));
+        ON_CALL(ports, Clock(_)).WillByDefault(Return(NX_SUCCESS));
+        ON_CALL(ports, Configure(_, _, _)).WillByDefault(Return(NX_SUCCESS));
+#ifdef NX_TIMER_FACTORY_STM32
+        g_nx_stm32_system.rcc = RCC;
+        RCC->CFGR = RCC_CFGR_PPRE1_DIV4 | RCC_CFGR_PPRE2_DIV2;
+#else
+        RCU_CFG0 = RCU_APB1_CKAHB_DIV4 | RCU_APB2_CKAHB_DIV2;
+#endif
+        NVIC->IP[30] = 0x20U;
+        NVIC->IP[24] = 0x30U;
+        cap = nx_factory_timer_capture(NX_TIMER_CAPTURE_ID_ENCODER);
+        power = nx_factory_advanced_pwm(NX_ADVANCED_PWM_ID_POWER);
+        ASSERT_NE(cap, nullptr);
+        ASSERT_NE(power, nullptr);
+        capture = static_cast<nx_timer_capture_controller_t*>(cap->context);
+        advanced = static_cast<nx_advanced_pwm_controller_t*>(power->context);
+    }
+    void TearDown() override {
+        s_refused = nullptr;
+        s_priority_refused = nullptr;
+        s_restore_refused = s_gpio_restore_refused = false;
+        NVIC->IABR[0] = 0U;
+        if (capture->count != 0U) {
+            nx_timer_capture_event_t event{};
+            while (nx_timer_capture_read(cap, &event) == NX_SUCCESS) {
+            }
+        }
+        EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+        EXPECT_EQ(munmap(mapping, 0x30000), 0);
+        s_ports = nullptr;
+    }
+    void edge(uint32_t ticks) {
+        CAP_CCR = ticks;
+        CAP_SR |= 2U;
+        CAP_IRQ();
+    }
+};
+
+TEST_F(TimerFactory, LookupIsPureBeforeAnyClockOrPinEffects) {
+    EXPECT_EQ(s_writes, 0U);
+    EXPECT_EQ(capture->config, nullptr);
+    EXPECT_EQ(advanced->config, nullptr);
+    EXPECT_EQ(nx_factory_timer_capture(NX_TIMER_CAPTURE_ID_COUNT), nullptr);
+    EXPECT_EQ(nx_factory_advanced_pwm(NX_ADVANCED_PWM_ID_COUNT), nullptr);
+}
+TEST_F(TimerFactory, ActualPolicyAndStaticIrqContextsAreBound) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    EXPECT_EQ(capture->config->edge, NX_TIMER_EDGE_BOTH);
+    EXPECT_EQ(capture->config->filter, 3U);
+    EXPECT_EQ(advanced->config->deadtime_ticks, 128U);
+    EXPECT_EQ(NVIC->IP[30], 0x50U);
+    EXPECT_EQ(NVIC->IP[24], 0x50U);
+    ASSERT_EQ(nx_timer_capture_start(cap, ring, 2U), NX_SUCCESS);
+    edge(31U);
+    nx_timer_capture_event_t event{};
+    ASSERT_EQ(nx_timer_capture_read(cap, &event), NX_SUCCESS);
+    EXPECT_EQ(event.captured_ticks, 31U);
+    EXPECT_EQ(event.observed_at, 100U);
+    ASSERT_EQ(nx_advanced_pwm_start(power), NX_SUCCESS);
+    ADV_SR |= 128U;
+    ADV_IRQ();
+    EXPECT_TRUE(advanced->fault);
+    EXPECT_EQ(ADV_BDTR & 32768U, 0U);
+}
+TEST_F(TimerFactory, FailedCaptureConstructorReleasesItsPartialSession) {
+    s_refused = &CAP_PSC;
+    s_hold = UINT32_MAX;
+    nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(result.primary, NX_ERROR_IO);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(result.remaining_effects, 0U);
+    EXPECT_EQ(capture->config, nullptr);
+    EXPECT_EQ(CAP_CCER, 0U);
+    EXPECT_EQ(CAP_GATE & 4U, 0U);
+    s_refused = nullptr;
+    EXPECT_EQ(nx_platform_start().primary, NX_SUCCESS);
+}
+TEST_F(TimerFactory, FailedAdvancedConstructorUnwindsAcquiredResources) {
+    s_refused = &ADV_PSC;
+    s_hold = UINT32_MAX;
+    nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(result.primary, NX_ERROR_IO);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(capture->config, nullptr);
+    EXPECT_EQ(advanced->config, nullptr);
+    EXPECT_EQ(NVIC->ISER[0] & ((1U << 30U) | (1U << 24U)), 0U);
+}
+TEST_F(TimerFactory, RefusedColdGateNeverBorrowsTimerOrPins) {
+    s_refused = &CAP_GATE;
+    s_hold = 4U;
+    EXPECT_CALL(ports, Configure(_, _, _)).Times(testing::AnyNumber());
+    EXPECT_CALL(ports, Configure(1U, 6U, _)).Times(0);
+    nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(result.primary, NX_ERROR_IO);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(capture->config, nullptr);
+    EXPECT_EQ(NVIC->IP[30], 0x20U);
+}
+TEST_F(TimerFactory,
+       ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact) {
+    PEER_DIER = 1U;
+    nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(result.primary, NX_ERROR_BUSY);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_EQ(PEER_DIER, 1U);
+    EXPECT_EQ(advanced->config, nullptr);
+    EXPECT_EQ(NVIC->IP[24], 0x30U);
+}
+TEST_F(TimerFactory, ForeignEnabledVectorIsNeverDisabledByRejectedAcquisition) {
+    NVIC->ISER[0] = 1U << 30U;
+    nx_platform_start_result_t result = nx_platform_start();
+    EXPECT_EQ(result.primary, NX_ERROR_BUSY);
+    EXPECT_EQ(result.cleanup, NX_SUCCESS);
+    EXPECT_NE(NVIC->ISER[0] & (1U << 30U), 0U);
+    EXPECT_EQ(NVIC->IP[30], 0x20U);
+}
+TEST_F(TimerFactory, RefusedIrqDisableRetainsPinsGatesAndProviderStorage) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    s_refused = &NVIC->ICER[0];
+    s_hold = 1U << 24U;
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_BUSY);
+    EXPECT_NE(advanced->config, nullptr);
+    EXPECT_NE(ADV_GATE & 1U, 0U);
+    EXPECT_EQ(NVIC->IP[24], 0x50U);
+    EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
+    s_refused = nullptr;
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+TEST_F(TimerFactory, ActivePublisherPreventsStorageReuseEvenAfterDisable) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    NVIC->IABR[0] = 1U << 24U;
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_BUSY);
+    EXPECT_NE(advanced->config, nullptr);
+    EXPECT_NE(ADV_GATE & 1U, 0U);
+    NVIC->IABR[0] = 0U;
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+TEST_F(TimerFactory, RefusedPriorityRestorePreservesLeaseUntilRetry) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    s_priority_refused = &NVIC->IP[24];
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
+    EXPECT_NE(advanced->config, nullptr);
+    EXPECT_NE(ADV_GATE & 1U, 0U);
+    s_priority_refused = nullptr;
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+    EXPECT_EQ(NVIC->IP[24], 0x30U);
+}
+TEST_F(TimerFactory, QueuedCaptureLoanBlocksPlatformClockAndPinRelease) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    ASSERT_EQ(nx_timer_capture_start(cap, ring, 2U), NX_SUCCESS);
+    edge(77U);
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_BUSY);
+    EXPECT_EQ(capture->events, ring);
+    EXPECT_NE(CAP_GATE & 4U, 0U);
+    nx_timer_capture_event_t event{};
+    ASSERT_EQ(nx_timer_capture_read(cap, &event), NX_SUCCESS);
+    EXPECT_EQ(event.captured_ticks, 77U);
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+    EXPECT_EQ(capture->events, nullptr);
+}
+TEST_F(TimerFactory, RefusedPeripheralDetachPreservesCaptureRing) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    ASSERT_EQ(nx_timer_capture_start(cap, ring, 2U), NX_SUCCESS);
+    s_refused = &CAP_DIER;
+    s_hold = 2U;
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_BUSY);
+    EXPECT_EQ(capture->events, ring);
+    EXPECT_NE(CAP_GATE & 4U, 0U);
+    s_refused = nullptr;
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+TEST_F(TimerFactory, RefusedSafeOutputLatchDoesNotReleasePinOrClock) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    gpio(1U, 20U) |= 1U << 13U;
+    s_refused = &gpio(1U, 24U);
+    s_hold = 1U << (13U + 16U);
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
+    EXPECT_NE(ADV_GATE & 1U, 0U);
+    EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
+    s_refused = nullptr;
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+TEST_F(TimerFactory, AllInactiveOutputProofsPrecedeAnyPinRelease) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    gpio(0U, 20U) |= 1U << 8U;
+    gpio(1U, 20U) |= 1U << 13U;
+    s_refused = &gpio(0U, 24U);
+    s_hold = 1U << (8U + 16U);
+    /* Capture has no pending ring and stops first in reverse acquisition.
+     * Its own pin may return; every pin of the failed power group must stay. */
+    EXPECT_CALL(ports, Restore(1U, 6U));
+    EXPECT_CALL(ports, Restore(0U, 8U)).Times(0);
+    EXPECT_CALL(ports, Restore(1U, 12U)).Times(0);
+    EXPECT_CALL(ports, Restore(1U, 13U)).Times(0);
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
+    EXPECT_NE(ADV_GATE & 1U, 0U);
+    EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
+    (void)testing::Mock::VerifyAndClearExpectations(&ports);
+    s_refused = nullptr;
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+TEST_F(TimerFactory, RefusedOriginalPinRestoreRetainsColdLease) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    s_restore_refused = true;
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
+    EXPECT_NE(ADV_GATE & 1U, 0U);
+    s_restore_refused = false;
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+TEST_F(TimerFactory, RefusedOwnedClockReleaseRetainsStopAndPreventsRestart) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    s_refused = &ADV_GATE;
+    s_hold = 1U;
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
+    EXPECT_NE(ADV_GATE & 1U, 0U);
+    EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
+    s_refused = nullptr;
+    EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+}
+TEST_F(TimerFactory, PreexistingClockAndUnrelatedGpioFieldsArePreserved) {
+    CAP_GATE |= 4U;
+    ADV_GATE |= 1U;
+    GPIO_GATE |= 3U;
+    gpio(0U, 0U) = 1U << 26U;
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    ASSERT_EQ(nx_platform_stop(), NX_SUCCESS);
+    EXPECT_NE(CAP_GATE & 4U, 0U);
+    EXPECT_NE(ADV_GATE & 1U, 0U);
+    EXPECT_EQ(GPIO_GATE & 3U, 3U);
+    EXPECT_EQ(gpio(0U, 0U) & (3U << 26U), 1U << 26U);
+}
+TEST_F(TimerFactory, StopAndColdRestartReuseOnlyAProvedQuiescentSession) {
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    ASSERT_EQ(nx_timer_capture_start(cap, ring, 2U), NX_SUCCESS);
+    ASSERT_EQ(nx_advanced_pwm_start(power), NX_SUCCESS);
+    ASSERT_EQ(nx_platform_stop(), NX_SUCCESS);
+    EXPECT_EQ(capture->config, nullptr);
+    EXPECT_EQ(advanced->config, nullptr);
+    EXPECT_EQ(NVIC->IP[30], 0x20U);
+    EXPECT_EQ(NVIC->IP[24], 0x30U);
+    ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    EXPECT_TRUE(capture->initialized);
+    EXPECT_TRUE(advanced->initialized);
+    EXPECT_EQ(advanced->duty_ticks, 0U);
+}

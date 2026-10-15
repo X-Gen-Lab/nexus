@@ -1,0 +1,22 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 2e19c41000ce21f90ebe8985382b0aaa0aac62dcd3725c4e25e5d5c7a6ba87d9\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/development/index.md:8
+msgid "Maintaining Nexus"
+msgstr "维护 Nexus"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/development/index.md:10
+msgid ""
+"Preserve current formatting and comment conventions. New behavior uses real "
+"RED–GREEN execution; documentation checks and firmware qualification have "
+"separate scopes."
+msgstr "保持现有格式和注释约定。新增行为必须实际执行 RED–GREEN；文档检查和固件资格有各自的验收范围。"

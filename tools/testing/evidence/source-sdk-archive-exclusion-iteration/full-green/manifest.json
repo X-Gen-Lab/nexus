@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "scope": "isolated dirty-development actual full SDK regression after archive exclusion",
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-B",
+    "tests/contracts/test_source_sdk.py",
+    "-v"
+  ],
+  "cwd": "/tmp/nexus-sdk-selector-tdd/source",
+  "environment": {
+    "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/usr/bin:/bin",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "TMPDIR": "/tmp/nexus-sdk-selector-tdd/temporary-boundary-tests"
+  },
+  "started_utc": "2026-10-11T22:21:23.522568+00:00",
+  "finished_utc": "2026-10-11T22:21:24.789872+00:00",
+  "exit_code": 1,
+  "source_unchanged": true,
+  "source_before": {
+    "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green/source-before.json",
+    "size": 4670328,
+    "sha256": "e6cff0383bd3e9a440abe356ae967a45001ece75f9c1a455b0f76f179a73b7f0"
+  },
+  "source_after": {
+    "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green/source-after.json",
+    "size": 4670328,
+    "sha256": "e6cff0383bd3e9a440abe356ae967a45001ece75f9c1a455b0f76f179a73b7f0"
+  },
+  "raw": {
+    "path": "/workspace/nexus-source-sdk-archive-exclusion/full-green/unittest.log",
+    "size": 3292,
+    "sha256": "6ed7e15e42d17b57303ac3bae874fee98e330a7c51654efd916ce735ad02c0b8"
+  },
+  "driver": {
+    "path": "/workspace/nexus-source-sdk-archive-exclusion/run_whole_sdk.py",
+    "size": 3968,
+    "sha256": "9c0eb7b967b1130cde00509203ca6600138937eacd071279f250928f0fa06caf"
+  },
+  "limits": [
+    "The fixed aac03 commit has exactly two authored source overlays; this is not final canonical qualification.",
+    "Maintained SDK boundary tests use their existing explicit development-fixture protocol and real child tools/ARM builds.",
+    "No custom consumer, alternate package verifier or copied test runner is introduced."
+  ]
+}

@@ -1,0 +1,96 @@
+Running main() from gmock_main.cc
+[==========] Running 22 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 15 tests from I2CAsyncRegisters
+[ RUN      ] I2CAsyncRegisters.OneByteNacksBeforeAddressClearAndWaitsStop
+[       OK ] I2CAsyncRegisters.OneByteNacksBeforeAddressClearAndWaitsStop (0 ms)
+[ RUN      ] I2CAsyncRegisters.FinalThreeWithdrawsAckBeforeNMinusTwo
+[       OK ] I2CAsyncRegisters.FinalThreeWithdrawsAckBeforeNMinusTwo (0 ms)
+[ RUN      ] I2CAsyncRegisters.ThreeByteAddressDisablesBufferInterruptBeforeBtf
+[       OK ] I2CAsyncRegisters.ThreeByteAddressDisablesBufferInterruptBeforeBtf (0 ms)
+[ RUN      ] I2CAsyncRegisters.TwoBytesUsePosAndNackBeforeAddressClear
+[       OK ] I2CAsyncRegisters.TwoBytesUsePosAndNackBeforeAddressClear (0 ms)
+[ RUN      ] I2CAsyncRegisters.FourBytesConsumesOneThenFinalOneAndTwo
+[       OK ] I2CAsyncRegisters.FourBytesConsumesOneThenFinalOneAndTwo (0 ms)
+[ RUN      ] I2CAsyncRegisters.TransmitTxeDoesNotConfirmWirePrefix
+[       OK ] I2CAsyncRegisters.TransmitTxeDoesNotConfirmWirePrefix (0 ms)
+[ RUN      ] I2CAsyncRegisters.CancelBeforeStartDrainsLateMasterWithoutRevokingLoan
+[       OK ] I2CAsyncRegisters.CancelBeforeStartDrainsLateMasterWithoutRevokingLoan (0 ms)
+[ RUN      ] I2CAsyncRegisters.ArbitrationNeverInjectsStopIntoOtherMaster
+[       OK ] I2CAsyncRegisters.ArbitrationNeverInjectsStopIntoOtherMaster (0 ms)
+[ RUN      ] I2CAsyncRegisters.DrainTimeoutQuarantinesThenOnlyActualReleaseSettles
+[       OK ] I2CAsyncRegisters.DrainTimeoutQuarantinesThenOnlyActualReleaseSettles (0 ms)
+[ RUN      ] I2CAsyncRegisters.ExpiredAdmissionAndForeignIdentityHaveNoEffects
+[       OK ] I2CAsyncRegisters.ExpiredAdmissionAndForeignIdentityHaveNoEffects (0 ms)
+[ RUN      ] I2CAsyncRegisters.RepeatedStartKeepsOneLoanAndResetsReceiveWindow
+[       OK ] I2CAsyncRegisters.RepeatedStartKeepsOneLoanAndResetsReceiveWindow (0 ms)
+[ RUN      ] I2CAsyncRegisters.ReadWriteAliasesAndDescriptorWrapRejectBeforeMutation
+[       OK ] I2CAsyncRegisters.ReadWriteAliasesAndDescriptorWrapRejectBeforeMutation (0 ms)
+[ RUN      ] I2CAsyncRegisters.MaskedAdmissionAndAsyncPollingNeverTouchHardware
+[       OK ] I2CAsyncRegisters.MaskedAdmissionAndAsyncPollingNeverTouchHardware (0 ms)
+[ RUN      ] I2CAsyncRegisters.CancelRequiresExplicitLocalRecoveryBeforeReuse
+/workspace/nexus-iteration-bus-design/i2c-src/tests/i2c_async_register_test.cpp:504: Failure
+Expected equality of these values:
+  nx_i2c_endpoint_submit(&endpoint, &request)
+    Which is: 0
+  NX_ERROR_STATE
+    Which is: 3
+
+/workspace/nexus-iteration-bus-design/i2c-src/tests/i2c_async_register_test.cpp:505: Failure
+Expected equality of these values:
+  nx_request_state(&request.base)
+    Which is: 2
+  NX_REQUEST_READY
+    Which is: 0
+
+/workspace/nexus-iteration-bus-design/i2c-src/tests/i2c_async_register_test.cpp:506: Failure
+Expected equality of these values:
+  nx_i2c_port_recover(&bus)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus-iteration-bus-design/i2c-src/tests/i2c_async_register_test.cpp:508: Failure
+Expected equality of these values:
+  nx_i2c_endpoint_submit(&endpoint, &request)
+    Which is: 3
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] I2CAsyncRegisters.CancelRequiresExplicitLocalRecoveryBeforeReuse (0 ms)
+[ RUN      ] I2CAsyncRegisters.WakeFailureCannotUnlatchCompletionOrReleaseBorrow
+[       OK ] I2CAsyncRegisters.WakeFailureCannotUnlatchCompletionOrReleaseBorrow (0 ms)
+[----------] 15 tests from I2CAsyncRegisters (0 ms total)
+
+[----------] 7 tests from I2CDmaRegisters
+[ RUN      ] I2CDmaRegisters.ReceiveLastIsBeforeAddressAndStopFollowsMemoryCompletion
+[       OK ] I2CDmaRegisters.ReceiveLastIsBeforeAddressAndStopFollowsMemoryCompletion (0 ms)
+[ RUN      ] I2CDmaRegisters.TxCounterZeroStillWaitsForBtf
+[       OK ] I2CDmaRegisters.TxCounterZeroStillWaitsForBtf (0 ms)
+[ RUN      ] I2CDmaRegisters.SimultaneousPeripheralNackOutranksDmaCompletion
+[       OK ] I2CDmaRegisters.SimultaneousPeripheralNackOutranksDmaCompletion (0 ms)
+[ RUN      ] I2CDmaRegisters.CounterNotZeroNeverReportsPayloadCompleted
+[       OK ] I2CDmaRegisters.CounterNotZeroNeverReportsPayloadCompleted (0 ms)
+[ RUN      ] I2CDmaRegisters.RefusedEngineDisableQuarantinesStorage
+[       OK ] I2CDmaRegisters.RefusedEngineDisableQuarantinesStorage (0 ms)
+[ RUN      ] I2CDmaRegisters.AllDomainsValidateBeforeAdmissionOrMmio
+[       OK ] I2CDmaRegisters.AllDomainsValidateBeforeAdmissionOrMmio (0 ms)
+[ RUN      ] I2CDmaRegisters.PeripheralErrorDuringStopDrainCannotPublishSuccess
+/workspace/nexus-iteration-bus-design/i2c-src/tests/i2c_async_register_test.cpp:551: Failure
+Expected equality of these values:
+  request.base.result
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+
+[  FAILED  ] I2CDmaRegisters.PeripheralErrorDuringStopDrainCannotPublishSuccess (0 ms)
+[----------] 7 tests from I2CDmaRegisters (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 22 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 20 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] I2CAsyncRegisters.CancelRequiresExplicitLocalRecoveryBeforeReuse
+[  FAILED  ] I2CDmaRegisters.PeripheralErrorDuringStopDrainCannotPublishSuccess
+
+ 2 FAILED TESTS

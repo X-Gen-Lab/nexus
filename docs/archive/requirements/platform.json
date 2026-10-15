@@ -1,0 +1,133 @@
+{
+  "schema_version": 2,
+  "subject_id": "nexus-platform",
+  "subject_status": "planned",
+  "requirements": [
+    {
+      "id": "NEX-REQ-001",
+      "backlog_ids": [
+        "RF-BAS-01",
+        "RF-FIX-02",
+        "RF-BLD-01",
+        "RF-BLD-02",
+        "RF-CI-01"
+      ],
+      "owner_role": "build-release",
+      "statement": "A maintained build derives all configuration and targets from one effective configuration bundle and fails on missing, unknown, contradictory or stale inputs.",
+      "verification_kind": "host_contract",
+      "status": "planned",
+      "acceptance": "Reconfigure maintained presets and external consumers; invalid symbols, stale generated bundles and target/config disagreement fail before artifact acceptance. Record actual nonzero checks against the same source and configuration.",
+      "evidence": []
+    },
+    {
+      "id": "NEX-REQ-002",
+      "backlog_ids": [
+        "RF-HAL-01",
+        "RF-HAL-02",
+        "RF-HAL-03",
+        "RF-HAL-04",
+        "RF-HAL-05",
+        "RF-FIX-04",
+        "RF-FIX-05",
+        "RF-FIX-06",
+        "RF-CMP-01"
+      ],
+      "owner_role": "core-interfaces",
+      "statement": "Typed device and component contracts preserve owner/generation identity, explicit capability and caller buffer leases through completion, cancellation, provider faults and recovery.",
+      "verification_kind": "host_and_hardware",
+      "status": "planned",
+      "acceptance": "Production caller tests reject stale references and duplicate completion, retain unsettled buffers and bounded callback contexts, and exercise FULL retry and teardown failures. Unsupported MCU providers remain explicit; any hardware lease or DMA qualification requires named-board execution evidence.",
+      "evidence": []
+    },
+    {
+      "id": "NEX-REQ-003",
+      "backlog_ids": [
+        "RF-FIX-03",
+        "RF-OS-01",
+        "RF-OS-02",
+        "RF-BOOT-01",
+        "RF-BOOT-03"
+      ],
+      "owner_role": "core-interfaces",
+      "statement": "OSAL and infrastructure lifecycle expose backend capabilities, bounded resources, one total wait budget and explicit task/ISR/startup/destruction contracts without hidden business scheduling.",
+      "verification_kind": "host_and_hardware",
+      "status": "planned",
+      "acceptance": "Actual backend and concurrency tests cover mask/event semantics, nested critical state, clock wrap, exhaustion, stale objects and lifecycle rollback. MCU interrupt/scheduler claims require corresponding physical evidence; unsupported baremetal primitives fail explicitly.",
+      "evidence": []
+    },
+    {
+      "id": "NEX-REQ-004",
+      "backlog_ids": [
+        "RF-FLS-01",
+        "RF-FLS-02",
+        "RF-FLS-03",
+        "RF-CMP-02"
+      ],
+      "owner_role": "bsp-ports",
+      "statement": "The platform exposes full physical Flash geometry and generation-checked external regions, while storage and reusable services consume narrow ports without selecting product partitions.",
+      "verification_kind": "host_and_hardware",
+      "status": "planned",
+      "acceptance": "Check density, nonuniform erase blocks, bounds, permissions and region borrowing against production providers. One external layout binds linker and regions; StorageHAL requires compatible geometry and explicit unlock. Fault models recover complete old or new records; physical durability requires real interruption tests.",
+      "evidence": []
+    },
+    {
+      "id": "NEX-REQ-005",
+      "backlog_ids": [
+        "RF-BRD-01",
+        "RF-BRD-02",
+        "RF-SDK-01",
+        "RF-SDK-02",
+        "RF-EX-01",
+        "RF-EX-02",
+        "RF-BOOT-02",
+        "RF-FIX-01"
+      ],
+      "owner_role": "bsp-ports",
+      "statement": "External applications and Board packages consume fixed public source SDK targets with explicit composition; SoC, Board and private vendor implementation boundaries remain reviewable.",
+      "verification_kind": "host_and_hardware",
+      "status": "planned",
+      "acceptance": "Build relocated and parent-project consumers through public targets; validate supported Board IRQ/AF/pin resources and reject conflicts. Normal application compilation does not inherit vendor headers or implicit Product policy. Physical Board claims bind actual PCB and measurements; source package checks do not promise a binary ABI.",
+      "evidence": []
+    },
+    {
+      "id": "NEX-REQ-006",
+      "backlog_ids": [
+        "RF-CMP-03"
+      ],
+      "owner_role": "core-interfaces",
+      "statement": "Cryptography and update mechanisms use explicit provider and policy ports and return unsupported or failure when required capabilities are absent.",
+      "verification_kind": "host_and_hardware",
+      "status": "planned",
+      "acceptance": "Production core tests reject unconfigured or partial providers, malformed/tampered records and failed update decisions without enabling an implicit backend. MCU keys, entropy, boot policy and trust roots remain external inputs; their hardware qualification requires independently bound evidence.",
+      "evidence": []
+    },
+    {
+      "id": "NEX-REQ-007",
+      "backlog_ids": [
+        "RF-HIL-01",
+        "RF-HIL-02",
+        "RF-HIL-03",
+        "RF-REL-01"
+      ],
+      "owner_role": "quality-hil",
+      "statement": "Artifact and HIL tooling binds actual source, dependencies, configuration, Board/layout, toolchain and executed results while separating software models from physical qualification.",
+      "verification_kind": "host_and_hardware",
+      "status": "planned",
+      "acceptance": "Reject zero/skipped or mismatched tests, changed artifacts, invalid identities and synthetic physical-HIL claims. A qualified platform claim includes executed board/probe/readback and reviewed resource/timing evidence; tooling consistency alone never promotes qualification.",
+      "evidence": []
+    },
+    {
+      "id": "NEX-REQ-008",
+      "backlog_ids": [
+        "RF-ARC-01",
+        "RF-REL-02"
+      ],
+      "owner_role": "technical-lead",
+      "statement": "The maintained platform states versioned public source compatibility, reviewed architecture changes and accountable maintenance scope without inventing team assignments, enterprise support or LTS.",
+      "verification_kind": "host_contract",
+      "status": "planned",
+      "acceptance": "Current decisions, support matrix and execution record distinguish implemented software, outstanding capabilities and qualification. Public interface changes update callers and meaningful regression records; SDK revision changes remain independently reviewable. Actual reviewer assignments and support commitments require explicit operational evidence.",
+      "evidence": []
+    }
+  ]
+}

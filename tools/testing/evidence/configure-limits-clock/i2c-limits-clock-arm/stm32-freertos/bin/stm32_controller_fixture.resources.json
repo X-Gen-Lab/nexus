@@ -1,0 +1,120 @@
+{
+  "board": "stm32f407zg-controller-link-fixture",
+  "budget": {
+    "path": "/workspace/nexus-config-iteration-evidence/i2c-limits-clock-arm/stm32-freertos/nexus-sdk/generated/resource-budget.json",
+    "sha256": "93aa9ca0082cd8774bf63793072672a7647ba81398cebb1abbd0abf8e79439f4",
+    "size": 189
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus-config-iteration-evidence/i2c-limits-clock-arm/stm32-freertos.toml",
+        "sha256": "e6bb3585865218d5173551d58cf99339ab464e86aa36d55cefc9b1ce5447f0e9",
+        "size": 422
+      },
+      "label": "external/stm32-freertos.toml"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "b3551672d2fae2619674aaa5444c53cec6238fdd53d378bb8d095edbd204c54d",
+        "size": 492
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/routes.json",
+        "sha256": "db9482fd6d3f023f4c0ffe7834c8f2d1867e65c7bfb3609855294c41a7653c35",
+        "size": 9629
+      },
+      "label": "soc/stm32f407/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/soc.json",
+        "sha256": "974b1947a370b507067787c1935a02853f9fb5569cb71925ffe2f2f462e0c166",
+        "size": 7009
+      },
+      "label": "soc/stm32f407/soc.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tests/contracts/stm32_assembly/zg_board/board.json",
+        "sha256": "937936cecd900c6dfff2545c3df9e6bcedf37756cc01d265de0f2c9fe3aeca9a",
+        "size": 1866
+      },
+      "label": "tests/contracts/stm32_assembly/zg_board/board.json"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-config-iteration-evidence/i2c-limits-clock-arm/stm32-freertos/bin/stm32_controller_fixture.elf",
+    "sha256": "7cad4718780a08422b6122245523d9fa185d7e04aeab71ed651be7a7142082be",
+    "size": 22028
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 1048576,
+      "footprint_bytes": 6380,
+      "loaded_bytes": 6380,
+      "ranges": [
+        [
+          134217728,
+          134224108
+        ]
+      ]
+    },
+    "ram": {
+      "ccm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 131072,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536871032
+          ],
+          [
+            536999936,
+            537001984
+          ]
+        ],
+        "reserved_bytes": 2168
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536871032,
+        "start": 536871032
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537001984,
+        "start": 536999936
+      }
+    }
+  },
+  "part": "STM32F407ZGT6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-config-iteration-evidence/i2c-limits-clock-arm/stm32-freertos/nexus-sdk/generated/resolved.json",
+    "sha256": "aa5beceb7bbebdaa919b6a7a94f53152bbd1879c06c85599a638f56fb7c24313",
+    "size": 20183
+  },
+  "schema_version": 1,
+  "soc_family": "stm32f407",
+  "status": "passed",
+  "violations": []
+}

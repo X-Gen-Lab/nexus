@@ -1,0 +1,11 @@
+test_both_authored_backends_resolve_the_same_physical_controller_routes (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_both_authored_backends_resolve_the_same_physical_controller_routes) ... ok
+test_secondary_receive_dma_modes_do_not_gain_unimplemented_support (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_secondary_receive_dma_modes_do_not_gain_unimplemented_support) ... ok
+test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_secondary_uart_and_primary_i2c_cannot_share_the_physical_tx_stream) ... ok
+test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_selected_factory_has_separate_faces_endpoints_and_exact_irq_contexts) ... ok
+test_three_parts_bind_five_independent_exact_controllers (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_three_parts_bind_five_independent_exact_controllers) ... ok
+test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses (tools.configure.test_secondary_controllers.SecondaryControllerConfigurationTests.test_two_i2c_controllers_share_only_readonly_algorithms_and_keep_local_addresses) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.473s
+
+OK

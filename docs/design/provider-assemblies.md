@@ -1,0 +1,74 @@
+# Selected provider assembly gate
+
+The maintained gate links explicitly authored software fixtures through their
+existing CMake projects. TOML and the sole configuration resolver select the
+exact part, Board package, backend, routes, modes and budgets. The gate does not
+rewrite a backend, create a provider registry, select source targets or infer
+physical Board wiring.
+
+```sh
+python scripts/ci/provider_assemblies.py \
+    --fixture tests/contracts/usb_assembly/stm32-zg.toml \
+    --family stm32f407 \
+    --compiler arm-none-eabi-gcc \
+    --output build/provider-assemblies/usb-stm32
+```
+
+Repeat `--fixture` for a reviewed list of authored TOMLs. Each file must be in
+`tests/contracts`, have its maintained sibling `CMakeLists.txt`, and resolve to
+an MCU configuration. The optional family assertion compares the actual
+resolver result. Different backends require distinct maintained authored TOMLs;
+there is no independent OS override in this gate. CMake builds each fixture's
+default target graph using `NEXUS_SOURCE_ROOT` and `NEXUS_ASSEMBLY_FILE`.
+The selected source root must be the checkout that owns the executed gate and
+its imported tools; tools from a different source checkout are refused.
+
+The output directory must be absent. Existing evidence, symlink destinations
+and source directories are refused. Every actual command records its argv,
+working directory, timestamps, return code and original stdout/stderr bytes.
+Missing tools, nonzero exits, timeouts and background artifact writers fail
+the matrix and preserve its failed report. An empty or duplicate matrix cannot
+count as successful work.
+
+After each real build, the gate requires exactly one firmware ELF and one
+completed generated bundle. It compares the built canonical configuration
+digest against the original resolved authored input, rechecks every declared
+input, and recomputes memory allocation using the existing ELF resource tool.
+The original post-link report must match the recomputation. Flash LOAD bytes,
+Flash footprint, each physical RAM domain, MSP and heap retain their existing
+budget semantics.
+
+For selected I/O, the existing retention tool independently follows actual
+face pointers, concrete operations tables and every non-NULL method in ELF
+LOAD bytes. Its post-link report must match the recomputation. A deliberately
+empty fixture instead proves zero authored controllers/devices, zero generated
+face declarations and absence of concrete I/O provider tables and faces from
+the actual ELF. This is an executed empty-selection GC check, not a skipped
+retention check or a claim that all unrelated runtime code is absent.
+
+The actual compiler database and Ninja dependency log bind compiled sources,
+generated headers, selected vendor headers and compiler-provided headers to
+file identities. Maintained graph/configuration sources and selected locked
+SDK input bytes are snapshotted before execution and verified afterward. The
+matrix rejects source, Git revision, tool or artifact changes. A dirty checkout
+may provide explicitly identified development evidence; it cannot qualify a
+clean release candidate through this gate alone.
+
+`report.json` records `selected_provider_assembly_matrix`, actual fixture and
+command counts, source identities, tool identities, per-fixture configuration
+digests, ELF/BIN/map/bundle/report identities, RAM domains and retained methods.
+All successful fixtures must pass; there is no skipped-pass result. CI owns its
+explicit fixture list and uploads original commands and artifacts alongside
+the report.
+
+This gate establishes software graph, compile/link, budget and selected
+provider retention evidence. It does not execute MCU startup, interrupts, DMA,
+USB enumeration, Ethernet traffic, timer waveforms or electrical controls.
+Physical status remains `not_executed`; cycles and latency remain
+`not_measured`. Model tests and eventual HIL qualification are separate scopes.
+
+Tool regression tests run with:
+
+```sh
+python -m unittest scripts.ci.test_provider_assemblies -v
+```

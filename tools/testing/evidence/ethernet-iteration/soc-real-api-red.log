@@ -1,0 +1,16 @@
+[0/1] Re-running CMake...
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-iteration-bus-design/eth-build
+[1/8] Building C object CMakeFiles/ethernet_gd32_test.dir/io/src/ethernet.c.o
+[2/8] Building C object CMakeFiles/ethernet_gd32_test.dir/io/src/mdio.c.o
+[3/8] Building C object CMakeFiles/ethernet_gd32_test.dir/io/src/eth_mac.c.o
+[4/8] Linking CXX executable ethernet_stm32_test
+FAILED: [code=1] ethernet_stm32_test 
+: && /usr/bin/c++  -Wl,--dependency-file=CMakeFiles/ethernet_stm32_test.dir/link.d CMakeFiles/ethernet_stm32_test.dir/tests/google/ethernet_mac_test.cpp.o CMakeFiles/ethernet_stm32_test.dir/io/src/ethernet.c.o CMakeFiles/ethernet_stm32_test.dir/io/src/mdio.c.o CMakeFiles/ethernet_stm32_test.dir/io/src/eth_mac.c.o -o ethernet_stm32_test  /workspace/nexus/build/iteration-bus/lib/libnexus_io.a  /workspace/nexus/build/iteration-bus/lib/libnexus_core.a  /workspace/nexus/build/iteration-bus/lib/libnexus_arch.a  /workspace/nexus/build/iteration-bus/lib/libgmock_main.a  /workspace/nexus/build/iteration-bus/lib/libgmock.a  /workspace/nexus/build/iteration-bus/lib/libgtest.a  -lpthread && :
+/usr/bin/ld: CMakeFiles/ethernet_stm32_test.dir/tests/google/ethernet_mac_test.cpp.o: in function `(anonymous namespace)::EthernetMac::Initialize(unsigned long)':
+ethernet_mac_test.cpp:(.text+0x57a): undefined reference to `nx_stm32_eth_initialize'
+collect2: error: ld returned 1 exit status
+[5/8] Linking CXX executable ethernet_mac_test
+[6/8] Building CXX object CMakeFiles/ethernet_gd32_test.dir/tests/google/ethernet_mac_test.cpp.o
+ninja: build stopped: subcommand failed.

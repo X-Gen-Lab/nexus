@@ -1,0 +1,4 @@
+[1/4] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc_continuous.c.o
+[2/4] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc_continuous.c.o
+[3/4] Linking CXX executable bin/nexus_stm32_adc_stream_test
+[4/4] Linking CXX executable bin/nexus_gd32_adc_stream_test

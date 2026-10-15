@@ -1,0 +1,283 @@
+{
+  "bindings": {
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/nexus-sdk/generated/bindings.c",
+    "sha256": "ea49a0122c7a9a37fba8e8bc3a7355c89691d3c63af5ea4c3c584c9cbc2bc649",
+    "size": 10574
+  },
+  "elf": {
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/bin/stm32_controller_fixture.elf",
+    "sha256": "ec914de3ad525c75ead12038748d061ba8e25d340901161d191aa63c94f76d2e",
+    "size": 21972
+  },
+  "face_count": 2,
+  "faces": [
+    {
+      "address": 134223992,
+      "context": "s_nx_port_bus",
+      "name": "s_nx_face_bus",
+      "operations": "nx_i2c_v1_async_ops",
+      "type": "nx_i2c_port_t"
+    },
+    {
+      "address": 134223984,
+      "context": "s_nx_endpoint_bus",
+      "name": "s_nx_device_face_sensor",
+      "operations": "nx_i2c_v1_async_endpoint_ops",
+      "type": "nx_i2c_endpoint_t"
+    }
+  ],
+  "kind": "linked_provider_retention",
+  "limitations": [
+    "Actual linked face/table/function bytes only; not execution, electrical or timing evidence."
+  ],
+  "method_count": 8,
+  "operations_table_count": 2,
+  "physical_status": "not_executed",
+  "public_contracts": [
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/adc.h",
+      "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1",
+      "size": 9218
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/adc_observer.h",
+      "sha256": "e95ab349207a44d8ae86c74325a49eb82fd9ce991ea940fff8e4b40dd21a7788",
+      "size": 4193
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/can.h",
+      "sha256": "000ad0f2e59545dfde162858039a437c17748e01ee6b1412e0a02143983706c3",
+      "size": 7235
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/dma.h",
+      "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b",
+      "size": 4114
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/exti.h",
+      "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6",
+      "size": 4106
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/flash.h",
+      "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c",
+      "size": 6868
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/gpio.h",
+      "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778",
+      "size": 2676
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/i2c.h",
+      "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3",
+      "size": 9481
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/i2c_bus_clear.h",
+      "sha256": "e1c188d2f093fdbb79664cde94736bd9a900edad64e290221e9e706dbb4b524f",
+      "size": 8046
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/spi.h",
+      "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a",
+      "size": 11660
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/stream.h",
+      "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a",
+      "size": 11194
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/timer.h",
+      "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a",
+      "size": 3191
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/uart.h",
+      "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc",
+      "size": 10872
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/uart_rs485.h",
+      "sha256": "58f684a10fa8647e5c55b970e74c8f753a3817e93103d12945788617442fa89e",
+      "size": 3247
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/wake.h",
+      "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9",
+      "size": 3440
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/watchdog.h",
+      "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c",
+      "size": 3724
+    }
+  ],
+  "schema_version": 1,
+  "status": "passed",
+  "tables": [
+    {
+      "address": 134224024,
+      "bytes": 20,
+      "methods": [
+        {
+          "address": 134222461,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "i2c_v1_async.c",
+              "name": "recover"
+            }
+          ],
+          "name": "recover",
+          "slot": 0,
+          "symbols": [
+            "recover"
+          ]
+        },
+        {
+          "address": 134221391,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "i2c_v1_async.c",
+              "name": "cancel"
+            }
+          ],
+          "name": "cancel",
+          "slot": 1,
+          "symbols": [
+            "cancel"
+          ]
+        },
+        {
+          "address": 134221831,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "i2c_v1_async.c",
+              "name": "service"
+            }
+          ],
+          "name": "service",
+          "slot": 2,
+          "symbols": [
+            "service"
+          ]
+        },
+        {
+          "address": 134222093,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "i2c_v1_async.c",
+              "name": "stop"
+            }
+          ],
+          "name": "stop",
+          "slot": 3,
+          "symbols": [
+            "stop"
+          ]
+        },
+        {
+          "address": 134221297,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "i2c_v1_async.c",
+              "name": "attach_wake"
+            }
+          ],
+          "name": "attach_wake",
+          "slot": 4,
+          "symbols": [
+            "attach_wake"
+          ]
+        }
+      ],
+      "name": "nx_i2c_v1_async_ops",
+      "null_methods": 0,
+      "slots": [
+        "recover",
+        "cancel",
+        "service",
+        "stop",
+        "attach_wake"
+      ],
+      "source": {
+        "path": "/workspace/nexus/soc/common/i2c_v1_async.c",
+        "sha256": "2caac5c5f04e82aa796fa164ed547e72d74ffe70bbc30c991cad0cf075d356f7",
+        "size": 25821
+      },
+      "type": "nx_i2c_ops_t"
+    },
+    {
+      "address": 134224008,
+      "bytes": 16,
+      "methods": [
+        {
+          "address": 134221825,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "i2c_v1_async.c",
+              "name": "submit"
+            }
+          ],
+          "name": "submit",
+          "slot": 1,
+          "symbols": [
+            "submit"
+          ]
+        },
+        {
+          "address": 134221819,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "i2c_v1_async.c",
+              "name": "start_admitted"
+            }
+          ],
+          "name": "start_admitted",
+          "slot": 2,
+          "symbols": [
+            "start_admitted"
+          ]
+        },
+        {
+          "address": 134220913,
+          "definitions": [
+            {
+              "binding": 0,
+              "file": "i2c_v1_async.c",
+              "name": "on_port"
+            }
+          ],
+          "name": "on_port",
+          "slot": 3,
+          "symbols": [
+            "on_port"
+          ]
+        }
+      ],
+      "name": "nx_i2c_v1_async_endpoint_ops",
+      "null_methods": 1,
+      "slots": [
+        "transaction",
+        "submit",
+        "start_admitted",
+        "on_port"
+      ],
+      "source": {
+        "path": "/workspace/nexus/soc/common/i2c_v1_async.c",
+        "sha256": "2caac5c5f04e82aa796fa164ed547e72d74ffe70bbc30c991cad0cf075d356f7",
+        "size": 25821
+      },
+      "type": "nx_i2c_endpoint_ops_t"
+    }
+  ]
+}

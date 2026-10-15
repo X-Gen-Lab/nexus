@@ -1,0 +1,21 @@
+......FF.
+======================================================================
+FAIL: test_selected_timer_owner_is_privileged_before_system_start_or_cleanup (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_selected_timer_owner_is_privileged_before_system_start_or_cleanup) (label='stm32-zg')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 66, in test_selected_timer_owner_is_privileged_before_system_start_or_cleanup
+    self.assertIn("!nx_arch_is_privileged()", stop)
+AssertionError: '!nx_arch_is_privileged()' not found in '\n    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) { return NX_ERROR_CONTEXT; }\n    if (s_nx_platform_initialized >= 2u) {\n        nx_result_t status_0 = stop_encoder();\n        if (status_0 != NX_SUCCESS) { return status_0; }\n        s_nx_platform_initialized = 1u;\n    }\n    if (s_nx_platform_initialized >= 1u) {\n        nx_result_t status_0 = stop_power();\n        if (status_0 != NX_SUCCESS) { return status_0; }\n        s_nx_platform_initialized = 0u;\n    }\n    if (s_nx_platform_started) {\n        NX_PLATFORM_REGISTER_WRITE(RCC->AHB1ENR,\n            RCC->AHB1ENR & ~s_nx_platform_gpio_clocks_added);\n        nx_arch_dsb();\n        if ((RCC->AHB1ENR & s_nx_platform_gpio_clocks_added) != 0u) {\n            return NX_ERROR_IO;\n        }\n        s_nx_platform_gpio_clocks_added = 0u;\n    }\n    nx_arch_dsb();\n    if (s_nx_platform_started && nx_stm32_system_stop(&g_nx_stm32_system, 1000000u) != 0) {\n        return NX_ERROR_IO;\n    }\n    s_nx_platform_started = false;\n    s_nx_platform_initialized = 0u;\n    return NX_SUCCESS;\n}\n/** \\brief Start explicit hardware only; rollback retains error facts. */\n'
+
+======================================================================
+FAIL: test_selected_timer_owner_is_privileged_before_system_start_or_cleanup (tools.configure.test_timer_advanced.TimerAssemblyConfigurationTests.test_selected_timer_owner_is_privileged_before_system_start_or_cleanup) (label='gd32')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_timer_advanced.py", line 66, in test_selected_timer_owner_is_privileged_before_system_start_or_cleanup
+    self.assertIn("!nx_arch_is_privileged()", stop)
+AssertionError: '!nx_arch_is_privileged()' not found in '\n    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) { return NX_ERROR_CONTEXT; }\n    if (s_nx_platform_initialized >= 2u) {\n        nx_result_t status_0 = stop_encoder();\n        if (status_0 != NX_SUCCESS) { return status_0; }\n        s_nx_platform_initialized = 1u;\n    }\n    if (s_nx_platform_initialized >= 1u) {\n        nx_result_t status_0 = stop_power();\n        if (status_0 != NX_SUCCESS) { return status_0; }\n        s_nx_platform_initialized = 0u;\n    }\n    if (s_nx_platform_started && s_nx_timer_gpio_clocks_added != 0u) {\n        NX_PLATFORM_REGISTER_WRITE(RCU_AHB1EN, RCU_AHB1EN & ~s_nx_timer_gpio_clocks_added);\n        nx_arch_dsb();\n        if ((RCU_AHB1EN & s_nx_timer_gpio_clocks_added) != 0u) { return NX_ERROR_IO; }\n        s_nx_timer_gpio_clocks_added = 0u;\n    }\n    if (s_nx_platform_started && nx_gd32_soc_stop() != 0) { return NX_ERROR_IO; }\n    s_nx_platform_started = false;\n    s_nx_platform_initialized = 0u;\n    return NX_SUCCESS;\n}\n/** \\brief Start explicit hardware only; rollback retains error facts. */\n'
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.347s
+
+FAILED (failures=2)

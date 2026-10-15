@@ -1,0 +1,230 @@
+{
+  "scope": "Actual six selected USB production graphs, real SDK/cold clock/FIFO/controller+endpoint faces. Compile/link budgets+retention only. No connector/VBUS/electrical HIL, class stack, product enumeration, or release claim.",
+  "commands": [
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/usb_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-baremetal",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-baremetal.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-baremetal-0.log",
+      "sha256": "2aa8a066ca3253fb65e67a91776b815456b178c1cfc7d844ad2310d7e13ea925"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-baremetal",
+        "--target",
+        "usb_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 1,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-baremetal-1.log",
+      "sha256": "f8e0cf56db2716ca1ca297c06c85209df76c89149a8e97ef86d397d4e60fbad3"
+    },
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/usb_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-freertos",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-freertos.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-freertos-0.log",
+      "sha256": "4fc75ffd2b9a90a123d274ced9eda319af8206449d1ac51b53abc77a82803186"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-freertos",
+        "--target",
+        "usb_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 1,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-freertos-1.log",
+      "sha256": "248fee7b8e61b4b5bafff9e8b0f1875cf8475a631cd5d68f93afe27882d3a166"
+    },
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/usb_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-ve-baremetal",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-ve-baremetal.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-ve-baremetal-0.log",
+      "sha256": "b7d5347610abeec6dfee8f90a66eecc5223667e8db10b02f276092fca381787b"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-ve-baremetal",
+        "--target",
+        "usb_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 1,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-ve-baremetal-1.log",
+      "sha256": "8cf18f96906240557c4df8c1ca22abfef3c7c913fdc074217f59e524c0a8b10a"
+    },
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/usb_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-ve-freertos",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-ve-freertos.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-ve-freertos-0.log",
+      "sha256": "968be0f07ae8191dee6390e252810209913c19670133a504d956bb34a5e81baa"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-ve-freertos",
+        "--target",
+        "usb_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 1,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-ve-freertos-1.log",
+      "sha256": "19e37a45062ab455663d9760baffa2a0f1966a4111aa175540f3cecb24dcbeb4"
+    },
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/usb_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/gd32-baremetal",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/usb-arm-matrix/gd32-baremetal.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/gd32-baremetal-0.log",
+      "sha256": "ae489eae3a166e501a59075efbb4dac0b283ebadb843106c5ab11f6af32d5562"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/gd32-baremetal",
+        "--target",
+        "usb_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 1,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/gd32-baremetal-1.log",
+      "sha256": "cbd3f33abe6285efe508f21f1de50b765f12bb8c3c868f64576a863f731853ed"
+    },
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/usb_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/gd32-freertos",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/usb-arm-matrix/gd32-freertos.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/gd32-freertos-0.log",
+      "sha256": "b5332453bdea43608860cba2071f060f2a6cce5aeba53544b43713448e226b6c"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/gd32-freertos",
+        "--target",
+        "usb_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 1,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/gd32-freertos-1.log",
+      "sha256": "c94b42bb2c6855758d85acffd8690f5efc89b1648f27d7e28c6e70ab094f2679"
+    }
+  ],
+  "artifacts": [],
+  "failures": [
+    "stm32-zg-baremetal",
+    "stm32-zg-freertos",
+    "stm32-ve-baremetal",
+    "stm32-ve-freertos",
+    "gd32-baremetal",
+    "gd32-freertos"
+  ]
+}

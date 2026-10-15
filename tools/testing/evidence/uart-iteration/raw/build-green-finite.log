@@ -1,0 +1,28 @@
+[1/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[2/26] Building C object io/CMakeFiles/nexus_io.dir/src/spi.c.o
+[3/26] Linking C static library lib/libnexus_io.a
+[4/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[5/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[6/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[7/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[8/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[9/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[10/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[11/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[12/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[13/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[14/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[15/26] Linking C static library lib/libnexus_io_native.a
+[16/26] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+[17/26] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_dma.c.o
+[18/26] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_receive.c.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_receive.c.o 
+/usr/bin/cc -DNEXUS_STM32_MODEL -DSTM32F407xx -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/build/uart-iteration/generated -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -isystem /workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c11 -include/workspace/nexus/tests/google/stm32_dma_model.h -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -MD -MT tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_receive.c.o -MF tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_receive.c.o.d -o tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_receive.c.o -c /workspace/nexus/soc/stm32f407/drivers/uart_receive.c
+/workspace/nexus/soc/stm32f407/drivers/uart_receive.c: In function ‘rx_start’:
+/workspace/nexus/soc/stm32f407/drivers/uart_receive.c:208:16: error: ‘NX_ERROR_nx_stm32_uart_receive_state_t’ undeclared (first use in this function); did you mean ‘nx_stm32_uart_receive_state_t’?
+  208 |         return NX_ERROR_nx_stm32_uart_receive_state_t;
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                nx_stm32_uart_receive_state_t
+/workspace/nexus/soc/stm32f407/drivers/uart_receive.c:208:16: note: each undeclared identifier is reported only once for each function it appears in
+[19/26] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/stm32_uart_receive_test.cpp.o
+ninja: build stopped: subcommand failed.

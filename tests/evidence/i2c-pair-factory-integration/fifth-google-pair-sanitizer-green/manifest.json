@@ -1,0 +1,638 @@
+{
+  "schema_version": 1,
+  "kind": "i2c-pair-generated-sanitizer-development-execution",
+  "status": "passed",
+  "physical_status": "not_executed",
+  "scope": "Actual generated paired factory, common algorithm and silicon GPIO/I2C code. External CPU/MMIO/NVIC/hardwareclock and separately tested systemclock port only are mocked. Dirty development inputs, no physical or clean candidate qualification.",
+  "commands": [
+    {
+      "argv": [
+        "/workspace/nexus/.venv/bin/cmake",
+        "--build",
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build",
+        "--target",
+        "nexus_stm32_i2c_pair_factory_test",
+        "nexus_stm32_i2c_pair_irq_factory_test",
+        "nexus_gd32_i2c_pair_factory_test",
+        "nexus_gd32_i2c_pair_irq_factory_test",
+        "--parallel",
+        "1"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751357450320053,
+      "completed_ns": 1791751392949947589,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/build.output",
+        "sha256": "319da52217fa9cbc9ead6e30d19fee0a0e7748e595a516bd86f1a1efe6fc4a97",
+        "bytes": 4124
+      }
+    },
+    {
+      "argv": [
+        "nm",
+        "-u",
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_stm32_i2c_pair_factory_test"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751392971314874,
+      "completed_ns": 1791751392975263194,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_factory_test-sanitizer-symbols.output",
+        "sha256": "e23fda77f3dd4e52b97e52f23aef148f5c9b6c5703d306c4854891858a26688c",
+        "bytes": 18369
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_stm32_i2c_pair_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751392975674275,
+      "completed_ns": 1791751392991543126,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_factory_test-discovery.output",
+        "sha256": "c9c8b447c9041272b0d866734bdf974517cd10111cb67379fbf83bd903d8a1b8",
+        "bytes": 777
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_stm32_i2c_pair_factory_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_factory_test.xml"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751392992001537,
+      "completed_ns": 1791751393007902586,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_factory_test-execution.output",
+        "sha256": "5a4600f8982932be89873648bf295953ceb77890547bb345195f9e21712d38e1",
+        "bytes": 2634
+      }
+    },
+    {
+      "argv": [
+        "nm",
+        "-u",
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_stm32_i2c_pair_irq_factory_test"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751393027643053,
+      "completed_ns": 1791751393031502691,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_irq_factory_test-sanitizer-symbols.output",
+        "sha256": "e23fda77f3dd4e52b97e52f23aef148f5c9b6c5703d306c4854891858a26688c",
+        "bytes": 18369
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_stm32_i2c_pair_irq_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751393031893472,
+      "completed_ns": 1791751393047611038,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_irq_factory_test-discovery.output",
+        "sha256": "b735dfba24d160003b3d016af138418ca92507a0d30fc212bdb19050cf137985",
+        "bytes": 733
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_stm32_i2c_pair_irq_factory_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_irq_factory_test.xml"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751393048043201,
+      "completed_ns": 1791751393063797241,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_irq_factory_test-execution.output",
+        "sha256": "c23b3f701b929246168667316433f3f9e211b5802ae46a86ea8c4d8e609718f2",
+        "bytes": 2487
+      }
+    },
+    {
+      "argv": [
+        "nm",
+        "-u",
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_gd32_i2c_pair_factory_test"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751393080657776,
+      "completed_ns": 1791751393084496053,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_factory_test-sanitizer-symbols.output",
+        "sha256": "e23fda77f3dd4e52b97e52f23aef148f5c9b6c5703d306c4854891858a26688c",
+        "bytes": 18369
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_gd32_i2c_pair_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751393084884270,
+      "completed_ns": 1791751393100851577,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_factory_test-discovery.output",
+        "sha256": "c9c8b447c9041272b0d866734bdf974517cd10111cb67379fbf83bd903d8a1b8",
+        "bytes": 777
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_gd32_i2c_pair_factory_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_factory_test.xml"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751393101393923,
+      "completed_ns": 1791751393119140917,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_factory_test-execution.output",
+        "sha256": "5a4600f8982932be89873648bf295953ceb77890547bb345195f9e21712d38e1",
+        "bytes": 2634
+      }
+    },
+    {
+      "argv": [
+        "nm",
+        "-u",
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_gd32_i2c_pair_irq_factory_test"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751393142443949,
+      "completed_ns": 1791751393146201184,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_irq_factory_test-sanitizer-symbols.output",
+        "sha256": "e23fda77f3dd4e52b97e52f23aef148f5c9b6c5703d306c4854891858a26688c",
+        "bytes": 18369
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_gd32_i2c_pair_irq_factory_test",
+        "--gtest_filter=*",
+        "--gtest_list_tests"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751393146647598,
+      "completed_ns": 1791751393162362551,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_irq_factory_test-discovery.output",
+        "sha256": "b735dfba24d160003b3d016af138418ca92507a0d30fc212bdb19050cf137985",
+        "bytes": 733
+      }
+    },
+    {
+      "argv": [
+        "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_gd32_i2c_pair_irq_factory_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_irq_factory_test.xml"
+      ],
+      "return_code": 0,
+      "started_ns": 1791751393162843375,
+      "completed_ns": 1791751393178605989,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_irq_factory_test-execution.output",
+        "sha256": "c23b3f701b929246168667316433f3f9e211b5802ae46a86ea8c4d8e609718f2",
+        "bytes": 2487
+      }
+    }
+  ],
+  "rows": [
+    {
+      "target": "nexus_stm32_i2c_pair_factory_test",
+      "executable": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_factory_test.executable",
+        "sha256": "1deb6536c729e3ca9b7db9bd6b5b69c6f5d70711a7d6d0ce440cd82afbd3ac70",
+        "bytes": 7319984
+      },
+      "executed_path": "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_stm32_i2c_pair_factory_test",
+      "status": "passed",
+      "sanitizer_symbols": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_factory_test-sanitizer-symbols.output",
+        "sha256": "e23fda77f3dd4e52b97e52f23aef148f5c9b6c5703d306c4854891858a26688c",
+        "bytes": 18369
+      },
+      "xml": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_factory_test.xml",
+        "sha256": "13df6eee81ae1f4cbb4de2e527cb42628f0e5dfa975d63da7102085d9bfcc748",
+        "bytes": 3880
+      },
+      "discovered_cases": [
+        "I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren",
+        "I2CPairFactory.BothControllersUseExactPinsClockAndPublisherTuples",
+        "I2CPairFactory.SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart",
+        "I2CPairFactory.OwnEventVectorCannotAdvanceThePeerRequest",
+        "I2CPairFactory.DmaTerminalPreservesPeerFlagsEngineAndBorrow",
+        "I2CPairFactory.SameAddressOnDifferentControllersKeepsIndependentLoans",
+        "I2CPairFactory.ForeignCancelCannotChangeOtherControllersRegistersOrLoans",
+        "I2CPairFactory.OneStopPreservesPeerPendingIrqsAndActiveRequest",
+        "I2CPairFactory.RefusedSecondaryDmaDisableQuarantinesOnlyItsLoan",
+        "I2CPairFactory.RefusedInterruptWithdrawalRetainsPlatformClockAndPins",
+        "I2CPairFactory.IsrAndMaskedColdStartRejectBeforeAnyLease",
+        "I2CPairFactory.ExpiredAndInvisibleBufferAdmissionHasNoPeerEffects",
+        "I2CPairFactory.PeripheralNackCannotSettleOrResetPeerController",
+        "I2CPairFactory.StopRestoresSelectedPinsAndLeavesUnrelatedFields"
+      ],
+      "google": {
+        "tests": 14,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "target": "nexus_stm32_i2c_pair_irq_factory_test",
+      "executable": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_irq_factory_test.executable",
+        "sha256": "6cd3d322617c3e5c87303eb9133bd3f95c610bb77450d564e86d8774664267de",
+        "bytes": 7251592
+      },
+      "executed_path": "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_stm32_i2c_pair_irq_factory_test",
+      "status": "passed",
+      "sanitizer_symbols": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_irq_factory_test-sanitizer-symbols.output",
+        "sha256": "e23fda77f3dd4e52b97e52f23aef148f5c9b6c5703d306c4854891858a26688c",
+        "bytes": 18369
+      },
+      "xml": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_stm32_i2c_pair_irq_factory_test.xml",
+        "sha256": "f42299b52d8fba0881d89d719a022e23cc851efc49f123cff2e3128a115c0562",
+        "bytes": 3635
+      },
+      "discovered_cases": [
+        "I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren",
+        "I2CPairFactory.BothControllersUseExactPinsClockAndPublisherTuples",
+        "I2CPairFactory.SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart",
+        "I2CPairFactory.OwnEventVectorCannotAdvanceThePeerRequest",
+        "I2CPairFactory.SameAddressOnDifferentControllersKeepsIndependentLoans",
+        "I2CPairFactory.ForeignCancelCannotChangeOtherControllersRegistersOrLoans",
+        "I2CPairFactory.OneStopPreservesPeerPendingIrqsAndActiveRequest",
+        "I2CPairFactory.RefusedInterruptWithdrawalRetainsPlatformClockAndPins",
+        "I2CPairFactory.IsrAndMaskedColdStartRejectBeforeAnyLease",
+        "I2CPairFactory.PeripheralNackCannotSettleOrResetPeerController",
+        "I2CPairFactory.StopRestoresSelectedPinsAndLeavesUnrelatedFields",
+        "I2CPairFactory.IrqThreeByteWindowCompletesOnlyAfterWireRelease",
+        "I2CPairFactory.IrqModeCanUseOrdinaryBufferWithoutCreatingDmaOwnership"
+      ],
+      "google": {
+        "tests": 13,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "target": "nexus_gd32_i2c_pair_factory_test",
+      "executable": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_factory_test.executable",
+        "sha256": "d8dfbdd36e4d17d0e99d69bd7a04493fdc985c69cc3077d0ab3ab5c06790039f",
+        "bytes": 7331064
+      },
+      "executed_path": "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_gd32_i2c_pair_factory_test",
+      "status": "passed",
+      "sanitizer_symbols": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_factory_test-sanitizer-symbols.output",
+        "sha256": "e23fda77f3dd4e52b97e52f23aef148f5c9b6c5703d306c4854891858a26688c",
+        "bytes": 18369
+      },
+      "xml": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_factory_test.xml",
+        "sha256": "932e1c9bb5d63362d24e2262ff0e5b995bdb90097428e35db80beb975709d3c0",
+        "bytes": 3880
+      },
+      "discovered_cases": [
+        "I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren",
+        "I2CPairFactory.BothControllersUseExactPinsClockAndPublisherTuples",
+        "I2CPairFactory.SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart",
+        "I2CPairFactory.OwnEventVectorCannotAdvanceThePeerRequest",
+        "I2CPairFactory.DmaTerminalPreservesPeerFlagsEngineAndBorrow",
+        "I2CPairFactory.SameAddressOnDifferentControllersKeepsIndependentLoans",
+        "I2CPairFactory.ForeignCancelCannotChangeOtherControllersRegistersOrLoans",
+        "I2CPairFactory.OneStopPreservesPeerPendingIrqsAndActiveRequest",
+        "I2CPairFactory.RefusedSecondaryDmaDisableQuarantinesOnlyItsLoan",
+        "I2CPairFactory.RefusedInterruptWithdrawalRetainsPlatformClockAndPins",
+        "I2CPairFactory.IsrAndMaskedColdStartRejectBeforeAnyLease",
+        "I2CPairFactory.ExpiredAndInvisibleBufferAdmissionHasNoPeerEffects",
+        "I2CPairFactory.PeripheralNackCannotSettleOrResetPeerController",
+        "I2CPairFactory.StopRestoresSelectedPinsAndLeavesUnrelatedFields"
+      ],
+      "google": {
+        "tests": 14,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "target": "nexus_gd32_i2c_pair_irq_factory_test",
+      "executable": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_irq_factory_test.executable",
+        "sha256": "bd5b1891253c95b32652879e73993101ce654b608bd1977e53526e4eec81faea",
+        "bytes": 7262904
+      },
+      "executed_path": "/workspace/nexus-g474-iteration-evidence/host-asan-build/bin/nexus_gd32_i2c_pair_irq_factory_test",
+      "status": "passed",
+      "sanitizer_symbols": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_irq_factory_test-sanitizer-symbols.output",
+        "sha256": "e23fda77f3dd4e52b97e52f23aef148f5c9b6c5703d306c4854891858a26688c",
+        "bytes": 18369
+      },
+      "xml": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/nexus_gd32_i2c_pair_irq_factory_test.xml",
+        "sha256": "1396a3bb8ec0549f077e0cb9f8eea21ec37f7b1944d7764eb61fedb64c568d5b",
+        "bytes": 3635
+      },
+      "discovered_cases": [
+        "I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren",
+        "I2CPairFactory.BothControllersUseExactPinsClockAndPublisherTuples",
+        "I2CPairFactory.SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart",
+        "I2CPairFactory.OwnEventVectorCannotAdvanceThePeerRequest",
+        "I2CPairFactory.SameAddressOnDifferentControllersKeepsIndependentLoans",
+        "I2CPairFactory.ForeignCancelCannotChangeOtherControllersRegistersOrLoans",
+        "I2CPairFactory.OneStopPreservesPeerPendingIrqsAndActiveRequest",
+        "I2CPairFactory.RefusedInterruptWithdrawalRetainsPlatformClockAndPins",
+        "I2CPairFactory.IsrAndMaskedColdStartRejectBeforeAnyLease",
+        "I2CPairFactory.PeripheralNackCannotSettleOrResetPeerController",
+        "I2CPairFactory.StopRestoresSelectedPinsAndLeavesUnrelatedFields",
+        "I2CPairFactory.IrqThreeByteWindowCompletesOnlyAfterWireRelease",
+        "I2CPairFactory.IrqModeCanUseOrdinaryBufferWithoutCreatingDmaOwnership"
+      ],
+      "google": {
+        "tests": 13,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "driver": {
+    "path": "/workspace/nexus-i2c-pair-iteration-evidence/capture_pair_sanitizer.py",
+    "sha256": "b050a45edb267ec78cda59a527f384a183a5c0d394fbd2acec6057bf5ebceaa8",
+    "bytes": 8367
+  },
+  "source_before": {
+    "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/source-before.json",
+    "sha256": "2626babead6263df258a74265fbf58721d2ebba58a0cb1b0236c973b4986efe1",
+    "bytes": 67817
+  },
+  "sanitizer": {
+    "cache": {
+      "path": "/workspace/nexus-g474-iteration-evidence/host-asan-build/CMakeCache.txt",
+      "sha256": "9c5ecb322d30293723de975b1019380fd6632252ba4d8d3f83fbf8b7dc3773b9",
+      "bytes": 23771
+    },
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "source_after": {
+    "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/source-after.json",
+    "sha256": "2626babead6263df258a74265fbf58721d2ebba58a0cb1b0236c973b4986efe1",
+    "bytes": 67817
+  },
+  "source_unchanged": true,
+  "generated": [
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/.nexus-config-bundle",
+      "sha256": "d46a3942d45d24c2a6fd9c1084e900c9cd41dded22f1595f6439eae4e3696afc",
+      "bytes": 65
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/bindings.c",
+      "sha256": "568d81a38cbc38cdaf9dbfe0ea67d7fcd7f6275273b8c4925f17ec99b18d02a3",
+      "bytes": 29606
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/input_paths.json",
+      "sha256": "dc490bcbd93ca7de5450dd91dfd81629d01c53624e86d0fda0f0aa9d6b86672a",
+      "bytes": 554
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/memory.ld",
+      "sha256": "6ed5810262f16806ec236d7c9ea84f1de82cd24c853ed15c5cf9151c1445dfe7",
+      "bytes": 2783
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/nexus_bindings.h",
+      "sha256": "7540dfa53ebbb1876a577cc3747b57be867bfccfa4cf4dd0720589e2314fb12c",
+      "bytes": 1303
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/nexus_config.h",
+      "sha256": "b7c799bbd1900c7550aec0cc3399c6b9ddd5a72cae3017be53635b5481035d42",
+      "bytes": 1226
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/nexus_factory.h",
+      "sha256": "46175e15f41ba54e80e063fcd688aa6e1af3d8d883b1a52c65c0572967728451",
+      "bytes": 14346
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/nexus_factory_strong.h",
+      "sha256": "70aab05cd2148b722761c78800022b5d52b99f5c145c6d184adf6406014f7f4d",
+      "bytes": 8563
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/resolved.json",
+      "sha256": "1de26526965f38811bda89d1669ff39a6750ef368efcac07b9aaf1571e848e3f",
+      "bytes": 29436
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/resource-budget.json",
+      "sha256": "43787a37e48eb2e3c86f7a0fcd4e8e1921c69b4c1fa5b90f47d3b0359369821e",
+      "bytes": 202
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-dma/selection.cmake",
+      "sha256": "cd5b9eecf57324d4ef11a4ac478fed66ee4b7d0de2b1ebbaf5adfedb754addb4",
+      "bytes": 1151
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/.nexus-config-bundle",
+      "sha256": "00573af425eb2474c9bd50fcd8cb946102b8d6bbea64778328e5ba421e37d72c",
+      "bytes": 65
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/bindings.c",
+      "sha256": "984fc9c5120c568f8e9d3894868a4805577d2294ceef92ce6cb5399f9e09b211",
+      "bytes": 23880
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/input_paths.json",
+      "sha256": "eb48c241d976f2ae6627074beea07703d483086dbf82e6076441a96dbdcef1ad",
+      "bytes": 562
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/memory.ld",
+      "sha256": "bff991d7e5cd9f692845d14e01c7341cca984af64f69dafb4ae777a070426100",
+      "bytes": 2783
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/nexus_bindings.h",
+      "sha256": "7540dfa53ebbb1876a577cc3747b57be867bfccfa4cf4dd0720589e2314fb12c",
+      "bytes": 1303
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/nexus_config.h",
+      "sha256": "b882c86391d5b6ce10c11b9288b3688f4ed8056053f0daa42a72b6cefa9f2146",
+      "bytes": 1226
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/nexus_factory.h",
+      "sha256": "46175e15f41ba54e80e063fcd688aa6e1af3d8d883b1a52c65c0572967728451",
+      "bytes": 14346
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/nexus_factory_strong.h",
+      "sha256": "70aab05cd2148b722761c78800022b5d52b99f5c145c6d184adf6406014f7f4d",
+      "bytes": 8563
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/resolved.json",
+      "sha256": "81708464f254c968e58f9fa45e2234c533fd9974dac89b5655ba16387c06e7b5",
+      "bytes": 28146
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/resource-budget.json",
+      "sha256": "43787a37e48eb2e3c86f7a0fcd4e8e1921c69b4c1fa5b90f47d3b0359369821e",
+      "bytes": 202
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-gd32-irq/selection.cmake",
+      "sha256": "57d2ec84490a9ce9fb0e69e2e74ab6230bff38d5e6be52a8b5a1134c42e0657a",
+      "bytes": 1151
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/.nexus-config-bundle",
+      "sha256": "00664a2dd4bc00d25f0940c6b4a14c900ababac03efa54b6cca99a2a16644ad3",
+      "bytes": 65
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/bindings.c",
+      "sha256": "468ec0cff683cb4e6b82aad7f73bdc150387b6a652eacdbdc2868e407ad333aa",
+      "bytes": 29749
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/input_paths.json",
+      "sha256": "d392d37348465e1702ad830a0df42c178c41842ea78335e938f04ccef06389a9",
+      "bytes": 574
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/memory.ld",
+      "sha256": "f51d2a34717670c601d14ccc7947698b917a4eaa69e742c00c9fe6dfe4f827b3",
+      "bytes": 2531
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/nexus_bindings.h",
+      "sha256": "7540dfa53ebbb1876a577cc3747b57be867bfccfa4cf4dd0720589e2314fb12c",
+      "bytes": 1303
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/nexus_config.h",
+      "sha256": "b9e681c17394da10c425265097e93ed8d2d3fedeb697013bc1f3d8dc1cbd2ea5",
+      "bytes": 1226
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/nexus_factory.h",
+      "sha256": "46175e15f41ba54e80e063fcd688aa6e1af3d8d883b1a52c65c0572967728451",
+      "bytes": 14346
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/nexus_factory_strong.h",
+      "sha256": "70aab05cd2148b722761c78800022b5d52b99f5c145c6d184adf6406014f7f4d",
+      "bytes": 8563
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/resolved.json",
+      "sha256": "07d3a3df70d79a454750d6cee2d3101183d899d1da2eb0aafb612ff2066753f9",
+      "bytes": 25842
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/resource-budget.json",
+      "sha256": "308d991923bde7816ede5655bb7a8b74ed042aa3dd719506a5a3e23bf11fcd66",
+      "bytes": 184
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-dma/selection.cmake",
+      "sha256": "4309623d140bfc5cd4e753c9de8d2f645af514819bb67040f2ec5b5d13cdce59",
+      "bytes": 1153
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/.nexus-config-bundle",
+      "sha256": "6da8fa6010d96e8dcd00b4d7ac2de3c46d42ffc81fb0991c2c50d2be594b95d9",
+      "bytes": 65
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/bindings.c",
+      "sha256": "11a7e7fe42e1aa724a3574f831d12c83490e85ce1aafad2ee7ac4dfdcba14af7",
+      "bytes": 24213
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/input_paths.json",
+      "sha256": "d4a2fcbd46098ee58f57972d9fa104c5b146d93890b49f2f85b277f7d6464967",
+      "bytes": 582
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/memory.ld",
+      "sha256": "0350b674c3f6a01315c6db4090ad4398b649ff59c70f3219ff717b1a7951c288",
+      "bytes": 2531
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/nexus_bindings.h",
+      "sha256": "7540dfa53ebbb1876a577cc3747b57be867bfccfa4cf4dd0720589e2314fb12c",
+      "bytes": 1303
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/nexus_config.h",
+      "sha256": "fb61e189bf529640f9352ea53164ae2713f11f119307a92eea60d241a7fa7fd6",
+      "bytes": 1226
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/nexus_factory.h",
+      "sha256": "46175e15f41ba54e80e063fcd688aa6e1af3d8d883b1a52c65c0572967728451",
+      "bytes": 14346
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/nexus_factory_strong.h",
+      "sha256": "70aab05cd2148b722761c78800022b5d52b99f5c145c6d184adf6406014f7f4d",
+      "bytes": 8563
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/resolved.json",
+      "sha256": "bc76350ce836f42459ee692f6973e8e0617d9c8456fc5578d5a79f0505d43cee",
+      "bytes": 24556
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/resource-budget.json",
+      "sha256": "308d991923bde7816ede5655bb7a8b74ed042aa3dd719506a5a3e23bf11fcd66",
+      "bytes": 184
+    },
+    {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/fifth-google-pair-sanitizer-green/generated/i2c-pair-stm32-irq/selection.cmake",
+      "sha256": "f6fd46903357f5f9391841c029de82718158079395e19fa2fd4cfdcf17551924",
+      "bytes": 1153
+    }
+  ]
+}

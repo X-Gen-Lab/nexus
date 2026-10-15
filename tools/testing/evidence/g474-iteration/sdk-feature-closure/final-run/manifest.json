@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "kind": "actual-sdk-contract-development-execution",
+  "scope": "All discovered SDK tests, real subprocess observation only. Dirty development source SDK; no clean candidate or physical qualification.",
+  "physical_status": "not_executed",
+  "driver": {
+    "path": "/workspace/nexus-sdk-feature-closure/run_all.py",
+    "sha256": "dc5c782b828ef5a2b9d4fb267ac4890b337f8ebd62976618355f19fea7ae5de4",
+    "size": 4840
+  },
+  "started_ns": 1791749954069104807,
+  "completed_ns": 1791750197023252169,
+  "tests_run": 42,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "source_before": {
+    "cmake/package/package_source_sdk.py": {
+      "path": "/workspace/nexus/cmake/package/package_source_sdk.py",
+      "sha256": "27526d62cd08455b9024b167f51eb50d758491400d8116f88ecd9975feeeccc3",
+      "size": 35379
+    },
+    "tests/contracts/test_source_sdk.py": {
+      "path": "/workspace/nexus/tests/contracts/test_source_sdk.py",
+      "sha256": "2acec34198c685ba5c18d72a794d299fca02b26121af957c1439d4dadbef7a7c",
+      "size": 47166
+    }
+  },
+  "source_after": {
+    "cmake/package/package_source_sdk.py": {
+      "path": "/workspace/nexus/cmake/package/package_source_sdk.py",
+      "sha256": "27526d62cd08455b9024b167f51eb50d758491400d8116f88ecd9975feeeccc3",
+      "size": 35379
+    },
+    "tests/contracts/test_source_sdk.py": {
+      "path": "/workspace/nexus/tests/contracts/test_source_sdk.py",
+      "sha256": "2acec34198c685ba5c18d72a794d299fca02b26121af957c1439d4dadbef7a7c",
+      "size": 47166
+    }
+  },
+  "owned_source_unchanged": true,
+  "commands": {
+    "path": "/workspace/nexus-sdk-feature-closure/final-run/commands.json",
+    "sha256": "5ea675df920381d6c41645d046e7d40a19f37ce0d060bbac34fa9f68ebce1e66",
+    "size": 98186
+  },
+  "status": "passed"
+}

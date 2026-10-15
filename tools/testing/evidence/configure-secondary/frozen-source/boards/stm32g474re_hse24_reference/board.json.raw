@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "stm32g474re-hse24-reference",
+  "soc": "STM32G474RET6",
+  "soc_family": "stm32g474",
+  "source_revision": "UM2505 Rev7 MB1367 C04/C05 source-reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 24000000
+  },
+  "bindings": [
+    {
+      "id": "led0",
+      "controller": "GPIOA",
+      "route": "gpio-pa5",
+      "initial": 0,
+      "mask": 32
+    },
+    {
+      "id": "uart1",
+      "controller": "LPUART1",
+      "route": "lpuart1-pa2-pa3"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only: physical PCB revision and solder bridges not inspected",
+    "X3 crystal population/frequency and SB25/SB26/SB24/SB28/SB27 electrical states not inspected",
+    "PA5 LD2/SB6 fitting and LPUART1 VCP SB17/SB23/SB18/SB22/SB13/SB19 paths not inspected",
+    "No physical HIL executed; clock timing, serial traffic and electrical behavior unqualified",
+    "All peripheral modes other than GPIOA PA5 and LPUART1 IRQ bytes remain unsupported"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/user_manual/um2505-stm32g4-nucleo64-boards-mb1367-stmicroelectronics.pdf",
+      "scope": "UM2505 Rev7 section7.5.1 p22 default X3 crystal24MHz SB25/SB26ON,SB24/SB28OFF,SB27OFF,C56/C59ON6.8pF. LD2 PA5activehigh SB6ON. VCP LPUART1 PA2/PA3AF12 SB17/SB23ON,SB18/SB22/SB13/SB19OFF. Source PDF SHA25635549bd8805ed884ce0e0eeceb9ce94097ecba2a7d95560e6d1109fb119fd3d4; actual Board not inspected."
+    },
+    {
+      "repository": "https://github.com/STMicroelectronics/cmsis-device-g4",
+      "tree": "626ee412334a5ed2e5b320af5a8d77d69f03a558",
+      "scope": "Actual G474 register layout/masks/startup/IRQ range102; no actual PCB or PHY qualification."
+    }
+  ]
+}

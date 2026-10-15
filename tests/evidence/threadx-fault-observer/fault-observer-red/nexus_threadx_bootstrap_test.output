@@ -1,0 +1,44 @@
+Running main() from gmock_main.cc
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from ThreadXBootstrap
+[ RUN      ] ThreadXBootstrap.RejectsISRCallbackBeforeProduct
+[       OK ] ThreadXBootstrap.RejectsISRCallbackBeforeProduct (0 ms)
+[ RUN      ] ThreadXBootstrap.RejectsUnprivilegedCallbackBeforeProduct
+[       OK ] ThreadXBootstrap.RejectsUnprivilegedCallbackBeforeProduct (0 ms)
+[ RUN      ] ThreadXBootstrap.RejectsFaultMaskBeforeProduct
+[       OK ] ThreadXBootstrap.RejectsFaultMaskBeforeProduct (0 ms)
+[ RUN      ] ThreadXBootstrap.RejectsUnselectedBasepriBeforeProduct
+[       OK ] ThreadXBootstrap.RejectsUnselectedBasepriBeforeProduct (1 ms)
+[ RUN      ] ThreadXBootstrap.CanonicalUnmaskedCallbackInvokesProduct
+[       OK ] ThreadXBootstrap.CanonicalUnmaskedCallbackInvokesProduct (0 ms)
+[ RUN      ] ThreadXBootstrap.CanonicalPrimaskCallbackInvokesProduct
+[       OK ] ThreadXBootstrap.CanonicalPrimaskCallbackInvokesProduct (0 ms)
+[ RUN      ] ThreadXBootstrap.ObserverPrecedesOverriddenProductHookForContextFault
+/workspace/nexus/tests/google/threadx_bootstrap_test.cpp:49: Failure
+Death test: enter(1, true)
+    Result: died but not with expected exit code:
+            Exited with exit status 68
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] ThreadXBootstrap.ObserverPrecedesOverriddenProductHookForContextFault (1 ms)
+[ RUN      ] ThreadXBootstrap.ObserverPrecedesProductHookForMaskedBootstrapFault
+/workspace/nexus/tests/google/threadx_bootstrap_test.cpp:52: Failure
+Death test: enter(3, true)
+    Result: died but not with expected exit code:
+            Exited with exit status 68
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] ThreadXBootstrap.ObserverPrecedesProductHookForMaskedBootstrapFault (25 ms)
+[----------] 8 tests from ThreadXBootstrap (30 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (30 ms total)
+[  PASSED  ] 6 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] ThreadXBootstrap.ObserverPrecedesOverriddenProductHookForContextFault
+[  FAILED  ] ThreadXBootstrap.ObserverPrecedesProductHookForMaskedBootstrapFault
+
+ 2 FAILED TESTS

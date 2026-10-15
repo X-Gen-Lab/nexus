@@ -1,0 +1,23 @@
+Running main() from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest_main.cc
+[==========] Running 7 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 7 tests from NativeFactory
+[ RUN      ] NativeFactory.LookupBeforeStartupHasNoEffectsAndChecksEveryClass
+[       OK ] NativeFactory.LookupBeforeStartupHasNoEffectsAndChecksEveryClass (0 ms)
+[ RUN      ] NativeFactory.GeneratedGPIOAndUARTHaveIndependentStateAndStorage
+[       OK ] NativeFactory.GeneratedGPIOAndUARTHaveIndependentStateAndStorage (0 ms)
+[ RUN      ] NativeFactory.GeneratedBusControllersAndEndpointMemoriesAreDistinct
+[       OK ] NativeFactory.GeneratedBusControllersAndEndpointMemoriesAreDistinct (0 ms)
+[ RUN      ] NativeFactory.StopRevokesOperationsAndRestartRetainsStaticIdentity
+[       OK ] NativeFactory.StopRevokesOperationsAndRestartRetainsStaticIdentity (0 ms)
+[ RUN      ] NativeFactory.StopRetainsQuarantinedBorrowUntilProviderDrain
+[       OK ] NativeFactory.StopRetainsQuarantinedBorrowUntilProviderDrain (0 ms)
+[ RUN      ] NativeFactory.AllNineClassesStopAndRestartWithRetainedWatchdogEffect
+[       OK ] NativeFactory.AllNineClassesStopAndRestartWithRetainedWatchdogEffect (0 ms)
+[ RUN      ] NativeFactory.PlatformStopKeepsADCStreamLoanUntilConsumerRelease
+[       OK ] NativeFactory.PlatformStopKeepsADCStreamLoanUntilConsumerRelease (0 ms)
+[----------] 7 tests from NativeFactory (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 7 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 7 tests.

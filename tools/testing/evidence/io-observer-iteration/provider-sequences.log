@@ -1,0 +1,24 @@
+Running main() from gmock_main.cc
+[==========] Running 6 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 3 tests from IODescriptorSequences
+[ RUN      ] IODescriptorSequences.UartCancellationAndEpochDoNotRevokeBorrow
+[       OK ] IODescriptorSequences.UartCancellationAndEpochDoNotRevokeBorrow (0 ms)
+[ RUN      ] IODescriptorSequences.SpiCancellationAndEpochDoNotRevokeBorrow
+[       OK ] IODescriptorSequences.SpiCancellationAndEpochDoNotRevokeBorrow (0 ms)
+[ RUN      ] IODescriptorSequences.I2cCancellationAndEpochDoNotRevokeBorrow
+[       OK ] IODescriptorSequences.I2cCancellationAndEpochDoNotRevokeBorrow (0 ms)
+[----------] 3 tests from IODescriptorSequences (0 ms total)
+
+[----------] 3 tests from IOProviderSequences
+[ RUN      ] IOProviderSequences.NativeUartThirtyTwoCancelDeadlineDrainHistories
+[       OK ] IOProviderSequences.NativeUartThirtyTwoCancelDeadlineDrainHistories (0 ms)
+[ RUN      ] IOProviderSequences.NativeSpiSixteenCancelDeadlineDrainHistories
+[       OK ] IOProviderSequences.NativeSpiSixteenCancelDeadlineDrainHistories (0 ms)
+[ RUN      ] IOProviderSequences.NativeAdcConsumerDelayStopAndOutOfOrderReleaseHistories
+[       OK ] IOProviderSequences.NativeAdcConsumerDelayStopAndOutOfOrderReleaseHistories (0 ms)
+[----------] 3 tests from IOProviderSequences (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 6 tests.

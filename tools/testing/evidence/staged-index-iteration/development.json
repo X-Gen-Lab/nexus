@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "staged-index-contract-development",
+  "source_files": [
+    {
+      "path": ".pre-commit-config.yaml",
+      "sha256": "0f2b19cf4eb777e0be9a3c67e122634accf7cd6a46fb695f454e0b5f32975d99"
+    },
+    {
+      "path": "scripts/ci/tdd_gate.py",
+      "sha256": "692a444e67bc42eb71de81f341e12024440976035cd115c964de8ffcbd3e58ab"
+    },
+    {
+      "path": "tools/testing/test_staged_execution.py",
+      "sha256": "67950061bc93dd08708dd46daa1c477bd3f64ba13199faae7afc9121ed768db2"
+    },
+    {
+      "path": "scripts/ci/test_style_gate.py",
+      "sha256": "5bd772bf44a53a46b69fedf12ffee73074d20573c0abe257d7e3efed6ed59da7"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "91402678c9439dadfe137a87341cf21f69742293086ab21721a26e43982e7868"
+    }
+  ],
+  "red": {
+    "log": "red.log",
+    "sha256": "a4f745e9193c1247cd5fde385065c09e111127ddd530e78a58abba20a20cd8ed",
+    "exit_code": 1,
+    "tests": 10,
+    "failures": 6
+  },
+  "green": {
+    "log": "green.log",
+    "sha256": "0a8b895b775d2196ad97ddaef5a9b50dc472a5569c89a2a7a4e42029c3ffd699",
+    "exit_code": 0,
+    "tests": 28,
+    "failures": 0
+  },
+  "scope": "Actual real temporary Git index and installed formatter/hook tests. Staged execution tests replace external Google subprocess boundaries; normal repository commit hook independently executes the full real GoogleTest plan.",
+  "physical_status": "not_applicable"
+}

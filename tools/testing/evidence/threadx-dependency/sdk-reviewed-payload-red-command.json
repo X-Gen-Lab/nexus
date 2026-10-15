@@ -1,0 +1,8 @@
+{
+  "command": [
+    "python3",
+    "-c",
+    "import importlib.util,unittest; s=importlib.util.spec_from_file_location('sdk_contracts','/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); r=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(m.SourceSDKThreadXSelectionTests)); raise SystemExit(not r.wasSuccessful())"
+  ],
+  "returncode": 1
+}

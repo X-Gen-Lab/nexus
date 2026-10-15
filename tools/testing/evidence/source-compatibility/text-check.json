@@ -1,0 +1,7 @@
+{
+  "kind": "development_text_check",
+  "status": "passed",
+  "files": 8,
+  "errors": [],
+  "formal_style_index_gate": "pending_root_staging"
+}

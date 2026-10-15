@@ -1,0 +1,17 @@
+Running main() from gmock_main.cc
+[==========] Running 4 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 4 tests from TimebaseSoC
+[ RUN      ] TimebaseSoC.ExactReviewedClockAndIRQProduceAStablePort
+[       OK ] TimebaseSoC.ExactReviewedClockAndIRQProduceAStablePort (0 ms)
+[ RUN      ] TimebaseSoC.MissingSleepClockAndDisabledWakeIRQRejectThePort
+[       OK ] TimebaseSoC.MissingSleepClockAndDisabledWakeIRQRejectThePort (0 ms)
+[ RUN      ] TimebaseSoC.WrongPrescalerAndStoppedTimebaseRejectWithoutRepair
+[       OK ] TimebaseSoC.WrongPrescalerAndStoppedTimebaseRejectWithoutRepair (0 ms)
+[ RUN      ] TimebaseSoC.ReservedCompareKeepsOverflowAndHasExplicitBorrowState
+[       OK ] TimebaseSoC.ReservedCompareKeepsOverflowAndHasExplicitBorrowState (0 ms)
+[----------] 4 tests from TimebaseSoC (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 4 tests.

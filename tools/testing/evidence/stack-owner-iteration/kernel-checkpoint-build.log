@@ -1,0 +1,7 @@
+[1/7] Building C object io/CMakeFiles/nexus_io.dir/src/ethernet.c.o
+[2/7] Building C object io/CMakeFiles/nexus_io_native.dir/native/ethernet.c.o
+[3/7] Linking C static library lib/libnexus_io.a
+[4/7] Building C object io/CMakeFiles/nexus_eth_native_engine.dir/src/eth_mac.c.o
+[5/7] Linking C static library lib/libnexus_io_native.a
+[6/7] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_services_kernel_test.dir/freertos_owner_endurance_test.cpp.o
+[7/7] Linking CXX executable bin/nexus_freertos_services_kernel_test

@@ -1,0 +1,288 @@
+{
+  "scope": "Actual default production ARM graph without USB selection; default ELF has no USB/ETH/MDIO runtime storage, tables, methods or strong IRQs; official weak startup aliases remain. Compile/link only, no hardware or product qualification.",
+  "commands": [
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/workspace/nexus",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tools/configure/assemblies/qiming-baremetal.toml",
+        "-DNEXUS_BUILD_TESTS=OFF",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg-0.log",
+      "sha256": "e77b9ae9ed0310ad4756c036bd5f76b0db83fb8e0880d96c7552be4ee1972b51"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg",
+        "--target",
+        "nexus_firmware",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg-1.log",
+      "sha256": "bc5666c2a7fd20356600a74e8ac8c84c20bb836cb3926c6ade09a2484dda3075"
+    },
+    {
+      "command": [
+        "arm-none-eabi-nm",
+        "-S",
+        "--size-sort",
+        "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/bin/nexus_firmware.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg-2.log",
+      "sha256": "5d3353c9d9e73065964ccae105513ed577b945f3d50c2a7408c93e61a05039bb"
+    },
+    {
+      "command": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/bin/nexus_firmware.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg-3.log",
+      "sha256": "2adb91dbbcf0bb10723f456f9901b56ded625eb265f5a3de6905c61e25052f8d"
+    },
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "/workspace/nexus",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tools/configure/assemblies/liangshan-baremetal.toml",
+        "-DNEXUS_BUILD_TESTS=OFF",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32-0.log",
+      "sha256": "cbe8bd91df69855824845b356203ca7c8e4111d4a4b1b0e0c8eaa8070567db66"
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32",
+        "--target",
+        "nexus_firmware",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32-1.log",
+      "sha256": "ffa686ed35b2d41251f2cd39d5e6030b6e172582c6ff414ae8431de721ca7dab"
+    },
+    {
+      "command": [
+        "arm-none-eabi-nm",
+        "-S",
+        "--size-sort",
+        "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/bin/nexus_firmware.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32-2.log",
+      "sha256": "0a44055a304bc6416369d1fa063fb70a9ba79237da9a8808f8c5b2ae4691d166"
+    },
+    {
+      "command": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/bin/nexus_firmware.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "PATH": "/workspace/nexus/.venv/bin:/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "exit_code": 0,
+      "log": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32-3.log",
+      "sha256": "be7608be76821ca00eb6cf498f638f81a7c8a37f27646f3d9098d40338f5c4e5"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/bin/nexus_firmware.resources.json",
+      "sha256": "729e8392410a9bbafbaf7f308be9e0ffb4bdde8ecbc556a4d42f1e109ef61d05",
+      "size": 3563
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/bin/nexus_firmware.map",
+      "sha256": "aca6bb5b95d86aabb39cb187b5be70f355368154c643bf8d4d1b23167752a549",
+      "size": 42767
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/bin/nexus_firmware.elf",
+      "sha256": "0fdb1450a1abd1c7ae2ec0b0f752d3620e3b6fa55a25bad19bcb91083f4aaaad",
+      "size": 21492
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/bin/nexus_firmware.bin",
+      "sha256": "fa43885f5cdb0827b9fd34be782ff8df853e07e20072d96342707444903ff758",
+      "size": 5368
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/input_paths.json",
+      "sha256": "cc93d8bb1bdb881aa8b053db87eba8ffd5139851cc56fcbdcd7ebcecb8329536",
+      "size": 484
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/nexus_config.h",
+      "sha256": "2c5e5dc0da2f095ccb6f87ff1557542e572be8dde711f30a9a1161bc1a9f701f",
+      "size": 1257
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/selection.cmake",
+      "sha256": "1515219f9e5e90f14b7e8f64392bb4ab6450c46cca109bf4b6742b34b7b20e1a",
+      "size": 1159
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/resource-budget.json",
+      "sha256": "a62f7fad79c1b379afcc7f8cefa0fc059ec01d238ca1f9b82f20c2bfc084970f",
+      "size": 184
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/nexus_factory.h",
+      "sha256": "0e1c04111e3aa5e9f6ad03ede32004df5791f14fd67aaf26fb32ea375416f20f",
+      "size": 9485
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/nexus_bindings.h",
+      "sha256": "20e4a198e640bf9f0cb4689bed7d643192e908ded1b00cff3a3808521232f47b",
+      "size": 1188
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/resolved.json",
+      "sha256": "2118954410808d6cd871db66b44c6a487dc61e91616009f51a5608f20bfed904",
+      "size": 20281
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/bindings.c",
+      "sha256": "74d3d180a4fe9e3e35398caba6bf7344229df7e9c0ee8d1c677949874815db44",
+      "size": 9687
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/nexus_factory_strong.h",
+      "sha256": "ef774272d8a646ab88e104f2ec90000d4fba70686868e7d512521b99e7cbcdd4",
+      "size": 7099
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/.nexus-config-bundle",
+      "sha256": "647a81a0de13356de7c65906f0ec02259d35ce07a89a837e8fb9c445269d2077",
+      "size": 65
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/generated/memory.ld",
+      "sha256": "6e12de2155909995d5402aecbc88fec2da9cfa3fdf2cd8a3923ecb1d07f1d862",
+      "size": 2531
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/stm32-zg/compile_commands.json",
+      "sha256": "5e929666b6350ae2f0871cf85e49582d467ce3b9c9589ad3865f09a9eaa24086",
+      "size": 50381
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/bin/nexus_firmware.resources.json",
+      "sha256": "53e6f76b14410b6a17b0337f11beff3c8bfa4a69e5fd2811f39ac521a03e7571",
+      "size": 3762
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/bin/nexus_firmware.map",
+      "sha256": "555cad12fab2ec5f1b368a629e9cf7a4dae5b159885d8f85c45b668adca782e0",
+      "size": 75467
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/bin/nexus_firmware.elf",
+      "sha256": "ab46599a244e0b94d5f9d552f01c9c6f241c08c7ea1f7c7159f00fa11fc6f103",
+      "size": 23188
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/bin/nexus_firmware.bin",
+      "sha256": "1887cd2501245a7bbf68e4ef0fb5e2e16a310fb0be16a1717dacdb9cdb3a00bf",
+      "size": 7082
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/input_paths.json",
+      "sha256": "711ef3e53fccbb3758b1fd9226e2799e1364bc969313c06c13445f806e3a2e3e",
+      "size": 482
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/nexus_config.h",
+      "sha256": "862f2c0e15e7d224eeab0483404f84652ffb04b3e935ff1fa58befd16c1c5003",
+      "size": 1259
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/selection.cmake",
+      "sha256": "b3b3654568f4d49c77ba4f86a5cadb85048b9a71da28e4748e3793b577d83906",
+      "size": 1157
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/resource-budget.json",
+      "sha256": "4c37b8d170b11ed6ac70f1ef8fb9c556a89a11e65c90f4e183ea046cc391dce4",
+      "size": 202
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/nexus_factory.h",
+      "sha256": "b65a4bca14cb2bbe1fbfc2a110d04f7ed9c10ffc838e48c8e061a467b6ba9d0f",
+      "size": 9485
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/nexus_bindings.h",
+      "sha256": "234e3be8781bbf1b9b30ff1400e9f4edc4f4fed63b5cd28dff3640bd45a8285a",
+      "size": 1188
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/resolved.json",
+      "sha256": "3d7f87b66437e8e89cd4fe95cd8d60b7bdbcf08bde3c5168d7df6fd50f48e405",
+      "size": 25215
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/bindings.c",
+      "sha256": "cae956424aabf083040bc8fdac386ccc1d75af487fbe04ed1a31b219b365eca1",
+      "size": 8186
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/nexus_factory_strong.h",
+      "sha256": "5621c3ddc4706a42d0e2535eccf11046a0b49ffb6e093c836dd096f6a4815651",
+      "size": 7099
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/.nexus-config-bundle",
+      "sha256": "df1d1ec96a43ea41c187b86131047f388de4fda66a0fd720b0aa6672267b531d",
+      "size": 65
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/generated/memory.ld",
+      "sha256": "7eec412accc90820fbc9d4afbbdab91eae4867acb7b90c79c5d366c799089e08",
+      "size": 2783
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/usb-default-corrective-green/gd32/compile_commands.json",
+      "sha256": "b4296c58edc950c9bf63ac87fa00e4f1b4b0a497acd7b838585ade69126bc704",
+      "size": 59060
+    }
+  ],
+  "failures": []
+}

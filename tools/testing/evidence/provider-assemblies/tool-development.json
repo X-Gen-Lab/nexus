@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "kind": "selected_provider_tools_development",
+  "status": "tool_tests_passed_arm_matrix_pending",
+  "source_scope": "exact_owned_files_dirty_development_not_candidate",
+  "source_at_freeze": {
+    "root": "/workspace/nexus",
+    "commit": "51596bace222fce9a93d676744b697e05faf9a05",
+    "tree": "136e14e3e94de31e845db81b1eecc1ca4f666ac5",
+    "dirty": true,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (heads/master)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (heads/master)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)"
+    ]
+  },
+  "owned_sources": [
+    {
+      "path": "/workspace/nexus/scripts/ci/provider_assemblies.py",
+      "bytes": 18324,
+      "sha256": "e38578c37ce06f84d45cefe1044766c55474f9b6fcab50030bebd29aeaf9b324"
+    },
+    {
+      "path": "/workspace/nexus/scripts/ci/test_provider_assemblies.py",
+      "bytes": 10197,
+      "sha256": "69e061dfd1e18a7d02ad81cec03b4be64db55c7b89bdff57240a48bed6144520"
+    },
+    {
+      "path": "/workspace/nexus/tools/measurement/retention.py",
+      "bytes": 20078,
+      "sha256": "865f9adc4ea7819ced3c50240e7791c222abcdea895adeb9c8eb9cc6b6312a35"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/test_provider_templates.py",
+      "bytes": 6258,
+      "sha256": "6cc09e655727663a8f6801963f36c2dbdbc2136d58fb6bcbc026ef64830e2070"
+    },
+    {
+      "path": "/workspace/nexus/docs/design/provider-assemblies.md",
+      "bytes": 4021,
+      "sha256": "4e1a6c63d2706a67bfc04919810d43dd4a4da0ae9b3c7b9231604e683d77455b"
+    }
+  ],
+  "actual_tools": {
+    "runner_tests": 25,
+    "template_tests": 13,
+    "legacy_retention_tests": 38,
+    "total_tests": 76,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "execution": {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/snapshot-addition-green.command.json",
+      "bytes": 1731,
+      "sha256": "9ce7b781693d5e96b7a120598a9867d0171365804dfc60930ce744ace973e802"
+    },
+    "raw_log": {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/snapshot-addition-green.log",
+      "bytes": 13289,
+      "sha256": "f0a858a5577171cb3cc67703fe2d730da0be21cf31892df0f65c14de6b7c03a5"
+    }
+  },
+  "text_check": {
+    "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/text-check-final.json",
+    "bytes": 1230,
+    "sha256": "c494786e49a4eaca45ba28428e2fd9998590555739abc5a4813347e417db5169"
+  },
+  "independent_review": {
+    "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/independent-review.json",
+    "bytes": 2912,
+    "sha256": "c62e87c15e009664dd246ab0c6e0a95d499fad8d4e2bc72a6d965f8737b763c6"
+  },
+  "actual_arm_matrix_status": "pending_final_canonical_source_after_io21_factory_freeze",
+  "current_authored_fixture_count": 20,
+  "secondary_factory_scope": "pending_not_counted_as_actual_graph",
+  "physical_status": "not_executed",
+  "cycles_status": "not_measured",
+  "formal_hooks_status": "root_normal_index_hook_pending",
+  "raw_evidence": [
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/background-writer-green.command.json",
+      "bytes": 259,
+      "sha256": "ffde520a8db9601d57ac77694060eeb9a88c908e7f37323e8dab74863d4599c1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/background-writer-green.log",
+      "bytes": 12366,
+      "sha256": "cb90fb395bab5879968ba7d16c2ebb9ea4a0683a70acd57abb87688069b48d96"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/background-writer-red.command.json",
+      "bytes": 252,
+      "sha256": "1bbeeff5f4d80b84a286b818918b3177cf145ce63ca2c2b623169660aa408acd"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/background-writer-red.log",
+      "bytes": 972,
+      "sha256": "ee3f0594d1ea69544f64a1fac0a0dca21db116da9e5aeab1e74249bb86098a1b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/independent-review.json",
+      "bytes": 2912,
+      "sha256": "c62e87c15e009664dd246ab0c6e0a95d499fad8d4e2bc72a6d965f8737b763c6"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/snapshot-addition-green.command.json",
+      "bytes": 1731,
+      "sha256": "9ce7b781693d5e96b7a120598a9867d0171365804dfc60930ce744ace973e802"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/snapshot-addition-green.log",
+      "bytes": 13289,
+      "sha256": "f0a858a5577171cb3cc67703fe2d730da0be21cf31892df0f65c14de6b7c03a5"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/snapshot-addition-red.command.json",
+      "bytes": 963,
+      "sha256": "c23db744261d895dd3d19a0638397ae3c522365e8c290565b6c385b56fd6b5b2"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/snapshot-addition-red.log",
+      "bytes": 940,
+      "sha256": "0e87135921075cde24f1d8ad5181f6dc634172e654c78b22455527c5fe561f0b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/style.json",
+      "bytes": 289,
+      "sha256": "f5927990df3f87279a8e74cf672d9dea8f7f0fd9b1c09a0b1e004860a9b6bce7"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/template-order-green.command.json",
+      "bytes": 1727,
+      "sha256": "9a208bb3684303045a7d12f5dd67ae27f230e280573766c7445e3fd268ea5f70"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/template-order-green.log",
+      "bytes": 13114,
+      "sha256": "46a089d2c62dca9ca9a85807620dddd064100bcbea2451796f990009f75ebf33"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/template-order-red.command.json",
+      "bytes": 970,
+      "sha256": "f644be846f5bcf5e3c3ab314b4628d6a59eb23b24ab0aa18e9c59716d77f4de2"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/template-order-red.log",
+      "bytes": 973,
+      "sha256": "d92288558984b14bd58f0dcf96edc12a8142f3fbca2d1975761cb6072e468dc8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/template-shadow-green.command.json",
+      "bytes": 1549,
+      "sha256": "86b03eea11546492b56660c4c99d10bcf05760815932a629f86c3e77c2843a96"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/template-shadow-green.log",
+      "bytes": 12557,
+      "sha256": "000f60bf5d323b0e7421402105995d18fed6f6b6b3e6900f456ee2a4ea6853f3"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/template-shadow-red.command.json",
+      "bytes": 254,
+      "sha256": "eeace78b46e7b43762cdf3505e67d60af3b558a1fc088d74b64b292f600c044b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/template-shadow-red.log",
+      "bytes": 979,
+      "sha256": "60a88b1a119e39fdf54ba5335518ab9ab8e9625ad7d365284a81fe6640ef6212"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/templates-green.command.json",
+      "bytes": 1137,
+      "sha256": "edaabf592693497e76b72ea75870b848fe32d760d1f209e70cbab2c8926740e5"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/templates-green.log",
+      "bytes": 12178,
+      "sha256": "dd8999e7056f103754cface67182e5d827366ea404e9ff19d7e11f0c08b5af05"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/templates-red.command.json",
+      "bytes": 313,
+      "sha256": "539d3b60b6e2d3df21d5a9e07b8eb14b8916b9158bdb302779355d7fef2fd358"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/templates-red.log",
+      "bytes": 13407,
+      "sha256": "f051f5107ea279afad400882307cd3294e4ea7d5ab9c2e2ef6f1d169c45187e7"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/text-check-final.json",
+      "bytes": 1230,
+      "sha256": "c494786e49a4eaca45ba28428e2fd9998590555739abc5a4813347e417db5169"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/text-check.json",
+      "bytes": 1229,
+      "sha256": "6984b312939c0df14adcd596b40d136e6bfcf8617e61a055622fcfae48aff417"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/tool-source-green.command.json",
+      "bytes": 1724,
+      "sha256": "2f000de3889d92c87af10dac2155b361d160376a9df0dbf2b91fcdeb7f98d35c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/tool-source-green.log",
+      "bytes": 12923,
+      "sha256": "d54c81d8bed747166c13432488d65d063a778052c71aa8df691125525d9b1d37"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/tool-source-red.command.json",
+      "bytes": 1261,
+      "sha256": "2d0fb66ee6e40e756cba92440c367ebed3af6587d1c9db2624966e2db6cdaf57"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/tool-source-red.log",
+      "bytes": 24641,
+      "sha256": "f9c39c1f46b67e4415941397633d366e903181ed566ce7306f214a3a5752507f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/unit-green.command.json",
+      "bytes": 710,
+      "sha256": "0631c28ea1caadeb6d5d2d86ec4fe113d5e12f0892d2f0c356d83b3945fd7382"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/unit-green.log",
+      "bytes": 3439,
+      "sha256": "8209c8c453680ad86d814a7d2a920769caa76d759b62863dd538f124fbefe056"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/unit-red.command.json",
+      "bytes": 306,
+      "sha256": "7982f1f426cd8c5fea02f01cb172f2935307670c98aac5e44306e33f198c1386"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/unit-red.log",
+      "bytes": 980,
+      "sha256": "2543a1e0c4830987e856d9e92d81e736429123e8675ad2f46cde188673002deb"
+    }
+  ]
+}

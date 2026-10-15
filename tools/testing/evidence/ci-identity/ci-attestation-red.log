@@ -1,0 +1,14 @@
+test_source_sdk_attests_only_a_successful_observed_manifest (__main__.WorkflowContracts.test_source_sdk_attests_only_a_successful_observed_manifest) ... FAIL
+
+======================================================================
+FAIL: test_source_sdk_attests_only_a_successful_observed_manifest (__main__.WorkflowContracts.test_source_sdk_attests_only_a_successful_observed_manifest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/.github/workflows/test_platform_ci.py", line 25, in test_source_sdk_attests_only_a_successful_observed_manifest
+    self.assertEqual(job.get('permissions', {}).get('id-token'), 'write')
+AssertionError: None != 'write'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.003s
+
+FAILED (failures=1)

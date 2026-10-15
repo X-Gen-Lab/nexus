@@ -1,0 +1,9 @@
+{
+  "command": [
+    "/workspace/nexus-industrial-design/can-tests/build/can_gd32f470_contract",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/gd32f470-preflight-red.xml"
+  ],
+  "exit_code": 1,
+  "stage": "RED",
+  "expected_failure": "Incorrect CPU priority width and foreign primary-domain address accepted by SoC binding"
+}

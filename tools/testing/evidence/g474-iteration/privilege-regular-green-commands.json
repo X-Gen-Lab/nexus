@@ -1,0 +1,44 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus-iteration-bus-design/g474-src",
+      "-B",
+      "/workspace/nexus-iteration-bus-design/g474-regular-build",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/nexus-tools/bin/ninja",
+      "-DCMAKE_BUILD_TYPE=Debug"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-regular-green-0.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-iteration-bus-design/g474-regular-build",
+      "--parallel",
+      "4"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-regular-green-1.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/g474-regular-build/g474_system_test",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-system-regular-green.xml"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-regular-green-2.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/g474-regular-build/g474_provider_test",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-provider-regular-green.xml"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/privilege-regular-green-3.log"
+  }
+]

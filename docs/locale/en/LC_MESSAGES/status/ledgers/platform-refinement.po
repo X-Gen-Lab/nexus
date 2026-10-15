@@ -1,0 +1,1104 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 1500dd64020f3354c2db84d5cf35936c28c4758241b970ee7d1f7cfe6f81c5dc\n"
+
+msgid "I/O 完善台账"
+msgstr "I/O refinement ledger"
+
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/platform-refinement-execution.csv>`。 "
+"源文件：`docs/design/platform-refinement-"
+"execution.csv`；SHA-256：`e4496e72ba53be176407804fffa805ef5b12f9da1e0949d2f3e8a20292d27e8b`。"
+msgstr ""
+"This page is derived from the original CSV; it is not a new status "
+"authority, execution record or software qualification. Original IDs, order "
+"and all fields come from the {download}`original ledger "
+"<../../design/platform-refinement-execution.csv>`. Source: "
+"`docs/design/platform-refinement-execution.csv`; SHA-256: "
+"`e4496e72ba53be176407804fffa805ef5b12f9da1e0949d2f3e8a20292d27e8b`."
+
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"Different ledgers overlap in scope; do not add their counts or calculate a "
+"project-wide completion rate. Interpret implementation, software and "
+"physical status separately. `development_passed` does not mean execution at "
+"the current documentation HEAD. Consult the exact results index for the "
+"source and scope of `qualification_record_authority`. Absolute `/workspace` "
+"and `/dev/shm` locators retain their original bytes and only identify the "
+"original execution host. See the [software-evidence entry](../software-"
+"verification.md) for retrievable archives and member locations."
+
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr ""
+"**Original exit fields** are only fields actually present in the original "
+"CSV. Tasks, qualification prerequisites and contract links also retain their"
+" original wording; they cannot be used to invent an execution."
+
+msgid "本表包含 60 条原记录，仅表示来源行数。"
+msgstr ""
+"This table contains 60 original records; this is only the source row count."
+
+msgid "IO-01"
+msgstr "IO-01"
+
+msgid "原字段"
+msgstr "Original field"
+
+msgid "原值"
+msgstr "Original value"
+
+msgid "`task_id`"
+msgstr "`task_id`"
+
+msgid "`task`"
+msgstr "`task`"
+
+msgid "ADC mode reset"
+msgstr "ADC mode reset"
+
+msgid "`implementation_status`"
+msgstr "`implementation_status`"
+
+msgid "implemented"
+msgstr "implemented"
+
+msgid "`software_status`"
+msgstr "`software_status`"
+
+msgid "development_passed"
+msgstr "development_passed"
+
+msgid "`hardware_status`"
+msgstr "`hardware_status`"
+
+msgid "not_executed"
+msgstr "not_executed"
+
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+msgid "soc/stm32f407/drivers/adc.c"
+msgstr "soc/stm32f407/drivers/adc.c"
+
+msgid "`evidence_paths`"
+msgstr "`evidence_paths`"
+
+msgid "tools/testing/evidence/adc-iteration"
+msgstr "tools/testing/evidence/adc-iteration"
+
+msgid "`exit_condition`"
+msgstr "`exit_condition`"
+
+msgid "stream to polling clears scan sequence before sample"
+msgstr "stream to polling clears scan sequence before sample"
+
+msgid "`owner`"
+msgstr "`owner`"
+
+msgid "codex"
+msgstr "codex"
+
+msgid "IO-02"
+msgstr "IO-02"
+
+msgid "ADC retry calibration"
+msgstr "ADC retry calibration"
+
+msgid "soc/gd32f470/drivers/adc.c"
+msgstr "soc/gd32f470/drivers/adc.c"
+
+msgid "retry repeats bounded stable reset calibration"
+msgstr "retry repeats bounded stable reset calibration"
+
+msgid "IO-03"
+msgstr "IO-03"
+
+msgid "GPIO inferred mask validation"
+msgstr "GPIO inferred mask validation"
+
+msgid "not_applicable"
+msgstr "not_applicable"
+
+msgid "tools/configure/configure.py"
+msgstr "tools/configure/configure.py"
+
+msgid "tools/configure/test_configure.py"
+msgstr "tools/configure/test_configure.py"
+
+msgid "omitted mask cannot authorize extra initial bits"
+msgstr "omitted mask cannot authorize extra initial bits"
+
+msgid "IO-04"
+msgstr "IO-04"
+
+msgid "Current support documentation"
+msgstr "Current support documentation"
+
+msgid "tools/configure/documentation.py;docs/delivery/support.md"
+msgstr "tools/configure/documentation.py;docs/delivery/support.md"
+
+msgid "tools/testing/evidence/configure-iteration"
+msgstr "tools/testing/evidence/configure-iteration"
+
+msgid "mode MPU split and reviewed route statements match production"
+msgstr "mode MPU split and reviewed route statements match production"
+
+msgid "IO-05"
+msgstr "IO-05"
+
+msgid "SPI polling owner identity"
+msgstr "SPI polling owner identity"
+
+msgid "components/bus_owner/src/spi_owner.c"
+msgstr "components/bus_owner/src/spi_owner.c"
+
+msgid "tools/testing/evidence/spi-polling-identity-green.log"
+msgstr "tools/testing/evidence/spi-polling-identity-green.log"
+
+msgid "foreign controller rejected before borrowing or hardware"
+msgstr "foreign controller rejected before borrowing or hardware"
+
+msgid "IO-06"
+msgstr "IO-06"
+
+msgid "Example startup rollback"
+msgstr "Example startup rollback"
+
+msgid "os/freertos/freertos.c;X-Gen-Lab/nexus-examples"
+msgstr "os/freertos/freertos.c;X-Gen-Lab/nexus-examples"
+
+msgid ""
+"X-Gen-Lab/nexus-examples/tests/evidence/startup-rollback;X-Gen-Lab/nexus-"
+"examples/tests/evidence/scheduler-return"
+msgstr ""
+"X-Gen-Lab/nexus-examples/tests/evidence/startup-rollback;X-Gen-Lab/nexus-"
+"examples/tests/evidence/scheduler-return"
+
+msgid "close drain join or prestart discard; preserve cleanup responsibility"
+msgstr "close drain join or prestart discard; preserve cleanup responsibility"
+
+msgid "IO-07"
+msgstr "IO-07"
+
+msgid "I/O service diagnostics"
+msgstr "I/O service diagnostics"
+
+msgid "targeted_passed"
+msgstr "targeted_passed"
+
+msgid "io;components"
+msgstr "io;components"
+
+msgid "tools/testing/evidence/io-observer-iteration"
+msgstr "tools/testing/evidence/io-observer-iteration"
+
+msgid "progress and failures observable without hidden worker"
+msgstr "progress and failures observable without hidden worker"
+
+msgid "IO-08"
+msgstr "IO-08"
+
+msgid "Mode ownership cancellation matrix"
+msgstr "Mode ownership cancellation matrix"
+
+msgid "soc;tests/google;scripts/ci/io_lifecycle_matrix.py"
+msgstr "soc;tests/google;scripts/ci/io_lifecycle_matrix.py"
+
+msgid "tools/testing/evidence/io-lifecycle-iteration"
+msgstr "tools/testing/evidence/io-lifecycle-iteration"
+
+msgid ""
+"203 reviewed bounded properties; source/object/binary capture and canonical "
+"all-plan executable admission; final fresh complete plan is the "
+"qualification authority"
+msgstr ""
+"203 reviewed bounded properties; source/object/binary capture and canonical "
+"all-plan executable admission; final fresh complete plan is the "
+"qualification authority"
+
+msgid "IO-09"
+msgstr "IO-09"
+
+msgid "Quarantine integration and recovery"
+msgstr "Quarantine integration and recovery"
+
+msgid "components;X-Gen-Lab/nexus-examples"
+msgstr "components;X-Gen-Lab/nexus-examples"
+
+msgid "retain borrowed storage; explicit recovery owner"
+msgstr "retain borrowed storage; explicit recovery owner"
+
+msgid "IO-10"
+msgstr "IO-10"
+
+msgid "Stream capacity backpressure budget"
+msgstr "Stream capacity backpressure budget"
+
+msgid "io/src/stream.c;tools/hil"
+msgstr "io/src/stream.c;tools/hil"
+
+msgid "bounded capacity and caller policy; no overwritten loans"
+msgstr "bounded capacity and caller policy; no overwritten loans"
+
+msgid "IO-11"
+msgstr "IO-11"
+
+msgid "Optional read-only capabilities"
+msgstr "Optional read-only capabilities"
+
+msgid "tools/configure/factory.py;tools/configure/providers/common.py"
+msgstr "tools/configure/factory.py;tools/configure/providers/common.py"
+
+msgid "selected descriptors; simulated Native flags; no hot path cost"
+msgstr "selected descriptors; simulated Native flags; no hot path cost"
+
+msgid "IO-12"
+msgstr "IO-12"
+
+msgid "UART RX DMA and IDLE"
+msgstr "UART RX DMA and IDLE"
+
+msgid ""
+"soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c"
+msgstr ""
+"soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c"
+
+msgid ""
+"tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-"
+"streams"
+msgstr ""
+"tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-"
+"streams"
+
+msgid "reviewed DMA routes; finite and continuous ownership"
+msgstr "reviewed DMA routes; finite and continuous ownership"
+
+msgid "IO-13"
+msgstr "IO-13"
+
+msgid "UART duplex DMA blocks"
+msgstr "UART duplex DMA blocks"
+
+msgid "TX DMA plus RX blocks without default state growth"
+msgstr "TX DMA plus RX blocks without default state growth"
+
+msgid "IO-14"
+msgstr "IO-14"
+
+msgid "UART RTS CTS and RS485"
+msgstr "UART RTS CTS and RS485"
+
+msgid "io/src/uart_rs485.c;soc;tools/configure"
+msgstr "io/src/uart_rs485.c;soc;tools/configure"
+
+msgid "tools/testing/evidence/uart-iteration;docs/design/uart-dma-rs485.md"
+msgstr "tools/testing/evidence/uart-iteration;docs/design/uart-dma-rs485.md"
+
+msgid "reviewed pins; actual TC; DE delay borrowing contract"
+msgstr "reviewed pins; actual TC; DE delay borrowing contract"
+
+msgid "IO-15"
+msgstr "IO-15"
+
+msgid "Continuous ADC DMA"
+msgstr "Continuous ADC DMA"
+
+msgid "io/src/stream.c;soc/*/drivers/adc_continuous.c"
+msgstr "io/src/stream.c;soc/*/drivers/adc_continuous.c"
+
+msgid ""
+"tools/testing/evidence/adc-iteration;tools/testing/evidence/configure-"
+"streams"
+msgstr ""
+"tools/testing/evidence/adc-iteration;tools/testing/evidence/configure-"
+"streams"
+
+msgid "preposted targets; hardware address replacement proof"
+msgstr "preposted targets; hardware address replacement proof"
+
+msgid "IO-16"
+msgstr "IO-16"
+
+msgid "ADC channel timing expansion"
+msgstr "ADC channel timing expansion"
+
+msgid "io/src/adc_observer.c;soc;tools/configure"
+msgstr "io/src/adc_observer.c;soc;tools/configure"
+
+msgid "sample-time and scan rate hardware bounds"
+msgstr "sample-time and scan rate hardware bounds"
+
+msgid "IO-17"
+msgstr "IO-17"
+
+msgid "DMA topology facts"
+msgstr "DMA topology facts"
+
+msgid "io/src/dma.c;tools/configure"
+msgstr "io/src/dma.c;tools/configure"
+
+msgid "common opaque IDs; provider validates reviewed physical topology"
+msgstr "common opaque IDs; provider validates reviewed physical topology"
+
+msgid "IO-18"
+msgstr "IO-18"
+
+msgid "SPI one-way DMA"
+msgstr "SPI one-way DMA"
+
+msgid "io/src/spi.c;soc/*/drivers/spi_dma.c"
+msgstr "io/src/spi.c;soc/*/drivers/spi_dma.c"
+
+msgid "tools/testing/evidence/spi-memory-arm-commands.json"
+msgstr "tools/testing/evidence/spi-memory-arm-commands.json"
+
+msgid "caller dummy discard; actual spans; per-direction MINC"
+msgstr "caller dummy discard; actual spans; per-direction MINC"
+
+msgid "IO-19"
+msgstr "IO-19"
+
+msgid "I2C interrupt DMA async"
+msgstr "I2C interrupt DMA async"
+
+msgid "io/src/i2c.c;soc/common/i2c_v1_async.c;soc/*/drivers/i2c_async.c"
+msgstr "io/src/i2c.c;soc/common/i2c_v1_async.c;soc/*/drivers/i2c_async.c"
+
+msgid ""
+"tools/testing/evidence/i2c-async-iteration;tools/testing/evidence/configure-"
+"streams"
+msgstr ""
+"tools/testing/evidence/i2c-async-iteration;tools/testing/evidence/configure-"
+"streams"
+
+msgid "ACK final byte sequence; BTF STOP; request final access"
+msgstr "ACK final byte sequence; BTF STOP; request final access"
+
+msgid "IO-20"
+msgstr "IO-20"
+
+msgid "I2C physical bus clear"
+msgstr "I2C physical bus clear"
+
+msgid "io/src/i2c_bus_clear.c"
+msgstr "io/src/i2c_bus_clear.c"
+
+msgid "tests/evidence/i2c-bus-clear"
+msgstr "tests/evidence/i2c-bus-clear"
+
+msgid "bounded pulses STOP; open-drain and cleanup ownership"
+msgstr "bounded pulses STOP; open-drain and cleanup ownership"
+
+msgid "IO-21"
+msgstr "IO-21"
+
+msgid "Additional reviewed controller routes"
+msgstr "Additional reviewed controller routes"
+
+msgid "soc/*/drivers;tests/google"
+msgstr "soc/*/drivers;tests/google"
+
+msgid "tools/testing/evidence/multi-controller-iteration"
+msgstr "tools/testing/evidence/multi-controller-iteration"
+
+msgid ""
+"static multi-controller assembly across three exact parts and two backends; "
+"18 authored firmware fixtures, pure cold I2C identity and retained "
+"lifecycle; final maintained ARM and clean SDK qualification required"
+msgstr ""
+"static multi-controller assembly across three exact parts and two backends; "
+"18 authored firmware fixtures, pure cold I2C identity and retained "
+"lifecycle; final maintained ARM and clean SDK qualification required"
+
+msgid "IO-22"
+msgstr "IO-22"
+
+msgid "GD additional SRAM and TCM linker"
+msgstr "GD additional SRAM and TCM linker"
+
+msgid ""
+"core/include/nexus/core/memory.h;soc/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform"
+msgstr ""
+"core/include/nexus/core/memory.h;soc/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform"
+
+msgid ""
+"tools/testing/evidence/memory-iteration;tools/testing/evidence/configure-"
+"memory-metadata"
+msgstr ""
+"tools/testing/evidence/memory-iteration;tools/testing/evidence/configure-"
+"memory-metadata"
+
+msgid "explicit sections and budgets; DMA TCM rejection"
+msgstr "explicit sections and budgets; DMA TCM rejection"
+
+msgid "IO-23"
+msgstr "IO-23"
+
+msgid "Three Board electrical fact review"
+msgstr "Three Board electrical fact review"
+
+msgid "blocked"
+msgstr "blocked"
+
+msgid "pending"
+msgstr "pending"
+
+msgid "boards"
+msgstr "boards"
+
+msgid "actual PCB revision connector crystal and NOR identity"
+msgstr "actual PCB revision connector crystal and NOR identity"
+
+msgid "IO-24"
+msgstr "IO-24"
+
+msgid "Resolver emitter common limits"
+msgstr "Resolver emitter common limits"
+
+msgid ""
+"tools/configure/providers/common.py;tools/configure/providers/*/bindings.py"
+msgstr ""
+"tools/configure/providers/common.py;tools/configure/providers/*/bindings.py"
+
+msgid "tools/testing/evidence/configure-limits-clock"
+msgstr "tools/testing/evidence/configure-limits-clock"
+
+msgid ""
+"factory limits derive from public contract; reviewed clock tuple; four "
+"selected ARM graphs with resource/retention evidence"
+msgstr ""
+"factory limits derive from public contract; reviewed clock tuple; four "
+"selected ARM graphs with resource/retention evidence"
+
+msgid "IO-25"
+msgstr "IO-25"
+
+msgid "Physical FP MVE task context"
+msgstr "Physical FP MVE task context"
+
+msgid "tools/hil"
+msgstr "tools/hil"
+
+msgid "real target observations; current three boards are M4F"
+msgstr "real target observations; current three boards are M4F"
+
+msgid "IO-26"
+msgstr "IO-26"
+
+msgid "Physical clock tick deadline accuracy"
+msgstr "Physical clock tick deadline accuracy"
+
+msgid "bound timer drift tick and monotonic evidence"
+msgstr "bound timer drift tick and monotonic evidence"
+
+msgid "IO-27"
+msgstr "IO-27"
+
+msgid "Runtime MSP task stack peaks"
+msgstr "Runtime MSP task stack peaks"
+
+msgid "tools/hil;os"
+msgstr "tools/hil;os"
+
+msgid "tools/testing/evidence/stack-owner-iteration"
+msgstr "tools/testing/evidence/stack-owner-iteration"
+
+msgid ""
+"bounded quiescent stack scan and actual pinned kernel ownership rounds; "
+"physical MCU stack/soak not executed"
+msgstr ""
+"bounded quiescent stack scan and actual pinned kernel ownership rounds; "
+"physical MCU stack/soak not executed"
+
+msgid "IO-28"
+msgstr "IO-28"
+
+msgid "OS owner lifecycle endurance"
+msgstr "OS owner lifecycle endurance"
+
+msgid "os;components;tools/hil"
+msgstr "os;components;tools/hil"
+
+msgid "IO-29"
+msgstr "IO-29"
+
+msgid "Board tickless continuous timer port"
+msgstr "Board tickless continuous timer port"
+
+msgid "soc;os/freertos"
+msgstr "soc;os/freertos"
+
+msgid "tools/testing/evidence/timebase-lowpower-iteration"
+msgstr "tools/testing/evidence/timebase-lowpower-iteration"
+
+msgid ""
+"explicit fixed-profile shallow WFI timebase port; "
+"actual4ARM/defaultomission/model50; physical wake accuracy unexecuted"
+msgstr ""
+"explicit fixed-profile shallow WFI timebase port; "
+"actual4ARM/defaultomission/model50; physical wake accuracy unexecuted"
+
+msgid "IO-30"
+msgstr "IO-30"
+
+msgid "Fail-stop and product safety output hooks"
+msgstr "Fail-stop and product safety output hooks"
+
+msgid "core/src/fault.c;os;X-Gen-Lab/nexus-examples"
+msgstr "core/src/fault.c;os;X-Gen-Lab/nexus-examples"
+
+msgid ""
+"tools/testing/evidence/fault-observation;tests/evidence/threadx-fault-"
+"observer"
+msgstr ""
+"tools/testing/evidence/fault-observation;tests/evidence/threadx-fault-"
+"observer"
+
+msgid ""
+"stateless observer before retaining fail-stop; preserves stronger incoming "
+"masks and actual fault context; external safety policy and physical outputs "
+"separately qualified"
+msgstr ""
+"stateless observer before retaining fail-stop; preserves stronger incoming "
+"masks and actual fault context; external safety policy and physical outputs "
+"separately qualified"
+
+msgid "IO-31"
+msgstr "IO-31"
+
+msgid "Physical restricted MPU isolation"
+msgstr "Physical restricted MPU isolation"
+
+msgid "software fixtures cannot prove actual memory fault isolation"
+msgstr "software fixtures cannot prove actual memory fault isolation"
+
+msgid "IO-32"
+msgstr "IO-32"
+
+msgid "Physical split security isolation"
+msgstr "Physical split security isolation"
+
+msgid "requires matching secure target and real SAU attribution"
+msgstr "requires matching secure target and real SAU attribution"
+
+msgid "IO-33"
+msgstr "IO-33"
+
+msgid "Selectable OS object cost"
+msgstr "Selectable OS object cost"
+
+msgid ""
+"os/freertos/freertos.c;scripts/ci/os_resources.py;tests/contracts/os_resources"
+msgstr ""
+"os/freertos/freertos.c;scripts/ci/os_resources.py;tests/contracts/os_resources"
+
+msgid ""
+"tools/testing/evidence/os-optimization;/workspace/nexus-"
+"delivery/bd6df2c7a1b9a6cb613947c0528f998ff21d31e3/github/all-"
+"cortex/reports/os-resources/report.json"
+msgstr ""
+"tools/testing/evidence/os-optimization;/workspace/nexus-"
+"delivery/bd6df2c7a1b9a6cb613947c0528f998ff21d31e3/github/all-"
+"cortex/reports/os-resources/report.json"
+
+msgid ""
+"actual eight ABI resource variants and 56 commands refreshed, 1136 evidence "
+"identity references verified; final clean source costs remain independently "
+"bound"
+msgstr ""
+"actual eight ABI resource variants and 56 commands refreshed, 1136 evidence "
+"identity references verified; final clean source costs remain independently "
+"bound"
+
+msgid "IO-34"
+msgstr "IO-34"
+
+msgid "Additional real RTOS backend"
+msgstr "Additional real RTOS backend"
+
+msgid "os/threadx;tools/configure/threadx.py"
+msgstr "os/threadx;tools/configure/threadx.py"
+
+msgid ""
+"tests/evidence/threadx-integration;tools/testing/evidence/threadx-"
+"dependency;tools/testing/evidence/threadx-context-iteration"
+msgstr ""
+"tests/evidence/threadx-integration;tools/testing/evidence/threadx-"
+"dependency;tools/testing/evidence/threadx-context-iteration"
+
+msgid ""
+"official locked ThreadX Linux and CortexM4 backend; actual62Google and two "
+"complete62 TSan executions plus sixBoardARM; Linux scheduler state snapshots"
+" and signal posture repaired; final clean installed SDK consumers required; "
+"no physical qualification"
+msgstr ""
+"official locked ThreadX Linux and CortexM4 backend; actual62Google and two "
+"complete62 TSan executions plus sixBoardARM; Linux scheduler state snapshots"
+" and signal posture repaired; final clean installed SDK consumers required; "
+"no physical qualification"
+
+msgid "IO-35"
+msgstr "IO-35"
+
+msgid "Optional nominal factory IDs"
+msgstr "Optional nominal factory IDs"
+
+msgid "tools/configure/factory.py;tools/configure/test_factory_features.py"
+msgstr "tools/configure/factory.py;tools/configure/test_factory_features.py"
+
+msgid "C and C++ compile reject cross-kind IDs; no default RAM cost"
+msgstr "C and C++ compile reject cross-kind IDs; no default RAM cost"
+
+msgid "IO-36"
+msgstr "IO-36"
+
+msgid "Executable TOML documentation"
+msgstr "Executable TOML documentation"
+
+msgid "tools/configure/documentation.py;tools/configure/test_documentation.py"
+msgstr ""
+"tools/configure/documentation.py;tools/configure/test_documentation.py"
+
+msgid "resolve every complete snippet; explicit fragment rationale"
+msgstr "resolve every complete snippet; explicit fragment rationale"
+
+msgid "IO-37"
+msgstr "IO-37"
+
+msgid "Provider property failure matrix"
+msgstr "Provider property failure matrix"
+
+msgid "tests/google;scripts/ci/io_lifecycle_matrix.py"
+msgstr "tests/google;scripts/ci/io_lifecycle_matrix.py"
+
+msgid ""
+"203 bounded properties from same fresh unfiltered production target "
+"execution; canonical all-plan/source/object/binary identity; final strict "
+"complete plan required"
+msgstr ""
+"203 bounded properties from same fresh unfiltered production target "
+"execution; canonical all-plan/source/object/binary identity; final strict "
+"complete plan required"
+
+msgid "IO-38"
+msgstr "IO-38"
+
+msgid "New mode resources and GC"
+msgstr "New mode resources and GC"
+
+msgid ""
+"tools/measurement/retention.py;soc/*/CMakeLists.txt;tests/contracts/*_assembly"
+msgstr ""
+"tools/measurement/retention.py;soc/*/CMakeLists.txt;tests/contracts/*_assembly"
+
+msgid ""
+"tools/testing/evidence/configure-streams;tools/testing/evidence/provider-"
+"empty-input-iteration"
+msgstr ""
+"tools/testing/evidence/configure-streams;tools/testing/evidence/provider-"
+"empty-input-iteration"
+
+msgid ""
+"maintained fixture-driven ARM assembly gate checks exact inputs, budgets and"
+" selected/omitted operation retention; final whole 87-fixture execution "
+"recorded outside source; legal empty SDK identities retained; 35 admission "
+"regressions and 92 related checks passed"
+msgstr ""
+"maintained fixture-driven ARM assembly gate checks exact inputs, budgets and"
+" selected/omitted operation retention; final whole 87-fixture execution "
+"recorded outside source; legal empty SDK identities retained; 35 admission "
+"regressions and 92 related checks passed"
+
+msgid "IO-39"
+msgstr "IO-39"
+
+msgid "Physical poll IRQ DMA benchmark"
+msgstr "Physical poll IRQ DMA benchmark"
+
+msgid "same artifact clock load optimization and raw timing"
+msgstr "same artifact clock load optimization and raw timing"
+
+msgid "IO-40"
+msgstr "IO-40"
+
+msgid "CI artifact source identity"
+msgstr "CI artifact source identity"
+
+msgid ".github/actions/record-identity;tools/maintenance/job_identity.py"
+msgstr ".github/actions/record-identity;tools/maintenance/job_identity.py"
+
+msgid "tools/testing/evidence/ci-identity"
+msgstr "tools/testing/evidence/ci-identity"
+
+msgid "every job actual checkout tree deps config tool identity"
+msgstr "every job actual checkout tree deps config tool identity"
+
+msgid "IO-41"
+msgstr "IO-41"
+
+msgid "Evidence retention and attestation"
+msgstr "Evidence retention and attestation"
+
+msgid "runtime_pending"
+msgstr "runtime_pending"
+
+msgid ".github/workflows/release.yml;dependencies/actions.lock.json"
+msgstr ".github/workflows/release.yml;dependencies/actions.lock.json"
+
+msgid "immutable archive and provenance; no fabricated signature"
+msgstr "immutable archive and provenance; no fabricated signature"
+
+msgid "IO-42"
+msgstr "IO-42"
+
+msgid "API schema SDK compatibility version"
+msgstr "API schema SDK compatibility version"
+
+msgid ""
+"dependencies/platform-"
+"compatibility.json;tools/configure/metadata.py;tools/maintenance/compatibility.py;cmake/package"
+msgstr ""
+"dependencies/platform-"
+"compatibility.json;tools/configure/metadata.py;tools/maintenance/compatibility.py;cmake/package"
+
+msgid ""
+"tools/testing/evidence/source-compatibility;tools/testing/evidence/source-"
+"compatibility-integration;tools/testing/evidence/configure-memory-"
+"metadata;tools/testing/evidence/source-sdk-archive-exclusion-iteration"
+msgstr ""
+"tools/testing/evidence/source-compatibility;tools/testing/evidence/source-"
+"compatibility-integration;tools/testing/evidence/configure-memory-"
+"metadata;tools/testing/evidence/source-sdk-archive-exclusion-iteration"
+
+msgid ""
+"canonical epochs and exact source-only SDK closure; 45 SDK boundary "
+"regressions passed; same-HEAD owned archive exclusion removes 183996010 "
+"bytes; final relocated clean canonical consumers required"
+msgstr ""
+"canonical epochs and exact source-only SDK closure; 45 SDK boundary "
+"regressions passed; same-HEAD owned archive exclusion removes 183996010 "
+"bytes; final relocated clean canonical consumers required"
+
+msgid "IO-43"
+msgstr "IO-43"
+
+msgid "Agent maintenance responsibility"
+msgstr "Agent maintenance responsibility"
+
+msgid ".github/maintainer-roles.json;tools/maintenance/ownership.py"
+msgstr ".github/maintainer-roles.json;tools/maintenance/ownership.py"
+
+msgid "tools/testing/evidence/agent-maintenance"
+msgstr "tools/testing/evidence/agent-maintenance"
+
+msgid "Codex owns all domains; no named people required"
+msgstr "Codex owns all domains; no named people required"
+
+msgid "IO-44"
+msgstr "IO-44"
+
+msgid "Remote rules and required checks"
+msgstr "Remote rules and required checks"
+
+msgid ".github/workflows"
+msgstr ".github/workflows"
+
+msgid "current connector cannot inspect branch protection; no fake CODEOWNERS"
+msgstr ""
+"current connector cannot inspect branch protection; no fake CODEOWNERS"
+
+msgid "IO-45"
+msgstr "IO-45"
+
+msgid "Defect review release execution ownership"
+msgstr "Defect review release execution ownership"
+
+msgid "AGENTS.md;tools/evidence/reproduce.py;.github/workflows"
+msgstr "AGENTS.md;tools/evidence/reproduce.py;.github/workflows"
+
+msgid ""
+"tools/testing/evidence/ci-identity;tools/testing/evidence/fixture-lifetime-"
+"iteration;tools/testing/evidence/freertos-failstop-parent-iteration"
+msgstr ""
+"tools/testing/evidence/ci-identity;tools/testing/evidence/fixture-lifetime-"
+"iteration;tools/testing/evidence/freertos-failstop-parent-iteration"
+
+msgid ""
+"Codex owns every domain; independent review and actual failure evidence "
+"retained; release validation distinct from ordinary CI and promotion remains"
+" external; three fixture lifetime gaps closed with 224 before/after regular "
+"and sanitizer executions; failstop eight cases passed regular/ASan/TSan "
+"after actual old timeout reproduction"
+msgstr ""
+"Codex owns every domain; independent review and actual failure evidence "
+"retained; release validation distinct from ordinary CI and promotion remains"
+" external; three fixture lifetime gaps closed with 224 before/after regular "
+"and sanitizer executions; failstop eight cases passed regular/ASan/TSan "
+"after actual old timeout reproduction"
+
+msgid "IO-46"
+msgstr "IO-46"
+
+msgid "Locked dependency upgrade maintenance"
+msgstr "Locked dependency upgrade maintenance"
+
+msgid ""
+"tools/maintenance/dependency_proposals.py;.github/workflows/dependency-"
+"maintenance.yml"
+msgstr ""
+"tools/maintenance/dependency_proposals.py;.github/workflows/dependency-"
+"maintenance.yml"
+
+msgid "tools/testing/evidence/source-compatibility"
+msgstr "tools/testing/evidence/source-compatibility"
+
+msgid ""
+"weekly read-only workflow defined; actual schedule pending default-branch "
+"workflow; upgrades require exact evidence"
+msgstr ""
+"weekly read-only workflow defined; actual schedule pending default-branch "
+"workflow; upgrades require exact evidence"
+
+msgid "IO-47"
+msgstr "IO-47"
+
+msgid "Real HIL station binding"
+msgstr "Real HIL station binding"
+
+msgid "three physical probes serial and chip identity unavailable"
+msgstr "three physical probes serial and chip identity unavailable"
+
+msgid "IO-48"
+msgstr "IO-48"
+
+msgid "Physical clock reset GPIO watchdog"
+msgstr "Physical clock reset GPIO watchdog"
+
+msgid "actual station capture and reset reason"
+msgstr "actual station capture and reset reason"
+
+msgid "IO-49"
+msgstr "IO-49"
+
+msgid "Physical UART SPI DMA fault waveforms"
+msgstr "Physical UART SPI DMA fault waveforms"
+
+msgid "logic-analyzer and serial raw capture matching artifact"
+msgstr "logic-analyzer and serial raw capture matching artifact"
+
+msgid "IO-50"
+msgstr "IO-50"
+
+msgid "Physical I2C electrical protocol"
+msgstr "Physical I2C electrical protocol"
+
+msgid "ACK NACK STOP line voltage bus clear observed"
+msgstr "ACK NACK STOP line voltage bus clear observed"
+
+msgid "IO-51"
+msgstr "IO-51"
+
+msgid "Physical ADC PWM EXTI"
+msgstr "Physical ADC PWM EXTI"
+
+msgid "real stimulus and independent instrument observations"
+msgstr "real stimulus and independent instrument observations"
+
+msgid "IO-52"
+msgstr "IO-52"
+
+msgid "Physical Flash power interruption"
+msgstr "Physical Flash power interruption"
+
+msgid "tools/hil;X-Gen-Lab/nexus-examples"
+msgstr "tools/hil;X-Gen-Lab/nexus-examples"
+
+msgid "destructive test region explicitly owned externally"
+msgstr "destructive test region explicitly owned externally"
+
+msgid "IO-53"
+msgstr "IO-53"
+
+msgid "Physical concurrent endurance and latency"
+msgstr "Physical concurrent endurance and latency"
+
+msgid "same firmware soak interrupt latency stack load evidence"
+msgstr "same firmware soak interrupt latency stack load evidence"
+
+msgid "IO-54"
+msgstr "IO-54"
+
+msgid "CAN platform interface and controllers"
+msgstr "CAN platform interface and controllers"
+
+msgid "io;soc"
+msgstr "io;soc"
+
+msgid ""
+"tools/testing/evidence/can-iteration;tools/testing/evidence/configure-can"
+msgstr ""
+"tools/testing/evidence/can-iteration;tools/testing/evidence/configure-can"
+
+msgid ""
+"classic CAN IRQ request/frame rings; shared filter-domain ownership; two "
+"generated instances; no physical bus claim"
+msgstr ""
+"classic CAN IRQ request/frame rings; shared filter-domain ownership; two "
+"generated instances; no physical bus claim"
+
+msgid "IO-55"
+msgstr "IO-55"
+
+msgid "Ethernet MAC PHY raw frames"
+msgstr "Ethernet MAC PHY raw frames"
+
+msgid "io;soc;components/dp83848;tools/configure/ethernet.py"
+msgstr "io;soc;components/dp83848;tools/configure/ethernet.py"
+
+msgid ""
+"tools/testing/evidence/ethernet-iteration;tools/testing/evidence/configure-"
+"ethernet"
+msgstr ""
+"tools/testing/evidence/ethernet-iteration;tools/testing/evidence/configure-"
+"ethernet"
+
+msgid ""
+"RMII borrowed descriptor/frame buffers; verified cold SRAM gates and "
+"generation; actual two-family factory/model tests and four ZG ARM graphs; "
+"physical PHY/link/PCB not executed"
+msgstr ""
+"RMII borrowed descriptor/frame buffers; verified cold SRAM gates and "
+"generation; actual two-family factory/model tests and four ZG ARM graphs; "
+"physical PHY/link/PCB not executed"
+
+msgid "IO-56"
+msgstr "IO-56"
+
+msgid "USB clock endpoints lifecycle"
+msgstr "USB clock endpoints lifecycle"
+
+msgid "io;soc;tools/configure/usb_device.py"
+msgstr "io;soc;tools/configure/usb_device.py"
+
+msgid ""
+"tools/testing/evidence/usb-device-iteration;tools/testing/evidence/usb-"
+"clock-iteration;tools/testing/evidence/configure-usb"
+msgstr ""
+"tools/testing/evidence/usb-device-iteration;tools/testing/evidence/usb-"
+"clock-iteration;tools/testing/evidence/configure-usb"
+
+msgid ""
+"DWCFS PIO endpoints and epoch-preserving assembly; actual48MHz proof and "
+"NVIC drain models/six selectedARM; no physical USB claim"
+msgstr ""
+"DWCFS PIO endpoints and epoch-preserving assembly; actual48MHz proof and "
+"NVIC drain models/six selectedARM; no physical USB claim"
+
+msgid "IO-57"
+msgstr "IO-57"
+
+msgid "Timer capture advanced PWM"
+msgstr "Timer capture advanced PWM"
+
+msgid "io; soc/*/drivers; tools/configure/timer_advanced.py"
+msgstr "io; soc/*/drivers; tools/configure/timer_advanced.py"
+
+msgid ""
+"tools/testing/evidence/timer-iteration;tools/testing/evidence/timer-factory-"
+"iteration"
+msgstr ""
+"tools/testing/evidence/timer-iteration;tools/testing/evidence/timer-factory-"
+"iteration"
+
+msgid ""
+"two-family timer capture and complementary PWM deadtime break ownership; "
+"actual shared-resource and cold cleanup regressions, selected/default ARM "
+"graphs; physical output and timing not executed"
+msgstr ""
+"two-family timer capture and complementary PWM deadtime break ownership; "
+"actual shared-resource and cold cleanup regressions, selected/default ARM "
+"graphs; physical output and timing not executed"
+
+msgid "IO-58"
+msgstr "IO-58"
+
+msgid "SoC sleep and clock lifecycle"
+msgstr "SoC sleep and clock lifecycle"
+
+msgid "soc;os"
+msgstr "soc;os"
+
+msgid "tools/testing/evidence/clock-domain-iteration"
+msgstr "tools/testing/evidence/clock-domain-iteration"
+
+msgid ""
+"caller-owned clock leases and exact fixed-profile shallow sleep; actual "
+"drain/wake/clock readback models; dynamic PLL/STOP and physical timing not "
+"supported"
+msgstr ""
+"caller-owned clock leases and exact fixed-profile shallow sleep; actual "
+"drain/wake/clock readback models; dynamic PLL/STOP and physical timing not "
+"supported"
+
+msgid "IO-59"
+msgstr "IO-59"
+
+msgid "Additional SoC Board complete vertical"
+msgstr "Additional SoC Board complete vertical"
+
+msgid ""
+"soc/stm32g474;boards/stm32g474re_hse24_reference;tools/configure/providers/stm32g474"
+msgstr ""
+"soc/stm32g474;boards/stm32g474re_hse24_reference;tools/configure/providers/stm32g474"
+
+msgid ""
+"tools/testing/evidence/g474-iteration;tests/evidence/g474-factory-"
+"integration"
+msgstr ""
+"tools/testing/evidence/g474-iteration;tests/evidence/g474-factory-"
+"integration"
+
+msgid ""
+"exact STM32G474RET6 GPIO LPUART factory/startup clock/linker longitudinal "
+"slice; actual regular sanitizer and selected/empty ARM; reference PCB and "
+"other peripherals unqualified"
+msgstr ""
+"exact STM32G474RET6 GPIO LPUART factory/startup clock/linker longitudinal "
+"slice; actual regular sanitizer and selected/empty ARM; reference PCB and "
+"other peripherals unqualified"
+
+msgid "IO-60"
+msgstr "IO-60"
+
+msgid "Narrow user I/O isolation contracts"
+msgstr "Narrow user I/O isolation contracts"
+
+msgid "components/user_io_broker"
+msgstr "components/user_io_broker"
+
+msgid "tools/testing/evidence/user-io-broker-iteration"
+msgstr "tools/testing/evidence/user-io-broker-iteration"
+
+msgid ""
+"trusted privileged GPIO gateway validates ranges and retains user loans "
+"until actual drain; optional component; SVC MPU TZ gateway and physical "
+"isolation not implemented"
+msgstr ""
+"trusted privileged GPIO gateway validates ranges and retains user loans "
+"until actual drain; optional component; SVC MPU TZ gateway and physical "
+"isolation not implemented"

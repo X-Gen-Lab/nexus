@@ -1,0 +1,4 @@
+tests/google/gd32_memory_test.cpp:10:10: fatal error: private/memory_init.h: No such file or directory
+   10 | #include "private/memory_init.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.

@@ -1,0 +1,15 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from FreeRTOSFailStop
+[ RUN      ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark
+[       OK ] FreeRTOSFailStop.AssertObservesLocationBeforeMaskAndPark (0 ms)
+[ RUN      ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName
+[       OK ] FreeRTOSFailStop.StackOverflowNeverDereferencesTaskOrName (0 ms)
+[ RUN      ] FreeRTOSFailStop.ReturningObserverCannotReclaimLoanOrContinueKernel
+[       OK ] FreeRTOSFailStop.ReturningObserverCannotReclaimLoanOrContinueKernel (1002 ms)
+[----------] 3 tests from FreeRTOSFailStop (1003 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (1003 ms total)
+[  PASSED  ] 3 tests.

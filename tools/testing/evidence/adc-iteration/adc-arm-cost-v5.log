@@ -1,0 +1,94 @@
+{
+  "rows": [
+    {
+      "soc": "stm32f407",
+      "variant": "baseline",
+      "elf": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.elf",
+        "bytes": 5476,
+        "sha256": "128d74ddb7f2220d17b68502674771538dd00c16d9ca2f32fbfff5ca762ed343"
+      },
+      "type_bytes": {
+        "cost_adc_face": 8,
+        "cost_adc_finite": 128,
+        "cost_adc_ops": 24,
+        "cost_adc_poll": 28,
+        "cost_stream": 40,
+        "cost_stream_slot": 40
+      }
+    },
+    {
+      "soc": "stm32f407",
+      "variant": "current",
+      "elf": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.elf",
+        "bytes": 5688,
+        "sha256": "99c7a76e27555c586dca4c42f1128f205e76d20afb9e24a0a316cb8ebd5a7f10"
+      },
+      "type_bytes": {
+        "cost_adc_continuous": 200,
+        "cost_adc_face": 8,
+        "cost_adc_finite": 128,
+        "cost_adc_ops": 36,
+        "cost_adc_poll": 28,
+        "cost_observation": 32,
+        "cost_observer": 32,
+        "cost_posted_producer": 12,
+        "cost_stream": 40,
+        "cost_stream_slot": 40
+      },
+      "default_ram_delta_bytes": 0,
+      "default_ops_rodata_delta_bytes": 12,
+      "continuous_vs_finite_ram_bytes": 72
+    },
+    {
+      "soc": "gd32f470",
+      "variant": "baseline",
+      "elf": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.elf",
+        "bytes": 5476,
+        "sha256": "cf9d012a60bc30f595cb26a83fe4ef9ca8fbe0a001affd0e0bd072d0c666329a"
+      },
+      "type_bytes": {
+        "cost_adc_face": 8,
+        "cost_adc_finite": 80,
+        "cost_adc_ops": 24,
+        "cost_adc_poll": 16,
+        "cost_stream": 40,
+        "cost_stream_slot": 40
+      }
+    },
+    {
+      "soc": "gd32f470",
+      "variant": "current",
+      "elf": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.elf",
+        "bytes": 5688,
+        "sha256": "6213e9e1f385255863e13ac3416793abb7cda713244f752daa16ee3adf036d97"
+      },
+      "type_bytes": {
+        "cost_adc_continuous": 160,
+        "cost_adc_face": 8,
+        "cost_adc_finite": 80,
+        "cost_adc_ops": 36,
+        "cost_adc_poll": 16,
+        "cost_observation": 32,
+        "cost_observer": 32,
+        "cost_posted_producer": 12,
+        "cost_stream": 40,
+        "cost_stream_slot": 40
+      },
+      "default_ram_delta_bytes": 0,
+      "default_ops_rodata_delta_bytes": 12,
+      "continuous_vs_finite_ram_bytes": 80
+    }
+  ],
+  "objects": 6,
+  "commands": 28,
+  "source_inputs": 92,
+  "report": {
+    "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/report.json",
+    "bytes": 60139,
+    "sha256": "df950d6fe4eca01b290ab7403d906a1adf2a1b67408ce93d19bab2010efe7031"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-readelf",
+    "-A",
+    "/workspace/nexus-threadx-probe/cpu2-integer-primask/threadx_cpu.elf"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

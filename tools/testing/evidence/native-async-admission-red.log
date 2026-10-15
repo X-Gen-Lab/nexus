@@ -1,0 +1,48 @@
+Running main() from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest_main.cc
+[==========] Running 6 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 6 tests from NativeAsync
+[ RUN      ] NativeAsync.SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects
+[       OK ] NativeAsync.SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects (0 ms)
+[ RUN      ] NativeAsync.SPIQuarantineRetainsBorrowAndStopUntilDrain
+/workspace/nexus/tests/google/native_async_test.cpp:105: Failure
+Expected equality of these values:
+  nx_spi_endpoint_transfer(&endpoint_api, tx, nullptr, 1, 100, &count)
+    Which is: 0
+  NX_ERROR_STATE
+    Which is: 3
+
+[  FAILED  ] NativeAsync.SPIQuarantineRetainsBorrowAndStopUntilDrain (0 ms)
+[ RUN      ] NativeAsync.UARTIDLEBlocksStayImmutableAndLossPrecedesLaterData
+/workspace/nexus/tests/google/native_async_test.cpp:127: Failure
+Expected equality of these values:
+  nx_uart_port_submit(&uart, &request)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] NativeAsync.UARTIDLEBlocksStayImmutableAndLossPrecedesLaterData (0 ms)
+[ RUN      ] NativeAsync.UARTStopPublishesFinalPrefixAndKeepsConsumerStorage
+/workspace/nexus/tests/google/native_async_test.cpp:178: Failure
+Expected equality of these values:
+  nx_native_uart_model_configure(&uart, &config)
+    Which is: 0
+  NX_ERROR_BUSY
+    Which is: 2
+
+[  FAILED  ] NativeAsync.UARTStopPublishesFinalPrefixAndKeepsConsumerStorage (0 ms)
+[ RUN      ] NativeAsync.ADCTriggersPublishWholeScansAndNeverOverwriteLoans
+[       OK ] NativeAsync.ADCTriggersPublishWholeScansAndNeverOverwriteLoans (0 ms)
+[ RUN      ] NativeAsync.ADCFailedScanIsNotPublishedAndNextScanReportsLoss
+[       OK ] NativeAsync.ADCFailedScanIsNotPublishedAndNextScanReportsLoss (0 ms)
+[----------] 6 tests from NativeAsync (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 3 tests, listed below:
+[  FAILED  ] NativeAsync.SPIQuarantineRetainsBorrowAndStopUntilDrain
+[  FAILED  ] NativeAsync.UARTIDLEBlocksStayImmutableAndLossPrecedesLaterData
+[  FAILED  ] NativeAsync.UARTStopPublishesFinalPrefixAndKeepsConsumerStorage
+
+ 3 FAILED TESTS

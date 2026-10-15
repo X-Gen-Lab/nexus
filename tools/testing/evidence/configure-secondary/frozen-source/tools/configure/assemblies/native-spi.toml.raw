@@ -1,0 +1,20 @@
+schema = 2
+board = "native_reference"
+backend = "native"
+clock = "model"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[spi.spi0]
+binding = "spi0"
+mode = "short-poll"
+max_hz = 1000000
+
+[spi_device.model0]
+controller = "spi0"
+driver = "spi-endpoint"

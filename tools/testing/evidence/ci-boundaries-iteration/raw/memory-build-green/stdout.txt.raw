@@ -1,0 +1,38 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/ci-boundary-memory/generated/resolved.json
+-- Configuring done (2.4s)
+-- Generating done (0.2s)
+-- Build files have been written to: /workspace/nexus/build/ci-boundary-memory
+[0/4] Re-checking globbed directories...
+[1/29] Building C object core/CMakeFiles/nexus_core.dir/src/time.c.o
+[2/29] Building C object core/CMakeFiles/nexus_core.dir/src/request.c.o
+[3/29] Building C object core/CMakeFiles/nexus_core.dir/src/stack_observation.c.o
+[4/29] Building C object core/CMakeFiles/nexus_core.dir/src/fault.c.o
+[5/29] Building C object core/CMakeFiles/nexus_core.dir/src/request_observer.c.o
+[6/29] Linking C static library lib/libnexus_core.a
+[7/29] Building C object arch/CMakeFiles/nexus_arch.dir/native/nx_arch_native.c.o
+[8/29] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.o
+[9/29] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.o
+[10/29] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.o
+[11/29] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.o
+[12/29] Building C object os/CMakeFiles/nexus_os_wait.dir/wait.c.o
+[13/29] Linking C static library lib/libnexus_arch.a
+[14/29] Linking C static library lib/libnexus_os_wait.a
+[15/29] Building C object os/CMakeFiles/nexus_os_baremetal.dir/baremetal/notify.c.o
+[16/29] Linking C static library lib/libnexus_os_baremetal.a
+[17/29] Building C object os/CMakeFiles/nexus_os_native.dir/native/native.c.o
+[18/29] Linking C static library lib/libnexus_os_native.a
+[19/29] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_default_test.dir/gd32_memory_boot_test.cpp.o
+[20/29] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_default_test.dir/__/__/soc/gd32f470/system.c.o
+[21/29] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_both_test.dir/gd32_memory_boot_test.cpp.o
+[22/29] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_both_test.dir/__/__/soc/gd32f470/system.c.o
+[23/29] Linking CXX executable bin/nexus_gd32_memory_boot_default_test
+[24/29] Linking CXX executable bin/nexus_gd32_memory_boot_both_test
+[25/29] Building CXX object tests/contracts/google/CMakeFiles/nexus_os_wait_test.dir/os_wait_test.cpp.o
+[26/29] Linking CXX executable bin/nexus_os_wait_test

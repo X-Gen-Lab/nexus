@@ -1,0 +1,98 @@
+"""Actual SDK ARM compilation and unchanged mutable-state layout evidence."""
+from pathlib import Path
+import hashlib
+import json
+import subprocess
+import sys
+
+root = Path('/workspace/nexus')
+external = Path('/workspace/nexus-multi-controller-iteration')
+evidence = root / 'tools/testing/evidence/multi-controller-iteration'
+out = evidence / 'i2c-arm-green2'
+out.mkdir(exist_ok=False)
+tool = Path('/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc')
+
+def identity(path):
+    content = path.read_bytes()
+    return {'path': str(path), 'bytes': len(content),
+            'sha256': hashlib.sha256(content).hexdigest()}
+
+flags = ['-std=c11', '-mcpu=cortex-m4', '-mthumb', '-mfpu=fpv4-sp-d16',
+         '-mfloat-abi=hard', '-Os', '-ffunction-sections', '-fdata-sections',
+         '-Wall', '-Wextra', '-Werror', '-Wpedantic', '-Wconversion', '-Wshadow',
+         '-Wstrict-prototypes', '-Wmissing-prototypes']
+inc = ['-Icore/include', '-Iarch/include', '-Iio/include', '-Iio/private',
+       '-Isoc/common']
+sources = [root / p for p in json.loads((external / 'i2c-owned.json').read_text())]
+sources += [root / 'soc/common/i2c_v1_async.h',
+            root / 'io/include/nexus/io/i2c.h']
+report = {'schema_version': 1, 'kind': 'i2c_secondary_sdk_arm_object_cost',
+          'status': 'running', 'scope': 'Actual strict Cortex-M4F SDK objects and mutable layout; development snapshot, not whole-image or hardware qualification.',
+          'source_inputs': [identity(p) for p in sources],
+          'compiler': identity(tool), 'physical_status': 'not_executed',
+          'cycles_status': 'not_measured', 'families': []}
+baseline_header = subprocess.check_output(
+    ['git', '-C', str(root), 'show', 'HEAD:soc/common/i2c_v1_async.h'])
+assert baseline_header == (root / 'soc/common/i2c_v1_async.h').read_bytes()
+report['mutable_state_header_matches_head'] = True
+report['comparison_head'] = subprocess.check_output(
+    ['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
+for family, define, config in [
+        ('stm32f407', 'STM32F407xx', Path('/workspace/nexus-config-iteration-evidence/can-arm-matrix-final/stm32-first-freertos/nexus-sdk/generated')),
+        ('gd32f470', 'GD32F470', Path('/workspace/nexus-config-iteration-evidence/can-arm-matrix-final/gd32-both-freertos/nexus-sdk/generated'))]:
+    extra = ['-D' + define, '-Isoc/' + family + '/private', '-I' + str(config)]
+    if family == 'stm32f407':
+        extra += ['-isystem', 'vendors/st/cmsis_device_f4/Include',
+                  '-isystem', 'vendors/arm/CMSIS_5/CMSIS/Core/Include']
+    else:
+        extra += ['-DHXTAL_VALUE=25000000', '-isystem',
+                  'vendors/gigadevice/gd32f4xx/Firmware/CMSIS', '-isystem',
+                  'vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include',
+                  '-isystem',
+                  'vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include']
+    objects = []
+    for source in ['soc/' + family + '/drivers/i2c_async.c',
+                   'soc/common/i2c_v1_async.c']:
+        obj = out / (family + '-' + source.replace('/', '-') + '.o')
+        subprocess.run([sys.executable, str(external / 'run.py'),
+                        'i2c-arm-green2-' + family + '-' + source.replace('/', '-'),
+                        str(tool), *flags, *inc, *extra, '-c', source, '-o',
+                        str(obj)], cwd=root, check=True)
+        size = subprocess.check_output([str(tool.with_name('arm-none-eabi-size')),
+                                        '-A', str(obj)], text=True)
+        raw = out / (obj.stem + '.size.raw')
+        raw.write_text(size)
+        text_bytes = sum(int(row.split()[1]) for row in size.splitlines()
+                         if row.startswith(('.text', '.rodata')))
+        ram_bytes = sum(int(row.split()[1]) for row in size.splitlines()
+                        if row.startswith(('.data', '.bss')))
+        objects.append({'source': source, 'object': identity(obj),
+                        'size': identity(raw), 'text_rodata_bytes': text_bytes,
+                        'global_data_bss_bytes': ram_bytes})
+    fixture = out / (family + '-types.c.raw')
+    fixture.write_text('#include "' + family + '_i2c_async.h"\n'
+                       'unsigned char state_size[sizeof(nx_i2c_v1_state_t)];\n'
+                       'unsigned char endpoint_size[sizeof(nx_i2c_v1_endpoint_t)];\n'
+                       'unsigned char dma_size[sizeof(nx_i2c_v1_dma_t)];\n'
+                       'unsigned char engine_size[sizeof(nx_i2c_v1_dma_engine_t)];\n')
+    obj = out / (family + '-types.o')
+    subprocess.run([sys.executable, str(external / 'run.py'),
+                    'i2c-arm-green2-' + family + '-types', str(tool), *flags, *inc,
+                    *extra, '-x', 'c', '-c', str(fixture), '-o', str(obj)],
+                   cwd=root, check=True)
+    nm = subprocess.check_output([str(tool.with_name('arm-none-eabi-nm')),
+                                  '-S', '--radix=d', str(obj)], text=True)
+    raw = out / (family + '-types.nm.raw')
+    raw.write_text(nm)
+    layout = {row.split()[-1]: int(row.split()[1]) for row in nm.splitlines()
+              if len(row.split()) == 4}
+    report['families'].append({'family': family, 'objects': objects,
+                              'layout': layout, 'fixture': identity(fixture),
+                              'types_object': identity(obj), 'nm': identity(raw),
+                              'generated_cpu_config': identity(config / 'nexus_config.h')})
+for item in report['source_inputs']:
+    assert identity(Path(item['path'])) == item
+report['status'] = 'passed'
+report['source_inputs_stable'] = True
+(out / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
+print(json.dumps(report['families'], indent=2))

@@ -1,0 +1,25 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "build/uart-iteration",
+      "--target",
+      "nexus_timebase_lowpower_test",
+      "--parallel",
+      "2"
+    ],
+    "returncode": 0,
+    "start": 1791743612.5791159,
+    "end": 1791743616.4081585
+  },
+  {
+    "command": [
+      "/workspace/nexus/build/uart-iteration/bin/nexus_timebase_lowpower_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/run-green-includes.xml"
+    ],
+    "returncode": 0,
+    "start": 1791743616.408197,
+    "end": 1791743616.4114137
+  }
+]

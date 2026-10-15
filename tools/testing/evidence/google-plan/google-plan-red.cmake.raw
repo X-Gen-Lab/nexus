@@ -1,0 +1,4 @@
+get_property(google_executables GLOBAL PROPERTY NEXUS_GOOGLE_EXECUTABLES)
+list(JOIN google_executables "\",\n    \"" google_executables)
+file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/google-contracts.json"
+    CONTENT "{\n  \"schema\": 1,\n  \"executables\": [\n    \"${google_executables}\"\n  ]\n}\n")

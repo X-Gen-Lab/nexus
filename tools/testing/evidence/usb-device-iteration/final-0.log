@@ -1,0 +1,18 @@
+[ 10%] Building C object CMakeFiles/usb_engine.dir/workspace/nexus/io/src/usb_device.c.o
+[ 10%] Building C object CMakeFiles/usb_engine.dir/workspace/nexus/io/src/usb_device_controller.c.o
+[ 15%] Building C object CMakeFiles/usb_engine.dir/workspace/nexus/io/native/usb_device.c.o
+[ 21%] Linking C static library libusb_engine.a
+[ 47%] Built target usb_engine
+[ 52%] Building C object CMakeFiles/usb_stm32f407_contract.dir/workspace/nexus/soc/stm32f407/drivers/usb_device.c.o
+[ 68%] Building CXX object CMakeFiles/usb_contract.dir/workspace/nexus/tests/google/usb_device_test.cpp.o
+[ 68%] Building C object CMakeFiles/usb_stm32f407_contract.dir/workspace/nexus/soc/stm32f407/usb_clock.c.o
+[ 68%] Building C object CMakeFiles/usb_gd32f470_contract.dir/workspace/nexus/soc/gd32f470/drivers/usb_device.c.o
+[ 73%] Building C object CMakeFiles/usb_gd32f470_contract.dir/workspace/nexus/soc/gd32f470/usb_clock.c.o
+[ 78%] Building CXX object CMakeFiles/usb_stm32f407_contract.dir/workspace/nexus/tests/google/usb_device_soc_test.cpp.o
+[ 84%] Building CXX object CMakeFiles/usb_gd32f470_contract.dir/workspace/nexus/tests/google/usb_device_soc_test.cpp.o
+[ 89%] Linking CXX executable usb_gd32f470_contract
+[ 94%] Linking CXX executable usb_stm32f407_contract
+[ 94%] Built target usb_gd32f470_contract
+[ 94%] Built target usb_stm32f407_contract
+[100%] Linking CXX executable usb_contract
+[100%] Built target usb_contract

@@ -1,0 +1,1056 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 1500dd64020f3354c2db84d5cf35936c28c4758241b970ee7d1f7cfe6f81c5dc\n"
+
+msgid "I/O 完善台账"
+msgstr "I/O 完善台账"
+
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/platform-refinement-execution.csv>`。 "
+"源文件：`docs/design/platform-refinement-"
+"execution.csv`；SHA-256：`e4496e72ba53be176407804fffa805ef5b12f9da1e0949d2f3e8a20292d27e8b`。"
+msgstr ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/platform-refinement-execution.csv>`。 "
+"源文件：`docs/design/platform-refinement-"
+"execution.csv`；SHA-256：`e4496e72ba53be176407804fffa805ef5b12f9da1e0949d2f3e8a20292d27e8b`。"
+
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+
+msgid "本表包含 60 条原记录，仅表示来源行数。"
+msgstr "本表包含 60 条原记录，仅表示来源行数。"
+
+msgid "IO-01"
+msgstr "IO-01"
+
+msgid "原字段"
+msgstr "原字段"
+
+msgid "原值"
+msgstr "原值"
+
+msgid "`task_id`"
+msgstr "`task_id`"
+
+msgid "`task`"
+msgstr "`task`"
+
+msgid "ADC mode reset"
+msgstr "ADC 模式复位"
+
+msgid "`implementation_status`"
+msgstr "`implementation_status`"
+
+msgid "implemented"
+msgstr "implemented"
+
+msgid "`software_status`"
+msgstr "`software_status`"
+
+msgid "development_passed"
+msgstr "development_passed"
+
+msgid "`hardware_status`"
+msgstr "`hardware_status`"
+
+msgid "not_executed"
+msgstr "not_executed"
+
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+msgid "soc/stm32f407/drivers/adc.c"
+msgstr "soc/stm32f407/drivers/adc.c"
+
+msgid "`evidence_paths`"
+msgstr "`evidence_paths`"
+
+msgid "tools/testing/evidence/adc-iteration"
+msgstr "tools/testing/evidence/adc-iteration"
+
+msgid "`exit_condition`"
+msgstr "`exit_condition`"
+
+msgid "stream to polling clears scan sequence before sample"
+msgstr "stream 切换为 polling 时在采样前清除扫描序列"
+
+msgid "`owner`"
+msgstr "`owner`"
+
+msgid "codex"
+msgstr "codex"
+
+msgid "IO-02"
+msgstr "IO-02"
+
+msgid "ADC retry calibration"
+msgstr "ADC 重试校准"
+
+msgid "soc/gd32f470/drivers/adc.c"
+msgstr "soc/gd32f470/drivers/adc.c"
+
+msgid "retry repeats bounded stable reset calibration"
+msgstr "重试会重复有界稳定复位校准"
+
+msgid "IO-03"
+msgstr "IO-03"
+
+msgid "GPIO inferred mask validation"
+msgstr "GPIO 推导 mask 验证"
+
+msgid "not_applicable"
+msgstr "not_applicable"
+
+msgid "tools/configure/configure.py"
+msgstr "tools/configure/configure.py"
+
+msgid "tools/configure/test_configure.py"
+msgstr "tools/configure/test_configure.py"
+
+msgid "omitted mask cannot authorize extra initial bits"
+msgstr "省略 mask 不能授权额外初始位"
+
+msgid "IO-04"
+msgstr "IO-04"
+
+msgid "Current support documentation"
+msgstr "当前支持文档"
+
+msgid "tools/configure/documentation.py;docs/delivery/support.md"
+msgstr "tools/configure/documentation.py;docs/delivery/support.md"
+
+msgid "tools/testing/evidence/configure-iteration"
+msgstr "tools/testing/evidence/configure-iteration"
+
+msgid "mode MPU split and reviewed route statements match production"
+msgstr "模式、MPU、分离安全域和已审查路由声明符合生产实现"
+
+msgid "IO-05"
+msgstr "IO-05"
+
+msgid "SPI polling owner identity"
+msgstr "SPI polling owner 身份"
+
+msgid "components/bus_owner/src/spi_owner.c"
+msgstr "components/bus_owner/src/spi_owner.c"
+
+msgid "tools/testing/evidence/spi-polling-identity-green.log"
+msgstr "tools/testing/evidence/spi-polling-identity-green.log"
+
+msgid "foreign controller rejected before borrowing or hardware"
+msgstr "借用或访问硬件前拒绝其他控制器"
+
+msgid "IO-06"
+msgstr "IO-06"
+
+msgid "Example startup rollback"
+msgstr "示例启动回退"
+
+msgid "os/freertos/freertos.c;X-Gen-Lab/nexus-examples"
+msgstr "os/freertos/freertos.c;X-Gen-Lab/nexus-examples"
+
+msgid ""
+"X-Gen-Lab/nexus-examples/tests/evidence/startup-rollback;X-Gen-Lab/nexus-"
+"examples/tests/evidence/scheduler-return"
+msgstr ""
+"X-Gen-Lab/nexus-examples/tests/evidence/startup-rollback;X-Gen-Lab/nexus-"
+"examples/tests/evidence/scheduler-return"
+
+msgid "close drain join or prestart discard; preserve cleanup responsibility"
+msgstr "close、drain、join 或启动前 discard；保留清理责任"
+
+msgid "IO-07"
+msgstr "IO-07"
+
+msgid "I/O service diagnostics"
+msgstr "I/O service 诊断"
+
+msgid "targeted_passed"
+msgstr "targeted_passed"
+
+msgid "io;components"
+msgstr "io;components"
+
+msgid "tools/testing/evidence/io-observer-iteration"
+msgstr "tools/testing/evidence/io-observer-iteration"
+
+msgid "progress and failures observable without hidden worker"
+msgstr "无需隐藏 worker 即可观察进展与失败"
+
+msgid "IO-08"
+msgstr "IO-08"
+
+msgid "Mode ownership cancellation matrix"
+msgstr "模式、所有权与取消矩阵"
+
+msgid "soc;tests/google;scripts/ci/io_lifecycle_matrix.py"
+msgstr "soc;tests/google;scripts/ci/io_lifecycle_matrix.py"
+
+msgid "tools/testing/evidence/io-lifecycle-iteration"
+msgstr "tools/testing/evidence/io-lifecycle-iteration"
+
+msgid ""
+"203 reviewed bounded properties; source/object/binary capture and canonical "
+"all-plan executable admission; final fresh complete plan is the "
+"qualification authority"
+msgstr "203 项已审查有界属性；源码／对象／binary 记录与规范全计划可执行准入；最终全新完整计划是资格权威"
+
+msgid "IO-09"
+msgstr "IO-09"
+
+msgid "Quarantine integration and recovery"
+msgstr "隔离集成与恢复"
+
+msgid "components;X-Gen-Lab/nexus-examples"
+msgstr "components;X-Gen-Lab/nexus-examples"
+
+msgid "retain borrowed storage; explicit recovery owner"
+msgstr "保留借用存储；显式恢复 owner"
+
+msgid "IO-10"
+msgstr "IO-10"
+
+msgid "Stream capacity backpressure budget"
+msgstr "stream 容量与背压预算"
+
+msgid "io/src/stream.c;tools/hil"
+msgstr "io/src/stream.c;tools/hil"
+
+msgid "bounded capacity and caller policy; no overwritten loans"
+msgstr "有界容量与调用者策略；不覆盖借用项"
+
+msgid "IO-11"
+msgstr "IO-11"
+
+msgid "Optional read-only capabilities"
+msgstr "可选只读能力"
+
+msgid "tools/configure/factory.py;tools/configure/providers/common.py"
+msgstr "tools/configure/factory.py;tools/configure/providers/common.py"
+
+msgid "selected descriptors; simulated Native flags; no hot path cost"
+msgstr "选定描述符；Native 模拟标志；无热路径成本"
+
+msgid "IO-12"
+msgstr "IO-12"
+
+msgid "UART RX DMA and IDLE"
+msgstr "UART RX DMA 与 IDLE"
+
+msgid ""
+"soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c"
+msgstr ""
+"soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c"
+
+msgid ""
+"tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-"
+"streams"
+msgstr ""
+"tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-"
+"streams"
+
+msgid "reviewed DMA routes; finite and continuous ownership"
+msgstr "已审查 DMA 路由；有限与连续模式所有权"
+
+msgid "IO-13"
+msgstr "IO-13"
+
+msgid "UART duplex DMA blocks"
+msgstr "UART 双向 DMA block"
+
+msgid "TX DMA plus RX blocks without default state growth"
+msgstr "TX DMA 加 RX block，不增加默认状态"
+
+msgid "IO-14"
+msgstr "IO-14"
+
+msgid "UART RTS CTS and RS485"
+msgstr "UART RTS、CTS 与 RS485"
+
+msgid "io/src/uart_rs485.c;soc;tools/configure"
+msgstr "io/src/uart_rs485.c;soc;tools/configure"
+
+msgid "tools/testing/evidence/uart-iteration;docs/design/uart-dma-rs485.md"
+msgstr "tools/testing/evidence/uart-iteration;docs/design/uart-dma-rs485.md"
+
+msgid "reviewed pins; actual TC; DE delay borrowing contract"
+msgstr "已审查引脚；真实 TC；DE 延时借用合同"
+
+msgid "IO-15"
+msgstr "IO-15"
+
+msgid "Continuous ADC DMA"
+msgstr "连续 ADC DMA"
+
+msgid "io/src/stream.c;soc/*/drivers/adc_continuous.c"
+msgstr "io/src/stream.c;soc/*/drivers/adc_continuous.c"
+
+msgid ""
+"tools/testing/evidence/adc-iteration;tools/testing/evidence/configure-"
+"streams"
+msgstr ""
+"tools/testing/evidence/adc-iteration;tools/testing/evidence/configure-"
+"streams"
+
+msgid "preposted targets; hardware address replacement proof"
+msgstr "预投递目标；硬件地址替换证明"
+
+msgid "IO-16"
+msgstr "IO-16"
+
+msgid "ADC channel timing expansion"
+msgstr "ADC 通道时序扩展"
+
+msgid "io/src/adc_observer.c;soc;tools/configure"
+msgstr "io/src/adc_observer.c;soc;tools/configure"
+
+msgid "sample-time and scan rate hardware bounds"
+msgstr "采样时间和扫描速率的硬件限制"
+
+msgid "IO-17"
+msgstr "IO-17"
+
+msgid "DMA topology facts"
+msgstr "DMA 拓扑事实"
+
+msgid "io/src/dma.c;tools/configure"
+msgstr "io/src/dma.c;tools/configure"
+
+msgid "common opaque IDs; provider validates reviewed physical topology"
+msgstr "公共不透明 ID；provider 验证已审查物理拓扑"
+
+msgid "IO-18"
+msgstr "IO-18"
+
+msgid "SPI one-way DMA"
+msgstr "SPI 单向 DMA"
+
+msgid "io/src/spi.c;soc/*/drivers/spi_dma.c"
+msgstr "io/src/spi.c;soc/*/drivers/spi_dma.c"
+
+msgid "tools/testing/evidence/spi-memory-arm-commands.json"
+msgstr "tools/testing/evidence/spi-memory-arm-commands.json"
+
+msgid "caller dummy discard; actual spans; per-direction MINC"
+msgstr "调用者提供 dummy／discard；真实 span；按方向设置 MINC"
+
+msgid "IO-19"
+msgstr "IO-19"
+
+msgid "I2C interrupt DMA async"
+msgstr "I2C 中断／DMA 异步"
+
+msgid "io/src/i2c.c;soc/common/i2c_v1_async.c;soc/*/drivers/i2c_async.c"
+msgstr "io/src/i2c.c;soc/common/i2c_v1_async.c;soc/*/drivers/i2c_async.c"
+
+msgid ""
+"tools/testing/evidence/i2c-async-iteration;tools/testing/evidence/configure-"
+"streams"
+msgstr ""
+"tools/testing/evidence/i2c-async-iteration;tools/testing/evidence/configure-"
+"streams"
+
+msgid "ACK final byte sequence; BTF STOP; request final access"
+msgstr "ACK 最后字节序列；BTF STOP；request 最终访问"
+
+msgid "IO-20"
+msgstr "IO-20"
+
+msgid "I2C physical bus clear"
+msgstr "I2C 物理总线清除"
+
+msgid "io/src/i2c_bus_clear.c"
+msgstr "io/src/i2c_bus_clear.c"
+
+msgid "tests/evidence/i2c-bus-clear"
+msgstr "tests/evidence/i2c-bus-clear"
+
+msgid "bounded pulses STOP; open-drain and cleanup ownership"
+msgstr "有界脉冲和 STOP；开漏与清理所有权"
+
+msgid "IO-21"
+msgstr "IO-21"
+
+msgid "Additional reviewed controller routes"
+msgstr "新增已审查控制器路由"
+
+msgid "soc/*/drivers;tests/google"
+msgstr "soc/*/drivers;tests/google"
+
+msgid "tools/testing/evidence/multi-controller-iteration"
+msgstr "tools/testing/evidence/multi-controller-iteration"
+
+msgid ""
+"static multi-controller assembly across three exact parts and two backends; "
+"18 authored firmware fixtures, pure cold I2C identity and retained "
+"lifecycle; final maintained ARM and clean SDK qualification required"
+msgstr ""
+"三个精确料号与两个后端的静态多控制器装配；18 份编写的固件夹具、纯冷态 I2C 身份和保留生命周期；需要最终维护 ARM 与干净 SDK 资格"
+
+msgid "IO-22"
+msgstr "IO-22"
+
+msgid "GD additional SRAM and TCM linker"
+msgstr "GD 附加 SRAM 与 TCM 链接"
+
+msgid ""
+"core/include/nexus/core/memory.h;soc/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform"
+msgstr ""
+"core/include/nexus/core/memory.h;soc/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform"
+
+msgid ""
+"tools/testing/evidence/memory-iteration;tools/testing/evidence/configure-"
+"memory-metadata"
+msgstr ""
+"tools/testing/evidence/memory-iteration;tools/testing/evidence/configure-"
+"memory-metadata"
+
+msgid "explicit sections and budgets; DMA TCM rejection"
+msgstr "显式 section 和预算；拒绝 DMA TCM"
+
+msgid "IO-23"
+msgstr "IO-23"
+
+msgid "Three Board electrical fact review"
+msgstr "三块 Board 电气事实审查"
+
+msgid "blocked"
+msgstr "blocked"
+
+msgid "pending"
+msgstr "pending"
+
+msgid "boards"
+msgstr "boards"
+
+msgid "actual PCB revision connector crystal and NOR identity"
+msgstr "真实 PCB 修订、连接器、晶振和 NOR 身份"
+
+msgid "IO-24"
+msgstr "IO-24"
+
+msgid "Resolver emitter common limits"
+msgstr "resolver／emitter 通用限制"
+
+msgid ""
+"tools/configure/providers/common.py;tools/configure/providers/*/bindings.py"
+msgstr ""
+"tools/configure/providers/common.py;tools/configure/providers/*/bindings.py"
+
+msgid "tools/testing/evidence/configure-limits-clock"
+msgstr "tools/testing/evidence/configure-limits-clock"
+
+msgid ""
+"factory limits derive from public contract; reviewed clock tuple; four "
+"selected ARM graphs with resource/retention evidence"
+msgstr "factory 限制由公共合同推导；已审查时钟组合；四个选定 ARM 图及资源／保留证据"
+
+msgid "IO-25"
+msgstr "IO-25"
+
+msgid "Physical FP MVE task context"
+msgstr "实板 FP／MVE 任务 context"
+
+msgid "tools/hil"
+msgstr "tools/hil"
+
+msgid "real target observations; current three boards are M4F"
+msgstr "真实目标观察；当前三块板均为 M4F"
+
+msgid "IO-26"
+msgstr "IO-26"
+
+msgid "Physical clock tick deadline accuracy"
+msgstr "实板时钟、Tick 与 deadline 精度"
+
+msgid "bound timer drift tick and monotonic evidence"
+msgstr "绑定定时器漂移、Tick 和单调时间证据"
+
+msgid "IO-27"
+msgstr "IO-27"
+
+msgid "Runtime MSP task stack peaks"
+msgstr "Runtime MSP／任务栈峰值"
+
+msgid "tools/hil;os"
+msgstr "tools/hil;os"
+
+msgid "tools/testing/evidence/stack-owner-iteration"
+msgstr "tools/testing/evidence/stack-owner-iteration"
+
+msgid ""
+"bounded quiescent stack scan and actual pinned kernel ownership rounds; "
+"physical MCU stack/soak not executed"
+msgstr "有界静止期栈扫描和真实固定版本内核所有权轮次；物理 MCU 栈／耐久未执行"
+
+msgid "IO-28"
+msgstr "IO-28"
+
+msgid "OS owner lifecycle endurance"
+msgstr "OS owner 生命周期耐久"
+
+msgid "os;components;tools/hil"
+msgstr "os;components;tools/hil"
+
+msgid "IO-29"
+msgstr "IO-29"
+
+msgid "Board tickless continuous timer port"
+msgstr "Board tickless 连续定时器 port"
+
+msgid "soc;os/freertos"
+msgstr "soc;os/freertos"
+
+msgid "tools/testing/evidence/timebase-lowpower-iteration"
+msgstr "tools/testing/evidence/timebase-lowpower-iteration"
+
+msgid ""
+"explicit fixed-profile shallow WFI timebase port; "
+"actual4ARM/defaultomission/model50; physical wake accuracy unexecuted"
+msgstr "显式固定 profile 浅 WFI 时间基准 port；实际 4 个 ARM／默认省略／50 个模型检查；物理唤醒精度未执行"
+
+msgid "IO-30"
+msgstr "IO-30"
+
+msgid "Fail-stop and product safety output hooks"
+msgstr "fail-stop 与产品安全输出 hook"
+
+msgid "core/src/fault.c;os;X-Gen-Lab/nexus-examples"
+msgstr "core/src/fault.c;os;X-Gen-Lab/nexus-examples"
+
+msgid ""
+"tools/testing/evidence/fault-observation;tests/evidence/threadx-fault-"
+"observer"
+msgstr ""
+"tools/testing/evidence/fault-observation;tests/evidence/threadx-fault-"
+"observer"
+
+msgid ""
+"stateless observer before retaining fail-stop; preserves stronger incoming "
+"masks and actual fault context; external safety policy and physical outputs "
+"separately qualified"
+msgstr ""
+"保留 fail-stop 前的无状态 observer；保留更强传入 mask 和真实 fault context；外部安全策略与物理输出分别取得资格"
+
+msgid "IO-31"
+msgstr "IO-31"
+
+msgid "Physical restricted MPU isolation"
+msgstr "实板受限 MPU 隔离"
+
+msgid "software fixtures cannot prove actual memory fault isolation"
+msgstr "软件夹具不能证明实际内存 fault 隔离"
+
+msgid "IO-32"
+msgstr "IO-32"
+
+msgid "Physical split security isolation"
+msgstr "实板分域安全隔离"
+
+msgid "requires matching secure target and real SAU attribution"
+msgstr "需要匹配的 secure 目标和真实 SAU 归属"
+
+msgid "IO-33"
+msgstr "IO-33"
+
+msgid "Selectable OS object cost"
+msgstr "可选择 OS 对象成本"
+
+msgid ""
+"os/freertos/freertos.c;scripts/ci/os_resources.py;tests/contracts/os_resources"
+msgstr ""
+"os/freertos/freertos.c;scripts/ci/os_resources.py;tests/contracts/os_resources"
+
+msgid ""
+"tools/testing/evidence/os-optimization;/workspace/nexus-"
+"delivery/bd6df2c7a1b9a6cb613947c0528f998ff21d31e3/github/all-"
+"cortex/reports/os-resources/report.json"
+msgstr ""
+"tools/testing/evidence/os-optimization;/workspace/nexus-"
+"delivery/bd6df2c7a1b9a6cb613947c0528f998ff21d31e3/github/all-"
+"cortex/reports/os-resources/report.json"
+
+msgid ""
+"actual eight ABI resource variants and 56 commands refreshed, 1136 evidence "
+"identity references verified; final clean source costs remain independently "
+"bound"
+msgstr "刷新了实际八个 ABI 资源变体和 56 条命令，验证 1,136 个证据身份引用；最终干净源码成本仍独立绑定"
+
+msgid "IO-34"
+msgstr "IO-34"
+
+msgid "Additional real RTOS backend"
+msgstr "新增真实 RTOS 后端"
+
+msgid "os/threadx;tools/configure/threadx.py"
+msgstr "os/threadx;tools/configure/threadx.py"
+
+msgid ""
+"tests/evidence/threadx-integration;tools/testing/evidence/threadx-"
+"dependency;tools/testing/evidence/threadx-context-iteration"
+msgstr ""
+"tests/evidence/threadx-integration;tools/testing/evidence/threadx-"
+"dependency;tools/testing/evidence/threadx-context-iteration"
+
+msgid ""
+"official locked ThreadX Linux and CortexM4 backend; actual62Google and two "
+"complete62 TSan executions plus sixBoardARM; Linux scheduler state snapshots"
+" and signal posture repaired; final clean installed SDK consumers required; "
+"no physical qualification"
+msgstr ""
+"官方锁定 ThreadX Linux 与 CortexM4 后端；实际 62 个 GoogleTest 用例及两次各 62 个用例的完整 TSan "
+"执行，加六个 Board ARM；已修复 Linux scheduler 状态快照和 signal 设置；需要最终干净已安装 SDK "
+"使用者；不具备物理资格"
+
+msgid "IO-35"
+msgstr "IO-35"
+
+msgid "Optional nominal factory IDs"
+msgstr "可选 nominal factory ID"
+
+msgid "tools/configure/factory.py;tools/configure/test_factory_features.py"
+msgstr "tools/configure/factory.py;tools/configure/test_factory_features.py"
+
+msgid "C and C++ compile reject cross-kind IDs; no default RAM cost"
+msgstr "C 与 C++ 编译拒绝跨类别 ID；无默认 RAM 成本"
+
+msgid "IO-36"
+msgstr "IO-36"
+
+msgid "Executable TOML documentation"
+msgstr "可执行 TOML 文档"
+
+msgid "tools/configure/documentation.py;tools/configure/test_documentation.py"
+msgstr ""
+"tools/configure/documentation.py;tools/configure/test_documentation.py"
+
+msgid "resolve every complete snippet; explicit fragment rationale"
+msgstr "解析每个完整片段；显式说明 fragment 原因"
+
+msgid "IO-37"
+msgstr "IO-37"
+
+msgid "Provider property failure matrix"
+msgstr "provider 属性失败矩阵"
+
+msgid "tests/google;scripts/ci/io_lifecycle_matrix.py"
+msgstr "tests/google;scripts/ci/io_lifecycle_matrix.py"
+
+msgid ""
+"203 bounded properties from same fresh unfiltered production target "
+"execution; canonical all-plan/source/object/binary identity; final strict "
+"complete plan required"
+msgstr "同一全新、无过滤的生产目标执行中的 203 项有界属性；规范全计划／源码／对象／binary 身份；需要最终严格完整计划"
+
+msgid "IO-38"
+msgstr "IO-38"
+
+msgid "New mode resources and GC"
+msgstr "新模式资源与 GC"
+
+msgid ""
+"tools/measurement/retention.py;soc/*/CMakeLists.txt;tests/contracts/*_assembly"
+msgstr ""
+"tools/measurement/retention.py;soc/*/CMakeLists.txt;tests/contracts/*_assembly"
+
+msgid ""
+"tools/testing/evidence/configure-streams;tools/testing/evidence/provider-"
+"empty-input-iteration"
+msgstr ""
+"tools/testing/evidence/configure-streams;tools/testing/evidence/provider-"
+"empty-input-iteration"
+
+msgid ""
+"maintained fixture-driven ARM assembly gate checks exact inputs, budgets and"
+" selected/omitted operation retention; final whole 87-fixture execution "
+"recorded outside source; legal empty SDK identities retained; 35 admission "
+"regressions and 92 related checks passed"
+msgstr ""
+"维护中的夹具驱动 ARM 装配门禁检查精确输入、预算及选定／省略操作保留；最终完整 87 个夹具执行记录在源码外；保留合法空 SDK 身份；35 "
+"项准入回归与 92 项相关检查通过"
+
+msgid "IO-39"
+msgstr "IO-39"
+
+msgid "Physical poll IRQ DMA benchmark"
+msgstr "实板 poll／IRQ／DMA benchmark"
+
+msgid "same artifact clock load optimization and raw timing"
+msgstr "相同产物、时钟、负载、优化和原始时序"
+
+msgid "IO-40"
+msgstr "IO-40"
+
+msgid "CI artifact source identity"
+msgstr "CI 产物源码身份"
+
+msgid ".github/actions/record-identity;tools/maintenance/job_identity.py"
+msgstr ".github/actions/record-identity;tools/maintenance/job_identity.py"
+
+msgid "tools/testing/evidence/ci-identity"
+msgstr "tools/testing/evidence/ci-identity"
+
+msgid "every job actual checkout tree deps config tool identity"
+msgstr "每个 job 保留真实 checkout、tree、依赖、配置和工具身份"
+
+msgid "IO-41"
+msgstr "IO-41"
+
+msgid "Evidence retention and attestation"
+msgstr "证据留存与证明"
+
+msgid "runtime_pending"
+msgstr "runtime_pending"
+
+msgid ".github/workflows/release.yml;dependencies/actions.lock.json"
+msgstr ".github/workflows/release.yml;dependencies/actions.lock.json"
+
+msgid "immutable archive and provenance; no fabricated signature"
+msgstr "不可变归档与来源记录；不伪造签名"
+
+msgid "IO-42"
+msgstr "IO-42"
+
+msgid "API schema SDK compatibility version"
+msgstr "API、schema 与 SDK 兼容性版本"
+
+msgid ""
+"dependencies/platform-"
+"compatibility.json;tools/configure/metadata.py;tools/maintenance/compatibility.py;cmake/package"
+msgstr ""
+"dependencies/platform-"
+"compatibility.json;tools/configure/metadata.py;tools/maintenance/compatibility.py;cmake/package"
+
+msgid ""
+"tools/testing/evidence/source-compatibility;tools/testing/evidence/source-"
+"compatibility-integration;tools/testing/evidence/configure-memory-"
+"metadata;tools/testing/evidence/source-sdk-archive-exclusion-iteration"
+msgstr ""
+"tools/testing/evidence/source-compatibility;tools/testing/evidence/source-"
+"compatibility-integration;tools/testing/evidence/configure-memory-"
+"metadata;tools/testing/evidence/source-sdk-archive-exclusion-iteration"
+
+msgid ""
+"canonical epochs and exact source-only SDK closure; 45 SDK boundary "
+"regressions passed; same-HEAD owned archive exclusion removes 183996010 "
+"bytes; final relocated clean canonical consumers required"
+msgstr ""
+"规范 epoch 与精确 source-only SDK 闭包；45 项 SDK 边界回归通过；同一 HEAD 维护归档排除减少 183,996,010"
+" 字节；需要最终搬移干净规范使用者"
+
+msgid "IO-43"
+msgstr "IO-43"
+
+msgid "Agent maintenance responsibility"
+msgstr "agent 维护责任"
+
+msgid ".github/maintainer-roles.json;tools/maintenance/ownership.py"
+msgstr ".github/maintainer-roles.json;tools/maintenance/ownership.py"
+
+msgid "tools/testing/evidence/agent-maintenance"
+msgstr "tools/testing/evidence/agent-maintenance"
+
+msgid "Codex owns all domains; no named people required"
+msgstr "Codex 负责所有领域；不需要实名人员"
+
+msgid "IO-44"
+msgstr "IO-44"
+
+msgid "Remote rules and required checks"
+msgstr "远端规则与 required checks"
+
+msgid ".github/workflows"
+msgstr ".github/workflows"
+
+msgid "current connector cannot inspect branch protection; no fake CODEOWNERS"
+msgstr "当前连接器不能检查 branch protection；不伪造 CODEOWNERS"
+
+msgid "IO-45"
+msgstr "IO-45"
+
+msgid "Defect review release execution ownership"
+msgstr "缺陷、评审与发布执行责任"
+
+msgid "AGENTS.md;tools/evidence/reproduce.py;.github/workflows"
+msgstr "AGENTS.md;tools/evidence/reproduce.py;.github/workflows"
+
+msgid ""
+"tools/testing/evidence/ci-identity;tools/testing/evidence/fixture-lifetime-"
+"iteration;tools/testing/evidence/freertos-failstop-parent-iteration"
+msgstr ""
+"tools/testing/evidence/ci-identity;tools/testing/evidence/fixture-lifetime-"
+"iteration;tools/testing/evidence/freertos-failstop-parent-iteration"
+
+msgid ""
+"Codex owns every domain; independent review and actual failure evidence "
+"retained; release validation distinct from ordinary CI and promotion remains"
+" external; three fixture lifetime gaps closed with 224 before/after regular "
+"and sanitizer executions; failstop eight cases passed regular/ASan/TSan "
+"after actual old timeout reproduction"
+msgstr ""
+"Codex 负责每个领域；保留独立评审和真实失败证据；发布验证与普通 CI 分离，提升发布资格仍在外部；通过 224 次前后常规与 sanitizer "
+"执行修复三个夹具生命周期缺口；实际复现旧超时问题后，八个 fail-stop 用例在常规／ASan／TSan 下通过"
+
+msgid "IO-46"
+msgstr "IO-46"
+
+msgid "Locked dependency upgrade maintenance"
+msgstr "锁定依赖升级维护"
+
+msgid ""
+"tools/maintenance/dependency_proposals.py;.github/workflows/dependency-"
+"maintenance.yml"
+msgstr ""
+"tools/maintenance/dependency_proposals.py;.github/workflows/dependency-"
+"maintenance.yml"
+
+msgid "tools/testing/evidence/source-compatibility"
+msgstr "tools/testing/evidence/source-compatibility"
+
+msgid ""
+"weekly read-only workflow defined; actual schedule pending default-branch "
+"workflow; upgrades require exact evidence"
+msgstr "已定义每周只读 workflow；真实 schedule 等待默认分支 workflow；升级需要精确证据"
+
+msgid "IO-47"
+msgstr "IO-47"
+
+msgid "Real HIL station binding"
+msgstr "真实 HIL station 绑定"
+
+msgid "three physical probes serial and chip identity unavailable"
+msgstr "三块实板的 probe、serial 和芯片身份不可用"
+
+msgid "IO-48"
+msgstr "IO-48"
+
+msgid "Physical clock reset GPIO watchdog"
+msgstr "实板时钟、复位、GPIO 与 watchdog"
+
+msgid "actual station capture and reset reason"
+msgstr "真实 station 采集与复位原因"
+
+msgid "IO-49"
+msgstr "IO-49"
+
+msgid "Physical UART SPI DMA fault waveforms"
+msgstr "实板 UART／SPI／DMA fault 波形"
+
+msgid "logic-analyzer and serial raw capture matching artifact"
+msgstr "与产物匹配的逻辑分析仪和串口原始采集"
+
+msgid "IO-50"
+msgstr "IO-50"
+
+msgid "Physical I2C electrical protocol"
+msgstr "实板 I2C 电气协议"
+
+msgid "ACK NACK STOP line voltage bus clear observed"
+msgstr "观察 ACK、NACK、STOP、线电压和总线清除"
+
+msgid "IO-51"
+msgstr "IO-51"
+
+msgid "Physical ADC PWM EXTI"
+msgstr "实板 ADC、PWM 与 EXTI"
+
+msgid "real stimulus and independent instrument observations"
+msgstr "真实激励与独立仪器观察"
+
+msgid "IO-52"
+msgstr "IO-52"
+
+msgid "Physical Flash power interruption"
+msgstr "实板 Flash 断电"
+
+msgid "tools/hil;X-Gen-Lab/nexus-examples"
+msgstr "tools/hil;X-Gen-Lab/nexus-examples"
+
+msgid "destructive test region explicitly owned externally"
+msgstr "破坏性测试区域由外部显式负责"
+
+msgid "IO-53"
+msgstr "IO-53"
+
+msgid "Physical concurrent endurance and latency"
+msgstr "实板并发耐久与延迟"
+
+msgid "same firmware soak interrupt latency stack load evidence"
+msgstr "相同固件的耐久、IRQ 延迟和栈负载证据"
+
+msgid "IO-54"
+msgstr "IO-54"
+
+msgid "CAN platform interface and controllers"
+msgstr "CAN 平台接口与控制器"
+
+msgid "io;soc"
+msgstr "io;soc"
+
+msgid ""
+"tools/testing/evidence/can-iteration;tools/testing/evidence/configure-can"
+msgstr ""
+"tools/testing/evidence/can-iteration;tools/testing/evidence/configure-can"
+
+msgid ""
+"classic CAN IRQ request/frame rings; shared filter-domain ownership; two "
+"generated instances; no physical bus claim"
+msgstr ""
+"classic CAN IRQ request／frame ring；共享 filter-domain 所有权；两个生成实例；不声明物理总线验证"
+
+msgid "IO-55"
+msgstr "IO-55"
+
+msgid "Ethernet MAC PHY raw frames"
+msgstr "Ethernet MAC／PHY 原始帧"
+
+msgid "io;soc;components/dp83848;tools/configure/ethernet.py"
+msgstr "io;soc;components/dp83848;tools/configure/ethernet.py"
+
+msgid ""
+"tools/testing/evidence/ethernet-iteration;tools/testing/evidence/configure-"
+"ethernet"
+msgstr ""
+"tools/testing/evidence/ethernet-iteration;tools/testing/evidence/configure-"
+"ethernet"
+
+msgid ""
+"RMII borrowed descriptor/frame buffers; verified cold SRAM gates and "
+"generation; actual two-family factory/model tests and four ZG ARM graphs; "
+"physical PHY/link/PCB not executed"
+msgstr ""
+"RMII 借用 descriptor／frame buffer；已验证冷态 SRAM 门禁与生成；实际两家族 factory／模型测试及四个 ZG "
+"ARM 图；物理 PHY／link／PCB 未执行"
+
+msgid "IO-56"
+msgstr "IO-56"
+
+msgid "USB clock endpoints lifecycle"
+msgstr "USB 时钟、endpoint 与生命周期"
+
+msgid "io;soc;tools/configure/usb_device.py"
+msgstr "io;soc;tools/configure/usb_device.py"
+
+msgid ""
+"tools/testing/evidence/usb-device-iteration;tools/testing/evidence/usb-"
+"clock-iteration;tools/testing/evidence/configure-usb"
+msgstr ""
+"tools/testing/evidence/usb-device-iteration;tools/testing/evidence/usb-"
+"clock-iteration;tools/testing/evidence/configure-usb"
+
+msgid ""
+"DWCFS PIO endpoints and epoch-preserving assembly; actual48MHz proof and "
+"NVIC drain models/six selectedARM; no physical USB claim"
+msgstr ""
+"DWCFS PIO endpoint 与保留 epoch 的装配；真实 48 MHz 证明和 NVIC 排空模型／六个选定 ARM；不声明物理 USB "
+"验证"
+
+msgid "IO-57"
+msgstr "IO-57"
+
+msgid "Timer capture advanced PWM"
+msgstr "Timer capture 与高级 PWM"
+
+msgid "io; soc/*/drivers; tools/configure/timer_advanced.py"
+msgstr "io；soc/*/drivers；tools/configure/timer_advanced.py"
+
+msgid ""
+"tools/testing/evidence/timer-iteration;tools/testing/evidence/timer-factory-"
+"iteration"
+msgstr ""
+"tools/testing/evidence/timer-iteration;tools/testing/evidence/timer-factory-"
+"iteration"
+
+msgid ""
+"two-family timer capture and complementary PWM deadtime break ownership; "
+"actual shared-resource and cold cleanup regressions, selected/default ARM "
+"graphs; physical output and timing not executed"
+msgstr ""
+"两家族 timer capture 和互补 PWM deadtime／break 所有权；实际共享资源与冷态清理回归、选定／默认 ARM "
+"图；物理输出与时序未执行"
+
+msgid "IO-58"
+msgstr "IO-58"
+
+msgid "SoC sleep and clock lifecycle"
+msgstr "SoC 睡眠与时钟生命周期"
+
+msgid "soc;os"
+msgstr "soc;os"
+
+msgid "tools/testing/evidence/clock-domain-iteration"
+msgstr "tools/testing/evidence/clock-domain-iteration"
+
+msgid ""
+"caller-owned clock leases and exact fixed-profile shallow sleep; actual "
+"drain/wake/clock readback models; dynamic PLL/STOP and physical timing not "
+"supported"
+msgstr ""
+"调用者拥有 clock lease 与精确固定 profile 浅睡眠；实际排空／唤醒／时钟读回模型；不支持动态 PLL／STOP 和物理时序"
+
+msgid "IO-59"
+msgstr "IO-59"
+
+msgid "Additional SoC Board complete vertical"
+msgstr "新增 SoC／Board 完整纵切片"
+
+msgid ""
+"soc/stm32g474;boards/stm32g474re_hse24_reference;tools/configure/providers/stm32g474"
+msgstr ""
+"soc/stm32g474;boards/stm32g474re_hse24_reference;tools/configure/providers/stm32g474"
+
+msgid ""
+"tools/testing/evidence/g474-iteration;tests/evidence/g474-factory-"
+"integration"
+msgstr ""
+"tools/testing/evidence/g474-iteration;tests/evidence/g474-factory-"
+"integration"
+
+msgid ""
+"exact STM32G474RET6 GPIO LPUART factory/startup clock/linker longitudinal "
+"slice; actual regular sanitizer and selected/empty ARM; reference PCB and "
+"other peripherals unqualified"
+msgstr ""
+"精确 STM32G474RET6 GPIO／LPUART factory、startup、clock／linker 纵切片；真实常规 sanitizer"
+" 与选定／空 ARM；参考 PCB 和其他外设未取得资格"
+
+msgid "IO-60"
+msgstr "IO-60"
+
+msgid "Narrow user I/O isolation contracts"
+msgstr "窄用户 I/O 隔离合同"
+
+msgid "components/user_io_broker"
+msgstr "components/user_io_broker"
+
+msgid "tools/testing/evidence/user-io-broker-iteration"
+msgstr "tools/testing/evidence/user-io-broker-iteration"
+
+msgid ""
+"trusted privileged GPIO gateway validates ranges and retains user loans "
+"until actual drain; optional component; SVC MPU TZ gateway and physical "
+"isolation not implemented"
+msgstr "可信特权 GPIO gateway 验证范围，借用保留至真实排空；可选组件；SVC、MPU、TZ gateway 和物理隔离未实现"

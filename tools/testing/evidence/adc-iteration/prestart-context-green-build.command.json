@@ -1,0 +1,21 @@
+{
+  "argv": [
+    ".venv/bin/cmake",
+    "--build",
+    "build/adc-iteration",
+    "--target",
+    "nexus_freertos_context_test",
+    "nexus_freertos_baseline_context_test",
+    "nexus_freertos_m23_context_test",
+    "nexus_freertos_v8_context_test",
+    "nexus_freertos_priority8_context_test",
+    "nexus_freertos_notifications_disabled_test",
+    "--parallel",
+    "2"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T15:38:11.212094+00:00",
+  "ended_at": "2026-10-11T15:38:58.160091+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/adc-iteration/prestart-context-green-build.log"
+}

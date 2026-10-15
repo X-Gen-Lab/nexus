@@ -1,0 +1,21 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-industrial-design/usb-tests/build",
+      "-j",
+      "4"
+    ],
+    "exit_code": 0,
+    "log": "green-build2.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/usb-tests/build/usb_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/usb-device-iteration/green-initial.xml"
+    ],
+    "exit_code": -11,
+    "log": "green-initial.log"
+  }
+]

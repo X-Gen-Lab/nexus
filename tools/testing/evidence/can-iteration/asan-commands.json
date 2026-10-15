@@ -1,0 +1,38 @@
+[
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/can-tests/build-asan/can_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/can_contract-asan.xml"
+    ],
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "exit_code": 0,
+    "log": "can_contract-asan.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/can-tests/build-asan/can_stm32f407_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/can_stm32f407_contract-asan.xml"
+    ],
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "exit_code": 0,
+    "log": "can_stm32f407_contract-asan.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-industrial-design/can-tests/build-asan/can_gd32f470_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/can_gd32f470_contract-asan.xml"
+    ],
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:abort_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+    },
+    "exit_code": 0,
+    "log": "can_gd32f470_contract-asan.log"
+  }
+]

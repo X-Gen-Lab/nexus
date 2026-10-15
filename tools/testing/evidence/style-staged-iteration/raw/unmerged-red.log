@@ -1,0 +1,14 @@
+test_staged_check_rejects_unmerged_index_before_selection (scripts.ci.test_style_gate.StyleGateTests.test_staged_check_rejects_unmerged_index_before_selection) ... FAIL
+
+======================================================================
+FAIL: test_staged_check_rejects_unmerged_index_before_selection (scripts.ci.test_style_gate.StyleGateTests.test_staged_check_rejects_unmerged_index_before_selection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/scripts/ci/test_style_gate.py", line 184, in test_staged_check_rejects_unmerged_index_before_selection
+    self.assertEqual(result.returncode, 1)
+AssertionError: 0 != 1
+
+----------------------------------------------------------------------
+Ran 1 test in 0.145s
+
+FAILED (failures=1)

@@ -1,0 +1,7 @@
+{# Inherit Alabaster 0.7.16, including its copyright and BSD-3-Clause credits. #}
+{% extends "!layout.html" %}
+{% block footer %}
+  {# Match only the pinned theme's credit label; retain the entire parent block. #}
+  {{ super()|replace('Powered by <a href="https://www.sphinx-doc.org/">',
+                    nexus_theme_ui.powered_by ~ '<a href="https://www.sphinx-doc.org/">') }}
+{% endblock %}

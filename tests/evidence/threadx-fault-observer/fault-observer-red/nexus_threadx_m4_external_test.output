@@ -1,0 +1,43 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from ThreadXM4External
+[ RUN      ] ThreadXM4External.ActualExternalHookLeavesSysTickAndOtherPrioritiesOwned
+[       OK ] ThreadXM4External.ActualExternalHookLeavesSysTickAndOtherPrioritiesOwned (0 ms)
+[ RUN      ] ThreadXM4External.TimerSetupFailureCallsRetainingProductFailStop
+[       OK ] ThreadXM4External.TimerSetupFailureCallsRetainingProductFailStop (0 ms)
+[ RUN      ] ThreadXM4External.ObserverPrecedesOverriddenTimerFailureHook
+unknown file: Failure
+
+Unexpected mock function call - returning directly.
+    Function call: Call(6)
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/threadx_m4_external_test.cpp:99: EXPECT_CALL(stopping, Call(NX_ERROR_IO))...
+         Expected: all pre-requisites are satisfied
+           Actual: the following immediate pre-requisites are not satisfied:
+/workspace/nexus/tests/google/threadx_m4_external_test.cpp:96: pre-requisite #0
+                   (end of pre-requisites)
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+/workspace/nexus/tests/google/threadx_m4_external_test.cpp:96: Failure
+Actual function call count doesn't match EXPECT_CALL(observing, Call(NX_FAULT_THREADX_ADAPTER, NX_ERROR_IO, ::testing::HasSubstr("m4.c"), ::testing::Gt(0U)))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+/workspace/nexus/tests/google/threadx_m4_external_test.cpp:99: Failure
+Actual function call count doesn't match EXPECT_CALL(stopping, Call(NX_ERROR_IO))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+
+[  FAILED  ] ThreadXM4External.ObserverPrecedesOverriddenTimerFailureHook (0 ms)
+[----------] 3 tests from ThreadXM4External (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 2 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] ThreadXM4External.ObserverPrecedesOverriddenTimerFailureHook
+
+ 1 FAILED TEST

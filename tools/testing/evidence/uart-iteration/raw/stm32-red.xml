@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="2" failures="2" disabled="0" errors="0" time="0." timestamp="2026-10-11T15:58:22.790" name="AllTests">
+  <testsuite name="Stm32UartReceive" tests="2" failures="2" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T15:58:22.790">
+    <testcase name="StartProgramsCallerBufferWithoutCpuPayloadCopy" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="66" status="run" result="completed" time="0." timestamp="2026-10-11T15:58:22.790" classname="Stm32UartReceive">
+      <failure message="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:67&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_rx_start(&amp;port, &amp;stream)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:67
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="InvalidFutureBufferRejectsWithoutLoanOrMmioEffect" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="77" status="run" result="completed" time="0." timestamp="2026-10-11T15:58:22.791" classname="Stm32UartReceive">
+      <failure message="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:79&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_rx_start(&amp;port, &amp;stream)&#x0A;    Which is: 7&#x0A;  NX_ERROR_PERMISSION&#x0A;    Which is: 10&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_uart_receive_test.cpp:79
+Expected equality of these values:
+  nx_uart_port_rx_start(&port, &stream)
+    Which is: 7
+  NX_ERROR_PERMISSION
+    Which is: 10
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

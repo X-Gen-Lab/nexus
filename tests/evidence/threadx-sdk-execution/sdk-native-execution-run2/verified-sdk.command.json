@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-B",
+    "/workspace/nexus-threadx-probe/sdk-native-package-run2/share/nexus/src/cmake/package/package_source_sdk.py",
+    "--verify",
+    "/workspace/nexus-threadx-probe/sdk-native-package-run2/share/nexus/src"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

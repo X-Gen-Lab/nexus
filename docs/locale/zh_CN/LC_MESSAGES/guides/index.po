@@ -1,0 +1,22 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 1d1967bcdbbd6c04486b2fc3c54261a071713a78810560d371b05100247f8fed\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/guides/index.md:8
+msgid "Task guides"
+msgstr "操作指南"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/guides/index.md:10
+msgid ""
+"Each guide defines inputs, ownership, rejection and an observable result. "
+"Hardware commands require an actual connected station; the documentation "
+"build does not access hardware."
+msgstr "每份指南说明输入、所有权、拒绝条件和可观察结果。执行硬件命令需要实际连接的工装；文档构建不访问硬件。"

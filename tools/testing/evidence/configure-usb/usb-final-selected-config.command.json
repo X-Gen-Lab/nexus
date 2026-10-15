@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/workspace/nexus/.venv/bin/python",
+    "-m",
+    "unittest",
+    "tools.configure.test_usb_device",
+    "tools.configure.test_kernel_assembly",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "env": {
+    "PATH": "/workspace/nexus/.venv/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback"
+  },
+  "returncode": 0,
+  "log": "/workspace/nexus-config-iteration-evidence/usb-final-selected-config.log",
+  "sha256": "3efcdaea120141aa3826e0cb7fd1734c40788f3aa3a9c4a43f78d76a60134b48"
+}

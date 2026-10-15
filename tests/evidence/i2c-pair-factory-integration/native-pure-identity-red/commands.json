@@ -1,0 +1,53 @@
+[
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-g474-iteration-evidence/host-build",
+      "--target",
+      "nexus_native_factory_test",
+      "--parallel",
+      "1"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751259815000188,
+    "completed_ns": 1791751264405616424,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-pure-identity-red/build.output",
+      "sha256": "e23c3e3df133350fe6cfef73dac1ab260d1b452cc720a571c710d8d9f969d894",
+      "bytes": 1819
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_native_factory_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "return_code": 0,
+    "started_ns": 1791751264421926122,
+    "completed_ns": 1791751264425634495,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-pure-identity-red/nexus_native_factory_test-discovery.output",
+      "sha256": "dd47f5921d6a07184648a1ae5fa56040a30c7ba2edfe39bae9af3d9609f8b03e",
+      "bytes": 585
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_native_factory_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/native-pure-identity-red/nexus_native_factory_test.xml"
+    ],
+    "return_code": 1,
+    "started_ns": 1791751264426008240,
+    "completed_ns": 1791751264429592770,
+    "output": {
+      "path": "/workspace/nexus-i2c-pair-iteration-evidence/native-pure-identity-red/nexus_native_factory_test-execution.output",
+      "sha256": "3ebbaaa8079b8841e67fc4c90388afad2664fa48442e1150bcb2b46f5b62cb7a",
+      "bytes": 3752
+    }
+  }
+]

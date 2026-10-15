@@ -1,0 +1,33 @@
+test_actual_selected_timer_faces_use_real_public_types (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_actual_selected_timer_faces_use_real_public_types) ... ok
+test_conflicting_macro_identity_and_escaped_template_fail_closed (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_conflicting_macro_identity_and_escaped_template_fail_closed) ... ok
+test_literal_specialization_binds_actual_const_table_only (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_literal_specialization_binds_actual_const_table_only) ... ok
+test_macro_mentions_without_actual_table_definition_are_rejected (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_macro_mentions_without_actual_table_definition_are_rejected) ... ok
+test_real_four_timer_tables_are_derived_from_the_selected_source (tools.configure.test_timer_capabilities.TimerCapabilityObserverTests.test_real_four_timer_tables_are_derived_from_the_selected_source) ... ok
+test_agent_policy_cannot_fabricate_codeowners (tools.testing.test_maintenance.AgentMaintenanceTests.test_agent_policy_cannot_fabricate_codeowners) ... ok
+test_agent_policy_requires_real_execution_gate_names (tools.testing.test_maintenance.AgentMaintenanceTests.test_agent_policy_requires_real_execution_gate_names) ... ok
+test_agent_responsibilities_do_not_require_named_people (tools.testing.test_maintenance.AgentMaintenanceTests.test_agent_responsibilities_do_not_require_named_people) ... ok
+test_checked_document_matches_facts_and_selected_implementation (tools.testing.test_maintenance.CapabilityDocumentationTests.test_checked_document_matches_facts_and_selected_implementation) ... ERROR
+test_current_matrix_uses_actual_resolver_and_preserves_scope (tools.testing.test_maintenance.CapabilityDocumentationTests.test_current_matrix_uses_actual_resolver_and_preserves_scope) ... ok
+test_generated_block_requires_exact_content_and_single_markers (tools.testing.test_maintenance.CapabilityDocumentationTests.test_generated_block_requires_exact_content_and_single_markers) ... ok
+test_ops_evidence_ignores_comments_and_strings (tools.testing.test_maintenance.CapabilityDocumentationTests.test_ops_evidence_ignores_comments_and_strings) ... ok
+test_assigned_team_generates_complete_review_output (tools.testing.test_maintenance.ReviewOwnershipTests.test_assigned_team_generates_complete_review_output) ... ok
+test_cli_rejects_duplicate_json_keys_without_publication (tools.testing.test_maintenance.ReviewOwnershipTests.test_cli_rejects_duplicate_json_keys_without_publication) ... ok
+test_invalid_assignments_are_rejected (tools.testing.test_maintenance.ReviewOwnershipTests.test_invalid_assignments_are_rejected) ... ok
+test_malformed_lists_and_conflicting_paths_are_rejected (tools.testing.test_maintenance.ReviewOwnershipTests.test_malformed_lists_and_conflicting_paths_are_rejected) ... ok
+test_pending_team_cannot_publish_an_ownership_file (tools.testing.test_maintenance.ReviewOwnershipTests.test_pending_team_cannot_publish_an_ownership_file) ... ok
+test_template_is_valid_but_not_an_assigned_team (tools.testing.test_maintenance.ReviewOwnershipTests.test_template_is_valid_but_not_an_assigned_team) ... ok
+
+======================================================================
+ERROR: test_checked_document_matches_facts_and_selected_implementation (tools.testing.test_maintenance.CapabilityDocumentationTests.test_checked_document_matches_facts_and_selected_implementation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_maintenance.py", line 55, in test_checked_document_matches_facts_and_selected_implementation
+    capabilities.check_block(document, expected)
+  File "/workspace/nexus/tools/maintenance/capabilities.py", line 194, in check_block
+    raise ValueError("Stale capability document; use --write to update")
+ValueError: Stale capability document; use --write to update
+
+----------------------------------------------------------------------
+Ran 18 tests in 4.810s
+
+FAILED (errors=1)

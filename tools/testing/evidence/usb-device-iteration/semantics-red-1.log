@@ -1,0 +1,233 @@
+Running main() from gmock_main.cc
+[==========] Running 36 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 36 tests from UsbDevice
+[ RUN      ] UsbDevice.FifoWriteDoesNotCompleteHostAcknowledgement
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.FifoWriteDoesNotCompleteHostAcknowledgement (0 ms)
+[ RUN      ] UsbDevice.ShortOutCompletesOnlyAfterDataAndTransferFacts
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.ShortOutCompletesOnlyAfterDataAndTransferFacts (0 ms)
+[ RUN      ] UsbDevice.OutOverflowCannotWriteBeyondCallerCapacity
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.OutOverflowCannotWriteBeyondCallerCapacity (0 ms)
+[ RUN      ] UsbDevice.FailedDisableKeepsRequestBorrowedThroughDrainDeadline
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.FailedDisableKeepsRequestBorrowedThroughDrainDeadline (0 ms)
+[ RUN      ] UsbDevice.FifoFlushFailureCannotSettleDisabledEndpoint
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.FifoFlushFailureCannotSettleDisabledEndpoint (0 ms)
+[ RUN      ] UsbDevice.StopCannotReleaseWakeOrClockWithAnEnabledIrq
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.StopCannotReleaseWakeOrClockWithAnEnabledIrq (0 ms)
+[ RUN      ] UsbDevice.NewSetupInvalidatesOldControlBeforeReusingStorage
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.NewSetupInvalidatesOldControlBeforeReusingStorage (0 ms)
+[ RUN      ] UsbDevice.AddressChangesOnlyAfterMatchingStatusInAcknowledgement
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.AddressChangesOnlyAfterMatchingStatusInAcknowledgement (0 ms)
+[ RUN      ] UsbDevice.ResetDoesNotRevokeAnUnprovedEndpointLoan
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.ResetDoesNotRevokeAnUnprovedEndpointLoan (0 ms)
+[ RUN      ] UsbDevice.StaleCompletionCannotFinishANewRequestEpoch
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.StaleCompletionCannotFinishANewRequestEpoch (0 ms)
+[ RUN      ] UsbDevice.IllegalPacketAndIncomingMaskRejectWithNoBorrow
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.IllegalPacketAndIncomingMaskRejectWithNoBorrow (0 ms)
+[ RUN      ] UsbDevice.StallRequiresIdleAndClearResetsBulkDataPid
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.StallRequiresIdleAndClearResetsBulkDataPid (0 ms)
+[ RUN      ] UsbDevice.FullEventsPreserveAuthoritativeLatestSetup
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.FullEventsPreserveAuthoritativeLatestSetup (0 ms)
+[ RUN      ] UsbDevice.SubsequentControlDataPacketsPreserveTheHardwarePidToggle
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.SubsequentControlDataPacketsPreserveTheHardwarePidToggle (0 ms)
+[ RUN      ] UsbDevice.SetupPhaseInterruptDoesNotBlockTheFollowingStatusOut
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.SetupPhaseInterruptDoesNotBlockTheFollowingStatusOut (0 ms)
+[ RUN      ] UsbDevice.ResetIrqDoesNotUseTheColdUnboundedAcknowledgementLoop
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.ResetIrqDoesNotUseTheColdUnboundedAcknowledgementLoop (0 ms)
+[ RUN      ] UsbDevice.EnumerationDoneIsAcknowledgedFromTheObservedSpeedFact
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.EnumerationDoneIsAcknowledgedFromTheObservedSpeedFact (0 ms)
+[ RUN      ] UsbDevice.OutCompletionWaitsForTheBoundedRxHeaderToBeConsumed
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.OutCompletionWaitsForTheBoundedRxHeaderToBeConsumed (0 ms)
+[ RUN      ] UsbDevice.PacketBuffersCannotAliasTheClockConsumerControl
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.PacketBuffersCannotAliasTheClockConsumerControl (0 ms)
+[ RUN      ] UsbDevice.RestartDoesNotReuseAnEarlierControlEpoch
+/workspace/nexus/tests/google/usb_device_test.cpp:291: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.RestartDoesNotReuseAnEarlierControlEpoch (0 ms)
+[ RUN      ] UsbDevice.CancellingOutRestoresPeerAdmissionAfterActualDrain
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.CancellingOutRestoresPeerAdmissionAfterActualDrain (0 ms)
+[ RUN      ] UsbDevice.UnknownNonControlOutEnableCannotBeOverwrittenAtAdmission
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.UnknownNonControlOutEnableCannotBeOverwrittenAtAdmission (0 ms)
+[ RUN      ] UsbDevice.PendingResetAtGlobalEnableRemainsObservableAfterColdStart
+/workspace/nexus/tests/google/usb_device_test.cpp:313: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/usb_device_test.cpp:64: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UsbDevice.PendingResetAtGlobalEnableRemainsObservableAfterColdStart (0 ms)
+[ RUN      ] UsbDevice.StopAndDetachJoinTheInFlightWakePublisher
+/workspace/nexus/tests/google/usb_device_test.cpp:361: Failure
+Expected equality of these values:
+  nx_usb_device_stop(&device)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+

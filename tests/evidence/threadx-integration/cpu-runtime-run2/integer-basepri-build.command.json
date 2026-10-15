@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "command": [
+    "cmake",
+    "--build",
+    "/workspace/nexus-threadx-probe/cpu2-integer-basepri",
+    "--target",
+    "threadx_cpu",
+    "--parallel",
+    "1"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

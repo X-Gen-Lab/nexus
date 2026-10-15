@@ -1,0 +1,39 @@
+....F.F
+======================================================================
+FAIL: test_runtime_facts_parent_symlink_is_rejected (test_documentation.DocumentationConfigurationTests.test_runtime_facts_parent_symlink_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/documentation.py", line 86, in check_document
+    result = runtime.resolve(assembly)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/runtime.py", line 73, in resolve
+    _fields(facts, {"schema_version", "cpu", "irq", "clock_hz"}, "CPU package")
+  File "/workspace/nexus/tools/configure/runtime.py", line 54, in _fields
+    raise RuntimeError(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+tools.configure.runtime.RuntimeError: CPU package: missing ['clock_hz', 'cpu', 'irq', 'schema_version'], unknown []
+
+The above exception was the direct cause of the following exception:
+
+ValueError: TOML documentation rejected at /tmp/tmpl1dxmv4g/example.md:1: CPU package: missing ['clock_hz', 'cpu', 'irq', 'schema_version'], unknown []
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_documentation.py", line 75, in test_runtime_facts_parent_symlink_is_rejected
+    with self.assertRaisesRegex(ValueError, "symlink"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "symlink" does not match "TOML documentation rejected at /tmp/tmpl1dxmv4g/example.md:1: CPU package: missing ['clock_hz', 'cpu', 'irq', 'schema_version'], unknown []"
+
+======================================================================
+FAIL: test_unterminated_toml_fence_cannot_disappear_from_the_gate (test_documentation.DocumentationConfigurationTests.test_unterminated_toml_fence_cannot_disappear_from_the_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_documentation.py", line 66, in test_unterminated_toml_fence_cannot_disappear_from_the_gate
+    with self.assertRaisesRegex(ValueError, "unterminated"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.006s
+
+FAILED (failures=2)

@@ -1,0 +1,145 @@
+test_consumer_uses_authored_toml_for_each_maintained_family (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_consumer_uses_authored_toml_for_each_maintained_family) ... FAIL
+test_test_framework_payload_is_not_a_firmware_sdk_dependency (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) ... 
+  test_test_framework_payload_is_not_a_firmware_sdk_dependency (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) (name='dependencies/source/googletest-1.16.0.tar.gz') ... FAIL
+  test_test_framework_payload_is_not_a_firmware_sdk_dependency (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) (name='dependencies/source/googletest-LICENSE.txt') ... FAIL
+test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) ... 
+  test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=[]) ... FAIL
+  test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=['physical pending']) ... FAIL
+  test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=[{'id': 'latency', 'fixture': 'logic analyzer', 'budget': -1, 'unit': 'us'}]) ... FAIL
+  test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=[{'id': 'latency', 'fixture': 'logic analyzer', 'budget': nan, 'unit': 'us'}]) ... FAIL
+  test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=[{'id': 'latency', 'fixture': '', 'budget': None, 'unit': 'us'}]) ... FAIL
+  test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=[{'id': 'irq_preemption', 'fixture': 'synthetic timing plan only', 'budget': None, 'unit': 'us'}, {'id': 'irq_preemption', 'fixture': 'synthetic timing plan only', 'budget': None, 'unit': 'us'}]) ... FAIL
+test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) ... 
+  test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) (key='baudrate') ... FAIL
+  test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) (key='tx') ... FAIL
+  test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) (key='rx') ... FAIL
+  test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) (key='controller') ... FAIL
+test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) ... FAIL
+
+======================================================================
+FAIL: test_consumer_uses_authored_toml_for_each_maintained_family (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_consumer_uses_authored_toml_for_each_maintained_family)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 39, in test_consumer_uses_authored_toml_for_each_maintained_family
+    self.assertTrue(assembly.endswith(".toml"), assembly)
+AssertionError: False is not true : -DNEXUS_ASSEMBLY_FILE=/tmp/SDK consumer inputs w16eyyhw/prefix/share/nexus/src/tools/configure/assemblies/native.json
+
+======================================================================
+FAIL: test_test_framework_payload_is_not_a_firmware_sdk_dependency (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) (name='dependencies/source/googletest-1.16.0.tar.gz')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 23, in test_test_framework_payload_is_not_a_firmware_sdk_dependency
+    self.assertFalse(source_sdk.selected(name))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_test_framework_payload_is_not_a_firmware_sdk_dependency (tests.contracts.test_source_sdk.SourceSDKSelectionTests.test_test_framework_payload_is_not_a_firmware_sdk_dependency) (name='dependencies/source/googletest-LICENSE.txt')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 23, in test_test_framework_payload_is_not_a_firmware_sdk_dependency
+    self.assertFalse(source_sdk.selected(name))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=[])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 96, in test_pending_physical_scope_is_strict_and_unique
+    with self.subTest(pending=pending), self.assertRaises(EvidenceError):
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=['physical pending'])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 96, in test_pending_physical_scope_is_strict_and_unique
+    with self.subTest(pending=pending), self.assertRaises(EvidenceError):
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=[{'id': 'latency', 'fixture': 'logic analyzer', 'budget': -1, 'unit': 'us'}])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 96, in test_pending_physical_scope_is_strict_and_unique
+    with self.subTest(pending=pending), self.assertRaises(EvidenceError):
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=[{'id': 'latency', 'fixture': 'logic analyzer', 'budget': nan, 'unit': 'us'}])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 96, in test_pending_physical_scope_is_strict_and_unique
+    with self.subTest(pending=pending), self.assertRaises(EvidenceError):
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=[{'id': 'latency', 'fixture': '', 'budget': None, 'unit': 'us'}])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 96, in test_pending_physical_scope_is_strict_and_unique
+    with self.subTest(pending=pending), self.assertRaises(EvidenceError):
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_pending_physical_scope_is_strict_and_unique (tests.contracts.test_hil_admission.HilAdmissionTests.test_pending_physical_scope_is_strict_and_unique) (pending=[{'id': 'irq_preemption', 'fixture': 'synthetic timing plan only', 'budget': None, 'unit': 'us'}, {'id': 'irq_preemption', 'fixture': 'synthetic timing plan only', 'budget': None, 'unit': 'us'}])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 96, in test_pending_physical_scope_is_strict_and_unique
+    with self.subTest(pending=pending), self.assertRaises(EvidenceError):
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) (key='baudrate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 104, in test_fixture_console_identity_and_probe_choices_are_strict
+    with self.subTest(key=key), self.assertRaises(EvidenceError):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) (key='tx')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 104, in test_fixture_console_identity_and_probe_choices_are_strict
+    with self.subTest(key=key), self.assertRaises(EvidenceError):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) (key='rx')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 104, in test_fixture_console_identity_and_probe_choices_are_strict
+    with self.subTest(key=key), self.assertRaises(EvidenceError):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict) (key='controller')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 104, in test_fixture_console_identity_and_probe_choices_are_strict
+    with self.subTest(key=key), self.assertRaises(EvidenceError):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_fixture_console_identity_and_probe_choices_are_strict (tests.contracts.test_hil_admission.HilAdmissionTests.test_fixture_console_identity_and_probe_choices_are_strict)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_admission.py", line 108, in test_fixture_console_identity_and_probe_choices_are_strict
+    with self.assertRaises(EvidenceError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.003s
+
+FAILED (failures=14)

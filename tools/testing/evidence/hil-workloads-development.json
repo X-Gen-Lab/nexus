@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "kind": "hil_workload_development",
+  "status": "passed",
+  "physical_status": "not_executed",
+  "scope": "Thirty host Python cases; no equipment or physical HIL executed",
+  "tdd": "Initial 24-case RED missing new module retained externally. Behavioral boundary RED ran 29 tests with 6 failing subcases; endurance RED ran 30 tests with 6 failing lower-bound subcases. No claim that every case had a behavioral RED.",
+  "records": [
+    {
+      "phase": "boundary-red",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tools.testing.test_hil_workloads"
+      ],
+      "started_utc": "2026-10-11T15:42:45.402827+00:00",
+      "finished_utc": "2026-10-11T15:42:45.563324+00:00",
+      "exit_code": 1,
+      "log": {
+        "path": "tools/testing/evidence/hil-workloads-boundary-red.log",
+        "sha256": "a4106639a615257184de163b2c5715edccd19fa2e767ddff6b7b96777e6a6f93",
+        "size": 10593
+      },
+      "physical_status": "not_executed"
+    },
+    {
+      "phase": "endurance-red",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tools.testing.test_hil_workloads"
+      ],
+      "started_utc": "2026-10-11T15:45:23.272543+00:00",
+      "finished_utc": "2026-10-11T15:45:23.419295+00:00",
+      "exit_code": 1,
+      "log": {
+        "path": "tools/testing/evidence/hil-workloads-endurance-red.log",
+        "sha256": "476d315117c189df3e3190d1d5bd3fe9bc6a3fb7ac41feb761e6a3029f20fd2a",
+        "size": 11460
+      },
+      "physical_status": "not_executed"
+    },
+    {
+      "phase": "final-style-green",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tools.testing.test_hil_workloads"
+      ],
+      "started_utc": "2026-10-11T15:46:16.794311+00:00",
+      "finished_utc": "2026-10-11T15:46:16.933351+00:00",
+      "exit_code": 0,
+      "log": {
+        "path": "tools/testing/evidence/hil-workloads-final-style-green.log",
+        "sha256": "5b5984056a169fddab6d982d471c0670d983989c1e9c4176a154036afcc2283e",
+        "size": 5811
+      },
+      "executed_tests": 30,
+      "physical_status": "not_executed"
+    }
+  ],
+  "files": [
+    {
+      "path": "tools/hil/workloads.py",
+      "sha256": "0510ad54825b21ff88adf4fee5948483cbc3cee5c8319497b24d4d3b7483c90e",
+      "size": 17736
+    },
+    {
+      "path": "tools/testing/test_hil_workloads.py",
+      "sha256": "c768b9f119cdb121ee0e57ca085cc14bc67f14fccf665029cfec83e628c71495",
+      "size": 18713
+    },
+    {
+      "path": "tools/hil/templates/workload.json",
+      "sha256": "827634570c666616d044a8e07e133216c96c37d40cbec1b01e5a82b640652da5",
+      "size": 14067
+    }
+  ]
+}

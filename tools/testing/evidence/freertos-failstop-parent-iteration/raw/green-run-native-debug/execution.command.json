@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/tmp/nexus-freertos-failstop-iteration/green-native-debug/bin/nexus_freertos_failstop_test",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-freertos-failstop-iteration/green-run-native-debug/results.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0,
+  "timeout": false,
+  "outer_bound_seconds": 30,
+  "duration_seconds": 5.029889663972426,
+  "stdout": {
+    "path": "/workspace/nexus-freertos-failstop-iteration/green-run-native-debug/execution.stdout",
+    "sha256": "9ce18002df4bc5d8b0c12e73ef16e158c69de728465e61abf7aed459071a8b83",
+    "bytes": 1660
+  },
+  "stderr": {
+    "path": "/workspace/nexus-freertos-failstop-iteration/green-run-native-debug/execution.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  }
+}

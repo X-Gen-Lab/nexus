@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="18" failures="2" disabled="0" errors="0" time="0.001" timestamp="2026-10-11T19:58:56.848" name="AllTests">
+  <testsuite name="TimerFactory" tests="18" failures="2" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-10-11T19:58:56.848">
+    <testcase name="LookupIsPureBeforeAnyClockOrPinEffects" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="328" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.848" classname="TimerFactory" />
+    <testcase name="ActualPolicyAndStaticIrqContextsAreBound" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="335" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.848" classname="TimerFactory" />
+    <testcase name="FailedCaptureConstructorReleasesItsPartialSession" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="354" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.848" classname="TimerFactory" />
+    <testcase name="FailedAdvancedConstructorUnwindsAcquiredResources" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="367" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory" />
+    <testcase name="RefusedColdGateNeverBorrowsTimerOrPins" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="377" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory">
+      <failure message="unknown file&#x0A;&#x0A;Unexpected mock function call - taking default action specified at:&#x0A;/workspace/nexus/tests/google/timer_factory_test.cpp:291:&#x0A;    Function call: Configure(0, 8, &apos;\x2&apos; (2))&#x0A;          Returns: 0&#x0A;Google Mock tried the following 1 expectation, but it didn&apos;t match:&#x0A;&#x0A;/workspace/nexus/tests/google/timer_factory_test.cpp:380: EXPECT_CALL(ports, Configure(1U, 6U, _))...&#x0A;  Expected arg #0: is equal to 1&#x0A;           Actual: 0&#x0A;  Expected arg #1: is equal to 6&#x0A;           Actual: 8&#x0A;         Expected: to be never called&#x0A;           Actual: never called - saturated and active&#x0A;" type=""><![CDATA[unknown file
+
+Unexpected mock function call - taking default action specified at:
+/workspace/nexus/tests/google/timer_factory_test.cpp:291:
+    Function call: Configure(0, 8, '\x2' (2))
+          Returns: 0
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/timer_factory_test.cpp:380: EXPECT_CALL(ports, Configure(1U, 6U, _))...
+  Expected arg #0: is equal to 1
+           Actual: 0
+  Expected arg #1: is equal to 6
+           Actual: 8
+         Expected: to be never called
+           Actual: never called - saturated and active
+]]></failure>
+      <failure message="unknown file&#x0A;&#x0A;Unexpected mock function call - taking default action specified at:&#x0A;/workspace/nexus/tests/google/timer_factory_test.cpp:291:&#x0A;    Function call: Configure(1, 13, &apos;\x2&apos; (2))&#x0A;          Returns: 0&#x0A;Google Mock tried the following 1 expectation, but it didn&apos;t match:&#x0A;&#x0A;/workspace/nexus/tests/google/timer_factory_test.cpp:380: EXPECT_CALL(ports, Configure(1U, 6U, _))...&#x0A;  Expected arg #1: is equal to 6&#x0A;           Actual: 13&#x0A;         Expected: to be never called&#x0A;           Actual: never called - saturated and active&#x0A;" type=""><![CDATA[unknown file
+
+Unexpected mock function call - taking default action specified at:
+/workspace/nexus/tests/google/timer_factory_test.cpp:291:
+    Function call: Configure(1, 13, '\x2' (2))
+          Returns: 0
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/timer_factory_test.cpp:380: EXPECT_CALL(ports, Configure(1U, 6U, _))...
+  Expected arg #1: is equal to 6
+           Actual: 13
+         Expected: to be never called
+           Actual: never called - saturated and active
+]]></failure>
+      <failure message="unknown file&#x0A;&#x0A;Unexpected mock function call - taking default action specified at:&#x0A;/workspace/nexus/tests/google/timer_factory_test.cpp:291:&#x0A;    Function call: Configure(1, 12, &apos;\x2&apos; (2))&#x0A;          Returns: 0&#x0A;Google Mock tried the following 1 expectation, but it didn&apos;t match:&#x0A;&#x0A;/workspace/nexus/tests/google/timer_factory_test.cpp:380: EXPECT_CALL(ports, Configure(1U, 6U, _))...&#x0A;  Expected arg #1: is equal to 6&#x0A;           Actual: 12&#x0A;         Expected: to be never called&#x0A;           Actual: never called - saturated and active&#x0A;" type=""><![CDATA[unknown file
+
+Unexpected mock function call - taking default action specified at:
+/workspace/nexus/tests/google/timer_factory_test.cpp:291:
+    Function call: Configure(1, 12, '\x2' (2))
+          Returns: 0
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/timer_factory_test.cpp:380: EXPECT_CALL(ports, Configure(1U, 6U, _))...
+  Expected arg #1: is equal to 6
+           Actual: 12
+         Expected: to be never called
+           Actual: never called - saturated and active
+]]></failure>
+      <failure message="unknown file&#x0A;&#x0A;Unexpected mock function call - taking default action specified at:&#x0A;/workspace/nexus/tests/google/timer_factory_test.cpp:291:&#x0A;    Function call: Configure(1, 13, &apos;\x1&apos; (1))&#x0A;          Returns: 0&#x0A;Google Mock tried the following 1 expectation, but it didn&apos;t match:&#x0A;&#x0A;/workspace/nexus/tests/google/timer_factory_test.cpp:380: EXPECT_CALL(ports, Configure(1U, 6U, _))...&#x0A;  Expected arg #1: is equal to 6&#x0A;           Actual: 13&#x0A;         Expected: to be never called&#x0A;           Actual: never called - saturated and active&#x0A;" type=""><![CDATA[unknown file
+
+Unexpected mock function call - taking default action specified at:
+/workspace/nexus/tests/google/timer_factory_test.cpp:291:
+    Function call: Configure(1, 13, '\x1' (1))
+          Returns: 0
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/timer_factory_test.cpp:380: EXPECT_CALL(ports, Configure(1U, 6U, _))...
+  Expected arg #1: is equal to 6
+           Actual: 13
+         Expected: to be never called
+           Actual: never called - saturated and active
+]]></failure>
+      <failure message="unknown file&#x0A;&#x0A;Unexpected mock function call - taking default action specified at:&#x0A;/workspace/nexus/tests/google/timer_factory_test.cpp:291:&#x0A;    Function call: Configure(0, 8, &apos;\x1&apos; (1))&#x0A;          Returns: 0&#x0A;Google Mock tried the following 1 expectation, but it didn&apos;t match:&#x0A;&#x0A;/workspace/nexus/tests/google/timer_factory_test.cpp:380: EXPECT_CALL(ports, Configure(1U, 6U, _))...&#x0A;  Expected arg #0: is equal to 1&#x0A;           Actual: 0&#x0A;  Expected arg #1: is equal to 6&#x0A;           Actual: 8&#x0A;         Expected: to be never called&#x0A;           Actual: never called - saturated and active&#x0A;" type=""><![CDATA[unknown file
+
+Unexpected mock function call - taking default action specified at:
+/workspace/nexus/tests/google/timer_factory_test.cpp:291:
+    Function call: Configure(0, 8, '\x1' (1))
+          Returns: 0
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/timer_factory_test.cpp:380: EXPECT_CALL(ports, Configure(1U, 6U, _))...
+  Expected arg #0: is equal to 1
+           Actual: 0
+  Expected arg #1: is equal to 6
+           Actual: 8
+         Expected: to be never called
+           Actual: never called - saturated and active
+]]></failure>
+    </testcase>
+    <testcase name="ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="387" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory" />
+    <testcase name="ForeignEnabledVectorIsNeverDisabledByRejectedAcquisition" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="397" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory" />
+    <testcase name="RefusedIrqDisableRetainsPinsGatesAndProviderStorage" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="405" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory" />
+    <testcase name="ActivePublisherPreventsStorageReuseEvenAfterDisable" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="417" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory" />
+    <testcase name="RefusedPriorityRestorePreservesLeaseUntilRetry" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="426" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory" />
+    <testcase name="QueuedCaptureLoanBlocksPlatformClockAndPinRelease" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="436" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory" />
+    <testcase name="RefusedPeripheralDetachPreservesCaptureRing" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="449" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory" />
+    <testcase name="RefusedSafeOutputLatchDoesNotReleasePinOrClock" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="460" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory" />
+    <testcase name="AllInactiveOutputProofsPrecedeAnyPinRelease" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="471" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.849" classname="TimerFactory">
+      <failure message="/workspace/nexus/tests/google/timer_factory_test.cpp:481&#x0A;Mock function called more times than expected - returning directly.&#x0A;    Function call: Restore(1, 12)&#x0A;         Expected: to be never called&#x0A;           Actual: called once - over-saturated and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/timer_factory_test.cpp:481
+Mock function called more times than expected - returning directly.
+    Function call: Restore(1, 12)
+         Expected: to be never called
+           Actual: called once - over-saturated and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/timer_factory_test.cpp:482&#x0A;Mock function called more times than expected - returning directly.&#x0A;    Function call: Restore(1, 13)&#x0A;         Expected: to be never called&#x0A;           Actual: called once - over-saturated and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/timer_factory_test.cpp:482
+Mock function called more times than expected - returning directly.
+    Function call: Restore(1, 13)
+         Expected: to be never called
+           Actual: called once - over-saturated and active
+]]></failure>
+    </testcase>
+    <testcase name="RefusedOriginalPinRestoreRetainsColdLease" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="490" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.850" classname="TimerFactory" />
+    <testcase name="RefusedOwnedClockReleaseRetainsStopAndPreventsRestart" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="498" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.850" classname="TimerFactory" />
+    <testcase name="PreexistingClockAndUnrelatedGpioFieldsArePreserved" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="508" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.850" classname="TimerFactory" />
+    <testcase name="StopAndColdRestartReuseOnlyAProvedQuiescentSession" file="/workspace/nexus/tests/google/timer_factory_test.cpp" line="520" status="run" result="completed" time="0." timestamp="2026-10-11T19:58:56.850" classname="TimerFactory" />
+  </testsuite>
+</testsuites>

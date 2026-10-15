@@ -1,0 +1,671 @@
+Archive member included to satisfy reference by file (symbol)
+
+nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                              CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj (nx_platform_stop)
+nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                              CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj (nx_arch_irq_save)
+nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+                              nexus-sdk/lib/libnexus_platform.a(bindings.c.obj) (nx_stm32_timer_capture_ops)
+nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+                              nexus-sdk/lib/libnexus_platform.a(bindings.c.obj) (nx_stm32_gpio_clock_enable)
+nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+                              nexus-sdk/lib/libnexus_platform.a(bindings.c.obj) (nx_stm32_advanced_pwm_ops)
+nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+                              CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj (nx_timer_capture_start)
+nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+                              CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj (nx_advanced_pwm_set_duty)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+                              nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj) (memset)
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+                              CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj (__libc_init_array)
+
+Discarded input sections
+
+ .text          0x00000000       0x14 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+ .data          0x00000000        0x0 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+ .bss           0x00000000        0x0 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+ .text          0x00000000        0x0 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+ .data          0x00000000        0x0 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+ .bss           0x00000000        0x0 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+ .text          0x00000000        0x0 CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+ .data          0x00000000        0x0 CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+ .bss           0x00000000        0x0 CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_gpio
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_uart
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_spi
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_i2c
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_flash
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_watchdog
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_exti
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_pwm
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_adc
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_can
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_usb_device
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_eth
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_spi_device
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_i2c_device
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_usb_endpoint
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_mdio
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_gpio_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_uart_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_spi_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_i2c_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_flash_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_watchdog_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_exti_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_pwm_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_adc_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_can_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_usb_device_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_eth_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_timer_capture_capability
+                0x00000000       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_advanced_pwm_capability
+                0x00000000       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_spi_device_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_i2c_device_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_usb_endpoint_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text.nx_factory_mdio_capability
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.s_nx_capability_advanced_pwm_power
+                0x00000000       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.s_nx_capability_timer_capture_encoder
+                0x00000000       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.nx_binding_encoder
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.nx_binding_power
+                0x00000000        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .text.nx_arch_irq_masks
+                0x00000000       0x16 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .text.nx_arch_exception_number
+                0x00000000        0x6 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .text.nx_arch_dmb
+                0x00000000        0x6 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .text.nx_arch_isb
+                0x00000000        0x6 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .text.nx_arch_cycle_snapshot
+                0x00000000       0x40 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .text.nx_stm32_gpio_write
+                0x00000000       0x30 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .text.nx_stm32_gpio_read
+                0x00000000       0x1a nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .text.nx_stm32_gpio_toggle
+                0x00000000       0x2a nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .text.nx_stm32_gpio_initialize
+                0x00000000       0x70 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .text.nx_stm32_uart1_pins_prepare
+                0x00000000       0x74 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .text.nx_stm32_gpio_stop
+                0x00000000       0x32 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .rodata.nx_stm32_gpio_ops
+                0x00000000        0xc nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+ .text          0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+ .data          0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+ .bss           0x00000000        0x0 nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+ .text          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .text          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+ .data          0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+ .bss           0x00000000        0x0 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         xr
+RAM              0x20000000         0x00020000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+LOAD CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+LOAD CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+LOAD nexus-sdk/lib/libnexus_platform.a
+LOAD nexus-sdk/lib/libnexus_arch.a
+LOAD nexus-sdk/lib/libnexus_os_baremetal.a
+LOAD nexus-sdk/lib/libnexus_soc_stm32f407.a
+LOAD nexus-sdk/lib/libnexus_io.a
+LOAD nexus-sdk/lib/libnexus_arch.a
+LOAD nexus-sdk/lib/libnexus_os_wait.a
+LOAD nexus-sdk/lib/libnexus_core.a
+START GROUP
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+END GROUP
+START GROUP
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a
+END GROUP
+START GROUP
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+LOAD /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a
+END GROUP
+                0x08000000                        __nx_flash_start = ORIGIN (FLASH)
+                0x08080000                        __nx_flash_end = (ORIGIN (FLASH) + LENGTH (FLASH))
+                0x20020000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+                0x20020000                        _sp = _estack
+                0x00000800                        _Min_Stack_Size = 0x800
+                0x00000000                        _Min_Heap_Size = 0x0
+                0x2001f800                        __nx_msp_start = (_estack - _Min_Stack_Size)
+                0x20020000                        __nx_msp_end = _estack
+                0x1723da3b                        __nx_resolved_sha256_0 = 0x1723da3b
+                0x19d57b67                        __nx_resolved_sha256_1 = 0x19d57b67
+                0xf4aea1be                        __nx_resolved_sha256_2 = 0xf4aea1be
+                0xa06db69d                        __nx_resolved_sha256_3 = 0xa06db69d
+                0x255235cc                        __nx_resolved_sha256_4 = 0x255235cc
+                0x116aecb9                        __nx_resolved_sha256_5 = 0x116aecb9
+                0xa996f6a4                        __nx_resolved_sha256_6 = 0xa996f6a4
+                0xab6ac557                        __nx_resolved_sha256_7 = 0xab6ac557
+
+.isr_vector     0x08000000      0x188
+ *(.isr_vector)
+ .isr_vector    0x08000000      0x188 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+                0x08000000                g_pfnVectors
+ *(.vectors)
+
+.text           0x08000188     0x1cb0
+ *(.text*)
+ .text.Reset_Handler
+                0x08000188       0x50 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+                0x08000188                Reset_Handler
+ .text.Default_Handler
+                0x080001d8        0x2 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+                0x080001d8                RTC_Alarm_IRQHandler
+                0x080001d8                HASH_RNG_IRQHandler
+                0x080001d8                EXTI2_IRQHandler
+                0x080001d8                TIM8_CC_IRQHandler
+                0x080001d8                DebugMon_Handler
+                0x080001d8                TIM1_CC_IRQHandler
+                0x080001d8                DMA2_Stream5_IRQHandler
+                0x080001d8                HardFault_Handler
+                0x080001d8                DMA1_Stream5_IRQHandler
+                0x080001d8                SysTick_Handler
+                0x080001d8                PVD_IRQHandler
+                0x080001d8                SDIO_IRQHandler
+                0x080001d8                TAMP_STAMP_IRQHandler
+                0x080001d8                PendSV_Handler
+                0x080001d8                NMI_Handler
+                0x080001d8                CAN2_RX1_IRQHandler
+                0x080001d8                EXTI3_IRQHandler
+                0x080001d8                TIM8_TRG_COM_TIM14_IRQHandler
+                0x080001d8                TIM1_UP_TIM10_IRQHandler
+                0x080001d8                TIM8_UP_TIM13_IRQHandler
+                0x080001d8                I2C3_ER_IRQHandler
+                0x080001d8                EXTI0_IRQHandler
+                0x080001d8                I2C2_EV_IRQHandler
+                0x080001d8                DMA1_Stream2_IRQHandler
+                0x080001d8                CAN1_RX0_IRQHandler
+                0x080001d8                FPU_IRQHandler
+                0x080001d8                OTG_HS_WKUP_IRQHandler
+                0x080001d8                UsageFault_Handler
+                0x080001d8                CAN2_SCE_IRQHandler
+                0x080001d8                DMA2_Stream2_IRQHandler
+                0x080001d8                SPI1_IRQHandler
+                0x080001d8                TIM6_DAC_IRQHandler
+                0x080001d8                DCMI_IRQHandler
+                0x080001d8                CAN2_RX0_IRQHandler
+                0x080001d8                DMA2_Stream3_IRQHandler
+                0x080001d8                USART6_IRQHandler
+                0x080001d8                USART3_IRQHandler
+                0x080001d8                CAN1_RX1_IRQHandler
+                0x080001d8                UART5_IRQHandler
+                0x080001d8                DMA2_Stream0_IRQHandler
+                0x080001d8                I2C1_EV_IRQHandler
+                0x080001d8                DMA1_Stream6_IRQHandler
+                0x080001d8                DMA1_Stream1_IRQHandler
+                0x080001d8                UART4_IRQHandler
+                0x080001d8                TIM3_IRQHandler
+                0x080001d8                RCC_IRQHandler
+                0x080001d8                TIM8_BRK_TIM12_IRQHandler
+                0x080001d8                Default_Handler
+                0x080001d8                EXTI15_10_IRQHandler
+                0x080001d8                ADC_IRQHandler
+                0x080001d8                DMA1_Stream7_IRQHandler
+                0x080001d8                TIM7_IRQHandler
+                0x080001d8                CAN2_TX_IRQHandler
+                0x080001d8                TIM5_IRQHandler
+                0x080001d8                DMA2_Stream7_IRQHandler
+                0x080001d8                I2C3_EV_IRQHandler
+                0x080001d8                EXTI9_5_IRQHandler
+                0x080001d8                RTC_WKUP_IRQHandler
+                0x080001d8                ETH_WKUP_IRQHandler
+                0x080001d8                SPI2_IRQHandler
+                0x080001d8                OTG_HS_EP1_IN_IRQHandler
+                0x080001d8                MemManage_Handler
+                0x080001d8                DMA1_Stream0_IRQHandler
+                0x080001d8                CAN1_TX_IRQHandler
+                0x080001d8                SVC_Handler
+                0x080001d8                EXTI4_IRQHandler
+                0x080001d8                FSMC_IRQHandler
+                0x080001d8                ETH_IRQHandler
+                0x080001d8                OTG_HS_EP1_OUT_IRQHandler
+                0x080001d8                WWDG_IRQHandler
+                0x080001d8                OTG_FS_WKUP_IRQHandler
+                0x080001d8                TIM1_TRG_COM_TIM11_IRQHandler
+                0x080001d8                OTG_HS_IRQHandler
+                0x080001d8                EXTI1_IRQHandler
+                0x080001d8                USART2_IRQHandler
+                0x080001d8                I2C2_ER_IRQHandler
+                0x080001d8                DMA2_Stream1_IRQHandler
+                0x080001d8                CAN1_SCE_IRQHandler
+                0x080001d8                FLASH_IRQHandler
+                0x080001d8                DMA2_Stream4_IRQHandler
+                0x080001d8                BusFault_Handler
+                0x080001d8                USART1_IRQHandler
+                0x080001d8                OTG_FS_IRQHandler
+                0x080001d8                SPI3_IRQHandler
+                0x080001d8                DMA1_Stream4_IRQHandler
+                0x080001d8                I2C1_ER_IRQHandler
+                0x080001d8                DMA2_Stream6_IRQHandler
+                0x080001d8                DMA1_Stream3_IRQHandler
+ *fill*         0x080001da        0x2 
+ .text.restore_hsi
+                0x080001dc       0x78 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+ .text.SystemInit
+                0x08000254       0x60 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+                0x08000254                SystemInit
+ .text.nx_stm32_system_start
+                0x080002b4      0x160 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+                0x080002b4                nx_stm32_system_start
+ .text.nx_stm32_system_stop
+                0x08000414       0x58 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+                0x08000414                nx_stm32_system_stop
+ .text.nx_stm32_system_timer_irq
+                0x0800046c       0x1e CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+                0x0800046c                nx_stm32_system_timer_irq
+ *fill*         0x0800048a        0x2 
+ .text.TIM2_IRQHandler
+                0x0800048c        0xc CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+                0x0800048c                TIM2_IRQHandler
+ .text.nx_stm32_system_now
+                0x08000498       0x32 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+                0x08000498                nx_stm32_system_now
+ *fill*         0x080004ca        0x2 
+ .text.nx_time_now_us
+                0x080004cc        0xc CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+                0x080004cc                nx_time_now_us
+ .text.nx_stm32_validate_identity
+                0x080004d8       0x40 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+                0x080004d8                nx_stm32_validate_identity
+ .text.startup.main
+                0x08000518       0x74 CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+                0x08000518                main
+ .text._init    0x0800058c        0x2 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x0800058c                _init
+ .text._fini    0x0800058e        0x2 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x0800058e                _fini
+ .text.TIM1_BRK_TIM9_IRQHandler
+                0x08000590        0xc nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x08000590                TIM1_BRK_TIM9_IRQHandler
+ .text.TIM4_IRQHandler
+                0x0800059c        0xc nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x0800059c                TIM4_IRQHandler
+ .text.nx_platform_stop
+                0x080005a8      0x31c nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x080005a8                nx_platform_stop
+ .text.nx_platform_start
+                0x080008c4      0x374 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x080008c4                nx_platform_start
+ .text.nx_factory_timer_capture
+                0x08000c38       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x08000c38                nx_factory_timer_capture
+ .text.nx_factory_advanced_pwm
+                0x08000c48       0x10 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+                0x08000c48                nx_factory_advanced_pwm
+ .text.nx_arch_irq_save
+                0x08000c58       0x10 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000c58                nx_arch_irq_save
+ .text.nx_arch_irq_restore
+                0x08000c68        0xe nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000c68                nx_arch_irq_restore
+ .text.nx_arch_irq_is_masked
+                0x08000c76       0x20 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000c76                nx_arch_irq_is_masked
+ .text.nx_arch_is_privileged
+                0x08000c96       0x16 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000c96                nx_arch_is_privileged
+ .text.nx_arch_in_isr
+                0x08000cac        0xc nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000cac                nx_arch_in_isr
+ .text.nx_arch_dsb
+                0x08000cb8        0x6 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+                0x08000cb8                nx_arch_dsb
+ .text.capture_overlap
+                0x08000cbe       0x1e nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .text.capture_output
+                0x08000cdc       0x64 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .text.capture_context
+                0x08000d40       0x14 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .text.capture_start
+                0x08000d54      0x1b0 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .text.capture_stop
+                0x08000f04       0xb0 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .text.capture_state
+                0x08000fb4       0x4e nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .text.capture_read
+                0x08001002       0x5e nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .text.nx_stm32_timer_capture_initialize
+                0x08001060      0x18c nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+                0x08001060                nx_stm32_timer_capture_initialize
+ .text.nx_stm32_timer_capture_release
+                0x080011ec       0xa0 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+                0x080011ec                nx_stm32_timer_capture_release
+ .text.nx_stm32_timer_capture_irq
+                0x0800128c       0xc0 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+                0x0800128c                nx_stm32_timer_capture_irq
+ .text.nx_stm32_gpio_clock_enable
+                0x0800134c       0x34 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+                0x0800134c                nx_stm32_gpio_clock_enable
+ .text.nx_stm32_pin_configure
+                0x08001380       0x8a nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+                0x08001380                nx_stm32_pin_configure
+ .text.nx_stm32_pin_capture
+                0x0800140a       0x62 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+                0x0800140a                nx_stm32_pin_capture
+ .text.nx_stm32_pin_restore
+                0x0800146c       0x92 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+                0x0800146c                nx_stm32_pin_restore
+ .text.advanced_overlap
+                0x080014fe       0x1e nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .text.advanced_context
+                0x0800151c       0x14 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .text.deadtime_ticks
+                0x08001530       0x26 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ *fill*         0x08001556        0x2 
+ .text.advanced_duty
+                0x08001558       0x70 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .text.break_active.isra.0
+                0x080015c8       0x18 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .text.advanced_state
+                0x080015e0       0xbc nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .text.advanced_clear
+                0x0800169c       0x88 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .text.observe_break
+                0x08001724       0x38 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .text.advanced_stop
+                0x0800175c       0x9c nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .text.advanced_start
+                0x080017f8      0x1b4 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .text.nx_stm32_advanced_pwm_initialize
+                0x080019ac      0x1d4 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+                0x080019ac                nx_stm32_advanced_pwm_initialize
+ .text.nx_stm32_advanced_pwm_release
+                0x08001b80       0x78 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+                0x08001b80                nx_stm32_advanced_pwm_release
+ .text.nx_stm32_advanced_pwm_irq
+                0x08001bf8        0xc nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+                0x08001bf8                nx_stm32_advanced_pwm_irq
+ .text.output_valid
+                0x08001c04       0x2e nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+ .text.nx_timer_capture_start
+                0x08001c32       0x32 nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+                0x08001c32                nx_timer_capture_start
+ .text.nx_timer_capture_stop
+                0x08001c64       0x18 nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+                0x08001c64                nx_timer_capture_stop
+ .text.nx_timer_capture_read
+                0x08001c7c       0x2c nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+                0x08001c7c                nx_timer_capture_read
+ .text.nx_timer_capture_state
+                0x08001ca8       0x2c nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+                0x08001ca8                nx_timer_capture_state
+ .text.nx_advanced_pwm_set_duty
+                0x08001cd4       0x18 nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+                0x08001cd4                nx_advanced_pwm_set_duty
+ .text.nx_advanced_pwm_start
+                0x08001cec       0x18 nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+                0x08001cec                nx_advanced_pwm_start
+ .text.nx_advanced_pwm_stop
+                0x08001d04       0x18 nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+                0x08001d04                nx_advanced_pwm_stop
+ .text.nx_advanced_pwm_state
+                0x08001d1c       0x50 nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+                0x08001d1c                nx_advanced_pwm_state
+ .text.nx_advanced_pwm_clear_fault
+                0x08001d6c       0x18 nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+                0x08001d6c                nx_advanced_pwm_clear_fault
+ .text.memset   0x08001d84       0x10 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+                0x08001d84                memset
+ .text.__libc_init_array
+                0x08001d94       0x48 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+                0x08001d94                __libc_init_array
+ *(.rodata*)
+ .rodata.s_nx_timer_config_encoder
+                0x08001ddc        0xc nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.s_nx_face_encoder
+                0x08001de8        0x8 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.s_nx_timer_config_power
+                0x08001df0       0x1c nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.s_nx_face_power
+                0x08001e0c        0x8 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .rodata.nx_stm32_timer_capture_ops
+                0x08001e14       0x10 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+                0x08001e14                nx_stm32_timer_capture_ops
+ .rodata.nx_stm32_advanced_pwm_ops
+                0x08001e24       0x14 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+                0x08001e24                nx_stm32_advanced_pwm_ops
+ *(.init)
+ *(.fini)
+
+.glue_7         0x08001e38        0x0
+ .glue_7        0x08001e38        0x0 linker stubs
+
+.glue_7t        0x08001e38        0x0
+ .glue_7t       0x08001e38        0x0 linker stubs
+
+.vfp11_veneer   0x08001e38        0x0
+ .vfp11_veneer  0x08001e38        0x0 linker stubs
+
+.v4_bx          0x08001e38        0x0
+ .v4_bx         0x08001e38        0x0 linker stubs
+
+.iplt           0x08001e38        0x0
+ .iplt          0x08001e38        0x0 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+
+.rel.dyn        0x08001e38        0x0
+ .rel.iplt      0x08001e38        0x0 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+
+.ARM.extab
+ *(.ARM.extab*)
+
+.ARM.exidx      0x08001e38        0x0
+                0x08001e38                        __exidx_start = .
+ *(.ARM.exidx*)
+                0x08001e38                        __exidx_end = .
+
+.preinit_array  0x08001e38        0x0
+                0x08001e38                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array*)
+                0x08001e38                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x08001e38        0x0
+                0x08001e38                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_NAME(.init_array.*))
+ *(.init_array*)
+                0x08001e38                        PROVIDE (__init_array_end = .)
+
+.fini_array     0x08001e38        0x0
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_NAME(.fini_array.*))
+ *(.fini_array*)
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.nx_ccm_unselected
+ *(.nx_ccm_data .nx_ccm_data.*)
+ *(.bss.nx_ccm_noinit .bss.nx_ccm_noinit.*)
+ *(.bss.nx_ccm .bss.nx_ccm.*)
+                0x00000001                        ASSERT ((SIZEOF (.nx_ccm_unselected) == 0x0), memory region is not selected)
+                0x08001e38                        _sidata = LOADADDR (.data)
+
+.data           0x20000000       0x28 load address 0x08001e38
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data*)
+ .data.g_nx_stm32_system
+                0x20000000       0x28 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+                0x20000000                g_nx_stm32_system
+                0x20000028                        . = ALIGN (0x4)
+                0x20000028                        _edata = .
+
+.igot.plt       0x20000028        0x0 load address 0x08001e60
+ .igot.plt      0x20000028        0x0 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+
+.bss            0x20000028       0xd0
+                0x20000028                        . = ALIGN (0x4)
+                0x20000028                        _sbss = .
+ *(.bss*)
+ .bss.s_power   0x20000028       0x18 CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+ .bss.s_capture
+                0x20000040       0x10 CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+ .bss.s_event   0x20000050       0x10 CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+ .bss.s_ring    0x20000060       0x40 CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+ .bss.s_nx_timer_irq_leased_encoder
+                0x200000a0        0x1 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_timer_priority_saved_encoder
+                0x200000a1        0x1 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_timer_pin_leases_encoder
+                0x200000a2        0x1 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ *fill*         0x200000a3        0x1 
+ .bss.s_nx_timer_pin_saved_encoder
+                0x200000a4        0x2 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ *fill*         0x200000a6        0x2 
+ .bss.s_nx_timer_clock_added_encoder
+                0x200000a8        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_port_encoder
+                0x200000ac       0x24 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_timer_irq_leased_power
+                0x200000d0        0x1 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_timer_priority_saved_power
+                0x200000d1        0x1 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_timer_pin_leases_power
+                0x200000d2        0x1 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ *fill*         0x200000d3        0x1 
+ .bss.s_nx_timer_pin_saved_power
+                0x200000d4        0x6 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ *fill*         0x200000da        0x2 
+ .bss.s_nx_timer_clock_added_power
+                0x200000dc        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_port_power
+                0x200000e0        0xc nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_platform_gpio_clocks_added
+                0x200000ec        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_platform_initialized
+                0x200000f0        0x4 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .bss.s_nx_platform_started
+                0x200000f4        0x1 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ *(COMMON)
+                0x200000f8                        . = ALIGN (0x4)
+ *fill*         0x200000f5        0x3 
+                0x200000f8                        _ebss = .
+
+.reserved       0x200000f8        0x0
+                0x200000f8                        . = ALIGN (0x8)
+                0x200000f8                        __heap_start = .
+                0x200000f8                        __nx_heap_start = .
+                0x200000f8                        . = (. + _Min_Heap_Size)
+                0x200000f8                        __heap_end = .
+                0x200000f8                        __nx_heap_end = .
+
+.msp            0x2001f800      0x800
+                0x20020000                        . = (. + _Min_Stack_Size)
+ *fill*         0x2001f800      0x800 
+                [!provide]                        PROVIDE (end = _ebss)
+                [!provide]                        PROVIDE (_end = _ebss)
+                0x00000001                        ASSERT (((_ebss + _Min_Heap_Size) <= (_estack - _Min_Stack_Size)), RAM stack/heap overlap)
+OUTPUT(bin/timer_controller_fixture.elf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x35
+ .ARM.attributes
+                0x00000000       0x21 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+ .ARM.attributes
+                0x00000021       0x34 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+ .ARM.attributes
+                0x00000055       0x34 CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+ .ARM.attributes
+                0x00000089       0x34 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .ARM.attributes
+                0x000000bd       0x34 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .ARM.attributes
+                0x000000f1       0x34 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .ARM.attributes
+                0x00000125       0x34 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .ARM.attributes
+                0x00000159       0x34 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .ARM.attributes
+                0x0000018d       0x34 nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+ .ARM.attributes
+                0x000001c1       0x34 nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+ .ARM.attributes
+                0x000001f5       0x34 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .ARM.attributes
+                0x00000229       0x34 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)
+
+.comment        0x00000000       0x46
+ .comment       0x00000000       0x46 CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+                                 0x47 (size before relaxing)
+ .comment       0x00000046       0x47 CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_platform.a(bindings.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_arch.a(nx_arch_cortex_m.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_soc_stm32f407.a(timer_capture.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_soc_stm32f407.a(gpio.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_soc_stm32f407.a(advanced_pwm.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_io.a(timer_capture.c.obj)
+ .comment       0x00000046       0x47 nexus-sdk/lib/libnexus_io.a(advanced_pwm.c.obj)
+
+.debug_frame    0x00000000       0x4c
+ .debug_frame   0x00000000       0x20 /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-memset.o)
+ .debug_frame   0x00000020       0x2c /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/14.3.1/../../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a(libc_a-init.o)

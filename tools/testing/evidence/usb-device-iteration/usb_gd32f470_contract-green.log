@@ -1,0 +1,19 @@
+Running main() from gmock_main.cc
+[==========] Running 5 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 5 tests from UsbSoc
+[ RUN      ] UsbSoc.RealRegisterFactsAndClockConsumerSurviveUntilDetach
+[       OK ] UsbSoc.RealRegisterFactsAndClockConsumerSurviveUntilDetach (0 ms)
+[ RUN      ] UsbSoc.ActualSdkEndpointOffsetWritesPioAndWaitsForHostXfrc
+[       OK ] UsbSoc.ActualSdkEndpointOffsetWritesPioAndWaitsForHostXfrc (0 ms)
+[ RUN      ] UsbSoc.FalseCpuFactsRejectBeforeBorrowingTheClock
+[       OK ] UsbSoc.FalseCpuFactsRejectBeforeBorrowingTheClock (0 ms)
+[ RUN      ] UsbSoc.ForeignCoreIsNotReboundOrReset
+[       OK ] UsbSoc.ForeignCoreIsNotReboundOrReset (0 ms)
+[ RUN      ] UsbSoc.FailedCoreResetKeepsClockAndOwnerStorage
+[       OK ] UsbSoc.FailedCoreResetKeepsClockAndOwnerStorage (0 ms)
+[----------] 5 tests from UsbSoc (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 5 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 5 tests.

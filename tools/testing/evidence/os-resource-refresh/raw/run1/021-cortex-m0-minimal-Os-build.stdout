@@ -1,0 +1,51 @@
+[1/51] Building C object nexus-runtime/core/CMakeFiles/nexus_core.dir/src/time.c.obj
+[2/51] Building C object nexus-runtime/core/CMakeFiles/nexus_core.dir/src/request.c.obj
+[3/51] Building C object nexus-runtime/core/CMakeFiles/nexus_core.dir/src/stack_observation.c.obj
+[4/51] Building C object nexus-runtime/core/CMakeFiles/nexus_core.dir/src/fault.c.obj
+[5/51] Building C object nexus-runtime/core/CMakeFiles/nexus_core.dir/src/request_observer.c.obj
+[6/51] Linking C static library nexus-runtime/core/libnexus_core.a
+[7/51] Building C object nexus-runtime/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cortex_m.c.obj
+[8/51] Building C object nexus-runtime/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.obj
+[9/51] Building C object nexus-runtime/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.obj
+[10/51] Building C object nexus-runtime/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.obj
+[11/51] Building C object nexus-runtime/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.obj
+[12/51] Building C object nexus-runtime/os/CMakeFiles/nexus_os_wait.dir/wait.c.obj
+[13/51] Building C object nexus-runtime/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/queue.c.obj
+[14/51] Building C object nexus-runtime/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/tasks.c.obj
+[15/51] Building C object nexus-runtime/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/list.c.obj
+[16/51] Building C object nexus-runtime/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/portable/GCC/ARM_CM0/port.c.obj
+[17/51] Building C object nexus-runtime/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/portable/GCC/ARM_CM0/portasm.c.obj
+[18/51] Linking C static library nexus-runtime/arch/libnexus_arch.a
+[19/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/gpio.c.obj
+[20/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/uart.c.obj
+[21/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/spi.c.obj
+[22/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/flash.c.obj
+[23/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/watchdog.c.obj
+[24/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/i2c.c.obj
+[25/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/exti.c.obj
+[26/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/timer.c.obj
+[27/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/flash_region.c.obj
+[28/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/adc.c.obj
+[29/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/dma.c.obj
+[30/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/wake.c.obj
+[31/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/stream.c.obj
+[32/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.obj
+[33/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/adc_observer.c.obj
+[34/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.obj
+[35/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/stream_budget.c.obj
+[36/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/can.c.obj
+[37/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/ethernet.c.obj
+[38/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/mdio.c.obj
+[39/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/timer_capture.c.obj
+[40/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/usb_device.c.obj
+[41/51] Linking C static library nexus-runtime/os/libnexus_os_wait.a
+[42/51] Linking C static library nexus-runtime/os/freertos/libnx_freertos_kernel.a
+[43/51] Building C object nexus-runtime/io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.obj
+[44/51] Building C object CMakeFiles/nexus_os_resources.dir/main.c.obj
+[45/51] Linking C static library nexus-runtime/io/libnexus_io.a
+[46/51] Building C object nexus-runtime/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj
+[47/51] Building C object nexus-runtime/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj
+[48/51] Building C object nexus-runtime/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj
+[49/51] Building C object nexus-runtime/os/freertos/CMakeFiles/nexus_os_freertos.dir/freertos.c.obj
+[50/51] Linking C static library nexus-runtime/os/freertos/libnexus_os_freertos.a
+[51/51] Linking C executable nexus_os_resources.elf

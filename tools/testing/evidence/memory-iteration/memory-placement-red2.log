@@ -1,0 +1,231 @@
+test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) ... 
+  test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='DATA') ... FAIL
+  test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='BSS') ... FAIL
+  test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='NOINIT') ... FAIL
+  test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='TCM', kind='DATA') ... FAIL
+  test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='TCM', kind='BSS') ... FAIL
+  test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='TCM', kind='NOINIT') ... FAIL
+test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected) ... 
+  test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='BSS') ... FAIL
+  test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='NOINIT') ... FAIL
+  test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected) (compiler='/usr/bin/gcc', region='TCM', kind='BSS') ... FAIL
+  test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected) (compiler='/usr/bin/gcc', region='TCM', kind='NOINIT') ... FAIL
+test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) ... 
+  test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='DATA') ... FAIL
+  test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='BSS') ... FAIL
+  test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='NOINIT') ... FAIL
+  test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='TCM', kind='DATA') ... FAIL
+  test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='TCM', kind='BSS') ... FAIL
+  test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='TCM', kind='NOINIT') ... FAIL
+test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) ... 
+  test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='DATA') ... FAIL
+  test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='BSS') ... FAIL
+  test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='NOINIT') ... FAIL
+  test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='TCM', kind='DATA') ... FAIL
+  test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='TCM', kind='BSS') ... FAIL
+  test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='TCM', kind='NOINIT') ... FAIL
+
+======================================================================
+FAIL: test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='DATA')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 66, in test_function_misuse_is_rejected_by_variable_only_attribute
+    self.assertIn("nocommon", result.stderr)
+AssertionError: 'nocommon' not found in '/tmp/tmpze3i_k_z/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='BSS')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 66, in test_function_misuse_is_rejected_by_variable_only_attribute
+    self.assertIn("nocommon", result.stderr)
+AssertionError: 'nocommon' not found in '/tmp/tmptml1yo55/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='NOINIT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 66, in test_function_misuse_is_rejected_by_variable_only_attribute
+    self.assertIn("nocommon", result.stderr)
+AssertionError: 'nocommon' not found in '/tmp/tmpdjvwlog1/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='TCM', kind='DATA')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 66, in test_function_misuse_is_rejected_by_variable_only_attribute
+    self.assertIn("nocommon", result.stderr)
+AssertionError: 'nocommon' not found in '/tmp/tmpd64ejvd6/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='TCM', kind='BSS')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 66, in test_function_misuse_is_rejected_by_variable_only_attribute
+    self.assertIn("nocommon", result.stderr)
+AssertionError: 'nocommon' not found in '/tmp/tmpxry75i4r/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) (compiler='/usr/bin/gcc', region='TCM', kind='NOINIT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 66, in test_function_misuse_is_rejected_by_variable_only_attribute
+    self.assertIn("nocommon", result.stderr)
+AssertionError: 'nocommon' not found in '/tmp/tmp32mn_maw/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='BSS')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 77, in test_nonzero_bss_and_noinit_initializer_is_rejected
+    self.assertIn("zero", result.stderr.lower())
+AssertionError: 'zero' not found in '/tmp/tmpzomln845/placement.c:1:10: fatal error: nexus/core/memory.h: no such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='NOINIT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 77, in test_nonzero_bss_and_noinit_initializer_is_rejected
+    self.assertIn("zero", result.stderr.lower())
+AssertionError: 'zero' not found in '/tmp/tmpfhk45uqj/placement.c:1:10: fatal error: nexus/core/memory.h: no such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected) (compiler='/usr/bin/gcc', region='TCM', kind='BSS')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 77, in test_nonzero_bss_and_noinit_initializer_is_rejected
+    self.assertIn("zero", result.stderr.lower())
+AssertionError: 'zero' not found in '/tmp/tmpzgqv9op7/placement.c:1:10: fatal error: nexus/core/memory.h: no such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected) (compiler='/usr/bin/gcc', region='TCM', kind='NOINIT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 77, in test_nonzero_bss_and_noinit_initializer_is_rejected
+    self.assertIn("zero", result.stderr.lower())
+AssertionError: 'zero' not found in '/tmp/tmp6c3llb7k/placement.c:1:10: fatal error: nexus/core/memory.h: no such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='DATA')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 46, in test_selected_variable_sections_compile
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : /tmp/tmpzjnkacl2/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory
+    1 | #include "nexus/core/memory.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+======================================================================
+FAIL: test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='BSS')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 46, in test_selected_variable_sections_compile
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : /tmp/tmpwy5924ai/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory
+    1 | #include "nexus/core/memory.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+======================================================================
+FAIL: test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='NOINIT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 46, in test_selected_variable_sections_compile
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : /tmp/tmp3wstvlkn/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory
+    1 | #include "nexus/core/memory.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+======================================================================
+FAIL: test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='TCM', kind='DATA')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 46, in test_selected_variable_sections_compile
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : /tmp/tmpupwi173a/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory
+    1 | #include "nexus/core/memory.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+======================================================================
+FAIL: test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='TCM', kind='BSS')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 46, in test_selected_variable_sections_compile
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : /tmp/tmpoia5q4wo/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory
+    1 | #include "nexus/core/memory.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+======================================================================
+FAIL: test_selected_variable_sections_compile (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile) (compiler='/usr/bin/gcc', region='TCM', kind='NOINIT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 46, in test_selected_variable_sections_compile
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : /tmp/tmptmc_719n/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory
+    1 | #include "nexus/core/memory.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+======================================================================
+FAIL: test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='DATA')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 56, in test_unselected_use_is_a_compile_error
+    self.assertIn("memory region is not selected", result.stderr)
+AssertionError: 'memory region is not selected' not found in '/tmp/tmpye4n1jhu/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='BSS')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 56, in test_unselected_use_is_a_compile_error
+    self.assertIn("memory region is not selected", result.stderr)
+AssertionError: 'memory region is not selected' not found in '/tmp/tmpq6aprf4a/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='ADDSRAM', kind='NOINIT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 56, in test_unselected_use_is_a_compile_error
+    self.assertIn("memory region is not selected", result.stderr)
+AssertionError: 'memory region is not selected' not found in '/tmp/tmpgd8frz8k/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='TCM', kind='DATA')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 56, in test_unselected_use_is_a_compile_error
+    self.assertIn("memory region is not selected", result.stderr)
+AssertionError: 'memory region is not selected' not found in '/tmp/tmpkf5954dw/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='TCM', kind='BSS')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 56, in test_unselected_use_is_a_compile_error
+    self.assertIn("memory region is not selected", result.stderr)
+AssertionError: 'memory region is not selected' not found in '/tmp/tmp6659h575/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+======================================================================
+FAIL: test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) (compiler='/usr/bin/gcc', region='TCM', kind='NOINIT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 56, in test_unselected_use_is_a_compile_error
+    self.assertIn("memory region is not selected", result.stderr)
+AssertionError: 'memory region is not selected' not found in '/tmp/tmps9yzvz_0/placement.c:1:10: fatal error: nexus/core/memory.h: No such file or directory\n    1 | #include "nexus/core/memory.h"\n      |          ^~~~~~~~~~~~~~~~~~~~~\ncompilation terminated.\n'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.179s
+
+FAILED (failures=22)

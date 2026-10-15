@@ -1,0 +1,31 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from MemoryBootFixture
+[ RUN      ] MemoryBootFixture.OccupiedAddressKeepsItsOriginalOwnerAndContents
+/workspace/nexus/tests/google/gd32_memory_boot_test.cpp:126: Failure
+Value of: reserve_exact(reinterpret_cast<uintptr_t>(existing), page)
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/gd32_memory_boot_test.cpp:127: Failure
+Expected equality of these values:
+  *value
+    Which is: 0
+  0x13579BDFU
+    Which is: 324508639
+
+[  FAILED  ] MemoryBootFixture.OccupiedAddressKeepsItsOriginalOwnerAndContents (0 ms)
+[ RUN      ] MemoryBootFixture.ResetInitializesOnlyAuthoredRegions
+[       OK ] MemoryBootFixture.ResetInitializesOnlyAuthoredRegions (0 ms)
+[ RUN      ] MemoryBootFixture.IncomingTcmClockIsNeverDisabledByReset
+[       OK ] MemoryBootFixture.IncomingTcmClockIsNeverDisabledByReset (0 ms)
+[----------] 3 tests from MemoryBootFixture (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 2 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] MemoryBootFixture.OccupiedAddressKeepsItsOriginalOwnerAndContents
+
+ 1 FAILED TEST

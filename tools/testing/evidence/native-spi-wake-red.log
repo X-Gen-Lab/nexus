@@ -1,0 +1,32 @@
+Running main() from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest_main.cc
+[==========] Running 6 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 6 tests from NativeAsync
+[ RUN      ] NativeAsync.SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects
+/workspace/nexus/tests/google/native_async_test.cpp:61: Failure
+Expected equality of these values:
+  nx_spi_port_attach_wake(&bus, &wake, 5)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] NativeAsync.SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects (0 ms)
+[ RUN      ] NativeAsync.SPIQuarantineRetainsBorrowAndStopUntilDrain
+[       OK ] NativeAsync.SPIQuarantineRetainsBorrowAndStopUntilDrain (0 ms)
+[ RUN      ] NativeAsync.UARTIDLEBlocksStayImmutableAndLossPrecedesLaterData
+[       OK ] NativeAsync.UARTIDLEBlocksStayImmutableAndLossPrecedesLaterData (0 ms)
+[ RUN      ] NativeAsync.UARTStopPublishesFinalPrefixAndKeepsConsumerStorage
+[       OK ] NativeAsync.UARTStopPublishesFinalPrefixAndKeepsConsumerStorage (0 ms)
+[ RUN      ] NativeAsync.ADCTriggersPublishWholeScansAndNeverOverwriteLoans
+[       OK ] NativeAsync.ADCTriggersPublishWholeScansAndNeverOverwriteLoans (0 ms)
+[ RUN      ] NativeAsync.ADCFailedScanIsNotPublishedAndNextScanReportsLoss
+[       OK ] NativeAsync.ADCFailedScanIsNotPublishedAndNextScanReportsLoss (0 ms)
+[----------] 6 tests from NativeAsync (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 5 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] NativeAsync.SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects
+
+ 1 FAILED TEST

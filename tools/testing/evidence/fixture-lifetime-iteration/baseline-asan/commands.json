@@ -1,0 +1,147 @@
+[
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/python",
+      "-B",
+      "tools/dev/dev.py",
+      "configure",
+      "--preset",
+      "native-asan",
+      "-B",
+      "/tmp/nexus-fixture-lifetime-builds/asan"
+    ],
+    "elapsed_s": 4.1961621579830535,
+    "exit_code": 0,
+    "failure": null,
+    "name": "configure",
+    "raw": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/baseline-asan/configure.log",
+      "sha256": "ef6c1c608e4a64751ba6ea68f9e18e9add9ba4627ace50a62337e4980fa4ac02",
+      "size": 1619
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/tmp/nexus-fixture-lifetime-builds/asan",
+      "--parallel",
+      "2",
+      "--target",
+      "nexus_can_controller_test",
+      "nexus_gd32_flash_fault_test",
+      "nexus_gd32_adc_stream_test"
+    ],
+    "elapsed_s": 14.520123810973018,
+    "exit_code": 0,
+    "failure": null,
+    "name": "build",
+    "raw": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/baseline-asan/build.log",
+      "sha256": "a7e14538d1af0ca5c561c3ee64a19e9b931a2cdd12693a0fa7766195a6492103",
+      "size": 5843
+    }
+  },
+  {
+    "argv": [
+      "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_can_controller_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "elapsed_s": 0.01670146797550842,
+    "exit_code": 0,
+    "failure": null,
+    "name": "nexus_can_controller_test-discovery",
+    "raw": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/baseline-asan/nexus_can_controller_test-discovery.log",
+      "sha256": "6224b997e64fc7129917ffebbfe38333a84c919f3727078cc343521c3c4b16ba",
+      "size": 1637
+    }
+  },
+  {
+    "argv": [
+      "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_can_controller_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-fixture-lifetime-iteration/baseline-asan/nexus_can_controller_test.xml"
+    ],
+    "elapsed_s": 0.016051629034336656,
+    "exit_code": 0,
+    "failure": null,
+    "name": "nexus_can_controller_test-execution",
+    "raw": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/baseline-asan/nexus_can_controller_test-execution.log",
+      "sha256": "e5a1997b1cff43834e9d4dff6cfddadaeca1a1d411b1b603c41d27f72d4bc946",
+      "size": 5058
+    }
+  },
+  {
+    "argv": [
+      "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_gd32_flash_fault_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "elapsed_s": 0.015680393029469997,
+    "exit_code": 0,
+    "failure": null,
+    "name": "nexus_gd32_flash_fault_test-discovery",
+    "raw": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/baseline-asan/nexus_gd32_flash_fault_test-discovery.log",
+      "sha256": "fd68edf21bb1763a02354c10382117d00f4c86a1316a457293015ec51ad84a3a",
+      "size": 100
+    }
+  },
+  {
+    "argv": [
+      "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_gd32_flash_fault_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-fixture-lifetime-iteration/baseline-asan/nexus_gd32_flash_fault_test.xml"
+    ],
+    "elapsed_s": 0.01559842104325071,
+    "exit_code": 0,
+    "failure": null,
+    "name": "nexus_gd32_flash_fault_test-execution",
+    "raw": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/baseline-asan/nexus_gd32_flash_fault_test-execution.log",
+      "sha256": "92afaf8248d784f98cc72d4f620a0278e7f48723c0fd24bf52e267061f8df067",
+      "size": 503
+    }
+  },
+  {
+    "argv": [
+      "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_gd32_adc_stream_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "elapsed_s": 0.015668324020225555,
+    "exit_code": 0,
+    "failure": null,
+    "name": "nexus_gd32_adc_stream_test-discovery",
+    "raw": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/baseline-asan/nexus_gd32_adc_stream_test-discovery.log",
+      "sha256": "b83652899a54a2354b0839c01fa9f68e27c1794ae3159df37e47daa1234184dc",
+      "size": 1342
+    }
+  },
+  {
+    "argv": [
+      "/tmp/nexus-fixture-lifetime-builds/asan/bin/nexus_gd32_adc_stream_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-fixture-lifetime-iteration/baseline-asan/nexus_gd32_adc_stream_test.xml"
+    ],
+    "elapsed_s": 0.015627574000973254,
+    "exit_code": 0,
+    "failure": null,
+    "name": "nexus_gd32_adc_stream_test-execution",
+    "raw": {
+      "path": "/workspace/nexus-fixture-lifetime-iteration/baseline-asan/nexus_gd32_adc_stream_test-execution.log",
+      "sha256": "7cc1edd85242dccac7db06d91a47fd5d1fb582b45d236c95bcbb79b996dbbff9",
+      "size": 4557
+    }
+  }
+]

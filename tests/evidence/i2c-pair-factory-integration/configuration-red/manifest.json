@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "i2c-pair-feature-configuration-development-observation",
+  "physical_status": "not_executed",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "-B",
+        "tools/configure/configure.py",
+        "--source-root",
+        "/workspace/nexus",
+        "--assembly",
+        "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml",
+        "--output",
+        "/workspace/nexus-i2c-pair-iteration-evidence/configuration-red/stm32-zg"
+      ],
+      "return_code": 1,
+      "started_ns": 1791750238693530730,
+      "completed_ns": 1791750238771316506,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/configuration-red/stm32-zg.output",
+        "sha256": "0d9df5a42a9c12508eb323d0d9e42adb9957bee8090dbcc5aeac4ec1d30dbe37",
+        "bytes": 92
+      }
+    },
+    {
+      "argv": [
+        "python",
+        "-B",
+        "tools/configure/configure.py",
+        "--source-root",
+        "/workspace/nexus",
+        "--assembly",
+        "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32-i2c-pair.toml",
+        "--output",
+        "/workspace/nexus-i2c-pair-iteration-evidence/configuration-red/gd32"
+      ],
+      "return_code": 1,
+      "started_ns": 1791750238771498325,
+      "completed_ns": 1791750238848249151,
+      "output": {
+        "path": "/workspace/nexus-i2c-pair-iteration-evidence/configuration-red/gd32.output",
+        "sha256": "29ababb1563ee962bb0da95c468f300329be58708bf9e13b25b8845f7da3d16c",
+        "bytes": 78
+      }
+    }
+  ],
+  "test_and_authored_inputs": [
+    {
+      "path": "/workspace/nexus/tests/google/i2c_pair_factory_test.cpp",
+      "sha256": "95d3e5a930aa6dfabcab437e2f6e2eef5ce35c490f69c9e9ccc639408135b43f",
+      "bytes": 19565
+    },
+    {
+      "path": "/workspace/nexus/tests/google/i2c_pair_factory_model.h",
+      "sha256": "822f3cee1ca67c51df2a1e8de08c2bd4bdf577b03fb87055ec84399e2451284a",
+      "bytes": 1928
+    },
+    {
+      "path": "/workspace/nexus/tests/google/i2c_pair_factory.cmake",
+      "sha256": "790bb9fd9cf7115431f19dd96b87a64bd078a96c420f28e9ec3ea6f3e02ec983",
+      "bytes": 3584
+    },
+    {
+      "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml",
+      "sha256": "d73f6e4c9d0ae105c592371f9b0bff5c2f6ad81d5c685ba5662389d89803fa9c",
+      "bytes": 667
+    },
+    {
+      "path": "/workspace/nexus/tests/contracts/multi_controller_assembly/gd32-i2c-pair.toml",
+      "sha256": "f513230ecc211fc537de3153856257478c2545ec7317133201e0187d75af73fd",
+      "bytes": 666
+    }
+  ],
+  "scope": "Initial actual configuration execution with paired primary/secondary authored controllers. These commands are not host Google execution."
+}

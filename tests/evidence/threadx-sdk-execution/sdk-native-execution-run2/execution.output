@@ -1,0 +1,12 @@
+[==========] Running 2 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 2 tests from InstalledThreadX
+[ RUN      ] InstalledThreadX.ByteQueueAndActualJoin
+[       OK ] InstalledThreadX.ByteQueueAndActualJoin (0 ms)
+[ RUN      ] InstalledThreadX.ActualMonotonicNotification
+[       OK ] InstalledThreadX.ActualMonotonicNotification (0 ms)
+[----------] 2 tests from InstalledThreadX (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 2 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 2 tests.

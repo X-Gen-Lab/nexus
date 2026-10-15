@@ -1,0 +1,44 @@
+[
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/workspace/nexus/tests/contracts/g474_assembly",
+      "-B",
+      "/workspace/nexus-g474-iteration-evidence/arm-four-run2/io/build",
+      "-G",
+      "Ninja",
+      "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/g474_assembly/io.toml",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake"
+    ],
+    "return_code": 0,
+    "started_ns": 1791748912010120903,
+    "completed_ns": 1791748912625474575,
+    "output": {
+      "path": "/workspace/nexus-g474-iteration-evidence/arm-four-run2/io/configure.output",
+      "sha256": "f05d14254a8bb10491bc244b38155b13bb3041b4220250e343504f913322d2dd",
+      "size": 1224
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-g474-iteration-evidence/arm-four-run2/io/build",
+      "--target",
+      "g474_assembly",
+      "--parallel",
+      "1"
+    ],
+    "return_code": 0,
+    "started_ns": 1791748912631540155,
+    "completed_ns": 1791748914658665544,
+    "output": {
+      "path": "/workspace/nexus-g474-iteration-evidence/arm-four-run2/io/build.output",
+      "sha256": "70d094b35e6349c12ce189d6617403648b2e3f6bf3b497f61c8462025ae09850",
+      "size": 4189
+    }
+  }
+]

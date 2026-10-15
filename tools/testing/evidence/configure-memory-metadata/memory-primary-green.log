@@ -1,0 +1,6 @@
+test_extra_selection_cannot_replace_the_authoritative_primary_ram (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_extra_selection_cannot_replace_the_authoritative_primary_ram) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+OK

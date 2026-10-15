@@ -1,0 +1,36 @@
+[
+  {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "tools.testing.test_threadx_lock",
+      "tools.testing.test_dependency_proposals",
+      "-v"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/threadx-dependency/bootstrap-green-0.log"
+  },
+  {
+    "command": [
+      "python3",
+      "tools/maintenance/threadx_lock.py",
+      "--source",
+      "ext/threadx",
+      "--lock",
+      "dependencies/threadx.lock.json",
+      "--port",
+      "linux"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/threadx-dependency/bootstrap-green-1.log"
+  },
+  {
+    "command": [
+      "python3",
+      "tools/maintenance/dependency_proposals.py"
+    ],
+    "returncode": 1,
+    "output": "/workspace/nexus/tools/testing/evidence/threadx-dependency/bootstrap-green-2.log"
+  }
+]

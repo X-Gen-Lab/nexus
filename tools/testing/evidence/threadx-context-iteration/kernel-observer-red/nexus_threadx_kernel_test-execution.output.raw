@@ -1,0 +1,92 @@
+[==========] Running 35 tests from 7 test suites.
+[----------] Global test environment set-up.
+[----------] 3 tests from ThreadXOfficial
+[ RUN      ] ThreadXOfficial.ReallyRunsKernelThread
+[       OK ] ThreadXOfficial.ReallyRunsKernelThread (0 ms)
+[ RUN      ] ThreadXOfficial.AsynchronousTicksPreserveTaskSignalPosture
+[       OK ] ThreadXOfficial.AsynchronousTicksPreserveTaskSignalPosture (10 ms)
+[ RUN      ] ThreadXOfficial.ContextObserversPreserveColdAndCriticalLockPosture
+[       OK ] ThreadXOfficial.ContextObserversPreserveColdAndCriticalLockPosture (0 ms)
+[----------] 3 tests from ThreadXOfficial (11 ms total)
+
+[----------] 5 tests from ThreadXAdapter
+[ RUN      ] ThreadXAdapter.LatchInitializesAndDestroys
+[       OK ] ThreadXAdapter.LatchInitializesAndDestroys (0 ms)
+[ RUN      ] ThreadXAdapter.ForeignPthreadCannotBorrowCurrentKernelTask
+[       OK ] ThreadXAdapter.ForeignPthreadCannotBorrowCurrentKernelTask (0 ms)
+[ RUN      ] ThreadXAdapter.ActualPortInterruptMaskRejectsWithoutChangingDepth
+[       OK ] ThreadXAdapter.ActualPortInterruptMaskRejectsWithoutChangingDepth (0 ms)
+[ RUN      ] ThreadXAdapter.OddByteItemsHaveExactFIFOAndNoOutputOnTimeout
+[       OK ] ThreadXAdapter.OddByteItemsHaveExactFIFOAndNoOutputOnTimeout (0 ms)
+[ RUN      ] ThreadXAdapter.InvalidCapacityIsRejectedBeforeKernelCreation
+[       OK ] ThreadXAdapter.InvalidCapacityIsRejectedBeforeKernelCreation (0 ms)
+[----------] 5 tests from ThreadXAdapter (0 ms total)
+
+[----------] 8 tests from ThreadXTasks
+[ RUN      ] ThreadXTasks.ReturnJoinDeletesBeforeStorageReuse
+[       OK ] ThreadXTasks.ReturnJoinDeletesBeforeStorageReuse (0 ms)
+[ RUN      ] ThreadXTasks.JoinTimeoutRetainsActualBlockedThread
+[       OK ] ThreadXTasks.JoinTimeoutRetainsActualBlockedThread (0 ms)
+[ RUN      ] ThreadXTasks.InvalidStackAndPriorityHaveNoLiveObjects
+[       OK ] ThreadXTasks.InvalidStackAndPriorityHaveNoLiveObjects (0 ms)
+[ RUN      ] ThreadXTasks.PrestartDiscardIsProvenActualKernelBootstrap
+[       OK ] ThreadXTasks.PrestartDiscardIsProvenActualKernelBootstrap (0 ms)
+[ RUN      ] ThreadXTasks.ForeignPthreadCannotBorrowBootstrapCallback
+[       OK ] ThreadXTasks.ForeignPthreadCannotBorrowBootstrapCallback (0 ms)
+[ RUN      ] ThreadXTasks.GoogleMockObservesOnlyExternalApplicationEntry
+[       OK ] ThreadXTasks.GoogleMockObservesOnlyExternalApplicationEntry (0 ms)
+[ RUN      ] ThreadXTasks.SelfJoinRejectsWithoutDeletingLiveThread
+[       OK ] ThreadXTasks.SelfJoinRejectsWithoutDeletingLiveThread (0 ms)
+[ RUN      ] ThreadXTasks.PermanentUsesNoCompletionLatchAndRunsRealKernel
+[       OK ] ThreadXTasks.PermanentUsesNoCompletionLatchAndRunsRealKernel (0 ms)
+[----------] 8 tests from ThreadXTasks (1 ms total)
+
+[----------] 8 tests from ThreadXClose
+[ RUN      ] ThreadXClose.CloseBroadcastsEveryBlockedSenderAndDrainsOriginal
+[       OK ] ThreadXClose.CloseBroadcastsEveryBlockedSenderAndDrainsOriginal (0 ms)
+[ RUN      ] ThreadXClose.CloseBroadcastsEveryBlockedReceiver
+==================
+WARNING: ThreadSanitizer: data race (pid=3560770)
+  Read of size 4 at 0x55cefc864918 by thread T4:
+    #0 _tx_thread_system_preempt_check /workspace/nexus/ext/threadx/common/src/tx_thread_system_preempt_check.c:74 (nexus_threadx_kernel_test+0x27bf9) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #1 _txe_thread_create /workspace/nexus/ext/threadx/common/src/txe_thread_create.c:205 (nexus_threadx_kernel_test+0x28ede) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #2 nx_threadx_task_start /workspace/nexus/os/threadx/threadx.c:564 (nexus_threadx_kernel_test+0x26cac) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #3 start /workspace/nexus/tests/google/threadx_close_test.cpp:73 (nexus_threadx_kernel_test+0x19d40) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #4 TestBody /workspace/nexus/tests/google/threadx_close_test.cpp:111 (nexus_threadx_kernel_test+0x1b229) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #5 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest.cc:2653 (nexus_threadx_kernel_test+0x7c617) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #6 _tx_thread_shell_entry /workspace/nexus/ext/threadx/common/src/tx_thread_shell_entry.c:108 (nexus_threadx_kernel_test+0x2b10c) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #7 _tx_linux_thread_entry /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_stack_build.c:153 (nexus_threadx_kernel_test+0x2b6d2) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+
+  Previous write of size 4 at 0x55cefc864918 by thread T1 (mutexes: write M0):
+    #0 _tx_thread_context_restore /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_context_restore.c:86 (nexus_threadx_kernel_test+0x2b3d9) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #1 _tx_linux_timer_interrupt /workspace/nexus-ci-security-iteration/threadx-tsan-build/contract_threadx_linux-port/tx_initialize_low_level.c:365 (nexus_threadx_kernel_test+0x297ae) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+
+  Location is global '_tx_thread_system_state' of size 4 at 0x55cefc864918 (nexus_threadx_kernel_test+0xd6918)
+
+  Mutex M0 (0x55cefc867e00) created at:
+    #0 pthread_mutex_init ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1315 (libtsan.so.2+0x5545f) (BuildId: 99ef88596cb10a8ccf307fe1a9070f66a44b1624)
+    #1 _tx_initialize_low_level /workspace/nexus-ci-security-iteration/threadx-tsan-build/contract_threadx_linux-port/tx_initialize_low_level.c:266 (nexus_threadx_kernel_test+0x29ae9) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #2 _tx_initialize_kernel_enter /workspace/nexus/ext/threadx/common/src/tx_initialize_kernel_enter.c:107 (nexus_threadx_kernel_test+0x27665) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #3 nx_threadx_kernel_enter /workspace/nexus/os/threadx/threadx.c:204 (nexus_threadx_kernel_test+0x26596) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #4 main /workspace/nexus/tests/google/threadx_kernel_test.cpp:264 (nexus_threadx_kernel_test+0x11234) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+
+  Thread T4 (tid=3560775, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1022 (libtsan.so.2+0x568a6) (BuildId: 99ef88596cb10a8ccf307fe1a9070f66a44b1624)
+    #1 _tx_thread_stack_build /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_stack_build.c:102 (nexus_threadx_kernel_test+0x2b72e) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #2 _tx_thread_create /workspace/nexus/ext/threadx/common/src/tx_thread_create.c:225 (nexus_threadx_kernel_test+0x2a8a6) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #3 _txe_thread_create /workspace/nexus/ext/threadx/common/src/txe_thread_create.c:299 (nexus_threadx_kernel_test+0x28f77) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #4 startup(void*) /workspace/nexus/tests/google/threadx_kernel_test.cpp:241 (nexus_threadx_kernel_test+0x14359) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #5 tx_application_define /workspace/nexus/os/threadx/threadx.c:223 (nexus_threadx_kernel_test+0x2668b) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #6 _tx_initialize_kernel_enter /workspace/nexus/ext/threadx/common/src/tx_initialize_kernel_enter.c:133 (nexus_threadx_kernel_test+0x27694) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #7 nx_threadx_kernel_enter /workspace/nexus/os/threadx/threadx.c:204 (nexus_threadx_kernel_test+0x26596) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #8 main /workspace/nexus/tests/google/threadx_kernel_test.cpp:264 (nexus_threadx_kernel_test+0x11234) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+
+  Thread T1 (tid=3560772, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1022 (libtsan.so.2+0x568a6) (BuildId: 99ef88596cb10a8ccf307fe1a9070f66a44b1624)
+    #1 _tx_initialize_low_level /workspace/nexus-ci-security-iteration/threadx-tsan-build/contract_threadx_linux-port/tx_initialize_low_level.c:282 (nexus_threadx_kernel_test+0x29b40) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #2 _tx_initialize_kernel_enter /workspace/nexus/ext/threadx/common/src/tx_initialize_kernel_enter.c:107 (nexus_threadx_kernel_test+0x27665) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #3 nx_threadx_kernel_enter /workspace/nexus/os/threadx/threadx.c:204 (nexus_threadx_kernel_test+0x26596) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+    #4 main /workspace/nexus/tests/google/threadx_kernel_test.cpp:264 (nexus_threadx_kernel_test+0x11234) (BuildId: 75b0ba18d7c3a284bb0afe48c08dd10697fdce02)
+
+SUMMARY: ThreadSanitizer: data race /workspace/nexus/ext/threadx/common/src/tx_thread_system_preempt_check.c:74 in _tx_thread_system_preempt_check
+==================

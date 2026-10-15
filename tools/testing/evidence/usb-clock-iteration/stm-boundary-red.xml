@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="10" failures="1" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:25:18.736" name="AllTests">
+  <testsuite name="UsbClock" tests="10" failures="1" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:25:18.736">
+    <testcase name="MissingAuthorityRejectsBeforeAnyWrite" file="tests/google/usb_clock_test.cpp" line="140" status="run" result="completed" time="0." timestamp="2026-10-11T17:25:18.736" classname="UsbClock" />
+    <testcase name="ColdContextAndFiniteDeadlineAreRequired" file="tests/google/usb_clock_test.cpp" line="146" status="run" result="completed" time="0." timestamp="2026-10-11T17:25:18.736" classname="UsbClock" />
+    <testcase name="UnexpectedPllProfileRejectsWithoutReclocking" file="tests/google/usb_clock_test.cpp" line="158" status="run" result="completed" time="0." timestamp="2026-10-11T17:25:18.736" classname="UsbClock" />
+    <testcase name="ExistingUsbGateIsAnExternalOwner" file="tests/google/usb_clock_test.cpp" line="166" status="run" result="completed" time="0." timestamp="2026-10-11T17:25:18.736" classname="UsbClock" />
+    <testcase name="Actual48ClockAndGateOutliveRetainedController" file="tests/google/usb_clock_test.cpp" line="172" status="run" result="completed" time="0." timestamp="2026-10-11T17:25:18.736" classname="UsbClock" />
+    <testcase name="OverflowAndDoubleReleaseDoNotMutateReferences" file="tests/google/usb_clock_test.cpp" line="187" status="run" result="completed" time="0." timestamp="2026-10-11T17:25:18.737" classname="UsbClock" />
+    <testcase name="GateReadbackFailureRollsBackOnlyOwnedClockBits" file="tests/google/usb_clock_test.cpp" line="197" status="run" result="completed" time="0." timestamp="2026-10-11T17:25:18.737" classname="UsbClock" />
+    <testcase name="RefusedStopRetainsCleanupResponsibility" file="tests/google/usb_clock_test.cpp" line="205" status="run" result="completed" time="0." timestamp="2026-10-11T17:25:18.737" classname="UsbClock" />
+    <testcase name="ChangedSourceFailsReadonlyValidationAndAdmission" file="tests/google/usb_clock_test.cpp" line="215" status="run" result="completed" time="0." timestamp="2026-10-11T17:25:18.737" classname="UsbClock" />
+    <testcase name="LostSourceAtGateBoundaryCannotPublishReadyOwner" file="tests/google/usb_clock_test.cpp" line="225" status="run" result="completed" time="0." timestamp="2026-10-11T17:25:18.737" classname="UsbClock">
+      <failure message="tests/google/usb_clock_test.cpp:227&#x0A;Expected equality of these values:&#x0A;  nx_stm32_usb_clock_start(&amp;state, true, 100U)&#x0A;    Which is: 0&#x0A;  NX_ERROR_IO&#x0A;    Which is: 6&#x0A;" type=""><![CDATA[tests/google/usb_clock_test.cpp:227
+Expected equality of these values:
+  nx_stm32_usb_clock_start(&state, true, 100U)
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+]]></failure>
+      <failure message="tests/google/usb_clock_test.cpp:228&#x0A;Expected equality of these values:&#x0A;  ((RCC_TypeDef *) ((0x40000000UL + 0x00020000UL) + 0x3800UL))-&gt;AHB2ENR &amp; (0x1UL &lt;&lt; (7U))&#x0A;    Which is: 128&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/usb_clock_test.cpp:228
+Expected equality of these values:
+  ((RCC_TypeDef *) ((0x40000000UL + 0x00020000UL) + 0x3800UL))->AHB2ENR & (0x1UL << (7U))
+    Which is: 128
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/usb_clock_test.cpp:229&#x0A;Expected equality of these values:&#x0A;  nx_stm32_usb_clock_ops.retain(&amp;state)&#x0A;    Which is: 6&#x0A;  NX_ERROR_STATE&#x0A;    Which is: 3&#x0A;" type=""><![CDATA[tests/google/usb_clock_test.cpp:229
+Expected equality of these values:
+  nx_stm32_usb_clock_ops.retain(&state)
+    Which is: 6
+  NX_ERROR_STATE
+    Which is: 3
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

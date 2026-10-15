@@ -1,0 +1,120 @@
+{
+  "board": "stm32f407zg-qiming-v31",
+  "budget": {
+    "path": "/workspace/nexus-config-iteration-evidence/usb-default-arm-green/stm32-zg/generated/resource-budget.json",
+    "sha256": "a62f7fad79c1b379afcc7f8cefa0fc059ec01d238ca1f9b82f20c2bfc084970f",
+    "size": 184
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus/boards/stm32f407_qiming_v31/board.json",
+        "sha256": "9899b6036e9bc7d11eada7bc6a62a9601124099e440bbf9d862b760adbf75cf8",
+        "size": 2580
+      },
+      "label": "boards/stm32f407_qiming_v31/board.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+        "size": 585
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/routes.json",
+        "sha256": "4f87395e8f16bf384e48b032aeff6e7109cc88aab99e09a961becae7ab090d28",
+        "size": 10205
+      },
+      "label": "soc/stm32f407/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32f407/soc.json",
+        "sha256": "4729408c962ed01351ad9eda5c5b476055c850d0fcb1b94b623623a14b5afc7a",
+        "size": 7381
+      },
+      "label": "soc/stm32f407/soc.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tools/configure/assemblies/qiming-baremetal.toml",
+        "sha256": "f7062593b705f31d70e3b65c9f5b27f63368ced38818a260296e5c1a4eef2f56",
+        "size": 407
+      },
+      "label": "tools/configure/assemblies/qiming-baremetal.toml"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-config-iteration-evidence/usb-default-arm-green/stm32-zg/bin/nexus_firmware.elf",
+    "sha256": "d9419c655b3caa217adc0f0611258462b35fb3f4dcfc396b83320446c53a4c00",
+    "size": 21492
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 1048576,
+      "footprint_bytes": 5352,
+      "loaded_bytes": 5352,
+      "ranges": [
+        [
+          134217728,
+          134223080
+        ]
+      ]
+    },
+    "ram": {
+      "ccm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 131072,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536871552
+          ],
+          [
+            536999936,
+            537001984
+          ]
+        ],
+        "reserved_bytes": 2688
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536871552,
+        "start": 536871552
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537001984,
+        "start": 536999936
+      }
+    }
+  },
+  "part": "STM32F407ZGT6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-config-iteration-evidence/usb-default-arm-green/stm32-zg/generated/resolved.json",
+    "sha256": "735f32329024a0cf150061005f31ef520d7d57f1c7163664663cd99002f80ffb",
+    "size": 19031
+  },
+  "schema_version": 1,
+  "soc_family": "stm32f407",
+  "status": "passed",
+  "violations": []
+}

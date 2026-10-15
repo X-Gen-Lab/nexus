@@ -1,0 +1,101 @@
+Running main() from gmock_main.cc
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from SPIMultiple
+[ RUN      ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers
+[       OK ] SPIMultiple.SecondaryColdInitPreservesPrimaryConfigAndPublishers (0 ms)
+[ RUN      ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers
+[       OK ] SPIMultiple.PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow
+[       OK ] SPIMultiple.SecondaryWireBusyCannotReleaseItsCsOrBorrow (0 ms)
+[ RUN      ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers
+[       OK ] SPIMultiple.RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement
+[       OK ] SPIMultiple.SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement (0 ms)
+[ RUN      ] SPIMultiple.DuplicateColdObjectCannotStealLivePhysicalPublishers
+tests/google/spi_multi_controller_test.cpp:268: Failure
+Expected equality of these values:
+  nx_stm32_spi_dma_initialize(&duplicate)
+    Which is: 0
+  NX_ERROR_BUSY
+    Which is: 2
+
+tests/google/spi_multi_controller_test.cpp:275: Failure
+Value of: duplicate.initialized
+  Actual: true
+Expected: false
+
+tests/google/spi_multi_controller_test.cpp:277: Failure
+Expected equality of these values:
+  NVIC_GetPriority(DMA1_Stream3_IRQn)
+    Which is: 5
+  9U
+    Which is: 9
+
+[  FAILED  ] SPIMultiple.DuplicateColdObjectCannotStealLivePhysicalPublishers (0 ms)
+[ RUN      ] SPIMultiple.NewReceiveErrorAtDisableCannotBecomeSuccessfulCompletion
+tests/google/spi_multi_controller_test.cpp:289: Failure
+Expected equality of these values:
+  requests[1].base.result
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+
+tests/google/spi_multi_controller_test.cpp:290: Failure
+Expected equality of these values:
+  requests[1].base.transferred
+    Which is: 4
+  0U
+    Which is: 0
+
+[  FAILED  ] SPIMultiple.NewReceiveErrorAtDisableCannotBecomeSuccessfulCompletion (0 ms)
+[ RUN      ] SPIMultiple.NewTransmitErrorBeforeW1cCannotBecomeSuccessfulCompletion
+tests/google/spi_multi_controller_test.cpp:303: Failure
+Expected equality of these values:
+  requests[1].base.result
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+
+tests/google/spi_multi_controller_test.cpp:304: Failure
+Expected equality of these values:
+  requests[1].base.transferred
+    Which is: 4
+  0U
+    Which is: 0
+
+[  FAILED  ] SPIMultiple.NewTransmitErrorBeforeW1cCannotBecomeSuccessfulCompletion (0 ms)
+[ RUN      ] SPIMultiple.ErrorAfterMemoryCompletionIsRecheckedBeforeSettlement
+tests/google/spi_multi_controller_test.cpp:315: Failure
+Expected equality of these values:
+  requests[1].base.result
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+
+tests/google/spi_multi_controller_test.cpp:316: Failure
+Expected equality of these values:
+  requests[1].base.transferred
+    Which is: 4
+  0U
+    Which is: 0
+
+[  FAILED  ] SPIMultiple.ErrorAfterMemoryCompletionIsRecheckedBeforeSettlement (0 ms)
+[ RUN      ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers
+[       OK ] SPIMultiple.SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers (0 ms)
+[ RUN      ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors
+[       OK ] SPIMultiple.SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors (0 ms)
+[ RUN      ] SPIMultiple.SecondaryPollingRecoveryPulsesApb1AndPreservesPrimaryWire
+[       OK ] SPIMultiple.SecondaryPollingRecoveryPulsesApb1AndPreservesPrimaryWire (0 ms)
+[----------] 12 tests from SPIMultiple (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 8 tests.
+[  FAILED  ] 4 tests, listed below:
+[  FAILED  ] SPIMultiple.DuplicateColdObjectCannotStealLivePhysicalPublishers
+[  FAILED  ] SPIMultiple.NewReceiveErrorAtDisableCannotBecomeSuccessfulCompletion
+[  FAILED  ] SPIMultiple.NewTransmitErrorBeforeW1cCannotBecomeSuccessfulCompletion
+[  FAILED  ] SPIMultiple.ErrorAfterMemoryCompletionIsRecheckedBeforeSettlement
+
+ 4 FAILED TESTS

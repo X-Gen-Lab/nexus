@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.31)
+project(lowpower_binding_fixture LANGUAGES C ASM)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(NEXUS_BUILD_TESTS OFF CACHE BOOL "ARM software-only fixture")
+set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "Caller main owns scheduler start")
+add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
+nexus_add_firmware(lowpower_fixture SOURCES main.c)

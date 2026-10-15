@@ -1,0 +1,15 @@
+/workspace/nexus/tools/testing/evidence/timer-iteration/arm-cold-cleanup-final/gd32f470-io-src-timer_capture.c.o  :
+section                        size   addr
+.text                             0      0
+.data                             0      0
+.bss                              0      0
+.text.output_valid               46      0
+.text.nx_timer_capture_start     50      0
+.text.nx_timer_capture_stop      24      0
+.text.nx_timer_capture_read      44      0
+.text.nx_timer_capture_state     44      0
+.comment                         71      0
+.ARM.attributes                  52      0
+Total                           331
+
+

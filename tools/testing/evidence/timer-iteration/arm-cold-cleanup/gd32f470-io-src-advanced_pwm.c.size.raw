@@ -1,0 +1,15 @@
+/workspace/nexus/tools/testing/evidence/timer-iteration/arm-cold-cleanup/gd32f470-io-src-advanced_pwm.c.o  :
+section                             size   addr
+.text                                  0      0
+.data                                  0      0
+.bss                                   0      0
+.text.nx_advanced_pwm_set_duty        24      0
+.text.nx_advanced_pwm_start           24      0
+.text.nx_advanced_pwm_stop            24      0
+.text.nx_advanced_pwm_state           80      0
+.text.nx_advanced_pwm_clear_fault     24      0
+.comment                              71      0
+.ARM.attributes                       52      0
+Total                                299
+
+

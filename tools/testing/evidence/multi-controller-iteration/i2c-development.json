@@ -1,0 +1,2354 @@
+{
+  "schema_version": 1,
+  "kind": "i2c_secondary_development_evidence",
+  "status": "passed",
+  "created_at": "2026-10-11T19:02:57.585952+00:00",
+  "scope": "Owned production-provider tests and actual SDK ARM objects. Development snapshot; full SDK, clean source and Board electrical qualification pending.",
+  "source_inputs": [
+    {
+      "path": "/workspace/nexus/soc/common/i2c_v1_async.c",
+      "bytes": 25991,
+      "sha256": "7e4afc3e53294bb3ed2ae4fc133b47878d4283c6b72d7920f3ca7f75d597149d"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/i2c_async.c",
+      "bytes": 9539,
+      "sha256": "3577634c493a8afd3f54afe5be700f6dc26bcb571d062d75013a8de7a64bf6d0"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/i2c_async.c",
+      "bytes": 9489,
+      "sha256": "3e4c1918f6718ef00159f8883bed715b7affa1a268a5ea0bd08aba8fee803271"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_i2c_async.h",
+      "bytes": 5258,
+      "sha256": "d7c45f44497bd07572911be5e0d0d06e285493dace5da9ae8bca241b38764988"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_i2c_async.h",
+      "bytes": 5248,
+      "sha256": "ecc221ba46d15fd7930332de3b3c2d6d3d07c05bfabdf67bb1cf370945d9f2cf"
+    },
+    {
+      "path": "/workspace/nexus/tests/google/i2c_multi_controller_model.h",
+      "bytes": 580,
+      "sha256": "38666766b390fb2f2b374c4a246e649f8e59d8f62a9cc6b065b11fda6deb3b3a"
+    },
+    {
+      "path": "/workspace/nexus/tests/google/i2c_multi_controller_test.cpp",
+      "bytes": 15621,
+      "sha256": "c0548d00df97e5d4c6eb4b313850e19dbaae2ede290737745db6a6200a140fe7"
+    },
+    {
+      "path": "/workspace/nexus/tests/contracts/multi_controller/nexus_config.h",
+      "bytes": 648,
+      "sha256": "a04b382a825328dac74e544bbcf5d1ce5782d31f0d5afe0cdaf65808b6639f95"
+    },
+    {
+      "path": "/workspace/nexus/tests/contracts/multi_controller/README.md",
+      "bytes": 894,
+      "sha256": "bc0d7d73f1b8cf9d4d7c03ff5be40ee972a59064586f7ad8c324716b13346089"
+    },
+    {
+      "path": "/workspace/nexus/tests/google/i2c_multi_controller.cmake",
+      "bytes": 1804,
+      "sha256": "a4bb874681b152adff0748e8c64cf4a0d316940988ebc14718ace4a5d243fc69"
+    },
+    {
+      "path": "/workspace/nexus/docs/design/multiple-controllers.md",
+      "bytes": 3574,
+      "sha256": "cf2b5cad421e8c29057cab7345e74f23f933e5a3f3716bb900da315d28297857"
+    }
+  ],
+  "google": [
+    {
+      "family": "stm",
+      "scope": "final",
+      "cases": 12,
+      "xml": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-final-green.xml",
+        "bytes": 3181,
+        "sha256": "8787c544e7cb67204fecf6199e7b2790cac5ec0d8306f70a3e4a8208b0c0bf0a"
+      },
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-green.command.json",
+        "bytes": 452,
+        "sha256": "6ff93e1405bbc6df518232c5040c9c513616a3fb39ae33d4c3439ebc003061f7"
+      }
+    },
+    {
+      "family": "gd",
+      "scope": "final",
+      "cases": 12,
+      "xml": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-final-green.xml",
+        "bytes": 3181,
+        "sha256": "7ac87793dbaa62bcbee369c6e530230e14f88d622c11628629988cf0936569d1"
+      },
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-green.command.json",
+        "bytes": 449,
+        "sha256": "c1185a54f4b847756b52ecb7a2dfb5e33b318ac7d4238e099baa65c50f189d51"
+      }
+    },
+    {
+      "family": "stm",
+      "scope": "san-final",
+      "cases": 12,
+      "xml": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-san-final-green.xml",
+        "bytes": 3181,
+        "sha256": "2dc550d3d7549dc44aacbc8cf5f7d5e1efefac862c75a406cbd492981427bb34"
+      },
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-green.command.json",
+        "bytes": 464,
+        "sha256": "5ecf221b81edd4a690bfbeb1e311ae8d721a66432d6f2ae68a183bf692443fba"
+      }
+    },
+    {
+      "family": "gd",
+      "scope": "san-final",
+      "cases": 12,
+      "xml": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-san-final-green.xml",
+        "bytes": 3181,
+        "sha256": "34af2d284f41593b407f53cd7946f7e2287781c6ec2c3cdfffcc89f50e154e75"
+      },
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-green.command.json",
+        "bytes": 461,
+        "sha256": "8c04af3e906e74891262278b6867c8f6b58fa7b0405af0e946b37169780ef951"
+      }
+    },
+    {
+      "family": "generic",
+      "scope": "legacy",
+      "cases": 22,
+      "xml": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/generic-i2c-legacy-green.xml",
+        "bytes": 5678,
+        "sha256": "6ab308bceb3a16980c653c04c08054a733143e29e935d3a8f6e5bf46b2b26614"
+      },
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-green.command.json",
+        "bytes": 473,
+        "sha256": "997bcc5a04be01ac73379f7a3dbecec8c202a496e3e6832bd6a28d1daf4ef281"
+      }
+    },
+    {
+      "family": "stm",
+      "scope": "legacy",
+      "cases": 23,
+      "xml": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-legacy-green.xml",
+        "bytes": 5920,
+        "sha256": "6d6f4c84245cb129332a753fa8fc1431456f51544e2e1343ec214a084758cdb0"
+      },
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-green.command.json",
+        "bytes": 461,
+        "sha256": "a4e9ead826b0f4c0f9803a0c5761c4f41d3a9b6a3bcd6c3a39fa2957305f756a"
+      }
+    },
+    {
+      "family": "gd",
+      "scope": "legacy",
+      "cases": 24,
+      "xml": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-legacy-green.xml",
+        "bytes": 6153,
+        "sha256": "9d5b8690e2169d0d8765521b802ecf9f8130cb61799b37568af78b5abeaace98"
+      },
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-green.command.json",
+        "bytes": 458,
+        "sha256": "400d3b88fce01e81b590a98226d159e0cba9938fdd74b80e603ceae1958433ca"
+      }
+    }
+  ],
+  "arm_report": {
+    "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/report.json",
+    "bytes": 7902,
+    "sha256": "378a52cbfb54fb2ee2a3b9761bfcbf52e046b3e8a068ac47b76a9aaaa631723f"
+  },
+  "physical_status": "not_executed",
+  "whole_firmware_link_status": "pending_configuration_assembly",
+  "default_image_gc_status": "pending_configuration_assembly",
+  "cycles_status": "not_measured",
+  "host_executables": [
+    {
+      "path": "/workspace/nexus-multi-controller-iteration/i2c-frozen-bin/stm-i2c-test",
+      "bytes": 4527744,
+      "sha256": "795a1b73a875b64de03b5913e1bef287ea6b70acc7a2d67068a7439fc6e55d8d"
+    },
+    {
+      "path": "/workspace/nexus-multi-controller-iteration/i2c-frozen-bin/gd-i2c-test",
+      "bytes": 4527728,
+      "sha256": "abb1917fbd2c8119a3cf8d80bce6f1a076c0d00213826fcdbf10f0b7083712aa"
+    },
+    {
+      "path": "/workspace/nexus-multi-controller-iteration/i2c-frozen-bin/stm-i2c-san-test",
+      "bytes": 6921344,
+      "sha256": "32ce9bd6fd8c2d3e45029d6529d7adcb0f6f57c8aa57e6007c75411d341fa544"
+    },
+    {
+      "path": "/workspace/nexus-multi-controller-iteration/i2c-frozen-bin/gd-i2c-san-test",
+      "bytes": 6920144,
+      "sha256": "cc7632103b38e575971efbb43d3932a52638b0bab1b68a296173acb8a607abb4"
+    },
+    {
+      "path": "/workspace/nexus-multi-controller-iteration/i2c-frozen-bin/generic-i2c-legacy-test",
+      "bytes": 4687016,
+      "sha256": "4e1bfdd457431bb16bcddef98cdad7c8460235af8eb0f3d0f1bc92b1a7a28264"
+    },
+    {
+      "path": "/workspace/nexus-multi-controller-iteration/i2c-frozen-bin/stm-i2c-legacy-test",
+      "bytes": 4696528,
+      "sha256": "eb387cc5f422d704a37bce1975aa4725e7be5914693dcfe8cbdd8b2d896c89ea"
+    },
+    {
+      "path": "/workspace/nexus-multi-controller-iteration/i2c-frozen-bin/gd-i2c-legacy-test",
+      "bytes": 4707528,
+      "sha256": "bf80b551ec894085257b33948cc40cf2ee93b1ce92b437b47acf727b614ecc7d"
+    }
+  ],
+  "format_command": {
+    "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-format-final.command.json",
+    "bytes": 738,
+    "sha256": "49cbea58cc5d14879a54ab02d01eb4f3a501b3ecd519ade66f7cf0034ca0e1b0"
+  },
+  "comment_command": {
+    "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-comment-final.command.json",
+    "bytes": 742,
+    "sha256": "0bd5f0f7eebbeef931221e6fa6adc556e626c02300475611e7f123c54089a3c6"
+  },
+  "raw_artifacts": [
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/README.md",
+      "bytes": 1238,
+      "sha256": "6f80f8128c2e32666cea7c42699ee6783df4bf390f5fe3a91ffc08fc1bc12688"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-behavior-red2.xml",
+      "bytes": 13453,
+      "sha256": "ffb2d7e39e5b7044d335fb19b194f938dcb07fdaac0602cdac831f5ff86c18a2"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-boundary-green.xml",
+      "bytes": 3181,
+      "sha256": "6dcde45bb480599e2938c295138a2303cf0a5d192a7f67792e840f46f400033d"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-final-green.xml",
+      "bytes": 3181,
+      "sha256": "7ac87793dbaa62bcbee369c6e530230e14f88d622c11628629988cf0936569d1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-green.xml",
+      "bytes": 1983,
+      "sha256": "f670a777f61bbbbb292d23675eb7ce8f090575dd46dc3267d7060b650b10a3dd"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-legacy-green.xml",
+      "bytes": 6153,
+      "sha256": "9d5b8690e2169d0d8765521b802ecf9f8130cb61799b37568af78b5abeaace98"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-san-final-green.xml",
+      "bytes": 3181,
+      "sha256": "34af2d284f41593b407f53cd7946f7e2287781c6ec2c3cdfffcc89f50e154e75"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/gd-i2c-san-green.xml",
+      "bytes": 3181,
+      "sha256": "99ae8e5e2813f5c4f5a4188812cc160d8ff76e4be50761ba6e20eef68585f381"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/generic-i2c-legacy-green.xml",
+      "bytes": 5678,
+      "sha256": "6ab308bceb3a16980c653c04c08054a733143e29e935d3a8f6e5bf46b2b26614"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/gd32f470-soc-common-i2c_v1_async.c.o",
+      "bytes": 8272,
+      "sha256": "dcdbc8d17cfb1b6b0505ba81d6aadf190894c4782a41dee7097ecaf3996b5675"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/gd32f470-soc-common-i2c_v1_async.c.size.raw",
+      "bytes": 1596,
+      "sha256": "5f98fc48ee0ecea974c35c8e0315813e569fdb2af071a4fd9eed1f3ea2c64db5"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/gd32f470-soc-gd32f470-drivers-i2c_async.c.o",
+      "bytes": 3604,
+      "sha256": "e20368e769ed23534dc78a9d9b1851d4cf6999d18e9c4bbe2b4d9a30a7865213"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/gd32f470-soc-gd32f470-drivers-i2c_async.c.size.raw",
+      "bytes": 908,
+      "sha256": "8cbad05705ea06f26df084d327f9a27b65db1fb3a5e3b6884fe4abcc5054cf78"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/gd32f470-types.c.raw",
+      "bytes": 252,
+      "sha256": "11f0732d5f029459639088f7f6f6bc8b57d3cdcf4e1663a4e564d52f217edbf7"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/gd32f470-types.nm.raw",
+      "bytes": 126,
+      "sha256": "466c867c19809f7a6142644f4b493c6cf7a9118875852d69cea24b757b3148ef"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/gd32f470-types.o",
+      "bytes": 1208,
+      "sha256": "d5e12a81f6a14955a5659d2886f2819b822bc72f81e04d72a140de3f717d5c5c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/report.json",
+      "bytes": 7902,
+      "sha256": "378a52cbfb54fb2ee2a3b9761bfcbf52e046b3e8a068ac47b76a9aaaa631723f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/stm32f407-soc-common-i2c_v1_async.c.o",
+      "bytes": 8272,
+      "sha256": "dcdbc8d17cfb1b6b0505ba81d6aadf190894c4782a41dee7097ecaf3996b5675"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/stm32f407-soc-common-i2c_v1_async.c.size.raw",
+      "bytes": 1597,
+      "sha256": "8725e3e9013d20f951e7551d7df14a8727ec3f19f8f5195cf6ee41b49217d8dc"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/stm32f407-soc-stm32f407-drivers-i2c_async.c.o",
+      "bytes": 3636,
+      "sha256": "25aa030a11ea341a169a1ef040f30766e35956384588781e2e6b91e96a075381"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/stm32f407-soc-stm32f407-drivers-i2c_async.c.size.raw",
+      "bytes": 926,
+      "sha256": "4c65d8dfcd061954787eade83bec9411c093898d68b20527d2d3437a3b3dd180"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/stm32f407-types.c.raw",
+      "bytes": 253,
+      "sha256": "2895673a1fae35faa3e3c3a5520920e6f19f168d483b1d183ad1620466c5266e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/stm32f407-types.nm.raw",
+      "bytes": 126,
+      "sha256": "466c867c19809f7a6142644f4b493c6cf7a9118875852d69cea24b757b3148ef"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2/stm32f407-types.o",
+      "bytes": 1208,
+      "sha256": "d127e63a28d387ad721d340d881434feb9b064bd95c1635ad19668eacd134e5c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-gd32f470-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1444,
+      "sha256": "89314350a74d482c9796a4d46796330ca0f140660f5b1e93ce763ca45db55ca8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-gd32f470-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-gd32f470-soc-gd32f470-drivers-i2c_async.c.command.json",
+      "bytes": 1465,
+      "sha256": "1a900bd9464897bf4a2b1a0ff22b9028d6289839314210487e6798bc231168e2"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-gd32f470-soc-gd32f470-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-gd32f470-types.command.json",
+      "bytes": 1500,
+      "sha256": "54a968668cb7b5defb9426eacd3397b1aee4c5033483535c576630f93df0747a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-gd32f470-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-stm32f407-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1293,
+      "sha256": "81f06d55d483a9467ef7991de3cc9bc83506c0d8f4c8599110e52005400c0f4c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-stm32f407-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-stm32f407-soc-stm32f407-drivers-i2c_async.c.command.json",
+      "bytes": 1317,
+      "sha256": "5dd6fc9315e3e45cc94814163cc1c399999b1d413b2daa81c5c05932244baa96"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-stm32f407-soc-stm32f407-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-stm32f407-types.command.json",
+      "bytes": 1350,
+      "sha256": "5260659c770d1dfe617e8dda537349d94614b690848a5dcd660351ef1c8acfa4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-green2-stm32f407-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-stm32f407-soc-stm32f407-drivers-i2c_async.c.command.json",
+      "bytes": 1251,
+      "sha256": "a2a3420a41c8a7f6f3ac2d6f8779075552d6054478c18cff5218637d45507c9f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-arm-stm32f407-soc-stm32f407-drivers-i2c_async.c.log",
+      "bytes": 917,
+      "sha256": "ca5602dba8a8264b7e95f558c02d3bc6d9394c838cf093ae05d6e2130b8e7e55"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-comment-final.command.json",
+      "bytes": 742,
+      "sha256": "0bd5f0f7eebbeef931221e6fa6adc556e626c02300475611e7f123c54089a3c6"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-comment-final.log",
+      "bytes": 2514,
+      "sha256": "df9f73c2c18bb037fdfbd85f9282129168d3adab17913f0f86ff9829efbe273a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-drivers/arm_i2c.py.raw",
+      "bytes": 5814,
+      "sha256": "399040edcd16b4349c7eba9146addb424a814b0509d78199951fbff4631ca33d"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-drivers/build_i2c.py.raw",
+      "bytes": 2771,
+      "sha256": "1cc4cefa327f44489b6454c7f71fdd56ece219f28dc08edb27c51bc93ab8f1b5"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-drivers/build_i2c_legacy.py.raw",
+      "bytes": 2782,
+      "sha256": "f0e44516acb6252a852437f40a677d022941f6ed58575ba398b33fc534729637"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-drivers/run.py.raw",
+      "bytes": 1315,
+      "sha256": "d14af5d89279da79f7cbbaae0ae54b9a25b231c9464826b3bccf9aa16f3ea35f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-format-final.command.json",
+      "bytes": 738,
+      "sha256": "49cbea58cc5d14879a54ab02d01eb4f3a501b3ecd519ade66f7cf0034ca0e1b0"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-format-final.log",
+      "bytes": 160,
+      "sha256": "11fd54548b6fd945057f995310ce5a2be242f785b7b86538f413e14bf2f51488"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-api-red-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1424,
+      "sha256": "1c89494e2c7fb8560f1398cec01b51eb9478a55c4647a991b5d0eb4e155e9645"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-api-red-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 548,
+      "sha256": "4f7cd9734ce496894af8bda71eb9e9935408aa59b2ca4ecdca26b8fdff84e4ba"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red-build-link.command.json",
+      "bytes": 875,
+      "sha256": "92363b2fac6ddebf7b91846f005b3e96dd4f12b4e70defb31f6b0ade748ee6b6"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red-build-link.log",
+      "bytes": 2775,
+      "sha256": "b71b9a4ed43908404d7f9361a3e1bc332b3c6bcdfb455685ab60a256ac2b2774"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1197,
+      "sha256": "fa436885310b27515a0be6798253a1186c3e37078c25c9035430c1d8ce2e05ea"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red-build-soc-gd32f470-drivers-i2c_async.c.command.json",
+      "bytes": 1218,
+      "sha256": "4f161d90bfa59f90bc95915d69d5f865c514b4c90d20ca68d455b5c419d5f1fd"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red-build-soc-gd32f470-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1435,
+      "sha256": "64d27afb83934a6974cf38332e6ef631e7f6c2227ccfb26e852cad093be693ca"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-core-src-request.c.command.json",
+      "bytes": 1180,
+      "sha256": "3b5c50c94a7820d339e54bcefb14d7bf2cb4b020f7dde74d85614118bd3f374f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-core-src-time.c.command.json",
+      "bytes": 1171,
+      "sha256": "07cdd0d9fd13ad1fa0c9f9e1adf8b03a314f1dbe70140434ebd13a21b580c3b6"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-io-src-dma.c.command.json",
+      "bytes": 1162,
+      "sha256": "4845c2068a4ec817593a1eeec27e84eba1ebd6c1ca756060e21472f48c9aa67f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-io-src-i2c.c.command.json",
+      "bytes": 1162,
+      "sha256": "9d8a4665a654ebb133dfa35203e61415349c15acc0ff3897f6c96f7c02f7f8a8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-io-src-wake.c.command.json",
+      "bytes": 1165,
+      "sha256": "58a6d3f98888ad850dd23de0bb6ef0acd48809c74e5c9136ad5c8b384aa4a596"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-link.command.json",
+      "bytes": 1139,
+      "sha256": "093e144e9e7c3f5e0124bcfe34fed6f82666a9b56dcfa853c9439048f32cdbaa"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1201,
+      "sha256": "11c266ec00572890c9a272caec2a3378c457fc1e07b9b58269d6375a67145ec6"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-soc-gd32f470-drivers-i2c_async.c.command.json",
+      "bytes": 1222,
+      "sha256": "b45eb820bffd391f32f485d173963cef5a6d3b54ab71cafb272157d924979e09"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-soc-gd32f470-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1439,
+      "sha256": "ab4e289cf080d340c9766bb15d806dcda0a407065a99769cf7823f068d07f8fd"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2.command.json",
+      "bytes": 436,
+      "sha256": "c120248f4a7f5d6a4bd863b99032795bfda1fe85ec40173fe16b1c7f66ae1bd1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-behavior-red2.log",
+      "bytes": 6670,
+      "sha256": "ed43d2bce14cb7fff63a00016bc7d9d1ca1d2e598e678f07f99c9466f6e3c854"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-core-src-request.c.command.json",
+      "bytes": 1181,
+      "sha256": "9ad2e731b59b08d25d4763039446fc9a0470184e638d4d93cba19cbf26e57c7b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-core-src-time.c.command.json",
+      "bytes": 1172,
+      "sha256": "b8e29e8715d9844552b222771aae3275ff4d246d36ddc6f62dd5b356b3b81535"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-io-src-dma.c.command.json",
+      "bytes": 1163,
+      "sha256": "c230c2551ffa0c4a3c65a35e2f9f8b01801595eaa7887f63aa2b871e9931dcd4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-io-src-i2c.c.command.json",
+      "bytes": 1163,
+      "sha256": "e89aaf5a50ee325fa7dd2fb391ade753f02a04ed6596e2498ac63b5bd025efd1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-io-src-wake.c.command.json",
+      "bytes": 1166,
+      "sha256": "db0aaf065f4b1650991a0023540bed20f184d9e92e8c2112d1568fafb1033328"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-link.command.json",
+      "bytes": 1140,
+      "sha256": "b9ca6934f6197df4b0a69c52fd296995d8ea50abbc0b3a4a3cff8b05172f23aa"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1202,
+      "sha256": "f65044082e0c83cbe34e5cfdc0180d7c98797d61fdece0bcdca9ebb7abd4ed49"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-soc-gd32f470-drivers-i2c_async.c.command.json",
+      "bytes": 1223,
+      "sha256": "b78c718db533077bff473650f55faa677361828aee3abb8f42bf2e4085d16e69"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-soc-gd32f470-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1440,
+      "sha256": "8e1603f34f3f2b13f84cb36f8ee84da58e32bce00eb7878691e57050832364a7"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green.command.json",
+      "bytes": 438,
+      "sha256": "bb9f4420c577c888f58d07f76b82f27ad5a6ffc620d8cc4ee3574235d238802f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green.log",
+      "bytes": 2246,
+      "sha256": "bb885961c0a2e62befc06e1449f28afaf81f92ffbf4d47afcd54971801710112"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-core-src-request.c.command.json",
+      "bytes": 1151,
+      "sha256": "a0b53342a279a7905540e9c472332cfc788c976e9574fcc9eb43b564508b2d58"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-core-src-time.c.command.json",
+      "bytes": 1142,
+      "sha256": "93c81b874ac88e40ef90954b47f38f2d3abdef6f1bfec0cf97e26df713b46a12"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-io-src-dma.c.command.json",
+      "bytes": 1133,
+      "sha256": "3f63b93b1ce836204a19bd4d744c44ba97b55ee263a0999f162f16a44bb8bea2"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-io-src-i2c.c.command.json",
+      "bytes": 1133,
+      "sha256": "04ca728cb97e8dcc8a603c2903e2e09c4867774f9103699b7eb767c7bf78372e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-io-src-wake.c.command.json",
+      "bytes": 1136,
+      "sha256": "55b2852c1d9424fe934f6fb133999639689b4f5435f4b8f6d9a67d6e3f420616"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-link.command.json",
+      "bytes": 1131,
+      "sha256": "9016b01db66d8d409bfaf611e44e5711551a70051a240c4a268b627410024614"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1172,
+      "sha256": "cead3066ae6ad0d2e9257e57ae71d46533e3d7c116f502941c80157cbf609037"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-soc-gd32f470-drivers-i2c_async.c.command.json",
+      "bytes": 1193,
+      "sha256": "dbc64e2b1a7a661f9d7f159f85884296415c368dd484f43f4fa374539206fa5c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-soc-gd32f470-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1410,
+      "sha256": "c9db054f1f8e7af13040826d73d2964510b547d027cbb0f7578748d67503f002"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-green.command.json",
+      "bytes": 449,
+      "sha256": "c1185a54f4b847756b52ecb7a2dfb5e33b318ac7d4238e099baa65c50f189d51"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-final-green.log",
+      "bytes": 2246,
+      "sha256": "bb885961c0a2e62befc06e1449f28afaf81f92ffbf4d47afcd54971801710112"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-core-src-request.c.command.json",
+      "bytes": 1172,
+      "sha256": "7797627cac0d22e74d72c0ded3ba59d4053dfef5251206913553a20f8c6ce4ed"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-core-src-time.c.command.json",
+      "bytes": 1163,
+      "sha256": "537b6a76d7a662d3752622358999b3b812a85753a013d0f61a35b15e51b003aa"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-io-src-dma.c.command.json",
+      "bytes": 1154,
+      "sha256": "53f6b5e92a3fe55e2ba76e5bdabaf809428f6595dba46860d95b96f40e58a71e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-io-src-i2c.c.command.json",
+      "bytes": 1154,
+      "sha256": "2fe948fe0fe979d1037c81a61f99f78484c35874addca8b3205e8f7653a49938"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-io-src-wake.c.command.json",
+      "bytes": 1157,
+      "sha256": "7b6940d07b5d12e7f048a8dd5d4193b8d13e757a4735718308974100f822f617"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-link.command.json",
+      "bytes": 1131,
+      "sha256": "43ed89542d6366af937f50eb90d228722f129320c24dbb46ddb633b1f3c2fff5"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1193,
+      "sha256": "fdb702a467249f2419f3947403a391b40b50a68c7c77db94f5448533a221520a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-soc-gd32f470-drivers-i2c_async.c.command.json",
+      "bytes": 1214,
+      "sha256": "82417a5966daaaa8f3b3f2ee227bf7870d6a88a799aafa5b4ce8c01c5efa7932"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-soc-gd32f470-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1431,
+      "sha256": "9957f611a8d59d1141b34fdb76d60a5807a2d4025deb5fedf8136280ee0b2e89"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green.command.json",
+      "bytes": 420,
+      "sha256": "81bfb212b7ab0357528586a7f87957884b3dbee0de47bacaaa406ddabc3e0df4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-green.log",
+      "bytes": 1434,
+      "sha256": "55c861499ca0e28820d9f78115ef2a13b6a7b6339af4e2680b578803ce096b57"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-arch-native-nx_arch_native.c.command.json",
+      "bytes": 1149,
+      "sha256": "0dfe92f6cbe93becaa8061ded362286dd411976d906917caec64c695c6fb7a8d"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-arch-native-nx_arch_native.c.log",
+      "bytes": 954,
+      "sha256": "6f44638b9090047e995a756e9ee8fa65517df56217cdf60b0a614ba75f5e8d61"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-core-src-request.c.command.json",
+      "bytes": 1119,
+      "sha256": "272e6a357b3be590b710f2dd0308c19fa426c74dd096deb57cee5a5db2d66d5d"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-core-src-time.c.command.json",
+      "bytes": 1110,
+      "sha256": "77cfea5941732405056c61d8f104b6fd99fc8bb05db74660a5ac4799860fe65c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-io-src-dma.c.command.json",
+      "bytes": 1101,
+      "sha256": "71701d32e6740fbbc15018c2cd31f2ff126e241e78ab8813276dc9b8b85c8311"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-io-src-i2c.c.command.json",
+      "bytes": 1101,
+      "sha256": "88dceaeef398218e08814b04fb93696a7a94144f81ccac5ad615dea8c03fb8f6"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-io-src-wake.c.command.json",
+      "bytes": 1104,
+      "sha256": "5e8d16963075153560b85527a75b77521ee2fd074308bdec04beb1ef7b130520"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1140,
+      "sha256": "61d8815b2dff23437e1ab28c54487630be80988a2fcc39233f028bfbf3525bf0"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-tests-google-i2c_async_register_test.cpp.command.json",
+      "bytes": 1372,
+      "sha256": "52b0a13a686ab7e6498f73c938823c415a4a7c3adde68ccc71903d5489b985f4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build-tests-google-i2c_async_register_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-arch-native-nx_arch_native.c.command.json",
+      "bytes": 1246,
+      "sha256": "22b78816ca82c277ff9577f03e12b5f4d09fb0030683737b1b64c50bcdf72054"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-arch-native-nx_arch_native.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-core-src-request.c.command.json",
+      "bytes": 1216,
+      "sha256": "e669489d16e8806a105ad8b75d42ff74c7a9506f5f8c840ba9f36aac2beb264a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-core-src-time.c.command.json",
+      "bytes": 1207,
+      "sha256": "38daa1313b0d29431f68b8761d32f8041bf6d725001db19a52251b87cf497c0b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-io-src-dma.c.command.json",
+      "bytes": 1198,
+      "sha256": "5bf2779fe3c5eb20ef1b8586dea9dd0f965f24ee028af3421654ee263266d063"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-io-src-i2c.c.command.json",
+      "bytes": 1198,
+      "sha256": "9cf63d81f729c0847aa3df62f6144f6d49bba61db3a178b4965760ce06b8b642"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-io-src-wake.c.command.json",
+      "bytes": 1201,
+      "sha256": "c5f0ec94d8832067fb853ee9d561e2b0b37dc2bf100fb72339cb941372e3ea38"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-link.command.json",
+      "bytes": 1286,
+      "sha256": "1f066cb6b28d2b8d40cc16d1077b60a3011a0bc3fa6080f0649db4b681b9962b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1237,
+      "sha256": "f8eae33e6a8f2eb637e3a7319f814326aa0313aa3ce1fa9949485d5dff6f55df"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-soc-gd32f470-drivers-i2c_async.c.command.json",
+      "bytes": 1258,
+      "sha256": "6387a78ff709958806b2186ab3fb5e2820873adfcac1015a952b360fe5098ac0"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-soc-gd32f470-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-tests-google-i2c_async_register_test.cpp.command.json",
+      "bytes": 1469,
+      "sha256": "d095e9a36b519760e875f47511ee8f72621ee1558eebf4b775d7bbfbd92160b4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-build2-tests-google-i2c_async_register_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-green.command.json",
+      "bytes": 458,
+      "sha256": "400d3b88fce01e81b590a98226d159e0cba9938fdd74b80e603ceae1958433ca"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-legacy-green.log",
+      "bytes": 4268,
+      "sha256": "25db5821591090cd3753cefeac87588e313a3b5c700db06a3e59953777db703a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-core-src-request.c.command.json",
+      "bytes": 1251,
+      "sha256": "ea247140849c1ccbb8ca71a0f7a9b271cb820de395f92beba5fd880290a652ce"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-core-src-time.c.command.json",
+      "bytes": 1242,
+      "sha256": "88a367a8078085f5a3ed6ae265675ef3dd4f2932e1ae7a92acd11b7b30eeebc2"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-io-src-dma.c.command.json",
+      "bytes": 1233,
+      "sha256": "3339e4c687cd073e65e232fe85324f4f4c8a6ce338d8cfd6b4f5611a6ca6519c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-io-src-i2c.c.command.json",
+      "bytes": 1233,
+      "sha256": "410244fd556a674d38bc9b5ba567bd77fd36f3b6c91da739af46d37c73e5ceed"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-io-src-wake.c.command.json",
+      "bytes": 1236,
+      "sha256": "745383b056a4b90e94694bdaba550c8b228a14fa8beb53f1e736097cdfa0555b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-link.command.json",
+      "bytes": 1201,
+      "sha256": "e970d72a3534566b2c073f34fa56bec6d12ca02b7e6acb0a095de74840646b6b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1272,
+      "sha256": "58dd183a23de2b7669be3c1819871f4cb0aa2a65686cfab6a73dbf287e5ccd80"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-soc-gd32f470-drivers-i2c_async.c.command.json",
+      "bytes": 1293,
+      "sha256": "fb182b8e0701ab21d5d88f20edebe135ac8d534636951d0df6031b852952e64c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-soc-gd32f470-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1510,
+      "sha256": "97fec284100eb9dcc46d20329dc41376567a6b640a85ff4c06df5196d641f2ac"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-core-src-request.c.command.json",
+      "bytes": 1236,
+      "sha256": "75791f81c648eda6cf145096c0c86b9d6118b56614dc266e2c93694517e68e8f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-core-src-time.c.command.json",
+      "bytes": 1227,
+      "sha256": "231ee8b484af161c4cf2c6ff2a8e6367e0df94b5f57cfcaa64990f2372e4ff14"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-io-src-dma.c.command.json",
+      "bytes": 1218,
+      "sha256": "f79f7a93e73ef115e8c16a09879de056d0d7ecf0edc85442d2771b98ebe83b74"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-io-src-i2c.c.command.json",
+      "bytes": 1218,
+      "sha256": "89313d2f179be92179a92ea1d975d00647c3b4f2a2becb8ca54503002d52b755"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-io-src-wake.c.command.json",
+      "bytes": 1221,
+      "sha256": "7e4e1e9e65efdd3967ab5bf8cd6b462b5acce3da1311fefbab9b3d356c3ed327"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-link.command.json",
+      "bytes": 1207,
+      "sha256": "9c297c95c05128a7860dd4d51bd91da0b692665af1ea25965c4c4fba57bf5006"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1257,
+      "sha256": "e11dfd5005027d8572134178f7a70d3837a03dc9b510113dc8eea9684d6bc4b8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-soc-gd32f470-drivers-i2c_async.c.command.json",
+      "bytes": 1278,
+      "sha256": "90f6f96cb90eff95260d0cc6f048488c22d63c5c11b2957912fed36b0f18f32e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-soc-gd32f470-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1495,
+      "sha256": "6d1097ef2d0f7ff3e3d17b4d64ddfbcc2898a54fad9088cc9c464720aaf624c7"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-green.command.json",
+      "bytes": 461,
+      "sha256": "8c04af3e906e74891262278b6867c8f6b58fa7b0405af0e946b37169780ef951"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-final-green.log",
+      "bytes": 2246,
+      "sha256": "bb885961c0a2e62befc06e1449f28afaf81f92ffbf4d47afcd54971801710112"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-green.command.json",
+      "bytes": 449,
+      "sha256": "649176fd9d19811d50702b7dbbc192375347455859f3b34d2c1274d56a115619"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-san-green.log",
+      "bytes": 2246,
+      "sha256": "bb885961c0a2e62befc06e1449f28afaf81f92ffbf4d47afcd54971801710112"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-arch-native-nx_arch_native.c.command.json",
+      "bytes": 804,
+      "sha256": "9c09fae76c8919802582caa46a9f1c83d2807f0f3e0ae5312257165626b39f80"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-arch-native-nx_arch_native.c.log",
+      "bytes": 954,
+      "sha256": "6f44638b9090047e995a756e9ee8fa65517df56217cdf60b0a614ba75f5e8d61"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-core-src-request.c.command.json",
+      "bytes": 774,
+      "sha256": "a85baece3d951f2a9fa70c6d4918fb4fd0f6d463ca7c2c13c975e8e52c3c5090"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-core-src-time.c.command.json",
+      "bytes": 765,
+      "sha256": "366819803b247501fbbd8304524895db65d8c60d5b80644ef39643408c65747b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-io-src-dma.c.command.json",
+      "bytes": 756,
+      "sha256": "46e70dedb6a4203b9fe364941ea94778d8d12780290cfd3ddee98ea24af113f4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-io-src-i2c.c.command.json",
+      "bytes": 756,
+      "sha256": "23f28ab3af3a56102cca8aaf40418f6da8bea23c9c02f7678becd3fec75729f4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-io-src-wake.c.command.json",
+      "bytes": 759,
+      "sha256": "029d13fb6664e28acfd236018d1154d5a578656b17ec5e2f4308f41026f45d4d"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 795,
+      "sha256": "6da97187c4f88188c30681a3f72c6f74a86ca756ae805024f179b2d28f8a0ca4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-tests-google-i2c_async_register_test.cpp.command.json",
+      "bytes": 1027,
+      "sha256": "7c0f3280d732d4d7a10e9fad95976ffae2edc542bc4238416a2cdb40cb5255b0"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build-tests-google-i2c_async_register_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-arch-native-nx_arch_native.c.command.json",
+      "bytes": 902,
+      "sha256": "5d615c402dc38a58d26dd1a7c4349b6354647f982087a20078b53433e14c53bc"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-arch-native-nx_arch_native.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-core-src-request.c.command.json",
+      "bytes": 872,
+      "sha256": "8e4c0ccad0de85dba0afa1ed6cde01a9f169ecba95afe058c5480c956f7103a9"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-core-src-time.c.command.json",
+      "bytes": 863,
+      "sha256": "fe4280df5c365ccbeb069d395ecef5dd2ba49515e15681c0f006871c13208a3c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-io-src-dma.c.command.json",
+      "bytes": 854,
+      "sha256": "8bc1f0feea4549b7e05a84db386067cb3876b5f57a119d0a7033896b0614b59a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-io-src-i2c.c.command.json",
+      "bytes": 854,
+      "sha256": "0df763e8b73c17d0303ab5f4ea20333c152eef78f13bc1cb4e4eb30900f661d6"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-io-src-wake.c.command.json",
+      "bytes": 857,
+      "sha256": "22dbf1b3099936104bc93af7dd9d370af97a1156eb4155ff3f1e7edda7c14788"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-link.command.json",
+      "bytes": 1240,
+      "sha256": "cad097bc82ecb66d75abbefdc658bdfed70f546e9f044c8c38ee9662ad7d1d9a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 893,
+      "sha256": "dd4f8397ee09d38e7fe28c30f3317e868f5d20911b945e22003649afdfacd024"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-tests-google-i2c_async_register_test.cpp.command.json",
+      "bytes": 1125,
+      "sha256": "a9d3686282f90f8b91a02547e05d8d3e347bd88de95611737ce754f7335fcf20"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-build2-tests-google-i2c_async_register_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-green.command.json",
+      "bytes": 473,
+      "sha256": "997bcc5a04be01ac73379f7a3dbecec8c202a496e3e6832bd6a28d1daf4ef281"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-generic-legacy-green.log",
+      "bytes": 3944,
+      "sha256": "ac2c8e0d41d48d7a5df8ceb6e96db0453a040df6aadbb74b2219daacfa26a5dd"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-api-red-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1271,
+      "sha256": "08d8ca37b5d31103172395b5f1fae37d84fb5cf0ef4a05501433377fb3f5f70b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-api-red-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 551,
+      "sha256": "7cf901dad4c31ee4e1cbf1dfc90ab0a690157893632e27faaa3a694abd399352"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red-build-link.command.json",
+      "bytes": 881,
+      "sha256": "3e0ca526046e5e21effba855df6fad16610544ec95bda13c41c12526a2851fbe"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red-build-link.log",
+      "bytes": 2783,
+      "sha256": "8e94b2b6b49c1351728ddaabd2ca667c5893e32c268f1ceb6958065ad3d487a7"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1044,
+      "sha256": "c1dbe4b0bdc941ef078165ff74d519d3a753674ecec3a4b6dd9a10a45d715252"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red-build-soc-stm32f407-drivers-i2c_async.c.command.json",
+      "bytes": 1068,
+      "sha256": "a46c06d5d28f93bdabd0de4cc3333beba6f787eb334882495e690f1e4142706a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red-build-soc-stm32f407-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1282,
+      "sha256": "8e03d10e0ebbcbdb88413ce60961b49d7540ad13671c2df88656ed6d7ace1650"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-core-src-request.c.command.json",
+      "bytes": 1028,
+      "sha256": "70c6eb530b5eae2e1c94d3b84395e2ec6657b4b48d542ce0120250400d7ee9b3"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-core-src-time.c.command.json",
+      "bytes": 1019,
+      "sha256": "3059fba8782ead628d22e4c01ffb7d2485fda31db6928af3aa951b20f300d276"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-io-src-dma.c.command.json",
+      "bytes": 1010,
+      "sha256": "e81a6319bbf9068f868df89e101dfd7d1a24f773343fbce14d42b9aa60710db6"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-io-src-i2c.c.command.json",
+      "bytes": 1010,
+      "sha256": "1a8f3b919f813b4495cdfe09452622584221cb0cb1fb8eb381de95d081b7f3be"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-io-src-wake.c.command.json",
+      "bytes": 1013,
+      "sha256": "37c8cc839e5bbe0860cbff35c46d155a70c626cd1567e8fbf1c691041d7406a8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-link.command.json",
+      "bytes": 1150,
+      "sha256": "2074acbecf21a15859b79273f45ee097c338978f74c9709247fd49d0ffb03de9"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1049,
+      "sha256": "71506ebd331e914c442806ee2c07ce17c26a304d6832a4116007cdb0c80b18c9"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-soc-stm32f407-drivers-i2c_async.c.command.json",
+      "bytes": 1073,
+      "sha256": "ea33148a99ceeb20cfa555d14a327147e4c7ba37b2247a57fea94d59b2fb2218"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-soc-stm32f407-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1287,
+      "sha256": "7d00b7007d4db7326f0be10f15fff96d56af340d2ef9041dcbc374cd13e86d6a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2.command.json",
+      "bytes": 439,
+      "sha256": "c4c56de496592e746af0dfbdaba0eb19b0058dacd9e29ff5a7d97ea5cff3049f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-behavior-red2.log",
+      "bytes": 6651,
+      "sha256": "558eb25ce97ee617f2aeb72803e190198da460f6b6f8979754b74a7349a7913f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-core-src-request.c.command.json",
+      "bytes": 1029,
+      "sha256": "f2f7f423e9e65605c91cfb2766d68ab75b5f90f680acf14eac5b9e0c12374f20"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-core-src-time.c.command.json",
+      "bytes": 1020,
+      "sha256": "77cc5237354df1b8b52ab10eaa8746afeb82f21f79262b245f4236a840c8044a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-io-src-dma.c.command.json",
+      "bytes": 1011,
+      "sha256": "58c1aa1f7b6fc47dc505f974a5d7d1ad7fa4c376ae29efaec48834c6727fea58"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-io-src-i2c.c.command.json",
+      "bytes": 1011,
+      "sha256": "feffac2e4ba5d705dbde26bf5b43c67d908b025040d0d3e8dcd7152bf6625971"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-io-src-wake.c.command.json",
+      "bytes": 1014,
+      "sha256": "3f8169ffd0351703bf669162edef02a48935d8c7de1921d7dc1cced4b12587ad"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-link.command.json",
+      "bytes": 1151,
+      "sha256": "2ba1405e6a887f7cae782da08d00b9ae847896c06b08aa8746498235f2c66dad"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1050,
+      "sha256": "ee36635fb7e1e0577e9b6f0f0c1bf60f325c2af1f738bb626d981432f09a56de"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-soc-stm32f407-drivers-i2c_async.c.command.json",
+      "bytes": 1074,
+      "sha256": "9fb4507ef84da96b964b882dfdeb20bb9115039062e93f29712ee6365bd24ad8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-soc-stm32f407-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1288,
+      "sha256": "8e78c81b161120b5a02443a8188cb30ddcde0dfe90bc0fb9b486271c1b42e5ac"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green.command.json",
+      "bytes": 441,
+      "sha256": "810839371be86c0f2564ca9c3403592c0b4838f61f7a840ac321bca66ba38b02"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-boundary-green.log",
+      "bytes": 2246,
+      "sha256": "bb885961c0a2e62befc06e1449f28afaf81f92ffbf4d47afcd54971801710112"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-core-src-request.c.command.json",
+      "bytes": 998,
+      "sha256": "326c7349e569079a44d10cafcc7a6544ad5c528bd1268011837a4731bfbec6f1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-core-src-time.c.command.json",
+      "bytes": 989,
+      "sha256": "49eeaf1e64d116520e39cecc8910ecefbe84602145b4caa4c058db46f23529a2"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-io-src-dma.c.command.json",
+      "bytes": 980,
+      "sha256": "1dc4b5c98603e79f7a93418b2528f482338163d8fe1bf3fb007dfa37ef0dbb12"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-io-src-i2c.c.command.json",
+      "bytes": 980,
+      "sha256": "68d5041720a5c266c67d71859141d33862251ca079b61637f8c4d1a5af425f26"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-io-src-wake.c.command.json",
+      "bytes": 983,
+      "sha256": "927f950c85de23d79957c24cdccf6a176aa2b6f105bc424814b770adbd7208c4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-link.command.json",
+      "bytes": 1142,
+      "sha256": "bb3e71800ace87a66ba7a3cb981b33646233fb1a96969992d47df211a3fe1257"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1019,
+      "sha256": "8f8c8630bb4867a4b1d97dfabfc5422d22a3810a86e2c0b5274d3f98ec6c53dd"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-soc-stm32f407-drivers-i2c_async.c.command.json",
+      "bytes": 1043,
+      "sha256": "c810a10615088e2280c2c97e3e14895d46ae20f2a3b1865384eae967574e67d1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-soc-stm32f407-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1257,
+      "sha256": "5cd9426859d06c542ba9db973f2c92d6493ef89a429592d54d0abf68cae2028c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-green.command.json",
+      "bytes": 452,
+      "sha256": "6ff93e1405bbc6df518232c5040c9c513616a3fb39ae33d4c3439ebc003061f7"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-final-green.log",
+      "bytes": 2246,
+      "sha256": "bb885961c0a2e62befc06e1449f28afaf81f92ffbf4d47afcd54971801710112"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-core-src-request.c.command.json",
+      "bytes": 1020,
+      "sha256": "84c17bbb9f68f12d6f60e666ab05b2ccb596138bb9f62a361508dfc4cedc8e80"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-core-src-time.c.command.json",
+      "bytes": 1011,
+      "sha256": "2a0fb8d9dc483244165fc408262e1c953bc77bc034164cfa82de2579bde66945"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-io-src-dma.c.command.json",
+      "bytes": 1002,
+      "sha256": "31208db406b32ba8037fb5b16a688c5c5437a580c309fb21d36ecd4f48fa059f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-io-src-i2c.c.command.json",
+      "bytes": 1002,
+      "sha256": "bc694af341febd1a891b23d3f5332138d65816c44048673aa8b2829f9ddd3901"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-io-src-wake.c.command.json",
+      "bytes": 1005,
+      "sha256": "a0ef42baaeb0e24c0466bc00d6e697e0682e1a3799ae834465fbdd0ffda6f3e3"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-link.command.json",
+      "bytes": 1142,
+      "sha256": "ef135df88860790e9011fa0f628aff62b797be98c3d516aae679d1f087705c8e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1041,
+      "sha256": "aeb125d0f1a9da0710b302d876bfb54d36628aa5ada1c99f40cbabf9e1bdb78b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-soc-stm32f407-drivers-i2c_async.c.command.json",
+      "bytes": 1065,
+      "sha256": "9fc3845ea4825a2745bbd6da6ff00c739a7fd7e5b7f18eb8d07172bda4796018"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-soc-stm32f407-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1279,
+      "sha256": "f0ff5b5340af6395dfc84ed5fdc4d3178da3ad3ddea5f95baf69b75b1b78af00"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green.command.json",
+      "bytes": 423,
+      "sha256": "abab9a4e27e155ae623bfd6ab5487f29afeeeea2ef88aa2f75f15707c6d90f1e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-green.log",
+      "bytes": 1434,
+      "sha256": "55c861499ca0e28820d9f78115ef2a13b6a7b6339af4e2680b578803ce096b57"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-arch-native-nx_arch_native.c.command.json",
+      "bytes": 1022,
+      "sha256": "a415811114af29626e0adc26e997f8ef7eb25f1ce9ca8540cffb54ffa8ce690b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-arch-native-nx_arch_native.c.log",
+      "bytes": 954,
+      "sha256": "6f44638b9090047e995a756e9ee8fa65517df56217cdf60b0a614ba75f5e8d61"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-core-src-request.c.command.json",
+      "bytes": 992,
+      "sha256": "78428cde6139afc90a1c39218e9103ab7639a09ce60085254b271f725fb9209e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-core-src-time.c.command.json",
+      "bytes": 983,
+      "sha256": "a0506779c77732169737389f2d089adc3da7dfd67bbcc7cd057b1fd8d8b01a59"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-io-src-dma.c.command.json",
+      "bytes": 974,
+      "sha256": "dda7a58e1df4cc6d7cf40cbd0d86868590e96a3880f304e6dd03d7c73235add0"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-io-src-i2c.c.command.json",
+      "bytes": 974,
+      "sha256": "637eabe2dea44c152e77fd68fdfb791f4f9b8478baae8ec8eb76d89d72dc990e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-io-src-wake.c.command.json",
+      "bytes": 977,
+      "sha256": "6bdbcab5c0061d1d3a273f6f2b7415ad5cbf75bd7dcb8ef948f6ee6e40a5e13b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1013,
+      "sha256": "7e8535e353076111efc6e2c0960ba7d8292551ddc7cf749888c2970cbdafdd13"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-tests-google-i2c_async_register_test.cpp.command.json",
+      "bytes": 1245,
+      "sha256": "fe6922355b7db7b322a5955d671b118652f0b5d34ef988cf1a1603a6fa69bedd"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build-tests-google-i2c_async_register_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-arch-native-nx_arch_native.c.command.json",
+      "bytes": 1120,
+      "sha256": "740c471bf4ee0d06387a8331a094c2a81177362047c0ed6e20f5a454a15cce57"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-arch-native-nx_arch_native.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-core-src-request.c.command.json",
+      "bytes": 1090,
+      "sha256": "a2c4230b39e0aff8f3926bb4edf7a8f15a4566ec94890e45c89310124daee5d1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-core-src-time.c.command.json",
+      "bytes": 1081,
+      "sha256": "6a343365d5b67f7e2f181344c4150d693d43f558b9a97f1f0968cb963243e1b5"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-io-src-dma.c.command.json",
+      "bytes": 1072,
+      "sha256": "ed193735f79c6e4471be073ca7d83ccd2e540075a4b8a317272c6520deef56a3"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-io-src-i2c.c.command.json",
+      "bytes": 1072,
+      "sha256": "5b767c41f5457e699ff8112bb39d90b5cab5f310fd36a9f799a78e382ef9fcd9"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-io-src-wake.c.command.json",
+      "bytes": 1075,
+      "sha256": "bc86004e20b14f6a98c2f679471f1c9ab9155b3b864814594cf11f147a06f9df"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-link.command.json",
+      "bytes": 1298,
+      "sha256": "76d1a6410509418ebadd371bfeedb628ce2d91721e03c87b5e47f48de55d65db"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1111,
+      "sha256": "2c0e7646f3eff4fec8812aa4f8dcecc7e69f5d52e1912811965cbac28b7c5567"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-soc-stm32f407-drivers-i2c_async.c.command.json",
+      "bytes": 1135,
+      "sha256": "bf0a9d8537be24bbefd7b4d929b2baea6b3357c9947f37113c2800085067abc4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-soc-stm32f407-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-tests-google-i2c_async_register_test.cpp.command.json",
+      "bytes": 1343,
+      "sha256": "53953a76fcf974f174134212ba89f5510aa058d857c5e9e6501f8efd7eaa78e0"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-build2-tests-google-i2c_async_register_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-green.command.json",
+      "bytes": 461,
+      "sha256": "a4e9ead826b0f4c0f9803a0c5761c4f41d3a9b6a3bcd6c3a39fa2957305f756a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-legacy-green.log",
+      "bytes": 4115,
+      "sha256": "819f7ae4c46d76bf10e8d641ebc30373821ab33fdb1b717fc035b3877e3586fb"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-core-src-request.c.command.json",
+      "bytes": 1099,
+      "sha256": "ad11022457ff5789c3203ba13c0d942f0e06da724763483b09ecc8526fd18ad3"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-core-src-time.c.command.json",
+      "bytes": 1090,
+      "sha256": "28d19a67e2dbd7c3b902a9acb6041cd278c997e6061fa42363b6c36992b8a792"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-io-src-dma.c.command.json",
+      "bytes": 1081,
+      "sha256": "5c1871f6cc0b74f11d211da5bf7780a0c8fa88f54ed0e02801aed7b22a72fc3f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-io-src-i2c.c.command.json",
+      "bytes": 1081,
+      "sha256": "7ba32a58e87d6be8543fba3174a5b9cb9d9a140e3f086209f8f778a64525bb39"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-io-src-wake.c.command.json",
+      "bytes": 1084,
+      "sha256": "f7ac722bd1922e32f0dc3af42d1bd25ccbdaac6647c3a3df0986903a256dcd1e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-link.command.json",
+      "bytes": 1212,
+      "sha256": "9b4b76105dc73bf8d5506039b3cf72024fb04eb27604c1cb449ba4543aaa564f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1120,
+      "sha256": "5aef5e7939789cc5c5a871f49c2c544c82c3da674740280cce0f2df034a8381f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-soc-stm32f407-drivers-i2c_async.c.command.json",
+      "bytes": 1144,
+      "sha256": "634abca1ce1a4ccef3e61b6c87658fc28db6b39822843d945cab31a18cdf8b04"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-soc-stm32f407-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1358,
+      "sha256": "4bc8e15d8e63ea7bff304de6b47223affd996dd87b1dcd39dcf96c96bb5c5811"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-core-src-request.c.command.json",
+      "bytes": 1083,
+      "sha256": "b80034bf0f9e791219ee8f403e334328284620811ea51dd184481319a60501b5"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-core-src-request.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-core-src-time.c.command.json",
+      "bytes": 1074,
+      "sha256": "c93254cd545c81d3a7918c7ce0c52bd30b13ff289832a5b6fd1fe07b6b57ce62"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-core-src-time.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-io-src-dma.c.command.json",
+      "bytes": 1065,
+      "sha256": "0a6dfcf8cc59f16306492b009fd6b665b7b22c2121e3cd0fbbca02a0578a4818"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-io-src-dma.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-io-src-i2c.c.command.json",
+      "bytes": 1065,
+      "sha256": "2687b270971e93832bb30642c6dda9dbd495b094e969a3d83be12055bfb3a449"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-io-src-i2c.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-io-src-wake.c.command.json",
+      "bytes": 1068,
+      "sha256": "966a6d23561b11d66b0a2bdccaa001ec23810f3e8a89377883c279b9653c3330"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-io-src-wake.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-link.command.json",
+      "bytes": 1218,
+      "sha256": "17919d766be80ae47e5bebd3cb2108b267fad5dfae8aa5d06b013be8005d2143"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-soc-common-i2c_v1_async.c.command.json",
+      "bytes": 1104,
+      "sha256": "cf55e3e76ce527649edf86850aef55b8f7b9e358212dde814334d16bc46c2946"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-soc-common-i2c_v1_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-soc-stm32f407-drivers-i2c_async.c.command.json",
+      "bytes": 1128,
+      "sha256": "2798071a2ea62d4ec66afbf7bc01fd6c1ac89bfe19e1d161f1fb1ccdac1f1f51"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-soc-stm32f407-drivers-i2c_async.c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-tests-google-i2c_multi_controller_test.cpp.command.json",
+      "bytes": 1342,
+      "sha256": "b74f7b9b787b4168907b5d5b181612e12b67a0e134d734e2ca90b05e386dafef"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-build-tests-google-i2c_multi_controller_test.cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-green.command.json",
+      "bytes": 464,
+      "sha256": "5ecf221b81edd4a690bfbeb1e311ae8d721a66432d6f2ae68a183bf692443fba"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-final-green.log",
+      "bytes": 2246,
+      "sha256": "bb885961c0a2e62befc06e1449f28afaf81f92ffbf4d47afcd54971801710112"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-green.command.json",
+      "bytes": 452,
+      "sha256": "32fbe22dc85f3e65f7e9f9b74a42f24943d2df057aff3886425ecf1ceea716ee"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-stm-san-green.log",
+      "bytes": 2246,
+      "sha256": "bb885961c0a2e62befc06e1449f28afaf81f92ffbf4d47afcd54971801710112"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-behavior-red2.xml",
+      "bytes": 13415,
+      "sha256": "559cc018d5b599bf90cc9ce2420b6de376fb92f40e310bc4e2457be49a51ab3f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-boundary-green.xml",
+      "bytes": 3181,
+      "sha256": "e5ce0d70c7ebe5ab99b2eaabe18c2246dd9e90967ec51e318b0c90f12ca7887b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-final-green.xml",
+      "bytes": 3181,
+      "sha256": "8787c544e7cb67204fecf6199e7b2790cac5ec0d8306f70a3e4a8208b0c0bf0a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-green.xml",
+      "bytes": 1983,
+      "sha256": "38cb62837ecef2d620ba8cd9694653ad608a0f49160bc9c0319c6aba66ca1732"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-legacy-green.xml",
+      "bytes": 5920,
+      "sha256": "6d6f4c84245cb129332a753fa8fc1431456f51544e2e1343ec214a084758cdb0"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-san-final-green.xml",
+      "bytes": 3181,
+      "sha256": "2dc550d3d7549dc44aacbc8cf5f7d5e1efefac862c75a406cbd492981427bb34"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/stm-i2c-san-green.xml",
+      "bytes": 3181,
+      "sha256": "62c16505b28411b4dc7d7e8355dfde0b96c34a1526a0aa8fde33f87b6b4213f3"
+    }
+  ]
+}

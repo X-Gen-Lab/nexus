@@ -1,0 +1,315 @@
+/**
+ * \file            bindings.c
+ * \brief           Generated fixed typed hardware construction.
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-09
+ * \copyright       Copyright (c) 2026 Nexus Team
+ */
+#include "nexus_bindings.h"
+#include "nexus_factory.h"
+#include "nexus_config.h"
+#include "nexus/arch/arch.h"
+#include "stm32f407_provider.h"
+#include "stm32f407_stream.h"
+#include "stm32f407_uart_receive.h"
+void _init(void);
+void _fini(void);
+/** \brief C runtime hooks; constructors use .init_array. */
+void _init(void) {}
+void _fini(void) {}
+static bool s_nx_platform_started;
+static size_t s_nx_platform_initialized;
+static uint32_t s_nx_platform_dma_clocks_added;
+static uint32_t s_nx_platform_gpio_clocks_added;
+static nx_stm32_uart_duplex_state_t s_nx_port_link;
+static const nx_uart_port_t s_nx_face_link = {
+    &nx_stm32_uart_duplex_ops, &s_nx_port_link
+};
+const nx_uart_port_t* const nx_binding_link = &s_nx_face_link;
+static const nx_dma_memory_region_t s_nx_dma_regions_link[] = {
+    { (uintptr_t)0x20000000u, 131072u, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE },
+    { (uintptr_t)0x08000000u, 1048576u, NX_DMA_MEMORY_READ },
+};
+static nx_result_t prepare_link(void) {
+    s_nx_port_link.transmit.dma = DMA2;
+    s_nx_port_link.transmit.regions = s_nx_dma_regions_link;
+    s_nx_port_link.transmit.region_count = 2u;
+    s_nx_port_link.receive = DMA2_Stream2;
+    s_nx_port_link.continuous = true;
+    s_nx_port_link.transmit.tx = DMA2_Stream7;
+    s_nx_port_link.transmit.dma_irq = DMA2_Stream7_IRQn;
+    s_nx_port_link.transmit.stream = 7u;
+    s_nx_port_link.transmit.channel = 4u;
+    s_nx_port_link.transmit.uart.registers = USART1;
+    s_nx_port_link.transmit.uart.rx_storage = NULL;
+    s_nx_port_link.transmit.uart.rx_capacity = 0u;
+    s_nx_port_link.transmit.uart.baud = 115200u;
+    s_nx_port_link.transmit.uart.profile = NX_UART_RX_BLOCKS;
+    s_nx_port_link.transmit.uart.irq = USART1_IRQn;
+    uint32_t saved_clock = RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN;
+    uint32_t saved_uart_clock = RCC->APB2ENR & RCC_APB2ENR_USART1EN;
+    nx_result_t clock = nx_stm32_gpio_clock_enable(0u);
+    if (clock != NX_SUCCESS) {
+        RCC->AHB1ENR = (RCC->AHB1ENR & ~(uint32_t)RCC_AHB1ENR_GPIOAEN) | saved_clock;
+        return clock;
+    }
+    uint16_t saved_tx = nx_stm32_pin_capture(GPIOA, 9u);
+    uint16_t saved_rx = nx_stm32_pin_capture(GPIOA, 10u);
+    nx_result_t pins = nx_stm32_uart1_pins_prepare();
+    nx_result_t uart = pins == NX_SUCCESS ? nx_stm32_uart_duplex_initialize(&s_nx_port_link, 84000000u) : pins;
+    if (uart != NX_SUCCESS) {
+        nx_stm32_pin_restore(GPIOA, 9u, saved_tx);
+        nx_stm32_pin_restore(GPIOA, 10u, saved_rx);
+        RCC->APB2ENR = (RCC->APB2ENR & ~(uint32_t)RCC_APB2ENR_USART1EN) | saved_uart_clock;
+        RCC->AHB1ENR = (RCC->AHB1ENR & ~(uint32_t)RCC_AHB1ENR_GPIOAEN) | saved_clock;
+        nx_arch_dsb();
+        return uart;
+    }
+    NVIC_SetPriority(s_nx_port_link.transmit.uart.irq, 5u);
+    NVIC_SetPriority(DMA2_Stream2_IRQn, 5u);
+    NVIC_SetPriority(s_nx_port_link.transmit.dma_irq, 5u);
+    return NX_SUCCESS;
+}
+static nx_result_t stop_link(void) {
+    nx_result_t status = nx_uart_port_stop(&s_nx_face_link);
+    if (status != NX_SUCCESS) { return status; }
+    (void)nx_stm32_pin_configure(GPIOA, 9u, 0u, 0u, 0u, false);
+    (void)nx_stm32_pin_configure(GPIOA, 10u, 0u, 0u, 0u, false);
+    RCC->APB2ENR &= ~(uint32_t)RCC_APB2ENR_USART1EN;
+    nx_arch_dsb();
+    return NX_SUCCESS;
+}
+void USART1_IRQHandler(void);
+/** \brief Fixed single-controller IRQ dispatch. */
+void USART1_IRQHandler(void) { nx_stm32_uart_duplex_irq(&s_nx_port_link); }
+void DMA2_Stream2_IRQHandler(void);
+/** \brief Exact selected DMA receive publisher. */
+void DMA2_Stream2_IRQHandler(void) { nx_stm32_uart_receive_dma_irq(&s_nx_port_link); }
+void DMA2_Stream7_IRQHandler(void);
+/** \brief Exact selected DMA TX observation. */
+void DMA2_Stream7_IRQHandler(void) { nx_stm32_uart_dma_irq(&s_nx_port_link.transmit); }
+/** \brief Stop only the initialized selected interfaces. */
+nx_result_t nx_platform_stop(void) {
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) { return NX_ERROR_CONTEXT; }
+    if (s_nx_platform_initialized >= 1u) {
+        nx_result_t status_0 = stop_link();
+        if (status_0 != NX_SUCCESS) { return status_0; }
+        s_nx_platform_initialized = 0u;
+    }
+    if (s_nx_platform_started) { RCC->AHB1ENR &= ~s_nx_platform_gpio_clocks_added; }
+    if (s_nx_platform_started) { RCC->AHB1ENR &= ~s_nx_platform_dma_clocks_added; }
+    nx_arch_dsb();
+    if (s_nx_platform_started && nx_stm32_system_stop(&g_nx_stm32_system, 1000000u) != 0) {
+        return NX_ERROR_IO;
+    }
+    s_nx_platform_started = false;
+    s_nx_platform_initialized = 0u;
+    return NX_SUCCESS;
+}
+/** \brief Start explicit hardware only; rollback retains error facts. */
+nx_platform_start_result_t nx_platform_start(void) {
+    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, 0u };
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        result.primary = NX_ERROR_CONTEXT; return result; }
+    if (s_nx_platform_started) { result.primary = NX_ERROR_STATE; return result; }
+    s_nx_platform_dma_clocks_added = 0u;
+    s_nx_platform_gpio_clocks_added = 0u;
+    result.primary = nx_stm32_validate_identity(1048576u);
+    if (result.primary != NX_SUCCESS) { return result; }
+    nx_stm32_start_result_t system = nx_stm32_system_start(&g_nx_stm32_system, 1000000u);
+    if (system.primary != 0) {
+        result.primary = NX_ERROR_IO;
+        result.cleanup = system.cleanup == 0 ? NX_SUCCESS : NX_ERROR_IO;
+        result.remaining_effects = system.remaining_effects;
+        s_nx_platform_started = result.remaining_effects != 0u;
+        return result;
+    }
+    s_nx_platform_started = true;
+    s_nx_platform_dma_clocks_added = ~RCC->AHB1ENR & (RCC_AHB1ENR_DMA2EN);
+    RCC->AHB1ENR |= (RCC_AHB1ENR_DMA2EN);
+    (void)RCC->AHB1ENR;
+    nx_arch_dsb();
+    s_nx_platform_gpio_clocks_added = ~RCC->AHB1ENR & 1u;
+    result.primary = prepare_link();
+    if (result.primary != NX_SUCCESS) {
+        result.cleanup = nx_platform_stop();
+        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;
+        return result;
+    }
+    s_nx_platform_initialized = 1u;
+    return result;
+}
+
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_gpio_port_t* nx_factory_gpio(nx_gpio_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_uart_port_t* nx_factory_uart(nx_uart_id_t id) {
+    switch (id) {
+        case NX_UART_ID_LINK:
+            return nx_binding_link;
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_spi_port_t* nx_factory_spi(nx_spi_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_i2c_port_t* nx_factory_i2c(nx_i2c_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_flash_port_t* nx_factory_flash(nx_flash_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_watchdog_port_t* nx_factory_watchdog(nx_watchdog_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_exti_port_t* nx_factory_exti(nx_exti_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_pwm_port_t* nx_factory_pwm(nx_pwm_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_adc_port_t* nx_factory_adc(nx_adc_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_spi_endpoint_t* nx_factory_spi_device(nx_spi_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure typed lookup; lifecycle remains explicit. */
+const nx_i2c_endpoint_t* nx_factory_i2c_device(nx_i2c_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_gpio_capability(
+    nx_gpio_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+static const nx_factory_io_capability_t s_nx_capability_uart_link = {
+    NX_FACTORY_CAP_IRQ | NX_FACTORY_CAP_TX_DMA | NX_FACTORY_CAP_RX_DMA | NX_FACTORY_CAP_BLOCK_STREAM, 65535U, 1U, 1U, 0U
+};
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_uart_capability(
+    nx_uart_id_t id) {
+    switch (id) {
+        case NX_UART_ID_LINK:
+            return &s_nx_capability_uart_link;
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_spi_capability(
+    nx_spi_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_i2c_capability(
+    nx_i2c_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_flash_capability(
+    nx_flash_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_watchdog_capability(
+    nx_watchdog_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_exti_capability(
+    nx_exti_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_pwm_capability(
+    nx_pwm_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_adc_capability(
+    nx_adc_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_spi_device_capability(
+    nx_spi_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}
+/** \brief Pure selected-only capability lookup. */
+const nx_factory_io_capability_t* nx_factory_i2c_device_capability(
+    nx_i2c_device_id_t id) {
+    switch (id) {
+        default:
+            return NULL;
+    }
+}

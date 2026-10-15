@@ -1,0 +1,119 @@
+Running main() from gmock_main.cc
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from UARTMultiple
+[ RUN      ] UARTMultiple.SecondaryColdInitPreservesPrimaryRegistersAndIrqs
+tests/google/uart_multi_controller_test.cpp:155: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UARTMultiple.SecondaryColdInitPreservesPrimaryRegistersAndIrqs (0 ms)
+[ RUN      ] UARTMultiple.SeparateRequestsRequireTheirOwnDmaAndWireCompletion
+tests/google/uart_multi_controller_test.cpp:140: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/uart_multi_controller_test.cpp:171: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] UARTMultiple.SeparateRequestsRequireTheirOwnDmaAndWireCompletion (0 ms)
+[ RUN      ] UARTMultiple.FailedSecondaryDrainRetainsOnlyItsExactBorrow
+tests/google/uart_multi_controller_test.cpp:140: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/uart_multi_controller_test.cpp:193: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] UARTMultiple.FailedSecondaryDrainRetainsOnlyItsExactBorrow (0 ms)
+[ RUN      ] UARTMultiple.SecondaryStopPreservesPrimaryPublishersAndClock
+tests/google/uart_multi_controller_test.cpp:140: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/uart_multi_controller_test.cpp:213: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] UARTMultiple.SecondaryStopPreservesPrimaryPublishersAndClock (0 ms)
+[ RUN      ] UARTMultiple.SecondaryIrqReceiveCannotWritePrimaryRing
+tests/google/uart_multi_controller_test.cpp:140: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/uart_multi_controller_test.cpp:229: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] UARTMultiple.SecondaryIrqReceiveCannotWritePrimaryRing (0 ms)
+[ RUN      ] UARTMultiple.SelectedPublisherCeilingRejectsUnsafeSecondaryVector
+tests/google/uart_multi_controller_test.cpp:140: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+tests/google/uart_multi_controller_test.cpp:242: Failure
+Expected: Both() doesn't generate new fatal failures in the current thread.
+  Actual: it does.
+
+[  FAILED  ] UARTMultiple.SelectedPublisherCeilingRejectsUnsafeSecondaryVector (0 ms)
+[ RUN      ] UARTMultiple.LivePhysicalControllerCannotBeAcquiredTwice
+tests/google/uart_multi_controller_test.cpp:253: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] UARTMultiple.LivePhysicalControllerCannotBeAcquiredTwice (0 ms)
+[ RUN      ] UARTMultiple.ContextAndSharedEngineConflictRejectBeforeAcquisition
+tests/google/uart_multi_controller_test.cpp:266: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+tests/google/uart_multi_controller_test.cpp:270: Failure
+Expected equality of these values:
+  Initialize(1U)
+    Which is: 7
+  NX_ERROR_BUSY
+    Which is: 2
+
+[  FAILED  ] UARTMultiple.ContextAndSharedEngineConflictRejectBeforeAcquisition (0 ms)
+[----------] 8 tests from UARTMultiple (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 8 tests, listed below:
+[  FAILED  ] UARTMultiple.SecondaryColdInitPreservesPrimaryRegistersAndIrqs
+[  FAILED  ] UARTMultiple.SeparateRequestsRequireTheirOwnDmaAndWireCompletion
+[  FAILED  ] UARTMultiple.FailedSecondaryDrainRetainsOnlyItsExactBorrow
+[  FAILED  ] UARTMultiple.SecondaryStopPreservesPrimaryPublishersAndClock
+[  FAILED  ] UARTMultiple.SecondaryIrqReceiveCannotWritePrimaryRing
+[  FAILED  ] UARTMultiple.SelectedPublisherCeilingRejectsUnsafeSecondaryVector
+[  FAILED  ] UARTMultiple.LivePhysicalControllerCannotBeAcquiredTwice
+[  FAILED  ] UARTMultiple.ContextAndSharedEngineConflictRejectBeforeAcquisition
+
+ 8 FAILED TESTS

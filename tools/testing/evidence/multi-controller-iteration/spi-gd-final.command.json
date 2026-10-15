@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-multi-controller-iteration/gd-spi-test",
+    "--gtest_output=xml:tools/testing/evidence/multi-controller-iteration/gd-spi-final.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:23:34.001295+00:00",
+  "ended_at": "2026-10-11T19:23:34.003992+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/spi-gd-final.log"
+}

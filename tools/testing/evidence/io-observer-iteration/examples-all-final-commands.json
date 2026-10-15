@@ -1,0 +1,42 @@
+[
+  {
+    "name": "examples-all-final-build",
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-examples/build/quarantine-iteration",
+      "--parallel",
+      "2"
+    ],
+    "cwd": "/workspace/nexus-examples",
+    "returncode": 0,
+    "start": 1791740316.3267775,
+    "end": 1791740316.8581114
+  },
+  {
+    "name": "examples-all-final-ctest",
+    "command": [
+      "/workspace/nexus/.venv/bin/ctest",
+      "--test-dir",
+      "/workspace/nexus-examples/build/quarantine-iteration",
+      "--output-on-failure",
+      "--timeout",
+      "45"
+    ],
+    "cwd": "/workspace/nexus-examples",
+    "returncode": 0,
+    "start": 1791740316.858126,
+    "end": 1791740317.072094
+  },
+  {
+    "name": "examples-quarantine-final",
+    "command": [
+      "/workspace/nexus-examples/build/quarantine-iteration/tests/owner_lifecycle_test",
+      "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/observer-tdd/examples-quarantine-final.xml"
+    ],
+    "cwd": "/workspace/nexus-examples",
+    "returncode": 0,
+    "start": 1791740317.0721023,
+    "end": 1791740317.0933185
+  }
+]

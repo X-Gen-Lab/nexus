@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/workspace/nexus/build/ethernet-config-model/bin/nexus_stm32_eth_factory_test",
+    "--gtest_output=xml:/workspace/nexus-config-iteration-evidence/ethernet-factory-stm32-red4.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "PATH": "/workspace/nexus/.venv/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+  "exit_code": 1,
+  "log": "/workspace/nexus-config-iteration-evidence/ethernet-factory-real-red4-stm32.log",
+  "sha256": "f51dd1c05a3f82a245349613da19238fe887f81f98089001fb6a352620ab46bc"
+}

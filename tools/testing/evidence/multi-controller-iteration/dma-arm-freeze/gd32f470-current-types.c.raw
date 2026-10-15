@@ -1,0 +1,7 @@
+#include "/workspace/nexus/soc/gd32f470/private/gd32f470_dma.h"
+#include "/workspace/nexus/soc/gd32f470/private/gd32f470_spi_dma.h"
+unsigned char uart_state_size[sizeof(nx_gd32_uart_state_t)];
+unsigned char uart_dma_state_size[sizeof(nx_gd32_uart_dma_state_t)];
+unsigned char spi_state_size[sizeof(nx_gd32_spi_state_t)];
+unsigned char spi_dma_state_size[sizeof(nx_gd32_spi_dma_state_t)];
+unsigned char spi_dma_endpoint_state_size[sizeof(nx_gd32_spi_dma_endpoint_state_t)];

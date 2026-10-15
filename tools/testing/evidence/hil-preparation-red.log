@@ -1,0 +1,97 @@
+test_missing_or_duplicate_smoke_console_is_rejected (tests.contracts.test_hil_prepare.HilPreparationTests.test_missing_or_duplicate_smoke_console_is_rejected) ... 
+  test_missing_or_duplicate_smoke_console_is_rejected (tests.contracts.test_hil_prepare.HilPreparationTests.test_missing_or_duplicate_smoke_console_is_rejected) (controllers=[{'id': 'sensor', 'kind': 'adc', 'mode': 'trigger-block', 'controller': 'ADC0', 'pins': []}]) ... ERROR
+  test_missing_or_duplicate_smoke_console_is_rejected (tests.contracts.test_hil_prepare.HilPreparationTests.test_missing_or_duplicate_smoke_console_is_rejected) (controllers=[{'id': 'console', 'kind': 'uart', 'mode': 'irq-byte-event', 'controller': 'USART0', 'baud': 115200, 'pins': [{'function': 'tx', 'pin': 'PA9'}, {'function': 'rx', 'pin': 'PA10'}]}, {'id': 'console', 'kind': 'uart', 'mode': 'irq-byte-event', 'controller': 'USART0', 'baud': 115200, 'pins': [{'function': 'tx', 'pin': 'PA9'}, {'function': 'rx', 'pin': 'PA10'}]}]) ... ERROR
+test_plan_has_selected_modes_and_unexecuted_physical_scope (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_has_selected_modes_and_unexecuted_physical_scope) ... ERROR
+test_plan_never_accepts_different_hardware_or_console_wiring (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_never_accepts_different_hardware_or_console_wiring) ... 
+  test_plan_never_accepts_different_hardware_or_console_wiring (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_never_accepts_different_hardware_or_console_wiring) (change='board') ... ERROR
+  test_plan_never_accepts_different_hardware_or_console_wiring (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_never_accepts_different_hardware_or_console_wiring) (change='part') ... ERROR
+  test_plan_never_accepts_different_hardware_or_console_wiring (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_never_accepts_different_hardware_or_console_wiring) (change='pin') ... ERROR
+  test_plan_never_accepts_different_hardware_or_console_wiring (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_never_accepts_different_hardware_or_console_wiring) (change='baud') ... ERROR
+test_preparation_is_repeatable_without_mutating_authored_inputs (tests.contracts.test_hil_prepare.HilPreparationTests.test_preparation_is_repeatable_without_mutating_authored_inputs) ... ERROR
+
+======================================================================
+ERROR: test_missing_or_duplicate_smoke_console_is_rejected (tests.contracts.test_hil_prepare.HilPreparationTests.test_missing_or_duplicate_smoke_console_is_rejected) (controllers=[{'id': 'sensor', 'kind': 'adc', 'mode': 'trigger-block', 'controller': 'ADC0', 'pins': []}])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 59, in test_missing_or_duplicate_smoke_console_is_rejected
+    self.prepare(resolved)
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 25, in prepare
+    from tools.hil.prepare import preparation_plan
+ModuleNotFoundError: No module named 'tools.hil.prepare'
+
+======================================================================
+ERROR: test_missing_or_duplicate_smoke_console_is_rejected (tests.contracts.test_hil_prepare.HilPreparationTests.test_missing_or_duplicate_smoke_console_is_rejected) (controllers=[{'id': 'console', 'kind': 'uart', 'mode': 'irq-byte-event', 'controller': 'USART0', 'baud': 115200, 'pins': [{'function': 'tx', 'pin': 'PA9'}, {'function': 'rx', 'pin': 'PA10'}]}, {'id': 'console', 'kind': 'uart', 'mode': 'irq-byte-event', 'controller': 'USART0', 'baud': 115200, 'pins': [{'function': 'tx', 'pin': 'PA9'}, {'function': 'rx', 'pin': 'PA10'}]}])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 59, in test_missing_or_duplicate_smoke_console_is_rejected
+    self.prepare(resolved)
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 25, in prepare
+    from tools.hil.prepare import preparation_plan
+ModuleNotFoundError: No module named 'tools.hil.prepare'
+
+======================================================================
+ERROR: test_plan_has_selected_modes_and_unexecuted_physical_scope (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_has_selected_modes_and_unexecuted_physical_scope)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 29, in test_plan_has_selected_modes_and_unexecuted_physical_scope
+    plan = self.prepare()
+           ^^^^^^^^^^^^^^
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 25, in prepare
+    from tools.hil.prepare import preparation_plan
+ModuleNotFoundError: No module named 'tools.hil.prepare'
+
+======================================================================
+ERROR: test_plan_never_accepts_different_hardware_or_console_wiring (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_never_accepts_different_hardware_or_console_wiring) (change='board')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 51, in test_plan_never_accepts_different_hardware_or_console_wiring
+    self.prepare(resolved)
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 25, in prepare
+    from tools.hil.prepare import preparation_plan
+ModuleNotFoundError: No module named 'tools.hil.prepare'
+
+======================================================================
+ERROR: test_plan_never_accepts_different_hardware_or_console_wiring (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_never_accepts_different_hardware_or_console_wiring) (change='part')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 51, in test_plan_never_accepts_different_hardware_or_console_wiring
+    self.prepare(resolved)
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 25, in prepare
+    from tools.hil.prepare import preparation_plan
+ModuleNotFoundError: No module named 'tools.hil.prepare'
+
+======================================================================
+ERROR: test_plan_never_accepts_different_hardware_or_console_wiring (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_never_accepts_different_hardware_or_console_wiring) (change='pin')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 51, in test_plan_never_accepts_different_hardware_or_console_wiring
+    self.prepare(resolved)
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 25, in prepare
+    from tools.hil.prepare import preparation_plan
+ModuleNotFoundError: No module named 'tools.hil.prepare'
+
+======================================================================
+ERROR: test_plan_never_accepts_different_hardware_or_console_wiring (tests.contracts.test_hil_prepare.HilPreparationTests.test_plan_never_accepts_different_hardware_or_console_wiring) (change='baud')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 51, in test_plan_never_accepts_different_hardware_or_console_wiring
+    self.prepare(resolved)
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 25, in prepare
+    from tools.hil.prepare import preparation_plan
+ModuleNotFoundError: No module named 'tools.hil.prepare'
+
+======================================================================
+ERROR: test_preparation_is_repeatable_without_mutating_authored_inputs (tests.contracts.test_hil_prepare.HilPreparationTests.test_preparation_is_repeatable_without_mutating_authored_inputs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 64, in test_preparation_is_repeatable_without_mutating_authored_inputs
+    self.assertEqual(self.prepare(), self.prepare())
+                     ^^^^^^^^^^^^^^
+  File "/workspace/nexus/tests/contracts/test_hil_prepare.py", line 25, in prepare
+    from tools.hil.prepare import preparation_plan
+ModuleNotFoundError: No module named 'tools.hil.prepare'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.008s
+
+FAILED (errors=8)

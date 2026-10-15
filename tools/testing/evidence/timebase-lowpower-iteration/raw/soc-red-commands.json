@@ -1,0 +1,17 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "build/uart-iteration",
+      "--target",
+      "nexus_stm32f407_lowpower_test",
+      "nexus_gd32f470_lowpower_test",
+      "--parallel",
+      "2"
+    ],
+    "returncode": 1,
+    "start": 1791744005.1116142,
+    "end": 1791744007.7539787
+  }
+]

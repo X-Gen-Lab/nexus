@@ -1,0 +1,11 @@
+{
+  "command": [
+    "python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_raw_evidence"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

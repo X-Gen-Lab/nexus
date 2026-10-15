@@ -1,0 +1,29 @@
+[0/1] Re-running CMake...
+-- Found Python3: /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus-config-iteration-evidence/native/generated/resolved.json
+-- Configuring done (0.8s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus-config-iteration-evidence/native
+[1/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[2/22] Building C object io/CMakeFiles/nexus_io.dir/src/spi.c.o
+[3/22] Building C object io/CMakeFiles/nexus_io.dir/src/uart.c.o
+[4/22] Building C object io/CMakeFiles/nexus_io.dir/src/adc.c.o
+[5/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[6/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[7/22] Building C object io/CMakeFiles/nexus_io.dir/src/stream.c.o
+[8/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[9/22] Linking C static library lib/libnexus_io.a
+[10/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[11/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[12/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[13/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[14/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[15/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[16/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[17/22] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[18/22] Building C object tests/contracts/google/CMakeFiles/nexus_native_factory_test.dir/native-factory/bindings.c.o
+[19/22] Linking C static library lib/libnexus_io_native.a
+[20/22] Building CXX object tests/contracts/google/CMakeFiles/nexus_native_factory_test.dir/native_factory_test.cpp.o
+[21/22] Linking CXX executable bin/nexus_native_factory_test

@@ -1,0 +1,67 @@
+[
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+      "--version"
+    ],
+    "exit_code": 0,
+    "log": "tool-arm-none-eabi-gcc-version.log",
+    "executable": {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+      "sha256": "510c55cfeed7328ade1eb8cb23808fcce1ba6c52dac8d4ebfe033ae4b2534385",
+      "size": 2421736
+    }
+  },
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+      "--version"
+    ],
+    "exit_code": 0,
+    "log": "tool-arm-none-eabi-nm-version.log",
+    "executable": {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm",
+      "sha256": "d2f338ba59a101e1af6f934b97bffb1419742d610c5bd7c42a086cae4bee9f98",
+      "size": 1097440
+    }
+  },
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+      "--version"
+    ],
+    "exit_code": 0,
+    "log": "tool-arm-none-eabi-objdump-version.log",
+    "executable": {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump",
+      "sha256": "29829538419301ed3da5f3148a89e19ea9f9111105fa2ec3e05550f8998a5389",
+      "size": 1909744
+    }
+  },
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+      "--version"
+    ],
+    "exit_code": 0,
+    "log": "tool-arm-none-eabi-size-version.log",
+    "executable": {
+      "path": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+      "sha256": "9aa1623c3874cab906b5cca55212b2f6abaec25fc2b1512e55cf9f1d8217f7cb",
+      "size": 1073352
+    }
+  },
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--version"
+    ],
+    "exit_code": 0,
+    "log": "tool-cmake-version.log",
+    "executable": {
+      "path": ".venv/bin/cmake",
+      "sha256": "e3eeed7e9fe7fe10cea561eda40fdae67337d6f94068ce0da2add7cbb88b9492",
+      "size": 223
+    }
+  }
+]

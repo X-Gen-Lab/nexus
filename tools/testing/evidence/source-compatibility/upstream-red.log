@@ -1,0 +1,69 @@
+test_actual_inventory_observes_pins_not_latest_claims (tools.testing.test_dependency_proposals.DependencyProposalTests.test_actual_inventory_observes_pins_not_latest_claims) ... ok
+test_archive_and_license_identity_produce_only_pending_proposal (tools.testing.test_dependency_proposals.DependencyProposalTests.test_archive_and_license_identity_produce_only_pending_proposal) ... ok
+test_bare_passed_marker_never_approves_upgrade (tools.testing.test_dependency_proposals.DependencyProposalTests.test_bare_passed_marker_never_approves_upgrade) ... ok
+test_boolean_schema_is_rejected (tools.testing.test_dependency_proposals.DependencyProposalTests.test_boolean_schema_is_rejected) ... ok
+test_candidate_archive_changed_or_empty_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_candidate_archive_changed_or_empty_rejects) ... ok
+test_candidate_archive_symlink_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_candidate_archive_symlink_rejects) ... ok
+test_existing_or_symlink_output_cannot_replace_evidence (tools.testing.test_dependency_proposals.DependencyProposalTests.test_existing_or_symlink_output_cannot_replace_evidence) ... ok
+test_explicit_upstream_records_raw_refs_without_upgrading (tools.testing.test_dependency_proposals.DependencyProposalTests.test_explicit_upstream_records_raw_refs_without_upgrading) ... ERROR
+test_failed_network_stays_not_observed_with_actual_exit (tools.testing.test_dependency_proposals.DependencyProposalTests.test_failed_network_stays_not_observed_with_actual_exit) ... ERROR
+test_license_is_reviewed_not_guessed (tools.testing.test_dependency_proposals.DependencyProposalTests.test_license_is_reviewed_not_guessed) ... ok
+test_malformed_remote_refs_do_not_become_observed (tools.testing.test_dependency_proposals.DependencyProposalTests.test_malformed_remote_refs_do_not_become_observed) ... ERROR
+test_missing_or_changed_license_notice_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_missing_or_changed_license_notice_rejects) ... ok
+test_missing_or_unknown_plan_field_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_missing_or_unknown_plan_field_rejects) ... ok
+test_proposal_does_not_modify_inputs_or_locks (tools.testing.test_dependency_proposals.DependencyProposalTests.test_proposal_does_not_modify_inputs_or_locks) ... ok
+test_sources_with_credentials_or_non_https_reject (tools.testing.test_dependency_proposals.DependencyProposalTests.test_sources_with_credentials_or_non_https_reject) ... ok
+test_stale_evidence_reference_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_stale_evidence_reference_rejects) ... ok
+test_unknown_dependency_and_same_revision_reject (tools.testing.test_dependency_proposals.DependencyProposalTests.test_unknown_dependency_and_same_revision_reject) ... ok
+test_unknown_evidence_gate_and_empty_reference_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_unknown_evidence_gate_and_empty_reference_rejects) ... ok
+test_unpinned_git_revision_rejects (tools.testing.test_dependency_proposals.DependencyProposalTests.test_unpinned_git_revision_rejects) ... ok
+test_upstream_invocation_is_no_shell_noninteractive_and_bounded (tools.testing.test_dependency_proposals.DependencyProposalTests.test_upstream_invocation_is_no_shell_noninteractive_and_bounded) ... ERROR
+test_upstream_origin_without_public_allowed_host_rejects_before_request (tools.testing.test_dependency_proposals.DependencyProposalTests.test_upstream_origin_without_public_allowed_host_rejects_before_request) ... ok
+
+======================================================================
+ERROR: test_explicit_upstream_records_raw_refs_without_upgrading (tools.testing.test_dependency_proposals.DependencyProposalTests.test_explicit_upstream_records_raw_refs_without_upgrading)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_dependency_proposals.py", line 140, in test_explicit_upstream_records_raw_refs_without_upgrading
+    result = proposals.observe_upstream(self.upstream_current(), output, runner=self.capture)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/maintenance/dependency_proposals.py", line 137, in observe_upstream
+    raise ValueError("upstream observation not implemented")
+ValueError: upstream observation not implemented
+
+======================================================================
+ERROR: test_failed_network_stays_not_observed_with_actual_exit (tools.testing.test_dependency_proposals.DependencyProposalTests.test_failed_network_stays_not_observed_with_actual_exit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_dependency_proposals.py", line 152, in test_failed_network_stays_not_observed_with_actual_exit
+    result = proposals.observe_upstream(self.upstream_current(), self.folder / "failed", runner=failure)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/maintenance/dependency_proposals.py", line 137, in observe_upstream
+    raise ValueError("upstream observation not implemented")
+ValueError: upstream observation not implemented
+
+======================================================================
+ERROR: test_malformed_remote_refs_do_not_become_observed (tools.testing.test_dependency_proposals.DependencyProposalTests.test_malformed_remote_refs_do_not_become_observed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_dependency_proposals.py", line 174, in test_malformed_remote_refs_do_not_become_observed
+    result = proposals.observe_upstream(self.upstream_current(), self.folder / "malformed", runner=malformed)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/maintenance/dependency_proposals.py", line 137, in observe_upstream
+    raise ValueError("upstream observation not implemented")
+ValueError: upstream observation not implemented
+
+======================================================================
+ERROR: test_upstream_invocation_is_no_shell_noninteractive_and_bounded (tools.testing.test_dependency_proposals.DependencyProposalTests.test_upstream_invocation_is_no_shell_noninteractive_and_bounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_dependency_proposals.py", line 187, in test_upstream_invocation_is_no_shell_noninteractive_and_bounded
+    proposals.observe_upstream(self.upstream_current(), self.folder / "bounded", runner=checked)
+  File "/workspace/nexus/tools/maintenance/dependency_proposals.py", line 137, in observe_upstream
+    raise ValueError("upstream observation not implemented")
+ValueError: upstream observation not implemented
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.093s
+
+FAILED (errors=4)

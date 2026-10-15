@@ -1,0 +1,23 @@
+-- The C compiler identification is GNU 14.2.0
+-- The CXX compiler identification is GNU 14.2.0
+-- The ASM compiler identification is GNU
+-- Found assembler: /usr/bin/cc
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Configuring incomplete, errors occurred!
+CMake Error at /tmp/nexus installed source sdk jducych8/relocated prefix with spaces/lib/cmake/Nexus/NexusConfig.cmake:15 (message):
+  This source SDK is a nonpublishable development fixture; explicitly set
+  NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON for a development consumer
+Call Stack (most recent call first):
+  CMakeLists.txt:4 (find_package)
+
+

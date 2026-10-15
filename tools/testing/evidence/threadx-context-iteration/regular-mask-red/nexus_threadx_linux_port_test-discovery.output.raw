@@ -1,0 +1,6 @@
+Running main() from gmock_main.cc
+ThreadXLinuxPort.
+  ProductionTimerUsesOneMonotonicDeadlineDomain
+  ExactNanosecondCarryCannotProduceInvalidTimespec
+  SuspendSignalPreservesInterruptedCallerErrno
+  NestedSuspendPreservesErrnoBeforeEarlyReturn

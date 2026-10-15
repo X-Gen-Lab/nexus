@@ -1,0 +1,52 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "-m",
+    "unittest",
+    "scripts.ci.test_provider_assemblies",
+    "tools.testing.test_provider_templates",
+    "tools.testing.test_provider_retention",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T20:09:06.739184+00:00",
+  "source_inputs": [
+    {
+      "path": "/workspace/nexus/scripts/ci/provider_assemblies.py",
+      "bytes": 18039,
+      "sha256": "639ff85d4cda01b660136e4a0d8319d4e601e368eb11a310064bf3cb38dd1a7a"
+    },
+    {
+      "path": "/workspace/nexus/scripts/ci/test_provider_assemblies.py",
+      "bytes": 9638,
+      "sha256": "093cd33ee04c21bdd08024d5c0accefcccb25b82ba1a4db80983aadf7e42d911"
+    },
+    {
+      "path": "/workspace/nexus/scripts/ci/arch_compile.py",
+      "bytes": 19488,
+      "sha256": "1494a66186d916e0740bf6954e21de0406434e61fa7b5454433d58324ce74ffe"
+    },
+    {
+      "path": "/workspace/nexus/tools/measurement/retention.py",
+      "bytes": 19927,
+      "sha256": "b42bbf4db68c3b117d952ca9fb4c982b3767e2102531f0372e521c611f25d7c4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/test_provider_templates.py",
+      "bytes": 5906,
+      "sha256": "652b817baf3298363cab9d83b402dad04a4bf6087889e6c98a6b5f086599b339"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+      "bytes": 18595,
+      "sha256": "4094c8bcb77f2e222b5fbead63b075a628007b56a8e5594cd814171d0e9715b1"
+    }
+  ],
+  "returncode": 0,
+  "ended_at": "2026-10-11T20:09:08.089712+00:00",
+  "log": {
+    "path": "/workspace/nexus/tools/testing/evidence/provider-assemblies/tool-source-green.log",
+    "bytes": 12923,
+    "sha256": "d54c81d8bed747166c13432488d65d063a778052c71aa8df691125525d9b1d37"
+  }
+}

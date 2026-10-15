@@ -1,0 +1,1097 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: e64ef491c1ef0475361cc617219312f750f7c17b0a6aab74bfe541f7b3d41d6a\n"
+
+msgid "SoC 原专项台账"
+msgstr "Original SoC workstream ledger"
+
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/soc-refinement-execution.csv>`。 源文件：`docs/design/soc-"
+"refinement-"
+"execution.csv`；SHA-256：`03add7405a9c459686bb0b6af326a56c4148b55a37202fb9bfd221bc9bcd6725`。"
+msgstr ""
+"This page is derived from the original CSV; it is not a new status "
+"authority, execution record or software qualification. Original IDs, order "
+"and all fields come from the {download}`original ledger <../../design/soc-"
+"refinement-execution.csv>`. Source: `docs/design/soc-refinement-"
+"execution.csv`; SHA-256: "
+"`03add7405a9c459686bb0b6af326a56c4148b55a37202fb9bfd221bc9bcd6725`."
+
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"Different ledgers overlap in scope; do not add their counts or calculate a "
+"project-wide completion rate. Interpret implementation, software and "
+"physical status separately. `development_passed` does not mean execution at "
+"the current documentation HEAD. Consult the exact results index for the "
+"source and scope of `qualification_record_authority`. Absolute `/workspace` "
+"and `/dev/shm` locators retain their original bytes and only identify the "
+"original execution host. See the [software-evidence entry](../software-"
+"verification.md) for retrievable archives and member locations."
+
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr ""
+"**Original exit fields** are only fields actually present in the original "
+"CSV. Tasks, qualification prerequisites and contract links also retain their"
+" original wording; they cannot be used to invent an execution."
+
+msgid "本表包含 55 条原记录，仅表示来源行数。"
+msgstr ""
+"This table contains 55 original records; this is only the source row count."
+
+msgid "SOC-01"
+msgstr "SOC-01"
+
+msgid "原字段"
+msgstr "Original field"
+
+msgid "原值"
+msgstr "Original value"
+
+msgid "`task_id`"
+msgstr "`task_id`"
+
+msgid "`priority`"
+msgstr "`priority`"
+
+msgid "P0"
+msgstr "P0"
+
+msgid "`scope`"
+msgstr "`scope`"
+
+msgid "revision"
+msgstr "revision"
+
+msgid "`task`"
+msgstr "`task`"
+
+msgid "Current SoC documentation"
+msgstr "Current SoC documentation"
+
+msgid "`implementation_status`"
+msgstr "`implementation_status`"
+
+msgid "documentation_updated"
+msgstr "documentation_updated"
+
+msgid "`software_status`"
+msgstr "`software_status`"
+
+msgid "qualification_record_authority"
+msgstr "qualification_record_authority"
+
+msgid "`hardware_status`"
+msgstr "`hardware_status`"
+
+msgid "not_applicable"
+msgstr "not_applicable"
+
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+msgid ""
+"soc/stm32f407/README.md;soc/gd32f470/README.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tools/configure/README.md"
+msgstr ""
+"soc/stm32f407/README.md;soc/gd32f470/README.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tools/configure/README.md"
+
+msgid "`evidence_paths`"
+msgstr "`evidence_paths`"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/soc-refinement.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/soc-refinement.md"
+
+msgid "`exit_condition`"
+msgstr "`exit_condition`"
+
+msgid "SoC configure README match maintained modes and ownership"
+msgstr "SoC configure README match maintained modes and ownership"
+
+msgid "`owner`"
+msgstr "`owner`"
+
+msgid "codex"
+msgstr "codex"
+
+msgid "SOC-02"
+msgstr "SOC-02"
+
+msgid "P1"
+msgstr "P1"
+
+msgid "automation"
+msgstr "automation"
+
+msgid "Capability declaration consistency"
+msgstr "Capability declaration consistency"
+
+msgid "implemented"
+msgstr "implemented"
+
+msgid "tools/maintenance/capabilities.py"
+msgstr "tools/maintenance/capabilities.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/maintenance/capabilities.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/maintenance/capabilities.py"
+
+msgid ""
+"Facts routes constructors source and fixtures agree without claiming PCB "
+"qualification"
+msgstr ""
+"Facts routes constructors source and fixtures agree without claiming PCB "
+"qualification"
+
+msgid "SOC-03"
+msgstr "SOC-03"
+
+msgid "Exact package pin inventory"
+msgstr "Exact package pin inventory"
+
+msgid "soc;tools/configure/configure.py;tools/configure/fact_references.py"
+msgstr "soc;tools/configure/configure.py;tools/configure/fact_references.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_physical_facts.py;tools/configure/test_soc_facts.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_physical_facts.py;tools/configure/test_soc_facts.py"
+
+msgid "Every route validated against complete exact-part GPIO inventory"
+msgstr "Every route validated against complete exact-part GPIO inventory"
+
+msgid "SOC-04"
+msgstr "SOC-04"
+
+msgid "GD SDK configuration input closure"
+msgstr "GD SDK configuration input closure"
+
+msgid ""
+"tools/configure/configure.py;vendors/gigadevice/gd32f4xx/source.lock.json"
+msgstr ""
+"tools/configure/configure.py;vendors/gigadevice/gd32f4xx/source.lock.json"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_configure.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_configure.py"
+
+msgid ""
+"GD source lock identity participates in resolved digest and import "
+"verification"
+msgstr ""
+"GD source lock identity participates in resolved digest and import "
+"verification"
+
+msgid "SOC-05"
+msgstr "SOC-05"
+
+msgid "maintenance"
+msgstr "maintenance"
+
+msgid "Datasheet and errata provenance"
+msgstr "Datasheet and errata provenance"
+
+msgid "source_index_implemented"
+msgstr "source_index_implemented"
+
+msgid "source_reviewed_applicability_pending"
+msgstr "source_reviewed_applicability_pending"
+
+msgid "soc;tools/configure/fact_references.py"
+msgstr "soc;tools/configure/fact_references.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_fact_references.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_fact_references.py"
+
+msgid ""
+"Flash RAM pin DMA IRQ clock facts retain source versions and silicon-review "
+"boundaries"
+msgstr ""
+"Flash RAM pin DMA IRQ clock facts retain source versions and silicon-review "
+"boundaries"
+
+msgid "SOC-06"
+msgstr "SOC-06"
+
+msgid "optimization"
+msgstr "optimization"
+
+msgid "Immutable hardware binding descriptors"
+msgstr "Immutable hardware binding descriptors"
+
+msgid "tools/configure/providers/descriptor.py;tools/configure/providers"
+msgstr "tools/configure/providers/descriptor.py;tools/configure/providers"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_descriptors.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_descriptors.py"
+
+msgid ""
+"Controller instances reuse explicit descriptors while independent assertions"
+" remain"
+msgstr ""
+"Controller instances reuse explicit descriptors while independent assertions"
+" remain"
+
+msgid "SOC-07"
+msgstr "SOC-07"
+
+msgid "P2"
+msgstr "P2"
+
+msgid "Family integration descriptors"
+msgstr "Family integration descriptors"
+
+msgid ""
+"tools/configure/providers/descriptor.py;cmake/package/package_source_sdk.py"
+msgstr ""
+"tools/configure/providers/descriptor.py;cmake/package/package_source_sdk.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_descriptors.py;tests/contracts/test_source_sdk.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/configure/test_descriptors.py;tests/contracts/test_source_sdk.py"
+
+msgid ""
+"Configuration family entry and dependency identities unified with CMake "
+"owning target graph"
+msgstr ""
+"Configuration family entry and dependency identities unified with CMake "
+"owning target graph"
+
+msgid "SOC-08"
+msgstr "SOC-08"
+
+msgid "contract"
+msgstr "contract"
+
+msgid "Startup phase responsibilities"
+msgstr "Startup phase responsibilities"
+
+msgid ""
+"soc/stm32f407/system.c;soc/gd32f470/system.c;soc/stm32g474/system.c;soc/stm32h743/system.c;soc/stm32u575/system.c"
+msgstr ""
+"soc/stm32f407/system.c;soc/gd32f470/system.c;soc/stm32g474/system.c;soc/stm32h743/system.c;soc/stm32u575/system.c"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_system_transaction_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_system_transaction_test.cpp"
+
+msgid "Pre-RAM post-RAM and fail-stop restrictions explicit and tested"
+msgstr "Pre-RAM post-RAM and fail-stop restrictions explicit and tested"
+
+msgid "SOC-09"
+msgstr "SOC-09"
+
+msgid "defense"
+msgstr "defense"
+
+msgid "Cold-start admission"
+msgstr "Cold-start admission"
+
+msgid "tools/configure/providers;soc"
+msgstr "tools/configure/providers;soc"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/physical_platform_factory_test.cpp;tests/google/multi_controller_factory_test.cpp;tests/google/g474_factory_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/physical_platform_factory_test.cpp;tests/google/multi_controller_factory_test.cpp;tests/google/g474_factory_test.cpp"
+
+msgid ""
+"Observable selected live owners rejected before global clock modification"
+msgstr ""
+"Observable selected live owners rejected before global clock modification"
+
+msgid "SOC-10"
+msgstr "SOC-10"
+
+msgid "Clock transaction consistency"
+msgstr "Clock transaction consistency"
+
+msgid "soc/stm32f407/system.c;soc/gd32f470/system.c"
+msgstr "soc/stm32f407/system.c;soc/gd32f470/system.c"
+
+msgid ""
+"Critical readback bounded failures safe source switching and retained "
+"rollback responsibility"
+msgstr ""
+"Critical readback bounded failures safe source switching and retained "
+"rollback responsibility"
+
+msgid "SOC-11"
+msgstr "SOC-11"
+
+msgid "Clock residue semantics"
+msgstr "Clock residue semantics"
+
+msgid ""
+"Primary cleanup remaining obligations distinguished from allowed retained "
+"PWR Flash settings"
+msgstr ""
+"Primary cleanup remaining obligations distinguished from allowed retained "
+"PWR Flash settings"
+
+msgid "SOC-12"
+msgstr "SOC-12"
+
+msgid "Time context restrictions"
+msgstr "Time context restrictions"
+
+msgid "soc/stm32f407/private;soc/gd32f470/private;soc/stm32g474/private"
+msgstr "soc/stm32f407/private;soc/gd32f470/private;soc/stm32g474/private"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp;core/include/nexus/core/time.h"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp;core/include/nexus/core/time.h"
+
+msgid "Task configurable IRQ masks and NMI HardFault limitations align"
+msgstr "Task configurable IRQ masks and NMI HardFault limitations align"
+
+msgid "SOC-13"
+msgstr "SOC-13"
+
+msgid "Time lifecycle validity"
+msgstr "Time lifecycle validity"
+
+msgid "soc/stm32f407/system.c;soc/gd32f470/timebase.c;soc/stm32g474/system.c"
+msgstr "soc/stm32f407/system.c;soc/gd32f470/timebase.c;soc/stm32g474/system.c"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp;tests/google/g474_system_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp;tests/google/g474_system_test.cpp"
+
+msgid ""
+"Before-start failed-start and stopped reads have a documented tested valid "
+"domain"
+msgstr ""
+"Before-start failed-start and stopped reads have a documented tested valid "
+"domain"
+
+msgid "SOC-14"
+msgstr "SOC-14"
+
+msgid "Deadline boot domain"
+msgstr "Deadline boot domain"
+
+msgid "contract_implemented"
+msgstr "contract_implemented"
+
+msgid "io/include;soc"
+msgstr "io/include;soc"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;core/include/nexus/core/time.h"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;core/include/nexus/core/time.h"
+
+msgid ""
+"Stop restart invalidates old deadlines and repeated-overflow limits remain "
+"explicit"
+msgstr ""
+"Stop restart invalidates old deadlines and repeated-overflow limits remain "
+"explicit"
+
+msgid "SOC-15"
+msgstr "SOC-15"
+
+msgid "Bootstrap poll bounds"
+msgstr "Bootstrap poll bounds"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_timebase_contract_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_timebase_contract_test.cpp"
+
+msgid ""
+"Per-phase and total work bounds distinguish polls from measured elapsed time"
+msgstr ""
+"Per-phase and total work bounds distinguish polls from measured elapsed time"
+
+msgid "SOC-16"
+msgstr "SOC-16"
+
+msgid "GD stop controller coverage"
+msgstr "GD stop controller coverage"
+
+msgid "soc/gd32f470/timebase.c"
+msgstr "soc/gd32f470/timebase.c"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_timebase_contract_test.cpp"
+
+msgid "Secondary polling enabled-controller defenses match maintained set"
+msgstr "Secondary polling enabled-controller defenses match maintained set"
+
+msgid "SOC-17"
+msgstr "SOC-17"
+
+msgid "Shallow sleep and tickless"
+msgstr "Shallow sleep and tickless"
+
+msgid "docs/design/timebase-lowpower.md;os/freertos"
+msgstr "docs/design/timebase-lowpower.md;os/freertos"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/timebase_lowpower_test.cpp;docs/design/timebase-"
+"lowpower.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/timebase_lowpower_test.cpp;docs/design/timebase-"
+"lowpower.md"
+
+msgid ""
+"OS tick SoC deadline and paused armed stop restrictions remain consistent"
+msgstr ""
+"OS tick SoC deadline and paused armed stop restrictions remain consistent"
+
+msgid "SOC-18"
+msgstr "SOC-18"
+
+msgid "USB48 lifecycle"
+msgstr "USB48 lifecycle"
+
+msgid "soc/stm32f407/usb_clock.c;soc/gd32f470/usb_clock.c"
+msgstr "soc/stm32f407/usb_clock.c;soc/gd32f470/usb_clock.c"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/usb_clock_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/usb_clock_test.cpp"
+
+msgid ""
+"Shared consumers fail cleanup ownership and detached hardware precede clock "
+"release"
+msgstr ""
+"Shared consumers fail cleanup ownership and detached hardware precede clock "
+"release"
+
+msgid "SOC-19"
+msgstr "SOC-19"
+
+msgid "No-init versus retention"
+msgstr "No-init versus retention"
+
+msgid "docs/design/soc-refinement.md"
+msgstr "docs/design/soc-refinement.md"
+
+msgid ""
+"Software no-copy no-clear separated from physical reset and power retention"
+msgstr ""
+"Software no-copy no-clear separated from physical reset and power retention"
+
+msgid "SOC-20"
+msgstr "SOC-20"
+
+msgid "G474 UART bounded critical sections"
+msgstr "G474 UART bounded critical sections"
+
+msgid "soc/stm32g474/drivers/uart.c"
+msgstr "soc/stm32g474/drivers/uart.c"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/g474_provider_test.cpp"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/g474_provider_test.cpp"
+
+msgid ""
+"No runtime modulo and explicit bounded blackout preserving arbitrary "
+"capacity loss order"
+msgstr ""
+"No runtime modulo and explicit bounded blackout preserving arbitrary "
+"capacity loss order"
+
+msgid "SOC-21"
+msgstr "SOC-21"
+
+msgid "GD selected EXTI dispatch"
+msgstr "GD selected EXTI dispatch"
+
+msgid "selected_profiles_observed"
+msgstr "selected_profiles_observed"
+
+msgid "soc/gd32f470/drivers/exti.c;tools/configure/providers/gd32f470"
+msgstr "soc/gd32f470/drivers/exti.c;tools/configure/providers/gd32f470"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_exti_test.cpp;tools/configure/test_gd32_exti_generation.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_exti_test.cpp;tools/configure/test_gd32_exti_generation.py"
+
+msgid ""
+"Measured selected-line costs preserve shared priority pending clear and "
+"owner isolation"
+msgstr ""
+"Measured selected-line costs preserve shared priority pending clear and "
+"owner isolation"
+
+msgid "SOC-22"
+msgstr "SOC-22"
+
+msgid "IRQ service drain budgets"
+msgstr "IRQ service drain budgets"
+
+msgid "soc;docs/design/soc-refinement.md"
+msgstr "soc;docs/design/soc-refinement.md"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/soc-execution-budgets.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/soc-execution-budgets.md"
+
+msgid ""
+"Modes document work bounds service obligations and timeout consequences"
+msgstr ""
+"Modes document work bounds service obligations and timeout consequences"
+
+msgid "SOC-23"
+msgstr "SOC-23"
+
+msgid "measurement"
+msgstr "measurement"
+
+msgid "Hot-path instruction baselines"
+msgstr "Hot-path instruction baselines"
+
+msgid "measurement_tool_implemented"
+msgstr "measurement_tool_implemented"
+
+msgid "tools/measurement/soc_costs.py"
+msgstr "tools/measurement/soc_costs.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/testing/test_soc_costs.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/testing/test_soc_costs.py"
+
+msgid ""
+"Fixed compiler optimization actual disassembly records change cost without "
+"invented cycles"
+msgstr ""
+"Fixed compiler optimization actual disassembly records change cost without "
+"invented cycles"
+
+msgid "SOC-24"
+msgstr "SOC-24"
+
+msgid "feature"
+msgstr "feature"
+
+msgid "F407 CCM placement"
+msgstr "F407 CCM placement"
+
+msgid "soc/stm32f407;tools/configure/memory.py"
+msgstr "soc/stm32f407;tools/configure/memory.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_memory_boot_test.cpp;scripts/ci/stm32_memory.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/stm32_memory_boot_test.cpp;scripts/ci/stm32_memory.py"
+
+msgid ""
+"Explicit selected data bss noinit init budget bounds and DMA rejection with "
+"default zero cost"
+msgstr ""
+"Explicit selected data bss noinit init budget bounds and DMA rejection with "
+"default zero cost"
+
+msgid "SOC-25"
+msgstr "SOC-25"
+
+msgid "GD RAM initializer consistency"
+msgstr "GD RAM initializer consistency"
+
+msgid "soc/gd32f470/memory_init.c;tools/configure/memory.py"
+msgstr "soc/gd32f470/memory_init.c;tools/configure/memory.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_memory_boot_test.cpp;scripts/ci/gd32_memory.py"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tests/google/gd32_memory_boot_test.cpp;scripts/ci/gd32_memory.py"
+
+msgid ""
+"Linker facts boot spans and first-write validation agree preserving noinit"
+msgstr ""
+"Linker facts boot spans and first-write validation agree preserving noinit"
+
+msgid "SOC-26"
+msgstr "SOC-26"
+
+msgid "Shared controller engine ownership"
+msgstr "Shared controller engine ownership"
+
+msgid "docs/design/soc-refinement.md;soc/common;io/private"
+msgstr "docs/design/soc-refinement.md;soc/common;io/private"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/delivery/architecture.md;docs/design/soc-refinement.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/delivery/architecture.md;docs/design/soc-refinement.md"
+
+msgid ""
+"Public private directory target SDK boundaries and selected retention stay "
+"explicit"
+msgstr ""
+"Public private directory target SDK boundaries and selected retention stay "
+"explicit"
+
+msgid "SOC-27"
+msgstr "SOC-27"
+
+msgid "Per-mode image cost deltas"
+msgstr "Per-mode image cost deltas"
+
+msgid "tools/measurement/soc_costs.py;tools/testing/test_soc_costs.py"
+msgstr "tools/measurement/soc_costs.py;tools/testing/test_soc_costs.py"
+
+msgid ""
+"Comparable empty selected backend mode ELF budgets with explained growth"
+msgstr ""
+"Comparable empty selected backend mode ELF budgets with explained growth"
+
+msgid "SOC-28"
+msgstr "SOC-28"
+
+msgid "conditional_extension"
+msgstr "conditional_extension"
+
+msgid "Additional fixed clock profiles"
+msgstr "Additional fixed clock profiles"
+
+msgid "partial_exact_reference_implemented"
+msgstr "partial_exact_reference_implemented"
+
+msgid "reference_software_validated"
+msgstr "reference_software_validated"
+
+msgid "not_executed"
+msgstr "not_executed"
+
+msgid ""
+"soc/stm32h743/system.c;arch/cortex_m/nx_arch_cache_control.c;soc/stm32u575/system.c;tools/configure/test_clock_sources.py"
+msgstr ""
+"soc/stm32h743/system.c;arch/cortex_m/nx_arch_cache_control.c;soc/stm32u575/system.c;tools/configure/test_clock_sources.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tests/google/h743_system_test.cpp;scripts/ci/stm32h743.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tests/google/h743_system_test.cpp;scripts/ci/stm32h743.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+
+msgid ""
+"An exact reviewed oscillator profile has implementation rollback and HIL"
+msgstr ""
+"An exact reviewed oscillator profile has implementation rollback and HIL"
+
+msgid "SOC-29"
+msgstr "SOC-29"
+
+msgid "Additional G474 peripheral modes"
+msgstr "Additional G474 peripheral modes"
+
+msgid ""
+"soc/stm32g474/drivers/exti.c;soc/stm32g474/soc.json;soc/stm32g474/routes.json;tools/configure/providers/stm32g474"
+msgstr ""
+"soc/stm32g474/drivers/exti.c;soc/stm32g474/soc.json;soc/stm32g474/routes.json;tools/configure/providers/stm32g474"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/stm32g474.md;tests/google/g474_exti_test.cpp;tests/google/g474_factory_test.cpp;tests/contracts/g474_assembly;scripts/ci/provider_assemblies.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/stm32g474.md;tests/google/g474_exti_test.cpp;tests/google/g474_factory_test.cpp;tests/contracts/g474_assembly;scripts/ci/provider_assemblies.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+
+msgid ""
+"Each selected controller mode closes facts provider generated model ARM and "
+"HIL"
+msgstr ""
+"Each selected controller mode closes facts provider generated model ARM and "
+"HIL"
+
+msgid "SOC-30"
+msgstr "SOC-30"
+
+msgid "Additional controllers routes packages"
+msgstr "Additional controllers routes packages"
+
+msgid ""
+"soc/stm32g474;soc/stm32h743;soc/stm32u575;boards;tests/contracts/g474_assembly/exti_board"
+msgstr ""
+"soc/stm32g474;soc/stm32h743;soc/stm32u575;boards;tests/contracts/g474_assembly/exti_board"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32g474/routes.json;soc/stm32h743/routes.json;soc/stm32u575/routes.json;docs/design/stm32g474.md;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32g474/routes.json;soc/stm32h743/routes.json;soc/stm32u575/routes.json;docs/design/stm32g474.md;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+
+msgid ""
+"Exact hardware and independent resources budgets Board sources and isolation"
+" reviewed"
+msgstr ""
+"Exact hardware and independent resources budgets Board sources and isolation"
+" reviewed"
+
+msgid "SOC-31"
+msgstr "SOC-31"
+
+msgid "Non-M4 full SoC integration"
+msgstr "Non-M4 full SoC integration"
+
+msgid "soc/stm32h743;soc/stm32u575;arch;os"
+msgstr "soc/stm32h743;soc/stm32u575;arch;os"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;scripts/ci/stm32h743.py;scripts/ci/stm32u575.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;scripts/ci/stm32h743.py;scripts/ci/stm32u575.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+
+msgid ""
+"Exact selected MCU startup clock memory IRQ peripherals OS and unit-specific"
+" HIL"
+msgstr ""
+"Exact selected MCU startup clock memory IRQ peripherals OS and unit-specific"
+" HIL"
+
+msgid "SOC-32"
+msgstr "SOC-32"
+
+msgid "Complex DMA cache security domains"
+msgstr "Complex DMA cache security domains"
+
+msgid ""
+"arch/cortex_m/nx_arch_cache_control.c;arch/cortex_m/nx_arch_nonsecure.c;soc/stm32h743/drivers/uart_dma.c;soc/stm32h743/system.c;soc/stm32u575/security.c;tools/configure/memory.py"
+msgstr ""
+"arch/cortex_m/nx_arch_cache_control.c;arch/cortex_m/nx_arch_nonsecure.c;soc/stm32h743/drivers/uart_dma.c;soc/stm32h743/system.c;soc/stm32u575/security.c;tools/configure/memory.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;tests/google/arch_cache_control_test.cpp;tests/google/h743_dma_test.cpp;tests/google/h743_dma_factory_test.cpp;tests/contracts/h743_assembly;scripts/ci/cache_control_compile.py;scripts/ci/stm32h743.py;docs/design/u575-trustzone-"
+"contract.md;docs/delivery/soc-extensions-results.json;docs/delivery/soc-"
+"extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;soc/stm32h743/README.md;tests/google/arch_cache_control_test.cpp;tests/google/h743_dma_test.cpp;tests/google/h743_dma_factory_test.cpp;tests/contracts/h743_assembly;scripts/ci/cache_control_compile.py;scripts/ci/stm32h743.py;docs/design/u575-trustzone-"
+"contract.md;docs/delivery/soc-extensions-results.json;docs/delivery/soc-"
+"extensions-verification.md"
+
+msgid ""
+"Per-engine reachability alignment cache security faults verified on exact "
+"target"
+msgstr ""
+"Per-engine reachability alignment cache security faults verified on exact "
+"target"
+
+msgid "SOC-33"
+msgstr "SOC-33"
+
+msgid "Bootloader and running-state handoff"
+msgstr "Bootloader and running-state handoff"
+
+msgid "not_implemented"
+msgstr "not_implemented"
+
+msgid "soc;docs/design/integration-contracts.md"
+msgstr "soc;docs/design/integration-contracts.md"
+
+msgid ""
+"Clock VTOR masks FP SysTick DMA RAM and live owners have exact entry "
+"contract"
+msgstr ""
+"Clock VTOR masks FP SysTick DMA RAM and live owners have exact entry "
+"contract"
+
+msgid "SOC-34"
+msgstr "SOC-34"
+
+msgid "Dynamic frequency changes"
+msgstr "Dynamic frequency changes"
+
+msgid "soc"
+msgstr "soc"
+
+msgid ""
+"Consumer protocol reconfiguration electrical order rollback and deadline "
+"handling verified"
+msgstr ""
+"Consumer protocol reconfiguration electrical order rollback and deadline "
+"handling verified"
+
+msgid "SOC-35"
+msgstr "SOC-35"
+
+msgid "Deep STOP continuous time"
+msgstr "Deep STOP continuous time"
+
+msgid "soc;os"
+msgstr "soc;os"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/timebase-lowpower.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/timebase-lowpower.md"
+
+msgid ""
+"Exact RTC LPTIM retention wake recovery precision and power physically "
+"verified"
+msgstr ""
+"Exact RTC LPTIM retention wake recovery precision and power physically "
+"verified"
+
+msgid "SOC-36"
+msgstr "SOC-36"
+
+msgid "Userspace MPU TrustZone transport"
+msgstr "Userspace MPU TrustZone transport"
+
+msgid "partial_synchronous_reference_implemented"
+msgstr "partial_synchronous_reference_implemented"
+
+msgid ""
+"arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone"
+msgstr ""
+"arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-"
+"broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-"
+"broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-"
+"extensions-results.json;docs/delivery/soc-extensions-verification.md"
+
+msgid ""
+"Actual permissions address copy borrow async exit gateway and hardware "
+"isolation verified"
+msgstr ""
+"Actual permissions address copy borrow async exit gateway and hardware "
+"isolation verified"
+
+msgid "SOC-37"
+msgstr "SOC-37"
+
+msgid "HIL"
+msgstr "HIL"
+
+msgid "physical_acceptance"
+msgstr "physical_acceptance"
+
+msgid "Station binding"
+msgstr "Station binding"
+
+msgid "tooling_implemented"
+msgstr "tooling_implemented"
+
+msgid "tooling_software_validated"
+msgstr "tooling_software_validated"
+
+msgid "tools/hil/soc_acceptance.py"
+msgstr "tools/hil/soc_acceptance.py"
+
+msgid ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/testing/test_soc_hil.py;tools/hil/README.md"
+msgstr ""
+"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
+"verification.md;tools/testing/test_soc_hil.py;tools/hil/README.md"
+
+msgid ""
+"Exact admitted station selected modes raw instrument capture and case-"
+"specific assertions pass"
+msgstr ""
+"Exact admitted station selected modes raw instrument capture and case-"
+"specific assertions pass"
+
+msgid "SOC-38"
+msgstr "SOC-38"
+
+msgid "PCB electrical facts"
+msgstr "PCB electrical facts"
+
+msgid "SOC-39"
+msgstr "SOC-39"
+
+msgid "Fixed clock profile"
+msgstr "Fixed clock profile"
+
+msgid "SOC-40"
+msgstr "SOC-40"
+
+msgid "Startup rollback faults"
+msgstr "Startup rollback faults"
+
+msgid "SOC-41"
+msgstr "SOC-41"
+
+msgid "Monotonic time"
+msgstr "Monotonic time"
+
+msgid "SOC-42"
+msgstr "SOC-42"
+
+msgid "RAM DMA domains"
+msgstr "RAM DMA domains"
+
+msgid "SOC-43"
+msgstr "SOC-43"
+
+msgid "UART"
+msgstr "UART"
+
+msgid "SOC-44"
+msgstr "SOC-44"
+
+msgid "SPI"
+msgstr "SPI"
+
+msgid "SOC-45"
+msgstr "SOC-45"
+
+msgid "I2C"
+msgstr "I2C"
+
+msgid "SOC-46"
+msgstr "SOC-46"
+
+msgid "ADC"
+msgstr "ADC"
+
+msgid "SOC-47"
+msgstr "SOC-47"
+
+msgid "EXTI capture"
+msgstr "EXTI capture"
+
+msgid "SOC-48"
+msgstr "SOC-48"
+
+msgid "PWM break"
+msgstr "PWM break"
+
+msgid "SOC-49"
+msgstr "SOC-49"
+
+msgid "Classic CAN"
+msgstr "Classic CAN"
+
+msgid "SOC-50"
+msgstr "SOC-50"
+
+msgid "USB FS device"
+msgstr "USB FS device"
+
+msgid "SOC-51"
+msgstr "SOC-51"
+
+msgid "Ethernet PHY"
+msgstr "Ethernet PHY"
+
+msgid "SOC-52"
+msgstr "SOC-52"
+
+msgid "Flash power loss"
+msgstr "Flash power loss"
+
+msgid "SOC-53"
+msgstr "SOC-53"
+
+msgid "Watchdog"
+msgstr "Watchdog"
+
+msgid "SOC-54"
+msgstr "SOC-54"
+
+msgid "Shallow sleep tickless"
+msgstr "Shallow sleep tickless"
+
+msgid "SOC-55"
+msgstr "SOC-55"
+
+msgid "Load endurance"
+msgstr "Load endurance"

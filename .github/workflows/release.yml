@@ -1,120 +1,230 @@
-name: Release
+name: Source SDK Delivery and Software Preview
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Release version (e.g., v1.0.0)'
-        required: true
+      expected_commit:
+        description: Exact 40-character checkout commit; mismatches fail closed
         type: string
+        required: true
+      publish:
+        description: Publish v0.1.0 software preview from verified bytes
+        type: boolean
+        default: false
+      ci_run_id:
+        description: Successful full CI run on main at expected_commit (last 24h)
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: nexus-source-sdk-release-${{ inputs.expected_commit }}
+  cancel-in-progress: false
 
 jobs:
-  create-release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-      version: ${{ steps.get_version.outputs.version }}
-
+  guard:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Require the exact requested checkout before any qualification
+        env:
+          NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+        run: |
+          python3 tools/release/delivery.py guard \
+            --expected-commit "$NEXUS_EXPECTED_COMMIT" \
+            --actual-commit "$(git rev-parse HEAD)"
+      - name: Require fresh successful full CI before reusing its qualification
+        if: inputs.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+          NEXUS_CI_RUN_ID: ${{ inputs.ci_run_id }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/main
+          [[ "$NEXUS_CI_RUN_ID" =~ ^[1-9][0-9]*$ ]]
+          gh api "repos/$GH_REPO/actions/runs/$NEXUS_CI_RUN_ID" > "$RUNNER_TEMP/ci-run.json"
+          attempt=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_attempt"])' "$RUNNER_TEMP/ci-run.json")
+          gh api "repos/$GH_REPO/actions/runs/$NEXUS_CI_RUN_ID/attempts/$attempt/jobs?per_page=100" > "$RUNNER_TEMP/ci-jobs.json"
+          python3 tools/release/delivery.py check-ci \
+            --record "$RUNNER_TEMP/ci-run.json" --jobs "$RUNNER_TEMP/ci-jobs.json" \
+            --expected-commit "$NEXUS_EXPECTED_COMMIT"
+  platform:
+    needs: guard
+    if: ${{ !inputs.publish }}
+    uses: ./.github/workflows/build-matrix.yml
+  contracts:
+    needs: guard
+    if: ${{ !inputs.publish }}
+    uses: ./.github/workflows/enterprise-tools.yml
+  source-sdk:
+    needs: [guard, platform, contracts]
+    if: >-
+      always() && needs.guard.result == 'success' &&
+      (inputs.publish || (needs.platform.result == 'success' && needs.contracts.result == 'success'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-
-      - name: Get version
-        id: get_version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Generate changelog
-        run: |
-          if [ -f CHANGELOG.md ]; then
-            sed -n "/## \[${{ steps.get_version.outputs.version }}\]/,/## \[/p" CHANGELOG.md | head -n -1 > release_notes.md
-          else
-            echo "Release ${{ steps.get_version.outputs.version }}" > release_notes.md
-          fi
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
+          submodules: false
+      - uses: ./.github/actions/setup-build
         with:
-          tag_name: ${{ steps.get_version.outputs.version }}
-          name: Release ${{ steps.get_version.outputs.version }}
-          body_path: release_notes.md
-          draft: false
-          prerelease: false
+          preset: native-debug
+          arm: 'true'
+      - name: Prepare the complete locked source SDK dependency closure
+        run: >-
+          .venv/bin/python tools/dev/dependencies.py prepare --scope sdk
+          --allow-network --report build/sdk-dependencies.json
+      - name: Package only the clean checked-out source and locked dependencies
+        run: >-
+          .venv/bin/python cmake/package/package_source_sdk.py
+          --source "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/nexus-source-sdk"
+      - name: Verify the installed source and exported CMake package byte identities
+        run: >-
+          .venv/bin/python cmake/package/package_source_sdk.py
+          --verify "$RUNNER_TEMP/nexus-source-sdk/share/nexus/src"
+      - name: Execute strict consumers against this exact installed prefix
+        run: >-
+          .venv/bin/python cmake/package/verify_consumers.py
+          --prefix "$RUNNER_TEMP/nexus-source-sdk"
+          --output "$RUNNER_TEMP/nexus-sdk-consumers"
+      - name: Stage verified SDK and strict consumer bytes inside owned build paths
+        env:
+          NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+        run: |
+          .venv/bin/python tools/release/delivery.py stage \
+            --source "$GITHUB_WORKSPACE" --prefix "$RUNNER_TEMP/nexus-source-sdk" \
+            --consumers "$RUNNER_TEMP/nexus-sdk-consumers" \
+            --output "$GITHUB_WORKSPACE/build/delivery" \
+            --expected-commit "$NEXUS_EXPECTED_COMMIT"
+      - name: Bind the upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: source-sdk
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/source-sdk
+          require-dependencies: 'true'
+          artifacts: |
+            build/delivery/source-sdk/
+            build/delivery/sdk-consumers/
+            build/delivery/staging-copy.json
+          tools: |
+            python=python3
+            cmake=cmake
+            compiler=arm-none-eabi-gcc
+      - name: Retain the verified source SDK
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: nexus-source-sdk-${{ github.sha }}
+          path: |
+            build/delivery/source-sdk/
+            build/delivery/sdk-consumers/
+            build/delivery/staging-copy.json
+            build/job-identities/source-sdk/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Attest the observed source SDK manifest
+        id: provenance
+        if: success()
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: build/job-identities/source-sdk/identity.json
+      - name: Retain the actual attestation bundle
+        if: success()
+        env:
+          NEXUS_ATTESTATION_BUNDLE: ${{ steps.provenance.outputs.bundle-path }}
+        run: |
+          test -s "$NEXUS_ATTESTATION_BUNDLE"
+          mkdir -p build/delivery/attestation
+          cp -- "$NEXUS_ATTESTATION_BUNDLE" build/delivery/attestation/bundle.json
+      - name: Bind the attestation upload to observed execution identity
+        if: always()
+        uses: ./.github/actions/record-identity
+        with:
+          job: source-sdk-attestation
+          result: ${{ job.status }}
+          expected-commit: ${{ github.sha }}
+          output: build/job-identities/source-sdk-attestation
+          artifacts: build/delivery/attestation/
+          tools: python=python3
+      - name: Preserve the actual attestation and its job identity
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: nexus-source-sdk-attestation-${{ github.sha }}
+          path: |
+            build/delivery/attestation/
+            build/job-identities/source-sdk-attestation/
+          retention-days: 30
+          include-hidden-files: true
+          if-no-files-found: error
+      # Platform/tool jobs are reused only after exact full CI admission.
+      # Physical HIL and production candidate qualification remain separate.
 
-  build-release:
-    name: Build ${{ matrix.name }}
-    needs: create-release
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Windows MSVC
-            os: windows-latest
-            preset: windows-msvc-release
-            artifact: nexus-windows-msvc
-          - name: Linux GCC
-            os: ubuntu-latest
-            preset: linux-gcc-release
-            artifact: nexus-linux-gcc
-          - name: macOS Clang
-            os: macos-latest
-            preset: macos-clang-release
-            artifact: nexus-macos-clang
-          - name: ARM Cortex-M4
-            os: ubuntu-latest
-            preset: cross-arm-release
-            artifact: nexus-arm-cortex-m4
-
+  publish:
+    needs: [guard, source-sdk]
+    if: inputs.publish && needs.guard.result == 'success' && needs.source-sdk.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+      attestations: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+      NEXUS_CI_RUN_ID: ${{ inputs.ci_run_id }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          os: ${{ matrix.os }}
-          preset: ${{ matrix.preset }}
-
-      - name: Configure
-        run: cmake --preset ${{ matrix.preset }}
-
-      - name: Build
-        run: cmake --build --preset ${{ matrix.preset }} --parallel
-
-      - name: Package
-        shell: bash
+          persist-credentials: false
+      - name: Download this run's SDK and exact qualified CI documentation
         run: |
-          mkdir -p release/${{ matrix.artifact }}
-          cp -r build/${{ matrix.preset }}/bin/* release/${{ matrix.artifact }}/ 2>/dev/null || true
-          cp -r build/${{ matrix.preset }}/lib/* release/${{ matrix.artifact }}/ 2>/dev/null || true
-          cp README.md LICENSE release/${{ matrix.artifact }}/
-
-      - name: Create Archive
-        shell: bash
+          [[ "$NEXUS_CI_RUN_ID" =~ ^[1-9][0-9]*$ ]]
+          mkdir -p "$RUNNER_TEMP/release-inputs"
+          gh api "repos/$GH_REPO/actions/runs/$NEXUS_CI_RUN_ID" > "$RUNNER_TEMP/release-inputs/ci-run.json"
+          attempt=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_attempt"])' "$RUNNER_TEMP/release-inputs/ci-run.json")
+          gh api "repos/$GH_REPO/actions/runs/$NEXUS_CI_RUN_ID/attempts/$attempt/jobs?per_page=100" > "$RUNNER_TEMP/release-inputs/ci-jobs.json"
+          gh run download "$GITHUB_RUN_ID" --name "nexus-source-sdk-$GITHUB_SHA" --dir "$RUNNER_TEMP/release-inputs/sdk"
+          gh run download "$GITHUB_RUN_ID" --name "nexus-source-sdk-attestation-$GITHUB_SHA" --dir "$RUNNER_TEMP/release-inputs/attestation"
+          gh run download "$NEXUS_CI_RUN_ID" --name "nexus-documentation-$GITHUB_SHA" --dir "$RUNNER_TEMP/release-inputs/docs"
+          gh run download "$NEXUS_CI_RUN_ID" --dir "$RUNNER_TEMP/release-inputs/ci-evidence"
+      - name: Verify the actual GitHub source SDK attestation
         run: |
-          cd release
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            7z a ${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.zip ${{ matrix.artifact }}
-            echo "ASSET_PATH=release/${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.zip" >> $GITHUB_ENV
-          else
-            tar czf ${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.tar.gz ${{ matrix.artifact }}
-            echo "ASSET_PATH=release/${{ matrix.artifact }}-${{ needs.create-release.outputs.version }}.tar.gz" >> $GITHUB_ENV
-          fi
-
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ needs.create-release.outputs.version }}
-          files: ${{ env.ASSET_PATH }}
+          gh attestation verify "$RUNNER_TEMP/release-inputs/sdk/job-identities/source-sdk/identity.json" \
+            --bundle "$RUNNER_TEMP/release-inputs/attestation/delivery/attestation/bundle.json" \
+            --repo "$GH_REPO" --signer-workflow "$GH_REPO/.github/workflows/release.yml" \
+            --signer-digest "$NEXUS_EXPECTED_COMMIT"
+      - name: Verify and assemble immutable release assets
+        run: |
+          python3 tools/release/delivery.py bundle \
+            --inputs "$RUNNER_TEMP/release-inputs" --output "$RUNNER_TEMP/release-assets" \
+            --expected-commit "$NEXUS_EXPECTED_COMMIT" --ci-run-id "$NEXUS_CI_RUN_ID" \
+            --release-run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT"
+      - name: Publish only the complete verified asset set on the existing exact tag
+        run: |
+          python3 tools/release/delivery.py publish \
+            --output "$RUNNER_TEMP/release-assets" --expected-commit "$NEXUS_EXPECTED_COMMIT" \
+            --ci-run-id "$NEXUS_CI_RUN_ID" --repository "$GH_REPO"

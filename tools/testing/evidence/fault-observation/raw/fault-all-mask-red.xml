@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="8" failures="3" disabled="0" errors="0" time="5.004" timestamp="2026-10-11T19:31:13.922" name="AllTests">
+  <testsuite name="FreeRTOSFailStop" tests="8" failures="3" disabled="0" skipped="0" errors="0" time="5.004" timestamp="2026-10-11T19:31:13.922">
+    <testcase name="AssertObservesLocationBeforeMaskAndPark" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="53" status="run" result="completed" time="0." timestamp="2026-10-11T19:31:13.922" classname="FreeRTOSFailStop" />
+    <testcase name="StackOverflowNeverDereferencesTaskOrName" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="61" status="run" result="completed" time="0." timestamp="2026-10-11T19:31:13.922" classname="FreeRTOSFailStop" />
+    <testcase name="ReturningObserverCannotReclaimLoanOrContinueKernel" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="70" status="run" result="completed" time="1." timestamp="2026-10-11T19:31:13.922" classname="FreeRTOSFailStop" />
+    <testcase name="StrongerIncomingBasepriIsNeverWeakenedByPortStore" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="86" status="run" result="completed" time="1." timestamp="2026-10-11T19:31:14.923" classname="FreeRTOSFailStop">
+      <failure message="/workspace/nexus/tests/google/freertos_failstop_test.cpp:87&#x0A;Death test: { prepare(NX_FAULT_FREERTOS_ASSERT, false); model_masks.basepri = (5u &lt;&lt; (8u - 4u)) - 16U; expected_basepri = model_masks.basepri; nx_freertos_assert_failed(&quot;owned-static-source&quot;, 73U); }&#x0A;    Result: died but not with expected exit code:&#x0A;            Exited with exit status 91&#x0A;Actual msg:&#x0A;[  DEATH   ] &#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_failstop_test.cpp:87
+Death test: { prepare(NX_FAULT_FREERTOS_ASSERT, false); model_masks.basepri = (5u << (8u - 4u)) - 16U; expected_basepri = model_masks.basepri; nx_freertos_assert_failed("owned-static-source", 73U); }
+    Result: died but not with expected exit code:
+            Exited with exit status 91
+Actual msg:
+[  DEATH   ] 
+]]></failure>
+    </testcase>
+    <testcase name="EqualIncomingBasepriStaysMaskedThroughObservation" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="94" status="run" result="completed" time="1." timestamp="2026-10-11T19:31:15.924" classname="FreeRTOSFailStop" />
+    <testcase name="PrimaskIsPreservedWithoutChangingAnotherMask" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="101" status="run" result="completed" time="1." timestamp="2026-10-11T19:31:16.924" classname="FreeRTOSFailStop">
+      <failure message="/workspace/nexus/tests/google/freertos_failstop_test.cpp:102&#x0A;Death test: { prepare(NX_FAULT_FREERTOS_ASSERT, false); model_masks.primask = 1U; expected_basepri = 0U; nx_freertos_assert_failed(&quot;owned-static-source&quot;, 73U); }&#x0A;    Result: died but not with expected exit code:&#x0A;            Exited with exit status 91&#x0A;Actual msg:&#x0A;[  DEATH   ] &#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_failstop_test.cpp:102
+Death test: { prepare(NX_FAULT_FREERTOS_ASSERT, false); model_masks.primask = 1U; expected_basepri = 0U; nx_freertos_assert_failed("owned-static-source", 73U); }
+    Result: died but not with expected exit code:
+            Exited with exit status 91
+Actual msg:
+[  DEATH   ] 
+]]></failure>
+    </testcase>
+    <testcase name="FaultmaskIsPreservedWithoutChangingAnotherMask" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="109" status="run" result="completed" time="1." timestamp="2026-10-11T19:31:17.925" classname="FreeRTOSFailStop">
+      <failure message="/workspace/nexus/tests/google/freertos_failstop_test.cpp:110&#x0A;Death test: { prepare(NX_FAULT_FREERTOS_ASSERT, false); model_masks.faultmask = 1U; expected_basepri = 0U; nx_freertos_assert_failed(&quot;owned-static-source&quot;, 73U); }&#x0A;    Result: died but not with expected exit code:&#x0A;            Exited with exit status 91&#x0A;Actual msg:&#x0A;[  DEATH   ] &#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_failstop_test.cpp:110
+Death test: { prepare(NX_FAULT_FREERTOS_ASSERT, false); model_masks.faultmask = 1U; expected_basepri = 0U; nx_freertos_assert_failed("owned-static-source", 73U); }
+    Result: died but not with expected exit code:
+            Exited with exit status 91
+Actual msg:
+[  DEATH   ] 
+]]></failure>
+    </testcase>
+    <testcase name="WeakerIncomingBasepriIsRaisedToActualKernelCeiling" file="/workspace/nexus/tests/google/freertos_failstop_test.cpp" line="117" status="run" result="completed" time="0." timestamp="2026-10-11T19:31:18.926" classname="FreeRTOSFailStop" />
+  </testsuite>
+</testsuites>

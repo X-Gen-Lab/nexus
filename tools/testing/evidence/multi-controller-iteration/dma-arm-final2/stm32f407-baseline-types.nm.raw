@@ -1,0 +1,5 @@
+00000000 00000024 B spi_dma_endpoint_state_size
+00000000 00000064 B spi_dma_state_size
+00000000 00000016 B spi_state_size
+00000000 00000088 B uart_dma_state_size
+00000000 00000064 B uart_state_size

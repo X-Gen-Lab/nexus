@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "kind": "independent-read-only-review",
+  "scope": "GD memory test mapping/host ELF placement; runtime-SDK aggregate timeout; backend kernel-lock capture corrective deltas",
+  "reviewer": "/root/arch_runtime",
+  "reviewer_execution": {
+    "tests": 0,
+    "builds": 0,
+    "equipment_operations": 0
+  },
+  "sources": [
+    {
+      "path": "tests/google/gd32_memory_boot_test.cpp",
+      "sha256": "6ad18cbd40ef6361510654c4f870943a8f29bfcd4c90e3dd91a8609a913586de",
+      "matches_owner_snapshot": true
+    },
+    {
+      "path": "tests/google/gd32_memory.cmake",
+      "sha256": "d51d75b8cc761c6d41c795105d8e90bd8166cc1572dd6f6db4791259e4274529",
+      "matches_owner_snapshot": true
+    },
+    {
+      "path": "tests/contracts/CMakeLists.txt",
+      "sha256": "2359282b663775b79f67fcf36bd10dbd23f3ce7ba527b4f4d488b75f0e1930e2",
+      "matches_owner_snapshot": true
+    },
+    {
+      "path": "scripts/ci/os_backend_probe.py",
+      "sha256": "ee58e45062fcd5e498bfeabe8974fd662f5954feabe77bb107627de073322b4b",
+      "matches_owner_snapshot": true
+    }
+  ],
+  "owner_snapshot": {
+    "path": "/workspace/nexus-ci-boundaries/final-source-before.json",
+    "sha256": "ab73f73f77ffe0a5d051aae3b7ad232645748061f0f8aa4d734e87a61c9b415e"
+  },
+  "conclusion": "No new blocker found in the requested narrow corrective deltas.",
+  "findings": [
+    {
+      "boundary": "Memory mapping ownership",
+      "reason": "reserve_exact uses MAP_FIXED_NOREPLACE and accepts only the exact returned address. An ignored flag returning elsewhere releases only that fresh mapping. Setup admits all four windows before filling modeled memory; per-window owned flags permit partial-admission teardown without releasing another owner."
+    },
+    {
+      "boundary": "Host image and heap separation",
+      "reason": "Non-PIE model ELF text starts at 0x60000000 above modeled hardware windows; actual global and sbrk checks require that base. Occupied-page case checks rejection and preservation of original owner bytes."
+    },
+    {
+      "boundary": "SDK timeout scope",
+      "reason": "Only aggregate CTest runtime-SDK budget rises from 180 to 900 seconds. Comment preserves independent 180-second child subprocess limits; no model drain deadline or source-contract behavior was relaxed."
+    },
+    {
+      "boundary": "Kernel identity consistency",
+      "reason": "run captures kernel once after validated contract, represents absence with kernel_lock=None, and uses the same resolved Path for before/after source digests and same validated kernel required_symbols for actual retained firmware symbols. Host non-kernel paths do not index an absent kernel."
+    }
+  ],
+  "owner_evidence_reported_separately": {
+    "memory": "Genuine prior RED and latest small-tree normal/SAN/TSan builds/execution belong to owner; reviewer did not rerun.",
+    "runtime_sdk": "Actual 21 cases / 118 children ~251 seconds and new CTest ~249 seconds PASS reported by owner; no inference of whole clean or remote CI.",
+    "backend": "19 tools plus actual Native probe 28 cases/10 commands reported by owner; kernel/firmware promotion remains explicit unsupported onboarding review."
+  },
+  "limits": [
+    "Read-only narrow delta review; production memory/system files were not modified and are not newly qualified by this sidecar.",
+    "No adversarial filesystem race, physical memory timing or HIL certification claim.",
+    "No inference of remote CodeQL or later whole-plan status."
+  ]
+}

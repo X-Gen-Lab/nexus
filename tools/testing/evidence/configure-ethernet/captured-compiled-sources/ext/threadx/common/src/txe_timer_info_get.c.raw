@@ -1,0 +1,106 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
+/* Portions of this file were generated with AI assistance. */
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Timer                                                               */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+#define TX_SOURCE_CODE
+
+
+/* Include necessary system files.  */
+
+#include "tx_api.h"
+#include "tx_timer.h"
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_timer_info_get                                 PORTABLE C      */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks for errors in the timer information get        */
+/*    service.                                                            */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                         Pointer to timer control block    */
+/*    name                              Destination for the timer name    */
+/*    active                            Destination for active flag       */
+/*    remaining_ticks                   Destination for remaining ticks   */
+/*                                        before expiration               */
+/*    reschedule_ticks                  Destination for reschedule ticks  */
+/*    next_timer                        Destination for next timer on the */
+/*                                        created list                    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_TIMER_ERROR                    Invalid timer pointer             */
+/*    status                            Completion status                 */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_timer_info_get                Actual info get call              */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/**************************************************************************/
+UINT  _txe_timer_info_get(TX_TIMER *timer_ptr, TX_NAME_CONST CHAR **name, UINT *active, ULONG *remaining_ticks,
+                ULONG *reschedule_ticks, TX_TIMER **next_timer)
+{
+
+UINT    status;
+
+
+    /* Check for an invalid timer pointer.  */
+    if (timer_ptr == TX_NULL)
+    {
+
+        /* Timer pointer is invalid, return appropriate error code.  */
+        status =  TX_TIMER_ERROR;
+    }
+
+    /* Now check for invalid timer ID.  */
+    else if (timer_ptr -> tx_timer_id != TX_TIMER_ID)
+    {
+
+        /* Timer pointer is invalid, return appropriate error code.  */
+        status =  TX_TIMER_ERROR;
+    }
+    else
+    {
+
+        /* Otherwise, call the actual timer information get service.  */
+        status =  _tx_timer_info_get(timer_ptr, name, active, remaining_ticks, reschedule_ticks, next_timer);
+    }
+
+    /* Return completion status.  */
+    return(status);
+}
+

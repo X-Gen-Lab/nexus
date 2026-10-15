@@ -1,0 +1,24 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/stm32_model/generate_constructors.py", line 22, in <module>
+    generated = constructor(item, result, result["board_bindings"],
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/providers/stm32f407/bindings.py", line 634, in constructor
+    if secondary_controllers.applies(item, result, "stm32"):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/secondary_controllers.py", line 65, in applies
+    for other in result.controllers):
+                 ^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'controllers'
+CMake Error at tests/contracts/stm32_model/CMakeLists.txt:13 (execute_process):
+  execute_process failed command indexes:
+
+    1: "Child return code: 1"
+
+
+
+-- Configuring incomplete, errors occurred!
+FAILED: [code=1] build.ninja 
+/workspace/nexus/.venv/lib/python3.12/site-packages/cmake/data/bin/cmake --regenerate-during-build -S/workspace/nexus -B/workspace/nexus-g474-iteration-evidence/host-asan-build
+ninja: error: rebuilding 'build.ninja': subcommand failed

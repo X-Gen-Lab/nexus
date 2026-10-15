@@ -1,0 +1,4 @@
+[==========] Running 33 tests from 7 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from ThreadXOfficial
+[ RUN      ] ThreadXOfficial.ReallyRunsKernelThread

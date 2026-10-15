@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "command": [
+    "timeout",
+    "20",
+    "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_primask_test",
+    "--gtest_filter=*",
+    "--gtest_list_tests"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

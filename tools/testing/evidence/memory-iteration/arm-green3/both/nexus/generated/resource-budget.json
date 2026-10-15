@@ -1,0 +1,12 @@
+{
+  "flash_footprint_max": 16384,
+  "flash_loaded_max": 16384,
+  "heap_max": 0,
+  "msp_max": 2048,
+  "ram_reserved_max": {
+    "addsram": 128,
+    "sram": 4096,
+    "tcm": 128
+  },
+  "schema_version": 1
+}

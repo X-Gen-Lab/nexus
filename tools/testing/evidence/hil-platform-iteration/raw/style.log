@@ -1,0 +1,1 @@
+Style check failed: Files are not in the Git index: ['tools/hil/fixtures/stm32g474re_hse24_reference.json', 'tools/testing/test_hil_platform_extensions.py', 'tools/testing/test_hil_protocol_admission.py']

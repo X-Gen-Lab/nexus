@@ -1,0 +1,105 @@
+{
+  "checked_files": 13,
+  "failing_diagnostics": 0,
+  "files": {
+    "soc/gd32f470/drivers/spi_dma.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "37c5cc04c26ea471bb46e9e8ea2f9fb4c680c2edbe5c3ee7562ff1acd01d0126"
+    },
+    "soc/gd32f470/drivers/uart_dma.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "bfba681c2662b913f2e73207490562aae6f5c8aff55fe9547021a183287d8ee3"
+    },
+    "soc/gd32f470/private/gd32f470_dma.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "7b8c3b160c6b851f70114fda40b261df1ea5b3461169c96f915f16e00bdb572e"
+    },
+    "soc/gd32f470/private/gd32f470_spi_dma.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "1c8fb7dff0745fd4f47dc00bcdb6d1c618a55a47addea0060abf9057141291e6"
+    },
+    "soc/stm32f407/drivers/spi.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "900a93cf28e9f85fe35063078609fac433a232ac7a1d12c13721e4e31a474d2b"
+    },
+    "soc/stm32f407/drivers/spi_dma.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "49bee3167e8663fe0e90ec451cbc9552d89fdfdb312662fe23b62816c7873ca9"
+    },
+    "soc/stm32f407/drivers/uart_dma.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "faf85a572d668e4a42bc7878e54ba1c654995d7ba7364918c144e70d1571fc56"
+    },
+    "soc/stm32f407/private/stm32f407_dma.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "9d34afa6b97aa4e71852cede594e96bdfd7ef9a4347d6f0d2d2df65f74dd94b7"
+    },
+    "tests/contracts/dma_multi_controller/nexus_config.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "5be6daad774537d235d6bb1a800e6fd354c3bf6e7ee82a1ae19c41588fefd866"
+    },
+    "tests/google/spi_multi_controller_model.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "f2ba037f78e50854b35101fdc0837d2c4363400d89f74848b09cc2d8a61f96e0"
+    },
+    "tests/google/spi_multi_controller_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "18ffa27fb5880d0bbc92c870dae9fd06c19aec8876bdc4189ae1455b94b014ee"
+    },
+    "tests/google/uart_multi_controller_model.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "eed500c08d24889dda6032ce815637efa58c12b95643e7261d88e1420523394d"
+    },
+    "tests/google/uart_multi_controller_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "dd920f18aea588827b180f95998fa9f10032629233ca40d20c329d3dd32eb41a"
+    }
+  },
+  "limitations": [
+    "Mechanical comment syntax and header fields only; no authorship verification.",
+    "No proof of ownership, ISR safety, deadlines, API coverage or contract correctness.",
+    "Baseline authenticity and changes require the separate review/CI policy."
+  ],
+  "ruleset_version": 1,
+  "schema_version": 1,
+  "status": "passed"
+}

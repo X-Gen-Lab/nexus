@@ -1,0 +1,3 @@
+usage: comment_style.py [-h] [--root ROOT] (--all | --files FILES [FILES ...])
+                        [--baseline BASELINE] [--json]
+comment_style.py: error: unrecognized arguments: tools/testing/evidence/multi-controller-iteration/dma-comment-style.json

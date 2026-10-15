@@ -1,0 +1,426 @@
+{
+  "schema_version": 1,
+  "kind": "development_tdd_raw_evidence",
+  "scope": "Executed development RED and subsequent GREEN logs; case sets may grow between executions. These logs never qualify final source, hardware, release or historical edit order.",
+  "physical_status": "not_executed",
+  "records": [
+    {
+      "boundary": "deadline",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/deadline-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/deadline/red.log",
+          "bytes": 6219,
+          "sha256": "31238c200ca8929fe92c8ebc96bab138e282babb05f4340a09bdfe0a9aabd595"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/deadline-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/deadline/extended-green.log",
+          "bytes": 4331,
+          "sha256": "f25a544548b4594eec8da90b236b5ae92c9ddef7d698b97abeff4e1c95b413bc"
+        }
+      ]
+    },
+    {
+      "boundary": "freertos-admission",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/freertos-admission-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/services/correctness-red.log",
+          "bytes": 2531,
+          "sha256": "281493e2c8684375201d5bc6bc4cd5aa3afa32d8f7eea810431fb3baed447a32"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/freertos-admission-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/services/correctness-green.log",
+          "bytes": 9492,
+          "sha256": "4e28ae5e6d91d986b9a5f607e459699a03fd7e8b56bcdb362b39535dd50b3772"
+        }
+      ]
+    },
+    {
+      "boundary": "irq-policy",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/irq-policy-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/irq-policy/wake-red.log",
+          "bytes": 4690,
+          "sha256": "83079fcb9e3d25b77d629386892b242446071c1798e6b9b6287e4628d0e52268"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/irq-policy-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/irq-policy/wake-green.log",
+          "bytes": 1461,
+          "sha256": "fc98414e0bf2409a24d5c09b1e54ddb8be4b7d9b612fa0350ec48f043111ce56"
+        }
+      ]
+    },
+    {
+      "boundary": "arch-sleep",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/arch-sleep-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/optional/arch-sleep-red.log",
+          "bytes": 1542,
+          "sha256": "533ea39808c9768e92e6e458f96b9468c16da0bd1525aae1ee1a78a64cd6f607"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/arch-sleep-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/optional/arch-sleep-green.log",
+          "bytes": 1540,
+          "sha256": "658f08d1ccb6a5cb6e971906f60951a883c96675d3a60df48d6526f56e20a230"
+        }
+      ]
+    },
+    {
+      "boundary": "diagnostic-ring",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/diagnostic-ring-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/optional/diagnostic-red.log",
+          "bytes": 3916,
+          "sha256": "901cb8bd41e397cc46a97b6b08acfeb42845f65df425ca21af6e5365bef1c665"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/diagnostic-ring-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/optional/diagnostic-green.log",
+          "bytes": 1760,
+          "sha256": "6aaf0e41f835e512421c036422b83ebe0bc7443a6501cc75c47a66bb1fb9cd98"
+        }
+      ]
+    },
+    {
+      "boundary": "tickless",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/tickless-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/optional/lowpower-red.log",
+          "bytes": 1204,
+          "sha256": "c222ddc8d36db18023d960c34c21c2db08655028c897063c448b058f7b524672"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/tickless-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/optional/lowpower-green.log",
+          "bytes": 2182,
+          "sha256": "0564c2354a2f9c0767a81da964929802996141bc2dc3a51f4a2efcbc2ac9d38a"
+        }
+      ]
+    },
+    {
+      "boundary": "secure-context",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/secure-context-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/optional/secure-context-red.log",
+          "bytes": 6980,
+          "sha256": "6ffc3bce910fdfa977b158e44e1f0473e4b109b346d70313e63bf32e4e13f779"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/secure-context-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/optional/secure-context-green.log",
+          "bytes": 3936,
+          "sha256": "ed1693cd451584f1675ab23cc935761ade2acc49d3e8fd69c873d05a088ca302"
+        }
+      ]
+    },
+    {
+      "boundary": "mpu-task",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/mpu-task-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/task-red.log",
+          "bytes": 16495,
+          "sha256": "c0cd3206103f05ba191172fdfcf12b60eadc074225ca779f652cfbeb54bdf48e"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/mpu-task-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/task-green-2.log",
+          "bytes": 6208,
+          "sha256": "2584dd2a8b2a97803f495cba349d11a10647c5312335c03288938f44300b2e51"
+        }
+      ]
+    },
+    {
+      "boundary": "mpu-veneer",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/mpu-veneer-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/veneer-red.log",
+          "bytes": 3986,
+          "sha256": "3932a632a693fba45d777019b150856b5e7880cc0fcac8e25f4451ae43ab1ba7"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/mpu-veneer-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/veneer-green.log",
+          "bytes": 102,
+          "sha256": "0292b91377e3f5de5fc72b83a91ddacbecbc2c226b761793f9b4babe85f7ad63"
+        }
+      ]
+    },
+    {
+      "boundary": "sdk-closure",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/sdk-closure-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/profiles/sdk-closure-red/stderr.txt",
+          "bytes": 27886,
+          "sha256": "b6364e49fbe040473f60c2b1019e918b63330657b9ff32425379c95914ce712f"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/sdk-closure-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/profiles/sdk-closure-green/stderr.txt",
+          "bytes": 99,
+          "sha256": "0bb65514d2e21841bc6c0770045a9d8c5255ee2f881d5c5ba45d79b9cb03adf1"
+        }
+      ]
+    },
+    {
+      "boundary": "ci-security",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/ci-security-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/runtime-retention/security-ci-red.txt",
+          "bytes": 3009,
+          "sha256": "686f6413638c49b5e5d19bce2f8676bb5d076598fde2203baad180068734447b"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/ci-security-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/runtime-retention/security-ci-green.txt",
+          "bytes": 2357,
+          "sha256": "aaaf9e5c37205f8f414cb75c2f5366d92a89a1e21ce90aa9bd50c19eef7ea4b6"
+        }
+      ]
+    },
+    {
+      "boundary": "mpu-bootstrap-lease",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/mpu-bootstrap-lease-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/guard-red.log",
+          "bytes": 13053,
+          "sha256": "e765c7b30d0b4b1c6ab4b73819e0a91f343b3a07f391c4cf9c03801fb029878e"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/mpu-bootstrap-lease-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/guard-green.log",
+          "bytes": 4622,
+          "sha256": "ebc04cd80d175535e8c3c834f92aeeabc0a28c231bf9a11edcfd114b9f21a09c"
+        }
+      ]
+    },
+    {
+      "boundary": "mpu-bootstrap-world",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/mpu-bootstrap-world-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/guard-world-red.log",
+          "bytes": 6240,
+          "sha256": "6cf320a22357b5dfb4e6d001768626301b133fd73ad17609d09070d7819d226a"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/mpu-bootstrap-world-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/guard-v8-green.log",
+          "bytes": 4787,
+          "sha256": "e8c1149a5b634af9ae68bd5f41e37bd23e23449566c04dfc3aa1891245ae21d6"
+        }
+      ]
+    },
+    {
+      "boundary": "mpu-actual-special-svc",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/mpu-actual-special-svc-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/port-red.log",
+          "bytes": 8113,
+          "sha256": "a714e8f1105b16f2fc3a7d40cff37445f854941e48721bd73ca686873e3d361d"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/mpu-actual-special-svc-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/port-green.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "boundary": "mpu-normal-flash",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/mpu-normal-flash-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/normal-flash-red.log",
+          "bytes": 1865,
+          "sha256": "9f7a68a99812e68f1a58b2709a78595615e9b7bcd12ef26dcc0dab69345109fa"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/mpu-normal-flash-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/mpu/normal-flash-green.log",
+          "bytes": 104,
+          "sha256": "c12abb957788e842f87142f815213f78a6f57b24be35c4a42b175e42410f4eb8"
+        }
+      ]
+    },
+    {
+      "boundary": "analysis-system-import",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/analysis-system-import-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/services/analysis-development/system-projection-red.log",
+          "bytes": 36757,
+          "sha256": "35e9f3ff770181226dff20a07b5ab4b918f9f2362b049af1ac68b689d05d44ff"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/analysis-system-import-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/services/analysis-development/system-projection-green.log",
+          "bytes": 127,
+          "sha256": "6c1ea36ebb8e973c7d90ef9c667c5916e54554b3ba72326d4ce9720e3f3c4269"
+        }
+      ]
+    },
+    {
+      "boundary": "analysis-header-ownership",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/analysis-header-ownership-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/services/analysis-development/header-ownership-red.log",
+          "bytes": 11746,
+          "sha256": "530bcefa115c5b67b02e5fd724b8c22bb20e1466fefcca53d78f1e6d5a45b6a4"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/analysis-header-ownership-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/services/analysis-development/header-ownership-green.log",
+          "bytes": 132,
+          "sha256": "8e348f8d07f3d560c0b36ea232a97071b18dd1cf7c15e0f6cca510db96b5e873"
+        }
+      ]
+    },
+    {
+      "boundary": "ci-mpu-compiler",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/ci-mpu-compiler-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/runtime-retention/mpu-ci-compiler-red-prepared.txt",
+          "bytes": 3049,
+          "sha256": "6352128fad16b9cec7132333e12c07fcf420eb0979a171d582cfd7c9259ec70f"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/ci-mpu-compiler-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/runtime-retention/mpu-ci-compiler-green.txt",
+          "bytes": 2357,
+          "sha256": "6c576b1009203a607e3536b087ab364591b2db22c76d135b31c2fa7b4a9cb2f3"
+        }
+      ]
+    },
+    {
+      "boundary": "runtime-mpu-source-identity",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/runtime-mpu-source-identity-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/runtime-retention/mpu-source-red.txt",
+          "bytes": 9936,
+          "sha256": "28facddb3d130b2db0ea398d97970d5d055a995be96a067549e1c98958d99c6c"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/runtime-mpu-source-identity-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/runtime-retention/mpu-source-green.txt",
+          "bytes": 2634,
+          "sha256": "c8131c1776c6fba7cb7307f25e641ba9e4b718d0d6e899d7e42ddf423b278548"
+        }
+      ]
+    },
+    {
+      "boundary": "v8-single-world",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/v8-single-world-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/profiles/v8-single-world-red/stderr.txt",
+          "bytes": 5151,
+          "sha256": "2fa946f1fc5588d5ac6a2ca353c19f120f8c9d46f79a69ed06ed609026d9e91d"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/v8-single-world-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/profiles/v8-single-world-green/stderr.txt",
+          "bytes": 365,
+          "sha256": "761a21b7a2a2e9fc967e2a1449980c4c4afdf2cf0160bc17c0c71adb819e3e83"
+        }
+      ]
+    },
+    {
+      "boundary": "sdk-mpu-guard",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/sdk-mpu-guard-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/profiles/mpu-guard-sdk-red/stderr.txt",
+          "bytes": 1831,
+          "sha256": "e7c3bbc147065548bcf5cead03a37cfe3a5aad3976ab5b249abd0e0192fc8b0f"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/sdk-mpu-guard-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/profiles/mpu-guard-sdk-green/stderr.txt",
+          "bytes": 98,
+          "sha256": "e864f3a16b8851794b151b50c9cd13c52696ef33fadad22d323e897b3535fe74"
+        }
+      ]
+    },
+    {
+      "boundary": "sdk-port-headers",
+      "files": [
+        {
+          "role": "red",
+          "path": "tools/testing/evidence/os-optimization/sdk-port-headers-red.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/profiles/sdk-port-headers-red/stderr.txt",
+          "bytes": 12435,
+          "sha256": "b0ce991f69ed542b09af0c5f673492e0c4f78fffcdf4bda1cde628cb0fd234f6"
+        },
+        {
+          "role": "green",
+          "path": "tools/testing/evidence/os-optimization/sdk-port-headers-green.log",
+          "original_path": "/workspace/nexus-os-implementation-evidence/profiles/sdk-port-headers-green/stderr.txt",
+          "bytes": 99,
+          "sha256": "aa7d69eb96f246cd5b04f5693bc0804923fd397ee46a4ec437d920e61a77f06c"
+        }
+      ]
+    }
+  ]
+}

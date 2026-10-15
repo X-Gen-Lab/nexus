@@ -1,0 +1,1464 @@
+{
+  "scope": "Dirty-source development ARM selected-method/GC evidence only; physical HIL not executed; not a software candidate",
+  "source_sha": "f13fe5ac643ed04b13ec5ee836d7452da20ecc5b",
+  "failed": [],
+  "source_changes_during_build": [],
+  "source_inputs": [
+    {
+      "path": "/workspace/nexus/arch/cortex_m/nx_arch_cache.c",
+      "sha256": "0556810dac343f65da20922a9c897a3cab061f22b1a5a41a4dbc8c4bf267b59b"
+    },
+    {
+      "path": "/workspace/nexus/arch/cortex_m/nx_arch_cortex_m.c",
+      "sha256": "0f0074a66d1c3ef41d7359381c9b2d3308a4cee0ed1fe9a21d060ccf88795941"
+    },
+    {
+      "path": "/workspace/nexus/arch/cortex_m/nx_arch_mpu.c",
+      "sha256": "ae07d4beba4f6f47eb4bc6f2a24e4e3342d36e6c8db8ab850755fd7d24fd552e"
+    },
+    {
+      "path": "/workspace/nexus/arch/cortex_m/nx_arch_security.c",
+      "sha256": "926e4ad07454a59397763bdca2c2cbbbeacdd9fdab564062936425dfb4df90d7"
+    },
+    {
+      "path": "/workspace/nexus/arch/cortex_m/nx_arch_sleep.c",
+      "sha256": "c1f87ad482c11f41b785fdbded2ec4a96a59fdbd9db52e3417033ae8d1c33b4b"
+    },
+    {
+      "path": "/workspace/nexus/components/bmp280/src/bmp280.c",
+      "sha256": "e6f6819f21c23e634f7cfcd0351721e057843cd423ecd831e16a5e48c6e645e3"
+    },
+    {
+      "path": "/workspace/nexus/components/bmp280/src/spi_transport.c",
+      "sha256": "4e54f5eb251581005862c993467c87c0d0e83d5b359256d3894f1f197b834259"
+    },
+    {
+      "path": "/workspace/nexus/components/bus_owner/src/bus_owner.c",
+      "sha256": "c8af9276e4c82136a042495812ac38c0d0adfa32609dd254d5d500c22a26d816"
+    },
+    {
+      "path": "/workspace/nexus/components/bus_owner/src/spi_async_owner.c",
+      "sha256": "a1f1343702cce7cfe56b5fa68318d10d420ffd9b401787cd9a2e6760435ef03c"
+    },
+    {
+      "path": "/workspace/nexus/components/bus_owner/src/spi_owner.c",
+      "sha256": "47ee230905b9a75f1b1738f739afca36a7de5f6a07f2e8782ed6054ff978c2fa"
+    },
+    {
+      "path": "/workspace/nexus/components/bus_owner/src/uart_owner.c",
+      "sha256": "f515fec1e6df45d325797397b622f8a16df34facda118331d6b169838cd020b9"
+    },
+    {
+      "path": "/workspace/nexus/components/log/src/log.c",
+      "sha256": "5230abef433477c1d7598ee7661018b99d46b19e35f4c1b8d376fe6cb8b4b9dc"
+    },
+    {
+      "path": "/workspace/nexus/components/modbus/src/modbus_rtu.c",
+      "sha256": "47199a2e50887f784011ad22bf1479070835380e999d32542b76f75ec4c0c28c"
+    },
+    {
+      "path": "/workspace/nexus/components/storage/src/flash_storage.c",
+      "sha256": "0e51a0d144bd154d0bc4ca4722ef73ec5dd282a89f5154c555fa0f794690f399"
+    },
+    {
+      "path": "/workspace/nexus/components/storage/src/storage.c",
+      "sha256": "30fdf8e0d29c8ecf61ca3d77ecd3749ae9e92a579daf579a143fb7c622d83bfe"
+    },
+    {
+      "path": "/workspace/nexus/core/src/request.c",
+      "sha256": "6fdc85b08c7e479cc943e77036912fb7313a4c690dd32c85a9f632d2380f03d8"
+    },
+    {
+      "path": "/workspace/nexus/core/src/time.c",
+      "sha256": "67b6bdab6428845f8c8aa99d7a173e232e491f3909dbe0c3c78cf19cb017c1fe"
+    },
+    {
+      "path": "/workspace/nexus/io/src/adc.c",
+      "sha256": "2a43862372a66b5258ec0a28256b78925b0bdc5b0f5a68a62bdf6b872de7e97c"
+    },
+    {
+      "path": "/workspace/nexus/io/src/adc_observer.c",
+      "sha256": "48fbc20045b5acc945d5533db881545c2a5f9e026fdb30273e7cce3b2e5ab6a3"
+    },
+    {
+      "path": "/workspace/nexus/io/src/dma.c",
+      "sha256": "98c3edf4a206ede42ecf314a7f9c1b7e892d71318604fc87e4aad18703b3bcbb"
+    },
+    {
+      "path": "/workspace/nexus/io/src/exti.c",
+      "sha256": "2b25b04b35965bc32596fddb9823105bf98e8746c1a6a58a5aff16e0831d28d7"
+    },
+    {
+      "path": "/workspace/nexus/io/src/flash.c",
+      "sha256": "4c0eb780eb87d6ce90b82ab4ab387f752ae15347057f90154252d5f22b4750cd"
+    },
+    {
+      "path": "/workspace/nexus/io/src/flash_region.c",
+      "sha256": "4a14b9330342c6cda18431db6c0fb3a6ba823579c4d33bf18eeffd85d866b2a9"
+    },
+    {
+      "path": "/workspace/nexus/io/src/gpio.c",
+      "sha256": "cfa133514adbae4a42e9e39c83921f9e885117b4cf251f6325dc300b19a4b0e0"
+    },
+    {
+      "path": "/workspace/nexus/io/src/i2c.c",
+      "sha256": "14a9e4f1728dd5b28e4525c83d77ea05903bdcc0645d6e9b824775ec21b22f9f"
+    },
+    {
+      "path": "/workspace/nexus/io/src/i2c_bus_clear.c",
+      "sha256": "b88cc7b5ec47eaea1684312737d69a2aae48d0a25f59106ff1e19915af6ad8df"
+    },
+    {
+      "path": "/workspace/nexus/io/src/spi.c",
+      "sha256": "933d438eee528cb00aa24aaf4c2d974ec18d47facc57d9c54a791d5c76161a5f"
+    },
+    {
+      "path": "/workspace/nexus/io/src/stream.c",
+      "sha256": "693292c7b185bd64004507bb7341d1311f122f84ea608c40cb5a72718253676e"
+    },
+    {
+      "path": "/workspace/nexus/io/src/timer.c",
+      "sha256": "4d2eba552c2aa8065ec6767711a5b045bbe2649c69975503ea5135c6d691a5ac"
+    },
+    {
+      "path": "/workspace/nexus/io/src/uart.c",
+      "sha256": "974704075e9bac9f80873862fcc49945e54e4cee43515c1bd61a8e6d8ab776a9"
+    },
+    {
+      "path": "/workspace/nexus/io/src/uart_rs485.c",
+      "sha256": "867bdec68729f028d8f5513e93f6656b5ec772568dfc117baf95b6c130dcc8e7"
+    },
+    {
+      "path": "/workspace/nexus/io/src/wake.c",
+      "sha256": "227718bd6f7a31e3469d60fa4d09fd264bd0a7a9ae13bf30bfc069b376ffca6c"
+    },
+    {
+      "path": "/workspace/nexus/io/src/watchdog.c",
+      "sha256": "ea3ec3f1cbc3dc1ebbba796760083a377356708532526d9354c5032b656cf357"
+    },
+    {
+      "path": "/workspace/nexus/os/baremetal/notify.c",
+      "sha256": "ebbde6ca1a0dfb361c1b2f0fec3972c641b769f5f37cdffb89bbed8ae9748281"
+    },
+    {
+      "path": "/workspace/nexus/os/diagnostic.c",
+      "sha256": "31984da91ae535393618e3f54c108d87ec885c44add65c3c476b59dcee522672"
+    },
+    {
+      "path": "/workspace/nexus/os/wait.c",
+      "sha256": "400d6748cd5ce1b634d0a8df8d59486bfc6a343345767712da0a6b00f6c933eb"
+    },
+    {
+      "path": "/workspace/nexus/soc/common/i2c_v1_async.c",
+      "sha256": "2caac5c5f04e82aa796fa164ed547e72d74ffe70bbc30c991cad0cf075d356f7"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/adc.c",
+      "sha256": "91138076b826167aa03a3cba530e46adf7b0e9217a818ef834682d588ccafb32"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/adc_continuous.c",
+      "sha256": "ac35e0ecc0ffb85f5a2d2e37866e4167ae568c1ad534cd03dbeed87253e0a181"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/adc_stream.c",
+      "sha256": "1b8297da3fd09a63e94c13b442de0f2b366a294315efc60c01592fb5b394d512"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/gpio.c",
+      "sha256": "85f4f9eff2c016a4d3d70be3f0df4f32e66fa9841701f99425e8247df4ec3140"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/i2c.c",
+      "sha256": "22e4c4bd0cb349bd7609f320f72220a65ea5f6cf8affb24f03d7f96fa325122e"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/i2c_async.c",
+      "sha256": "61cf250b2a6bc81350deac8e283ea27fead8980e5d69b88c71e1a0eccb329860"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/uart.c",
+      "sha256": "3759de1117f6d952a5dbbfd1af1ec66b3675a1feb97e853e0253ea576b12469b"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/uart_dma.c",
+      "sha256": "ce5574b69bf6edbb74b6e0c3f412bce197d6ae6da9aa41e3eba434789293b154"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/uart_receive.c",
+      "sha256": "f9b8babd5f5f24a859ebe6361ecc32232a6ac934a47e7a7c9aff6d91c6bfc6b6"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/system.c",
+      "sha256": "711d6e4f5a4a673360523697b875e1c47d91a44a4ac974be056ecafe6cdb8f76"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/timebase.c",
+      "sha256": "13a1f65ea87ecd06f3093f6736f657393626ac72d36fafafdf83157665e3fe79"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/adc.c",
+      "sha256": "d10f7c0df236765296c5a598e4504d0559dada030b8f27c39602302e72070217"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/adc_continuous.c",
+      "sha256": "25506290b03308aa8417e4cf5735e9ce17cdab5b4cd6c81021088e35fee6e61e"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/adc_stream.c",
+      "sha256": "b7e15782abd9b4d7126efe55761cdb4364ad8ef73336154e9970485fbc4210b6"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/gpio.c",
+      "sha256": "cc9f96ded9b52f11f15fc24552dfebfc2bbd45b66b293ae55bfa6f9e6f954559"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/i2c.c",
+      "sha256": "6df7da48f22a1dca7849a127c429f46d799d3f58cd6b7277d5a7ad093b075c9d"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/i2c_async.c",
+      "sha256": "584c989e3c2a53e89e4a470582ce9528bb1b0b400563b330f1941f59145cf156"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/uart.c",
+      "sha256": "3d89f535de8c89708155df99d6ca10283e94fa67f037c78f09a4505e26d4816d"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/uart_dma.c",
+      "sha256": "d33a2846a2a752847ac47ad96778fc2d2afffb7755d9d2cc801f24232acdd3b9"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/uart_receive.c",
+      "sha256": "6a9a0c68a5346fd785b15e705614a17d6fff1154649d4080333e5d35a072d390"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/system.c",
+      "sha256": "b1c57502702a19b26f58af0aa6e10ac1d35c3a742e842dcb2c69c9a7323343db"
+    },
+    {
+      "path": "/workspace/nexus/tests/contracts/gd32_assembly/controller_main.c",
+      "sha256": "70b3ec754f6f6439c26909b980f64f6b70932360bf0fb25127a79e469dda583a"
+    },
+    {
+      "path": "/workspace/nexus/tests/contracts/stm32_assembly/controller_main.c",
+      "sha256": "9663a44f4b08f7b5c286c4e25792c026d488935f10d36f592b76d0e235d1dc64"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S",
+      "sha256": "ad26e5ba7b4a8d2ba6a449994eb64dfd5825213732d8a3947148b8e3369c92db"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_adc.c",
+      "sha256": "569e3988965032cbf68ab05bca2e46f9106273f0471c6e9e4edef9b826e641b1"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fmc.c",
+      "sha256": "9d92cc681c71045bdf0df8ebd132626ca598f52f6d0a43abfd72bdcb930daafc"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c",
+      "sha256": "d700a902dfec2cdcf4979c675812cd1d3656c53adc288be6c188cab51ed98098"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_i2c.c",
+      "sha256": "9c95205edf953a2c2fb6e4fb75bc6c3dffcac8a0ed7f6b7a9a00076fcafb2983"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c",
+      "sha256": "25b11ab26ecbe945a485e6fe263d6a346648f1d1ffbbe563b21cde5af6f704d3"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_timer.c",
+      "sha256": "d8df83299f14b69aa91be785b455cdfeb28e5bd26709b99195998cb208355ebe"
+    },
+    {
+      "path": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_usart.c",
+      "sha256": "96f0a2cf0f5e67797fd15334042699210eedc3058c3913c423be5a38a706a6fc"
+    },
+    {
+      "path": "/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s",
+      "sha256": "430f14fd00db0f7aa88f354aee54064efb582ddc4cc264fb8e435dc7d7a2f53d"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/nexus-sdk/generated/bindings.c",
+      "sha256": "edefba83d99bd618ae411043939cae00999c36f7ecd40d296921f955f3d20706"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/nexus-sdk/generated/bindings.c",
+      "sha256": "efaf0d5e074a833521c76d2a5ebbdba6b09e11705d44e790a7722b3f6c187116"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/nexus-sdk/generated/bindings.c",
+      "sha256": "4cbe138bb4d1b8a424ce87d63f7eee237f6d8c7a89accc82b83d95f4e6b30240"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/nexus-sdk/generated/bindings.c",
+      "sha256": "60164a767d0509c27126b90b29988867b96e0bb049ff71fe3afa5d660a3782cf"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/nexus-sdk/generated/bindings.c",
+      "sha256": "7dcdd262ae4d65d70e998e7efe7c7bf68473fa0e23389bc49282e9bfe40da5a7"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/nexus-sdk/generated/bindings.c",
+      "sha256": "c51b426f6e3ed37e472cb05b0bbea7879c2df546664adb5d3912cb73d33f589a"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/nexus-sdk/generated/bindings.c",
+      "sha256": "64421af410c265cce1e81bf7f3e7400eea715e8b8e8a583b4e6be47e419b4d9c"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/nexus-sdk/generated/bindings.c",
+      "sha256": "1c5702ee955e07b7d4ff713664e352bec320f2ff6505e45cf94f939917d7eb46"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/nexus-sdk/generated/bindings.c",
+      "sha256": "56d5c934cc3ddb1c4d3eaac0e3cb74ad3f4618d32423e18c1b48f1c7d2f4555b"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/nexus-sdk/generated/bindings.c",
+      "sha256": "3c20ff893bef13ab9306204aee0eb821dce019677d25e9fe4859a4a43bc024c2"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/nexus-sdk/generated/bindings.c",
+      "sha256": "475f87e8416629008f21ccb6dc3e8f73ead953f9a859ee7402faf8fe3d9f0d64"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/nexus-sdk/generated/bindings.c",
+      "sha256": "ea49a0122c7a9a37fba8e8bc3a7355c89691d3c63af5ea4c3c584c9cbc2bc649"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/nexus-sdk/generated/bindings.c",
+      "sha256": "a0c471a26308312b638f975f286c15dee820bb8ead2f72c3c1b92d9530a7957d"
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/nexus-sdk/generated/bindings.c",
+      "sha256": "81807801c71d91e76585a2f741c55f3fdc8ca48b46eb24d6f9111ed59db6d9d6"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/bin/stm32_controller_fixture.bin",
+      "sha256": "f47910549af4390f52639adffe313335d468aa1ca75a943198863b61dda606a5",
+      "bytes": 7906
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/bin/provider-retention.json",
+      "sha256": "5fd2a79139d4b9824ce617a97822884ec0ff1dfc1ce80addb98563d174eac50f",
+      "bytes": 7249
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/bin/stm32_controller_fixture.resources.json",
+      "sha256": "fbbf270a14e1c42433adb37912f7704a21c89ef3ad2992b6c27024a478c8243e",
+      "bytes": 3360
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/bin/stm32_controller_fixture.map",
+      "sha256": "d9e87550c3e3b4e4394a7aa45cb203a55c8f0433053c4bf864be5d8d47de22f3",
+      "bytes": 57106
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/bin/stm32_controller_fixture.elf",
+      "sha256": "d936c68ee4443b984f7a64841b52ef412990e2f1d70ef91c43876d5e26529511",
+      "bytes": 22932
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/bin/stm32_controller_fixture.bin",
+      "sha256": "4a4f2c47cc0e2fe0b72918721cd1740fbc516e43c8f24af5e74e439dde89bda2",
+      "bytes": 7906
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/bin/provider-retention.json",
+      "sha256": "9ebb63463b6452ff0dce9c7daea6217abfe0fa6a14ff9283dcb693346cc2fd90",
+      "bytes": 7261
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/bin/stm32_controller_fixture.resources.json",
+      "sha256": "7bfa139c317f62dbda6c1565d31bb47ab105ea54effe01b08f9b2451d930515e",
+      "bytes": 3390
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/bin/stm32_controller_fixture.map",
+      "sha256": "994b1231c051f877c07a68c0f2c60cb8d706412b8099ef04846615ff5373bdb7",
+      "bytes": 57106
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/bin/stm32_controller_fixture.elf",
+      "sha256": "10f5f07ce7a461abfd37089ce1cf89621d2fc5f2f01d5dd555af6f9fc76fcdb9",
+      "bytes": 22932
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/bin/stm32_controller_fixture.bin",
+      "sha256": "86cba26c93150585313c75bf3945d40300d9099ecfcae96ce8616e261a62f449",
+      "bytes": 8962
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/bin/provider-retention.json",
+      "sha256": "002d38048dd53d6c0ce37702e4ca981f525a28d51a37c9b9e3130e8fcec66634",
+      "bytes": 7283
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/bin/stm32_controller_fixture.resources.json",
+      "sha256": "f5a12f56a2473a9014f7c3a3f783b5849ee1f187dbf58059a20a9057416b7232",
+      "bytes": 3355
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/bin/stm32_controller_fixture.map",
+      "sha256": "a86d8a63e6d793810485fa9fba8fbd9e93332c006ca3fa4a4b91815f865fa78e",
+      "bytes": 57706
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/bin/stm32_controller_fixture.elf",
+      "sha256": "474493a9e288c11c4d5c94cde0a8f4824b76b7f424a84e68802cbe008361d8d5",
+      "bytes": 27628
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/bin/stm32_controller_fixture.bin",
+      "sha256": "1a4eb963596893fe8a463dbd4ce42728e9fbca67e1113dda2f213927f226a6c6",
+      "bytes": 8966
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/bin/provider-retention.json",
+      "sha256": "36c122283a98a94ad5f6f7721788bb98750b2a4b9747b7a6310979c7c411c061",
+      "bytes": 7305
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/bin/stm32_controller_fixture.resources.json",
+      "sha256": "2c6251433f968c9737d2cf10b6f31a3ab5d2ad911a7d78ebc56934a5ee7be466",
+      "bytes": 3410
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/bin/stm32_controller_fixture.map",
+      "sha256": "1de5c7601113b999df2027499cacd0aa57e99b4fcd80375bf985870493a108ca",
+      "bytes": 57707
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/bin/stm32_controller_fixture.elf",
+      "sha256": "0a0d7878983c700cc38cb89d30a336725526094671404dcb3b75ee03ca652e38",
+      "bytes": 27628
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/bin/stm32_controller_fixture.bin",
+      "sha256": "848cc85980d138d5fb6fc14f6ed3cd7fa9977a90f8e1cf0180dd26f40a7c56a9",
+      "bytes": 9336
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/bin/provider-retention.json",
+      "sha256": "3c7382181c810415866776db447f7dc9a8728c10d018d55046a35221f98ce023",
+      "bytes": 7643
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/bin/stm32_controller_fixture.resources.json",
+      "sha256": "66d2cddb6aa6cd60d35fba83c144dae63b0a469eac2f36c25684437dc9fcf53f",
+      "bytes": 3375
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/bin/stm32_controller_fixture.map",
+      "sha256": "50ab472b92d7e0474be6d1340f3ad72e59bcc6208cc65124d754ca850f2dbcd4",
+      "bytes": 52399
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/bin/stm32_controller_fixture.elf",
+      "sha256": "da757c1c9f10425487f56ca4d29bc9128045364e084ea76888ae6d9ce3bc06d7",
+      "bytes": 27132
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/bin/stm32_controller_fixture.bin",
+      "sha256": "1f256b0dfa0d9e84af84a43f4bd0ef129b154321400ef8b4c27cc08e5d6a42bc",
+      "bytes": 6356
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/bin/provider-retention.json",
+      "sha256": "92bd4db3355d6f96791920f5019d56ac79cfc1aceee4f9e5b163b1a7157efcd7",
+      "bytes": 7756
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/bin/stm32_controller_fixture.resources.json",
+      "sha256": "68d1eb96a86a6950065b472f210afa9bebde2b6a39f7f1f8c7044c6eb75c5da4",
+      "bytes": 3340
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/bin/stm32_controller_fixture.map",
+      "sha256": "2853ac1a0d00621821b6f7f803ab3f054d3c9b08fedf01d8dd379d0d365bb7e9",
+      "bytes": 46777
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/bin/stm32_controller_fixture.elf",
+      "sha256": "ec914de3ad525c75ead12038748d061ba8e25d340901161d191aa63c94f76d2e",
+      "bytes": 21972
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/bin/stm32_controller_fixture.bin",
+      "sha256": "dbf0a19263c6d9d283e3b007075396dfe13ba058e467f527b344ea8ab7626f34",
+      "bytes": 6820
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/bin/provider-retention.json",
+      "sha256": "8f5671934de95db8feadd349c3e4cabe56261e27125590c41d9fe46586801865",
+      "bytes": 7756
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/bin/stm32_controller_fixture.resources.json",
+      "sha256": "15578940271beeee9759f7343c0f4f2882d846760b78199e4b5d735cc4e93196",
+      "bytes": 3340
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/bin/stm32_controller_fixture.map",
+      "sha256": "43f835680f73e3746ba91d1c0047cdd5a18996e72361112d3463f2ce3754f8f3",
+      "bytes": 47393
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/bin/stm32_controller_fixture.elf",
+      "sha256": "687c1e6ded1c389929d7ae39265a43cb47fb50a664eb36e5d06aceff9354b28f",
+      "bytes": 22252
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/bin/provider-retention.json",
+      "sha256": "9e34642adaa889fdf94e700a2efc5a73258ee1c8b7b3af23703039ce91405960",
+      "bytes": 7240
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/bin/gd32_controller_fixture.bin",
+      "sha256": "3049a6915e83cc9f17d76b4db9dcdd4745922daba002737aa9ee091a6fc4c83a",
+      "bytes": 9936
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/bin/gd32_controller_fixture.elf",
+      "sha256": "e07123f5602834b122222095d01abf355f54b0df686280d3507a12d04ccbc1e7",
+      "bytes": 28812
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/bin/gd32_controller_fixture.map",
+      "sha256": "88825ea21c1d8b78a1f77e6d0a93ff907cce37a94a66f73ae25fb549c90e8e51",
+      "bytes": 92047
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/bin/gd32_controller_fixture.resources.json",
+      "sha256": "c5bb9c5fd22535bd322a63dfd31e472b453ca171064d741b10adc3237701e9ff",
+      "bytes": 3568
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/bin/provider-retention.json",
+      "sha256": "012e5634ad8125a54c0cfbc4f13e6caf45ff1eae1211edd3bc975a327c6f5a75",
+      "bytes": 7252
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/bin/gd32_controller_fixture.bin",
+      "sha256": "8ecc586f51e4b537aabbe5113b7dca917b1bd008e276491a4b902a1ccab0f575",
+      "bytes": 9940
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/bin/gd32_controller_fixture.elf",
+      "sha256": "ef64d1a65a63254d9b45e868da8faae28740ba640307fbc129474b304fe1497d",
+      "bytes": 28812
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/bin/gd32_controller_fixture.map",
+      "sha256": "9469cd8a13f951281a46176e7d4393e8407dc7594febf1fb402ae8295f27c1da",
+      "bytes": 92048
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/bin/gd32_controller_fixture.resources.json",
+      "sha256": "8a2c71fa48d132e0ed7ac5b29cd0aa677470253129b81beee7b17bb79f8aeb65",
+      "bytes": 3598
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/bin/provider-retention.json",
+      "sha256": "9abf2262231c1022b52ead03c95ee0cd271763eb3946b5ff01b89d1d81a478cb",
+      "bytes": 7274
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/bin/gd32_controller_fixture.bin",
+      "sha256": "d79cdcbeb4944f73a3b642124cf90703cc07b7f858c6c0aa05a75735be263ecd",
+      "bytes": 10556
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/bin/gd32_controller_fixture.elf",
+      "sha256": "3ab9d016254503ce1a96813503a95222191b262a13bc4f4b7bfa92b43269973e",
+      "bytes": 29392
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/bin/gd32_controller_fixture.map",
+      "sha256": "506766cbc6c666ac291538cf1ee64ee046f0aec10b71e87bc9c18e6530872f4b",
+      "bytes": 92658
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/bin/gd32_controller_fixture.resources.json",
+      "sha256": "19787a36cfe66425a6f4b6785d87abf3d26bea6873d09896b2ed8d0b887d1960",
+      "bytes": 3565
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/bin/provider-retention.json",
+      "sha256": "9b28db8a2137038f15c2bf88aa731ad0cb4f14d89484ed76b71e0a89031e292e",
+      "bytes": 7296
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/bin/gd32_controller_fixture.bin",
+      "sha256": "81f84e7797c4faad51496191649c023dd70bc611f950d57ea1e8df5d60747343",
+      "bytes": 10560
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/bin/gd32_controller_fixture.elf",
+      "sha256": "9235bca85c5b52439204a7174c9e26ed8200886fe61c7c00afbf67cf7e137e8e",
+      "bytes": 29392
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/bin/gd32_controller_fixture.map",
+      "sha256": "2d41e8dbd0c07dcbb6d2070964b5fea18a6aeee989874ff01f45d16b7005ff12",
+      "bytes": 92659
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/bin/gd32_controller_fixture.resources.json",
+      "sha256": "3d44858473e8d318c02401dcf2208bc44217f6377fad321fbacf99d2ba542a64",
+      "bytes": 3620
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/bin/provider-retention.json",
+      "sha256": "20a559f6f79cc1a3e3c63d5e8ed4ad44bb78ac439c916263c8b0a29d91f076a7",
+      "bytes": 7295
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/bin/gd32_controller_fixture.bin",
+      "sha256": "02204eec8585742f2d7837339321ede61dd134a6055b20b7b03eaff8c4d55687",
+      "bytes": 10796
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/bin/gd32_controller_fixture.elf",
+      "sha256": "2df3ca376736cda02adc74681d498d5f538e8a25688012aac4cb631f16150a42",
+      "bytes": 28744
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/bin/gd32_controller_fixture.map",
+      "sha256": "a3539716120ae383bffed9ed0246189bed1f47a86e2e74ea98c3af801b131750",
+      "bytes": 82458
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/bin/gd32_controller_fixture.resources.json",
+      "sha256": "efec37b1ece3b40d2cd81e38489da4d1beae16cb8f1d9c538ff792bb59ea39af",
+      "bytes": 3585
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/bin/provider-retention.json",
+      "sha256": "d779971ae6cf43cccb112037dfc8fd3419138ba2653164284e787862b0bec042",
+      "bytes": 7752
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/bin/gd32_controller_fixture.bin",
+      "sha256": "26d785dc315ef6ead253616f3c2928e8a773ab209b3a677b365555a68cd55c74",
+      "bytes": 7600
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/bin/gd32_controller_fixture.elf",
+      "sha256": "6059938ad7657352d427de0b76dc5fb5703da1d4b8cf5289439622c1700e1d07",
+      "bytes": 23300
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/bin/gd32_controller_fixture.map",
+      "sha256": "b93a1330aee9ad57d190ecfdb1815da11628f0b6527180facb85781a7f0b8b6e",
+      "bytes": 73139
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/bin/gd32_controller_fixture.resources.json",
+      "sha256": "f8a8dee0a8dd9c89bd1b7c60e6926d00eafa6d5f74a96342c5e287f29a1d9a8c",
+      "bytes": 3548
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/bin/provider-retention.json",
+      "sha256": "e7b53779e38cf05028aae82b2a97a8493efc19e8407abe602db7eb4e8c7ea369",
+      "bytes": 7753
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/bin/gd32_controller_fixture.bin",
+      "sha256": "e4f7859efad224dced2af9da49e2d2b9a2b62a05cd70c1b60073fb73285abb15",
+      "bytes": 8108
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/bin/gd32_controller_fixture.elf",
+      "sha256": "ee161559d5224cf5a0de470ccc9edf48d5438da294985f15315b53725a41950c",
+      "bytes": 23580
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/bin/gd32_controller_fixture.map",
+      "sha256": "0ca4d9835f507f0e9c5c95ce99510d3d129ab7f3a8ca0009686abd9f1155a3e3",
+      "bytes": 73757
+    },
+    {
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/bin/gd32_controller_fixture.resources.json",
+      "sha256": "8c124e3e439e2c809c1df9f84b5301947b57d7ff63aaad2949480281417f77f0",
+      "bytes": 3548
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/stm32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/stm32_assembly/zg-rx-dma-idle.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle-0.log",
+      "sha256": "c059ac9cd3e2681fab4f9f17688e5345c31c9d45179f68e3c048bbf6c7b16324",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle",
+        "--target",
+        "stm32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle-1.log",
+      "sha256": "18e16a21efdef5d2f72f21f0a5810c7180333fc82c4262a293c14f9144780a06",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle-nm.log",
+      "sha256": "891dd3903f014eb8162577ea5896f32e8c1f34f1e58cc573919f7e161f242dda",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-idle-size.log",
+      "sha256": "48ae5ed5cf8ec6e4878832647ea92b2e068f5bba1fc5a7b51476aa1c47d20612",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/stm32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/stm32_assembly/zg-rx-dma-continuous.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous-0.log",
+      "sha256": "90dfe6ccf94aa3b5d9fba590af5ae21ab6133704f358afb4a4f66b8eb62642e2",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous",
+        "--target",
+        "stm32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous-1.log",
+      "sha256": "1a4a8b5135e4983416de63b8d8aba883f75da6568f33476df3c8f877e6559e12",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous-nm.log",
+      "sha256": "77cf0672d23384b1703265a48ccceb2bd6bbc0981002fa7c6e0bd796aa1fd72e",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-rx-dma-continuous-size.log",
+      "sha256": "f807d6da27ff50b5a87dd37e926576c41bdcca4088c666460643e7c90497f8a2",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/stm32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/stm32_assembly/zg-dma-duplex.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-0.log",
+      "sha256": "32cb56e8ff54f42823ee9ef69443277b0bae6a27166063775d939077c7d5004c",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex",
+        "--target",
+        "stm32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-1.log",
+      "sha256": "e4cdc2c31c487e3e11d166cbcaf1d7909b9b86fcd1a506d5e1e3db35db2c2500",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-nm.log",
+      "sha256": "25a7a6fec64ba00d836cb829695c1f838dae3e92af540c3dba01b081729ee3ff",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-size.log",
+      "sha256": "7ec19aaff9514f3c5e7823c43a07fc72691dd07d19c1ad9ddea5032b883390d6",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/stm32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/stm32_assembly/zg-dma-duplex-continuous.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous-0.log",
+      "sha256": "7d79043dc8ee1ef6c3924cfca7706691b1b78d7fdbc6e444177bad969b2f2178",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous",
+        "--target",
+        "stm32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous-1.log",
+      "sha256": "cd66bff0e50ccc6b76dd5fd5a3fc9f0ce7723b3a9ea3c4ee4467d0f7d4e7187f",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous-nm.log",
+      "sha256": "5d80e94968007c3a82c02c2539be4699dad36225910f1c6a1cca4f5366458bce",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-dma-duplex-continuous-size.log",
+      "sha256": "448c2d7cf91e57f40d6170aaec6e294d743215443783b0d2bade909faddf3c2a",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/stm32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/stm32_assembly/zg-adc-continuous.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous-0.log",
+      "sha256": "fab3d1b907fd61f1a90587a0620f6210ceeed71dde0d08d045ecce4bcf90a62c",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous",
+        "--target",
+        "stm32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous-1.log",
+      "sha256": "7e81d7a3bab81718ecc748ac31b249fd4ca445ae00197726a6fece21b7c6c5ae",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous-nm.log",
+      "sha256": "2ff5810bfdf7737532c55d9c3b72f8f67c8f87633877a0f10128ad5e8f7c5f4d",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-adc-continuous-size.log",
+      "sha256": "e1a1967a348331e201fd2edfc0a820fdac5532a13188e7c139c13090755b31d4",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/stm32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/stm32_assembly/zg-i2c-irq.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq-0.log",
+      "sha256": "74eb5ab51781e9a8226b3cbb4cbc8c7272d744e5238057c8c9462145eefbe605",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq",
+        "--target",
+        "stm32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq-1.log",
+      "sha256": "acf3e6b2e11e098262c00083adcea9b9e509a915228d19b066ab7cf6d4daf0cb",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq-nm.log",
+      "sha256": "c72431d2e37b9aa2dae0a1f62909e7c30483af9744e99348ec58e5f04dc1d2c9",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-irq-size.log",
+      "sha256": "13d03bccdeea8d5aa0d07d96d567e93e79a4d8c8959d85383985d0f1e9168bed",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/stm32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/stm32_assembly/zg-i2c-dma.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma-0.log",
+      "sha256": "b2ddb13b5db346ef522ef0c08b194b90bdc2d63c669c0bd39fd37b614d0e0efa",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma",
+        "--target",
+        "stm32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma-1.log",
+      "sha256": "2e6ee8d17766450fd99bb8d5fbb42013e9b78bbca5a435122567b8dcc7641ad3",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma-nm.log",
+      "sha256": "5c4e697b1e857cd0dbbf59d893ca2e3b0fb6241cf7c13eea575b69563bbae2e8",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma/bin/stm32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/stm32-i2c-dma-size.log",
+      "sha256": "8e7692976a2f469e993691cbbfec559800d6d2cc42e7f28e32bf484d1c6607de",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/gd32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/gd32_assembly/rx-dma-idle.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle-0.log",
+      "sha256": "9fb3b97096cfc29251079f168a6a7f5cc18132594def78e70f381832b7c20a52",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle",
+        "--target",
+        "gd32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle-1.log",
+      "sha256": "c75bdc2a38d7cac0f9706d0bfece3020ff11ca7eae6075f1e22e9b0a2d4c3338",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle-nm.log",
+      "sha256": "8cfd5427aa431c85ba694c8ea8d40375340e90d9ba118098d52c39fb44f152fc",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-idle-size.log",
+      "sha256": "62dcc0fdeec79a0a24a53e481a14514d613937a98ddc357aece4337a2dae981d",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/gd32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/gd32_assembly/rx-dma-continuous.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous-0.log",
+      "sha256": "ebf07b90d1c60ad933d298bfc84ae9fc555951867c4c41f3bc8ba1923fc65fb0",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous",
+        "--target",
+        "gd32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous-1.log",
+      "sha256": "bd0c00ca97651ec3c3d5d02c2760c9295eca88762bdddbe97443c8a55c352308",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous-nm.log",
+      "sha256": "a08552bd20397c4c22396557943b0862f74faa4f6ce6c12584fc58fc32e7bd37",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-rx-dma-continuous-size.log",
+      "sha256": "80768eb310b684faecc74886e3bce06a5c6c36cc2cf71ce973f64665d59f5aaa",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/gd32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/gd32_assembly/dma-duplex.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-0.log",
+      "sha256": "59803d412ce8f97122b95859f4c0c7145136193c486a459047f6a320673333ba",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex",
+        "--target",
+        "gd32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-1.log",
+      "sha256": "8665c5c5041bfdfc20ae8ff726e8a8d38c3ce73aec2bfc60df5a7e574fb07f5c",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-nm.log",
+      "sha256": "66ec6195c85990361d0580889ad971e367302e8c1f94a96bff0c8f202aa9b85b",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-size.log",
+      "sha256": "48ffb322c5aa5d617d3ccab1ab0a3f536e5263d307d1f57b66e1788964fb3d42",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/gd32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/gd32_assembly/dma-duplex-continuous.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous-0.log",
+      "sha256": "5478368f6c6db12008b09cf953b8f9799cfef3d86023a7a7aef935b8c2acb026",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous",
+        "--target",
+        "gd32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous-1.log",
+      "sha256": "5ecaae17dd22e4e0227ab4a475a3998a81c42a5b55a5210cddbb056d113edc20",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous-nm.log",
+      "sha256": "56695f9eac261710441cd817bf2504558c7a69b4c0c817473e2c92a774225410",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-dma-duplex-continuous-size.log",
+      "sha256": "7fe4f86e1a0cccbc17a3cd7e413c8317f0ce373150ddc03fcf3e1ff0e31b9435",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/gd32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/gd32_assembly/adc-continuous.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous-0.log",
+      "sha256": "04989c3b573a4f92401b9a82445718f5c3261f2bd4cb52ebf777378bb5536f3d",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous",
+        "--target",
+        "gd32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous-1.log",
+      "sha256": "b570a8ded7ba9f407fed2afa8f54693241d11df6c6327f23747de965ff653ea3",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous-nm.log",
+      "sha256": "a8dfaba08f2865ccc6a3cd231ab217b27fec548d4b5455a202c37ca4d4449c25",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-adc-continuous-size.log",
+      "sha256": "44c780fba3573c3bd3601dab5742d39ce77fd1d2b15cf2b73a16f019495bbfe5",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/gd32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/gd32_assembly/i2c-irq.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq-0.log",
+      "sha256": "6675d16348cccb6feaef0a36d2c37198a1bb8955fadb258e6da692aebe3c30f9",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq",
+        "--target",
+        "gd32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq-1.log",
+      "sha256": "42625899be86f5874b66f0c4f5d900eaaf9bba6bc57c239d14a45bc371d82998",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq-nm.log",
+      "sha256": "141ec60689dabcacc3f3937fdacfcf40cbe6be2b7a1cd557f8747b21badeb09d",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-irq-size.log",
+      "sha256": "85fea9e1887ebdad78ff5fdcf07864361c710eba824447963876bc93df3b3cbf",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "-S",
+        "/workspace/nexus/tests/contracts/gd32_assembly",
+        "-B",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma",
+        "-G",
+        "Ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+        "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+        "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus/tests/contracts/gd32_assembly/i2c-dma.toml",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma-0.log",
+      "sha256": "1106e27e448b1dc747cc3662793f7304e06be9f1442cc414eac0a3a9d30002f1",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cmake",
+        "--build",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma",
+        "--target",
+        "gd32_controller_fixture",
+        "-j",
+        "4"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma-1.log",
+      "sha256": "f38fc6999233364c8be93ecd12811bcd939a4843f18716e933d4decb1dd95380",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-nm",
+        "-a",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma-nm.log",
+      "sha256": "5008b420bfb29640b7cf763ca38c47db2423152938dbed9ae416bb53d55ec66e",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "arm-none-eabi-size",
+        "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma/bin/gd32_controller_fixture.elf"
+      ],
+      "cwd": "/workspace/nexus",
+      "path": "/workspace/nexus-config-iteration-evidence/mode-arm-matrix-green/gd32-i2c-dma-size.log",
+      "sha256": "8f26a767b147850d9743c6f1d8eeb6b47d587bac523d921b26d8159948d4efd4",
+      "exit_code": 0
+    }
+  ]
+}

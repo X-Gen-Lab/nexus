@@ -1,0 +1,5 @@
+tests/google/uart_multi_controller_test.cpp: In member function ‘nx_result_t {anonymous}::UARTMultiple::Initialize(unsigned int)’:
+tests/google/uart_multi_controller_test.cpp:86:16: error: ‘nx_gd32_uart_dma_initialize_at’ was not declared in this scope; did you mean ‘nx_gd32_uart_dma_initialize’?
+   86 |         return nx_gd32_uart_dma_initialize_at(&states[i], i == 0U ? &nx_gd32_usart0_controller : &nx_gd32_usart1_controller,
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                nx_gd32_uart_dma_initialize

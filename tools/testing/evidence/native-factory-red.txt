@@ -1,0 +1,42 @@
+Running main() from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest_main.cc
+[==========] Running 4 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 4 tests from NativeFactory
+[ RUN      ] NativeFactory.LookupBeforeStartupHasNoEffectsAndChecksEveryClass
+[       OK ] NativeFactory.LookupBeforeStartupHasNoEffectsAndChecksEveryClass (0 ms)
+[ RUN      ] NativeFactory.GeneratedGPIOAndUARTHaveIndependentStateAndStorage
+[       OK ] NativeFactory.GeneratedGPIOAndUARTHaveIndependentStateAndStorage (0 ms)
+[ RUN      ] NativeFactory.GeneratedBusControllersAndEndpointMemoriesAreDistinct
+[       OK ] NativeFactory.GeneratedBusControllersAndEndpointMemoriesAreDistinct (0 ms)
+[ RUN      ] NativeFactory.StopRevokesOperationsAndRestartRetainsStaticIdentity
+/workspace/nexus/tests/google/native_factory_test.cpp:214: Failure
+Expected equality of these values:
+  nx_gpio_port_write(gpio, 1, 0)
+    Which is: 0
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/native_factory_test.cpp:217: Failure
+Expected equality of these values:
+  nx_spi_endpoint_transfer(spi, &tx, nullptr, 1, 100, &count)
+    Which is: 0
+  NX_ERROR_STATE
+    Which is: 3
+
+/workspace/nexus/tests/google/native_factory_test.cpp:220: Failure
+Expected equality of these values:
+  nx_i2c_endpoint_transaction(i2c, &message, 1, 100, &count)
+    Which is: 0
+  NX_ERROR_STATE
+    Which is: 3
+
+[  FAILED  ] NativeFactory.StopRevokesOperationsAndRestartRetainsStaticIdentity (0 ms)
+[----------] 4 tests from NativeFactory (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 3 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] NativeFactory.StopRevokesOperationsAndRestartRetainsStaticIdentity
+
+ 1 FAILED TEST

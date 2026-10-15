@@ -5,7 +5,47 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 项目遵循 [语义化版本](https://semver.org/lang/zh-CN/spec/v2.0.0.html)。
 
-## [未发布]
+
+## [0.1.0] - 2026-10-15（Asia/Shanghai）
+
+首个公开 Source SDK 开发者预览版。下方一月的第一阶段记录是历史项目里程碑，
+不标识本次平台发行。
+
+### 新增
+
+- 可搬移源码 SDK，包含精确版本选择、固定递归依赖、许可声明和完整文件 manifest。
+  消费方一同重新编译平台与应用；不承诺稳定二进制 ABI。
+- 静态 C11 Core／Arch／SoC／Board、typed I/O、可选 OS 和组件机制。一份 TOML
+  装配经严格 typed IR 生成唯一原子 bundle。factory 返回已有只读 face，不分配
+  或启动硬件；共享操作表分派到私有实例 context。
+- F407ZG 启明、F407VE 天空星与 GD32F470ZG 梁山派精确装配；G474 EXTI、H743
+  固定时钟／Cache／TX DMA、U575 单域或同步双域参考分别维护窄范围。CPU-only
+  Runtime 不建立 SoC／Board 支持。ThreadX 保持明确的 Native／M4 子集。
+- 双语任务文档、公共 API、软件证据索引和可执行 HIL 准备工具。应用与产品策略
+  继续由外部消费工程维护。
+
+### 变更
+
+- 将公开发行前的 `1.0.0` 源码版本规范为首个公开 `0.1.0`。
+  `dependencies/platform-compatibility.json` 是唯一人工维护的版本策略；CMake、
+  生成头文件和 package metadata 从中派生版本。源码接口 epoch `1`、SDK 精确
+  匹配和 authored schema `2` 保持不变。
+- 静态 typed I/O、调用者持有请求、显式所有权、配置和目标图取代已被替代的
+  HAL／OSAL／Kconfig 装配路径。
+
+### 验证与限制
+
+发行资产 manifest 和执行 receipt 记录本次准确源码、依赖、工具与实际软件检查。
+历史证据保持原始源码：构建系统基线为 `cc6a065c`，更早 SoC 基线独立记录，
+不向本次发行转移资格。八个旧 H743／U575 候选归档当前在记录路径不可取得，
+原因是搬移后的 `/tmp` 目标不存在；旧通过 receipt 保留，但不能使归档变为可下载。
+
+MCU 实板 HIL 保持 `not_executed`。源码分发、host 模型、ARM 链接和文档发布
+不建立物理时序、电气安全、签名产品资格、认证或 LTS。精确支持、核验和剩余
+验收见[发行指南](docs/status/release-0.1.0.md)，原始记录见
+[当前交付](docs/delivery/README.md)。
+
+## 重构前历史（已被替代）
 
 ### 新增
 
@@ -234,7 +274,11 @@
 
 ---
 
-## [0.1.0] - 2026-01-12（第一阶段完成）
+## 历史第一阶段里程碑 - 2026-01-12
+
+本条保留早期开发记录，原标签为 `0.1.0`。2026-10-15 发行盘点时未观察到对应的
+公开平台 GitHub tag／release。旧架构与平台声明只描述该里程碑，不建立当前支持
+或资格。
 
 ### 新增
 

@@ -1,0 +1,39 @@
+{
+  "argv": [
+    "/workspace/nexus/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "scripts.ci.test_provider_assemblies",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0,
+  "started_at": "2026-10-11T22:36:29.497950+00:00",
+  "ended_at": "2026-10-11T22:36:30.015744+00:00",
+  "source_before": [
+    {
+      "path": "scripts/ci/provider_assemblies.py",
+      "sha256": "9c63186b82ccf29a59741659d82b531e92133cdce960e5a75b772a1e5dba1a49",
+      "bytes": 18588
+    },
+    {
+      "path": "scripts/ci/test_provider_assemblies.py",
+      "sha256": "a6b2b6315c55fc99e7403331732569428e7e4cf0696f401663e2b4baf8aeaf48",
+      "bytes": 14442
+    }
+  ],
+  "source_after": [
+    {
+      "path": "scripts/ci/provider_assemblies.py",
+      "sha256": "9c63186b82ccf29a59741659d82b531e92133cdce960e5a75b772a1e5dba1a49",
+      "bytes": 18588
+    },
+    {
+      "path": "scripts/ci/test_provider_assemblies.py",
+      "sha256": "a6b2b6315c55fc99e7403331732569428e7e4cf0696f401663e2b4baf8aeaf48",
+      "bytes": 14442
+    }
+  ],
+  "source_stable": true
+}

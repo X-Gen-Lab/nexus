@@ -1,0 +1,12 @@
+[
+  {
+    "path": "scripts/ci/provider_assemblies.py",
+    "sha256": "e38578c37ce06f84d45cefe1044766c55474f9b6fcab50030bebd29aeaf9b324",
+    "bytes": 18324
+  },
+  {
+    "path": "scripts/ci/test_provider_assemblies.py",
+    "sha256": "51d644e7699dea9b4f03d0e2ac4bf6b215ca80c8a748f4768e3cba9ddadeb676",
+    "bytes": 14247
+  }
+]

@@ -1,0 +1,38 @@
+/**
+ * \file            hooks.c
+ * \brief           Explicit weak fail-stop for kernel invariant violations
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-09
+ *
+ * \copyright       Copyright (c) 2026 Nexus Team
+ */
+#include "nexus/core/fault.h"
+#include "nexus/os/freertos.h"
+
+/* The test port disables stack checking; retain the exported hook prototype. */
+void vApplicationStackOverflowHook(TaskHandle_t task, char* name);
+
+/** \brief A returning observer cannot authorize corrupted-kernel progress. */
+static _Noreturn void park(nx_fault_domain_t domain, const char* file,
+                           unsigned line) {
+    nx_fault_observe(domain, NX_ERROR_STATE, file, line);
+    taskDISABLE_INTERRUPTS();
+    for (;;) {
+    }
+}
+
+/** \brief Preserve responsibility on stack/invariant corruption. */
+__attribute__((weak, noreturn)) void nx_freertos_assert_failed(const char* file,
+                                                               unsigned line) {
+    park(NX_FAULT_FREERTOS_ASSERT, file, line);
+}
+
+/** \brief Observe stack failure without inspecting potentially corrupt names.
+ */
+__attribute__((weak)) void vApplicationStackOverflowHook(TaskHandle_t task,
+                                                         char* name) {
+    (void)task;
+    (void)name;
+    park(NX_FAULT_FREERTOS_STACK, __FILE__, __LINE__);
+}

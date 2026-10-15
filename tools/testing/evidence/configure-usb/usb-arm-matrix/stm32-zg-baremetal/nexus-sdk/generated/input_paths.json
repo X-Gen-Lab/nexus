@@ -1,0 +1,7 @@
+{
+  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
+  "external/stm32-zg-baremetal.toml": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix/stm32-zg-baremetal.toml",
+  "soc/stm32f407/routes.json": "/workspace/nexus/soc/stm32f407/routes.json",
+  "soc/stm32f407/soc.json": "/workspace/nexus/soc/stm32f407/soc.json",
+  "tests/contracts/usb_assembly/stm32-zg-board/board.json": "/workspace/nexus/tests/contracts/usb_assembly/stm32-zg-board/board.json"
+}

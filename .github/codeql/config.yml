@@ -1,0 +1,6 @@
+name: Maintained Nexus code
+
+# Archived documentation tools are retained for provenance and are not executed.
+# Production code, current tooling and behavioral tests remain in analysis scope.
+paths-ignore:
+  - docs/archive/**

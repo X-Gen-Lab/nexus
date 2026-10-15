@@ -1,0 +1,172 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: a7176136304e634ef22159970acb669ccc5ebcbb068f64419adf92dd396db353\n"
+
+msgid "Wait correctly and shut down an explicit owner"
+msgstr "正确等待并停止显式 owner"
+
+msgid ""
+"Use this guide for applications selecting an optional Native, FreeRTOS or "
+"ThreadX adapter. The application owns tasks, stacks, notifications, queues "
+"and execution progress. Baremetal has no scheduler. Platform start never "
+"starts a kernel. The [OS contract](../design/os-contracts.md) remains "
+"authoritative."
+msgstr ""
+"选择可选 Native、FreeRTOS 或 ThreadX adapter "
+"的应用使用本指南。应用拥有任务、栈、通知、队列和执行进度。裸机没有调度器。平台启动从不启动内核。[OS 合同](../design/os-"
+"contracts.md)保持权威。"
+
+msgid "Avoid lost completion and unbounded waits"
+msgstr "避免丢失完成和无限等待"
+
+msgid ""
+"Use the request's latched predicate as truth. Check the completion "
+"predicate, arm the notification sequence, recheck, wait with the same "
+"absolute monotonic deadline, then recheck again. Wakes are hints and may be "
+"coalesced or unrelated. On timeout, perform the contract's final predicate "
+"observation. Do not restart a relative budget after each hint and do not "
+"block the only executor that must make progress."
+msgstr ""
+"以请求的锁存谓词为权威。先检查完成谓词，调用 `arm` "
+"快照通知序列，再次检查，以同一绝对单调截止时间等待，然后再次检查。唤醒只是提示，可能合并或与当前请求无关。超时后执行合同要求的最后一次谓词观察。不得在每次提示后重新开始相对时间预算，也不得阻塞唯一负责推进的执行者。"
+
+msgid ""
+"![Predicate, wake and explicit shutdown "
+"responsibilities](../assets/diagrams/wait-wake-shutdown.svg)"
+msgstr "![谓词、唤醒与显式停机责任](../assets/diagrams/wait-wake-shutdown.svg)"
+
+msgid "Predicate, wake and explicit shutdown responsibilities"
+msgstr "谓词、唤醒与显式停机责任"
+
+msgid ""
+"FIG-08 shows the current wait/wake responsibilities. A provider IRQ sink "
+"must respect the selected kernel syscall ceiling; an unqualified priority "
+"cannot call an ISR kernel API. ThreadX has its own reviewed M4/Native subset"
+" and masking policy, not the FreeRTOS port or tickless/isolation capability "
+"set."
+msgstr ""
+"FIG-08 表示当前 wait/唤醒责任。提供者 IRQ 接收端必须遵守选定内核系统调用优先级阈值；不合法优先级不得调用 ISR 内核 "
+"API。ThreadX 有自己复核的 M4/Native 子集和屏蔽策略，不继承 FreeRTOS 端口或 tickless/isolation "
+"能力集。"
+
+msgid "Shut down in dependency order"
+msgstr "按依赖顺序停机"
+
+msgid "Close client admission and reject new work without borrowing it."
+msgstr "关闭客户端准入，不借用地拒绝新工作。"
+
+msgid ""
+"Keep the resource owner/executor running. Request cancellation using stable "
+"slots and matching epochs; cancellation does not release accepted storage."
+msgstr "保持资源 owner/执行者运行。通过稳定槽与匹配 epoch 请求取消；取消不释放已接受的存储。"
+
+msgid ""
+"Drain transfers and block loans. Acquire-observe SETTLED and read results. A"
+" failed drain retains QUARANTINED storage and explicit recovery "
+"responsibility."
+msgstr "排空传输和块借用。Acquire 观察 SETTLED 并读取结果。失败排空保留 QUARANTINED 存储和明确恢复责任。"
+
+msgid ""
+"Join producers and detach/join control observers before slot or request "
+"reuse."
+msgstr "复用槽或请求前，join 生产者并 detach/join 控制观察者。"
+
+msgid ""
+"Stop and join the owner. Quiesce hardware IRQ publishers before destroying "
+"their notification, queue, guard, stack or TCB storage."
+msgstr "停止并 join owner。销毁通知、队列、临界区保护、栈或 TCB 存储前，确保硬件 IRQ 发布者停止访问并完成必要同步。"
+
+msgid ""
+"Stop platform providers only when their selected lifetime and kernel "
+"clock/Tick ownership permit it. A running scheduler is not stopped by "
+"ordinary I/O teardown."
+msgstr "只有选定生命周期与内核时钟/Tick 所有权允许时才能停止 platform 提供者。普通 I/O 拆除不停止正在运行的调度器。"
+
+msgid "Task return has a backend-specific implementation:"
+msgstr "任务返回后的实现因后端而异："
+
+msgid "Backend"
+msgstr "后端"
+
+msgid "After the application entry returns"
+msgstr "应用入口返回后的行为"
+
+msgid "External owner must prove"
+msgstr "外部所有者必须证明"
+
+msgid "Native"
+msgstr "Native"
+
+msgid "The pthread entry returns and the host thread terminates"
+msgstr "pthread 入口返回，主机线程终止"
+
+msgid "Successful `nx_native_task_join()`"
+msgstr "`nx_native_task_join()` 成功"
+
+msgid "FreeRTOS"
+msgstr "FreeRTOS"
+
+msgid ""
+"The wrapper publishes its completion hint and suspends until the external "
+"joiner deletes it"
+msgstr "包装任务发布完成提示，然后挂起，直到外部 join 调用方将其删除"
+
+msgid "Successful `nx_freertos_task_join()` and external kernel detachment"
+msgstr "`nx_freertos_task_join()` 成功，且内核引用已在外部解除"
+
+msgid "ThreadX"
+msgstr "ThreadX"
+
+msgid ""
+"The wrapper publishes its return predicate and completion hint, then follows"
+" the kernel completion path"
+msgstr "包装任务发布返回谓词和完成提示，然后进入内核完成路径"
+
+msgid ""
+"Successful `nx_threadx_task_join()`; the hint alone does not prove ready-"
+"list detachment"
+msgstr "`nx_threadx_task_join()` 成功；提示本身不能证明任务已经脱离就绪链表"
+
+msgid ""
+"Returning from an entry function or observing a completion hint never "
+"authorizes stack/TCB reclamation. Keep wrapper, stack and kernel-control "
+"storage until the one external lifecycle owner successfully joins it. Raw "
+"queues and closable queues have different lifecycle contracts; close is not "
+"destruction. Keep all storage on the failure path and retry cleanup only "
+"through its real owner."
+msgstr ""
+"入口函数返回或观察到完成提示，都不允许回收栈／TCB。必须保留包装对象、栈和内核控制存储，直到唯一的外部生命周期所有者成功 "
+"join。原始队列和可关闭队列的生命周期合同不同；关闭不等于销毁。失败路径保留全部存储，只能由真实所有者重试清理。"
+
+msgid "Execute maintained software fixtures"
+msgstr "执行维护中的软件夹具"
+
+msgid ""
+"First prepare the [fixed source and recursive dependencies](source-"
+"checkout.md). From that repository root, with host build tools available:"
+msgstr "先准备[固定源码与递归依赖](source-checkout.md)。然后从该仓库根目录、在主机构建工具可用的条件下执行："
+
+msgid ""
+"Both binaries must execute nonempty passing cases. This targeted development"
+" scope does not replace the complete TDD gate. The external UART owner "
+"application in [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples)"
+" supplies product workers; its pin/revision must be recorded before claiming"
+" consumer execution."
+msgstr ""
+"两个可执行文件都必须实际执行非空且全部通过的用例。此定向开发范围不替代完整 TDD 门禁。[nexus-"
+"examples](https://github.com/X-Gen-Lab/nexus-examples) 的外部 UART owner "
+"应用提供产品执行任务；声明消费工程执行前必须记录其固定源码版本。"
+
+msgid ""
+"Physical scheduler context, IRQ ceiling, FP/MVE retention, stack peaks and "
+"wake latency require real station evidence. Do not inherit POSIX behavior as"
+" MCU timing."
+msgstr "物理调度器上下文、IRQ 优先级阈值、FP/MVE 保留、栈峰值和唤醒延迟需要真实工位证据。不得将 POSIX 行为继承为 MCU 时序。"

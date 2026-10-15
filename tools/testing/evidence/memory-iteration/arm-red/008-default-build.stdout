@@ -1,0 +1,43 @@
+[1/42] Building C object nexus/core/CMakeFiles/nexus_core.dir/src/time.c.obj
+[2/42] Building C object nexus/core/CMakeFiles/nexus_core.dir/src/request.c.obj
+[3/42] Building C object nexus/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cortex_m.c.obj
+[4/42] Building C object nexus/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.obj
+[5/42] Building C object nexus/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.obj
+[6/42] Building C object nexus/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.obj
+[7/42] Linking C static library nexus/lib/libnexus_core.a
+[8/42] Building C object nexus/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.obj
+[9/42] Linking C static library nexus/lib/libnexus_arch.a
+[10/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/gpio.c.obj
+[11/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/uart.c.obj
+[12/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/spi.c.obj
+[13/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/flash.c.obj
+[14/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/i2c.c.obj
+[15/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/watchdog.c.obj
+[16/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/exti.c.obj
+[17/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/timer.c.obj
+[18/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/flash_region.c.obj
+[19/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/adc.c.obj
+[20/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/dma.c.obj
+[21/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/wake.c.obj
+[22/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/stream.c.obj
+[23/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.obj
+[24/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/adc_observer.c.obj
+[25/42] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.obj
+[26/42] Building C object nexus/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c.obj
+[27/42] Building C object nexus/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fmc.c.obj
+[28/42] Linking C static library nexus/lib/libnexus_io.a
+[29/42] Building C object nexus/os/CMakeFiles/nexus_os_wait.dir/wait.c.obj
+[30/42] Building C object nexus/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/timebase.c.obj
+[31/42] Building C object nexus/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj
+[32/42] Building C object nexus/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_timer.c.obj
+[33/42] Linking C static library nexus/lib/libnexus_os_wait.a
+[34/42] Linking C static library nexus/lib/libnexus_gd32_sdk.a
+[35/42] Linking C static library nexus/lib/libnexus_soc_gd32f470.a
+[36/42] Building C object CMakeFiles/nexus_gd32_memory.dir/main.c.obj
+[37/42] Building C object nexus/os/CMakeFiles/nexus_os_baremetal.dir/baremetal/notify.c.obj
+[38/42] Building ASM object CMakeFiles/nexus_gd32_memory_nexus_startup.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S.obj
+[39/42] Linking C static library nexus/lib/libnexus_platform.a
+[40/42] Linking C static library nexus/lib/libnexus_os_baremetal.a
+[41/42] Building C object CMakeFiles/nexus_gd32_memory_nexus_startup.dir/workspace/nexus/soc/gd32f470/system.c.obj
+[42/42] Linking C executable bin/nexus_gd32_memory.elf
+ELF budget: passed

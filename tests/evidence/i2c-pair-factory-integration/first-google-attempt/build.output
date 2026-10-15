@@ -1,0 +1,36 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus-g474-iteration-evidence/host-build/generated/resolved.json
+-- Configuring done (2.4s)
+-- Generating done (0.2s)
+-- Build files have been written to: /workspace/nexus-g474-iteration-evidence/host-build
+[0/3] Re-checking globbed directories...
+[1/29] Linking C static library lib/libnexus_core.a
+[2/29] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_factory_test.dir/i2c_pair_factory_test.cpp.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_factory_test.dir/i2c_pair_factory_test.cpp.o 
+/usr/bin/c++ -DNX_I2C_PAIR_STM32 -DSTM32F407xx -D_fini=nx_i2c_pair_fixture_fini -D_init=nx_i2c_pair_fixture_init -I/workspace/nexus-g474-iteration-evidence/host-build/tests/contracts/google/i2c-pair-stm32-dma -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/soc/common -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus-g474-iteration-evidence/host-build/generated -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -isystem /workspace/nexus-g474-iteration-evidence/host-build/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus-g474-iteration-evidence/host-build/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus-g474-iteration-evidence/host-build/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus-g474-iteration-evidence/host-build/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c++17 -include/workspace/nexus/tests/google/i2c_pair_factory_model.h -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -MD -MT tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_factory_test.dir/i2c_pair_factory_test.cpp.o -MF tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_factory_test.dir/i2c_pair_factory_test.cpp.o.d -o tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_factory_test.dir/i2c_pair_factory_test.cpp.o -c /workspace/nexus/tests/google/i2c_pair_factory_test.cpp
+/workspace/nexus/tests/google/i2c_pair_factory_test.cpp: In member function ‘virtual void {anonymous}::I2CPairFactory::SetUp()’:
+/workspace/nexus/tests/google/i2c_pair_factory_test.cpp:147:24: error: ‘nx_binding_primary_sensor’ was not declared in this scope; did you mean ‘nx_device_primary_sensor’?
+  147 |         endpoints[0] = nx_binding_primary_sensor;
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~
+      |                        nx_device_primary_sensor
+/workspace/nexus/tests/google/i2c_pair_factory_test.cpp:148:24: error: ‘nx_binding_secondary_sensor’ was not declared in this scope; did you mean ‘nx_device_secondary_sensor’?
+  148 |         endpoints[1] = nx_binding_secondary_sensor;
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                        nx_device_secondary_sensor
+/workspace/nexus/tests/google/i2c_pair_factory_test.cpp: In member function ‘virtual void {anonymous}::I2CPairFactory::TearDown()’:
+/workspace/nexus/tests/google/i2c_pair_factory_test.cpp:163:20: error: suggest explicit braces to avoid ambiguous ‘else’ [-Werror=dangling-else]
+  163 |                 if (states[i]->active != nullptr)
+      |                    ^
+/workspace/nexus/tests/google/i2c_pair_factory_test.cpp:177:12: error: suggest explicit braces to avoid ambiguous ‘else’ [-Werror=dangling-else]
+  177 |         if (sram != MAP_FAILED && sram != nullptr)
+      |            ^
+/workspace/nexus/tests/google/i2c_pair_factory_test.cpp:179:12: error: suggest explicit braces to avoid ambiguous ‘else’ [-Werror=dangling-else]
+  179 |         if (mmio != MAP_FAILED && mmio != nullptr)
+      |            ^
+cc1plus: all warnings being treated as errors
+ninja: build stopped: subcommand failed.

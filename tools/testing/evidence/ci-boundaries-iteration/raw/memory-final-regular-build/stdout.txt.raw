@@ -1,0 +1,8 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Configuring incomplete, errors occurred!
+FAILED: [code=1] build.ninja 
+/workspace/nexus/.venv/lib/python3.12/site-packages/cmake/data/bin/cmake --regenerate-during-build -S/workspace/nexus -B/workspace/nexus/build/ci-boundary-memory

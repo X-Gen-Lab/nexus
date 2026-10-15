@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "kind": "provider-ci-development",
+  "source_files": [
+    {
+      "path": ".github/workflows/build-matrix.yml",
+      "sha256": "14b9111652ab10d3843358a32957f5a4cc54a99c6c28f2c1e3eed788d6f538bf"
+    },
+    {
+      "path": ".github/workflows/test_platform_ci.py",
+      "sha256": "9ca09b7ec35fd87f1c88acd381a3e865f5928f3baeeb09eda6dde1fca5902444"
+    }
+  ],
+  "scope": "Workflow and shell syntax plus actual temporary CTest admission; selected real ARM source-budget-retention execution is separate and pending final source closure.",
+  "red": {
+    "tests": 1,
+    "failures": 1,
+    "log": "red.log"
+  },
+  "corrected_environment_failure": {
+    "log": "missing-tool-path.log",
+    "failure": "cmake missing from inherited PATH; 4 CTest fixtures not executed"
+  },
+  "physical_status": "not_executed",
+  "actual_arm_matrix_status": "pending",
+  "green": {
+    "tests": 21,
+    "failures": 0,
+    "log": "green.log"
+  }
+}

@@ -1,0 +1,29 @@
+Running main() from gmock_main.cc
+[==========] Running 10 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 10 tests from NativeFactory
+[ RUN      ] NativeFactory.NominalGettersPreserveIdentityWithoutStartingDevices
+[       OK ] NativeFactory.NominalGettersPreserveIdentityWithoutStartingDevices (0 ms)
+[ RUN      ] NativeFactory.ColdI2CChildrenKeepPureControllerAndAddressIdentity
+[       OK ] NativeFactory.ColdI2CChildrenKeepPureControllerAndAddressIdentity (0 ms)
+[ RUN      ] NativeFactory.SelectedCapabilitiesRemainReadonlyAndModelScoped
+[       OK ] NativeFactory.SelectedCapabilitiesRemainReadonlyAndModelScoped (0 ms)
+[ RUN      ] NativeFactory.LookupBeforeStartupHasNoEffectsAndChecksEveryClass
+[       OK ] NativeFactory.LookupBeforeStartupHasNoEffectsAndChecksEveryClass (0 ms)
+[ RUN      ] NativeFactory.GeneratedGPIOAndUARTHaveIndependentStateAndStorage
+[       OK ] NativeFactory.GeneratedGPIOAndUARTHaveIndependentStateAndStorage (0 ms)
+[ RUN      ] NativeFactory.GeneratedBusControllersAndEndpointMemoriesAreDistinct
+[       OK ] NativeFactory.GeneratedBusControllersAndEndpointMemoriesAreDistinct (0 ms)
+[ RUN      ] NativeFactory.StopRevokesOperationsAndRestartRetainsStaticIdentity
+[       OK ] NativeFactory.StopRevokesOperationsAndRestartRetainsStaticIdentity (0 ms)
+[ RUN      ] NativeFactory.StopRetainsQuarantinedBorrowUntilProviderDrain
+[       OK ] NativeFactory.StopRetainsQuarantinedBorrowUntilProviderDrain (0 ms)
+[ RUN      ] NativeFactory.AllNineClassesStopAndRestartWithRetainedWatchdogEffect
+[       OK ] NativeFactory.AllNineClassesStopAndRestartWithRetainedWatchdogEffect (0 ms)
+[ RUN      ] NativeFactory.PlatformStopKeepsADCStreamLoanUntilConsumerRelease
+[       OK ] NativeFactory.PlatformStopKeepsADCStreamLoanUntilConsumerRelease (0 ms)
+[----------] 10 tests from NativeFactory (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 10 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 10 tests.

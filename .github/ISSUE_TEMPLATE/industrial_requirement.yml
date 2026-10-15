@@ -1,0 +1,44 @@
+name: Reusable platform requirement
+description: Define a common mechanism and its observable software or hardware acceptance.
+title: '[Requirement] '
+body:
+  - type: input
+    id: identity
+    attributes:
+      label: Requirement or NG task
+      description: Link the current 33-task ledger or an exact new mechanism requirement.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Trigger and resulting behavior
+      description: Include failure state and explain why the mechanism belongs in the common platform. Product policy stays external.
+    validations:
+      required: true
+  - type: textarea
+    id: target
+    attributes:
+      label: Exact target and bounded mode
+      description: Full SoC part, Board and observed PCB revision, backend, compiler, assembly, ownership, storage, deadlines and resource budgets. Mark unknown facts.
+    validations:
+      required: true
+  - type: dropdown
+    id: owner
+    attributes:
+      label: Accountable role
+      options: [technical-lead, core-interfaces, bsp-ports, industrial-apps, quality-hil, build-release]
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Applicable verification and identity
+      description: Separate actual host/model tests, ARM linkage/resources, sealed software and physical HIL. Link source/config/artifact and raw reports when executed.
+    validations:
+      required: true
+  - type: textarea
+    id: risk
+    attributes:
+      label: Contract and external consumer impact
+      description: Identify borrowed storage, cancellation/drain, persistence or startup changes and required external migration or recovery.

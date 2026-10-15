@@ -1,0 +1,46 @@
+// FIG-04 reference: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph FactoryInstances {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-04 Static instances and shared ops\nReference layout: two same-kind instances; controller != endpoint"];
+    caller [label="application: assembly-local typed ID", fillcolor="#f8fafc"];
+    factory [label="Typed factory\nBounded switch lookup of an existing readonly face\nInvalid ID -> NULL; no allocation, initialization or hardware start"];
+    subgraph clusterUart {
+        label="UART instances selected by assembly"; color="#64748b";
+        faceA [label="const UART face A\nops* + context*"];
+        faceB [label="const UART face B\nops* + context*"];
+        ops [label="Const readonly UART ops\nOne shared table per provider / mode", fillcolor="#fefce8"];
+        stateA [label="private state A: own active ref / RX storage"];
+        stateB [label="private state B: own active ref / RX storage"];
+        { rank=same; faceA; faceB; }
+        { rank=same; stateA; stateB; }
+    }
+    subgraph clusterBus {
+        label="Bus identity: distinct controller / endpoint factory classes and namespaces"; color="#64748b";
+        controller [label="SPI controller face\nreal controller state and recovery"];
+        endpoint [label="SPI device endpoint face\nCS / mode / frequency / controller reference"];
+        i2c [label="I2C: controller != address endpoint"];
+    }
+    caller -> factory [label="lookup, outside ordinary I/O hot path"];
+    factory -> faceA [label="existing face reference"];
+    factory -> faceB [label="existing face reference"];
+    faceA -> ops [label="readonly ops reference"];
+    faceB -> ops [label="readonly ops reference"];
+    faceA -> stateA [label="per-instance context"];
+    faceB -> stateB [label="per-instance context"];
+    ops -> stateA [label="method receives this context", style=dashed];
+    ops -> stateB [label="method receives this context", style=dashed];
+    factory -> controller [label="controller ID"];
+    factory -> endpoint [label="device ID"];
+    endpoint -> controller [label="actual controller reference / admission"];
+    endpoint -> i2c [style=invis];
+}

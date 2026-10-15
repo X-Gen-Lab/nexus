@@ -1,0 +1,7 @@
+{
+  "boards/gd32f470_liangshan/board.json": "/workspace/nexus/boards/gd32f470_liangshan/board.json",
+  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
+  "external/gd32.toml": "/workspace/nexus-industrial-design/sleep-consumer/gd32.toml",
+  "soc/gd32f470/routes.json": "/workspace/nexus/soc/gd32f470/routes.json",
+  "soc/gd32f470/soc.json": "/workspace/nexus/soc/gd32f470/soc.json"
+}

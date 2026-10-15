@@ -1,56 +1,20 @@
-# Vendor Libraries
+# Vendor SDK sources
 
-This directory contains official chip vendor libraries and SDKs.
+Maintained firmware targets use the SDKs below. A directory or submodule for another family does not establish a supported Nexus platform.
 
-## Directory Structure
+| Sources | Origin and version identity | License boundary |
+| --- | --- | --- |
+| `arm/CMSIS_5` | Official Arm repository, pinned gitlink | Upstream notices |
+| `st/cmsis_device_f4` | Official ST repository, pinned gitlink | Upstream notices |
+| `st/stm32f4xx_hal_driver` | Official ST repository, pinned gitlink | Upstream notices |
+| `gigadevice/gd32f4xx` | Official GD32F4xx 3.3.3 Firmware subtree, per-file source lock | BSD-3-Clause, Apache-2.0 and two original Arm Cortex-M distribution notices; see its README and LICENSES |
 
-```
-vendors/
-├── st/                     # STMicroelectronics
-│   ├── cmsis_device_f4/    # CMSIS Device for STM32F4
-│   ├── cmsis_device_h7/    # CMSIS Device for STM32H7
-│   ├── stm32f4xx_hal/      # STM32F4 HAL Driver
-│   └── stm32h7xx_hal/      # STM32H7 HAL Driver
-├── nordic/                 # Nordic Semiconductor
-│   └── nrfx/               # nRF SDK drivers
-├── espressif/              # Espressif Systems
-│   └── esp-idf/            # ESP-IDF components
-└── README.md
+The GigaDevice import is byte-identical to the selected upstream subtree. Git attributes preserve its original line endings. Validate it with:
+
+```sh
+python3 scripts/ci/verify_vendor_source.py --root vendors/gigadevice/gd32f4xx
 ```
 
-## Adding Vendor Libraries
+Public product and HAL/OSAL interfaces use Nexus types. Vendor includes and macros belong to implementation targets; an SDK bring-up application must explicitly request the matching SDK target.
 
-### Option 1: Git Submodule (Recommended)
-
-```bash
-# STM32F4 HAL
-git submodule add https://github.com/STMicroelectronics/stm32f4xx_hal_driver.git vendors/st/stm32f4xx_hal
-
-# CMSIS Device F4
-git submodule add https://github.com/STMicroelectronics/cmsis_device_f4.git vendors/st/cmsis_device_f4
-
-# CMSIS Core
-git submodule add https://github.com/ARM-software/CMSIS_5.git ext/cmsis
-```
-
-### Option 2: Manual Download
-
-Download from official sources and extract to appropriate directory.
-
-## License
-
-Each vendor library retains its original license. See individual directories for license information.
-
-| Vendor | Library | License |
-|--------|---------|---------|
-| ST | STM32 HAL | BSD-3-Clause |
-| ST | CMSIS Device | Apache-2.0 |
-| ARM | CMSIS Core | Apache-2.0 |
-| Nordic | nrfx | BSD-3-Clause |
-| Espressif | ESP-IDF | Apache-2.0 |
-
-## Notes
-
-- These libraries are excluded from code formatting checks
-- These libraries are excluded from static analysis
-- Do not modify vendor code directly; use wrapper layers in `platforms/`
+SDK updates require origin, version, license and content identity review plus the matching compile/link and device-contract regressions. Do not modify an imported vendor file to implement board wiring or product policy. Configuration does not download dependencies, and vendor code is not relicensed under the repository's MIT license.

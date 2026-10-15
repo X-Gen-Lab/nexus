@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="3" failures="1" disabled="0" errors="0" time="0." timestamp="2026-10-11T19:22:20.165" name="AllTests">
+  <testsuite name="ThreadXM4External" tests="3" failures="1" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T19:22:20.165">
+    <testcase name="ActualExternalHookLeavesSysTickAndOtherPrioritiesOwned" file="/workspace/nexus/tests/google/threadx_m4_external_test.cpp" line="49" status="run" result="completed" time="0." timestamp="2026-10-11T19:22:20.165" classname="ThreadXM4External" />
+    <testcase name="TimerSetupFailureCallsRetainingProductFailStop" file="/workspace/nexus/tests/google/threadx_m4_external_test.cpp" line="63" status="run" result="completed" time="0." timestamp="2026-10-11T19:22:20.165" classname="ThreadXM4External" />
+    <testcase name="ObserverPrecedesOverriddenTimerFailureHook" file="/workspace/nexus/tests/google/threadx_m4_external_test.cpp" line="78" status="run" result="completed" time="0." timestamp="2026-10-11T19:22:20.165" classname="ThreadXM4External">
+      <failure message="unknown file&#x0A;&#x0A;Unexpected mock function call - returning directly.&#x0A;    Function call: Call(6)&#x0A;Google Mock tried the following 1 expectation, but it didn&apos;t match:&#x0A;&#x0A;/workspace/nexus/tests/google/threadx_m4_external_test.cpp:99: EXPECT_CALL(stopping, Call(NX_ERROR_IO))...&#x0A;         Expected: all pre-requisites are satisfied&#x0A;           Actual: the following immediate pre-requisites are not satisfied:&#x0A;/workspace/nexus/tests/google/threadx_m4_external_test.cpp:96: pre-requisite #0&#x0A;                   (end of pre-requisites)&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[unknown file
+
+Unexpected mock function call - returning directly.
+    Function call: Call(6)
+Google Mock tried the following 1 expectation, but it didn't match:
+
+/workspace/nexus/tests/google/threadx_m4_external_test.cpp:99: EXPECT_CALL(stopping, Call(NX_ERROR_IO))...
+         Expected: all pre-requisites are satisfied
+           Actual: the following immediate pre-requisites are not satisfied:
+/workspace/nexus/tests/google/threadx_m4_external_test.cpp:96: pre-requisite #0
+                   (end of pre-requisites)
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/threadx_m4_external_test.cpp:96&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(observing, Call(NX_FAULT_THREADX_ADAPTER, NX_ERROR_IO, ::testing::HasSubstr(&quot;m4.c&quot;), ::testing::Gt(0U)))...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/threadx_m4_external_test.cpp:96
+Actual function call count doesn't match EXPECT_CALL(observing, Call(NX_FAULT_THREADX_ADAPTER, NX_ERROR_IO, ::testing::HasSubstr("m4.c"), ::testing::Gt(0U)))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/threadx_m4_external_test.cpp:99&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(stopping, Call(NX_ERROR_IO))...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/threadx_m4_external_test.cpp:99
+Actual function call count doesn't match EXPECT_CALL(stopping, Call(NX_ERROR_IO))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

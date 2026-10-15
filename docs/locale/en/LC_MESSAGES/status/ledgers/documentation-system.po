@@ -1,0 +1,1598 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 032b56cca53112449ab6886d51e25dc878e254fe1891c2836ddf913951b9d8f0\n"
+
+msgid "文档系统台账"
+msgstr "Documentation-system ledger"
+
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/documentation-system-execution.csv>`。 "
+"源文件：`docs/design/documentation-system-"
+"execution.csv`；SHA-256：`d1f5adad33468cb83c2849b9ec5176d10d958db044620943e93fb0d02d6a2c77`。"
+msgstr ""
+"This page is derived from the original CSV; it is not a new status "
+"authority, execution record or software qualification. Original IDs, order "
+"and all fields come from the {download}`original ledger "
+"<../../design/documentation-system-execution.csv>`. Source: "
+"`docs/design/documentation-system-execution.csv`; SHA-256: "
+"`d1f5adad33468cb83c2849b9ec5176d10d958db044620943e93fb0d02d6a2c77`."
+
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"Different ledgers overlap in scope; do not add their counts or calculate a "
+"project-wide completion rate. Interpret implementation, software and "
+"physical status separately. `development_passed` does not mean execution at "
+"the current documentation HEAD. Consult the exact results index for the "
+"source and scope of `qualification_record_authority`. Absolute `/workspace` "
+"and `/dev/shm` locators retain their original bytes and only identify the "
+"original execution host. See the [software-evidence entry](../software-"
+"verification.md) for retrievable archives and member locations."
+
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr ""
+"**Original exit fields** are only fields actually present in the original "
+"CSV. Tasks, qualification prerequisites and contract links also retain their"
+" original wording; they cannot be used to invent an execution."
+
+msgid "本表包含 58 条原记录，仅表示来源行数。"
+msgstr ""
+"This table contains 58 original records; this is only the source row count."
+
+msgid "DOC-01"
+msgstr "DOC-01"
+
+msgid "原字段"
+msgstr "Original field"
+
+msgid "原值"
+msgstr "Original value"
+
+msgid "`task_id`"
+msgstr "`task_id`"
+
+msgid "`priority`"
+msgstr "`priority`"
+
+msgid "P1"
+msgstr "P1"
+
+msgid "`phase`"
+msgstr "`phase`"
+
+msgid "D1"
+msgstr "D1"
+
+msgid "`task`"
+msgstr "`task`"
+
+msgid "登记页面权威与读者任务"
+msgstr "Register page authorities and reader tasks"
+
+msgid "`dependencies`"
+msgstr "`dependencies`"
+
+msgid "（原字段为空）"
+msgstr "(original field empty)"
+
+msgid "`implementation_status`"
+msgstr "`implementation_status`"
+
+msgid "implemented"
+msgstr "implemented"
+
+msgid "`validation_status`"
+msgstr "`validation_status`"
+
+msgid "passed"
+msgstr "passed"
+
+msgid "`exit_condition`"
+msgstr "`exit_condition`"
+
+msgid "逐页明确正文、API、支持、资格、台账和历史来源；目录和唯一导航可审查"
+msgstr ""
+"Identify authoritative prose, API, support, qualification, ledger and "
+"historical sources for every page; directory structure and unique navigation"
+" must be reviewable"
+
+msgid "`owner`"
+msgstr "`owner`"
+
+msgid "codex"
+msgstr "codex"
+
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+msgid "docs/design/documentation-migration.csv;docs/index.md"
+msgstr "docs/design/documentation-migration.csv;docs/index.md"
+
+msgid "`evidence_paths`"
+msgstr "`evidence_paths`"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-01"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-01"
+
+msgid "`validation_scope`"
+msgstr "`validation_scope`"
+
+msgid "accepted_docs_exit"
+msgstr "accepted_docs_exit"
+
+msgid "DOC-02"
+msgstr "DOC-02"
+
+msgid "修正根入口与支持口径"
+msgstr "Correct root entries and support statements"
+
+msgid "README中typed factory、TOML、ThreadX、连续模式与精确支持一致；不扩大实板范围"
+msgstr ""
+"README statements about typed factory, TOML, ThreadX, continuous modes and "
+"exact support are consistent; do not expand physical-board scope"
+
+msgid "README.md;README_CN.md;docs/status/support.md"
+msgstr "README.md;README_CN.md;docs/status/support.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-02"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-02"
+
+msgid "DOC-03"
+msgstr "DOC-03"
+
+msgid "修正可执行配置模板"
+msgstr "Correct executable configuration templates"
+
+msgid "Board示例含soc_family；完整Board和CPU/TOML经实际解析；片段明确不建立完整配置资格"
+msgstr ""
+"Board examples include soc_family; complete Board and CPU/TOML inputs are "
+"actually parsed; fragments explicitly do not establish complete-"
+"configuration qualification"
+
+msgid "docs/design/integration-contracts.md;tools/configure/documentation.py"
+msgstr "docs/design/integration-contracts.md;tools/configure/documentation.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-03"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-03"
+
+msgid "DOC-04"
+msgstr "DOC-04"
+
+msgid "统一最新资格导航"
+msgstr "Unify latest-qualification navigation"
+
+msgid "当前代码、文档HEAD、qualified source和历史记录分别可定位；不继承旧执行"
+msgstr ""
+"Current code, documentation HEAD, qualified source and historical records "
+"are separately locatable; prior execution is not inherited"
+
+msgid "docs/status/software-verification.md;docs/status/hardware.md"
+msgstr "docs/status/software-verification.md;docs/status/hardware.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-04"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-04"
+
+msgid "DOC-05"
+msgstr "DOC-05"
+
+msgid "逐台账映射原退出条件与新证据"
+msgstr "Map original exit conditions and new evidence for each ledger"
+
+msgid "OS48和已过期状态按scope映射；原编号/条件/失败记录保留；不批量标passed"
+msgstr ""
+"Map OS48 and outdated statuses by scope; retain original IDs, conditions and"
+" failed records; do not bulk-mark passed"
+
+msgid "tools/documentation/status.py;docs/status/ledgers.md"
+msgstr "tools/documentation/status.py;docs/status/ledgers.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-05"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-05"
+
+msgid "DOC-06"
+msgstr "DOC-06"
+
+msgid "建立迁移引用与旧URL清单"
+msgstr "Create migration-reference and legacy-URL inventories"
+
+msgid "每个当前内容源有去向；相对链接/anchor/工具输入/旧URL的处理规则齐全"
+msgstr ""
+"Every current content source has a destination; relative links, anchors, "
+"tool inputs and legacy URLs have complete handling rules"
+
+msgid "docs/reference/history.md;docs/reference/redirects.csv"
+msgstr "docs/reference/history.md;docs/reference/redirects.csv"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-06"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-06"
+
+msgid "DOC-07"
+msgstr "DOC-07"
+
+msgid "D2"
+msgstr "D2"
+
+msgid "选择并接入MyST"
+msgstr "Select and integrate MyST"
+
+msgid "兼容维护Sphinx/Breathe；完整Markdown与RST正负样例实际构建；pin明确"
+msgstr ""
+"Remain compatible with maintained Sphinx/Breathe; actually build complete "
+"positive and negative Markdown/RST fixtures; specify the pin"
+
+msgid "docs/sphinx/conf.py;docs/sphinx/requirements.txt"
+msgstr "docs/sphinx/conf.py;docs/sphinx/requirements.txt"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-07"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-07"
+
+msgid "DOC-08"
+msgstr "DOC-08"
+
+msgid "调整Sphinx source root与排除范围"
+msgstr "Adjust the Sphinx source root and exclusions"
+
+msgid "docs为source root；正文直接索引；archive/生成输出/大证据不误入站点"
+msgstr ""
+"Use docs as source root and index prose directly; keep archives, generated "
+"outputs and large evidence outside the site"
+
+msgid "docs/sphinx/conf.py"
+msgstr "docs/sphinx/conf.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-08"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-08"
+
+msgid "DOC-09"
+msgstr "DOC-09"
+
+msgid "实施唯一任务导航"
+msgstr "Implement unique task navigation"
+
+msgid "DOC-08;DOC-06"
+msgstr "DOC-08;DOC-06"
+
+msgid "首页提供使用/接入/维护/验收/迁移入口；当前页面可达可搜索；无第二套正文"
+msgstr ""
+"The home page provides use, integration, maintenance, acceptance and "
+"migration entries; current pages are reachable and searchable; do not "
+"maintain a second copy of prose"
+
+msgid "docs/index.md;docs/reference/index.md;docs/guides/index.md"
+msgstr "docs/index.md;docs/reference/index.md;docs/guides/index.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-09"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-09"
+
+msgid "DOC-10"
+msgstr "DOC-10"
+
+msgid "重组公共API和factory说明"
+msgstr "Reorganize public API and factory explanations"
+
+msgid "Core/Arch/I/O/OS/Components模块页连到符号；factory示例基于实际生成接口"
+msgstr ""
+"Core/Arch/I/O/OS/Components module pages link to symbols; factory examples "
+"use actual generated interfaces"
+
+msgid "docs/reference/api/index.md;docs/explanation/factory.md"
+msgstr "docs/reference/api/index.md;docs/explanation/factory.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-10"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-10"
+
+msgid "DOC-11"
+msgstr "DOC-11"
+
+msgid "接入系统合同与架构解释"
+msgstr "Integrate system contracts and architecture explanations"
+
+msgid "生命周期和安全限制保持原规范；合同与解释分别有一份authority"
+msgstr ""
+"Lifecycle and safety restrictions retain their original normative meaning; "
+"contracts and explanations each have one authority"
+
+msgid ""
+"docs/explanation/platform-"
+"architecture.md;docs/explanation/ownership.md;docs/delivery/architecture.md"
+msgstr ""
+"docs/explanation/platform-"
+"architecture.md;docs/explanation/ownership.md;docs/delivery/architecture.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-11"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-11"
+
+msgid "DOC-12"
+msgstr "DOC-12"
+
+msgid "P2"
+msgstr "P2"
+
+msgid "接入源码相邻README"
+msgstr "Integrate source-adjacent READMEs"
+
+msgid "保留实现地图和SoC局部权威；include相对引用正确或源码链接绑定站点revision"
+msgstr ""
+"Retain the implementation map and local SoC authorities; include-relative "
+"references are correct or source links are bound to the site revision"
+
+msgid "docs/explanation/source-map.md;docs/development/implementation-map.md"
+msgstr "docs/explanation/source-map.md;docs/development/implementation-map.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-12"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-12"
+
+msgid "DOC-13"
+msgstr "DOC-13"
+
+msgid "D3"
+msgstr "D3"
+
+msgid "交付外部SDK入门教程"
+msgstr "Deliver the external SDK introductory tutorial"
+
+msgid "DOC-03;DOC-09;DOC-27"
+msgstr "DOC-03;DOC-09;DOC-27"
+
+msgid "固定版本的真实外部consumer配置/构建/运行或链接成功；保留实际命令和清理步骤"
+msgstr ""
+"A real external consumer at a fixed revision configures, builds and runs or "
+"links successfully; retain actual commands and cleanup steps"
+
+msgid "docs/tutorials/source-sdk.md"
+msgstr "docs/tutorials/source-sdk.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-13"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-13"
+
+msgid "DOC-14"
+msgstr "DOC-14"
+
+msgid "交付异步I/O与取消排空教程"
+msgstr "Deliver the async I/O and cancellation-drain tutorial"
+
+msgid "DOC-13;DOC-10"
+msgstr "DOC-13;DOC-10"
+
+msgid "真实示例覆盖reject/accept/cancel/drain/settled/quarantine；无借用提前回收"
+msgstr ""
+"Real examples cover reject/accept/cancel/drain/settled/quarantine; borrowed "
+"storage is not reclaimed early"
+
+msgid "docs/tutorials/async-io.md"
+msgstr "docs/tutorials/async-io.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-14"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-14"
+
+msgid "DOC-15"
+msgstr "DOC-15"
+
+msgid "交付Board接入指南"
+msgstr "Deliver the Board-integration guide"
+
+msgid "DOC-03;DOC-09"
+msgstr "DOC-03;DOC-09"
+
+msgid "可验证模板、路由授权、来源和unknown明确；已有SoC复用；软件与PCB资格分开"
+msgstr ""
+"Verifiable templates, route authorization, sources and unknowns are "
+"explicit; reuse existing SoCs; separate software and PCB qualification"
+
+msgid "docs/guides/board-porting.md"
+msgstr "docs/guides/board-porting.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-15"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-15"
+
+msgid "DOC-16"
+msgstr "DOC-16"
+
+msgid "交付SoC/provider/组件接入指南"
+msgstr "Deliver SoC/provider/component integration guides"
+
+msgid "DOC-03;DOC-11"
+msgstr "DOC-03;DOC-11"
+
+msgid "按纵切片列facts/startup/time/provider/测试/SDK/HIL条件；通用器件不强制进生成器"
+msgstr ""
+"List facts/startup/time/provider/testing/SDK/HIL conditions by vertical "
+"slice; generic devices need not enter the generator"
+
+msgid "docs/guides/provider-porting.md"
+msgstr "docs/guides/provider-porting.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-16"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-16"
+
+msgid "DOC-17"
+msgstr "DOC-17"
+
+msgid "交付OS等待与停机指南"
+msgstr "Deliver OS waiting and shutdown guidance"
+
+msgid "DOC-02;DOC-11"
+msgstr "DOC-02;DOC-11"
+
+msgid "后端语义、执行推进、真实删除和存储回收条件清晰；示例经维护后端验证"
+msgstr ""
+"Backend semantics, execution progress, actual deletion and storage-"
+"reclamation conditions are clear; examples are validated on maintained "
+"backends"
+
+msgid "docs/guides/os-shutdown.md"
+msgstr "docs/guides/os-shutdown.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-17"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-17"
+
+msgid "DOC-18"
+msgstr "DOC-18"
+
+msgid "交付旧配置与接口迁移指南"
+msgstr "Deliver legacy configuration and interface migration guidance"
+
+msgid "DOC-02;DOC-09"
+msgstr "DOC-02;DOC-09"
+
+msgid "旧HAL/OSAL/Kconfig到当前TOML/factory有可执行转换路径；旧ID不跨bundle持久化"
+msgstr ""
+"Legacy HAL/OSAL/Kconfig has an executable migration path to current "
+"TOML/factory; old IDs are not persisted across bundles"
+
+msgid "docs/guides/migration.md"
+msgstr "docs/guides/migration.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-18"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-18"
+
+msgid "DOC-19"
+msgstr "DOC-19"
+
+msgid "交付配置和工具参考"
+msgstr "Deliver configuration and tool references"
+
+msgid "DOC-10;DOC-11"
+msgstr "DOC-10;DOC-11"
+
+msgid "字段/单位/拒绝规则和CLI来自维护实现；API声明不手抄；无重复配置权威"
+msgstr ""
+"Fields, units, rejection rules and CLI come from maintained implementation; "
+"do not manually copy API declarations or duplicate configuration authorities"
+
+msgid ""
+"docs/reference/configuration/assembly.md;docs/reference/configuration/tools.md"
+msgstr ""
+"docs/reference/configuration/assembly.md;docs/reference/configuration/tools.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-19"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-19"
+
+msgid "DOC-20"
+msgstr "DOC-20"
+
+msgid "交付性能诊断与HIL准备指南"
+msgstr "Deliver performance-diagnosis and HIL-preparation guidance"
+
+msgid "DOC-09;DOC-04"
+msgstr "DOC-09;DOC-04"
+
+msgid "区分ELF预算/实测cycles/stack/HIL；工具准备不声称已执行硬件"
+msgstr ""
+"Distinguish ELF budgets, measured cycles, stack and HIL; tool preparation "
+"does not claim hardware execution"
+
+msgid "docs/guides/performance-hil.md"
+msgstr "docs/guides/performance-hil.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-20"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-20"
+
+msgid "DOC-21"
+msgstr "DOC-21"
+
+msgid "D4"
+msgstr "D4"
+
+msgid "确定双语术语与发布关键页"
+msgstr "Define bilingual terminology and release-critical pages"
+
+msgid "原文语言和不可翻译标识明确；关键页范围固定；不要求复制CSV或原始日志"
+msgstr ""
+"Original languages and nontranslatable identifiers are explicit; fix "
+"critical-page scope; do not require duplicated CSVs or raw logs"
+
+msgid "docs/locale/terminology.csv"
+msgstr "docs/locale/terminology.csv"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-21"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-21"
+
+msgid "DOC-22"
+msgstr "DOC-22"
+
+msgid "实施gettext与翻译源版本检查"
+msgstr "Implement gettext and translation-source revision checks"
+
+msgid "DOC-07;DOC-21"
+msgstr "DOC-07;DOC-21"
+
+msgid "只有一条翻译链；中文/英文原文分别做en/zh_CN构建；缺译fallback与stale/fuzzy按实际正文语言和源版本标记"
+msgstr ""
+"Use one translation chain; build English and Chinese originals into en/zh_CN"
+" respectively; mark missing fallback and stale/fuzzy according to actual "
+"prose language and source revision"
+
+msgid "tools/documentation/sphinx_ext.py;docs/locale"
+msgstr "tools/documentation/sphinx_ext.py;docs/locale"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-22"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-22"
+
+msgid "DOC-23"
+msgstr "DOC-23"
+
+msgid "完成关键使用路径双语审查"
+msgstr "Complete bilingual review of critical use paths"
+
+msgid "DOC-13;DOC-14;DOC-15;DOC-17;DOC-18;DOC-22"
+msgstr "DOC-13;DOC-14;DOC-15;DOC-17;DOC-18;DOC-22"
+
+msgid "入门/配置/factory/借用/支持/资格/迁移关键正文独立审查；缺失语言不假报完整"
+msgstr ""
+"Independently review critical introductory, configuration, factory, borrow, "
+"support, qualification and migration prose; do not falsely report missing "
+"languages as complete"
+
+msgid "docs/locale;docs/locale/terminology.csv"
+msgstr "docs/locale;docs/locale/terminology.csv"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-23"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-23"
+
+msgid "DOC-24"
+msgstr "DOC-24"
+
+msgid "显示真实页面语言与翻译状态"
+msgstr "Show actual page language and translation status"
+
+msgid ""
+"reviewed/stale/missing/original在页和入口可见；英文fallback不标中文已译；locale不覆盖source_language"
+msgstr ""
+"reviewed/stale/missing/original are visible on pages and entry points; "
+"English fallback is not marked as translated Chinese; locale does not "
+"override source_language"
+
+msgid "tools/documentation/sphinx_ext.py;docs/sphinx/conf.py"
+msgstr "tools/documentation/sphinx_ext.py;docs/sphinx/conf.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-24"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-24"
+
+msgid "DOC-25"
+msgstr "DOC-25"
+
+msgid "整理本地图示与离线资源"
+msgstr "Organize local diagrams and offline resources"
+
+msgid ""
+"图源可审查、箭头与契约一致；图像/字体/脚本不依赖CDN；新增渲染工具受锁；DOT/SVG成对；Graphviz及实际字体受锁；SVG无外部资源/脚本/DOCTYPE"
+msgstr ""
+"Diagram sources are reviewable and arrows agree with contracts; "
+"images/fonts/scripts do not depend on CDNs; lock new rendering tools; pair "
+"DOT/SVG; lock Graphviz and actual fonts; SVG has no external "
+"resources/scripts/DOCTYPE"
+
+msgid "tools/documentation/diagrams.py;docs/assets/diagrams/diagram-index.csv"
+msgstr ""
+"tools/documentation/diagrams.py;docs/assets/diagrams/diagram-index.csv"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-25"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-25"
+
+msgid "DOC-26"
+msgstr "DOC-26"
+
+msgid "完成读者任务走查"
+msgstr "Complete reader-task walkthroughs"
+
+msgid "DOC-13;DOC-14;DOC-15;DOC-16;DOC-17;DOC-18;DOC-19;DOC-20;DOC-24;DOC-42"
+msgstr "DOC-13;DOC-14;DOC-15;DOC-16;DOC-17;DOC-18;DOC-19;DOC-20;DOC-24;DOC-42"
+
+msgid "独立agent从入口完成任务；错误步骤/不可达合同/版本混淆修正；记录实际结果；按内容标准独立语义审查"
+msgstr ""
+"An independent agent completes tasks from their entry points; correct bad "
+"steps, inaccessible contracts and revision confusion; record actual results;"
+" independently review semantics against content standards"
+
+msgid "docs/index.md;docs/status/index.md;docs/tutorials/index.md"
+msgstr "docs/index.md;docs/status/index.md;docs/tutorials/index.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-26"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-26"
+
+msgid "DOC-27"
+msgstr "DOC-27"
+
+msgid "D5"
+msgstr "D5"
+
+msgid "统一docs CLI与旧脚本转发"
+msgstr "Unify the docs CLI and legacy-script forwarding"
+
+msgid "check/build/preview/package/doctor目标明确；本地与CI严格参数一致；失败码与诊断保留"
+msgstr ""
+"check/build/preview/package/doctor have clear purposes; local and CI strict "
+"arguments match; preserve failure codes and diagnostics"
+
+msgid "tools/documentation/cli.py;tools/dev/dev.py;scripts/tools/docs.py"
+msgstr "tools/documentation/cli.py;tools/dev/dev.py;scripts/tools/docs.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-27"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-27"
+
+msgid "DOC-28"
+msgstr "DOC-28"
+
+msgid "建立离线链接anchor导航检查"
+msgstr "Create offline link, anchor and navigation checks"
+
+msgid "DOC-06;DOC-09;DOC-27"
+msgstr "DOC-06;DOC-09;DOC-27"
+
+msgid "故意坏文件/anchor/重复ID/不可达页实际失败；合法跨页引用和迁移别名实际通过"
+msgstr ""
+"Deliberately bad files/anchors/duplicate IDs/unreachable pages actually "
+"fail; legal cross-page references and migration aliases actually pass"
+
+msgid "tools/documentation/check.py;tools/documentation/delivery.py"
+msgstr "tools/documentation/check.py;tools/documentation/delivery.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-28"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-28"
+
+msgid "DOC-29"
+msgstr "DOC-29"
+
+msgid "扩大实际配置片段验证"
+msgstr "Expand actual configuration-fragment validation"
+
+msgid "DOC-03;DOC-27"
+msgstr "DOC-03;DOC-27"
+
+msgid "新路径/RST/完整Board和CPU输入经实际resolver；语法片段不升级可执行资格"
+msgstr ""
+"New paths, RST, complete Board and CPU inputs pass the actual resolver; "
+"syntax fragments do not gain executable qualification"
+
+msgid "tools/configure/documentation.py;tools/documentation/check.py"
+msgstr "tools/configure/documentation.py;tools/documentation/check.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-29"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-29"
+
+msgid "DOC-30"
+msgstr "DOC-30"
+
+msgid "关联可执行代码和consumer"
+msgstr "Associate executable code and consumers"
+
+msgid "DOC-13;DOC-27"
+msgstr "DOC-13;DOC-27"
+
+msgid "literalinclude来源和测试身份可追溯；维护示例真实构建；不任意执行文档shell"
+msgstr ""
+"literalinclude sources and test identities are traceable; maintained "
+"examples actually build; do not arbitrarily execute documentation shell text"
+
+msgid ""
+"docs/tutorials/source-sdk.md;docs/tutorials/async-"
+"io.md;cmake/package/verify_consumers.py"
+msgstr ""
+"docs/tutorials/source-sdk.md;docs/tutorials/async-"
+"io.md;cmake/package/verify_consumers.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-30"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-30"
+
+msgid "DOC-31"
+msgstr "DOC-31"
+
+msgid "建立有界外部链接检查"
+msgstr "Create bounded external-link checking"
+
+msgid "404/版本错误与网络失败分别报告；timeout/retry有界；commit默认无需网络"
+msgstr ""
+"Report 404/revision mistakes separately from network failures; bound "
+"timeout/retry; commits require no network by default"
+
+msgid "tools/documentation/check.py"
+msgstr "tools/documentation/check.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-31"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-31"
+
+msgid "DOC-32"
+msgstr "DOC-32"
+
+msgid "接入文档commit与严格CI门禁"
+msgstr "Integrate documentation commit and strict CI gates"
+
+msgid "DOC-27;DOC-28;DOC-29;DOC-30"
+msgstr "DOC-27;DOC-28;DOC-29;DOC-30"
+
+msgid "快速离线commit检查和完整文档CI执行；工具负路径TDD；正文调整不伪造固件验收；图资源机器检查与正文/图语义审查分工明确"
+msgstr ""
+"Execute fast offline commit checks and complete documentation CI; apply TDD "
+"to negative tool paths; prose changes do not fabricate firmware acceptance; "
+"machine diagram-resource checks and prose/diagram semantic review have "
+"explicit separate responsibilities"
+
+msgid ""
+".pre-commit-config.yaml;.github/workflows/docs-"
+"build.yml;tools/documentation/check.py;tools/documentation/test_status.py"
+msgstr ""
+".pre-commit-config.yaml;.github/workflows/docs-"
+"build.yml;tools/documentation/check.py;tools/documentation/test_status.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-32"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-32"
+
+msgid "DOC-33"
+msgstr "DOC-33"
+
+msgid "锁定并实际安装文档工具闭包"
+msgstr "Lock and actually install the documentation-tool closure"
+
+msgid "DOC-07;DOC-27"
+msgstr "DOC-07;DOC-27"
+
+msgid ""
+"Python全部传递wheel hash及Doxygen身份锁定；干净维护tuple实际安装/构建成功；Graphviz与实际字体闭包实际验证"
+msgstr ""
+"Lock all transitive Python wheel hashes and Doxygen identity; actually "
+"install/build at a clean maintained tuple; actually verify Graphviz and font"
+" closure"
+
+msgid ""
+"dependencies/docs-tools.lock.json;dependencies/docs-python-linux-"
+"cp312.txt;tools/documentation/install.py"
+msgstr ""
+"dependencies/docs-tools.lock.json;dependencies/docs-python-linux-"
+"cp312.txt;tools/documentation/install.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-33"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-33"
+
+msgid "DOC-34"
+msgstr "DOC-34"
+
+msgid "隔离preview构建与发布权限"
+msgstr "Separate preview builds from publication permissions"
+
+msgid "DOC-32;DOC-33"
+msgstr "DOC-32;DOC-33"
+
+msgid "PR artifact带source身份；可信部署只消费验证输出；不在高权限执行外部PR源码"
+msgstr ""
+"PR artifacts carry source identity; trusted deployment consumes only "
+"verified outputs; do not execute external PR source with elevated privileges"
+
+msgid ".github/workflows/docs-build.yml;.github/workflows/docs-publish.yml"
+msgstr ".github/workflows/docs-build.yml;.github/workflows/docs-publish.yml"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-34"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-34"
+
+msgid "DOC-35"
+msgstr "DOC-35"
+
+msgid "D6"
+msgstr "D6"
+
+msgid "生成版本与资格manifest"
+msgstr "Generate version and qualification manifests"
+
+msgid "DOC-04;DOC-24;DOC-27;DOC-33"
+msgstr "DOC-04;DOC-24;DOC-27;DOC-33"
+
+msgid ""
+"平台版本由既有policy读取；code/docs/qualified "
+"source独立；outputs只列payload；不包含manifest/checksums/archive或间接hash自引用"
+msgstr ""
+"Read platform version from existing policy; separate code/docs/qualified "
+"source; outputs list payload only; exclude manifest/checksums/archive and "
+"indirect hash self-reference"
+
+msgid ""
+"tools/documentation/delivery.py;docs/reference/documentation-delivery.md"
+msgstr ""
+"tools/documentation/delivery.py;docs/reference/documentation-delivery.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-35"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-35"
+
+msgid "DOC-36"
+msgstr "DOC-36"
+
+msgid "生成相对链接离线HTML包"
+msgstr "Generate relative-link offline HTML packages"
+
+msgid "DOC-25;DOC-32;DOC-35"
+msgstr "DOC-25;DOC-32;DOC-35"
+
+msgid "包含语言/API/manifest/校验/许可；脱离workspace可浏览验真；无hash自引用"
+msgstr ""
+"Include languages/API/manifest/checksums/licenses; browse and verify outside"
+" the workspace; avoid hash self-reference"
+
+msgid "tools/documentation/delivery.py"
+msgstr "tools/documentation/delivery.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-36"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-36"
+
+msgid "DOC-37"
+msgstr "DOC-37"
+
+msgid "发布不可变版本与stable入口"
+msgstr "Publish immutable versions and the stable entry"
+
+msgid "DOC-23;DOC-26;DOC-34;DOC-36;DOC-31;DOC-58"
+msgstr "DOC-23;DOC-26;DOC-34;DOC-36;DOC-31;DOC-58"
+
+msgid "release-id绑定manifest且不覆盖；实际部署成功；stable不宣称HIL全部通过"
+msgstr ""
+"Bind release-id to a manifest without overwrite; actual deployment succeeds;"
+" stable does not claim all HIL passed"
+
+msgid "tools/documentation/delivery.py;.github/workflows/docs-publish.yml"
+msgstr "tools/documentation/delivery.py;.github/workflows/docs-publish.yml"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-37"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-37"
+
+msgid "DOC-38"
+msgstr "DOC-38"
+
+msgid "执行发布后站点与下载验证"
+msgstr "Execute post-publication site and download verification"
+
+msgid "在线身份与部署包一致；关键页面/旧URL/图/下载校验通过；旧API不静默映射新合同"
+msgstr ""
+"Online identity matches the deployed package; critical pages, legacy URLs, "
+"diagrams and downloads pass checks; old APIs are not silently mapped to new "
+"contracts"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-38"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-38"
+
+msgid "DOC-39"
+msgstr "DOC-39"
+
+msgid "完成独立恢复与长期存储"
+msgstr "Complete independent recovery and long-term storage"
+
+msgid "DOC-36;DOC-37"
+msgstr "DOC-36;DOC-37"
+
+msgid "稳定取得位置和保留策略明确；独立根恢复浏览验真；异地恢复须真实执行"
+msgstr ""
+"Stable acquisition locations and retention policy are explicit; restore, "
+"browse and verify in an independent root; remote recovery must actually "
+"execute"
+
+msgid "tools/documentation/delivery.py;tools/evidence/store.py"
+msgstr "tools/documentation/delivery.py;tools/evidence/store.py"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-39"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-39"
+
+msgid "DOC-40"
+msgstr "DOC-40"
+
+msgid "收尾迁移并独立交付审查"
+msgstr "Close migration and independently review delivery"
+
+msgid "DOC-06;DOC-38;DOC-39;DOC-41;DOC-42;DOC-58"
+msgstr "DOC-06;DOC-38;DOC-39;DOC-41;DOC-42;DOC-58"
+
+msgid "映射全部处理；无重复规范/断链/错误资格；原证据保留；58项范围及15类必需图满足退出条件；未声明支持的配置、HIL和后续扩展如实保留边界"
+msgstr ""
+"All mappings handled; no duplicate standards, broken links or incorrect "
+"qualification; original evidence retained; all 58 tasks and 15 required "
+"diagram classes meet exit conditions; unclaimed configurations, HIL and "
+"later extensions retain accurate boundaries"
+
+msgid ""
+"docs/design/documentation-migration.csv;docs/status/documentation-"
+"acceptance.md"
+msgstr ""
+"docs/design/documentation-migration.csv;docs/status/documentation-"
+"acceptance.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-40"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-40"
+
+msgid "DOC-41"
+msgstr "DOC-41"
+
+msgid "应用正文写作与语义标准"
+msgstr "Apply prose-writing and semantic standards"
+
+msgid "DOC-01;DOC-21"
+msgstr "DOC-01;DOC-21"
+
+msgid "关键页面明确读者/目标/配置；术语/单位/规范强度/事实与资格通过独立审查"
+msgstr ""
+"Critical pages specify readers, goals and configurations; terminology, "
+"units, normative strength, facts and qualification pass independent review"
+
+msgid ""
+"docs/design/documentation-standards.md;docs/development/documentation.md"
+msgstr ""
+"docs/design/documentation-standards.md;docs/development/documentation.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-41"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-41"
+
+msgid "DOC-42"
+msgstr "DOC-42"
+
+msgid "应用五类模板与逐页内容审查"
+msgstr "Apply five templates and per-page content review"
+
+msgid "DOC-41;DOC-11;DOC-13;DOC-14;DOC-15;DOC-16;DOC-17;DOC-18;DOC-19;DOC-20"
+msgstr "DOC-41;DOC-11;DOC-13;DOC-14;DOC-15;DOC-16;DOC-17;DOC-18;DOC-19;DOC-20"
+
+msgid ""
+"tutorial/how-"
+"to/reference/explanation/status关键页面按模板走查；缺项修正或理由明确；metadata不替代内容合格"
+msgstr ""
+"Walk through critical tutorial/how-to/reference/explanation/status pages "
+"against templates; correct omissions or explain them; metadata does not "
+"substitute for acceptable content"
+
+msgid ""
+"docs/design/documentation-"
+"templates.md;docs/tutorials;docs/guides;docs/reference;docs/explanation;docs/status"
+msgstr ""
+"docs/design/documentation-"
+"templates.md;docs/tutorials;docs/guides;docs/reference;docs/explanation;docs/status"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-42"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-42"
+
+msgid "DOC-43"
+msgstr "DOC-43"
+
+msgid "交付全平台架构与外部边界图"
+msgstr "Deliver whole-platform architecture and external-boundary diagrams"
+
+msgid "DOC-11;DOC-25;DOC-41"
+msgstr "DOC-11;DOC-25;DOC-41"
+
+msgid "Core/Arch/SoC/Board/I/O/可选OS组件和外部产品责任清楚；factory取接口与直接I/O区分"
+msgstr ""
+"Core/Arch/SoC/Board/I/O/optional OS components and external-product "
+"responsibilities are clear; distinguish factory interface lookup from direct"
+" I/O"
+
+msgid ""
+"docs/assets/diagrams/platform-"
+"architecture.dot;docs/assets/diagrams/platform-"
+"architecture.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/platform-"
+"architecture.dot;docs/assets/diagrams/platform-"
+"architecture.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-43"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-43"
+
+msgid "DOC-44"
+msgstr "DOC-44"
+
+msgid "交付真实编译目标依赖图"
+msgstr "Deliver the actual compilation-target dependency graph"
+
+msgid "DOC-08;DOC-25;DOC-41"
+msgstr "DOC-08;DOC-25;DOC-41"
+
+msgid "实际CMake目标和private/public依赖核对；厂商实现私有；不把生成或运行箭头当编译依赖"
+msgstr ""
+"Check actual CMake targets and private/public dependencies; vendor "
+"implementation remains private; do not treat generation or runtime arrows as"
+" compilation dependencies"
+
+msgid ""
+"docs/assets/diagrams/build-targets.dot;docs/assets/diagrams/build-"
+"targets.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/build-targets.dot;docs/assets/diagrams/build-"
+"targets.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-44"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-44"
+
+msgid "DOC-45"
+msgstr "DOC-45"
+
+msgid "交付配置与生成流程图"
+msgstr "Deliver configuration and generation-flow diagrams"
+
+msgid "DOC-03;DOC-25;DOC-41"
+msgstr "DOC-03;DOC-25;DOC-41"
+
+msgid "TOML/facts/typed IR/原子bundle/CMake/Ninja产物和失败失效准确；未知Board事实不修复为已知"
+msgstr ""
+"TOML/facts/typed IR/atomic bundles/CMake/Ninja artifacts and failure "
+"invalidation are accurate; do not turn unknown Board facts into known facts"
+
+msgid ""
+"docs/assets/diagrams/configuration-"
+"generation.dot;docs/assets/diagrams/configuration-"
+"generation.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/configuration-"
+"generation.dot;docs/assets/diagrams/configuration-"
+"generation.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-45"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-45"
+
+msgid "DOC-46"
+msgstr "DOC-46"
+
+msgid "交付factory和实例结构图"
+msgstr "Deliver factory and instance-structure diagrams"
+
+msgid "DOC-10;DOC-25;DOC-41"
+msgstr "DOC-10;DOC-25;DOC-41"
+
+msgid "静态face/共享ops/独立context与controller/endpoint对应源码；getter无分配或初始化"
+msgstr ""
+"Static faces/shared ops/independent contexts and controller/endpoint "
+"relationships match source; getters allocate or initialize nothing"
+
+msgid ""
+"docs/assets/diagrams/factory-instances.dot;docs/assets/diagrams/factory-"
+"instances.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/factory-instances.dot;docs/assets/diagrams/factory-"
+"instances.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-46"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-46"
+
+msgid "DOC-47"
+msgstr "DOC-47"
+
+msgid "交付初始化停机与失败撤回图"
+msgstr "Deliver initialization, shutdown and failed-start withdrawal diagrams"
+
+msgid "prepare/start/stop/withdraw按实际选定流程；部分效果和逆序撤回责任明确；不自动启动scheduler"
+msgstr ""
+"prepare/start/stop/withdraw follow the actual selected sequence; partial "
+"effects and reverse-order withdrawal responsibilities are explicit; do not "
+"start the scheduler automatically"
+
+msgid ""
+"docs/assets/diagrams/platform-lifecycle.dot;docs/assets/diagrams/platform-"
+"lifecycle.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/platform-lifecycle.dot;docs/assets/diagrams/platform-"
+"lifecycle.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-47"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-47"
+
+msgid "DOC-48"
+msgstr "DOC-48"
+
+msgid "交付请求状态与借用图"
+msgstr "Deliver request-state and borrow diagrams"
+
+msgid "DOC-14;DOC-25;DOC-41"
+msgstr "DOC-14;DOC-25;DOC-41"
+
+msgid "admission结果与enum状态分开；取消/deadline仍借用；SETTLED和观察者/slot释放条件明确"
+msgstr ""
+"Separate admission outcomes from enum states; cancellation/deadline retain "
+"borrowing; SETTLED and observer/slot-release conditions are explicit"
+
+msgid ""
+"docs/assets/diagrams/request-lifecycle.dot;docs/assets/diagrams/request-"
+"lifecycle.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/request-lifecycle.dot;docs/assets/diagrams/request-"
+"lifecycle.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-48"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-48"
+
+msgid "DOC-49"
+msgstr "DOC-49"
+
+msgid "交付UART和SPI DMA执行时序"
+msgstr "Deliver UART and SPI DMA execution sequences"
+
+msgid "选定模式正常与取消/排空失败路径；Task/IRQ/DMA域、DMA TC/wire complete/SETTLED分开"
+msgstr ""
+"Show normal and cancellation/drain-failure paths for selected modes; "
+"separate Task/IRQ/DMA domains and DMA TC/wire complete/SETTLED"
+
+msgid ""
+"docs/assets/diagrams/dma-completion.dot;docs/assets/diagrams/dma-"
+"completion.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/dma-completion.dot;docs/assets/diagrams/dma-"
+"completion.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-49"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-49"
+
+msgid "DOC-50"
+msgstr "DOC-50"
+
+msgid "交付wait wake和OS退出图"
+msgstr "Deliver wait/wake and OS-shutdown diagrams"
+
+msgid "DOC-17;DOC-25;DOC-41"
+msgstr "DOC-17;DOC-25;DOC-41"
+
+msgid "ready-arm-ready-wait-ready、deadline和执行推进责任准确；实际join/delete后回收存储"
+msgstr ""
+"ready-arm-ready-wait-ready, deadlines and execution-progress "
+"responsibilities are accurate; reclaim storage only after actual join/delete"
+
+msgid ""
+"docs/assets/diagrams/wait-wake-shutdown.dot;docs/assets/diagrams/wait-wake-"
+"shutdown.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/wait-wake-shutdown.dot;docs/assets/diagrams/wait-wake-"
+"shutdown.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-50"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-50"
+
+msgid "DOC-51"
+msgstr "DOC-51"
+
+msgid "交付内存DMA和Cache参考图"
+msgstr "Deliver memory, DMA and Cache reference diagrams"
+
+msgid "DOC-20;DOC-25;DOC-41"
+msgstr "DOC-20;DOC-25;DOC-41"
+
+msgid "精确芯片/模式/内存域/可达性/对齐和完整line维护；不从CPU名推导DMA或coherence"
+msgstr ""
+"Specify exact chip/mode/memory domain/reachability/alignment and whole-line "
+"maintenance; do not infer DMA or coherence from a CPU name"
+
+msgid ""
+"docs/assets/diagrams/h743-memory-cache.dot;docs/assets/diagrams/h743-memory-"
+"cache.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/h743-memory-cache.dot;docs/assets/diagrams/h743-memory-"
+"cache.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-51"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-51"
+
+msgid "DOC-52"
+msgstr "DOC-52"
+
+msgid "交付Source SDK消费流程图"
+msgstr "Deliver Source SDK consumption-flow diagrams"
+
+msgid "DOC-13;DOC-25;DOC-41"
+msgstr "DOC-13;DOC-25;DOC-41"
+
+msgid "真实搬移外部consumer与源码树自测试分开；配置/构建/运行或链接的scope准确"
+msgstr ""
+"Separate actual relocated external consumers from source-tree self-tests; "
+"accurately state configuration/build/run-or-link scope"
+
+msgid ""
+"docs/assets/diagrams/source-sdk-consumer.dot;docs/assets/diagrams/source-"
+"sdk-consumer.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/source-sdk-consumer.dot;docs/assets/diagrams/source-"
+"sdk-consumer.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-52"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-52"
+
+msgid "DOC-53"
+msgstr "DOC-53"
+
+msgid "交付软件与HIL证据关系图"
+msgstr "Deliver software and HIL evidence-relationship diagrams"
+
+msgid "DOC-04;DOC-25;DOC-41"
+msgstr "DOC-04;DOC-25;DOC-41"
+
+msgid "源码/配置/工具/receipt与候选身份关联；软件和HIL分别实际取得；无自动物理资格"
+msgstr ""
+"Associate source/configuration/tools/receipts with candidate identity; "
+"software and HIL evidence are separately acquired through actual execution; "
+"no automatic physical qualification"
+
+msgid ""
+"docs/assets/diagrams/qualification-"
+"evidence.dot;docs/assets/diagrams/qualification-"
+"evidence.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/qualification-"
+"evidence.dot;docs/assets/diagrams/qualification-"
+"evidence.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-53"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-53"
+
+msgid "DOC-54"
+msgstr "DOC-54"
+
+msgid "交付发布与独立恢复图"
+msgstr "Deliver release and independent-recovery diagrams"
+
+msgid "DOC-35;DOC-36;DOC-25;DOC-41"
+msgstr "DOC-35;DOC-36;DOC-25;DOC-41"
+
+msgid "文档/SDK/档案交付渠道与身份准确；目标和实际已发布分开；独立取得/恢复/验真边界明确"
+msgstr ""
+"Documentation/SDK/archive channels and identities are accurate; distinguish "
+"targets from actual publications; clarify independent "
+"acquisition/recovery/verification boundaries"
+
+msgid ""
+"docs/assets/diagrams/release-recovery.dot;docs/assets/diagrams/release-"
+"recovery.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/release-recovery.dot;docs/assets/diagrams/release-"
+"recovery.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-54"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-54"
+
+msgid "DOC-55"
+msgstr "DOC-55"
+
+msgid "交付Cortex M能力分层图"
+msgstr "Deliver Cortex-M capability-layer diagrams"
+
+msgid "DOC-19;DOC-25;DOC-41"
+msgstr "DOC-19;DOC-25;DOC-41"
+
+msgid "CPU原语/Runtime/SoC/Board/HIL分层；FPU/MVE/Cache/安全能力和实际port不互相继承"
+msgstr ""
+"Separate CPU primitives/Runtime/SoC/Board/HIL; FPU/MVE/Cache/security "
+"capabilities and actual ports do not inherit qualification from one another"
+
+msgid ""
+"docs/assets/diagrams/cortex-m-capabilities.dot;docs/assets/diagrams/cortex-"
+"m-capabilities.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/cortex-m-capabilities.dot;docs/assets/diagrams/cortex-"
+"m-capabilities.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-55"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-55"
+
+msgid "DOC-56"
+msgstr "DOC-56"
+
+msgid "交付U575同步双域参考图"
+msgstr "Deliver the U575 synchronous two-domain reference diagram"
+
+msgid "限定独立TZEN1无OS同步参考；SAU/MPU/GTZC/gateway和seal失败责任；无通用NS RTOS/async声明"
+msgstr ""
+"Limit scope to an independent TZEN1 synchronous no-OS reference; define "
+"SAU/MPU/GTZC/gateway and seal-failure responsibilities; no general NS "
+"RTOS/async claim"
+
+msgid ""
+"docs/assets/diagrams/u575-security-"
+"domains.dot;docs/assets/diagrams/u575-security-"
+"domains.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/u575-security-"
+"domains.dot;docs/assets/diagrams/u575-security-"
+"domains.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-56"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-56"
+
+msgid "DOC-57"
+msgstr "DOC-57"
+
+msgid "交付连续流与可见丢块图"
+msgstr "Deliver continuous-stream and visible-loss diagrams"
+
+msgid "producer/block/consumer/loan/overrun/stop准确；服务与容量条件明确；不承诺无条件零丢失"
+msgstr ""
+"producer/block/consumer/loan/overrun/stop are accurate; service and capacity"
+" conditions are explicit; do not promise unconditional zero loss"
+
+msgid ""
+"docs/assets/diagrams/continuous-stream.dot;docs/assets/diagrams/continuous-"
+"stream.svg;docs/assets/diagrams/README.md"
+msgstr ""
+"docs/assets/diagrams/continuous-stream.dot;docs/assets/diagrams/continuous-"
+"stream.svg;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-57"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-57"
+
+msgid "DOC-58"
+msgstr "DOC-58"
+
+msgid "执行图文一致性与视觉离线审查"
+msgstr "Execute diagram/prose consistency and visual/offline review"
+
+msgid ""
+"DOC-25;DOC-28;DOC-43;DOC-44;DOC-45;DOC-46;DOC-47;DOC-48;DOC-49;DOC-50;DOC-51;DOC-52;DOC-53;DOC-54;DOC-55;DOC-56;DOC-57"
+msgstr ""
+"DOC-25;DOC-28;DOC-43;DOC-44;DOC-45;DOC-46;DOC-47;DOC-48;DOC-49;DOC-50;DOC-51;DOC-52;DOC-53;DOC-54;DOC-55;DOC-56;DOC-57"
+
+msgid "每条边和状态核对来源；图源/输出/alt/caption齐全；SVG安全资源与字体；桌面/窄屏放大/打印/离线实际验证，未执行不标通过"
+msgstr ""
+"Check every edge and state against sources; include "
+"sources/outputs/alt/captions; check SVG-safe resources and fonts; actually "
+"verify desktop/narrow-screen zoom/print/offline; do not mark unexecuted "
+"checks passed"
+
+msgid ""
+"tools/documentation/diagrams.py;docs/assets/styles/nexus.css;docs/assets/diagrams/README.md"
+msgstr ""
+"tools/documentation/diagrams.py;docs/assets/styles/nexus.css;docs/assets/diagrams/README.md"
+
+msgid ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-58"
+msgstr ""
+"docs/status/documentation-results.json;payload/final-closure/accepted-task-"
+"records.json#DOC-58"

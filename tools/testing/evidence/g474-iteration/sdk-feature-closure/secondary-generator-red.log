@@ -1,0 +1,14 @@
+test_rehashed_secondary_controller_generator_omission_rejects (test_source_sdk.SourceSDKTests.test_rehashed_secondary_controller_generator_omission_rejects) ... FAIL
+
+======================================================================
+FAIL: test_rehashed_secondary_controller_generator_omission_rejects (test_source_sdk.SourceSDKTests.test_rehashed_secondary_controller_generator_omission_rejects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_source_sdk.py", line 557, in test_rehashed_secondary_controller_generator_omission_rejects
+    self.assertNotEqual(result.returncode, 0,
+AssertionError: 0 == 0 : Rehashed controller generator omission accepted
+
+----------------------------------------------------------------------
+Ran 1 test in 7.422s
+
+FAILED (failures=1)

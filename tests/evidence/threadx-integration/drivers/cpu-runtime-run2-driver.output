@@ -1,0 +1,13 @@
++ cmake -S /workspace/nexus-threadx-probe/cpu-fixture -B /workspace/nexus-threadx-probe/cpu2-integer-basepri -G Ninja -DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake -DNEXUS_RUNTIME_ASSEMBLY=/workspace/nexus-threadx-probe/cpu-assemblies/integer-basepri/runtime.toml
++ cmake --build /workspace/nexus-threadx-probe/cpu2-integer-basepri --target threadx_cpu --parallel 1
++ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm --defined-only /workspace/nexus-threadx-probe/cpu2-integer-basepri/threadx_cpu.elf
++ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-readelf -A /workspace/nexus-threadx-probe/cpu2-integer-basepri/threadx_cpu.elf
++ cmake -S /workspace/nexus-threadx-probe/cpu-fixture -B /workspace/nexus-threadx-probe/cpu2-integer-primask -G Ninja -DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake -DNEXUS_RUNTIME_ASSEMBLY=/workspace/nexus-threadx-probe/cpu-assemblies/integer-primask/runtime.toml
++ cmake --build /workspace/nexus-threadx-probe/cpu2-integer-primask --target threadx_cpu --parallel 1
++ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm --defined-only /workspace/nexus-threadx-probe/cpu2-integer-primask/threadx_cpu.elf
++ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-readelf -A /workspace/nexus-threadx-probe/cpu2-integer-primask/threadx_cpu.elf
++ cmake -S /workspace/nexus-threadx-probe/cpu-fixture -B /workspace/nexus-threadx-probe/cpu2-fp-softfp -G Ninja -DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake -DNEXUS_RUNTIME_ASSEMBLY=/workspace/nexus-threadx-probe/cpu-assemblies/fp-softfp/runtime.toml
++ cmake --build /workspace/nexus-threadx-probe/cpu2-fp-softfp --target threadx_cpu --parallel 1
++ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-nm --defined-only /workspace/nexus-threadx-probe/cpu2-fp-softfp/threadx_cpu.elf
++ /workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-readelf -A /workspace/nexus-threadx-probe/cpu2-fp-softfp/threadx_cpu.elf
+actual CPU links 3

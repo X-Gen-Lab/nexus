@@ -1,0 +1,23 @@
+..F............F
+======================================================================
+FAIL: test_assertions_inside_string_literal_are_not_review_predicates (tools.testing.test_io_lifecycle_matrix.IOLifecycleMatrixTests.test_assertions_inside_string_literal_are_not_review_predicates)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py", line 107, in test_assertions_inside_string_literal_are_not_review_predicates
+    with self.assertRaises(ValueError): matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_test_body_compiled_only_for_other_target_cannot_prove_this_binary (tools.testing.test_io_lifecycle_matrix.IOLifecycleMatrixTests.test_test_body_compiled_only_for_other_target_cannot_prove_this_binary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_io_lifecycle_matrix.py", line 117, in test_test_body_compiled_only_for_other_target_cannot_prove_this_binary
+    with self.assertRaises(ValueError): matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.036s
+
+FAILED (failures=2)

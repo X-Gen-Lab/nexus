@@ -1,0 +1,23 @@
+test_each_native_build_executes_unfiltered_google_contract_gate (__main__.WorkflowContracts.test_each_native_build_executes_unfiltered_google_contract_gate) ... FAIL
+test_tooling_runs_google_report_and_hil_preparation_boundaries (__main__.WorkflowContracts.test_tooling_runs_google_report_and_hil_preparation_boundaries) ... FAIL
+
+======================================================================
+FAIL: test_each_native_build_executes_unfiltered_google_contract_gate (__main__.WorkflowContracts.test_each_native_build_executes_unfiltered_google_contract_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/.github/workflows/test_platform_ci.py", line 70, in test_each_native_build_executes_unfiltered_google_contract_gate
+    self.assertIn('scripts/ci/tdd_gate.py --all --preset', commands)
+AssertionError: 'scripts/ci/tdd_gate.py --all --preset' not found in '\n\n.venv/bin/python tools/dev/dev.py configure --preset "${{ matrix.preset }}"\n.venv/bin/python tools/dev/dev.py build --preset "${{ matrix.preset }}" --parallel 4\n.venv/bin/python tools/dev/dev.py test --preset "${{ matrix.preset }}" --parallel 1\n'
+
+======================================================================
+FAIL: test_tooling_runs_google_report_and_hil_preparation_boundaries (__main__.WorkflowContracts.test_tooling_runs_google_report_and_hil_preparation_boundaries)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/.github/workflows/test_platform_ci.py", line 78, in test_tooling_runs_google_report_and_hil_preparation_boundaries
+    self.assertIn('discover -s tools/testing', commands)
+AssertionError: 'discover -s tools/testing' not found in '\n\necho "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"\n.venv/bin/python -m unittest discover -s tools/configure -p \'test_*.py\' -v\nmkdir -p build/quality\n.venv/bin/python -m unittest discover -s tests/contracts -p \'test_*.py\' -v             2>&1 | tee build/quality/tool-contracts.log\n\n.venv/bin/python -m unittest scripts.ci.test_format_tool scripts.ci.test_comment_style scripts.ci.test_install_dev_tools scripts.ci.test_style_gate scripts.ci.test_commit_message\n.venv/bin/python -m unittest discover -s scripts/ci -p \'test_quality_tools.py\'\n.venv/bin/python .github/workflows/test_platform_ci.py\n\n'
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.008s
+
+FAILED (failures=2)

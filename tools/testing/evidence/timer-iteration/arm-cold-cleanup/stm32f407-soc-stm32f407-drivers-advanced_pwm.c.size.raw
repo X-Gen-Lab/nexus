@@ -1,0 +1,24 @@
+/workspace/nexus/tools/testing/evidence/timer-iteration/arm-cold-cleanup/stm32f407-soc-stm32f407-drivers-advanced_pwm.c.o  :
+section                                  size   addr
+.text                                       0      0
+.data                                       0      0
+.bss                                        0      0
+.text.advanced_overlap                     30      0
+.text.advanced_context                     20      0
+.text.deadtime_ticks                       38      0
+.text.advanced_duty                       112      0
+.text.break_active.isra.0                  24      0
+.text.advanced_state                      188      0
+.text.advanced_clear                      136      0
+.text.observe_break                        56      0
+.text.advanced_stop                       120      0
+.text.advanced_start                      436      0
+.text.nx_stm32_advanced_pwm_initialize    468      0
+.text.nx_stm32_advanced_pwm_release       120      0
+.text.nx_stm32_advanced_pwm_irq            12      0
+.rodata.nx_stm32_advanced_pwm_ops          20      0
+.comment                                   71      0
+.ARM.attributes                            52      0
+Total                                    1903
+
+

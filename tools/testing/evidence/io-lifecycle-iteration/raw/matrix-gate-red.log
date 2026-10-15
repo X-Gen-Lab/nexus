@@ -1,0 +1,41 @@
+FFFF
+======================================================================
+FAIL: test_audit_failure_rejects_successful_google_execution (tools.testing.test_tdd_matrix_integration.TDDMatrixIntegrationTests.test_audit_failure_rejects_successful_google_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_tdd_matrix_integration.py", line 99, in test_audit_failure_rejects_successful_google_execution
+    self.assertEqual(status, 1, output)
+AssertionError: 0 != 1 : Executed 1 GoogleTest cases; evidence: /tmp/tmpb6ljbdhj/build/native-debug/tdd/execution.json
+
+
+======================================================================
+FAIL: test_build_capture_execution_summary_strict_audit_order (tools.testing.test_tdd_matrix_integration.TDDMatrixIntegrationTests.test_build_capture_execution_summary_strict_audit_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_tdd_matrix_integration.py", line 81, in test_build_capture_execution_summary_strict_audit_order
+    before.assert_called_once()
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/mock.py", line 928, in assert_called_once
+    raise AssertionError(msg)
+AssertionError: Expected 'capture' to have been called once. Called 0 times.
+
+======================================================================
+FAIL: test_capture_failure_stops_before_discovery (tools.testing.test_tdd_matrix_integration.TDDMatrixIntegrationTests.test_capture_failure_stops_before_discovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_tdd_matrix_integration.py", line 91, in test_capture_failure_stops_before_discovery
+    self.assertEqual(status, 1, output)
+AssertionError: 0 != 1 : Executed 1 GoogleTest cases; evidence: /tmp/tmp2r_1mfkh/build/native-debug/tdd/execution.json
+
+
+======================================================================
+FAIL: test_prior_matrix_success_is_removed_when_new_tools_fail (tools.testing.test_tdd_matrix_integration.TDDMatrixIntegrationTests.test_prior_matrix_success_is_removed_when_new_tools_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_tdd_matrix_integration.py", line 111, in test_prior_matrix_success_is_removed_when_new_tools_fail
+    self.assertFalse(report.exists())
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.007s
+
+FAILED (failures=4)

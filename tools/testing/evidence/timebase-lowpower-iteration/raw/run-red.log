@@ -1,0 +1,300 @@
+Running main() from gmock_main.cc
+[==========] Running 14 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 14 tests from TimebaseLowpower
+[ RUN      ] TimebaseLowpower.PendingTickRejectsWithoutChangingSource
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:62: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &out)
+    Which is: 7
+  NX_ERROR_BUSY
+    Which is: 2
+
+[  FAILED  ] TimebaseLowpower.PendingTickRejectsWithoutChangingSource (0 ms)
+[ RUN      ] TimebaseLowpower.CapturePreservesFractionAndHasADeclaredSampleBound
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:69: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &out)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:70: Failure
+Expected equality of these values:
+  out.time_us
+    Which is: 0
+  now
+    Which is: 1000
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:71: Failure
+Expected equality of these values:
+  out.phase_us
+    Which is: 0
+  249U
+    Which is: 249
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:72: Failure
+Expected equality of these values:
+  context.phase_cycles
+    Which is: 0
+  166U
+    Which is: 166
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:73: Failure
+Expected equality of these values:
+  control
+    Which is: 7
+  6U
+    Which is: 6
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:74: Failure
+Value of: context.paused
+  Actual: false
+Expected: true
+
+[  FAILED  ] TimebaseLowpower.CapturePreservesFractionAndHasADeclaredSampleBound (0 ms)
+[ RUN      ] TimebaseLowpower.PendingArrivalDuringDisableRollsBackControl
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:79: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &out)
+    Which is: 7
+  NX_ERROR_BUSY
+    Which is: 2
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:81: Failure
+Expected equality of these values:
+  pending
+    Which is: 0
+  pending_tick
+    Which is: 67108864
+
+[  FAILED  ] TimebaseLowpower.PendingArrivalDuringDisableRollsBackControl (0 ms)
+[ RUN      ] TimebaseLowpower.ExcessiveOrReversedSampleWindowRejects
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:89: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &out)
+    Which is: 7
+  NX_ERROR_BUSY
+    Which is: 2
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:86: Failure
+Actual function call count doesn't match EXPECT_CALL(clock, Call())...
+         Expected: to be called twice
+           Actual: never called - unsatisfied and active
+
+[  FAILED  ] TimebaseLowpower.ExcessiveOrReversedSampleWindowRejects (0 ms)
+[ RUN      ] TimebaseLowpower.AlarmUsesAbsoluteLowWordAcrossCounterWrap
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:45: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &snapshot)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:97: Failure
+Expected equality of these values:
+  nx_timebase_arm_deadline(&context, now + 10U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:98: Failure
+Expected equality of these values:
+  compare
+    Which is: 0
+  4U
+    Which is: 4
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:99: Failure
+Expected equality of these values:
+  interrupts
+    Which is: 1
+  3U
+    Which is: 3
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:101: Failure
+Value of: context.armed
+  Actual: false
+Expected: true
+
+[  FAILED  ] TimebaseLowpower.AlarmUsesAbsoluteLowWordAcrossCounterWrap (0 ms)
+[ RUN      ] TimebaseLowpower.ExpiredAndOverHorizonAlarmsHaveNoEffects
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:45: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &snapshot)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:106: Failure
+Expected equality of these values:
+  nx_timebase_arm_deadline(&context, now)
+    Which is: 7
+  NX_ERROR_TIMEOUT
+    Which is: 4
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:107: Failure
+Expected equality of these values:
+  nx_timebase_arm_deadline(&context, now + (1UL << 32U))
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+
+[  FAILED  ] TimebaseLowpower.ExpiredAndOverHorizonAlarmsHaveNoEffects (0 ms)
+[ RUN      ] TimebaseLowpower.LateArmRejectsAndPreservesOverflow
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:45: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &snapshot)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:115: Failure
+Expected equality of these values:
+  nx_timebase_arm_deadline(&context, now + 10U)
+    Which is: 7
+  NX_ERROR_TIMEOUT
+    Which is: 4
+
+[  FAILED  ] TimebaseLowpower.LateArmRejectsAndPreservesOverflow (0 ms)
+[ RUN      ] TimebaseLowpower.DisarmNeverStealsSharedOverflowFlag
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:45: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &snapshot)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:122: Failure
+Expected equality of these values:
+  nx_timebase_arm_deadline(&context, now + 10U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] TimebaseLowpower.DisarmNeverStealsSharedOverflowFlag (0 ms)
+[ RUN      ] TimebaseLowpower.FailedInterruptDisableCannotResumeAndForgetOwnership
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:45: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &snapshot)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:131: Failure
+Expected equality of these values:
+  nx_timebase_arm_deadline(&context, now + 10U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] TimebaseLowpower.FailedInterruptDisableCannotResumeAndForgetOwnership (0 ms)
+[ RUN      ] TimebaseLowpower.FirstCounterConsumesShortLoadBeforeFutureFullReload
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:45: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &snapshot)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:148: Failure
+Expected equality of these values:
+  ticks
+    Which is: 0
+  1U
+    Which is: 1
+
+[  FAILED  ] TimebaseLowpower.FirstCounterConsumesShortLoadBeforeFutureFullReload (0 ms)
+[ RUN      ] TimebaseLowpower.NearZeroRemainderQuantizationAddsAtMostOneMicrosecond
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:45: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &snapshot)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:155: Failure
+Expected equality of these values:
+  value
+    Which is: 126001
+  167U
+    Which is: 167
+
+[  FAILED  ] TimebaseLowpower.NearZeroRemainderQuantizationAddsAtMostOneMicrosecond (0 ms)
+[ RUN      ] TimebaseLowpower.UnprovenReloadIsAnExplicitRetainedFault
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:45: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &snapshot)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:162: Failure
+Expected: nx_timebase_resume_tick(&context, now + 10U) throws an exception of type std::runtime_error.
+  Actual: it throws nothing.
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:163: Failure
+Value of: context.paused
+  Actual: false
+Expected: true
+
+[  FAILED  ] TimebaseLowpower.UnprovenReloadIsAnExplicitRetainedFault (0 ms)
+[ RUN      ] TimebaseLowpower.AlarmDispatchClearsOnlyTheReservedCompareSource
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:45: Failure
+Expected equality of these values:
+  nx_timebase_pause_tick(&context, &snapshot)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:168: Failure
+Expected equality of these values:
+  nx_timebase_arm_deadline(&context, now + 10U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] TimebaseLowpower.AlarmDispatchClearsOnlyTheReservedCompareSource (0 ms)
+[ RUN      ] TimebaseLowpower.TickHandlerRestoresFullPeriodBeforeKernelDispatch
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:180: Failure
+Expected equality of these values:
+  reload
+    Which is: 50
+  registers.full_reload
+    Which is: 167999
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:181: Failure
+Expected equality of these values:
+  ticks
+    Which is: 0
+  1U
+    Which is: 1
+
+/workspace/nexus/tests/google/timebase_lowpower_test.cpp:182: Failure
+Value of: context.first_short
+  Actual: true
+Expected: false
+
+[  FAILED  ] TimebaseLowpower.TickHandlerRestoresFullPeriodBeforeKernelDispatch (0 ms)
+[----------] 14 tests from TimebaseLowpower (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 14 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 14 tests, listed below:
+[  FAILED  ] TimebaseLowpower.PendingTickRejectsWithoutChangingSource
+[  FAILED  ] TimebaseLowpower.CapturePreservesFractionAndHasADeclaredSampleBound
+[  FAILED  ] TimebaseLowpower.PendingArrivalDuringDisableRollsBackControl
+[  FAILED  ] TimebaseLowpower.ExcessiveOrReversedSampleWindowRejects
+[  FAILED  ] TimebaseLowpower.AlarmUsesAbsoluteLowWordAcrossCounterWrap
+[  FAILED  ] TimebaseLowpower.ExpiredAndOverHorizonAlarmsHaveNoEffects
+[  FAILED  ] TimebaseLowpower.LateArmRejectsAndPreservesOverflow
+[  FAILED  ] TimebaseLowpower.DisarmNeverStealsSharedOverflowFlag
+[  FAILED  ] TimebaseLowpower.FailedInterruptDisableCannotResumeAndForgetOwnership
+[  FAILED  ] TimebaseLowpower.FirstCounterConsumesShortLoadBeforeFutureFullReload
+[  FAILED  ] TimebaseLowpower.NearZeroRemainderQuantizationAddsAtMostOneMicrosecond
+[  FAILED  ] TimebaseLowpower.UnprovenReloadIsAnExplicitRetainedFault
+[  FAILED  ] TimebaseLowpower.AlarmDispatchClearsOnlyTheReservedCompareSource
+[  FAILED  ] TimebaseLowpower.TickHandlerRestoresFullPeriodBeforeKernelDispatch
+
+14 FAILED TESTS

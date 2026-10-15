@@ -1,0 +1,145 @@
+Running main() from gmock_main.cc
+[==========] Running 10 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 10 tests from GD32SPIDMA
+[ RUN      ] GD32SPIDMA.ProgramsExactIndependentDmaRoutesWithoutCopying
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:123: Failure
+Expected equality of these values:
+  nx_spi_endpoint_submit(&endpoint, &request)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] GD32SPIDMA.ProgramsExactIndependentDmaRoutesWithoutCopying (0 ms)
+[ RUN      ] GD32SPIDMA.BothDmaCompletionsRetainCsUntilIndependentWireIdle
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:141: Failure
+Expected equality of these values:
+  nx_spi_endpoint_submit(&endpoint, &request)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] GD32SPIDMA.BothDmaCompletionsRetainCsUntilIndependentWireIdle (0 ms)
+[ RUN      ] GD32SPIDMA.RejectedDomainsOverlapAndExpiredDeadlineHaveZeroEffects
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:161: Failure
+Expected equality of these values:
+  nx_spi_endpoint_submit(&endpoint, &request)
+    Which is: 7
+  NX_ERROR_PERMISSION
+    Which is: 10
+
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:163: Failure
+Expected equality of these values:
+  nx_spi_endpoint_submit(&endpoint, &request)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:166: Failure
+Expected equality of these values:
+  nx_spi_endpoint_submit(&endpoint, &request)
+    Which is: 7
+  NX_ERROR_TIMEOUT
+    Which is: 4
+
+[  FAILED  ] GD32SPIDMA.RejectedDomainsOverlapAndExpiredDeadlineHaveZeroEffects (0 ms)
+[ RUN      ] GD32SPIDMA.EndpointIdentityAndBusySecondChildCannotAcquireCs
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:178: Failure
+Value of: nx_spi_endpoint_on_port(&endpoint, &bus)
+  Actual: false
+Expected: true
+
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:190: Failure
+Expected equality of these values:
+  nx_spi_endpoint_submit(&endpoint, &request)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] GD32SPIDMA.EndpointIdentityAndBusySecondChildCannotAcquireCs (0 ms)
+[ RUN      ] GD32SPIDMA.CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:197: Failure
+Expected equality of these values:
+  nx_spi_endpoint_submit(&endpoint, &request)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] GD32SPIDMA.CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains (0 ms)
+[ RUN      ] GD32SPIDMA.RefusedEngineDisableKeepsBorrowDespiteIdleWire
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:220: Failure
+Expected equality of these values:
+  nx_spi_endpoint_submit(&endpoint, &request)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] GD32SPIDMA.RefusedEngineDisableKeepsBorrowDespiteIdleWire (0 ms)
+[ RUN      ] GD32SPIDMA.DmaErrorRequiresExplicitIdleRecoveryAndNeverReplays
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:238: Failure
+Expected equality of these values:
+  nx_spi_endpoint_submit(&endpoint, &request)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] GD32SPIDMA.DmaErrorRequiresExplicitIdleRecoveryAndNeverReplays (0 ms)
+[ RUN      ] GD32SPIDMA.WakeFollowsLatchedFactsAndLateIrqsNeverReplayCompletion
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:258: Failure
+Expected equality of these values:
+  nx_spi_port_attach_wake(&bus, &wake, 5U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] GD32SPIDMA.WakeFollowsLatchedFactsAndLateIrqsNeverReplayCompletion (0 ms)
+[ RUN      ] GD32SPIDMA.BothActualIrqPrioritiesMustPermitKernelCallingWake
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:287: Failure
+Expected equality of these values:
+  nx_spi_port_attach_wake(&bus, &wake, 5U)
+    Which is: 7
+  NX_ERROR_PERMISSION
+    Which is: 10
+
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:291: Failure
+Expected equality of these values:
+  nx_spi_port_attach_wake(&bus, &wake, 5U)
+    Which is: 7
+  NX_ERROR_PERMISSION
+    Which is: 10
+
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:294: Failure
+Expected equality of these values:
+  nx_spi_port_attach_wake(&bus, &wake, 5U)
+    Which is: 7
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+[  FAILED  ] GD32SPIDMA.BothActualIrqPrioritiesMustPermitKernelCallingWake (0 ms)
+[ RUN      ] GD32SPIDMA.FalseTransferCompleteCounterIsAnErrorAndCannotSettleSuccess
+/workspace/nexus/tests/google/gd32_spi_dma_test.cpp:298: Failure
+Expected equality of these values:
+  nx_spi_endpoint_submit(&endpoint, &request)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] GD32SPIDMA.FalseTransferCompleteCounterIsAnErrorAndCannotSettleSuccess (0 ms)
+[----------] 10 tests from GD32SPIDMA (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 10 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 10 tests, listed below:
+[  FAILED  ] GD32SPIDMA.ProgramsExactIndependentDmaRoutesWithoutCopying
+[  FAILED  ] GD32SPIDMA.BothDmaCompletionsRetainCsUntilIndependentWireIdle
+[  FAILED  ] GD32SPIDMA.RejectedDomainsOverlapAndExpiredDeadlineHaveZeroEffects
+[  FAILED  ] GD32SPIDMA.EndpointIdentityAndBusySecondChildCannotAcquireCs
+[  FAILED  ] GD32SPIDMA.CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains
+[  FAILED  ] GD32SPIDMA.RefusedEngineDisableKeepsBorrowDespiteIdleWire
+[  FAILED  ] GD32SPIDMA.DmaErrorRequiresExplicitIdleRecoveryAndNeverReplays
+[  FAILED  ] GD32SPIDMA.WakeFollowsLatchedFactsAndLateIrqsNeverReplayCompletion
+[  FAILED  ] GD32SPIDMA.BothActualIrqPrioritiesMustPermitKernelCallingWake
+[  FAILED  ] GD32SPIDMA.FalseTransferCompleteCounterIsAnErrorAndCannotSettleSuccess
+
+10 FAILED TESTS

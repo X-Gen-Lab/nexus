@@ -1,0 +1,11 @@
+Running main() from gmock_main.cc
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FreeRTOSPrestart
+[ RUN      ] FreeRTOSPrestart.ReverseDiscardReclaimsCandidateThenSchedulerRunsReusedTCBs
+[       OK ] FreeRTOSPrestart.ReverseDiscardReclaimsCandidateThenSchedulerRunsReusedTCBs (1 ms)
+[----------] 1 test from FreeRTOSPrestart (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (2 ms total)
+[  PASSED  ] 1 test.

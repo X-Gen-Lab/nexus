@@ -1,0 +1,137 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: c96bc3d140a5a24ef6811c1070be8d175a25ab89bbda886078f606518ad398dd\n"
+
+msgid "Source, software evidence and physical qualification"
+msgstr "源码、软件证据与物理资格"
+
+msgid ""
+"A document describes code; it does not qualify that code merely by being "
+"published. A result applies to the exact source, configuration, environment "
+"and artifacts that were actually executed. Current document source, "
+"described code source and qualified historical code source are separate "
+"identities."
+msgstr ""
+"文档描述代码，发布文档自身不会使代码合格。结果适用于实际执行的精确源码、配置、环境和产物。当前文档源码、所描述代码源码和已合格历史代码源码是独立身份。"
+
+msgid ""
+"![Separate Native, ARM, SDK, reproduction and physical "
+"evidence](../../assets/diagrams/qualification-evidence.svg)"
+msgstr ""
+"![独立 Native、ARM、SDK、复现与物理证据](../../assets/diagrams/qualification-"
+"evidence.svg)"
+
+msgid "Separate Native, ARM, SDK, reproduction and physical evidence"
+msgstr "独立 Native、ARM、SDK、复现与物理证据"
+
+msgid ""
+"FIG-11 shows evidence inputs and their independent scope. No arrow turns a "
+"model or a workflow into physical measurements."
+msgstr "FIG-11 表示证据输入及其独立范围。任何箭头都不会把模型或工作流变成物理测量。"
+
+msgid "Evidence"
+msgstr "证据"
+
+msgid "What it can establish"
+msgstr "能够建立的结论"
+
+msgid "Limit"
+msgstr "限制"
+
+msgid "Native/GoogleTest/GoogleMock"
+msgstr "Native/GoogleTest/GoogleMock"
+
+msgid "Executed software contracts against selected models/ports"
+msgstr "针对选定模型/端口实际执行的软件合同"
+
+msgid "Not physical timing or electrical truth"
+msgstr "不是物理时序或电气事实"
+
+msgid "ARM ELF/BIN/map"
+msgstr "ARM ELF/BIN/map"
+
+msgid "Actual compile/link, vector, configuration and resource binding"
+msgstr "实际编译/链接、向量表、配置和资源绑定"
+
+msgid "Not MCU execution"
+msgstr "不是 MCU 执行"
+
+msgid "Relocated Source SDK consumer"
+msgstr "搬移后的 Source SDK 消费者"
+
+msgid "Public include/ABI closure and actual consumer build/run/link"
+msgstr "公共包含路径/ABI 闭包与实际消费者构建/运行/链接"
+
+msgid "Not product integration or HIL"
+msgstr "不是产品集成或 HIL"
+
+msgid "Two fresh offline builds"
+msgstr "两次新生成的离线构建"
+
+msgid "Actual byte comparison in the bound environment"
+msgstr "绑定环境内的实际字节比较"
+
+msgid "Not a digest-only or universal reproducibility promise"
+msgstr "不是仅有摘要或普遍可复现承诺"
+
+msgid "Software candidate"
+msgstr "软件候选"
+
+msgid "Clean exact scope, identities and retained unsigned artifacts"
+msgstr "干净精确范围、身份与保留的无签名产物"
+
+msgid "Not signed product release, safety certification or LTS"
+msgstr "不是签名产品发布、安全认证或 LTS"
+
+msgid "Real HIL record"
+msgstr "真实 HIL 记录"
+
+msgid "Observed hardware/workload/instrument scope on one admitted station"
+msgstr "一个已准入的工位上观察的硬件/负载/仪器范围"
+
+msgid "Not unobserved loads or arbitrary boards"
+msgstr "不是未观察负载或任意板卡"
+
+msgid "Locate actual records"
+msgstr "定位实际记录"
+
+msgid ""
+"The [delivery index](../../delivery/README.md) retains original results and "
+"limitations. The build-system result record binds qualified code `cc6a065c`;"
+" its document updates do not inherit those tests to a new HEAD. Earlier SoC "
+"extension evidence binds `98270512` independently. Read each linked JSON "
+"result and raw receipt for exact full source identity, selected scope, "
+"artifact hashes and failed attempts."
+msgstr ""
+"[交付索引](../../delivery/README.md)保留原始结果和限制。构建系统结果绑定已验证代码 "
+"`cc6a065c`；后续文档提交不把这些测试继承到新 HEAD。较早 SoC 扩展证据独立绑定 `98270512`。阅读关联 JSON result"
+" 和原始回执，核对完整精确源码身份、选定范围、产物摘要和失败尝试。"
+
+msgid ""
+"Current physical MCU records remain `not_executed`: no connected Board "
+"station has established clock accuracy, IRQ/DMA timing, Cache behavior, "
+"context retention, electrical outputs, Flash power-loss or long-duration "
+"performance. Software-reference HIL fixtures cannot be edited into physical "
+"qualification."
+msgstr ""
+"当前 MCU 物理记录保持 `not_executed`：没有已连接 Board 工位建立时钟精度、IRQ/DMA "
+"时序、缓存行为、上下文保留、电气输出、Flash 掉电或长期性能。不能编辑软件参考 HIL 夹具来建立物理资格。"
+
+msgid ""
+"A new implementation must run its applicable gates with fresh nonempty "
+"reports. A new documentation-only build may reference old qualified code "
+"while explicitly showing that identity; it must not rewrite the old record "
+"or reuse test counts as current execution. See the [performance/HIL "
+"guide](../../guides/performance-hil.md) and the [build "
+"contract](../../design/build-system.md)."
+msgstr ""
+"新实现必须执行其适用门禁，提供新生成的非空报告。新的纯文档构建可明确显示身份并引用旧已验证代码，但不得改写旧记录或把旧用例数当成本次执行。见[性能/HIL"
+" 指南](../../guides/performance-hil.md)和[构建合同](../../design/build-system.md)。"

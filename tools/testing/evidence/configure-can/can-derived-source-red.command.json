@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-m",
+    "unittest",
+    "tools.configure.test_can.CanConfigurationTests.test_derived_capability_uses_actual_common_io_operations_source",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1
+}

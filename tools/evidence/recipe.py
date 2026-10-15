@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+"""Declare immutable recipe inputs without claiming observed image reproduction."""
+
+from __future__ import annotations
+
+import argparse
+from datetime import datetime
+import hashlib
+from pathlib import Path
+import re
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from tools.evidence.common import (EvidenceError, atomic_json, digest, fields,
+                                   load_json, regular_file, separate_outputs, sha256_value)
+
+APT_PACKAGES = ("gcc", "g++", "git", "make", "binutils")
+FRONTEND = "docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e"
+
+
+def validate(lock: dict) -> dict:
+    fields(lock, {"schema_version", "kind", "base_image", "frontend", "snapshot_at",
+                  "debian_suite", "apt_packages", "python_requirements_sha256",
+                  "observed_image_config_id", "recipe_reproducible", "scope"})
+    if (type(lock["schema_version"]) is not int or lock["schema_version"] != 1 or
+            lock["kind"] != "nexus_build_recipe" or lock["recipe_reproducible"] is not False):
+        raise EvidenceError("unsupported recipe or unestablished reproduction claim")
+    if not isinstance(lock["base_image"], str) or not re.fullmatch(r"[A-Za-z0-9_./:-]+@sha256:[0-9a-f]{64}", lock["base_image"]):
+        raise EvidenceError("recipe requires an exact base image digest")
+    if lock["frontend"] != FRONTEND or lock["debian_suite"] not in ("bookworm", "trixie"):
+        raise EvidenceError("recipe frontend or Debian suite is unsupported")
+    try:
+        datetime.strptime(lock["snapshot_at"], "%Y%m%dT%H%M%SZ")
+    except (ValueError, TypeError) as error:
+        raise EvidenceError("exact valid Debian snapshot timestamp required") from error
+    if not isinstance(lock["snapshot_at"], str) or not re.fullmatch(r"[0-9]{8}T[0-9]{6}Z", lock["snapshot_at"]):
+        raise EvidenceError("canonical Debian snapshot timestamp required")
+    packages = lock["apt_packages"]
+    if not isinstance(packages, dict) or set(packages) != set(APT_PACKAGES):
+        raise EvidenceError("all five directly installed APT versions required")
+    for version in packages.values():
+        if not isinstance(version, str) or not re.fullmatch(r"[0-9][A-Za-z0-9.+:~_-]{0,127}", version):
+            raise EvidenceError("APT package version must be exact and shell-safe")
+    sha256_value(lock["python_requirements_sha256"])
+    if not isinstance(lock["observed_image_config_id"], str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", lock["observed_image_config_id"]):
+        raise EvidenceError("actual observed image config identity required")
+    return lock
+
+
+def create(observed: dict, base_image: str, snapshot: str, requirements: Path) -> dict:
+    fields(observed, {"suite", "apt_packages", "image_config_id"})
+    text = regular_file(requirements).read_text()
+    selected = [line for line in text.splitlines() if line and not line.startswith("#")]
+    if not selected or any(not re.fullmatch(r"[A-Za-z0-9_.-]+==[A-Za-z0-9_.+!-]+ --hash=sha256:[0-9a-f]{64}", line) for line in selected):
+        raise EvidenceError("recipe Python requirements require full exact hash pins")
+    lock = {"schema_version": 1, "kind": "nexus_build_recipe", "frontend": FRONTEND,
+            "base_image": base_image, "snapshot_at": snapshot,
+            "debian_suite": observed["suite"], "apt_packages": observed["apt_packages"],
+            "python_requirements_sha256": digest(requirements),
+            "observed_image_config_id": observed["image_config_id"],
+            "recipe_reproducible": False,
+            "scope": "declared fixed recipe inputs; reconstruction of the observed OCI bytes is unverified"}
+    return validate(lock)
+
+
+def verify(lock: dict, requirements: Path) -> dict:
+    validate(lock)
+    if digest(requirements) != lock["python_requirements_sha256"]:
+        raise EvidenceError("recipe Python hash lock changed")
+    return {"status": "declared_inputs_verified", "recipe_reproducible": False,
+            "observed_image_config_id": lock["observed_image_config_id"]}
+
+
+def emit(lock: dict, requirements_path: str) -> str:
+    validate(lock)
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*", requirements_path) or ".." in requirements_path.split("/"):
+        raise EvidenceError("recipe requirements path must be a safe context-relative file")
+    timestamp, suite = lock["snapshot_at"], lock["debian_suite"]
+    sources = (f"deb [check-valid-until=no] https://snapshot.debian.org/archive/debian/{timestamp}/ {suite} main\\n"
+               f"deb [check-valid-until=no] https://snapshot.debian.org/archive/debian/{timestamp}/ {suite}-updates main\\n"
+               f"deb [check-valid-until=no] https://snapshot.debian.org/archive/debian-security/{timestamp}/ {suite}-security main\\n")
+    packages = " ".join(f"'{name}={lock['apt_packages'][name]}'" for name in APT_PACKAGES)
+    return (f"# syntax={lock['frontend']}\n"
+            "# Generated by tools/evidence/recipe.py; fixed inputs are declared.\n"
+            "# Recreating the qualified OCI bytes has not been established.\n"
+            f"FROM {lock['base_image']}\n"
+            "RUN --mount=type=secret,id=proxy_ca,required=true \\\n"
+            "    rm -f /etc/apt/sources.list.d/debian.sources && \\\n"
+            f"    printf '{sources}' > /etc/apt/sources.list && \\\n"
+            "    apt-get -o Acquire::https::CaInfo=/run/secrets/proxy_ca \\\n"
+            "    -o Acquire::Check-Valid-Until=false update && \\\n"
+            "    apt-get -o Acquire::https::CaInfo=/run/secrets/proxy_ca \\\n"
+            f"    install -y --no-install-recommends {packages} && \\\n"
+            "    rm -rf /var/lib/apt/lists/*\n"
+            f"COPY {requirements_path} /opt/nexus/requirements-hashed.txt\n"
+            "RUN --mount=type=secret,id=proxy_ca,required=true \\\n"
+            "    PIP_CERT=/run/secrets/proxy_ca python -m pip install \\\n"
+            "    --no-cache-dir --require-hashes -r /opt/nexus/requirements-hashed.txt\n"
+            'ENV PATH="/toolchain/bin:/usr/local/bin:/usr/bin:/bin"\n'
+            "WORKDIR /work\n"
+            'CMD ["python", "--version"]\n')
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("operation", choices=("create", "verify"))
+    parser.add_argument("--observed", type=Path)
+    parser.add_argument("--base-image")
+    parser.add_argument("--snapshot")
+    parser.add_argument("--requirements", type=Path, required=True)
+    parser.add_argument("--lock", type=Path, required=True)
+    parser.add_argument("--dockerfile", type=Path)
+    parser.add_argument("--requirements-path", default="dependencies/python-tools-linux-cp312.txt")
+    parser.add_argument("--report", type=Path)
+    args = parser.parse_args(argv)
+    try:
+        outputs = [path for path in (args.report, args.dockerfile) if path is not None]
+        inputs = [args.requirements]
+        if args.operation == "create":
+            outputs.append(args.lock)
+            if args.observed:
+                inputs.append(args.observed)
+        else:
+            inputs.append(args.lock)
+            # Verification reads the Dockerfile; it never rewrites it.
+            if args.dockerfile:
+                outputs.remove(args.dockerfile)
+                inputs.append(args.dockerfile)
+        separate_outputs(outputs, inputs)
+        if args.operation == "create":
+            if None in (args.observed, args.base_image, args.snapshot):
+                parser.error("create requires --observed --base-image --snapshot")
+            lock = create(load_json(args.observed), args.base_image, args.snapshot, args.requirements)
+            atomic_json(args.lock, lock)
+        else:
+            lock = load_json(args.lock)
+        result = verify(lock, args.requirements)
+        if args.dockerfile:
+            text = emit(lock, args.requirements_path)
+            if args.operation == "create":
+                args.dockerfile.write_text(text)
+            elif args.dockerfile.read_text() != text:
+                raise EvidenceError("Dockerfile differs from locked declared recipe")
+            result["dockerfile_sha256"] = hashlib.sha256(text.encode()).hexdigest()
+        if args.report:
+            atomic_json(args.report, result)
+        print(result["status"])
+        return 0
+    except (EvidenceError, OSError, ValueError, TypeError) as error:
+        print("Build recipe rejected: " + str(error), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

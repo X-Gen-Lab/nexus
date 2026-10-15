@@ -1,0 +1,16 @@
+diagram_id,title,kind,source_dot,rendered_svg,render_status,review_status,code_basis,task_id,scope
+FIG-01,全平台分层与外部边界,current,platform-architecture.dot,platform-architecture.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-43,产品外置；可选组件与OS；运行访问和构建事实逐边区分
+FIG-02,选定编译目标依赖,reference,build-targets.dot,build-targets.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-44,H743 baremetal IRQ UART；准确PUBLIC/PRIVATE/INTERFACE/OBJECT关系
+FIG-03,配置与原子生成,current,configuration-generation.dot,configuration-generation.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-45,构建输入/产物链，生成失败使owned bundle失效
+FIG-04,factory与静态实例,reference,factory-instances.dot,factory-instances.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-46,按需选入的两同类实例示意；同模式ops共享，controller/endpoint独立
+FIG-05,显式启动停机与失败撤回,current,platform-lifecycle.dot,platform-lifecycle.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-47,生成生命周期骨架；每个SoC私有启动/清理保持具体合同
+FIG-06,Core请求状态与借用,current,request-lifecycle.dot,request-lifecycle.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-48,Core helper允许的迁移与调用前提；不承诺各provider恢复API
+FIG-07,UART与SPI有限DMA时序,reference,dma-completion.dot,dma-completion.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-49,F407 USART1/SPI1精确有限DMA；Task/IRQ/DMA完成与失败路径
+FIG-08,wait wake与外部退出,current,wait-wake-shutdown.dot,wait-wake-shutdown.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-50,ready-arm-ready-wait-ready与实际执行/join责任
+FIG-09,H743内存DMA与Cache,reference,h743-memory-cache.dot,h743-memory-cache.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-51,H743ZIT6有限USART3 TX；AXI SRAM完整32-byte lines
+FIG-10,Source SDK独立消费,current,source-sdk-consumer.dot,source-sdk-consumer.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-52,实际公开入口和consumer；搬移完整prefix，Native run/ARM link分开
+FIG-11,软件与HIL证据关系,current,qualification-evidence.dot,qualification-evidence.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-53,实际scope evidence独立取得；HIL tooling不是物理测量
+FIG-12,文档SDK与证据发布恢复,reference,release-recovery.dot,release-recovery.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-54,交付流程参考；公开发布/下载需真实receipt，不从流程图推断发生
+FIG-13,Cortex-M能力分层,current,cortex-m-capabilities.dot,cortex-m-capabilities.svg,rendered,source_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-55,九核CPU软件层、Runtime、真实SoC与实板范围分开
+FIG-14,U575同步双域参考,reference,u575-security-domains.dot,u575-security-domains.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-56,独立TZEN1无OS同步GPIO；不改变TZEN0默认provider
+FIG-15,连续RX与可见丢块,reference,continuous-stream.dot,continuous-stream.svg,rendered,reference_reviewed,0111c8d3b9c7b37d258b9c401070305b13b6f3a1,DOC-57,F407 USART1连续RX；预置FIFO贷款、loss和停止责任

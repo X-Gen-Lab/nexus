@@ -1,0 +1,17 @@
+[0/1] Re-running CMake...
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-ci-security-iteration/threadx-tsan-build
+[1/12] Building C object CMakeFiles/contract_threadx_linux.dir/contract_threadx_linux-port/tx_initialize_low_level.c.o
+[2/12] Linking C static library libcontract_threadx_linux.a
+[3/12] Linking CXX executable nexus_threadx_bootstrap_test
+[4/12] Linking CXX executable nexus_threadx_m4_test
+[5/12] Linking CXX executable nexus_threadx_irq_test
+[6/12] Linking CXX executable nexus_threadx_m4_primask_test
+[7/12] Linking CXX executable nexus_threadx_irq_primask_test
+[8/12] Linking CXX executable nexus_threadx_m4_external_test
+[9/12] Linking CXX executable nexus_threadx_linux_port_test
+[10/12] Building CXX object CMakeFiles/nexus_threadx_kernel_test.dir/workspace/nexus/tests/google/threadx_kernel_test.cpp.o
+[11/12] Linking CXX executable nexus_threadx_kernel_test

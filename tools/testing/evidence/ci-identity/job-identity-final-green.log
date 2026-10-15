@@ -1,0 +1,23 @@
+test_actual_checkout_tree_tools_and_even_empty_logs_are_bound (tools.testing.test_job_identity.JobIdentityTests.test_actual_checkout_tree_tools_and_even_empty_logs_are_bound) ... ok
+test_artifact_mutation_during_version_execution_is_rejected (tools.testing.test_job_identity.JobIdentityTests.test_artifact_mutation_during_version_execution_is_rejected) ... ok
+test_artifacts_cannot_escape_checkout_or_follow_symlinks (tools.testing.test_job_identity.JobIdentityTests.test_artifacts_cannot_escape_checkout_or_follow_symlinks) ... ok
+test_claimed_event_sha_cannot_replace_actual_checkout (tools.testing.test_job_identity.JobIdentityTests.test_claimed_event_sha_cannot_replace_actual_checkout) ... ok
+test_configuration_identity_binds_actual_declared_input_bytes (tools.testing.test_job_identity.JobIdentityTests.test_configuration_identity_binds_actual_declared_input_bytes) ... ok
+test_cpu_runtime_inputs_use_their_actual_length_framed_identity (tools.testing.test_job_identity.JobIdentityTests.test_cpu_runtime_inputs_use_their_actual_length_framed_identity) ... ok
+test_failed_job_retains_invalid_configuration_bytes (tools.testing.test_job_identity.JobIdentityTests.test_failed_job_retains_invalid_configuration_bytes) ... ok
+test_failure_keeps_actual_dirty_source_and_missing_outputs (tools.testing.test_job_identity.JobIdentityTests.test_failure_keeps_actual_dirty_source_and_missing_outputs) ... ok
+test_missing_configuration_navigation_cannot_seal_success (tools.testing.test_job_identity.JobIdentityTests.test_missing_configuration_navigation_cannot_seal_success) ... ok
+test_missing_tool_cannot_seal_a_success (tools.testing.test_job_identity.JobIdentityTests.test_missing_tool_cannot_seal_a_success) ... ok
+test_mutation_during_actual_version_process_is_detected (tools.testing.test_job_identity.JobIdentityTests.test_mutation_during_actual_version_process_is_detected) ... ok
+test_parent_traversal_cannot_hash_a_file_outside_checkout (tools.testing.test_job_identity.JobIdentityTests.test_parent_traversal_cannot_hash_a_file_outside_checkout) ... ok
+test_partial_dependency_observation_cannot_claim_completion (tools.testing.test_job_identity.JobIdentityTests.test_partial_dependency_observation_cannot_claim_completion) ... ok
+test_real_failed_version_process_cannot_seal_success (tools.testing.test_job_identity.JobIdentityTests.test_real_failed_version_process_cannot_seal_success) ... ok
+test_success_rejects_dirty_source (tools.testing.test_job_identity.JobIdentityTests.test_success_rejects_dirty_source) ... ok
+test_success_requires_actual_nonempty_artifact_set (tools.testing.test_job_identity.JobIdentityTests.test_success_requires_actual_nonempty_artifact_set) ... ok
+test_tool_cannot_rewrite_its_own_observed_binary (tools.testing.test_job_identity.JobIdentityTests.test_tool_cannot_rewrite_its_own_observed_binary) ... ok
+test_unknown_result_and_duplicate_artifact_selection_are_rejected (tools.testing.test_job_identity.JobIdentityTests.test_unknown_result_and_duplicate_artifact_selection_are_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 1.461s
+
+OK

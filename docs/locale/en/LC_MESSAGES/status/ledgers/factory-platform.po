@@ -1,0 +1,601 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: cb818a62c68eca24b4a3c1f1c7505e2048658e573bad17d211562f118fa723bc\n"
+
+msgid "Factory 与 TDD 台账"
+msgstr "Factory and TDD ledger"
+
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/factory-platform-execution.csv>`。 源文件：`docs/design/factory-"
+"platform-"
+"execution.csv`；SHA-256：`49215c9d35115fd258b86d516869215950c78ee5579ca440d9427de731780836`。"
+msgstr ""
+"This page is derived from the original CSV; it is not a new status "
+"authority, execution record or software qualification. Original IDs, order "
+"and all fields come from the {download}`original ledger "
+"<../../design/factory-platform-execution.csv>`. Source: "
+"`docs/design/factory-platform-execution.csv`; SHA-256: "
+"`49215c9d35115fd258b86d516869215950c78ee5579ca440d9427de731780836`."
+
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"Different ledgers overlap in scope; do not add their counts or calculate a "
+"project-wide completion rate. Interpret implementation, software and "
+"physical status separately. `development_passed` does not mean execution at "
+"the current documentation HEAD. Consult the exact results index for the "
+"source and scope of `qualification_record_authority`. Absolute `/workspace` "
+"and `/dev/shm` locators retain their original bytes and only identify the "
+"original execution host. See the [software-evidence entry](../software-"
+"verification.md) for retrievable archives and member locations."
+
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr ""
+"**Original exit fields** are only fields actually present in the original "
+"CSV. Tasks, qualification prerequisites and contract links also retain their"
+" original wording; they cannot be used to invent an execution."
+
+msgid "本表包含 24 条原记录，仅表示来源行数。"
+msgstr ""
+"This table contains 24 original records; this is only the source row count."
+
+msgid "FP-001"
+msgstr "FP-001"
+
+msgid "原字段"
+msgstr "Original field"
+
+msgid "原值"
+msgstr "Original value"
+
+msgid "`task_id`"
+msgstr "`task_id`"
+
+msgid "`phase`"
+msgstr "`phase`"
+
+msgid "P0"
+msgstr "P0"
+
+msgid "`area`"
+msgstr "`area`"
+
+msgid "architecture"
+msgstr "architecture"
+
+msgid "`task`"
+msgstr "`task`"
+
+msgid "factory + shared polymorphic face contracts"
+msgstr "factory + shared polymorphic face contracts"
+
+msgid "`roles`"
+msgstr "`roles`"
+
+msgid "TL;Core"
+msgstr "TL;Core"
+
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+msgid "docs/design/next-generation-platform.md;io/include/nexus/io"
+msgstr "docs/design/next-generation-platform.md;io/include/nexus/io"
+
+msgid "`software_exit`"
+msgstr "`software_exit`"
+
+msgid ""
+"immutable faces; independent contexts; cold factory; explicit lifecycle"
+msgstr ""
+"immutable faces; independent contexts; cold factory; explicit lifecycle"
+
+msgid "`implementation_status`"
+msgstr "`implementation_status`"
+
+msgid "implemented"
+msgstr "implemented"
+
+msgid "`hardware_status`"
+msgstr "`hardware_status`"
+
+msgid "not_applicable"
+msgstr "not_applicable"
+
+msgid "`qualification_authority`"
+msgstr "`qualification_authority`"
+
+msgid "fresh external evidence for exact source HEAD"
+msgstr "fresh external evidence for exact source HEAD"
+
+msgid "FP-002"
+msgstr "FP-002"
+
+msgid "testing"
+msgstr "testing"
+
+msgid "GoogleTest and GoogleMock offline host framework"
+msgstr "GoogleTest and GoogleMock offline host framework"
+
+msgid "QA;Build"
+msgstr "QA;Build"
+
+msgid ""
+"tests/google/CMakeLists.txt;dependencies/googletest.lock.json;dependencies/source"
+msgstr ""
+"tests/google/CMakeLists.txt;dependencies/googletest.lock.json;dependencies/source"
+
+msgid "exact archive SHA; C++ host only; no firmware dependency"
+msgstr "exact archive SHA; C++ host only; no firmware dependency"
+
+msgid "FP-003"
+msgstr "FP-003"
+
+msgid "automation"
+msgstr "automation"
+
+msgid "TDD and commit checks"
+msgstr "TDD and commit checks"
+
+msgid "scripts/ci/tdd_gate.py;.pre-commit-config.yaml;AGENTS.md;tools/testing"
+msgstr ""
+"scripts/ci/tdd_gate.py;.pre-commit-config.yaml;AGENTS.md;tools/testing"
+
+msgid ""
+"actual complete fresh execution; no filters/skips; staged snapshot; recorded"
+" RED/GREEN"
+msgstr ""
+"actual complete fresh execution; no filters/skips; staged snapshot; recorded"
+" RED/GREEN"
+
+msgid "FP-004"
+msgstr "FP-004"
+
+msgid "P1"
+msgstr "P1"
+
+msgid "configuration"
+msgstr "configuration"
+
+msgid "TOML schema2 authoring and immutable typed IR"
+msgstr "TOML schema2 authoring and immutable typed IR"
+
+msgid "Build;BSP"
+msgstr "Build;BSP"
+
+msgid ""
+"tools/configure/authored.py;tools/configure/ir.py;tools/configure/configure.py"
+msgstr ""
+"tools/configure/authored.py;tools/configure/ir.py;tools/configure/configure.py"
+
+msgid ""
+"strict fields; exact resources; frozen nested values; common CLI frontend"
+msgstr ""
+"strict fields; exact resources; frozen nested values; common CLI frontend"
+
+msgid "FP-005"
+msgstr "FP-005"
+
+msgid "factory"
+msgstr "factory"
+
+msgid "generated static instances and typed IDs"
+msgstr "generated static instances and typed IDs"
+
+msgid "Core;Build"
+msgstr "Core;Build"
+
+msgid "tools/configure/factory.py;tools/configure/bindings.py"
+msgstr "tools/configure/factory.py;tools/configure/bindings.py"
+
+msgid ""
+"constant face; uint16 IDs; invalid returns NULL; controller and endpoint "
+"identities distinct"
+msgstr ""
+"constant face; uint16 IDs; invalid returns NULL; controller and endpoint "
+"identities distinct"
+
+msgid "FP-006"
+msgstr "FP-006"
+
+msgid "native"
+msgstr "native"
+
+msgid "multiple independent Native providers"
+msgstr "multiple independent Native providers"
+
+msgid "Core;QA"
+msgstr "Core;QA"
+
+msgid ""
+"io/native;tests/google/native_instances_test.cpp;tests/google/native_factory_test.cpp"
+msgstr ""
+"io/native;tests/google/native_instances_test.cpp;tests/google/native_factory_test.cpp"
+
+msgid ""
+"actual generated factory; independent resources; stopped admission; borrowed"
+" storage retained"
+msgstr ""
+"actual generated factory; independent resources; stopped admission; borrowed"
+" storage retained"
+
+msgid "FP-007"
+msgstr "FP-007"
+
+msgid "P2"
+msgstr "P2"
+
+msgid "platform"
+msgstr "platform"
+
+msgid "three boards and baremetal/FreeRTOS composition"
+msgstr "three boards and baremetal/FreeRTOS composition"
+
+msgid "BSP;Build"
+msgstr "BSP;Build"
+
+msgid "boards;soc;CMakePresets.json"
+msgstr "boards;soc;CMakePresets.json"
+
+msgid "six real ARM preset ELF/BIN/map and budget reports; explicit routes"
+msgstr "six real ARM preset ELF/BIN/map and budget reports; explicit routes"
+
+msgid "not_executed"
+msgstr "not_executed"
+
+msgid "FP-008"
+msgstr "FP-008"
+
+msgid "io"
+msgstr "io"
+
+msgid "all nine interface kinds share static ops"
+msgstr "all nine interface kinds share static ops"
+
+msgid "Core;BSP"
+msgstr "Core;BSP"
+
+msgid "io/include/nexus/io;io/src;soc/*/drivers;io/native"
+msgstr "io/include/nexus/io;io/src;soc/*/drivers;io/native"
+
+msgid ""
+"production SDK private; all calls use exact context; C/C++ ABI consumers"
+msgstr ""
+"production SDK private; all calls use exact context; C/C++ ABI consumers"
+
+msgid "FP-009"
+msgstr "FP-009"
+
+msgid "components"
+msgstr "components"
+
+msgid "common narrow ports and separate application examples"
+msgstr "common narrow ports and separate application examples"
+
+msgid "Components;Build"
+msgstr "Components;Build"
+
+msgid "components;X-Gen-Lab/nexus-examples"
+msgstr "components;X-Gen-Lab/nexus-examples"
+
+msgid ""
+"generic components and actual relocated consumers; external source pin "
+"matches core"
+msgstr ""
+"generic components and actual relocated consumers; external source pin "
+"matches core"
+
+msgid "FP-010"
+msgstr "FP-010"
+
+msgid "P3"
+msgstr "P3"
+
+msgid "wake"
+msgstr "wake"
+
+msgid "explicit bounded IRQ wake"
+msgstr "explicit bounded IRQ wake"
+
+msgid ""
+"io/include/nexus/io/wake.h;io/src/wake.c;tests/google/irq_wake_test.cpp"
+msgstr ""
+"io/include/nexus/io/wake.h;io/src/wake.c;tests/google/irq_wake_test.cpp"
+
+msgid ""
+"latched predicates; actual publisher priority ceiling; detach publishers "
+"before release"
+msgstr ""
+"latched predicates; actual publisher priority ceiling; detach publishers "
+"before release"
+
+msgid "FP-011"
+msgstr "FP-011"
+
+msgid "dma"
+msgstr "dma"
+
+msgid "STM32 USART1 finite TX DMA"
+msgstr "STM32 USART1 finite TX DMA"
+
+msgid "BSP;QA"
+msgstr "BSP;QA"
+
+msgid "soc/stm32f407/drivers/uart_dma.c;tests/google/stm32_uart_dma_test.cpp"
+msgstr "soc/stm32f407/drivers/uart_dma.c;tests/google/stm32_uart_dma_test.cpp"
+
+msgid ""
+"DMA2 stream7 channel4; memory-domain rejection; memory TC distinct from wire"
+" TC; quarantine"
+msgstr ""
+"DMA2 stream7 channel4; memory-domain rejection; memory TC distinct from wire"
+" TC; quarantine"
+
+msgid "FP-012"
+msgstr "FP-012"
+
+msgid "GD32 USART0 finite TX DMA"
+msgstr "GD32 USART0 finite TX DMA"
+
+msgid "soc/gd32f470/drivers/uart_dma.c;tests/google/gd32_uart_dma_test.cpp"
+msgstr "soc/gd32f470/drivers/uart_dma.c;tests/google/gd32_uart_dma_test.cpp"
+
+msgid ""
+"DMA1 channel7 selector4; independent wire and engine drain; late IRQ "
+"protection"
+msgstr ""
+"DMA1 channel7 selector4; independent wire and engine drain; late IRQ "
+"protection"
+
+msgid "FP-013"
+msgstr "FP-013"
+
+msgid "STM32 SPI1 full duplex finite DMA"
+msgstr "STM32 SPI1 full duplex finite DMA"
+
+msgid "soc/stm32f407/drivers/spi_dma.c;tests/google/stm32_spi_dma_test.cpp"
+msgstr "soc/stm32f407/drivers/spi_dma.c;tests/google/stm32_spi_dma_test.cpp"
+
+msgid ""
+"DMA2 RXstream0/TXstream3 channel3; nonoverlapping buffers; CS retained until"
+" idle"
+msgstr ""
+"DMA2 RXstream0/TXstream3 channel3; nonoverlapping buffers; CS retained until"
+" idle"
+
+msgid "FP-014"
+msgstr "FP-014"
+
+msgid "GD32 SPI4 full duplex finite DMA"
+msgstr "GD32 SPI4 full duplex finite DMA"
+
+msgid "soc/gd32f470/drivers/spi_dma.c;tests/google/gd32_spi_dma_test.cpp"
+msgstr "soc/gd32f470/drivers/spi_dma.c;tests/google/gd32_spi_dma_test.cpp"
+
+msgid ""
+"DMA1 RXchannel3/TXchannel4 selector2; no poll-as-async; exact CS interval"
+msgstr ""
+"DMA1 RXchannel3/TXchannel4 selector2; no poll-as-async; exact CS interval"
+
+msgid "FP-015"
+msgstr "FP-015"
+
+msgid "separate optional async SPI owner executor"
+msgstr "separate optional async SPI owner executor"
+
+msgid ""
+"components/bus_owner/src/spi_async_owner.c;tests/google/spi_async_owner_test.cpp"
+msgstr ""
+"components/bus_owner/src/spi_async_owner.c;tests/google/spi_async_owner_test.cpp"
+
+msgid ""
+"reject foreign bus before admission; preserve payload during quarantine; "
+"small polling executor"
+msgstr ""
+"reject foreign bus before admission; preserve payload during quarantine; "
+"small polling executor"
+
+msgid "FP-016"
+msgstr "FP-016"
+
+msgid "P4"
+msgstr "P4"
+
+msgid "stream"
+msgstr "stream"
+
+msgid "bounded fixed-block loans and Native producers"
+msgstr "bounded fixed-block loans and Native producers"
+
+msgid "io/src/stream.c;io/native/stream.c;tests/google/native_async_test.cpp"
+msgstr "io/src/stream.c;io/native/stream.c;tests/google/native_async_test.cpp"
+
+msgid ""
+"never overwrite loan; epoch identity; loss ordering; stop joins producers "
+"and consumers"
+msgstr ""
+"never overwrite loan; epoch identity; loss ordering; stop joins producers "
+"and consumers"
+
+msgid "FP-017"
+msgstr "FP-017"
+
+msgid "STM32 and GD32 UART RX IDLE/block providers"
+msgstr "STM32 and GD32 UART RX IDLE/block providers"
+
+msgid "soc/*/drivers/uart_stream.c;tests/google/*uart_stream_test.cpp"
+msgstr "soc/*/drivers/uart_stream.c;tests/google/*uart_stream_test.cpp"
+
+msgid ""
+"exact mode; whole/IDLE prefix publication; bounded loss; final block and "
+"held consumer survive stop"
+msgstr ""
+"exact mode; whole/IDLE prefix publication; bounded loss; final block and "
+"held consumer survive stop"
+
+msgid "FP-018"
+msgstr "FP-018"
+
+msgid "adc"
+msgstr "adc"
+
+msgid "STM32 and GD32 timer trigger DMA block providers"
+msgstr "STM32 and GD32 timer trigger DMA block providers"
+
+msgid "soc/*/drivers/adc_stream.c;tests/google/*adc_stream_test.cpp"
+msgstr "soc/*/drivers/adc_stream.c;tests/google/*adc_stream_test.cpp"
+
+msgid ""
+"timer and conversion limits; disabled normal DMA before publication; "
+"pause/rearm without overwrite"
+msgstr ""
+"timer and conversion limits; disabled normal DMA before publication; "
+"pause/rearm without overwrite"
+
+msgid "FP-019"
+msgstr "FP-019"
+
+msgid "controllers"
+msgstr "controllers"
+
+msgid "multiple GD32 controllers and reviewed resources"
+msgstr "multiple GD32 controllers and reviewed resources"
+
+msgid ""
+"soc/gd32f470/private/gd32f470_provider.h;tests/google/gd32_multi_test.cpp;tests/contracts/gd32_assembly/multi.toml"
+msgstr ""
+"soc/gd32f470/private/gd32f470_provider.h;tests/google/gd32_multi_test.cpp;tests/contracts/gd32_assembly/multi.toml"
+
+msgid ""
+"independent UART/SPI/I2C descriptors; exact controller clocks and generated "
+"IRQ state"
+msgstr ""
+"independent UART/SPI/I2C descriptors; exact controller clocks and generated "
+"IRQ state"
+
+msgid "FP-020"
+msgstr "FP-020"
+
+msgid "performance"
+msgstr "performance"
+
+msgid "actual ELF interface and resource cost audit"
+msgstr "actual ELF interface and resource cost audit"
+
+msgid ""
+"tools/measurement/interfaces.py;tools/measurement/compare.py;tests/contracts/test_interface_cost.py"
+msgstr ""
+"tools/measurement/interfaces.py;tools/measurement/compare.py;tests/contracts/test_interface_cost.py"
+
+msgid ""
+"readonly two-pointer face; no writable ops; actual retained symbols; "
+"O2/Os/O3 +/- LTO"
+msgstr ""
+"readonly two-pointer face; no writable ops; actual retained symbols; "
+"O2/Os/O3 +/- LTO"
+
+msgid "FP-021"
+msgstr "FP-021"
+
+msgid "P5"
+msgstr "P5"
+
+msgid "sdk"
+msgstr "sdk"
+
+msgid "clean source SDK and external pin"
+msgstr "clean source SDK and external pin"
+
+msgid "Build;Components"
+msgstr "Build;Components"
+
+msgid "cmake/package;X-Gen-Lab/nexus-examples"
+msgstr "cmake/package;X-Gen-Lab/nexus-examples"
+
+msgid ""
+"clean current HEAD; relocated C/C++ Native and ARM consumers; no host "
+"framework in firmware SDK"
+msgstr ""
+"clean current HEAD; relocated C/C++ Native and ARM consumers; no host "
+"framework in firmware SDK"
+
+msgid "FP-022"
+msgstr "FP-022"
+
+msgid "evidence"
+msgstr "evidence"
+
+msgid "offline reproduction and software candidate"
+msgstr "offline reproduction and software candidate"
+
+msgid "Build;QA"
+msgstr "Build;QA"
+
+msgid "tools/evidence;docs/delivery/qualification.md"
+msgstr "tools/evidence;docs/delivery/qualification.md"
+
+msgid ""
+"same clean source/config/dependency/tool/ELF; fresh nonempty tests; two "
+"network-none builds"
+msgstr ""
+"same clean source/config/dependency/tool/ELF; fresh nonempty tests; two "
+"network-none builds"
+
+msgid "FP-023"
+msgstr "FP-023"
+
+msgid "hil"
+msgstr "hil"
+
+msgid "three-board HIL tooling and unbound plans"
+msgstr "three-board HIL tooling and unbound plans"
+
+msgid "QA;BSP"
+msgstr "QA;BSP"
+
+msgid "tools/hil/prepare.py;tools/hil/admit.py;tools/hil/fixtures"
+msgstr "tools/hil/prepare.py;tools/hil/admit.py;tools/hil/fixtures"
+
+msgid ""
+"explicit station/PCB/probe/serial; missing identity and budget rejected; no "
+"invented physical pass"
+msgstr ""
+"explicit station/PCB/probe/serial; missing identity and budget rejected; no "
+"invented physical pass"
+
+msgid "FP-024"
+msgstr "FP-024"
+
+msgid "delivery"
+msgstr "delivery"
+
+msgid "scope freeze and conditional physical acceptance"
+msgstr "scope freeze and conditional physical acceptance"
+
+msgid "TL;QA;Build"
+msgstr "TL;QA;Build"
+
+msgid ""
+"docs/delivery/support.md;docs/delivery/verification.md;docs/delivery/qualification.md"
+msgstr ""
+"docs/delivery/support.md;docs/delivery/verification.md;docs/delivery/qualification.md"
+
+msgid ""
+"software and physical status separate; physical execution only when "
+"connected; exact tested tuples"
+msgstr ""
+"software and physical status separate; physical execution only when "
+"connected; exact tested tuples"

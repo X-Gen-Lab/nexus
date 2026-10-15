@@ -1,0 +1,138 @@
+Starting program: /workspace/nexus-ci-security-iteration/threadx-tsan-build/nexus_threadx_kernel_test > /workspace/nexus-ci-security-iteration/threadx-context-followup/tsan-after-scheduler-inferior.output 2>&1
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Thread 1 "nexus_threadx_k" received signal SIGINT, Interrupt.
+0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+  Id   Target Id                                             Frame 
+* 1    Thread 0x7f077d5c73c0 (LWP 3542786) "nexus_threadx_k" 0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+  2    Thread 0x7f077a5ff6c0 (LWP 3542787) "nexus_threadx_k" 0x00007f077dc04c1f in __sanitizer::internal_usleep (useconds=useconds@entry=100000) at ../../../../src/libsanitizer/sanitizer_common/sanitizer_linux.cpp:519
+  3    Thread 0x7f0779dfe6c0 (LWP 3542788) "nexus_threadx_k" 0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+  6    Thread 0x7f07795fd6c0 (LWP 3542791) "nexus_threadx_k" 0x00007f077d657c50 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+  13   Thread 0x7f0778dfc6c0 (LWP 3542798) "nexus_threadx_k" 0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+  14   Thread 0x7f07785fb6c0 (LWP 3542799) "nexus_threadx_k" 0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+  15   Thread 0x7f0777dfa6c0 (LWP 3542800) "nexus_threadx_k" 0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 15 (Thread 0x7f0777dfa6c0 (LWP 3542800) "nexus_threadx_k"):
+#0  0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f077d657668 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007f077d657c8c in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#3  0x00007f077d662920 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#4  0x00007f077dbb2afd in ___interceptor_sem_wait (s=0x727c00000418) at ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:6527
+#5  0x00005636ef15a65a in _tx_linux_thread_entry (ptr=0x727c000003d0) at /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_stack_build.c:149
+#6  0x00007f077db8cf4a in __tsan_thread_start_func (arg=0x7f07795fbe50) at ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1012
+#7  0x00007f077d65ab7b in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#8  0x00007f077d6d87f8 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 14 (Thread 0x7f07785fb6c0 (LWP 3542799) "nexus_threadx_k"):
+#0  0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f077d657668 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007f077d657c8c in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#3  0x00007f077d662920 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#4  0x00007f077dbb2afd in ___interceptor_sem_wait (s=0x727c00000250) at ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:6527
+#5  0x00005636ef1585b4 in _tx_thread_system_return () at /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_system_return.c:160
+#6  0x00005636ef1571d2 in _tx_thread_system_suspend (thread_ptr=thread_ptr@entry=0x727c00000208) at /workspace/nexus/ext/threadx/common/src/tx_thread_system_suspend.c:372
+#7  0x00005636ef1594b1 in _tx_semaphore_get (semaphore_ptr=semaphore_ptr@entry=0x727c000000e8, wait_option=wait_option@entry=4294967295) at /workspace/nexus/ext/threadx/common/src/tx_semaphore_get.c:206
+#8  0x00005636ef157ca2 in _txe_semaphore_get (semaphore_ptr=semaphore_ptr@entry=0x727c000000e8, wait_option=wait_option@entry=4294967295) at /workspace/nexus/ext/threadx/common/src/txe_semaphore_get.c:136
+#9  0x00005636ef154c74 in notify_wait (context=0x727c000000e8, sequence=0, deadline=18446744073709551615) at /workspace/nexus/os/threadx/threadx.c:309
+#10 notify_wait (context=0x727c000000e8, sequence=0, deadline=18446744073709551615) at /workspace/nexus/os/threadx/threadx.c:288
+#11 0x00005636ef1553fe in closable_call (queue=queue@entry=0x727c00000010, item=item@entry=0x727c00000da8, deadline=deadline@entry=18446744073709551615, waiter=waiter@entry=0x727c000000e8, send=send@entry=true) at /workspace/nexus/os/threadx/threadx.c:810
+#12 0x00005636ef15633f in nx_threadx_closable_queue_send_until (queue=0x727c00000010, item=0x727c00000da8, deadline=18446744073709551615, waiter=0x727c000000e8) at /workspace/nexus/os/threadx/threadx.c:831
+#13 0x00005636ef1482d1 in (anonymous namespace)::worker_entry (context=0x727c00000d98) at /workspace/nexus/tests/google/threadx_close_test.cpp:23
+#14 0x00005636ef155067 in task_entry (input=<optimized out>) at /workspace/nexus/os/threadx/threadx.c:516
+#15 0x00005636ef15a0a5 in _tx_thread_shell_entry () at /workspace/nexus/ext/threadx/common/src/tx_thread_shell_entry.c:108
+#16 0x00005636ef15a66b in _tx_linux_thread_entry (ptr=0x727c00000208) at /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_stack_build.c:153
+#17 0x00007f077db8cf4a in __tsan_thread_start_func (arg=0x7f07795fbe50) at ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1012
+#18 0x00007f077d65ab7b in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#19 0x00007f077d6d87f8 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 13 (Thread 0x7f0778dfc6c0 (LWP 3542798) "nexus_threadx_k"):
+#0  0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f077d657668 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007f077d657c8c in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#3  0x00007f077d662920 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#4  0x00007f077dbb2afd in ___interceptor_sem_wait (s=0x5636ef2087c8 <(anonymous namespace)::permanent+72>) at ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:6527
+#5  0x00005636ef1585b4 in _tx_thread_system_return () at /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_system_return.c:160
+#6  0x00005636ef1571d2 in _tx_thread_system_suspend (thread_ptr=thread_ptr@entry=0x5636ef208780 <(anonymous namespace)::permanent>) at /workspace/nexus/ext/threadx/common/src/tx_thread_system_suspend.c:372
+#7  0x00005636ef1594b1 in _tx_semaphore_get (semaphore_ptr=semaphore_ptr@entry=0x5636ef208900 <(anonymous namespace)::permanent_gate>, wait_option=wait_option@entry=4294967295) at /workspace/nexus/ext/threadx/common/src/tx_semaphore_get.c:206
+#8  0x00005636ef157ca2 in _txe_semaphore_get (semaphore_ptr=0x5636ef208900 <(anonymous namespace)::permanent_gate>, wait_option=4294967295) at /workspace/nexus/ext/threadx/common/src/txe_semaphore_get.c:136
+#9  0x00005636ef14c555 in (anonymous namespace)::permanent_worker () at /workspace/nexus/tests/google/threadx_wait_test.cpp:167
+#10 0x00005636ef1550f7 in permanent_entry (input=<optimized out>) at /workspace/nexus/os/threadx/threadx.c:653
+#11 0x00005636ef15a0a5 in _tx_thread_shell_entry () at /workspace/nexus/ext/threadx/common/src/tx_thread_shell_entry.c:108
+#12 0x00005636ef15a66b in _tx_linux_thread_entry (ptr=0x5636ef208780 <(anonymous namespace)::permanent>) at /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_stack_build.c:153
+#13 0x00007f077db8cf4a in __tsan_thread_start_func (arg=0x7f07795fbed0) at ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1012
+#14 0x00007f077d65ab7b in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#15 0x00007f077d6d87f8 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 6 (Thread 0x7f07795fd6c0 (LWP 3542791) "nexus_threadx_k"):
+#0  0x00007f077d657c50 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f077d65eb65 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007f077db93d01 in ___interceptor_pthread_mutex_timedlock (m=0x5636ef208da0 <_tx_linux_mutex>, abstime=0x7f07795fbeb0) at ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1366
+#3  0x00005636ef158bb2 in _tx_linux_mutex_lock_retry (mutex=mutex@entry=0x5636ef208da0 <_tx_linux_mutex>) at /workspace/nexus-ci-security-iteration/threadx-tsan-build/contract_threadx_linux-port/tx_thread_schedule.c:237
+#4  0x00005636ef158270 in _tx_thread_interrupt_control (new_posture=new_posture@entry=1) at /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_interrupt_control.c:97
+#5  0x00005636ef1583e0 in _tx_thread_interrupt_disable () at /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_interrupt_control.c:39
+#6  0x00005636ef159844 in _tx_thread_create (thread_ptr=thread_ptr@entry=0x727c000003d0, name_ptr=name_ptr@entry=0x5636ef1c1c33 "queue", entry_function=entry_function@entry=0x5636ef154ff9 <task_entry>, entry_input=entry_input@entry=0, stack_start=stack_start@entry=0x727c00000998, stack_size=stack_size@entry=1024, priority=8, preempt_threshold=8, time_slice=0, auto_start=0) at /workspace/nexus/ext/threadx/common/src/tx_thread_create.c:234
+#7  0x00005636ef157f36 in _txe_thread_create (thread_ptr=thread_ptr@entry=0x727c000003d0, name_ptr=name_ptr@entry=0x5636ef1c1c33 "queue", entry_function=entry_function@entry=0x5636ef154ff9 <task_entry>, entry_input=entry_input@entry=0, stack_start=<optimized out>, stack_start@entry=0x727c00000998, stack_size=stack_size@entry=1024, priority=8, preempt_threshold=8, time_slice=0, auto_start=0, thread_control_block_size=360) at /workspace/nexus/ext/threadx/common/src/txe_thread_create.c:299
+#8  0x00005636ef155c6b in nx_threadx_task_start (task=0x727c000003d0, name=0x5636ef1c1c33 "queue", stack=0x727c00000998, stack_bytes=1024, priority=8, entry=<optimized out>, context=0x727c00000db8) at /workspace/nexus/os/threadx/threadx.c:564
+#9  0x00005636ef148cff in (anonymous namespace)::ThreadXClose::start (this=this@entry=0x727c00000000, index=index@entry=1, send=send@entry=true, item=item@entry=13) at /workspace/nexus/tests/google/threadx_close_test.cpp:73
+#10 0x00005636ef149ac3 in (anonymous namespace)::ThreadXClose_CloseBroadcastsEveryBlockedSenderAndDrainsOriginal_Test::TestBody (this=0x727c00000000) at /workspace/nexus/tests/google/threadx_close_test.cpp:91
+#11 0x00005636ef1ab5b0 in testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void> (object=0x727c00000000, method=&virtual testing::Test::TestBody(), location=0x5636ef1c8bbb "the test body") at /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest.cc:2653
+#12 0x00005636ef1a3e6b in testing::internal::HandleExceptionsInMethodIfSupported<testing::Test, void> (object=0x727c00000000, method=&virtual testing::Test::TestBody(), location=0x5636ef1c8bbb "the test body") at /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest.cc:2689
+#13 0x00005636ef17fd7f in testing::Test::Run (this=0x727c00000000) at /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest.cc:2728
+#14 0x00005636ef180782 in testing::TestInfo::Run (this=0x724400001180) at /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest.cc:2874
+#15 0x00005636ef181061 in testing::TestSuite::Run (this=0x7244000012c0) at /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest.cc:3052
+#16 0x00005636ef191165 in testing::internal::UnitTestImpl::RunAllTests (this=0x725800000000) at /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest.cc:6004
+#17 0x00005636ef1ac666 in testing::internal::HandleSehExceptionsInMethodIfSupported<testing::internal::UnitTestImpl, bool> (object=0x725800000000, method=(bool (testing::internal::UnitTestImpl::*)(testing::internal::UnitTestImpl * const)) 0x5636ef190d9e <testing::internal::UnitTestImpl::RunAllTests()>, location=0x5636ef1c9660 "auxiliary test code (environments or event listeners)") at /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest.cc:2653
+#18 0x00005636ef1a5053 in testing::internal::HandleExceptionsInMethodIfSupported<testing::internal::UnitTestImpl, bool> (object=0x725800000000, method=(bool (testing::internal::UnitTestImpl::*)(testing::internal::UnitTestImpl * const)) 0x5636ef190d9e <testing::internal::UnitTestImpl::RunAllTests()>, location=0x5636ef1c9660 "auxiliary test code (environments or event listeners)") at /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest.cc:2689
+#19 0x00005636ef18f924 in testing::UnitTest::Run (this=0x5636ef2091a0 <testing::UnitTest::GetInstance()::instance>) at /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest.cc:5583
+#20 0x00005636ef142d45 in RUN_ALL_TESTS () at /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:2334
+#21 (anonymous namespace)::execute () at /workspace/nexus/tests/google/threadx_kernel_test.cpp:21
+#22 0x00005636ef15a0a5 in _tx_thread_shell_entry () at /workspace/nexus/ext/threadx/common/src/tx_thread_shell_entry.c:108
+#23 0x00005636ef15a66b in _tx_linux_thread_entry (ptr=0x5636ef208200 <(anonymous namespace)::runner>) at /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_stack_build.c:153
+#24 0x00007f077db8cf4a in __tsan_thread_start_func (arg=0x7ffcfd788640) at ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1012
+#25 0x00007f077d65ab7b in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#26 0x00007f077d6d87f8 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 3 (Thread 0x7f0779dfe6c0 (LWP 3542788) "nexus_threadx_k"):
+#0  0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f077d657668 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007f077d657c8c in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#3  0x00007f077d662920 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#4  0x00007f077dbb2afd in ___interceptor_sem_wait (s=0x5636ef208c80 <_tx_linux_thread_other_wait>) at ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:6527
+#5  0x00005636ef1588df in _tx_linux_thread_suspend (thread_id=139670077822656) at /workspace/nexus-ci-security-iteration/threadx-tsan-build/contract_threadx_linux-port/tx_initialize_low_level.c:421
+#6  0x00005636ef15a5c1 in _tx_thread_context_save () at /workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_context_save.c:89
+#7  0x00005636ef158755 in _tx_linux_timer_interrupt (p=<optimized out>) at /workspace/nexus-ci-security-iteration/threadx-tsan-build/contract_threadx_linux-port/tx_initialize_low_level.c:353
+#8  0x00007f077db8cf4a in __tsan_thread_start_func (arg=0x7ffcfd788830) at ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:1012
+#9  0x00007f077d65ab7b in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#10 0x00007f077d6d87f8 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 2 (Thread 0x7f077a5ff6c0 (LWP 3542787) "nexus_threadx_k"):
+#0  0x00007f077dc04c1f in __sanitizer::internal_usleep (useconds=useconds@entry=100000) at ../../../../src/libsanitizer/sanitizer_common/sanitizer_linux.cpp:519
+#1  0x00007f077dbfcfd2 in __sanitizer::SleepForMillis (millis=millis@entry=100) at ../../../../src/libsanitizer/sanitizer_common/sanitizer_common.cpp:379
+#2  0x00007f077dbe4dd8 in __tsan::BackgroundThread (arg=<optimized out>) at ../../../../src/libsanitizer/tsan/tsan_rtl.cpp:473
+#3  0x00007f077d65ab7b in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#4  0x00007f077d6d87f8 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+
+Thread 1 (Thread 0x7f077d5c73c0 (LWP 3542786) "nexus_threadx_k"):
+#0  0x00007f077d6629ee in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f077d657668 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#2  0x00007f077d657c8c in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#3  0x00007f077d662920 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#4  0x00007f077dbb2afd in ___interceptor_sem_wait (s=0x5636ef208d80 <_tx_linux_semaphore>) at ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:6527
+#5  0x00005636ef158d5d in _tx_thread_schedule () at /workspace/nexus-ci-security-iteration/threadx-tsan-build/contract_threadx_linux-port/tx_thread_schedule.c:200
+#6  0x00005636ef15666d in _tx_initialize_kernel_enter () at /workspace/nexus/ext/threadx/common/src/tx_initialize_kernel_enter.c:148
+#7  0x00005636ef155555 in nx_threadx_kernel_enter (startup=0x5636ef143cb9 <startup(void*)>, context=0x0) at /workspace/nexus/os/threadx/threadx.c:204
+#8  0x00005636ef140fdb in main (argc=<optimized out>, argv=0x7ffcfd788b58) at /workspace/nexus/tests/google/threadx_kernel_test.cpp:214
+$8 = {__lock = 2, __count = 1, __owner = 3542788, __nusers = 1, __kind = 1, __spins = 0, __elision = 0, __list = {__prev = 0x0, __next = 0x0}}
+$9 = 139670086215360
+$10 = (TX_THREAD *) 0x5636ef208200 <(anonymous namespace)::runner>
+$11 = (TX_THREAD *) 0x5636ef208200 <(anonymous namespace)::runner>
+$12 = 0
+$13 = 0
+[Switching to thread 6 (Thread 0x7f07795fd6c0 (LWP 3542791))]
+#0  0x00007f077d657c50 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#3  0x00005636ef158bb2 in _tx_linux_mutex_lock_retry (mutex=mutex@entry=0x5636ef208da0 <_tx_linux_mutex>) at /workspace/nexus-ci-security-iteration/threadx-tsan-build/contract_threadx_linux-port/tx_thread_schedule.c:237
+237	        linux_status =  pthread_mutex_timedlock(mutex, &ts);
+$14 = {tv_sec = 1791753795, tv_nsec = 977622740}
+$15 = <optimized out>
+[Inferior 1 (process 3542786) killed]

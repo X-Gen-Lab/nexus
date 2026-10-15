@@ -1,0 +1,9 @@
+{
+  "command": [
+    "/workspace/nexus-industrial-design/can-tests/build/can_contract",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/drain-red.xml"
+  ],
+  "exit_code": 1,
+  "stage": "RED",
+  "expected_failure": "IRQ enable ignored yet start success; stop neither drains FIFO nor retains failed release"
+}

@@ -1,0 +1,21 @@
+Running main() from /workspace/nexus/build/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/src/gtest_main.cc
+[==========] Running 6 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 6 tests from NativeAsync
+[ RUN      ] NativeAsync.SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects
+[       OK ] NativeAsync.SPIBorrowWaitsForWireCompletionAndOtherEndpointRejects (0 ms)
+[ RUN      ] NativeAsync.SPIQuarantineRetainsBorrowAndStopUntilDrain
+[       OK ] NativeAsync.SPIQuarantineRetainsBorrowAndStopUntilDrain (0 ms)
+[ RUN      ] NativeAsync.UARTIDLEBlocksStayImmutableAndLossPrecedesLaterData
+[       OK ] NativeAsync.UARTIDLEBlocksStayImmutableAndLossPrecedesLaterData (0 ms)
+[ RUN      ] NativeAsync.UARTStopPublishesFinalPrefixAndKeepsConsumerStorage
+[       OK ] NativeAsync.UARTStopPublishesFinalPrefixAndKeepsConsumerStorage (0 ms)
+[ RUN      ] NativeAsync.ADCTriggersPublishWholeScansAndNeverOverwriteLoans
+[       OK ] NativeAsync.ADCTriggersPublishWholeScansAndNeverOverwriteLoans (0 ms)
+[ RUN      ] NativeAsync.ADCFailedScanIsNotPublishedAndNextScanReportsLoss
+[       OK ] NativeAsync.ADCFailedScanIsNotPublishedAndNextScanReportsLoss (0 ms)
+[----------] 6 tests from NativeAsync (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 6 tests.

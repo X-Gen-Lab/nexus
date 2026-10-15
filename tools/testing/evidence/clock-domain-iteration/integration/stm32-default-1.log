@@ -1,0 +1,54 @@
+[  2%] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/time.c.obj
+[  4%] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cortex_m.c.obj
+[  6%] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.obj
+[  8%] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request.c.obj
+[ 11%] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.obj
+[ 13%] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request_observer.c.obj
+[ 15%] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.obj
+[ 17%] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/stack_observation.c.obj
+[ 20%] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.obj
+[ 22%] Linking C static library ../lib/libnexus_core.a
+[ 22%] Built target nexus_core
+[ 24%] Linking C static library ../lib/libnexus_arch.a
+[ 26%] Building C object nexus-sdk/os/CMakeFiles/nexus_os_wait.dir/wait.c.obj
+[ 26%] Built target nexus_arch
+[ 28%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/gpio.c.obj
+[ 31%] Linking C static library ../lib/libnexus_os_wait.a
+[ 33%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart.c.obj
+[ 33%] Built target nexus_os_wait
+[ 35%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/spi.c.obj
+[ 37%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c.c.obj
+[ 40%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash.c.obj
+[ 42%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/watchdog.c.obj
+[ 44%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/exti.c.obj
+[ 46%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer.c.obj
+[ 48%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc.c.obj
+[ 51%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash_region.c.obj
+[ 53%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/dma.c.obj
+[ 55%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream.c.obj
+[ 57%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/wake.c.obj
+[ 60%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.obj
+[ 62%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc_observer.c.obj
+[ 64%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.obj
+[ 66%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream_budget.c.obj
+[ 68%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/can.c.obj
+[ 71%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/ethernet.c.obj
+[ 73%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/mdio.c.obj
+[ 75%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/usb_device.c.obj
+[ 77%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer_capture.c.obj
+[ 80%] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.obj
+[ 82%] Building C object nexus-sdk/os/CMakeFiles/nexus_os_baremetal.dir/baremetal/notify.c.obj
+[ 84%] Linking C static library ../lib/libnexus_io.a
+[ 86%] Linking C static library ../lib/libnexus_os_baremetal.a
+[ 86%] Built target nexus_io
+[ 86%] Built target nexus_os_baremetal
+[ 88%] Building ASM object CMakeFiles/sleep_consumer_nexus_startup.dir/workspace/nexus/vendors/st/cmsis_device_f4/Source/Templates/gcc/startup_stm32f407xx.s.obj
+[ 91%] Building C object nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj
+[ 93%] Building C object CMakeFiles/sleep_consumer_nexus_startup.dir/workspace/nexus/soc/stm32f407/system.c.obj
+[ 95%] Linking C static library lib/libnexus_platform.a
+[ 95%] Built target sleep_consumer_nexus_startup
+[ 95%] Built target nexus_platform
+[ 97%] Building C object CMakeFiles/sleep_consumer.dir/main.c.obj
+[100%] Linking C executable bin/sleep_consumer.elf
+ELF budget: passed
+[100%] Built target sleep_consumer

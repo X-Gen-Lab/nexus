@@ -1,0 +1,286 @@
+test_actual_project_semantic_version_must_match (tools.testing.test_compatibility.CompatibilityTests.test_actual_project_semantic_version_must_match) ... FAIL
+test_boolean_epoch_or_schema_are_not_integer_versions (tools.testing.test_compatibility.CompatibilityTests.test_boolean_epoch_or_schema_are_not_integer_versions) ... ok
+test_current_policy_matches_actual_authorities (tools.testing.test_compatibility.CompatibilityTests.test_current_policy_matches_actual_authorities) ... ERROR
+test_duplicate_json_policy_keys_are_rejected (tools.testing.test_compatibility.CompatibilityTests.test_duplicate_json_policy_keys_are_rejected) ... FAIL
+test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) ... 
+  test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='assembly_authoring') ... FAIL
+  test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='assembly_projection') ... FAIL
+  test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='typed_ir') ... FAIL
+  test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='board') ... FAIL
+  test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='soc') ... FAIL
+  test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='routes') ... FAIL
+  test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='runtime_assembly') ... FAIL
+  test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='cpu_facts') ... FAIL
+  test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='runtime_resolved') ... FAIL
+  test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='source_sdk_manifest') ... FAIL
+test_exact_source_generation_is_accepted (tools.testing.test_compatibility.CompatibilityTests.test_exact_source_generation_is_accepted) ... ERROR
+test_generated_factory_macro_mismatch_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_generated_factory_macro_mismatch_is_rejected) ... FAIL
+test_generated_factory_matching_macros_are_accepted (tools.testing.test_compatibility.CompatibilityTests.test_generated_factory_matching_macros_are_accepted) ... ERROR
+test_generated_factory_version_mismatch_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_generated_factory_version_mismatch_is_rejected) ... FAIL
+test_missing_policy_is_fail_closed (tools.testing.test_compatibility.CompatibilityTests.test_missing_policy_is_fail_closed) ... ok
+test_new_schema_requires_explicit_policy_review (tools.testing.test_compatibility.CompatibilityTests.test_new_schema_requires_explicit_policy_review) ... FAIL
+test_package_inspection_verifies_real_manifest_not_marker (tools.testing.test_compatibility.CompatibilityTests.test_package_inspection_verifies_real_manifest_not_marker) ... ok
+test_policy_symlink_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_policy_symlink_is_rejected) ... FAIL
+test_real_package_cannot_accept_version_ranges (tools.testing.test_compatibility.CompatibilityTests.test_real_package_cannot_accept_version_ranges) ... FAIL
+test_source_only_exact_policy_cannot_claim_binary_compatibility (tools.testing.test_compatibility.CompatibilityTests.test_source_only_exact_policy_cannot_claim_binary_compatibility) ... ok
+test_unknown_or_missing_policy_fields_are_rejected (tools.testing.test_compatibility.CompatibilityTests.test_unknown_or_missing_policy_fields_are_rejected) ... ok
+test_unknown_requested_epoch_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_unknown_requested_epoch_is_rejected) ... ok
+
+======================================================================
+ERROR: test_current_policy_matches_actual_authorities (tools.testing.test_compatibility.CompatibilityTests.test_current_policy_matches_actual_authorities)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 18, in test_current_policy_matches_actual_authorities
+    report = compatibility.check(ROOT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/maintenance/compatibility.py", line 17, in check
+    raise ValueError("compatibility inspection not implemented")
+ValueError: compatibility inspection not implemented
+
+======================================================================
+ERROR: test_exact_source_generation_is_accepted (tools.testing.test_compatibility.CompatibilityTests.test_exact_source_generation_is_accepted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 26, in test_exact_source_generation_is_accepted
+    report = compatibility.validate(self.policy, self.observed, 1)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/maintenance/compatibility.py", line 11, in validate
+    raise ValueError("compatibility inspection not implemented")
+ValueError: compatibility inspection not implemented
+
+======================================================================
+ERROR: test_generated_factory_matching_macros_are_accepted (tools.testing.test_compatibility.CompatibilityTests.test_generated_factory_matching_macros_are_accepted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 115, in test_generated_factory_matching_macros_are_accepted
+    self.assertEqual(compatibility.check(ROOT, generated=header)["status"], "consistent")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/maintenance/compatibility.py", line 17, in check
+    raise ValueError("compatibility inspection not implemented")
+ValueError: compatibility inspection not implemented
+
+======================================================================
+FAIL: test_actual_project_semantic_version_must_match (tools.testing.test_compatibility.CompatibilityTests.test_actual_project_semantic_version_must_match)
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 78, in test_actual_project_semantic_version_must_match
+    with self.assertRaisesRegex(ValueError, "version"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "version" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_duplicate_json_policy_keys_are_rejected (tools.testing.test_compatibility.CompatibilityTests.test_duplicate_json_policy_keys_are_rejected)
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 42, in test_duplicate_json_policy_keys_are_rejected
+    with self.assertRaisesRegex(ValueError, "Duplicate"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "Duplicate" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='assembly_authoring')
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 84, in test_each_real_schema_epoch_must_match
+    with self.subTest(key=key), self.assertRaisesRegex(ValueError, "schema"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='assembly_projection')
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 84, in test_each_real_schema_epoch_must_match
+    with self.subTest(key=key), self.assertRaisesRegex(ValueError, "schema"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='typed_ir')
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 84, in test_each_real_schema_epoch_must_match
+    with self.subTest(key=key), self.assertRaisesRegex(ValueError, "schema"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='board')
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 84, in test_each_real_schema_epoch_must_match
+    with self.subTest(key=key), self.assertRaisesRegex(ValueError, "schema"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='soc')
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 84, in test_each_real_schema_epoch_must_match
+    with self.subTest(key=key), self.assertRaisesRegex(ValueError, "schema"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='routes')
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 84, in test_each_real_schema_epoch_must_match
+    with self.subTest(key=key), self.assertRaisesRegex(ValueError, "schema"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='runtime_assembly')
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 84, in test_each_real_schema_epoch_must_match
+    with self.subTest(key=key), self.assertRaisesRegex(ValueError, "schema"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='cpu_facts')
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 84, in test_each_real_schema_epoch_must_match
+    with self.subTest(key=key), self.assertRaisesRegex(ValueError, "schema"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='runtime_resolved')
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 84, in test_each_real_schema_epoch_must_match
+    with self.subTest(key=key), self.assertRaisesRegex(ValueError, "schema"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_each_real_schema_epoch_must_match (tools.testing.test_compatibility.CompatibilityTests.test_each_real_schema_epoch_must_match) (key='source_sdk_manifest')
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 84, in test_each_real_schema_epoch_must_match
+    with self.subTest(key=key), self.assertRaisesRegex(ValueError, "schema"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_generated_factory_macro_mismatch_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_generated_factory_macro_mismatch_is_rejected)
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 101, in test_generated_factory_macro_mismatch_is_rejected
+    with self.assertRaisesRegex(ValueError, "epoch"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "epoch" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_generated_factory_version_mismatch_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_generated_factory_version_mismatch_is_rejected)
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 108, in test_generated_factory_version_mismatch_is_rejected
+    with self.assertRaisesRegex(ValueError, "version"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "version" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_new_schema_requires_explicit_policy_review (tools.testing.test_compatibility.CompatibilityTests.test_new_schema_requires_explicit_policy_review)
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 89, in test_new_schema_requires_explicit_policy_review
+    with self.assertRaisesRegex(ValueError, "schema"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "schema" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_policy_symlink_is_rejected (tools.testing.test_compatibility.CompatibilityTests.test_policy_symlink_is_rejected)
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 49, in test_policy_symlink_is_rejected
+    with self.assertRaisesRegex(ValueError, "symlink|regular"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "symlink|regular" does not match "compatibility inspection not implemented"
+
+======================================================================
+FAIL: test_real_package_cannot_accept_version_ranges (tools.testing.test_compatibility.CompatibilityTests.test_real_package_cannot_accept_version_ranges)
+----------------------------------------------------------------------
+ValueError: compatibility inspection not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_compatibility.py", line 94, in test_real_package_cannot_accept_version_ranges
+    with self.assertRaisesRegex(ValueError, "exact"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "exact" does not match "compatibility inspection not implemented"
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.005s
+
+FAILED (failures=17, errors=3)

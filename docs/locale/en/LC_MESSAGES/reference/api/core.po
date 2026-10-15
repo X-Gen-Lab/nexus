@@ -1,0 +1,173 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 6192e0020a97003295af1a766d8e1d65e290729acdcd2cebe0d8c32b0f8fc60d\nX-Nexus-Reviewed: true\n"
+
+msgid "Core: requests, status and time"
+msgstr "Core: requests, status and time"
+
+msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgstr "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+
+msgid "fault.h"
+msgstr "fault.h"
+
+msgid "Bounded observation before retaining platform fail-stop."
+msgstr "Bounded observation before retaining platform fail-stop."
+
+msgid "Author  Nexus Team"
+msgstr "Author  Nexus Team"
+
+msgid "Enums"
+msgstr "Enums"
+
+msgid "Fault origin, without any product safety or recovery decision."
+msgstr "Fault origin, without any product safety or recovery decision."
+
+msgid "Values:"
+msgstr "Values:"
+
+msgid "Functions"
+msgstr "Functions"
+
+msgid "Observe a terminal fault before the caller retains effects."
+msgstr "Observe a terminal fault before the caller retains effects."
+
+msgid "Parameters"
+msgstr "Parameters"
+
+msgid "memory.h"
+msgstr "memory.h"
+
+msgid "Variable-only placement in explicitly selected data regions."
+msgstr "Variable-only placement in explicitly selected data regions."
+
+msgid "Defines"
+msgstr "Defines"
+
+msgid "Place static storage in an authored optional memory region."
+msgstr "Place static storage in an authored optional memory region."
+
+msgid "request.h"
+msgstr "request.h"
+
+msgid "Caller-owned admission, borrow, settlement and stable cancellation."
+msgstr "Caller-owned admission, borrow, settlement and stable cancellation."
+
+msgid "Request state; only READY and SETTLED have no provider borrow."
+msgstr "Request state; only READY and SETTLED have no provider borrow."
+
+msgid "Initialize fresh unborrowed request storage."
+msgstr "Initialize fresh unborrowed request storage."
+
+msgid "Prepare a READY or consumed SETTLED request."
+msgstr "Prepare a READY or consumed SETTLED request."
+
+msgid "Returns"
+msgstr "Returns"
+
+msgid "Read request state with acquire ordering."
+msgstr "Read request state with acquire ordering."
+
+msgid "Establish the chain's unique admission and provider borrow."
+msgstr "Establish the chain's unique admission and provider borrow."
+
+msgid "Advance an already admitted request without readmission."
+msgstr "Advance an already admitted request without readmission."
+
+msgid "Release-publish SETTLED as the final provider access."
+msgstr "Release-publish SETTLED as the final provider access."
+
+msgid "Copy the unique settled result after acquire publication."
+msgstr "Copy the unique settled result after acquire publication."
+
+msgid "Bind a stable slot to a new request incarnation."
+msgstr "Bind a stable slot to a new request incarnation."
+
+msgid "Resolve cancellation using stable storage before dereference."
+msgstr "Resolve cancellation using stable storage before dereference."
+
+msgid "Drop a slot reference only after settlement and control drain."
+msgstr "Drop a slot reference only after settlement and control drain."
+
+msgid "Caller-owned request metadata, without payload or callbacks."
+msgstr "Caller-owned request metadata, without payload or callbacks."
+
+msgid "Public Members"
+msgstr "Public Members"
+
+msgid "Adapter-owned stable cancellation identity."
+msgstr "Adapter-owned stable cancellation identity."
+
+msgid "request_observer.h"
+msgstr "request_observer.h"
+
+msgid "Optional stable-identity request observation without locks."
+msgstr "Optional stable-identity request observation without locks."
+
+msgid "Bind the exact live incarnation without storing its pointer."
+msgstr "Bind the exact live incarnation without storing its pointer."
+
+msgid "Copy state and acquire-observed final result for exact epoch."
+msgstr "Copy state and acquire-observed final result for exact epoch."
+
+msgid "Remove only this sidecar reference, leaving loans untouched."
+msgstr "Remove only this sidecar reference, leaving loans untouched."
+
+msgid "Copied facts; result/count are valid only when settled is true."
+msgstr "Copied facts; result/count are valid only when settled is true."
+
+msgid "Caller-owned optional sidecar, fresh zero storage before bind."
+msgstr "Caller-owned optional sidecar, fresh zero storage before bind."
+
+msgid "stack_observation.h"
+msgstr "stack_observation.h"
+
+msgid "Bounded read-only observation of caller-painted stack spans."
+msgstr "Bounded read-only observation of caller-painted stack spans."
+
+msgid "Read a bounded low-address paint prefix without mutation."
+msgstr "Read a bounded low-address paint prefix without mutation."
+
+msgid "Byte-prefix paint observations, not an exact physical stack peak."
+msgstr "Byte-prefix paint observations, not an exact physical stack peak."
+
+msgid "status.h"
+msgstr "status.h"
+
+msgid "Small vendor-independent result vocabulary."
+msgstr "Small vendor-independent result vocabulary."
+
+msgid "Operation result; success at submission means admission only."
+msgstr "Operation result; success at submission means admission only."
+
+msgid "time.h"
+msgstr "time.h"
+
+msgid "Absolute monotonic microsecond deadlines and wrap extension."
+msgstr "Absolute monotonic microsecond deadlines and wrap extension."
+
+msgid "Typedefs"
+msgstr "Typedefs"
+
+msgid "Microseconds in one boot/clock domain; no wall-clock semantics."
+msgstr "Microseconds in one boot/clock domain; no wall-clock semantics."
+
+msgid "Read the selected provider's monotonic clock."
+msgstr "Read the selected provider's monotonic clock."
+
+msgid "Test an absolute deadline against a clock snapshot."
+msgstr "Test an absolute deadline against a clock snapshot."
+
+msgid "Add a duration without wrapping the monotonic domain."
+msgstr "Add a duration without wrapping the monotonic domain."
+
+msgid "Initialize counter extension and its clock domain."
+msgstr "Initialize counter extension and its clock domain."
+
+msgid "Extend a wrapping counter and convert to microseconds."
+msgstr "Extend a wrapping counter and convert to microseconds."
+
+msgid "An explicitly injected clock; its context outlives all borrowers."
+msgstr "An explicitly injected clock; its context outlives all borrowers."
+
+msgid "State for extending one 32-bit free-running hardware counter."
+msgstr "State for extending one 32-bit free-running hardware counter."

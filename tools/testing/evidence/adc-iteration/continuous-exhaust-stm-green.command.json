@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "build/adc-iteration/bin/nexus_stm32_adc_stream_test",
+    "--gtest_output=xml:tools/testing/evidence/adc-iteration/continuous-exhaust-stm-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T16:27:59.579713+00:00",
+  "ended_at": "2026-10-11T16:27:59.583113+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-stm-green.log"
+}

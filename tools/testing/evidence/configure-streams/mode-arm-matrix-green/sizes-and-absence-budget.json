@@ -1,0 +1,114 @@
+[
+  {
+    "family": "stm32",
+    "mode": "rx-dma-idle",
+    "text": 7866,
+    "data": 40,
+    "bss": 2264,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "stm32",
+    "mode": "rx-dma-continuous",
+    "text": 7866,
+    "data": 40,
+    "bss": 2264,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "stm32",
+    "mode": "dma-duplex",
+    "text": 8922,
+    "data": 40,
+    "bss": 2264,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "stm32",
+    "mode": "dma-duplex-continuous",
+    "text": 8926,
+    "data": 40,
+    "bss": 2264,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "stm32",
+    "mode": "adc-continuous",
+    "text": 9296,
+    "data": 40,
+    "bss": 2264,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "stm32",
+    "mode": "i2c-irq",
+    "text": 6316,
+    "data": 40,
+    "bss": 2128,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "stm32",
+    "mode": "i2c-dma",
+    "text": 6780,
+    "data": 40,
+    "bss": 2128,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "gd32",
+    "mode": "rx-dma-idle",
+    "text": 9932,
+    "data": 4,
+    "bss": 2256,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "gd32",
+    "mode": "rx-dma-continuous",
+    "text": 9936,
+    "data": 4,
+    "bss": 2256,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "gd32",
+    "mode": "dma-duplex",
+    "text": 10552,
+    "data": 4,
+    "bss": 2256,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "gd32",
+    "mode": "dma-duplex-continuous",
+    "text": 10556,
+    "data": 4,
+    "bss": 2256,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "gd32",
+    "mode": "adc-continuous",
+    "text": 10792,
+    "data": 4,
+    "bss": 2240,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "gd32",
+    "mode": "i2c-irq",
+    "text": 7596,
+    "data": 4,
+    "bss": 2136,
+    "tx_dma_ops_retained": false
+  },
+  {
+    "family": "gd32",
+    "mode": "i2c-dma",
+    "text": 8104,
+    "data": 4,
+    "bss": 2136,
+    "tx_dma_ops_retained": false
+  }
+]

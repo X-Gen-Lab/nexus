@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "id": "stm32h743",
+  "variants": {
+    "STM32H743ZIT6": {
+      "package": "LQFP144",
+      "flash": {
+        "origin": 134217728,
+        "size": 2097152,
+        "erase_blocks": [
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072,
+          131072
+        ]
+      },
+      "memory": [
+        {
+          "id": "itcm",
+          "origin": 0,
+          "size": 65536,
+          "dma_engines": {
+            "DMA1": false,
+            "DMA2": false,
+            "BDMA": false,
+            "MDMA": true
+          },
+          "linker": false
+        },
+        {
+          "id": "dtcm",
+          "origin": 536870912,
+          "size": 131072,
+          "dma_engines": {
+            "DMA1": false,
+            "DMA2": false,
+            "BDMA": false,
+            "MDMA": true
+          },
+          "linker": false
+        },
+        {
+          "id": "axi-sram",
+          "origin": 603979776,
+          "size": 524288,
+          "dma_engines": {
+            "DMA1": true,
+            "DMA2": true,
+            "BDMA": false,
+            "MDMA": true
+          },
+          "linker": true
+        },
+        {
+          "id": "sram1",
+          "origin": 805306368,
+          "size": 131072,
+          "dma_engines": {
+            "DMA1": true,
+            "DMA2": true,
+            "BDMA": false,
+            "MDMA": true
+          },
+          "linker": false
+        },
+        {
+          "id": "sram2",
+          "origin": 805437440,
+          "size": 131072,
+          "dma_engines": {
+            "DMA1": true,
+            "DMA2": true,
+            "BDMA": false,
+            "MDMA": true
+          },
+          "linker": false
+        },
+        {
+          "id": "sram3",
+          "origin": 805568512,
+          "size": 32768,
+          "dma_engines": {
+            "DMA1": true,
+            "DMA2": true,
+            "BDMA": false,
+            "MDMA": true
+          },
+          "linker": false
+        },
+        {
+          "id": "sram4",
+          "origin": 939524096,
+          "size": 65536,
+          "dma_engines": {
+            "DMA1": true,
+            "DMA2": true,
+            "BDMA": true,
+            "MDMA": true
+          },
+          "linker": false
+        },
+        {
+          "id": "backup-sram",
+          "origin": 947912704,
+          "size": 4096,
+          "dma_engines": {
+            "DMA1": true,
+            "DMA2": true,
+            "BDMA": true,
+            "MDMA": true
+          },
+          "linker": false
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD0",
+        "PD1",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PE0",
+        "PE1",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PF0",
+        "PF1",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PG0",
+        "PG1",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9",
+        "PG10",
+        "PG11",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15",
+        "PH0",
+        "PH1",
+        "PC2_C",
+        "PC3_C"
+      ],
+      "pad_conditions": {
+        "PC2_C": {
+          "gpio": "PC2",
+          "condition": "Separate package analog pad; GPIO connection requires reviewed SYSCFG analog-switch and electrical configuration, unimplemented in this reference",
+          "source": "DS12110 Rev11 January2026 Figure57 LQFP144 pinout and GPIO/analog switch note; RM0433 Rev9 GPIO analog switches PC2/PC3.",
+          "status": "not_exposed"
+        },
+        "PC3_C": {
+          "gpio": "PC3",
+          "condition": "Separate package analog pad; GPIO connection requires reviewed SYSCFG analog-switch and electrical configuration, unimplemented in this reference",
+          "source": "DS12110 Rev11 January2026 Figure57 LQFP144 pinout and GPIO/analog switch note; RM0433 Rev9 GPIO analog switches PC2/PC3.",
+          "status": "not_exposed"
+        }
+      }
+    }
+  },
+  "cpu": {
+    "arch": "cortex-m7",
+    "fpu": "fpv5-d16",
+    "float_abi": "hard",
+    "dsp": true,
+    "dwt_cyccnt": true,
+    "mpu_version": 7,
+    "mpu_regions": 16,
+    "icache_line_bytes": 32,
+    "dcache_line_bytes": 32,
+    "security": "single",
+    "sau": false,
+    "mve": "none"
+  },
+  "irq": {
+    "priority_bits": 4,
+    "external_count": 150
+  },
+  "clock_profiles": {
+    "hsi32-fixed-cache-off": {
+      "source": "hsi",
+      "input_hz": 64000000,
+      "core_hz": 32000000,
+      "apb1_hz": 32000000,
+      "apb2_hz": 32000000
+    },
+    "hsi32-fixed-cache-on": {
+      "source": "hsi",
+      "input_hz": 64000000,
+      "core_hz": 32000000,
+      "apb1_hz": 32000000,
+      "apb2_hz": 32000000
+    },
+    "hsi64-fixed-cache-off": {
+      "source": "hsi",
+      "input_hz": 64000000,
+      "core_hz": 64000000,
+      "apb1_hz": 64000000,
+      "apb2_hz": 64000000
+    },
+    "hsi64-fixed-cache-on": {
+      "source": "hsi",
+      "input_hz": 64000000,
+      "core_hz": 64000000,
+      "apb1_hz": 64000000,
+      "apb2_hz": 64000000
+    }
+  },
+  "controllers": {
+    "GPIOB": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PB0"
+      ]
+    },
+    "USART3": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes",
+        "dma-tx"
+      ],
+      "irq": [
+        "USART3_IRQn"
+      ],
+      "irq_numbers": [
+        39
+      ],
+      "clock_hz": 64000000,
+      "pins": [
+        "PD8",
+        "PD9"
+      ]
+    }
+  },
+  "reserved_resources": [
+    "timer:TIM2",
+    "irq:TIM2_IRQn"
+  ],
+  "source_lock": {
+    "cmsis_core": "55b19837f5703e418ca37894d5745b1dc05e4c91",
+    "cmsis_device_h7": "8f922cdc7cc6de2344e75ddd657889f4ff761790"
+  },
+  "provenance": [
+    "DS12110 Rev11 January2026: STM32H743ZI 2MiB Flash/LQFP144; Figure57 physical PC2_C/PC3_C pads do not imply direct PC2/PC3 GPIO routes.",
+    "RM0433 Rev9 October2026 pp106-109/136-137: MDMA reaches TCM; DMA1/DMA2 cannot; BDMA confined to D3 SRAM4/backup. Bus reachability does not authorize DMA placement, power state or retention.",
+    "RM0433 Rev9 section6.4.1 p262: Run* forbids any RAM write before ACTVOSRDY; ExitRun0Mode must not use stack. Fixed HSI64 profile uses conservative reset Flash7WS and LDO; Cache remains off.",
+    "https://www.st.com/resource/en/datasheet/stm32h743zi.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0433-stm32h742-stm32h743753-and-stm32h750-value-line-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+    "https://github.com/STMicroelectronics/cmsis-device-h7/tree/8f922cdc7cc6de2344e75ddd657889f4ff761790"
+  ]
+}

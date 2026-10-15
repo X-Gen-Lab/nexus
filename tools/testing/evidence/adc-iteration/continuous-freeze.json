@@ -1,0 +1,1418 @@
+{
+  "schema_version": 1,
+  "kind": "continuous_adc_development_freeze",
+  "status": "passed",
+  "clean_candidate": false,
+  "source_head": "8aa60740d95b93a51b10b816942f459635e2d406",
+  "owned_sources": [
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/adc.h",
+      "bytes": 9218,
+      "sha256": "5ee17ef758e5164bacf624e58167f896e3c12727244f4b4d4f50373d45f940c1"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/adc_observer.h",
+      "bytes": 4193,
+      "sha256": "e95ab349207a44d8ae86c74325a49eb82fd9ce991ea940fff8e4b40dd21a7788"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/stream.h",
+      "bytes": 11194,
+      "sha256": "b487013990688436f0f0a90d686d1073fc46dcd05217ee6b65a9b63b1005ed7a"
+    },
+    {
+      "path": "/workspace/nexus/io/src/adc.c",
+      "bytes": 4646,
+      "sha256": "2a43862372a66b5258ec0a28256b78925b0bdc5b0f5a68a62bdf6b872de7e97c"
+    },
+    {
+      "path": "/workspace/nexus/io/src/adc_observer.c",
+      "bytes": 7132,
+      "sha256": "48fbc20045b5acc945d5533db881545c2a5f9e026fdb30273e7cce3b2e5ab6a3"
+    },
+    {
+      "path": "/workspace/nexus/io/src/stream.c",
+      "bytes": 14946,
+      "sha256": "693292c7b185bd64004507bb7341d1311f122f84ea608c40cb5a72718253676e"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/adc_stream.c",
+      "bytes": 14753,
+      "sha256": "b7e15782abd9b4d7126efe55761cdb4364ad8ef73336154e9970485fbc4210b6"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/drivers/adc_continuous.c",
+      "bytes": 17996,
+      "sha256": "25506290b03308aa8417e4cf5735e9ce17cdab5b4cd6c81021088e35fee6e61e"
+    },
+    {
+      "path": "/workspace/nexus/soc/stm32f407/private/stm32f407_stream.h",
+      "bytes": 5348,
+      "sha256": "a34e2d0e2455f428f909f73f32eeb023fb912b8e8ba90390dc89c05834c004dd"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/adc_stream.c",
+      "bytes": 16230,
+      "sha256": "1b8297da3fd09a63e94c13b442de0f2b366a294315efc60c01592fb5b394d512"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/adc_continuous.c",
+      "bytes": 20238,
+      "sha256": "ac35e0ecc0ffb85f5a2d2e37866e4167ae568c1ad534cd03dbeed87253e0a181"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/private/gd32f470_adc_stream.h",
+      "bytes": 5450,
+      "sha256": "039c4add217243e2cfa9ab0a99cfaba96067d351cfd212db5d6ea29369f8fb6a"
+    },
+    {
+      "path": "/workspace/nexus/tests/google/stream_test.cpp",
+      "bytes": 13687,
+      "sha256": "37906da197d2512b79be6daf879326d9a01ba7acba58efb429ef00e2f70b987a"
+    },
+    {
+      "path": "/workspace/nexus/tests/google/stm32_adc_stream_test.cpp",
+      "bytes": 25020,
+      "sha256": "1dd14bcd36b1982dccc65ac1fac5518470a4c07d1bad3face711af4b6bf844f4"
+    },
+    {
+      "path": "/workspace/nexus/tests/google/stm32_adc_stream_model.h",
+      "bytes": 1327,
+      "sha256": "9fd5bde480c6e363c800aeed241771e46227e4220a3a67b14cfcf33b9cf1d6e5"
+    },
+    {
+      "path": "/workspace/nexus/tests/google/gd32_adc_stream_test.cpp",
+      "bytes": 24323,
+      "sha256": "c0ee34378acfd389637d509a48d3d8495119a07a434fcaf7058d530c1546b692"
+    },
+    {
+      "path": "/workspace/nexus/tests/google/gd32_adc_stream_model.h",
+      "bytes": 1069,
+      "sha256": "1e65ce15ed5d6a896a769a876d323b0ff705f63d5969bf80cb649f5b161be59a"
+    }
+  ],
+  "integration_sources": [
+    {
+      "path": "/workspace/nexus/io/CMakeLists.txt",
+      "bytes": 1041,
+      "sha256": "c998e2a83a43f684510393713498682883c097e4b1466557682a38de7f111358"
+    },
+    {
+      "path": "/workspace/nexus/tests/google/CMakeLists.txt",
+      "bytes": 20228,
+      "sha256": "84fdd2aaad57fc58ad665a0fb729da5366c7eb96644eda3637f10886dbc3caea"
+    }
+  ],
+  "checks": [
+    {
+      "name": "continuous-exhaust-stm-green",
+      "cases": 26,
+      "failures": 0,
+      "skipped": 0,
+      "case_identities": [
+        "Stm32AdcStream.StabilizationRequiresExplicitServiceBeforeFirstTrigger",
+        "Stm32AdcStream.ValidatesCompleteScanConversionBudgetBeforeAdmission",
+        "Stm32AdcStream.PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume",
+        "Stm32AdcStream.RefusedDisableNeverPublishesMutableDmaMemory",
+        "Stm32AdcStream.MisalignedOrPartialScanBlocksRejectWithoutTimerEffects",
+        "Stm32AdcStream.WarmupStartsAfterPowerStoreBarrierCompletes",
+        "Stm32AdcStream.ObservedDmaFaultCannotBeReplacedByLateTransferComplete",
+        "Stm32AdcStream.BasicAdcInitializationCannotBypassStreamClockValidation",
+        "Stm32AdcStream.InvalidStreamClockBoundsRejectBeforeAdmission",
+        "Stm32AdcStream.StoppedMultiChannelStreamRestoresIndependentPollShots",
+        "Stm32AdcContinuous.TwoPrepostedTargetsStayInvisibleUntilSwapped",
+        "Stm32AdcContinuous.HeldConsumerForcesStopAndExplicitWarmResume",
+        "Stm32AdcContinuous.FailedDrainRetainsBothPrepostedLoans",
+        "Stm32AdcContinuous.WholeScanEqualCapacityAndDomainsValidateBeforeLoan",
+        "Stm32AdcContinuous.WrongCompletionPhaseNeverPublishesUnprovenMemory",
+        "Stm32AdcContinuous.RefusedTargetWriteRetainsSpareUntilProvedDrain",
+        "Stm32AdcContinuous.BankFlipDuringAddressWriteNeverPublishesOldTarget",
+        "Stm32AdcContinuous.SequenceFactsAreColdAndDescribeCompleteScanCost",
+        "Stm32AdcContinuous.ObserverUsesLoanEpochAndSoftwareObservationClock",
+        "Stm32AdcContinuous.ObserverCountAndPayloadAliasRejectBeforeDmaLoan",
+        "Stm32AdcContinuous.ObserverSequenceNeverWrapsOrPublishesMissingRecord",
+        "Stm32AdcContinuous.WrongAddressReadbackMustNotReleasePreviousTarget",
+        "Stm32AdcContinuous.ErrorArrivingDuringTargetWriteRejectsPublication",
+        "Stm32AdcContinuous.NewErrorAtCompletionAcknowledgementCannotDisappear",
+        "Stm32AdcContinuous.ExhaustedEpochRejectsBeforePartialDoubleTargetAdmission",
+        "Stm32AdcContinuous.EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite"
+      ],
+      "xml": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-stm-green.xml",
+        "bytes": 7139,
+        "sha256": "5749ac5d60efd069996b6a8e2225dfe8df8d86e685c28f911e1fb6fd2de18bd5"
+      },
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-stm-green.command.json",
+        "bytes": 422,
+        "sha256": "5fd7cd43e765b460061e26e806cae20ab71952ab636cd1d72edc6e598e20cf1a"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-stm-green.log",
+        "bytes": 4834,
+        "sha256": "412c803313daad0bbd039058f507e20d79c6c22a24a21870bf4bdff06c75fb2b"
+      }
+    },
+    {
+      "name": "continuous-exhaust-gd-green",
+      "cases": 25,
+      "failures": 0,
+      "skipped": 0,
+      "case_identities": [
+        "GD32ADCStream.FullScanPublicationRequiresEngineDetach",
+        "GD32ADCStream.BackpressureNeverOverwritesAndResumeIsExplicit",
+        "GD32ADCStream.InvalidDomainAndRateRejectBeforeLoanOrEffects",
+        "GD32ADCStream.StopRetainsProducerUntilEngineStopsAndLateIRQIsHarmless",
+        "GD32ADCStream.WakeUsesActualDmaPriorityAndLatchedPublication",
+        "GD32ADCStream.EveryBlockRequiresStabilityAndRecalibrationBeforeTrigger",
+        "GD32ADCStream.CalibrationTimeoutReleasesOnlyQuiescentProducer",
+        "GD32ADCStream.DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss",
+        "GD32ADCStream.StabilityClockStartsAfterPowerStoreHasCompleted",
+        "GD32ADCContinuous.SwappedBankPublishesWhileOtherBankKeepsAcquiring",
+        "GD32ADCContinuous.StarvationStopsAndNeverOverwritesBorrowedBlock",
+        "GD32ADCContinuous.FailedDisableRetainsBothTargetsUntilReadback",
+        "GD32ADCContinuous.InvalidLateDomainAndUnequalScanCapacityNeverLoan",
+        "GD32ADCContinuous.WrongBankPhaseStopsInsteadOfPublishingUnknownScan",
+        "GD32ADCContinuous.RefusedAddressWriteAndDrainRetainThreeLoans",
+        "GD32ADCContinuous.BankSwitchDuringTargetWriteRejectsPublication",
+        "GD32ADCContinuous.ExplicitSampleTimeCostsLimitTheCompleteScanRate",
+        "GD32ADCContinuous.IncorrectReplacementAddressNeverPublishesOldBlock",
+        "GD32ADCContinuous.DmaErrorAtTargetStoreRejectsPublication",
+        "GD32ADCContinuous.SequenceFactsReportSelectedCyclesAndNominalClocks",
+        "GD32ADCContinuous.ObserverEpochTracksBlockAndRejectsReleasedLoan",
+        "GD32ADCContinuous.CalibrationTimeoutDoesNotInventCompletedBlockLoss",
+        "GD32ADCContinuous.ErrorBeforeW1cCompletionStoreRemainsAuthoritative",
+        "GD32ADCContinuous.ExhaustedEpochRejectsBeforePartialDoubleTargetAdmission",
+        "GD32ADCContinuous.EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite"
+      ],
+      "xml": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-gd-green.xml",
+        "bytes": 6804,
+        "sha256": "95f4030b7a76a97f5cee3b4f632a5daf887bfe7975c7853323b7651db610b922"
+      },
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-gd-green.command.json",
+        "bytes": 419,
+        "sha256": "be2b5ee2696d669dbd0635859d3066f15de2b995754b4c456aac8eca9e6af622"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-gd-green.log",
+        "bytes": 4557,
+        "sha256": "00380cd716d315efcec54741c20060d1428a4b156424e51cacc0a898e26fff60"
+      }
+    },
+    {
+      "name": "observer-storage-green",
+      "cases": 27,
+      "failures": 0,
+      "skipped": 0,
+      "case_identities": [
+        "DmaMemory.RejectsOverflowAlignmentAndCrossDomainRanges",
+        "DmaResource.ChannelSelectorsDoNotCreateSeparateStreams",
+        "DmaResource.OpaqueIdentitiesDoNotImposeOneSocTopology",
+        "DmaDrain.CounterAndTransferCompleteNeverProveWireCompletion",
+        "StreamBlocks.DoesNotOverwriteBorrowedStorageOrAcceptStaleRelease",
+        "StreamBlocks.RejectsPartialPublicationAndRetainsFillingBorrowOnStop",
+        "StreamBlocks.OverflowIsReportedAtTheNextPublishedBoundary",
+        "PostedStream.PrepostedFillsRemainInvisibleAndPublicationIsFIFO",
+        "PostedStream.LIFOAbortNeedsQuiescenceAndNeverLeavesConsumerHoles",
+        "PostedStream.StopRetainsAllPostedLoansUntilReverseDrain",
+        "PostedStream.WrapNeverOverwritesHeldConsumerAndOldEpochCannotAbort",
+        "PostedStream.ExhaustedIdentityRetainsCursorAndOutputWithoutWrap",
+        "PostedStream.InitializationRejectsLiveLoansAndPreservesOutput",
+        "AdcObserverStorage.ColdInitializationRejectsOverflowAliasAndMask",
+        "AdcObserverStorage.BindingRejectsPayloadAndOwnerAliasesBeforeAdmission",
+        "AdcObserverStorage.RetainsMetadataUntilProducerAndConsumerJoin",
+        "AdcObserverStorage.StaleFillAndSequenceExhaustionDoNotRewriteRecord",
+        "AdcObserverStorage.BoundObserverCannotBeReboundToAnotherOwner",
+        "IrqWake.RejectsKernelUnsafePrioritiesBeforeAttachingSink",
+        "IrqWake.BaselineKernelAcceptsEveryValidExternalPriority",
+        "IrqWake.KernelPolicyCannotBeInferredFromZeroCeiling",
+        "IrqWake.RejectsNonExternalAndOutOfRangePublishers",
+        "IrqWake.BasepriRequiresPreemptionOnlyPriorityGrouping",
+        "IrqWake.EightBitPriorityAndV8ExternalBoundRemainExplicit",
+        "IrqWake.RejectsMalformedPolicyBeforeAnyCallback",
+        "IrqWake.NonkernelTargetsAndDetachRemainLegalWithNoKernel",
+        "IrqWake.NonkernelMainlineTargetMayUseSubpriorityGrouping"
+      ],
+      "xml": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/observer-storage-green.xml",
+        "bytes": 7620,
+        "sha256": "ccc53c2bfab21deb4381dedd414d6feb9d388516d838c0c7f7643286f87dbcd0"
+      },
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/observer-storage-green.command.json",
+        "bytes": 411,
+        "sha256": "6688463892ec75d19cabf2b3381c8248210f40254a3a5795b7c6364b0f102bcc"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/observer-storage-green.log",
+        "bytes": 4993,
+        "sha256": "50e4262f8ca1bcad9e67025749674d09eb2aba5fa3792a615028a138a35a3c92"
+      }
+    }
+  ],
+  "total_cases": 78,
+  "history_commands": [
+    {
+      "name": "adc-arm-cost-v2",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost-v2.command.json",
+        "bytes": 317,
+        "sha256": "5cd70b474fababb0f0f1d2045ccfdbab1d3611edad0507553e657c7ec0855b6a"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost-v2.log",
+        "bytes": 387,
+        "sha256": "6120c7a8b82652b49a36ef36d4568849d118260a6400b795fe0ca07ca526ebfa"
+      }
+    },
+    {
+      "name": "adc-arm-cost-v3",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost-v3.command.json",
+        "bytes": 317,
+        "sha256": "7da8842a38b5a126295573186ce9e8d8201eee1deb5a9a1f4150e552ece5121b"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost-v3.log",
+        "bytes": 277,
+        "sha256": "08b1b2f657ef20cb254cbe84f9d8aabbd31717aa7382ef5c0e58f993e789d4b8"
+      }
+    },
+    {
+      "name": "adc-arm-cost-v4",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost-v4.command.json",
+        "bytes": 317,
+        "sha256": "d10c4c84254352376d77faf77cf1d7d14f8893cfc2fa464304261c101988d4bd"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost-v4.log",
+        "bytes": 3365,
+        "sha256": "03897681e22defcc13c6a1e8faf7aefa78f9902a43bb5764d4fac123399ac391"
+      }
+    },
+    {
+      "name": "adc-arm-cost-v5",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost-v5.command.json",
+        "bytes": 317,
+        "sha256": "30c2709088abcf4a0aa7218faa9645374adfd725b174233793dbb46ef7a88a92"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost-v5.log",
+        "bytes": 2869,
+        "sha256": "94c23724c7ab4da2b86198f7a1e130016dabcac94557f6f8034755d4697bd72f"
+      }
+    },
+    {
+      "name": "adc-arm-cost",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost.command.json",
+        "bytes": 311,
+        "sha256": "e3ba70a9b821c84f894cf5a8115f7d7a1d3859bbef9eefebb2bd6a22eaaec374"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-arm-cost.log",
+        "bytes": 2039,
+        "sha256": "6ab3e832de0a4a3cb501851345cef32ded671e331c6dff960ca05c81d3eff4b2"
+      }
+    },
+    {
+      "name": "adc-observation-api-red-build",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-observation-api-red-build.command.json",
+        "bytes": 403,
+        "sha256": "84e89e72fba954ff8923f63491621609fb3e6a9c1bd1f71dcb7e76a56b969c44"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-observation-api-red-build.log",
+        "bytes": 15214,
+        "sha256": "4d7e7b0ce8a66153c82f92e92ebc44a6e36ad5b641e1ef68335ec5565fb16755"
+      }
+    },
+    {
+      "name": "adc-observation-gd-green",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-observation-gd-green.command.json",
+        "bytes": 413,
+        "sha256": "9adc801bcc38148b7980ba0f681b49f7a123f074f97ab9604b449046f5cedf79"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-observation-gd-green.log",
+        "bytes": 3201,
+        "sha256": "db7d28393540ceba0c1529354386f97a58e7edc9bccb176ff2c48860056ffe34"
+      }
+    },
+    {
+      "name": "adc-observation-green-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-observation-green-build.command.json",
+        "bytes": 435,
+        "sha256": "f384c8b8d609a90fc0a400c3c11395d82e31d4c2d6989964e1bfaf946f38a737"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-observation-green-build.log",
+        "bytes": 2992,
+        "sha256": "ba9cb275fa1a36b8bda0439a1c9da486a9fd698ff2d3cf2ef879a8cb2cea341e"
+      }
+    },
+    {
+      "name": "adc-observation-stm-green",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-observation-stm-green.command.json",
+        "bytes": 416,
+        "sha256": "8b3d92a0466157839b3c7a1ccecd6cb9c077e42db33819f38612bd843efba7bb"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/adc-observation-stm-green.log",
+        "bytes": 3953,
+        "sha256": "4bbf65906c3f59cbd9247836bfef527d90037f3e451fe078fa3452b11b3e5e01"
+      }
+    },
+    {
+      "name": "continuous-ack-gd-green",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-gd-green.command.json",
+        "bytes": 411,
+        "sha256": "beac945d3f1a09326469f1d4c17ee224d113b4c0ee78bfb8d3d7a6b481d47ff9"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-gd-green.log",
+        "bytes": 4191,
+        "sha256": "cf379c53d61d7d4ab6e0779526462f4dd8195cef55df36f1244b0e2c86357982"
+      }
+    },
+    {
+      "name": "continuous-ack-gd-red",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-gd-red.command.json",
+        "bytes": 407,
+        "sha256": "954c52a1c2e128ddc4bb814c4f0c57db88e363d9789e2b069c7e720858a5c57c"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-gd-red.log",
+        "bytes": 4699,
+        "sha256": "5f9ef906304aeb7531e1bd891e2f1cf22c36cd697949b2c65f860548ec0ed8df"
+      }
+    },
+    {
+      "name": "continuous-ack-green-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-green-build.command.json",
+        "bytes": 434,
+        "sha256": "bfe6d63ac422adf79f71dad15c5006e7539981295a6a6676e6cf21d8d30560a0"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-green-build.log",
+        "bytes": 1126,
+        "sha256": "988932b6795f7505f9f9da3e0aa809e850e431ca8b6e2410fd808cacb56a4938"
+      }
+    },
+    {
+      "name": "continuous-ack-red-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-red-build.command.json",
+        "bytes": 432,
+        "sha256": "0b3c7553fceb1aaf454a43f437b7ca7523b2036f9ef75fdbd47b6a1f213e01b6"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-red-build.log",
+        "bytes": 359,
+        "sha256": "1d942bda25e5b1718ab0f108f0bf6c5c20cc0cdc32b61d4eca417ae2edd3bc62"
+      }
+    },
+    {
+      "name": "continuous-ack-stm-green",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-stm-green.command.json",
+        "bytes": 414,
+        "sha256": "d5fe24fbe501603bfa8b795a82ec56675bf594e438df76061b401143e8d9bf86"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-stm-green.log",
+        "bytes": 4464,
+        "sha256": "fe1c3fb622329320b267e7aaae7566a55d6c057c8d93fa76a047bbaa26dc76db"
+      }
+    },
+    {
+      "name": "continuous-ack-stm-red",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-stm-red.command.json",
+        "bytes": 410,
+        "sha256": "b32ec41a3b1d82a5f86b5945f679de4ec0a246de4ae4019ebb052f11351946f6"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-ack-stm-red.log",
+        "bytes": 5159,
+        "sha256": "4ce435569075b3fefc19624d285560f4ebb5d8fd05037af72da90b60e1b6d5ba"
+      }
+    },
+    {
+      "name": "continuous-api-red-build",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-api-red-build.command.json",
+        "bytes": 398,
+        "sha256": "0957e204f94defacac1d08e2a3f5f63e1c553527781e3e316a231d9be35711d8"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-api-red-build.log",
+        "bytes": 6642,
+        "sha256": "7931639edea089b540679b390b499468ea8f349d75ee23c6e1dd8669722b9d7f"
+      }
+    },
+    {
+      "name": "continuous-exhaust-gd-green",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-gd-green.command.json",
+        "bytes": 419,
+        "sha256": "be2b5ee2696d669dbd0635859d3066f15de2b995754b4c456aac8eca9e6af622"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-gd-green.log",
+        "bytes": 4557,
+        "sha256": "00380cd716d315efcec54741c20060d1428a4b156424e51cacc0a898e26fff60"
+      }
+    },
+    {
+      "name": "continuous-exhaust-gd-red",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-gd-red.command.json",
+        "bytes": 415,
+        "sha256": "786d75f67078508a1d3a83160d4f0be700b79a90c411ce337b2c2f86d4cd904a"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-gd-red.log",
+        "bytes": 5188,
+        "sha256": "bbbb21eb29c340364f7b722c13735e18bea2917ea0f69445b6ec57043ec7881f"
+      }
+    },
+    {
+      "name": "continuous-exhaust-green-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-green-build.command.json",
+        "bytes": 438,
+        "sha256": "52d548ff7d4f1a0837e6a7b2cfddb269449d17bf770ef33ced947936da92909c"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-green-build.log",
+        "bytes": 393,
+        "sha256": "2901179674ab3bccb9366a7eb17dbec9aac88b9e1002ed17d75c31a3ea8fd935"
+      }
+    },
+    {
+      "name": "continuous-exhaust-red-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-red-build.command.json",
+        "bytes": 436,
+        "sha256": "127d0428878ee324f0df677bb75982dbe630aa6774f12c138f722787b8553744"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-red-build.log",
+        "bytes": 900,
+        "sha256": "8f3b27ade2f01cd91fbdb6eecf0d2a33af48308c7f052213c4f58a6601955e04"
+      }
+    },
+    {
+      "name": "continuous-exhaust-stm-green",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-stm-green.command.json",
+        "bytes": 422,
+        "sha256": "5fd7cd43e765b460061e26e806cae20ab71952ab636cd1d72edc6e598e20cf1a"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-stm-green.log",
+        "bytes": 4834,
+        "sha256": "412c803313daad0bbd039058f507e20d79c6c22a24a21870bf4bdff06c75fb2b"
+      }
+    },
+    {
+      "name": "continuous-exhaust-stm-red",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-stm-red.command.json",
+        "bytes": 418,
+        "sha256": "d751bcf230d30dc24903b2e14d8ee60fb56d8478e617bded670dc79da62da0ca"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-exhaust-stm-red.log",
+        "bytes": 5469,
+        "sha256": "4791440de83dea6c3e3649db0ece80600fea15cb39483800585e2a9953868346"
+      }
+    },
+    {
+      "name": "continuous-gd-api-red-build",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-gd-api-red-build.command.json",
+        "bytes": 400,
+        "sha256": "97b2dcafba0fd32fc6f6be713eb48de4708684324ca2c245d9c55b93eac591c8"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-gd-api-red-build.log",
+        "bytes": 6442,
+        "sha256": "1b0b983158ebc7adeb9eccd25133ca5d9c5fc3add1e28e559995167a98cbbda3"
+      }
+    },
+    {
+      "name": "continuous-gd-green-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-gd-green-build.command.json",
+        "bytes": 398,
+        "sha256": "d4b5b95a1951006bb6390fb5d930c01afbbfa0a5313650786e7e513bf0d0f67b"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-gd-green-build.log",
+        "bytes": 1354,
+        "sha256": "ccaeeade82a51f593561c650760c6857303ef457492a520d3dc9d92e053a6adc"
+      }
+    },
+    {
+      "name": "continuous-gd-green",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-gd-green.command.json",
+        "bytes": 403,
+        "sha256": "92dd644e45ba0a6248f7c7a2daaac2f7b8676e6be70fbc77babfffa813a5a8a6"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-gd-green.log",
+        "bytes": 3201,
+        "sha256": "db7d28393540ceba0c1529354386f97a58e7edc9bccb176ff2c48860056ffe34"
+      }
+    },
+    {
+      "name": "continuous-readback-gd-green",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-gd-green.command.json",
+        "bytes": 421,
+        "sha256": "5aa24fdcbe8dc56e024efe36ae5e07632734f621d82402818853f09430106815"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-gd-green.log",
+        "bytes": 4530,
+        "sha256": "bed94ec2e70b9e0cb2e25551fe493014fc88e07974f731808ab9f7bbb169c594"
+      }
+    },
+    {
+      "name": "continuous-readback-gd-green2",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-gd-green2.command.json",
+        "bytes": 423,
+        "sha256": "f6fafec600b8e55381c5dc6e5186505646676eb1691ee565855c0421d670d377"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-gd-green2.log",
+        "bytes": 4022,
+        "sha256": "37c7ce6135461b8501f6c54a189aae2c54bac40bbc9714e2056876bb0cabce03"
+      }
+    },
+    {
+      "name": "continuous-readback-gd-red",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-gd-red.command.json",
+        "bytes": 417,
+        "sha256": "a0878b32fc3417497c7e1274ac550ecccc2bcef3fa02a25b45911a59e0b959b8"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-gd-red.log",
+        "bytes": 6682,
+        "sha256": "8fbe69effb2c53e4d5b0160741c13d566aa666e3c978ac59fd05f8939d92450f"
+      }
+    },
+    {
+      "name": "continuous-readback-gd-red2",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-gd-red2.command.json",
+        "bytes": 419,
+        "sha256": "c88b384b1f7a2825960eeefd794bf065e9eb358e2c1134bfe55d110031883b69"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-gd-red2.log",
+        "bytes": 4770,
+        "sha256": "48b04fe258239d73314ff5525124a4c3f7fac0d5427601425ea50db9b557b823"
+      }
+    },
+    {
+      "name": "continuous-readback-green-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-green-build.command.json",
+        "bytes": 439,
+        "sha256": "1ffaa29b862a9a13e5396a638f2ec6fbcdddfb00388aef0a61ccdb7b9d53f173"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-green-build.log",
+        "bytes": 772,
+        "sha256": "63a453f8ca2b907fcf51726d29bdbd2f5f1843d027f3851a8e252c7ae5af01b6"
+      }
+    },
+    {
+      "name": "continuous-readback-green2-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-green2-build.command.json",
+        "bytes": 440,
+        "sha256": "368860fbb4278c0bf09afa4c269b4d6a8e39986843ca492208213bfb9a288663"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-green2-build.log",
+        "bytes": 934,
+        "sha256": "046cd4384105cdd4213c03fb6b2c347d60e37d085eda45ab30e430aa140c29c4"
+      }
+    },
+    {
+      "name": "continuous-readback-red-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-red-build.command.json",
+        "bytes": 437,
+        "sha256": "e61e57f3db37038e7e3b32b14aadc3d4075499b4ef0d568b2f1c9c17f5ac925e"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-red-build.log",
+        "bytes": 1281,
+        "sha256": "a1b72df398ddd19ea81f2a3799004ab1c50e9d8e17f8c1dcadf70cdb0c71c8e0"
+      }
+    },
+    {
+      "name": "continuous-readback-red2-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-red2-build.command.json",
+        "bytes": 403,
+        "sha256": "99fa0524c26f6cafea5caa87e16e4d90a5eed07914d368486cd6f119b66d9b42"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-red2-build.log",
+        "bytes": 1354,
+        "sha256": "15020ffd585e74911a4f19865b05cbd92bc55350c9464186de78ebb0f2484da4"
+      }
+    },
+    {
+      "name": "continuous-readback-stm-green",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-stm-green.command.json",
+        "bytes": 424,
+        "sha256": "45bf1e27808e8e89a15dff46ca69c4a3681bc393c53074df6cc2966bf5023000"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-stm-green.log",
+        "bytes": 4984,
+        "sha256": "7ad46197dcbea128cd686d77d5353477f1994dcff7276edebfe01acc72a2264e"
+      }
+    },
+    {
+      "name": "continuous-readback-stm-green2",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-stm-green2.command.json",
+        "bytes": 426,
+        "sha256": "3659c388a5f46dd3ccc9cc6b61aa7958de7e455e642571e43ad859c5ed74bc55"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-stm-green2.log",
+        "bytes": 4291,
+        "sha256": "d669de31cdd0a2cbeee29596040a2e3b071b0b7f4419d6837c305c676afcfe39"
+      }
+    },
+    {
+      "name": "continuous-readback-stm-red",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-stm-red.command.json",
+        "bytes": 420,
+        "sha256": "baf19a292954007362567597a20e6ec67f64b16ee86fffc3d7fd9b9d8b53c7ce"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-readback-stm-red.log",
+        "bytes": 4984,
+        "sha256": "7ad46197dcbea128cd686d77d5353477f1994dcff7276edebfe01acc72a2264e"
+      }
+    },
+    {
+      "name": "continuous-stm-green-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-stm-green-build.command.json",
+        "bytes": 400,
+        "sha256": "29af673d05dd42eb40ff87bc13121863c69c71750ebee80156e049dbf1413cbc"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-stm-green-build.log",
+        "bytes": 1118,
+        "sha256": "b908213c6e4edb4edb58be58dba3412070fe844eff8c47920ba08f16c6929a05"
+      }
+    },
+    {
+      "name": "continuous-stm-green",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-stm-green.command.json",
+        "bytes": 406,
+        "sha256": "2e823da58658c99706a3c572d9e35c5f6665983caa834e0a720c3f2c333971d9"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-stm-green.log",
+        "bytes": 3275,
+        "sha256": "02b5e284e36f796b34592e4fda38c7485cbd2841a3581dffa2eb5921c1cd1bf9"
+      }
+    },
+    {
+      "name": "observer-storage-green-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/observer-storage-green-build.command.json",
+        "bytes": 403,
+        "sha256": "bb3afbd6b5a300ae5032eb2b5b7c8bda23bc4b0248c18e28c519d9234b44b8db"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/observer-storage-green-build.log",
+        "bytes": 173,
+        "sha256": "1db291920554cff1356979a0425b1346288219cbb7ff3a59cf6802a3636e9391"
+      }
+    },
+    {
+      "name": "observer-storage-green",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/observer-storage-green.command.json",
+        "bytes": 411,
+        "sha256": "6688463892ec75d19cabf2b3381c8248210f40254a3a5795b7c6364b0f102bcc"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/observer-storage-green.log",
+        "bytes": 4993,
+        "sha256": "50e4262f8ca1bcad9e67025749674d09eb2aba5fa3792a615028a138a35a3c92"
+      }
+    },
+    {
+      "name": "posted-api-red-build",
+      "exit_code": 1,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/posted-api-red-build.command.json",
+        "bytes": 403,
+        "sha256": "3ef55a91c205d8dac409a8bdc96ad5ccd51b0591fb4702c9f61c492031c14304"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/posted-api-red-build.log",
+        "bytes": 23662,
+        "sha256": "fa210770bc83fa6c26e74b8a904878f59d52a1fb322b931066e6f6582161dd3e"
+      }
+    },
+    {
+      "name": "posted-green-build",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/posted-green-build.command.json",
+        "bytes": 401,
+        "sha256": "9847d18612f27539cca4a6264be763d83e5a4293e45e45dbcfd0f26278d04ceb"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/posted-green-build.log",
+        "bytes": 956,
+        "sha256": "24021b74f830a24426b1911357715769e1e236d096d5030810dd2be6e81244ab"
+      }
+    },
+    {
+      "name": "posted-green",
+      "exit_code": 0,
+      "command": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/posted-green.command.json",
+        "bytes": 391,
+        "sha256": "fd788fc14e3d576a5c80c7741282834fb7e9e27f026d486bab8a1aba5ce06a10"
+      },
+      "raw_log": {
+        "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/posted-green.log",
+        "bytes": 4066,
+        "sha256": "3f3da1833f76ae3de1eef04f78aa4f7b868e74bebbaf923ab9484fc4f1612e7e"
+      }
+    }
+  ],
+  "arm_cost_report": {
+    "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/report.json",
+    "bytes": 60139,
+    "sha256": "df950d6fe4eca01b290ab7403d906a1adf2a1b67408ce93d19bab2010efe7031"
+  },
+  "arm_cost_artifacts": [
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/adc.h.raw",
+      "bytes": 6200,
+      "sha256": "4c11f9e9de71457df9034fa427632f0c59ad620c2b789445edd01958072c8098",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/adc.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/dma.h.raw",
+      "bytes": 4114,
+      "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/dma.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/exti.h.raw",
+      "bytes": 4106,
+      "sha256": "b0b621a0b71603986eef27614228da25c30d53d307d33d4ea9c5c3a9e47166c6",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/exti.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/flash.h.raw",
+      "bytes": 6868,
+      "sha256": "cf0abbbc2807486abae45d966e21748b107ca8951c66d9ce4524d6e3ef0bd47c",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/flash.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/gpio.h.raw",
+      "bytes": 2676,
+      "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/gpio.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/i2c.h.raw",
+      "bytes": 3856,
+      "sha256": "b9021b1784ffaab02e159200ad11c09bd714ec99ba2ff0aba5d5b1ffe9452a9b",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/i2c.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/native/model.h.raw",
+      "bytes": 24994,
+      "sha256": "c3615741a44db4c00035190d2038289ca2d6dcc54fd058558151ed23e8b51c35",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/native/model.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/spi.h.raw",
+      "bytes": 10019,
+      "sha256": "8dd74638c243d4d376b14aab679b356c15ff34a26771186d19e343e98b1bca39",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/spi.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/stream.h.raw",
+      "bytes": 7683,
+      "sha256": "6d8baced785fa7237becba850529797db8c33eabd24ece434f31db0fa152bc85",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/stream.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/timer.h.raw",
+      "bytes": 3191,
+      "sha256": "0ccc8af93007acc1bde7f2038930d3b8e57808fce26707adf372f09dc43e3f7a",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/timer.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/uart.h.raw",
+      "bytes": 10872,
+      "sha256": "e1f92a50ca05f95891474717daf150e0d1ba63efcde5146891b10bcbc1be07bc",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/uart.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/wake.h.raw",
+      "bytes": 3440,
+      "sha256": "19808b17fec81b85392983febc012f10a20eef00227df9b12008fb0884160fc9",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/wake.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/watchdog.h.raw",
+      "bytes": 3724,
+      "sha256": "7ef3f9b068f581bf5fc4deb7a8aae852f4c662c893962c59d00ee14f91f16f8c",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/io/include/nexus/io/watchdog.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_adc_stream.h.raw",
+      "bytes": 3236,
+      "sha256": "ded256119a5c570aa2030315fe92c7fadbe7b2505579d129f45a14d68e0c7838",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_adc_stream.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_dma.h.raw",
+      "bytes": 2428,
+      "sha256": "492b221c3207e522e67e2e17ebe5c39a131fe2b68ecf83f706c83c36cb909ca0",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_dma.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_provider.h.raw",
+      "bytes": 21482,
+      "sha256": "4987faee662fc25062f8584cf12caf16d477ed296f9fbb93d0e4ffee03b78aa8",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_provider.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_spi_dma.h.raw",
+      "bytes": 3009,
+      "sha256": "058bbe190aac6987300b8ca54dd05786ed5aad3b2c03c660e82eacd4ee6096a2",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_spi_dma.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_uart_stream.h.raw",
+      "bytes": 1966,
+      "sha256": "15fa379dea5de9a61efabaf0de414e739623387f8547ac7f564a218bc698185f",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f470_uart_stream.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f4xx_libopt.h.raw",
+      "bytes": 839,
+      "sha256": "64afa1aa962f93bc9cad8a23244b39b383dd4aa29c0056c20d9a4cd2537f10db",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/gd32f4xx_libopt.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/system.h.raw",
+      "bytes": 2710,
+      "sha256": "ea3ae416c653f9abbfb42da62a1aa832290594cdd95a4bb98bb709601ee181bc",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/gd32f470/private/system.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_dma.h.raw",
+      "bytes": 4407,
+      "sha256": "5733649756bb2fb383501a304c10ca0bf8e7f1fce21bd4cbf726b187f27a0959",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_dma.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_provider.h.raw",
+      "bytes": 11328,
+      "sha256": "edf2d5bebde43eba0a7e3da35d22a955fe9ad9f3be1f63c79934308d87bc2e2c",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_provider.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_stream.h.raw",
+      "bytes": 3441,
+      "sha256": "7711f9b4156f232901994cd0f65b03b6b639e23f8b1d43a9554c2a18886e6fb9",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_stream.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_system.h.raw",
+      "bytes": 3327,
+      "sha256": "72c4a5b774453c6a62e8bc2fdc058f2e1356dac4021b197ee998b128ac939e47",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/baseline/soc/stm32f407/private/stm32f407_system.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc-disassembly.log",
+      "bytes": 19062,
+      "sha256": "966f231a1a310f2a9fa0131bf2727faafbe014a335bf9395449cb40c6bda1e38"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc-sections.log",
+      "bytes": 831,
+      "sha256": "7e4356395f7109f1c47c9beb5da64e3755b1b467ab61c27df3a5d639a5c8caff"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc.d",
+      "bytes": 4305,
+      "sha256": "a514725d4d31a36b7f5ea5ecfac8cf4773dc0971dd6b9efcb66b047b5a938c98"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc.o",
+      "bytes": 4496,
+      "sha256": "cce07bd3d9f4b9fa9a11bc67bba151a4c83afb694c9827373db260a1939c04fe"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous-disassembly.log",
+      "bytes": 31406,
+      "sha256": "62ef7212d788e8efc8dd0848ca633ff86734170ed28e5bf0a2bd76bd3e8715da"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous-sections.log",
+      "bytes": 1278,
+      "sha256": "27a33f0282c3e51f4def0222c78f697c168bbc4b2b493877af39fc379af37ca7"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous.d",
+      "bytes": 4436,
+      "sha256": "dd287737334ae93d892a84d07a1bc8986537ffcec198f39a0e9ae6a466bd0822"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_continuous.o",
+      "bytes": 7228,
+      "sha256": "fc7ed3345e2a0ad8905a02d608e660078043c88db08fb97b65d0312db9782403"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream-disassembly.log",
+      "bytes": 29777,
+      "sha256": "41d0b3813254bba4c676e05f383f652cefc7986b85c00075c0f1c0d764946c14"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream-sections.log",
+      "bytes": 1186,
+      "sha256": "8a0086e90e04b148e6de51830eb5fd75d6a42072566f46d1a731dea53f3fca49"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream.d",
+      "bytes": 4428,
+      "sha256": "f59fad1012e3d48d040c1e2a8c98897b9d135e11818efa3c8b3f24fb9d50be05"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-adc_stream.o",
+      "bytes": 6712,
+      "sha256": "4a860091d03717a4cd712328368fa925730db6137cec887f35f516fa6e8dc5d1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.c.raw",
+      "bytes": 408,
+      "sha256": "1f6545a20b25f8ec2a44686ba306b32413c6d59c802b3e3dd0aed35832c44303",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.d",
+      "bytes": 5189,
+      "sha256": "1669bf71693d6bcb7df524cc60633f66e145d39b2938b06c60abcce13a01656c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline/types.elf",
+      "bytes": 5476,
+      "sha256": "cf9d012a60bc30f595cb26a83fe4ef9ca8fbe0a001affd0e0bd072d0c666329a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-baseline-nm.log",
+      "bytes": 419,
+      "sha256": "d4d106203f0055cc9e47ddef5ba507bdfb04cfde4df7639a29aacef2c67cbc7e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.c.raw",
+      "bytes": 668,
+      "sha256": "5d5317f0567d1b22e10f07597843e11d386f3b208085aa342a42fbc1d3791e20",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.d",
+      "bytes": 4372,
+      "sha256": "b85a26069daf5b14944f1d8f76650dac9b04bef04a28f82f463fc70defd5a8c0"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current/types.elf",
+      "bytes": 5688,
+      "sha256": "6213e9e1f385255863e13ac3416793abb7cda713244f752daa16ee3adf036d97"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-current-nm.log",
+      "bytes": 571,
+      "sha256": "dcb222ad89ce8fe5abe68d2460837c6f907daf12850ca0fb6da9f21b3cba6967"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/gd32f470-fresh-authority.log",
+      "bytes": 119,
+      "sha256": "e1119649d33cd6ef88492d9b5726bb61646ea80851ea4c0e42156141175ce3ee"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/.nexus-config-bundle",
+      "bytes": 65,
+      "sha256": "5b1d4d92d854e66f003824807cbb2b0ebcbed7daad87ead1c057cd0cdf7258d9"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/bindings.c.raw",
+      "bytes": 7103,
+      "sha256": "9ecaa9809506561dcd14aaafa3ce0df5fea9d2e8d49fe308077529da1126d363",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/bindings.c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/input_paths.json",
+      "bytes": 375,
+      "sha256": "114d1a158e9ef54cc04d26c181681313e5c6c35efb7fae46d49d078e7c340b29"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/memory.ld",
+      "bytes": 2227,
+      "sha256": "7b2f4ed1edaf43116e81f8c8c0382965451c35cd64b778e9a4420771324e575c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/nexus_bindings.h.raw",
+      "bytes": 1188,
+      "sha256": "234e3be8781bbf1b9b30ff1400e9f4edc4f4fed63b5cd28dff3640bd45a8285a",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/nexus_bindings.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/nexus_config.h.raw",
+      "bytes": 1127,
+      "sha256": "fb3e83992d18dab13dee7a23255efe192ab518f3b5f24d92efbb82b376a9e6af",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/nexus_config.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/nexus_factory.h.raw",
+      "bytes": 6593,
+      "sha256": "e735dfb0cbe88b1b723537ac483f18e4de4aa07b3e57f168789ce1e07c57a350",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/nexus_factory.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/nexus_factory_strong.h.raw",
+      "bytes": 4762,
+      "sha256": "3b06a57b6d58bc24dfdc7d07775e7c21da05a53a7078e6941585f57561eb5fa9",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/nexus_factory_strong.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/resolved.json",
+      "bytes": 20781,
+      "sha256": "a28c6fa76a163e5fec9de8302769d72170300153352f586f240eb29bcaecdbc8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/resource-budget.json",
+      "bytes": 202,
+      "sha256": "4c37b8d170b11ed6ac70f1ef8fb9c556a89a11e65c90f4e183ea046cc391dce4"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/gd32f470/selection.cmake",
+      "bytes": 1078,
+      "sha256": "16f85affdb1fb2d67355bc316e147c303c5a7bee006fc4377511aea8bae96eac"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/.nexus-config-bundle",
+      "bytes": 65,
+      "sha256": "fc1a9945a70c69830e1a618454d6d2094bd2fa84dafd46a9d4254f5cfa0aafd8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/bindings.c.raw",
+      "bytes": 8358,
+      "sha256": "b0f8a65a34e891f6378c3dd8d68000271681f27943df0ba86d8cc63330f3f101",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/bindings.c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/input_paths.json",
+      "bytes": 377,
+      "sha256": "0ce234841442b4e349e9a85ea45f6490f75b8b1af61191c3574b94395dd1a09a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/memory.ld",
+      "bytes": 2227,
+      "sha256": "6221895bd856c2155b4e1d5706e673548b03d608997b818e335f5105fe70892f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/nexus_bindings.h.raw",
+      "bytes": 1188,
+      "sha256": "20e4a198e640bf9f0cb4689bed7d643192e908ded1b00cff3a3808521232f47b",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/nexus_bindings.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/nexus_config.h.raw",
+      "bytes": 1125,
+      "sha256": "ccaa44e495b369a4e9d3ead4ed9822f24cdd5962d71f8c71d41e5b51169bf939",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/nexus_config.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/nexus_factory.h.raw",
+      "bytes": 6593,
+      "sha256": "1f620e4d4c7d24ac3d4e5fcec789daea344a4f62e8174f7bdacbc3651a00c430",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/nexus_factory.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/nexus_factory_strong.h.raw",
+      "bytes": 4762,
+      "sha256": "5b100a10e3cd5d00efaf0a0874e85bac146bf74d9a68e2e3a3638b9ecc15dbbc",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/nexus_factory_strong.h"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/resolved.json",
+      "bytes": 15311,
+      "sha256": "58ab9ae431b8ed5f839b9864bf71fea4fd235db416c66a148f64df2cb3321d1e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/resource-budget.json",
+      "bytes": 184,
+      "sha256": "a62f7fad79c1b379afcc7f8cefa0fc059ec01d238ca1f9b82f20c2bfc084970f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/generated/stm32f407/selection.cmake",
+      "bytes": 1080,
+      "sha256": "f19f96952df4abc7fa3e74b457a26d7c4fa488928a7656b6c88b727533610d19"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/report.json",
+      "bytes": 60139,
+      "sha256": "df950d6fe4eca01b290ab7403d906a1adf2a1b67408ce93d19bab2010efe7031"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc-disassembly.log",
+      "bytes": 8443,
+      "sha256": "cb761451740a5e86c7c9b03319f6544c562ef2b3a2a691cbfc1e5f3444de4a66"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc-sections.log",
+      "bytes": 564,
+      "sha256": "4a3e7e3567a4e43dc26612c18baf9f83a98bcbff40ef8e32c11166e9fa06bf3f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc.d",
+      "bytes": 2728,
+      "sha256": "58ef8e122473b4d88ae8b02876ccdd894698398dd9a6cb078d7c26abed8fe9c8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc.o",
+      "bytes": 2264,
+      "sha256": "51c6c42661c551bae8ff0176418486573a11e0b42789f533a01c012c1824ab48"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous-disassembly.log",
+      "bytes": 27152,
+      "sha256": "1fc4c04ddfcefb2aab8931437216c0dd0a467bbcc3570342109783b73ece0b54"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous-sections.log",
+      "bytes": 1246,
+      "sha256": "44512b58a80b5343ed25ea05a89b925baf6903d81585972a82ff4e813a4579cf"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous.d",
+      "bytes": 2915,
+      "sha256": "4b360bc99582d64593f128c37525ccfa9fa176f6a6426d4e116ca08d294bd480"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous.o",
+      "bytes": 6508,
+      "sha256": "c1ef85c1ec110f8c2cf7d10e1258f06ce82408989e55bf6a70070f3e07321306"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream-disassembly.log",
+      "bytes": 28820,
+      "sha256": "b4faeed6a1c861c4989aff18ae6a54be531ef0f79d5992110fae0b0b9abbf25b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream-sections.log",
+      "bytes": 1209,
+      "sha256": "e3e157990dc4a00e7f5f6c82376a97fd37e0f444701bd2f76e60be399a1dc619"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream.d",
+      "bytes": 2907,
+      "sha256": "616516a3753547a22de7f441ea9234398f3941de9843bc9c69d451dc51e7f26d"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_stream.o",
+      "bytes": 6332,
+      "sha256": "52d5fd2a47de2cbae454cde73bfce1e91fc12c1db91a2a3d229388c72d5e071f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.c.raw",
+      "bytes": 407,
+      "sha256": "a5f58c6d151874c3c3fa3044361a473c7eee9f33eb18924fad370639a5bce097",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.d",
+      "bytes": 3827,
+      "sha256": "052614ac8aac26a11ebfebebda1db9d8b2f3c379101737493215c69137f00060"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline/types.elf",
+      "bytes": 5476,
+      "sha256": "128d74ddb7f2220d17b68502674771538dd00c16d9ca2f32fbfff5ca762ed343"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-baseline-nm.log",
+      "bytes": 419,
+      "sha256": "fb89876ed21d3d6e6c4be0f140a2ec149e39a0821898d29e6c36515c25400a7a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.c.raw",
+      "bytes": 668,
+      "sha256": "66d5b199455473a4a997c857278a2e525f9e7e51b999fc4e464c5be8f0817671",
+      "original_archive_path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.d",
+      "bytes": 2952,
+      "sha256": "603c888ddb1a7b9d5f5f19ff9c12efcbee1b42ee53aeab32a2d0eeaec81f98d3"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current/types.elf",
+      "bytes": 5688,
+      "sha256": "99c7a76e27555c586dca4c42f1128f205e76d20afb9e24a0a316cb8ebd5a7f10"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-current-nm.log",
+      "bytes": 571,
+      "sha256": "25f9fbf7fafbef5abc82fdf2a421f1090f4f9d307483a7126943e0c28abb04d3"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-fresh-authority.log",
+      "bytes": 122,
+      "sha256": "cb2ccbccbcac24aa4403aaa5717496609dee1674a483a7185ed1b288ba300244"
+    }
+  ],
+  "limits": [
+    "Register models are production-algorithm evidence, not physical ADC accuracy/latency/capture-duration qualification.",
+    "Default poll/finite/stream/slot storage unchanged; ADC ops Flash increases twelve bytes per selected table.",
+    "Multiple unobserved double-buffer laps cannot be counted from a latched TC bit and CT alone; no precise lost-trigger count or sample aperture timestamp is promised.",
+    "Observer timestamp is software publication observation in the Core clock domain.",
+    "New generated mode whole-firmware ELFs are integrated by configuration owner, not qualified by this type/object report."
+  ],
+  "physical_status": "not_executed",
+  "historical_source_archive_index": {
+    "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/artifact-relocation.json",
+    "bytes": 58418,
+    "sha256": "cdc467e37e5e4076fbc4462c4f8b1244b3893303159d115c3f8774ce9c371830"
+  },
+  "original_manifest": {
+    "path": "/workspace/nexus/tools/testing/evidence/adc-iteration/continuous-freeze.json.original.raw",
+    "bytes": 60331,
+    "sha256": "3e740d349ffa1f531ddd92d2a62590ffaa1135b2bafc3000e0526d67de17ab32"
+  }
+}

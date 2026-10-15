@@ -1,0 +1,38 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/native-debug/generated/resolved.json
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus/build/native-debug
+[1/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[2/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[3/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[4/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[5/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[6/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[7/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[8/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[9/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[10/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[11/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[12/17] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[13/17] Linking C static library lib/libnexus_io_native.a
+[14/17] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc.c.o
+[15/17] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o
+[16/17] Linking CXX executable bin/nexus_stm32_adc_stream_test
+FAILED: [code=1] bin/nexus_stm32_adc_stream_test 
+: && /usr/bin/c++ -g -Wl,--dependency-file=tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/link.d tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc.c.o -o bin/nexus_stm32_adc_stream_test  lib/libgmock_main.a  lib/libnexus_io_native.a  lib/libnexus_arch.a  lib/libgmock.a  lib/libgtest.a  lib/libnexus_io.a  lib/libnexus_arch.a  lib/libnexus_core.a && :
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o: warning: relocation against `nx_stm32_adc_stream_ops' in read-only section `.text._ZN14Stm32AdcStreamC2Ev[_ZN14Stm32AdcStreamC5Ev]'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o: in function `Stm32AdcStream::SetUp()':
+/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:68:(.text._ZN14Stm32AdcStream5SetUpEv[_ZN14Stm32AdcStream5SetUpEv]+0x190): undefined reference to `nx_stm32_adc_stream_initialize'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o: in function `Stm32AdcStream_PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume_Test::TestBody()':
+/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:92:(.text._ZN77Stm32AdcStream_PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume_Test8TestBodyEv+0x30c): undefined reference to `nx_stm32_adc_stream_irq'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o: in function `Stm32AdcStream_RefusedDisableNeverPublishesMutableDmaMemory_Test::TestBody()':
+/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:115:(.text._ZN64Stm32AdcStream_RefusedDisableNeverPublishesMutableDmaMemory_Test8TestBodyEv+0x111): undefined reference to `nx_stm32_adc_stream_irq'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o: in function `Stm32AdcStream::Stm32AdcStream()':
+/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:32:(.text._ZN14Stm32AdcStreamC2Ev[_ZN14Stm32AdcStreamC5Ev]+0x77): undefined reference to `nx_stm32_adc_stream_ops'
+/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.

@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "trigger": "GitHub a07a2dd push run38162514991 arch/security compile links passed but identity binding rejected old two-input navigation",
+  "red": "24identitycases; 3errors reproduce actual CLI and runtime metadata closure mismatch",
+  "green": "24actualidentitycases; CPU CLI has2 framed inputs, runtime has3, missingmetadata and replacedpolicyfacts reject",
+  "scope": "Raw execution preserved; does not claim physicalCPU or passingchangedremoteActions"
+}

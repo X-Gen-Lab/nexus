@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "kind": "independent_read_only_review",
+  "scope": "provider_retention_external_elf_fixture_corrective",
+  "reviewer": "/root/arch_runtime/retention_fixture_review",
+  "created_utc": "2026-10-11T21:27:01.299488+00:00",
+  "blocking_findings": [],
+  "verdict": "accepted_for_development_fixture_test_scope",
+  "source_inputs": [
+    {
+      "path": "/workspace/nexus/tools/testing/test_provider_retention.py",
+      "bytes": 20182,
+      "sha256": "75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992"
+    },
+    {
+      "path": "/workspace/nexus/tools/measurement/retention.py",
+      "bytes": 20078,
+      "sha256": "865f9adc4ea7819ced3c50240e7791c222abcdea895adeb9c8eb9cc6b6312a35"
+    },
+    {
+      "path": "/workspace/nexus/soc/gd32f470/drivers/i2c.c",
+      "bytes": 15319,
+      "sha256": "25ee035c32ea99b1bfffd1d09bee7c6c386c25f0b528bbfc7bb651160980675c"
+    },
+    {
+      "path": "/workspace/nexus/io/include/nexus/io/i2c.h",
+      "bytes": 9481,
+      "sha256": "0ee6a43651b49ffaca0727b239ad7e773ffee9f4a6f8a2395b62e29e8ffbc7a3"
+    }
+  ],
+  "evidence_inputs": [
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/development.json",
+      "bytes": 6362,
+      "sha256": "0ca7f31a52977469526f60e88da018564ecbbb9a0f13563606ddd466824a3c49"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/archive-index.json",
+      "bytes": 13202,
+      "sha256": "b30e7d9af573bea5e620d036ae797881957ef78f183b19ec5422141a865d5f6a"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/source-before.py.raw",
+      "bytes": 18595,
+      "sha256": "4094c8bcb77f2e222b5fbead63b075a628007b56a8e5594cd814171d0e9715b1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/existing-red/command.json",
+      "bytes": 1044,
+      "sha256": "b86db17ba2a069fc25c15d0f8fb72e893bb81309b4f8b60c0f95831b87a6810b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/existing-red/stderr.txt",
+      "bytes": 12880,
+      "sha256": "b1c6de6510b09e09477fa86a377d5d5d224e476c8acef790455b2f709ce56343"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/fixture-final-green/command.json",
+      "bytes": 1057,
+      "sha256": "70bb9f4239495e5c12a2c7dd156bcbcc7dc5fc0a527642d62156f910d5e4cf6c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/fixture-final-green/stderr.txt",
+      "bytes": 7429,
+      "sha256": "9d1b8ed92a8511ad45ccc22976dcf556b02fe101157a87cb91d431bfd03016a0"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/tools-final-green/command.json",
+      "bytes": 1136,
+      "sha256": "fd534a1d36d25429cbbbea9cd64e4f5b59f7617639bea46d284d9c99c6e7ad34"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/tools-final-green/stdout.txt",
+      "bytes": 545,
+      "sha256": "a257d1fbaffe41259aee5c1f405faebcdca5f9e648223b69480c14a19eff4913"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/tools-final-green/stderr.txt",
+      "bytes": 1318,
+      "sha256": "ebe3a4243666b5f1c4a978ef5aaba03441d514d3043e0d74771b4c362bfd012e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/tools-testing-final-green.json",
+      "bytes": 190,
+      "sha256": "1152b1de330a0bccb4eacb072277dd4868f98aceb4c4171703c8c62d386079ad"
+    }
+  ],
+  "source_binding_checks": {
+    "expected_test_sha256_matches": true,
+    "expected_manifest_sha256_matches": true,
+    "current_owned_and_context_sources_match_manifest": true,
+    "archived_source_snapshots_match_current_sources": true,
+    "archive_entries_checked": 29,
+    "archive_byte_or_sha256_mismatches": [],
+    "red_source_snapshot_matches_record": true,
+    "final_specialized_and_whole_tool_run_source_matches_current_owned_source": true
+  },
+  "reviewed_properties": [
+    "Public nx_i2c_endpoint_ops_t fields are transaction, submit, start_admitted, on_port; GD32 polling initializer supplies transaction and static on_port and leaves the two admission slots NULL.",
+    "Base synthetic table now has the on_port Thumb pointer in slot 3 at byte offset 48 and a local function symbol with FILE=i2c.c, matching the real initializer source.",
+    "GPIO, SPI and SPI-DMA derivative fixtures keep that selected I2C endpoint table complete and move its synthetic methods to distinct executable addresses when needed.",
+    "Production inspect_provider_retention still derives the ABI and initializer from real sources, requires every initialized method, checks concrete Thumb/LOAD code, and matches local FILE provenance to the initializer translation unit.",
+    "The reviewed production inspector bytes equal the retained source snapshot and the preexisting independent provider-assembly review source hash 865f9adc4ea7819ced3c50240e7791c222abcdea895adeb9c8eb9cc6b6312a35; no fixture-scope inspector relaxation is present.",
+    "All 38 original test methods are retained. Static AST comparison finds only four changed existing test bodies: three complete-method counts now include on_port and the weak-method test selects nx_gd32_i2c_endpoint_transaction by its actual name.",
+    "The original weak-symbol rejection still weakens the intended global transaction symbol. Added tests separately require the real on_port slot/local definition and reject a missing identity method or a same-named local method from another source.",
+    "No test removal, skip, expected-failure marker, production monkeypatch, test filter or negative assertion downgrade is introduced by the corrective diff."
+  ],
+  "owner_execution_evidence": {
+    "execution_author": "fixture_owner",
+    "red": {
+      "command_record": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/existing-red/command.json",
+      "source_sha256": "4094c8bcb77f2e222b5fbead63b075a628007b56a8e5594cd814171d0e9715b1",
+      "executed": 38,
+      "errors": 7,
+      "exit_code": 1,
+      "failure_reason": "Seven previously passing fixture paths reach the real inspector and fail because the now-initialized on_port method is omitted from the synthetic table.",
+      "source_unchanged_before_after": true
+    },
+    "final_specialized_green": {
+      "command_record": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/fixture-final-green/command.json",
+      "source_sha256": "75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992",
+      "executed": 41,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0,
+      "source_unchanged_before_after": true
+    },
+    "final_whole_tools_green": {
+      "command_record": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/tools-final-green/command.json",
+      "source_sha256": "75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992",
+      "suite": "testing",
+      "discovered": 433,
+      "executed": 433,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed",
+      "exit_code": 0,
+      "source_unchanged_before_after": true
+    },
+    "retained_initial_whole_suite_failure": {
+      "command_record": "/workspace/nexus/tools/testing/evidence/provider-retention-fixture-corrective/raw/tools-green/command.json",
+      "executed": 433,
+      "failures": 4,
+      "errors": 8,
+      "reason": "CMake executable absent from that child environment; raw failure kept and followed by full successful runs."
+    },
+    "raw_stream_hashes_match_command_records": true,
+    "acceptance_uses_final_runs": true
+  },
+  "reviewer_execution": {
+    "test_runs": 0,
+    "build_runs": 0,
+    "physical_runs": 0,
+    "actions": "Source/evidence reads, static diff and AST inspection, byte counts and SHA-256 checks, this review artifact write only."
+  },
+  "nonblocking_notes": [
+    "raw/final-sources.json records the earlier 3f869a94cfcbc7b24695ee20e36feaedfc1f4bfa974a364d8a8c0b964fc653d8 fixture variant. The final command records, manifest and archived owned-source snapshot bind acceptance to 75dc5dc7f9de0d18d58ca918285edf27335debd70294d086c23690073ed75992.",
+    "The PATH prefix is owner-reported environment context; the command records do not serialize the full environment. Final raw logs and report establish completed tool executions rather than a reproducible toolchain identity."
+  ],
+  "limitations": [
+    "This acceptance applies to the fixture correction and retained development execution, with no reviewer test or build reruns.",
+    "Synthetic ELF data exercises the real inspector and does not establish executable firmware behavior or functional controller/endpoint composition.",
+    "The broader production-inspector change already present in the working tree is outside this corrective diff; this review requires the exact inspected production hash and does not accept later changes to it.",
+    "Whole tool execution binds the corrected fixture hash, not a complete immutable closure of every mutable source in the 433-case suite.",
+    "No clean-source candidate, commit hook, GoogleTest/full firmware qualification, remote CI or physical/electrical qualification is established."
+  ],
+  "source_status": "working_tree_development_not_clean_candidate",
+  "physical_status": "not_executed"
+}

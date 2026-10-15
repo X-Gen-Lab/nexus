@@ -1,0 +1,1596 @@
+{
+  "schema": 1,
+  "kind": "development-contract-execution",
+  "preset": "uart-iteration explicit development subset",
+  "passed": 280,
+  "suites": [
+    {
+      "binary": "nexus_freertos_failstop_test",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 8,
+      "cases": [
+        {
+          "name": "AssertObservesLocationBeforeMaskAndPark",
+          "classname": "FreeRTOSFailStop",
+          "status": "passed"
+        },
+        {
+          "name": "StackOverflowNeverDereferencesTaskOrName",
+          "classname": "FreeRTOSFailStop",
+          "status": "passed"
+        },
+        {
+          "name": "ReturningObserverCannotReclaimLoanOrContinueKernel",
+          "classname": "FreeRTOSFailStop",
+          "status": "passed"
+        },
+        {
+          "name": "StrongerIncomingBasepriIsNeverWeakenedByPortStore",
+          "classname": "FreeRTOSFailStop",
+          "status": "passed"
+        },
+        {
+          "name": "EqualIncomingBasepriStaysMaskedThroughObservation",
+          "classname": "FreeRTOSFailStop",
+          "status": "passed"
+        },
+        {
+          "name": "PrimaskIsPreservedWithoutChangingAnotherMask",
+          "classname": "FreeRTOSFailStop",
+          "status": "passed"
+        },
+        {
+          "name": "FaultmaskIsPreservedWithoutChangingAnotherMask",
+          "classname": "FreeRTOSFailStop",
+          "status": "passed"
+        },
+        {
+          "name": "WeakerIncomingBasepriIsRaisedToActualKernelCeiling",
+          "classname": "FreeRTOSFailStop",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "5849983ad12336dc3283847356b44a917a013e3b3d3d8340558b5a3941cedb84"
+    },
+    {
+      "binary": "nexus_gd32_adc_stream_test",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 25,
+      "cases": [
+        {
+          "name": "FullScanPublicationRequiresEngineDetach",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "BackpressureNeverOverwritesAndResumeIsExplicit",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidDomainAndRateRejectBeforeLoanOrEffects",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "StopRetainsProducerUntilEngineStopsAndLateIRQIsHarmless",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "WakeUsesActualDmaPriorityAndLatchedPublication",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "EveryBlockRequiresStabilityAndRecalibrationBeforeTrigger",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "CalibrationTimeoutReleasesOnlyQuiescentProducer",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "StabilityClockStartsAfterPowerStoreHasCompleted",
+          "classname": "GD32ADCStream",
+          "status": "passed"
+        },
+        {
+          "name": "SwappedBankPublishesWhileOtherBankKeepsAcquiring",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "StarvationStopsAndNeverOverwritesBorrowedBlock",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "FailedDisableRetainsBothTargetsUntilReadback",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidLateDomainAndUnequalScanCapacityNeverLoan",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "WrongBankPhaseStopsInsteadOfPublishingUnknownScan",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedAddressWriteAndDrainRetainThreeLoans",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "BankSwitchDuringTargetWriteRejectsPublication",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitSampleTimeCostsLimitTheCompleteScanRate",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "IncorrectReplacementAddressNeverPublishesOldBlock",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorAtTargetStoreRejectsPublication",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "SequenceFactsReportSelectedCyclesAndNominalClocks",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ObserverEpochTracksBlockAndRejectsReleasedLoan",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "CalibrationTimeoutDoesNotInventCompletedBlockLoss",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorBeforeW1cCompletionStoreRemainsAuthoritative",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ExhaustedEpochRejectsBeforePartialDoubleTargetAdmission",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
+          "classname": "GD32ADCContinuous",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "2b1b32524008c1b30b14f77c74941f511823c67811062a98024a5e63f2a5a5e2"
+    },
+    {
+      "binary": "nexus_gd32_i2c_async_test",
+      "tests": 24,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 24,
+      "cases": [
+        {
+          "name": "OneByteNacksBeforeAddressClearAndWaitsStop",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "FinalThreeWithdrawsAckBeforeNMinusTwo",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ThreeByteAddressDisablesBufferInterruptBeforeBtf",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TwoBytesUsePosAndNackBeforeAddressClear",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "FourBytesConsumesOneThenFinalOneAndTwo",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TransmitTxeDoesNotConfirmWirePrefix",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CancelBeforeStartDrainsLateMasterWithoutRevokingLoan",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ArbitrationNeverInjectsStopIntoOtherMaster",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "DrainTimeoutQuarantinesThenOnlyActualReleaseSettles",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredAdmissionAndForeignIdentityHaveNoEffects",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RepeatedStartKeepsOneLoanAndResetsReceiveWindow",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReadWriteAliasesAndDescriptorWrapRejectBeforeMutation",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MaskedAdmissionAndAsyncPollingNeverTouchHardware",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CancelRequiresExplicitLocalRecoveryBeforeReuse",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "WakeFailureCannotUnlatchCompletionOrReleaseBorrow",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveLastIsBeforeAddressAndStopFollowsMemoryCompletion",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TxCounterZeroStillWaitsForBtf",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "SimultaneousPeripheralNackOutranksDmaCompletion",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CounterNotZeroNeverReportsPayloadCompleted",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedEngineDisableQuarantinesStorage",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "AllDomainsValidateBeforeAdmissionOrMmio",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "PeripheralErrorDuringStopDrainCannotPublishSuccess",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ColdRouteTamperingRejectsBeforeRegistersOrPublishers",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "UnsafeDmaPublisherPreventsKernelWakeBinding",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "300d67db4f0b24b6685b4bf76783a8c083df3a5442f61e7ad524a252d56c5a4c"
+    },
+    {
+      "binary": "nexus_gd32_i2c_register_test",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 13,
+      "cases": [
+        {
+          "name": "ReceivesThreeFourAndMaximumLengthWithExactPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MixedReadsUseRepeatedStartWithoutIntermediateStop",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NackArbitrationAndBusErrorPreserveCompletedReadPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ContextAndOversizedMessagesRejectBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NeverDeadlineRejectsBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StuckStopCannotReportSuccessAndRequiresRecovery",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "EightMessageBoundIsValidatedBeforeTheFirstStart",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedStopDoesNotIssueAnotherStopAfterMasterRelease",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StopBitClearWithoutMasterReleaseCannotReportSuccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveRestartIsRequestedOnlyOnceEvenWhenHardwareClearsIt",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "71d162b38fe0f3a81c5d1df45dd5cd559d4df3fb42f6346002240d00ef9fbf88"
+    },
+    {
+      "binary": "nexus_gd32_spi_dma_test",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 15,
+      "cases": [
+        {
+          "name": "ProgramsExactIndependentDmaRoutesWithoutCopying",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "PollingEndpointsProveSharedControllerWithoutDmaAlias",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitSingleCellSpansProgramFixedDmaWithoutScratch",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitDiscardRejectsInvalidSpansBeforeAnyEffects",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "BothDmaCompletionsRetainCsUntilIndependentWireIdle",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedDomainsOverlapAndExpiredDeadlineHaveZeroEffects",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "EndpointIdentityAndBusySecondChildCannotAcquireCs",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedEngineDisableKeepsBorrowDespiteIdleWire",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorRequiresExplicitIdleRecoveryAndNeverReplays",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "WakeFollowsLatchedFactsAndLateIrqsNeverReplayCompletion",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorWakeObservesLatchedDrainAfterRestoringIncomingMask",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "BothActualIrqPrioritiesMustPermitKernelCallingWake",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "FalseTransferCompleteCounterIsAnErrorAndCannotSettleSuccess",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedMemoryWithUnboundedRequestStillHasBoundedDrain",
+          "classname": "GD32SPIDMA",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "c1851d7f9fae78296ec9ed22228647b6d1dc9b124de464500368bd25c31b32f3"
+    },
+    {
+      "binary": "nexus_gd32_uart_dma_test",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 9,
+      "cases": [
+        {
+          "name": "DmaCompletionRetainsBorrowUntilIndependentWireIdle",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedDomainHasNoMemoryBorrowOrHardwareEffects",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "CancellationCannotReleaseMemoryWhenEngineStillOwnsIt",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "LateDmaIRQCannotReachSettledRequest",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "NeverDeadlineStillBoundsMissingWireCompletionAfterDma",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "NeverDeadlineStillBoundsRefusedEngineDisableAfterDma",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "AlreadyCompletedMemoryAndWireStaySuccessfulAtLateService",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx",
+          "classname": "GD32UARTDMA",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "6f814b9aadd714a3d381e169f8dba2565ea61c07fd6160346611f5c7f7458060"
+    },
+    {
+      "binary": "nexus_gd32_uart_receive_test",
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 35,
+      "cases": [
+        {
+          "name": "StartProgramsCallerBufferWithoutCpuPayloadCopy",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidFutureBufferRejectsWithoutLoanOrMmioEffect",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "IdlePublishesOnlyTheStablePartialPrefix",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedDisableRetainsLoanUntilARealServiceRetryDrains",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "FullDmaBlockRequiresExplicitOwnerRearm",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "TransferErrorAbortsUnreliablePrefixAndLatchesLoss",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "StopClosesTransmitAdmissionWhileConsumerLoanExists",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "PendingIdleThenDmaFlagCannotPublishSameBufferTwice",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousSwapsInactiveTargetBeforePublishingAndWraps",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousIdleFlushesCompletedHeadThenStablePartialFuture",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousUnexpectedParityOfBankStopsAndLatchesLoss",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveStopOnFreshStateFailsWithoutDereferencingHardware",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousRejectsUnequalOrTooFewBuffersWithoutAdmission",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "IrqTransmitAbortMustDrainRxBeforeResettingSharedUsart",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareFlowSurvivesIrqTransmitAbortControllerReset",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousWrongAddressStoreFailsExactReplacementProof",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "Rs485ActualProviderPrevalidatesAndWaitsWireTcBeforeDeWithdrawal",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ExactValidatorRejectsExpiredDescriptorWithoutBorrowOrMmio",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "IdleRechecksErrorThatArrivesDuringActualDmaDisable",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "StopRechecksUartErrorBeforeClearingDataAndPublishingPrefix",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousConsumesCapturedTcWithExactlyOneAckStore",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedSecondPrepostRollsBackEveryPrivateRetainedReference",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ObservedOverrunInFiniteGapIsRecordedBeforeRearmClearsStatus",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorArrivingDuringIdleDisableIsObservedBeforeDataClearsIt",
+          "classname": "Gd32UartReceive",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "62d017d723ab4d9858b3821631ed6769d88cf79479679246bbe9c97181e651d0"
+    },
+    {
+      "binary": "nexus_gd32_uart_stream_test",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 9,
+      "cases": [
+        {
+          "name": "ColdAssemblyAndRejectedAdmissionHaveNoRxStorageEffects",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "FullAndIdleBlocksNeverOverwriteHeldConsumer",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorOnlyNeverCreatesAStaleByteAndMarksValidPrefix",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "OverallStopPublishesPrefixAndWaitsForConsumerRelease",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "TxRemainsIndependentAndResetLossRestoresRxSource",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "DistinctControllersHaveIndependentLoansAndRegisters",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "FullIdleHasOnePublicationWithBothObservedFacts",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "WakeFollowsPublicationAndUsesActualPriorityCeiling",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        },
+        {
+          "name": "FailedResetRetainsTxAndRxLoanUntilProvedDrain",
+          "classname": "GD32UARTStream",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "802e28159e8a8c1f774f4da61870673c901cbd84f841eb82d39e3a53f3d66b21"
+    },
+    {
+      "binary": "nexus_io_state_machine_test",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 7,
+      "cases": [
+        {
+          "name": "UartCancellationAndEpochDoNotRevokeBorrow",
+          "classname": "IODescriptorSequences",
+          "status": "passed"
+        },
+        {
+          "name": "SpiCancellationAndEpochDoNotRevokeBorrow",
+          "classname": "IODescriptorSequences",
+          "status": "passed"
+        },
+        {
+          "name": "I2cCancellationAndEpochDoNotRevokeBorrow",
+          "classname": "IODescriptorSequences",
+          "status": "passed"
+        },
+        {
+          "name": "NativeUartThirtyTwoCancelDeadlineDrainHistories",
+          "classname": "IOProviderSequences",
+          "status": "passed"
+        },
+        {
+          "name": "NativeSpiSixteenCancelDeadlineDrainHistories",
+          "classname": "IOProviderSequences",
+          "status": "passed"
+        },
+        {
+          "name": "NativeAdcConsumerDelayStopAndOutOfOrderReleaseHistories",
+          "classname": "IOProviderSequences",
+          "status": "passed"
+        },
+        {
+          "name": "I2cPublicDispatchAndObservationRetainAcrossDependencyRetries",
+          "classname": "IOProviderSequences",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "074e86410f218dbb3353402a912ab048f5a730d2f1bf3807391747a5e3a2039e"
+    },
+    {
+      "binary": "nexus_stm32_adc_stream_test",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 26,
+      "cases": [
+        {
+          "name": "StabilizationRequiresExplicitServiceBeforeFirstTrigger",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "ValidatesCompleteScanConversionBudgetBeforeAdmission",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedDisableNeverPublishesMutableDmaMemory",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "MisalignedOrPartialScanBlocksRejectWithoutTimerEffects",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "WarmupStartsAfterPowerStoreBarrierCompletes",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "ObservedDmaFaultCannotBeReplacedByLateTransferComplete",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "BasicAdcInitializationCannotBypassStreamClockValidation",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidStreamClockBoundsRejectBeforeAdmission",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "StoppedMultiChannelStreamRestoresIndependentPollShots",
+          "classname": "Stm32AdcStream",
+          "status": "passed"
+        },
+        {
+          "name": "TwoPrepostedTargetsStayInvisibleUntilSwapped",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "HeldConsumerForcesStopAndExplicitWarmResume",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "FailedDrainRetainsBothPrepostedLoans",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "WholeScanEqualCapacityAndDomainsValidateBeforeLoan",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "WrongCompletionPhaseNeverPublishesUnprovenMemory",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedTargetWriteRetainsSpareUntilProvedDrain",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "BankFlipDuringAddressWriteNeverPublishesOldTarget",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "SequenceFactsAreColdAndDescribeCompleteScanCost",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ObserverUsesLoanEpochAndSoftwareObservationClock",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ObserverCountAndPayloadAliasRejectBeforeDmaLoan",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ObserverSequenceNeverWrapsOrPublishesMissingRecord",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "WrongAddressReadbackMustNotReleasePreviousTarget",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorArrivingDuringTargetWriteRejectsPublication",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "NewErrorAtCompletionAcknowledgementCannotDisappear",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "ExhaustedEpochRejectsBeforePartialDoubleTargetAdmission",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        },
+        {
+          "name": "EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
+          "classname": "Stm32AdcContinuous",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "4b3a9aa46c4ef98b8d0d639b19527b272a9817f0ac076e6959ea9f406a3a2cc6"
+    },
+    {
+      "binary": "nexus_stm32_i2c_async_test",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 23,
+      "cases": [
+        {
+          "name": "OneByteNacksBeforeAddressClearAndWaitsStop",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "FinalThreeWithdrawsAckBeforeNMinusTwo",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ThreeByteAddressDisablesBufferInterruptBeforeBtf",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TwoBytesUsePosAndNackBeforeAddressClear",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "FourBytesConsumesOneThenFinalOneAndTwo",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TransmitTxeDoesNotConfirmWirePrefix",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CancelBeforeStartDrainsLateMasterWithoutRevokingLoan",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ArbitrationNeverInjectsStopIntoOtherMaster",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "DrainTimeoutQuarantinesThenOnlyActualReleaseSettles",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredAdmissionAndForeignIdentityHaveNoEffects",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RepeatedStartKeepsOneLoanAndResetsReceiveWindow",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReadWriteAliasesAndDescriptorWrapRejectBeforeMutation",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MaskedAdmissionAndAsyncPollingNeverTouchHardware",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CancelRequiresExplicitLocalRecoveryBeforeReuse",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "WakeFailureCannotUnlatchCompletionOrReleaseBorrow",
+          "classname": "I2CAsyncRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveLastIsBeforeAddressAndStopFollowsMemoryCompletion",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "TxCounterZeroStillWaitsForBtf",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "SimultaneousPeripheralNackOutranksDmaCompletion",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CounterNotZeroNeverReportsPayloadCompleted",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedEngineDisableQuarantinesStorage",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "AllDomainsValidateBeforeAdmissionOrMmio",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "PeripheralErrorDuringStopDrainCannotPublishSuccess",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ColdRouteTamperingRejectsBeforeRegistersOrPublishers",
+          "classname": "I2CDmaRegisters",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "a8e76af3275044a53b89e640d3d4d9afeebd605c04e2afe7dbc447d76ff799ed"
+    },
+    {
+      "binary": "nexus_stm32_i2c_register_test",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 14,
+      "cases": [
+        {
+          "name": "ReceivesThreeFourAndMaximumLengthWithExactPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MixedReadsUseRepeatedStartWithoutIntermediateStop",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NackArbitrationAndBusErrorPreserveCompletedReadPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ContextAndOversizedMessagesRejectBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "NeverDeadlineRejectsBeforeHardwareAccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StuckStopCannotReportSuccessAndRequiresRecovery",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "EightMessageBoundIsValidatedBeforeTheFirstStart",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedStopDoesNotIssueAnotherStopAfterMasterRelease",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "StopBitClearWithoutMasterReleaseCannotReportSuccess",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveRestartIsRequestedOnlyOnceEvenWhenHardwareClearsIt",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "RecoveryRequiresBothReleasedLinesWhenBusyFlagIsClear",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        },
+        {
+          "name": "MissingLineFactsRejectInitializationAndRecovery",
+          "classname": "I2CRegisters",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "c37475d5686985ec17fdc490bf17a33a032a7124baf8e800addf170e3c2879a9"
+    },
+    {
+      "binary": "nexus_stm32_spi_dma_test",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 11,
+      "cases": [
+        {
+          "name": "BothDmaCompletionsKeepCsAndBorrowUntilSpiIsIdle",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitDiscardBorrowsOneCellAndDisablesRxIncrement",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "ExplicitDummyBorrowsOneCellAndDisablesTxIncrement",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "FixedMemoryRejectsUnknownOverlapAndMissingDomains",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "FollowingOrdinaryAdmissionRestoresBothMemoryIncrements",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "CancelledPartialDmaRetainsCsAndNeverInventsWireByteCount",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedEngineDisableRetainsBorrowEvenWhenWireIsIdle",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "WrongBusIdentityAndInvalidDomainsFailBeforeAdmission",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "PollingEndpointsProveSharedControllerWithoutDmaAlias",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        },
+        {
+          "name": "LateServiceWithRealCompletionProofPreservesSuccess",
+          "classname": "Stm32SpiDma",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "0c44094fcafd30669c62b88a7dc8b2a81eeb16cafb11167a81938ba3ca247dec"
+    },
+    {
+      "binary": "nexus_stm32_uart_dma_test",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 10,
+      "cases": [
+        {
+          "name": "DmaTransferCompleteCannotSettleUntilUartTc",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "CancellationCountsOnlyProvenWireBytesAndRetainsDrainBorrow",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidDomainRejectsWithoutBorrowOrRegisterWrites",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "ExpiredDrainQuarantinesUntilActualWireIdle",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "WireIdleCannotReleaseMemoryWhenEngineRefusesDisable",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "DmaCompletionBoundsWireDrainWithoutRequestDeadline",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "LateServiceWithWireAndEngineProofPreservesSuccess",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "BlockRxRequiresTheSeparateStreamProvider",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        },
+        {
+          "name": "DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx",
+          "classname": "Stm32UartDma",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "93aee2b5ecc36978bb1b78b3d30655b7366015b6a0e69cc8e5352de786a07abc"
+    },
+    {
+      "binary": "nexus_stm32_uart_receive_test",
+      "tests": 33,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 33,
+      "cases": [
+        {
+          "name": "StartProgramsCallerBufferWithoutCpuPayloadCopy",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidFutureBufferRejectsWithoutLoanOrMmioEffect",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "IdlePublishesOnlyTheStablePartialPrefix",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RefusedDisableRetainsLoanUntilARealServiceRetryDrains",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "FullDmaBlockRequiresExplicitOwnerRearm",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "TransferErrorAbortsUnreliablePrefixAndLatchesLoss",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "StopClosesTransmitAdmissionWhileConsumerLoanExists",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "PendingIdleThenDmaFlagCannotPublishSameBufferTwice",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousSwapsInactiveTargetBeforePublishingAndWraps",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousIdleFlushesCompletedHeadThenStablePartialFuture",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousUnexpectedParityOfBankStopsAndLatchesLoss",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ReceiveStopOnFreshStateFailsWithoutDereferencingHardware",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousRejectsUnequalOrTooFewBuffersWithoutAdmission",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousWrongAddressStoreFailsExactReplacementProof",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "Rs485ActualProviderPrevalidatesAndWaitsWireTcBeforeDeWithdrawal",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ExactValidatorRejectsExpiredDescriptorWithoutBorrowOrMmio",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "IdleRechecksErrorThatArrivesDuringActualDmaDisable",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "StopRechecksUartErrorBeforeClearingDataAndPublishingPrefix",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ContinuousConsumesCapturedTcWithExactlyOneAckStore",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "RejectedSecondPrepostRollsBackEveryPrivateRetainedReference",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ObservedOverrunInFiniteGapIsRecordedBeforeRearmClearsStatus",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorArrivingDuringIdleDisableIsObservedBeforeDataClearsIt",
+          "classname": "Stm32UartReceive",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "335562a32acde889a8235884b8962bb6ad76f0399b25e08b099e15a05793f1a4"
+    },
+    {
+      "binary": "nexus_stm32_uart_stream_test",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 5,
+      "cases": [
+        {
+          "name": "IdlePublishesPartialAndBackpressureKeepsConsumerLoan",
+          "classname": "Stm32UartStream",
+          "status": "passed"
+        },
+        {
+          "name": "DroppedReceptionProducesLossAtTheNextUsefulBlock",
+          "classname": "Stm32UartStream",
+          "status": "passed"
+        },
+        {
+          "name": "FullIdleHasOnePublicationWithBothObservedFacts",
+          "classname": "Stm32UartStreamFacts",
+          "status": "passed"
+        },
+        {
+          "name": "ErrorOnlyMarksFilledPrefixAtIdleWithoutFakeByte",
+          "classname": "Stm32UartStreamFacts",
+          "status": "passed"
+        },
+        {
+          "name": "StopPublishesErrorPrefixAndJoinsConsumerLoan",
+          "classname": "Stm32UartStreamFacts",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "909805b7dcdb7025b25ccb32994dcb30a4b1ae0957c8eec20b34b697112ff5f7"
+    },
+    {
+      "binary": "nexus_uart_rs485_test",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 13,
+      "cases": [
+        {
+          "name": "RejectsInvalidTransportBeforeDirectionOrBorrow",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "SetupThenTrueTransportSettlementThenMinimumHold",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "CancelDuringSetupNeverStartsUartAndWithdrawsDirection",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "SetupConsumesAbsoluteDeadlineAndDoesNotStartExpiredTransfer",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "ActiveCancelAndFailedDrainRetainOuterBorrowAndDirection",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "FailedDirectionWithdrawalQuarantinesUntilActualRetry",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "StopClosesAdmissionAndDrainsDirectionBeforeTransportStop",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "SuccessAlreadySettledInTransportWinsLaterCancel",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "InitRejectsConfigOverlappingControlBeforeAnyDirectionStore",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "InvalidDirectionMaskRejectsBeforeStartupStore",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "FailedTransportStartWithdrawsDirectionBeforeSettlingOuter",
+          "classname": "UartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "NativeWireTcAndSelectedDirectionHaveIndependentLifetimes",
+          "classname": "NativeUartRs485",
+          "status": "passed"
+        },
+        {
+          "name": "NativeHeldDrainRetainsOuterDirectionUntilRealRetry",
+          "classname": "NativeUartRs485",
+          "status": "passed"
+        }
+      ],
+      "report_sha256": "9183b64dbe2a5965eb34e1274a1ee9ccbd88034541eb6c6ed04afb39a518d6a7"
+    }
+  ],
+  "scope": "Development targeted full-binary execution using maintained tdd_gate helpers; not complete repository/clean candidate/HIL."
+}

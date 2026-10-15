@@ -1,0 +1,53 @@
+test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute) ... FAIL
+test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected) ... FAIL
+test_selected_variable_sections_compile_on_both_compilers (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile_on_both_compilers) ... FAIL
+test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error) ... FAIL
+
+======================================================================
+FAIL: test_function_misuse_is_rejected_by_variable_only_attribute (tests.contracts.test_memory_placement.MemoryPlacementTests.test_function_misuse_is_rejected_by_variable_only_attribute)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 58, in test_function_misuse_is_rejected_by_variable_only_attribute
+    for compiler in self.compilers():
+                    ^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 33, in compilers
+    self.fail("Both actual GNU and Clang C compilers are required")
+AssertionError: Both actual GNU and Clang C compilers are required
+
+======================================================================
+FAIL: test_nonzero_bss_and_noinit_initializer_is_rejected (tests.contracts.test_memory_placement.MemoryPlacementTests.test_nonzero_bss_and_noinit_initializer_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 68, in test_nonzero_bss_and_noinit_initializer_is_rejected
+    for compiler in self.compilers():
+                    ^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 33, in compilers
+    self.fail("Both actual GNU and Clang C compilers are required")
+AssertionError: Both actual GNU and Clang C compilers are required
+
+======================================================================
+FAIL: test_selected_variable_sections_compile_on_both_compilers (tests.contracts.test_memory_placement.MemoryPlacementTests.test_selected_variable_sections_compile_on_both_compilers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 37, in test_selected_variable_sections_compile_on_both_compilers
+    for compiler in self.compilers():
+                    ^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 33, in compilers
+    self.fail("Both actual GNU and Clang C compilers are required")
+AssertionError: Both actual GNU and Clang C compilers are required
+
+======================================================================
+FAIL: test_unselected_use_is_a_compile_error (tests.contracts.test_memory_placement.MemoryPlacementTests.test_unselected_use_is_a_compile_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 48, in test_unselected_use_is_a_compile_error
+    for compiler in self.compilers():
+                    ^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tests/contracts/test_memory_placement.py", line 33, in compilers
+    self.fail("Both actual GNU and Clang C compilers are required")
+AssertionError: Both actual GNU and Clang C compilers are required
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+FAILED (failures=4)

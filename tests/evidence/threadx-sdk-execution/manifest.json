@@ -1,0 +1,320 @@
+{
+  "evidence": {
+    "bytes": 3620,
+    "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/manifest.json",
+    "sha256": "93d173d98856e132a477ec0c3cfeac8ca1711901287b78405d5f44dd70171fed"
+  },
+  "failed_attempts_retained": [
+    "frozen-script-incomplete-SOURCE_ROOT",
+    "authored-assembly-missing-memory"
+  ],
+  "initial_31_sdk_suite": "separate-original-immutable-record",
+  "kind": "installed-sdk-threadx-public-native-execution-development",
+  "physical": "not_executed",
+  "preserved_raw_bytes": [
+    {
+      "original": {
+        "bytes": 458,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run1/configure.command.json",
+        "sha256": "0d157ad711afcba21aecca98c9af0219f11885512ee9617b2e4eb2fb16dee3d9"
+      },
+      "preserved": {
+        "bytes": 458,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run1/configure.command.json",
+        "sha256": "0d157ad711afcba21aecca98c9af0219f11885512ee9617b2e4eb2fb16dee3d9"
+      }
+    },
+    {
+      "original": {
+        "bytes": 1275,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run1/configure.log",
+        "sha256": "1c27e26b01c73e25b64e0813aa0949eef64c9459e1d11350d68e2e2c32696fd5"
+      },
+      "preserved": {
+        "bytes": 1275,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run1/configure.output",
+        "sha256": "1c27e26b01c73e25b64e0813aa0949eef64c9459e1d11350d68e2e2c32696fd5"
+      }
+    },
+    {
+      "original": {
+        "bytes": 250,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/build.command.json",
+        "sha256": "bb66c23ac5f900d8dee3c430dcfb9ecfcf64d0e9e729a0f6302f34e8bfb9bbd2"
+      },
+      "preserved": {
+        "bytes": 250,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/build.command.json",
+        "sha256": "bb66c23ac5f900d8dee3c430dcfb9ecfcf64d0e9e729a0f6302f34e8bfb9bbd2"
+      }
+    },
+    {
+      "original": {
+        "bytes": 44155,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/build.log",
+        "sha256": "19083bba45775dd7edcc9c198b0cc4de6bbf3b47e7d36f8f709cbc0d4f20d0b3"
+      },
+      "preserved": {
+        "bytes": 44155,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/build.output",
+        "sha256": "19083bba45775dd7edcc9c198b0cc4de6bbf3b47e7d36f8f709cbc0d4f20d0b3"
+      }
+    },
+    {
+      "original": {
+        "bytes": 458,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/configure.command.json",
+        "sha256": "24b28afa34e92552e3bf7edd44cb3c84c0395eddff2def7ebaeebf12c94485a7"
+      },
+      "preserved": {
+        "bytes": 458,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/configure.command.json",
+        "sha256": "24b28afa34e92552e3bf7edd44cb3c84c0395eddff2def7ebaeebf12c94485a7"
+      }
+    },
+    {
+      "original": {
+        "bytes": 1480,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/configure.log",
+        "sha256": "134b7d74c53f0e996a1ffe16dc638ea8255ab4b53e26fc98f6fbc70a8aa723b7"
+      },
+      "preserved": {
+        "bytes": 1480,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/configure.output",
+        "sha256": "134b7d74c53f0e996a1ffe16dc638ea8255ab4b53e26fc98f6fbc70a8aa723b7"
+      }
+    },
+    {
+      "original": {
+        "bytes": 251,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/discovery.command.json",
+        "sha256": "0f18cf1fcbd343b478ae19db9be74e18afe2cd6f93c36a9876f6a2af081798b5"
+      },
+      "preserved": {
+        "bytes": 251,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/discovery.command.json",
+        "sha256": "0f18cf1fcbd343b478ae19db9be74e18afe2cd6f93c36a9876f6a2af081798b5"
+      }
+    },
+    {
+      "original": {
+        "bytes": 73,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/discovery.log",
+        "sha256": "a1ed7d23f63d4a9af3da754824f6058087006a90c32379b526c07661e32222e1"
+      },
+      "preserved": {
+        "bytes": 73,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/discovery.output",
+        "sha256": "a1ed7d23f63d4a9af3da754824f6058087006a90c32379b526c07661e32222e1"
+      }
+    },
+    {
+      "original": {
+        "bytes": 392,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/execution.command.json",
+        "sha256": "08d3a7aceaac8b2b85935c0b979ab01e0d8fb3f3d89cddcb3a6f3a685aa9b5c2"
+      },
+      "preserved": {
+        "bytes": 392,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/execution.command.json",
+        "sha256": "08d3a7aceaac8b2b85935c0b979ab01e0d8fb3f3d89cddcb3a6f3a685aa9b5c2"
+      }
+    },
+    {
+      "original": {
+        "bytes": 555,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/execution.log",
+        "sha256": "0517d0bd3c7d90b613a777b421964826d9dbac6fa167a3a47f00a2cfb7f5ef09"
+      },
+      "preserved": {
+        "bytes": 555,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/execution.output",
+        "sha256": "0517d0bd3c7d90b613a777b421964826d9dbac6fa167a3a47f00a2cfb7f5ef09"
+      }
+    },
+    {
+      "original": {
+        "bytes": 3620,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/manifest.json",
+        "sha256": "93d173d98856e132a477ec0c3cfeac8ca1711901287b78405d5f44dd70171fed"
+      },
+      "preserved": {
+        "bytes": 3620,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/manifest.json",
+        "sha256": "93d173d98856e132a477ec0c3cfeac8ca1711901287b78405d5f44dd70171fed"
+      }
+    },
+    {
+      "original": {
+        "bytes": 782,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/results.xml",
+        "sha256": "8ce131b68ea7a37986e0e8c1f6fee3dc09c1a8eb614f5fae1084502a418c0461"
+      },
+      "preserved": {
+        "bytes": 782,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/results.xml",
+        "sha256": "8ce131b68ea7a37986e0e8c1f6fee3dc09c1a8eb614f5fae1084502a418c0461"
+      }
+    },
+    {
+      "original": {
+        "bytes": 343,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/verified-sdk.command.json",
+        "sha256": "05f348e8f70003723de9221d239311ed8c2bc4eeb2f5245c9f9299899bb61458"
+      },
+      "preserved": {
+        "bytes": 343,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/verified-sdk.command.json",
+        "sha256": "05f348e8f70003723de9221d239311ed8c2bc4eeb2f5245c9f9299899bb61458"
+      }
+    },
+    {
+      "original": {
+        "bytes": 267,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/verified-sdk.log",
+        "sha256": "0292f43aa3216dfc2f88496c78ae09e8bb1ebdbac36b15d3c89f66c019372536"
+      },
+      "preserved": {
+        "bytes": 267,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2/verified-sdk.output",
+        "sha256": "0292f43aa3216dfc2f88496c78ae09e8bb1ebdbac36b15d3c89f66c019372536"
+      }
+    },
+    {
+      "original": {
+        "bytes": 905,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-package-run1.output",
+        "sha256": "4355e0b72ef559bf9873bcae967129662c64888bb9ea5d53a4722fc54ca1968e"
+      },
+      "preserved": {
+        "bytes": 905,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-package-run1.output",
+        "sha256": "4355e0b72ef559bf9873bcae967129662c64888bb9ea5d53a4722fc54ca1968e"
+      }
+    },
+    {
+      "original": {
+        "bytes": 267,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-package-run2.output",
+        "sha256": "0292f43aa3216dfc2f88496c78ae09e8bb1ebdbac36b15d3c89f66c019372536"
+      },
+      "preserved": {
+        "bytes": 267,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-package-run2.output",
+        "sha256": "0292f43aa3216dfc2f88496c78ae09e8bb1ebdbac36b15d3c89f66c019372536"
+      }
+    },
+    {
+      "original": {
+        "bytes": 181,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-threadx-run1.toml.snapshot.txt",
+        "sha256": "b4239b82a924f0b2170c823cb774a58f49abdc7a6417e718311e90f9934c2e97"
+      },
+      "preserved": {
+        "bytes": 181,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-threadx-run1.toml.snapshot.txt",
+        "sha256": "b4239b82a924f0b2170c823cb774a58f49abdc7a6417e718311e90f9934c2e97"
+      }
+    },
+    {
+      "original": {
+        "bytes": 910,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run1-driver.output",
+        "sha256": "6d8b170ec23d75d9368050e01bb9dfcf087dfa5c9a39711a9c0a4861e5a1869d"
+      },
+      "preserved": {
+        "bytes": 910,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run1-driver.output",
+        "sha256": "6d8b170ec23d75d9368050e01bb9dfcf087dfa5c9a39711a9c0a4861e5a1869d"
+      }
+    },
+    {
+      "original": {
+        "bytes": 1082,
+        "path": "/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2-driver.output",
+        "sha256": "9e2e4205b77a7eaa593f3fdd56e47cdf12a44b865cdbce876219ead38d0e7f6f"
+      },
+      "preserved": {
+        "bytes": 1082,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk-native-execution-run2-driver.output",
+        "sha256": "9e2e4205b77a7eaa593f3fdd56e47cdf12a44b865cdbce876219ead38d0e7f6f"
+      }
+    },
+    {
+      "original": {
+        "bytes": 527,
+        "path": "/workspace/nexus-threadx-probe/sdk-native/CMakeLists.txt",
+        "sha256": "f1e042b2fd6e26e38082e6a458274ffe18fec1453d1b35f163e1aeb4f2acf9fd"
+      },
+      "preserved": {
+        "bytes": 527,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/fixture/CMakeLists.txt.snapshot.txt",
+        "sha256": "f1e042b2fd6e26e38082e6a458274ffe18fec1453d1b35f163e1aeb4f2acf9fd"
+      }
+    },
+    {
+      "original": {
+        "bytes": 3914,
+        "path": "/workspace/nexus-threadx-probe/sdk-native/main.cpp",
+        "sha256": "91cd683968252a35da729616cf86b23260c58c6f50498f95fb53ef6b89999870"
+      },
+      "preserved": {
+        "bytes": 3914,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/fixture/main.cpp.snapshot.txt",
+        "sha256": "91cd683968252a35da729616cf86b23260c58c6f50498f95fb53ef6b89999870"
+      }
+    },
+    {
+      "original": {
+        "bytes": 235,
+        "path": "/workspace/nexus-threadx-probe/sdk-native/threadx.toml",
+        "sha256": "f67267a37ebd5f9f5b73c53fee24fa920057725e884536870156ec816069dc15"
+      },
+      "preserved": {
+        "bytes": 235,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/fixture/threadx.toml.snapshot.txt",
+        "sha256": "f67267a37ebd5f9f5b73c53fee24fa920057725e884536870156ec816069dc15"
+      }
+    },
+    {
+      "original": {
+        "bytes": 2827,
+        "path": "/workspace/nexus-threadx-probe/sdk_native_execution.py",
+        "sha256": "ea10a36b12086aaa4f3fd96e1aa65464a60f6d211336a60ebc42585287db7968"
+      },
+      "preserved": {
+        "bytes": 2827,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk_native_execution.py.snapshot.txt",
+        "sha256": "ea10a36b12086aaa4f3fd96e1aa65464a60f6d211336a60ebc42585287db7968"
+      }
+    },
+    {
+      "original": {
+        "bytes": 2827,
+        "path": "/workspace/nexus-threadx-probe/sdk_native_execution_run2.py",
+        "sha256": "2f86a7c521d3e8f75e7a98981081e586fe91c3f4507cb1acf7549d38cd5eca64"
+      },
+      "preserved": {
+        "bytes": 2827,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/sdk_native_execution_run2.py.snapshot.txt",
+        "sha256": "2f86a7c521d3e8f75e7a98981081e586fe91c3f4507cb1acf7549d38cd5eca64"
+      }
+    },
+    {
+      "original": {
+        "bytes": 1617795,
+        "path": "/workspace/nexus-threadx-probe/sdk-native-package-run2/share/nexus/src/.nexus-source-sdk.json",
+        "sha256": "36158eced45bb8f74042d19799a1692e96f715b831334d37142c00db9ee4c4e1"
+      },
+      "preserved": {
+        "bytes": 1617795,
+        "path": "/workspace/nexus/tests/evidence/threadx-sdk-execution/installed-source-sdk.json",
+        "sha256": "36158eced45bb8f74042d19799a1692e96f715b831334d37142c00db9ee4c4e1"
+      }
+    }
+  ],
+  "qualification": "unsigned-dirty-development-fixture-only",
+  "schema": 1,
+  "shutdown": "whole-host-process-reset-after-Google-XML-no-running-kernel-platform-stop",
+  "test_cases": 2
+}

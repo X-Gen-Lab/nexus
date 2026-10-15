@@ -1,0 +1,54 @@
+Running main() from gmock_main.cc
+[==========] Running 17 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 17 tests from ClockDomain
+[ RUN      ] ClockDomain.CloseRetainsConsumerUntilExactRelease
+[       OK ] ClockDomain.CloseRetainsConsumerUntilExactRelease (0 ms)
+[ RUN      ] ClockDomain.CopiedTokenCannotRemoveOriginalBorrow
+[       OK ] ClockDomain.CopiedTokenCannotRemoveOriginalBorrow (0 ms)
+[ RUN      ] ClockDomain.ReopenInvalidatesOldControlWithoutEpochReuse
+[       OK ] ClockDomain.ReopenInvalidatesOldControlWithoutEpochReuse (0 ms)
+[ RUN      ] ClockDomain.ExhaustedEpochCannotReopen
+[       OK ] ClockDomain.ExhaustedEpochCannotReopen (0 ms)
+[ RUN      ] ClockDomain.ExactCapacityAndDuplicateAdmissionReject
+[       OK ] ClockDomain.ExactCapacityAndDuplicateAdmissionReject (0 ms)
+[ RUN      ] ClockDomain.ForeignDomainAndDoubleReleaseKeepOwnership
+[       OK ] ClockDomain.ForeignDomainAndDoubleReleaseKeepOwnership (0 ms)
+[ RUN      ] ClockDomain.CloseOutputCannotOverwriteDomainOrLease
+[       OK ] ClockDomain.CloseOutputCannotOverwriteDomainOrLease (0 ms)
+[ RUN      ] ClockDomain.UnalignedAndWrappingTokenRejectBeforeAccess
+[       OK ] ClockDomain.UnalignedAndWrappingTokenRejectBeforeAccess (0 ms)
+[ RUN      ] ClockDomain.LiveConstructAndZeroCapacityRejectUnchanged
+[       OK ] ClockDomain.LiveConstructAndZeroCapacityRejectUnchanged (0 ms)
+[ RUN      ] ClockDomain.CloseIsIdempotentButOpenControlIsNotQuiescent
+[       OK ] ClockDomain.CloseIsIdempotentButOpenControlIsNotQuiescent (0 ms)
+[ RUN      ] ClockDomain.ReopenWithConsumerIsBusyAndRetainsClosedState
+[       OK ] ClockDomain.ReopenWithConsumerIsBusyAndRetainsClosedState (0 ms)
+[ RUN      ] ClockDomain.GuardNestingRestoresIncomingMask
+[       OK ] ClockDomain.GuardNestingRestoresIncomingMask (0 ms)
+[ RUN      ] ClockDomain.ConcurrentConsumersCannotCrossClosedAdmission
+[       OK ] ClockDomain.ConcurrentConsumersCannotCrossClosedAdmission (1 ms)
+[ RUN      ] ClockDomain.DuplicateNonHeadTokenIsAStateRejection
+/workspace/nexus/tests/google/clock_domain_test.cpp:182: Failure
+Expected equality of these values:
+  nx_clock_domain_acquire(&domain, &first)
+    Which is: 1
+  NX_ERROR_STATE
+    Which is: 3
+
+[  FAILED  ] ClockDomain.DuplicateNonHeadTokenIsAStateRejection (0 ms)
+[ RUN      ] ClockDomain.UnprivilegedOrFaultCannotAcquireOrClose
+[       OK ] ClockDomain.UnprivilegedOrFaultCannotAcquireOrClose (0 ms)
+[ RUN      ] ClockDomain.ConfigurableIrqAcquiresButCannotCloseLifecycle
+[       OK ] ClockDomain.ConfigurableIrqAcquiresButCannotCloseLifecycle (0 ms)
+[ RUN      ] ClockDomain.StaleControlAndNullInputsRejectWithoutWrites
+[       OK ] ClockDomain.StaleControlAndNullInputsRejectWithoutWrites (0 ms)
+[----------] 17 tests from ClockDomain (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 17 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 16 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] ClockDomain.DuplicateNonHeadTokenIsAStateRejection
+
+ 1 FAILED TEST

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "kind": "artifact_archive_metadata_failure",
+  "status": "failed",
+  "scope": "archive_metadata_only_not_production_compile_or_measurement",
+  "observed_exception": "FileNotFoundError: raw/execution/run1-execution.json missing while constructing archive index",
+  "cause": "outer execution document was not added as a self identity to the referenced-file traversal",
+  "retained_partial_archive": "/workspace/nexus/tools/testing/evidence/os-resource-refresh/raw",
+  "production_report_status": "passed",
+  "production_report_sha256": "815c1b53400a7b2111c312a292d95d02bdfd51c992b0b36c7b8dadb786cd187e",
+  "continuation": "verify existing raw bytes then copy only missing execution document and emit fresh metadata",
+  "recorded_at": "2026-10-11T20:25:38.264049+00:00"
+}

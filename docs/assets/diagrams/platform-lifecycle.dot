@@ -1,0 +1,55 @@
+// FIG-05 current: source-backed, scoped engineering view.
+// Code basis: 0111c8d3b9c7b37d258b9c401070305b13b6f3a1.
+// Relations and qualification limits are documented in README.md.
+digraph PlatformLifecycle {
+    graph [newrank=true, rankdir=TB, bgcolor="white", pad=0.28, nodesep=0.42,
+           ranksep=0.66, fontname="Noto Sans CJK SC", fontsize=15,
+           labelloc=t];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=13, margin="0.18,0.12"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=11, arrowsize=0.8];
+
+    graph [label="FIG-05 生成 Platform 的显式冷生命周期
+同一外部 privileged task owner 串行推进"];
+    cold [label="冷对象：无成功运行许可", fillcolor="#f8fafc"];
+    context [label="检查 context / started
+拒绝 ISR、mask；物理实现检查 privilege"];
+    system [label="SoC start_system / start_resources
+冷时钟、timebase、pin 租约等精确前提"];
+    instances [label="按声明次序 initialize 实例
+可能留效果者在调用前计入 cleanup"];
+    running [label="start primary=SUCCESS
+外部应用才可开展业务；不启动 scheduler", fillcolor="#f0fdf4"];
+    quiesce [label="外部先关闭 producers / direct writers
+执行者继续 drain，join 调用者与 observers"];
+    reverse [label="nx_platform_stop：已初始化实例逆序停止
+仅成功一步后减少 initialized 计数"];
+    withdraw [label="provider stop_system
+恢复自有 pin / gate / timebase / cache 效果"];
+    released [label="stop=SUCCESS：剩余效果已释放
+不保证继续主动驱动产品安全电平", fillcolor="#f0fdf4"];
+    primary [label="初始化错误：保留 primary
+调用 nx_platform_stop 收集 cleanup", fillcolor="#fff7ed"];
+    retained [label="BUSY / IO：保留未清理 leases 与存储
+可能已部分停止；继续必要 service 后重试", fillcolor="#fff7ed"];
+    cold -> context [label="显式 start"];
+    rejected [label="拒绝：保留原生命周期与效果\n未授权新业务调用", fillcolor="#fff7ed"];
+    context -> rejected [label="context / STATE 错误"];
+    context -> system [label="前提通过"];
+    system -> instances [label="阶段成功"];
+    system -> retained [label="取得效果后失败"];
+    instances -> running [label="全部成功"];
+    instances -> primary [label="任一失败"];
+    primary -> reverse [label="逆序 cleanup（含留效果的失败实例）"];
+    running -> quiesce [label="产品决定停止"];
+    quiesce -> reverse [label="满足 stop 调用前提"];
+    reverse -> withdraw [label="实例全部释放"];
+    reverse -> retained [label="遇到首个未清理效果"];
+    withdraw -> released [label="观测清理成功"];
+    withdraw -> retained [label="系统清理失败"];
+    retained -> reverse [label="按实际保留阶段重试
+无超时强制回收", constraint=false];
+    released -> cold [label="新 epoch / 新生命周期", constraint=false];
+}

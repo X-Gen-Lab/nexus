@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="6" failures="0" disabled="0" errors="0" time="0.001" timestamp="2026-10-11T21:34:58.761" name="AllTests">
+  <testsuite name="ThreadXLinuxPort" tests="6" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-10-11T21:34:58.762">
+    <testcase name="ProductionTimerUsesOneMonotonicDeadlineDomain" file="/workspace/nexus/tests/google/threadx_linux_port_test.cpp" line="115" status="run" result="completed" time="0." timestamp="2026-10-11T21:34:58.762" classname="ThreadXLinuxPort" />
+    <testcase name="ExactNanosecondCarryCannotProduceInvalidTimespec" file="/workspace/nexus/tests/google/threadx_linux_port_test.cpp" line="132" status="run" result="completed" time="0." timestamp="2026-10-11T21:34:58.762" classname="ThreadXLinuxPort" />
+    <testcase name="SuspendSignalPreservesInterruptedCallerErrno" file="/workspace/nexus/tests/google/threadx_linux_port_test.cpp" line="149" status="run" result="completed" time="0." timestamp="2026-10-11T21:34:58.762" classname="ThreadXLinuxPort" />
+    <testcase name="SuspendConsumesOnlyBlockedResumeSignal" file="/workspace/nexus/tests/google/threadx_linux_port_test.cpp" line="159" status="run" result="completed" time="0." timestamp="2026-10-11T21:34:58.762" classname="ThreadXLinuxPort" />
+    <testcase name="RealPendingResumeBeforeWaitPreservesCompleteMask" file="/workspace/nexus/tests/google/threadx_linux_port_test.cpp" line="170" status="run" result="completed" time="0." timestamp="2026-10-11T21:34:58.762" classname="ThreadXLinuxPort" />
+    <testcase name="NestedSuspendPreservesErrnoBeforeEarlyReturn" file="/workspace/nexus/tests/google/threadx_linux_port_test.cpp" line="187" status="run" result="completed" time="0." timestamp="2026-10-11T21:34:58.763" classname="ThreadXLinuxPort" />
+  </testsuite>
+</testsuites>

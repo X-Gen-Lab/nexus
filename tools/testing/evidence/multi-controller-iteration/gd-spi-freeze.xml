@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="12" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T19:32:30.746" name="AllTests">
+  <testsuite name="SPIMultiple" tests="12" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T19:32:30.746">
+    <testcase name="SecondaryColdInitPreservesPrimaryConfigAndPublishers" file="tests/google/spi_multi_controller_test.cpp" line="206" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.746" classname="SPIMultiple" />
+    <testcase name="PeerCompletionCannotClearFlagsOrReleaseBorrowedBuffers" file="tests/google/spi_multi_controller_test.cpp" line="216" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.746" classname="SPIMultiple" />
+    <testcase name="SecondaryWireBusyCannotReleaseItsCsOrBorrow" file="tests/google/spi_multi_controller_test.cpp" line="236" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.746" classname="SPIMultiple" />
+    <testcase name="RefusedSecondaryEngineWithdrawalRetainsOnlyItsBuffers" file="tests/google/spi_multi_controller_test.cpp" line="249" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.746" classname="SPIMultiple" />
+    <testcase name="SecondaryFixedScalarModeKeepsIndependentSpanAndDmaIncrement" file="tests/google/spi_multi_controller_test.cpp" line="267" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.746" classname="SPIMultiple" />
+    <testcase name="IdleForeignPublisherRejectsBeforeControllerAcquisition" file="tests/google/spi_multi_controller_test.cpp" line="277" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.747" classname="SPIMultiple" />
+    <testcase name="DuplicateColdObjectCannotStealLivePhysicalPublishers" file="tests/google/spi_multi_controller_test.cpp" line="288" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.747" classname="SPIMultiple" />
+    <testcase name="NewReceiveErrorAtDisableCannotBecomeSuccessfulCompletion" file="tests/google/spi_multi_controller_test.cpp" line="308" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.747" classname="SPIMultiple" />
+    <testcase name="NewTransmitErrorBeforeW1cCannotBecomeSuccessfulCompletion" file="tests/google/spi_multi_controller_test.cpp" line="322" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.747" classname="SPIMultiple" />
+    <testcase name="ErrorAfterMemoryCompletionIsRecheckedBeforeSettlement" file="tests/google/spi_multi_controller_test.cpp" line="336" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.747" classname="SPIMultiple" />
+    <testcase name="SelectedSecondaryStopWithdrawsOnlyItsOwnPublishers" file="tests/google/spi_multi_controller_test.cpp" line="348" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.747" classname="SPIMultiple" />
+    <testcase name="SecondaryKernelSinkValidatesOnlyActualSelectedDmaVectors" file="tests/google/spi_multi_controller_test.cpp" line="356" status="run" result="completed" time="0." timestamp="2026-10-11T19:32:30.747" classname="SPIMultiple" />
+  </testsuite>
+</testsuites>

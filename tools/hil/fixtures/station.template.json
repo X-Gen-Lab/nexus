@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "hil_station",
+  "station_id": null,
+  "board": null,
+  "part": null,
+  "pcb_revision": null,
+  "chip_uid": null,
+  "probe": {
+    "serial": null,
+    "interface": null,
+    "transport": "swd",
+    "tool": {
+      "path": null,
+      "sha256": null,
+      "size": null
+    },
+    "interface_config": {
+      "path": null,
+      "sha256": null,
+      "size": null
+    },
+    "target_config": {
+      "path": null,
+      "sha256": null,
+      "size": null
+    }
+  },
+  "serial": {
+    "path": null,
+    "baudrate": 115200,
+    "electrical_mode": "ttl_3v3",
+    "wiring_checked": false,
+    "ground_connected": false
+  },
+  "power": {
+    "source": null,
+    "voltage_mv": null
+  },
+  "outputs_disconnected": false,
+  "budgets": {}
+}

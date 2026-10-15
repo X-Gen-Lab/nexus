@@ -1,0 +1,189 @@
+{
+  "checked_files": 25,
+  "failing_diagnostics": 0,
+  "files": {
+    "core/include/nexus/core/fault.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "17badcda55d9f3d194de9bef1b8a98095d9a594c6a86aeacee7fb29774113d51"
+    },
+    "core/src/fault.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "976a3af81cfefa6d7185b7328162825eb08fc4ae25042a543de1fc8369a8367f"
+    },
+    "os/threadx/config/tx_user.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "5b3c5f40f28469e6d57edc37353014715f65ad35c6c314bfb05dcf8a90b0d760"
+    },
+    "os/threadx/include/nexus/os/threadx.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "5d8ca6893cbfa3d35e571b094e453a6adcf5003b1aaf0f705ba5a8bec6db711e"
+    },
+    "os/threadx/m4.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "4db45fb6abceb85f10af071c6cec6eb848a52531573b93f17ec31e47c1f2acc2"
+    },
+    "os/threadx/private/irq_model.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "156388419e5aab7976a9b9aa96a86e5f4a4ed25c5b05c3c7620051c5aa0e9096"
+    },
+    "os/threadx/private/m4_model.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "dafea17e8a93b9e2b2562b64944c28d1e38d6f01ce650360c6b07430a1c8a989"
+    },
+    "os/threadx/threadx.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "5c36ec9d70a03bfdaf80e1391482d7b9d963b60c1dc7c3b1f157baa7b8d977ef"
+    },
+    "tests/contracts/os_threadx_runtime/clock.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "c11c6c3b263e95ebf6284152c0e6711a76a6a576ef21cd5ee62060aaf96fadc7"
+    },
+    "tests/contracts/os_threadx_runtime/external_tick.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "675602f5675b04263a3fff893e856a3fec4a877ad894ef11d6d3f11f0e3ca054"
+    },
+    "tests/contracts/os_threadx_runtime/m4-config/nexus_config.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "db6686dfdf0575b2204c7314920ce8368810c6dfc3f942211c2509f336b32f03"
+    },
+    "tests/contracts/os_threadx_runtime/m4-external-config/nexus_config.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "7aae15268d376e7449b5a1cffe1c5427efe1f53710fd6b3efda014af47e8c69f"
+    },
+    "tests/contracts/os_threadx_runtime/m4-primask-config/nexus_config.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "36c3ace852cfe78e42f195408266d212d0df4ea2e07ab1bb8200f1c56b83a26c"
+    },
+    "tests/contracts/os_threadx_runtime/main.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "a7c4fa75001d0920cb349432b9cff430a0fd1288bfd1de2ebd3fc61cd9736997"
+    },
+    "tests/google/threadx_admission_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "06a6221124f38336c8b0dc30abb149c5ddd1d5714fab9e0078fbd28b52d87250"
+    },
+    "tests/google/threadx_bootstrap_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "780542ed7455ce7f4a3ddcac531c653d113726ed0d98bdf6ceeda63f916a0bf7"
+    },
+    "tests/google/threadx_close_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "373ec3bd4a75624b31f3da249cc98681dcfaf3d9ee708bd79dfd204aa904a5f6"
+    },
+    "tests/google/threadx_irq_primask_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "eada08d11d99bded416eb5d6704da5797919ef35f534c96c820bf623b674a7c0"
+    },
+    "tests/google/threadx_irq_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "3f79752b2fb13e3c4c18711f4e0bcdaa4021e0273481e8954621fe96c85e0337"
+    },
+    "tests/google/threadx_kernel_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "74033b04ce0aa34e69b60c953248c794f74a1b7e9419c4ff1b00bdcb72ab28c2"
+    },
+    "tests/google/threadx_linux_port_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "349ec6c95f13fcbedf5b6ca236daff74e494db5f7c527d014db277eeb4cbfd89"
+    },
+    "tests/google/threadx_m4_external_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "d87e0e91d345e677686459812daadd837551779936653b7af2607f7545f11046"
+    },
+    "tests/google/threadx_m4_primask_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "b40f7cc5db7a83a47ef500f5449d72c7517b4f06c13c4aebd88d2ed1a2ef3f49"
+    },
+    "tests/google/threadx_m4_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "6256e332bab51038cd7c339ec26433fd889d45446cef2ca9c558ac769d4f3609"
+    },
+    "tests/google/threadx_wait_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "a63a0b1b47028ef48b444d8bdb747e5ed482675624ad162733f962672a87f639"
+    }
+  },
+  "limitations": [
+    "Mechanical comment syntax and header fields only; no authorship verification.",
+    "No proof of ownership, ISR safety, deadlines, API coverage or contract correctness.",
+    "Baseline authenticity and changes require the separate review/CI policy."
+  ],
+  "ruleset_version": 1,
+  "schema_version": 1,
+  "status": "passed"
+}

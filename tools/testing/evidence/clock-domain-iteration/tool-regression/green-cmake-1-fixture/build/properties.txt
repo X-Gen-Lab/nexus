@@ -1,0 +1,8 @@
+sleep_sources=/workspace/nexus/soc/gd32f470/sleep.c
+selected=TRUE
+SOURCES=/workspace/nexus/soc/gd32f470/sleep.c
+INCLUDE_DIRECTORIES=/workspace/nexus/soc/gd32f470/private;/workspace/nexus/components/clock_domain/private;/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS;/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include;/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include
+INTERFACE_INCLUDE_DIRECTORIES=value-NOTFOUND
+COMPILE_DEFINITIONS=GD32F470;HXTAL_VALUE=25000000
+LINK_LIBRARIES=Nexus::ClockDomain;Nexus::Arch;nexus_build_options;nexus_owned_warnings
+EXCLUDE_FROM_ALL=TRUE

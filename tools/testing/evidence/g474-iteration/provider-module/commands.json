@@ -1,0 +1,89 @@
+{
+  "commands": [
+    {
+      "command": "PYTHONPATH=tools/configure python -m unittest discover -s tools/configure/providers/stm32g474 -p 'test_provider.py' -v",
+      "log": "red.log",
+      "exit_code": 1,
+      "cases": 17,
+      "reason": "New module and facts absent; genuine missing production capability/emitter APIs."
+    },
+    {
+      "command": "PYTHONPATH=tools/configure python -m unittest discover -s tools/configure/providers/stm32g474 -p 'test_provider.py' -v",
+      "log": "green.log",
+      "exit_code": 1,
+      "reason": "Discovery start directory shadowed generic emission module; corrected test imports/package invocation."
+    },
+    {
+      "command": "PYTHONPATH=. python -m unittest tools.configure.providers.stm32g474.test_provider -v",
+      "log": "green-run2.log",
+      "exit_code": 1,
+      "cases": 17,
+      "reason": "Two test assertions expected stop in definitions rather than stop expression and duplicated GPIO clock readback at emitter level; assertions corrected to actual contract."
+    },
+    {
+      "command": "PYTHONPATH=. python -m unittest tools.configure.providers.stm32g474.test_provider -v",
+      "log": "green-run3.log",
+      "exit_code": 0,
+      "cases": 17
+    },
+    {
+      "command": "PYTHONPATH=. python -m unittest tools.configure.providers.stm32g474.test_provider -v",
+      "log": "foreign-ir-red.log",
+      "exit_code": 1,
+      "cases": 18,
+      "reason": "Actual production constructor reinterpreted a foreign typed provider decision; regression expected rejection before emission."
+    },
+    {
+      "command": "PYTHONPATH=. python -m unittest tools.configure.providers.stm32g474.test_provider -v",
+      "log": "foreign-ir-green.log",
+      "exit_code": 0,
+      "cases": 18
+    },
+    {
+      "command": "PYTHONPATH=. python -m unittest tools.configure.providers.stm32g474.test_provider -v",
+      "log": "integrated-green.log",
+      "exit_code": 0,
+      "cases": 18
+    },
+    {
+      "command": "PYTHONPATH=.:tools/configure python -m unittest discover -s tools/configure -p 'test_*.py' -v",
+      "log": "whole-config-green-attempt1.log",
+      "exit_code": 1,
+      "cases": 336,
+      "reason": "Pending independent timer authored integration failed; one existing test lacked cmake on this command PATH. G4 tests passed. No whole-suite qualification claimed."
+    },
+    {
+      "command": "PYTHONPATH=. python -m unittest tools.configure.providers.stm32g474.test_provider -v",
+      "log": "foreign-uart-module-green.log",
+      "exit_code": 0,
+      "cases": 18
+    },
+    {
+      "command": "PYTHONPATH=. python -m unittest tools.configure.providers.stm32g474.test_provider -v",
+      "log": "foreign-control-module-green.log",
+      "exit_code": 0,
+      "cases": 18
+    }
+  ],
+  "source_sha256": {
+    "soc/stm32g474/soc.json": "0c8e4ece490edd06190295601139b0182a29249d6734744892c272e74420dd56",
+    "soc/stm32g474/routes.json": "b731f659b0afd3fff78ccefd1f7b410370a3358bfebb5bf412403bab5699c874",
+    "boards/stm32g474re_hse24_reference/board.json": "6db394749153f691d43343eb78e105aa329dabe9ea1d65ed7f3bcb449f1bfa1c",
+    "boards/stm32g474re_hse24_reference/README.md": "580b6a47e27de2cc1133f75ce20597358e8f1db0c7d2a5dc53ae3827c295a912",
+    "tools/configure/providers/stm32g474/__init__.py": "ac304aa4ca6d9443044695e17597216e6b90cdeda877015452a2db0eae84c597",
+    "tools/configure/providers/stm32g474/bindings.py": "80eaed6351bfe58c0862d871b8e870efe951f95bc3f82ac420f4fc414cb3b6b3",
+    "tools/configure/providers/stm32g474/emission.py": "dd3af048e2aafa85b87ec20da172a2d60ff0604e6618fb3cac4c9a1452de7303",
+    "tools/configure/providers/stm32g474/test_provider.py": "3b28edc2d02edb73626696d6205503021b2973d0d83bbc61298321944070af79"
+  },
+  "qualification": "Scoped dirty software contracts/factory/ARM composition; no clean whole-platform candidate or physical qualification",
+  "physical_hil": "not_executed",
+  "external_execution_evidence": {
+    "actual_factory_and_incremental": "/workspace/nexus-g474-iteration-evidence/incremental-provider-restored-green/manifest.json",
+    "actual_old_cold_count_red": "/workspace/nexus-g474-iteration-evidence/historical-precount-red/manifest.json",
+    "actual_foreign_cr1_red": "/workspace/nexus-g474-iteration-evidence/foreign-uart-red/manifest.json",
+    "actual_foreign_cr3_red": "/workspace/nexus-g474-iteration-evidence/foreign-dma-control-red/manifest.json",
+    "actual_arm_four": "/workspace/nexus-g474-iteration-evidence/arm-four-run2/manifest.json",
+    "executed_by": "/root/os_delivery_examples",
+    "independent_review_pending": "generated resource lifecycle; source provider baseline already independently reviewed"
+  }
+}

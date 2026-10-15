@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "name": "googletest",
+  "version": "1.16.0",
+  "commit": "6910c9d9165801d8827d628cb72eb7ea9dd538c5",
+  "archive": "dependencies/source/googletest-1.16.0.tar.gz",
+  "url": "https://codeload.github.com/google/googletest/tar.gz/6910c9d9165801d8827d628cb72eb7ea9dd538c5",
+  "sha256": "bde221be7f3841fcbc3971665d77d717116394a42155d988ee6407dfc39f1f09",
+  "bytes": 877456,
+  "license": "BSD-3-Clause",
+  "scope": "host GoogleTest/GoogleMock targets only; no configure-time network"
+}

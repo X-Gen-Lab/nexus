@@ -1,0 +1,182 @@
+08002c64 t .udivsi3_skip_div0_test
+08002bd0 00000040 T PendSV_Handler
+08002c20 00000020 T SVC_Handler
+080029f4 00000024 T SysTick_Handler
+08002d78 00000002 W __aeabi_idiv0
+08002d78 00000002 W __aeabi_ldiv0
+08002dbc 0000005a T __aeabi_lmul
+08002c64 T __aeabi_uidiv
+08002d70 00000008 T __aeabi_uidivmod
+08002d7c 0000003e T __aeabi_uldivmod
+20000a90 B __bss_end__
+20000008 B __bss_start__
+08002fb0 T __clzdi2
+08002fc8 0000003c T __clzsi2
+20000004 D __data_end__
+20000000 D __data_start__
+08003120 R __exidx_end
+08003118 R __exidx_start
+08002dbc 0000005a T __muldi3
+00000060 A __nexus_os_size_closable_queue
+00000010 A __nexus_os_size_direct_notify
+000000ac A __nexus_os_size_joinable_task
+00000054 A __nexus_os_size_notify
+00000058 A __nexus_os_size_permanent_task
+00000054 A __nexus_os_size_queue_waiter
+00000050 A __nexus_os_size_raw_queue
+00000048 A __nexus_os_size_semaphore
+00000004 A __nexus_os_size_stack_word
+00000054 A __nexus_os_size_tcb
+00000010 A __nexus_os_size_wait_port
+08002e18 00000198 T __udivmoddi4
+08002c64 0000010a T __udivsi3
+08000074 00000230 T _start
+08000408 000001ac t closable_transfer
+0800033c 000000a0 t deadline_ticks
+08000334 00000008 t direct_arm
+08000624 0000007a t direct_wait
+08000734 0000009c t direct_wake
+08000000 0000000c t exception_references
+200006f0 00000008 b fixture_time
+08003014 00000012 T memcpy
+08003004 00000010 T memset
+08000054 00000004 t not_ready
+0800032c 00000008 t notify_arm
+080005b4 0000006e t notify_wait
+080006a0 00000094 t notify_wake
+08000f20 00000006 T nx_arch_exception_number
+08000f3c 0000000c T nx_arch_in_isr
+08000f14 0000000a T nx_arch_irq_is_masked
+08000f04 0000000e T nx_arch_irq_masks
+08000ef4 0000000e T nx_arch_irq_restore
+08000ee4 00000010 T nx_arch_irq_save
+08000f28 00000012 T nx_arch_is_privileged
+08002c40 0000001e T nx_deadline_expired
+08002c60 00000002 W nx_fault_observe
+08000030 0000000c W nx_freertos_assert_failed
+08000e24 00000060 T nx_freertos_closable_queue_close
+08000e84 0000005e T nx_freertos_closable_queue_destroy
+08000db0 0000004a T nx_freertos_closable_queue_init
+08000e10 00000014 T nx_freertos_closable_queue_receive_until
+08000dfc 00000014 T nx_freertos_closable_queue_send_until
+08000c98 00000032 T nx_freertos_direct_notify_destroy
+08000c24 0000003a T nx_freertos_direct_notify_init
+08000c60 00000038 T nx_freertos_direct_notify_port
+080008f0 00000038 T nx_freertos_notify_destroy
+08000870 00000046 T nx_freertos_notify_init
+080008b8 00000038 T nx_freertos_notify_port
+08000ccc 00000064 T nx_freertos_permanent_task_start
+08000bc0 00000042 T nx_freertos_queue_destroy
+08000a68 00000062 T nx_freertos_queue_init
+08000b48 00000078 T nx_freertos_queue_receive
+08000c14 00000010 T nx_freertos_queue_receive_until
+08000acc 0000007a T nx_freertos_queue_send
+08000c04 00000010 T nx_freertos_queue_send_until
+08000d78 00000038 T nx_freertos_queue_waiter_destroy
+08000d30 00000046 T nx_freertos_queue_waiter_init
+080009e8 0000007e T nx_freertos_task_join
+08000928 000000c0 T nx_freertos_task_start
+20000008 0000000c B nx_os_closable_payload__bytes
+20000578 00000060 B nx_os_closable_queue__bytes
+20000628 00000010 B nx_os_direct_notify__bytes
+20000220 00000200 B nx_os_join_stack__bytes
+20000478 000000ac B nx_os_joinable_task__bytes
+20000638 00000054 B nx_os_notify__bytes
+20000020 00000200 B nx_os_permanent_stack__bytes
+20000420 00000058 B nx_os_permanent_task__bytes
+20000524 00000054 B nx_os_queue_waiter__bytes
+20000014 0000000c B nx_os_raw_payload__bytes
+200005d8 00000050 B nx_os_raw_queue__bytes
+2000069c 00000054 B nx_os_tcb__bytes
+2000068c 00000010 B nx_os_wait_port__bytes
+08000058 0000001c T nx_time_now_us
+08000f48 00000062 T nx_wait_until
+0800000c 00000022 t park
+08000050 00000002 t permanent_entry
+08000fac 000000b8 t prvAddCurrentTaskToDelayedList
+080020e8 00000076 t prvCopyDataToQueue
+08001064 0000004c t prvIdleTask
+0800293c 00000030 t prvTaskExitError
+08002160 00000092 t prvUnlockQueue
+08001d54 00000014 T pvTaskIncrementMutexHeldCount
+20000a8c 00000004 B pxCurrentTCB
+200009c0 00000004 b pxDelayedTaskList
+200009bc 00000004 b pxOverflowDelayedTaskList
+08002a3c 000000a0 T pxPortInitialiseStack
+200009ec 000000a0 b pxReadyTasksLists
+080007d0 000000a0 t queue_until
+200006f8 00000004 b result_sink
+0800004c 00000002 t returning_entry
+08002c2e t stacking_used_msp
+08002c28 t stacking_used_psp
+080002e8 00000044 t task_context_allowed
+080003dc 0000002a t task_entry
+080002a4 00000044 t task_storage_valid
+20000000 00000004 d ulCriticalNesting
+08002bc0 00000008 T ulSetInterruptMask
+08001d68 000000b8 T ulTaskGenericNotifyTake
+20000978 00000004 b uxCurrentNumberOfTasks
+20000990 00000004 b uxDeletedTasksWaitingCleanUp
+200006fc 00000200 b uxIdleTaskStack.2
+0800291c 00000020 T uxListRemove
+08002870 00000028 T uxQueueMessagesWaiting
+20000950 00000004 b uxSchedulerSuspended
+08001790 0000000c T uxTaskGetNumberOfTasks
+2000095c 00000004 b uxTaskNumber
+20000970 00000004 b uxTopReadyPriority
+08003114 00000004 t uxTopUsedPriority
+0800003c 00000010 W vApplicationStackOverflowHook
+08002bc8 00000006 T vClearInterruptMask
+080028b4 00000016 T vListInitialise
+080028cc 00000006 T vListInitialiseItem
+080028ec 0000002e T vListInsert
+080028d4 00000016 T vListInsertEnd
+080029ac 00000018 T vPortEnterCritical
+080029c4 00000030 T vPortExitCritical
+08002a18 00000024 T vPortSVCHandler_C
+0800296c 00000028 W vPortSetupTimerInterrupt
+08002994 00000018 T vPortYield
+08002898 0000001c T vQueueDelete
+08002b80 00000020 T vRestoreContextOfFirstTask
+08002bb0 00000010 T vStartFirstTask
+0800149c 000000cc T vTaskDelete
+08001a8c 00000018 T vTaskInternalSetTimeOutState
+08001b2c 0000000c T vTaskMissedYield
+08001968 00000034 T vTaskPlaceOnEventList
+08001c98 000000bc T vTaskPriorityDisinheritAfterTimeout
+08001568 00000070 T vTaskStartScheduler
+08001894 000000d4 T vTaskSuspend
+080015d8 00000010 T vTaskSuspendAll
+080017c0 000000d4 T vTaskSwitchContext
+200009d8 00000014 b xDelayedTaskList1
+200009c4 00000014 b xDelayedTaskList2
+20000954 00000004 b xIdleTaskHandles
+200008fc 00000054 b xIdleTaskTCB.3
+20000958 00000004 b xNextTaskUnblockTime
+20000960 00000004 b xNumOfOverflows
+20000968 00000004 b xPendedTicks
+200009a8 00000014 b xPendingReadyList
+08002adc 00000098 T xPortStartScheduler
+080022b0 00000090 T xQueueGenericCreateStatic
+080021f4 000000bc T xQueueGenericReset
+08002340 0000017c T xQueueGenericSend
+080024bc 000000bc T xQueueGiveFromISR
+08002578 00000168 T xQueueReceive
+080026e0 00000190 T xQueueSemaphoreTake
+2000096c 00000004 b xSchedulerRunning
+2000097c 00000014 b xSuspendedTaskList
+08001aa4 00000088 T xTaskCheckForTimeOut
+08001264 00000238 T xTaskCreateStatic
+08001e20 00000140 T xTaskGenericNotify
+08001f60 00000188 T xTaskGenericNotifyFromISR
+08001b38 0000000c T xTaskGetCurrentTaskHandle
+08001b44 00000020 T xTaskGetSchedulerState
+0800179c 00000024 T xTaskIncrementTick
+080010b0 000001b4 t xTaskIncrementTick.part.0
+08001bf8 000000a0 T xTaskPriorityDisinherit
+08001b64 00000094 T xTaskPriorityInherit
+0800199c 000000f0 T xTaskRemoveFromEventList
+080015e8 000001a8 T xTaskResumeAll
+20000994 00000014 b xTasksWaitingTermination
+20000974 00000004 b xTickCount
+20000964 00000004 b xYieldPendings

@@ -1,0 +1,46 @@
+Running main() from gmock_main.cc
+[==========] Running 14 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 14 tests from I2CPairFactory
+[ RUN      ] I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren
+/workspace/nexus/tests/google/i2c_pair_factory_test.cpp:246: Failure
+Value of: nx_i2c_endpoint_on_port(endpoints[0], ports[0])
+  Actual: false
+Expected: true
+
+[  FAILED  ] I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren (0 ms)
+[ RUN      ] I2CPairFactory.BothControllersUseExactPinsClockAndPublisherTuples
+[       OK ] I2CPairFactory.BothControllersUseExactPinsClockAndPublisherTuples (0 ms)
+[ RUN      ] I2CPairFactory.SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart
+[       OK ] I2CPairFactory.SecondaryFailureRollsBackPrimaryAndAllowsFreshRestart (0 ms)
+[ RUN      ] I2CPairFactory.OwnEventVectorCannotAdvanceThePeerRequest
+[       OK ] I2CPairFactory.OwnEventVectorCannotAdvanceThePeerRequest (0 ms)
+[ RUN      ] I2CPairFactory.DmaTerminalPreservesPeerFlagsEngineAndBorrow
+[       OK ] I2CPairFactory.DmaTerminalPreservesPeerFlagsEngineAndBorrow (0 ms)
+[ RUN      ] I2CPairFactory.SameAddressOnDifferentControllersKeepsIndependentLoans
+[       OK ] I2CPairFactory.SameAddressOnDifferentControllersKeepsIndependentLoans (0 ms)
+[ RUN      ] I2CPairFactory.ForeignCancelCannotChangeOtherControllersRegistersOrLoans
+[       OK ] I2CPairFactory.ForeignCancelCannotChangeOtherControllersRegistersOrLoans (0 ms)
+[ RUN      ] I2CPairFactory.OneStopPreservesPeerPendingIrqsAndActiveRequest
+[       OK ] I2CPairFactory.OneStopPreservesPeerPendingIrqsAndActiveRequest (0 ms)
+[ RUN      ] I2CPairFactory.RefusedSecondaryDmaDisableQuarantinesOnlyItsLoan
+[       OK ] I2CPairFactory.RefusedSecondaryDmaDisableQuarantinesOnlyItsLoan (0 ms)
+[ RUN      ] I2CPairFactory.RefusedInterruptWithdrawalRetainsPlatformClockAndPins
+[       OK ] I2CPairFactory.RefusedInterruptWithdrawalRetainsPlatformClockAndPins (0 ms)
+[ RUN      ] I2CPairFactory.IsrAndMaskedColdStartRejectBeforeAnyLease
+[       OK ] I2CPairFactory.IsrAndMaskedColdStartRejectBeforeAnyLease (0 ms)
+[ RUN      ] I2CPairFactory.ExpiredAndInvisibleBufferAdmissionHasNoPeerEffects
+[       OK ] I2CPairFactory.ExpiredAndInvisibleBufferAdmissionHasNoPeerEffects (0 ms)
+[ RUN      ] I2CPairFactory.PeripheralNackCannotSettleOrResetPeerController
+[       OK ] I2CPairFactory.PeripheralNackCannotSettleOrResetPeerController (0 ms)
+[ RUN      ] I2CPairFactory.StopRestoresSelectedPinsAndLeavesUnrelatedFields
+[       OK ] I2CPairFactory.StopRestoresSelectedPinsAndLeavesUnrelatedFields (0 ms)
+[----------] 14 tests from I2CPairFactory (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 14 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 13 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] I2CPairFactory.PureLookupHasDistinctControllersAndAddressedChildren
+
+ 1 FAILED TEST

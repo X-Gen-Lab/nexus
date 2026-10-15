@@ -1,0 +1,386 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: a614e9b22674004f6d3b28ba3b5671616408ce4b4f2d7bae8a948b55f740aba0\nX-Nexus-Reviewed: true\n"
+
+msgid "Optional common components"
+msgstr "可选通用组件"
+
+msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgstr "这些声明来自公共头文件。选择、生命周期、支持的执行模式和物理资源授权范围仍以对应设计及支持记录为准。"
+
+msgid "bmp280.h"
+msgstr "bmp280.h"
+
+msgid "BMP280 calibration and explicit forced-conversion driver."
+msgstr "BMP280 校准与显式强制转换驱动。"
+
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+msgid "Functions"
+msgstr "函数"
+
+msgid "Parse the exact 24-byte little-endian calibration block."
+msgstr "解析准确的 24 字节小端校准块。"
+
+msgid "Parameters"
+msgstr "参数"
+
+msgid "Returns"
+msgstr "返回值"
+
+msgid "Compensate one raw sample using checked integer arithmetic."
+msgstr "使用经过检查的整数运算补偿一个原始样本。"
+
+msgid "Validate chip ID and load calibration, without scanning."
+msgstr "验证芯片 ID 并加载校准，不扫描设备。"
+
+msgid "Start one forced temperature/pressure conversion."
+msgstr "启动一次强制温度／压力转换。"
+
+msgid "Poll conversion without an implicit worker or blocking delay."
+msgstr "轮询转换，不使用隐式执行任务或阻塞延迟。"
+
+msgid "Stop software use after all synchronous calls have exited."
+msgstr "全部同步调用退出后停止软件使用。"
+
+msgid "Synchronous settled SPI transaction port."
+msgstr "同步、已结清的 SPI 事务端口。"
+
+msgid "Public Members"
+msgstr "公共成员"
+
+msgid "Register calibration, owned by one device instance."
+msgstr "由一个设备实例拥有的寄存器校准数据。"
+
+msgid "Output is valid only on successful conversion/compensation."
+msgstr "仅成功转换／补偿时输出有效。"
+
+msgid "Explicit device context, no Board pins or automatic sampling task."
+msgstr "显式设备上下文，不含 Board 引脚或自动采样任务。"
+
+msgid "bmp280_spi.h"
+msgstr "bmp280_spi.h"
+
+msgid "Optional BMP280 adapter over a fixed SPI endpoint."
+msgstr "固定 SPI 端点上的可选 BMP280 适配器。"
+
+msgid "Bind a real polling SPI endpoint as settled transport."
+msgstr "绑定真实轮询 SPI 端点作为能结清的传输端口。"
+
+msgid "bus_owner.h"
+msgstr "bus_owner.h"
+
+msgid "Explicit bounded multi-producer, single-executor adapter."
+msgstr "显式、有界的多生产者、单执行者适配器。"
+
+msgid "Initialize unused owner/slot storage."
+msgstr "初始化尚未使用的 owner／slot 存储。"
+
+msgid "Establish the chain's unique admission."
+msgstr "建立请求链唯一的准入判定。"
+
+msgid "Submit cancellation through stable adapter storage."
+msgstr "通过稳定适配器存储提交取消。"
+
+msgid "Advance at most one bounded execution step."
+msgstr "至多推进一个有界执行步骤。"
+
+msgid "Close admission and request every accepted operation to stop."
+msgstr "关闭准入，并请求每个已接受操作停止。"
+
+msgid "Test whether execution and completion publication have exited."
+msgstr "检查执行及完成发布是否都已退出。"
+
+msgid "Explicit bounded metadata exclusion port."
+msgstr "显式、有界元数据排斥端口。"
+
+msgid "One real execution owner, injected without OS dependency."
+msgstr "真实且唯一的执行所有者，注入时不依赖 OS。"
+
+msgid "start SUCCESS borrows operation until service SUCCESS. BUSY or any start error retains zero operation references/hardware effects; an error after partial start must instead accept and report through service. service SUCCESS proves all hardware/IRQ/deferred accesses stopped, writes final result/count, and releases the operation. BUSY still borrows. Other service errors retain ownership and require continued recovery/service. cancel requests drain; it never by itself releases operation. Callbacks run only in the externally scheduled executor, outside adapter metadata guard."
+msgstr "start 返回 SUCCESS 后开始借用 operation，直到 service 返回 SUCCESS。BUSY 或任何 start 错误都必须不保留 operation 引用／硬件效果；部分启动后发生的错误必须改为接受操作，再通过 service 报告。service 返回 SUCCESS 必须证明全部硬件／IRQ／延后访问已停止，写入最终 result/count，并释放 operation。BUSY 仍保留借用。其他 service 错误保留所有权，并要求继续恢复／service。cancel 请求排空，绝不单独释放 operation。回调只在外部调度的执行者中运行，且必须位于适配器元数据临界区之外。"
+
+msgid "Stable control identity; never dereference a stale request pointer."
+msgstr "稳定控制身份；绝不解引用过期请求指针。"
+
+msgid "Exact caller-owned slot, linked in either the free or FIFO chain; initialize only with owner init."
+msgstr "调用者拥有的准确槽，连接在空闲链或 FIFO 链中；只能通过 owner init 初始化。"
+
+msgid "Explicit adapter state; external application supplies all storage."
+msgstr "显式适配器状态；全部存储由外部应用供给。"
+
+msgid "clock_domain.h"
+msgstr "clock_domain.h"
+
+msgid "Explicit clock consumers and epoch-bound drain control."
+msgstr "显式时钟消费者与绑定 epoch 的排空控制。"
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "作者  Nexus Team   版本  1.0.0   日期  2026-10-11   版权  Copyright (c) 2026 Nexus Team"
+
+msgid "Typedefs"
+msgstr "类型定义"
+
+msgid "Opaque provider, statically supplied by its privileged owner."
+msgstr "不透明提供者，由其特权所有者静态供给。"
+
+msgid "One stable caller-owned consumer token."
+msgstr "一个稳定、调用者拥有的消费者 token。"
+
+msgid "Enums"
+msgstr "枚举"
+
+msgid "Only shallow sleep preserves the established clock/time domain."
+msgstr "仅浅睡眠保持既有时钟／时间域。"
+
+msgid "Values:"
+msgstr "取值："
+
+msgid "Acquire one admitted clock consumer without waiting."
+msgstr "无等待地取得一个允许准入的时钟消费者。"
+
+msgid "Remove the exact retained token after consumer drain."
+msgstr "消费者排空后移除准确保留的 token。"
+
+msgid "Close admission and return the current epoch control."
+msgstr "关闭准入并返回当前 epoch 控制身份。"
+
+msgid "Validate closed admission and zero retained consumers."
+msgstr "验证准入已关闭且保留消费者为零。"
+
+msgid "Reopen a drained domain under a new admission epoch."
+msgstr "在新的准入 epoch 下重新开放已排空的时钟域。"
+
+msgid "Epoch-bound close control and quiescence evidence."
+msgstr "绑定 epoch 的关闭控制与静止证据。"
+
+msgid "dp83848.h"
+msgstr "dp83848.h"
+
+msgid "Explicit DP83848 identity, reset and observed link mechanism."
+msgstr "显式 DP83848 身份、复位与链路观察机制。"
+
+msgid "Defines"
+msgstr "宏定义"
+
+msgid "Read exact supported identity; mismatch never becomes a default PHY."
+msgstr "读取准确支持的身份；不匹配时绝不改用默认 PHY。"
+
+msgid "Bounded BMCR soft reset and observed self-clearing acknowledgement."
+msgstr "有界 BMCR 软件复位，并观察自清除确认。"
+
+msgid "Start explicit negotiation or fixed mode, never wait for fake link."
+msgstr "启动显式协商或固定模式，不等待伪造链路。"
+
+msgid "Observe latch-low BMSR twice and DP83848 PHYSTS speed/duplex truth."
+msgstr "对锁存低电平 BMSR 读取两次，并观察 DP83848 PHYSTS 的真实速率／双工状态。"
+
+msgid "External policy explicitly selects autonegotiation or fixed mode."
+msgstr "外部策略显式选择自动协商或固定模式。"
+
+msgid "Caller-owned PHY state; no board address, reset GPIO or worker default."
+msgstr "调用者拥有的 PHY 状态；不提供默认板级地址、reset GPIO 或执行任务。"
+
+msgid "file_flash.h"
+msgstr "file_flash.h"
+
+msgid "Native persistent file Flash model with fault injection."
+msgstr "支持故障注入的 Native 持久文件 Flash 模型。"
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-09  Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "作者  Nexus Team   版本  1.0.0   日期  2026-10-09  版权  Copyright (c) 2026 Nexus Team"
+
+msgid "Open an exclusively locked persistent host Flash model."
+msgstr "打开使用独占锁的持久主机 Flash 模型。"
+
+msgid "Close the host file after all store users have quiesced."
+msgstr "全部存储使用者静止后关闭主机文件。"
+
+msgid "Set an explicit model interruption boundary."
+msgstr "设置显式模型中断边界。"
+
+msgid "flash_storage.h"
+msgstr "flash_storage.h"
+
+msgid "Explicit physical Flash-region adapter without global registry."
+msgstr "显式物理 Flash 区域适配器，不使用全局登记表。"
+
+msgid "Bind an explicit writable uniform-erase physical region."
+msgstr "绑定显式可写、擦除粒度统一的物理区域。"
+
+msgid "Set the next transaction's one absolute mutation deadline."
+msgstr "设置下一事务唯一的绝对修改截止时间。"
+
+msgid "Caller-owned adapter, no dynamic binding or global token lookup."
+msgstr "调用者拥有的适配器，不使用动态绑定或全局 token 查找。"
+
+msgid "log.h"
+msgstr "log.h"
+
+msgid "Instance-local synchronous bounded log sink."
+msgstr "实例内同步、有界日志接收端。"
+
+msgid "Structured severity, with filtering before touching a sink."
+msgstr "结构化严重级别；在访问接收端前完成过滤。"
+
+msgid "Initialize an unused logger before exposing it to tasks."
+msgstr "向任务暴露日志对象之前初始化。"
+
+msgid "Write caller bytes, with no implicit allocation/formatting."
+msgstr "写入调用者字节，不进行隐式分配／格式化。"
+
+msgid "Flush an explicit sink without creating a background worker."
+msgstr "刷新显式接收端，不创建后台执行任务。"
+
+msgid "Reject new writes and test whether the sink has exited."
+msgstr "拒绝新写入并检查接收端是否已退出。"
+
+msgid "Synchronous caller-injected sink."
+msgstr "调用者注入的同步接收端。"
+
+msgid "Logger storage belongs to its caller; shared immutable port is copied."
+msgstr "日志存储属于调用者；共享不可变端口在初始化时复制。"
+
+msgid "modbus_rtu.h"
+msgstr "modbus_rtu.h"
+
+msgid "Bounded Modbus RTU core and explicit RS485 ports."
+msgstr "有界 Modbus RTU 核心与显式 RS485 端口。"
+
+msgid "Compute standard Modbus CRC16 over caller bytes."
+msgstr "对调用者字节计算标准 Modbus CRC16。"
+
+msgid "Initialize an unused or fully quiesced protocol instance."
+msgstr "初始化尚未使用或完全静止的协议实例。"
+
+msgid "Feed an externally timestamped UART byte."
+msgstr "输入外部添加时间戳的 UART 字节。"
+
+msgid "Service RTU silence and bounded synchronous RS485 response."
+msgstr "推进 RTU 静默间隔与有界同步 RS485 响应。"
+
+msgid "Discard an errored or overrun receive frame."
+msgstr "丢弃发生错误或溢出的接收帧。"
+
+msgid "Settle retained TX then restore receive silence acquisition."
+msgstr "结清保留的 TX，再恢复接收静默判定。"
+
+msgid "Settle the port before reclaiming protocol storage."
+msgstr "回收协议存储之前先使端口结清。"
+
+msgid "owner_observer.h"
+msgstr "owner_observer.h"
+
+msgid "Explicit owner progress diagnostics without default state."
+msgstr "显式 owner 推进诊断，不含默认状态。"
+
+msgid "Bind an initialized exact owner without creating work."
+msgstr "绑定已初始化的准确 owner，不创建工作。"
+
+msgid "Execute exactly one real service step and copy diagnostics."
+msgstr "准确执行一次真实 service 步骤并复制诊断。"
+
+msgid "Drop only the observation binding, no owner/loan teardown."
+msgstr "仅撤销观察绑定，不拆除 owner 或借用。"
+
+msgid "Copied service facts without request, payload or slot references."
+msgstr "已复制的 service 事实，不含 request、payload 或 slot 引用。"
+
+msgid "Opt-in caller sidecar; no pointer added to default owner."
+msgstr "调用者显式选择的附加状态；不向默认 owner 增加指针。"
+
+msgid "spi_async_owner.h"
+msgstr "spi_async_owner.h"
+
+msgid "Optional finite async SPI executor for one explicit bus."
+msgstr "一个显式总线的可选有限异步 SPI 执行者。"
+
+msgid "Bind one async-capable bus to an explicit owner executor."
+msgstr "将具备异步能力的总线绑定到显式 owner 执行者。"
+
+msgid "Exact async storage independent of the polling adapter."
+msgstr "独立于轮询适配器的准确异步存储。"
+
+msgid "spi_owner.h"
+msgstr "spi_owner.h"
+
+msgid "Explicit polling SPI executor for the bounded owner adapter."
+msgstr "有界 owner 适配器的显式轮询 SPI 执行者。"
+
+msgid "Bind an explicit synchronous SPI execution adapter."
+msgstr "绑定显式同步 SPI 执行适配器。"
+
+msgid "Caller-owned SPI transaction descriptor, borrowed until SETTLED."
+msgstr "调用者拥有的 SPI 事务描述符，借用保持到 SETTLED。"
+
+msgid "Exact polling executor storage; no payload copy or queue."
+msgstr "准确轮询执行者存储，不复制载荷或设置队列。"
+
+msgid "storage.h"
+msgstr "storage.h"
+
+msgid "Two-bank durable blob storage over an explicit narrow port."
+msgstr "使用显式窄端口的双 bank 持久 blob 存储。"
+
+msgid "Storage errors expose retry/reopen/recovery decisions."
+msgstr "存储错误显式暴露重试／重开／恢复决策。"
+
+msgid "Open/recover two externally supplied uniform erase banks."
+msgstr "打开／恢复两个外部供给、擦除粒度统一的 bank。"
+
+msgid "Load and validate the latest committed whole blob."
+msgstr "加载并验证最新提交的完整 blob。"
+
+msgid "Commit a complete blob to the inactive bank."
+msgstr "将完整 blob 提交到非活动 bank。"
+
+msgid "Query usable blob capacity without touching hardware."
+msgstr "查询可用 blob 容量，不访问硬件。"
+
+msgid "Synchronous settled persistent Flash port."
+msgstr "同步且已结清的持久 Flash 端口。"
+
+msgid "Instance metadata with caller-sized workspace."
+msgstr "实例元数据与调用者确定容量的工作区。"
+
+msgid "uart_owner.h"
+msgstr "uart_owner.h"
+
+msgid "Explicit IRQ UART executor with private provider settlement."
+msgstr "显式 IRQ UART 执行者与私有提供者请求结清。"
+
+msgid "Bind a UART controller to one explicit service executor."
+msgstr "将 UART 控制器绑定到一个显式 service 执行者。"
+
+msgid "Caller-owned TX payload descriptor borrowed until outer SETTLED."
+msgstr "调用者拥有的 TX 载荷描述符，借用保持到外层 SETTLED。"
+
+msgid "One executor's exact private provider request."
+msgstr "一个执行者准确且私有的提供者请求。"
+
+msgid "user_io_broker.h"
+msgstr "user_io_broker.h"
+
+msgid "Narrow kernel-invoked user GPIO message contract."
+msgstr "由内核调用的窄接口用户 GPIO 消息合同。"
+
+msgid "Broker and persistent kernel call storage stay provider private."
+msgstr "broker 与持久内核调用存储保持提供者私有。"
+
+msgid "Only scalar GPIO operations are admitted by this message ABI."
+msgstr "此消息 ABI 仅允许标量 GPIO 操作。"
+
+msgid "Execute one scalar GPIO message through a trusted gateway."
+msgstr "通过可信网关执行一个标量 GPIO 消息。"
+
+msgid "Retry retained cleanup without reading users or replaying IO."
+msgstr "重试保留的清理，不读取用户存储或重放 I/O。"
+
+msgid "Untrusted copied message; identity never comes from users."
+msgstr "来自不可信方的已复制消息；身份绝不取自用户输入。"
+
+msgid "Fully initialized copied result; value is zero for errors/WRITE."
+msgstr "完整初始化的复制结果；错误或 WRITE 时 value 为零。"
+
+msgid "Distinguish admission, cleanup retention and possible effect."
+msgstr "区分准入、保留清理责任与可能发生的效果。"

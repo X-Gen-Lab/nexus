@@ -1,0 +1,20 @@
+00009230 B __bss_end__
+00009028 B __bss_start
+00009028 B __bss_start__
+00009028 R __data_start
+00009230 B __end__
+00009230 B _bss_end__
+00009028 R _edata
+00009230 B _end
+00080000 B _stack
+00009074 000000c8 B cost_adc_continuous
+0000913c 00000008 B cost_adc_face
+00009194 00000080 B cost_adc_finite
+00008004 00000024 R cost_adc_ops
+00009214 0000001c B cost_adc_poll
+00009028 00000020 B cost_observation
+00009048 00000020 B cost_observer
+00009068 0000000c B cost_posted_producer
+0000916c 00000028 B cost_stream
+00009144 00000028 B cost_stream_slot
+00008000 00000004 T main

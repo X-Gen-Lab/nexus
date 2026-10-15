@@ -1,0 +1,21 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-m",
+    "unittest",
+    "scripts.ci.test_style_gate.StyleGateTests.test_staged_check_rejects_unmerged_index_before_selection",
+    "-v"
+  ],
+  "returncode": 1,
+  "source_before": {
+    ".pre-commit-config.yaml": "72827d178cbe11acd97f0ee0e6193fc8d8afc1eddfd461c12003cd2bbe8f6834",
+    "scripts/ci/style_gate.py": "96954f709936259a82a2d8f29af497c69f9f4c254d5373603ec8abc5a7244c43",
+    "scripts/ci/test_style_gate.py": "4b71061433aed1ea37a61f9a5a8d8476ea9e2b3a03340363be8ad7001afa4cc2"
+  },
+  "source_after": {
+    ".pre-commit-config.yaml": "72827d178cbe11acd97f0ee0e6193fc8d8afc1eddfd461c12003cd2bbe8f6834",
+    "scripts/ci/style_gate.py": "96954f709936259a82a2d8f29af497c69f9f4c254d5373603ec8abc5a7244c43",
+    "scripts/ci/test_style_gate.py": "4b71061433aed1ea37a61f9a5a8d8476ea9e2b3a03340363be8ad7001afa4cc2"
+  },
+  "source_unchanged": true
+}

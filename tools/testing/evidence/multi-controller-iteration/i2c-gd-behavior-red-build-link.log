@@ -1,0 +1,23 @@
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/gd-tests-google-i2c_multi_controller_test.cpp.o: in function `(anonymous namespace)::I2CMultiple::TearDown()':
+i2c_multi_controller_test.cpp:(.text+0x6a6): undefined reference to `nx_i2c_port_cancel'
+/usr/bin/ld: i2c_multi_controller_test.cpp:(.text+0x852): undefined reference to `nx_i2c_port_service'
+/usr/bin/ld: i2c_multi_controller_test.cpp:(.text+0x879): undefined reference to `nx_i2c_port_stop'
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/gd-tests-google-i2c_multi_controller_test.cpp.o: in function `(anonymous namespace)::I2CMultiple::Submit(unsigned int)':
+i2c_multi_controller_test.cpp:(.text+0xd8f): undefined reference to `nx_i2c_request_prepare'
+/usr/bin/ld: i2c_multi_controller_test.cpp:(.text+0xea8): undefined reference to `nx_i2c_endpoint_submit'
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/gd-tests-google-i2c_multi_controller_test.cpp.o: in function `(anonymous namespace)::I2CMultiple::Wire(unsigned int)':
+i2c_multi_controller_test.cpp:(.text+0x12f4): undefined reference to `nx_i2c_port_service'
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/gd-tests-google-i2c_multi_controller_test.cpp.o: in function `(anonymous namespace)::I2CMultiple_OneStopCannotWithdrawAnotherControllersPublishers_Test::TestBody()':
+i2c_multi_controller_test.cpp:(.text+0x3313): undefined reference to `nx_i2c_port_stop'
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/gd-tests-google-i2c_multi_controller_test.cpp.o: in function `(anonymous namespace)::I2CMultiple_FailedSecondaryDmaDrainRetainsItsBorrowOnly_Test::TestBody()':
+i2c_multi_controller_test.cpp:(.text+0x4f3d): undefined reference to `nx_i2c_port_cancel'
+/usr/bin/ld: i2c_multi_controller_test.cpp:(.text+0x5045): undefined reference to `nx_i2c_port_service'
+/usr/bin/ld: i2c_multi_controller_test.cpp:(.text+0x54d1): undefined reference to `nx_i2c_port_service'
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/gd-tests-google-i2c_multi_controller_test.cpp.o: in function `(anonymous namespace)::I2CMultiple_SecondaryPublisherCeilingUsesActualSelectedDmaIrq_Test::TestBody()':
+i2c_multi_controller_test.cpp:(.text+0x598f): undefined reference to `nx_i2c_port_attach_wake'
+/usr/bin/ld: i2c_multi_controller_test.cpp:(.text+0x5b54): undefined reference to `nx_i2c_port_attach_wake'
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/gd-soc-common-i2c_v1_async.c.o: in function `prepare_message':
+i2c_v1_async.c:(.text+0x413): undefined reference to `nx_arch_dmb'
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/gd-soc-common-i2c_v1_async.c.o: in function `start':
+i2c_v1_async.c:(.text+0x538): undefined reference to `nx_i2c_request_validate'
+collect2: error: ld returned 1 exit status

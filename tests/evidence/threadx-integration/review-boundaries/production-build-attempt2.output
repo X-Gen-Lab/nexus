@@ -1,0 +1,14 @@
+[0/1] Re-running CMake...
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-threadx-probe/integration-build
+[1/33] Building CXX object CMakeFiles/nexus_threadx_m4_test.dir/workspace/nexus/tests/google/threadx_m4_test.cpp.o
+[2/33] Building C object CMakeFiles/nexus_threadx_m4_test.dir/workspace/nexus/os/threadx/m4.c.o
+[3/33] Building CXX object CMakeFiles/nexus_threadx_irq_test.dir/workspace/nexus/tests/google/threadx_irq_test.cpp.o
+FAILED: [code=1] CMakeFiles/nexus_threadx_irq_test.dir/workspace/nexus/tests/google/threadx_irq_test.cpp.o 
+/usr/bin/c++ -DNEXUS_CPU_EXTERNAL_IRQ_COUNT=82 -DNEXUS_IRQ_PRIORITY_BITS=4 -DNEXUS_THREADX_IRQ_MODEL -DTX_INCLUDE_USER_DEFINE_FILE -DTX_PORT_BASEPRI=80 -DTX_PORT_USE_BASEPRI -DTX_TIMER_TICKS_PER_SECOND=1000 -D_GNU_SOURCE -I/workspace/nexus/os/threadx/include -I/workspace/nexus/arch/include -I/workspace/nexus/os/threadx/private -I/workspace/nexus-threadx-probe/native-generated -I/workspace/nexus/os/threadx/config -I/workspace/nexus/os/include -I/workspace/nexus/core/include -isystem /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus-threadx-probe/google/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -isystem /workspace/nexus/ext/threadx/common/inc -isystem /workspace/nexus/ext/threadx/ports/linux/gnu/inc -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -MD -MT CMakeFiles/nexus_threadx_irq_test.dir/workspace/nexus/tests/google/threadx_irq_test.cpp.o -MF CMakeFiles/nexus_threadx_irq_test.dir/workspace/nexus/tests/google/threadx_irq_test.cpp.o.d -o CMakeFiles/nexus_threadx_irq_test.dir/workspace/nexus/tests/google/threadx_irq_test.cpp.o -c /workspace/nexus/tests/google/threadx_irq_test.cpp
+/workspace/nexus/tests/google/threadx_irq_test.cpp:11:10: fatal error: private/irq_model.h: No such file or directory
+   11 | #include "private/irq_model.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+ninja: build stopped: subcommand failed.

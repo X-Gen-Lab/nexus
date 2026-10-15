@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/workspace/nexus/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/configure",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0,
+  "log": "/workspace/nexus-config-iteration-evidence/ethernet-usb-current-config-green.log",
+  "sha256": "aae433262de7c6ce00ddf99340e133597058dd35cc861f4ed9c31d575a5f8d89"
+}

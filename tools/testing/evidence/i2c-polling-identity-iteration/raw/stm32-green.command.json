@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus/build/native-debug/bin/nexus_stm32_i2c_register_test",
+    "--gtest_filter=*",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/polling-pure-identity/stm32-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

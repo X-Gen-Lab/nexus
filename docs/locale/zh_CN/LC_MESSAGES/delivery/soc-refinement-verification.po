@@ -1,0 +1,716 @@
+# Authored translation; independent semantic review pending.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 3dc7c227baf37d68f030e3f9e958a393f32fb98c588a127c5fbe6060317060e0\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:1
+msgid "SoC refinement execution record"
+msgstr "SoC 完善执行记录"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:3
+msgid ""
+"This is the historical `3728b334` baseline. Later functionality and "
+"execution status are recorded separately in [SoC extensions](soc-extensions-"
+"verification.md). The hashes and counts below do not qualify those later "
+"changes."
+msgstr ""
+"这是历史 `3728b334` 基线。后续功能和执行状态在 [SoC 扩展](soc-extensions-verification.md) "
+"中单独记录；下面的 hash 和计数不资格化后续变更。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:7
+msgid ""
+"This record covers the {download}`55-item SoC ledger <../design/soc-"
+"refinement-execution.csv>`. It distinguishes implemented mechanisms from the"
+" exact source and execution scope of each result. Subsequent source changes "
+"do not inherit earlier results. All physical tests remain `not_executed`."
+msgstr ""
+"本记录覆盖 {download}`55 项 SoC 台账 <../design/soc-refinement-"
+"execution.csv>`，区分已实现机制与各结果的精确源码、执行范围。后续源码变更不继承此前结果；所有物理测试保持 `not_executed`。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:12
+msgid "Committed software gates"
+msgstr "已提交软件门禁"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:14
+msgid ""
+"The following commits passed ordinary staged hooks, including the unchanged-"
+"index TDD gate and commit-message checks. No test filter, skipped-only "
+"report or hook bypass establishes acceptance. Counts describe their "
+"individual execution scopes; they must not be added together as a final-"
+"platform test total."
+msgstr ""
+"以下提交通过普通暂存 hook，包括 index 不变的 TDD 门禁和提交消息检查。测试过滤、仅跳过报告或绕过 hook "
+"都不能建立验收。计数仅描述各自执行范围，不得相加为最终平台测试总数。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Commit"
+msgstr "提交"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Change"
+msgstr "变更"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Recorded software execution"
+msgstr "已记录软件执行"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`e7deeecdb2dfc85d40f2f557cd655cfa34e1492d`"
+msgstr "`e7deeecdb2dfc85d40f2f557cd655cfa34e1492d`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Exact-package GPIO inventory and bounded G474 UART"
+msgstr "精确封装 GPIO 清单和有界 G474 UART"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Normal commit gates; source-specific RED/GREEN retained"
+msgstr "普通提交门禁；保留源码专属 RED／GREEN"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`7e48b879b327df19c6d7dd7f672a5898585bdb2c`"
+msgstr "`7e48b879b327df19c6d7dd7f672a5898585bdb2c`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Nineteen SoC HIL case recipes and captured-evidence validation"
+msgstr "十九项 SoC HIL 配方与已采集证据校验"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Normal tool gates; plans remain prepared and unbound"
+msgstr "普通工具门禁；计划保持已准备、未绑定"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`1f5ff587f00ce91882ffd455982f50191bc7907f`"
+msgstr "`1f5ff587f00ce91882ffd455982f50191bc7907f`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Startup, clock, memory and interrupt cleanup ownership"
+msgstr "启动、时钟、内存、中断清理所有权"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"156 GoogleTest executables / 2,819 cases; 480 tool and 385 configuration "
+"tests"
+msgstr "156 个 GoogleTest 程序／2,819 个用例；480 个工具、385 个配置测试"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`ae27e999f157fecd027db99bdfa99ce38582a940`"
+msgstr "`ae27e999f157fecd027db99bdfa99ce38582a940`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Reviewed original H7/U5 CMSIS dependency closures"
+msgstr "经审查的原始 H7／U5 CMSIS 依赖闭包"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"156 GoogleTest executables / 2,819 cases; 527 tool and 385 configuration "
+"tests"
+msgstr "156 个 GoogleTest 程序／2,819 个用例；527 个工具、385 个配置测试"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`ee33f38d8120405b5bf6f383710f81d05b12371b`"
+msgstr "`ee33f38d8120405b5bf6f383710f81d05b12371b`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Immutable descriptors, cold admission, EXTI and timer start"
+msgstr "不可变 descriptor、冷态准入、EXTI 和 timer 启动"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"157 GoogleTest executables / 2,847 cases; 576 tool and 397 configuration "
+"tests"
+msgstr "157 个 GoogleTest 程序／2,847 个用例；576 个工具、397 个配置测试"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`5899c230c8063eb8832bb1dc7f171958d83227d5`"
+msgstr "`5899c230c8063eb8832bb1dc7f171958d83227d5`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Runtime timer ACK isolation, retained cleanup and narrow W1C models"
+msgstr "运行 timer ACK 隔离、保留清理及窄 W1C 模型"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"157 GoogleTest executables / 2,862 cases; 576 tool and 397 configuration "
+"tests"
+msgstr "157 个 GoogleTest 程序／2,862 个用例；576 个工具、397 个配置测试"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`c3c4a62ebdbd3661bb561392651e80c23dd5b1e3`"
+msgstr "`c3c4a62ebdbd3661bb561392651e80c23dd5b1e3`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "H743/U575 static GPIO/UART references, SDK closure and HIL guards"
+msgstr "H743／U575 静态 GPIO／UART 参考、SDK 闭包及 HIL 防护"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"163 GoogleTest executables / 2,982 cases; 585 tool and 415 configuration "
+"tests"
+msgstr "163 个 GoogleTest 程序／2,982 个用例；585 个工具、415 个配置测试"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`23cde7e57a4781db8ffe2e75849c02f976c4304d`"
+msgstr "`23cde7e57a4781db8ffe2e75849c02f976c4304d`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"Selected GPIO leases and terminal time-domain failures across five MCU "
+"families"
+msgstr "五个 MCU 家族的选定 GPIO 租约和终止时间域失败"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"165 GoogleTest executables / 3,040 cases; 585 tool and 423 configuration "
+"tests"
+msgstr "165 个 GoogleTest 程序／3,040 个用例；585 个工具、423 个配置测试"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`3728b334b02eb2eb70bcf5d4caafbb9746837dd3`"
+msgstr "`3728b334b02eb2eb70bcf5d4caafbb9746837dd3`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"Complete private pin-helper dependencies and aligned startup DATA loads"
+msgstr "完整私有 pin-helper 依赖和对齐 startup DATA load"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"165 GoogleTest executables / 3,040 cases; 585 tool and 428 configuration "
+"tests"
+msgstr "165 个 GoogleTest 程序／3,040 个用例；585 个工具、428 个配置测试"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:31
+msgid ""
+"All numerical suites above completed without failures or skips. Their staged"
+" source-tree identities and raw hook outputs are retained in the external "
+"`nexus-soc-20261012/evidence/batch-*/` and `nexus-soc-"
+"qualification-20261012/batch-*-hook-passed/` records. An earlier failed hook"
+" remains a failed attempt; its output is not rewritten as a successful run."
+msgstr ""
+"上述数字测试集均零失败、零跳过。暂存源码 tree 身份和原始 hook 输出保留于外部 `nexus-"
+"soc-20261012/evidence/batch-*/` 和 `nexus-soc-"
+"qualification-20261012/batch-*-hook-passed/`。此前失败 hook 保留失败尝试，不将输出改写为成功。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:37
+msgid ""
+"The dependency-only commit `ae27e999f157fecd027db99bdfa99ce38582a940` "
+"additionally passed 47 actual source-SDK boundary tests with zero failures "
+"or skips. Source and dependency state were clean before and after execution."
+" Relocated public consumers exercised Native C/C++, the existing platform "
+"ARM profiles and ThreadX within their declared scopes. This run did **not** "
+"qualify H743/U575 firmware. Its raw command receipts and consumer artifacts "
+"are recorded in `nexus-soc-qualification-20261012/sdk-dependency-"
+"boundaries-v2/`."
+msgstr ""
+"仅依赖变更的提交 `ae27e999f157fecd027db99bdfa99ce38582a940` 另外通过 47 个实际 Source SDK "
+"边界测试，零失败、零跳过。执行前后源码和依赖均干净。搬移后的公共消费工程 在各自声明范围验证 Native C／C++、既有平台 ARM profile"
+" 和 ThreadX。此执行**没有**资格化 H743／U575 固件。原始回执和产物保留于 `nexus-soc-"
+"qualification-20261012/sdk-dependency-boundaries-v2/`。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:45
+msgid "Baseline source qualification"
+msgstr "基线源码资格"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:47
+msgid ""
+"The implementation qualification source is "
+"`3728b334b02eb2eb70bcf5d4caafbb9746837dd3`, tree "
+"`48ba820e5c2d4c372bf7eb6e909c49850cc1fe76`. Subsequent documentation commits"
+" describe that exact code source; they do not replace its qualification "
+"identity. The {download}`portable result index <soc-refinement-"
+"results.json>` records exact report hashes and archive-relative paths "
+"without copying raw logs into Git."
+msgstr ""
+"实现资格源码为 `3728b334b02eb2eb70bcf5d4caafbb9746837dd3`，tree "
+"`48ba820e5c2d4c372bf7eb6e909c49850cc1fe76`。后续文档提交描述该精确源码，不替换其资格身份。{download}`可迁移结果索引"
+" <soc-refinement-results.json>` 记录报告精确摘要和归档相对路径，不把 raw logs 复制到 Git。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:54
+msgid ""
+"Normal hooks passed on that source. The same complete model execution binds "
+"203 reviewed I/O properties to assertion anchors and current production "
+"inputs; this is bounded executed evidence, not a formal or exhaustive proof."
+" All five maintained ARM gates passed, covering sixteen memory/reference "
+"images and 87 selected-provider images. The same code source passed all 58 "
+"installed SDK boundary tests. Its 236 actual commands include expected "
+"nonzero negative-path results; the test suite has zero failures, errors or "
+"skips. Earlier results, including 58 SDK tests and 22 legacy contract "
+"programs on `23cde7e`, are retained as source-specific history and are not "
+"promoted to the new source."
+msgstr ""
+"该源码通过普通 hooks。相同完整模型执行将 203 个已审查 I/O property 绑定到 assertion anchor "
+"和当前生产输入；这只是有界执行证据，不是形式或穷尽证明。五个维护 ARM 门禁均通过，覆盖十六个内存／参考镜像和 87 个选定 provider "
+"镜像。同一源码通过全部 58 个安装 SDK 边界测试，236 条实际命令包含预期非零负路径，测试集零失败、零错误、零跳过。此前结果包括 "
+"`23cde7e` 上的 58 个 SDK 测试和 22 个旧契约程序，保留为源码专属历史，不提升为新源码资格。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Scope"
+msgstr "范围"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Maintained execution entry"
+msgstr "维护中的执行入口"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Final-source status"
+msgstr "最终源码状态"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Production C, generated factory and failure paths"
+msgstr "生产 C、生成 factory 和失败路径"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`scripts/ci/tdd_gate.py --all`"
+msgstr "`scripts/ci/tdd_gate.py --all`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"165 executables / 3,040 cases; zero failures or skips on the code source "
+"above"
+msgstr "165 个程序／3,040 个用例；上述源码零失败、零跳过"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Configuration, provider descriptors and tools"
+msgstr "配置、provider descriptor 和工具"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`tools/testing/run_tool_tests.py`"
+msgstr "`tools/testing/run_tool_tests.py`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"585 tool / 428 configuration cases; zero failures or skips on the code "
+"source above"
+msgstr "585 个工具／428 个配置用例；上述源码零失败、零跳过"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "F407 default/CCM and GD main/additional/TCM RAM"
+msgstr "F407 默认／CCM、GD 主／附加／TCM RAM"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`scripts/ci/stm32_memory.py`, `scripts/ci/gd32_memory.py`"
+msgstr "`scripts/ci/stm32_memory.py`, `scripts/ci/gd32_memory.py`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Eight actual ARM images passed resources and selected retention"
+msgstr "八个实际 ARM 镜像通过资源和选定保留检查"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "H743 empty/selected, baremetal/FreeRTOS"
+msgstr "H743 empty／selected，裸机／FreeRTOS"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`scripts/ci/stm32h743.py`"
+msgstr "`scripts/ci/stm32h743.py`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Four actual ARM images passed"
+msgstr "四个实际 ARM 镜像通过"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "U575 empty/selected, baremetal/FreeRTOS"
+msgstr "U575 empty／selected，裸机／FreeRTOS"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`scripts/ci/stm32u575.py`"
+msgstr "`scripts/ci/stm32u575.py`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Every maintained authored controller assembly"
+msgstr "全部维护中的手写 controller 装配"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`scripts/ci/provider_assemblies.py`"
+msgstr "`scripts/ci/provider_assemblies.py`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "All 87 actual fixtures passed; clean source and unchanged inputs"
+msgstr "全部 87 个实际夹具通过；源码干净、输入未变"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Installed SDK and actual public consumers"
+msgstr "安装 SDK 和实际公共 consumer"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`tests/contracts/test_source_sdk.py`, `test_device_sdk_payload.py`"
+msgstr "`tests/contracts/test_source_sdk.py`, `test_device_sdk_payload.py`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"58 actual tests passed; clean source before/after; relocated Native, "
+"selected MCU and ThreadX consumers"
+msgstr "58 个实际测试通过；执行前后源码干净；搬移后的 Native、所选 MCU 和 ThreadX 消费工程"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Hot paths and image/resource costs"
+msgstr "热路径、镜像／资源成本"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`tools/measurement/soc_costs.py`"
+msgstr "`tools/measurement/soc_costs.py`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"Eleven representative final profiles observed: eight H743/U575 plus F407 "
+"EXTI, GD EXTI and G474 LPUART"
+msgstr "观察十一个代表性最终 profile：八个 H743／U575，以及 F407 EXTI、GD EXTI、G474 LPUART"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Derived capability projection"
+msgstr "派生能力投影"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`tools/maintenance/capabilities.py --check`"
+msgstr "`tools/maintenance/capabilities.py --check`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "87 rows checked; actual exit code zero"
+msgstr "检查 87 行；实际返回码为零"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "External examples on the same platform code"
+msgstr "同平台源码的外部示例"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`X-Gen-Lab/nexus-examples`"
+msgstr "`X-Gen-Lab/nexus-examples`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid ""
+"Eight CTest programs, three GoogleTest programs / 43 cases, 20 ARM images "
+"and budgets; ten HIL plans remain prepared and unbound"
+msgstr "八个 CTest 程序、三个 GoogleTest 程序／43 个用例、20 个 ARM 镜像及预算；十个 HIL 计划仍已准备、未绑定"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Offline reproducibility and candidate sealing"
+msgstr "离线复现与候选封存"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`tools/evidence/reproduce.py`, `candidate.py`, `proof.py`"
+msgstr "`tools/evidence/reproduce.py`, `candidate.py`, `proof.py`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Not established by this iteration record"
+msgstr "本轮记录未建立"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Physical SoC cases 37–55"
+msgstr "物理 SoC 用例 37–55"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "`tools/hil/soc_acceptance.py`"
+msgstr "`tools/hil/soc_acceptance.py`"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Tooling implemented; physical execution absent"
+msgstr "工具已实现；没有物理执行"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:79
+msgid ""
+"The H743 ELF gate inspects the actual reset-to-power-entry closure before "
+"RAM is usable, in addition to vector bytes, selected retention and "
+"resources. The U575 gate preserves the declared TZEN=0 single-state boot "
+"boundary. Its vector/count checks do not automatically prove the complete "
+"Reset/SystemInit/data/BSS/MSP call closure. Independent review has now "
+"checked all eight actual H743/U575 images, including the complete linked "
+"startup path and four-byte DATA load alignment; 2,297 identified inputs "
+"stayed unchanged before and after capture. The gate's "
+"`source_and_call_closure_review_required` boundary is closed by that "
+"separate source-bound report, not by relabelling the vector test. Neither "
+"ARM gate executes a scheduler on the MCU or establishes a measured "
+"electrical result."
+msgstr ""
+"H743 ELF 门禁除向量字节、选定保留和资源外，还检查 RAM 可用前的实际 reset-to-power-entry 闭包。U575 门禁保留声明"
+" TZEN=0 单状态启动边界，其 vector／count 检查不会自动证明完整 Reset／SystemInit／data／BSS／MSP "
+"调用闭包。独立审查已检查八个实际 H743／U575 镜像，包括完整链接启动路径和 four-byte DATA load 对齐；采集前后 2,297 "
+"个已识别输入未变。`source_and_call_closure_review_required` 由单独源码绑定报告关闭，不能通过重标 vector"
+" 测试关闭。两个 ARM 门禁均没有在 MCU 上运行 scheduler，也不建立实测电气结果。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:90
+msgid ""
+"The actual selected-reference costs are below. Flash is the sum of LOAD file"
+" bytes, not the largest occupied address span. RAM includes reserved MSP "
+"exactly once; every row reserves 2,048 MSP bytes and zero heap. Static "
+"reservations are not measured stack high water or product application "
+"budgets."
+msgstr ""
+"实际所选参考成本如下。Flash 为 LOAD 文件字节总和，不是最大占用地址跨度。RAM 只计一次预留 MSP，每行 2,048 MSP "
+"bytes、零 heap。静态预留不是实测栈峰值或产品预算。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Family"
+msgstr "家族"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Backend"
+msgstr "后端"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Assembly"
+msgstr "装配"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Flash LOAD bytes"
+msgstr "Flash LOAD 字节"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "RAM reserved bytes"
+msgstr "RAM 预留字节"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "H743"
+msgstr "H743"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "baremetal"
+msgstr "裸机"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "empty"
+msgstr "空配置"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "2,437"
+msgstr "2,437"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "2,104"
+msgstr "2,104"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "GPIO + UART"
+msgstr "GPIO＋UART"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "8,908"
+msgstr "8,908"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "2,364"
+msgstr "2,364"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "FreeRTOS"
+msgstr "FreeRTOS"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "7,564"
+msgstr "7,564"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "3,716"
+msgstr "3,716"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "14,108"
+msgstr "14,108"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "3,976"
+msgstr "3,976"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "U575"
+msgstr "U575"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "2,225"
+msgstr "2,225"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "2,112"
+msgstr "2,112"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "8,712"
+msgstr "8,712"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "2,372"
+msgstr "2,372"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "7,300"
+msgstr "7,300"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "3,724"
+msgstr "3,724"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "13,868"
+msgstr "13,868"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "3,984"
+msgstr "3,984"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:106
+msgid ""
+"The selected H743 and U575 images expose 60 and 68 bytes respectively of "
+"GPIO lease/gate objects. These are not total Platform storage. An inlined or"
+" unretained helper without a separate function symbol is not assigned zero "
+"cost. These observations describe exact linked selections; different "
+"backends, capacities or routes are not comparable optimization percentages. "
+"No cycles, interrupt blackout time or WCET was measured."
+msgstr ""
+"所选 H743／U575 镜像分别暴露 60／68 bytes GPIO lease／gate 对象，并非 Platform "
+"总存储。内联或未保留、没有独立函数符号的 helper 不能按零成本计算。这些观察只描述精确链接选择；不同后端、容量、route "
+"不能作为可比优化百分比。没有测量 cycles、中断屏蔽时长或 WCET。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:113
+msgid ""
+"The same observer also inspected three existing images from the completed "
+"87-fixture matrix without recompiling them:"
+msgstr "同一 observer 还直接检查完整 87-fixture 矩阵中的三个既有镜像，没有重新编译："
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Selected storage"
+msgstr "选定存储"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "F407 VE EXTI"
+msgstr "F407 VE EXTI"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "Two lines, four event slots each"
+msgstr "两条 line，每条四个 event slot"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "6,152"
+msgstr "6,152"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "2,344"
+msgstr "2,344"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "GD32 EXTI"
+msgstr "GD32 EXTI"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "One line, eight event slots"
+msgstr "一条 line，八个 event slot"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "6,956"
+msgstr "6,956"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "2,260"
+msgstr "2,260"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "G474 GPIO/LPUART"
+msgstr "G474 GPIO／LPUART"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "64 RX bytes"
+msgstr "64 RX bytes"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "9,012"
+msgstr "9,012"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:0
+msgid "2,316"
+msgstr "2,316"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:122
+msgid ""
+"These RAM figures also include the 2,048-byte MSP reservation and zero heap."
+" The supplementary report records exact symbol sizes, decoded instructions "
+"and static branch sites. Different routes and capacities make these separate"
+" baselines. The eleven measured profiles do not represent every maintained "
+"mode or establish cycle counts, blackout duration or a cross-chip "
+"optimization rate."
+msgstr ""
+"这些 RAM 数字同样含 2,048-byte MSP 预留和零 heap。补充报告记录精确符号尺寸、解码指令和静态分支位置。不同 "
+"route／容量属于独立基线。十一个实测 profile 不代表全部维护模式，也不建立 cycles、中断屏蔽时长或跨芯片优化率。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:128
+msgid ""
+"External examples are qualified at code commit "
+"`f02b91867bb64abfa31e3c1d4b6004bd1a38b091`, pinned to the platform code "
+"above. The actual 46-command clean execution and its source record are "
+"indexed separately. The ten HIL preparations do not mean ten physical "
+"station executions."
+msgstr ""
+"外部示例资格为代码 commit `f02b91867bb64abfa31e3c1d4b6004bd1a38b091`，pin 到上述平台源码。实际 "
+"46-command 干净执行及源码记录单独索引；十个 HIL 准备不等于十次物理 station 执行。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:133
+msgid "Interpreting the ledger"
+msgstr "解释台账"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:135
+msgid ""
+"`implemented` records a mechanism in source. `contract_implemented` and "
+"`documentation_updated` record narrower contract/documentation work. "
+"`qualification_record_authority` delegates acceptance to the actual external"
+" record for the exact source/configuration/artifact tuple; it is not a "
+"source file's self-reported pass. `final_source_pending` means that "
+"execution is still required for the completed source scope."
+msgstr ""
+"`implemented` 记录源码中的机制。`contract_implemented` 和 `documentation_updated` "
+"记录范围更窄的契约／文档工作。`qualification_record_authority` 将验收交给精确 "
+"source／configuration／artifact tuple 的外部实际记录，不是源码文件自报 "
+"passed。`final_source_pending` 表示完成的源码范围仍需执行。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:142
+msgid ""
+"`selected_profiles_observed` records actual static cost measurements only "
+"for the profiles named above and in the index. `tooling_software_validated` "
+"qualifies the HIL software contracts; the corresponding physical test "
+"remains unexecuted. The partial-reference implementation states preserve "
+"their limited GPIO/UART scope even after host, ARM or installed-SDK checks "
+"pass."
+msgstr ""
+"`selected_profiles_observed` 只记录以上及索引命名 profile "
+"的真实静态成本。`tooling_software_validated` 资格化 HIL "
+"软件契约，相应物理测试仍未执行。部分参考实现即使通过主机、ARM 或安装 SDK 检查，也保留有限 GPIO／UART 范围。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:148
+msgid ""
+"SOC-05 records versioned datasheet, manual and errata provenance. Actual "
+"silicon revision and full per-mode errata applicability remain unqualified. "
+"SOC-23 and SOC-27 require observed actual ELF costs; an observer's unit "
+"tests alone do not complete measurement. A changed capacity, backend, Board "
+"route or memory layout must be reported as a distinct selection rather than "
+"a like-for-like saving."
+msgstr ""
+"SOC-05 记录版本化 datasheet、manual、errata 来源，实际硅片修订及每个模式完整 errata "
+"适用性仍未资格化。SOC-23／SOC-27 要求实际 ELF 成本观察，observer 单元测试不能完成测量。容量、后端、Board route "
+"或内存布局变化应作为不同选择报告，不能描述为同配置节省。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:154
+msgid ""
+"SOC-28, SOC-30 and SOC-31 contain only the exact H743/U575 GPIO/UART/time "
+"reference subset. SOC-29 and SOC-32–36 retain explicit missing features. "
+"Their original exit conditions remain unchanged. A rejected unsupported mode"
+" is not a completed mode implementation. SOC-37–55 contain executable "
+"software preparation, admission, capture and validation tools; every "
+"physical exit remains open until real station records are captured and "
+"validated."
+msgstr ""
+"SOC-28、SOC-30、SOC-31 仅包含精确 H743／U575 GPIO／UART／time 参考子集。SOC-29、SOC-32–36 "
+"保留明确缺失功能，原始退出条件不变。拒绝不支持模式不是该模式实现完成。SOC-37–55 包含可执行的软件准备、准入、采集、校验工具；真实 "
+"station 记录采集并校验前，所有物理退出保持开放。"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-refinement-verification.md:161
+msgid ""
+"No result here establishes MCU cycles, interrupt latency, Flash power-loss "
+"behavior, cache/DMA coherence, TrustZone isolation, product safety, "
+"certification or a product release. Exact support remains defined by the "
+"[support matrix](support.md) and [SoC contracts](../design/soc-"
+"refinement.md)."
+msgstr ""
+"这里没有结果建立 MCU cycles、中断延迟、Flash 掉电、cache／DMA 一致性、TrustZone "
+"隔离、产品安全、认证或产品发布。精确支持由[支持矩阵](support.md)及 [SoC 合同](../design/soc-"
+"refinement.md)定义。"

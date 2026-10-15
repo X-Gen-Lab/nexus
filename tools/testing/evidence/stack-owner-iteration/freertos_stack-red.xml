@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="7" failures="7" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:52:53.846" name="AllTests">
+  <testsuite name="FreeRTOSStack" tests="7" failures="7" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:52:53.846">
+    <testcase name="RejectsInvalidBindingsBeforeAnyKernelOrMemoryAccess" file="/workspace/nexus/tests/google/freertos_stack_test.cpp" line="57" status="run" result="completed" time="0." timestamp="2026-10-11T17:52:53.846" classname="FreeRTOSStack">
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:58&#x0A;Expected equality of these values:&#x0A;  nx_freertos_stack_observe(nullptr, &amp;out)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:58
+Expected equality of these values:
+  nx_freertos_stack_observe(nullptr, &out)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:59&#x0A;Expected equality of these values:&#x0A;  nx_freertos_stack_observe(&amp;binding, nullptr)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:59
+Expected equality of these values:
+  nx_freertos_stack_observe(&binding, nullptr)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:61&#x0A;Expected equality of these values:&#x0A;  nx_freertos_stack_observe(&amp;binding, &amp;out)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:61
+Expected equality of these values:
+  nx_freertos_stack_observe(&binding, &out)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:64&#x0A;Expected equality of these values:&#x0A;  nx_freertos_stack_observe(&amp;binding, &amp;out)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:64
+Expected equality of these values:
+  nx_freertos_stack_observe(&binding, &out)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+    </testcase>
+    <testcase name="HandlerRejectsWithoutCallingTheKernel" file="/workspace/nexus/tests/google/freertos_stack_test.cpp" line="68" status="run" result="completed" time="0." timestamp="2026-10-11T17:52:53.846" classname="FreeRTOSStack">
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:70&#x0A;Expected equality of these values:&#x0A;  nx_freertos_stack_observe(&amp;binding, &amp;out)&#x0A;    Which is: 7&#x0A;  NX_ERROR_CONTEXT&#x0A;    Which is: 14&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:70
+Expected equality of these values:
+  nx_freertos_stack_observe(&binding, &out)
+    Which is: 7
+  NX_ERROR_CONTEXT
+    Which is: 14
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:69&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, isr())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:69
+Actual function call count doesn't match EXPECT_CALL(dependency, isr())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+    <testcase name="MaskedThreadRejectsWithoutCallingTheKernel" file="/workspace/nexus/tests/google/freertos_stack_test.cpp" line="74" status="run" result="completed" time="0." timestamp="2026-10-11T17:52:53.846" classname="FreeRTOSStack">
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:79&#x0A;Expected equality of these values:&#x0A;  nx_freertos_stack_observe(&amp;binding, &amp;out)&#x0A;    Which is: 7&#x0A;  NX_ERROR_CONTEXT&#x0A;    Which is: 14&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:79
+Expected equality of these values:
+  nx_freertos_stack_observe(&binding, &out)
+    Which is: 7
+  NX_ERROR_CONTEXT
+    Which is: 14
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:77&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, masks())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:77
+Actual function call count doesn't match EXPECT_CALL(dependency, masks())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:76&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, privileged())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:76
+Actual function call count doesn't match EXPECT_CALL(dependency, privileged())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:75&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, isr())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:75
+Actual function call count doesn't match EXPECT_CALL(dependency, isr())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+    <testcase name="StoppedSchedulerDoesNotQueryAnUnstartedTask" file="/workspace/nexus/tests/google/freertos_stack_test.cpp" line="82" status="run" result="completed" time="0." timestamp="2026-10-11T17:52:53.846" classname="FreeRTOSStack">
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:89&#x0A;Expected equality of these values:&#x0A;  nx_freertos_stack_observe(&amp;binding, &amp;out)&#x0A;    Which is: 7&#x0A;  NX_ERROR_CONTEXT&#x0A;    Which is: 14&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:89
+Expected equality of these values:
+  nx_freertos_stack_observe(&binding, &out)
+    Which is: 7
+  NX_ERROR_CONTEXT
+    Which is: 14
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:87&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, scheduler())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:87
+Actual function call count doesn't match EXPECT_CALL(dependency, scheduler())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:85&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, masks())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:85
+Actual function call count doesn't match EXPECT_CALL(dependency, masks())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:84&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, privileged())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:84
+Actual function call count doesn't match EXPECT_CALL(dependency, privileged())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:83&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, isr())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:83
+Actual function call count doesn't match EXPECT_CALL(dependency, isr())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+    <testcase name="ActualKernelBufferMismatchCannotProduceASnapshot" file="/workspace/nexus/tests/google/freertos_stack_test.cpp" line="92" status="run" result="completed" time="0." timestamp="2026-10-11T17:52:53.847" classname="FreeRTOSStack">
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:98&#x0A;Expected equality of these values:&#x0A;  nx_freertos_stack_observe(&amp;binding, &amp;out)&#x0A;    Which is: 7&#x0A;  NX_ERROR_STATE&#x0A;    Which is: 3&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:98
+Expected equality of these values:
+  nx_freertos_stack_observe(&binding, &out)
+    Which is: 7
+  NX_ERROR_STATE
+    Which is: 3
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:94&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, buffers(binding.handle, testing::_, testing::_))...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:94
+Actual function call count doesn't match EXPECT_CALL(dependency, buffers(binding.handle, testing::_, testing::_))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:46&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, scheduler())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:46
+Actual function call count doesn't match EXPECT_CALL(dependency, scheduler())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:44&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, masks())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:44
+Actual function call count doesn't match EXPECT_CALL(dependency, masks())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:43&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, privileged())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:43
+Actual function call count doesn't match EXPECT_CALL(dependency, privileged())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:42&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, isr())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:42
+Actual function call count doesn't match EXPECT_CALL(dependency, isr())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+    <testcase name="AllPaintedSpanTerminatesWithoutTheKernelUnboundedScan" file="/workspace/nexus/tests/google/freertos_stack_test.cpp" line="102" status="run" result="completed" time="0." timestamp="2026-10-11T17:52:53.847" classname="FreeRTOSStack">
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:105&#x0A;Expected equality of these values:&#x0A;  nx_freertos_stack_observe(&amp;binding, &amp;out)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:105
+Expected equality of these values:
+  nx_freertos_stack_observe(&binding, &out)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:50&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, buffers(binding.handle, testing::_, testing::_))...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:50
+Actual function call count doesn't match EXPECT_CALL(dependency, buffers(binding.handle, testing::_, testing::_))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:46&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, scheduler())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:46
+Actual function call count doesn't match EXPECT_CALL(dependency, scheduler())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:44&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, masks())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:44
+Actual function call count doesn't match EXPECT_CALL(dependency, masks())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:43&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, privileged())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:43
+Actual function call count doesn't match EXPECT_CALL(dependency, privileged())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:42&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, isr())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:42
+Actual function call count doesn't match EXPECT_CALL(dependency, isr())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+    <testcase name="ReadOnlyObservedPrefixUsesOriginalCapacity" file="/workspace/nexus/tests/google/freertos_stack_test.cpp" line="111" status="run" result="completed" time="0." timestamp="2026-10-11T17:52:53.847" classname="FreeRTOSStack">
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:115&#x0A;Expected equality of these values:&#x0A;  nx_freertos_stack_observe(&amp;binding, &amp;out)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:115
+Expected equality of these values:
+  nx_freertos_stack_observe(&binding, &out)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:50&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, buffers(binding.handle, testing::_, testing::_))...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:50
+Actual function call count doesn't match EXPECT_CALL(dependency, buffers(binding.handle, testing::_, testing::_))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:46&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, scheduler())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:46
+Actual function call count doesn't match EXPECT_CALL(dependency, scheduler())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:44&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, masks())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:44
+Actual function call count doesn't match EXPECT_CALL(dependency, masks())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:43&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, privileged())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:43
+Actual function call count doesn't match EXPECT_CALL(dependency, privileged())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/freertos_stack_test.cpp:42&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(dependency, isr())...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/freertos_stack_test.cpp:42
+Actual function call count doesn't match EXPECT_CALL(dependency, isr())...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

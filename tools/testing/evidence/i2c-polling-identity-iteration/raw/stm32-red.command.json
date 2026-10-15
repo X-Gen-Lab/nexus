@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/workspace/nexus/build/native-debug/bin/nexus_stm32_i2c_register_test",
+    "--gtest_filter=*",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-i2c-pair-iteration-evidence/polling-pure-identity/stm32-red.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 1,
+  "tests": "17",
+  "failures": "3",
+  "sources": {
+    "io/native/i2c.c": "fe6d546164f974e9f74d4eaa7832d7d2d8196abc2a3102cf79018893bd86666d",
+    "soc/stm32f407/drivers/i2c.c": "6df7da48f22a1dca7849a127c429f46d799d3f58cd6b7277d5a7ad093b075c9d",
+    "soc/gd32f470/drivers/i2c.c": "22e4c4bd0cb349bd7609f320f72220a65ea5f6cf8affb24f03d7f96fa325122e",
+    "tests/google/i2c_register_test.cpp": "b47e98de737302a9662bfac088466490db22c11bd5e8866a0e35a1364c46a1ff"
+  }
+}

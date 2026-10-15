@@ -1,0 +1,1219 @@
+{
+  "schema_version": 1,
+  "kind": "gd32_optional_memory_development_freeze",
+  "status": "passed",
+  "scope": "actual host initializer/reset models and exact development production ARM ELF; not clean-source SDK qualification",
+  "physical_status": "not_executed",
+  "cycles_status": "not_measured",
+  "source_inputs": [
+    {
+      "path": "core/include/nexus/core/memory.h",
+      "bytes": 3064,
+      "sha256": "d38dc78859c5796672427590ed836d65bfd09daaac3009ef04f27a3ce73b31d1"
+    },
+    {
+      "path": "soc/gd32f470/memory_init.c",
+      "bytes": 3565,
+      "sha256": "0f3502565b87febe4ed3e833fdf5ac9eef6f91f09ec52a356a1ba4b2d6bcbe87"
+    },
+    {
+      "path": "soc/gd32f470/private/memory_init.h",
+      "bytes": 1991,
+      "sha256": "31a96ed0a74cd5f41f1906aa87aaee449a6affadc3505f081b4cc52f9531bd0b"
+    },
+    {
+      "path": "soc/gd32f470/system.c",
+      "bytes": 8430,
+      "sha256": "711d6e4f5a4a673360523697b875e1c47d91a44a4ac974be056ecafe6cdb8f76"
+    },
+    {
+      "path": "tests/google/gd32_memory_test.cpp",
+      "bytes": 7704,
+      "sha256": "135d617bc830bf619f578c22f7f6f18c94b4847f7a26df1f383b2088d0f18bee"
+    },
+    {
+      "path": "tests/google/gd32_memory_boot_test.cpp",
+      "bytes": 5480,
+      "sha256": "376f972e05b58650d1559528cca171eff6b269d2e42d809d174e6806ef53b7f4"
+    },
+    {
+      "path": "tests/google/gd32_memory.cmake",
+      "bytes": 2125,
+      "sha256": "3c7312cb8a5e76b78cea64cff750624cdc7b45f7f8d951b4aeda775f41bf3bdb"
+    },
+    {
+      "path": "tests/contracts/test_memory_placement.py",
+      "bytes": 6261,
+      "sha256": "1abed1efa1ff1d28ef9349c6306fb34bb51bcdc2670449f6cffd6b6eaaa62a68"
+    },
+    {
+      "path": "tests/contracts/test_gd32_memory_matrix.py",
+      "bytes": 5351,
+      "sha256": "8fc1c6f4744a542d40a2ef928bae5598082c7e1951ecd7d7e6cdde6b90e72d82"
+    },
+    {
+      "path": "scripts/ci/gd32_memory.py",
+      "bytes": 14384,
+      "sha256": "297a9f2a07a96124d1f4452794461b136d9027e2297c9c165c42d5ef7e74ba31"
+    },
+    {
+      "path": "tests/contracts/gd32_memory/main.c",
+      "bytes": 1973,
+      "sha256": "744c662dbe7606bcad9f6f4f6a04f94e5b0c0f5e49e5fb71262644b8d07997bd"
+    },
+    {
+      "path": "tests/contracts/gd32_memory/both.toml",
+      "bytes": 306,
+      "sha256": "9adb844cbcfe08af292f072934198a0112a1fbb1d2b39b7d88f3343358acba77"
+    },
+    {
+      "path": "tests/contracts/gd32_memory/unselected.c",
+      "bytes": 899,
+      "sha256": "aeabfff018b4771645ada1f4be87a953c208a30db4a0c82a55580034e69f491f"
+    },
+    {
+      "path": "tests/contracts/gd32_memory/addsram.toml",
+      "bytes": 266,
+      "sha256": "2f793ac8de0420715c9f397f93416ebdc146b5594daee690f6374a7aee024042"
+    },
+    {
+      "path": "tests/contracts/gd32_memory/README.md",
+      "bytes": 1483,
+      "sha256": "5143df85ae55707f4718572c35942bf07d066a8818ee01064ca7e9b855b05d9f"
+    },
+    {
+      "path": "tests/contracts/gd32_memory/default.toml",
+      "bytes": 222,
+      "sha256": "6bf4196e803a085829184aa3cb99b1baa6974a8109d0ba90582c27379f31b20d"
+    },
+    {
+      "path": "tests/contracts/gd32_memory/tcm.toml",
+      "bytes": 262,
+      "sha256": "78c2e7eef95dce9b2cd3cacc456e8c20aa0f211e7fa4ecda07d5e2acb2f7632d"
+    },
+    {
+      "path": "tests/contracts/gd32_memory/CMakeLists.txt",
+      "bytes": 1346,
+      "sha256": "f6e602b30cd38bef01e6df351f301bd8546c11132e25133c5aa4970c3bb5c877"
+    }
+  ],
+  "google": [
+    {
+      "report": {
+        "path": "tools/testing/evidence/memory-iteration/maintained-initialize-green.xml",
+        "bytes": 3234,
+        "sha256": "b7f0e102739f4ceaa21b81c3f63d2ef08d8b1dda55bdce93d8409d028d0d3bc0"
+      },
+      "cases": 12
+    },
+    {
+      "report": {
+        "path": "tools/testing/evidence/memory-iteration/maintained-default-green.xml",
+        "bytes": 821,
+        "sha256": "84a6b095c35d1fcd9dfc32042abf069ce10c78cfa6c1abca90fd3ac51e669a92"
+      },
+      "cases": 2
+    },
+    {
+      "report": {
+        "path": "tools/testing/evidence/memory-iteration/maintained-both-green.xml",
+        "bytes": 821,
+        "sha256": "80b73eea3e60b3c097ce53636ce5e478d1c0a1d521ade0090a1eb2a2f33b3354"
+      },
+      "cases": 2
+    }
+  ],
+  "arm_matrix": {
+    "path": "tools/testing/evidence/memory-iteration/arm-green3/report.json",
+    "bytes": 87417,
+    "sha256": "9d0d19f578a106308e0904aa3415ec85f44458f94a80dc750779153ef5b63e70"
+  },
+  "arm_bound_artifacts": [
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/default/bin/nexus_gd32_memory.elf",
+      "bytes": 16284,
+      "sha256": "82ed920d41c488795faff05bd952e17c9c0b925dad7eae00e4af4a83c90e019b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/default/bin/nexus_gd32_memory.bin",
+      "bytes": 2876,
+      "sha256": "57ba1ba052e04528f65a9ea1512ee7d4ec2f05863372d7cf34ac0f4a1ac3aef7"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/default/bin/nexus_gd32_memory.map",
+      "bytes": 48877,
+      "sha256": "0cbde9c9e61e79a1ca1bfae9e7a56b04be3f88942290b3f665481b372cb9ee0d"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/default/nexus/generated/resolved.json",
+      "bytes": 20686,
+      "sha256": "9a86e08773113c14e4bf2e7f289c45c05c92a514688e6a1ae08edb6b307f8192"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/default/nexus/generated/resource-budget.json",
+      "bytes": 201,
+      "sha256": "ed0bc6eb7021386517d5f8eaf58b14b3b2fd81e2e2849c31c615453f489ea545"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/default/bin/nexus_gd32_memory.resources.json",
+      "bytes": 3681,
+      "sha256": "c189b8dbeca4bdf447afe61c24b6a058d6974ebb3448c0af12ed5a7633b7f8cd"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/default/compile_commands.json.raw",
+      "bytes": 45547,
+      "sha256": "c24b68ac390a0af8183fb862197b5ab5fc7048f51b0bdb9a5229915410019178",
+      "original_archive_path": "tools/testing/evidence/memory-iteration/arm-green3/default/compile_commands.json",
+      "original_execution_path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/default/compile_commands.json"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/default/nexus/generated/memory.ld",
+      "bytes": 2783,
+      "sha256": "6d7d9596c4b1f3a2747b7f12770da47fe66953dff95c7ff084a7c0362f0888cb"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/addsram/bin/nexus_gd32_memory.elf",
+      "bytes": 21176,
+      "sha256": "37764c995db0193dd62d311172a48ab66ac9dd33b6a0824dff0a6d422c2d3141"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/addsram/bin/nexus_gd32_memory.bin",
+      "bytes": 3320,
+      "sha256": "737a74c2ed04e7763a5faf5d5b36b4cd21bdc28c24eed67a6703ac8ad4cb14b1"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/addsram/bin/nexus_gd32_memory.map",
+      "bytes": 51883,
+      "sha256": "d0aff7cfb4771093ea115f6e77f1a3db7cd3c9702abbe68a98eaa3e1ec3a0d31"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/generated/resolved.json",
+      "bytes": 20763,
+      "sha256": "6670d69b3967aaae9aaa0a5678c4622075b8380ceb6cfcf2bac667914793513f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/generated/resource-budget.json",
+      "bytes": 203,
+      "sha256": "4393d801fa0b8ef7a58a4ebf7925e0938e568b8e06efefb565b7eeb538978cc2"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/addsram/bin/nexus_gd32_memory.resources.json",
+      "bytes": 3759,
+      "sha256": "0b10e262beeaed968cb1efb7610b62a0738a38250b5c64ec269bcb4c0dcbdc35"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/addsram/compile_commands.json.raw",
+      "bytes": 46830,
+      "sha256": "06224cacd7abe738d3d0861834a6a5829da27782c864067a68c8fddc8d86d0ff",
+      "original_archive_path": "tools/testing/evidence/memory-iteration/arm-green3/addsram/compile_commands.json",
+      "original_execution_path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/addsram/compile_commands.json"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/addsram/nexus/generated/memory.ld",
+      "bytes": 3411,
+      "sha256": "afb876766617a5e997a16d0dec3add9900a71f3742e5cecd6a20511178a8045f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/tcm/bin/nexus_gd32_memory.elf",
+      "bytes": 21124,
+      "sha256": "fa57ef68ce5fdffbc49ded0657204779a8d410858b0a14f08ac37d808af433c8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/tcm/bin/nexus_gd32_memory.bin",
+      "bytes": 3352,
+      "sha256": "6a0adcda6fa5670134b197a4f0a9a174c33eb27c0d8ab4907aa1244aebef332e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/tcm/bin/nexus_gd32_memory.map",
+      "bytes": 51739,
+      "sha256": "a087ea552cc92beacda4b0421d82c02790b646b0515c7c321ca9149efc821c8f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/generated/resolved.json",
+      "bytes": 20755,
+      "sha256": "f6b1dc75622e91d88c8c35d572bf0e96175ff88eebe5756bffea36f091055cae"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/generated/resource-budget.json",
+      "bytes": 203,
+      "sha256": "3cd1629fbc590e0281dd6b8031d6b80d4a516b30078976ad1a4de1172d5a1c77"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/tcm/bin/nexus_gd32_memory.resources.json",
+      "bytes": 3739,
+      "sha256": "a1c516b617d140b343b6442ca094a0fa5b4fd3fc617694851f50028f59048ddc"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/tcm/compile_commands.json.raw",
+      "bytes": 46430,
+      "sha256": "903bd2484124221f1ae210f7db4dd9c23e3e639ab6b4ff902a583c6a04215aae",
+      "original_archive_path": "tools/testing/evidence/memory-iteration/arm-green3/tcm/compile_commands.json",
+      "original_execution_path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/tcm/compile_commands.json"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/tcm/nexus/generated/memory.ld",
+      "bytes": 3330,
+      "sha256": "f238b0994a115c4337578b495a4bfeb43a5a8ce37056b45862759c822f50b587"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/both/bin/nexus_gd32_memory.elf",
+      "bytes": 25964,
+      "sha256": "e03ac45c53d11d535be94b15b21eee1e1fa2d04419727f3bc2dd3b4c6b61888d"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/both/bin/nexus_gd32_memory.bin",
+      "bytes": 3448,
+      "sha256": "63582608e3312242604e6d0bc46b5fc7853091e20b404cd362140f6ee50e96fb"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/both/bin/nexus_gd32_memory.map",
+      "bytes": 55404,
+      "sha256": "a5abc0339ce0710dab7ddc7cbe70589a3c91b225eb5e4b05217f747b978f185f"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/both/nexus/generated/resolved.json",
+      "bytes": 20810,
+      "sha256": "6670fd794fd9f8bf8bbc0cda74177404fe551ffd6e731fb9c2577c55f700ab69"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/both/nexus/generated/resource-budget.json",
+      "bytes": 205,
+      "sha256": "6918a5758e86bbd33c1e7b7b88a0916d514b7d09327b250598a833741136da8b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/both/bin/nexus_gd32_memory.resources.json",
+      "bytes": 3822,
+      "sha256": "74098901e969cd6b216227b6c1d3156633e3593f591241bbf06a57da19b2c18e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/both/compile_commands.json.raw",
+      "bytes": 46530,
+      "sha256": "cba18a74b2448cadca49e9f6bc43a8d282b486d04120c752e96f0450f21acbfe",
+      "original_archive_path": "tools/testing/evidence/memory-iteration/arm-green3/both/compile_commands.json",
+      "original_execution_path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/both/compile_commands.json"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/both/nexus/generated/memory.ld",
+      "bytes": 3960,
+      "sha256": "1fb2184b0b8bb11f67c73d2ac09aa241bcb4d420b529fd87707bba0cd6273fe2"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/000-gcc-version.stdout",
+      "bytes": 285,
+      "sha256": "e5d5fdd1e3a8634d1981bc07130f5176636ecd4a28fef63c6271e44f57db621b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/000-gcc-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/001-nm-version.stdout",
+      "bytes": 317,
+      "sha256": "5575abf98c504928ea6b5e12603f097783adf5bf3b2ca77832136df9f86da264"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/001-nm-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/002-objdump-version.stdout",
+      "bytes": 322,
+      "sha256": "0c4e426f2b17ed2daa205b680de17f88876d0c0a1610e98e72b972692d3768da"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/002-objdump-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/003-readelf-version.stdout",
+      "bytes": 322,
+      "sha256": "23eced56e2a47dc3d9b6d88d079a69f4da05199bce98ca7517fc84c03db44367"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/003-readelf-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/004-cmake-version.stdout",
+      "bytes": 91,
+      "sha256": "f6e81c2559f3ce00c5fdad01d7b226c301f5d6b07ee04f65db6dbfdc1cc5970b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/004-cmake-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/005-ninja-version.stdout",
+      "bytes": 36,
+      "sha256": "e2d14d3b09221b66ba4be4e6fcdf0b867181f75109973bd744ba1833d231a543"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/005-ninja-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/006-python-version.stdout",
+      "bytes": 15,
+      "sha256": "4c3569f5da09975434dd9fd9a91fadbc4367a91d8f3c3fab59e9241ab9ee4bd8"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/006-python-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/007-default-configure.stdout",
+      "bytes": 1086,
+      "sha256": "ecc55710046021a08fe73a9f5e2196d3cbdeef629e955432516d3a6b0427a33b"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/007-default-configure.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/008-default-build.stdout",
+      "bytes": 3918,
+      "sha256": "cdd1579b845242853b210e26a5e96426beaafebd6d8e37e7ffecd3a0723202ac"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/008-default-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/009-default-SystemInit-preprocessor.stdout",
+      "bytes": 106158,
+      "sha256": "37232be55b1c67008fd89956d5af3799a3a7cb07aa302dca9379f3d15a3b54d9"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/009-default-SystemInit-preprocessor.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/010-addsram-configure.stdout",
+      "bytes": 1086,
+      "sha256": "f3e6e03a5b11da34b2998aa45aa8d5bdc6afe8ef709439c6a074e407b9131e8d"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/010-addsram-configure.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/011-addsram-build.stdout",
+      "bytes": 4038,
+      "sha256": "a908ec2b4400a84cb95d5777dc0366dd249e9a8e743e564f6253dacd340808f6"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/011-addsram-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/012-tcm-configure.stdout",
+      "bytes": 1078,
+      "sha256": "f7d8952827f76f683641631a183e8fb8ce58a9fe938f656ae1e94231e2be3935"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/012-tcm-configure.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/013-tcm-build.stdout",
+      "bytes": 4038,
+      "sha256": "330eea1acfac72e19f5f5c640f91a14ce6963472951f5509c626ecb2547f307e"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/013-tcm-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/014-both-configure.stdout",
+      "bytes": 1080,
+      "sha256": "c66d327d43c6b16801506fdb3c5b9e50cc8ef2fe173e1493d694a223064f23c0"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/014-both-configure.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/015-both-build.stdout",
+      "bytes": 4038,
+      "sha256": "042e3b80780fa74e2ca199dcf83310c7a347eb8d9c2cc64f4095ba6d63308069"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/015-both-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/016-addsram-budget-refusal.stdout",
+      "bytes": 19,
+      "sha256": "7f7513b160e9545a7efdb1ba10dc117db21ddb5ac71af6dfcb180a144064b028"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/016-addsram-budget-refusal.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/017-addsram-unselected-configure.stdout",
+      "bytes": 1108,
+      "sha256": "0caea8202b78e1ee8de9166b354a9595c1942289ca29b10909dc50a5a95062a9"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/017-addsram-unselected-configure.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/018-addsram-unselected-link.stdout",
+      "bytes": 6456,
+      "sha256": "2c02479343c2367fca47f41405eb782b071febc7b85f67ca820abb1e1ba33e7c"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/018-addsram-unselected-link.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/019-tcm-budget-refusal.stdout",
+      "bytes": 19,
+      "sha256": "7f7513b160e9545a7efdb1ba10dc117db21ddb5ac71af6dfcb180a144064b028"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/019-tcm-budget-refusal.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/020-tcm-unselected-configure.stdout",
+      "bytes": 1100,
+      "sha256": "f61230927ac868cc49f0f04c1a885904834623f6c0a9041b93c093dad482adb9"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/020-tcm-unselected-configure.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/021-tcm-unselected-link.stdout",
+      "bytes": 6420,
+      "sha256": "3250d00cef573aa3c9466c2101a782b0ed5c5a80bf4a7ad4300f5edc67ab3c08"
+    },
+    {
+      "path": "/workspace/nexus/tools/testing/evidence/memory-iteration/arm-green3/021-tcm-unselected-link.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "historical_failures": [
+    {
+      "path": "tools/testing/evidence/memory-iteration/arm-red/report.json",
+      "bytes": 50050,
+      "sha256": "03053ff7f0c1414d52ca71e0a1f600380d967fb2ee46acd09422bd811c203c1c"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/arm-green/report.json",
+      "bytes": 53383,
+      "sha256": "17324697e5fab09adbae312662c3b47bb965af4b56439e1d5153d7355312a7bf"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/arm-green2/report.json",
+      "bytes": 61762,
+      "sha256": "68dcf2c7858cd316b2f7dcf688a19a9749e0a2ebeebdd110224497d21ec6aa5e"
+    }
+  ],
+  "historical_raw_source_index": {
+    "path": "tools/testing/evidence/memory-iteration/artifact-relocation.json",
+    "bytes": 26523,
+    "sha256": "513277ae987324f77fe35679416d21df84da317060badae4c061e8690ea1be7c"
+  },
+  "focused_raw_artifacts": [
+    {
+      "path": "tools/testing/evidence/memory-iteration/artifact-relocation.json",
+      "bytes": 24950,
+      "sha256": "5245620e537fd31cb23474b3f0aeba187c8eb8b61914b44ae5c68419f52fbb83"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/maintained-both-green.xml",
+      "bytes": 821,
+      "sha256": "80b73eea3e60b3c097ce53636ce5e478d1c0a1d521ade0090a1eb2a2f33b3354"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/maintained-default-green.xml",
+      "bytes": 821,
+      "sha256": "84a6b095c35d1fcd9dfc32042abf069ce10c78cfa6c1abca90fd3ac51e669a92"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/maintained-initialize-green.xml",
+      "bytes": 3234,
+      "sha256": "b7f0e102739f4ceaa21b81c3f63d2ef08d8b1dda55bdce93d8409d028d0d3bc0"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-api-red.command.json",
+      "bytes": 586,
+      "sha256": "0e11e37be2c5c9c5af515e324214a4525b2badb20226a53e2ea4246c0bbeabf3"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-api-red.log",
+      "bytes": 209,
+      "sha256": "4305deca2878ccea726321929c039e13ab363777ac7525a2230c97791d11e03f"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-api-red2.command.json",
+      "bytes": 587,
+      "sha256": "03481ae004cb21d8309f48ea2735a8bb30dfee7a221f8411229e7d041c3dbdad"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-api-red2.log",
+      "bytes": 209,
+      "sha256": "4305deca2878ccea726321929c039e13ab363777ac7525a2230c97791d11e03f"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-arm-green.command.json",
+      "bytes": 521,
+      "sha256": "e4961aaa70255b4975133a4bf2070fcb5b64e2d974b23e851250d37e4e2124cb"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-arm-green.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-arm-green2.command.json",
+      "bytes": 523,
+      "sha256": "9294bbfaeeb097270998b90aef687fd4aaffeccb900e61764b9ca81099f2c702"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-arm-green2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-arm-green3.command.json",
+      "bytes": 523,
+      "sha256": "437648f11d6c6f0ec76bab8b29f713a398e77e232c35706d3fa7a97d157c5ff4"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-arm-green3.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-arm-red.command.json",
+      "bytes": 517,
+      "sha256": "6c2304aa3aac541edfae31872e1d8a711edd93539ff9b06bbdfcb72af7e2425c"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-arm-red.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-default-build-gd32_memory_boot_test.command.json",
+      "bytes": 1215,
+      "sha256": "110dff3055009fdc13674830da27abd84d05041d345436cdb367a3e4c8155ff3"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-default-build-gd32_memory_boot_test.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-default-build-link.command.json",
+      "bytes": 677,
+      "sha256": "ed5521184f7ca757eb825a0769007c3811d25eb7a7b994381d59f4ce7f5eec5c"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-default-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-default-build-system.command.json",
+      "bytes": 1101,
+      "sha256": "be5999c4b9580db62d34a85ff26b4f6ec4f7cd42b1c9284bc8949e4e29192e44"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-default-build-system.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-default.command.json",
+      "bytes": 434,
+      "sha256": "dc686cdd2f17e67a411a2516da32ca5c983fee43d4383469ffc71648c54d4a88"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-default.log",
+      "bytes": 643,
+      "sha256": "6a0a8c53a99807f113c36ae78f1914c4f32622b22bda345ac69cc900b2f52cd5"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-default.xml",
+      "bytes": 787,
+      "sha256": "3b758ea92718ed2ac2366950238dbcf17e44229095ccb0e6132fc67cc43187cd"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-final-build-gd32_memory_boot_test.command.json",
+      "bytes": 1207,
+      "sha256": "f5cc89740b07bb5c1eebacc412667285bf7728beeac5c2b82e457ec5011cbd98"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-final-build-gd32_memory_boot_test.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-final-build-link.command.json",
+      "bytes": 721,
+      "sha256": "d6528b3eb61e95bf6e2ca2d0377c362b567be5fe3e002ab096e5dfac1613aa0f"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-final-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-final-build-system.command.json",
+      "bytes": 1093,
+      "sha256": "226e0e9f8b23d7e5600cb36f4237f6ae475a3aa0756602ad568d8cebda39ece9"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-final-build-system.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-final.command.json",
+      "bytes": 427,
+      "sha256": "e966ab0b1c77683c534c96d32bd760eb1a3e98df63997eb0f108258d4249f63c"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-final.log",
+      "bytes": 643,
+      "sha256": "6a0a8c53a99807f113c36ae78f1914c4f32622b22bda345ac69cc900b2f52cd5"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-final.xml",
+      "bytes": 787,
+      "sha256": "06eb1c95499699c5cbfaeac4a6c64f6d137cd0cf3ea7ab87dab7f5c67ba7cebd"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-green-build-gd32_memory_boot_test.command.json",
+      "bytes": 1207,
+      "sha256": "0d2ed3dd2b386d16e8683bd9f33739dbc58e3e5137275ef9e1afb75e71e2a7b5"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-green-build-gd32_memory_boot_test.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-green-build-link.command.json",
+      "bytes": 721,
+      "sha256": "a888876cd3d6fa216fd9e9291386569bd87a155eed574b8a04f2254a1437255d"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-green-build-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-green-build-system.command.json",
+      "bytes": 1093,
+      "sha256": "7f5acd55be692ffd16262205e8dffae90ea762aac65c9b3df07fad81c659541e"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-green-build-system.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-green.command.json",
+      "bytes": 427,
+      "sha256": "2014ddb715c557bf696d8ed767e53bed203b01ab0001d29a99107955d5c74d0c"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-green.log",
+      "bytes": 643,
+      "sha256": "6a0a8c53a99807f113c36ae78f1914c4f32622b22bda345ac69cc900b2f52cd5"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-green.xml",
+      "bytes": 787,
+      "sha256": "9724df7edcf68c89a49c87debacbd741e1eed8fe5997c39983341a470d57c9e5"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build-gd32_memory_boot_test.command.json",
+      "bytes": 1155,
+      "sha256": "df001625a0f60f35882571d31e6b1bd42dfcc70e4acb1d0c98f83ffe93ead9db"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build-gd32_memory_boot_test.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build-link.command.json",
+      "bytes": 694,
+      "sha256": "06460647270913298cc1ad54b710001b0537b52262fbee38611aa46e3b29ecac"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build-link.log",
+      "bytes": 361,
+      "sha256": "0e7941ccc496906f940ff4f5429c781e96d3e0ecfbb45fc4fa692379c626f7c2"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build-system.command.json",
+      "bytes": 1041,
+      "sha256": "1eef51199b5d4d3e521448ef08982181c1a0228000e65fe39114b9e093b4db74"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build-system.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build2-gd32_memory_boot_test.command.json",
+      "bytes": 1206,
+      "sha256": "8549f66e5abaf0a22c7ab387bccad8388ab3b2f00a37a5ee5cdc731c8aa29e0c"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build2-gd32_memory_boot_test.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build2-link.command.json",
+      "bytes": 720,
+      "sha256": "e8c6bc592bbaff8a276b27516de4145b26c4d90ea44d7dc877113e9c5c09589e"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build2-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build2-system.command.json",
+      "bytes": 1092,
+      "sha256": "b03dae5a4c82348f6d61e004411f5d9a121b5e01be79a6af2dc92e6902a4d858"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red-build2-system.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red.command.json",
+      "bytes": 423,
+      "sha256": "b17415b21c54292fd5dc695e50a8a7275f1f962f67404a7cc257ae20db977531"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red.log",
+      "bytes": 2195,
+      "sha256": "fb131668c46dfab8666d01811864adc7b43dec317b89d90a472d8c1caa252650"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-boot-red.xml",
+      "bytes": 4264,
+      "sha256": "c2b52ed8a49cb750975c727baad86c86802f7bc42bca5b5ec29d0c70b694a07d"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-green-build.command.json",
+      "bytes": 848,
+      "sha256": "e5f956bc8a87120494e9638316dc8b2c01a8d653c8a318b4a7aaf23c54bbb8a9"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-green-build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-green-c.command.json",
+      "bytes": 580,
+      "sha256": "884408287ad03f20ffbc46ac6d763416fbd31864e90340549a510ee350951340"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-green-c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-green-link.command.json",
+      "bytes": 604,
+      "sha256": "caed93f6e9cd16369144b7bcbc9972b91a187e973b25f21b00f537931d53dbd3"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-green-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-green.command.json",
+      "bytes": 435,
+      "sha256": "148975150289301abcbe3f225ed2d8a3e2cd34c7ee49987d1f46f0fa5e358d11"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-green.log",
+      "bytes": 2017,
+      "sha256": "dbc99bca7ef28a511978976b751f836d9945ec4cdaf439ed3cbe9ea0583fcc5e"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-green.xml",
+      "bytes": 2805,
+      "sha256": "a7d7ce34ca507800630d91ca9294a328ac89da67890bdaa4a055a4990b1cd8e1"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-red-build.command.json",
+      "bytes": 850,
+      "sha256": "35caaa08d570b0210925223f42ea0b016aab477efb359af56a191686df95098a"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-red-build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-red.command.json",
+      "bytes": 435,
+      "sha256": "03c8c8e8905ffda60f5bc29ad35c126171e6e238147cea97d05d66484e5a3fc9"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-red.log",
+      "bytes": 3533,
+      "sha256": "edc6db6fc3fca6a854da29da805c729232a4d1052c85a6e5f3d8f409110b840d"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-align-red.xml",
+      "bytes": 6200,
+      "sha256": "9471dae9175fa54c579f67b0bebb7254932ad3027ccbf071bafcc6c0c19f45d5"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-green-build.command.json",
+      "bytes": 849,
+      "sha256": "f9da93020091828fa0787d5cdf554262e7163df2d29927045573969e292962c3"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-green-build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-green-c.command.json",
+      "bytes": 581,
+      "sha256": "81bf6b7ff1748d48fbd6f7caa5314df22e43d56425624437de7b37550bd1e17d"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-green-c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-green.command.json",
+      "bytes": 437,
+      "sha256": "75d90c1ba79770dd96f39e8fb6171a60c9230c58365d9ce399fa4bcf4165c5e4"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-green.log",
+      "bytes": 2168,
+      "sha256": "8d0214d28f272cbec250db2b71a088b200aba4f06dd0436cc863c0e6405d7ea8"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-green.xml",
+      "bytes": 3030,
+      "sha256": "210e29c60e46ccdd50c5e5f014445335337b3c1e8dd593dfbeeb63a2c6300f25"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-red-build.command.json",
+      "bytes": 851,
+      "sha256": "3f9ab12b9dea2c1bdfae437c1f0d26b6217c4c5329098da1b7cd8d9744b6734a"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-red-build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-red.command.json",
+      "bytes": 437,
+      "sha256": "9420292a47cf24c65d1256d7b1b4491470075be94d0a0a9d728e8383dc9705f0"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-red.log",
+      "bytes": 2971,
+      "sha256": "78dc108b33095ad5987799a5ee39da557af84b25d8ebf3279e92190f83ded8d4"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-control-noinit-red.xml",
+      "bytes": 4729,
+      "sha256": "725af972c187da01b6be88a29f184e31de93531d8194bc926c0b976339aca744"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-helper-green-c.command.json",
+      "bytes": 573,
+      "sha256": "d5e0825fcea1dc664546b307ec6b3a7f46e1a08e248de27b58f156566bb439db"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-helper-green-c.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-helper-green-cpp.command.json",
+      "bytes": 649,
+      "sha256": "22e59a2eac18e4df767d184a30ade96a70c3438f82699801d84246a7aa2dc599"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-helper-green-cpp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-helper-green-link.command.json",
+      "bytes": 597,
+      "sha256": "917b7455043d5e335a71a5a188c648eaad54a86f3645a4f210111bac45fa997c"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-helper-green-link.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-helper-green.command.json",
+      "bytes": 421,
+      "sha256": "f273cf992eeb2be58013789245cbe18915e1db7eb5eca8ad080c2a1ef32e3d3e"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-helper-green.log",
+      "bytes": 1862,
+      "sha256": "3d9ff30bcabb452c1c92c617aae8a2dea168edc82af86fbb2150ea23db9842ea"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-helper-green.xml",
+      "bytes": 2578,
+      "sha256": "41cd5aa099ed1a59b59a61425a5e897d281f80e05868812e3e07d9d7e7053f5d"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-maintained-both-green.command.json",
+      "bytes": 426,
+      "sha256": "0eede8db21f529d3345f7b51e6fbef6a9434300dbffa908934877aa425ae8518"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-maintained-both-green.log",
+      "bytes": 643,
+      "sha256": "6a0a8c53a99807f113c36ae78f1914c4f32622b22bda345ac69cc900b2f52cd5"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-maintained-default-green.command.json",
+      "bytes": 435,
+      "sha256": "246f1522b1cade61738fdbc047ba504d4d9af346dc6a83a84c4acdf436061828"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-maintained-default-green.log",
+      "bytes": 643,
+      "sha256": "6a0a8c53a99807f113c36ae78f1914c4f32622b22bda345ac69cc900b2f52cd5"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-maintained-initialize-green.command.json",
+      "bytes": 428,
+      "sha256": "93e458cf9d3432b71d2ec4132c4b1d9d4a96507d71d22f77f2dad7f776eb1027"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-maintained-initialize-green.log",
+      "bytes": 2168,
+      "sha256": "8d0214d28f272cbec250db2b71a088b200aba4f06dd0436cc863c0e6405d7ea8"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-matrix-tools-final.command.json",
+      "bytes": 384,
+      "sha256": "86ebe132865d65b0e90570c838bda2f9b93a67e1462578a1be412430aeb12f9b"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-matrix-tools-final.log",
+      "bytes": 1484,
+      "sha256": "d30059996901eb4712b0ad3904ff4cabaf5fe6786ec701b72c3d419b3d3d9f47"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-matrix-tools-green.command.json",
+      "bytes": 384,
+      "sha256": "7a48577916065cfe5bcb272e42c9861ba919714003d86e55280ab82969b52956"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-matrix-tools-green.log",
+      "bytes": 939,
+      "sha256": "82698c10c7ab50a439d7e785502d4366317b66637bdd6a5bc98b65f2fb560e7f"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-matrix-tools-red.command.json",
+      "bytes": 382,
+      "sha256": "5045018348e6880916472016dfb4168744a8c9efac51627e8befa11f162b9d8f"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-matrix-tools-red.log",
+      "bytes": 1598,
+      "sha256": "cdac02504aa35d42af85faf7ddd6bfbfd0b6d7042ff7d8703904304794a9ed99"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-matrix-tools.command.json",
+      "bytes": 378,
+      "sha256": "300efaec815ed24d8af1e2d42be272020dafdcbff1211367623dccf60aedda00"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-matrix-tools.log",
+      "bytes": 750,
+      "sha256": "de6f4f9231a8ee49f7634d11863c515cd02d39261b6081765500fdcb35c61c6d"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-placement-gc-green.command.json",
+      "bytes": 382,
+      "sha256": "8c6ab80ad9afc2c1c55ecdf07f0c0e5dab7767354dfb3ec4867cde173376217f"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-placement-gc-green.log",
+      "bytes": 932,
+      "sha256": "1aa929e15eb88c155c3e027260254eb87d9778c8dd5dc01f134ae5664c58da19"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-placement-gc-red.command.json",
+      "bytes": 380,
+      "sha256": "7d38eadec6368c905faccee3f8b36cd9f3dfbc9357e467ad50bbf183fdf4d66e"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-placement-gc-red.log",
+      "bytes": 6879,
+      "sha256": "b8a3a6c11439dc8fd23fd58a1c276d44c0dbde9cda5438b8b9036c5c1c1ce3c0"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-placement-green.command.json",
+      "bytes": 379,
+      "sha256": "85a7f85c5ee6d8f418c4f91efe70ff0048c234a0be505c42df0ef0721aa76e7b"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-placement-green.log",
+      "bytes": 752,
+      "sha256": "ffbca71027a4625f8ae93c9a7370db186bcbde864dd17693ba84d160f2e6e138"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-placement-red.command.json",
+      "bytes": 377,
+      "sha256": "1a277be639c485da3ee65944d8c55602398459fd95898216a5081391d136ea30"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-placement-red.log",
+      "bytes": 3940,
+      "sha256": "5e26730ea2a14b7deb8746551f812e79c32929d9da3ad364fb9c2c88b2951d9f"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-placement-red2.command.json",
+      "bytes": 378,
+      "sha256": "73047d7a426ce2f3c44db0578e23d5052d67b087e8ab111a346a9a74404b0421"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-placement-red2.log",
+      "bytes": 23704,
+      "sha256": "fcece30b53f1374f5df1165c5f159c95bad226db8ee0a6f41ba4f800404d11fd"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-tools-final.command.json",
+      "bytes": 422,
+      "sha256": "8b25d993edb7b1b34ee207c04deb37e964d58251ba2f2daad3da9a8454cd3ef4"
+    },
+    {
+      "path": "tools/testing/evidence/memory-iteration/memory-tools-final.log",
+      "bytes": 1774,
+      "sha256": "a978efe77bc45b771c92fc7009c1aab388e3516571c38f130cda0f54ab19fa22"
+    }
+  ],
+  "default_extra_cost": {
+    "helper_objects": 0,
+    "retained_helper_symbols": 0,
+    "extra_ram_bytes": 0,
+    "extra_sections_bytes": 0,
+    "startup_path": "removed_by_preprocessor"
+  },
+  "archive_refreeze": {
+    "status": "navigation_updated_without_execution",
+    "original_manifest": {
+      "path": "tools/testing/evidence/memory-iteration/development.json.original.raw",
+      "bytes": 47811,
+      "sha256": "6a42bcd1f48550df141eb584f0f306d0ace5747c4654654c9dbc097bc1077279"
+    },
+    "original_artifact_index": {
+      "path": "tools/testing/evidence/memory-iteration/artifact-relocation.json.original.raw",
+      "bytes": 24950,
+      "sha256": "5245620e537fd31cb23474b3f0aeba187c8eb8b61914b44ae5c68419f52fbb83"
+    },
+    "source_comment_changes": [
+      {
+        "prior_identity": {
+          "path": "tests/google/gd32_memory_test.cpp",
+          "bytes": 7702,
+          "sha256": "b56dd787fa7c94a6eaf4d3c76f1b65a3e6d18dcdaf54d050a0a34fbe61e003e1"
+        },
+        "current_identity": {
+          "path": "tests/google/gd32_memory_test.cpp",
+          "bytes": 7704,
+          "sha256": "135d617bc830bf619f578c22f7f6f18c94b4847f7a26df1f383b2088d0f18bee"
+        },
+        "reason": "Comment-only namespace style correction after historical executions; does not requalify old executions against current source."
+      },
+      {
+        "prior_identity": {
+          "path": "tests/google/gd32_memory_boot_test.cpp",
+          "bytes": 5478,
+          "sha256": "0690de00aa0ce6017d7feadccabb39623f717ee679470ad06844d837bc6292a5"
+        },
+        "current_identity": {
+          "path": "tests/google/gd32_memory_boot_test.cpp",
+          "bytes": 5480,
+          "sha256": "376f972e05b58650d1559528cca171eff6b269d2e42d809d174e6806ef53b7f4"
+        },
+        "reason": "Comment-only namespace style correction after historical executions; does not requalify old executions against current source."
+      }
+    ],
+    "relocated_compile_databases": [
+      {
+        "original_archive_path": "tools/testing/evidence/memory-iteration/arm-green3/default/compile_commands.json",
+        "original_output_name": "compile_commands.json",
+        "path": "tools/testing/evidence/memory-iteration/arm-green3/default/compile_commands.json.raw",
+        "bytes": 45547,
+        "sha256": "c24b68ac390a0af8183fb862197b5ab5fc7048f51b0bdb9a5229915410019178"
+      },
+      {
+        "original_archive_path": "tools/testing/evidence/memory-iteration/arm-green3/addsram/compile_commands.json",
+        "original_output_name": "compile_commands.json",
+        "path": "tools/testing/evidence/memory-iteration/arm-green3/addsram/compile_commands.json.raw",
+        "bytes": 46830,
+        "sha256": "06224cacd7abe738d3d0861834a6a5829da27782c864067a68c8fddc8d86d0ff"
+      },
+      {
+        "original_archive_path": "tools/testing/evidence/memory-iteration/arm-green3/tcm/compile_commands.json",
+        "original_output_name": "compile_commands.json",
+        "path": "tools/testing/evidence/memory-iteration/arm-green3/tcm/compile_commands.json.raw",
+        "bytes": 46430,
+        "sha256": "903bd2484124221f1ae210f7db4dd9c23e3e639ab6b4ff902a583c6a04215aae"
+      },
+      {
+        "original_archive_path": "tools/testing/evidence/memory-iteration/arm-green3/both/compile_commands.json",
+        "original_output_name": "compile_commands.json",
+        "path": "tools/testing/evidence/memory-iteration/arm-green3/both/compile_commands.json.raw",
+        "bytes": 46530,
+        "sha256": "cba18a74b2448cadca49e9f6bc43a8d282b486d04120c752e96f0450f21acbfe"
+      }
+    ],
+    "qualification_note": "Historical Google and ARM reports retain the original execution source/tool identity. Current owned source comments are separately identified; no tests or compilations were rerun for this archival repair."
+  }
+}

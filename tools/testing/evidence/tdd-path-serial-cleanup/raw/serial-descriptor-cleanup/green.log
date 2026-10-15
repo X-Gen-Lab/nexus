@@ -1,0 +1,6 @@
+....Serial capture rejected: fresh serial capture must not overwrite inputs or old output
+........................
+----------------------------------------------------------------------
+Ran 28 tests in 0.446s
+
+OK

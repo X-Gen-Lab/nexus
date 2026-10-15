@@ -1,0 +1,17 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "scripts/ci/comment_style.py",
+    "--json",
+    "--files",
+    "io/private/timer_capture_impl.h",
+    "io/private/advanced_pwm_impl.h",
+    "io/private/timer_advanced_controller.h",
+    "tests/google/timer_advanced_test.cpp"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:48:16.469239+00:00",
+  "ended_at": "2026-10-11T19:48:16.615491+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/timer-iteration/timer-cold-cleanup-final-style.log"
+}

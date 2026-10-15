@@ -1,0 +1,27 @@
+[
+  {
+    "path": "tools/configure/usb_device.py",
+    "sha256": "01cf7239797b81f21ff3e2128499e9432e0e298a33a19a2f11ef55d2594b64df",
+    "baseline_sha256": "e95cc892fb94f37b6ee0254c4216e000615bfd891126facc79577ffc9c8ab36b"
+  },
+  {
+    "path": "tools/configure/bindings.py",
+    "sha256": "4f7746cf202b6a07efe38853951e58628f666442d4a3996135a16c91adf4fbd1",
+    "baseline_sha256": "de9f6ef1b171679c197283194691060426b2c514e8d220b68799de57329001e8"
+  },
+  {
+    "path": "tools/configure/providers/stm32f407/emission.py",
+    "sha256": "239d8372ff68a02c8b531fd088c0aeeb5ea05a1afe50550afb44cd4110186764",
+    "baseline_sha256": "765dcf3aa265e4d045b312c45b28de8090e0d528f446acd6d3077874af6507da"
+  },
+  {
+    "path": "tests/google/usb_factory_test.cpp",
+    "sha256": "0648651e6a3042f2b30cbfe6c52645d265e840a35748de8e0cdf61cdfce90197",
+    "baseline_sha256": "452a53f16a562f16abb24ea7f8f2e919c5f770f6b7164db3c01614dd87a19d1f"
+  },
+  {
+    "path": "tests/google/usb_factory_model.h",
+    "sha256": "771c69e54cc555362fb7747dfd9f45ea5c8d9d40cdb7ef32bcd480b5acd507c0",
+    "baseline_sha256": null
+  }
+]

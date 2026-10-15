@@ -1,0 +1,313 @@
+/**
+ * \file            threadx.h
+ * \brief           Caller-owned ThreadX task, wait and byte queue services
+ * \author          Nexus Team
+ * \note            Privileged, single-core, current-security-domain APIs.
+ *                  All controls start zeroed and remain adapter-owned while
+ *                  live. One external lifecycle owner serializes init/destroy
+ *                  and joins; publishers, queue callers and IRQ sources must
+ *                  quiesce before reclaiming storage. Runtime task operations
+ *                  require unmasked Thread mode and a running kernel. Actual
+ *                  bootstrap permits object init, task create/discard and wake;
+ *                  it does not permit blocking waits or queue operations.
+ *                  A manual mask, ISR or unsupported context returns CONTEXT
+ *                  before mutation. The byte queue's task threshold guard
+ *                  rejects foreign priority-zero time-sliced callers.
+ *                  All deadlines use nx_time_now_us; NX_DEADLINE_NEVER is an
+ *                  actual unbounded kernel wait. Timeout never revokes any
+ *                  accepted I/O borrow. MPU/TZ isolation, tickless sleep and
+ *                  additional Cortex-M ports are outside this backend scope.
+ */
+#ifndef NEXUS_OS_THREADX_H
+#define NEXUS_OS_THREADX_H
+#include "nexus/core/time.h"
+#include "nexus/os/wait.h"
+#include "tx_api.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/** \brief One binary latch; publishers quiesce before destruction. */
+typedef struct {
+    TX_SEMAPHORE control;
+    uint32_t sequence;
+    uint32_t waiting;
+    bool live;
+} nx_threadx_notify_t;
+
+/** \brief Returning task retains all storage until external successful join. */
+typedef struct {
+    TX_THREAD control;
+    TX_SEMAPHORE finished;
+    void (*entry)(void*);
+    void* context;
+    uint32_t entered;
+    uint32_t returned;
+    bool live;
+} nx_threadx_task_t;
+
+/** \brief Permanent task has no completion latch, join or destroy. */
+typedef struct {
+    TX_THREAD control;
+    void (*entry)(void*);
+    void* context;
+    bool live;
+} nx_threadx_permanent_task_t;
+
+/** \brief Exact arbitrary byte items; no native word-size narrowing. */
+typedef struct {
+    TX_SEMAPHORE readable;
+    TX_SEMAPHORE writable;
+    uint8_t* storage;
+    size_t depth;
+    size_t item_size;
+    size_t head;
+    size_t tail;
+    size_t count;
+    uint32_t users;
+    bool live;
+} nx_threadx_queue_t;
+
+/** \brief One explicit caller latch per simultaneous close-aware operation. */
+typedef struct nx_threadx_queue_waiter {
+    nx_threadx_notify_t notification;
+    struct nx_threadx_queue_waiter* next;
+    uint32_t active;
+} nx_threadx_queue_waiter_t;
+
+/** \brief Optional bounded close broadcast; registry is task-only. */
+typedef struct {
+    nx_threadx_queue_t queue;
+    nx_threadx_queue_waiter_t* send_waiters;
+    nx_threadx_queue_waiter_t* receive_waiters;
+    size_t maximum_waiters;
+    bool closed;
+} nx_threadx_closable_queue_t;
+
+/**
+ * \brief           Explicit irreversible kernel entry owned by the product
+ * \param[in]       startup: Product initialization inside tx_application_define
+ * \param[in]       context: Borrowed through startup and kernel lifetime
+ * \return          CONTEXT or INVALID before entry; successful entry never
+ *                  returns
+ * \note            Privileged cold Thread/MSP, no live FP context or masks.
+ *                  Startup may create and discard unused static objects. After
+ *                  startup returns, the bootstrap scope is sealed. An
+ *                  unexpected kernel return invokes fail-stop and retains all
+ *                  effects; it never reopens bootstrap reclamation.
+ */
+nx_result_t nx_threadx_kernel_enter(void (*startup)(void*), void* context);
+
+/**
+ * \brief           Product failure hook; default parks forever
+ * \param[in]       reason: Context, permanent-entry or kernel-return failure
+ * \note            Privileged current context. Product owns safe output/reset.
+ *                  Returning does not authorize cleanup; the adapter parks.
+ */
+void nx_threadx_fail_stop(nx_result_t reason);
+
+/**
+ * \brief           Mandatory product hook only for explicit external Tick
+ * \param[in]       tick_hz: Exact immutable resolved kernel frequency
+ * \return          SUCCESS after binding a real bounded periodic IRQ source
+ * \note            Actual kernel bootstrap, privileged PRIMASK masked.
+ *                  Provider owns timer clock and IRQ ceiling; it must not
+ *                  change the platform's continuous monotonic clock. Missing
+ *                  hook fails linking. Failure enters retaining fail-stop.
+ */
+nx_result_t nx_threadx_external_tick_setup(uint32_t tick_hz);
+
+/**
+ * \brief           Read-only configurable-IRQ and selected mask-policy gate
+ * \return          True only in a privileged unmasked reviewed external IRQ
+ * \note            Native has no hardware IRQ source and returns false.
+ */
+bool nx_threadx_isr_allowed(void);
+
+/**
+ * \brief           Initialize one binary latch in task or actual bootstrap
+ * \param[in,out]   notification: Zeroed caller control retained until destroy
+ * \return          SUCCESS, INVALID, CONTEXT or IO
+ */
+nx_result_t nx_threadx_notify_init(nx_threadx_notify_t* notification);
+/**
+ * \brief           Bind a sequence hint and one concurrent blocking waiter
+ * \param[in,out]   notification: Live latch retained through every port user
+ * \return          Wait face; empty face for null or non-live control
+ * \note            Binding/arm are reads. Wake supports task/bootstrap or an
+ *                  IRQ admitted by nx_threadx_isr_allowed. Wait is task-only;
+ *                  finite deadline expiration precedes a changed sequence.
+ */
+nx_wait_port_t nx_threadx_notify_port(nx_threadx_notify_t* notification);
+/**
+ * \brief           Destroy only after all publishers and waiter quiesce
+ * \param[in,out]   notification: Live caller latch
+ * \return          SUCCESS, INVALID, CONTEXT, BUSY or IO; failure retains it
+ */
+nx_result_t nx_threadx_notify_destroy(nx_threadx_notify_t* notification);
+
+/**
+ * \brief           Create a cooperatively returning task using exact storage
+ * \param[in,out]   task: Zeroed caller TCB/control, retained until join/discard
+ * \param[in]       name: Borrowed immutable name, retained until reclamation
+ * \param[in]       stack: Eight-byte aligned caller storage
+ * \param[in]       stack_bytes: Actual capacity, at least TX_MINIMUM_STACK
+ * \param[in]       priority: ThreadX priority; smaller values run first
+ * \param[in]       entry: Returns only after application stop/drain
+ * \param[in]       context: Borrowed until successful join/discard
+ * \return          SUCCESS, INVALID, CONTEXT or IO; partial failure retains
+ *                  live control if reclamation cannot be established
+ * \note            No adapter heap or worker. Name is borrowed, not copied.
+ *                  Linux uses its own pthread stack; the caller buffer only
+ *                  validates kernel metadata and is not a host stack budget.
+ *                  A resumed higher-priority entry may run before start
+ * returns.
+ */
+nx_result_t nx_threadx_task_start(nx_threadx_task_t* task, const char* name,
+                                  void* stack, size_t stack_bytes,
+                                  UINT priority, void (*entry)(void*),
+                                  void* context);
+/**
+ * \brief           Join a cooperatively returned task and prove detachment
+ * \param[in,out]   task: Live caller task, one external joiner only
+ * \param[in]       deadline: Absolute Core deadline or NX_DEADLINE_NEVER
+ * \return          SUCCESS, INVALID, CONTEXT, TIMEOUT or IO
+ * \note            Self-join is rejected. Timeout retains task, borrowed name,
+ *                  stack and context. Completion hint alone never reclaims;
+ *                  successful real kernel deletion establishes detachment.
+ */
+nx_result_t nx_threadx_task_join(nx_threadx_task_t* task,
+                                 nx_time_us_t deadline);
+/**
+ * \brief           Discard an unused task only inside actual bootstrap
+ * \param[in,out]   task: Live task whose entry has never begun
+ * \return          SUCCESS, INVALID, CONTEXT or IO; failure retains storage
+ * \note            This is prestart rollback, never runtime cancellation.
+ */
+nx_result_t nx_threadx_task_discard_before_scheduler(nx_threadx_task_t* task);
+/**
+ * \brief           Start a permanent task without a join/completion latch
+ * \param[in,out]   task: Zeroed caller control retained until reset
+ * \param[in]       name: Borrowed immutable name retained until reset
+ * \param[in]       stack: Eight-byte aligned caller storage retained until
+ * reset \param[in]       stack_bytes: Actual capacity, at least
+ * TX_MINIMUM_STACK \param[in]       priority: ThreadX priority; smaller values
+ * run first \param[in]       entry: Must never return; return invokes retaining
+ * fail-stop \param[in]       context: Borrowed until reset \return SUCCESS,
+ * INVALID, CONTEXT or IO; live partial effects remain
+ */
+nx_result_t nx_threadx_permanent_task_start(nx_threadx_permanent_task_t* task,
+                                            const char* name, void* stack,
+                                            size_t stack_bytes, UINT priority,
+                                            void (*entry)(void*),
+                                            void* context);
+
+/**
+ * \brief           Initialize an exact arbitrary-byte bounded queue
+ * \param[in,out]   queue: Zeroed caller control retained until destroy
+ * \param[in]       storage: Caller payload storage retained until destroy
+ * \param[in]       storage_bytes: Exact depth multiplied by item_size
+ * \param[in]       depth: Positive bounded capacity, below TX_WAIT_FOREVER
+ * \param[in]       item_size: Positive byte count, without word-size narrowing
+ * \return          SUCCESS, INVALID, CONTEXT or IO
+ */
+nx_result_t nx_threadx_queue_init(nx_threadx_queue_t* queue, uint8_t* storage,
+                                  size_t storage_bytes, size_t depth,
+                                  size_t item_size);
+/**
+ * \brief           Task-only send; immediate readiness wins over expiration
+ * \param[in,out]   queue: Live queue retained throughout the operation
+ * \param[in]       item: Exactly item_size readable bytes borrowed until return
+ * \param[in]       deadline: Absolute Core deadline or NX_DEADLINE_NEVER
+ * \return          SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO
+ */
+nx_result_t nx_threadx_queue_send_until(nx_threadx_queue_t* queue,
+                                        const void* item,
+                                        nx_time_us_t deadline);
+/**
+ * \brief           Task-only receive; output changes only on SUCCESS
+ * \param[in,out]   queue: Live queue retained throughout the operation
+ * \param[out]      item: Exactly item_size writable bytes borrowed until return
+ * \param[in]       deadline: Absolute Core deadline or NX_DEADLINE_NEVER
+ * \return          SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO
+ */
+nx_result_t nx_threadx_queue_receive_until(nx_threadx_queue_t* queue,
+                                           void* item, nx_time_us_t deadline);
+/**
+ * \brief           Destroy a drained queue after every caller quiesces
+ * \param[in,out]   queue: Live caller control and storage
+ * \return          SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage
+ */
+nx_result_t nx_threadx_queue_destroy(nx_threadx_queue_t* queue);
+/**
+ * \brief           Initialize one explicit close-aware operation latch
+ * \param[in,out]   waiter: Zeroed caller storage retained until waiter destroy
+ * \return          SUCCESS, INVALID, CONTEXT or IO
+ */
+nx_result_t nx_threadx_queue_waiter_init(nx_threadx_queue_waiter_t* waiter);
+/**
+ * \brief           Destroy inactive waiter after its operation has returned
+ * \param[in,out]   waiter: Live caller latch with no concurrent users
+ * \return          SUCCESS, INVALID, CONTEXT, BUSY or IO
+ */
+nx_result_t nx_threadx_queue_waiter_destroy(nx_threadx_queue_waiter_t* waiter);
+/**
+ * \brief           Add explicit bounded close broadcast to a byte queue
+ * \param[in,out]   queue: Zeroed caller control retained until destroy
+ * \param[in]       storage: Caller payload storage retained until destroy
+ * \param[in]       storage_bytes: Exact depth multiplied by item_size
+ * \param[in]       depth: Positive capacity below TX_WAIT_FOREVER
+ * \param[in]       item_size: Positive exact payload byte count
+ * \param[in]       maximum_waiters: Positive maximum simultaneous operations
+ * \return          SUCCESS, INVALID, CONTEXT or IO
+ * \note            Payload size and maximum_waiters bound task scheduling
+ *                  pause; the entire copy/broadcast does not mask interrupts.
+ */
+nx_result_t nx_threadx_closable_queue_init(nx_threadx_closable_queue_t* queue,
+                                           uint8_t* storage,
+                                           size_t storage_bytes, size_t depth,
+                                           size_t item_size,
+                                           size_t maximum_waiters);
+/**
+ * \brief           Reject sends, wake registered waiters, retain queued items
+ * \param[in,out]   queue: Live close-aware queue
+ * \return          SUCCESS, INVALID or CONTEXT; close is idempotent
+ */
+nx_result_t nx_threadx_closable_queue_close(nx_threadx_closable_queue_t* queue);
+/**
+ * \brief           Send with immediate close wake and explicit admission
+ * \param[in,out]   queue: Live queue retained throughout the operation
+ * \param[in]       item: Exactly item_size readable bytes borrowed until return
+ * \param[in]       deadline: Absolute Core deadline or NX_DEADLINE_NEVER
+ * \param[in,out]   waiter: Live exclusive latch for this simultaneous call
+ * \return          SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO
+ * \note            A closed queue rejects sends without changing payload.
+ */
+nx_result_t
+nx_threadx_closable_queue_send_until(nx_threadx_closable_queue_t* queue,
+                                     const void* item, nx_time_us_t deadline,
+                                     nx_threadx_queue_waiter_t* waiter);
+/**
+ * \brief           Receive and drain previously queued items after close
+ * \param[in,out]   queue: Live queue retained throughout the operation
+ * \param[out]      item: Exactly item_size writable bytes borrowed until return
+ * \param[in]       deadline: Absolute Core deadline or NX_DEADLINE_NEVER
+ * \param[in,out]   waiter: Live exclusive latch for this simultaneous call
+ * \return          SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO
+ * \note            Closed and empty returns CANCELLED; failure leaves output.
+ */
+nx_result_t
+nx_threadx_closable_queue_receive_until(nx_threadx_closable_queue_t* queue,
+                                        void* item, nx_time_us_t deadline,
+                                        nx_threadx_queue_waiter_t* waiter);
+/**
+ * \brief           Destroy only a closed, drained and quiesced queue
+ * \param[in,out]   queue: Live control and its borrowed payload storage
+ * \return          SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage
+ */
+nx_result_t
+nx_threadx_closable_queue_destroy(nx_threadx_closable_queue_t* queue);
+#ifdef __cplusplus
+}
+#endif
+#endif /* NEXUS_OS_THREADX_H */

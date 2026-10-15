@@ -1,0 +1,35 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/adc-iteration/generated/resolved.json
+-- Configuring done (0.8s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus/build/adc-iteration
+[1/28] Building C object io/CMakeFiles/nexus_io.dir/src/adc.c.o
+[2/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[3/28] Building C object io/CMakeFiles/nexus_io.dir/src/adc_observer.c.o
+[4/28] Linking C static library lib/libnexus_io.a
+[5/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[6/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[7/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[8/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[9/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[10/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[11/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[12/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[13/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[14/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[15/28] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[16/28] Linking C static library lib/libnexus_io_native.a
+[17/28] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc.c.o
+[18/28] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc_stream.c.o
+[19/28] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc_continuous.c.o
+[20/28] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o
+[21/28] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/gd32_adc_stream_test.cpp.o
+[22/28] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc.c.o
+[23/28] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc_stream.c.o
+[24/28] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc_continuous.c.o
+[25/28] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/contracts/gd32_model/model.c.o
+[26/28] Linking CXX executable bin/nexus_stm32_adc_stream_test
+[27/28] Linking CXX executable bin/nexus_gd32_adc_stream_test

@@ -1,0 +1,40 @@
++ /workspace/nexus/.venv/bin/cmake --build --preset native-debug --target nexus_stm32_uart_dma_test
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/native-debug/generated/resolved.json
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus/build/native-debug
+[1/15] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[2/15] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[3/15] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[4/15] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[5/15] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[6/15] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[7/15] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[8/15] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[9/15] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[10/15] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[11/15] Linking C static library lib/libnexus_io_native.a
+[12/15] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+[13/15] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o
+[14/15] Linking CXX executable bin/nexus_stm32_uart_dma_test
+FAILED: [code=1] bin/nexus_stm32_uart_dma_test 
+: && /usr/bin/c++ -g -Wl,--dependency-file=tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/link.d tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/__/__/soc/stm32f407/drivers/uart.c.o -o bin/nexus_stm32_uart_dma_test  lib/libgmock_main.a  lib/libnexus_io_native.a  lib/libnexus_arch.a  lib/libgmock.a  lib/libgtest.a  lib/libnexus_io.a  lib/libnexus_arch.a  lib/libnexus_core.a && :
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o: warning: relocation against `nx_stm32_uart_dma_ops' in read-only section `.text._ZN12Stm32UartDmaC2Ev[_ZN12Stm32UartDmaC5Ev]'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o: in function `Stm32UartDma::SetUp()':
+/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:42:(.text._ZN12Stm32UartDma5SetUpEv[_ZN12Stm32UartDma5SetUpEv]+0x155): undefined reference to `nx_stm32_uart_dma_initialize'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o: in function `Stm32UartDma_CancellationCountsOnlyProvenWireBytesAndRetainsDrainBorrow_Test::TestBody()':
+/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:81:(.text._ZN76Stm32UartDma_CancellationCountsOnlyProvenWireBytesAndRetainsDrainBorrow_Test8TestBodyEv+0x28d): undefined reference to `nx_stm32_uart_dma_uart_irq'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o: in function `Stm32UartDma_ExpiredDrainQuarantinesUntilActualWireIdle_Test::TestBody()':
+/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:106:(.text._ZN60Stm32UartDma_ExpiredDrainQuarantinesUntilActualWireIdle_Test8TestBodyEv+0x313): undefined reference to `nx_stm32_uart_dma_uart_irq'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o: in function `Stm32UartDma_DmaTransferCompleteCannotSettleUntilUartTc_Test::TestBody()':
+/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:57:(.text._ZN60Stm32UartDma_DmaTransferCompleteCannotSettleUntilUartTc_Test8TestBodyEv+0x3f8): undefined reference to `nx_stm32_uart_dma_irq'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_uart_dma_test.cpp:62:(.text._ZN60Stm32UartDma_DmaTransferCompleteCannotSettleUntilUartTc_Test8TestBodyEv+0x545): undefined reference to `nx_stm32_uart_dma_uart_irq'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o: in function `Stm32UartDma::Stm32UartDma()':
+/workspace/nexus/tests/google/stm32_uart_dma_test.cpp:13:(.text._ZN12Stm32UartDmaC2Ev[_ZN12Stm32UartDmaC5Ev]+0x21): undefined reference to `nx_stm32_uart_dma_ops'
+/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.

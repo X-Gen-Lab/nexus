@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cmake",
+    "-S",
+    "/workspace/nexus",
+    "-B",
+    "/workspace/nexus/build/ethernet-config-model",
+    "-G",
+    "Ninja",
+    "-DCMAKE_BUILD_TYPE=Debug",
+    "-DNEXUS_BUILD_TESTS=ON",
+    "-DNEXUS_BUILD_WORKLOAD=OFF"
+  ],
+  "cwd": "/workspace/nexus",
+  "PATH": "/workspace/nexus/.venv/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+  "exit_code": 0,
+  "log": "/workspace/nexus-config-iteration-evidence/ethernet-factory-red-config.log",
+  "sha256": "c57cb5e1066408f2ba73edadd0c42d830fe331e88f9e55083b6c4a638a74d66c"
+}

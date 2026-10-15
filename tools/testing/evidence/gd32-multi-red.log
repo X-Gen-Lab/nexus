@@ -1,0 +1,56 @@
+In file included from build/agent-polymorphic/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from tests/google/gd32_multi_test.cpp:16:
+tests/google/gd32_multi_test.cpp: In member function ‘virtual void {anonymous}::GD32MultiController_UARTsHaveIndependentBuffersCompletionAndStop_Test::TestBody()’:
+tests/google/gd32_multi_test.cpp:55:51: error: ‘nx_gd32_usart0_controller’ was not declared in this scope; did you mean ‘nx_gd32_uart_cancel’?
+   55 |     ASSERT_EQ(nx_gd32_uart_initialize_at(&first, &nx_gd32_usart0_controller,
+      |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:55:15: error: ‘nx_gd32_uart_initialize_at’ was not declared in this scope; did you mean ‘nx_gd32_uart_initialize’?
+   55 |     ASSERT_EQ(nx_gd32_uart_initialize_at(&first, &nx_gd32_usart0_controller,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:59:52: error: ‘nx_gd32_usart1_controller’ was not declared in this scope; did you mean ‘nx_gd32_uart_cancel’?
+   59 |     ASSERT_EQ(nx_gd32_uart_initialize_at(&second, &nx_gd32_usart1_controller,
+      |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:59:15: error: ‘nx_gd32_uart_initialize_at’ was not declared in this scope; did you mean ‘nx_gd32_uart_initialize’?
+   59 |     ASSERT_EQ(nx_gd32_uart_initialize_at(&second, &nx_gd32_usart1_controller,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:64:55: error: ‘nx_gd32_usart1_controller’ was not declared in this scope; did you mean ‘nx_gd32_uart_cancel’?
+   64 |     EXPECT_EQ(nx_gd32_uart_initialize_at(&duplicate, &nx_gd32_usart1_controller,
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:64:15: error: ‘nx_gd32_uart_initialize_at’ was not declared in this scope; did you mean ‘nx_gd32_uart_initialize’?
+   64 |     EXPECT_EQ(nx_gd32_uart_initialize_at(&duplicate, &nx_gd32_usart1_controller,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:82:5: error: ‘nx_gd32_uart_irq’ was not declared in this scope; did you mean ‘nx_gd32_uart_ops’?
+   82 |     nx_gd32_uart_irq(&first);
+      |     ^~~~~~~~~~~~~~~~
+      |     nx_gd32_uart_ops
+tests/google/gd32_multi_test.cpp: In member function ‘virtual void {anonymous}::GD32MultiController_SPIResetAndChipSelectStayOnTheirOwnController_Test::TestBody()’:
+tests/google/gd32_multi_test.cpp:115:42: error: ‘nx_gd32_spi4_controller’ was not declared in this scope; did you mean ‘nx_gd32_spi_recover’?
+  115 |                                         &nx_gd32_spi4_controller, GPIOB,
+      |                                          ^~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:114:15: error: ‘nx_gd32_spi_initialize_at’ was not declared in this scope; did you mean ‘nx_gd32_spi_initialize’?
+  114 |     ASSERT_EQ(nx_gd32_spi_initialize_at(&first, &first_device,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:119:42: error: ‘nx_gd32_spi0_controller’ was not declared in this scope; did you mean ‘nx_gd32_spi_recover’?
+  119 |                                         &nx_gd32_spi0_controller, GPIOB,
+      |                                          ^~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:118:15: error: ‘nx_gd32_spi_initialize_at’ was not declared in this scope; did you mean ‘nx_gd32_spi_initialize’?
+  118 |     ASSERT_EQ(nx_gd32_spi_initialize_at(&second, &second_device,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp: In member function ‘virtual void {anonymous}::GD32MultiController_I2CRecoveryAndTransactionsUseTheirOwnLines_Test::TestBody()’:
+tests/google/gd32_multi_test.cpp:156:42: error: ‘nx_gd32_i2c0_controller’ was not declared in this scope; did you mean ‘nx_gd32_i2c_recover’?
+  156 |                                         &nx_gd32_i2c0_controller, 0x50, 100000,
+      |                                          ^~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:155:15: error: ‘nx_gd32_i2c_initialize_at’ was not declared in this scope; did you mean ‘nx_gd32_i2c_initialize’?
+  155 |     ASSERT_EQ(nx_gd32_i2c_initialize_at(&first, &first_device,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:160:42: error: ‘nx_gd32_i2c1_controller’ was not declared in this scope; did you mean ‘nx_gd32_i2c_recover’?
+  160 |                                         &nx_gd32_i2c1_controller, 0x51, 100000,
+      |                                          ^~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp:159:15: error: ‘nx_gd32_i2c_initialize_at’ was not declared in this scope; did you mean ‘nx_gd32_i2c_initialize’?
+  159 |     ASSERT_EQ(nx_gd32_i2c_initialize_at(&second, &second_device,
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~
+tests/google/gd32_multi_test.cpp: In function ‘void USART0_IRQHandler()’:
+tests/google/gd32_multi_test.cpp:185:5: error: ‘nx_gd32_uart_irq’ was not declared in this scope; did you mean ‘nx_gd32_uart_ops’?
+  185 |     nx_gd32_uart_irq(uart0_irq);
+      |     ^~~~~~~~~~~~~~~~
+      |     nx_gd32_uart_ops

@@ -1,0 +1,30 @@
+[0/1] Re-running CMake...
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-threadx-probe/integration-build
+[1/25] Building CXX object CMakeFiles/nexus_threadx_kernel_test.dir/workspace/nexus/tests/google/threadx_kernel_test.cpp.o
+[2/25] Building CXX object CMakeFiles/nexus_threadx_kernel_test.dir/workspace/nexus/tests/google/threadx_close_test.cpp.o
+[3/25] Building CXX object CMakeFiles/nexus_threadx_kernel_test.dir/workspace/nexus/tests/google/threadx_wait_test.cpp.o
+[4/25] Building CXX object CMakeFiles/nexus_threadx_kernel_test.dir/workspace/nexus/tests/google/threadx_admission_test.cpp.o
+[5/25] Building C object CMakeFiles/nexus_threadx_kernel_test.dir/workspace/nexus/os/threadx/threadx.c.o
+[6/25] Building CXX object CMakeFiles/nexus_threadx_bootstrap_test.dir/workspace/nexus/tests/google/threadx_bootstrap_test.cpp.o
+[7/25] Building C object CMakeFiles/nexus_threadx_bootstrap_test.dir/workspace/nexus/os/threadx/threadx.c.o
+[8/25] Building CXX object CMakeFiles/nexus_threadx_m4_test.dir/workspace/nexus/tests/google/threadx_m4_test.cpp.o
+[9/25] Building C object CMakeFiles/nexus_threadx_m4_test.dir/workspace/nexus/os/threadx/m4.c.o
+[10/25] Building CXX object CMakeFiles/nexus_threadx_irq_test.dir/workspace/nexus/tests/google/threadx_irq_test.cpp.o
+[11/25] Building C object CMakeFiles/nexus_threadx_irq_test.dir/workspace/nexus/os/threadx/threadx.c.o
+[12/25] Building CXX object CMakeFiles/nexus_threadx_m4_primask_test.dir/workspace/nexus/tests/google/threadx_m4_primask_test.cpp.o
+[13/25] Building C object CMakeFiles/nexus_threadx_m4_primask_test.dir/workspace/nexus/os/threadx/m4.c.o
+[14/25] Building CXX object CMakeFiles/nexus_threadx_irq_primask_test.dir/workspace/nexus/tests/google/threadx_irq_primask_test.cpp.o
+[15/25] Building C object CMakeFiles/nexus_threadx_irq_primask_test.dir/workspace/nexus/os/threadx/threadx.c.o
+[16/25] Building CXX object CMakeFiles/nexus_threadx_m4_external_test.dir/workspace/nexus/tests/google/threadx_m4_external_test.cpp.o
+[17/25] Building C object CMakeFiles/nexus_threadx_m4_external_test.dir/workspace/nexus/os/threadx/m4.c.o
+[18/25] Linking CXX executable nexus_threadx_kernel_test
+[19/25] Linking CXX executable nexus_threadx_bootstrap_test
+[20/25] Linking CXX executable nexus_threadx_m4_test
+[21/25] Linking CXX executable nexus_threadx_irq_test
+[22/25] Linking CXX executable nexus_threadx_m4_primask_test
+[23/25] Linking CXX executable nexus_threadx_irq_primask_test
+[24/25] Linking CXX executable nexus_threadx_m4_external_test

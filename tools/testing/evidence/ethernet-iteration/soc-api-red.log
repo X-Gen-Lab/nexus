@@ -1,0 +1,20 @@
+[0/1] Re-running CMake...
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-iteration-bus-design/eth-build
+[1/14] Building C object CMakeFiles/ethernet_stm32_test.dir/io/src/mdio.c.o
+[2/14] Building CXX object CMakeFiles/ethernet_gd32_test.dir/tests/google/ethernet_mac_test.cpp.o
+FAILED: [code=1] CMakeFiles/ethernet_gd32_test.dir/tests/google/ethernet_mac_test.cpp.o 
+/usr/bin/c++ -DGD32F470 -DHXTAL_VALUE=25000000 -DNX_ETH_TEST_GD32 -I/workspace/nexus-iteration-bus-design/eth-src/io/include -I/workspace/nexus-iteration-bus-design/eth-src/io/private -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus/build/iteration-bus/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -I/workspace/nexus/build/iteration-bus/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -I/workspace/nexus-iteration-bus-design/eth-src/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=gnu++17 -Wall -Wextra -Werror -Wpedantic -include /workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_model.h -MD -MT CMakeFiles/ethernet_gd32_test.dir/tests/google/ethernet_mac_test.cpp.o -MF CMakeFiles/ethernet_gd32_test.dir/tests/google/ethernet_mac_test.cpp.o.d -o CMakeFiles/ethernet_gd32_test.dir/tests/google/ethernet_mac_test.cpp.o -c /workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp
+In file included from /workspace/nexus-iteration-bus-design/eth-src/soc/gd32f470/private/gd32f470_eth.h:9,
+                 from /workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:14:
+/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h:364:10: fatal error: gd32f4xx_libopt.h: No such file or directory
+  364 | #include "gd32f4xx_libopt.h"
+      |          ^~~~~~~~~~~~~~~~~~~
+compilation terminated.
+[3/14] Building C object CMakeFiles/ethernet_stm32_test.dir/io/src/ethernet.c.o
+[4/14] Building C object CMakeFiles/ethernet_mac_test.dir/io/src/eth_mac.c.o
+[5/14] Building C object CMakeFiles/ethernet_stm32_test.dir/io/src/eth_mac.c.o
+[6/14] Building CXX object CMakeFiles/ethernet_mac_test.dir/tests/google/ethernet_mac_test.cpp.o
+[7/14] Building CXX object CMakeFiles/ethernet_stm32_test.dir/tests/google/ethernet_mac_test.cpp.o
+ninja: build stopped: subcommand failed.

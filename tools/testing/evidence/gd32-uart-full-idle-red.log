@@ -1,0 +1,34 @@
+Running main() from gmock_main.cc
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from GD32UARTStream
+[ RUN      ] GD32UARTStream.ColdAssemblyAndRejectedAdmissionHaveNoRxStorageEffects
+[       OK ] GD32UARTStream.ColdAssemblyAndRejectedAdmissionHaveNoRxStorageEffects (0 ms)
+[ RUN      ] GD32UARTStream.FullAndIdleBlocksNeverOverwriteHeldConsumer
+[       OK ] GD32UARTStream.FullAndIdleBlocksNeverOverwriteHeldConsumer (0 ms)
+[ RUN      ] GD32UARTStream.ErrorOnlyNeverCreatesAStaleByteAndMarksValidPrefix
+[       OK ] GD32UARTStream.ErrorOnlyNeverCreatesAStaleByteAndMarksValidPrefix (0 ms)
+[ RUN      ] GD32UARTStream.OverallStopPublishesPrefixAndWaitsForConsumerRelease
+[       OK ] GD32UARTStream.OverallStopPublishesPrefixAndWaitsForConsumerRelease (0 ms)
+[ RUN      ] GD32UARTStream.TxRemainsIndependentAndResetLossRestoresRxSource
+[       OK ] GD32UARTStream.TxRemainsIndependentAndResetLossRestoresRxSource (0 ms)
+[ RUN      ] GD32UARTStream.DistinctControllersHaveIndependentLoansAndRegisters
+[       OK ] GD32UARTStream.DistinctControllersHaveIndependentLoansAndRegisters (0 ms)
+[ RUN      ] GD32UARTStream.FullIdleHasOnePublicationWithBothObservedFacts
+/workspace/nexus/tests/google/gd32_uart_stream_test.cpp:232: Failure
+Expected: (block.flags & 1U) != (0U), actual: 0 vs 0
+
+[  FAILED  ] GD32UARTStream.FullIdleHasOnePublicationWithBothObservedFacts (0 ms)
+[ RUN      ] GD32UARTStream.WakeFollowsPublicationAndUsesActualPriorityCeiling
+[       OK ] GD32UARTStream.WakeFollowsPublicationAndUsesActualPriorityCeiling (0 ms)
+[ RUN      ] GD32UARTStream.FailedResetRetainsTxAndRxLoanUntilProvedDrain
+[       OK ] GD32UARTStream.FailedResetRetainsTxAndRxLoanUntilProvedDrain (0 ms)
+[----------] 9 tests from GD32UARTStream (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 9 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 8 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] GD32UARTStream.FullIdleHasOnePublicationWithBothObservedFacts
+
+ 1 FAILED TEST

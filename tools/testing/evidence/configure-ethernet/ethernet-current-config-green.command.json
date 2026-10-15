@@ -1,0 +1,18 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/configure",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "PATH": "/workspace/nexus/.venv/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+  "exit_code": 0,
+  "log": "/workspace/nexus-config-iteration-evidence/ethernet-current-config-green.log",
+  "sha256": "9a4a88121c6dc21a6b1d6f5f2eabbde1d9ecadb948fd59908e09d7b739336086"
+}

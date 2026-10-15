@@ -1,0 +1,59 @@
+test_budget_rejects_zero_bool_unaligned_and_physical_overflow (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_budget_rejects_zero_bool_unaligned_and_physical_overflow) ... ok
+test_default_has_no_selected_extra_budget_and_rejects_live_sections (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_default_has_no_selected_extra_budget_and_rejects_live_sections) ... FAIL
+test_extra_domains_have_separate_immutable_limits_and_physical_facts (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_extra_domains_have_separate_immutable_limits_and_physical_facts) ... ERROR
+test_region_contract_rejects_unknown_fields_and_non_table_values (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_region_contract_rejects_unknown_fields_and_non_table_values) ... ok
+test_unknown_main_or_unsupported_chip_region_is_not_silently_selected (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_unknown_main_or_unsupported_chip_region_is_not_silently_selected) ... FAIL
+
+======================================================================
+ERROR: test_extra_domains_have_separate_immutable_limits_and_physical_facts (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_extra_domains_have_separate_immutable_limits_and_physical_facts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_memory_regions.py", line 29, in test_extra_domains_have_separate_immutable_limits_and_physical_facts
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 780, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 272, in resolve
+    assembly_input = load_assembly(assembly_path, root, snapshots)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 258, in load_assembly
+    return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 112, in read
+    return normalize(data, path, root, fail, obj, integer, text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/authored.py", line 41, in normalize
+    memory = obj(data["memory"], {"main_stack_bytes"},
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 116, in obj
+    fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: memory TOML: missing [], unknown ['regions']
+
+======================================================================
+FAIL: test_default_has_no_selected_extra_budget_and_rejects_live_sections (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_default_has_no_selected_extra_budget_and_rejects_live_sections)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_memory_regions.py", line 58, in test_default_has_no_selected_extra_budget_and_rejects_live_sections
+    self.assertIn("memory region is not selected", source)
+AssertionError: 'memory region is not selected' not found in '/* Exact resolved physical layout; no product reservation. */\nENTRY(Reset_Handler)\nPHDRS {\n    flash PT_LOAD FLAGS(5);\n    data PT_LOAD FLAGS(6);\n    ram PT_LOAD FLAGS(6);\n    stack PT_LOAD FLAGS(6);\n}\nMEMORY {\n    FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 1048576\n    RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 196608\n}\n_estack = ORIGIN(RAM) + LENGTH(RAM);\n_sp = _estack;\n_Min_Stack_Size = 2048;\n_Min_Heap_Size = 0;\n__nx_msp_start = _estack - _Min_Stack_Size;\n__nx_msp_end = _estack;\n__nx_resolved_sha256_0 = 0x4fe7e757;\n__nx_resolved_sha256_1 = 0x3c90d3b7;\n__nx_resolved_sha256_2 = 0xe9b41853;\n__nx_resolved_sha256_3 = 0x8d8b2928;\n__nx_resolved_sha256_4 = 0x595bca7c;\n__nx_resolved_sha256_5 = 0x9840d838;\n__nx_resolved_sha256_6 = 0x81e1bcf3;\n__nx_resolved_sha256_7 = 0x8ad9d734;\nSECTIONS {\n    .isr_vector : { KEEP(*(.isr_vector)) KEEP(*(.vectors)) } > FLASH :flash\n    .text : { *(.text*) *(.rodata*) KEEP(*(.init)) KEEP(*(.fini)) } > FLASH :flash\n    .ARM.extab : { *(.ARM.extab*) } > FLASH :flash\n    .ARM.exidx : { __exidx_start = .; *(.ARM.exidx*) __exidx_end = .; } > FLASH :flash\n    .preinit_array : { PROVIDE_HIDDEN(__preinit_array_start = .); KEEP(*(.preinit_array*)) PROVIDE_HIDDEN(__preinit_array_end = .); } > FLASH :flash\n    .init_array : { PROVIDE_HIDDEN(__init_array_start = .); KEEP(*(SORT(.init_array.*))) KEEP(*(.init_array*)) PROVIDE_HIDDEN(__init_array_end = .); } > FLASH :flash\n    .fini_array : { PROVIDE_HIDDEN(__fini_array_start = .); KEEP(*(SORT(.fini_array.*))) KEEP(*(.fini_array*)) PROVIDE_HIDDEN(__fini_array_end = .); } > FLASH :flash\n    _sidata = LOADADDR(.data);\n    .data : { . = ALIGN(4); _sdata = .; *(.data*) . = ALIGN(4); _edata = .; } > RAM AT> FLASH :data\n    .bss (NOLOAD) : AT(ADDR(.bss)) { . = ALIGN(4); _sbss = .; *(.bss*) *(COMMON) . = ALIGN(4); _ebss = .; } > RAM :ram\n    .reserved (NOLOAD) : AT(ADDR(.reserved)) { . = ALIGN(8); __heap_start = .; __nx_heap_start = .; . += _Min_Heap_Size; __heap_end = .; __nx_heap_end = .; } > RAM :ram\n    .msp __nx_msp_start (NOLOAD) : AT(__nx_msp_start) { . += _Min_Stack_Size; } > RAM :stack\n    PROVIDE(end = _ebss);\n    PROVIDE(_end = _ebss);\n    ASSERT(_ebss + _Min_Heap_Size <= _estack - _Min_Stack_Size, "RAM stack/heap overlap")\n}\n'
+
+======================================================================
+FAIL: test_unknown_main_or_unsupported_chip_region_is_not_silently_selected (tools.configure.test_memory_regions.MemoryRegionConfigurationTests.test_unknown_main_or_unsupported_chip_region_is_not_silently_selected)
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unknown Board package id: stm32f407_qiming
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_memory_regions.py", line 81, in test_unknown_main_or_unsupported_chip_region_is_not_silently_selected
+    with self.assertRaisesRegex(ValueError, "region"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "region" does not match "Unknown Board package id: stm32f407_qiming"
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.012s
+
+FAILED (failures=2, errors=1)

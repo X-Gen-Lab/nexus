@@ -1,0 +1,14 @@
+clang-format version 14.0.6 (https://github.com/ssciwr/clang-format-wheel e79d44a98fc6eeb3e9751220e441da03812564c1)
+Mode: Check; files: 25
+FAIL: /workspace/nexus/core/include/nexus/core/fault.h
+/workspace/nexus/core/include/nexus/core/fault.h:36:75: error: code should be clang-formatted [-Wclang-format-violations]
+ *                  No default observer registry, worker or retained event exists.
+                                                                          ^
+FAIL: /workspace/nexus/core/src/fault.c
+/workspace/nexus/core/src/fault.c:12:70: error: code should be clang-formatted [-Wclang-format-violations]
+__attribute__((weak)) void nx_fault_observe(nx_fault_domain_t domain,
+                                                                     ^
+/workspace/nexus/core/src/fault.c:13:63: error: code should be clang-formatted [-Wclang-format-violations]
+                                           nx_result_t reason,
+                                                              ^
+FAILED: 2/25 selected files

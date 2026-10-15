@@ -1,0 +1,1 @@
+Style check failed: Files are not in the Git index: ['.github/security/trufflehog.json', 'scripts/ci/secret_scan.py', 'tests/contracts/threadx_linux_port_predecessor.c.raw', 'tools/testing/test_secret_scan.py']

@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="53" failures="7" disabled="0" errors="0" time="0.002" timestamp="2026-10-11T19:44:26.143" name="AllTests">
+  <testsuite name="TimerContracts" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T19:44:26.143">
+    <testcase name="InterfacesKeepOptionalModesSeparate" file="tests/google/timer_advanced_test.cpp" line="241" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.143" classname="TimerContracts" />
+  </testsuite>
+  <testsuite name="TimerHardware" tests="52" failures="7" disabled="0" skipped="0" errors="0" time="0.002" timestamp="2026-10-11T19:44:26.143">
+    <testcase name="CaptureAuthorityRejectsBeforeMmio" file="tests/google/timer_advanced_test.cpp" line="248" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.143" classname="TimerHardware" />
+    <testcase name="CaptureRejectsUnrepresentableClockAndFilter" file="tests/google/timer_advanced_test.cpp" line="258" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.143" classname="TimerHardware" />
+    <testcase name="CaptureCannotReplaceEnabledController" file="tests/google/timer_advanced_test.cpp" line="267" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="CaptureReportsRawModuloTicksAndSeparateObservation" file="tests/google/timer_advanced_test.cpp" line="274" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="CaptureOverflowIsObservableWithoutOverwritingConsumer" file="tests/google/timer_advanced_test.cpp" line="290" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="CaptureStopRetainsQueuedRingUntilTaskDrain" file="tests/google/timer_advanced_test.cpp" line="312" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="CaptureFailedDetachRetainsRingAndIncomingMask" file="tests/google/timer_advanced_test.cpp" line="328" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="CaptureRejectsRingControlOutputAndOverflowAliases" file="tests/google/timer_advanced_test.cpp" line="342" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="CaptureW0cPreservesUnrelatedObservedFacts" file="tests/google/timer_advanced_test.cpp" line="355" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="CaptureErrorOnlyDoesNotInventAnEdge" file="tests/google/timer_advanced_test.cpp" line="367" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedAuthorityRejectsBeforeMmio" file="tests/google/timer_advanced_test.cpp" line="376" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedDeadtimeRepresentabilityFollowsActualEncoding" file="tests/google/timer_advanced_test.cpp" line="386" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedDoesNotRoundUnrepresentableDeadtime" file="tests/google/timer_advanced_test.cpp" line="400" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedRejectsIrreversibleExistingLock" file="tests/google/timer_advanced_test.cpp" line="408" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedDutyCannotModifyFixedBase" file="tests/google/timer_advanced_test.cpp" line="415" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedDeadtimeClockIsIndependentOfPsc" file="tests/google/timer_advanced_test.cpp" line="425" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedHardwareBreakLatchesAndNeverAutorestarts" file="tests/google/timer_advanced_test.cpp" line="435" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedLateBreakBeforeMoeReadbackFailsStart" file="tests/google/timer_advanced_test.cpp" line="456" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedFailedMoeDetachKeepsOwnerResponsibility" file="tests/google/timer_advanced_test.cpp" line="464" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedRejectsOutputThatOverwritesControl" file="tests/google/timer_advanced_test.cpp" line="475" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.144" classname="TimerHardware" />
+    <testcase name="AdvancedClearsOnlyObservedBreakFlag" file="tests/google/timer_advanced_test.cpp" line="483" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="AdvancedRejectsWrongPhysicalBreakBitBeforeWrites" file="tests/google/timer_advanced_test.cpp" line="493" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="AdvancedCannotEnableAlteredDeadtimeOrBreakPolarity" file="tests/google/timer_advanced_test.cpp" line="499" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="AdvancedCannotEnableAlteredDtsClockDivider" file="tests/google/timer_advanced_test.cpp" line="506" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="AdvancedColdConfigurationCannotAliasMutableState" file="tests/google/timer_advanced_test.cpp" line="513" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="CaptureProtectsActualInterfaceTableFromRingOverwrite" file="tests/google/timer_advanced_test.cpp" line="527" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="CaptureRejectsInterfaceFaceAndMethodsOutputAliases" file="tests/google/timer_advanced_test.cpp" line="535" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="CaptureRejectsAlteredInputSelectionAtStart" file="tests/google/timer_advanced_test.cpp" line="543" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="BothColdConstructorsRequireActualSelectedClockGates" file="tests/google/timer_advanced_test.cpp" line="550" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="CaptureFailedIrqAdmissionReturnsNoBorrow" file="tests/google/timer_advanced_test.cpp" line="561" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="CaptureRestartCannotReplaceAnExistingBorrow" file="tests/google/timer_advanced_test.cpp" line="574" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="CaptureAndAdvancedTaskControlsRejectIsrMutation" file="tests/google/timer_advanced_test.cpp" line="582" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="AdvancedDoesNotClearAFaultUntilHardwareAcknowledge" file="tests/google/timer_advanced_test.cpp" line="596" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="AdvancedPhysicalActiveLowBreakUsesActualPolarity" file="tests/google/timer_advanced_test.cpp" line="610" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="AdvancedRefusedDutyNeverChangesStagedValue" file="tests/google/timer_advanced_test.cpp" line="622" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="AdvancedRefusedChannelWithdrawPreventsCleanStop" file="tests/google/timer_advanced_test.cpp" line="631" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="CaptureUsesClockOnlyForActualPublishedValues" file="tests/google/timer_advanced_test.cpp" line="643" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="CaptureCannotInheritGatedClockOrXorInputSelection" file="tests/google/timer_advanced_test.cpp" line="658" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="AdvancedCannotInheritSlaveModeOrRepetitionCounter" file="tests/google/timer_advanced_test.cpp" line="666" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.145" classname="TimerHardware" />
+    <testcase name="CaptureColdReleaseRequiresDrainAndSupportsNewSession" file="tests/google/timer_advanced_test.cpp" line="674" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware" />
+    <testcase name="AdvancedColdReleaseQuiescesSourceBeforeNewSession" file="tests/google/timer_advanced_test.cpp" line="689" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware" />
+    <testcase name="CaptureFailedStopAcknowledgesLateSourceWithoutRingWrite" file="tests/google/timer_advanced_test.cpp" line="699" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware" />
+    <testcase name="AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled" file="tests/google/timer_advanced_test.cpp" line="712" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware" />
+    <testcase name="CaptureReadClearPreservesNewUnreadEdge" file="tests/google/timer_advanced_test.cpp" line="720" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware" />
+    <testcase name="CaptureObservesOvercaptureAfterActualDataRead" file="tests/google/timer_advanced_test.cpp" line="737" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware" />
+    <testcase name="FailedCaptureConstructorRetainsCleanupSession" file="tests/google/timer_advanced_test.cpp" line="751" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware">
+      <failure message="tests/google/timer_advanced_test.cpp:757&#x0A;Expected equality of these values:&#x0A;  capture.config&#x0A;    Which is: NULL&#x0A;  &amp;cap_config&#x0A;    Which is: 0x5631ac06e310&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:757
+Expected equality of these values:
+  capture.config
+    Which is: NULL
+  &cap_config
+    Which is: 0x5631ac06e310
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:760&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_release(&amp;capture)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:760
+Expected equality of these values:
+  nx_stm32_timer_capture_release(&capture)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:762&#x0A;Expected equality of these values:&#x0A;  ((TIM_TypeDef *) (0x40000000UL + 0x0800UL))-&gt;CCER&#x0A;    Which is: 2&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:762
+Expected equality of these values:
+  ((TIM_TypeDef *) (0x40000000UL + 0x0800UL))->CCER
+    Which is: 2
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:764&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_initialize(&amp;capture, &amp;cap_config)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:764
+Expected equality of these values:
+  nx_stm32_timer_capture_initialize(&capture, &cap_config)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="FailedAdvancedConstructorRetainsCleanupSession" file="tests/google/timer_advanced_test.cpp" line="767" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware">
+      <failure message="tests/google/timer_advanced_test.cpp:772&#x0A;Expected equality of these values:&#x0A;  advanced.config&#x0A;    Which is: NULL&#x0A;  &amp;adv_config&#x0A;    Which is: 0x5631ac06e320&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:772
+Expected equality of these values:
+  advanced.config
+    Which is: NULL
+  &adv_config
+    Which is: 0x5631ac06e320
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:775&#x0A;Expected equality of these values:&#x0A;  nx_stm32_advanced_pwm_release(&amp;advanced)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:775
+Expected equality of these values:
+  nx_stm32_advanced_pwm_release(&advanced)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="FailedCaptureCleanupRetainsIdentityUntilRealReadback" file="tests/google/timer_advanced_test.cpp" line="782" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware">
+      <failure message="tests/google/timer_advanced_test.cpp:791&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_release(&amp;capture)&#x0A;    Which is: 1&#x0A;  NX_ERROR_BUSY&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:791
+Expected equality of these values:
+  nx_stm32_timer_capture_release(&capture)
+    Which is: 1
+  NX_ERROR_BUSY
+    Which is: 2
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:792&#x0A;Expected equality of these values:&#x0A;  capture.config&#x0A;    Which is: NULL&#x0A;  &amp;cap_config&#x0A;    Which is: 0x5631ac06e310&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:792
+Expected equality of these values:
+  capture.config
+    Which is: NULL
+  &cap_config
+    Which is: 0x5631ac06e310
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:797&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_release(&amp;capture)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:797
+Expected equality of these values:
+  nx_stm32_timer_capture_release(&capture)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:799&#x0A;Expected equality of these values:&#x0A;  ((TIM_TypeDef *) (0x40000000UL + 0x0800UL))-&gt;DIER&#x0A;    Which is: 2&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:799
+Expected equality of these values:
+  ((TIM_TypeDef *) (0x40000000UL + 0x0800UL))->DIER
+    Which is: 2
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:800&#x0A;Expected equality of these values:&#x0A;  ((TIM_TypeDef *) (0x40000000UL + 0x0800UL))-&gt;CCER&#x0A;    Which is: 1&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:800
+Expected equality of these values:
+  ((TIM_TypeDef *) (0x40000000UL + 0x0800UL))->CCER
+    Which is: 1
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:801&#x0A;Expected equality of these values:&#x0A;  ((TIM_TypeDef *) (0x40000000UL + 0x0800UL))-&gt;CR1 &amp; 1U&#x0A;    Which is: 1&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:801
+Expected equality of these values:
+  ((TIM_TypeDef *) (0x40000000UL + 0x0800UL))->CR1 & 1U
+    Which is: 1
+  0U
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="FailedAdvancedCleanupRetainsIdentityUntilRealReadback" file="tests/google/timer_advanced_test.cpp" line="804" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware">
+      <failure message="tests/google/timer_advanced_test.cpp:814&#x0A;Expected equality of these values:&#x0A;  nx_stm32_advanced_pwm_release(&amp;advanced)&#x0A;    Which is: 1&#x0A;  NX_ERROR_BUSY&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:814
+Expected equality of these values:
+  nx_stm32_advanced_pwm_release(&advanced)
+    Which is: 1
+  NX_ERROR_BUSY
+    Which is: 2
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:815&#x0A;Expected equality of these values:&#x0A;  advanced.config&#x0A;    Which is: NULL&#x0A;  &amp;adv_config&#x0A;    Which is: 0x5631ac06e320&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:815
+Expected equality of these values:
+  advanced.config
+    Which is: NULL
+  &adv_config
+    Which is: 0x5631ac06e320
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:820&#x0A;Expected equality of these values:&#x0A;  nx_stm32_advanced_pwm_release(&amp;advanced)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:820
+Expected equality of these values:
+  nx_stm32_advanced_pwm_release(&advanced)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:822&#x0A;Expected equality of these values:&#x0A;  ((TIM_TypeDef *) ((0x40000000UL + 0x00010000UL) + 0x0000UL))-&gt;DIER&#x0A;    Which is: 128&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:822
+Expected equality of these values:
+  ((TIM_TypeDef *) ((0x40000000UL + 0x00010000UL) + 0x0000UL))->DIER
+    Which is: 128
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:823&#x0A;Expected equality of these values:&#x0A;  ((TIM_TypeDef *) ((0x40000000UL + 0x00010000UL) + 0x0000UL))-&gt;CCER&#x0A;    Which is: 5&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:823
+Expected equality of these values:
+  ((TIM_TypeDef *) ((0x40000000UL + 0x00010000UL) + 0x0000UL))->CCER
+    Which is: 5
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:824&#x0A;Expected equality of these values:&#x0A;  ((TIM_TypeDef *) ((0x40000000UL + 0x00010000UL) + 0x0000UL))-&gt;CR1 &amp; 1U&#x0A;    Which is: 1&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:824
+Expected equality of these values:
+  ((TIM_TypeDef *) ((0x40000000UL + 0x00010000UL) + 0x0000UL))->CR1 & 1U
+    Which is: 1
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:825&#x0A;Expected equality of these values:&#x0A;  ((TIM_TypeDef *) ((0x40000000UL + 0x00010000UL) + 0x0000UL))-&gt;BDTR &amp; 32768U&#x0A;    Which is: 32768&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:825
+Expected equality of these values:
+  ((TIM_TypeDef *) ((0x40000000UL + 0x00010000UL) + 0x0000UL))->BDTR & 32768U
+    Which is: 32768
+  0U
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="UntouchedReleaseNeverWithdrawsForeignActiveTimer" file="tests/google/timer_advanced_test.cpp" line="828" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware">
+      <failure message="tests/google/timer_advanced_test.cpp:838&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_release(&amp;capture)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:838
+Expected equality of these values:
+  nx_stm32_timer_capture_release(&capture)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:839&#x0A;Expected equality of these values:&#x0A;  nx_stm32_advanced_pwm_release(&amp;advanced)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:839
+Expected equality of these values:
+  nx_stm32_advanced_pwm_release(&advanced)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="UntouchedAdmissionRejectionsReleaseWithoutEffects" file="tests/google/timer_advanced_test.cpp" line="850" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware">
+      <failure message="tests/google/timer_advanced_test.cpp:855&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_release(&amp;capture)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:855
+Expected equality of these values:
+  nx_stm32_timer_capture_release(&capture)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:856&#x0A;Expected equality of these values:&#x0A;  nx_stm32_advanced_pwm_release(&amp;advanced)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:856
+Expected equality of these values:
+  nx_stm32_advanced_pwm_release(&advanced)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:861&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_release(&amp;capture)&#x0A;    Which is: 1&#x0A;  NX_ERROR_CONTEXT&#x0A;    Which is: 14&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:861
+Expected equality of these values:
+  nx_stm32_timer_capture_release(&capture)
+    Which is: 1
+  NX_ERROR_CONTEXT
+    Which is: 14
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:862&#x0A;Expected equality of these values:&#x0A;  nx_stm32_advanced_pwm_release(&amp;advanced)&#x0A;    Which is: 1&#x0A;  NX_ERROR_CONTEXT&#x0A;    Which is: 14&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:862
+Expected equality of these values:
+  nx_stm32_advanced_pwm_release(&advanced)
+    Which is: 1
+  NX_ERROR_CONTEXT
+    Which is: 14
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:864&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_release(&amp;capture)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:864
+Expected equality of these values:
+  nx_stm32_timer_capture_release(&capture)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:865&#x0A;Expected equality of these values:&#x0A;  nx_stm32_advanced_pwm_release(&amp;advanced)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:865
+Expected equality of these values:
+  nx_stm32_advanced_pwm_release(&advanced)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:869&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_release(&amp;capture)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:869
+Expected equality of these values:
+  nx_stm32_timer_capture_release(&capture)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:870&#x0A;Expected equality of these values:&#x0A;  nx_stm32_advanced_pwm_release(&amp;advanced)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:870
+Expected equality of these values:
+  nx_stm32_advanced_pwm_release(&advanced)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="FailedSessionReleaseChecksAllOwnedSourceBits" file="tests/google/timer_advanced_test.cpp" line="874" status="run" result="completed" time="0." timestamp="2026-10-11T19:44:26.146" classname="TimerHardware">
+      <failure message="tests/google/timer_advanced_test.cpp:883&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_release(&amp;capture)&#x0A;    Which is: 1&#x0A;  NX_ERROR_BUSY&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:883
+Expected equality of these values:
+  nx_stm32_timer_capture_release(&capture)
+    Which is: 1
+  NX_ERROR_BUSY
+    Which is: 2
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:884&#x0A;Expected equality of these values:&#x0A;  capture.config&#x0A;    Which is: NULL&#x0A;  &amp;cap_config&#x0A;    Which is: 0x5631ac06e310&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:884
+Expected equality of these values:
+  capture.config
+    Which is: NULL
+  &cap_config
+    Which is: 0x5631ac06e310
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:886&#x0A;Expected equality of these values:&#x0A;  nx_stm32_timer_capture_release(&amp;capture)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:886
+Expected equality of these values:
+  nx_stm32_timer_capture_release(&capture)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:890&#x0A;Expected equality of these values:&#x0A;  nx_stm32_advanced_pwm_release(&amp;advanced)&#x0A;    Which is: 1&#x0A;  NX_ERROR_BUSY&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:890
+Expected equality of these values:
+  nx_stm32_advanced_pwm_release(&advanced)
+    Which is: 1
+  NX_ERROR_BUSY
+    Which is: 2
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:891&#x0A;Expected equality of these values:&#x0A;  advanced.config&#x0A;    Which is: NULL&#x0A;  &amp;adv_config&#x0A;    Which is: 0x5631ac06e320&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:891
+Expected equality of these values:
+  advanced.config
+    Which is: NULL
+  &adv_config
+    Which is: 0x5631ac06e320
+]]></failure>
+      <failure message="tests/google/timer_advanced_test.cpp:893&#x0A;Expected equality of these values:&#x0A;  nx_stm32_advanced_pwm_release(&amp;advanced)&#x0A;    Which is: 1&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/timer_advanced_test.cpp:893
+Expected equality of these values:
+  nx_stm32_advanced_pwm_release(&advanced)
+    Which is: 1
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

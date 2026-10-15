@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "documents": {
+    "datasheet": {
+      "document_id": "DS8626",
+      "revision": "12",
+      "document_date": "March 2026",
+      "kind": "datasheet",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "sha256": "1f41b4fa49a9960215ebb76cd0a75f20241db82eed60d308345a80463caeed22",
+      "bytes": 2792056,
+      "anchors": {
+        "package_gpio": "Table 7, printed pages 49\u201360; Figure 13 p44 (LQFP100) / Figure 14 p45 (LQFP144)",
+        "alternate_functions": "Table 9, printed page64 onward",
+        "device_features": "Table 2, printed pages 15\u201316"
+      }
+    },
+    "reference_manual": {
+      "document_id": "RM0090",
+      "revision": "22",
+      "document_date": "May 2026",
+      "kind": "reference_manual",
+      "url": "https://www.st.com/resource/en/reference_manual/dm00031020.pdf",
+      "sha256": "f3ff2322eec21f4e49081f68481b764506eee81dba6031bc767e2f8955b27cca",
+      "bytes": 21385881,
+      "anchors": {
+        "memory": "Section 2.3.1\u20132.3.2 p68; Table 5 flash organization p75",
+        "dma_mapping": "Tables 43/44 pp309/310",
+        "irq": "Section 12.1.3 pp373ff, Table62 pp374ff (F405/407)",
+        "clock": "STM32F405/407/415/417 Figure21 p217; Section7"
+      }
+    },
+    "errata": {
+      "document_id": "ES0182",
+      "revision": "19",
+      "document_date": "July 2026",
+      "kind": "errata",
+      "url": "https://www.st.com/resource/en/errata_sheet/dm00037591-stm32f405407xx-and-stm32f415417xx-device-errata-stmicroelectronics.pdf",
+      "sha256": "1d3da0f99b85013548d17df07919516bf862f8f38cbd1a61f08e75abb8e4c54f",
+      "bytes": 2231932,
+      "anchors": {
+        "applicability": "Table1 and Table2 p1; revision-specific device limitations Table3 pp2ff"
+      }
+    }
+  },
+  "package_review": {
+    "document": "datasheet",
+    "variants": [
+      "STM32F407VET6",
+      "STM32F407ZGT6"
+    ],
+    "status": "package_gpio_reviewed",
+    "scope": "GPIO package matrix independently agrees with the official pinout diagram; Board routes and mode support remain independent."
+  },
+  "errata_review": {
+    "document": "errata",
+    "status": "applicability_only",
+    "silicon_revision": "not_observed",
+    "mode_workarounds": "not_fully_audited",
+    "hardware_qualification": "not_executed",
+    "identification": "ES0182 Table2, device marking plus DBGMCU_IDCODE REV_ID[15:0]; Table3 per revision/application applicability"
+  },
+  "limitations": [
+    "Reference sections are a source index, not a complete register or errata implementation audit.",
+    "Observed silicon revision and mode-specific applicability are required before hardware qualification."
+  ]
+}

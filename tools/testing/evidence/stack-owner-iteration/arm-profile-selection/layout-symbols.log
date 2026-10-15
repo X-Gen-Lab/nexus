@@ -1,0 +1,3 @@
+00000010 A __stack_binding_bytes
+0000000c A __stack_observation_bytes
+00000000 T fixture_layout

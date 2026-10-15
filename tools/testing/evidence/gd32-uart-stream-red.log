@@ -1,0 +1,6 @@
+RED command: g++ -std=c++17 -fsyntax-only -Icore/include -Iarch/include -Iio/include -Isoc/gd32f470/private -Itests/contracts/gd32_model -Ibuild/tdd-bootstrap/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include tests/google/gd32_uart_stream_test.cpp
+Expected missing concrete GD32 block provider before implementation.
+tests/google/gd32_uart_stream_test.cpp:10:10: fatal error: gd32f470_uart_stream.h: No such file or directory
+   10 | #include "gd32f470_uart_stream.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.

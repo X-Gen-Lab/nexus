@@ -1,0 +1,66 @@
+[
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/workspace/nexus/tests/contracts/stm32_assembly",
+      "-B",
+      "/workspace/nexus-config-iteration-evidence/uart-rx-cost-split/stm32",
+      "-G",
+      "Ninja",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/uart-rx-cost-old/stm32.toml",
+      "-DCMAKE_BUILD_TYPE=Release"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/uart-rx-cost-split/stm32-0.log",
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/workspace/nexus-config-iteration-evidence/uart-rx-cost-split/stm32",
+      "--target",
+      "stm32_controller_fixture",
+      "-j",
+      "4"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/uart-rx-cost-split/stm32-1.log",
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "cmake",
+      "-S",
+      "/workspace/nexus/tests/contracts/gd32_assembly",
+      "-B",
+      "/workspace/nexus-config-iteration-evidence/uart-rx-cost-split/gd32",
+      "-G",
+      "Ninja",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake",
+      "-DNEXUS_SOURCE_ROOT=/workspace/nexus",
+      "-DNEXUS_ASSEMBLY_FILE=/workspace/nexus-config-iteration-evidence/uart-rx-cost-old/gd32.toml",
+      "-DCMAKE_BUILD_TYPE=Release"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/uart-rx-cost-split/gd32-0.log",
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "cmake",
+      "--build",
+      "/workspace/nexus-config-iteration-evidence/uart-rx-cost-split/gd32",
+      "--target",
+      "gd32_controller_fixture",
+      "-j",
+      "4"
+    ],
+    "cwd": "/workspace/nexus",
+    "path": "/workspace/nexus-config-iteration-evidence/uart-rx-cost-split/gd32-1.log",
+    "exit_code": 0
+  }
+]

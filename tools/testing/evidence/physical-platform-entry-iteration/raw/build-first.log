@@ -1,0 +1,69 @@
+[0/2] Re-checking globbed directories...
+[1/24] Building C object CMakeFiles/timer_api.dir/workspace/nexus/io/src/gpio.c.o
+[2/24] Building C object CMakeFiles/timer_api.dir/workspace/nexus/io/src/spi.c.o
+[3/24] Building C object CMakeFiles/timer_api.dir/workspace/nexus/io/src/uart.c.o
+[4/24] Building C object CMakeFiles/timer_api.dir/workspace/nexus/io/src/dma.c.o
+[5/24] Building C object CMakeFiles/timer_api.dir/workspace/nexus/io/src/i2c.c.o
+[6/24] Building C object CMakeFiles/timer_api.dir/workspace/nexus/io/src/wake.c.o
+[7/24] Building C object CMakeFiles/timer_api.dir/workspace/nexus/core/src/time.c.o
+[8/24] Building C object CMakeFiles/timer_api.dir/workspace/nexus/core/src/request.c.o
+[9/24] Linking C static library libtimer_api.a
+[10/24] Building C object CMakeFiles/timer_arch.dir/workspace/nexus/arch/native/nx_arch_native.c.o
+[11/24] Linking C static library libtimer_arch.a
+[12/24] Building C object test-import/CMakeFiles/nexus_stm32_physical_platform_factory_test_empty.dir/physical-platform-stm32-empty/bindings.c.o
+[13/24] Building C object test-import/CMakeFiles/nexus_stm32_physical_platform_factory_test_gpio.dir/physical-platform-stm32-gpio/bindings.c.o
+[14/24] Building C object test-import/CMakeFiles/nexus_stm32_physical_platform_factory_test.dir/workspace/nexus/soc/stm32f407/drivers/gpio.c.o
+[15/24] Building C object test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test_empty.dir/physical-platform-gd32-empty/bindings.c.o
+[16/24] Building C object test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test_gpio.dir/physical-platform-gd32-gpio/bindings.c.o
+[17/24] Building C object test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test.dir/workspace/nexus/soc/gd32f470/drivers/gpio.c.o
+[18/24] Building C object test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test_vendor.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.o
+[19/24] Building C object test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test_vendor.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c.o
+[20/24] Building CXX object test-import/CMakeFiles/nexus_stm32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o
+FAILED: [code=1] test-import/CMakeFiles/nexus_stm32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o 
+/usr/bin/c++ -DNX_PHYSICAL_FACTORY_STM32 -DSTM32F407xx -I/workspace/nexus-industrial-design/physical-factory-tests/build/test-import/physical-platform-stm32-gpio -I/workspace/nexus/soc/stm32f407 -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/st/cmsis_device_f4/Include -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus/tests/google/physical_platform_factory_model.h -MD -MT test-import/CMakeFiles/nexus_stm32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o -MF test-import/CMakeFiles/nexus_stm32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o.d -o test-import/CMakeFiles/nexus_stm32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o -c /workspace/nexus/tests/google/physical_platform_factory_test.cpp
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp: In member function ‘virtual void PhysicalPlatformFactory_IncomingMaskRejectsAndRemainsSaved_Test::TestBody()’:
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:183:11: error: ‘nx_irq_state_t’ does not name a type; did you mean ‘nx_pwm_state_t’?
+  183 |     const nx_irq_state_t saved = nx_arch_irq_save();
+      |           ^~~~~~~~~~~~~~
+      |           nx_pwm_state_t
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:187:25: error: ‘saved’ was not declared in this scope
+  187 |     nx_arch_irq_restore(saved);
+      |                         ^~~~~
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp: In member function ‘virtual void PhysicalPlatformFactory_PrivilegedOwnerCanRestartActualSelectedGraph_Test::TestBody()’:
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:196:54: error: ‘NX_GPIO_OUTPUT’ was not declared in this scope; did you mean ‘NX_GPIO_ID_OUTPUT’?
+  196 |         const nx_gpio_port_t* port = nx_factory_gpio(NX_GPIO_OUTPUT);
+      |                                                      ^~~~~~~~~~~~~~
+      |                                                      NX_GPIO_ID_OUTPUT
+In file included from /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/internal/gmock-internal-utils.h:51,
+                 from /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock-actions.h:146,
+                 from /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock.h:56,
+                 from /workspace/nexus/tests/google/physical_platform_factory_test.cpp:23:
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:199:19: error: ‘nx_gpio_write’ was not declared in this scope; did you mean ‘nx_mdio_write’?
+  199 |         EXPECT_EQ(nx_gpio_write(port, 8U, 0U), NX_SUCCESS);
+      |                   ^~~~~~~~~~~~~
+[21/24] Building CXX object test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o
+FAILED: [code=1] test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o 
+/usr/bin/c++ -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus-industrial-design/physical-factory-tests/build/test-import/physical-platform-gd32-gpio -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -Wall -Wextra -Werror -Wconversion -Wshadow -include/workspace/nexus/tests/google/physical_platform_factory_model.h -MD -MT test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o -MF test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o.d -o test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o -c /workspace/nexus/tests/google/physical_platform_factory_test.cpp
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp: In member function ‘virtual void PhysicalPlatformFactory_IncomingMaskRejectsAndRemainsSaved_Test::TestBody()’:
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:183:11: error: ‘nx_irq_state_t’ does not name a type; did you mean ‘nx_pwm_state_t’?
+  183 |     const nx_irq_state_t saved = nx_arch_irq_save();
+      |           ^~~~~~~~~~~~~~
+      |           nx_pwm_state_t
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:187:25: error: ‘saved’ was not declared in this scope
+  187 |     nx_arch_irq_restore(saved);
+      |                         ^~~~~
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp: In member function ‘virtual void PhysicalPlatformFactory_PrivilegedOwnerCanRestartActualSelectedGraph_Test::TestBody()’:
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:196:54: error: ‘NX_GPIO_OUTPUT’ was not declared in this scope; did you mean ‘NX_GPIO_ID_OUTPUT’?
+  196 |         const nx_gpio_port_t* port = nx_factory_gpio(NX_GPIO_OUTPUT);
+      |                                                      ^~~~~~~~~~~~~~
+      |                                                      NX_GPIO_ID_OUTPUT
+In file included from /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/internal/gmock-internal-utils.h:51,
+                 from /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock-actions.h:146,
+                 from /workspace/nexus/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include/gmock/gmock.h:56,
+                 from /workspace/nexus/tests/google/physical_platform_factory_test.cpp:23:
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:201:19: error: ‘nx_gpio_write’ was not declared in this scope; did you mean ‘nx_mdio_write’?
+  201 |         EXPECT_EQ(nx_gpio_write(port, 128U, 0U), NX_SUCCESS);
+      |                   ^~~~~~~~~~~~~
+ninja: build stopped: subcommand failed.

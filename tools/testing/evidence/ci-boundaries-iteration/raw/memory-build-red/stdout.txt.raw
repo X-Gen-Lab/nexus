@@ -1,0 +1,14 @@
+[0/2] Re-checking globbed directories...
+[1/14] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+[2/14] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o
+[3/14] Building CXX object _deps/google-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+[4/14] Linking CXX static library lib/libgtest.a
+[5/14] Linking CXX static library lib/libgmock.a
+[6/14] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_default_test.dir/__/__/soc/gd32f470/system.c.o
+[7/14] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_default_test.dir/gd32_memory_boot_test.cpp.o
+[8/14] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_both_test.dir/__/__/soc/gd32f470/system.c.o
+[9/14] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_both_test.dir/__/__/soc/gd32f470/memory_init.c.o
+[10/14] Linking CXX static library lib/libgmock_main.a
+[11/14] Linking CXX executable bin/nexus_gd32_memory_boot_default_test
+[12/14] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_both_test.dir/gd32_memory_boot_test.cpp.o
+[13/14] Linking CXX executable bin/nexus_gd32_memory_boot_both_test

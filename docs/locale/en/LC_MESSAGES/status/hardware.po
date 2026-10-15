@@ -1,0 +1,141 @@
+# Authored translation; independently semantically reviewed.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Nexus agent-reviewed documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 31d93f0c89045f6b799c73420e5a16d5b7ef2f9d93baa1d1fadba729a7248976\n"
+
+msgid "HIL 与实板状态"
+msgstr "HIL and physical-board status"
+
+msgid ""
+"当前没有接入可执行的 MCU 实板、调试探针或串口。F407ZG 启明、F407VE 天空星、 F470ZG 梁山派，以及 G474／H743／U575"
+" 来源参考切片的物理状态均为 `not_executed`。 准备工装、成功生成计划或通过 host validator，不是 MCU "
+"上实际完成的实验。"
+msgstr ""
+"No executable MCU boards, debug probes or serial ports are currently "
+"connected. Physical status for F407ZG Qiming, F407VE Sky Star, F470ZG "
+"Liangshan, and the G474/H743/U575 source-reference slices is `not_executed`."
+" Prepared tooling, a successfully generated plan or a passing host validator"
+" is not an experiment actually performed on an MCU."
+
+msgid "待执行范围"
+msgstr "Pending execution scope"
+
+msgid "已有入口"
+msgstr "Existing entry"
+
+msgid "尚缺的真实证据"
+msgstr "Real evidence still needed"
+
+msgid "三块首发板与芯片参考配置"
+msgstr "Three initial boards and chip-reference configurations"
+
+msgid ""
+"[支持记录](../delivery/support.md)、[通用 HIL 准备](../guides/performance-hil.md)"
+msgstr ""
+"[Support records](../delivery/support.md), [general HIL "
+"preparation](../guides/performance-hil.md)"
+
+msgid "PCB、探针、供电、晶振、接线与 station admission"
+msgstr "PCB, probe, supply, oscillator, wiring and station admission"
+
+msgid "UART／SPI／ADC／Flash 等实际模式"
+msgstr "Actual UART/SPI/ADC/Flash and other modes"
+
+msgid "[资格合同](../delivery/qualification.md)"
+msgstr "[Qualification contract](../delivery/qualification.md)"
+
+msgid "IRQ、DMA、线完成、取消排空、过载、掉电原始 traces"
+msgstr ""
+"Raw traces for IRQ, DMA, wire completion, cancellation drain, overload and "
+"power loss"
+
+msgid "OS49–OS55"
+msgstr "OS49–OS55"
+
+msgid "[OS 原记录](../delivery/os.md)、[逐项 OS 台账](ledgers/os.md)"
+msgstr ""
+"[Original OS records](../delivery/os.md), [per-task OS "
+"ledger](ledgers/os.md)"
+
+msgid "IRQ→task、寄存器保持、栈峰值、Tick、满载退出、睡眠与异常响应"
+msgstr ""
+"IRQ-to-task, register retention, stack peaks, Tick, full-load shutdown, "
+"sleep and fault response"
+
+msgid "H743 Cache／DMA、U575 双域"
+msgstr "H743 Cache/DMA and U575 security domains"
+
+msgid "[SoC 扩展记录](../delivery/soc-extensions-verification.md)"
+msgstr "[SoC extension records](../delivery/soc-extensions-verification.md)"
+
+msgid "精确电源／option bytes 与真实硬件执行、隔离和失败观测"
+msgstr ""
+"Exact supply/option bytes and actual hardware execution, isolation and "
+"failure observations"
+
+msgid "cycles、latency、power、WCET"
+msgstr "cycles、latency、power、WCET"
+
+msgid "[后续迭代](roadmap.md)"
+msgstr "[Later iterations](roadmap.md)"
+
+msgid "同一 candidate、仪器、负载与明确预算的实际测量"
+msgstr ""
+"Actual measurements with the same candidate, instruments, load and explicit "
+"budgets"
+
+msgid ""
+"OS 计划保持 `prepared_unbound`，物理状态保持 `not_executed`。真实执行必须先满足 station "
+"admission，并提供准确 workload、instrument、raw trace、时间和目标身份。 禁止给 unbound 计划填写 "
+"`passed` 来代替 acquisition。"
+msgstr ""
+"OS plans remain `prepared_unbound`; physical status remains `not_executed`. "
+"Real execution first requires station admission and an accurate workload, "
+"instrument, raw trace, time and target identity. Do not enter `passed` on an"
+" unbound plan as a substitute for acquisition."
+
+msgid "首次实板验收顺序"
+msgstr "First physical-board acceptance sequence"
+
+msgid "核对具体 PCB、option bytes、电气条件、安全初值与 clock，不猜接线。"
+msgstr ""
+"Check the exact PCB, option bytes, electrical conditions, safe initial "
+"levels and clock; do not guess wiring."
+
+msgid "将真实 probe、serial 与需要的 waveform／power-cut 仪器绑定到 station。"
+msgstr ""
+"Bind actual probes, serial ports and required waveform/power-cut instruments"
+" to the station."
+
+msgid "固定源码、resolved 配置、工具和 candidate ELF；采用实际预算。"
+msgstr ""
+"Fix the source, resolved configuration, tools and candidate ELF; use actual "
+"budgets."
+
+msgid "执行对应模式的原始采集与失败路径，保留每次失败和重试。"
+msgstr ""
+"Acquire raw observations and exercise failure paths for the selected mode, "
+"retaining every failure and retry."
+
+msgid "对同一 tuple 做资格判断。没有执行的 controller、mode 或板卡保持未执行。"
+msgstr ""
+"Assess qualification for that exact tuple. Controllers, modes or boards not "
+"executed remain unexecuted."
+
+msgid ""
+"工具源码入口见 [实现地图](../development/implementation-map.md)。物理 scope "
+"仅在真实站点执行后升级，不能因文档发布、软件 CI 或片上单元存在自动升级。"
+msgstr ""
+"Tool source entry points are in the [implementation "
+"map](../development/implementation-map.md). Physical scope advances only "
+"after execution at a real station, never because of documentation "
+"publication, software CI or on-chip capability."

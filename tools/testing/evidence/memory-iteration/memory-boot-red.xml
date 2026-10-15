@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="2" failures="1" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:54:31.935" name="AllTests">
+  <testsuite name="MemoryBootFixture" tests="2" failures="1" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:54:31.935">
+    <testcase name="ResetInitializesOnlyAuthoredRegions" file="tests/google/gd32_memory_boot_test.cpp" line="115" status="run" result="completed" time="0." timestamp="2026-10-11T16:54:31.935" classname="MemoryBootFixture">
+      <failure message="tests/google/gd32_memory_boot_test.cpp:118&#x0A;Expected equality of these values:&#x0A;  word(addsram, 1U)&#x0A;    Which is: 2779096485&#x0A;  11U&#x0A;    Which is: 11&#x0A;" type=""><![CDATA[tests/google/gd32_memory_boot_test.cpp:118
+Expected equality of these values:
+  word(addsram, 1U)
+    Which is: 2779096485
+  11U
+    Which is: 11
+]]></failure>
+      <failure message="tests/google/gd32_memory_boot_test.cpp:119&#x0A;Expected equality of these values:&#x0A;  word(addsram, 2U)&#x0A;    Which is: 2779096485&#x0A;  12U&#x0A;    Which is: 12&#x0A;" type=""><![CDATA[tests/google/gd32_memory_boot_test.cpp:119
+Expected equality of these values:
+  word(addsram, 2U)
+    Which is: 2779096485
+  12U
+    Which is: 12
+]]></failure>
+      <failure message="tests/google/gd32_memory_boot_test.cpp:120&#x0A;Expected equality of these values:&#x0A;  word(addsram, 4U)&#x0A;    Which is: 2779096485&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/gd32_memory_boot_test.cpp:120
+Expected equality of these values:
+  word(addsram, 4U)
+    Which is: 2779096485
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/gd32_memory_boot_test.cpp:121&#x0A;Expected equality of these values:&#x0A;  word(addsram, 5U)&#x0A;    Which is: 2779096485&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/gd32_memory_boot_test.cpp:121
+Expected equality of these values:
+  word(addsram, 5U)
+    Which is: 2779096485
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/gd32_memory_boot_test.cpp:128&#x0A;Expected equality of these values:&#x0A;  word(tcm, 1U)&#x0A;    Which is: 1515870810&#x0A;  13U&#x0A;    Which is: 13&#x0A;" type=""><![CDATA[tests/google/gd32_memory_boot_test.cpp:128
+Expected equality of these values:
+  word(tcm, 1U)
+    Which is: 1515870810
+  13U
+    Which is: 13
+]]></failure>
+      <failure message="tests/google/gd32_memory_boot_test.cpp:129&#x0A;Expected equality of these values:&#x0A;  word(tcm, 2U)&#x0A;    Which is: 1515870810&#x0A;  14U&#x0A;    Which is: 14&#x0A;" type=""><![CDATA[tests/google/gd32_memory_boot_test.cpp:129
+Expected equality of these values:
+  word(tcm, 2U)
+    Which is: 1515870810
+  14U
+    Which is: 14
+]]></failure>
+      <failure message="tests/google/gd32_memory_boot_test.cpp:130&#x0A;Expected equality of these values:&#x0A;  word(tcm, 4U)&#x0A;    Which is: 1515870810&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/gd32_memory_boot_test.cpp:130
+Expected equality of these values:
+  word(tcm, 4U)
+    Which is: 1515870810
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/gd32_memory_boot_test.cpp:131&#x0A;Expected equality of these values:&#x0A;  word(tcm, 5U)&#x0A;    Which is: 1515870810&#x0A;  0U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[tests/google/gd32_memory_boot_test.cpp:131
+Expected equality of these values:
+  word(tcm, 5U)
+    Which is: 1515870810
+  0U
+    Which is: 0
+]]></failure>
+      <failure message="tests/google/gd32_memory_boot_test.cpp:132&#x0A;Expected: ((*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x30U)) &amp; ((uint32_t)((uint32_t)0x01U&lt;&lt;(20)))) != (0U), actual: 0 vs 0&#x0A;" type=""><![CDATA[tests/google/gd32_memory_boot_test.cpp:132
+Expected: ((*(volatile uint32_t *)(uint32_t)((((uint32_t)0x40020000U) + 0x00003800U) + 0x30U)) & ((uint32_t)((uint32_t)0x01U<<(20)))) != (0U), actual: 0 vs 0
+]]></failure>
+    </testcase>
+    <testcase name="IncomingTcmClockIsNeverDisabledByReset" file="tests/google/gd32_memory_boot_test.cpp" line="146" status="run" result="completed" time="0." timestamp="2026-10-11T16:54:31.935" classname="MemoryBootFixture" />
+  </testsuite>
+</testsuites>

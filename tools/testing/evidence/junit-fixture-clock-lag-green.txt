@@ -1,0 +1,18 @@
+test_actual_case_identity_and_hash_retained (tests.contracts.test_junit.JunitEvidenceContracts.test_actual_case_identity_and_hash_retained) ... ok
+test_all_skipped_report_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_all_skipped_report_rejected) ... ok
+test_duplicate_and_missing_names_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_duplicate_and_missing_names_rejected) ... ok
+test_failures_and_errors_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_failures_and_errors_rejected) ... ok
+test_false_counts_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_false_counts_rejected) ... ok
+test_fixture_freshness_is_independent_of_filesystem_clock_lag (tests.contracts.test_junit.JunitEvidenceContracts.test_fixture_freshness_is_independent_of_filesystem_clock_lag) ... ok
+test_malformed_xml_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_malformed_xml_rejected) ... ok
+test_missing_report_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_missing_report_rejected) ... ok
+test_nested_suite_totals_are_validated (tests.contracts.test_junit.JunitEvidenceContracts.test_nested_suite_totals_are_validated) ... ok
+test_orphan_error_and_nonexecuted_status_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_orphan_error_and_nonexecuted_status_rejected) ... ok
+test_partial_skip_is_reported_without_becoming_passed (tests.contracts.test_junit.JunitEvidenceContracts.test_partial_skip_is_reported_without_becoming_passed) ... ok
+test_stale_previous_success_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_stale_previous_success_rejected) ... ok
+test_zero_test_report_rejected (tests.contracts.test_junit.JunitEvidenceContracts.test_zero_test_report_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.522s
+
+OK

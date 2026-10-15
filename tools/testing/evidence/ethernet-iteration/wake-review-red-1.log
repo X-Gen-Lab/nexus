@@ -1,0 +1,178 @@
+Running main() from gmock_main.cc
+[==========] Running 33 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 33 tests from EthernetMac
+[ RUN      ] EthernetMac.OwnHandoffRetainsBorrowUntilRealTransmitStatus
+[       OK ] EthernetMac.OwnHandoffRetainsBorrowUntilRealTransmitStatus (0 ms)
+[ RUN      ] EthernetMac.HeldReceiveLoanIsNeverOverwrittenAtRingWrap
+[       OK ] EthernetMac.HeldReceiveLoanIsNeverOverwrittenAtRingWrap (0 ms)
+[ RUN      ] EthernetMac.CancellationWaitsForActualEngineAndFifoDrain
+[       OK ] EthernetMac.CancellationWaitsForActualEngineAndFifoDrain (0 ms)
+[ RUN      ] EthernetMac.InvalidDomainRejectsBeforeResetOrOwnPublication
+[       OK ] EthernetMac.InvalidDomainRejectsBeforeResetOrOwnPublication (0 ms)
+[ RUN      ] EthernetMac.MdioTimeoutDoesNotInventReadValueOrClearBusy
+[       OK ] EthernetMac.MdioTimeoutDoesNotInventReadValueOrClearBusy (0 ms)
+[ RUN      ] EthernetMac.ReceiveOutputCannotAliasDmaBufferOrOtherLoans
+[       OK ] EthernetMac.ReceiveOutputCannotAliasDmaBufferOrOtherLoans (0 ms)
+[ RUN      ] EthernetMac.StateAndMdioOutputCannotOverwriteProviderStorage
+[       OK ] EthernetMac.StateAndMdioOutputCannotOverwriteProviderStorage (0 ms)
+[ RUN      ] EthernetMac.LateFatalIrqClosesAdmissionBeforeNewOwnPublication
+[       OK ] EthernetMac.LateFatalIrqClosesAdmissionBeforeNewOwnPublication (0 ms)
+[ RUN      ] EthernetMac.InitializationCannotResetForeignDescriptorEngine
+[       OK ] EthernetMac.InitializationCannotResetForeignDescriptorEngine (0 ms)
+[ RUN      ] EthernetMac.StopDoesNotReclaimStuckOwnOrHeldLoan
+[       OK ] EthernetMac.StopDoesNotReclaimStuckOwnOrHeldLoan (0 ms)
+[ RUN      ] EthernetMac.CapturedWakeRemainsBorrowedDuringItsCallback
+[       OK ] EthernetMac.CapturedWakeRemainsBorrowedDuringItsCallback (0 ms)
+[ RUN      ] EthernetMac.CrcLengthFragmentAndVlanAreDiscardedWithoutBorrow
+[       OK ] EthernetMac.CrcLengthFragmentAndVlanAreDiscardedWithoutBorrow (0 ms)
+[ RUN      ] EthernetMac.RingFullRejectsWithoutChangingRejectedRequest
+[       OK ] EthernetMac.RingFullRejectsWithoutChangingRejectedRequest (0 ms)
+[ RUN      ] EthernetMac.UnalignedPayloadRejectsWithoutDescriptorEffects
+[       OK ] EthernetMac.UnalignedPayloadRejectsWithoutDescriptorEffects (0 ms)
+[ RUN      ] EthernetMac.FatalBusErrorCannotTurnMissingStatusIntoSuccess
+[       OK ] EthernetMac.FatalBusErrorCannotTurnMissingStatusIntoSuccess (0 ms)
+[ RUN      ] EthernetMac.UnderflowIsLatchedAndDrainedWithoutReplay
+[       OK ] EthernetMac.UnderflowIsLatchedAndDrainedWithoutReplay (0 ms)
+[ RUN      ] EthernetMac.CancelPreservesAlreadyReturnedWireSuccess
+[       OK ] EthernetMac.CancelPreservesAlreadyReturnedWireSuccess (0 ms)
+[ RUN      ] EthernetMac.FrameMetadataMustRemainValidForEveryOutstandingBorrow
+[       OK ] EthernetMac.FrameMetadataMustRemainValidForEveryOutstandingBorrow (0 ms)
+[ RUN      ] EthernetMac.CoalescedCompletionsRependAfterConstantIrqBudget
+[       OK ] EthernetMac.CoalescedCompletionsRependAfterConstantIrqBudget (0 ms)
+[ RUN      ] EthernetMac.WakeBindingUsesActualPriorityAfterExternalChange
+[       OK ] EthernetMac.WakeBindingUsesActualPriorityAfterExternalChange (0 ms)
+[ RUN      ] EthernetMac.MdioCompletionAtDeadlineDoesNotPublishLateValue
+[       OK ] EthernetMac.MdioCompletionAtDeadlineDoesNotPublishLateValue (0 ms)
+[ RUN      ] EthernetMac.ResetAcknowledgementAtDeadlineRetainsStartupOwner
+[       OK ] EthernetMac.ResetAcknowledgementAtDeadlineRetainsStartupOwner (0 ms)
+[ RUN      ] EthernetMac.ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess
+[       OK ] EthernetMac.ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess (0 ms)
+[ RUN      ] EthernetMac.ModifiedReceiveTokenCannotRearmOriginalLoan
+[       OK ] EthernetMac.ModifiedReceiveTokenCannotRearmOriginalLoan (0 ms)
+[ RUN      ] EthernetMac.ReceiveTokenBindsExactProviderIdentity
+[       OK ] EthernetMac.ReceiveTokenBindsExactProviderIdentity (0 ms)
+[ RUN      ] EthernetMac.LinkChangeRequiresBothDirectionsQuiet
+[       OK ] EthernetMac.LinkChangeRequiresBothDirectionsQuiet (0 ms)
+[ RUN      ] EthernetMac.SameObservedLinkDoesNotRewriteActiveEngine
+[       OK ] EthernetMac.SameObservedLinkDoesNotRewriteActiveEngine (0 ms)
+[ RUN      ] EthernetMac.LinkDownMustDrainRxBeforeReconfiguration
+[       OK ] EthernetMac.LinkDownMustDrainRxBeforeReconfiguration (0 ms)
+[ RUN      ] EthernetMac.WakeTargetCannotResideInDmaReceiveStorage
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:583: Failure
+Expected equality of these values:
+  NX_ERROR_INVALID
+    Which is: 1
+  nx_eth_port_attach_wake(&port, in_dma, 0)
+    Which is: 0
+
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:584: Failure
+Expected equality of these values:
+  nullptr
+    Which is: NULL
+  mac.wake
+    Which is: 0x559a9efa0598
+
+[  FAILED  ] EthernetMac.WakeTargetCannotResideInDmaReceiveStorage (0 ms)
+[ RUN      ] EthernetMac.KnownWakeStorageCannotBeUsedAsMutableOutput
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:593: Failure
+Expected equality of these values:
+  NX_ERROR_INVALID
+    Which is: 1
+  nx_mdio_read(&mdio, 1, 2, reinterpret_cast<uint16_t*>(storage), now + 100)
+    Which is: 0
+
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:596: Failure
+Expected equality of these values:
+  NX_ERROR_INVALID
+    Which is: 1
+  nx_eth_port_state(&port, reinterpret_cast<nx_eth_state_t*>(storage))
+    Which is: 0
+
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:599: Failure
+Expected equality of these values:
+  0
+  std::memcmp(storage, &wake, sizeof(wake))
+    Which is: 1
+
+[  FAILED  ] EthernetMac.KnownWakeStorageCannotBeUsedAsMutableOutput (0 ms)
+[ RUN      ] EthernetMac.RequestMetadataCannotOverwriteBorrowedWakeTarget
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:615: Failure
+Expected equality of these values:
+  NX_ERROR_INVALID
+    Which is: 1
+  nx_eth_port_submit(&port, aliased)
+    Which is: 0
+
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:616: Failure
+Expected equality of these values:
+  NX_REQUEST_READY
+    Which is: 0
+  nx_request_state(&aliased->base)
+    Which is: 2
+
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:617: Failure
+Expected equality of these values:
+  nullptr
+    Which is: NULL
+  txslots[0].request
+    Which is: 0x7ffc40815f20
+
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:618: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  tx[0].status & own
+    Which is: 2147483648
+
+[  FAILED  ] EthernetMac.RequestMetadataCannotOverwriteBorrowedWakeTarget (0 ms)
+[ RUN      ] EthernetMac.WakeReplacementRechecksPublisherAfterColdValidation
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:662: Failure
+Expected equality of these values:
+  NX_ERROR_BUSY
+    Which is: 2
+  replaced
+    Which is: 0
+
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:663: Failure
+Expected equality of these values:
+  &old_wake
+    Which is: 0x7ffc40815f40
+  mac.wake
+    Which is: 0x7ffc40815f20
+
+[  FAILED  ] EthernetMac.WakeReplacementRechecksPublisherAfterColdValidation (0 ms)
+[ RUN      ] EthernetMac.StopRechecksCapturedPublisherAfterNvicDisableBoundary
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:678: Failure
+Expected equality of these values:
+  NX_ERROR_BUSY
+    Which is: 2
+  nx_eth_port_stop(&port)
+    Which is: 0
+
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:679: Failure
+Value of: mac.retained
+  Actual: false
+Expected: true
+
+/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:680: Failure
+Expected equality of these values:
+  &wake
+    Which is: 0x7ffc40815ed0
+  mac.wake
+    Which is: NULL
+
+[  FAILED  ] EthernetMac.StopRechecksCapturedPublisherAfterNvicDisableBoundary (0 ms)
+[----------] 33 tests from EthernetMac (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 33 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 28 tests.
+[  FAILED  ] 5 tests, listed below:
+[  FAILED  ] EthernetMac.WakeTargetCannotResideInDmaReceiveStorage
+[  FAILED  ] EthernetMac.KnownWakeStorageCannotBeUsedAsMutableOutput
+[  FAILED  ] EthernetMac.RequestMetadataCannotOverwriteBorrowedWakeTarget
+[  FAILED  ] EthernetMac.WakeReplacementRechecksPublisherAfterColdValidation
+[  FAILED  ] EthernetMac.StopRechecksCapturedPublisherAfterNvicDisableBoundary
+
+ 5 FAILED TESTS

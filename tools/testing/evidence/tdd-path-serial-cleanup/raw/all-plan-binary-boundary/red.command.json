@@ -1,0 +1,16 @@
+{
+  "command": [
+    "python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_tdd_gate"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 1,
+  "sources": {
+    "scripts/ci/tdd_gate.py": "692a444e67bc42eb71de81f341e12024440976035cd115c964de8ffcbd3e58ab",
+    "tools/testing/test_tdd_gate.py": "534bb7e1fd6aa45ff12625eae997215a36e1f5621f808c6a21ec59847301ba67",
+    "scripts/ci/io_lifecycle_matrix.py": "b0d5abd0b4c364bd0e4e689bd754dae3905c48c2f0305fe6660d5870eacfc840"
+  }
+}

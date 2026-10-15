@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "kind": "configuration_dma_streams_development_tdd",
+  "scope": "Actual authored resolver, generated C11/C++17, selected Native factory, ARM section-GC/retention; software development only",
+  "physical_status": "not_executed",
+  "qualifies_source_candidate": false,
+  "limits": [
+    "Source was dirty during development runs. ARM links do not establish physical DMA, wiring or timing.",
+    "RX-only cost baseline precedes owner final race fixes; original ELF/map/bin remain at original command locations and their exact hashes are preserved in each original manifest.",
+    "Copied raw logs and generated bundles preserve the actual command paths; they are historical records, not relocated build commands.",
+    "The first 14-mode compiler matrix found an invalid generated I2C stop-face identifier (four real compiler failures). The fresh final matrix resolves and links all 14 fixtures and retains every selected method.",
+    "FreeRTOS fixtures link the selected kernel backend but do not start a scheduler, call OS APIs from I/O ISR or prove task/IRQ timing."
+  ],
+  "records": [
+    {
+      "path": "tools/testing/evidence/configure-streams/upfront-dma-red.log",
+      "sha256": "80da96127c1c41a879de2c419bb22c4677ea62be943e229c7e933e4649299bc6",
+      "bytes": 3169,
+      "command": "python3 -m unittest discover -s tools/configure -p test_configure.py",
+      "cwd": "/workspace/nexus",
+      "exit_code": 1
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/upfront-dma-green.log",
+      "sha256": "c051f4a28593fbbe7ba8e2c78ea787d0a1ba653983d4d6624d4a8ca9290e06e0",
+      "bytes": 164,
+      "command": "python3 -m unittest discover -s tools/configure -p test_configure.py",
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/mode-traits-red.log",
+      "sha256": "c0e0861db2be80a9893c80848a77ccfeb9c5f7d88654974a305cfacd1bd87473",
+      "bytes": 5335,
+      "command": "python3 -m unittest discover -s tools/configure -p test_providers.py",
+      "cwd": "/workspace/nexus",
+      "exit_code": 1
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/mode-traits-green.log",
+      "sha256": "321ed9d973fc8eebde33b95d0370dfc9dcb745254356bac00c682b9aab9ed5ee",
+      "bytes": 114,
+      "command": "python3 -m unittest discover -s tools/configure -p test_providers.py",
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/adc-continuous-config-red.log",
+      "sha256": "091c46e412f465f81789fc7bc3c46a11ab2d08840ac5fd5436b6c6397e83c40d",
+      "bytes": 11635,
+      "command": "python3 -m unittest tools.configure.test_stream_modes.AdcContinuousConfigurationTests -v",
+      "cwd": "/workspace/nexus",
+      "exit_code": 1
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/adc-continuous-config-green.log",
+      "sha256": "8dc7c03cabe82d416fbad5daa63afa03f1bc054e42e67fe37e9754e3741d4cc2",
+      "bytes": 102,
+      "command": "python3 -m unittest tools.configure.test_stream_modes.AdcContinuousConfigurationTests -v",
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/uart-receive-config-red.log",
+      "sha256": "697bd05842ae6597047e056c13c98460bb5e02ae6a8bef9cb861399a86956e64",
+      "bytes": 19024,
+      "command": "python3 -m unittest tools.configure.test_stream_modes.UartReceiveConfigurationTests -v",
+      "cwd": "/workspace/nexus",
+      "exit_code": 1
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/uart-receive-config-green.log",
+      "sha256": "0070f3eea188810cc8dccfa23716bc423c65176a79cd0e854557097fdc65d6d1",
+      "bytes": 106,
+      "command": "python3 -m unittest tools.configure.test_stream_modes -v",
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/i2c-config-red.log",
+      "sha256": "8f9b444e5d894c072a5cc1141e24dd30a787c71e8195299e92bb26a39031117a",
+      "bytes": 16437,
+      "command": "python3 -m unittest tools.configure.test_i2c_modes -v",
+      "cwd": "/workspace/nexus",
+      "exit_code": 1
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/i2c-config-green.log",
+      "sha256": "2038eb3535b37f510044993ea80631c0bba303201558d1ffb19f0eccc0f7e99a",
+      "bytes": 687,
+      "command": "python3 -m unittest tools.configure.test_i2c_modes -v",
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/configure-streams-final-green.log",
+      "sha256": "056de23f0bc3b1f73f49e4d1498e42a08f2802adf0f4c170506bc70779fd2435",
+      "bytes": 30870,
+      "command": "PATH=/workspace/nexus/.venv/bin:$PATH python3 -m unittest discover -s tools/configure -p test_*.py -v",
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/strong-format-green.log",
+      "sha256": "d54256a0d253c18ed365c0f4279b85927fa9c1e5c6b8ac65a7d59b29ee18bfef",
+      "bytes": 1280,
+      "command": "python3 -m unittest tools.configure.test_factory_features -v",
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/native-factory-streams-build.log",
+      "sha256": "9b65bac207e412b5bbe4622f241cad40a24f8b14730d33c9fcd31fa8cb22f9c5",
+      "bytes": 2315,
+      "command": "PATH=/workspace/nexus/.venv/bin:$PATH cmake --build /workspace/nexus-config-iteration-evidence/native --target nexus_native_factory_test -j 4",
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/native-factory-streams-green.log",
+      "sha256": "0b6c593c8648ae9bb2c3f4f942d9e2bdeaacc39e2a962f438230956c73d281f7",
+      "bytes": 1824,
+      "command": "/workspace/nexus-config-iteration-evidence/native/bin/nexus_native_factory_test --gtest_output=xml:/workspace/nexus-config-iteration-evidence/native-factory-streams.xml",
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/i2c-actual-ops-red.log",
+      "sha256": "6af9a88efaeedbd7e0967ceedfb21560434af013f87df0066b8dbb4e5e483c88",
+      "bytes": 48615,
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tools.configure.test_i2c_modes",
+        "-v"
+      ],
+      "cwd": "/workspace/nexus",
+      "exit_code": 1
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/i2c-actual-ops-green.log",
+      "sha256": "87131f7e83284acd34a16a9e0037d6971a39c293f65369f927d2407a3a4c0fff",
+      "bytes": 687,
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tools.configure.test_i2c_modes",
+        "-v"
+      ],
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/i2c-common-support-red.log",
+      "sha256": "629337d047661e7ebecb7ded9d996d9c96df631dad79a9dfe7b16a505d9dd712",
+      "bytes": 1754,
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tools.configure.test_i2c_modes",
+        "-v"
+      ],
+      "cwd": "/workspace/nexus",
+      "exit_code": 1
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/i2c-common-support-green.log",
+      "sha256": "b064e43a6dad4c5212541779546f6cbb1694b9b0ecc2881cc0d68b4a691d0bfd",
+      "bytes": 878,
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tools.configure.test_i2c_modes",
+        "-v"
+      ],
+      "cwd": "/workspace/nexus",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/configure-streams-qualified-green.log",
+      "sha256": "c5b392ddbdaa12f636afe52cb5ca1b2ef926bbe9714b8f8c16284e8686fcdb6f",
+      "bytes": 31045,
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/configure",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "cwd": "/workspace/nexus",
+      "path_environment_prefix": "/workspace/nexus/.venv/bin",
+      "exit_code": 0
+    },
+    {
+      "path": "tools/testing/evidence/configure-streams/final-configuration-green.log",
+      "sha256": "1b0d03feee6c712a9a62fa9e2a0cde8efd57a46ff2e887df765c7b1493399e05",
+      "bytes": 31045,
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/configure",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "cwd": "/workspace/nexus",
+      "path_environment_prefix": "/workspace/nexus/.venv/bin",
+      "exit_code": 0
+    }
+  ],
+  "final_arm_modes_passed": 14,
+  "final_arm_source_changes_during_build": [],
+  "final_host_cases": {
+    "configuration_unittest": 214,
+    "native_factory_google": 9
+  },
+  "archive_index": {
+    "path": "tools/testing/evidence/configure-streams/archive-index.json",
+    "sha256": "bfe356b9793c73aaeb4ddbd745fc666fbaf99b35f065250e5fdfca18e801679a",
+    "bytes": 342239
+  },
+  "expanded_arm_matrix": {
+    "parts": [
+      "STM32F407VET6",
+      "STM32F407ZGT6",
+      "GD32F470ZGT6"
+    ],
+    "backends": [
+      "baremetal",
+      "freertos"
+    ],
+    "maintained_modes_per_part": 7,
+    "compiled_linked_budgeted_retained": 42,
+    "calls_os": false,
+    "source_changes_during_expansion": [],
+    "physical_status": "not_executed"
+  }
+}

@@ -1,0 +1,28 @@
+import urllib.request,lzma,json,hashlib,subprocess,concurrent.futures
+from pathlib import Path
+r=Path('/tmp/nexus-gcc13-ubuntu-toolchain');base='https://archive.ubuntu.com/ubuntu/'
+records={}
+for suite in ['noble','noble-updates']:
+ u=base+'dists/'+suite+'/main/binary-amd64/Packages.xz'
+ raw=urllib.request.urlopen(u,timeout=60).read();(r/(suite+'-Packages.xz')).write_bytes(raw)
+ for para in lzma.decompress(raw).decode().split('\n\n'):
+  d={}
+  for line in para.splitlines():
+   if line and not line.startswith(' ') and ': ' in line:
+    k,v=line.split(': ',1);d[k]=v
+  if d.get('Package') in ['gcc-13-x86-64-linux-gnu','g++-13-x86-64-linux-gnu','cpp-13-x86-64-linux-gnu','libgcc-13-dev','libstdc++-13-dev','gcc-13-base','libc6-dev','linux-libc-dev']:
+   d['suite']=suite;records[d['Package']]=d
+assert len(records)==8,records.keys()
+for name,d in records.items():
+ if '13' in name:assert d['Version']=='13.3.0-6ubuntu2~24.04.1',(name,d['Version'])
+def get(item):
+ name,d=item;p=r/Path(d['Filename']).name
+ b=urllib.request.urlopen(base+d['Filename'],timeout=120).read()
+ assert len(b)==int(d['Size']) and hashlib.sha256(b).hexdigest()==d['SHA256']
+ p.write_bytes(b);d['local_deb']=str(p)
+ return name,d
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as e: records=dict(e.map(get,records.items()))
+(r/'packages.json').write_text(json.dumps(records,indent=2)+'\n')
+for d in records.values():subprocess.run(['dpkg-deb','-x',d['local_deb'],str(r/'root')],check=True)
+print('Extracted 8 exact Ubuntu packages; all index sizes/SHA256 verified; system unchanged')
+print(subprocess.check_output([str(r/'root/usr/bin/x86_64-linux-gnu-g++-13'),'--version'],text=True))

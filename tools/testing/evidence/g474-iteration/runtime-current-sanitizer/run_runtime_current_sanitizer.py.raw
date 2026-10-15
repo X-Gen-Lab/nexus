@@ -1,0 +1,76 @@
+"""Run the newly rebuilt complete G474 runtime sanitizer binaries."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import time
+import xml.etree.ElementTree as ET
+
+ROOT = Path('/workspace/nexus')
+BUILD = Path('/workspace/nexus-g474-iteration-evidence/host-asan-build')
+OUT = Path('/workspace/nexus-g474-iteration-evidence/runtime-current-sanitizer')
+owned = ['soc/stm32g474/system.c', 'soc/stm32g474/README.md',
+ 'soc/stm32g474/drivers/gpio.c', 'soc/stm32g474/drivers/uart.c',
+ 'soc/stm32g474/private/stm32g474_system.h',
+ 'soc/stm32g474/private/stm32g474_provider.h',
+ 'tests/google/g474_system_test.cpp', 'tests/google/g474_provider_test.cpp',
+ 'tests/contracts/g474_model.c', 'tests/contracts/g474_model.h',
+ 'docs/design/stm32g474.md']
+
+
+def identity(path):
+ data=path.read_bytes()
+ return {'path':str(path),'sha256':hashlib.sha256(data).hexdigest(),'size':len(data)}
+
+
+before={name:identity(ROOT/name) for name in owned}
+env={k:v for k,v in os.environ.items() if not k.startswith('GTEST_')}
+env['ASAN_OPTIONS']='detect_leaks=1:abort_on_error=1'
+env['UBSAN_OPTIONS']='halt_on_error=1:print_stacktrace=1'
+records=[]
+rows=[]
+for short in ('system','provider'):
+ binary=BUILD/'bin'/('nexus_g474_'+short+'_test')
+ commands=[[str(binary),'--gtest_list_tests'],
+           [str(binary),'--gtest_output=xml:'+str(OUT/(short+'.xml'))]]
+ result_xml=OUT/(short+'.xml')
+ if result_xml.exists():raise ValueError('Fresh XML must not already exist')
+ discovered=[]
+ for index,argv in enumerate(commands):
+  start=time.time_ns()
+  result=subprocess.run(argv,capture_output=True,text=True,env=env,timeout=60)
+  log=OUT/(short+('-discovery.output' if index==0 else '-run.output'))
+  log.write_text(result.stdout+result.stderr)
+  records.append({'argv':argv,'return_code':result.returncode,
+    'started_ns':start,'completed_ns':time.time_ns(),'output':identity(log)})
+  if result.returncode:raise ValueError('Actual command failed: '+str(argv))
+  if index==0:
+   group=''
+   for line in result.stdout.splitlines():
+    if line and not line.startswith(' ') and line.rstrip().endswith('.'):
+     group=line.strip()
+    elif group and line.startswith('  ') and line.strip():
+     discovered.append(group+line.strip().split(' #',1)[0])
+ tree=ET.parse(result_xml).getroot()
+ actual=[e.attrib['classname']+'.'+e.attrib['name'] for e in tree.iter('testcase')]
+ if set(actual)!=set(discovered) or len(actual)!=len(discovered) or not actual:
+  raise ValueError('Discovery/report case identities differ or empty')
+ if any(int(tree.get(k,'0')) for k in ('failures','errors','disabled')):
+  raise ValueError('XML reports failures/errors/disabled tests')
+ if any(e.find('skipped') is not None for e in tree.iter('testcase')):
+  raise ValueError('Skipped test cannot qualify')
+ rows.append({'binary':identity(binary),'xml':identity(result_xml),
+              'discovery_cases':discovered,'tests':len(actual),'status':'passed'})
+after={name:identity(ROOT/name) for name in owned}
+report={'schema_version':1,'kind':'g474-current-model-runtime-sanitizer-execution',
+ 'scope':'Actual newly rebuilt entire system/provider Google suites, ASan+UBSan; current model cast. Dirty development software only; no HIL or clean candidate claim.',
+ 'physical_status':'not_executed','driver':identity(Path(__file__)),
+ 'commands':records,'rows':rows,'source_before':before,'source_after':after,
+ 'source_unchanged':before==after,'tests':sum(r['tests'] for r in rows),
+ 'status':'passed' if before==after else 'failed',
+ 'build_output':identity(OUT/'build-retry.output'),
+ 'compile_commands':identity(BUILD/'compile_commands.json')}
+(OUT/'manifest.json').write_text(json.dumps(report,indent=2)+'\n')
+print('Actual complete sanitizer:',report['tests'],report['status'])
+raise SystemExit(0 if report['status']=='passed' else 1)

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_io_lifecycle_matrix",
+    "tools.testing.test_tdd_matrix_integration"
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0
+}

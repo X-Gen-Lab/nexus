@@ -1,0 +1,39 @@
+{
+  "entries": [
+    {
+      "command": "/usr/bin/cc -I/workspace/nexus/core/include -I/tmp/nexus-freertos-failstop-fortify-validation/native-debug/generated -g -std=c11 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o core/CMakeFiles/nexus_core.dir/src/request.c.o -c /workspace/nexus/core/src/request.c",
+      "directory": "/tmp/nexus-freertos-failstop-fortify-validation/native-debug",
+      "file": "/workspace/nexus/core/src/request.c",
+      "output": "core/CMakeFiles/nexus_core.dir/src/request.c.o"
+    },
+    {
+      "command": "/usr/bin/cc -I/workspace/nexus/core/include -I/tmp/nexus-freertos-failstop-fortify-validation/native-debug/generated -g -std=c11 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o core/CMakeFiles/nexus_core.dir/src/fault.c.o -c /workspace/nexus/core/src/fault.c",
+      "directory": "/tmp/nexus-freertos-failstop-fortify-validation/native-debug",
+      "file": "/workspace/nexus/core/src/fault.c",
+      "output": "core/CMakeFiles/nexus_core.dir/src/fault.c.o"
+    },
+    {
+      "command": "/usr/bin/cc -I/workspace/nexus/tests/contracts/os_freertos_runtime -I/workspace/nexus/os/freertos/include -I/workspace/nexus/ext/freertos/include -I/workspace/nexus/ext/freertos/portable/ThirdParty/GCC/Posix -I/workspace/nexus/os/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -g -std=c11 -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o tests/contracts/os_freertos_runtime/CMakeFiles/contract_os_freertos_hooks.dir/__/__/__/os/freertos/hooks.c.o -c /workspace/nexus/os/freertos/hooks.c",
+      "directory": "/tmp/nexus-freertos-failstop-fortify-validation/native-debug",
+      "file": "/workspace/nexus/os/freertos/hooks.c",
+      "output": "tests/contracts/os_freertos_runtime/CMakeFiles/contract_os_freertos_hooks.dir/__/__/__/os/freertos/hooks.c.o"
+    },
+    {
+      "command": "/usr/bin/c++ -I/workspace/nexus/tests/contracts/os_freertos_runtime -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/include -I/workspace/nexus/arch/include -I/tmp/nexus-freertos-failstop-fortify-validation/native-debug/generated -I/workspace/nexus/core/include -isystem /workspace/nexus/ext/freertos/include -isystem /workspace/nexus/ext/freertos/portable/ThirdParty/GCC/Posix -isystem /tmp/nexus-freertos-failstop-fortify-validation/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /tmp/nexus-freertos-failstop-fortify-validation/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /tmp/nexus-freertos-failstop-fortify-validation/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /tmp/nexus-freertos-failstop-fortify-validation/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c++17 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -o tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/freertos_failstop_test.cpp.o -c /workspace/nexus/tests/google/freertos_failstop_test.cpp",
+      "directory": "/tmp/nexus-freertos-failstop-fortify-validation/native-debug",
+      "file": "/workspace/nexus/tests/google/freertos_failstop_test.cpp",
+      "output": "tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/freertos_failstop_test.cpp.o"
+    },
+    {
+      "command": "/usr/bin/cc -I/workspace/nexus/tests/contracts/os_freertos_runtime -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/include -I/workspace/nexus/arch/include -I/tmp/nexus-freertos-failstop-fortify-validation/native-debug/generated -I/workspace/nexus/core/include -isystem /workspace/nexus/ext/freertos/include -isystem /workspace/nexus/ext/freertos/portable/ThirdParty/GCC/Posix -isystem /tmp/nexus-freertos-failstop-fortify-validation/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /tmp/nexus-freertos-failstop-fortify-validation/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /tmp/nexus-freertos-failstop-fortify-validation/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /tmp/nexus-freertos-failstop-fortify-validation/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c11 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/__/__/os/freertos/hooks.c.o -c /workspace/nexus/os/freertos/hooks.c",
+      "directory": "/tmp/nexus-freertos-failstop-fortify-validation/native-debug",
+      "file": "/workspace/nexus/os/freertos/hooks.c",
+      "output": "tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/__/__/os/freertos/hooks.c.o"
+    }
+  ],
+  "full_database": {
+    "bytes": 960420,
+    "path": "/tmp/nexus-freertos-failstop-fortify-validation/native-debug/compile_commands.json",
+    "sha256": "0915f6a5d1e2959085c559fb6bf96cf51feac05722150a20762cbc2e4f75a777"
+  }
+}

@@ -1,0 +1,27 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-iteration-bus-design/g474-build"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus-iteration-bus-design/g474-src/evidence/gpio-rollback-green-0.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/g474-build/g474_system_test",
+      "--gtest_output=xml:/workspace/nexus-iteration-bus-design/g474-src/evidence/gpio-rollback-system-green.xml"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus-iteration-bus-design/g474-src/evidence/gpio-rollback-green-1.log"
+  },
+  {
+    "command": [
+      "/workspace/nexus-iteration-bus-design/g474-build/g474_provider_test",
+      "--gtest_output=xml:/workspace/nexus-iteration-bus-design/g474-src/evidence/gpio-rollback-provider-green.xml"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus-iteration-bus-design/g474-src/evidence/gpio-rollback-green-2.log"
+  }
+]

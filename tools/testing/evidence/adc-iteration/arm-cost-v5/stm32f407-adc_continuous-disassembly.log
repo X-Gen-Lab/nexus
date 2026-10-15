@@ -1,0 +1,740 @@
+
+/workspace/nexus/tools/testing/evidence/adc-iteration/arm-cost-v5/stm32f407-adc_continuous.o:     file format elf32-littlearm
+
+
+Disassembly of section .text.attach_wake:
+
+00000000 <attach_wake>:
+   0:	b082      	sub	sp, #8
+   2:	b120      	cbz	r0, e <attach_wake+0xe>
+   4:	4b03      	ldr	r3, [pc, #12]	@ (14 <attach_wake+0x14>)
+   6:	695b      	ldr	r3, [r3, #20]
+   8:	9301      	str	r3, [sp, #4]
+   a:	b002      	add	sp, #8
+   c:	4718      	bx	r3
+   e:	2001      	movs	r0, #1
+  10:	b002      	add	sp, #8
+  12:	4770      	bx	lr
+  14:	00000000 	.word	0x00000000
+
+Disassembly of section .text.block_observation:
+
+00000000 <block_observation>:
+   0:	b130      	cbz	r0, 10 <block_observation+0x10>
+   2:	7e43      	ldrb	r3, [r0, #25]
+   4:	b123      	cbz	r3, 10 <block_observation+0x10>
+   6:	f8d0 00c0 	ldr.w	r0, [r0, #192]	@ 0xc0
+   a:	b108      	cbz	r0, 10 <block_observation+0x10>
+   c:	f7ff bffe 	b.w	0 <nx_adc_observer_read>
+  10:	2007      	movs	r0, #7
+  12:	4770      	bx	lr
+
+Disassembly of section .text.arm:
+
+00000000 <arm>:
+   0:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+   2:	f100 0680 	add.w	r6, r0, #128	@ 0x80
+   6:	4604      	mov	r4, r0
+   8:	4630      	mov	r0, r6
+   a:	f7ff fffe 	bl	0 <nx_stream_post_can_reserve>
+   e:	b960      	cbnz	r0, 2a <arm+0x2a>
+  10:	6b23      	ldr	r3, [r4, #48]	@ 0x30
+  12:	e9d3 2306 	ldrd	r2, r3, [r3, #24]
+  16:	f1b3 3fff 	cmp.w	r3, #4294967295	@ 0xffffffff
+  1a:	bf08      	it	eq
+  1c:	f1b2 3fff 	cmpeq.w	r2, #4294967295	@ 0xffffffff
+  20:	bf0c      	ite	eq
+  22:	250d      	moveq	r5, #13
+  24:	2502      	movne	r5, #2
+  26:	4628      	mov	r0, r5
+  28:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
+  2a:	f104 0790 	add.w	r7, r4, #144	@ 0x90
+  2e:	4639      	mov	r1, r7
+  30:	4630      	mov	r0, r6
+  32:	f7ff fffe 	bl	0 <nx_stream_post_reserve>
+  36:	4605      	mov	r5, r0
+  38:	2800      	cmp	r0, #0
+  3a:	d1f4      	bne.n	26 <arm+0x26>
+  3c:	4630      	mov	r0, r6
+  3e:	f7ff fffe 	bl	0 <nx_stream_post_can_reserve>
+  42:	b928      	cbnz	r0, 50 <arm+0x50>
+  44:	2201      	movs	r2, #1
+  46:	4639      	mov	r1, r7
+  48:	4630      	mov	r0, r6
+  4a:	f7ff fffe 	bl	0 <nx_stream_post_abort>
+  4e:	e7df      	b.n	10 <arm+0x10>
+  50:	f104 01a8 	add.w	r1, r4, #168	@ 0xa8
+  54:	4630      	mov	r0, r6
+  56:	f7ff fffe 	bl	0 <nx_stream_post_reserve>
+  5a:	4605      	mov	r5, r0
+  5c:	b128      	cbz	r0, 6a <arm+0x6a>
+  5e:	2201      	movs	r2, #1
+  60:	4639      	mov	r1, r7
+  62:	4630      	mov	r0, r6
+  64:	f7ff fffe 	bl	0 <nx_stream_post_abort>
+  68:	e7dd      	b.n	26 <arm+0x26>
+  6a:	6923      	ldr	r3, [r4, #16]
+  6c:	6826      	ldr	r6, [r4, #0]
+  6e:	f884 00c5 	strb.w	r0, [r4, #197]	@ 0xc5
+  72:	2b01      	cmp	r3, #1
+  74:	bf94      	ite	ls
+  76:	2300      	movls	r3, #0
+  78:	2301      	movhi	r3, #1
+  7a:	021b      	lsls	r3, r3, #8
+  7c:	f884 0074 	strb.w	r0, [r4, #116]	@ 0x74
+  80:	60b0      	str	r0, [r6, #8]
+  82:	4620      	mov	r0, r4
+  84:	6073      	str	r3, [r6, #4]
+  86:	f7ff fffe 	bl	0 <nx_stm32_adc_stream_sequence>
+  8a:	69e3      	ldr	r3, [r4, #28]
+  8c:	4632      	mov	r2, r6
+  8e:	2120      	movs	r1, #32
+  90:	f842 5b4c 	str.w	r5, [r2], #76
+  94:	601d      	str	r5, [r3, #0]
+  96:	6059      	str	r1, [r3, #4]
+  98:	f8b4 1070 	ldrh.w	r1, [r4, #112]	@ 0x70
+  9c:	60dd      	str	r5, [r3, #12]
+  9e:	2701      	movs	r7, #1
+  a0:	6299      	str	r1, [r3, #40]	@ 0x28
+  a2:	f8b4 1072 	ldrh.w	r1, [r4, #114]	@ 0x72
+  a6:	62d9      	str	r1, [r3, #44]	@ 0x2c
+  a8:	625d      	str	r5, [r3, #36]	@ 0x24
+  aa:	615f      	str	r7, [r3, #20]
+  ac:	611d      	str	r5, [r3, #16]
+  ae:	6a23      	ldr	r3, [r4, #32]
+  b0:	213d      	movs	r1, #61	@ 0x3d
+  b2:	60d9      	str	r1, [r3, #12]
+  b4:	4b16      	ldr	r3, [pc, #88]	@ (110 <arm+0x110>)
+  b6:	f04f 5180 	mov.w	r1, #268435456	@ 0x10000000
+  ba:	f8c3 1184 	str.w	r1, [r3, #388]	@ 0x184
+  be:	6a63      	ldr	r3, [r4, #36]	@ 0x24
+  c0:	609a      	str	r2, [r3, #8]
+  c2:	f8d4 2090 	ldr.w	r2, [r4, #144]	@ 0x90
+  c6:	60da      	str	r2, [r3, #12]
+  c8:	f8d4 20a8 	ldr.w	r2, [r4, #168]	@ 0xa8
+  cc:	611a      	str	r2, [r3, #16]
+  ce:	f8d4 2094 	ldr.w	r2, [r4, #148]	@ 0x94
+  d2:	40fa      	lsrs	r2, r7
+  d4:	605a      	str	r2, [r3, #4]
+  d6:	2280      	movs	r2, #128	@ 0x80
+  d8:	615a      	str	r2, [r3, #20]
+  da:	4a0e      	ldr	r2, [pc, #56]	@ (114 <arm+0x114>)
+  dc:	601a      	str	r2, [r3, #0]
+  de:	f7ff fffe 	bl	0 <nx_arch_dsb>
+  e2:	6a62      	ldr	r2, [r4, #36]	@ 0x24
+  e4:	6813      	ldr	r3, [r2, #0]
+  e6:	433b      	orrs	r3, r7
+  e8:	6013      	str	r3, [r2, #0]
+  ea:	4b0b      	ldr	r3, [pc, #44]	@ (118 <arm+0x118>)
+  ec:	60b3      	str	r3, [r6, #8]
+  ee:	f7ff fffe 	bl	0 <nx_arch_dsb>
+  f2:	68b3      	ldr	r3, [r6, #8]
+  f4:	f7ff fffe 	bl	0 <nx_time_now_us>
+  f8:	2203      	movs	r2, #3
+  fa:	2300      	movs	r3, #0
+  fc:	f7ff fffe 	bl	0 <nx_deadline_after>
+ 100:	f884 7075 	strb.w	r7, [r4, #117]	@ 0x75
+ 104:	e9c4 0116 	strd	r0, r1, [r4, #88]	@ 0x58
+ 108:	f884 50c6 	strb.w	r5, [r4, #198]	@ 0xc6
+ 10c:	e78b      	b.n	26 <arm+0x26>
+ 10e:	bf00      	nop
+ 110:	e000e100 	.word	0xe000e100
+ 114:	00062d16 	.word	0x00062d16
+ 118:	08000301 	.word	0x08000301
+
+Disassembly of section .text.start:
+
+00000000 <start>:
+   0:	e92d 43f7 	stmdb	sp!, {r0, r1, r2, r4, r5, r6, r7, r8, r9, lr}
+   4:	460e      	mov	r6, r1
+   6:	4617      	mov	r7, r2
+   8:	4605      	mov	r5, r0
+   a:	b920      	cbnz	r0, 16 <start+0x16>
+   c:	2401      	movs	r4, #1
+   e:	4620      	mov	r0, r4
+  10:	b003      	add	sp, #12
+  12:	e8bd 83f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, pc}
+  16:	2900      	cmp	r1, #0
+  18:	d0f8      	beq.n	c <start+0xc>
+  1a:	680b      	ldr	r3, [r1, #0]
+  1c:	2b00      	cmp	r3, #0
+  1e:	d0f5      	beq.n	c <start+0xc>
+  20:	684b      	ldr	r3, [r1, #4]
+  22:	2b02      	cmp	r3, #2
+  24:	d9f2      	bls.n	c <start+0xc>
+  26:	f7ff fffe 	bl	0 <nx_arch_in_isr>
+  2a:	b108      	cbz	r0, 30 <start+0x30>
+  2c:	240e      	movs	r4, #14
+  2e:	e7ee      	b.n	e <start+0xe>
+  30:	f7ff fffe 	bl	0 <nx_arch_irq_is_masked>
+  34:	2800      	cmp	r0, #0
+  36:	d1f9      	bne.n	2c <start+0x2c>
+  38:	7e6b      	ldrb	r3, [r5, #25]
+  3a:	2b00      	cmp	r3, #0
+  3c:	d069      	beq.n	112 <start+0x112>
+  3e:	f10d 0306 	add.w	r3, sp, #6
+  42:	aa01      	add	r2, sp, #4
+  44:	4639      	mov	r1, r7
+  46:	4628      	mov	r0, r5
+  48:	f7ff fffe 	bl	0 <nx_stm32_adc_stream_rate>
+  4c:	4604      	mov	r4, r0
+  4e:	2800      	cmp	r0, #0
+  50:	d1dd      	bne.n	e <start+0xe>
+  52:	4631      	mov	r1, r6
+  54:	4628      	mov	r0, r5
+  56:	f7ff fffe 	bl	0 <nx_stm32_adc_stream_blocks>
+  5a:	4604      	mov	r4, r0
+  5c:	2800      	cmp	r0, #0
+  5e:	d1d6      	bne.n	e <start+0xe>
+  60:	6871      	ldr	r1, [r6, #4]
+  62:	2301      	movs	r3, #1
+  64:	2028      	movs	r0, #40	@ 0x28
+  66:	4299      	cmp	r1, r3
+  68:	d813      	bhi.n	92 <start+0x92>
+  6a:	f7ff fffe 	bl	0 <nx_arch_irq_save>
+  6e:	6b2b      	ldr	r3, [r5, #48]	@ 0x30
+  70:	4680      	mov	r8, r0
+  72:	b94b      	cbnz	r3, 88 <start+0x88>
+  74:	7e2b      	ldrb	r3, [r5, #24]
+  76:	b93b      	cbnz	r3, 88 <start+0x88>
+  78:	6a6b      	ldr	r3, [r5, #36]	@ 0x24
+  7a:	681b      	ldr	r3, [r3, #0]
+  7c:	07da      	lsls	r2, r3, #31
+  7e:	d403      	bmi.n	88 <start+0x88>
+  80:	69eb      	ldr	r3, [r5, #28]
+  82:	681b      	ldr	r3, [r3, #0]
+  84:	07db      	lsls	r3, r3, #31
+  86:	d50d      	bpl.n	a4 <start+0xa4>
+  88:	4640      	mov	r0, r8
+  8a:	f7ff fffe 	bl	0 <nx_arch_irq_restore>
+  8e:	2402      	movs	r4, #2
+  90:	e7bd      	b.n	e <start+0xe>
+  92:	6832      	ldr	r2, [r6, #0]
+  94:	fb00 2403 	mla	r4, r0, r3, r2
+  98:	6852      	ldr	r2, [r2, #4]
+  9a:	6864      	ldr	r4, [r4, #4]
+  9c:	4294      	cmp	r4, r2
+  9e:	d1b5      	bne.n	c <start+0xc>
+  a0:	3301      	adds	r3, #1
+  a2:	e7e0      	b.n	66 <start+0x66>
+  a4:	f8d5 00c0 	ldr.w	r0, [r5, #192]	@ 0xc0
+  a8:	bb38      	cbnz	r0, fa <start+0xfa>
+  aa:	4631      	mov	r1, r6
+  ac:	f105 0080 	add.w	r0, r5, #128	@ 0x80
+  b0:	f7ff fffe 	bl	0 <nx_stream_post_initialize>
+  b4:	4604      	mov	r4, r0
+  b6:	4681      	mov	r9, r0
+  b8:	b9d0      	cbnz	r0, f0 <start+0xf0>
+  ba:	f8bd 3004 	ldrh.w	r3, [sp, #4]
+  be:	f8a5 3070 	strh.w	r3, [r5, #112]	@ 0x70
+  c2:	f8bd 3006 	ldrh.w	r3, [sp, #6]
+  c6:	f8a5 3072 	strh.w	r3, [r5, #114]	@ 0x72
+  ca:	2301      	movs	r3, #1
+  cc:	f885 0078 	strb.w	r0, [r5, #120]	@ 0x78
+  d0:	f885 00c4 	strb.w	r0, [r5, #196]	@ 0xc4
+  d4:	f885 0077 	strb.w	r0, [r5, #119]	@ 0x77
+  d8:	632e      	str	r6, [r5, #48]	@ 0x30
+  da:	66af      	str	r7, [r5, #104]	@ 0x68
+  dc:	762b      	strb	r3, [r5, #24]
+  de:	4628      	mov	r0, r5
+  e0:	f7ff fffe 	bl	0 <start>
+  e4:	4604      	mov	r4, r0
+  e6:	b180      	cbz	r0, 10a <start+0x10a>
+  e8:	f8c5 9030 	str.w	r9, [r5, #48]	@ 0x30
+  ec:	f885 9018 	strb.w	r9, [r5, #24]
+  f0:	f8d5 00c0 	ldr.w	r0, [r5, #192]	@ 0xc0
+  f4:	f7ff fffe 	bl	0 <nx_adc_observer_unbind>
+  f8:	e007      	b.n	10a <start+0x10a>
+  fa:	23c8      	movs	r3, #200	@ 0xc8
+  fc:	462a      	mov	r2, r5
+  fe:	4631      	mov	r1, r6
+ 100:	f7ff fffe 	bl	0 <nx_adc_observer_bind>
+ 104:	4604      	mov	r4, r0
+ 106:	2800      	cmp	r0, #0
+ 108:	d0cf      	beq.n	aa <start+0xaa>
+ 10a:	4640      	mov	r0, r8
+ 10c:	f7ff fffe 	bl	0 <nx_arch_irq_restore>
+ 110:	e77d      	b.n	e <start+0xe>
+ 112:	2403      	movs	r4, #3
+ 114:	e77b      	b.n	e <start+0xe>
+
+Disassembly of section .text.sequence_info:
+
+00000000 <sequence_info>:
+   0:	b5f0      	push	{r4, r5, r6, r7, lr}
+   2:	b300      	cbz	r0, 46 <sequence_info+0x46>
+   4:	b1f9      	cbz	r1, 46 <sequence_info+0x46>
+   6:	7e43      	ldrb	r3, [r0, #25]
+   8:	b1eb      	cbz	r3, 46 <sequence_info+0x46>
+   a:	e9d0 5603 	ldrd	r5, r6, [r0, #12]
+   e:	2300      	movs	r3, #0
+  10:	4c0e      	ldr	r4, [pc, #56]	@ (4c <sequence_info+0x4c>)
+  12:	461a      	mov	r2, r3
+  14:	42b3      	cmp	r3, r6
+  16:	d10f      	bne.n	38 <sequence_info+0x38>
+  18:	e9d0 6718 	ldrd	r6, r7, [r0, #96]	@ 0x60
+  1c:	6880      	ldr	r0, [r0, #8]
+  1e:	e9c1 4302 	strd	r4, r3, [r1, #8]
+  22:	e9c1 6206 	strd	r6, r2, [r1, #24]
+  26:	2308      	movs	r3, #8
+  28:	e9c1 3704 	strd	r3, r7, [r1, #16]
+  2c:	230c      	movs	r3, #12
+  2e:	e9c1 0500 	strd	r0, r5, [r1]
+  32:	840b      	strh	r3, [r1, #32]
+  34:	2000      	movs	r0, #0
+  36:	bdf0      	pop	{r4, r5, r6, r7, pc}
+  38:	5cef      	ldrb	r7, [r5, r3]
+  3a:	f834 7017 	ldrh.w	r7, [r4, r7, lsl #1]
+  3e:	320c      	adds	r2, #12
+  40:	443a      	add	r2, r7
+  42:	3301      	adds	r3, #1
+  44:	e7e6      	b.n	14 <sequence_info+0x14>
+  46:	2001      	movs	r0, #1
+  48:	e7f5      	b.n	36 <sequence_info+0x36>
+  4a:	bf00      	nop
+  4c:	00000000 	.word	0x00000000
+
+Disassembly of section .text.rollback:
+
+00000000 <rollback>:
+   0:	69c2      	ldr	r2, [r0, #28]
+   2:	2300      	movs	r3, #0
+   4:	b510      	push	{r4, lr}
+   6:	f880 3075 	strb.w	r3, [r0, #117]	@ 0x75
+   a:	6813      	ldr	r3, [r2, #0]
+   c:	f023 0301 	bic.w	r3, r3, #1
+  10:	6013      	str	r3, [r2, #0]
+  12:	6802      	ldr	r2, [r0, #0]
+  14:	4b2f      	ldr	r3, [pc, #188]	@ (d4 <rollback+0xd4>)
+  16:	6891      	ldr	r1, [r2, #8]
+  18:	4604      	mov	r4, r0
+  1a:	400b      	ands	r3, r1
+  1c:	6093      	str	r3, [r2, #8]
+  1e:	f7ff fffe 	bl	0 <nx_arch_dsb>
+  22:	6a63      	ldr	r3, [r4, #36]	@ 0x24
+  24:	681a      	ldr	r2, [r3, #0]
+  26:	f022 021f 	bic.w	r2, r2, #31
+  2a:	601a      	str	r2, [r3, #0]
+  2c:	695a      	ldr	r2, [r3, #20]
+  2e:	f022 0280 	bic.w	r2, r2, #128	@ 0x80
+  32:	615a      	str	r2, [r3, #20]
+  34:	f7ff fffe 	bl	0 <nx_arch_dsb>
+  38:	6a23      	ldr	r3, [r4, #32]
+  3a:	223d      	movs	r2, #61	@ 0x3d
+  3c:	60da      	str	r2, [r3, #12]
+  3e:	4b26      	ldr	r3, [pc, #152]	@ (d8 <rollback+0xd8>)
+  40:	f04f 5280 	mov.w	r2, #268435456	@ 0x10000000
+  44:	f8c3 2184 	str.w	r2, [r3, #388]	@ 0x184
+  48:	6a63      	ldr	r3, [r4, #36]	@ 0x24
+  4a:	681a      	ldr	r2, [r3, #0]
+  4c:	06d1      	lsls	r1, r2, #27
+  4e:	d13e      	bne.n	ce <rollback+0xce>
+  50:	695b      	ldr	r3, [r3, #20]
+  52:	061a      	lsls	r2, r3, #24
+  54:	d43b      	bmi.n	ce <rollback+0xce>
+  56:	69e3      	ldr	r3, [r4, #28]
+  58:	681b      	ldr	r3, [r3, #0]
+  5a:	07db      	lsls	r3, r3, #31
+  5c:	d437      	bmi.n	ce <rollback+0xce>
+  5e:	6823      	ldr	r3, [r4, #0]
+  60:	689a      	ldr	r2, [r3, #8]
+  62:	4b1e      	ldr	r3, [pc, #120]	@ (dc <rollback+0xdc>)
+  64:	421a      	tst	r2, r3
+  66:	d132      	bne.n	ce <rollback+0xce>
+  68:	f894 3074 	ldrb.w	r3, [r4, #116]	@ 0x74
+  6c:	b14b      	cbz	r3, 82 <rollback+0x82>
+  6e:	2201      	movs	r2, #1
+  70:	f104 0138 	add.w	r1, r4, #56	@ 0x38
+  74:	f104 0080 	add.w	r0, r4, #128	@ 0x80
+  78:	f7ff fffe 	bl	0 <nx_stream_post_abort>
+  7c:	b950      	cbnz	r0, 94 <rollback+0x94>
+  7e:	f884 0074 	strb.w	r0, [r4, #116]	@ 0x74
+  82:	f8d4 3088 	ldr.w	r3, [r4, #136]	@ 0x88
+  86:	2b02      	cmp	r3, #2
+  88:	d005      	beq.n	96 <rollback+0x96>
+  8a:	f8d4 2088 	ldr.w	r2, [r4, #136]	@ 0x88
+  8e:	2a01      	cmp	r2, #1
+  90:	d011      	beq.n	b6 <rollback+0xb6>
+  92:	2000      	movs	r0, #0
+  94:	bd10      	pop	{r4, pc}
+  96:	f894 10c5 	ldrb.w	r1, [r4, #197]	@ 0xc5
+  9a:	2318      	movs	r3, #24
+  9c:	f081 0101 	eor.w	r1, r1, #1
+  a0:	fb03 4101 	mla	r1, r3, r1, r4
+  a4:	2201      	movs	r2, #1
+  a6:	3190      	adds	r1, #144	@ 0x90
+  a8:	f104 0080 	add.w	r0, r4, #128	@ 0x80
+  ac:	f7ff fffe 	bl	0 <nx_stream_post_abort>
+  b0:	2800      	cmp	r0, #0
+  b2:	d0ea      	beq.n	8a <rollback+0x8a>
+  b4:	e7ee      	b.n	94 <rollback+0x94>
+  b6:	f894 10c5 	ldrb.w	r1, [r4, #197]	@ 0xc5
+  ba:	2318      	movs	r3, #24
+  bc:	fb03 4101 	mla	r1, r3, r1, r4
+  c0:	f104 0080 	add.w	r0, r4, #128	@ 0x80
+  c4:	3190      	adds	r1, #144	@ 0x90
+  c6:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+  ca:	f7ff bffe 	b.w	0 <nx_stream_post_abort>
+  ce:	2002      	movs	r0, #2
+  d0:	e7e0      	b.n	94 <rollback+0x94>
+  d2:	bf00      	nop
+  d4:	cffffcfe 	.word	0xcffffcfe
+  d8:	e000e100 	.word	0xe000e100
+  dc:	30000301 	.word	0x30000301
+
+Disassembly of section .text.halt:
+
+00000000 <halt>:
+   0:	1e0b      	subs	r3, r1, #0
+   2:	bf18      	it	ne
+   4:	2301      	movne	r3, #1
+   6:	b510      	push	{r4, lr}
+   8:	f880 3078 	strb.w	r3, [r0, #120]	@ 0x78
+   c:	f8d0 30c0 	ldr.w	r3, [r0, #192]	@ 0xc0
+  10:	f880 10c4 	strb.w	r1, [r0, #196]	@ 0xc4
+  14:	2201      	movs	r2, #1
+  16:	4604      	mov	r4, r0
+  18:	f880 20c6 	strb.w	r2, [r0, #198]	@ 0xc6
+  1c:	b103      	cbz	r3, 20 <halt+0x20>
+  1e:	761a      	strb	r2, [r3, #24]
+  20:	6b20      	ldr	r0, [r4, #48]	@ 0x30
+  22:	2101      	movs	r1, #1
+  24:	f7ff fffe 	bl	0 <nx_stream_note_loss>
+  28:	4620      	mov	r0, r4
+  2a:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+  2e:	f7ff bffe 	b.w	0 <halt>
+
+Disassembly of section .text.attach_observer:
+
+00000000 <attach_observer>:
+   0:	b538      	push	{r3, r4, r5, lr}
+   2:	460d      	mov	r5, r1
+   4:	4604      	mov	r4, r0
+   6:	b310      	cbz	r0, 4e <attach_observer+0x4e>
+   8:	7e43      	ldrb	r3, [r0, #25]
+   a:	b303      	cbz	r3, 4e <attach_observer+0x4e>
+   c:	f7ff fffe 	bl	0 <nx_arch_in_isr>
+  10:	b110      	cbz	r0, 18 <attach_observer+0x18>
+  12:	240e      	movs	r4, #14
+  14:	4620      	mov	r0, r4
+  16:	bd38      	pop	{r3, r4, r5, pc}
+  18:	f7ff fffe 	bl	0 <nx_arch_irq_is_masked>
+  1c:	2800      	cmp	r0, #0
+  1e:	d1f8      	bne.n	12 <attach_observer+0x12>
+  20:	f7ff fffe 	bl	0 <nx_arch_irq_save>
+  24:	6b23      	ldr	r3, [r4, #48]	@ 0x30
+  26:	b973      	cbnz	r3, 46 <attach_observer+0x46>
+  28:	7e23      	ldrb	r3, [r4, #24]
+  2a:	b963      	cbnz	r3, 46 <attach_observer+0x46>
+  2c:	b12d      	cbz	r5, 3a <attach_observer+0x3a>
+  2e:	686b      	ldr	r3, [r5, #4]
+  30:	b15b      	cbz	r3, 4a <attach_observer+0x4a>
+  32:	68ab      	ldr	r3, [r5, #8]
+  34:	b14b      	cbz	r3, 4a <attach_observer+0x4a>
+  36:	682b      	ldr	r3, [r5, #0]
+  38:	b93b      	cbnz	r3, 4a <attach_observer+0x4a>
+  3a:	f8c4 50c0 	str.w	r5, [r4, #192]	@ 0xc0
+  3e:	2400      	movs	r4, #0
+  40:	f7ff fffe 	bl	0 <nx_arch_irq_restore>
+  44:	e7e6      	b.n	14 <attach_observer+0x14>
+  46:	2402      	movs	r4, #2
+  48:	e7fa      	b.n	40 <attach_observer+0x40>
+  4a:	2401      	movs	r4, #1
+  4c:	e7f8      	b.n	40 <attach_observer+0x40>
+  4e:	2403      	movs	r4, #3
+  50:	e7e0      	b.n	14 <attach_observer+0x14>
+
+Disassembly of section .text.service:
+
+00000000 <service>:
+   0:	e92d 4370 	stmdb	sp!, {r4, r5, r6, r8, r9, lr}
+   4:	4604      	mov	r4, r0
+   6:	2800      	cmp	r0, #0
+   8:	d059      	beq.n	be <service+0xbe>
+   a:	f7ff fffe 	bl	0 <nx_arch_in_isr>
+   e:	b118      	cbz	r0, 18 <service+0x18>
+  10:	250e      	movs	r5, #14
+  12:	4628      	mov	r0, r5
+  14:	e8bd 8370 	ldmia.w	sp!, {r4, r5, r6, r8, r9, pc}
+  18:	f7ff fffe 	bl	0 <nx_arch_irq_is_masked>
+  1c:	2800      	cmp	r0, #0
+  1e:	d1f7      	bne.n	10 <service+0x10>
+  20:	6b23      	ldr	r3, [r4, #48]	@ 0x30
+  22:	2b00      	cmp	r3, #0
+  24:	d04d      	beq.n	c2 <service+0xc2>
+  26:	f894 3077 	ldrb.w	r3, [r4, #119]	@ 0x77
+  2a:	2b00      	cmp	r3, #0
+  2c:	d149      	bne.n	c2 <service+0xc2>
+  2e:	f7ff fffe 	bl	0 <nx_arch_irq_save>
+  32:	f894 30c6 	ldrb.w	r3, [r4, #198]	@ 0xc6
+  36:	4606      	mov	r6, r0
+  38:	b143      	cbz	r3, 4c <service+0x4c>
+  3a:	4620      	mov	r0, r4
+  3c:	f7ff fffe 	bl	0 <service>
+  40:	4605      	mov	r5, r0
+  42:	b370      	cbz	r0, a2 <service+0xa2>
+  44:	4630      	mov	r0, r6
+  46:	f7ff fffe 	bl	0 <nx_arch_irq_restore>
+  4a:	e7e2      	b.n	12 <service+0x12>
+  4c:	6823      	ldr	r3, [r4, #0]
+  4e:	681b      	ldr	r3, [r3, #0]
+  50:	069b      	lsls	r3, r3, #26
+  52:	d507      	bpl.n	64 <service+0x64>
+  54:	2106      	movs	r1, #6
+  56:	4620      	mov	r0, r4
+  58:	f7ff fffe 	bl	0 <service>
+  5c:	f894 30c6 	ldrb.w	r3, [r4, #198]	@ 0xc6
+  60:	2b00      	cmp	r3, #0
+  62:	d1ea      	bne.n	3a <service+0x3a>
+  64:	f894 3075 	ldrb.w	r3, [r4, #117]	@ 0x75
+  68:	b1cb      	cbz	r3, 9e <service+0x9e>
+  6a:	e9d4 8916 	ldrd	r8, r9, [r4, #88]	@ 0x58
+  6e:	f7ff fffe 	bl	0 <nx_time_now_us>
+  72:	4602      	mov	r2, r0
+  74:	460b      	mov	r3, r1
+  76:	4640      	mov	r0, r8
+  78:	4649      	mov	r1, r9
+  7a:	f7ff fffe 	bl	0 <nx_deadline_expired>
+  7e:	b1b8      	cbz	r0, b0 <service+0xb0>
+  80:	6822      	ldr	r2, [r4, #0]
+  82:	6893      	ldr	r3, [r2, #8]
+  84:	f043 5380 	orr.w	r3, r3, #268435456	@ 0x10000000
+  88:	6093      	str	r3, [r2, #8]
+  8a:	f7ff fffe 	bl	0 <nx_arch_dsb>
+  8e:	69e2      	ldr	r2, [r4, #28]
+  90:	6813      	ldr	r3, [r2, #0]
+  92:	f043 0301 	orr.w	r3, r3, #1
+  96:	6013      	str	r3, [r2, #0]
+  98:	2300      	movs	r3, #0
+  9a:	f884 3075 	strb.w	r3, [r4, #117]	@ 0x75
+  9e:	2500      	movs	r5, #0
+  a0:	e7d0      	b.n	44 <service+0x44>
+  a2:	f894 3078 	ldrb.w	r3, [r4, #120]	@ 0x78
+  a6:	b12b      	cbz	r3, b4 <service+0xb4>
+  a8:	f894 50c4 	ldrb.w	r5, [r4, #196]	@ 0xc4
+  ac:	2d00      	cmp	r5, #0
+  ae:	d1c9      	bne.n	44 <service+0x44>
+  b0:	2502      	movs	r5, #2
+  b2:	e7c7      	b.n	44 <service+0x44>
+  b4:	4620      	mov	r0, r4
+  b6:	f7ff fffe 	bl	0 <service>
+  ba:	4605      	mov	r5, r0
+  bc:	e7f6      	b.n	ac <service+0xac>
+  be:	2501      	movs	r5, #1
+  c0:	e7a7      	b.n	12 <service+0x12>
+  c2:	2503      	movs	r5, #3
+  c4:	e7a5      	b.n	12 <service+0x12>
+
+Disassembly of section .text.stop:
+
+00000000 <stop>:
+   0:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+   2:	4605      	mov	r5, r0
+   4:	b358      	cbz	r0, 5e <stop+0x5e>
+   6:	f7ff fffe 	bl	0 <nx_arch_in_isr>
+   a:	b110      	cbz	r0, 12 <stop+0x12>
+   c:	240e      	movs	r4, #14
+   e:	4620      	mov	r0, r4
+  10:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
+  12:	f7ff fffe 	bl	0 <nx_arch_irq_is_masked>
+  16:	2800      	cmp	r0, #0
+  18:	d1f8      	bne.n	c <stop+0xc>
+  1a:	6b2c      	ldr	r4, [r5, #48]	@ 0x30
+  1c:	2c00      	cmp	r4, #0
+  1e:	d0f6      	beq.n	e <stop+0xe>
+  20:	f7ff fffe 	bl	0 <nx_arch_irq_save>
+  24:	2301      	movs	r3, #1
+  26:	f885 3077 	strb.w	r3, [r5, #119]	@ 0x77
+  2a:	4607      	mov	r7, r0
+  2c:	4628      	mov	r0, r5
+  2e:	f7ff fffe 	bl	0 <stop>
+  32:	4606      	mov	r6, r0
+  34:	6b28      	ldr	r0, [r5, #48]	@ 0x30
+  36:	f7ff fffe 	bl	0 <nx_stream_stop>
+  3a:	4604      	mov	r4, r0
+  3c:	b96e      	cbnz	r6, 5a <stop+0x5a>
+  3e:	b940      	cbnz	r0, 52 <stop+0x52>
+  40:	f8d5 00c0 	ldr.w	r0, [r5, #192]	@ 0xc0
+  44:	f7ff fffe 	bl	0 <nx_adc_observer_unbind>
+  48:	4604      	mov	r4, r0
+  4a:	b910      	cbnz	r0, 52 <stop+0x52>
+  4c:	6328      	str	r0, [r5, #48]	@ 0x30
+  4e:	7628      	strb	r0, [r5, #24]
+  50:	6528      	str	r0, [r5, #80]	@ 0x50
+  52:	4638      	mov	r0, r7
+  54:	f7ff fffe 	bl	0 <nx_arch_irq_restore>
+  58:	e7d9      	b.n	e <stop+0xe>
+  5a:	4634      	mov	r4, r6
+  5c:	e7f9      	b.n	52 <stop+0x52>
+  5e:	2401      	movs	r4, #1
+  60:	e7d5      	b.n	e <stop+0xe>
+
+Disassembly of section .text.nx_stm32_adc_continuous_initialize:
+
+00000000 <nx_stm32_adc_continuous_initialize>:
+   0:	b108      	cbz	r0, 6 <nx_stm32_adc_continuous_initialize+0x6>
+   2:	f7ff bffe 	b.w	0 <nx_stm32_adc_stream_initialize>
+   6:	2001      	movs	r0, #1
+   8:	4770      	bx	lr
+
+Disassembly of section .text.nx_stm32_adc_continuous_irq:
+
+00000000 <nx_stm32_adc_continuous_irq>:
+   0:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
+   4:	4604      	mov	r4, r0
+   6:	2800      	cmp	r0, #0
+   8:	f000 80c9 	beq.w	19e <nx_stm32_adc_continuous_irq+0x19e>
+   c:	6b03      	ldr	r3, [r0, #48]	@ 0x30
+   e:	2b00      	cmp	r3, #0
+  10:	f000 80c5 	beq.w	19e <nx_stm32_adc_continuous_irq+0x19e>
+  14:	f890 3077 	ldrb.w	r3, [r0, #119]	@ 0x77
+  18:	2b00      	cmp	r3, #0
+  1a:	f040 80c0 	bne.w	19e <nx_stm32_adc_continuous_irq+0x19e>
+  1e:	f890 30c6 	ldrb.w	r3, [r0, #198]	@ 0xc6
+  22:	2b00      	cmp	r3, #0
+  24:	f040 80bb 	bne.w	19e <nx_stm32_adc_continuous_irq+0x19e>
+  28:	6a03      	ldr	r3, [r0, #32]
+  2a:	685f      	ldr	r7, [r3, #4]
+  2c:	f017 0f2d 	tst.w	r7, #45	@ 0x2d
+  30:	f000 80b5 	beq.w	19e <nx_stm32_adc_continuous_irq+0x19e>
+  34:	6a43      	ldr	r3, [r0, #36]	@ 0x24
+  36:	f017 0f0d 	tst.w	r7, #13
+  3a:	681d      	ldr	r5, [r3, #0]
+  3c:	d10d      	bne.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+  3e:	f890 30c5 	ldrb.w	r3, [r0, #197]	@ 0xc5
+  42:	f405 2900 	and.w	r9, r5, #524288	@ 0x80000
+  46:	f485 2500 	eor.w	r5, r5, #524288	@ 0x80000
+  4a:	f3c5 45c0 	ubfx	r5, r5, #19, #1
+  4e:	42ab      	cmp	r3, r5
+  50:	d103      	bne.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+  52:	6803      	ldr	r3, [r0, #0]
+  54:	681b      	ldr	r3, [r3, #0]
+  56:	0699      	lsls	r1, r3, #26
+  58:	d504      	bpl.n	64 <nx_stm32_adc_continuous_irq+0x64>
+  5a:	2106      	movs	r1, #6
+  5c:	4620      	mov	r0, r4
+  5e:	f7ff fffe 	bl	0 <nx_stm32_adc_continuous_irq>
+  62:	e083      	b.n	16c <nx_stm32_adc_continuous_irq+0x16c>
+  64:	f100 0880 	add.w	r8, r0, #128	@ 0x80
+  68:	4640      	mov	r0, r8
+  6a:	f7ff fffe 	bl	0 <nx_stream_post_can_reserve>
+  6e:	b958      	cbnz	r0, 88 <nx_stm32_adc_continuous_irq+0x88>
+  70:	6b23      	ldr	r3, [r4, #48]	@ 0x30
+  72:	e9d3 2306 	ldrd	r2, r3, [r3, #24]
+  76:	f1b3 3fff 	cmp.w	r3, #4294967295	@ 0xffffffff
+  7a:	bf08      	it	eq
+  7c:	f1b2 3fff 	cmpeq.w	r2, #4294967295	@ 0xffffffff
+  80:	bf0c      	ite	eq
+  82:	210d      	moveq	r1, #13
+  84:	2100      	movne	r1, #0
+  86:	e7e9      	b.n	5c <nx_stm32_adc_continuous_irq+0x5c>
+  88:	f104 0638 	add.w	r6, r4, #56	@ 0x38
+  8c:	4631      	mov	r1, r6
+  8e:	4640      	mov	r0, r8
+  90:	f7ff fffe 	bl	0 <nx_stream_post_reserve>
+  94:	2800      	cmp	r0, #0
+  96:	d1e0      	bne.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+  98:	2301      	movs	r3, #1
+  9a:	f884 3074 	strb.w	r3, [r4, #116]	@ 0x74
+  9e:	6a23      	ldr	r3, [r4, #32]
+  a0:	f007 073d 	and.w	r7, r7, #61	@ 0x3d
+  a4:	60df      	str	r7, [r3, #12]
+  a6:	4b3f      	ldr	r3, [pc, #252]	@ (1a4 <nx_stm32_adc_continuous_irq+0x1a4>)
+  a8:	f04f 5280 	mov.w	r2, #268435456	@ 0x10000000
+  ac:	f8c3 2184 	str.w	r2, [r3, #388]	@ 0x184
+  b0:	6a63      	ldr	r3, [r4, #36]	@ 0x24
+  b2:	6ba2      	ldr	r2, [r4, #56]	@ 0x38
+  b4:	f1b9 0f00 	cmp.w	r9, #0
+  b8:	d05d      	beq.n	176 <nx_stm32_adc_continuous_irq+0x176>
+  ba:	60da      	str	r2, [r3, #12]
+  bc:	f7ff fffe 	bl	0 <nx_arch_dsb>
+  c0:	ea4f 47d9 	mov.w	r7, r9, lsr #19
+  c4:	2318      	movs	r3, #24
+  c6:	fb03 4307 	mla	r3, r3, r7, r4
+  ca:	6ba1      	ldr	r1, [r4, #56]	@ 0x38
+  cc:	f8d3 2090 	ldr.w	r2, [r3, #144]	@ 0x90
+  d0:	6a63      	ldr	r3, [r4, #36]	@ 0x24
+  d2:	f1b9 0f00 	cmp.w	r9, #0
+  d6:	d050      	beq.n	17a <nx_stm32_adc_continuous_irq+0x17a>
+  d8:	68d8      	ldr	r0, [r3, #12]
+  da:	4288      	cmp	r0, r1
+  dc:	d1bd      	bne.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+  de:	6919      	ldr	r1, [r3, #16]
+  e0:	4291      	cmp	r1, r2
+  e2:	d1ba      	bne.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+  e4:	2218      	movs	r2, #24
+  e6:	fb02 4205 	mla	r2, r2, r5, r4
+  ea:	68d9      	ldr	r1, [r3, #12]
+  ec:	f8d2 2090 	ldr.w	r2, [r2, #144]	@ 0x90
+  f0:	4291      	cmp	r1, r2
+  f2:	d0b2      	beq.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+  f4:	6919      	ldr	r1, [r3, #16]
+  f6:	4291      	cmp	r1, r2
+  f8:	d0af      	beq.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+  fa:	681a      	ldr	r2, [r3, #0]
+  fc:	f3c2 42c0 	ubfx	r2, r2, #19, #1
+ 100:	42ba      	cmp	r2, r7
+ 102:	d1aa      	bne.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+ 104:	681b      	ldr	r3, [r3, #0]
+ 106:	07da      	lsls	r2, r3, #31
+ 108:	d5a7      	bpl.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+ 10a:	6a23      	ldr	r3, [r4, #32]
+ 10c:	685b      	ldr	r3, [r3, #4]
+ 10e:	f013 0f2d 	tst.w	r3, #45	@ 0x2d
+ 112:	d1a2      	bne.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+ 114:	6823      	ldr	r3, [r4, #0]
+ 116:	681b      	ldr	r3, [r3, #0]
+ 118:	069b      	lsls	r3, r3, #26
+ 11a:	d49e      	bmi.n	5a <nx_stm32_adc_continuous_irq+0x5a>
+ 11c:	2d00      	cmp	r5, #0
+ 11e:	bf14      	ite	ne
+ 120:	2718      	movne	r7, #24
+ 122:	2700      	moveq	r7, #0
+ 124:	f8d4 90c0 	ldr.w	r9, [r4, #192]	@ 0xc0
+ 128:	3790      	adds	r7, #144	@ 0x90
+ 12a:	4427      	add	r7, r4
+ 12c:	f1b9 0f00 	cmp.w	r9, #0
+ 130:	d129      	bne.n	186 <nx_stm32_adc_continuous_irq+0x186>
+ 132:	2318      	movs	r3, #24
+ 134:	fb03 4505 	mla	r5, r3, r5, r4
+ 138:	4639      	mov	r1, r7
+ 13a:	f8d5 2094 	ldr.w	r2, [r5, #148]	@ 0x94
+ 13e:	2302      	movs	r3, #2
+ 140:	4640      	mov	r0, r8
+ 142:	f7ff fffe 	bl	0 <nx_stream_post_publish>
+ 146:	4607      	mov	r7, r0
+ 148:	4601      	mov	r1, r0
+ 14a:	2800      	cmp	r0, #0
+ 14c:	d186      	bne.n	5c <nx_stm32_adc_continuous_irq+0x5c>
+ 14e:	ce0f      	ldmia	r6!, {r0, r1, r2, r3}
+ 150:	3590      	adds	r5, #144	@ 0x90
+ 152:	c50f      	stmia	r5!, {r0, r1, r2, r3}
+ 154:	e896 0003 	ldmia.w	r6, {r0, r1}
+ 158:	e885 0003 	stmia.w	r5, {r0, r1}
+ 15c:	f894 30c5 	ldrb.w	r3, [r4, #197]	@ 0xc5
+ 160:	f884 7074 	strb.w	r7, [r4, #116]	@ 0x74
+ 164:	f083 0301 	eor.w	r3, r3, #1
+ 168:	f884 30c5 	strb.w	r3, [r4, #197]	@ 0xc5
+ 16c:	6d20      	ldr	r0, [r4, #80]	@ 0x50
+ 16e:	e8bd 43f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
+ 172:	f7ff bffe 	b.w	0 <nx_irq_wake_signal>
+ 176:	611a      	str	r2, [r3, #16]
+ 178:	e7a0      	b.n	bc <nx_stm32_adc_continuous_irq+0xbc>
+ 17a:	6918      	ldr	r0, [r3, #16]
+ 17c:	4288      	cmp	r0, r1
+ 17e:	f47f af6c 	bne.w	5a <nx_stm32_adc_continuous_irq+0x5a>
+ 182:	68d9      	ldr	r1, [r3, #12]
+ 184:	e7ac      	b.n	e0 <nx_stm32_adc_continuous_irq+0xe0>
+ 186:	f7ff fffe 	bl	0 <nx_time_now_us>
+ 18a:	4602      	mov	r2, r0
+ 18c:	460b      	mov	r3, r1
+ 18e:	4648      	mov	r0, r9
+ 190:	4639      	mov	r1, r7
+ 192:	f7ff fffe 	bl	0 <nx_adc_observer_record>
+ 196:	4601      	mov	r1, r0
+ 198:	2800      	cmp	r0, #0
+ 19a:	d0ca      	beq.n	132 <nx_stm32_adc_continuous_irq+0x132>
+ 19c:	e75e      	b.n	5c <nx_stm32_adc_continuous_irq+0x5c>
+ 19e:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
+ 1a2:	bf00      	nop
+ 1a4:	e000e100 	.word	0xe000e100

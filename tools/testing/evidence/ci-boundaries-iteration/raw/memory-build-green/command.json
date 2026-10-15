@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "/workspace/nexus/.venv/bin/cmake",
+    "--build",
+    "/workspace/nexus/build/ci-boundary-memory",
+    "--parallel",
+    "2",
+    "--target",
+    "nexus_gd32_memory_boot_default_test",
+    "nexus_gd32_memory_boot_both_test",
+    "nexus_os_wait_test"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0,
+  "started_ns": 1791751497511961776,
+  "ended_ns": 1791751505485738844,
+  "timeout_seconds": 900,
+  "stdout": {
+    "path": "/workspace/nexus-ci-boundaries/memory-build-green/stdout.txt",
+    "bytes": 2856,
+    "sha256": "514b54dba80276857ba494f00128a8a551c4445105c6051caedb4fa8f1f290a6"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-ci-boundaries/memory-build-green/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

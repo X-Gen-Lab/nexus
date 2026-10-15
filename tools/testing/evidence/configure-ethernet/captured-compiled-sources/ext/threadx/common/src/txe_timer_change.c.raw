@@ -1,0 +1,110 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Timer                                                               */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+#define TX_SOURCE_CODE
+
+
+/* Include necessary system files.  */
+
+#include "tx_api.h"
+#include "tx_timer.h"
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_timer_change                                   PORTABLE C      */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks for errors in the application timer change     */
+/*    function call.                                                      */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    timer_ptr                         Pointer to timer control block    */
+/*    initial_ticks                     Initial expiration ticks          */
+/*    reschedule_ticks                  Reschedule ticks                  */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_TIMER_ERROR                    Invalid application timer pointer */
+/*    TX_TICK_ERROR                     Invalid initial tick value of 0   */
+/*    status                            Actual completion status          */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_timer_change                  Actual timer change function      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/**************************************************************************/
+UINT  _txe_timer_change(TX_TIMER *timer_ptr, ULONG initial_ticks, ULONG reschedule_ticks)
+{
+
+UINT    status;
+
+
+    /* Check for an invalid timer pointer.  */
+    if (timer_ptr == TX_NULL)
+    {
+
+        /* Timer pointer is invalid, return appropriate error code.  */
+        status =  TX_TIMER_ERROR;
+    }
+
+    /* Now check for invalid timer ID.  */
+    else if (timer_ptr -> tx_timer_id != TX_TIMER_ID)
+    {
+
+        /* Timer pointer is invalid, return appropriate error code.  */
+        status =  TX_TIMER_ERROR;
+    }
+
+    /* Check for an illegal initial tick value.  */
+    else if (initial_ticks == ((ULONG) 0))
+    {
+
+        /* Invalid initial tick value, return appropriate error code.  */
+        status =  TX_TICK_ERROR;
+    }
+
+    else
+    {
+
+        /* Call actual application timer function.  */
+        status =  _tx_timer_change(timer_ptr, initial_ticks, reschedule_ticks);
+    }
+
+    /* Return completion status.  */
+    return(status);
+}
+

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="1" failures="0" disabled="0" errors="0" time="0.002" timestamp="2026-10-11T15:41:08.596" name="AllTests">
+  <testsuite name="FreeRTOSPrestart" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-10-11T15:41:08.596">
+    <testcase name="ReverseDiscardReclaimsCandidateThenSchedulerRunsReusedTCBs" file="/workspace/nexus/tests/google/freertos_prestart_test.cpp" line="49" status="run" result="completed" time="0.001" timestamp="2026-10-11T15:41:08.596" classname="FreeRTOSPrestart" />
+  </testsuite>
+</testsuites>

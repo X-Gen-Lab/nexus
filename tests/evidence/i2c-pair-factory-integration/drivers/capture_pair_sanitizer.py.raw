@@ -1,0 +1,147 @@
+#!/usr/bin/env python3
+"""Capture actual scoped I2C-pair development execution, no source mutation."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import time
+import xml.etree.ElementTree as ET
+
+ROOT = Path('/workspace/nexus')
+OUT = Path('/workspace/nexus-i2c-pair-iteration-evidence')
+BUILD = Path('/workspace/nexus-g474-iteration-evidence/host-asan-build')
+TARGETS = ['nexus_stm32_i2c_pair_factory_test', 'nexus_stm32_i2c_pair_irq_factory_test',
+           'nexus_gd32_i2c_pair_factory_test', 'nexus_gd32_i2c_pair_irq_factory_test']
+
+
+def identity(path):
+    path = Path(path)
+    raw = path.read_bytes()
+    return {'path': str(path), 'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
+
+
+def write(path, value):
+    Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+
+def snapshot():
+    paths = set()
+    for dirname in ['tools/configure', 'io', 'core', 'arch', 'soc/common', 'soc/stm32f407',
+                    'soc/gd32f470', 'tests/contracts/multi_controller_assembly',
+                    'tests/contracts/gd32_model', 'cmake', 'dependencies']:
+        for p in (ROOT / dirname).rglob('*'):
+            if p.is_file() and p.suffix in {'.c', '.h', '.S', '.py', '.json', '.toml', '.cmake', '.txt'} and '__pycache__' not in p.parts and not p.name.startswith('test_'):
+                paths.add(p)
+    for dirname in ['vendors/st/cmsis_device_f4/Include',
+                    'vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include',
+                    'vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include']:
+        paths.update(p for p in (ROOT/dirname).glob('*') if p.is_file())
+    paths.add(ROOT/'vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c')
+    paths.update(ROOT/'tests/google'/name for name in ['CMakeLists.txt', 'i2c_pair_factory_test.cpp', 'i2c_pair_factory_model.h', 'i2c_pair_factory.cmake', 'i2c_async_register_model.h'])
+    paths.add(ROOT/'dependencies/source/googletest-1.16.0.tar.gz')
+    return [identity(p) for p in sorted(paths)]
+
+
+def main():
+    destination = OUT / sys.argv[1]
+    destination.mkdir(exist_ok=False)
+    before = snapshot()
+    write(destination/'source-before.json', before)
+    env = {key: value for key, value in os.environ.items() if not key.startswith('GTEST_')}
+    env['ASAN_OPTIONS'] = 'detect_leaks=1:halt_on_error=1'
+    env['UBSAN_OPTIONS'] = 'halt_on_error=1:print_stacktrace=1'
+    env['PATH'] = str(ROOT/'.venv/bin') + os.pathsep + env.get('PATH', '')
+    commands = []
+    rows = []
+    report = {'schema_version': 1, 'kind': 'i2c-pair-generated-sanitizer-development-execution',
+              'status': 'failed', 'physical_status': 'not_executed',
+              'scope': 'Actual generated paired factory, common algorithm and silicon GPIO/I2C code. External CPU/MMIO/NVIC/hardwareclock and separately tested systemclock port only are mocked. Dirty development inputs, no physical or clean candidate qualification.',
+              'commands': commands, 'rows': rows, 'driver': identity(__file__),
+              'source_before': identity(destination/'source-before.json'),
+              'sanitizer': {'cache': identity(BUILD/'CMakeCache.txt'), 'ASAN_OPTIONS': env['ASAN_OPTIONS'], 'UBSAN_OPTIONS': env['UBSAN_OPTIONS']}}
+    def run(name, argv):
+        path = destination/(name+'.output')
+        started = time.time_ns()
+        with path.open('xb') as stream:
+            result = subprocess.run(argv, cwd=ROOT, env=env, stdout=stream,
+                                    stderr=subprocess.STDOUT, timeout=240)
+        command = {'argv': argv, 'return_code': result.returncode, 'started_ns': started,
+                   'completed_ns': time.time_ns(), 'output': identity(path)}
+        commands.append(command)
+        write(destination/'commands.json', commands)
+        return command
+    try:
+        if 'NEXUS_ENABLE_SANITIZERS:BOOL=ON' not in (BUILD/'CMakeCache.txt').read_text():
+            raise ValueError('Actual build cache has no ASAN/UBSAN instrumentation')
+        build = run('build', [str(ROOT/'.venv/bin/cmake'), '--build', str(BUILD),
+                             '--target', *TARGETS, '--parallel', '1'])
+        if build['return_code']:
+            raise ValueError('Actual build failed')
+        for target in TARGETS:
+            executable = BUILD/'bin'/target
+            saved = destination/(target+'.executable')
+            shutil.copyfile(executable, saved)
+            assert identity(executable)['sha256'] == identity(saved)['sha256']
+            row = {'target': target, 'executable': identity(saved),
+                   'executed_path': str(executable), 'status': 'failed'}
+            rows.append(row)
+            nm = run(target+'-sanitizer-symbols', ['nm', '-u', str(executable)])
+            symbols = Path(nm['output']['path']).read_text()
+            if nm['return_code'] or '__asan_init' not in symbols or '__ubsan_handle_' not in symbols:
+                raise ValueError('Actual ELF lacks sanitizer instrumentation')
+            row['sanitizer_symbols'] = nm['output']
+            discovery = run(target+'-discovery', [str(executable), '--gtest_filter=*', '--gtest_list_tests'])
+            if discovery['return_code']:
+                raise ValueError('Actual discovery failed')
+            expected, suite = [], None
+            for line in Path(discovery['output']['path']).read_text().splitlines():
+                if line and not line.startswith(' ') and line.endswith('.'):
+                    suite = line.strip()
+                elif suite and line.startswith('  '):
+                    expected.append(suite + line.strip())
+            if not expected:
+                raise ValueError('Zero discovered cases')
+            xml = destination/(target+'.xml')
+            execution = run(target+'-execution', [str(executable), '--gtest_filter=*', '--gtest_repeat=1', '--gtest_also_run_disabled_tests', '--gtest_output=xml:'+str(xml)])
+            row['xml'] = identity(xml)
+            tree = ET.parse(xml).getroot()
+            cases = list(tree.iter('testcase'))
+            actual = [case.attrib['classname']+'.'+case.attrib['name'] for case in cases]
+            row['discovered_cases'] = expected
+            row['google'] = {key: int(tree.get(key, '0')) for key in ['tests', 'failures', 'disabled', 'errors']}
+            row['google']['skipped'] = sum(case.find('skipped') is not None for case in cases)
+            if actual != expected or any(case.get('status') != 'run' or case.get('result') != 'completed' for case in cases):
+                raise ValueError('Actual execution does not match complete discovery')
+            if execution['return_code'] or any(row['google'][key] for key in ['failures', 'disabled', 'errors', 'skipped']):
+                continue
+            row['status'] = 'passed'
+        if all(row['status'] == 'passed' for row in rows) and len(rows) == len(TARGETS):
+            report['status'] = 'passed'
+    except (ValueError, OSError, subprocess.TimeoutExpired) as error:
+        report['error'] = str(error)
+    after = snapshot()
+    write(destination/'source-after.json', after)
+    report['source_after'] = identity(destination/'source-after.json')
+    report['source_unchanged'] = before == after
+    if not report['source_unchanged']:
+        report['status'] = 'failed'
+        report['source_change_error'] = 'Captured source inputs changed during execution'
+    generated = destination/'generated'
+    for p in sorted((BUILD/'tests/contracts/google').glob('i2c-pair-*/**/*')):
+        if p.is_file():
+            target = generated/p.relative_to(BUILD/'tests/contracts/google')
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(p, target)
+    report['generated'] = [identity(p) for p in sorted(generated.rglob('*')) if p.is_file()] if generated.exists() else []
+    write(destination/'manifest.json', report)
+    print(json.dumps({'status': report['status'], 'source_unchanged': report['source_unchanged'],
+                      'rows': [{key: row.get(key) for key in ['target', 'status', 'google']} for row in rows],
+                      'manifest': str(destination/'manifest.json')}))
+    return 0 if report['status'] == 'passed' else 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

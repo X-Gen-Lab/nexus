@@ -1,0 +1,154 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 25e71f14ff2185a54246010a7d95f057740ba2f0d5ebdc52f161a4fee6903abb\n"
+
+msgid "Assembly input and rejected selections"
+msgstr "装配输入与拒绝规则"
+
+msgid ""
+"The authored configuration authority is one schema-2 TOML assembly. SoC and "
+"Board facts remain maintained JSON; `resolved.json` is output, not an "
+"authored alternative. CMake owns software dependencies. Failed TOML "
+"resolution never falls back to Kconfig, cache variables, schema-1 JSON or "
+"old generated headers."
+msgstr ""
+"配置权威是一份人工编写的 schema-2 TOML 装配。SoC 和 Board 事实保持维护中的 JSON；`resolved.json` "
+"是输出，不是另一份人工编写的输入。CMake 拥有软件依赖。TOML 解析失败绝不回退 Kconfig、缓存变量、schema-1 JSON "
+"或旧生成头。"
+
+msgid ""
+"Before running the resolver, prepare the [fixed source and recursive "
+"dependencies](../../guides/source-checkout.md)."
+msgstr "运行解析器前，先准备[固定源码与递归依赖](../../guides/source-checkout.md)。"
+
+msgid "Complete maintained input"
+msgstr "完整维护输入"
+
+msgid "Complete Native UART assembly, parsed by the production resolver."
+msgstr "完整 Native UART 装配，由生产解析器解析。"
+
+msgid "Selection"
+msgstr "选择"
+
+msgid "Meaning and rejection boundary"
+msgstr "含义与拒绝边界"
+
+msgid "`schema = 2`"
+msgstr "`schema = 2`"
+
+msgid "Authored TOML generation; unknown keys reject"
+msgstr "人工编写的 TOML 生成；未知键拒绝"
+
+msgid "`board`"
+msgstr "`board`"
+
+msgid "Maintained immediate child of `boards/`; exactly one Board selector"
+msgstr "`boards/` 的维护中直接子目录；必须恰好选择一个 Board"
+
+msgid "`board_package`"
+msgstr "`board_package`"
+
+msgid "External package path relative to the assembly; alternative to `board`"
+msgstr "相对装配定位的外部包路径；与 `board` 二选一"
+
+msgid "`backend`"
+msgstr "`backend`"
+
+msgid ""
+"Explicit `native`, `baremetal`, `freertos` or supported `threadx` subset"
+msgstr "显式 `native`、`baremetal`、`freertos` 或受支持 `threadx` 子集"
+
+msgid "`clock`"
+msgstr "`clock`"
+
+msgid "Maintained exact profile matching Board and SoC facts"
+msgstr "匹配 Board 与 SoC 事实的维护中精确配置"
+
+msgid "`optimization`"
+msgstr "`optimization`"
+
+msgid ""
+"Maintained optimization/debug/LTO profile; no arbitrary compiler override"
+msgstr "维护中的优化/调试/LTO 配置；不接受任意编译器覆盖"
+
+msgid "`[memory]`"
+msgstr "`[memory]`"
+
+msgid "Byte budgets for stack, libc heap, static RAM and Flash LOAD"
+msgstr "以字节记录栈、libc 堆、静态 RAM 和 Flash LOAD 预算"
+
+msgid "`[factory]`"
+msgstr "`[factory]`"
+
+msgid "Explicit optional strong IDs and capability metadata"
+msgstr "显式可选强类型 ID 和能力元数据"
+
+msgid "Kind instance table"
+msgstr "类别实例表"
+
+msgid "Stable authored name, reviewed binding, mode and bounded options"
+msgstr "稳定人工编写的名称、复核绑定、模式与有界选项"
+
+msgid "SPI/I2C device table"
+msgstr "SPI/I2C 器件表"
+
+msgid "Separate endpoint identity tied to an existing controller"
+msgstr "关联已有控制器的独立端点身份"
+
+msgid "`[abi]`"
+msgstr "`[abi]`"
+
+msgid ""
+"Assert reviewed CPU architecture/FPU/float ABI; cannot invent chip features"
+msgstr "断言复核 CPU architecture/FPU/float ABI；不能虚构芯片特性"
+
+msgid ""
+"Resource checks cover actual pin/AF, controller, IRQ ceiling, shared "
+"timer/timebase, physical DMA controller/stream, clock, exact memory domain, "
+"mode and endpoint identity. A syntactically valid selector can still reject "
+"because that provider does not implement the route. The resolver never "
+"silently changes pins, modes or clock."
+msgstr ""
+"资源检查覆盖实际引脚／AF、控制器、IRQ 系统调用优先级阈值、共享定时器／时间基准、物理 DMA "
+"控制器／流、时钟、准确内存域、模式及端点身份。即使选择项语法合法，仍可能因提供者未实现该路由而被拒绝。解析器绝不静默改变引脚、模式或时钟。"
+
+msgid "Inspect and generate"
+msgstr "检查并生成"
+
+msgid "Run from the repository root, using a new output you own:"
+msgstr "从仓库根目录执行，使用自己拥有的新输出："
+
+msgid ""
+"`check` and `explain` do not generate output. `generate` publishes one "
+"atomic owned bundle; failure invalidates its owned output without replacing "
+"unrelated data. Inspect `resolved.json`, input identities, generated "
+"`nexus_config.h`, bindings, factory, linker memory and budgets. Changing "
+"declared inputs requires a fresh resolution; separate Board/backend "
+"combinations use separate build roots."
+msgstr ""
+"`check` 与 `explain` 不生成输出。`generate` 发布一个原子自有 bundle；失败使其自有输出失效，不替换无关数据。检查 "
+"`resolved.json`、输入身份、生成的 "
+"`nexus_config.h`、绑定、factory、链接器内存和预算。声明输入变化要求重新解析；不同 Board/backend "
+"组合使用独立构建根目录。"
+
+msgid ""
+"CPU-only Runtime has a separate authored runtime TOML using the shared CPU "
+"resolver. It emits Core/Arch/optional OS policy, no "
+"SoC/Board/startup/factory. Do not use it to claim a full device platform. "
+"The [build contract](../../design/build-system.md), [integration "
+"contract](../../design/integration-contracts.md) and production field "
+"model/schema own detailed accepted fields; editor completion does not "
+"establish hardware capability."
+msgstr ""
+"CPU-only Runtime 使用独立人工编写的 runtime TOML 和共享 CPU 解析器。它只生成 Core/Arch/可选 OS "
+"策略，不生成 SoC/Board/startup/factory。不得据此声明完整设备平台。[构建合同](../../design/build-"
+"system.md)、[接入合同](../../design/integration-contracts.md)和生产字段模型／schema "
+"拥有详细合法字段；编辑器补全不建立硬件能力。"

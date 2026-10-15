@@ -1,0 +1,89 @@
+test_actual_subprocess_pipeline_retains_raw_and_never_qualifies (tools.testing.test_hil_acquire.HilAcquireTests.test_actual_subprocess_pipeline_retains_raw_and_never_qualifies) ... ERROR
+test_changed_input_and_wrong_admission_reject_before_process (tools.testing.test_hil_acquire.HilAcquireTests.test_changed_input_and_wrong_admission_reject_before_process) ... ok
+test_cleanup_failure_retains_exclusive_station_quarantine (tools.testing.test_hil_acquire.HilAcquireTests.test_cleanup_failure_retains_exclusive_station_quarantine) ... ERROR
+test_existing_output_and_symlink_cannot_be_overwritten (tools.testing.test_hil_acquire.HilAcquireTests.test_existing_output_and_symlink_cannot_be_overwritten) ... ok
+test_failed_command_retains_stderr_and_stops_later_operations (tools.testing.test_hil_acquire.HilAcquireTests.test_failed_command_retains_stderr_and_stops_later_operations) ... ERROR
+test_json_schema_supports_runtime_reviewed_lower_bound (tools.testing.test_hil_acquire.HilAcquireTests.test_json_schema_supports_runtime_reviewed_lower_bound) ... FAIL
+test_plan_never_executes_process_or_creates_station_lock (tools.testing.test_hil_acquire.HilAcquireTests.test_plan_never_executes_process_or_creates_station_lock) ... ERROR
+test_timeout_retains_raw_and_cleanup_still_executes (tools.testing.test_hil_acquire.HilAcquireTests.test_timeout_retains_raw_and_cleanup_still_executes) ... ERROR
+test_wrong_observed_uid_prevents_flash_but_runs_cleanup (tools.testing.test_hil_acquire.HilAcquireTests.test_wrong_observed_uid_prevents_flash_but_runs_cleanup) ... ERROR
+test_wrong_operation_order_or_unknown_fields_fail_before_execution (tools.testing.test_hil_acquire.HilAcquireTests.test_wrong_operation_order_or_unknown_fields_fail_before_execution) ... ok
+
+======================================================================
+ERROR: test_actual_subprocess_pipeline_retains_raw_and_never_qualifies (tools.testing.test_hil_acquire.HilAcquireTests.test_actual_subprocess_pipeline_retains_raw_and_never_qualifies)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 99, in test_actual_subprocess_pipeline_retains_raw_and_never_qualifies
+    result = execute_acquisition(self.recipe_path, self.admission_path,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/hil/acquire.py", line 19, in execute_acquisition
+    raise EvidenceError("acquisition adapter is not implemented")
+tools.evidence.common.EvidenceError: acquisition adapter is not implemented
+
+======================================================================
+ERROR: test_cleanup_failure_retains_exclusive_station_quarantine (tools.testing.test_hil_acquire.HilAcquireTests.test_cleanup_failure_retains_exclusive_station_quarantine)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 147, in test_cleanup_failure_retains_exclusive_station_quarantine
+    result = execute_acquisition(self.recipe_path, self.admission_path,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/hil/acquire.py", line 19, in execute_acquisition
+    raise EvidenceError("acquisition adapter is not implemented")
+tools.evidence.common.EvidenceError: acquisition adapter is not implemented
+
+======================================================================
+ERROR: test_failed_command_retains_stderr_and_stops_later_operations (tools.testing.test_hil_acquire.HilAcquireTests.test_failed_command_retains_stderr_and_stops_later_operations)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 134, in test_failed_command_retains_stderr_and_stops_later_operations
+    result = execute_acquisition(self.recipe_path, self.admission_path,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/hil/acquire.py", line 19, in execute_acquisition
+    raise EvidenceError("acquisition adapter is not implemented")
+tools.evidence.common.EvidenceError: acquisition adapter is not implemented
+
+======================================================================
+ERROR: test_plan_never_executes_process_or_creates_station_lock (tools.testing.test_hil_acquire.HilAcquireTests.test_plan_never_executes_process_or_creates_station_lock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 92, in test_plan_never_executes_process_or_creates_station_lock
+    result = acquisition_plan(self.recipe_path, self.admission_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/hil/acquire.py", line 13, in acquisition_plan
+    raise EvidenceError("acquisition adapter is not implemented")
+tools.evidence.common.EvidenceError: acquisition adapter is not implemented
+
+======================================================================
+ERROR: test_timeout_retains_raw_and_cleanup_still_executes (tools.testing.test_hil_acquire.HilAcquireTests.test_timeout_retains_raw_and_cleanup_still_executes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 163, in test_timeout_retains_raw_and_cleanup_still_executes
+    result = execute_acquisition(self.recipe_path, self.admission_path,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/hil/acquire.py", line 19, in execute_acquisition
+    raise EvidenceError("acquisition adapter is not implemented")
+tools.evidence.common.EvidenceError: acquisition adapter is not implemented
+
+======================================================================
+ERROR: test_wrong_observed_uid_prevents_flash_but_runs_cleanup (tools.testing.test_hil_acquire.HilAcquireTests.test_wrong_observed_uid_prevents_flash_but_runs_cleanup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 123, in test_wrong_observed_uid_prevents_flash_but_runs_cleanup
+    result = execute_acquisition(self.recipe_path, self.admission_path,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/hil/acquire.py", line 19, in execute_acquisition
+    raise EvidenceError("acquisition adapter is not implemented")
+tools.evidence.common.EvidenceError: acquisition adapter is not implemented
+
+======================================================================
+FAIL: test_json_schema_supports_runtime_reviewed_lower_bound (tools.testing.test_hil_acquire.HilAcquireTests.test_json_schema_supports_runtime_reviewed_lower_bound)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_hil_acquire.py", line 219, in test_json_schema_supports_runtime_reviewed_lower_bound
+    self.assertIn("minimum", budget["properties"])
+AssertionError: 'minimum' not found in {'maximum': {'type': 'number', 'minimum': 0}, 'unit': {'type': 'string', 'pattern': '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$'}}
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.246s
+
+FAILED (failures=1, errors=6)

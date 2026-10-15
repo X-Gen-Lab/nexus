@@ -1,0 +1,40 @@
+Running main() from gmock_main.cc
+Note: Google Test filter = IrqWakeProvider.*
+[==========] Running 2 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 2 tests from IrqWakeProvider
+[ RUN      ] IrqWakeProvider.UartLatchesRxBeforeWakeAndStopsPublishingOnDetach
+/workspace/nexus/tests/google/irq_wake_test.cpp:33: Failure
+Expected equality of these values:
+  nx_uart_port_attach_wake(&port, &wake, 6U)
+    Which is: 7
+  NX_ERROR_PERMISSION
+    Which is: 10
+
+/workspace/nexus/tests/google/irq_wake_test.cpp:34: Failure
+Expected equality of these values:
+  nx_uart_port_attach_wake(&port, &wake, 5U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] IrqWakeProvider.UartLatchesRxBeforeWakeAndStopsPublishingOnDetach (0 ms)
+[ RUN      ] IrqWakeProvider.ExtiOverflowWakesConsumerWithoutOverwritingEvents
+/workspace/nexus/tests/google/irq_wake_test.cpp:60: Failure
+Expected equality of these values:
+  nx_exti_port_attach_wake(&port, &wake, 0U)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] IrqWakeProvider.ExtiOverflowWakesConsumerWithoutOverwritingEvents (0 ms)
+[----------] 2 tests from IrqWakeProvider (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 2 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] IrqWakeProvider.UartLatchesRxBeforeWakeAndStopsPublishingOnDetach
+[  FAILED  ] IrqWakeProvider.ExtiOverflowWakesConsumerWithoutOverwritingEvents
+
+ 2 FAILED TESTS

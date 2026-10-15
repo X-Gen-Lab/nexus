@@ -1,0 +1,21 @@
+{
+  "command": [
+    "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
+    "-std=c11",
+    "-mcpu=cortex-m4",
+    "-mthumb",
+    "-fshort-enums",
+    "-Os",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-I/workspace/nexus/core/include",
+    "-I/workspace/nexus-examples/apps/uart_owner_runtime",
+    "-c",
+    "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-policy-layout.c",
+    "-o",
+    "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-policy-layout.o"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

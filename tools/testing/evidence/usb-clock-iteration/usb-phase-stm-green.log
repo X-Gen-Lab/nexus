@@ -1,0 +1,31 @@
+Running main() from gmock_main.cc
+[==========] Running 11 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 11 tests from UsbClock
+[ RUN      ] UsbClock.MissingAuthorityRejectsBeforeAnyWrite
+[       OK ] UsbClock.MissingAuthorityRejectsBeforeAnyWrite (0 ms)
+[ RUN      ] UsbClock.ColdContextAndFiniteDeadlineAreRequired
+[       OK ] UsbClock.ColdContextAndFiniteDeadlineAreRequired (0 ms)
+[ RUN      ] UsbClock.UnexpectedPllProfileRejectsWithoutReclocking
+[       OK ] UsbClock.UnexpectedPllProfileRejectsWithoutReclocking (0 ms)
+[ RUN      ] UsbClock.ExistingUsbGateIsAnExternalOwner
+[       OK ] UsbClock.ExistingUsbGateIsAnExternalOwner (0 ms)
+[ RUN      ] UsbClock.Actual48ClockAndGateOutliveRetainedController
+[       OK ] UsbClock.Actual48ClockAndGateOutliveRetainedController (0 ms)
+[ RUN      ] UsbClock.OverflowAndDoubleReleaseDoNotMutateReferences
+[       OK ] UsbClock.OverflowAndDoubleReleaseDoNotMutateReferences (0 ms)
+[ RUN      ] UsbClock.GateReadbackFailureRollsBackOnlyOwnedClockBits
+[       OK ] UsbClock.GateReadbackFailureRollsBackOnlyOwnedClockBits (0 ms)
+[ RUN      ] UsbClock.RefusedStopRetainsCleanupResponsibility
+[       OK ] UsbClock.RefusedStopRetainsCleanupResponsibility (0 ms)
+[ RUN      ] UsbClock.ChangedSourceFailsReadonlyValidationAndAdmission
+[       OK ] UsbClock.ChangedSourceFailsReadonlyValidationAndAdmission (0 ms)
+[ RUN      ] UsbClock.LostSourceAtGateBoundaryCannotPublishReadyOwner
+[       OK ] UsbClock.LostSourceAtGateBoundaryCannotPublishReadyOwner (0 ms)
+[ RUN      ] UsbClock.FailedAcquisitionDrainCannotBecomeReadyAfterSourceRecovery
+[       OK ] UsbClock.FailedAcquisitionDrainCannotBecomeReadyAfterSourceRecovery (0 ms)
+[----------] 11 tests from UsbClock (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 11 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 11 tests.

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="28" failures="2" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:32:35.316" name="AllTests">
+  <testsuite name="Gd32UartReceive" tests="28" failures="2" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:32:35.316">
+    <testcase name="StartProgramsCallerBufferWithoutCpuPayloadCopy" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="113" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="InvalidFutureBufferRejectsWithoutLoanOrMmioEffect" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="124" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="IdlePublishesOnlyTheStablePartialPrefix" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="133" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="RefusedDisableRetainsLoanUntilARealServiceRetryDrains" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="153" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="FullDmaBlockRequiresExplicitOwnerRearm" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="172" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="TransferErrorAbortsUnreliablePrefixAndLatchesLoss" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="188" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="StopClosesTransmitAdmissionWhileConsumerLoanExists" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="201" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="PendingIdleThenDmaFlagCannotPublishSameBufferTwice" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="219" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ContinuousPrepostsTwoTargetsBeforeEnablingDoubleBuffer" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="231" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ContinuousSwapsInactiveTargetBeforePublishingAndWraps" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="243" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="273" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="296" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="315" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ContinuousIdleFlushesCompletedHeadThenStablePartialFuture" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="341" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ContinuousUnexpectedParityOfBankStopsAndLatchesLoss" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="360" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="371" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="TransmitAliasOfMutableRxPoolRejectsBeforeBorrowOrHardwareStart" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="403" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ReceivePoolAliasOfActiveTransmitRejectsWithoutAnyProducerLoan" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="414" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ReceiveStopOnFreshStateFailsWithoutDereferencingHardware" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="424" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ContinuousRejectsUnequalOrTooFewBuffersWithoutAdmission" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="430" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="IrqTransmitAbortMustDrainRxBeforeResettingSharedUsart" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="442" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="466" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="480" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="HardwareFlowSurvivesIrqTransmitAbortControllerReset" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="498" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="513" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="ContinuousWrongAddressStoreFailsExactReplacementProof" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="528" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive" />
+    <testcase name="Rs485ActualProviderPrevalidatesAndWaitsWireTcBeforeDeWithdrawal" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="549" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:569&#x0A;Expected equality of these values:&#x0A;  nx_uart_port_submit(&amp;rs485, &amp;request)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:569
+Expected equality of these values:
+  nx_uart_port_submit(&rs485, &request)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:564&#x0A;Actual function call count doesn&apos;t match EXPECT_CALL(hardware, Direction(8U, 0U))...&#x0A;         Expected: to be called once&#x0A;           Actual: never called - unsatisfied and active&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:564
+Actual function call count doesn't match EXPECT_CALL(hardware, Direction(8U, 0U))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+]]></failure>
+    </testcase>
+    <testcase name="ExactValidatorRejectsExpiredDescriptorWithoutBorrowOrMmio" file="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp" line="591" status="run" result="completed" time="0." timestamp="2026-10-11T16:32:35.316" classname="Gd32UartReceive">
+      <failure message="/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:597&#x0A;Expected equality of these values:&#x0A;  nx_gd32_uart_receive_tx_validate(&amp;state, &amp;request)&#x0A;    Which is: 7&#x0A;  NX_ERROR_TIMEOUT&#x0A;    Which is: 4&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_uart_receive_test.cpp:597
+Expected equality of these values:
+  nx_gd32_uart_receive_tx_validate(&state, &request)
+    Which is: 7
+  NX_ERROR_TIMEOUT
+    Which is: 4
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

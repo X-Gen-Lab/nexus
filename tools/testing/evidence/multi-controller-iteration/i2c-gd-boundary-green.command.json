@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-multi-controller-iteration/gd-i2c-test",
+    "--gtest_output=xml:tools/testing/evidence/multi-controller-iteration/gd-i2c-boundary-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T18:51:40.437867+00:00",
+  "ended_at": "2026-10-11T18:51:40.441023+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/multi-controller-iteration/i2c-gd-boundary-green.log"
+}

@@ -1,0 +1,131 @@
+Running main() from gmock_main.cc
+[==========] Running 15 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 15 tests from MultipleFactory
+[ RUN      ] MultipleFactory.LookupBindsFiveDistinctControllersWithoutEffects
+[       OK ] MultipleFactory.LookupBindsFiveDistinctControllersWithoutEffects (0 ms)
+[ RUN      ] MultipleFactory.ActualGeneratedStartupAcquiresEachSelectedPublisher
+[       OK ] MultipleFactory.ActualGeneratedStartupAcquiresEachSelectedPublisher (0 ms)
+[ RUN      ] MultipleFactory.IncomingMaskRejectsBeforeClockOrPinEffects
+[       OK ] MultipleFactory.IncomingMaskRejectsBeforeClockOrPinEffects (0 ms)
+[ RUN      ] MultipleFactory.ForeignIdleDmaPublisherIsPreservedOnColdRefusal
+[       OK ] MultipleFactory.ForeignIdleDmaPublisherIsPreservedOnColdRefusal (0 ms)
+[ RUN      ] MultipleFactory.PartialGpioClockFailureReversesItsRecordedEffect
+[       OK ] MultipleFactory.PartialGpioClockFailureReversesItsRecordedEffect (0 ms)
+[ RUN      ] MultipleFactory.FailedSecondaryPinPrepareRestoresThePartialLease
+[       OK ] MultipleFactory.FailedSecondaryPinPrepareRestoresThePartialLease (0 ms)
+[ RUN      ] MultipleFactory.RefusedSelectedVectorJoinRetainsResourcesUntilRetry
+[       OK ] MultipleFactory.RefusedSelectedVectorJoinRetainsResourcesUntilRetry (0 ms)
+[ RUN      ] MultipleFactory.SecondaryActivePublisherCannotBeReusedAfterDisable
+[       OK ] MultipleFactory.SecondaryActivePublisherCannotBeReusedAfterDisable (0 ms)
+[ RUN      ] MultipleFactory.RefusedSelectedPriorityRestoreRetainsColdLease
+[       OK ] MultipleFactory.RefusedSelectedPriorityRestoreRetainsColdLease (0 ms)
+[ RUN      ] MultipleFactory.RefusedOriginalPinRestoreDoesNotAdmitRestart
+[       OK ] MultipleFactory.RefusedOriginalPinRestoreDoesNotAdmitRestart (0 ms)
+[ RUN      ] MultipleFactory.RefusedOwnedDmaClockReleaseRetainsItsMarker
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:572: Failure
+Expected equality of these values:
+  nx_platform_stop()
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:573: Failure
+Expected equality of these values:
+  nx_platform_start().primary
+    Which is: 0
+  NX_ERROR_STATE
+    Which is: 3
+
+[  FAILED  ] MultipleFactory.RefusedOwnedDmaClockReleaseRetainsItsMarker (0 ms)
+[ RUN      ] MultipleFactory.TwoDmaUartRequestsUseSeparateReviewedEngines
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:597: Failure
+Expected equality of these values:
+  nx_platform_stop()
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:598: Failure
+Expected equality of these values:
+  nx_request_state(&uart_requests[0].base)
+    Which is: 2
+  NX_REQUEST_SETTLED
+    Which is: 4
+
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:599: Failure
+Expected equality of these values:
+  nx_request_state(&uart_requests[1].base)
+    Which is: 3
+  NX_REQUEST_SETTLED
+    Which is: 4
+
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:445: Failure
+Expected equality of these values:
+  nx_platform_stop()
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] MultipleFactory.TwoDmaUartRequestsUseSeparateReviewedEngines (0 ms)
+[ RUN      ] MultipleFactory.ForeignSpiEndpointRejectsBeforeDmaOrRequestBorrow
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:602: Failure
+Expected equality of these values:
+  nx_platform_start().primary
+    Which is: 3
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:445: Failure
+Expected equality of these values:
+  nx_platform_stop()
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] MultipleFactory.ForeignSpiEndpointRejectsBeforeDmaOrRequestBorrow (0 ms)
+[ RUN      ] MultipleFactory.BufferOutsideGeneratedDmaDomainHasNoAdmissionEffect
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:618: Failure
+Expected equality of these values:
+  nx_platform_start().primary
+    Which is: 3
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:445: Failure
+Expected equality of these values:
+  nx_platform_stop()
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] MultipleFactory.BufferOutsideGeneratedDmaDomainHasNoAdmissionEffect (0 ms)
+[ RUN      ] MultipleFactory.FullReverseCleanupAllowsOnlyQuiescentColdRestart
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:630: Failure
+Expected equality of these values:
+  nx_platform_start().primary
+    Which is: 3
+  NX_SUCCESS
+    Which is: 0
+
+/workspace/nexus/tests/google/multi_controller_factory_test.cpp:445: Failure
+Expected equality of these values:
+  nx_platform_stop()
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+
+[  FAILED  ] MultipleFactory.FullReverseCleanupAllowsOnlyQuiescentColdRestart (0 ms)
+[----------] 15 tests from MultipleFactory (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 15 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 10 tests.
+[  FAILED  ] 5 tests, listed below:
+[  FAILED  ] MultipleFactory.RefusedOwnedDmaClockReleaseRetainsItsMarker
+[  FAILED  ] MultipleFactory.TwoDmaUartRequestsUseSeparateReviewedEngines
+[  FAILED  ] MultipleFactory.ForeignSpiEndpointRejectsBeforeDmaOrRequestBorrow
+[  FAILED  ] MultipleFactory.BufferOutsideGeneratedDmaDomainHasNoAdmissionEffect
+[  FAILED  ] MultipleFactory.FullReverseCleanupAllowsOnlyQuiescentColdRestart
+
+ 5 FAILED TESTS

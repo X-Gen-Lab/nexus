@@ -1,0 +1,122 @@
+{
+  "board": "gd32f470zg-controller-link-fixture",
+  "budget": {
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-expanded/gd32f470zgt6-freertos-rx-dma-continuous/nexus-sdk/generated/resource-budget.json",
+    "sha256": "4f7ab7028e51eda4f011fe5bdbf6293365cf49554b5685ff746f97a76d3e6b00",
+    "size": 207
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus-config-iteration-evidence/mode-arm-expanded/gd32f470zgt6-freertos-rx-dma-continuous.toml",
+        "sha256": "587a051dc272a8feda703d0b9380de9b9bf59738377feaf4ed9b7b5bed62d66f",
+        "size": 395
+      },
+      "label": "external/gd32f470zgt6-freertos-rx-dma-continuous.toml"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/gd32f470/routes.json",
+        "sha256": "4e6c35cb9be028a96b780a5f67dceb677e50272a1ba0ea36a2a25e3b93fd9ba1",
+        "size": 8389
+      },
+      "label": "soc/gd32f470/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/gd32f470/soc.json",
+        "sha256": "ce094ab9956334116e884e55a4adb8980d7ffa31b5fa7400817c77aaf5e21a1b",
+        "size": 8165
+      },
+      "label": "soc/gd32f470/soc.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tests/contracts/gd32_assembly/software_board/board.json",
+        "sha256": "114399829ffc7af5be1ea6932122aa3bab8bf01f4cdfea000e31e9caf1dc78f9",
+        "size": 2216
+      },
+      "label": "tests/contracts/gd32_assembly/software_board/board.json"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-expanded/gd32f470zgt6-freertos-rx-dma-continuous/bin/gd32_controller_fixture.elf",
+    "sha256": "b6b4193276896727dc5b28bf94c3974b5b386a0b2abf1f27af6846b3364c898e",
+    "size": 28784
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 1048576,
+      "footprint_bytes": 9960,
+      "loaded_bytes": 9960,
+      "ranges": [
+        [
+          134217728,
+          134227688
+        ]
+      ]
+    },
+    "ram": {
+      "addsram": {
+        "capacity_bytes": 262144,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 196608,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536870916
+          ],
+          [
+            536870920,
+            536871128
+          ],
+          [
+            537065472,
+            537067520
+          ]
+        ],
+        "reserved_bytes": 2260
+      },
+      "tcm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536871128,
+        "start": 536871128
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537067520,
+        "start": 537065472
+      }
+    }
+  },
+  "part": "GD32F470ZGT6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-config-iteration-evidence/mode-arm-expanded/gd32f470zgt6-freertos-rx-dma-continuous/nexus-sdk/generated/resolved.json",
+    "sha256": "4fcc1a40e91c68472057c2d1541d47344e47f2ba2e1a99d773512dbea0ee78dd",
+    "size": 24383
+  },
+  "schema_version": 1,
+  "soc_family": "gd32f470",
+  "status": "passed",
+  "violations": []
+}

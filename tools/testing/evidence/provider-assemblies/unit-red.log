@@ -1,0 +1,19 @@
+test_provider_assemblies (unittest.loader._FailedTest.test_provider_assemblies) ... ERROR
+
+======================================================================
+ERROR: test_provider_assemblies (unittest.loader._FailedTest.test_provider_assemblies)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_provider_assemblies
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/scripts/ci/test_provider_assemblies.py", line 11, in <module>
+    from scripts.ci import provider_assemblies as gate
+ImportError: cannot import name 'provider_assemblies' from 'scripts.ci' (unknown location)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

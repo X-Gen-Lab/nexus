@@ -1,0 +1,21 @@
+Running main() from gmock_main.cc
+[==========] Running 6 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 6 tests from TimebaseSoC
+[ RUN      ] TimebaseSoC.ExactReviewedClockAndIRQProduceAStablePort
+[       OK ] TimebaseSoC.ExactReviewedClockAndIRQProduceAStablePort (0 ms)
+[ RUN      ] TimebaseSoC.MissingSleepClockAndDisabledWakeIRQRejectThePort
+[       OK ] TimebaseSoC.MissingSleepClockAndDisabledWakeIRQRejectThePort (0 ms)
+[ RUN      ] TimebaseSoC.WrongPrescalerAndStoppedTimebaseRejectWithoutRepair
+[       OK ] TimebaseSoC.WrongPrescalerAndStoppedTimebaseRejectWithoutRepair (0 ms)
+[ RUN      ] TimebaseSoC.PLLTupleSourceReadinessAndSpreadSpectrumAreNotCachedFacts
+[       OK ] TimebaseSoC.PLLTupleSourceReadinessAndSpreadSpectrumAreNotCachedFacts (0 ms)
+[ RUN      ] TimebaseSoC.CounterDirectionOnePulseAndComparePreloadRejectWithoutRepair
+[       OK ] TimebaseSoC.CounterDirectionOnePulseAndComparePreloadRejectWithoutRepair (0 ms)
+[ RUN      ] TimebaseSoC.ReservedCompareKeepsOverflowAndHasExplicitBorrowState
+[       OK ] TimebaseSoC.ReservedCompareKeepsOverflowAndHasExplicitBorrowState (0 ms)
+[----------] 6 tests from TimebaseSoC (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 6 tests.

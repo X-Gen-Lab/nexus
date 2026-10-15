@@ -1,0 +1,42 @@
+{
+  "qualification": "development-only compile of real exact-derived official TU with upstream debug enabled; not execution or HIL",
+  "command": [
+    "/usr/bin/cc",
+    "-DTX_LINUX_DEBUG_ENABLE",
+    "-DTX_INCLUDE_USER_DEFINE_FILE",
+    "-DTX_TIMER_TICKS_PER_SECOND=1000",
+    "-D_GNU_SOURCE",
+    "-I/workspace/nexus/os/threadx/config",
+    "-I/workspace/nexus-threadx-probe/native-generated",
+    "-isystem",
+    "/workspace/nexus/ext/threadx/common/inc",
+    "-isystem",
+    "/workspace/nexus/ext/threadx/ports/linux/gnu/inc",
+    "-g",
+    "-Os",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-fsanitize=thread",
+    "-fno-omit-frame-pointer",
+    "-o",
+    "/workspace/nexus-ci-security-iteration/threadx-context-followup/lowlevel-debug-probe.o",
+    "-c",
+    "/workspace/nexus-ci-security-iteration/threadx-tsan-build/contract_threadx_linux-port/tx_initialize_low_level.c"
+  ],
+  "exit_code": 0,
+  "output": {
+    "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/official-observers-debug-compile.output",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "source": {
+    "path": "/workspace/nexus-ci-security-iteration/threadx-tsan-build/contract_threadx_linux-port/tx_initialize_low_level.c",
+    "sha256": "5875c5332424ea1eb3bc701671651a87258c1289538c4240704eb758b36e0388",
+    "bytes": 18161
+  },
+  "binary": {
+    "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/lowlevel-debug-probe.o",
+    "sha256": "d98688de7c6500195baeb516cda402c8330a79f648c725a6eed8975e6863eecb",
+    "bytes": 51688
+  }
+}

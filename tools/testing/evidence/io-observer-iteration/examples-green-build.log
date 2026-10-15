@@ -1,0 +1,57 @@
+[0/1] Re-running CMake...
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus-examples/build/quarantine-iteration/nexus/generated/resolved.json
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Configuring done (0.9s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus-examples/build/quarantine-iteration
+[1/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/gpio.c.o
+[2/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/uart.c.o
+[3/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/i2c.c.o
+[4/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/spi.c.o
+[5/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/flash.c.o
+[6/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/watchdog.c.o
+[7/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/exti.c.o
+[8/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/timer.c.o
+[9/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/adc.c.o
+[10/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/flash_region.c.o
+[11/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/dma.c.o
+[12/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/wake.c.o
+[13/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[14/50] Building C object nexus/io/CMakeFiles/nexus_io.dir/src/stream.c.o
+[15/50] Linking C static library nexus/lib/libnexus_io.a
+[16/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[17/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[18/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[19/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[20/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[21/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[22/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[23/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[24/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[25/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[26/50] Building C object nexus/io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[27/50] Building C object nexus/components/CMakeFiles/nexus_bmp280.dir/bmp280/src/bmp280.c.o
+[28/50] Building C object nexus/CMakeFiles/nexus_platform.dir/generated/bindings.c.o
+[29/50] Linking C static library nexus/lib/libnexus_io_native.a
+[30/50] Linking C static library nexus/lib/libnexus_bmp280.a
+[31/50] Building C object nexus/components/CMakeFiles/nexus_bmp280_spi.dir/bmp280/src/spi_transport.c.o
+[32/50] Building C object nexus/components/CMakeFiles/nexus_uart_owner.dir/bus_owner/src/uart_owner.c.o
+[33/50] Building C object nexus/components/CMakeFiles/nexus_log.dir/log/src/log.c.o
+[34/50] Building C object nexus/components/CMakeFiles/nexus_storage.dir/storage/src/storage.c.o
+[35/50] Building C object CMakeFiles/uart_owner_runtime.dir/apps/uart_owner_runtime/main.c.o
+[36/50] Building C object nexus/components/CMakeFiles/nexus_modbus.dir/modbus/src/modbus_rtu.c.o
+[37/50] Building C object CMakeFiles/uart_owner_runtime.dir/apps/uart_owner_runtime/lifecycle.c.o
+[38/50] Building C object CMakeFiles/uart_owner_runtime.dir/apps/uart_owner_runtime/scheduler_return.c.o
+[39/50] Building C object CMakeFiles/uart_owner_runtime.dir/apps/uart_owner_runtime/bootstrap.c.o
+[40/50] Linking C static library nexus/lib/libnexus_platform.a
+[41/50] Linking C static library nexus/lib/libnexus_uart_owner.a
+[42/50] Linking C static library nexus/lib/libnexus_bmp280_spi.a
+[43/50] Linking C static library nexus/lib/libnexus_log.a
+[44/50] Linking C static library nexus/lib/libnexus_storage.a
+[45/50] Linking C static library nexus/lib/libnexus_modbus.a
+[46/50] Building C object CMakeFiles/uart_owner_runtime.dir/apps/uart_owner_runtime/quarantine_policy.c.o
+[47/50] Linking C executable bin/uart_owner_runtime
+[48/50] Building C object tests/CMakeFiles/owner_lifecycle_test.dir/__/apps/uart_owner_runtime/quarantine_policy.c.o
+[49/50] Linking CXX executable tests/owner_lifecycle_test

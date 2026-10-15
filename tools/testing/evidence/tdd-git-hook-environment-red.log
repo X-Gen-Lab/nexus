@@ -1,0 +1,25 @@
+test_real_commit_hook_checks_the_actual_submodule_and_commit_index (tools.testing.test_git_environment.GitEnvironmentTests.test_real_commit_hook_checks_the_actual_submodule_and_commit_index) ... FAIL
+
+======================================================================
+FAIL: test_real_commit_hook_checks_the_actual_submodule_and_commit_index (tools.testing.test_git_environment.GitEnvironmentTests.test_real_commit_hook_checks_the_actual_submodule_and_commit_index)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/testing/test_git_environment.py", line 77, in test_real_commit_hook_checks_the_actual_submodule_and_commit_index
+    self.assertEqual(result.returncode, 0, output)
+AssertionError: 1 != 0 : real hook inherited GIT_INDEX_FILE: True
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/workspace/nexus/tools/configure/configure.py", line 69, in dependency_identity
+    if git(checkout, "status", "--porcelain", "--untracked-files=normal"):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 63, in git
+    fail(f"Cannot verify SDK dependency: {relative}")
+  File "/workspace/nexus/tools/configure/configure.py", line 183, in fail
+    raise ConfigurationError(message)
+tools.configure.configure.ConfigurationError: Cannot verify SDK dependency: vendor/sdk
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.144s
+
+FAILED (failures=1)

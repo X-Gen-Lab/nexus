@@ -1,0 +1,32 @@
+from pathlib import Path
+import hashlib,json,os,subprocess,sys,xml.etree.ElementTree as ET
+ROOT=Path('/workspace/nexus');BUILD=Path(sys.argv[1]);OUT=Path(sys.argv[2]);OUT.mkdir(exist_ok=False)
+files=sorted(p for p in list((ROOT/'os/threadx').rglob('*'))+list((ROOT/'tests/google').glob('threadx*_test.cpp'))+[ROOT/'tests/google/threadx.cmake',ROOT/'dependencies/threadx.lock.json'] if p.is_file() and '__pycache__' not in p.parts)
+def identity(p):
+ raw=p.read_bytes();return {'path':str(p),'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)}
+before=[identity(p) for p in files];rows=[]
+for name in ('kernel','bootstrap','m4','irq','m4_primask','irq_primask','m4_external','linux_port'):
+ target='nexus_threadx_'+name+'_test';binary=BUILD/target
+ row={'target':target,'binary':identity(binary)}
+ for phase,flags in [('discovery',['--gtest_list_tests']),('execution',['--gtest_output=xml:'+str(OUT/(target+'.xml'))])]:
+  args=['timeout','25',str(binary),*flags]
+  env=dict(os.environ);env['TSAN_OPTIONS']='halt_on_error=1'
+  result=subprocess.run(args,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+  out=OUT/(target+'-'+phase+'.output');out.write_bytes(result.stdout)
+  row[phase]={'command':args,'exit_code':result.returncode,'output':identity(out)}
+  if result.returncode:break
+ if row['discovery']['exit_code']==0 and row.get('execution',{}).get('exit_code')==0:
+  listing=(OUT/(target+'-discovery.output')).read_text();suite=None;cases=[]
+  for line in listing.splitlines():
+   line=line.split('#')[0].rstrip()
+   if line.endswith('.') and line and not line[0].isspace():suite=line[:-1]
+   elif suite and line.startswith('  '):cases.append((suite,line.strip()))
+  xml=ET.parse(OUT/(target+'.xml')).getroot();actual=[(x.attrib['classname'],x.attrib['name']) for x in xml.iter('testcase')]
+  assert cases and sorted(cases)==sorted(actual)
+  assert not any(x.tag in ('failure','error','skipped') for x in xml.iter())
+  row['passed']=len(cases);row['report']=identity(OUT/(target+'.xml'))
+ rows.append(row)
+after=[identity(p) for p in files];assert before==after
+manifest={'qualification':'development-only; not MCU/HIL','source_before':before,'source_after':after,'source_unchanged':True,'suites':rows,'passed':sum(x.get('passed',0) for x in rows),'all_passed':all(x.get('passed',0)>0 for x in rows),'official_source':identity(ROOT/'ext/threadx/ports/linux/gnu/src/tx_initialize_low_level.c'),'compile_commands':identity(BUILD/'compile_commands.json')}
+(OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+print('passed',manifest['passed'],'all_passed',manifest['all_passed'])

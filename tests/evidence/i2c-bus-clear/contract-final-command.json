@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-io20-build/bin/nexus_i2c_bus_clear_test",
+    "--gtest_filter=*",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-os-iteration-evidence/io20-bus-clear/contract-final.xml"
+  ],
+  "exit_code": 0,
+  "started_ns": 1791736752740936859
+}

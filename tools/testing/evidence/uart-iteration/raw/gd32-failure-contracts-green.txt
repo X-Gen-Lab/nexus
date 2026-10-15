@@ -1,0 +1,25 @@
+Running main() from gmock_main.cc
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from Gd32UartReceive
+[ RUN      ] Gd32UartReceive.StartProgramsCallerBufferWithoutCpuPayloadCopy
+[       OK ] Gd32UartReceive.StartProgramsCallerBufferWithoutCpuPayloadCopy (0 ms)
+[ RUN      ] Gd32UartReceive.InvalidFutureBufferRejectsWithoutLoanOrMmioEffect
+[       OK ] Gd32UartReceive.InvalidFutureBufferRejectsWithoutLoanOrMmioEffect (0 ms)
+[ RUN      ] Gd32UartReceive.IdlePublishesOnlyTheStablePartialPrefix
+[       OK ] Gd32UartReceive.IdlePublishesOnlyTheStablePartialPrefix (0 ms)
+[ RUN      ] Gd32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains
+[       OK ] Gd32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains (0 ms)
+[ RUN      ] Gd32UartReceive.FullDmaBlockRequiresExplicitOwnerRearm
+[       OK ] Gd32UartReceive.FullDmaBlockRequiresExplicitOwnerRearm (0 ms)
+[ RUN      ] Gd32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss
+[       OK ] Gd32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss (0 ms)
+[ RUN      ] Gd32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists
+[       OK ] Gd32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists (0 ms)
+[ RUN      ] Gd32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice
+[       OK ] Gd32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice (0 ms)
+[----------] 8 tests from Gd32UartReceive (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 8 tests.

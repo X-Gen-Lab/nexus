@@ -1,0 +1,6 @@
+CMake Error at /workspace/nexus/cmake/platform/Runtime.cmake:26 (message):
+  NEXUS_CPU_ARCH is not a runtime override; use ASSEMBLY
+Call Stack (most recent call first):
+  CMakeLists.txt:11 (nexus_add_runtime)
+
+

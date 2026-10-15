@@ -1,0 +1,19 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 041c6d7fc9d602ec69588fc14d9ef2f96722ac163ef1d3f69802f42251422e34\n"
+
+msgid "Tutorials"
+msgstr "入门教程"
+
+msgid ""
+"Follow one fixed, verifiable path. Start with the external Source SDK "
+"consumer; use the request tutorial before adding asynchronous execution."
+msgstr "沿一条固定、可验证的路径完成任务。先构建外部 Source SDK 消费工程，再通过请求教程理解异步执行。"

@@ -1,0 +1,82 @@
+[
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+      "-A",
+      "tools/testing/evidence/usb-device-iteration/arm/gd32f470-drivers-usb_device.o"
+    ],
+    "exit_code": 0,
+    "stdout": "tools/testing/evidence/usb-device-iteration/arm/gd32f470-drivers-usb_device.o  :\nsection                               size   addr\n.text                                    0      0\n.data                                    0      0\n.bss                                     0      0\n.text.nx_gd32_usb_device_initialize     88      0\n.comment                                71      0\n.ARM.attributes                         52      0\nTotal                                  211\n\n\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+      "-A",
+      "tools/testing/evidence/usb-device-iteration/arm/gd32f470-src-usb_device.o"
+    ],
+    "exit_code": 0,
+    "stdout": "tools/testing/evidence/usb-device-iteration/arm/gd32f470-src-usb_device.o  :\nsection                           size   addr\n.text                                0      0\n.data                                0      0\n.bss                                 0      0\n.text.nx_usb_in_prepare             64      0\n.text.nx_usb_out_prepare            64      0\n.text.nx_usb_endpoint_submit        24      0\n.text.nx_usb_endpoint_cancel        24      0\n.text.nx_usb_endpoint_stall         24      0\n.text.nx_usb_device_service         24      0\n.text.nx_usb_device_read_events     44      0\n.text.nx_usb_device_state           24      0\n.text.nx_usb_device_address         44      0\n.text.nx_usb_device_attach_wake     24      0\n.text.nx_usb_device_stop            24      0\n.comment                            71      0\n.ARM.attributes                     52      0\nTotal                              507\n\n\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+      "-A",
+      "tools/testing/evidence/usb-device-iteration/arm/gd32f470-src-usb_device_controller.o"
+    ],
+    "exit_code": 0,
+    "stdout": "tools/testing/evidence/usb-device-iteration/arm/gd32f470-src-usb_device_controller.o  :\nsection                              size   addr\n.text                                   0      0\n.data                                   0      0\n.bss                                    0      0\n.text.overlap                          44      0\n.text.event                           156      0\n.text.finish                          168      0\n.text.begin_drain                      64      0\n.text.arm_setup                       108      0\n.text.drain                           276      0\n.text.address                         132      0\n.text.stall                           168      0\n.text.storage_valid                   332      0\n.text.submit                          712      0\n.text.attach_wake                     204      0\n.text.state                           112      0\n.text.read_events                     340      0\n.text.nx_usb_controller_initialize   1520      0\n.text.nx_usb_controller_irq          2156      0\n.text.cancel                           96      0\n.text.stop                            620      0\n.text.service                          60      0\n.rodata.nx_usb_fs_device_ops           24      0\n.rodata.nx_usb_fs_endpoint_ops         12      0\n.comment                               71      0\n.ARM.attributes                        52      0\nTotal                                7427\n\n\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+      "-A",
+      "tools/testing/evidence/usb-device-iteration/arm/gd32f470-structure-sizes.o"
+    ],
+    "exit_code": 0,
+    "stdout": "tools/testing/evidence/usb-device-iteration/arm/gd32f470-structure-sizes.o  :\nsection                          size   addr\n.text                               0      0\n.data                               0      0\n.bss                                0      0\n.rodata.nx_usb_structure_sizes     20      0\n.comment                           71      0\n.ARM.attributes                    52      0\nTotal                             143\n\n\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+      "-A",
+      "tools/testing/evidence/usb-device-iteration/arm/stm32f407-drivers-usb_device.o"
+    ],
+    "exit_code": 0,
+    "stdout": "tools/testing/evidence/usb-device-iteration/arm/stm32f407-drivers-usb_device.o  :\nsection                                size   addr\n.text                                     0      0\n.data                                     0      0\n.bss                                      0      0\n.text.nx_stm32_usb_device_initialize     88      0\n.comment                                 71      0\n.ARM.attributes                          52      0\nTotal                                   211\n\n\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+      "-A",
+      "tools/testing/evidence/usb-device-iteration/arm/stm32f407-src-usb_device.o"
+    ],
+    "exit_code": 0,
+    "stdout": "tools/testing/evidence/usb-device-iteration/arm/stm32f407-src-usb_device.o  :\nsection                           size   addr\n.text                                0      0\n.data                                0      0\n.bss                                 0      0\n.text.nx_usb_in_prepare             64      0\n.text.nx_usb_out_prepare            64      0\n.text.nx_usb_endpoint_submit        24      0\n.text.nx_usb_endpoint_cancel        24      0\n.text.nx_usb_endpoint_stall         24      0\n.text.nx_usb_device_service         24      0\n.text.nx_usb_device_read_events     44      0\n.text.nx_usb_device_state           24      0\n.text.nx_usb_device_address         44      0\n.text.nx_usb_device_attach_wake     24      0\n.text.nx_usb_device_stop            24      0\n.comment                            71      0\n.ARM.attributes                     52      0\nTotal                              507\n\n\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+      "-A",
+      "tools/testing/evidence/usb-device-iteration/arm/stm32f407-src-usb_device_controller.o"
+    ],
+    "exit_code": 0,
+    "stdout": "tools/testing/evidence/usb-device-iteration/arm/stm32f407-src-usb_device_controller.o  :\nsection                              size   addr\n.text                                   0      0\n.data                                   0      0\n.bss                                    0      0\n.text.overlap                          44      0\n.text.event                           156      0\n.text.finish                          168      0\n.text.begin_drain                      64      0\n.text.arm_setup                       108      0\n.text.drain                           276      0\n.text.address                         132      0\n.text.stall                           168      0\n.text.storage_valid                   332      0\n.text.submit                          712      0\n.text.attach_wake                     204      0\n.text.state                           112      0\n.text.read_events                     340      0\n.text.nx_usb_controller_initialize   1520      0\n.text.nx_usb_controller_irq          2156      0\n.text.cancel                           96      0\n.text.stop                            620      0\n.text.service                          60      0\n.rodata.nx_usb_fs_device_ops           24      0\n.rodata.nx_usb_fs_endpoint_ops         12      0\n.comment                               71      0\n.ARM.attributes                        52      0\nTotal                                7427\n\n\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
+      "-A",
+      "tools/testing/evidence/usb-device-iteration/arm/stm32f407-structure-sizes.o"
+    ],
+    "exit_code": 0,
+    "stdout": "tools/testing/evidence/usb-device-iteration/arm/stm32f407-structure-sizes.o  :\nsection                          size   addr\n.text                               0      0\n.data                               0      0\n.bss                                0      0\n.rodata.nx_usb_structure_sizes     20      0\n.comment                           71      0\n.ARM.attributes                    52      0\nTotal                             143\n\n\n",
+    "stderr": ""
+  }
+]

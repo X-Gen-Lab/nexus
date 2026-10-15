@@ -1,0 +1,61 @@
+{
+  "Graph_files_are_observed_not_changed": true,
+  "actual_host_tool_observation_after": {
+    "C": {
+      "bytes": 1162264,
+      "path": "/usr/bin/cc",
+      "resolved_path": "/usr/bin/x86_64-linux-gnu-gcc-14",
+      "sha256": "a23ecab8ff08f09ad8c80602c2c5df7f49e09c25905cb8975902e101bf72635f"
+    },
+    "CXX": {
+      "bytes": 1166360,
+      "path": "/usr/bin/c++",
+      "resolved_path": "/usr/bin/x86_64-linux-gnu-g++-14",
+      "sha256": "6b3696e4dcb85e1c949c732a02befa50e3983ecf94ce7e8e58d9d503b954b79d"
+    }
+  },
+  "production_before_after_unchanged": true,
+  "production_files": [
+    {
+      "bytes": 6932,
+      "path": "/workspace/nexus/CMakePresets.json",
+      "sha256": "abafbb950d483440ebd5e7eee075543449431170938b860a2b1cf16c937ac238"
+    },
+    {
+      "bytes": 5929,
+      "path": "/workspace/nexus/arch/include/nexus/arch/arch.h",
+      "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289"
+    },
+    {
+      "bytes": 2026,
+      "path": "/workspace/nexus/core/include/nexus/core/fault.h",
+      "sha256": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b"
+    },
+    {
+      "bytes": 639,
+      "path": "/workspace/nexus/core/src/fault.c",
+      "sha256": "976a3af81cfefa6d7185b7328162825eb08fc4ae25042a543de1fc8369a8367f"
+    },
+    {
+      "bytes": 6864,
+      "path": "/workspace/nexus/core/src/request.c",
+      "sha256": "6fdc85b08c7e479cc943e77036912fb7313a4c690dd32c85a9f632d2380f03d8"
+    },
+    {
+      "bytes": 1850,
+      "path": "/workspace/nexus/os/freertos/hooks.c",
+      "sha256": "08f2b17edeb716fbdacce01b473537fca777e215a7c26569b1680daeabfa6298"
+    },
+    {
+      "bytes": 634,
+      "path": "/workspace/nexus/tests/google/failstop.cmake",
+      "sha256": "b19ddc57a9f6ad5a849e6bdd3812aff286ac4ff18022d0cabba85f70462b605e"
+    }
+  ],
+  "source": {
+    "bytes": 13266,
+    "path": "/workspace/nexus/tests/google/freertos_failstop_test.cpp",
+    "resolved_path": "/workspace/nexus/tests/google/freertos_failstop_test.cpp",
+    "sha256": "d5d6b882503a7385223d0daf9a649453aece832bfacde8aa75d2194b1ecdd0ac"
+  }
+}

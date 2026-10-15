@@ -1,0 +1,120 @@
+{
+  "direct_requirements": {
+    "clang-format": "14.0.6",
+    "cmake": "3.31.6",
+    "ninja": "1.13.2",
+    "pre-commit": "4.3.0",
+    "pyyaml": "6.0.3",
+    "setuptools": "84.0.0"
+  },
+  "kind": "offline_python_wheels",
+  "schema_version": 1,
+  "target": "Linux-x86_64-cp312",
+  "wheels": [
+    {
+      "filename": "cfgv-3.5.0-py2.py3-none-any.whl",
+      "name": "cfgv",
+      "sha256": "a8dc6b26ad22ff227d2634a65cb388215ce6cc96bbcc5cfde7641ae87e8dacc0",
+      "size": 7445,
+      "version": "3.5.0"
+    },
+    {
+      "filename": "clang_format-14.0.6-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl",
+      "name": "clang-format",
+      "sha256": "d7c1c5e404c58e55f0170f01b3c5611dce6c119e62b5d1020347e0ad97d5a047",
+      "size": 1147591,
+      "version": "14.0.6"
+    },
+    {
+      "filename": "cmake-3.31.6-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "name": "cmake",
+      "sha256": "1c8b05df0602365da91ee6a3336fe57525b137706c4ab5675498f662ae1dbcec",
+      "size": 27800904,
+      "version": "3.31.6"
+    },
+    {
+      "filename": "distlib-0.4.3-py2.py3-none-any.whl",
+      "name": "distlib",
+      "sha256": "4b0ce306c966eb73bc3a7b6abad017c556dadd92c44701562cd528ac7fde4d5b",
+      "size": 470628,
+      "version": "0.4.3"
+    },
+    {
+      "filename": "filelock-4.1.1-py3-none-any.whl",
+      "name": "filelock",
+      "sha256": "3f4a557945a7b0f95efeb1f432267affe5d45ac8ddde2aed1b97ebb62382c089",
+      "size": 132460,
+      "version": "4.1.1"
+    },
+    {
+      "filename": "identify-2.6.20-py2.py3-none-any.whl",
+      "name": "identify",
+      "sha256": "6a16b69b93187244e0548cbfd25b3e4a6f9a7a2ad784625c3bec2b8d27b81aaa",
+      "size": 99506,
+      "version": "2.6.20"
+    },
+    {
+      "filename": "ninja-1.13.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "name": "ninja",
+      "sha256": "65a24341b5ac09fcadcc37082660be40a94174e51a937fabf6e2cae26225fa2c",
+      "size": 183365,
+      "version": "1.13.2"
+    },
+    {
+      "filename": "nodeenv-1.11.0-py2.py3-none-any.whl",
+      "name": "nodeenv",
+      "sha256": "edaa16e6c14d7cf395d75d4bbd5a26390f4dc06501a33b4e76282b02cc688a25",
+      "size": 34277,
+      "version": "1.11.0"
+    },
+    {
+      "filename": "packaging-26.3-py3-none-any.whl",
+      "name": "packaging",
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "size": 129956,
+      "version": "26.3"
+    },
+    {
+      "filename": "platformdirs-4.13.0-py3-none-any.whl",
+      "name": "platformdirs",
+      "sha256": "3dbcf4cd708f21cf876c4eaa90e58412bc4f033d87143f41b1493ff77c25b7e1",
+      "size": 32724,
+      "version": "4.13.0"
+    },
+    {
+      "filename": "pre_commit-4.3.0-py2.py3-none-any.whl",
+      "name": "pre-commit",
+      "sha256": "2b0747ad7e6e967169136edffee14c16e148a778a54e4f967921aa1ebf2308d8",
+      "size": 220965,
+      "version": "4.3.0"
+    },
+    {
+      "filename": "python_discovery-1.6.2-py3-none-any.whl",
+      "name": "python-discovery",
+      "sha256": "f0c697f95a3aaec4174a6e5e58f5885e25768684bafc76f1afde384709ebdcf2",
+      "size": 38912,
+      "version": "1.6.2"
+    },
+    {
+      "filename": "pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+      "name": "pyyaml",
+      "sha256": "ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc",
+      "size": 807870,
+      "version": "6.0.3"
+    },
+    {
+      "filename": "setuptools-84.0.0-py3-none-any.whl",
+      "name": "setuptools",
+      "sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670",
+      "size": 818216,
+      "version": "84.0.0"
+    },
+    {
+      "filename": "virtualenv-21.14.7-py3-none-any.whl",
+      "name": "virtualenv",
+      "sha256": "3769219a308c5d2f093e7729621ad12a6346b5767a7ec4338414e2a0fb0c526b",
+      "size": 5487587,
+      "version": "21.14.7"
+    }
+  ]
+}

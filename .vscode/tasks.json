@@ -2,83 +2,317 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Configure CMake (Debug)",
-            "type": "shell",
-            "command": "cmake",
+            "label": "Configure Native",
+            "type": "process",
+            "command": "python",
             "args": [
-                "-B", "build",
-                "-G", "Ninja",
-                "-DCMAKE_BUILD_TYPE=Debug",
-                "-DNEXUS_PLATFORM=${input:platform}",
-                "-DNEXUS_BUILD_TESTS=ON"
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "native-debug"
             ],
-            "problemMatcher": [],
-            "group": "build"
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
         },
         {
-            "label": "Configure CMake (Release)",
-            "type": "shell",
-            "command": "cmake",
+            "label": "Build Native",
+            "type": "process",
+            "command": "python",
             "args": [
-                "-B", "build",
-                "-G", "Ninja",
-                "-DCMAKE_BUILD_TYPE=Release",
-                "-DNEXUS_PLATFORM=${input:platform}"
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "native-debug",
+                "--parallel",
+                "4"
             ],
-            "problemMatcher": [],
-            "group": "build"
-        },
-        {
-            "label": "Build",
-            "type": "shell",
-            "command": "cmake",
-            "args": ["--build", "build", "--parallel"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Native"
+            ],
+            "dependsOrder": "sequence",
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
-            "problemMatcher": ["$gcc"]
+            }
         },
         {
-            "label": "Clean",
-            "type": "shell",
-            "command": "cmake",
-            "args": ["--build", "build", "--target", "clean"],
-            "problemMatcher": []
-        },
-        {
-            "label": "Run Tests",
-            "type": "shell",
-            "command": "ctest",
-            "args": ["--test-dir", "build", "--output-on-failure"],
-            "group": "test",
-            "problemMatcher": []
-        },
-        {
-            "label": "Format Code",
-            "type": "shell",
-            "command": "powershell",
+            "label": "Configure Qiming baremetal",
+            "type": "process",
+            "command": "python",
             "args": [
-                "-Command",
-                "Get-ChildItem -Recurse -Include *.c,*.h | ForEach-Object { clang-format -i $_.FullName }"
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "stm32-qiming-baremetal"
             ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "problemMatcher": []
         },
         {
-            "label": "Generate Docs",
-            "type": "shell",
-            "command": "doxygen",
-            "args": ["Doxyfile"],
-            "problemMatcher": []
-        }
-    ],
-    "inputs": [
+            "label": "Build Qiming baremetal",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "stm32-qiming-baremetal",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Qiming baremetal"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
         {
-            "id": "platform",
-            "type": "pickString",
-            "description": "Select target platform",
-            "options": ["stm32f4", "stm32h7", "esp32", "nrf52", "native"],
-            "default": "stm32f4"
+            "label": "Configure Qiming FreeRTOS",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "stm32-qiming-freertos"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Qiming FreeRTOS",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "stm32-qiming-freertos",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Qiming FreeRTOS"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Configure Sky baremetal",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "stm32-sky-baremetal"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Sky baremetal",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "stm32-sky-baremetal",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Sky baremetal"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Configure Sky FreeRTOS",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "stm32-sky-freertos"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Sky FreeRTOS",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "stm32-sky-freertos",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Sky FreeRTOS"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Configure Liangshan baremetal",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "gd32-liangshan-baremetal"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Liangshan baremetal",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "gd32-liangshan-baremetal",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Liangshan baremetal"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Configure Liangshan FreeRTOS",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "configure",
+                "--preset",
+                "gd32-liangshan-freertos"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Liangshan FreeRTOS",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "build",
+                "--preset",
+                "gd32-liangshan-freertos",
+                "--parallel",
+                "4"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "dependsOn": [
+                "Configure Liangshan FreeRTOS"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Test Native",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/dev/dev.py",
+                "test",
+                "--preset",
+                "native-debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": [
+                "Build Native"
+            ],
+            "problemMatcher": [],
+            "group": "test"
         }
     ]
 }

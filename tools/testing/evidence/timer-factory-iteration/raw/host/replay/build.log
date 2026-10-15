@@ -1,0 +1,31 @@
+[  4%] Building C object CMakeFiles/timer_api.dir/workspace/nexus/io/src/timer_capture.c.o
+[  8%] Building C object CMakeFiles/timer_arch.dir/workspace/nexus/arch/native/nx_arch_native.c.o
+[ 16%] Linking C static library libtimer_arch.a
+[ 16%] Building C object CMakeFiles/timer_api.dir/workspace/nexus/io/src/advanced_pwm.c.o
+[ 16%] Built target timer_arch
+[ 20%] Linking C static library libtimer_api.a
+[ 20%] Built target timer_api
+[ 24%] Building CXX object CMakeFiles/replay_inactive-proof_gd32.dir/workspace/nexus-industrial-design/timer-factory-tests/inactive-proof-red-source/tests/google/timer_factory_test-final.cpp.o
+[ 28%] Building CXX object CMakeFiles/replay_inactive-proof_stm32.dir/workspace/nexus-industrial-design/timer-factory-tests/inactive-proof-red-source/tests/google/timer_factory_test-final.cpp.o
+[ 32%] Building C object CMakeFiles/replay_inactive-proof_gd32.dir/workspace/nexus-industrial-design/timer-factory-tests/inactive-proof-red-source/gd32-bindings.c.o
+[ 36%] Building C object CMakeFiles/replay_inactive-proof_gd32.dir/workspace/nexus/soc/gd32f470/drivers/timer_capture.c.o
+[ 40%] Building C object CMakeFiles/replay_inactive-proof_gd32.dir/workspace/nexus/soc/gd32f470/drivers/advanced_pwm.c.o
+[ 44%] Building C object CMakeFiles/replay_inactive-proof_stm32.dir/workspace/nexus-industrial-design/timer-factory-tests/inactive-proof-red-source/stm32-bindings.c.o
+[ 48%] Linking CXX executable replay_inactive-proof_gd32
+[ 52%] Building C object CMakeFiles/replay_inactive-proof_stm32.dir/workspace/nexus/soc/stm32f407/drivers/timer_capture.c.o
+[ 52%] Built target replay_inactive-proof_gd32
+[ 56%] Building CXX object CMakeFiles/replay_privilege_stm32.dir/workspace/nexus-industrial-design/timer-factory-tests/privilege-red-source/tests/google/timer_factory_test.cpp.o
+[ 60%] Building C object CMakeFiles/replay_inactive-proof_stm32.dir/workspace/nexus/soc/stm32f407/drivers/advanced_pwm.c.o
+[ 64%] Linking CXX executable replay_inactive-proof_stm32
+[ 64%] Built target replay_inactive-proof_stm32
+[ 68%] Building CXX object CMakeFiles/replay_privilege_gd32.dir/workspace/nexus-industrial-design/timer-factory-tests/privilege-red-source/tests/google/timer_factory_test.cpp.o
+[ 72%] Building C object CMakeFiles/replay_privilege_stm32.dir/workspace/nexus-industrial-design/timer-factory-tests/privilege-red-source/stm32-bindings.c.o
+[ 76%] Building C object CMakeFiles/replay_privilege_stm32.dir/workspace/nexus/soc/stm32f407/drivers/timer_capture.c.o
+[ 80%] Building C object CMakeFiles/replay_privilege_gd32.dir/workspace/nexus-industrial-design/timer-factory-tests/privilege-red-source/gd32-bindings.c.o
+[ 84%] Building C object CMakeFiles/replay_privilege_stm32.dir/workspace/nexus/soc/stm32f407/drivers/advanced_pwm.c.o
+[ 88%] Building C object CMakeFiles/replay_privilege_gd32.dir/workspace/nexus/soc/gd32f470/drivers/timer_capture.c.o
+[ 92%] Linking CXX executable replay_privilege_stm32
+[ 96%] Building C object CMakeFiles/replay_privilege_gd32.dir/workspace/nexus/soc/gd32f470/drivers/advanced_pwm.c.o
+[100%] Linking CXX executable replay_privilege_gd32
+[100%] Built target replay_privilege_stm32
+[100%] Built target replay_privilege_gd32

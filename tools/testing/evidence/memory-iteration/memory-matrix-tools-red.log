@@ -1,0 +1,18 @@
+test_attached_output_option_cannot_destroy_the_actual_object (tests.contracts.test_gd32_memory_matrix.MemoryMatrixTests.test_attached_output_option_cannot_destroy_the_actual_object) ... FAIL
+test_changed_source_identity_fails_closed (tests.contracts.test_gd32_memory_matrix.MemoryMatrixTests.test_changed_source_identity_fails_closed) ... ok
+test_existing_output_is_never_overwritten (tests.contracts.test_gd32_memory_matrix.MemoryMatrixTests.test_existing_output_is_never_overwritten) ... ok
+test_missing_tool_retains_actual_failure_report (tests.contracts.test_gd32_memory_matrix.MemoryMatrixTests.test_missing_tool_retains_actual_failure_report) ... ok
+test_preprocessing_does_not_overwrite_actual_build_depfiles (tests.contracts.test_gd32_memory_matrix.MemoryMatrixTests.test_preprocessing_does_not_overwrite_actual_build_depfiles) ... ok
+
+======================================================================
+FAIL: test_attached_output_option_cannot_destroy_the_actual_object (tests.contracts.test_gd32_memory_matrix.MemoryMatrixTests.test_attached_output_option_cannot_destroy_the_actual_object)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tests/contracts/test_gd32_memory_matrix.py", line 43, in test_attached_output_option_cannot_destroy_the_actual_object
+    self.assertEqual(obj.read_bytes(), b'original actual object')
+AssertionError: b'unsigned live;\n' != b'original actual object'
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.013s
+
+FAILED (failures=1)

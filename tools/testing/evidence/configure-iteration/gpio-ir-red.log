@@ -1,0 +1,13 @@
+.........................F...................................
+======================================================================
+FAIL: test_gpio_effective_mask_is_materialized_in_the_typed_decision (test_configure.ResolverTests.test_gpio_effective_mask_is_materialized_in_the_typed_decision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_configure.py", line 158, in test_gpio_effective_mask_is_materialized_in_the_typed_decision
+    self.assertEqual(ir.controllers[0].options.mask, 1)
+AssertionError: 0 != 1
+
+----------------------------------------------------------------------
+Ran 61 tests in 0.180s
+
+FAILED (failures=1)

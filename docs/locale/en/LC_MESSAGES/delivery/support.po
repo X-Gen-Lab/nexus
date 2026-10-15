@@ -1,0 +1,321 @@
+# Authored translation, independently corrected and reviewed.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: abb55d06e44f7d40d4ffba8540091b1405990beecc2396ddb3fcac18965edd7c\n"
+
+msgid "精确支持范围"
+msgstr "Exact support scope"
+
+msgid "[派生能力矩阵](capabilities.md) 自动核对 SoC/route 的 mode、参考 Board binding 与实际 resolver/emitter 选择的生产源码。叙述表说明运行合同，派生表说明精确 身份与有限源码一致性；两者均不继承旧 HEAD 的资格或替代实板执行。"
+msgstr "The [derived capability matrix](capabilities.md) automatically checks SoC/route modes, reference-Board bindings and production sources selected by the actual resolver/emitter. Narrative tables describe runtime contracts; derived tables describe exact identities and bounded source consistency. Neither inherits old-HEAD qualification nor replaces physical execution."
+
+msgid "芯片、板卡与系统"
+msgstr "Chips, Boards and systems"
+
+msgid "目标"
+msgstr "Target"
+
+msgid "软件实现"
+msgstr "Software implementation"
+
+msgid "未完成的物理事实"
+msgstr "Unfinished physical facts"
+
+msgid "STM32F407ZGT6 / 启明欣欣 V3.1"
+msgstr "STM32F407ZGT6 / Qiming Xinxin V3.1"
+
+msgid "Cortex-M4F；1 MiB Flash；主 SRAM 128 KiB、CCM 64 KiB；声明 clock/profile 与 reviewed routes"
+msgstr "Cortex-M4F; 1 MiB Flash; main SRAM 128 KiB, CCM 64 KiB; declared clock/profile and reviewed routes"
+
+msgid "实际 PCB 修订、晶振、供电、连续性、波形与负载"
+msgstr "Actual PCB revision, crystal, power, continuity, waveforms and loads"
+
+msgid "STM32F407VET6 / 天空星青春版"
+msgstr "STM32F407VET6 / Sky Star Youth Edition"
+
+msgid "Cortex-M4F；512 KiB Flash；主 SRAM 128 KiB、CCM 64 KiB；独立 Board 资源"
+msgstr "Cortex-M4F; 512 KiB Flash; main SRAM 128 KiB, CCM 64 KiB; independent Board resources"
+
+msgid "相同类别的实际 PCB／电气／HIL 验收"
+msgstr "Corresponding actual PCB/electrical/HIL acceptance"
+
+msgid "GD32F470ZGT6 / 梁山派"
+msgstr "GD32F470ZGT6 / Liangshan Pi"
+
+msgid "Cortex-M4F；1 MiB Flash；主 SRAM 192 KiB、ADDSRAM 256 KiB、TCM 64 KiB；25 MHz 声明输入、200 MHz profile；可选 USB 独立 48 MHz owner"
+msgstr "Cortex-M4F; 1 MiB Flash; main SRAM 192 KiB, ADDSRAM 256 KiB, TCM 64 KiB; declared 25 MHz input, 200 MHz profile; optional independent 48 MHz USB owner"
+
+msgid "未观察 PCB/晶振/电气；默认 linker 只用主 SRAM；实际 USB clock/PHY 仍未测量"
+msgstr "PCB/crystal/electrical facts unobserved; default linker uses main SRAM only; actual USB clock/PHY unmeasured"
+
+msgid "STM32G474RET6 / MB1367 来源参考配置"
+msgstr "STM32G474RET6 / MB1367 source-reference configuration"
+
+msgid "Cortex-M4F；512 KiB Flash；128 KiB 连续 CPU SRAM alias；HSE24/170 MHz、独立 TIM2；GPIOA PA5、LPUART1 PA2/PA3 IRQ bytes；另有 PA0/PA1 selected EXTI 软件夹具；生成 factory 和裸机/FreeRTOS ELF"
+msgstr "Cortex-M4F; 512 KiB Flash; contiguous 128 KiB CPU SRAM alias; HSE24/170 MHz, independent TIM2; GPIOA PA5, LPUART1 PA2/PA3 IRQ bytes; PA0/PA1 selected-EXTI software fixture; generated factory and baremetal/FreeRTOS ELF"
+
+msgid "实际 PCB／晶振／焊桥／EXTI 接线未观察；未授权 DMA；软件报告与实际 PCB／电气验收分开"
+msgstr "Actual PCB/crystal/solder bridges/EXTI wiring unobserved; no DMA authorization; software reports separate from actual PCB/electrical acceptance"
+
+msgid "STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置"
+msgstr "STM32H743ZIT6 / NUCLEO-H743ZI2 source-reference configuration"
+
+msgid "Cortex-M7F；2 MiB Flash；默认 AXI SRAM 512 KiB；pre-RAM LDO、固定 HSI32／HSI64 × Cache off/on、TIM2；PB0 GPIO、USART3 PD8/PD9 IRQ bytes 或有限 TX DMA；裸机／FreeRTOS 静态装配"
+msgstr "Cortex-M7F; 2 MiB Flash; default AXI SRAM 512 KiB; pre-RAM LDO, fixed HSI32/HSI64 × Cache off/on, TIM2; PB0 GPIO, USART3 PD8/PD9 IRQ bytes or bounded TX DMA; baremetal/FreeRTOS static assembly"
+
+msgid "PCB／供电／硅片修订／焊桥／Cache 一致性未观察；RX 仍为 IRQ bytes；未实现 RX DMA、其他 RAM 放置或运行状态接管；最终软件资格独立记录"
+msgstr "PCB/power/silicon revision/solder bridges/Cache coherence unobserved; RX remains IRQ bytes; no RX DMA, alternate RAM placement or running-state handover; final software qualification recorded separately"
+
+msgid "STM32U575ZIT6Q / NUCLEO-U575ZI-Q 单状态参考配置"
+msgstr "STM32U575ZIT6Q / NUCLEO-U575ZI-Q single-state reference configuration"
+
+msgid "Cortex-M33F；2 MiB Flash；默认 SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；PC7 GPIO、USART1 PA9/PA10 IRQ bytes；裸机／FreeRTOS 静态装配"
+msgstr "Cortex-M33F; 2 MiB Flash; default SRAM1 192 KiB; externally preconfirmed TZEN=0/SWAP_BANK=0; MSIS4 MHz, TIM2; PC7 GPIO, USART1 PA9/PA10 IRQ bytes; baremetal/FreeRTOS static assembly"
+
+msgid "PCB／SMPS／硅片修订／option bytes 未观察；Cache 关闭；此 Platform 配置未开放 DMA、双域 factory 或其他 RAM 放置；最终软件资格独立记录"
+msgstr "PCB/SMPS/silicon revision/option bytes unobserved; Cache disabled; this Platform exposes no DMA, split-domain factory or alternate RAM placement; final software qualification recorded separately"
+
+msgid "STM32U575 独立 TZEN=1 双域参考"
+msgstr "Independent STM32U575 TZEN=1 split-domain reference"
+
+msgid "外部预先配置 option bytes；两个 Runtime 镜像、冷启动 SAU／MPU／SRAM 归属 owner、真实 CMSE SG；单一非特权 NonSecure Thread 通过同步复制消息访问受限 PC7 GPIO"
+msgstr "Externally preconfigured option bytes; two Runtime images, cold SAU/MPU/SRAM-attribution owner, actual CMSE SG; one unprivileged NonSecure Thread accesses restricted PC7 GPIO through synchronously copied messages"
+
+msgid "未执行实板隔离验收；无 OS、通用双域 factory、NS 任务身份、异步借用／跨域 DMA 或产品镜像认证；不改变上列 TZEN=0 默认装配"
+msgstr "No physical-isolation acceptance; no OS, generic split-domain factory, NS task identity, asynchronous borrow/cross-domain DMA or product-image authentication; does not change default TZEN=0 assembly above"
+
+msgid "Native"
+msgstr "Native"
+
+msgid "Linux/POSIX 行为模型、实际线程与持久化文件故障模型"
+msgstr "Linux/POSIX behavior model with actual threads/persistent-file fault models"
+
+msgid "不构成 MCU 或电气资格"
+msgstr "No MCU or electrical qualification"
+
+msgid "裸机和锁定 FreeRTOS 均为显式选择的薄适配。启动只建立平台时钟／接口，不创建 scheduler、产品任务或工作流。FreeRTOS POSIX host 运行验证软件生命周期，不能 替代对应 MCU 的 IRQ ceiling、FPU context 与 stack high-water 实板验证。"
+msgstr "Baremetal/pinned FreeRTOS are explicitly selected thin adapters. Startup establishes platform clocks/interfaces only, without schedulers, product tasks or workflows. FreeRTOS POSIX host execution verifies software lifecycle, not MCU IRQ ceilings, FPU context or physical stack high-water."
+
+msgid "H743 使用官方 Cortex-M7 启动与有界 LDO 电源入口，在 ACTVOSRDY 前禁止 RAM 写入；从 HSI64、Cache off 的可信冷状态建立所选固定时钟与 Cache 配置。Cache 关闭位本身不能证明外来 dirty 数据已经清理；要求可信复位或此前成功完成自有 clean/disable。U575 默认 Platform 使用官方 Cortex-M33 启动并维护 TZEN=0 单地址状态；独立 TZEN=1 参考有自己的入口和安全归属 owner。启动后读取 option register 不能使不匹配的启动变成合法状态。两者都不修改 option bytes，不自动 接管 bootloader、DMA 或既有 clock/IRQ owner。原始 CMSIS Device H7/U5 源码、 许可和版本固定在 source lock。 精确入口见 [H743](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md) 与 [U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/README.md)。"
+msgstr "H743 uses official Cortex-M7 startup/bounded LDO entry and forbids RAM writes before ACTVOSRDY, establishing selected clocks/Cache from trusted HSI64/Cache-off cold state. Disabled Cache bits do not prove foreign dirty data clean; trusted reset/prior successful owned clean-disable is required. Default U575 Platform uses official Cortex-M33 startup/TZEN=0 single-address state. Independent TZEN=1 has separate entry/security owner. Reading option registers after startup cannot legalize incompatible startup. Neither changes option bytes or automatically takes over bootloaders, DMA or existing clock/IRQ owners. Original CMSIS Device H7/U5 bytes/licenses/versions are source-locked. Entries: [H743](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md), [U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/README.md)."
+
+msgid "ThreadX 是额外显式后端，锁定官方 Eclipse ThreadX 6.5.2.202603 release。当前 配置维护三块 F407/F470 Board 的 Cortex-M4 GNU port，以及 Native Linux GNU。 独立 CPU runtime 维护 M4 integer、M4F hard/softfp，BASEPRI 或 PRIMASK 政策； 其他 Cortex-M ThreadX port 明确拒绝。生产 graph、真实 Linux 内核 task/queue/join 与三板 ARM 链接分别验证，Linux 自身 pthread 栈与内部 host 分配不是 MCU 成本。 ThreadX 不实现本项目 FreeRTOS 的 MPU、split-security 或 tickless 模式。详见 [ThreadX 接入](../design/threadx.md)。平台启动不进入任何内核，产品显式进入内核； 仍运行的 scheduler 不允许普通 I/O shutdown 关闭其 clock/Tick。"
+msgstr "ThreadX is an additional explicit backend pinned to official Eclipse ThreadX 6.5.2.202603. Configuration maintains Cortex-M4 GNU on three F407/F470 Boards and Native Linux GNU. Independent CPU runtime maintains M4 integer/M4F hard-softfp with BASEPRI/PRIMASK policies; other Cortex-M ThreadX ports reject. Production graphs, actual Linux task/queue/join and three-board ARM links are verified separately. Linux pthread stacks/internal host allocations are not MCU cost. ThreadX implements none of this project's FreeRTOS MPU/split-security/tickless modes. See [ThreadX](../design/threadx.md). Platform start enters no kernel; products enter explicitly. Running schedulers cannot lose clock/Tick through ordinary I/O shutdown."
+
+msgid "CPU 软件层另支持 M0／M0+／M3／M4／M7／M23／M33／M55／M85，统一严格事实 解析器选择 Core/Arch、原子操作和裸机/FreeRTOS runtime。M0/M0+ RMW 使用 bounded saved-PRIMASK；可选 cache/MPU/SAU 有真实 CPU 算法，FPU/MVE 与安全 状态决定精确 kernel port 和 ABI。CPU-only runtime 自身不生成 SoC/Board/factory； 上述 H743/U575 纵切片分别拥有独立装配与验收。编译、寄存器模型与真实 FP/MVE/cache/MPU/安全世界验收分别记录； `cache.h` 的范围维护与仅 M7 维护的冷 Cache 启停分别提供；CMSE 范围权限观察 本身不建立用户内存 pin、复制或 transport。 可选 restricted MPU task 和 split Secure/NonSecure runtime 已有独立软件实现； 窄 delay/tick SVC、Secure context lease 与调用者静态存储分别验证。默认仍为 privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围和配置例子见 [Cortex-M 软件支持](cortex-m.md) 与 [Arch 契约](../design/arch-contracts.md)。"
+msgstr "CPU software additionally supports M0/M0+/M3/M4/M7/M23/M33/M55/M85. One strict fact parser selects Core/Arch/atomics/baremetal-FreeRTOS runtime. M0/M0+ RMW uses bounded saved-PRIMASK. Optional cache/MPU/SAU execute real CPU algorithms; FPU/MVE/security choose exact kernel ports/ABI. CPU-only runtime generates no SoC/Board/factory. H743/U575 slices separately own assembly/acceptance. Compilation, register models and actual FP/MVE/cache/MPU/security-world acceptance are recorded separately. `cache.h` range maintenance and M7-only cold control are separate; CMSE permission observation alone provides no user-memory pin/copy/transport. Restricted-MPU-task/split Secure-NonSecure runtime have independent software implementations with separately verified narrow delay/tick SVC, Secure-context leases and caller static storage. Default remains privileged single-world; MPU+split rejects; no physical HIL added. See [Cortex-M](cortex-m.md) and [Arch contracts](../design/arch-contracts.md)."
+
+msgid "首发模式"
+msgstr "Launch modes"
+
+msgid "以下完整外设表对应 F407/F470 首发实现。G474 另维护 selected EXTI，H743 另维护固定 Cache 配置和有限 UART TX DMA；U575 默认装配仍为 GPIO／IRQ UART， 双域同步 GPIO 参考单独维护。不从芯片型号或通用接口推断其他外设、DMA、 ThreadX 或低功耗模式。"
+msgstr "The full peripheral table below describes F407/F470 launch implementations. G474 additionally maintains selected EXTI; H743 fixed Cache/bounded UART TX DMA; default U575 GPIO/IRQ UART with separately maintained synchronous split-domain GPIO. Chip names/generic interfaces imply no additional peripherals, DMA, ThreadX or low-power modes."
+
+msgid "接口"
+msgstr "Interface"
+
+msgid "已实现模式与限制"
+msgstr "Implemented modes and limits"
+
+msgid "GPIO"
+msgstr "GPIO"
+
+msgid "authorized mask、原子 set/reset、快照 read、single-writer toggle"
+msgstr "Authorized mask, atomic set/reset, snapshot read and single-writer toggle"
+
+msgid "UART"
+msgstr "UART"
+
+msgid "8N1 IRQ TX 或有限 TX DMA；caller-owned request、真实 TC；IRQ RX blocks／IDLE、有限及连续 RX DMA、双向 DMA；显式 RTS/CTS 与外部静态 RS485 适配；STM baud 最低 1282、GD 最低 1526，最高 1 Mbaud"
+msgstr "8N1 IRQ TX or bounded TX DMA; caller-owned requests, actual TC; IRQ RX blocks/IDLE, bounded/continuous RX DMA and duplex DMA; explicit RTS/CTS/external static RS485 adapter; STM minimum baud 1282, GD minimum 1526, maximum 1 Mbaud"
+
+msgid "SPI"
+msgstr "SPI"
+
+msgid "8-bit MSB-first；短轮询每笔最多 256 bytes；有限 DMA 最多 65535 bytes；双向递增或调用者单字节固定 dummy/discard；单 wire-active、完整 CS interval；独立 CS endpoint"
+msgstr "8-bit MSB-first; short polling ≤256 bytes/transaction; bounded DMA ≤65535 bytes; incrementing bidirectional spans or caller one-byte fixed dummy/discard; one wire-active operation, complete CS interval, separate CS endpoints"
+
+msgid "I2C"
+msgstr "I2C"
+
+msgid "100 kHz；最多 8 条消息、每条 read/write 1–256 bytes；轮询、中断及 DMA 消息；1/2/末三字节 ACK、repeated START/NACK/仲裁/STOP；恢复检查 BUSY 与所选 SCL/SDA 电平；独立有界 GPIO bus-clear 工具"
+msgstr "100 kHz; ≤8 messages, read/write 1–256 bytes each; polling/IRQ/DMA messages; 1/2/final-three-byte ACK, repeated START/NACK/arbitration/STOP; recovery checks BUSY/selected SCL-SDA levels; separate bounded GPIO bus-clear tool"
+
+msgid "Flash"
+msgstr "Flash"
+
+msgid "STM 精确 16/64/128 KiB sector 几何与 x32 program（4-byte alignment/length，声明供电 2.7–3.6 V）；GD 官方独立 4 KiB page erase 与 halfword program；全物理空间、外部受限 region"
+msgstr "STM exact 16/64/128 KiB sectors and x32 program (4-byte alignment/length, declared 2.7–3.6 V); GD official independent 4 KiB page erase/halfword program; complete physical space with external restricted regions"
+
+msgid "Watchdog"
+msgstr "Watchdog"
+
+msgid "独立 enable/feed/reset cause；启用不可逆，late failure 不擦除责任；GD IRC32K 物理 timeout bounds 未保证"
+msgstr "Independent enable/feed/reset cause; irreversible enable, retained responsibility after late failure; GD IRC32K physical timeout bounds not guaranteed"
+
+msgid "EXTI"
+msgstr "EXTI"
+
+msgid "selected line、共享 vector、caller-sized event queue、丢失／coalescing 可见；无 debounce 政策"
+msgstr "Selected lines, shared vectors, caller-sized event queues, visible loss/coalescing; no debounce policy"
+
+msgid "PWM"
+msgstr "PWM"
+
+msgid "固定 timer/channel/base、CCR shadow、0/100%、safe inactive；公共 stop 可以 restart，平台 teardown 释放 owner"
+msgstr "Fixed timer/channel/base, CCR shadow, 0/100%, safe inactive; public stop permits restart, platform teardown releases owner"
+
+msgid "ADC"
+msgstr "ADC"
+
+msgid "reviewed channel、single-shot/低速 scan、有限及连续双缓冲定时触发 DMA blocks；显式 sample time/reference；只发布完整扫描；可选外部序列与软件观测时间记录"
+msgstr "Reviewed channels, single-shot/low-rate scan, bounded/continuous double-buffer timer-triggered DMA blocks; explicit sample time/reference; complete scans only; optional external sequences/software observation timestamps"
+
+msgid "Classic CAN"
+msgstr "Classic CAN"
+
+msgid "11/29-bit DATA/RTR、0–8 bytes、真实三邮箱、共享 filter domain、显式 abort/bus-off recovery；没有 CAN FD 或自动重发"
+msgstr "11/29-bit DATA/RTR, 0–8 bytes, three real mailboxes/shared filter domain, explicit abort/bus-off recovery; no CAN FD/automatic retransmission"
+
+msgid "USB FS device"
+msgstr "USB FS device"
+
+msgid "internal PHY PIO、EP0 control IN/OUT64、EP1–3 bulk8/16/32/64、packet loan、SETUP epoch、reset/stop drain、独立 48 MHz owner；没有 Host/HS/DMA/ISO/class stack"
+msgstr "Internal-PHY PIO, EP0 control IN/OUT64, EP1–3 bulk8/16/32/64, packet loans, SETUP epochs, reset/stop drain, independent 48 MHz owner; no Host/HS/DMA/ISO/class stack"
+
+msgid "USB 配置/factory 已在两 STM 封装与 GD470 的软件 Board 夹具执行真实 ARM 链接， 默认参考 Board 不自动暴露 USB connector/VBUS 电气。`vbus_sensing=true` 缺少 reviewed 电气时拒绝。PA11/PA12 AF10 的硅片路线不证明实际跳帽、供电、VBUS 或 ESD；它与 CAN1/USART1 flow-control 的资源冲突必须拒绝。详见 [USB packet 合同](../design/usb-device.md)。"
+msgstr "USB configuration/factory actually ARM-links on software-Board fixtures for both STM packages/GD470. Default reference Boards expose no automatic USB connector/VBUS electrical facts. `vbus_sensing=true` rejects absent reviewed electrical facts. PA11/PA12 AF10 silicon routes prove no actual jumpers/power/VBUS/ESD; CAN1/USART1-flow-control conflicts must reject. See [USB packet contract](../design/usb-device.md)."
+
+msgid "以下纵切片拥有独立生产机制和开发证据，最终配置、SDK 与完整镜像接入分别验收。 不能将其中一项的模型通过记为整个平台或参考 PCB 通过。"
+msgstr "The following slices have independent production mechanisms/development evidence. Final configuration/SDK/full-image integration are accepted separately. One passed model cannot mean whole-platform/reference-PCB acceptance."
+
+msgid "可选机制"
+msgstr "Optional mechanism"
+
+msgid "精确范围与当前边界"
+msgstr "Exact scope and current boundary"
+
+msgid "Raw Ethernet / MDIO / DP83848"
+msgstr "Raw Ethernet / MDIO / DP83848"
+
+msgid "Native/ST/GD normal chained descriptor、RMII、14–1514-byte untagged Ethernet II、caller-owned RX loan；ETH/MDIO face 共用一个 MAC context；ST ZG/GD ZG 软件夹具已有 factory 与裸机/FreeRTOS ELF；无协议栈、PTP、checksum offload、VLAN、jumbo"
+msgstr "Native/ST/GD normal chained descriptors, RMII, 14–1514-byte untagged Ethernet II, caller-owned RX loans; ETH/MDIO faces share one MAC context; ST-ZG/GD-ZG software fixtures have factory/baremetal-FreeRTOS ELFs; no protocol stack/PTP/checksum offload/VLAN/jumbo"
+
+msgid "Input capture"
+msgstr "Input capture"
+
+msgid "STM TIM4 CH1 / GD TIMER3 CH0，PB6 AF2、16-bit modulo count、caller event ring；软件观测时间不是 edge aperture；装配接入独立验收"
+msgstr "STM TIM4 CH1 / GD TIMER3 CH0, PB6 AF2, 16-bit modulo counts, caller event rings; software observation time is not edge aperture; assembly integration separately accepted"
+
+msgid "Complementary PWM / break"
+msgstr "Complementary PWM / break"
+
+msgid "STM TIM1 / GD TIMER0，PA8/PB13/PB12 AF1；不可变精确 deadtime 与 BKIN，禁止自动重启；没有功率级安全资格"
+msgstr "STM TIM1 / GD TIMER0, PA8/PB13/PB12 AF1; immutable exact deadtime/BKIN, no automatic restart; no power-stage safety qualification"
+
+msgid "User I/O broker"
+msgstr "User I/O broker"
+
+msgid "特权 kernel 调用的 scalar GPIO read/set-reset、真实 principal/pin/copy/unpin 窄端口；U575 独立无 OS 参考接入同步 CMSE gateway；无通用 SVC、多任务 userspace transport 或异步用户 DMA"
+msgstr "Privileged-kernel scalar GPIO read/set-reset with actual principal/pin/copy/unpin narrow ports; independent OS-free U575 synchronous CMSE gateway; no generic SVC/multitask-userspace transport/asynchronous user DMA"
+
+msgid "参考 Board 默认不声明 Ethernet PHY/REFCLK/reset 接线。启明 ZG 可选 RMII 来源 涉及 PG11/13/14，因此不授权 VE100 封装；天空星和梁山派无 reviewed PHY 路线。 协议、电缆、PHY power/reset、产品 MAC 地址和恢复策略留在外部。详见 [Ethernet](../design/ethernet.md)、[高级 timer](../design/timer-advanced.md)、 [用户 I/O broker](../design/user-io-broker.md) 与 [G474](../design/stm32g474.md)。"
+msgstr "Reference Boards declare no default Ethernet PHY/REFCLK/reset wiring. Qiming-ZG optional RMII provenance needs PG11/13/14, unauthorized on VE100. Sky Star/Liangshan Pi lack reviewed PHY routes. External projects own protocols/cables/PHY power-reset/product MAC/recovery. See [Ethernet](../design/ethernet.md), [advanced timers](../design/timer-advanced.md), [user I/O broker](../design/user-io-broker.md) and [G474](../design/stm32g474.md)."
+
+msgid "G474 维护真实 generated factory 主机合同、独立 system/provider 回归，以及 empty／GPIO-UART／selected-EXTI 的裸机／FreeRTOS ARM 夹具；门禁检查预算、 操作表保留、未选驱动裁剪和向量字节。它们使用 reviewed Board 资料与锁定的 官方 CMSIS，不能证明某块实物的 MCU、X3 晶振或 VCP／LD2 焊桥。 [初次 SoC 执行记录](soc-refinement-verification.md) 保留其历史 code revision； [扩展执行记录](soc-extensions-verification.md) 单独绑定后续扩展的源码和证据。 离线复现与候选封存仍有独立 退出条件，不能继承此前 F407/F470 候选的资格。"
+msgstr "G474 maintains actual generated-factory host contracts, independent system/provider regressions and empty/GPIO-UART/selected-EXTI baremetal-FreeRTOS ARM fixtures. Gates check budgets/table retention/unselected-driver trimming/vector bytes. Reviewed Board documents/pinned official CMSIS prove no actual MCU/X3 crystal/VCP-LD2 bridges. [Initial SoC execution](soc-refinement-verification.md) retains historical code revision; [extensions](soc-extensions-verification.md) independently bind later source/evidence. Offline reproduction/candidate sealing have separate exits and inherit no old F407/F470 qualification."
+
+msgid "H743 的有限 TX DMA 仅维护 USART3、DMA1 Stream0、DMAMUX1 channel0/request46 和 AXI SRAM 可达域。Cache on 要求完整 32-byte cache line 的调用者所有权， clean 后才启动 DMA；准备和 drain 未完成都不能解除借用。Cache 生命周期在 平台启停时固定，全部 provider 排空后才能撤回系统时基并 clean/disable Cache。 不开放 RX DMA、其他 DMA engine、可选 RAM 布局或运行中变频。独立 U575 双域 参考的分区、固定 principal 和同步借用前提见 [TrustZone 合同](../design/u575-trustzone-contract.md)。"
+msgstr "H743 bounded TX DMA maintains only USART3, DMA1 Stream0, DMAMUX1 channel0/request46 and AXI SRAM reachability. Cache on requires caller ownership of complete 32-byte lines and clean before DMA. Neither incomplete preparation nor drain releases borrows. Cache lifecycle is fixed at platform start/stop; all providers drain before timebase withdrawal/cache clean-disable. No RX DMA, other DMA engines, optional RAM layout or live scaling. Independent U575 split partitions/fixed principal/synchronous-borrow premises are in [TrustZone](../design/u575-trustzone-contract.md)."
+
+msgid "Ethernet 生成夹具保留精确 TX/RX descriptors 与 RX buffers，只接纳 STM 主 SRAM 128 KiB 或 GD 主 SRAM192 KiB。四个 ZG ARM graph 的开发预算/retention 通过不 授权 GD ADDSRAM/TCM、STM CCM、VE100 的 PG route 或某个产品 PHY。独立 cold review、clean-source SDK 与实板资格仍各自建立，参考默认镜像不选入 ETH/MDIO。"
+msgstr "Ethernet fixtures retain exact TX/RX descriptors/RX buffers and admit only STM main SRAM128 KiB/GD main SRAM192 KiB. Development budget/retention on four ZG ARM graphs authorize no GD ADDSRAM/TCM, STM CCM, VE100 PG routes or product PHY. Independent cold review/clean-source SDK/physical qualification remain separate. Default references select no ETH/MDIO."
+
+msgid "有限 DMA 的精确首发路线如下，其他 controller／通道组合由 resolver 拒绝。"
+msgstr "Exact bounded-DMA launch routes follow; the resolver rejects other controller/channel combinations."
+
+msgid "模式"
+msgstr "Mode"
+
+msgid "STM32F407"
+msgstr "STM32F407"
+
+msgid "GD32F470"
+msgstr "GD32F470"
+
+msgid "UART TX DMA"
+msgstr "UART TX DMA"
+
+msgid "USART1；DMA2 stream7 channel4"
+msgstr "USART1; DMA2 stream7 channel4"
+
+msgid "USART0；DMA1 channel7 selector4"
+msgstr "USART0; DMA1 channel7 selector4"
+
+msgid "UART RX DMA／双向 DMA"
+msgstr "UART RX DMA / duplex DMA"
+
+msgid "USART1；RX DMA2 stream2 channel4；TX 同上"
+msgstr "USART1; RX DMA2 stream2 channel4; TX as above"
+
+msgid "USART0；RX DMA1 channel2 selector4；TX 同上"
+msgstr "USART0; RX DMA1 channel2 selector4; TX as above"
+
+msgid "SPI 全双工 DMA"
+msgstr "SPI full-duplex DMA"
+
+msgid "SPI1；DMA2 RXstream0／TXstream3 channel3"
+msgstr "SPI1; DMA2 RXstream0/TXstream3 channel3"
+
+msgid "SPI4；DMA1 RXchannel3／TXchannel4 selector2"
+msgstr "SPI4; DMA1 RXchannel3/TXchannel4 selector2"
+
+msgid "I2C 消息 DMA"
+msgstr "I2C message DMA"
+
+msgid "I2C1；DMA1 RXstream0／TXstream6 channel1"
+msgstr "I2C1; DMA1 RXstream0/TXstream6 channel1"
+
+msgid "I2C0；DMA0 RXchannel0／TXchannel6 selector1"
+msgstr "I2C0; DMA0 RXchannel0/TXchannel6 selector1"
+
+msgid "ADC 有限／连续 trigger blocks"
+msgstr "ADC bounded/continuous trigger blocks"
+
+msgid "ADC1；TIM3 TRGO；DMA2 stream4 channel0"
+msgstr "ADC1; TIM3 TRGO; DMA2 stream4 channel0"
+
+msgid "ADC0；TIMER2 TRGO；DMA1 channel0 selector0"
+msgstr "ADC0; TIMER2 TRGO; DMA1 channel0 selector0"
+
+msgid "已审查的软件 Board 配置支持 STM32F407 I2C1/I2C2 与 GD32F470 I2C0/I2C1 的 IRQ/DMA 装配及 typed factory；双控制器夹具已有独立实例隔离与真实 SDK 链接证据。 参考 Board 只开放明确声明的 binding；其他硅片路线与实际接线需单独审查。详见 [多控制器所有权](../design/multiple-controllers.md)。"
+msgstr "Reviewed software-Board configurations support STM32F407 I2C1/I2C2 and GD32F470 I2C0/I2C1 IRQ/DMA assembly/typed factories. Dual-controller fixtures have independent-instance isolation/real-SDK link evidence. Reference Boards expose declared bindings only; other silicon routes/actual wiring require separate review. See [multicontroller ownership](../design/multiple-controllers.md)."
+
+msgid "SPI DMA 要求非空、不重叠的 TX／RX 实际访问跨度；固定地址方向只访问调用者的一字节。 不分配 scratch 或隐式复制池。实际 memory domain 与读写权限由 provider 再次校验；STM CCM、GD TCM 均不能作为 DMA 缓冲。DMA TC 表示内存传输事实，UART TC／SPI idle 表示线上事实；两者排空证明 都满足后才发布 SETTLED。取消、超时或 EN 拒绝关闭保留借用，进入 QUARANTINED。"
+msgstr "SPI DMA requires nonempty/nonoverlapping actual TX/RX spans; fixed-address directions access caller one-byte storage only. No scratch/implicit copy pool is allocated. Providers recheck actual memory domains/permissions; STM CCM/GD TCM cannot be DMA buffers. DMA TC is a memory fact; UART TC/SPI idle are line facts. Both drain proofs precede SETTLED. Cancellation/timeout/EN-disable refusal retain borrows in QUARANTINED."
+
+msgid "UART 的 `irq-blocks` 保留独立 IRQ 接收实现；`rx-dma-idle` 使用有限 DMA 与 IDLE， `rx-dma-continuous` 使用硬件双缓冲，另有显式 `dma-duplex` 和 `dma-duplex-continuous`。块由调用者提供，消费者 acquire 后保持不可变，直到匹配 epoch 的 release。连续模式必须预留两个硬件目标及替换块；替换地址读回、目标银行 和新错误检查成立后才能发布旧块。没有替换块就停止，不覆写消费者借用。 仅接收模式使用独立只读方法表，不保留 TX DMA 方法与对应链接代码；当前共享 接收状态布局仍包含 TX DMA 基类字段，不能宣称冷态字段开销为零。RTS/CTS 并不代替 容量和排空合同；RS485 的 DE 引脚、极性及 setup/hold 时间由外部工程明确提供， 到达真实 UART TC 后才开始 hold 并撤销 DE。详见 [UART DMA 与 RS485](../design/uart-dma-rs485.md)。"
+msgstr "UART `irq-blocks` keeps independent IRQ RX. `rx-dma-idle` uses bounded DMA/IDLE, `rx-dma-continuous` hardware double buffers; explicit `dma-duplex`/`dma-duplex-continuous` also exist. Caller blocks remain immutable after consumer acquire until matching-epoch release. Continuous modes reserve two hardware targets/replacement blocks. Replacement-address readback, bank/new-error checks precede old-block publication. No replacement means stop, never overwrite consumer loans. RX-only uses a separate read-only table without TX-DMA methods or corresponding linked code; the shared receive-state layout still contains TX-DMA base fields, so zero cold-field overhead is not claimed. RTS/CTS does not replace capacity/drain. External RS485 supplies DE pin/polarity/setup-hold; actual UART TC precedes hold/DE withdrawal. See [UART DMA/RS485](../design/uart-dma-rs485.md)."
+
+msgid "ADC 的 `trigger-dma` 使用普通有限 DMA；每块停止触发、转换与内存写入，再发布完整块。 调用者必须显式 service，完成上电稳定／GD 校准后重新触发下一块。无空闲 loan 时 保持暂停，不覆写、不伪造暂停期间的精确丢样数。该模式有块间间隙，不承诺连续 无间隙采样。`trigger-dma-continuous` 则显式选择硬件双缓冲及预投递块，地址替换 成功后发布完整块；至少需要三个调用者 slot。频率需满足精确 timer divider 和 整段 scan 转换时间；GD 连续模式显式选择 SDK 对应的 sample-time code，有限模式 保持原有 15-cycle sample。可选 observer 的时间戳是软件发布观测时间，不是采样 孔径时间。单个锁存 TC/CT 事实无法计算未观测的多轮丢样。stop 在持有 loan 时返回 BUSY。"
+msgstr "ADC `trigger-dma` uses ordinary bounded DMA: stop trigger/conversion/memory writes per block before publishing complete blocks. Callers explicitly service stabilization/GD calibration before next trigger. No free loan means pause without overwriting/invented exact missed samples. Inter-block gaps are expected. `trigger-dma-continuous` explicitly selects hardware double buffers/preposted blocks, publishing after successful replacement; at least three caller slots are needed. Frequency must satisfy exact timer division/full scan time. GD continuous selects SDK sample-time codes; bounded mode retains 15-cycle samples. Optional timestamps are software publication observations, not sampling apertures. One latched TC/CT cannot count unobserved multiple rounds. Stop with outstanding loans returns BUSY."
+
+msgid "I2C 中断及 DMA 共享经过两家 SDK 布局与位定义检查的 V1 寄存器算法，MCU 热路径 直接访问寄存器。DMA TC 不代表线上完成；最后字节、BTF、STOP/MSL、DMA EN 和 IRQ 发布者必须排空后才 SETTLED。bus-clear 独立要求静止外设、独占开漏 GPIO 和 有界等待，最多九个完成的恢复脉冲；STOP 或释放失败保留 lease，可继续清理。 平台没有为未经审查的 Board 自动切换引脚。详见 [I2C 总线恢复](../design/i2c-bus-clear.md)。"
+msgstr "I2C IRQ/DMA share a V1 register algorithm checked against both SDK layouts/bits; MCU hot paths access registers directly. DMA TC is not wire completion. Final byte/BTF/STOP-MSL/DMA-EN/IRQ publishers drain before SETTLED. Separate bus-clear requires quiescent peripherals, exclusive open-drain GPIO and bounded waits; at most nine completed pulses. STOP/release failure retains leases for cleanup retries. No automatic pin switching occurs on unreviewed Boards. See [I2C recovery](../design/i2c-bus-clear.md)."
+
+msgid "这些是 **SoC 实现能力**。参考 Board 默认 binding、软件测试夹具路线、现场测量结果 各自独立。STM32 默认参考 Board 未声明可资格化的 SPI CS，资源矩阵只测 empty/GPIO/UART；软件 fixture 的 SPI 不能继承为参考板 SPI 支持。GD32 默认 Board 的 SPI4 PF6/7/8/9 有公开来源，外接 NOR 具体料号仍未知。"
+msgstr "These are **SoC implementation capabilities**. Default reference bindings, software-fixture routes and field measurements are independent. STM defaults declare no qualifiable SPI CS; resource matrices measure only empty/GPIO/UART, so fixture SPI does not qualify reference-board SPI. Default GD SPI4 PF6/7/8/9 has public provenance; external NOR exact part remains unknown."
+
+msgid "明确边界"
+msgstr "Explicit boundaries"
+
+msgid "连续模式不能承诺任意 IRQ 延迟与消费者速度下无丢失。I2C 超出 256-byte 的 read、 动态 clock、deep sleep/STOP、安全启动／升级及上述未维护模式明确不提供。 FreeRTOS 可选 `lowpower_port=\"timebase\"` 只在固定 F407/GD470 profile 使用浅 Sleep； 要求 SysTick、tickless、single privileged、无 MPU。默认 `custom` 不新增 sleep 机制；CPU-only runtime 缺少 SoC timebase 时拒绝该选择。实际相位、clock 连续性、 wake latency 与功耗保持物理未执行，见[浅睡眠](../design/timebase-lowpower.md)。 Unsupported 配置明确拒绝，不通过成功 stub 声称支持。"
+msgstr "Continuous modes promise no losslessness under arbitrary IRQ latency/consumer speed. I2C reads beyond 256 bytes, dynamic clocks, deep sleep/STOP, secure boot/update and unmaintained modes are unavailable. FreeRTOS `lowpower_port=\"timebase\"` uses shallow Sleep only on fixed F407/GD470 profiles, requiring SysTick/tickless/single-privileged/no-MPU. Default `custom` adds no sleep mechanism; CPU-only runtime without SoC timebase rejects the choice. Actual phase/clock continuity/wake latency/power are physically unexecuted; see [shallow sleep](../design/timebase-lowpower.md). Unsupported configurations reject explicitly rather than claim support through successful stubs."
+
+msgid "Flash pulse 不能被 deadline 撤销；BUSY 未清不能释放责任。产品负责 Flash 执行 停顿、电压、watchdog 窗口、掉电、认证、布局与持久化格式迁移。公共通用 storage 的 CRC/commit 机制不等于安全升级协议。"
+msgstr "Deadlines cannot cancel Flash pulses; uncleared BUSY retains responsibility. Products own Flash stalls/voltage/watchdog windows/power cuts/authentication/layout/persistent-format migration. Generic storage CRC/commit is not a secure-update protocol."
+
+msgid "GD32 Flash 的重新上锁读回失败会保留静态 provider 并拒绝继续操作，需要受控 复位；普通 stop 不能恢复此状态。`tests/google/gd32_flash_fault_test.cpp` 专项模型 验证故障后拒绝读取／写入／重新取得控制器，不构成实板资格。 生命周期与扫描诊断的解释见[安全审查](security-review.md)。"
+msgstr "GD32 Flash relock-readback failure retains static providers/rejects further operations and requires controlled reset; ordinary stop cannot recover it. `tests/google/gd32_flash_fault_test.cpp` checks postfault read/write/controller-reacquisition refusal, without physical qualification. See [security review](security-review.md) for lifecycle/scan diagnostics."
+
+msgid "硬件未接入，全部 MCU 目标的 clock、reset、GPIO safe output、UART TC/abort/RX、SPI/I2C 电气、Flash 掉电、watchdog reset、EXTI 波形、PWM 与 ADC 精度均未执行。当前 支持声明不能替代物理 HIL 或产品 release promotion。"
+msgstr "Hardware is disconnected. Clock/reset/GPIO-safe-output/UART-TC-abort-RX/SPI-I2C-electrical/Flash-power-cut/watchdog-reset/EXTI-waveform/PWM/ADC-precision execution is absent for every MCU target. Current support cannot replace physical HIL or product-release promotion."

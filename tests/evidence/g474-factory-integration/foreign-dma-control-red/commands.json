@@ -1,0 +1,53 @@
+[
+  {
+    "argv": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "--build",
+      "/workspace/nexus-g474-iteration-evidence/host-build",
+      "--target",
+      "nexus_g474_factory_test",
+      "--parallel",
+      "1"
+    ],
+    "return_code": 0,
+    "started_ns": 1791748470103797579,
+    "completed_ns": 1791748472025701270,
+    "output": {
+      "path": "/workspace/nexus-g474-iteration-evidence/foreign-dma-control-red/build.output",
+      "sha256": "5698b02182d0c1d7a5161fa4836566813078cc2c9cc104bc26cff71b11c01c15",
+      "bytes": 169
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_g474_factory_test",
+      "--gtest_filter=*",
+      "--gtest_list_tests"
+    ],
+    "return_code": 0,
+    "started_ns": 1791748472031596302,
+    "completed_ns": 1791748472035337833,
+    "output": {
+      "path": "/workspace/nexus-g474-iteration-evidence/foreign-dma-control-red/discovery.output",
+      "sha256": "25bb494c21cd469eb3e8212b76705a74a29e07d69b9a4e94e29a9933f83fd350",
+      "bytes": 794
+    }
+  },
+  {
+    "argv": [
+      "/workspace/nexus-g474-iteration-evidence/host-build/bin/nexus_g474_factory_test",
+      "--gtest_filter=*",
+      "--gtest_repeat=1",
+      "--gtest_also_run_disabled_tests",
+      "--gtest_output=xml:/workspace/nexus-g474-iteration-evidence/foreign-dma-control-red/google.xml"
+    ],
+    "return_code": 1,
+    "started_ns": 1791748472035618000,
+    "completed_ns": 1791748472051184285,
+    "output": {
+      "path": "/workspace/nexus-g474-iteration-evidence/foreign-dma-control-red/execution.output",
+      "sha256": "0d49693c2ac3b3fa2c926754121e90f231baff952c673435ac20d4217e349cc1",
+      "bytes": 2873
+    }
+  }
+]

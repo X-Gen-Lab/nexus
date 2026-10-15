@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="24" failures="1" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:26:16.853" name="AllTests">
+  <testsuite name="Stm32AdcStream" tests="10" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:26:16.854">
+    <testcase name="StabilizationRequiresExplicitServiceBeforeFirstTrigger" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="157" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcStream" />
+    <testcase name="ValidatesCompleteScanConversionBudgetBeforeAdmission" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="172" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcStream" />
+    <testcase name="PublishesOnlyAfterDrainAndRequiresExplicitFreeBlockResume" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="181" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcStream" />
+    <testcase name="RefusedDisableNeverPublishesMutableDmaMemory" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="215" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcStream" />
+    <testcase name="MisalignedOrPartialScanBlocksRejectWithoutTimerEffects" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="234" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcStream" />
+    <testcase name="WarmupStartsAfterPowerStoreBarrierCompletes" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="243" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcStream" />
+    <testcase name="ObservedDmaFaultCannotBeReplacedByLateTransferComplete" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="258" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcStream" />
+    <testcase name="BasicAdcInitializationCannotBypassStreamClockValidation" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="281" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcStream" />
+    <testcase name="InvalidStreamClockBoundsRejectBeforeAdmission" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="294" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcStream" />
+    <testcase name="StoppedMultiChannelStreamRestoresIndependentPollShots" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="311" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcStream" />
+  </testsuite>
+  <testsuite name="Stm32AdcContinuous" tests="14" failures="1" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:26:16.854">
+    <testcase name="TwoPrepostedTargetsStayInvisibleUntilSwapped" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="397" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="HeldConsumerForcesStopAndExplicitWarmResume" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="425" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="FailedDrainRetainsBothPrepostedLoans" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="446" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="WholeScanEqualCapacityAndDomainsValidateBeforeLoan" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="459" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="WrongCompletionPhaseNeverPublishesUnprovenMemory" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="472" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="RefusedTargetWriteRetainsSpareUntilProvedDrain" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="482" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="BankFlipDuringAddressWriteNeverPublishesOldTarget" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="499" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="SequenceFactsAreColdAndDescribeCompleteScanCost" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="510" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="ObserverUsesLoanEpochAndSoftwareObservationClock" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="525" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="ObserverCountAndPayloadAliasRejectBeforeDmaLoan" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="559" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="ObserverSequenceNeverWrapsOrPublishesMissingRecord" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="571" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="WrongAddressReadbackMustNotReleasePreviousTarget" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="586" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="ErrorArrivingDuringTargetWriteRejectsPublication" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="596" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous" />
+    <testcase name="NewErrorAtCompletionAcknowledgementCannotDisappear" file="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp" line="606" status="run" result="completed" time="0." timestamp="2026-10-11T16:26:16.854" classname="Stm32AdcContinuous">
+      <failure message="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:611&#x0A;Expected equality of these values:&#x0A;  nx_stream_acquire(&amp;stream, &amp;block)&#x0A;    Which is: 0&#x0A;  NX_ERROR_EMPTY&#x0A;    Which is: 9&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:611
+Expected equality of these values:
+  nx_stream_acquire(&stream, &block)
+    Which is: 0
+  NX_ERROR_EMPTY
+    Which is: 9
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:612&#x0A;Expected equality of these values:&#x0A;  nx_adc_port_stream_service(&amp;port)&#x0A;    Which is: 0&#x0A;  NX_ERROR_IO&#x0A;    Which is: 6&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:612
+Expected equality of these values:
+  nx_adc_port_stream_service(&port)
+    Which is: 0
+  NX_ERROR_IO
+    Which is: 6
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:613&#x0A;Expected equality of these values:&#x0A;  nx_adc_port_stream_stop(&amp;port)&#x0A;    Which is: 2&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/stm32_adc_stream_test.cpp:613
+Expected equality of these values:
+  nx_adc_port_stream_stop(&port)
+    Which is: 2
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "command": [
+    ".venv/bin/python",
+    "-m",
+    "unittest",
+    "tools.testing.test_staged_execution",
+    "-v"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 0
+}

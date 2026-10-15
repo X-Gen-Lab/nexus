@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-timer-iteration/stm-test",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/timer-iteration/timer-stm-cold-cleanup-final-regular.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:48:16.328260+00:00",
+  "ended_at": "2026-10-11T19:48:16.358444+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/timer-iteration/timer-stm-cold-cleanup-final-regular.log"
+}

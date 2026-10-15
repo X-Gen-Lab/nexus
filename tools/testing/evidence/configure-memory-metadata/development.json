@@ -1,0 +1,346 @@
+{
+  "artifacts": [
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-region-red.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-region-red.log",
+      "sha256": "e5592bc7ad08f294ef67bea5f959d02b3ec159944ed693938dce4dce7ab2804d",
+      "size": 7025
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-region-red.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-region-red.command.json",
+      "sha256": "27bfb54c63f07e8a87975e125185fb4238e288207a5c2af763601bb9de279431",
+      "size": 160
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-region-definitive-red.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-region-definitive-red.log",
+      "sha256": "19b212d876010838faaa72cead53c096be1aca667999784ccbbbba36a8c1ff71",
+      "size": 6122
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-region-definitive-red.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-region-definitive-red.command.json",
+      "sha256": "a6b2a10fa393c8e7fac95618a7dd6d0ce8c656e0fe0b3cecb5966ddbf0e41ab0",
+      "size": 189
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-region-green.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-region-green.log",
+      "sha256": "4656b6707d2740456803a7cdf39baadea83865401654796624ad9e4e1cd6d880",
+      "size": 1146
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-region-green.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-region-green.command.json",
+      "sha256": "995466731b67dbdae234a51e05542854c57a6b477c576e512c4429ae042f3e60",
+      "size": 189
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-primary-red.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-primary-red.log",
+      "sha256": "8dff0393c6350d2c7c829cd1ac6a9994a0e952ab717380e429dcda475f55cf1e",
+      "size": 977
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-primary-red.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-primary-red.command.json",
+      "sha256": "7d4f27403feaeecf2232318a2d00bc5dfc32a53e63e4bbad7c69a650e48cb66b",
+      "size": 286
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-primary-green.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-primary-green.log",
+      "sha256": "7a26077d3971af50cb882aaad8194a7e24075ab363bf2e9019c3855a4ec6ae1b",
+      "size": 305
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-primary-green.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-primary-green.command.json",
+      "sha256": "d16592481e5eee4753191a7540094ecb2cfc3c7bfc71c5f8bd31b1dfa48e1f54",
+      "size": 286
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/metadata-binding-red.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/metadata-binding-red.log",
+      "sha256": "5bcdd2d3db8701971c65fb66c4f3f2bf5151a1086119ac153a757415df45c219",
+      "size": 5952
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/metadata-binding-red.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/metadata-binding-red.command.json",
+      "sha256": "a7d96d6b2349f6df3e3f9653946a6b3b8bd092fca240b8479a08b38d3941778e",
+      "size": 191
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/metadata-binding-complete-red.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/metadata-binding-complete-red.log",
+      "sha256": "5d74dd2f185c6d8301192c9b95961de57cde460ef67140467e2d5d0e1cdd9e0c",
+      "size": 7597
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/metadata-binding-complete-red.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/metadata-binding-complete-red.command.json",
+      "sha256": "a7d96d6b2349f6df3e3f9653946a6b3b8bd092fca240b8479a08b38d3941778e",
+      "size": 191
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/owner-observer-selection-red.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/owner-observer-selection-red.log",
+      "sha256": "b2fbf418421c00153b008b9dc05482420fee508c2bb5c689f261f284f7d43ad8",
+      "size": 1434
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/owner-observer-selection-red.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/owner-observer-selection-red.command.json",
+      "sha256": "b23421734b0d9b326ec433fbf5e2aae188d29d0c17bb47274b08666cada6c636",
+      "size": 266
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-metadata-green.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-metadata-green.log",
+      "sha256": "1b68e12c840d5f5b5abf1494e1c7eedb2e58233c1f3248fa125b1ae3b753c90f",
+      "size": 10429
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-metadata-green.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-metadata-green.command.json",
+      "sha256": "0859f752c758dd27f455fb2c8a26ebc6e43c9db30f717c3df700505c7074e045",
+      "size": 234
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-metadata-final-green.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-metadata-final-green.log",
+      "sha256": "a3b7f31e91ce9f3f32360e47349d83a312249f363a9bfe7870015a6c18aaa75e",
+      "size": 2955
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-metadata-final-green.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-metadata-final-green.command.json",
+      "sha256": "013c53f308d7fe2df94c68b5629f1d67b0ba4a7d8fdda4263062f5b96c27af30",
+      "size": 234
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/metadata-containment-red.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/metadata-containment-red.log",
+      "sha256": "5fbb98713bac267ffcdd6177479025739f1680e5d085ffeef98676cfa88b7cf9",
+      "size": 911
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/metadata-containment-red.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/metadata-containment-red.command.json",
+      "sha256": "52a9c1c17deb805310ccd77e52c53a62fb7f5e06be34728be345018fe4223987",
+      "size": 276
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-metadata-containment-green.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-metadata-containment-green.log",
+      "sha256": "5dca8db4133cf8a29458ce9b181e2217d5078a7c33ebefd348e9fcb1cfa21c41",
+      "size": 3151
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-metadata-containment-green.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-metadata-containment-green.command.json",
+      "sha256": "013c53f308d7fe2df94c68b5629f1d67b0ba4a7d8fdda4263062f5b96c27af30",
+      "size": 234
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/configure-memory-metadata-suite.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/configure-memory-metadata-suite.log",
+      "sha256": "00cbdf9f0c268cb4b172f968e2218884c947718b37e287dcf883f262039333f0",
+      "size": 34874
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/configure-memory-metadata-suite.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/configure-memory-metadata-suite.command.json",
+      "sha256": "8493f8d8ceea858bbe48fca02c7cc5bbd522a822a2c7bd6c43c8003a92401d81",
+      "size": 222
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/configure-memory-metadata-suite-final.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/configure-memory-metadata-suite-final.log",
+      "sha256": "cc8c097fe5ef72ce37db55b3045c0ee5fb8b66547440aacbdfaad692837d08d3",
+      "size": 33661
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/configure-memory-metadata-suite-final.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/configure-memory-metadata-suite-final.command.json",
+      "sha256": "e238e1ef4e9c7300a21a72db0c8ca507f895ab972493800212897fe2afc1e1e3",
+      "size": 709
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/configure-memory-metadata-final-suite.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/configure-memory-metadata-final-suite.log",
+      "sha256": "277818888b526949b8ac9c9e6e1d155a578891bffead387d9e79e1a6d0c145dd",
+      "size": 33841
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/configure-memory-metadata-final-suite.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/configure-memory-metadata-final-suite.command.json",
+      "sha256": "e238e1ef4e9c7300a21a72db0c8ca507f895ab972493800212897fe2afc1e1e3",
+      "size": 709
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/compatibility-integration-green.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/compatibility-integration-green.log",
+      "sha256": "b2976c4c7da8aecfc99f889d41584333898c998ecef1c57743252c0bcbfede32",
+      "size": 3642
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/compatibility-integration-green.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/compatibility-integration-green.command.json",
+      "sha256": "c2d789300762523f3b576c52ad4138393e53bc79d0950f517359b40755a9e840",
+      "size": 639
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-cmake-selection-red.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-cmake-selection-red.log",
+      "sha256": "abf4259ec23eccc063ea469b57ac1202c17c12fa591e9222874a5d4e116f36c6",
+      "size": 4880
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-cmake-selection-red.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-cmake-selection-red.command.json",
+      "sha256": "a6b2a10fa393c8e7fac95618a7dd6d0ce8c656e0fe0b3cecb5966ddbf0e41ab0",
+      "size": 189
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-cmake-selection-green.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-cmake-selection-green.log",
+      "sha256": "09ac210fc33c30da3e183f381631270efa27823f385df4026226870f96d11022",
+      "size": 1354
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/memory-cmake-selection-green.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/memory-cmake-selection-green.command.json",
+      "sha256": "995466731b67dbdae234a51e05542854c57a6b477c576e512c4429ae042f3e60",
+      "size": 189
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/configure-memory-cmake-metadata-final-suite.log",
+      "path": "tools/testing/evidence/configure-memory-metadata/configure-memory-cmake-metadata-final-suite.log",
+      "sha256": "0c92c39b1baabad105153021ca37dfac8645af065eba41a85ce73ee98e2f495f",
+      "size": 33841
+    },
+    {
+      "original_path": "/workspace/nexus-config-iteration-evidence/configure-memory-cmake-metadata-final-suite.command.json",
+      "path": "tools/testing/evidence/configure-memory-metadata/configure-memory-cmake-metadata-final-suite.command.json",
+      "sha256": "e238e1ef4e9c7300a21a72db0c8ca507f895ab972493800212897fe2afc1e1e3",
+      "size": 709
+    }
+  ],
+  "behavior": [
+    "Selected addsram / tcm immutable independent budgets; primary SRAM preserved",
+    "Live unselected placement fails closed; placement initializer supplied by memory owner",
+    "Policy bytes bind assembly / runtime identities and version macros",
+    "Unknown factory epoch rejected; input mutations reject publication",
+    "Owned output marker cannot authorize deleting policy input",
+    "Optional owner-observer component selection",
+    "Header and CMake selected-memory projections share the same resolved facts"
+  ],
+  "kind": "development-evidence",
+  "notes": [
+    "Earlier logs are preserved verbatim, including one fixture Board-ID typo and one missing PATH tool execution; these are not passing qualification",
+    "Historical file names do not override actual exit codes in adjacent command JSON",
+    "Recorded commands and working directories remain their actual execution strings"
+  ],
+  "physical_qualification": false,
+  "schema_version": 1,
+  "scope": "IO22 exact optional GD32 RAM regions and IO42 source-interface metadata binding",
+  "software_candidate": false,
+  "source_clean": false,
+  "source_head": "f13fe5ac643ed04b13ec5ee836d7452da20ecc5b",
+  "sources": [
+    {
+      "owned": true,
+      "path": "tools/configure/authored.py",
+      "sha256": "8192855ce0e00f595159756e92d6dd436d108bb3ca834678821b2956caf5b483",
+      "size": 8936
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/assembly.schema.json",
+      "sha256": "fe77c76fbb58d341828ed7dbe066d6570f8a5779e68db438f78b9b7d3587b4e2",
+      "size": 13165
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/configure.py",
+      "sha256": "ddd0ae47ea5ac50eef4c1a7e92c39228ca33e0cf9535951f35334b6a37a4672d",
+      "size": 49774
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/cpu.py",
+      "sha256": "1f77a9e936ab2ea1f7828541b853c65663b4d33575e55a39655c8467655acf39",
+      "size": 18105
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/factory.py",
+      "sha256": "bf7766a9f26fe6cd1698109846d65189f17c77ada84a38c658dc01cc816d9b76",
+      "size": 9948
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/ir.py",
+      "sha256": "6625809c33422c7ea792dab65c1a378f961c9e0828dc7cac088d449f977e44bf",
+      "size": 8951
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/runtime.py",
+      "sha256": "40628fce4db24b7a79100379e5bd0270e005010e75139ad73916d40ce2010d67",
+      "size": 9052
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/memory.py",
+      "sha256": "daff8e35fc603693ae0a68b8f4efde4c01218159fd759c8b442adfb73d62743e",
+      "size": 7581
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/test_memory_regions.py",
+      "sha256": "2f6d4d98e0dfcc2d2e2a79b24ee8c7659dc84f0d99d70c6013ee2e8b08456740",
+      "size": 5724
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/test_metadata_binding.py",
+      "sha256": "3f8d6bec1455874efd1ba18e181fb5a8f7c1975aba8f24d5e97f10da03bd88d5",
+      "size": 7496
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/test_configure.py",
+      "sha256": "d419c3a263e19d12bf4f7af9b5cad016f39b2a96f605e2bb1f760e21b6483ef1",
+      "size": 19689
+    },
+    {
+      "owned": true,
+      "path": "tools/configure/test_toml.py",
+      "sha256": "a6450760ea3a143615f750cb5931687f882b811fa4fb71c21229e2a7ed3450db",
+      "size": 29531
+    },
+    {
+      "owned": false,
+      "path": "tools/configure/metadata.py",
+      "sha256": "01cf7d731dc8b1a00e8e20f1d2fd1a736720277b8d3f7c5514a91273eeaa38a0",
+      "size": 3967
+    },
+    {
+      "owned": false,
+      "path": "dependencies/platform-compatibility.json",
+      "sha256": "b3551672d2fae2619674aaa5444c53cec6238fdd53d378bb8d095edbd204c54d",
+      "size": 492
+    }
+  ],
+  "validation": {
+    "arm_memory_matrix": "separate memory-iteration evidence owned by ADC / memory agent; pending at this freeze",
+    "configuration_suite_cases": 230,
+    "configuration_suite_exit_code": 0,
+    "configuration_suite_log": "tools/testing/evidence/configure-memory-metadata/configure-memory-cmake-metadata-final-suite.log",
+    "new_cases": 16
+  }
+}

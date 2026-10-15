@@ -1,0 +1,109 @@
+"""Archive exact development bytes without changing historical evidence."""
+from pathlib import Path
+import hashlib
+import json
+import subprocess
+
+ROOT = Path('/workspace/nexus')
+EXTERNAL = Path('/workspace/nexus-io-implementation-evidence/lifecycle-extensions')
+ARCHIVE = ROOT / 'tools/testing/evidence/io-lifecycle-platform-extension'
+ARCHIVE.mkdir(parents=True, exist_ok=False)
+MAINTAINED = ['scripts/ci/io_lifecycle_matrix.py',
+              'tools/testing/test_io_lifecycle_matrix.py',
+              'tools/testing/io_lifecycle_matrix.json',
+              'docs/design/io-lifecycle-matrix.md']
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def store(source, relative):
+    data = source.read_bytes()
+    destination = ARCHIVE / relative
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(data)
+    assert destination.read_bytes() == data
+    return {'original_path': str(source), 'stored_path': relative,
+            'sha256': sha(data), 'bytes': len(data)}
+
+raw = []
+for source in sorted(EXTERNAL.rglob('*')):
+    if not source.is_file() or source == Path(__file__):
+        continue
+    relative = source.relative_to(EXTERNAL).as_posix()
+    if source.suffix in ('.txt', '.py'):
+        relative += '.raw'
+    raw.append(store(source, 'raw/' + relative))
+
+snapshot = json.loads((EXTERNAL / 'matrix-execution-attempt1/preexecution.json').read_text())
+bound = {ROOT / name: digest for name, digest in snapshot['sources'].items()}
+for contexts in snapshot['target_compiled'].values():
+    for context in contexts:
+        bound[Path(context['source'])] = context['source_sha256']
+for name in MAINTAINED:
+    path = ROOT / name
+    bound[path] = sha(path.read_bytes())
+capsules = []
+for source, expected in sorted(bound.items()):
+    data = source.read_bytes()
+    assert sha(data) == expected, f'Bound source changed before archival: {source}'
+    location = source.relative_to(ROOT).as_posix()
+    record = store(source, 'source-capsules/' + location + '.raw')
+    record['checkout_path'] = location
+    capsules.append(record)
+
+build_files = []
+for name in ('compile_commands.json', 'google-contracts.json'):
+    source = ROOT / 'build/native-debug' / name
+    build_files.append(store(source, 'build-identity/' + name + '.raw'))
+expected_database = snapshot['compile_commands_sha256']
+expected_plan = snapshot['plan_sha256']
+assert build_files[0]['sha256'] == expected_database
+assert build_files[1]['sha256'] == expected_plan
+
+old = json.loads(subprocess.check_output(
+    ['git', 'show', 'HEAD:tools/testing/io_lifecycle_matrix.json'], cwd=ROOT, text=True))
+current = json.loads((ROOT / 'tools/testing/io_lifecycle_matrix.json').read_text())
+assert old['properties'][:80] == current['properties'][:80]
+manifest = {
+    'schema': 1, 'kind': 'bounded-io-lifecycle-platform-development-evidence',
+    'qualifies_candidate': False, 'physical_status': 'not_executed',
+    'scope': 'Explicit 37-target dirty-source development subset; root clean whole-plan qualification remains required.',
+    'properties': 203, 'added_properties': 123,
+    'added_groups': {'can': 22, 'usb_device': 24, 'eth': 30,
+                     'g474_uart_and_factory': 11, 'timer': 36},
+    'old_first_80_property_objects_unchanged': True,
+    'old_first_80_sha256': sha(json.dumps(old['properties'][:80], sort_keys=True).encode()),
+    'actual_google_cases': 710, 'actual_targets': 37,
+    'bound_catalogue_sources': len(snapshot['sources']),
+    'reviewed_tus': len(snapshot['compiled']),
+    'reviewed_compiled_contexts': sum(map(len, snapshot['compiled'].values())),
+    'target_local_compiled_contexts': sum(map(len, snapshot['target_compiled'].values())),
+    'generated_factory_tus': 9,
+    'maintained_sources': [{'path': name, 'sha256': sha((ROOT / name).read_bytes())}
+                           for name in MAINTAINED],
+    'tdd': {
+        'red': {'log': 'raw/generated-context-red.log', 'exit_code': 1,
+                'behavior': 'Seven new capture/audit boundary cases: six assertion failures and one missing new field; original 18 cases remain passing.'},
+        'green': {'log': 'raw/generated-context-green.log', 'exit_code': 0,
+                  'cases': 25},
+        'final_tools': {'log': 'raw/matrix-tool-final.log', 'exit_code': 0,
+                        'cases': 29, 'scope': '25 matrix boundary cases plus four existing gate integration cases.'}},
+    'build_attempts': [
+        {'command': 'raw/actual-target-configure.command.json', 'exit_code': 1,
+         'status': 'Preserved real typed-model fixture mismatch, no test execution from stale binaries.'},
+        {'command': 'raw/actual-target-configure-after-model-fix.command.json', 'exit_code': 0},
+        {'command': 'raw/actual-target-build.command.json', 'exit_code': 0},
+        {'command': 'raw/actual-target-configure-final-plan.command.json', 'exit_code': 0},
+        {'command': 'raw/actual-target-build-final-plan.command.json', 'exit_code': 0}],
+    'execution': 'raw/matrix-execution-attempt1/execution.json',
+    'property_report': 'raw/matrix-execution-attempt1/matrix-report.json',
+    'review_status': 'Author source/assertion review; independent tool-boundary review queued, not claimed completed.',
+    'limits': [
+        'Source assertion anchors and fresh selected-model execution do not establish formal or exhaustive interleaving proof.',
+        'Factory generated TU identities are observed from the existing actual compile database; no second registry or runner.',
+        'Objects and executables are hash-bound in the report but their large binary bytes are not copied into this source archive.',
+        'Original 80-property archive remains byte-for-byte historical evidence; these 203 properties require fresh whole-plan execution for a candidate.',
+        'No physical CAN/USB/PHY/timer waveform, electrical safe output, actual IRQ latency, or new station qualification.'],
+    'raw_files': raw, 'source_capsules': capsules, 'build_identity_files': build_files}
+(ARCHIVE / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+print('archived', len(raw), 'raw files', len(capsules), 'source capsules')

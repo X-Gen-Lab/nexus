@@ -1,0 +1,7 @@
+{
+  "argv": [
+    "/workspace/nexus-threadx-probe/build/threadx_bootstrap_test",
+    "--gtest_output=xml:/workspace/nexus-threadx-probe/evidence/review-boundaries/threadx_bootstrap_test-red.xml"
+  ],
+  "returncode": 1
+}

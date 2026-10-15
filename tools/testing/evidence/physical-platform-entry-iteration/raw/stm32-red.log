@@ -1,0 +1,226 @@
+Running main() from gmock_main.cc
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from EmptyAndGPIO/PhysicalPlatformFactory
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:129: Failure
+Expected equality of these values:
+  result.primary
+    Which is: 0
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:132: Failure
+Expected equality of these values:
+  s_starts
+    Which is: 1
+  0U
+    Which is: 0
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:133: Failure
+Expected equality of these values:
+  s_identities
+    Which is: 1
+  0U
+    Which is: 0
+
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0, where GetParam() = false (2 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:129: Failure
+Expected equality of these values:
+  result.primary
+    Which is: 0
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:132: Failure
+Expected equality of these values:
+  s_starts
+    Which is: 1
+  0U
+    Which is: 0
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:133: Failure
+Expected equality of these values:
+  s_identities
+    Which is: 1
+  0U
+    Which is: 0
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:135: Failure
+Expected equality of these values:
+  register_snapshot()
+    Which is: { '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', ... }
+  before
+    Which is: { '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', ... }
+
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1, where GetParam() = true (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:141: Failure
+Expected equality of these values:
+  stop()
+    Which is: 0
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0, where GetParam() = false (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:141: Failure
+Expected equality of these values:
+  stop()
+    Which is: 0
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1, where GetParam() = true (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:152: Failure
+Expected equality of these values:
+  stop()
+    Which is: 0
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:153: Failure
+Expected equality of these values:
+  s_stops
+    Which is: 1
+  0U
+    Which is: 0
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:157: Failure
+Expected equality of these values:
+  start().primary
+    Which is: 0
+  NX_ERROR_STATE
+    Which is: 3
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:159: Failure
+Expected equality of these values:
+  s_stops
+    Which is: 2
+  1U
+    Which is: 1
+
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0, where GetParam() = false (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:152: Failure
+Expected equality of these values:
+  stop()
+    Which is: 0
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:153: Failure
+Expected equality of these values:
+  s_stops
+    Which is: 1
+  0U
+    Which is: 0
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:154: Failure
+Expected equality of these values:
+  s_writes
+    Which is: 1
+  writes
+    Which is: 0
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:155: Failure
+Expected equality of these values:
+  register_snapshot()
+    Which is: { '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', ... }
+  before
+    Which is: { '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', ... }
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:157: Failure
+Expected equality of these values:
+  start().primary
+    Which is: 0
+  NX_ERROR_STATE
+    Which is: 3
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:159: Failure
+Expected equality of these values:
+  s_stops
+    Which is: 2
+  1U
+    Which is: 1
+
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1, where GetParam() = true (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:170: Failure
+Expected equality of these values:
+  stop()
+    Which is: 6
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:171: Failure
+Expected equality of these values:
+  s_stops
+    Which is: 2
+  stops
+    Which is: 1
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:178: Failure
+Expected equality of these values:
+  s_stops
+    Which is: 3
+  stops + 1U
+    Which is: 2
+
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0, where GetParam() = false (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:170: Failure
+Expected equality of these values:
+  stop()
+    Which is: 6
+  NX_ERROR_CONTEXT
+    Which is: 14
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:171: Failure
+Expected equality of these values:
+  s_stops
+    Which is: 2
+  stops
+    Which is: 1
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:172: Failure
+Expected equality of these values:
+  s_writes
+    Which is: 2
+  writes
+    Which is: 1
+
+/workspace/nexus/tests/google/physical_platform_factory_test.cpp:178: Failure
+Expected equality of these values:
+  s_stops
+    Which is: 3
+  stops + 1U
+    Which is: 2
+
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1, where GetParam() = true (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0 (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1 (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0 (0 ms)
+[ RUN      ] EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1
+[       OK ] EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1 (0 ms)
+[----------] 12 tests from EmptyAndGPIO/PhysicalPlatformFactory (3 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (3 ms total)
+[  PASSED  ] 4 tests.
+[  FAILED  ] 8 tests, listed below:
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0, where GetParam() = false
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1, where GetParam() = true
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0, where GetParam() = false
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1, where GetParam() = true
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0, where GetParam() = false
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1, where GetParam() = true
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0, where GetParam() = false
+[  FAILED  ] EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1, where GetParam() = true
+
+ 8 FAILED TESTS

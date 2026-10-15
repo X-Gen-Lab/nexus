@@ -1,0 +1,3 @@
+[ 14%] Building C object CMakeFiles/user_io_contract.dir/workspace/nexus/components/user_io_broker/src/user_io_broker.c.o
+[ 28%] Linking CXX executable user_io_contract
+[100%] Built target user_io_contract

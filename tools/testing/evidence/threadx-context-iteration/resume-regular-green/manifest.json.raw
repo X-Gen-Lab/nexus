@@ -1,0 +1,598 @@
+{
+  "qualification": "development-only; not MCU/HIL",
+  "source_before": [
+    {
+      "path": "/workspace/nexus/dependencies/threadx.lock.json",
+      "sha256": "a9785a8be298555fc93aa09e714bf4ff3047936c5214b0aead5898d83f22ed12",
+      "bytes": 43594
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/CMakeLists.txt",
+      "sha256": "d5e811ffdd123d6ae3152a4b18c4ca9c9876c97f1f1b8d8008b283f07ec631e5",
+      "bytes": 1338
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/Kernel.cmake",
+      "sha256": "2e105fffd44445fcbd1459ec45d5cddb369bea0a51162f9e005e0e413eafa673",
+      "bytes": 5106
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/README.md",
+      "sha256": "390616df92ce932c713b10f4c1064ced52a73d7fc7fef38b04aed593b0f3af40",
+      "bytes": 12727
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/config/tx_user.h",
+      "sha256": "5b3c5f40f28469e6d57edc37353014715f65ad35c6c314bfb05dcf8a90b0d760",
+      "bytes": 351
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/include/nexus/os/threadx.h",
+      "sha256": "5d8ca6893cbfa3d35e571b094e453a6adcf5003b1aaf0f705ba5a8bec6db711e",
+      "bytes": 16484
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/m4.c",
+      "sha256": "4db45fb6abceb85f10af071c6cec6eb848a52531573b93f17ec31e47c1f2acc2",
+      "bytes": 3145
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/m4_vectors.S",
+      "sha256": "5bd44cdf0dad2f62f9e053e6d4b0dca9be11b5a4a52ce8a3a6d3115d3f6829e2",
+      "bytes": 700
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/prepare_linux.py",
+      "sha256": "e73c37ec0042a96933125498290376e87d304e03678b108bc76696cdee526151",
+      "bytes": 7237
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/private/irq_model.h",
+      "sha256": "156388419e5aab7976a9b9aa96a86e5f4a4ed25c5b05c3c7620051c5aa0e9096",
+      "bytes": 399
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/private/m4_model.h",
+      "sha256": "dafea17e8a93b9e2b2562b64944c28d1e38d6f01ce650360c6b07430a1c8a989",
+      "bytes": 444
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/threadx.c",
+      "sha256": "b9227721d6a9ee87fe241f322e81838627fab5e3516b20c0a77adcbf054cb921",
+      "bytes": 30031
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx.cmake",
+      "sha256": "4e15bc479c87b7710e41ee14171fdc1e80fb69ba1e6c31a5ff76b824d4de969f",
+      "bytes": 3422
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_admission_test.cpp",
+      "sha256": "06a6221124f38336c8b0dc30abb149c5ddd1d5714fab9e0078fbd28b52d87250",
+      "bytes": 2657
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_bootstrap_test.cpp",
+      "sha256": "780542ed7455ce7f4a3ddcac531c653d113726ed0d98bdf6ceeda63f916a0bf7",
+      "bytes": 3002
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_close_test.cpp",
+      "sha256": "373ec3bd4a75624b31f3da249cc98681dcfaf3d9ee708bd79dfd204aa904a5f6",
+      "bytes": 6862
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_irq_primask_test.cpp",
+      "sha256": "eada08d11d99bded416eb5d6704da5797919ef35f534c96c820bf623b674a7c0",
+      "bytes": 1859
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_irq_test.cpp",
+      "sha256": "3f79752b2fb13e3c4c18711f4e0bcdaa4021e0273481e8954621fe96c85e0337",
+      "bytes": 2086
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_kernel_test.cpp",
+      "sha256": "d544364e9efa7f70f947b3ad6824ae818ad66ea748adbecc780aae6905c4e4e3",
+      "bytes": 9162
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_linux_port_test.cpp",
+      "sha256": "e8a54aa74f19410db1ee1e0ad41af4bc9cf4a330be6f7cca71d26f8b9070e1ed",
+      "bytes": 5202
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_m4_external_test.cpp",
+      "sha256": "d87e0e91d345e677686459812daadd837551779936653b7af2607f7545f11046",
+      "bytes": 3868
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_m4_primask_test.cpp",
+      "sha256": "b40f7cc5db7a83a47ef500f5449d72c7517b4f06c13c4aebd88d2ed1a2ef3f49",
+      "bytes": 1799
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_m4_test.cpp",
+      "sha256": "6256e332bab51038cd7c339ec26433fd889d45446cef2ca9c558ac769d4f3609",
+      "bytes": 1789
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_wait_test.cpp",
+      "sha256": "a63a0b1b47028ef48b444d8bdb747e5ed482675624ad162733f962672a87f639",
+      "bytes": 7553
+    }
+  ],
+  "source_after": [
+    {
+      "path": "/workspace/nexus/dependencies/threadx.lock.json",
+      "sha256": "a9785a8be298555fc93aa09e714bf4ff3047936c5214b0aead5898d83f22ed12",
+      "bytes": 43594
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/CMakeLists.txt",
+      "sha256": "d5e811ffdd123d6ae3152a4b18c4ca9c9876c97f1f1b8d8008b283f07ec631e5",
+      "bytes": 1338
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/Kernel.cmake",
+      "sha256": "2e105fffd44445fcbd1459ec45d5cddb369bea0a51162f9e005e0e413eafa673",
+      "bytes": 5106
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/README.md",
+      "sha256": "390616df92ce932c713b10f4c1064ced52a73d7fc7fef38b04aed593b0f3af40",
+      "bytes": 12727
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/config/tx_user.h",
+      "sha256": "5b3c5f40f28469e6d57edc37353014715f65ad35c6c314bfb05dcf8a90b0d760",
+      "bytes": 351
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/include/nexus/os/threadx.h",
+      "sha256": "5d8ca6893cbfa3d35e571b094e453a6adcf5003b1aaf0f705ba5a8bec6db711e",
+      "bytes": 16484
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/m4.c",
+      "sha256": "4db45fb6abceb85f10af071c6cec6eb848a52531573b93f17ec31e47c1f2acc2",
+      "bytes": 3145
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/m4_vectors.S",
+      "sha256": "5bd44cdf0dad2f62f9e053e6d4b0dca9be11b5a4a52ce8a3a6d3115d3f6829e2",
+      "bytes": 700
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/prepare_linux.py",
+      "sha256": "e73c37ec0042a96933125498290376e87d304e03678b108bc76696cdee526151",
+      "bytes": 7237
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/private/irq_model.h",
+      "sha256": "156388419e5aab7976a9b9aa96a86e5f4a4ed25c5b05c3c7620051c5aa0e9096",
+      "bytes": 399
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/private/m4_model.h",
+      "sha256": "dafea17e8a93b9e2b2562b64944c28d1e38d6f01ce650360c6b07430a1c8a989",
+      "bytes": 444
+    },
+    {
+      "path": "/workspace/nexus/os/threadx/threadx.c",
+      "sha256": "b9227721d6a9ee87fe241f322e81838627fab5e3516b20c0a77adcbf054cb921",
+      "bytes": 30031
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx.cmake",
+      "sha256": "4e15bc479c87b7710e41ee14171fdc1e80fb69ba1e6c31a5ff76b824d4de969f",
+      "bytes": 3422
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_admission_test.cpp",
+      "sha256": "06a6221124f38336c8b0dc30abb149c5ddd1d5714fab9e0078fbd28b52d87250",
+      "bytes": 2657
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_bootstrap_test.cpp",
+      "sha256": "780542ed7455ce7f4a3ddcac531c653d113726ed0d98bdf6ceeda63f916a0bf7",
+      "bytes": 3002
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_close_test.cpp",
+      "sha256": "373ec3bd4a75624b31f3da249cc98681dcfaf3d9ee708bd79dfd204aa904a5f6",
+      "bytes": 6862
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_irq_primask_test.cpp",
+      "sha256": "eada08d11d99bded416eb5d6704da5797919ef35f534c96c820bf623b674a7c0",
+      "bytes": 1859
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_irq_test.cpp",
+      "sha256": "3f79752b2fb13e3c4c18711f4e0bcdaa4021e0273481e8954621fe96c85e0337",
+      "bytes": 2086
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_kernel_test.cpp",
+      "sha256": "d544364e9efa7f70f947b3ad6824ae818ad66ea748adbecc780aae6905c4e4e3",
+      "bytes": 9162
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_linux_port_test.cpp",
+      "sha256": "e8a54aa74f19410db1ee1e0ad41af4bc9cf4a330be6f7cca71d26f8b9070e1ed",
+      "bytes": 5202
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_m4_external_test.cpp",
+      "sha256": "d87e0e91d345e677686459812daadd837551779936653b7af2607f7545f11046",
+      "bytes": 3868
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_m4_primask_test.cpp",
+      "sha256": "b40f7cc5db7a83a47ef500f5449d72c7517b4f06c13c4aebd88d2ed1a2ef3f49",
+      "bytes": 1799
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_m4_test.cpp",
+      "sha256": "6256e332bab51038cd7c339ec26433fd889d45446cef2ca9c558ac769d4f3609",
+      "bytes": 1789
+    },
+    {
+      "path": "/workspace/nexus/tests/google/threadx_wait_test.cpp",
+      "sha256": "a63a0b1b47028ef48b444d8bdb747e5ed482675624ad162733f962672a87f639",
+      "bytes": 7553
+    }
+  ],
+  "source_unchanged": true,
+  "suites": [
+    {
+      "target": "nexus_threadx_kernel_test",
+      "binary": {
+        "path": "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_kernel_test",
+        "sha256": "2315419501daeebfce8911d63686f9e87a75c3a1222f7f7ec9eb0b996e612fbc",
+        "bytes": 1549808
+      },
+      "discovery": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_kernel_test",
+          "--gtest_list_tests"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_kernel_test-discovery.output",
+          "sha256": "49728cd11d6727ee1ae740a9b1be1ca9c40d48bedbee0c6a24449438671d5f99",
+          "bytes": 1559
+        }
+      },
+      "execution": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_kernel_test",
+          "--gtest_output=xml:/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_kernel_test.xml"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_kernel_test-execution.output",
+          "sha256": "5576c736faac36deed7f9b01bd453ce3d23233d0088a445a7ad0197055a74887",
+          "bytes": 5727
+        }
+      },
+      "passed": 34,
+      "report": {
+        "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_kernel_test.xml",
+        "sha256": "626e6f62f92340ab632b70e2762156bbbad8b5d562faac1f5361c445badaa9b7",
+        "bytes": 9432
+      }
+    },
+    {
+      "target": "nexus_threadx_bootstrap_test",
+      "binary": {
+        "path": "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_bootstrap_test",
+        "sha256": "eb5d67dc29505013d61a1a9cbcbfa791175a75446d82e189e960ba4cfc4c657f",
+        "bytes": 1396912
+      },
+      "discovery": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_bootstrap_test",
+          "--gtest_list_tests"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_bootstrap_test-discovery.output",
+          "sha256": "4d3d472a97cb4a6f1abd265d1aa7d92214f1b78e2a16c11af3b1858fa55d3487",
+          "bytes": 392
+        }
+      },
+      "execution": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_bootstrap_test",
+          "--gtest_output=xml:/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_bootstrap_test.xml"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_bootstrap_test-execution.output",
+          "sha256": "c656ec0d9bc58f43fb842fb29734ffb68f7bff0ad3bbdc8108b4826455be911c",
+          "bytes": 1537
+        }
+      },
+      "passed": 8,
+      "report": {
+        "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_bootstrap_test.xml",
+        "sha256": "3b15a1cd0d8a071fde8659deaf5ffd2b60abb3d2120a7a95a7ea9c13625d79c6",
+        "bytes": 2303
+      }
+    },
+    {
+      "target": "nexus_threadx_m4_test",
+      "binary": {
+        "path": "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_test",
+        "sha256": "08dfc36b3e1cfcf7928ca420b2a0606948e7c29277cb1fda65a8e6d97e9f1d69",
+        "bytes": 1346560
+      },
+      "discovery": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_test",
+          "--gtest_list_tests"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_test-discovery.output",
+          "sha256": "1c6a99d65939195b860491d4cdfca09d8faba384fdd977095864e6ce988dfbd2",
+          "bytes": 97
+        }
+      },
+      "execution": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_test",
+          "--gtest_output=xml:/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_test.xml"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_test-execution.output",
+          "sha256": "f3231e31e09f2c4e0cb3c65a69e04a33a7be0818ae8c8ddd2e58ad84cb8dd1a7",
+          "bytes": 487
+        }
+      },
+      "passed": 1,
+      "report": {
+        "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_test.xml",
+        "sha256": "6fc650ecaf15428b3e06c171165556e0df19704b994b4029549371a0069ec7dd",
+        "bytes": 567
+      }
+    },
+    {
+      "target": "nexus_threadx_irq_test",
+      "binary": {
+        "path": "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_irq_test",
+        "sha256": "5857e562e5296f9009c81acc9c7bd9dff277dec23c402d2a36d853ffd8304bdf",
+        "bytes": 1373728
+      },
+      "discovery": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_irq_test",
+          "--gtest_list_tests"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_irq_test-discovery.output",
+          "sha256": "289345aa188091b4ef56b7b4af2286160a564b190e22499c3fd094fe74ae83dd",
+          "bytes": 241
+        }
+      },
+      "execution": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_irq_test",
+          "--gtest_output=xml:/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_irq_test.xml"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_irq_test-execution.output",
+          "sha256": "34dd3a55ecfce9976ed1418ac2eb8435aac0a67f2b1b89c022a3e9b1804b22f4",
+          "bytes": 986
+        }
+      },
+      "passed": 5,
+      "report": {
+        "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_irq_test.xml",
+        "sha256": "656a101cc73a60d80f8622c0d2cae3219d91d65a46c12edb006ffc96a7a0549c",
+        "bytes": 1477
+      }
+    },
+    {
+      "target": "nexus_threadx_m4_primask_test",
+      "binary": {
+        "path": "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_primask_test",
+        "sha256": "9916ab2af531d94b3d20398dae1cf0d259a6ffa8cc9978fb9496c51b36301549",
+        "bytes": 1346600
+      },
+      "discovery": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_primask_test",
+          "--gtest_list_tests"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_primask_test-discovery.output",
+          "sha256": "42d7e97f38d9b586be3e7dc42c8ac37c5a2f7c4a81afcba766a8689629033fd1",
+          "bytes": 99
+        }
+      },
+      "execution": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_primask_test",
+          "--gtest_output=xml:/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_primask_test.xml"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_primask_test-execution.output",
+          "sha256": "db14150f656d077a23d4f292c1d78948044dbf8d5c4f517426f7324bfd607fba",
+          "bytes": 505
+        }
+      },
+      "passed": 1,
+      "report": {
+        "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_primask_test.xml",
+        "sha256": "a7b5d06b54d4b1f35cd6d70b761f21aa3912f9d368105c1c387571419f9d9ac8",
+        "bytes": 584
+      }
+    },
+    {
+      "target": "nexus_threadx_irq_primask_test",
+      "binary": {
+        "path": "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_irq_primask_test",
+        "sha256": "1aa92a9a91e31c6d5b84b6ab27e1b407b0444edb8816e2bad1a3645edf2e72a9",
+        "bytes": 1367016
+      },
+      "discovery": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_irq_primask_test",
+          "--gtest_list_tests"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_irq_primask_test-discovery.output",
+          "sha256": "097b1c33561d665826558b8f9509f49e333561237eea47425f99933e8eede15f",
+          "bytes": 178
+        }
+      },
+      "execution": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_irq_primask_test",
+          "--gtest_output=xml:/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_irq_primask_test.xml"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_irq_primask_test-execution.output",
+          "sha256": "39a3d433bc7e782ee335710868a58d340b13e7b98c0a953d3545da2648ffe318",
+          "bytes": 800
+        }
+      },
+      "passed": 3,
+      "report": {
+        "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_irq_primask_test.xml",
+        "sha256": "d4025712b709c950e6fd2179b65e6482de8e711576980e694fee38006c9c9761",
+        "bytes": 1077
+      }
+    },
+    {
+      "target": "nexus_threadx_m4_external_test",
+      "binary": {
+        "path": "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_external_test",
+        "sha256": "c1147bbfc72917269eacb063cbded2c783637fe6e170a3379412e0b0e6113068",
+        "bytes": 1456400
+      },
+      "discovery": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_external_test",
+          "--gtest_list_tests"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_external_test-discovery.output",
+          "sha256": "47a5cbf6f4c5a3f6f1db5db148237bd8f226c903e8f9ded4f11523b8efe8bc60",
+          "bytes": 204
+        }
+      },
+      "execution": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_m4_external_test",
+          "--gtest_output=xml:/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_external_test.xml"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_external_test-execution.output",
+          "sha256": "86bd02a3e5390727a8e8a30dbb4e6a9be6d39a7b5c0deb610457c9de7da93dfc",
+          "bytes": 852
+        }
+      },
+      "passed": 3,
+      "report": {
+        "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_m4_external_test.xml",
+        "sha256": "580fdcfb81d83bc8bea170bd2cf63908245337d86226a8a68b03df1faa2a97be",
+        "bytes": 1103
+      }
+    },
+    {
+      "target": "nexus_threadx_linux_port_test",
+      "binary": {
+        "path": "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_linux_port_test",
+        "sha256": "49c9ab960a3c80011c4f704b9f761c0267cd62fbc82066323b325015fab35bef",
+        "bytes": 1414432
+      },
+      "discovery": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_linux_port_test",
+          "--gtest_list_tests"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_linux_port_test-discovery.output",
+          "sha256": "d3003d72a28a644533fc1a86b7ee414e223aaddf45fb172fa1ab58581d4c9ea8",
+          "bytes": 286
+        }
+      },
+      "execution": {
+        "command": [
+          "timeout",
+          "25",
+          "/workspace/nexus-threadx-probe/integration-build/nexus_threadx_linux_port_test",
+          "--gtest_output=xml:/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_linux_port_test.xml"
+        ],
+        "exit_code": 0,
+        "output": {
+          "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_linux_port_test-execution.output",
+          "sha256": "58cd00d8d2cb46920ad773709f6052cbfff715e7401131c369eaaeee20020e10",
+          "bytes": 1136
+        }
+      },
+      "passed": 5,
+      "report": {
+        "path": "/workspace/nexus-ci-security-iteration/threadx-context-followup/resume-regular-green/nexus_threadx_linux_port_test.xml",
+        "sha256": "2edb970fce24b33372a99232daee7596169406a5b5428ae0970a44d7117d055f",
+        "bytes": 1591
+      }
+    }
+  ],
+  "passed": 60,
+  "all_passed": true,
+  "official_source": {
+    "path": "/workspace/nexus/ext/threadx/ports/linux/gnu/src/tx_initialize_low_level.c",
+    "sha256": "760b2e8e341b7fcdd2b5984eb9724100c562ccd27b79a18673f9fe45dd93b1da",
+    "bytes": 15951
+  },
+  "compile_commands": {
+    "path": "/workspace/nexus-threadx-probe/integration-build/compile_commands.json",
+    "sha256": "047c5f8782b4c8b65e00e177b157c00c3e2e1f274beb75643602058c4e3292f9",
+    "bytes": 195700
+  }
+}

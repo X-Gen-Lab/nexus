@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "stm32u575-nucleo-zi-q",
+  "soc": "STM32U575ZIT6Q",
+  "soc_family": "stm32u575",
+  "source_revision": "UM2861 NUCLEO-U575ZI-Q MB1549 source-reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "led0",
+      "controller": "GPIOC",
+      "route": "gpio-pc7",
+      "initial": 0,
+      "mask": 128
+    },
+    {
+      "id": "uart1",
+      "controller": "USART1",
+      "route": "usart1-pa9-pa10"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only: actual PCB revision and solder bridges not inspected",
+    "Boot contract must observe TZEN0 and SWAP_BANK0; no automatic option-byte change",
+    "PC7 LD1 SB21ON/SB23OFF and PA9/PA10 VCP SB32/SB34ON source defaults not physically inspected",
+    "Silicon revision, supply/SMPS population and USART ES0499 noise behavior remain unobserved",
+    "No physical HIL executed; clock accuracy, interrupts and UART electrical traffic unqualified",
+    "Only PC7 GPIO and USART1 IRQ bytes maintained; DMA/cache/TrustZone/deepSTOP and other routes unsupported"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/user_manual/um2861-stm32u5-nucleo144-boards-mb1549-stmicroelectronics.pdf",
+      "scope": "Official UM2861 identifies STM32U575ZIT6Q MB1549,PC7LD1/VCPPA9PA10 default bridges; physical PCB/silicon uninspected."
+    },
+    {
+      "repository": "https://github.com/STMicroelectronics/cmsis-device-u5",
+      "tree": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",
+      "scope": "Unmodified register layouts/IRQ/startup; no vendor HAL runtime dependency."
+    }
+  ]
+}

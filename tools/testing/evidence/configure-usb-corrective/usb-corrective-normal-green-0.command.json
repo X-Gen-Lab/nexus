@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "cmake",
+    "-S",
+    "/workspace/nexus",
+    "-B",
+    "/workspace/nexus/build/usb-config-model",
+    "-DCMAKE_C_FLAGS="
+  ],
+  "cwd": "/workspace/nexus",
+  "returncode": 0,
+  "log": "/workspace/nexus-config-iteration-evidence/usb-corrective-normal-green-0.log",
+  "sha256": "43a1d0d22e302f10c8eff9a03d0ded3b13ee24742962253327ccee735bab0e7d"
+}

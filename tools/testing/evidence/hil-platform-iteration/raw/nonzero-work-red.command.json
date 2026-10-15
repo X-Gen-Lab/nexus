@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_hil_platform_extensions.HilPlatformExtensionTests.test_new_protocols_require_positive_amount_of_real_work"
+  ],
+  "cwd": "/workspace/nexus",
+  "exit_code": 1
+}

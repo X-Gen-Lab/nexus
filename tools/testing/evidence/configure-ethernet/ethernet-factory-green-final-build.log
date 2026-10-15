@@ -1,0 +1,6 @@
+[1/6] Building C object io/CMakeFiles/nexus_io.dir/src/timer_capture.c.o
+[2/6] Linking C static library lib/libnexus_io.a
+[3/6] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_eth_factory_test.dir/ethernet_factory_test.cpp.o
+[4/6] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/ethernet_factory_test.cpp.o
+[5/6] Linking CXX executable bin/nexus_stm32_eth_factory_test
+[6/6] Linking CXX executable bin/nexus_gd32_eth_factory_test

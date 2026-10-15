@@ -1,0 +1,15 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from EthernetApi
+[ RUN      ] EthernetApi.PrepareExcludesFcsAndPreservesRejectedRequest
+[       OK ] EthernetApi.PrepareExcludesFcsAndPreservesRejectedRequest (0 ms)
+[ RUN      ] EthernetApi.DispatchesExactInstanceWithoutInitialization
+[       OK ] EthernetApi.DispatchesExactInstanceWithoutInitialization (0 ms)
+[ RUN      ] EthernetApi.MdioRejectsMalformedAddressWithoutProviderCall
+[       OK ] EthernetApi.MdioRejectsMalformedAddressWithoutProviderCall (0 ms)
+[----------] 3 tests from EthernetApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 3 tests.

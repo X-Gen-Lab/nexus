@@ -1,0 +1,4 @@
+[1/4] Building C object CMakeFiles/nexus_threadx_bootstrap_test.dir/workspace/nexus/os/threadx/threadx.c.o
+[2/4] Building C object CMakeFiles/nexus_threadx_m4_external_test.dir/workspace/nexus/os/threadx/m4.c.o
+[3/4] Linking CXX executable nexus_threadx_bootstrap_test
+[4/4] Linking CXX executable nexus_threadx_m4_external_test

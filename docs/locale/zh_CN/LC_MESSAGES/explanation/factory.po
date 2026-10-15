@@ -1,0 +1,142 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 3000b58da4d6cb430de78f88e1c18e6069f10092f5066359d49c627fd45740e7\n"
+
+msgid "Typed factory, static instances and polymorphic faces"
+msgstr "类型化 factory、静态实例与多态接口面"
+
+msgid ""
+"The current platform keeps typed factory lookup and C polymorphism. "
+"Configuration generates the exact instances; factory lookup returns them "
+"without constructing, initializing, locking or discovering anything. "
+"Hardware startup and request execution are separate explicit actions."
+msgstr ""
+"当前平台保留类型化工厂查找和 C 多态。配置生成精确实例；factory 查找只返回它们，不构造、初始化、加锁或探测。硬件启动和请求执行是各自显式动作。"
+
+msgid ""
+"![Current factory IDs, shared readonly ops and independent instance "
+"contexts](../assets/diagrams/factory-instances.svg)"
+msgstr ""
+"![当前 factory ID、共享只读 ops 与独立实例上下文](../assets/diagrams/factory-instances.svg)"
+
+msgid ""
+"Current factory IDs, shared readonly ops and independent instance contexts"
+msgstr "当前 factory ID、共享只读 ops 与独立实例上下文"
+
+msgid ""
+"FIG-04 shows the current identity structure. A controller and a child "
+"endpoint have different interfaces and IDs even when their implementation "
+"shares a physical bus."
+msgstr "FIG-04 表示当前身份结构。控制器与子端点端点有不同接口和 ID，即使实现共享同一物理总线。"
+
+msgid "What generation owns"
+msgstr "生成器拥有的责任"
+
+msgid ""
+"One schema-2 TOML selects instance names, bindings, modes and exact "
+"capacities. The strict resolver produces typed IR; emitters publish readonly"
+" faces, shared ops references, private independent contexts, fixed IRQ "
+"wiring and compact getters. Native assemblies receive independent model "
+"state too; a test singleton is not the production instance-generation "
+"mechanism."
+msgstr ""
+"一份 schema-2 TOML 选择实例名、绑定、模式和精确容量。严格解析器产生类型化 IR；生成器发布只读接口面、共享 ops "
+"引用、独立私有上下文、固定 IRQ 接线和紧凑获取函数。Native 装配同样取得独立模型状态；测试单例不是生产实例生成机制。"
+
+msgid ""
+"`nexus_factory.h` is generated for each assembly, so its IDs are not a "
+"universal header or persistent numbering scheme. Default IDs are compact "
+"`uint16_t` aliases with named constants. COUNT, invalid and unselected "
+"entries return NULL. Optional nominal strong IDs and capability records are "
+"explicit configuration choices; a chip capability record does not grant "
+"Board routing or physical qualification."
+msgstr ""
+"每次装配生成自己的 `nexus_factory.h`，其 ID 不是通用头文件或持久编号。默认 ID 是紧凑 `uint16_t` alias "
+"和具名常量。COUNT、无效和未选择项返回 NULL。可选名义强类型 ID 与 capability 记录必须明确配置；芯片能力记录不授予 Board "
+"路由或物理资格。"
+
+msgid "What a call does"
+msgstr "一次调用执行什么"
+
+msgid "Action"
+msgstr "动作"
+
+msgid "Work performed"
+msgstr "实际工作"
+
+msgid "`nx_factory_uart(id)`"
+msgstr "`nx_factory_uart(id)`"
+
+msgid "Select and return an existing readonly UART face"
+msgstr "选择并返回已有只读 UART 接口面"
+
+msgid "`nx_platform_start()`"
+msgstr "`nx_platform_start()`"
+
+msgid "Execute selected setup and retain cleanup outcomes"
+msgstr "执行选定初始化，保留清理结果"
+
+msgid "Public I/O operation"
+msgstr "公共 I/O 操作"
+
+msgid "Validate face, then dispatch `ops(context, ...)`"
+msgstr "验证接口面，再分发 `ops(context, ...)`"
+
+msgid "IRQ entry"
+msgstr "IRQ 入口"
+
+msgid "Access the fixed concrete provider and its owned hardware"
+msgstr "访问固定具体提供者和其拥有的硬件"
+
+msgid "Explicit service/wait"
+msgstr "显式 service/wait"
+
+msgid "Advance or observe the selected lifecycle"
+msgstr "推进或观察选定生命周期"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Close/drain according to contract; cannot revoke outstanding storage"
+msgstr "按合同关闭/排空；不能提前收回仍在借用的存储"
+
+msgid ""
+"Products may retain a face for the provider-storage lifetime. Stopping "
+"hardware does not revoke a pointer or synchronize callers. The application "
+"must quiesce callers and publishers before reclaiming external adapter "
+"storage. No getter changes mode or silently acquires execution ownership."
+msgstr ""
+"产品可在提供者存储生命周期内保留接口面。停止硬件不会撤销指针，也不会同步调用方。应用必须确保调用方与发布者停止访问并完成必要同步，才能回收外部 "
+"adapter 存储。获取函数不改变模式或悄悄取得执行所有权。"
+
+msgid "Verify the generated design"
+msgstr "验证生成设计"
+
+msgid ""
+"This complete maintained assembly selects independent Native instances:"
+msgstr "以下完整维护装配选择独立 Native 实例："
+
+msgid ""
+"Maintained generated factory fixture; its software Board is not a physical "
+"PCB."
+msgstr "维护中的生成 factory 夹具；其软件 Board 不是物理 PCB。"
+
+msgid ""
+"The [async tutorial](../tutorials/async-io.md) runs the complete generated "
+"factory binary. It verifies cold lookup, distinct contexts with shared ops, "
+"bus/endpoint identity, invalid IDs, stop/restart and retained quarantine. "
+"The authority for these interfaces is the [integration "
+"contract](../design/integration-contracts.md) and generated/public headers; "
+"this page explains the design rather than duplicating function declarations."
+msgstr ""
+"[异步教程](../tutorials/async-io.md)运行完整生成 factory 可执行文件，验证冷态查找、共享 ops "
+"下的独立上下文、总线/端点身份、无效 ID、停止/重启和隔离保留。这些接口的权威是[接入合同](../design/integration-"
+"contracts.md)及生成/公开头文件；本页解释设计，不重复函数声明。"

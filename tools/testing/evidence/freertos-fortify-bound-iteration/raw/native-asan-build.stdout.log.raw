@@ -1,0 +1,16 @@
+[0/2] Re-checking globbed directories...
+[1/16] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+[2/16] Building C object core/CMakeFiles/nexus_core.dir/src/time.c.o
+[3/16] Building C object core/CMakeFiles/nexus_core.dir/src/request.c.o
+[4/16] Building C object core/CMakeFiles/nexus_core.dir/src/stack_observation.c.o
+[5/16] Building C object core/CMakeFiles/nexus_core.dir/src/request_observer.c.o
+[6/16] Building C object core/CMakeFiles/nexus_core.dir/src/fault.c.o
+[7/16] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o
+[8/16] Linking C static library lib/libnexus_core.a
+[9/16] Building CXX object _deps/google-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+[10/16] Linking CXX static library lib/libgtest.a
+[11/16] Linking CXX static library lib/libgmock.a
+[12/16] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/__/__/os/freertos/hooks.c.o
+[13/16] Linking CXX static library lib/libgmock_main.a
+[14/16] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/freertos_failstop_test.cpp.o
+[15/16] Linking CXX executable bin/nexus_freertos_failstop_test

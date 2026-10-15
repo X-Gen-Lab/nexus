@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="3" failures="1" disabled="0" errors="0" time="0." timestamp="2026-10-11T20:44:07.869" name="AllTests">
+  <testsuite name="MemoryBootFixture" tests="3" failures="1" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T20:44:07.869">
+    <testcase name="OccupiedAddressKeepsItsOriginalOwnerAndContents" file="/workspace/nexus/tests/google/gd32_memory_boot_test.cpp" line="119" status="run" result="completed" time="0." timestamp="2026-10-11T20:44:07.869" classname="MemoryBootFixture">
+      <failure message="/workspace/nexus/tests/google/gd32_memory_boot_test.cpp:126&#x0A;Value of: reserve_exact(reinterpret_cast&lt;uintptr_t&gt;(existing), page)&#x0A;  Actual: true&#x0A;Expected: false&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_memory_boot_test.cpp:126
+Value of: reserve_exact(reinterpret_cast<uintptr_t>(existing), page)
+  Actual: true
+Expected: false
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/gd32_memory_boot_test.cpp:127&#x0A;Expected equality of these values:&#x0A;  *value&#x0A;    Which is: 0&#x0A;  0x13579BDFU&#x0A;    Which is: 324508639&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/gd32_memory_boot_test.cpp:127
+Expected equality of these values:
+  *value
+    Which is: 0
+  0x13579BDFU
+    Which is: 324508639
+]]></failure>
+    </testcase>
+    <testcase name="ResetInitializesOnlyAuthoredRegions" file="/workspace/nexus/tests/google/gd32_memory_boot_test.cpp" line="131" status="run" result="completed" time="0." timestamp="2026-10-11T20:44:07.869" classname="MemoryBootFixture" />
+    <testcase name="IncomingTcmClockIsNeverDisabledByReset" file="/workspace/nexus/tests/google/gd32_memory_boot_test.cpp" line="162" status="run" result="completed" time="0." timestamp="2026-10-11T20:44:07.869" classname="MemoryBootFixture" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,218 @@
+Running main() from gmock_main.cc
+[==========] Running 103 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 34 tests from FreeRTOSContextTest
+[ RUN      ] FreeRTOSContextTest.BootstrapCreatesObjectsWithoutSchedulerQueries
+[       OK ] FreeRTOSContextTest.BootstrapCreatesObjectsWithoutSchedulerQueries (0 ms)
+[ RUN      ] FreeRTOSContextTest.BootstrapNoWaitQueueAndWakeRemainAllowed
+[       OK ] FreeRTOSContextTest.BootstrapNoWaitQueueAndWakeRemainAllowed (0 ms)
+[ RUN      ] FreeRTOSContextTest.BootstrapRejectsAllBlockingOperations
+[       OK ] FreeRTOSContextTest.BootstrapRejectsAllBlockingOperations (0 ms)
+[ RUN      ] FreeRTOSContextTest.RunningWaitRetainsSequenceAndReleasesWaiter
+[       OK ] FreeRTOSContextTest.RunningWaitRetainsSequenceAndReleasesWaiter (0 ms)
+[ RUN      ] FreeRTOSContextTest.ExpiredWakeDoesNotBypassDeadline
+[       OK ] FreeRTOSContextTest.ExpiredWakeDoesNotBypassDeadline (0 ms)
+[ RUN      ] FreeRTOSContextTest.RejectsSmallStackBeforeAnyKernelMutation
+[       OK ] FreeRTOSContextTest.RejectsSmallStackBeforeAnyKernelMutation (0 ms)
+[ RUN      ] FreeRTOSContextTest.RejectsMisalignedStackBeforeKernelMutation
+[       OK ] FreeRTOSContextTest.RejectsMisalignedStackBeforeKernelMutation (0 ms)
+[ RUN      ] FreeRTOSContextTest.SuccessfulJoinDeletesBeforeReclaimPermission
+[       OK ] FreeRTOSContextTest.SuccessfulJoinDeletesBeforeReclaimPermission (0 ms)
+[ RUN      ] FreeRTOSContextTest.KernelBootstrapMaskAllowsFollowingStaticObjects
+[       OK ] FreeRTOSContextTest.KernelBootstrapMaskAllowsFollowingStaticObjects (0 ms)
+[ RUN      ] FreeRTOSContextTest.RunningAndSuspendedCanonicalMasksRejectMutation
+[       OK ] FreeRTOSContextTest.RunningAndSuspendedCanonicalMasksRejectMutation (0 ms)
+[ RUN      ] FreeRTOSContextTest.NoncanonicalBasepriRejectsWithoutKernelQueries
+[       OK ] FreeRTOSContextTest.NoncanonicalBasepriRejectsWithoutKernelQueries (0 ms)
+[ RUN      ] FreeRTOSContextTest.AllowedIrqPublishesBeforeGivingAndYielding
+[       OK ] FreeRTOSContextTest.AllowedIrqPublishesBeforeGivingAndYielding (0 ms)
+[ RUN      ] FreeRTOSContextTest.UnsafeGroupingRejectsBeforePriorityOrKernelReads
+[       OK ] FreeRTOSContextTest.UnsafeGroupingRejectsBeforePriorityOrKernelReads (0 ms)
+[ RUN      ] FreeRTOSContextTest.AboveCeilingIrqRejectsBeforeSequencePublication
+[       OK ] FreeRTOSContextTest.AboveCeilingIrqRejectsBeforeSequencePublication (0 ms)
+[ RUN      ] FreeRTOSContextTest.SystemAndOutOfRangeExceptionsNeverReadNvic
+[       OK ] FreeRTOSContextTest.SystemAndOutOfRangeExceptionsNeverReadNvic (0 ms)
+[ RUN      ] FreeRTOSContextTest.MaskedIrqNeverReadsNvicOrPublishesSequence
+[       OK ] FreeRTOSContextTest.MaskedIrqNeverReadsNvicOrPublishesSequence (0 ms)
+[ RUN      ] FreeRTOSContextTest.LastExternalVectorAcceptedWithinSelectedProfile
+[       OK ] FreeRTOSContextTest.LastExternalVectorAcceptedWithinSelectedProfile (0 ms)
+[ RUN      ] FreeRTOSContextTest.FaultmaskAlwaysRejectsBeforeKernelQueries
+[       OK ] FreeRTOSContextTest.FaultmaskAlwaysRejectsBeforeKernelQueries (0 ms)
+[ RUN      ] FreeRTOSContextTest.DeadlineQueueKeepsOneBudgetAfterSpuriousReturn
+[       OK ] FreeRTOSContextTest.DeadlineQueueKeepsOneBudgetAfterSpuriousReturn (0 ms)
+[ RUN      ] FreeRTOSContextTest.ExpiredDeadlineQueueStillReceivesReadyItem
+[       OK ] FreeRTOSContextTest.ExpiredDeadlineQueueStillReceivesReadyItem (0 ms)
+[ RUN      ] FreeRTOSContextTest.PermanentTaskCreatesNoJoinSemaphore
+[       OK ] FreeRTOSContextTest.PermanentTaskCreatesNoJoinSemaphore (0 ms)
+[ RUN      ] FreeRTOSContextTest.DisabledNotificationsRejectBeforeObjectChanges
+[       OK ] FreeRTOSContextTest.DisabledNotificationsRejectBeforeObjectChanges (0 ms)
+[ RUN      ] FreeRTOSContextTest.ClosableQueueCloseLatchesBeforeWaiterSleeps
+[       OK ] FreeRTOSContextTest.ClosableQueueCloseLatchesBeforeWaiterSleeps (0 ms)
+[ RUN      ] FreeRTOSContextTest.ClosedQueueDrainsThenRejectsReceiveAndSends
+[       OK ] FreeRTOSContextTest.ClosedQueueDrainsThenRejectsReceiveAndSends (0 ms)
+[ RUN      ] FreeRTOSContextTest.ClosableQueueDestroyRequiresCloseAndDrain
+[       OK ] FreeRTOSContextTest.ClosableQueueDestroyRequiresCloseAndDrain (0 ms)
+[ RUN      ] FreeRTOSContextTest.ClosableQueueBudgetRejectsBeforeQueueAccess
+[       OK ] FreeRTOSContextTest.ClosableQueueBudgetRejectsBeforeQueueAccess (0 ms)
+[ RUN      ] FreeRTOSContextTest.ClosableWaiterRejectsConcurrentBorrowAndDestroy
+[       OK ] FreeRTOSContextTest.ClosableWaiterRejectsConcurrentBorrowAndDestroy (0 ms)
+[ RUN      ] FreeRTOSContextTest.ClosableInitRejectsMissingWaiterBudget
+[       OK ] FreeRTOSContextTest.ClosableInitRejectsMissingWaiterBudget (0 ms)
+[ RUN      ] FreeRTOSContextTest.FailedTaskCreateReleasesOnlyNewLatch
+[       OK ] FreeRTOSContextTest.FailedTaskCreateReleasesOnlyNewLatch (0 ms)
+[ RUN      ] FreeRTOSContextTest.PrestartDiscardSuspendsThenDeletesBeforeReclaim
+[       OK ] FreeRTOSContextTest.PrestartDiscardSuspendsThenDeletesBeforeReclaim (0 ms)
+[ RUN      ] FreeRTOSContextTest.PrestartDiscardPreservesCanonicalBootstrapMask
+[       OK ] FreeRTOSContextTest.PrestartDiscardPreservesCanonicalBootstrapMask (0 ms)
+[ RUN      ] FreeRTOSContextTest.DiscardRejectsRunningAndSuspendedWithoutMutation
+[       OK ] FreeRTOSContextTest.DiscardRejectsRunningAndSuspendedWithoutMutation (0 ms)
+[ RUN      ] FreeRTOSContextTest.DiscardRejectsMalformedOrUnstartedObjects
+[       OK ] FreeRTOSContextTest.DiscardRejectsMalformedOrUnstartedObjects (0 ms)
+[ RUN      ] FreeRTOSContextTest.JoinTimeoutRetainsEveryBorrowedResource
+[       OK ] FreeRTOSContextTest.JoinTimeoutRetainsEveryBorrowedResource (0 ms)
+[----------] 34 tests from FreeRTOSContextTest (2 ms total)
+
+[----------] 69 tests from UnsafeCpuContexts/FreeRTOSRejectedContextTest
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/0
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/0 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/1
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/1 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/2
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/2 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/3
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/3 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/4
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/4 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/5
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/5 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/6
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/6 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/7
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/7 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/8
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/8 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/9
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/9 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/10
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/10 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/11
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/11 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/12
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/12 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/13
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/13 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/14
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/14 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/15
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/15 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/16
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/16 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/17
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/17 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/18
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/18 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/19
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/19 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/20
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/20 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/21
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/21 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/22
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/22 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/23
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/23 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/24
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/24 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/25
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/25 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/26
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/26 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/27
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/27 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/28
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/28 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/29
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/29 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/30
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/30 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/31
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/31 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/32
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/32 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/33
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/33 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/34
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/34 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/35
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/35 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/36
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/36 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/37
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/37 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/38
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/38 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/39
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/39 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/40
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/40 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/41
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/41 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/42
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/42 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/43
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/43 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/44
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/44 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/45
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/45 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/46
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/46 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/47
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/47 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/48
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/48 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/49
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/49 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/50
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/50 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/51
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/51 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/52
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/52 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/53
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/53 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/54
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/54 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/55
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/55 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/56
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/56 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/57
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/57 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/58
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/58 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/59
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/59 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/60
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/60 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/61
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/61 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/62
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/62 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/63
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/63 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/64
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/64 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/65
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/65 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/66
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/66 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/67
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/67 (0 ms)
+[ RUN      ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/68
+[       OK ] UnsafeCpuContexts/FreeRTOSRejectedContextTest.RejectsBeforeKernelOrStorageEffects/68 (0 ms)
+[----------] 69 tests from UnsafeCpuContexts/FreeRTOSRejectedContextTest (3 ms total)
+
+[----------] Global test environment tear-down
+[==========] 103 tests from 2 test suites ran. (5 ms total)
+[  PASSED  ] 103 tests.

@@ -1,0 +1,11 @@
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/stm-spi-soc-stm32f407-drivers-gpio.c.o: warning: relocation against `g_nx_stm32_system' in read-only section `.text'
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/stm-spi-soc-stm32f407-drivers-gpio.c.o: in function `nx_stm32_gpio_clock_enable':
+gpio.c:(.text+0x2c1): undefined reference to `g_nx_stm32_system'
+/usr/bin/ld: gpio.c:(.text+0x2e5): undefined reference to `g_nx_stm32_system'
+/usr/bin/ld: gpio.c:(.text+0x2ef): undefined reference to `g_nx_stm32_system'
+/usr/bin/ld: gpio.c:(.text+0x2fc): undefined reference to `g_nx_stm32_system'
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/stm-spi-soc-stm32f407-drivers-gpio.c.o: in function `nx_stm32_uart1_pins_prepare':
+gpio.c:(.text+0x349): undefined reference to `g_nx_stm32_system'
+/usr/bin/ld: /workspace/nexus-multi-controller-iteration/stm-spi-soc-stm32f407-drivers-gpio.c.o:gpio.c:(.text+0x353): more undefined references to `g_nx_stm32_system' follow
+/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+collect2: error: ld returned 1 exit status

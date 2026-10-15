@@ -1,0 +1,10 @@
+[1/10] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/soc/stm32f407/system.c.o
+[2/10] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/soc/stm32f407/timebase_lowpower.c.o
+[3/10] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/os/freertos/timebase_lowpower.c.o
+[4/10] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/timebase_soc_integration_test.cpp.o
+[5/10] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_integration_test.dir/__/__/soc/gd32f470/timebase.c.o
+[6/10] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_integration_test.dir/__/__/soc/gd32f470/timebase_lowpower.c.o
+[7/10] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_integration_test.dir/__/__/os/freertos/timebase_lowpower.c.o
+[8/10] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_integration_test.dir/timebase_soc_integration_test.cpp.o
+[9/10] Linking CXX executable bin/nexus_stm32f407_lowpower_integration_test
+[10/10] Linking CXX executable bin/nexus_gd32f470_lowpower_integration_test

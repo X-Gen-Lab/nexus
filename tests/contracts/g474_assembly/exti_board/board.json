@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "stm32g474re-exti-software-fixture",
+  "soc": "STM32G474RET6",
+  "soc_family": "stm32g474",
+  "source_revision": "software-fixture-v1",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 24000000
+  },
+  "bindings": [
+    {
+      "id": "edge0",
+      "controller": "EXTI0",
+      "route": "exti0-pa0"
+    },
+    {
+      "id": "edge1",
+      "controller": "EXTI1",
+      "route": "exti1-pa1"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software link and register-model fixture only; no physical PCB, electrical route, fitted clock or button is asserted.",
+    "All physical HIL remains not executed."
+  ],
+  "provenance": [
+    {
+      "scope": "DS12288 Rev6 LQFP64 PA0/PA1 package inventory; RM0440 Rev9 SYSCFG_EXTICR1 and EXTI0/1 mapping. No Board wiring claim.",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf"
+    }
+  ]
+}

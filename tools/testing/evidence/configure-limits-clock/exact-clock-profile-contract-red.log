@@ -1,0 +1,126 @@
+test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) ... 
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='core_hz', value=1) ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='apb1_hz', value=1) ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='apb2_hz', value=1) ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='apb1_hz', value=False) ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='apb2_hz', value=100000000.0) ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='profile_alias', value='unimplemented-clock') ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='core_hz', value=1) ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='apb1_hz', value=1) ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='apb2_hz', value=1) ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='apb1_hz', value=False) ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='apb2_hz', value=100000000.0) ... FAIL
+  test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='profile_alias', value='unimplemented-clock') ... FAIL
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='core_hz', value=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='apb1_hz', value=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='apb2_hz', value=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='apb1_hz', value=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='apb2_hz', value=100000000.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='stm32f407', field='profile_alias', value='unimplemented-clock')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='core_hz', value=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='apb1_hz', value=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='apb2_hz', value=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='apb1_hz', value=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='apb2_hz', value=100000000.0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile (test_providers.ProviderContractTests.test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile) (family='gd32f470', field='profile_alias', value='unimplemented-clock')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_providers.py", line 29, in test_mcu_clock_facts_must_match_the_actual_fixed_startup_profile
+    with self.assertRaisesRegex(ValueError, 'Clock'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.005s
+
+FAILED (failures=12)

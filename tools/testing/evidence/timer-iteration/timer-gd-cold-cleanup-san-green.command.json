@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/workspace/nexus-timer-iteration/gd-san-test",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/timer-iteration/timer-gd-cold-cleanup-san-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T19:45:54.910841+00:00",
+  "ended_at": "2026-10-11T19:45:54.929429+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/timer-iteration/timer-gd-cold-cleanup-san-green.log"
+}

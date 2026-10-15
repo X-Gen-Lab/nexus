@@ -1,0 +1,8 @@
+{
+  "command": [
+    "/workspace/nexus-industrial-design/can-tests/build/can_contract",
+    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/drain-green.xml"
+  ],
+  "exit_code": 0,
+  "stage": "GREEN"
+}

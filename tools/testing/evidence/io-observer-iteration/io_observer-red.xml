@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="14" failures="14" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:21:53.796" name="AllTests">
+  <testsuite name="RequestObservation" tests="5" failures="5" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:21:53.797">
+    <testcase name="InvalidAndStaleBindingRejectWithoutReference" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="30" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="RequestObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:31&#x0A;Expected equality of these values:&#x0A;  nx_request_observer_bind(nullptr, &amp;slot, epoch)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:31
+Expected equality of these values:
+  nx_request_observer_bind(nullptr, &slot, epoch)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:32&#x0A;Expected equality of these values:&#x0A;  nx_request_observer_bind(&amp;observer, nullptr, epoch)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:32
+Expected equality of these values:
+  nx_request_observer_bind(&observer, nullptr, epoch)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:33&#x0A;Expected equality of these values:&#x0A;  nx_request_observer_bind(&amp;observer, &amp;slot, 0U)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:33
+Expected equality of these values:
+  nx_request_observer_bind(&observer, &slot, 0U)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:34&#x0A;Expected equality of these values:&#x0A;  nx_request_observer_bind(&amp;observer, &amp;slot, epoch + 1U)&#x0A;    Which is: 7&#x0A;  NX_ERROR_STATE&#x0A;    Which is: 3&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:34
+Expected equality of these values:
+  nx_request_observer_bind(&observer, &slot, epoch + 1U)
+    Which is: 7
+  NX_ERROR_STATE
+    Which is: 3
+]]></failure>
+    </testcase>
+    <testcase name="BorrowedFactsDoNotExposePrivateResults" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="37" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="RequestObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:38&#x0A;Expected equality of these values:&#x0A;  nx_request_observer_bind(&amp;observer, &amp;slot, epoch)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:38
+Expected equality of these values:
+  nx_request_observer_bind(&observer, &slot, epoch)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="OldEpochCannotReadAReusedRequest" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="58" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="RequestObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:59&#x0A;Expected equality of these values:&#x0A;  nx_request_observer_bind(&amp;observer, &amp;slot, epoch)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:59
+Expected equality of these values:
+  nx_request_observer_bind(&observer, &slot, epoch)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ReversedClockPreservesOutputAndSaturatesCounters" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="71" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="RequestObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:72&#x0A;Expected equality of these values:&#x0A;  nx_request_observer_bind(&amp;observer, &amp;slot, epoch)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:72
+Expected equality of these values:
+  nx_request_observer_bind(&observer, &slot, epoch)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="OutputOverlapCannotRewriteBorrowedControl" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="84" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="RequestObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:85&#x0A;Expected equality of these values:&#x0A;  nx_request_observer_bind(&amp;observer, &amp;slot, epoch)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:85
+Expected equality of these values:
+  nx_request_observer_bind(&observer, &slot, epoch)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="StreamObservation" tests="2" failures="2" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:21:53.797">
+    <testcase name="TotalFreeDoesNotClaimTheFifoCursorIsAvailable" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="93" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="StreamObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:111&#x0A;Expected equality of these values:&#x0A;  nx_stream_observe(&amp;stream, &amp;observation)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:111
+Expected equality of these values:
+  nx_stream_observe(&stream, &observation)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="InvalidMetadataAndAliasedOutputRemainUnchanged" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="121" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="StreamObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:125&#x0A;Expected equality of these values:&#x0A;  nx_stream_observe(nullptr, &amp;output)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:125
+Expected equality of these values:
+  nx_stream_observe(nullptr, &output)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:126&#x0A;Expected equality of these values:&#x0A;  nx_stream_observe(&amp;stream, &amp;output)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:126
+Expected equality of these values:
+  nx_stream_observe(&stream, &output)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="StreamBudget" tests="3" failures="3" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:21:53.797">
+    <testcase name="CalculatesDeclaredPipelineCapacityAndStrictLatency" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="129" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="StreamBudget">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:132&#x0A;Expected equality of these values:&#x0A;  nx_stream_budget_calculate(&amp;budget, &amp;output)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:132
+Expected equality of these values:
+  nx_stream_budget_calculate(&budget, &output)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="RoundsFractionalRetentionUpWithoutAdditionOverflow" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="145" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="StreamBudget">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:148&#x0A;Expected equality of these values:&#x0A;  nx_stream_budget_calculate(&amp;budget, &amp;output)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:148
+Expected equality of these values:
+  nx_stream_budget_calculate(&budget, &output)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="ArithmeticOverflowNeverCreatesAClampedPassingBudget" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="155" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="StreamBudget">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:159&#x0A;Expected equality of these values:&#x0A;  nx_stream_budget_calculate(&amp;budget, &amp;output)&#x0A;    Which is: 7&#x0A;  NX_ERROR_EXHAUSTED&#x0A;    Which is: 13&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:159
+Expected equality of these values:
+  nx_stream_budget_calculate(&budget, &output)
+    Which is: 7
+  NX_ERROR_EXHAUSTED
+    Which is: 13
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:162&#x0A;Expected equality of these values:&#x0A;  nx_stream_budget_calculate(&amp;budget, &amp;output)&#x0A;    Which is: 7&#x0A;  NX_ERROR_EXHAUSTED&#x0A;    Which is: 13&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:162
+Expected equality of these values:
+  nx_stream_budget_calculate(&budget, &output)
+    Which is: 7
+  NX_ERROR_EXHAUSTED
+    Which is: 13
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:165&#x0A;Expected equality of these values:&#x0A;  nx_stream_budget_calculate(&amp;budget, &amp;output)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:165
+Expected equality of these values:
+  nx_stream_budget_calculate(&budget, &output)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="OwnerObservation" tests="4" failures="4" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:21:53.797">
+    <testcase name="BindingDoesNotServiceAndRejectsIncompleteOwner" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="221" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="OwnerObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:222&#x0A;Expected equality of these values:&#x0A;  nx_owner_observer_bind(nullptr, &amp;owner)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:222
+Expected equality of these values:
+  nx_owner_observer_bind(nullptr, &owner)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:224&#x0A;Expected equality of these values:&#x0A;  nx_owner_observer_bind(&amp;observer, &amp;incomplete)&#x0A;    Which is: 7&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:224
+Expected equality of these values:
+  nx_owner_observer_bind(&observer, &incomplete)
+    Which is: 7
+  NX_ERROR_INVALID
+    Which is: 1
+]]></failure>
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:225&#x0A;Expected equality of these values:&#x0A;  nx_owner_observer_bind(&amp;observer, &amp;owner)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:225
+Expected equality of these values:
+  nx_owner_observer_bind(&observer, &owner)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="RealErrorAndClockDiagnosticRemainIndependentDuringDrain" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="229" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="OwnerObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:230&#x0A;Expected equality of these values:&#x0A;  nx_owner_observer_bind(&amp;observer, &amp;owner)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:230
+Expected equality of these values:
+  nx_owner_observer_bind(&observer, &owner)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="BusyAndSaturatingCountersNeverInventQuarantine" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="256" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="OwnerObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:257&#x0A;Expected equality of these values:&#x0A;  nx_owner_observer_bind(&amp;observer, &amp;owner)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:257
+Expected equality of these values:
+  nx_owner_observer_bind(&observer, &owner)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+    <testcase name="OutputAliasRejectsBeforeHardwareService" file="/workspace/nexus/tests/google/io_observer_test.cpp" line="269" status="run" result="completed" time="0." timestamp="2026-10-11T17:21:53.797" classname="OwnerObservation">
+      <failure message="/workspace/nexus/tests/google/io_observer_test.cpp:270&#x0A;Expected equality of these values:&#x0A;  nx_owner_observer_bind(&amp;observer, &amp;owner)&#x0A;    Which is: 7&#x0A;  NX_SUCCESS&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus/tests/google/io_observer_test.cpp:270
+Expected equality of these values:
+  nx_owner_observer_bind(&observer, &owner)
+    Which is: 7
+  NX_SUCCESS
+    Which is: 0
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

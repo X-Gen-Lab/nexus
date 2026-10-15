@@ -1,0 +1,1315 @@
+﻿2026-10-11T23:15:29.4541824Z Current runner version: '2.337.0'
+2026-10-11T23:15:29.4574501Z ##[group]Runner Image Provisioner
+2026-10-11T23:15:29.4575909Z Hosted Compute Agent
+2026-10-11T23:15:29.4576617Z Version: 20261002.596
+2026-10-11T23:15:29.4577279Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+2026-10-11T23:15:29.4578106Z Build Date: 2026-10-02T22:28:27Z
+2026-10-11T23:15:29.4578812Z Worker ID: {108b1a38-1be4-4ee3-9b38-02e096a15b96}
+2026-10-11T23:15:29.4579565Z Region: centralus
+2026-10-11T23:15:29.4580203Z Cloud: Azure
+2026-10-11T23:15:29.4580761Z ##[endgroup]
+2026-10-11T23:15:29.4582452Z ##[group]Operating System
+2026-10-11T23:15:29.4583445Z Ubuntu
+2026-10-11T23:15:29.4584041Z 24.04.5
+2026-10-11T23:15:29.4584631Z LTS
+2026-10-11T23:15:29.4585248Z ##[endgroup]
+2026-10-11T23:15:29.4585863Z ##[group]Runner Image
+2026-10-11T23:15:29.4586506Z Image: ubuntu-24.04
+2026-10-11T23:15:29.4587114Z Version: 20261004.327.1
+2026-10-11T23:15:29.4588589Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-11T23:15:29.4590130Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+2026-10-11T23:15:29.4591104Z ##[endgroup]
+2026-10-11T23:15:29.4592241Z ##[group]GITHUB_TOKEN Permissions
+2026-10-11T23:15:29.4595604Z Contents: read
+2026-10-11T23:15:29.4596193Z Metadata: read
+2026-10-11T23:15:29.4596779Z ##[endgroup]
+2026-10-11T23:15:29.4599655Z Secret source: Actions
+2026-10-11T23:15:29.4600643Z Cache mode: write
+2026-10-11T23:15:29.4601529Z Prepare workflow directory
+2026-10-11T23:15:29.5063161Z Prepare all required actions
+2026-10-11T23:15:29.5117338Z Getting action download info
+2026-10-11T23:15:29.7330418Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-10-11T23:15:29.8378207Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+2026-10-11T23:15:30.4509305Z Uses: X-Gen-Lab/nexus/.github/workflows/build-matrix.yml@refs/heads/codex/next-generation-platform (08bdfb765902c725c75a20b3d05bac31f8afe7c8)
+2026-10-11T23:15:30.4514365Z Complete job name: Build & Test / Native contracts (native-release)
+2026-10-11T23:15:30.5321512Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-10-11T23:15:30.5322595Z with:
+2026-10-11T23:15:30.5323474Z   submodules: false
+2026-10-11T23:15:30.5324070Z   fetch-depth: 0
+2026-10-11T23:15:30.5324674Z   repository: X-Gen-Lab/nexus
+2026-10-11T23:15:30.5330238Z   token: ***
+2026-10-11T23:15:30.5330793Z   ssh-strict: true
+2026-10-11T23:15:30.5331436Z   ssh-user: git
+2026-10-11T23:15:30.5332019Z   persist-credentials: true
+2026-10-11T23:15:30.5332633Z   clean: true
+2026-10-11T23:15:30.5333497Z   sparse-checkout-cone-mode: true
+2026-10-11T23:15:30.5334167Z   fetch-tags: false
+2026-10-11T23:15:30.5334790Z   show-progress: true
+2026-10-11T23:15:30.5335406Z   lfs: false
+2026-10-11T23:15:30.5336293Z   set-safe-directory: true
+2026-10-11T23:15:30.5337019Z   allow-unsafe-pr-checkout: false
+2026-10-11T23:15:30.5338094Z ##[endgroup]
+2026-10-11T23:15:30.6438610Z Syncing repository: X-Gen-Lab/nexus
+2026-10-11T23:15:30.6442197Z ##[group]Getting Git version info
+2026-10-11T23:15:30.6443991Z Working directory is '/home/runner/work/nexus/nexus'
+2026-10-11T23:15:30.6445740Z [command]/usr/bin/git version
+2026-10-11T23:15:30.6467970Z git version 2.55.0
+2026-10-11T23:15:30.6488016Z ##[endgroup]
+2026-10-11T23:15:30.6501908Z Temporarily overriding HOME='/home/runner/work/_temp/28fa7229-7e9f-491c-b5a5-ef94da966f23' before making global git config changes
+2026-10-11T23:15:30.6505229Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-11T23:15:30.6508945Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/nexus/nexus
+2026-10-11T23:15:30.6559316Z Deleting the contents of '/home/runner/work/nexus/nexus'
+2026-10-11T23:15:30.6564443Z ##[group]Determining repository object format
+2026-10-11T23:15:30.6566451Z ##[endgroup]
+2026-10-11T23:15:30.6567405Z ##[group]Initializing the repository
+2026-10-11T23:15:30.6570512Z [command]/usr/bin/git init /home/runner/work/nexus/nexus
+2026-10-11T23:15:30.6666498Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-11T23:15:30.6667789Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-11T23:15:30.6669179Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-11T23:15:30.6670175Z hint: call:
+2026-10-11T23:15:30.6670702Z hint:
+2026-10-11T23:15:30.6671418Z hint: 	git config --global init.defaultBranch <name>
+2026-10-11T23:15:30.6672239Z hint:
+2026-10-11T23:15:30.6673399Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-11T23:15:30.6674679Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-11T23:15:30.6675565Z hint:
+2026-10-11T23:15:30.6676171Z hint: 	git branch -m <name>
+2026-10-11T23:15:30.6676799Z hint:
+2026-10-11T23:15:30.6677815Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-11T23:15:30.6679121Z Initialized empty Git repository in /home/runner/work/nexus/nexus/.git/
+2026-10-11T23:15:30.6681322Z [command]/usr/bin/git remote add origin https://github.com/X-Gen-Lab/nexus
+2026-10-11T23:15:30.6733502Z ##[endgroup]
+2026-10-11T23:15:30.6734518Z ##[group]Disabling automatic garbage collection
+2026-10-11T23:15:30.6737460Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-11T23:15:30.6775191Z ##[endgroup]
+2026-10-11T23:15:30.6776616Z ##[group]Setting up auth
+2026-10-11T23:15:30.6778079Z Removing SSH command configuration
+2026-10-11T23:15:30.6779836Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-11T23:15:30.6815425Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-11T23:15:30.7215607Z Removing HTTP extra header
+2026-10-11T23:15:30.7221762Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-11T23:15:30.7257117Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-11T23:15:30.7448571Z Removing includeIf entries pointing to credentials config files
+2026-10-11T23:15:30.7455166Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:15:30.7485779Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-11T23:15:30.7679576Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-02906522-ff95-42de-a27e-4bb66f7e1928.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-11T23:15:30.7715712Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/nexus/nexus/.git.path /home/runner/work/_temp/git-credentials-02906522-ff95-42de-a27e-4bb66f7e1928.config
+2026-10-11T23:15:30.7748833Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/nexus/nexus/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-02906522-ff95-42de-a27e-4bb66f7e1928.config
+2026-10-11T23:15:30.7786624Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-02906522-ff95-42de-a27e-4bb66f7e1928.config
+2026-10-11T23:15:30.7820115Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-02906522-ff95-42de-a27e-4bb66f7e1928.config
+2026-10-11T23:15:30.7848584Z ##[endgroup]
+2026-10-11T23:15:30.7849605Z ##[group]Fetching the repository
+2026-10-11T23:15:30.7854647Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-10-11T23:15:43.0095545Z From https://github.com/X-Gen-Lab/nexus
+2026-10-11T23:15:43.0097296Z  * [new branch]        codex/industrial-platform-modernization -> origin/codex/industrial-platform-modernization
+2026-10-11T23:15:43.0098667Z  * [new branch]        codex/next-generation-platform -> origin/codex/next-generation-platform
+2026-10-11T23:15:43.0099574Z  * [new branch]        main       -> origin/main
+2026-10-11T23:15:43.0105804Z [command]/usr/bin/git branch --list --remote origin/codex/next-generation-platform
+2026-10-11T23:15:43.0132967Z   origin/codex/next-generation-platform
+2026-10-11T23:15:43.0140457Z [command]/usr/bin/git rev-parse refs/remotes/origin/codex/next-generation-platform
+2026-10-11T23:15:43.0164055Z 08bdfb765902c725c75a20b3d05bac31f8afe7c8
+2026-10-11T23:15:43.0166236Z ##[endgroup]
+2026-10-11T23:15:43.0167241Z ##[group]Determining the checkout info
+2026-10-11T23:15:43.0172066Z ##[endgroup]
+2026-10-11T23:15:43.0173045Z [command]/usr/bin/git sparse-checkout disable
+2026-10-11T23:15:43.0292198Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-11T23:15:43.0375663Z ##[group]Checking out the ref
+2026-10-11T23:15:43.0380702Z [command]/usr/bin/git checkout --progress --force -B codex/next-generation-platform refs/remotes/origin/codex/next-generation-platform
+2026-10-11T23:15:44.1161861Z Updating files:  80% (14812/18501)
+2026-10-11T23:15:44.1272515Z Updating files:  81% (14986/18501)
+2026-10-11T23:15:44.1332019Z Updating files:  82% (15171/18501)
+2026-10-11T23:15:44.1396603Z Updating files:  83% (15356/18501)
+2026-10-11T23:15:44.1431915Z Updating files:  84% (15541/18501)
+2026-10-11T23:15:44.1478527Z Updating files:  85% (15726/18501)
+2026-10-11T23:15:44.1572022Z Updating files:  86% (15911/18501)
+2026-10-11T23:15:44.1636199Z Updating files:  87% (16096/18501)
+2026-10-11T23:15:44.2032004Z Updating files:  88% (16281/18501)
+2026-10-11T23:15:44.2244081Z Updating files:  89% (16466/18501)
+2026-10-11T23:15:44.2298219Z Updating files:  90% (16651/18501)
+2026-10-11T23:15:44.2333521Z Updating files:  91% (16836/18501)
+2026-10-11T23:15:44.2384548Z Updating files:  92% (17021/18501)
+2026-10-11T23:15:44.2420969Z Updating files:  93% (17206/18501)
+2026-10-11T23:15:44.2452471Z Updating files:  94% (17391/18501)
+2026-10-11T23:15:44.2490389Z Updating files:  95% (17576/18501)
+2026-10-11T23:15:44.2539667Z Updating files:  96% (17761/18501)
+2026-10-11T23:15:44.2583118Z Updating files:  97% (17946/18501)
+2026-10-11T23:15:44.2646281Z Updating files:  98% (18131/18501)
+2026-10-11T23:15:44.2800395Z Updating files:  99% (18316/18501)
+2026-10-11T23:15:44.2801005Z Updating files: 100% (18501/18501)
+2026-10-11T23:15:44.2801723Z Updating files: 100% (18501/18501), done.
+2026-10-11T23:15:44.3975034Z Switched to a new branch 'codex/next-generation-platform'
+2026-10-11T23:15:44.4278594Z branch 'codex/next-generation-platform' set up to track 'origin/codex/next-generation-platform'.
+2026-10-11T23:15:44.4311028Z ##[endgroup]
+2026-10-11T23:15:44.4524132Z [command]/usr/bin/git log -1 --format=%H
+2026-10-11T23:15:44.4551071Z 08bdfb765902c725c75a20b3d05bac31f8afe7c8
+2026-10-11T23:15:44.5496564Z Prepare all required actions
+2026-10-11T23:15:44.5497414Z Getting action download info
+2026-10-11T23:15:44.6833782Z Download action repository 'actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97' (SHA:5fda3b95a4ea91299a34e894583c3862153e4b97)
+2026-10-11T23:15:45.5913049Z ##[group]Run ./.github/actions/setup-build
+2026-10-11T23:15:45.5913486Z with:
+2026-10-11T23:15:45.5913828Z   preset: native-release
+2026-10-11T23:15:45.5914169Z   arm: false
+2026-10-11T23:15:45.5914494Z   os: ubuntu-24.04
+2026-10-11T23:15:45.5914831Z ##[endgroup]
+2026-10-11T23:15:45.5982257Z ##[start-action display=Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97;id=__self.__actions_setup-python]
+2026-10-11T23:15:45.6616858Z ##[group]Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+2026-10-11T23:15:45.6617441Z with:
+2026-10-11T23:15:45.6617804Z   python-version: 3.11
+2026-10-11T23:15:45.6618342Z   check-latest: false
+2026-10-11T23:15:45.6621132Z   token: ***
+2026-10-11T23:15:45.6621723Z   update-environment: true
+2026-10-11T23:15:45.6622110Z   allow-prereleases: false
+2026-10-11T23:15:45.6622447Z   freethreaded: false
+2026-10-11T23:15:45.6622940Z ##[endgroup]
+2026-10-11T23:15:45.8729263Z ##[group]Installed versions
+2026-10-11T23:15:45.9059229Z Successfully set up CPython (3.11.17)
+2026-10-11T23:15:45.9060335Z ##[endgroup]
+2026-10-11T23:15:45.9136604Z ##[end-action id=__self.__actions_setup-python;outcome=success;conclusion=success;duration_ms=315]
+2026-10-11T23:15:45.9140056Z ##[start-action display=Install the locked local build and commit tools;id=__self.__run]
+2026-10-11T23:15:46.0710704Z ##[group]Run python scripts/setup/install_dev_tools.py --skip-hooks
+2026-10-11T23:15:46.0711508Z [36;1mpython scripts/setup/install_dev_tools.py --skip-hooks[0m
+2026-10-11T23:15:46.0712077Z [36;1m.venv/bin/python -m pip install -r requirements.txt[0m
+2026-10-11T23:15:46.0712595Z [36;1mecho "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"[0m
+2026-10-11T23:15:46.1145362Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-11T23:15:46.1146364Z env:
+2026-10-11T23:15:46.1146809Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:15:46.1147441Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T23:15:46.1148010Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:15:46.1148529Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:15:46.1149065Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:15:46.1149634Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T23:15:46.1150108Z ##[endgroup]
+2026-10-11T23:15:50.5691982Z Collecting pre-commit==4.3.0 (from -r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:50.6546564Z   Downloading pre_commit-4.3.0-py2.py3-none-any.whl.metadata (1.2 kB)
+2026-10-11T23:15:50.7516431Z Collecting clang-format==14.0.6 (from -r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 3))
+2026-10-11T23:15:50.7728435Z   Downloading clang_format-14.0.6-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl.metadata (4.6 kB)
+2026-10-11T23:15:50.8069003Z Collecting cfgv>=2.0.0 (from pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:50.8240714Z   Downloading cfgv-3.5.0-py2.py3-none-any.whl.metadata (8.9 kB)
+2026-10-11T23:15:50.9006161Z Collecting identify>=1.0.0 (from pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:50.9173192Z   Downloading identify-2.6.20-py2.py3-none-any.whl.metadata (4.4 kB)
+2026-10-11T23:15:50.9517439Z Collecting nodeenv>=0.11.1 (from pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:50.9681733Z   Downloading nodeenv-1.11.0-py2.py3-none-any.whl.metadata (40 kB)
+2026-10-11T23:15:50.9799742Z      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 41.0/41.0 kB 3.8 MB/s eta 0:00:00
+2026-10-11T23:15:51.0340127Z Collecting pyyaml>=5.1 (from pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:51.0507153Z   Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-10-11T23:15:51.1517936Z Collecting virtualenv>=20.10.0 (from pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:51.1682463Z   Downloading virtualenv-21.14.6-py3-none-any.whl.metadata (4.1 kB)
+2026-10-11T23:15:51.2098064Z Collecting distlib<1,>=0.4.3 (from virtualenv>=20.10.0->pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:51.2277339Z   Downloading distlib-0.4.3-py2.py3-none-any.whl.metadata (5.3 kB)
+2026-10-11T23:15:51.2808389Z Collecting filelock<5,>=3.24.2 (from virtualenv>=20.10.0->pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:51.2969349Z   Downloading filelock-4.1.1-py3-none-any.whl.metadata (2.0 kB)
+2026-10-11T23:15:51.3469574Z Collecting packaging>=26.3 (from virtualenv>=20.10.0->pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:51.3633960Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-10-11T23:15:51.4115170Z Collecting platformdirs<5,>=4.4 (from virtualenv>=20.10.0->pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:51.4283929Z   Downloading platformdirs-4.13.0-py3-none-any.whl.metadata (5.5 kB)
+2026-10-11T23:15:51.4597511Z Collecting python-discovery>=1.6.1 (from virtualenv>=20.10.0->pre-commit==4.3.0->-r /home/runner/work/nexus/nexus/dependencies/development-tools.txt (line 2))
+2026-10-11T23:15:51.4767852Z   Downloading python_discovery-1.6.2-py3-none-any.whl.metadata (5.1 kB)
+2026-10-11T23:15:51.5161097Z Downloading pre_commit-4.3.0-py2.py3-none-any.whl (220 kB)
+2026-10-11T23:15:51.5484843Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 221.0/221.0 kB 7.2 MB/s eta 0:00:00
+2026-10-11T23:15:51.5714739Z Downloading clang_format-14.0.6-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl (1.1 MB)
+2026-10-11T23:15:51.6303855Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 20.1 MB/s eta 0:00:00
+2026-10-11T23:15:51.6470381Z Downloading cfgv-3.5.0-py2.py3-none-any.whl (7.4 kB)
+2026-10-11T23:15:51.6657097Z Downloading identify-2.6.20-py2.py3-none-any.whl (99 kB)
+2026-10-11T23:15:51.6703924Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 99.5/99.5 kB 32.8 MB/s eta 0:00:00
+2026-10-11T23:15:51.6864107Z Downloading nodeenv-1.11.0-py2.py3-none-any.whl (34 kB)
+2026-10-11T23:15:51.7075116Z Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (806 kB)
+2026-10-11T23:15:51.7275616Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 806.6/806.6 kB 44.6 MB/s eta 0:00:00
+2026-10-11T23:15:51.7485522Z Downloading virtualenv-21.14.6-py3-none-any.whl (5.5 MB)
+2026-10-11T23:15:51.8201749Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 79.1 MB/s eta 0:00:00
+2026-10-11T23:15:51.8378015Z Downloading distlib-0.4.3-py2.py3-none-any.whl (470 kB)
+2026-10-11T23:15:51.8450884Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 470.6/470.6 kB 95.3 MB/s eta 0:00:00
+2026-10-11T23:15:51.8621889Z Downloading filelock-4.1.1-py3-none-any.whl (132 kB)
+2026-10-11T23:15:51.8682645Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.5/132.5 kB 36.4 MB/s eta 0:00:00
+2026-10-11T23:15:51.8852650Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-10-11T23:15:51.8909431Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 130.0/130.0 kB 34.3 MB/s eta 0:00:00
+2026-10-11T23:15:51.9082333Z Downloading platformdirs-4.13.0-py3-none-any.whl (32 kB)
+2026-10-11T23:15:51.9278635Z Downloading python_discovery-1.6.2-py3-none-any.whl (38 kB)
+2026-10-11T23:15:52.0628455Z Installing collected packages: distlib, clang-format, pyyaml, platformdirs, packaging, nodeenv, identify, filelock, cfgv, python-discovery, virtualenv, pre-commit
+2026-10-11T23:15:52.6424060Z Successfully installed cfgv-3.5.0 clang-format-14.0.6 distlib-0.4.3 filelock-4.1.1 identify-2.6.20 nodeenv-1.11.0 packaging-26.3 platformdirs-4.13.0 pre-commit-4.3.0 python-discovery-1.6.2 pyyaml-6.0.3 virtualenv-21.14.6
+2026-10-11T23:15:52.7867940Z 
+2026-10-11T23:15:52.7868902Z [notice] A new release of pip is available: 24.0 -> 26.2.1
+2026-10-11T23:15:52.7870037Z [notice] To update, run: /home/runner/work/nexus/nexus/.venv/bin/python -m pip install --upgrade pip
+2026-10-11T23:15:53.1579619Z Git hook installation skipped.
+2026-10-11T23:15:53.1580274Z Development tools verified in /home/runner/work/nexus/nexus/.venv.
+2026-10-11T23:15:53.1580886Z Run this .venv's Python with -m pre_commit run --all-files; see --help for activation.
+2026-10-11T23:15:53.4577561Z Requirement already satisfied: pre-commit==4.3.0 in ./.venv/lib/python3.11/site-packages (from -r dependencies/development-tools.txt (line 2)) (4.3.0)
+2026-10-11T23:15:53.4585988Z Requirement already satisfied: clang-format==14.0.6 in ./.venv/lib/python3.11/site-packages (from -r dependencies/development-tools.txt (line 3)) (14.0.6)
+2026-10-11T23:15:53.6948657Z Collecting cmake==3.31.6 (from -r dependencies/environment-tools.txt (line 2))
+2026-10-11T23:15:53.7655796Z   Downloading cmake-3.31.6-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.3 kB)
+2026-10-11T23:15:53.8141953Z Collecting ninja==1.13.2 (from -r dependencies/environment-tools.txt (line 3))
+2026-10-11T23:15:53.8305389Z   Downloading ninja-1.13.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.4 kB)
+2026-10-11T23:15:53.8352694Z Requirement already satisfied: PyYAML==6.0.3 in ./.venv/lib/python3.11/site-packages (from -r requirements.txt (line 5)) (6.0.3)
+2026-10-11T23:15:53.8391109Z Requirement already satisfied: cfgv>=2.0.0 in ./.venv/lib/python3.11/site-packages (from pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (3.5.0)
+2026-10-11T23:15:53.8402025Z Requirement already satisfied: identify>=1.0.0 in ./.venv/lib/python3.11/site-packages (from pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (2.6.20)
+2026-10-11T23:15:53.8420265Z Requirement already satisfied: nodeenv>=0.11.1 in ./.venv/lib/python3.11/site-packages (from pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (1.11.0)
+2026-10-11T23:15:53.8432697Z Requirement already satisfied: virtualenv>=20.10.0 in ./.venv/lib/python3.11/site-packages (from pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (21.14.6)
+2026-10-11T23:15:53.8580378Z Requirement already satisfied: distlib<1,>=0.4.3 in ./.venv/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (0.4.3)
+2026-10-11T23:15:53.8593030Z Requirement already satisfied: filelock<5,>=3.24.2 in ./.venv/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (4.1.1)
+2026-10-11T23:15:53.8603501Z Requirement already satisfied: packaging>=26.3 in ./.venv/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (26.3)
+2026-10-11T23:15:53.8612586Z Requirement already satisfied: platformdirs<5,>=4.4 in ./.venv/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (4.13.0)
+2026-10-11T23:15:53.8622474Z Requirement already satisfied: python-discovery>=1.6.1 in ./.venv/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit==4.3.0->-r dependencies/development-tools.txt (line 2)) (1.6.2)
+2026-10-11T23:15:53.8888438Z Downloading cmake-3.31.6-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (27.8 MB)
+2026-10-11T23:15:54.5154305Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 27.8/27.8 MB 24.8 MB/s eta 0:00:00
+2026-10-11T23:15:54.5324673Z Downloading ninja-1.13.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (183 kB)
+2026-10-11T23:15:54.5527482Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 183.4/183.4 kB 9.8 MB/s eta 0:00:00
+2026-10-11T23:15:54.6655778Z Installing collected packages: ninja, cmake
+2026-10-11T23:15:55.5459722Z Successfully installed cmake-3.31.6 ninja-1.13.2
+2026-10-11T23:15:55.5661408Z 
+2026-10-11T23:15:55.5662376Z [notice] A new release of pip is available: 24.0 -> 26.2.1
+2026-10-11T23:15:55.5663272Z [notice] To update, run: /home/runner/work/nexus/nexus/.venv/bin/python -m pip install --upgrade pip
+2026-10-11T23:15:55.6788007Z ##[end-action id=__self.__run;outcome=success;conclusion=success;duration_ms=9764]
+2026-10-11T23:15:55.6791679Z ##[start-action display=Initialize selected vendor and scheduler sources;id=__self.__run_2]
+2026-10-11T23:15:55.7711371Z ##[group]Run git submodule update --init --recursive ext/freertos ext/threadx vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/cmsis_device_g4
+2026-10-11T23:15:55.7712674Z [36;1mgit submodule update --init --recursive ext/freertos ext/threadx vendors/arm/CMSIS_5 vendors/st/cmsis_device_f4 vendors/st/cmsis_device_g4[0m
+2026-10-11T23:15:55.7761961Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-11T23:15:55.7762459Z env:
+2026-10-11T23:15:55.7763085Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:15:55.7763642Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T23:15:55.7764250Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:15:55.7764765Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:15:55.7765256Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:15:55.7765765Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T23:15:55.7766196Z ##[endgroup]
+2026-10-11T23:15:55.8508527Z Submodule 'ext/freertos' (https://github.com/FreeRTOS/FreeRTOS-Kernel.git) registered for path 'ext/freertos'
+2026-10-11T23:15:55.8517397Z Submodule 'ext/threadx' (https://github.com/eclipse-threadx/threadx.git) registered for path 'ext/threadx'
+2026-10-11T23:15:55.8709730Z Submodule 'vendors/arm/CMSIS_5' (https://github.com/ARM-software/CMSIS_5.git) registered for path 'vendors/arm/CMSIS_5'
+2026-10-11T23:15:55.8808897Z Submodule 'vendors/st/cmsis_device_f4' (https://github.com/STMicroelectronics/cmsis_device_f4.git) registered for path 'vendors/st/cmsis_device_f4'
+2026-10-11T23:15:55.8902383Z Submodule 'vendors/st/cmsis_device_g4' (https://github.com/STMicroelectronics/cmsis-device-g4.git) registered for path 'vendors/st/cmsis_device_g4'
+2026-10-11T23:15:55.8937103Z Cloning into '/home/runner/work/nexus/nexus/ext/freertos'...
+2026-10-11T23:16:03.5403298Z Cloning into '/home/runner/work/nexus/nexus/ext/threadx'...
+2026-10-11T23:16:05.5493279Z Cloning into '/home/runner/work/nexus/nexus/vendors/arm/CMSIS_5'...
+2026-10-11T23:16:19.5774497Z Cloning into '/home/runner/work/nexus/nexus/vendors/st/cmsis_device_f4'...
+2026-10-11T23:16:20.8760382Z Cloning into '/home/runner/work/nexus/nexus/vendors/st/cmsis_device_g4'...
+2026-10-11T23:16:21.5639942Z Submodule path 'ext/freertos': checked out 'dbf70559b27d39c1fdb68dfb9a32140b6a6777a0'
+2026-10-11T23:16:21.5669323Z Submodule 'ThirdParty/FreeRTOS-Kernel-Community-Supported-Ports' (https://github.com/FreeRTOS/FreeRTOS-Kernel-Community-Supported-Ports) registered for path 'ext/freertos/portable/ThirdParty/Community-Supported-Ports'
+2026-10-11T23:16:21.5677928Z Submodule 'ThirdParty/FreeRTOS-Kernel-Partner-Supported-Ports' (https://github.com/FreeRTOS/FreeRTOS-Kernel-Partner-Supported-Ports) registered for path 'ext/freertos/portable/ThirdParty/Partner-Supported-Ports'
+2026-10-11T23:16:21.5706452Z Cloning into '/home/runner/work/nexus/nexus/ext/freertos/portable/ThirdParty/Community-Supported-Ports'...
+2026-10-11T23:16:22.1075246Z Cloning into '/home/runner/work/nexus/nexus/ext/freertos/portable/ThirdParty/Partner-Supported-Ports'...
+2026-10-11T23:16:22.5499208Z Submodule path 'ext/freertos/portable/ThirdParty/Community-Supported-Ports': checked out '9c5bad7b2f42b4e8420f12290b9bc085d3309e8b'
+2026-10-11T23:16:22.5595101Z Submodule path 'ext/freertos/portable/ThirdParty/Partner-Supported-Ports': checked out 'dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9'
+2026-10-11T23:16:22.9076189Z Submodule path 'ext/threadx': checked out '93387b0a60382a29579bbad5045c68328e3751df'
+2026-10-11T23:16:23.1390742Z Submodule path 'vendors/arm/CMSIS_5': checked out '55b19837f5703e418ca37894d5745b1dc05e4c91'
+2026-10-11T23:16:23.2081221Z Submodule path 'vendors/st/cmsis_device_f4': checked out '3c77349ce04c8af401454cc51f85ea9a50e34fc1'
+2026-10-11T23:16:23.2669346Z Submodule path 'vendors/st/cmsis_device_g4': checked out '626ee412334a5ed2e5b320af5a8d77d69f03a558'
+2026-10-11T23:16:23.2701021Z ##[end-action id=__self.__run_2;outcome=success;conclusion=success;duration_ms=27590]
+2026-10-11T23:16:23.2704315Z ##[start-action display=Install the locked ARM compiler;id=__self.__run_3]
+2026-10-11T23:16:23.2713963Z ##[end-action id=__self.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-11T23:16:23.2774450Z ##[group]Run .venv/bin/python tools/dev/dev.py configure --preset "native-release"
+2026-10-11T23:16:23.2775144Z [36;1m.venv/bin/python tools/dev/dev.py configure --preset "native-release"[0m
+2026-10-11T23:16:23.2817843Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-11T23:16:23.2818265Z env:
+2026-10-11T23:16:23.2818714Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:16:23.2819258Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T23:16:23.2819816Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:16:23.2820278Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:16:23.2820720Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:16:23.2821219Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T23:16:23.2821644Z ##[endgroup]
+2026-10-11T23:16:23.3177779Z + /home/runner/work/nexus/nexus/.venv/bin/cmake --preset native-release
+2026-10-11T23:16:23.4921126Z Preset CMake variables:
+2026-10-11T23:16:23.4921914Z 
+2026-10-11T23:16:23.4924710Z   CMAKE_BUILD_TYPE="Release"
+2026-10-11T23:16:23.4926201Z   NEXUS_ASSEMBLY_FILE="/home/runner/work/nexus/nexus/tools/configure/assemblies/native.toml"
+2026-10-11T23:16:23.4927415Z   NEXUS_BUILD_TESTS="ON"
+2026-10-11T23:16:23.4927816Z 
+2026-10-11T23:16:23.4928283Z -- The C compiler identification is GNU 13.3.0
+2026-10-11T23:16:23.5206911Z -- The ASM compiler identification is GNU
+2026-10-11T23:16:23.5221500Z -- Found assembler: /usr/bin/cc
+2026-10-11T23:16:23.5271539Z -- Detecting C compiler ABI info
+2026-10-11T23:16:23.6076990Z -- Detecting C compiler ABI info - done
+2026-10-11T23:16:23.6221293Z -- Check for working C compiler: /usr/bin/cc - skipped
+2026-10-11T23:16:23.6223582Z -- Detecting C compile features
+2026-10-11T23:16:23.6228099Z -- Detecting C compile features - done
+2026-10-11T23:16:23.7358003Z -- Found Python3: /opt/hostedtoolcache/Python/3.11.17/x64/bin/python3.11 (found suitable version "3.11.17", minimum required is "3.11") found components: Interpreter
+2026-10-11T23:16:23.8891729Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-10-11T23:16:23.9590565Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-10-11T23:16:23.9601224Z -- Found Threads: TRUE
+2026-10-11T23:16:25.4648722Z -- The CXX compiler identification is GNU 13.3.0
+2026-10-11T23:16:25.4719881Z -- Detecting CXX compiler ABI info
+2026-10-11T23:16:25.5588463Z -- Detecting CXX compiler ABI info - done
+2026-10-11T23:16:25.5732252Z -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-10-11T23:16:25.5735562Z -- Detecting CXX compile features
+2026-10-11T23:16:25.5741659Z -- Detecting CXX compile features - done
+2026-10-11T23:16:28.3432209Z -- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+2026-10-11T23:16:28.4099318Z -- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+2026-10-11T23:16:28.7740744Z -- Found Python3: /opt/hostedtoolcache/Python/3.11.17/x64/bin/python3.11 (found version "3.11.17") found components: Interpreter
+2026-10-11T23:16:28.7750083Z -- Nexus: NATIVE_MODEL/native, Os
+2026-10-11T23:16:28.7750931Z -- Sole resolved configuration: /home/runner/work/nexus/nexus/build/native-release/generated/resolved.json
+2026-10-11T23:16:28.7757769Z -- Configuring done (5.4s)
+2026-10-11T23:16:29.0169431Z -- Generating done (0.2s)
+2026-10-11T23:16:29.0174851Z -- Build files have been written to: /home/runner/work/nexus/nexus/build/native-release
+2026-10-11T23:16:29.0484483Z ##[group]Run .venv/bin/python tools/dev/dev.py build --preset "native-release" --parallel 4
+2026-10-11T23:16:29.0485324Z [36;1m.venv/bin/python tools/dev/dev.py build --preset "native-release" --parallel 4[0m
+2026-10-11T23:16:29.0528665Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-11T23:16:29.0529151Z env:
+2026-10-11T23:16:29.0529563Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:16:29.0530147Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T23:16:29.0530809Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:16:29.0531318Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:16:29.0531787Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:16:29.0532302Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T23:16:29.0532746Z ##[endgroup]
+2026-10-11T23:16:29.0895180Z + /home/runner/work/nexus/nexus/.venv/bin/cmake --build --preset native-release --parallel 4
+2026-10-11T23:16:29.1675483Z [0/2] Re-checking globbed directories...
+2026-10-11T23:16:29.2140603Z [1/928] Building C object core/CMakeFiles/nexus_core.dir/src/stack_observation.c.o
+2026-10-11T23:16:29.2248039Z [2/928] Building C object core/CMakeFiles/nexus_core.dir/src/time.c.o
+2026-10-11T23:16:29.2355720Z [3/928] Building C object core/CMakeFiles/nexus_core.dir/src/request_observer.c.o
+2026-10-11T23:16:29.2393866Z [4/928] Building C object core/CMakeFiles/nexus_core.dir/src/request.c.o
+2026-10-11T23:16:29.2437821Z [5/928] Building C object core/CMakeFiles/nexus_core.dir/src/fault.c.o
+2026-10-11T23:16:29.2681557Z [6/928] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.o
+2026-10-11T23:16:29.2767552Z [7/928] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.o
+2026-10-11T23:16:29.2778948Z [8/928] Building C object arch/CMakeFiles/nexus_arch.dir/native/nx_arch_native.c.o
+2026-10-11T23:16:29.2979349Z [9/928] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.o
+2026-10-11T23:16:29.2982065Z [10/928] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.o
+2026-10-11T23:16:29.3042310Z [11/928] Building C object io/CMakeFiles/nexus_io.dir/src/gpio.c.o
+2026-10-11T23:16:29.3426436Z [12/928] Building C object io/CMakeFiles/nexus_io.dir/src/uart.c.o
+2026-10-11T23:16:29.3487170Z [13/928] Building C object io/CMakeFiles/nexus_io.dir/src/spi.c.o
+2026-10-11T23:16:29.3765124Z [14/928] Building C object io/CMakeFiles/nexus_io.dir/src/flash.c.o
+2026-10-11T23:16:29.4046574Z [15/928] Building C object io/CMakeFiles/nexus_io.dir/src/i2c.c.o
+2026-10-11T23:16:29.4065726Z [16/928] Building C object io/CMakeFiles/nexus_io.dir/src/watchdog.c.o
+2026-10-11T23:16:29.4474257Z [17/928] Building C object io/CMakeFiles/nexus_io.dir/src/exti.c.o
+2026-10-11T23:16:29.4477328Z [18/928] Building C object io/CMakeFiles/nexus_io.dir/src/timer.c.o
+2026-10-11T23:16:29.4754648Z [19/928] Building C object io/CMakeFiles/nexus_io.dir/src/flash_region.c.o
+2026-10-11T23:16:29.4836006Z [20/928] Building C object io/CMakeFiles/nexus_io.dir/src/adc.c.o
+2026-10-11T23:16:29.5334762Z [21/928] Building C object io/CMakeFiles/nexus_io.dir/src/dma.c.o
+2026-10-11T23:16:29.5639292Z [22/928] Building C object io/CMakeFiles/nexus_io.dir/src/wake.c.o
+2026-10-11T23:16:29.5986041Z [23/928] Building C object io/CMakeFiles/nexus_io.dir/src/stream.c.o
+2026-10-11T23:16:29.6298502Z [24/928] Building C object io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.o
+2026-10-11T23:16:29.6616939Z [25/928] Building C object io/CMakeFiles/nexus_io.dir/src/adc_observer.c.o
+2026-10-11T23:16:29.6985431Z [26/928] Building C object io/CMakeFiles/nexus_io.dir/src/stream_budget.c.o
+2026-10-11T23:16:29.7085158Z [27/928] Building C object io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.o
+2026-10-11T23:16:29.7436887Z [28/928] Building C object io/CMakeFiles/nexus_io.dir/src/can.c.o
+2026-10-11T23:16:29.7591160Z [29/928] Building C object io/CMakeFiles/nexus_io.dir/src/ethernet.c.o
+2026-10-11T23:16:29.7665068Z [30/928] Building C object io/CMakeFiles/nexus_io.dir/src/mdio.c.o
+2026-10-11T23:16:29.8009970Z [31/928] Building C object io/CMakeFiles/nexus_io.dir/src/timer_capture.c.o
+2026-10-11T23:16:29.8071478Z [32/928] Building C object io/CMakeFiles/nexus_io.dir/src/usb_device.c.o
+2026-10-11T23:16:29.8277647Z [33/928] Building C object os/CMakeFiles/nexus_os_wait.dir/wait.c.o
+2026-10-11T23:16:29.8310054Z [34/928] Building C object io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.o
+2026-10-11T23:16:29.8585712Z [35/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+2026-10-11T23:16:29.9014367Z [36/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+2026-10-11T23:16:30.0162388Z [37/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+2026-10-11T23:16:30.0657710Z [38/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+2026-10-11T23:16:30.1196155Z [39/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+2026-10-11T23:16:30.1972285Z [40/928] Linking C static library lib/libnexus_arch.a
+2026-10-11T23:16:30.2008298Z [41/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+2026-10-11T23:16:30.2043385Z [42/928] Linking C static library lib/libnexus_core.a
+2026-10-11T23:16:30.2589083Z [43/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+2026-10-11T23:16:30.2698373Z [44/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+2026-10-11T23:16:30.2929342Z [45/928] Linking C static library lib/libnexus_io.a
+2026-10-11T23:16:30.2998628Z [46/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+2026-10-11T23:16:30.3270312Z [47/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+2026-10-11T23:16:30.3795032Z [48/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+2026-10-11T23:16:30.3822164Z [49/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+2026-10-11T23:16:30.4203905Z [50/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/can.c.o
+2026-10-11T23:16:30.4505134Z [51/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/ethernet.c.o
+2026-10-11T23:16:30.5047327Z [52/928] Building C object io/CMakeFiles/nexus_io_native.dir/native/usb_device.c.o
+2026-10-11T23:16:30.6598028Z [53/928] Building C object io/CMakeFiles/nexus_can_native_engine.dir/src/can_controller.c.o
+2026-10-11T23:16:30.7421645Z [54/928] Linking C static library lib/libnexus_os_wait.a
+2026-10-11T23:16:30.7857781Z [55/928] Building C object io/CMakeFiles/nexus_eth_native_engine.dir/src/eth_mac.c.o
+2026-10-11T23:16:30.8440116Z [56/928] Building C object components/CMakeFiles/nexus_bus_owner.dir/bus_owner/src/bus_owner.c.o
+2026-10-11T23:16:30.8690892Z [57/928] Building C object io/CMakeFiles/nexus_usb_native_engine.dir/src/usb_device_controller.c.o
+2026-10-11T23:16:30.8779357Z [58/928] Building C object components/CMakeFiles/nexus_bmp280.dir/bmp280/src/bmp280.c.o
+2026-10-11T23:16:31.3438269Z [59/928] Building C object components/CMakeFiles/nexus_storage.dir/storage/src/storage.c.o
+2026-10-11T23:16:31.3456962Z [60/928] Building C object tests/contracts/os_freertos_runtime/CMakeFiles/contract_freertos_posix.dir/__/__/__/ext/freertos/tasks.c.o
+2026-10-11T23:16:31.3495404Z [61/928] Building C object tests/contracts/os_freertos_runtime/CMakeFiles/contract_freertos_posix.dir/__/__/__/ext/freertos/queue.c.o
+2026-10-11T23:16:31.3884708Z [62/928] Building C object tests/contracts/os_freertos_runtime/CMakeFiles/contract_freertos_posix.dir/__/__/__/ext/freertos/list.c.o
+2026-10-11T23:16:31.4014065Z [63/928] Building C object tests/contracts/os_freertos_runtime/CMakeFiles/contract_freertos_posix_events.dir/posix_event.c.o
+2026-10-11T23:16:31.4234782Z [64/928] Building C object tests/contracts/os_freertos_runtime/CMakeFiles/contract_freertos_posix_events.dir/posix_idle.c.o
+2026-10-11T23:16:31.4595164Z [65/928] Building C object tests/contracts/os_freertos_runtime/CMakeFiles/contract_freertos_posix.dir/__/__/__/ext/freertos/portable/ThirdParty/GCC/Posix/port.c.o
+2026-10-11T23:16:31.4684655Z [66/928] Building C object CMakeFiles/nexus_platform.dir/generated/bindings.c.o
+2026-10-11T23:16:31.5184432Z [67/928] Building C object os/CMakeFiles/nexus_os_diagnostic.dir/diagnostic.c.o
+2026-10-11T23:16:31.5497761Z [68/928] Building C object os/CMakeFiles/nexus_os_baremetal.dir/baremetal/notify.c.o
+2026-10-11T23:16:31.5702422Z [69/928] Linking C static library lib/libnexus_io_native.a
+2026-10-11T23:16:31.6655044Z [70/928] Building C object os/CMakeFiles/nexus_os_native.dir/native/native.c.o
+2026-10-11T23:16:31.6704492Z [71/928] Linking C static library lib/libnexus_bus_owner.a
+2026-10-11T23:16:31.7015880Z [72/928] Building C object components/CMakeFiles/nexus_spi_owner.dir/bus_owner/src/spi_owner.c.o
+2026-10-11T23:16:31.7134782Z [73/928] Building C object components/CMakeFiles/nexus_spi_async_owner.dir/bus_owner/src/spi_async_owner.c.o
+2026-10-11T23:16:31.7434832Z [74/928] Building C object components/CMakeFiles/nexus_uart_owner.dir/bus_owner/src/uart_owner.c.o
+2026-10-11T23:16:31.7734794Z [75/928] Building C object components/CMakeFiles/nexus_bmp280_spi.dir/bmp280/src/spi_transport.c.o
+2026-10-11T23:16:31.8115149Z [76/928] Building C object components/CMakeFiles/nexus_log.dir/log/src/log.c.o
+2026-10-11T23:16:31.8368878Z [77/928] Linking C static library lib/libnexus_bmp280.a
+2026-10-11T23:16:31.9063404Z [78/928] Linking C static library lib/libnexus_storage.a
+2026-10-11T23:16:31.9601514Z [79/928] Building C object components/CMakeFiles/nexus_flash_storage.dir/storage/src/flash_storage.c.o
+2026-10-11T23:16:31.9694679Z [80/928] Building C object components/CMakeFiles/nexus_modbus.dir/modbus/src/modbus_rtu.c.o
+2026-10-11T23:16:32.0244597Z [81/928] Building C object components/owner_observer/CMakeFiles/nexus_owner_observer.dir/src/owner_observer.c.o
+2026-10-11T23:16:32.0694895Z [82/928] Building C object components/CMakeFiles/nexus_file_flash.dir/storage/src/file_flash.c.o
+2026-10-11T23:16:32.0990712Z [83/928] Building C object components/dp83848/CMakeFiles/nexus_dp83848.dir/src/dp83848.c.o
+2026-10-11T23:16:32.1702412Z [84/928] Linking C static library lib/libcontract_freertos_posix.a
+2026-10-11T23:16:32.2598828Z [85/928] Building C object tests/contracts/google/CMakeFiles/nexus_clock_domain_test_provider.dir/__/__/components/clock_domain/src/clock_domain.c.o
+2026-10-11T23:16:32.3031918Z [86/928] Building C object tests/contracts/os_freertos_runtime/CMakeFiles/contract_os_freertos_posix.dir/__/__/__/os/freertos/freertos.c.o
+2026-10-11T23:16:32.3048327Z [87/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_delete.c.o
+2026-10-11T23:16:32.3489890Z [88/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_reset.c.o
+2026-10-11T23:16:32.3497564Z [89/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_block_allocate.c.o
+2026-10-11T23:16:32.3929683Z [90/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_block_pool_cleanup.c.o
+2026-10-11T23:16:32.3962510Z [91/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_block_pool_create.c.o
+2026-10-11T23:16:32.4382521Z [92/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_block_pool_delete.c.o
+2026-10-11T23:16:32.4409411Z [93/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_block_pool_info_get.c.o
+2026-10-11T23:16:32.4689303Z [94/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_block_pool_initialize.c.o
+2026-10-11T23:16:32.4814997Z [95/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_block_pool_performance_info_get.c.o
+2026-10-11T23:16:32.5124810Z [96/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_block_pool_performance_system_info_get.c.o
+2026-10-11T23:16:32.5274870Z [97/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_block_pool_prioritize.c.o
+2026-10-11T23:16:32.5574964Z [98/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_block_release.c.o
+2026-10-11T23:16:32.5754930Z [99/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_allocate.c.o
+2026-10-11T23:16:32.6025213Z [100/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_pool_cleanup.c.o
+2026-10-11T23:16:32.6215053Z [101/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_pool_create.c.o
+2026-10-11T23:16:32.6515162Z [102/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_pool_delete.c.o
+2026-10-11T23:16:32.6634997Z [103/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_pool_info_get.c.o
+2026-10-11T23:16:32.6841291Z [104/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_pool_initialize.c.o
+2026-10-11T23:16:32.7025281Z [105/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_pool_performance_info_get.c.o
+2026-10-11T23:16:32.7224989Z [106/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_pool_performance_system_info_get.c.o
+2026-10-11T23:16:32.7525144Z [107/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_pool_prioritize.c.o
+2026-10-11T23:16:32.7764877Z [108/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_pool_search.c.o
+2026-10-11T23:16:32.8055190Z [109/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_byte_release.c.o
+2026-10-11T23:16:32.8235021Z [110/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_event_flags_cleanup.c.o
+2026-10-11T23:16:32.8501132Z [111/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_event_flags_create.c.o
+2026-10-11T23:16:32.8695202Z [112/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_event_flags_delete.c.o
+2026-10-11T23:16:32.9045041Z [113/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_event_flags_get.c.o
+2026-10-11T23:16:32.9135006Z [114/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_event_flags_info_get.c.o
+2026-10-11T23:16:32.9375204Z [115/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_event_flags_initialize.c.o
+2026-10-11T23:16:32.9603228Z [116/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_event_flags_performance_info_get.c.o
+2026-10-11T23:16:32.9739981Z [117/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_event_flags_performance_system_info_get.c.o
+2026-10-11T23:16:33.0164956Z [118/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_event_flags_set_notify.c.o
+2026-10-11T23:16:33.0315816Z [119/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_event_flags_set.c.o
+2026-10-11T23:16:33.0545812Z [120/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_initialize_high_level.c.o
+2026-10-11T23:16:33.0889784Z [121/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_initialize_kernel_enter.c.o
+2026-10-11T23:16:33.0912106Z [122/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_initialize_kernel_setup.c.o
+2026-10-11T23:16:33.1279001Z [123/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_misra.c.o
+2026-10-11T23:16:33.1440956Z [124/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_cleanup.c.o
+2026-10-11T23:16:33.1875486Z [125/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_create.c.o
+2026-10-11T23:16:33.1924800Z [126/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_delete.c.o
+2026-10-11T23:16:33.2342242Z [127/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_info_get.c.o
+2026-10-11T23:16:33.2357584Z [128/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_get.c.o
+2026-10-11T23:16:33.2739228Z [129/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_performance_info_get.c.o
+2026-10-11T23:16:33.2768982Z [130/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_initialize.c.o
+2026-10-11T23:16:33.3139491Z [131/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_performance_system_info_get.c.o
+2026-10-11T23:16:33.3226443Z [132/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_prioritize.c.o
+2026-10-11T23:16:33.3645613Z [133/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_priority_change.c.o
+2026-10-11T23:16:33.3855522Z [134/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_mutex_put.c.o
+2026-10-11T23:16:33.4245361Z [135/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_cleanup.c.o
+2026-10-11T23:16:33.4354961Z [136/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_create.c.o
+2026-10-11T23:16:33.4655007Z [137/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_delete.c.o
+2026-10-11T23:16:33.4774645Z [138/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_flush.c.o
+2026-10-11T23:16:33.5144775Z [139/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_info_get.c.o
+2026-10-11T23:16:33.5264526Z [140/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_front_send.c.o
+2026-10-11T23:16:33.5463261Z [141/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_initialize.c.o
+2026-10-11T23:16:33.5662656Z [142/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_performance_info_get.c.o
+2026-10-11T23:16:33.5875622Z [143/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_performance_system_info_get.c.o
+2026-10-11T23:16:33.6169231Z [144/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_prioritize.c.o
+2026-10-11T23:16:33.6525790Z [145/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_receive.c.o
+2026-10-11T23:16:33.6819226Z [146/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_send.c.o
+2026-10-11T23:16:33.6870754Z [147/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_queue_send_notify.c.o
+2026-10-11T23:16:33.7185665Z [148/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_cleanup.c.o
+2026-10-11T23:16:33.7366214Z [149/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_ceiling_put.c.o
+2026-10-11T23:16:33.7538737Z [150/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_create.c.o
+2026-10-11T23:16:33.7859873Z [151/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_delete.c.o
+2026-10-11T23:16:33.7937478Z [152/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_get.c.o
+2026-10-11T23:16:33.8163602Z [153/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_info_get.c.o
+2026-10-11T23:16:33.8278306Z [154/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_initialize.c.o
+2026-10-11T23:16:33.8441641Z [155/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_performance_info_get.c.o
+2026-10-11T23:16:33.8699213Z [156/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_performance_system_info_get.c.o
+2026-10-11T23:16:33.8843754Z [157/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_prioritize.c.o
+2026-10-11T23:16:33.9125020Z [158/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_put_notify.c.o
+2026-10-11T23:16:33.9176887Z [159/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_semaphore_put.c.o
+2026-10-11T23:16:33.9633847Z [160/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_create.c.o
+2026-10-11T23:16:33.9656439Z [161/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_entry_exit_notify.c.o
+2026-10-11T23:16:34.0057428Z [162/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_identify.c.o
+2026-10-11T23:16:34.0124853Z [163/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_info_get.c.o
+2026-10-11T23:16:34.0494720Z [164/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_performance_info_get.c.o
+2026-10-11T23:16:34.0500082Z [165/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_initialize.c.o
+2026-10-11T23:16:34.0890278Z [166/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_performance_system_info_get.c.o
+2026-10-11T23:16:34.1000397Z [167/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_preemption_change.c.o
+2026-10-11T23:16:34.1351836Z [168/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_priority_change.c.o
+2026-10-11T23:16:34.1429416Z [169/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_relinquish.c.o
+2026-10-11T23:16:34.1793604Z [170/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_resume.c.o
+2026-10-11T23:16:34.1870525Z [171/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_shell_entry.c.o
+2026-10-11T23:16:34.2268539Z [172/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_sleep.c.o
+2026-10-11T23:16:34.2366142Z [173/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_stack_analyze.c.o
+2026-10-11T23:16:34.2592222Z [174/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_stack_error_handler.c.o
+2026-10-11T23:16:34.2766262Z [175/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_stack_error_notify.c.o
+2026-10-11T23:16:34.3064797Z [176/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_suspend.c.o
+2026-10-11T23:16:34.3184621Z [177/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_system_preempt_check.c.o
+2026-10-11T23:16:34.3545512Z [178/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_system_resume.c.o
+2026-10-11T23:16:34.3848907Z [179/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_system_suspend.c.o
+2026-10-11T23:16:34.4034982Z [180/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_terminate.c.o
+2026-10-11T23:16:34.4288637Z [181/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_time_slice.c.o
+2026-10-11T23:16:34.4365044Z [182/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_time_slice_change.c.o
+2026-10-11T23:16:34.4715033Z [183/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_timeout.c.o
+2026-10-11T23:16:34.4826251Z [184/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_thread_wait_abort.c.o
+2026-10-11T23:16:34.5103573Z [185/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_time_get.c.o
+2026-10-11T23:16:34.5234302Z [186/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_time_set.c.o
+2026-10-11T23:16:34.5535312Z [187/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_activate.c.o
+2026-10-11T23:16:34.5594717Z [188/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_change.c.o
+2026-10-11T23:16:34.5985136Z [189/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_create.c.o
+2026-10-11T23:16:34.6074766Z [190/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_deactivate.c.o
+2026-10-11T23:16:34.6434825Z [191/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_delete.c.o
+2026-10-11T23:16:34.6604961Z [192/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_expiration_process.c.o
+2026-10-11T23:16:34.6934891Z [193/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_info_get.c.o
+2026-10-11T23:16:34.7024848Z [194/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_initialize.c.o
+2026-10-11T23:16:34.7335384Z [195/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_performance_info_get.c.o
+2026-10-11T23:16:34.7387290Z [196/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_performance_system_info_get.c.o
+2026-10-11T23:16:34.7804784Z [197/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_system_activate.c.o
+2026-10-11T23:16:34.7844815Z [198/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_system_deactivate.c.o
+2026-10-11T23:16:34.8144995Z [199/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_timer_thread_entry.c.o
+2026-10-11T23:16:34.8204572Z [200/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_buffer_full_notify.c.o
+2026-10-11T23:16:34.8525176Z [201/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_disable.c.o
+2026-10-11T23:16:34.8584787Z [202/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_enable.c.o
+2026-10-11T23:16:34.8908054Z [203/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_event_filter.c.o
+2026-10-11T23:16:34.8964827Z [204/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_event_unfilter.c.o
+2026-10-11T23:16:34.9294888Z [205/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_initialize.c.o
+2026-10-11T23:16:34.9354920Z [206/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_interrupt_control.c.o
+2026-10-11T23:16:34.9684873Z [207/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_isr_enter_insert.c.o
+2026-10-11T23:16:34.9744612Z [208/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_isr_exit_insert.c.o
+2026-10-11T23:16:35.0115074Z [209/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_object_register.c.o
+2026-10-11T23:16:35.0145027Z [210/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_object_unregister.c.o
+2026-10-11T23:16:35.0464978Z [211/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/tx_trace_user_event_insert.c.o
+2026-10-11T23:16:35.0494637Z [212/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_block_allocate.c.o
+2026-10-11T23:16:35.0905323Z [213/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_block_pool_delete.c.o
+2026-10-11T23:16:35.0934779Z [214/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_block_pool_create.c.o
+2026-10-11T23:16:35.1295391Z [215/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_block_pool_info_get.c.o
+2026-10-11T23:16:35.1324569Z [216/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_block_pool_prioritize.c.o
+2026-10-11T23:16:35.1694828Z [217/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_block_release.c.o
+2026-10-11T23:16:35.1744576Z [218/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_byte_allocate.c.o
+2026-10-11T23:16:35.2135201Z [219/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_byte_pool_delete.c.o
+2026-10-11T23:16:35.2164955Z [220/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_byte_pool_create.c.o
+2026-10-11T23:16:35.2525020Z [221/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_byte_pool_prioritize.c.o
+2026-10-11T23:16:35.2699239Z [222/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_byte_pool_info_get.c.o
+2026-10-11T23:16:35.2835664Z [223/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_byte_release.c.o
+2026-10-11T23:16:35.3157920Z [224/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_event_flags_create.c.o
+2026-10-11T23:16:35.3224228Z [225/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_event_flags_delete.c.o
+2026-10-11T23:16:35.3609744Z [226/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_event_flags_get.c.o
+2026-10-11T23:16:35.3645093Z [227/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_event_flags_info_get.c.o
+2026-10-11T23:16:35.3997925Z [228/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_event_flags_set.c.o
+2026-10-11T23:16:35.4007267Z [229/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_event_flags_set_notify.c.o
+2026-10-11T23:16:35.4420492Z [230/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_mutex_delete.c.o
+2026-10-11T23:16:35.4464665Z [231/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_mutex_create.c.o
+2026-10-11T23:16:35.5022445Z [232/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_mutex_get.c.o
+2026-10-11T23:16:35.5064779Z [233/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_mutex_info_get.c.o
+2026-10-11T23:16:35.5455533Z [234/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_mutex_put.c.o
+2026-10-11T23:16:35.5484699Z [235/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_mutex_prioritize.c.o
+2026-10-11T23:16:35.5890997Z [236/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_queue_delete.c.o
+2026-10-11T23:16:35.5933657Z [237/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_queue_create.c.o
+2026-10-11T23:16:35.6315011Z [238/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_queue_flush.c.o
+2026-10-11T23:16:35.6374677Z [239/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_queue_front_send.c.o
+2026-10-11T23:16:35.6696570Z [240/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_queue_info_get.c.o
+2026-10-11T23:16:35.6784812Z [241/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_queue_prioritize.c.o
+2026-10-11T23:16:35.7145034Z [242/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_queue_receive.c.o
+2026-10-11T23:16:35.7286639Z [243/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_queue_send.c.o
+2026-10-11T23:16:35.7435581Z [244/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_queue_send_notify.c.o
+2026-10-11T23:16:35.7686661Z [245/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_semaphore_ceiling_put.c.o
+2026-10-11T23:16:35.7904611Z [246/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_semaphore_create.c.o
+2026-10-11T23:16:35.8104832Z [247/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_semaphore_delete.c.o
+2026-10-11T23:16:35.8299422Z [248/928] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+2026-10-11T23:16:35.8310373Z [249/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_semaphore_get.c.o
+2026-10-11T23:16:35.8514708Z [250/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_semaphore_info_get.c.o
+2026-10-11T23:16:35.8707566Z [251/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_semaphore_put.c.o
+2026-10-11T23:16:35.8714586Z [252/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_semaphore_prioritize.c.o
+2026-10-11T23:16:35.8940726Z [253/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_semaphore_put_notify.c.o
+2026-10-11T23:16:35.9117405Z [254/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_delete.c.o
+2026-10-11T23:16:35.9307146Z [255/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_create.c.o
+2026-10-11T23:16:35.9385109Z [256/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_entry_exit_notify.c.o
+2026-10-11T23:16:35.9611139Z [257/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_info_get.c.o
+2026-10-11T23:16:35.9705413Z [258/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_preemption_change.c.o
+2026-10-11T23:16:35.9804779Z [259/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_priority_change.c.o
+2026-10-11T23:16:36.0054958Z [260/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_relinquish.c.o
+2026-10-11T23:16:36.0095035Z [261/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_reset.c.o
+2026-10-11T23:16:36.0283832Z [262/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_resume.c.o
+2026-10-11T23:16:36.0514787Z [263/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_terminate.c.o
+2026-10-11T23:16:36.0544615Z [264/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_suspend.c.o
+2026-10-11T23:16:36.0744976Z [265/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_time_slice_change.c.o
+2026-10-11T23:16:36.0884936Z [266/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_timer_activate.c.o
+2026-10-11T23:16:36.0990818Z [267/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_thread_wait_abort.c.o
+2026-10-11T23:16:36.1175008Z [268/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_timer_change.c.o
+2026-10-11T23:16:36.1421675Z [269/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_timer_create.c.o
+2026-10-11T23:16:36.1448331Z [270/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_timer_deactivate.c.o
+2026-10-11T23:16:36.1635171Z [271/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_timer_delete.c.o
+2026-10-11T23:16:36.1895200Z [272/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/common/src/txe_timer_info_get.c.o
+2026-10-11T23:16:36.1985056Z [273/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/ports/linux/gnu/src/tx_thread_context_restore.c.o
+2026-10-11T23:16:36.1987290Z [274/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/ports/linux/gnu/src/tx_thread_context_save.c.o
+2026-10-11T23:16:36.2441046Z [275/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/ports/linux/gnu/src/tx_thread_interrupt_control.c.o
+2026-10-11T23:16:36.2601225Z [276/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/ports/linux/gnu/src/tx_thread_stack_build.c.o
+2026-10-11T23:16:36.2625821Z /home/runner/work/nexus/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_stack_build.c: In function ‘_tx_linux_thread_entry’:
+2026-10-11T23:16:36.2645276Z /home/runner/work/nexus/nexus/ext/threadx/ports/linux/gnu/src/tx_thread_stack_build.c:145:5: warning: ignoring return value of ‘nice’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+2026-10-11T23:16:36.2673995Z   145 |     nice(20);
+2026-10-11T23:16:36.2694471Z       |     ^~~~~~~~
+2026-10-11T23:16:36.2704693Z [277/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/ports/linux/gnu/src/tx_thread_system_return.c.o
+2026-10-11T23:16:36.2964064Z [278/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/__/__/ext/threadx/ports/linux/gnu/src/tx_timer_interrupt.c.o
+2026-10-11T23:16:36.3351711Z [279/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/contract_threadx_linux-port/tx_thread_schedule.c.o
+2026-10-11T23:16:36.3743598Z [280/928] Building C object tests/contracts/google/CMakeFiles/contract_threadx_linux.dir/contract_threadx_linux-port/tx_initialize_low_level.c.o
+2026-10-11T23:16:36.3765594Z /home/runner/work/nexus/nexus/build/native-release/tests/contracts/google/contract_threadx_linux-port/tx_initialize_low_level.c: In function ‘_tx_linux_timer_interrupt’:
+2026-10-11T23:16:36.3796183Z /home/runner/work/nexus/nexus/build/native-release/tests/contracts/google/contract_threadx_linux-port/tx_initialize_low_level.c:371:5: warning: ignoring return value of ‘nice’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+2026-10-11T23:16:36.3814331Z   371 |     nice(10);
+2026-10-11T23:16:36.3843805Z       |     ^~~~~~~~
+2026-10-11T23:16:36.4794004Z [281/928] Linking C static library lib/libnexus_platform.a
+2026-10-11T23:16:36.5014719Z [282/928] Building C object CMakeFiles/nexus_firmware.dir/tools/measurement/workload.c.o
+2026-10-11T23:16:36.5317817Z [283/928] Building C object tests/contracts/google/CMakeFiles/nexus_user_io_broker_test_provider.dir/__/__/components/user_io_broker/src/user_io_broker.c.o
+2026-10-11T23:16:36.5984442Z [284/928] Linking C static library lib/libnexus_os_diagnostic.a
+2026-10-11T23:16:36.6388055Z [285/928] Linking C static library lib/libnexus_os_baremetal.a
+2026-10-11T23:16:36.6965861Z [286/928] Linking C static library lib/libnexus_os_native.a
+2026-10-11T23:16:36.7466368Z [287/928] Linking C static library lib/libnexus_spi_owner.a
+2026-10-11T23:16:36.7974749Z [288/928] Linking C static library lib/libnexus_spi_async_owner.a
+2026-10-11T23:16:36.8460087Z [289/928] Linking C static library lib/libnexus_uart_owner.a
+2026-10-11T23:16:36.8934871Z [290/928] Linking C static library lib/libnexus_bmp280_spi.a
+2026-10-11T23:16:36.9425518Z [291/928] Linking C static library lib/libnexus_log.a
+2026-10-11T23:16:36.9892769Z [292/928] Linking C static library lib/libnexus_modbus.a
+2026-10-11T23:16:37.0404516Z [293/928] Linking C static library lib/libnexus_flash_storage.a
+2026-10-11T23:16:37.0874727Z [294/928] Linking C static library lib/libnexus_file_flash.a
+2026-10-11T23:16:37.1314821Z [295/928] Linking C static library lib/libnexus_owner_observer.a
+2026-10-11T23:16:37.1824697Z [296/928] Linking C static library lib/libnexus_dp83848.a
+2026-10-11T23:16:37.2574684Z [297/928] Building C object tests/contracts/CMakeFiles/contract_core_contract.dir/core_contract_test.c.o
+2026-10-11T23:16:37.3524713Z [298/928] Building C object tests/contracts/CMakeFiles/contract_os_wait.dir/os_wait.c.o
+2026-10-11T23:16:37.4820342Z [299/928] Building C object tests/contracts/CMakeFiles/contract_native_io.dir/native_io_test.c.o
+2026-10-11T23:16:37.5454879Z [300/928] Building C object tests/contracts/CMakeFiles/contract_bus_owner.dir/components_owner.c.o
+2026-10-11T23:16:37.5855120Z [301/928] Building C object tests/contracts/CMakeFiles/contract_bmp280.dir/components_bmp280.c.o
+2026-10-11T23:16:37.6784634Z [302/928] Building C object tests/contracts/CMakeFiles/contract_storage.dir/components_storage.c.o
+2026-10-11T23:16:37.7056133Z [303/928] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o
+2026-10-11T23:16:37.7362720Z [304/928] Building C object tests/contracts/CMakeFiles/contract_log.dir/components_log.c.o
+2026-10-11T23:16:37.7734889Z [305/928] Building C object tests/contracts/CMakeFiles/contract_flash_storage.dir/components_flash_storage.c.o
+2026-10-11T23:16:37.8409356Z [306/928] Building C object tests/contracts/CMakeFiles/contract_spi_adapter.dir/components_spi.c.o
+2026-10-11T23:16:37.8814713Z [307/928] Building C object tests/contracts/CMakeFiles/contract_modbus.dir/components_modbus.c.o
+2026-10-11T23:16:37.9834999Z [308/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/gd32_model/model.c.o
+2026-10-11T23:16:38.0100281Z [309/928] Building C object tests/contracts/CMakeFiles/contract_uart_adapter.dir/components_uart.c.o
+2026-10-11T23:16:38.0864939Z [310/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/__/__/soc/gd32f470/drivers/gpio.c.o
+2026-10-11T23:16:38.1346495Z [311/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/gd32_io_test.c.o
+2026-10-11T23:16:38.2054813Z [312/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/__/__/soc/gd32f470/drivers/spi.c.o
+2026-10-11T23:16:38.2084835Z [313/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/__/__/soc/gd32f470/drivers/uart.c.o
+2026-10-11T23:16:38.2774894Z [314/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/__/__/soc/gd32f470/drivers/watchdog.c.o
+2026-10-11T23:16:38.2911110Z [315/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/__/__/soc/gd32f470/drivers/i2c.c.o
+2026-10-11T23:16:38.3065034Z [316/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/__/__/soc/gd32f470/drivers/flash.c.o
+2026-10-11T23:16:38.3714867Z [317/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/__/__/soc/gd32f470/drivers/timer.c.o
+2026-10-11T23:16:38.4084880Z [318/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/__/__/soc/gd32f470/drivers/exti.c.o
+2026-10-11T23:16:38.4174638Z [319/928] Building C object tests/contracts/CMakeFiles/contract_gd32_io.dir/__/__/soc/gd32f470/drivers/adc.c.o
+2026-10-11T23:16:38.4714822Z [320/928] Building C object tests/contracts/CMakeFiles/contract_gd32_system.dir/__/__/soc/gd32f470/system.c.o
+2026-10-11T23:16:38.4872728Z [321/928] Building C object tests/contracts/CMakeFiles/contract_gd32_system.dir/gd32_system_test.c.o
+2026-10-11T23:16:38.4907593Z [322/928] Building C object tests/contracts/CMakeFiles/contract_gd32_system.dir/__/__/soc/gd32f470/timebase.c.o
+2026-10-11T23:16:38.5409354Z [323/928] Building C object tests/contracts/os_freertos_runtime/CMakeFiles/contract_os_freertos_hooks.dir/__/__/__/os/freertos/hooks.c.o
+2026-10-11T23:16:38.5899993Z [324/928] Building C object tests/contracts/os_freertos_runtime/CMakeFiles/contract_os_freertos.dir/__/os_freertos.c.o
+2026-10-11T23:16:38.6029803Z [325/928] Linking C static library lib/libcontract_os_freertos_posix.a
+2026-10-11T23:16:38.6945115Z [326/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_system_model.dir/__/stm32_system_test.c.o
+2026-10-11T23:16:38.7034948Z [327/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_system_model.dir/__/__/__/soc/stm32f407/system.c.o
+2026-10-11T23:16:38.8015162Z [328/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_io_model.dir/__/__/__/soc/stm32f407/drivers/gpio.c.o
+2026-10-11T23:16:38.8108005Z [329/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_io_model.dir/__/__/__/soc/stm32f407/drivers/spi.c.o
+2026-10-11T23:16:38.9264925Z [330/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_io_model.dir/__/__/__/soc/stm32f407/drivers/uart.c.o
+2026-10-11T23:16:38.9414847Z [331/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_io_model.dir/__/__/__/soc/stm32f407/drivers/i2c.c.o
+2026-10-11T23:16:38.9744686Z [332/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_io_model.dir/__/__/__/soc/stm32f407/drivers/flash.c.o
+2026-10-11T23:16:39.0288569Z [333/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_io_model.dir/__/__/__/soc/stm32f407/drivers/watchdog.c.o
+2026-10-11T23:16:39.1005226Z [334/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_io_model.dir/__/__/__/soc/stm32f407/drivers/exti.c.o
+2026-10-11T23:16:39.1195176Z [335/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_io_model.dir/__/__/__/soc/stm32f407/drivers/timer.c.o
+2026-10-11T23:16:39.1405032Z [336/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_io_model.dir/__/__/__/soc/stm32f407/drivers/adc.c.o
+2026-10-11T23:16:39.2544898Z [337/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_constructor_model.dir/__/__/__/soc/stm32f407/drivers/exti.c.o
+2026-10-11T23:16:39.2985294Z [338/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_constructor_model.dir/__/__/__/soc/stm32f407/drivers/gpio.c.o
+2026-10-11T23:16:39.3924756Z [339/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_constructor_model.dir/__/__/__/soc/stm32f407/drivers/spi.c.o
+2026-10-11T23:16:39.4305232Z [340/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_constructor_model.dir/__/__/__/soc/stm32f407/drivers/timer.c.o
+2026-10-11T23:16:39.4844775Z [341/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_io_model.dir/__/stm32_io_test.c.o
+2026-10-11T23:16:39.5204849Z [342/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_constructor_model.dir/__/__/__/soc/stm32f407/drivers/i2c.c.o
+2026-10-11T23:16:39.7759856Z [343/928] Building C object tests/contracts/stm32_model/CMakeFiles/contract_stm32_constructor_model.dir/__/stm32_constructor_test.c.o
+2026-10-11T23:16:43.6401641Z [344/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_polymorphic_io_test.dir/polymorphic_mock_test.cpp.o
+2026-10-11T23:16:43.7294604Z [345/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_owner_mock_test.dir/owner_mock_test.cpp.o
+2026-10-11T23:16:43.7504749Z [346/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_realtime_metadata_test.dir/realtime_metadata_test.cpp.o
+2026-10-11T23:16:43.8784708Z [347/928] Building CXX object _deps/google-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+2026-10-11T23:16:43.9884527Z [348/928] Linking CXX static library lib/libgtest.a
+2026-10-11T23:16:44.0894175Z [349/928] Linking CXX static library lib/libgmock.a
+2026-10-11T23:16:45.1488941Z [350/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/dma_test.cpp.o
+2026-10-11T23:16:46.6265666Z [351/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/stream_test.cpp.o
+2026-10-11T23:16:46.8186118Z [352/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_uart_owner_mock_test.dir/uart_owner_test.cpp.o
+2026-10-11T23:16:47.8174792Z [353/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_hardware_contract_test.dir/wake_test.cpp.o
+2026-10-11T23:16:48.3896108Z [354/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_spi_async_owner_mock_test.dir/spi_async_owner_test.cpp.o
+2026-10-11T23:16:52.4165282Z [355/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_uart_rs485_test.dir/uart_rs485_test.cpp.o
+2026-10-11T23:16:52.5421548Z [356/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_io_state_machine_test.dir/io_state_machine_test.cpp.o
+2026-10-11T23:16:52.5754645Z [357/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_io_observer_test.dir/io_observer_test.cpp.o
+2026-10-11T23:16:53.3345568Z [358/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_i2c_bus_clear_test.dir/i2c_bus_clear_test.cpp.o
+2026-10-11T23:16:53.9932619Z [359/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stream_storage_test.dir/stream_storage_test.cpp.o
+2026-10-11T23:16:54.9478570Z [360/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_native_async_test.dir/native_async_test.cpp.o
+2026-10-11T23:16:55.9110738Z [361/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_services_kernel_test.dir/freertos_services_kernel_test.cpp.o
+2026-10-11T23:16:56.3783565Z [362/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_services_kernel_test.dir/freertos_stack_kernel_test.cpp.o
+2026-10-11T23:16:56.4315014Z [363/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_services_kernel_test.dir/__/__/os/freertos/stack_snapshot.c.o
+2026-10-11T23:16:57.0805519Z [364/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_irq_wake_provider_test.dir/irq_wake_test.cpp.o
+2026-10-11T23:16:57.2116956Z [365/928] Building C object tests/contracts/google/CMakeFiles/nexus_native_factory_test.dir/native-factory/bindings.c.o
+2026-10-11T23:16:57.3794877Z [366/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_native_instances_test.dir/native_instances_test.cpp.o
+2026-10-11T23:16:57.5519369Z [367/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+2026-10-11T23:16:57.7075201Z [368/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/__/__/soc/stm32f407/drivers/uart_dma.c.o
+2026-10-11T23:16:57.8724948Z [369/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_services_kernel_test.dir/freertos_owner_endurance_test.cpp.o
+2026-10-11T23:16:58.0454972Z [370/928] Building C object tests/contracts/google/CMakeFiles/nexus_irq_wake_stm32_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+2026-10-11T23:16:59.1141620Z [371/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_dma_test.dir/stm32_uart_dma_test.cpp.o
+2026-10-11T23:16:59.3136269Z [372/928] Building C object tests/contracts/google/CMakeFiles/nexus_irq_wake_gd32_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+2026-10-11T23:16:59.4215259Z [373/928] Building C object tests/contracts/google/CMakeFiles/nexus_irq_wake_gd32_test.dir/__/contracts/gd32_model/model.c.o
+2026-10-11T23:16:59.6778225Z [374/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_irq_wake_stm32_test.dir/irq_wake_stm32_test.cpp.o
+2026-10-11T23:16:59.7080696Z [375/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_native_factory_test.dir/native_factory_test.cpp.o
+2026-10-11T23:16:59.8264959Z [376/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_test.dir/__/__/soc/gd32f470/drivers/spi.c.o
+2026-10-11T23:16:59.8774953Z [377/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+2026-10-11T23:16:59.9345291Z [378/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_test.dir/__/__/soc/gd32f470/drivers/gpio.c.o
+2026-10-11T23:17:00.0294905Z [379/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_test.dir/__/__/soc/gd32f470/drivers/i2c.c.o
+2026-10-11T23:17:00.0424776Z [380/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_test.dir/__/contracts/gd32_model/model.c.o
+2026-10-11T23:17:00.1321923Z [381/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_irq_wake_gd32_test.dir/irq_wake_gd32_test.cpp.o
+2026-10-11T23:17:00.1404842Z [382/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/__/__/soc/stm32f407/drivers/spi.c.o
+2026-10-11T23:17:00.2454932Z [383/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/__/__/soc/stm32f407/drivers/gpio.c.o
+2026-10-11T23:17:00.3294943Z [384/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/__/__/soc/stm32f407/drivers/spi_dma.c.o
+2026-10-11T23:17:00.5324907Z [385/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+2026-10-11T23:17:00.7224379Z [386/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/__/__/soc/gd32f470/drivers/uart_dma.c.o
+2026-10-11T23:17:00.8275177Z [387/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/__/contracts/gd32_model/model.c.o
+2026-10-11T23:17:01.2725163Z [388/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_multi_test.dir/gd32_multi_test.cpp.o
+2026-10-11T23:17:01.4585661Z [389/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+2026-10-11T23:17:01.6330598Z [390/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_dma.c.o
+2026-10-11T23:17:01.8724983Z [391/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_receive.c.o
+2026-10-11T23:17:02.0693141Z [392/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/stm32_spi_dma_test.cpp.o
+2026-10-11T23:17:02.2186308Z [393/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_uart_dma_test.dir/gd32_uart_dma_test.cpp.o
+2026-10-11T23:17:02.2611736Z [394/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+2026-10-11T23:17:02.3945107Z [395/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/__/soc/gd32f470/drivers/uart_dma.c.o
+2026-10-11T23:17:02.4904844Z [396/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/__/soc/gd32f470/drivers/uart_receive.c.o
+2026-10-11T23:17:02.4964780Z [397/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/contracts/gd32_model/model.c.o
+2026-10-11T23:17:02.6624770Z [398/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+2026-10-11T23:17:02.7614843Z [399/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/__/__/soc/stm32f407/drivers/uart_stream.c.o
+2026-10-11T23:17:04.1665043Z [400/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_stream_test.dir/stm32_uart_stream_test.cpp.o
+2026-10-11T23:17:04.2794947Z [401/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_spi_dma_test.dir/__/__/soc/gd32f470/drivers/spi.c.o
+2026-10-11T23:17:04.5014755Z [402/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_spi_dma_test.dir/__/__/soc/gd32f470/drivers/spi_dma.c.o
+2026-10-11T23:17:04.6034750Z [403/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_spi_dma_test.dir/__/contracts/gd32_model/model.c.o
+2026-10-11T23:17:06.3474921Z [404/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_spi_dma_test.dir/gd32_spi_dma_test.cpp.o
+2026-10-11T23:17:06.4325650Z [405/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc.c.o
+2026-10-11T23:17:06.4454955Z [406/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/stm32_uart_receive_test.cpp.o
+2026-10-11T23:17:06.5855018Z [407/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc_stream.c.o
+2026-10-11T23:17:06.5957176Z [408/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/__/__/soc/stm32f407/drivers/adc_continuous.c.o
+2026-10-11T23:17:06.7074908Z [409/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_flash_fault_test.dir/__/__/soc/gd32f470/drivers/flash.c.o
+2026-10-11T23:17:06.8144386Z [410/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_flash_fault_test.dir/__/contracts/gd32_model/model.c.o
+2026-10-11T23:17:07.5635266Z [411/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/gd32_uart_receive_test.cpp.o
+2026-10-11T23:17:07.6875227Z [412/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc.c.o
+2026-10-11T23:17:07.8576066Z [413/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc_stream.c.o
+2026-10-11T23:17:07.8800455Z [414/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_adc_stream_test.dir/stm32_adc_stream_test.cpp.o
+2026-10-11T23:17:07.9995893Z [415/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/contracts/gd32_model/model.c.o
+2026-10-11T23:17:08.0345986Z [416/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc_continuous.c.o
+2026-10-11T23:17:08.1085006Z [417/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_flash_fault_test.dir/gd32_flash_fault_test.cpp.o
+2026-10-11T23:17:08.1654851Z [418/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_initialize_test.dir/__/__/soc/gd32f470/drivers/adc.c.o
+2026-10-11T23:17:08.3605026Z [419/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_stream_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+2026-10-11T23:17:08.4745704Z [420/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_stream_test.dir/__/__/soc/gd32f470/drivers/uart_stream.c.o
+2026-10-11T23:17:08.5905523Z [421/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_stream_test.dir/__/contracts/gd32_model/model.c.o
+2026-10-11T23:17:10.0095571Z [422/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/gd32_adc_stream_test.cpp.o
+2026-10-11T23:17:10.1471487Z [423/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_register_test.dir/__/__/soc/stm32f407/drivers/i2c.c.o
+2026-10-11T23:17:11.6135392Z [424/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_uart_stream_test.dir/gd32_uart_stream_test.cpp.o
+2026-10-11T23:17:11.7725357Z [425/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_register_test.dir/__/__/soc/gd32f470/drivers/i2c.c.o
+2026-10-11T23:17:12.5305094Z [426/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_adc_initialize_test.dir/gd32_adc_initialize_test.cpp.o
+2026-10-11T23:17:12.6525335Z [427/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_register_test.dir/i2c_register_test.cpp.o
+2026-10-11T23:17:12.7347205Z [428/928] Building C object tests/contracts/google/CMakeFiles/nexus_generic_i2c_async_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:17:12.9415082Z [429/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_async_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:17:13.0275403Z [430/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_async_test.dir/__/__/soc/stm32f407/drivers/i2c_async.c.o
+2026-10-11T23:17:14.1885396Z [431/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_register_test.dir/i2c_register_test.cpp.o
+2026-10-11T23:17:14.3885121Z [432/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_async_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:17:14.4844854Z [433/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_async_test.dir/__/__/soc/gd32f470/drivers/i2c_async.c.o
+2026-10-11T23:17:16.0095176Z [434/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_generic_i2c_async_test.dir/i2c_async_register_test.cpp.o
+2026-10-11T23:17:16.0555195Z [435/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m0_test.dir/__/__/arch/cortex_m/nx_arch_cortex_m.c.o
+2026-10-11T23:17:16.9685336Z [436/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_async_test.dir/i2c_async_register_test.cpp.o
+2026-10-11T23:17:17.0105210Z [437/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m0plus_test.dir/__/__/arch/cortex_m/nx_arch_cortex_m.c.o
+2026-10-11T23:17:17.3705299Z [438/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_async_test.dir/i2c_async_register_test.cpp.o
+2026-10-11T23:17:17.4215155Z [439/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m3_test.dir/__/__/arch/cortex_m/nx_arch_cortex_m.c.o
+2026-10-11T23:17:18.2215077Z [440/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m0_test.dir/arch_cortex_test.cpp.o
+2026-10-11T23:17:18.2715182Z [441/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m4_test.dir/__/__/arch/cortex_m/nx_arch_cortex_m.c.o
+2026-10-11T23:17:19.6895120Z [442/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m0plus_test.dir/arch_cortex_test.cpp.o
+2026-10-11T23:17:19.7405106Z [443/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m7_test.dir/__/__/arch/cortex_m/nx_arch_cortex_m.c.o
+2026-10-11T23:17:20.8545118Z [444/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m3_test.dir/arch_cortex_test.cpp.o
+2026-10-11T23:17:20.8955627Z [445/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m23_test.dir/__/__/arch/cortex_m/nx_arch_cortex_m.c.o
+2026-10-11T23:17:21.1395651Z [446/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m4_test.dir/arch_cortex_test.cpp.o
+2026-10-11T23:17:21.1874570Z [447/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m33_test.dir/__/__/arch/cortex_m/nx_arch_cortex_m.c.o
+2026-10-11T23:17:22.0644608Z [448/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m7_test.dir/arch_cortex_test.cpp.o
+2026-10-11T23:17:22.1123967Z [449/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m55_test.dir/__/__/arch/cortex_m/nx_arch_cortex_m.c.o
+2026-10-11T23:17:23.3245192Z [450/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m23_test.dir/arch_cortex_test.cpp.o
+2026-10-11T23:17:23.3765231Z [451/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m85_test.dir/__/__/arch/cortex_m/nx_arch_cortex_m.c.o
+2026-10-11T23:17:24.5414560Z [452/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m33_test.dir/arch_cortex_test.cpp.o
+2026-10-11T23:17:25.0405168Z [453/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m55_test.dir/arch_cortex_test.cpp.o
+2026-10-11T23:17:25.0790009Z [454/928] Building C object tests/contracts/google/CMakeFiles/nexus_atomic_m0_test.dir/__/__/os/baremetal/notify.c.o
+2026-10-11T23:17:25.1264979Z [455/928] Building C object tests/contracts/google/CMakeFiles/nexus_atomic_m0_test.dir/__/__/components/log/src/log.c.o
+2026-10-11T23:17:25.2880512Z [456/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_native_test.dir/arch_native_test.cpp.o
+2026-10-11T23:17:25.9755278Z [457/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cortex_m85_test.dir/arch_cortex_test.cpp.o
+2026-10-11T23:17:26.0175185Z [458/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cache_none_test.dir/__/__/arch/cortex_m/nx_arch_cache.c.o
+2026-10-11T23:17:26.6065252Z [459/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_atomic_native_test.dir/atomic_native_test.cpp.o
+2026-10-11T23:17:26.6504974Z [460/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cache_data_test.dir/__/__/arch/cortex_m/nx_arch_cache.c.o
+2026-10-11T23:17:28.4984846Z [461/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cache_none_test.dir/arch_cache_test.cpp.o
+2026-10-11T23:17:28.5405026Z [462/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cache_instruction_test.dir/__/__/arch/cortex_m/nx_arch_cache.c.o
+2026-10-11T23:17:28.7477272Z [463/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_atomic_m0_test.dir/atomic_fallback_test.cpp.o
+2026-10-11T23:17:28.7975163Z [464/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_cache_both_test.dir/__/__/arch/cortex_m/nx_arch_cache.c.o
+2026-10-11T23:17:30.0276628Z [465/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cache_data_test.dir/arch_cache_test.cpp.o
+2026-10-11T23:17:30.0845565Z [466/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_mpu_v0_test.dir/__/__/arch/cortex_m/nx_arch_mpu.c.o
+2026-10-11T23:17:30.6629780Z [467/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cache_instruction_test.dir/arch_cache_test.cpp.o
+2026-10-11T23:17:30.7275934Z [468/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_mpu_v7_test.dir/__/__/arch/cortex_m/nx_arch_mpu.c.o
+2026-10-11T23:17:32.5505053Z [469/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_cache_both_test.dir/arch_cache_test.cpp.o
+2026-10-11T23:17:32.6165011Z [470/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_mpu_v8_test.dir/__/__/arch/cortex_m/nx_arch_mpu.c.o
+2026-10-11T23:17:33.1525018Z [471/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_mpu_v0_test.dir/arch_mpu_test.cpp.o
+2026-10-11T23:17:33.1845078Z [472/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_security_single_test.dir/__/__/arch/cortex_m/nx_arch_security.c.o
+2026-10-11T23:17:35.0955493Z [473/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_mpu_v7_test.dir/arch_mpu_test.cpp.o
+2026-10-11T23:17:35.1429680Z [474/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_security_secure_test.dir/__/__/arch/cortex_m/nx_arch_security.c.o
+2026-10-11T23:17:35.9355128Z [475/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_mpu_v8_test.dir/arch_mpu_test.cpp.o
+2026-10-11T23:17:35.9685578Z [476/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_security_secure-no-sau_test.dir/__/__/arch/cortex_m/nx_arch_security.c.o
+2026-10-11T23:17:36.1111675Z [477/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_security_single_test.dir/arch_security_test.cpp.o
+2026-10-11T23:17:36.1434985Z [478/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_security_nonsecure_test.dir/__/__/arch/cortex_m/nx_arch_security.c.o
+2026-10-11T23:17:37.5686484Z [479/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_native_mechanism_test.dir/arch_native_mechanism_test.cpp.o
+2026-10-11T23:17:38.0965473Z [480/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_security_secure_test.dir/arch_security_test.cpp.o
+2026-10-11T23:17:38.3129961Z [481/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_context_test.dir/__/__/os/freertos/freertos.c.o
+2026-10-11T23:17:38.3514850Z [482/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_context_test.dir/__/__/core/src/time.c.o
+2026-10-11T23:17:38.6217123Z [483/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_security_secure-no-sau_test.dir/arch_security_test.cpp.o
+2026-10-11T23:17:38.8480139Z [484/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_baseline_context_test.dir/__/__/os/freertos/freertos.c.o
+2026-10-11T23:17:38.8915244Z [485/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_baseline_context_test.dir/__/__/core/src/time.c.o
+2026-10-11T23:17:39.4965044Z [486/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_security_nonsecure_test.dir/arch_security_test.cpp.o
+2026-10-11T23:17:39.7154899Z [487/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_m23_context_test.dir/__/__/os/freertos/freertos.c.o
+2026-10-11T23:17:39.7544891Z [488/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_m23_context_test.dir/__/__/core/src/time.c.o
+2026-10-11T23:17:55.4525095Z [489/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_context_test.dir/freertos_context_test.cpp.o
+2026-10-11T23:17:55.6684128Z [490/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_baseline_context_test.dir/freertos_context_test.cpp.o
+2026-10-11T23:17:55.6708679Z [491/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_v8_context_test.dir/__/__/os/freertos/freertos.c.o
+2026-10-11T23:17:55.7095138Z [492/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_v8_context_test.dir/__/__/core/src/time.c.o
+2026-10-11T23:17:55.9435902Z [493/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_priority8_context_test.dir/__/__/os/freertos/freertos.c.o
+2026-10-11T23:17:55.9855863Z [494/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_priority8_context_test.dir/__/__/core/src/time.c.o
+2026-10-11T23:17:56.2585586Z [495/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_m23_context_test.dir/freertos_context_test.cpp.o
+2026-10-11T23:17:56.4720426Z [496/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_notifications_disabled_test.dir/__/__/os/freertos/freertos.c.o
+2026-10-11T23:17:56.5175349Z [497/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_notifications_disabled_test.dir/__/__/core/src/time.c.o
+2026-10-11T23:17:57.8881640Z [498/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_v8_context_test.dir/freertos_context_test.cpp.o
+2026-10-11T23:17:58.1336287Z [499/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_prestart_test.dir/freertos_prestart_test.cpp.o
+2026-10-11T23:18:02.5323719Z [500/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_arch_sleep_test.dir/arch_sleep_test.cpp.o
+2026-10-11T23:18:02.5751033Z [501/928] Building C object tests/contracts/google/CMakeFiles/nexus_arch_sleep_test.dir/__/__/arch/cortex_m/nx_arch_sleep.c.o
+2026-10-11T23:18:04.1275107Z [502/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_os_wait_test.dir/os_wait_test.cpp.o
+2026-10-11T23:18:04.1784728Z [503/928] Building C object tests/contracts/google/CMakeFiles/nexus_os_diagnostic_test.dir/__/__/os/diagnostic.c.o
+2026-10-11T23:18:04.5775098Z [504/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_os_diagnostic_test.dir/os_diagnostic_test.cpp.o
+2026-10-11T23:18:04.6330307Z [505/928] Building C object tests/contracts/google/CMakeFiles/nexus_os_lowpower_test.dir/__/__/os/freertos/lowpower.c.o
+2026-10-11T23:18:06.0615485Z [506/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_os_diagnostic_native_test.dir/os_diagnostic_native_test.cpp.o
+2026-10-11T23:18:12.2356717Z [507/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_os_lowpower_test.dir/os_lowpower_test.cpp.o
+2026-10-11T23:18:12.3486404Z [508/928] Building C object tests/contracts/google/CMakeFiles/nexus_os_secure_context_test.dir/__/__/os/freertos/secure/context.c.o
+2026-10-11T23:18:12.3754802Z [509/928] Building C object tests/contracts/google/CMakeFiles/nexus_os_secure_context_test.dir/__/__/os/freertos/secure/init.c.o
+2026-10-11T23:18:12.4504892Z [510/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_os_secure_context_test.dir/os_secure_context_test.cpp.o
+2026-10-11T23:18:12.5544837Z [511/928] Building C object tests/contracts/google/CMakeFiles/nexus_os_secure_fp_context_test.dir/__/__/os/freertos/secure/context.c.o
+2026-10-11T23:18:12.5924776Z [512/928] Building C object tests/contracts/google/CMakeFiles/nexus_os_secure_fp_context_test.dir/__/__/os/freertos/secure/init.c.o
+2026-10-11T23:18:13.2975258Z [513/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_notifications_disabled_test.dir/freertos_context_test.cpp.o
+2026-10-11T23:18:13.3995051Z [514/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_v7_test.dir/__/__/os/freertos/mpu/task.c.o
+2026-10-11T23:18:13.8075026Z [515/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_priority8_context_test.dir/freertos_context_test.cpp.o
+2026-10-11T23:18:13.9120303Z [516/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_v8_test.dir/__/__/os/freertos/mpu/task.c.o
+2026-10-11T23:18:16.5965064Z [517/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_guard_v7_test.dir/freertos_mpu_guard_test.cpp.o
+2026-10-11T23:18:16.6485293Z [518/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_guard_v7_test.dir/__/__/os/freertos/mpu/guard.c.o
+2026-10-11T23:18:18.0685067Z [519/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_v7_test.dir/freertos_mpu_test.cpp.o
+2026-10-11T23:18:18.1195286Z [520/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_guard_v8_ns_test.dir/__/__/os/freertos/mpu/guard.c.o
+2026-10-11T23:18:18.6524922Z [521/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_os_secure_fp_context_test.dir/os_secure_context_test.cpp.o
+2026-10-11T23:18:18.7044987Z [522/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_guard_v8_single_test.dir/__/__/os/freertos/mpu/guard.c.o
+2026-10-11T23:18:19.2615100Z [523/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_v8_test.dir/freertos_mpu_test.cpp.o
+2026-10-11T23:18:19.3115167Z [524/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_m3_test.dir/nexus_freertos_mpu_port_m3_test/port-model.c.o
+2026-10-11T23:18:19.3655519Z [525/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_m3_test.dir/__/__/os/freertos/mpu/guard.c.o
+2026-10-11T23:18:19.4014908Z [526/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_guard_v8_ns_test.dir/freertos_mpu_guard_test.cpp.o
+2026-10-11T23:18:19.4485660Z [527/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_m4_test.dir/nexus_freertos_mpu_port_m4_test/port-model.c.o
+2026-10-11T23:18:19.4992692Z [528/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_m4_test.dir/__/__/os/freertos/mpu/guard.c.o
+2026-10-11T23:18:20.8684962Z [529/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_guard_v8_single_test.dir/freertos_mpu_guard_test.cpp.o
+2026-10-11T23:18:20.9012047Z [530/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_v8_ns_test.dir/nexus_freertos_mpu_port_v8_ns_test/port-model.c.o
+2026-10-11T23:18:20.9510927Z [531/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_v8_ns_test.dir/__/__/os/freertos/mpu/guard.c.o
+2026-10-11T23:18:22.9318965Z [532/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_m3_test.dir/freertos_mpu_port_test.cpp.o
+2026-10-11T23:18:22.9725186Z [533/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_v8_single_test.dir/nexus_freertos_mpu_port_v8_single_test/port-model.c.o
+2026-10-11T23:18:23.0234780Z [534/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_v8_single_test.dir/__/__/os/freertos/mpu/guard.c.o
+2026-10-11T23:18:23.4352737Z [535/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_v8_ns_test.dir/freertos_mpu_port_test.cpp.o
+2026-10-11T23:18:23.5165880Z [536/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_arch_test.dir/__/__/soc/gd32f470/timebase.c.o
+2026-10-11T23:18:23.5495234Z [537/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_m4_test.dir/freertos_mpu_port_test.cpp.o
+2026-10-11T23:18:23.6086149Z [538/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_memory_test.dir/__/__/soc/gd32f470/memory_init.c.o
+2026-10-11T23:18:25.1520488Z [539/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_mpu_port_v8_single_test.dir/freertos_mpu_port_test.cpp.o
+2026-10-11T23:18:25.2275657Z [540/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_default_test.dir/__/__/soc/gd32f470/system.c.o
+2026-10-11T23:18:25.3259559Z [541/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_default_test.dir/gd32_memory_boot_test.cpp.o
+2026-10-11T23:18:25.3644729Z [542/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_memory_test.dir/gd32_memory_test.cpp.o
+2026-10-11T23:18:25.3944787Z [543/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_both_test.dir/__/__/soc/gd32f470/system.c.o
+2026-10-11T23:18:25.4164997Z [544/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_both_test.dir/__/__/soc/gd32f470/memory_init.c.o
+2026-10-11T23:18:25.4884933Z [545/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_usb_clock_test.dir/__/__/soc/stm32f407/usb_clock.c.o
+2026-10-11T23:18:26.7615118Z [546/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_memory_boot_both_test.dir/gd32_memory_boot_test.cpp.o
+2026-10-11T23:18:26.8495132Z [547/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_usb_clock_test.dir/__/__/soc/gd32f470/usb_clock.c.o
+2026-10-11T23:18:27.1739758Z [548/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32f407_usb_clock_test.dir/usb_clock_test.cpp.o
+2026-10-11T23:18:27.2854256Z [549/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_arch_test.dir/gd32_arch_test.cpp.o
+2026-10-11T23:18:27.3405023Z [550/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_stack_test.dir/__/__/os/freertos/stack_snapshot.c.o
+2026-10-11T23:18:27.5036838Z [551/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32f470_usb_clock_test.dir/usb_clock_test.cpp.o
+2026-10-11T23:18:27.6646780Z [552/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_can_factory_test.dir/can-factory-stm32/bindings.c.o
+2026-10-11T23:18:27.7793470Z [553/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_can_factory_test.dir/__/__/soc/stm32f407/drivers/can.c.o
+2026-10-11T23:18:28.2990068Z [554/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stack_observation_test.dir/stack_observation_test.cpp.o
+2026-10-11T23:18:28.4335516Z [555/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_can_factory_test.dir/can-factory-gd32/bindings.c.o
+2026-10-11T23:18:28.5025495Z [556/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_can_factory_test.dir/__/__/soc/gd32f470/drivers/can.c.o
+2026-10-11T23:18:31.4485745Z [557/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_can_controller_test.dir/can_controller_test.cpp.o
+2026-10-11T23:18:31.6625488Z [558/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_stack_test.dir/freertos_stack_test.cpp.o
+2026-10-11T23:18:31.7345227Z [559/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_can_test.dir/__/__/soc/stm32f407/drivers/can.c.o
+2026-10-11T23:18:32.3045345Z [560/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_can_factory_test.dir/can_factory_test.cpp.o
+2026-10-11T23:18:32.3608026Z [561/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_can_test.dir/__/__/soc/gd32f470/drivers/can.c.o
+2026-10-11T23:18:32.7345062Z [562/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_can_factory_test.dir/can_factory_test.cpp.o
+2026-10-11T23:18:33.4794901Z [563/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_can_test.dir/can_soc_test.cpp.o
+2026-10-11T23:18:33.7594551Z [564/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_can_test.dir/can_soc_test.cpp.o
+2026-10-11T23:18:33.8336293Z [565/928] Building C object tests/contracts/google/CMakeFiles/nexus_ethernet_mac_test.dir/__/__/io/src/eth_mac.c.o
+2026-10-11T23:18:34.2010270Z [566/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_ethernet_test.dir/__/__/io/src/eth_mac.c.o
+2026-10-11T23:18:34.2664982Z [567/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_ethernet_test.dir/__/__/soc/stm32f407/drivers/ethernet.c.o
+2026-10-11T23:18:34.9231723Z [568/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_ethernet_api_test.dir/ethernet_api_test.cpp.o
+2026-10-11T23:18:35.2820200Z [569/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_ethernet_test.dir/__/__/io/src/eth_mac.c.o
+2026-10-11T23:18:35.3414864Z [570/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_ethernet_test.dir/__/__/soc/gd32f470/drivers/ethernet.c.o
+2026-10-11T23:18:35.9732184Z [571/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_ethernet_mac_test.dir/ethernet_mac_test.cpp.o
+2026-10-11T23:18:37.0048375Z [572/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_ethernet_test.dir/ethernet_mac_test.cpp.o
+2026-10-11T23:18:37.0664726Z [573/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_ethernet_native_test.dir/ethernet_native_test.cpp.o
+2026-10-11T23:18:37.5245145Z [574/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_ethernet_test.dir/ethernet_mac_test.cpp.o
+2026-10-11T23:18:37.5760889Z [575/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_usb_device_test.dir/__/__/soc/stm32f407/drivers/usb_device.c.o
+2026-10-11T23:18:37.6584893Z [576/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_usb_device_test.dir/__/__/soc/stm32f407/usb_clock.c.o
+2026-10-11T23:18:38.9816667Z [577/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32f407_usb_device_test.dir/usb_device_soc_test.cpp.o
+2026-10-11T23:18:39.0201858Z [578/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_usb_device_test.dir/__/__/soc/gd32f470/drivers/usb_device.c.o
+2026-10-11T23:18:39.1085095Z [579/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_usb_device_test.dir/__/__/soc/gd32f470/usb_clock.c.o
+2026-10-11T23:18:39.5834972Z [580/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32f470_usb_device_test.dir/usb_device_soc_test.cpp.o
+2026-10-11T23:18:39.6292701Z [581/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_dp83848_test.dir/dp83848_test.cpp.o
+2026-10-11T23:18:39.7184908Z [582/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_timer_advanced_test.dir/__/__/soc/stm32f407/drivers/timer_capture.c.o
+2026-10-11T23:18:39.7634781Z [583/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_timer_advanced_test.dir/__/__/io/src/timer_capture.c.o
+2026-10-11T23:18:39.7754845Z [584/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_timer_advanced_test.dir/__/__/soc/stm32f407/drivers/advanced_pwm.c.o
+2026-10-11T23:18:39.8054889Z [585/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_timer_advanced_test.dir/__/__/io/src/advanced_pwm.c.o
+2026-10-11T23:18:39.9344955Z [586/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_timer_advanced_test.dir/__/__/soc/gd32f470/drivers/timer_capture.c.o
+2026-10-11T23:18:40.0784877Z [587/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_timer_advanced_test.dir/__/__/soc/gd32f470/drivers/advanced_pwm.c.o
+2026-10-11T23:18:40.1274846Z [588/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_timer_advanced_test.dir/__/__/io/src/timer_capture.c.o
+2026-10-11T23:18:40.1715156Z [589/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_timer_advanced_test.dir/__/__/io/src/advanced_pwm.c.o
+2026-10-11T23:18:40.5144774Z [590/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_usb_device_test.dir/usb_device_test.cpp.o
+2026-10-11T23:18:40.6655254Z [591/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_timer_factory_test.dir/timer-factory-stm32/bindings.c.o
+2026-10-11T23:18:40.8044824Z [592/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_timer_factory_test.dir/__/__/soc/stm32f407/drivers/timer_capture.c.o
+2026-10-11T23:18:40.9517763Z [593/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_timer_factory_test.dir/__/__/soc/stm32f407/drivers/advanced_pwm.c.o
+2026-10-11T23:18:44.1214947Z [594/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32f407_timer_advanced_test.dir/timer_advanced_test.cpp.o
+2026-10-11T23:18:44.2625002Z [595/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_timer_factory_test.dir/timer-factory-gd32/bindings.c.o
+2026-10-11T23:18:44.4025147Z [596/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_timer_factory_test.dir/__/__/soc/gd32f470/drivers/timer_capture.c.o
+2026-10-11T23:18:44.5495272Z [597/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_timer_factory_test.dir/__/__/soc/gd32f470/drivers/advanced_pwm.c.o
+2026-10-11T23:18:44.7725466Z [598/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32f470_timer_advanced_test.dir/timer_advanced_test.cpp.o
+2026-10-11T23:18:45.0585458Z [599/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/multi-controller-factory-stm32/bindings.c.o
+2026-10-11T23:18:45.2378661Z [600/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/__/__/soc/stm32f407/drivers/uart.c.o
+2026-10-11T23:18:45.2944911Z [601/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_timer_factory_test.dir/timer_factory_test.cpp.o
+2026-10-11T23:18:45.3835530Z [602/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/__/__/soc/stm32f407/drivers/spi.c.o
+2026-10-11T23:18:45.3915270Z [603/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/__/__/soc/stm32f407/drivers/uart_dma.c.o
+2026-10-11T23:18:45.4774863Z [604/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/__/__/soc/stm32f407/drivers/i2c_async.c.o
+2026-10-11T23:18:45.5825080Z [605/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/__/__/soc/stm32f407/drivers/spi_dma.c.o
+2026-10-11T23:18:45.6834933Z [606/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:18:45.6874847Z [607/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_multi_controller_factory_test_gpio.dir/__/__/soc/stm32f407/drivers/gpio.c.o
+2026-10-11T23:18:45.9489209Z [608/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/multi-controller-factory-gd32/bindings.c.o
+2026-10-11T23:18:46.0985174Z [609/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_timer_factory_test.dir/timer_factory_test.cpp.o
+2026-10-11T23:18:46.5568615Z [610/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/__/__/soc/gd32f470/drivers/uart.c.o
+2026-10-11T23:18:46.5604812Z [611/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/__/__/soc/gd32f470/drivers/uart_dma.c.o
+2026-10-11T23:18:46.6788913Z [612/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/__/__/soc/gd32f470/drivers/spi.c.o
+2026-10-11T23:18:46.7715561Z [613/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/__/__/soc/gd32f470/drivers/i2c_async.c.o
+2026-10-11T23:18:46.7835815Z [614/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/__/__/soc/gd32f470/drivers/spi_dma.c.o
+2026-10-11T23:18:46.8915039Z [615/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test_gpio.dir/__/__/soc/gd32f470/drivers/gpio.c.o
+2026-10-11T23:18:46.9815097Z [616/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:18:46.9960938Z [617/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/__/__/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.o
+2026-10-11T23:18:47.1303763Z [618/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/__/__/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c.o
+2026-10-11T23:18:47.1413829Z [619/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/__/__/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_usart.c.o
+2026-10-11T23:18:47.2435315Z [620/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test_vendor.dir/__/__/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_spi.c.o
+2026-10-11T23:18:47.4124918Z [621/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_factory_test.dir/i2c-pair-stm32-dma/bindings.c.o
+2026-10-11T23:18:47.6215088Z [622/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_factory_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:18:47.7115299Z [623/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_factory_test.dir/__/__/soc/stm32f407/drivers/i2c_async.c.o
+2026-10-11T23:18:47.8184837Z [624/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_factory_test.dir/__/__/soc/stm32f407/drivers/gpio.c.o
+2026-10-11T23:18:49.9975331Z [625/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_multi_controller_factory_test.dir/multi_controller_factory_test.cpp.o
+2026-10-11T23:18:50.1480624Z [626/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_irq_factory_test.dir/i2c-pair-stm32-irq/bindings.c.o
+2026-10-11T23:18:50.3655145Z [627/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_irq_factory_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:18:50.4535212Z [628/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_irq_factory_test.dir/__/__/soc/stm32f407/drivers/i2c_async.c.o
+2026-10-11T23:18:50.5615241Z [629/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_irq_factory_test.dir/__/__/soc/stm32f407/drivers/gpio.c.o
+2026-10-11T23:18:50.8104589Z [630/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_factory_test.dir/i2c_pair_factory_test.cpp.o
+2026-10-11T23:18:50.9744908Z [631/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_factory_test.dir/i2c-pair-gd32-dma/bindings.c.o
+2026-10-11T23:18:50.9889229Z [632/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_multi_controller_factory_test.dir/multi_controller_factory_test.cpp.o
+2026-10-11T23:18:51.0775354Z [633/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_factory_test.dir/__/__/soc/gd32f470/drivers/i2c_async.c.o
+2026-10-11T23:18:51.1764840Z [634/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_factory_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:18:51.1814652Z [635/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_factory_test.dir/__/__/soc/gd32f470/drivers/gpio.c.o
+2026-10-11T23:18:51.2565083Z [636/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_factory_test.dir/__/__/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.o
+2026-10-11T23:18:51.3946550Z [637/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_irq_factory_test.dir/i2c-pair-gd32-irq/bindings.c.o
+2026-10-11T23:18:51.4443818Z [638/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_i2c_pair_irq_factory_test.dir/i2c_pair_factory_test.cpp.o
+2026-10-11T23:18:51.5345766Z [639/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_irq_factory_test.dir/__/__/soc/gd32f470/drivers/i2c_async.c.o
+2026-10-11T23:18:51.6075210Z [640/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_irq_factory_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:18:51.6455046Z [641/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_irq_factory_test.dir/__/__/soc/gd32f470/drivers/gpio.c.o
+2026-10-11T23:18:51.6946743Z [642/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_irq_factory_test.dir/__/__/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.o
+2026-10-11T23:18:51.7431049Z [643/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_physical_platform_factory_test_empty.dir/physical-platform-stm32-empty/bindings.c.o
+2026-10-11T23:18:51.8076456Z [644/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_physical_platform_factory_test_gpio.dir/physical-platform-stm32-gpio/bindings.c.o
+2026-10-11T23:18:51.9305604Z [645/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_physical_platform_factory_test.dir/__/__/soc/stm32f407/drivers/gpio.c.o
+2026-10-11T23:18:52.0239596Z [646/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_physical_platform_factory_test_empty.dir/physical-platform-gd32-empty/bindings.c.o
+2026-10-11T23:18:52.1195424Z [647/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_physical_platform_factory_test_gpio.dir/physical-platform-gd32-gpio/bindings.c.o
+2026-10-11T23:18:54.3554623Z [648/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_factory_test.dir/i2c_pair_factory_test.cpp.o
+2026-10-11T23:18:54.4775361Z [649/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_physical_platform_factory_test.dir/__/__/soc/gd32f470/drivers/gpio.c.o
+2026-10-11T23:18:54.5885427Z [650/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_physical_platform_factory_test_vendor.dir/__/__/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.o
+2026-10-11T23:18:54.7445537Z [651/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_physical_platform_factory_test_vendor.dir/__/__/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c.o
+2026-10-11T23:18:54.9262012Z [652/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_i2c_pair_irq_factory_test.dir/i2c_pair_factory_test.cpp.o
+2026-10-11T23:18:55.0338796Z [653/928] Building C object tests/contracts/google/CMakeFiles/nexus_timebase_lowpower_test.dir/__/__/os/freertos/timebase_lowpower.c.o
+2026-10-11T23:18:55.1164956Z [654/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_physical_platform_factory_test.dir/physical_platform_factory_test.cpp.o
+2026-10-11T23:18:55.1795072Z [655/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_test.dir/__/__/soc/stm32f407/timebase_lowpower.c.o
+2026-10-11T23:18:55.3074872Z [656/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_test.dir/__/__/os/freertos/timebase_lowpower.c.o
+2026-10-11T23:18:55.4655179Z [657/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_physical_platform_factory_test.dir/physical_platform_factory_test.cpp.o
+2026-10-11T23:18:55.5247294Z [658/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_test.dir/__/__/soc/gd32f470/timebase_lowpower.c.o
+2026-10-11T23:18:55.6534773Z [659/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_test.dir/__/__/os/freertos/timebase_lowpower.c.o
+2026-10-11T23:18:56.8013964Z [660/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_test.dir/timebase_soc_test.cpp.o
+2026-10-11T23:18:56.8917409Z [661/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/soc/stm32f407/system.c.o
+2026-10-11T23:18:56.9593209Z [662/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/soc/stm32f407/timebase_lowpower.c.o
+2026-10-11T23:18:57.0714908Z [663/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_test.dir/timebase_soc_test.cpp.o
+2026-10-11T23:18:57.0920362Z [664/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/__/__/os/freertos/timebase_lowpower.c.o
+2026-10-11T23:18:57.1698340Z [665/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_integration_test.dir/__/__/soc/gd32f470/timebase.c.o
+2026-10-11T23:18:57.2255219Z [666/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_integration_test.dir/__/__/soc/gd32f470/timebase_lowpower.c.o
+2026-10-11T23:18:57.2764999Z [667/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32f407_lowpower_integration_test.dir/timebase_soc_integration_test.cpp.o
+2026-10-11T23:18:57.3375100Z [668/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_integration_test.dir/__/__/os/freertos/timebase_lowpower.c.o
+2026-10-11T23:18:57.4545039Z [669/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_usb_factory_test.dir/usb-factory-stm32/bindings.c.o
+2026-10-11T23:18:57.5034911Z [670/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_usb_factory_test.dir/__/__/soc/stm32f407/drivers/usb_device.c.o
+2026-10-11T23:18:57.5794886Z [671/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_usb_factory_test.dir/__/__/soc/stm32f407/usb_clock.c.o
+2026-10-11T23:18:58.2966045Z [672/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_timebase_lowpower_test.dir/timebase_lowpower_test.cpp.o
+2026-10-11T23:18:58.4105595Z [673/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_usb_factory_test.dir/usb-factory-gd32/bindings.c.o
+2026-10-11T23:18:58.4541466Z [674/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_usb_factory_test.dir/__/__/soc/gd32f470/drivers/usb_device.c.o
+2026-10-11T23:18:58.5449645Z [675/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_usb_factory_test.dir/__/__/soc/gd32f470/usb_clock.c.o
+2026-10-11T23:18:58.6305300Z [676/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32f470_lowpower_integration_test.dir/timebase_soc_integration_test.cpp.o
+2026-10-11T23:18:58.6652350Z [677/928] Linking C static library lib/libnexus_clock_domain_test_provider.a
+2026-10-11T23:19:00.7043829Z [678/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32f407_clock_sleep_test.dir/clock_sleep_soc_test.cpp.o
+2026-10-11T23:19:00.7677985Z [679/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_clock_sleep_test.dir/__/__/soc/stm32f407/sleep.c.o
+2026-10-11T23:19:00.8075475Z [680/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_clock_sleep_test.dir/__/__/arch/cortex_m/nx_arch_sleep.c.o
+2026-10-11T23:19:00.8675413Z [681/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_clock_domain_test.dir/clock_domain_test.cpp.o
+2026-10-11T23:19:00.9289903Z [682/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_clock_sleep_test.dir/__/__/soc/gd32f470/sleep.c.o
+2026-10-11T23:19:00.9744911Z [683/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_clock_sleep_test.dir/__/__/arch/cortex_m/nx_arch_sleep.c.o
+2026-10-11T23:19:02.2470248Z [684/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_usb_factory_test.dir/usb_factory_test.cpp.o
+2026-10-11T23:19:02.3384721Z [685/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_system_test.dir/__/contracts/g474_model.c.o
+2026-10-11T23:19:02.4654917Z [686/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_system_test.dir/__/__/soc/stm32g474/system.c.o
+2026-10-11T23:19:02.5095392Z [687/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_usb_factory_test.dir/usb_factory_test.cpp.o
+2026-10-11T23:19:02.5795899Z [688/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_system_test.dir/__/__/soc/stm32g474/drivers/gpio.c.o
+2026-10-11T23:19:02.7184932Z [689/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_system_test.dir/__/__/soc/stm32g474/drivers/uart.c.o
+2026-10-11T23:19:02.7364959Z [690/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_g474_system_test.dir/g474_system_test.cpp.o
+2026-10-11T23:19:02.8075233Z [691/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_provider_test.dir/__/contracts/g474_model.c.o
+2026-10-11T23:19:02.8254958Z [692/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32f470_clock_sleep_test.dir/clock_sleep_soc_test.cpp.o
+2026-10-11T23:19:02.8644807Z [693/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_provider_test.dir/__/__/soc/stm32g474/system.c.o
+2026-10-11T23:19:02.9215074Z [694/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_provider_test.dir/__/__/soc/stm32g474/drivers/gpio.c.o
+2026-10-11T23:19:03.0282191Z [695/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_provider_test.dir/__/__/soc/stm32g474/drivers/uart.c.o
+2026-10-11T23:19:03.0482153Z [696/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/g474-factory/bindings.c.o
+2026-10-11T23:19:03.1159959Z [697/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/__/contracts/g474_model.c.o
+2026-10-11T23:19:03.1754876Z [698/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/__/__/soc/stm32g474/system.c.o
+2026-10-11T23:19:03.2255240Z [699/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/__/__/soc/stm32g474/drivers/gpio.c.o
+2026-10-11T23:19:03.3734972Z [700/928] Building C object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/__/__/soc/stm32g474/drivers/uart.c.o
+2026-10-11T23:19:03.4474550Z [701/928] Linking C static library lib/libcontract_threadx_linux.a
+2026-10-11T23:19:04.8894863Z [702/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_g474_provider_test.dir/g474_provider_test.cpp.o
+2026-10-11T23:19:05.0415082Z [703/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_kernel_test.dir/threadx_close_test.cpp.o
+2026-10-11T23:19:05.1824846Z [704/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_g474_factory_test.dir/g474_factory_test.cpp.o
+2026-10-11T23:19:05.3715072Z [705/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_kernel_test.dir/threadx_kernel_test.cpp.o
+2026-10-11T23:19:05.3995068Z [706/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_kernel_test.dir/__/contracts/os_threadx_runtime/clock.c.o
+2026-10-11T23:19:05.4214732Z [707/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_kernel_test.dir/__/__/os/threadx/threadx.c.o
+2026-10-11T23:19:05.6744993Z [708/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_bootstrap_test.dir/__/__/os/threadx/threadx.c.o
+2026-10-11T23:19:05.7075270Z [709/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_bootstrap_test.dir/__/contracts/os_threadx_runtime/clock.c.o
+2026-10-11T23:19:06.4815539Z [710/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_kernel_test.dir/threadx_admission_test.cpp.o
+2026-10-11T23:19:06.5395241Z [711/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_m4_test.dir/__/__/os/threadx/m4.c.o
+2026-10-11T23:19:07.1715022Z [712/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_bootstrap_test.dir/threadx_bootstrap_test.cpp.o
+2026-10-11T23:19:07.4405040Z [713/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_irq_test.dir/__/__/os/threadx/threadx.c.o
+2026-10-11T23:19:07.4735056Z [714/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_irq_test.dir/__/contracts/os_threadx_runtime/clock.c.o
+2026-10-11T23:19:07.7154896Z [715/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_kernel_test.dir/threadx_wait_test.cpp.o
+2026-10-11T23:19:07.7655226Z [716/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_m4_primask_test.dir/__/__/os/threadx/m4.c.o
+2026-10-11T23:19:07.8855736Z [717/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_irq_test.dir/threadx_irq_test.cpp.o
+2026-10-11T23:19:07.9898471Z [718/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_m4_test.dir/threadx_m4_test.cpp.o
+2026-10-11T23:19:08.0229369Z [719/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_irq_primask_test.dir/__/contracts/os_threadx_runtime/clock.c.o
+2026-10-11T23:19:08.1444998Z [720/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_irq_primask_test.dir/__/__/os/threadx/threadx.c.o
+2026-10-11T23:19:08.1954822Z [721/928] Building C object tests/contracts/google/CMakeFiles/nexus_threadx_m4_external_test.dir/__/__/os/threadx/m4.c.o
+2026-10-11T23:19:08.9923269Z [722/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_irq_primask_test.dir/threadx_irq_primask_test.cpp.o
+2026-10-11T23:19:09.5675062Z [723/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_m4_primask_test.dir/threadx_m4_primask_test.cpp.o
+2026-10-11T23:19:09.7644508Z [724/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_i2c_multi_controller_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:19:09.8595011Z [725/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32f407_i2c_multi_controller_test.dir/__/__/soc/stm32f407/drivers/i2c_async.c.o
+2026-10-11T23:19:11.0695962Z [726/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_linux_port_test.dir/threadx_linux_port_test.cpp.o
+2026-10-11T23:19:11.2708901Z [727/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_i2c_multi_controller_test.dir/__/__/soc/common/i2c_v1_async.c.o
+2026-10-11T23:19:11.3725109Z [728/928] Building C object tests/contracts/google/CMakeFiles/nexus_gd32f470_i2c_multi_controller_test.dir/__/__/soc/gd32f470/drivers/i2c_async.c.o
+2026-10-11T23:19:11.4924710Z [729/928] Linking C static library lib/libnexus_user_io_broker_test_provider.a
+2026-10-11T23:19:11.8655416Z [730/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_threadx_m4_external_test.dir/threadx_m4_external_test.cpp.o
+2026-10-11T23:19:12.1656176Z [731/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32f407_i2c_multi_controller_test.dir/i2c_multi_controller_test.cpp.o
+2026-10-11T23:19:12.2105197Z [732/928] Building C object tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/__/__/os/freertos/hooks.c.o
+2026-10-11T23:19:13.1455964Z [733/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32f470_i2c_multi_controller_test.dir/i2c_multi_controller_test.cpp.o
+2026-10-11T23:19:13.2969197Z [734/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/eth-factory-stm32/bindings.c.o
+2026-10-11T23:19:13.3654660Z [735/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/__/__/soc/stm32f407/drivers/ethernet.c.o
+2026-10-11T23:19:13.6315569Z [736/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/freertos_failstop_test.cpp.o
+2026-10-11T23:19:13.6317944Z FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/freertos_failstop_test.cpp.o 
+2026-10-11T23:19:13.6326821Z /usr/bin/c++  -I/home/runner/work/nexus/nexus/tests/contracts/os_freertos_runtime -I/home/runner/work/nexus/nexus/os/freertos/include -I/home/runner/work/nexus/nexus/os/include -I/home/runner/work/nexus/nexus/arch/include -I/home/runner/work/nexus/nexus/build/native-release/generated -I/home/runner/work/nexus/nexus/core/include -isystem /home/runner/work/nexus/nexus/ext/freertos/include -isystem /home/runner/work/nexus/nexus/ext/freertos/portable/ThirdParty/GCC/Posix -isystem /home/runner/work/nexus/nexus/build/native-release/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /home/runner/work/nexus/nexus/build/native-release/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /home/runner/work/nexus/nexus/build/native-release/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /home/runner/work/nexus/nexus/build/native-release/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -O3 -DNDEBUG -std=c++17 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -MD -MT tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/freertos_failstop_test.cpp.o -MF tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/freertos_failstop_test.cpp.o.d -o tests/contracts/google/CMakeFiles/nexus_freertos_failstop_test.dir/freertos_failstop_test.cpp.o -c /home/runner/work/nexus/nexus/tests/google/freertos_failstop_test.cpp
+2026-10-11T23:19:13.6338103Z In file included from /usr/include/features.h:502,
+2026-10-11T23:19:13.6339199Z                  from /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:33,
+2026-10-11T23:19:13.6340165Z                  from /usr/include/stdint.h:26,
+2026-10-11T23:19:13.6340987Z                  from /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h:9,
+2026-10-11T23:19:13.6341929Z                  from /home/runner/work/nexus/nexus/arch/include/nexus/arch/arch.h:12,
+2026-10-11T23:19:13.6343446Z                  from /home/runner/work/nexus/nexus/tests/google/freertos_failstop_test.cpp:9:
+2026-10-11T23:19:13.6344840Z In function ‘ssize_t read(int, void*, size_t)’,
+2026-10-11T23:19:13.6347347Z     inlined from ‘void {anonymous}::read_evidence(int, Capture&)’ at /home/runner/work/nexus/nexus/tests/google/freertos_failstop_test.cpp:156:13,
+2026-10-11T23:19:13.6349421Z     inlined from ‘bool {anonymous}::observe_terminal(nx_arch_irq_masks_t, bool, bool, Probe)’ at /home/runner/work/nexus/nexus/tests/google/freertos_failstop_test.cpp:270:26:
+2026-10-11T23:19:13.6351891Z /usr/include/x86_64-linux-gnu/bits/unistd.h:28:10: error: ‘ssize_t __read_alias(int, void*, size_t)’ writing 168 or more bytes into a region of size 32 overflows the destination [-Werror=stringop-overflow=]
+2026-10-11T23:19:13.6355082Z    28 |   return __glibc_fortify (read, __nbytes, sizeof (char),
+2026-10-11T23:19:13.6355889Z       |          ^~~~~~~~~~~~~~~
+2026-10-11T23:19:13.6357524Z /home/runner/work/nexus/nexus/tests/google/freertos_failstop_test.cpp: In function ‘bool {anonymous}::observe_terminal(nx_arch_irq_masks_t, bool, bool, Probe)’:
+2026-10-11T23:19:13.6359762Z /home/runner/work/nexus/nexus/tests/google/freertos_failstop_test.cpp:148:14: note: destination object ‘{anonymous}::Capture::partial’ of size 32
+2026-10-11T23:19:13.6361136Z   148 |     Evidence partial{};
+2026-10-11T23:19:13.6361810Z       |              ^~~~~~~
+2026-10-11T23:19:13.6363488Z /usr/include/x86_64-linux-gnu/bits/unistd-decl.h:29:16: note: in a call to function ‘ssize_t __read_alias(int, void*, size_t)’ declared with attribute ‘access (write_only, 2, 3)’
+2026-10-11T23:19:13.6365083Z    29 | extern ssize_t __REDIRECT_FORTIFY (__read_alias, (int __fd, void *__buf,
+2026-10-11T23:19:13.6365937Z       |                ^~~~~~~~~~~~~~~~~~
+2026-10-11T23:19:13.6366786Z cc1plus: all warnings being treated as errors
+2026-10-11T23:19:13.7095923Z [737/928] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/__/__/io/src/eth_mac.c.o
+2026-10-11T23:19:16.0405501Z [738/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_user_io_broker_test.dir/user_io_broker_test.cpp.o
+2026-10-11T23:19:17.1719816Z [739/928] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_eth_factory_test.dir/ethernet_factory_test.cpp.o
+2026-10-11T23:19:17.1720612Z ninja: build stopped: subcommand failed.
+2026-10-11T23:19:17.1811592Z ##[error]Process completed with exit code 1.
+2026-10-11T23:19:17.1897553Z Prepare all required actions
+2026-10-11T23:19:17.1962450Z ##[group]Run ./.github/actions/record-identity
+2026-10-11T23:19:17.1963159Z with:
+2026-10-11T23:19:17.1963550Z   job: native-native-release
+2026-10-11T23:19:17.1963940Z   result: failure
+2026-10-11T23:19:17.1964354Z   expected-commit: 08bdfb765902c725c75a20b3d05bac31f8afe7c8
+2026-10-11T23:19:17.1964924Z   output: build/job-identities/native-native-release
+2026-10-11T23:19:17.1965418Z   require-dependencies: true
+2026-10-11T23:19:17.1966455Z   artifacts: build/native-release/ctest-results.xml
+build/native-release/Testing/Temporary/
+build/native-release/generated/
+build/native-release/compile_commands.json
+build/native-release/tdd/
+build/native-release/google-contracts.json
+
+2026-10-11T23:19:17.1967566Z   tools: python=python3
+cmake=cmake
+compiler=cc
+
+2026-10-11T23:19:17.1968005Z env:
+2026-10-11T23:19:17.1968428Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:17.1969107Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T23:19:17.1969679Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:17.1970184Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:17.1970752Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:17.1971292Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T23:19:17.1971799Z ##[endgroup]
+2026-10-11T23:19:17.1979033Z ##[start-action display=Observe source, configuration closure and artifact bytes;id=__self_2.__run]
+2026-10-11T23:19:17.2004821Z ##[group]Run python3 - <<'PY'
+2026-10-11T23:19:17.2005312Z [36;1mpython3 - <<'PY'[0m
+2026-10-11T23:19:17.2005714Z [36;1mimport os[0m
+2026-10-11T23:19:17.2006060Z [36;1mimport subprocess[0m
+2026-10-11T23:19:17.2006409Z [36;1mimport sys[0m
+2026-10-11T23:19:17.2006767Z [36;1m[0m
+2026-10-11T23:19:17.2007081Z [36;1mdef required(name):[0m
+2026-10-11T23:19:17.2007515Z [36;1m    value = os.environ['NEXUS_IDENTITY_' + name][0m
+2026-10-11T23:19:17.2008011Z [36;1m    if not value.strip():[0m
+2026-10-11T23:19:17.2008462Z [36;1m        raise SystemExit('missing identity input: ' + name)[0m
+2026-10-11T23:19:17.2008984Z [36;1m    return value[0m
+2026-10-11T23:19:17.2009330Z [36;1m[0m
+2026-10-11T23:19:17.2009767Z [36;1marguments = [sys.executable, 'tools/maintenance/job_identity.py',[0m
+2026-10-11T23:19:17.2010525Z [36;1m             '--job', required('JOB'), '--result', required('RESULT'),[0m
+2026-10-11T23:19:17.2011041Z [36;1m             '--expected-commit', required('COMMIT'),[0m
+2026-10-11T23:19:17.2011511Z [36;1m             '--output', required('OUTPUT')][0m
+2026-10-11T23:19:17.2012019Z [36;1mfor name, flag in (('ARTIFACTS', '--artifact'), ('TOOLS', '--tool')):[0m
+2026-10-11T23:19:17.2012596Z [36;1m    for value in required(name).splitlines():[0m
+2026-10-11T23:19:17.2013317Z [36;1m        if value.strip():[0m
+2026-10-11T23:19:17.2013757Z [36;1m            arguments.extend([flag, value.strip()])[0m
+2026-10-11T23:19:17.2014244Z [36;1mdependencies = required('DEPENDENCIES')[0m
+2026-10-11T23:19:17.2014667Z [36;1mif dependencies == 'false':[0m
+2026-10-11T23:19:17.2015161Z [36;1m    arguments.append('--observe-uninitialized-dependencies')[0m
+2026-10-11T23:19:17.2015686Z [36;1melif dependencies != 'true':[0m
+2026-10-11T23:19:17.2016169Z [36;1m    raise SystemExit('invalid identity dependency policy')[0m
+2026-10-11T23:19:17.2016673Z [36;1mraise SystemExit(subprocess.call(arguments))[0m
+2026-10-11T23:19:17.2017061Z [36;1mPY[0m
+2026-10-11T23:19:17.2063389Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-11T23:19:17.2063877Z env:
+2026-10-11T23:19:17.2064390Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:17.2065095Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T23:19:17.2065695Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:17.2066453Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:17.2066946Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:17.2067468Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T23:19:17.2067968Z   NEXUS_IDENTITY_JOB: native-native-release
+2026-10-11T23:19:17.2068372Z   NEXUS_IDENTITY_RESULT: failure
+2026-10-11T23:19:17.2068868Z   NEXUS_IDENTITY_COMMIT: 08bdfb765902c725c75a20b3d05bac31f8afe7c8
+2026-10-11T23:19:17.2070033Z   NEXUS_IDENTITY_ARTIFACTS: build/native-release/ctest-results.xml
+build/native-release/Testing/Temporary/
+build/native-release/generated/
+build/native-release/compile_commands.json
+build/native-release/tdd/
+build/native-release/google-contracts.json
+
+2026-10-11T23:19:17.2071165Z   NEXUS_IDENTITY_TOOLS: python=python3
+cmake=cmake
+compiler=cc
+
+2026-10-11T23:19:17.2071721Z   NEXUS_IDENTITY_OUTPUT: build/job-identities/native-native-release
+2026-10-11T23:19:17.2072166Z   NEXUS_IDENTITY_DEPENDENCIES: true
+2026-10-11T23:19:17.2072564Z ##[endgroup]
+2026-10-11T23:19:18.1917806Z ##[end-action id=__self_2.__run;outcome=success;conclusion=success;duration_ms=993]
+2026-10-11T23:19:18.1966410Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+2026-10-11T23:19:18.1966810Z with:
+2026-10-11T23:19:18.1967034Z   name: contracts-native-release
+2026-10-11T23:19:18.1968055Z   path: build/native-release/ctest-results.xml
+build/native-release/Testing/Temporary/
+build/native-release/generated/
+build/native-release/compile_commands.json
+build/native-release/tdd/
+build/native-release/google-contracts.json
+build/job-identities/native-native-release/
+
+2026-10-11T23:19:18.1969083Z   retention-days: 30
+2026-10-11T23:19:18.1969313Z   include-hidden-files: true
+2026-10-11T23:19:18.1969564Z   if-no-files-found: error
+2026-10-11T23:19:18.1969800Z   compression-level: 6
+2026-10-11T23:19:18.1970016Z   overwrite: false
+2026-10-11T23:19:18.1970226Z   archive: true
+2026-10-11T23:19:18.1970437Z env:
+2026-10-11T23:19:18.1970695Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:18.1971164Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib/pkgconfig
+2026-10-11T23:19:18.1971575Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:18.1971948Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:18.1972319Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.17/x64
+2026-10-11T23:19:18.1972978Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.17/x64/lib
+2026-10-11T23:19:18.1973406Z ##[endgroup]
+2026-10-11T23:19:18.3459893Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-11T23:19:18.3464342Z The least common ancestor is /home/runner/work/nexus/nexus/build. This will be the root directory of the artifact
+2026-10-11T23:19:18.3465375Z With the provided path, there will be 17 files uploaded
+2026-10-11T23:19:18.3467623Z Artifact name is valid!
+2026-10-11T23:19:18.3468221Z Root directory input is valid!
+2026-10-11T23:19:18.6053914Z Uploading artifact: contracts-native-release.zip
+2026-10-11T23:19:18.6096465Z Beginning upload of artifact content to blob storage
+2026-10-11T23:19:18.8413950Z Uploaded bytes 41437
+2026-10-11T23:19:18.8849853Z Finished uploading artifact content to blob storage!
+2026-10-11T23:19:18.8850905Z SHA256 digest of uploaded artifact is 9ce00557c3f66c775d9101200c137176967aa1d6cf5719c921983f47820f33e8
+2026-10-11T23:19:18.8851491Z Finalizing artifact upload
+2026-10-11T23:19:19.1802739Z Artifact contracts-native-release successfully finalized. Artifact ID 11718811573
+2026-10-11T23:19:19.1803939Z Artifact contracts-native-release has been successfully uploaded! Final size is 41437 bytes. Artifact ID is 11718811573
+2026-10-11T23:19:19.1807588Z Artifact download URL: https://github.com/X-Gen-Lab/nexus/actions/runs/38183431342/artifacts/11718811573
+2026-10-11T23:19:19.1974592Z Post job cleanup.
+2026-10-11T23:19:19.1978832Z ##[start-action display=Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97;id=__6d044dda-190d-41d3-afa7-c7d79445dcfa.__actions_setup-python]
+2026-10-11T23:19:19.1981476Z ##[end-action id=__6d044dda-190d-41d3-afa7-c7d79445dcfa.__actions_setup-python;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-10-11T23:19:19.2049812Z Post job cleanup.
+2026-10-11T23:19:19.2895875Z [command]/usr/bin/git version
+2026-10-11T23:19:19.2949621Z git version 2.55.0
+2026-10-11T23:19:19.2984169Z Temporarily overriding HOME='/home/runner/work/_temp/14ff74f5-e2a3-4823-a8c7-e4d0011060ac' before making global git config changes
+2026-10-11T23:19:19.2985358Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-11T23:19:19.2989647Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/nexus/nexus
+2026-10-11T23:19:19.3026507Z Removing SSH command configuration
+2026-10-11T23:19:19.3034383Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-11T23:19:19.3072347Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-11T23:19:19.3323234Z Entering 'ext/freertos'
+2026-10-11T23:19:19.3365646Z Entering 'ext/freertos/portable/ThirdParty/Community-Supported-Ports'
+2026-10-11T23:19:19.3405507Z Entering 'ext/freertos/portable/ThirdParty/Partner-Supported-Ports'
+2026-10-11T23:19:19.3448346Z Entering 'ext/threadx'
+2026-10-11T23:19:19.3508410Z Entering 'vendors/arm/CMSIS_5'
+2026-10-11T23:19:19.3551944Z Entering 'vendors/st/cmsis_device_f4'
+2026-10-11T23:19:19.3590627Z Entering 'vendors/st/cmsis_device_g4'
+2026-10-11T23:19:19.3639618Z Removing HTTP extra header
+2026-10-11T23:19:19.3645396Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-11T23:19:19.3683179Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-11T23:19:19.3925103Z Entering 'ext/freertos'
+2026-10-11T23:19:19.3979845Z Entering 'ext/freertos/portable/ThirdParty/Community-Supported-Ports'
+2026-10-11T23:19:19.4021043Z Entering 'ext/freertos/portable/ThirdParty/Partner-Supported-Ports'
+2026-10-11T23:19:19.4058627Z Entering 'ext/threadx'
+2026-10-11T23:19:19.4116764Z Entering 'vendors/arm/CMSIS_5'
+2026-10-11T23:19:19.4161145Z Entering 'vendors/st/cmsis_device_f4'
+2026-10-11T23:19:19.4204434Z Entering 'vendors/st/cmsis_device_g4'
+2026-10-11T23:19:19.4256521Z Removing includeIf entries pointing to credentials config files
+2026-10-11T23:19:19.4264033Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:19:19.4293063Z includeif.gitdir:/home/runner/work/nexus/nexus/.git.path
+2026-10-11T23:19:19.4293745Z includeif.gitdir:/home/runner/work/nexus/nexus/.git/worktrees/*.path
+2026-10-11T23:19:19.4294338Z includeif.gitdir:/github/workspace/.git.path
+2026-10-11T23:19:19.4294760Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-11T23:19:19.4301557Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/nexus/nexus/.git.path
+2026-10-11T23:19:19.4324780Z /home/runner/work/_temp/git-credentials-02906522-ff95-42de-a27e-4bb66f7e1928.config
+2026-10-11T23:19:19.4335527Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/nexus/nexus/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-02906522\-ff95\-42de\-a27e\-4bb66f7e1928\.config
+2026-10-11T23:19:19.4376186Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/nexus/nexus/.git/worktrees/*.path
+2026-10-11T23:19:19.4401720Z /home/runner/work/_temp/git-credentials-02906522-ff95-42de-a27e-4bb66f7e1928.config
+2026-10-11T23:19:19.4409978Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/nexus/nexus/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-02906522\-ff95\-42de\-a27e\-4bb66f7e1928\.config
+2026-10-11T23:19:19.4445722Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-10-11T23:19:19.4467759Z /github/runner_temp/git-credentials-02906522-ff95-42de-a27e-4bb66f7e1928.config
+2026-10-11T23:19:19.4473366Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-02906522\-ff95\-42de\-a27e\-4bb66f7e1928\.config
+2026-10-11T23:19:19.4505635Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-11T23:19:19.4526353Z /github/runner_temp/git-credentials-02906522-ff95-42de-a27e-4bb66f7e1928.config
+2026-10-11T23:19:19.4534198Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-02906522\-ff95\-42de\-a27e\-4bb66f7e1928\.config
+2026-10-11T23:19:19.4568804Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-11T23:19:19.4778132Z Entering 'ext/freertos'
+2026-10-11T23:19:19.4795610Z file:/home/runner/work/nexus/nexus/.git/modules/ext/freertos/config	remote.origin.url
+2026-10-11T23:19:19.4812682Z Entering 'ext/freertos/portable/ThirdParty/Community-Supported-Ports'
+2026-10-11T23:19:19.4831248Z file:/home/runner/work/nexus/nexus/.git/modules/ext/freertos/modules/ThirdParty/FreeRTOS-Kernel-Community-Supported-Ports/config	remote.origin.url
+2026-10-11T23:19:19.4849230Z Entering 'ext/freertos/portable/ThirdParty/Partner-Supported-Ports'
+2026-10-11T23:19:19.4865826Z file:/home/runner/work/nexus/nexus/.git/modules/ext/freertos/modules/ThirdParty/FreeRTOS-Kernel-Partner-Supported-Ports/config	remote.origin.url
+2026-10-11T23:19:19.4882435Z Entering 'ext/threadx'
+2026-10-11T23:19:19.4901016Z file:/home/runner/work/nexus/nexus/.git/modules/ext/threadx/config	remote.origin.url
+2026-10-11T23:19:19.4932203Z Entering 'vendors/arm/CMSIS_5'
+2026-10-11T23:19:19.4950099Z file:/home/runner/work/nexus/nexus/.git/modules/vendors/arm/CMSIS_5/config	remote.origin.url
+2026-10-11T23:19:19.4969914Z Entering 'vendors/st/cmsis_device_f4'
+2026-10-11T23:19:19.4987546Z file:/home/runner/work/nexus/nexus/.git/modules/vendors/st/cmsis_device_f4/config	remote.origin.url
+2026-10-11T23:19:19.5003304Z Entering 'vendors/st/cmsis_device_g4'
+2026-10-11T23:19:19.5021248Z file:/home/runner/work/nexus/nexus/.git/modules/vendors/st/cmsis_device_g4/config	remote.origin.url
+2026-10-11T23:19:19.5049877Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/ext/freertos/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:19:19.5079729Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/ext/freertos/modules/ThirdParty/FreeRTOS-Kernel-Community-Supported-Ports/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:19:19.5106300Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/ext/freertos/modules/ThirdParty/FreeRTOS-Kernel-Partner-Supported-Ports/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:19:19.5132470Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/ext/threadx/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:19:19.5160984Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/vendors/arm/CMSIS_5/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:19:19.5191867Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/vendors/st/cmsis_device_f4/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:19:19.5223062Z [command]/usr/bin/git config --file /home/runner/work/nexus/nexus/.git/modules/vendors/st/cmsis_device_g4/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-11T23:19:19.5245606Z Removing credentials config '/home/runner/work/_temp/git-credentials-02906522-ff95-42de-a27e-4bb66f7e1928.config'
+2026-10-11T23:19:19.5389455Z Cleaning up orphan processes

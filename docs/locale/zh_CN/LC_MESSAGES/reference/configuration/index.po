@@ -1,0 +1,22 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: e7327addacf7477328dd5ada959c84fa41143c601d724d5eb7c29b613dbcd74f\n"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/reference/configuration/index.md:8
+msgid "Configuration and tools"
+msgstr "配置与工具"
+
+#: ../../../workspace/nexus-build-system-20261012/docs/reference/configuration/index.md:10
+msgid ""
+"Use one authored TOML assembly and maintained facts. Unknown keys, "
+"unsupported modes and stale inputs are rejected rather than repaired "
+"silently."
+msgstr "使用一份人工维护的 TOML 装配和已维护的事实。未知键、未支持模式和过期输入被明确拒绝，解析器不静默修复配置。"

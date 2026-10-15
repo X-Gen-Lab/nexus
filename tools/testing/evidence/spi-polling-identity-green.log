@@ -1,0 +1,24 @@
+Running main() from gmock_main.cc
+[==========] Running 6 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 3 tests from SPIPollingOwner
+[ RUN      ] SPIPollingOwner.RejectsForeignEndpointWithoutWireEffects
+[       OK ] SPIPollingOwner.RejectsForeignEndpointWithoutWireEffects (0 ms)
+[ RUN      ] SPIPollingOwner.AllowsDistinctChipSelectsOnBoundController
+[       OK ] SPIPollingOwner.AllowsDistinctChipSelectsOnBoundController (0 ms)
+[ RUN      ] SPIPollingOwner.RejectsIncompleteBindingAndMissingIdentityMethod
+[       OK ] SPIPollingOwner.RejectsIncompleteBindingAndMissingIdentityMethod (0 ms)
+[----------] 3 tests from SPIPollingOwner (0 ms total)
+
+[----------] 3 tests from SPIAsyncOwner
+[ RUN      ] SPIAsyncOwner.RejectsWrongBusBeforeTouchingProviderOrPayload
+[       OK ] SPIAsyncOwner.RejectsWrongBusBeforeTouchingProviderOrPayload (0 ms)
+[ RUN      ] SPIAsyncOwner.RejectionDetachesPrivateBuffersAndPreservesReady
+[       OK ] SPIAsyncOwner.RejectionDetachesPrivateBuffersAndPreservesReady (0 ms)
+[ RUN      ] SPIAsyncOwner.CancellationCannotReleaseQuarantinedStorage
+[       OK ] SPIAsyncOwner.CancellationCannotReleaseQuarantinedStorage (0 ms)
+[----------] 3 tests from SPIAsyncOwner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 6 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 6 tests.

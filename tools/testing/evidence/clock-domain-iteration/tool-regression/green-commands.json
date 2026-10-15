@@ -1,0 +1,62 @@
+[
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/tmp/nexus-sleep-cmake-kd2bki3a",
+      "-B",
+      "/tmp/nexus-sleep-cmake-kd2bki3a/build"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "elapsed_seconds": 0.2652209910447709,
+    "stdout": "green-cmake-0-stdout.log",
+    "stderr": "green-cmake-0-stderr.log",
+    "captured_fixture": "green-cmake-0-fixture"
+  },
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/tmp/nexus-sleep-cmake-00iwwbtc",
+      "-B",
+      "/tmp/nexus-sleep-cmake-00iwwbtc/build"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "elapsed_seconds": 0.2601360119879246,
+    "stdout": "green-cmake-1-stdout.log",
+    "stderr": "green-cmake-1-stderr.log",
+    "captured_fixture": "green-cmake-1-fixture"
+  },
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/tmp/nexus-sleep-cmake-3fhfqn0i",
+      "-B",
+      "/tmp/nexus-sleep-cmake-3fhfqn0i/build"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "elapsed_seconds": 0.21588873898144811,
+    "stdout": "green-cmake-2-stdout.log",
+    "stderr": "green-cmake-2-stderr.log",
+    "captured_fixture": "green-cmake-2-fixture"
+  },
+  {
+    "command": [
+      "/workspace/nexus/.venv/bin/cmake",
+      "-S",
+      "/tmp/nexus-sleep-cmake-rv9t34b0",
+      "-B",
+      "/tmp/nexus-sleep-cmake-rv9t34b0/build"
+    ],
+    "cwd": "/workspace/nexus",
+    "exit_code": 0,
+    "elapsed_seconds": 0.2057079149526544,
+    "stdout": "green-cmake-3-stdout.log",
+    "stderr": "green-cmake-3-stderr.log",
+    "captured_fixture": "green-cmake-3-fixture"
+  }
+]

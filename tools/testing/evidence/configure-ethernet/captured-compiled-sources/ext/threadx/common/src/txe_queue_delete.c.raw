@@ -1,0 +1,136 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Queue                                                               */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+#define TX_SOURCE_CODE
+
+
+/* Include necessary system files.  */
+
+#include "tx_api.h"
+#include "tx_timer.h"
+#include "tx_thread.h"
+#include "tx_queue.h"
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _txe_queue_delete                                   PORTABLE C      */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function checks for errors in the queue delete function call.  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    queue_ptr                         Pointer to queue control block    */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    TX_QUEUE_ERROR                    Invalid queue pointer             */
+/*    TX_CALLER_ERROR                   Invalid caller of this function   */
+/*    status                            Actual completion status          */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    _tx_queue_delete                  Actual queue delete function      */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Application Code                                                    */
+/*                                                                        */
+/**************************************************************************/
+UINT  _txe_queue_delete(TX_QUEUE *queue_ptr)
+{
+
+UINT            status;
+#ifndef TX_TIMER_PROCESS_IN_ISR
+TX_THREAD       *thread_ptr;
+#endif
+
+
+    /* Default status to success.  */
+    status =  TX_SUCCESS;
+
+    /* Check for an invalid queue pointer.  */
+    if (queue_ptr == TX_NULL)
+    {
+
+        /* Queue pointer is invalid, return appropriate error code.  */
+        status =  TX_QUEUE_ERROR;
+    }
+
+    /* Now check for a valid queue ID.  */
+    else if (queue_ptr -> tx_queue_id != TX_QUEUE_ID)
+    {
+
+        /* Queue pointer is invalid, return appropriate error code.  */
+        status =  TX_QUEUE_ERROR;
+    }
+    else
+    {
+
+        /* Check for invalid caller of this function.  */
+
+        /* Is the caller an ISR or Initialization?  */
+        if (TX_THREAD_GET_SYSTEM_STATE() != ((ULONG) 0))
+        {
+
+            /* Invalid caller of this function, return appropriate error code.  */
+            status =  TX_CALLER_ERROR;
+        }
+
+#ifndef TX_TIMER_PROCESS_IN_ISR
+        else
+        {
+
+            /* Pickup thread pointer.  */
+            TX_THREAD_GET_CURRENT(thread_ptr)
+
+            /* Is the caller the system timer thread?  */
+            if (thread_ptr == &_tx_timer_thread)
+            {
+
+                /* Invalid caller of this function, return appropriate error code.  */
+                status =  TX_CALLER_ERROR;
+            }
+        }
+#endif
+    }
+
+    /* Determine if everything is okay.  */
+    if (status == TX_SUCCESS)
+    {
+
+        /* Call actual queue delete function.  */
+        status =  _tx_queue_delete(queue_ptr);
+    }
+
+    /* Return completion status.  */
+    return(status);
+}
+

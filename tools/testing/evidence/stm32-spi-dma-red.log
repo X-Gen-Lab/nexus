@@ -1,0 +1,28 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/native-debug/generated/resolved.json
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/nexus/build/native-debug
+[1/5] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/__/__/soc/stm32f407/drivers/spi.c.o
+[2/5] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/__/__/soc/stm32f407/drivers/gpio.c.o
+[3/5] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/stm32_spi_dma_test.cpp.o
+[4/5] Linking CXX executable bin/nexus_stm32_spi_dma_test
+FAILED: [code=1] bin/nexus_stm32_spi_dma_test 
+: && /usr/bin/c++ -g -Wl,--dependency-file=tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/link.d tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/stm32_spi_dma_test.cpp.o tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/__/__/soc/stm32f407/drivers/spi.c.o tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/__/__/soc/stm32f407/drivers/gpio.c.o -o bin/nexus_stm32_spi_dma_test  lib/libgmock_main.a  lib/libnexus_io_native.a  lib/libnexus_arch.a  lib/libgmock.a  lib/libgtest.a  lib/libnexus_io.a  lib/libnexus_arch.a  lib/libnexus_core.a && :
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/stm32_spi_dma_test.cpp.o: warning: relocation against `nx_stm32_spi_dma_endpoint_ops' in read-only section `.text._ZN11Stm32SpiDmaC2Ev[_ZN11Stm32SpiDmaC5Ev]'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/stm32_spi_dma_test.cpp.o: in function `Stm32SpiDma::SetUp()':
+/workspace/nexus/tests/google/stm32_spi_dma_test.cpp:69:(.text._ZN11Stm32SpiDma5SetUpEv[_ZN11Stm32SpiDma5SetUpEv]+0x1d4): undefined reference to `nx_stm32_spi_dma_initialize'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/stm32_spi_dma_test.cpp.o: in function `Stm32SpiDma::CompleteMemory()':
+/workspace/nexus/tests/google/stm32_spi_dma_test.cpp:80:(.text._ZN64Stm32SpiDma_BothDmaCompletionsKeepCsAndBorrowUntilSpiIsIdle_Test8TestBodyEv+0x2f7): undefined reference to `nx_stm32_spi_dma_irq'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_spi_dma_test.cpp:81:(.text._ZN64Stm32SpiDma_BothDmaCompletionsKeepCsAndBorrowUntilSpiIsIdle_Test8TestBodyEv+0x30b): undefined reference to `nx_stm32_spi_dma_irq'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/stm32_spi_dma_test.cpp.o: in function `Stm32SpiDma_WrongBusIdentityAndInvalidDomainsFailBeforeAdmission_Test::TestBody()':
+/workspace/nexus/tests/google/stm32_spi_dma_test.cpp:146:(.text._ZN69Stm32SpiDma_WrongBusIdentityAndInvalidDomainsFailBeforeAdmission_Test8TestBodyEv+0x47): undefined reference to `nx_stm32_spi_dma_ops'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_stm32_spi_dma_test.dir/stm32_spi_dma_test.cpp.o: in function `Stm32SpiDma::Stm32SpiDma()':
+/workspace/nexus/tests/google/stm32_spi_dma_test.cpp:26:(.text._ZN11Stm32SpiDmaC2Ev[_ZN11Stm32SpiDmaC5Ev]+0x36): undefined reference to `nx_stm32_spi_dma_ops'
+/usr/bin/ld: /workspace/nexus/tests/google/stm32_spi_dma_test.cpp:26:(.text._ZN11Stm32SpiDmaC2Ev[_ZN11Stm32SpiDmaC5Ev]+0xba): undefined reference to `nx_stm32_spi_dma_endpoint_ops'
+/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.

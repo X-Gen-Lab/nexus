@@ -1,0 +1,17 @@
+/workspace/nexus/tools/testing/evidence/multi-controller-iteration/dma-arm-freeze/stm32f407-current-spi.c.o  :
+section                                size   addr
+.text                                     0      0
+.data                                     0      0
+.bss                                      0      0
+.text.on_port                            32      0
+.text.wait_status                        78      0
+.text.reset_controller                   56      0
+.text.nx_stm32_spi_endpoint_transfer    474      0
+.text.nx_stm32_spi_recover               88      0
+.rodata.nx_stm32_spi_ops                 20      0
+.rodata.nx_stm32_spi_endpoint_ops        20      0
+.comment                                 71      0
+.ARM.attributes                          52      0
+Total                                   891
+
+

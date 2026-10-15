@@ -1,0 +1,26 @@
+[
+  {
+    "cmd": [
+      "/workspace/nexus-industrial-design/clock-tests/build/clock_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/clock-domain-iteration/clock_contract-green.xml"
+    ],
+    "returncode": 0,
+    "log": "tools/testing/evidence/clock-domain-iteration/clock_contract-green.log"
+  },
+  {
+    "cmd": [
+      "/workspace/nexus-industrial-design/clock-tests/build/sleep_stm32f407_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/clock-domain-iteration/sleep_stm32f407_contract-green.xml"
+    ],
+    "returncode": 0,
+    "log": "tools/testing/evidence/clock-domain-iteration/sleep_stm32f407_contract-green.log"
+  },
+  {
+    "cmd": [
+      "/workspace/nexus-industrial-design/clock-tests/build/sleep_gd32f470_contract",
+      "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/clock-domain-iteration/sleep_gd32f470_contract-green.xml"
+    ],
+    "returncode": 0,
+    "log": "tools/testing/evidence/clock-domain-iteration/sleep_gd32f470_contract-green.log"
+  }
+]

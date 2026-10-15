@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "build/adc-iteration/bin/nexus_hardware_contract_test",
+    "--gtest_output=xml:tools/testing/evidence/adc-iteration/observer-storage-green.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T16:28:52.172602+00:00",
+  "ended_at": "2026-10-11T16:28:52.175887+00:00",
+  "exit_code": 0,
+  "log": "/workspace/nexus/tools/testing/evidence/adc-iteration/observer-storage-green.log"
+}

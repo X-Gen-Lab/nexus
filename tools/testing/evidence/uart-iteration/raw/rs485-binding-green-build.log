@@ -1,0 +1,11 @@
+[1/4] Building C object io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.o
+[2/4] Linking C static library lib/libnexus_io.a
+[3/4] Building CXX object tests/contracts/google/CMakeFiles/nexus_uart_rs485_test.dir/uart_rs485_test.cpp.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_uart_rs485_test.dir/uart_rs485_test.cpp.o 
+/usr/bin/c++  -I/workspace/nexus/build/uart-iteration/generated -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/uart-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c++17 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -MD -MT tests/contracts/google/CMakeFiles/nexus_uart_rs485_test.dir/uart_rs485_test.cpp.o -MF tests/contracts/google/CMakeFiles/nexus_uart_rs485_test.dir/uart_rs485_test.cpp.o.d -o tests/contracts/google/CMakeFiles/nexus_uart_rs485_test.dir/uart_rs485_test.cpp.o -c /workspace/nexus/tests/google/uart_rs485_test.cpp
+/workspace/nexus/tests/google/uart_rs485_test.cpp: In member function ‘virtual void UartRs485_InitRejectsConfigOverlappingControlBeforeAnyDirectionStore_Test::TestBody()’:
+/workspace/nexus/tests/google/uart_rs485_test.cpp:302:62: error: static assertion failed
+  302 |     static_assert(sizeof(fresh.inner) + sizeof(fresh.active) >= sizeof(config));
+      |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/uart_rs485_test.cpp:302:62: note: the comparison reduces to ‘(48 >= 56)’
+ninja: build stopped: subcommand failed.

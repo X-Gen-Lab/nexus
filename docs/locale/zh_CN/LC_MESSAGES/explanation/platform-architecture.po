@@ -1,0 +1,200 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 28735b509ad43d0a4e192e4095720df097ed969f1763390d732823e0de8aadbb\n"
+
+msgid "How the platform is assembled and executed"
+msgstr "平台如何装配与执行"
+
+msgid ""
+"Nexus is a statically assembled C11 MCU platform. It separates reusable "
+"mechanisms from external product policy. One authored TOML selects exact "
+"hardware and optional adapters; immutable I/O faces expose the chosen "
+"private providers. The application owns execution and recovery. These are "
+"current design boundaries, not whole-platform physical qualification."
+msgstr ""
+"Nexus 是静态装配的 C11 MCU 平台，将通用机制与外部产品策略分开。一份人工编写的 TOML 选择精确硬件与可选 adapter；不可变 "
+"I/O 接口面暴露所选私有提供者。应用负责执行与恢复。这些是当前设计边界，不代表整个平台已经取得物理资格。"
+
+msgid ""
+"![Current platform layers and external product "
+"boundary](../assets/diagrams/platform-architecture.svg)"
+msgstr "![当前平台分层与外部产品边界](../assets/diagrams/platform-architecture.svg)"
+
+msgid "Current platform layers and external product boundary"
+msgstr "当前平台分层与外部产品边界"
+
+msgid ""
+"FIG-01 expresses current layer responsibilities. Arrows describe labeled "
+"dependencies or access; it is not an initialization sequence."
+msgstr "FIG-01 表达当前各层责任。箭头描述已标明的依赖或访问，不是初始化顺序。"
+
+msgid "Layer"
+msgstr "层"
+
+msgid "State and responsibility"
+msgstr "状态与责任"
+
+msgid "Core"
+msgstr "Core"
+
+msgid "Results, monotonic deadline, request publication and stable epochs"
+msgstr "结果、绝对单调截止时间、请求发布与稳定 epoch"
+
+msgid "Arch"
+msgstr "Arch"
+
+msgid ""
+"Compile-time CPU primitives; incoming masks, barriers, optional "
+"Cache/MPU/SAU"
+msgstr "编译期 CPU 原语；输入中断掩码、屏障和可选缓存／MPU／SAU"
+
+msgid "SoC"
+msgstr "SoC"
+
+msgid ""
+"Exact chip clocks, memory, startup, IRQ/DMA and controller implementation"
+msgstr "精确芯片时钟、内存、启动、IRQ／DMA 和控制器实现"
+
+msgid "Board"
+msgstr "Board"
+
+msgid "Reviewed PCB routes, oscillator/safe-level facts and explicit unknowns"
+msgstr "已审查 PCB 路由、晶振／安全电平事实及明确未知项"
+
+msgid "I/O"
+msgstr "I/O"
+
+msgid "Typed public faces and operation contracts; no vendor layout"
+msgstr "类型化公共接口面与操作合同；不暴露厂商布局"
+
+msgid "Optional OS/owner"
+msgstr "可选 OS／owner"
+
+msgid "Explicit per-object wait, task or shared-resource execution storage"
+msgstr "显式逐对象等待、任务或共享资源执行存储"
+
+msgid "Optional component"
+msgstr "可选组件"
+
+msgid "Bounded algorithms through narrow ports"
+msgstr "通过窄端口实现有界算法"
+
+msgid "External product"
+msgstr "外部产品"
+
+msgid "Main, workers, roles, private PCB, budgets, partitions and recovery"
+msgstr "main、执行任务、角色、私有 PCB、预算、分区与恢复"
+
+msgid "Build-time decisions and runtime work"
+msgstr "构建期决策与运行时工作"
+
+msgid ""
+"The resolver combines authored TOML with reviewed SoC/Board facts into "
+"immutable typed IR and an atomic bundle. It validates modes, resources, "
+"clocks, IRQs, ABI, DMA reachability and budgets. CMake owns the source "
+"dependency graph; the resolver does not discover software from device names "
+"or generate product workers."
+msgstr ""
+"解析器将人工编写的 TOML 与已审查 SoC／Board 事实组合为不可变类型化 IR 及原子生成包。它验证模式、资源、时钟、IRQ、ABI、DMA "
+"可达性与预算。CMake 拥有源码依赖图；解析器不根据设备名称发现软件，也不生成产品执行任务。"
+
+msgid ""
+"![Actual compile-target dependency relationships](../assets/diagrams/build-"
+"targets.svg)"
+msgstr "![实际编译目标依赖关系](../assets/diagrams/build-targets.svg)"
+
+msgid "Actual compile-target dependency relationships"
+msgstr "实际编译目标依赖关系"
+
+msgid ""
+"FIG-02 is the checked compile graph. Vendor and provider includes remain "
+"private; public consumers receive Nexus types and selected compile/link "
+"policy."
+msgstr "FIG-02 是已核对的编译图。厂商和提供者包含路径保持私有；公共消费工程获得 Nexus 类型及所选编译／链接策略。"
+
+msgid ""
+"![Authored inputs, atomic generation and firmware "
+"artifacts](../assets/diagrams/configuration-generation.svg)"
+msgstr "![编写的输入、原子生成与固件产物](../assets/diagrams/configuration-generation.svg)"
+
+msgid "Authored inputs, atomic generation and firmware artifacts"
+msgstr "编写的输入、原子生成与固件产物"
+
+msgid ""
+"FIG-03 shows current generation. Unknown and conflicting selections fail; no"
+" Kconfig/cache/old-header fallback repairs them. Runtime factory lookup "
+"returns an existing face. After explicit successful platform start, ordinary"
+" operations call its shared ops table with its instance context. IRQ "
+"dispatch is fixed to provider instances and does not repeat factory lookup "
+"for every byte."
+msgstr ""
+"FIG-03 表达当前生成流程。未知或冲突选择必须失败；不得通过 "
+"Kconfig／缓存／旧头文件回退修补。运行时类型化工厂查找返回已有接口面。平台显式启动成功后，普通操作通过共享 ops 表调用该实例上下文。IRQ "
+"分发固定到提供者实例，不为每个字节重复执行工厂查找。"
+
+msgid "Lifecycle and failure responsibility"
+msgstr "生命周期与失败责任"
+
+msgid ""
+"![Current initialization, failure withdrawal and retained cleanup "
+"responsibility](../assets/diagrams/platform-lifecycle.svg)"
+msgstr "![当前初始化、失败撤回与保留的清理责任](../assets/diagrams/platform-lifecycle.svg)"
+
+msgid ""
+"Current initialization, failure withdrawal and retained cleanup "
+"responsibility"
+msgstr "当前初始化、失败撤回与保留的清理责任"
+
+msgid ""
+"FIG-05 shows explicit startup and reverse cleanup. A static face can exist "
+"before start and after stop; its pointer is not a capability to execute cold"
+" hardware. Partial failure can retain irreversible watchdog effects or busy "
+"borrows. Products must inspect primary and cleanup outcomes, continue the "
+"real executor, and retain quarantined resources. Platform start never starts"
+" a scheduler."
+msgstr ""
+"FIG-05 表达显式启动与逆序清理。静态接口面可以在启动前和停止后存在；其指针不授予操作未启动硬件的权限。部分失败可能留下不可逆 watchdog "
+"效果或活跃借用。产品必须检查主要结果与清理结果，继续运行真实执行器，并保留隔离资源。平台启动从不启动调度器。"
+
+msgid "Costs and tradeoffs"
+msgstr "成本与取舍"
+
+msgid ""
+"A 32-bit face contains two pointers: eight bytes of readonly storage. "
+"Provider/mode ops are shared; exact mutable state and selected buffers "
+"remain separate. Indirection lets one public interface serve independent "
+"concrete providers and GoogleMock ports. Its cost is one public dispatch and"
+" code/readonly table retention; actual Flash/RAM and timing are measured on "
+"the selected linked image."
+msgstr ""
+"32 位接口面包含两个指针，占用八字节只读存储。提供者／模式的 ops 共享；精确可变状态与所选缓冲区分开。间接调用允许同一公共接口服务独立具体提供者与"
+" GoogleMock 端口。成本是一次公共分发以及保留代码／只读表；实际 Flash／RAM 与时序必须在所选链接镜像上测量。"
+
+msgid ""
+"Static assembly rejects conflicts early and prunes unselected drivers. It "
+"deliberately forgoes hotplug discovery, runtime string registries, arbitrary"
+" dynamic clock changes and automatic recovery policy. Optional shared owners"
+" add explicitly budgeted slots and synchronization; direct single-executor "
+"paths need no default OS lock or worker."
+msgstr ""
+"静态装配提前拒绝冲突，裁剪未选择驱动。它不提供热插拔发现、运行时字符串注册表、任意动态时钟变化或自动恢复策略。可选共享 owner "
+"增加显式预算的槽与同步；直接单执行器路径不需要默认 OS 锁或执行任务。"
+
+msgid ""
+"Read [factory](factory.md), [ownership](ownership.md), the [integration "
+"contract](../design/integration-contracts.md) and [exact "
+"support](../reference/platforms/support.md). Architecture diagrams explain "
+"mechanisms; tests, image checks and HIL establish their separate execution "
+"scopes."
+msgstr ""
+"阅读[类型化工厂](factory.md)、[所有权](ownership.md)、[接入合同](../design/integration-"
+"contracts.md)和[精确支持范围](../reference/platforms/support.md)。架构图解释机制；测试、镜像检查和 "
+"HIL 分别建立各自执行范围。"

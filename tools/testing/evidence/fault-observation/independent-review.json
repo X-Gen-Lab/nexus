@@ -1,0 +1,117 @@
+{
+  "kind": "independent-source-read-only-review",
+  "reviewer": "/root/arch_runtime",
+  "reviewed_at_utc": "2026-10-11T19:39:31.287172+00:00",
+  "executions_by_reviewer": {
+    "tests": 0,
+    "arm_builds": 0,
+    "physical_tests": 0
+  },
+  "source_mutations_by_reviewer": 0,
+  "scope": "IO30 bounded stateless fault observation and actual terminal caller paths",
+  "conclusion": "closed under documented trusted observer and product override contracts; no additional blocking source issue identified",
+  "source_files": [
+    {
+      "path": "core/include/nexus/core/fault.h",
+      "bytes": 2026,
+      "sha256": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b"
+    },
+    {
+      "path": "core/src/fault.c",
+      "bytes": 639,
+      "sha256": "976a3af81cfefa6d7185b7328162825eb08fc4ae25042a543de1fc8369a8367f"
+    },
+    {
+      "path": "os/freertos/hooks.c",
+      "bytes": 1850,
+      "sha256": "08f2b17edeb716fbdacce01b473537fca777e215a7c26569b1680daeabfa6298"
+    },
+    {
+      "path": "os/freertos/include/FreeRTOSConfig.h",
+      "bytes": 7105,
+      "sha256": "a66625ab819e4a978092ee74faba38f13315aa2c032ab8bda83825370f18e428"
+    },
+    {
+      "path": "os/threadx/threadx.c",
+      "bytes": 28434,
+      "sha256": "5c36ec9d70a03bfdaf80e1391482d7b9d963b60c1dc7c3b1f157baa7b8d977ef"
+    },
+    {
+      "path": "os/threadx/m4.c",
+      "bytes": 3145,
+      "sha256": "4db45fb6abceb85f10af071c6cec6eb848a52531573b93f17ec31e47c1f2acc2"
+    },
+    {
+      "path": "os/threadx/include/nexus/os/threadx.h",
+      "bytes": 16484,
+      "sha256": "5d8ca6893cbfa3d35e571b094e453a6adcf5003b1aaf0f705ba5a8bec6db711e"
+    },
+    {
+      "path": "tests/google/freertos_failstop_test.cpp",
+      "bytes": 5641,
+      "sha256": "61f5fa073588525ebcf5a22dfa271ff04b23d5981431dac715c22b216efa01ef"
+    },
+    {
+      "path": "tests/google/threadx_bootstrap_test.cpp",
+      "bytes": 3002,
+      "sha256": "780542ed7455ce7f4a3ddcac531c653d113726ed0d98bdf6ceeda63f916a0bf7"
+    },
+    {
+      "path": "tests/google/threadx_m4_external_test.cpp",
+      "bytes": 3868,
+      "sha256": "d87e0e91d345e677686459812daadd837551779936653b7af2607f7545f11046"
+    },
+    {
+      "path": "tests/google/failstop.cmake",
+      "bytes": 634,
+      "sha256": "b19ddc57a9f6ad5a849e6bdd3812aff286ac4ff18022d0cabba85f70462b605e"
+    },
+    {
+      "path": "arch/cortex_m/nx_arch_cortex_m.c",
+      "bytes": 2330,
+      "sha256": "0f0074a66d1c3ef41d7359381c9b2d3308a4cee0ed1fe9a21d060ccf88795941"
+    },
+    {
+      "path": "arch/native/nx_arch_native.c",
+      "bytes": 3260,
+      "sha256": "a1bf35f6cbcfc6f5d2ec72ebfae1040728055d4bd52aba98757729a7e82da93e"
+    },
+    {
+      "path": "ext/freertos/portable/GCC/ARM_CM4F/portmacro.h",
+      "bytes": 10427,
+      "sha256": "e870959ed8a21b7b13de6db819d4fabddc6a49dfffcbe4d4c931fe82b27ffb2c"
+    }
+  ],
+  "closed_findings": [
+    {
+      "finding": "Pinned FreeRTOS Mainline taskDISABLE_INTERRUPTS writes BASEPRI directly and can weaken a stronger incoming mask.",
+      "counterexample": "Incoming BASEPRI 0x40 with kernel ceiling 0x50 would reopen priority 0x40 on an unconditional store.",
+      "current_resolution": "The default park uses the read-only Arch mask leaf. PRIMASK or FAULTMASK suppress any additional store; equal/stronger nonzero BASEPRI is retained; only zero/weaker BASEPRI takes the normal port disable path.",
+      "proof_scope": "Read of current production, real pinned ARM_CM4F port macro and current death fixture. Owner regression execution is separate; this reviewer did not rerun it."
+    },
+    {
+      "finding": "ThreadX product failure-hook documentation previously assumed privileged fault context.",
+      "current_resolution": "The header now states the actual context is not normalized and can be masked, ISR or unprivileged; the Core observer precedes the product hook and returning does not authorize cleanup.",
+      "proof_scope": "Read of central fail_stop, its bootstrap validation paths and external Tick setup_failed caller."
+    },
+    {
+      "finding": "SIGALRM death-fixture handler previously read ordinary static model/expected fields.",
+      "current_resolution": "The signal handler now reads only volatile sig_atomic_t observed/correct/mask_ok and uses async-signal-safe _Exit. The mask getter/port mock evaluate normal model fields outside the signal handler.",
+      "proof_scope": "Test-fixture correctness correction, not a new production-behavior RED claim."
+    }
+  ],
+  "current_invariants": [
+    "Core weak observer is stateless and returns without side effects; domain/reason/file/line do not create a retained event, registry or worker.",
+    "Default FreeRTOS assert/stack paths observe before terminal masking/park. Stack hook does not inspect possibly corrupt task/name pointers.",
+    "ThreadX central and M4 external-Tick failure paths observe before the product hook and park even if that hook returns.",
+    "Returning observation does not complete, cancel or reclaim accepted requests or provider storage.",
+    "Strong FreeRTOS assertion override is documented to remain non-returning and must explicitly invoke observation if preserving that observation contract."
+  ],
+  "limits": [
+    "Observer boundedness, no reentrancy, no mask mutation, no OS lock and no request mutation are trusted product integration obligations; no mechanical callback timeout, reentrancy guard or strong-hook enforcement is added.",
+    "A functioning kernel, stack, clock, transport, peripheral permissions or privileged context is not established by observation.",
+    "Kernel BASEPRI masking does not prove high-priority IRQ, NMI, DMA or wire quiescence. ThreadX general failure park does not add a global interrupt mask.",
+    "No safety-output state, hardware reset, physical timing, HIL, MPU/SVC or TrustZone qualification follows from this review.",
+    "Owner raw RED/GREEN execution evidence remains distinct and was not rerun or counted as independent execution here."
+  ]
+}

@@ -1,0 +1,244 @@
+/*
+ * FreeRTOS Kernel V11.1.0
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * https://www.FreeRTOS.org
+ * https://github.com/FreeRTOS
+ *
+ */
+
+/*-----------------------------------------------------------
+* Implementation of functions defined in portable.h for the ARM CM4 MPU port.
+*----------------------------------------------------------*/
+
+/* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
+ * all the API functions to use the MPU wrappers.  That should only be done when
+ * task.h is included from an application file. */
+#define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+
+/* Scheduler includes. */
+
+#define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+#include "FreeRTOS.h"
+#include "task.h"
+#include "guard.h"
+#include "mpu_port_model.h"
+nx_freertos_mpu_start_t xNexusMpuStart;
+void prvRestoreContextOfFirstTask(void);
+void vRestoreContextOfFirstTask(void);
+void vPortYield(void);
+#define portOFFSET_TO_PC                          ( 6 )
+#define portEXPECTED_MPU_TYPE_VALUE               ( configTOTAL_MPU_REGIONS << 8UL )
+#define portMPU_ENABLE                            ( 0x01UL )
+#define portMPU_BACKGROUND_ENABLE                 ( 1UL << 2UL )
+#define portMPU_REGION_VALID                      ( 0x10UL )
+#define portMPU_REGION_ENABLE                     ( 0x01UL )
+#define portNVIC_MEM_FAULT_ENABLE                 ( 1UL << 16UL )
+#undef portNVIC_INT_CTRL_REG
+#define portNVIC_INT_CTRL_REG (*nx_mpu_model_register(NX_MPU_REG_PENDSV))
+#define portMPU_TYPE_REG (*nx_mpu_model_register(NX_MPU_REG_TYPE))
+#define portMPU_REGION_BASE_ADDRESS_REG (*nx_mpu_model_register(NX_MPU_REG_BASE))
+#define portMPU_REGION_ATTRIBUTE_REG (*nx_mpu_model_register(NX_MPU_REG_ATTRIBUTES))
+#define portMPU_CTRL_REG (*nx_mpu_model_register(NX_MPU_REG_CONTROL))
+#define portNVIC_SYS_CTRL_STATE_REG (*nx_mpu_model_register(NX_MPU_REG_FAULT))
+void vSVCHandler_C( uint32_t * pulParam, uint32_t ulNexusExceptionReturn );
+void vSVCHandler_C( uint32_t * pulParam, uint32_t ulNexusExceptionReturn ) /* PRIVILEGED_FUNCTION */
+{
+    uint8_t ucSVCNumber;
+    uint32_t ulPC;
+
+    #if ( ( configUSE_MPU_WRAPPERS_V1 == 1 ) && ( configENFORCE_SYSTEM_CALLS_FROM_KERNEL_ONLY == 1 ) )
+        #if defined( __ARMCC_VERSION )
+
+            /* Declaration when these variable are defined in code instead of being
+             * exported from linker scripts. */
+            extern uint32_t * __syscalls_flash_start__;
+            extern uint32_t * __syscalls_flash_end__;
+        #else
+            /* Declaration when these variable are exported from linker scripts. */
+            extern uint32_t __syscalls_flash_start__[];
+            extern uint32_t __syscalls_flash_end__[];
+        #endif /* #if defined( __ARMCC_VERSION ) */
+    #endif /* #if ( ( configUSE_MPU_WRAPPERS_V1 == 1 ) && ( configENFORCE_SYSTEM_CALLS_FROM_KERNEL_ONLY == 1 ) ) */
+
+    /* The stack contains: r0, r1, r2, r3, r12, LR, PC and xPSR.  The first
+     * argument (r0) is pulParam[ 0 ]. */
+    ulPC = pulParam[ portOFFSET_TO_PC ];
+    ucSVCNumber = nx_mpu_model_opcode(ulPC);
+
+    switch( ucSVCNumber )
+    {
+        case portSVC_START_SCHEDULER:
+            if( nx_freertos_mpu_start_consume(&xNexusMpuStart, pulParam, ulNexusExceptionReturn) == pdFALSE ) { return; }
+            prvRestoreContextOfFirstTask();
+            break;
+
+        case portSVC_YIELD:
+            portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT;
+
+            /* Barriers are normally not required
+             * but do ensure the code is completely
+             * within the specified behaviour for the
+             * architecture. */
+            nx_mpu_model_barrier();
+            nx_mpu_model_barrier();
+
+            break;
+
+    #if ( configUSE_MPU_WRAPPERS_V1 == 1 )
+        #if ( configENFORCE_SYSTEM_CALLS_FROM_KERNEL_ONLY == 1 )
+            case portSVC_RAISE_PRIVILEGE: /* Only raise the privilege, if the
+                                           * svc was raised from any of the
+                                           * system calls. */
+
+                if( ( ulPC >= ( uint32_t ) __syscalls_flash_start__ ) &&
+                    ( ulPC <= ( uint32_t ) __syscalls_flash_end__ ) )
+                {
+                    __asm volatile
+                    (
+                        "   mrs r1, control     \n" /* Obtain current control value. */
+                        "   bic r1, #1          \n" /* Set privilege bit. */
+                        "   msr control, r1     \n" /* Write back new control value. */
+                        ::: "r1", "memory"
+                    );
+                }
+
+                break;
+        #else /* if ( configENFORCE_SYSTEM_CALLS_FROM_KERNEL_ONLY == 1 ) */
+            case portSVC_RAISE_PRIVILEGE:
+                __asm volatile
+                (
+                    "   mrs r1, control     \n" /* Obtain current control value. */
+                    "   bic r1, #1          \n" /* Set privilege bit. */
+                    "   msr control, r1     \n" /* Write back new control value. */
+                    ::: "r1", "memory"
+                );
+                break;
+        #endif /* #if( configENFORCE_SYSTEM_CALLS_FROM_KERNEL_ONLY == 1 ) */
+    #endif /* #if ( configUSE_MPU_WRAPPERS_V1 == 1 ) */
+
+        default: /* Unknown SVC call. */
+            break;
+    }
+}
+static uint32_t prvGetMPURegionSizeSetting( uint32_t ulActualSizeInBytes )
+{
+    uint32_t ulRegionSize, ulReturnValue = 4;
+
+    /* 32 is the smallest region size, 31 is the largest valid value for
+     * ulReturnValue. */
+    for( ulRegionSize = 32UL; ulReturnValue < 31UL; ( ulRegionSize <<= 1UL ) )
+    {
+        if( ulActualSizeInBytes <= ulRegionSize )
+        {
+            break;
+        }
+        else
+        {
+            ulReturnValue++;
+        }
+    }
+
+    /* Shift the code by one before returning so it can be written directly
+     * into the the correct bit position of the attribute register. */
+    return( ulReturnValue << 1UL );
+}
+static void prvSetupMPU( void )
+{
+    #if defined( __ARMCC_VERSION )
+
+        /* Declaration when these variable are defined in code instead of being
+         * exported from linker scripts. */
+        extern uint32_t * __privileged_functions_start__;
+        extern uint32_t * __privileged_functions_end__;
+        extern uint32_t * __privileged_data_start__;
+        extern uint32_t * __privileged_data_end__;
+    #else
+        /* Declaration when these variable are exported from linker scripts. */
+        extern uint32_t __privileged_functions_start__[];
+        extern uint32_t __privileged_functions_end__[];
+        extern uint32_t __privileged_data_start__[];
+        extern uint32_t __privileged_data_end__[];
+    #endif /* if defined( __ARMCC_VERSION ) */
+
+    /* The only permitted number of regions are 8 or 16. */
+    configASSERT( ( configTOTAL_MPU_REGIONS == 8 ) || ( configTOTAL_MPU_REGIONS == 16 ) );
+
+    /* Ensure that the configTOTAL_MPU_REGIONS is configured correctly. */
+    configASSERT( portMPU_TYPE_REG == portEXPECTED_MPU_TYPE_VALUE );
+
+    /* Check the expected MPU is present. */
+    if( portMPU_TYPE_REG == portEXPECTED_MPU_TYPE_VALUE )
+    {
+        /* First setup the unprivileged flash for unprivileged read only access. */
+        portMPU_REGION_BASE_ADDRESS_REG = ( nx_mpu_model_link_address(__nexus_user_flash_start__) ) | /* Base address. */
+                                          ( portMPU_REGION_VALID ) |
+                                          ( portUNPRIVILEGED_FLASH_REGION );
+
+        portMPU_REGION_ATTRIBUTE_REG = ( portMPU_REGION_READ_ONLY ) |
+                                       ( ( configTEX_S_C_B_FLASH & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) |
+                                       ( prvGetMPURegionSizeSetting( nx_mpu_model_link_address(__nexus_user_flash_end__) - nx_mpu_model_link_address(__nexus_user_flash_start__) ) ) |
+                                       ( portMPU_REGION_ENABLE );
+
+        /* Setup the privileged flash for privileged only access.  This is where
+         * the kernel code is placed. */
+        portMPU_REGION_BASE_ADDRESS_REG = ( nx_mpu_model_link_address(__privileged_functions_start__) ) | /* Base address. */
+                                          ( portMPU_REGION_VALID ) |
+                                          ( portPRIVILEGED_FLASH_REGION );
+
+        portMPU_REGION_ATTRIBUTE_REG = ( portMPU_REGION_PRIVILEGED_READ_ONLY ) |
+                                       ( ( configTEX_S_C_B_FLASH & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) |
+                                       ( prvGetMPURegionSizeSetting( nx_mpu_model_link_address(__privileged_functions_end__) - nx_mpu_model_link_address(__privileged_functions_start__) ) ) |
+                                       ( portMPU_REGION_ENABLE );
+
+        /* Setup the privileged data RAM region.  This is where the kernel data
+         * is placed. */
+        portMPU_REGION_BASE_ADDRESS_REG = ( nx_mpu_model_link_address(__privileged_data_start__) ) | /* Base address. */
+                                          ( portMPU_REGION_VALID ) |
+                                          ( portPRIVILEGED_RAM_REGION );
+
+        portMPU_REGION_ATTRIBUTE_REG = ( portMPU_REGION_PRIVILEGED_READ_WRITE ) |
+                                       ( portMPU_REGION_EXECUTE_NEVER ) |
+                                       ( ( configTEX_S_C_B_SRAM & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) |
+                                       prvGetMPURegionSizeSetting( nx_mpu_model_link_address(__privileged_data_end__) - nx_mpu_model_link_address(__privileged_data_start__) ) |
+                                       ( portMPU_REGION_ENABLE );
+
+        /* Nexus: exact read-only executable SVC window. Privileged MMIO
+         * uses the enabled background map; users have no peripheral grant. */
+        portMPU_REGION_BASE_ADDRESS_REG = ( nx_mpu_model_link_address(__nexus_syscall_flash_start__) ) |
+                                          ( portMPU_REGION_VALID ) |
+                                          ( portGENERAL_PERIPHERALS_REGION );
+
+        portMPU_REGION_ATTRIBUTE_REG = ( portMPU_REGION_READ_ONLY ) |
+                                       ( ( configTEX_S_C_B_FLASH & portMPU_RASR_TEX_S_C_B_MASK ) << portMPU_RASR_TEX_S_C_B_LOCATION ) |
+                                       ( prvGetMPURegionSizeSetting( nx_mpu_model_link_address(__nexus_syscall_flash_end__) - nx_mpu_model_link_address(__nexus_syscall_flash_start__) ) ) |
+                                       ( portMPU_REGION_ENABLE );
+
+        /* Enable the memory fault exception. */
+        portNVIC_SYS_CTRL_STATE_REG |= portNVIC_MEM_FAULT_ENABLE;
+
+        /* Enable the MPU with the background region configured. */
+        portMPU_CTRL_REG |= ( portMPU_ENABLE | portMPU_BACKGROUND_ENABLE );
+    }
+}
+void nx_mpu_model_setup(void) { prvSetupMPU(); }
+void nx_mpu_model_dispatch(uint32_t *frame, uint32_t return_state) { vSVCHandler_C(frame, return_state); }

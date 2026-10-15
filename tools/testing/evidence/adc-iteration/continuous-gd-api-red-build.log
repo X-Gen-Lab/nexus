@@ -1,0 +1,57 @@
+[0/1] Re-running CMake...
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /workspace/nexus/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /workspace/nexus/build/adc-iteration/generated/resolved.json
+-- Configuring done (0.7s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/nexus/build/adc-iteration
+[1/6] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc.c.o
+[2/6] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/__/soc/gd32f470/drivers/adc_stream.c.o
+[3/6] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/__/contracts/gd32_model/model.c.o
+[4/6] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/gd32_adc_stream_test.cpp.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/gd32_adc_stream_test.cpp.o 
+/usr/bin/c++ -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/tests/contracts/gd32_model -I/workspace/nexus/arch/include -I/workspace/nexus/build/adc-iteration/generated -I/workspace/nexus/io/include -I/workspace/nexus/core/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c++17 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -MD -MT tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/gd32_adc_stream_test.cpp.o -MF tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/gd32_adc_stream_test.cpp.o.d -o tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/gd32_adc_stream_test.cpp.o -c /workspace/nexus/tests/google/gd32_adc_stream_test.cpp
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp:289:5: error: ‘nx_gd32_adc_continuous_state_t’ does not name a type; did you mean ‘nx_gd32_adc_stream_state_t’?
+  289 |     nx_gd32_adc_continuous_state_t state = {};
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |     nx_gd32_adc_stream_state_t
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp:296:34: error: ‘nx_gd32_adc_continuous_ops’ was not declared in this scope; did you mean ‘nx_gd32_adc_stream_ops’?
+  296 |     const nx_adc_port_t port = {&nx_gd32_adc_continuous_ops, &state};
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                  nx_gd32_adc_stream_ops
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp:296:63: error: ‘state’ was not declared in this scope; did you mean ‘statx’?
+  296 |     const nx_adc_port_t port = {&nx_gd32_adc_continuous_ops, &state};
+      |                                                               ^~~~~
+      |                                                               statx
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp: In member function ‘virtual void GD32ADCContinuous::SetUp()’:
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp:316:9: error: ‘state’ was not declared in this scope; did you mean ‘statx’?
+  316 |         state.base.regions = regions;
+      |         ^~~~~
+      |         statx
+In file included from /workspace/nexus/build/adc-iteration/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include/gtest/gtest.h:71,
+                 from /workspace/nexus/tests/google/gd32_adc_stream_test.cpp:20:
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp:320:19: error: ‘nx_gd32_adc_continuous_initialize’ was not declared in this scope; did you mean ‘nx_gd32_adc_stream_initialize’?
+  320 |         ASSERT_EQ(nx_gd32_adc_continuous_initialize(
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp: In member function ‘virtual void GD32ADCContinuous::TearDown()’:
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp:333:52: error: ‘state’ was not declared in this scope; did you mean ‘statx’?
+  333 |             EXPECT_EQ(nx_gd32_adc_continuous_stop(&state), NX_SUCCESS);
+      |                                                    ^~~~~
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp:333:23: error: ‘nx_gd32_adc_continuous_stop’ was not declared in this scope; did you mean ‘nx_gd32_adc_stream_stop’?
+  333 |             EXPECT_EQ(nx_gd32_adc_continuous_stop(&state), NX_SUCCESS);
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp: In member function ‘void GD32ADCContinuous::Complete(unsigned int)’:
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp:349:37: error: ‘state’ was not declared in this scope; did you mean ‘statx’?
+  349 |         nx_gd32_adc_continuous_irq(&state);
+      |                                     ^~~~~
+      |                                     statx
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp:349:9: error: ‘nx_gd32_adc_continuous_irq’ was not declared in this scope; did you mean ‘nx_gd32_adc_stream_irq’?
+  349 |         nx_gd32_adc_continuous_irq(&state);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |         nx_gd32_adc_stream_irq
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp: In member function ‘virtual void GD32ADCContinuous_FailedDisableRetainsBothTargetsUntilReadback_Test::TestBody()’:
+/workspace/nexus/tests/google/gd32_adc_stream_test.cpp:396:15: error: ‘state’ was not declared in this scope; did you mean ‘statx’?
+  396 |     EXPECT_EQ(state.posted.pending, 2U);
+      |               ^~~~~
+ninja: build stopped: subcommand failed.

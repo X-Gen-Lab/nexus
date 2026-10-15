@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="33" failures="5" disabled="0" errors="0" time="0." timestamp="2026-10-11T18:09:41.086" name="AllTests">
+  <testsuite name="EthernetMac" tests="33" failures="5" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T18:09:41.086">
+    <testcase name="OwnHandoffRetainsBorrowUntilRealTransmitStatus" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="193" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="HeldReceiveLoanIsNeverOverwrittenAtRingWrap" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="209" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="CancellationWaitsForActualEngineAndFifoDrain" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="225" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="InvalidDomainRejectsBeforeResetOrOwnPublication" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="246" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="MdioTimeoutDoesNotInventReadValueOrClearBusy" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="252" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="ReceiveOutputCannotAliasDmaBufferOrOtherLoans" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="262" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="StateAndMdioOutputCannotOverwriteProviderStorage" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="271" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="LateFatalIrqClosesAdmissionBeforeNewOwnPublication" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="281" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="InitializationCannotResetForeignDescriptorEngine" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="289" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="StopDoesNotReclaimStuckOwnOrHeldLoan" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="295" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="CapturedWakeRemainsBorrowedDuringItsCallback" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="313" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="CrcLengthFragmentAndVlanAreDiscardedWithoutBorrow" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="353" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="RingFullRejectsWithoutChangingRejectedRequest" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="369" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="UnalignedPayloadRejectsWithoutDescriptorEffects" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="382" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="FatalBusErrorCannotTurnMissingStatusIntoSuccess" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="391" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="UnderflowIsLatchedAndDrainedWithoutReplay" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="403" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="CancelPreservesAlreadyReturnedWireSuccess" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="414" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="FrameMetadataMustRemainValidForEveryOutstandingBorrow" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="429" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="CoalescedCompletionsRependAfterConstantIrqBudget" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="446" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="WakeBindingUsesActualPriorityAfterExternalChange" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="464" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="MdioCompletionAtDeadlineDoesNotPublishLateValue" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="486" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="ResetAcknowledgementAtDeadlineRetainsStartupOwner" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="494" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="504" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="ModifiedReceiveTokenCannotRearmOriginalLoan" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="514" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="ReceiveTokenBindsExactProviderIdentity" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="525" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="LinkChangeRequiresBothDirectionsQuiet" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="538" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="SameObservedLinkDoesNotRewriteActiveEngine" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="550" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="LinkDownMustDrainRxBeforeReconfiguration" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="558" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac" />
+    <testcase name="WakeTargetCannotResideInDmaReceiveStorage" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="578" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac">
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:583&#x0A;Expected equality of these values:&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;  nx_eth_port_attach_wake(&amp;port, in_dma, 0)&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:583
+Expected equality of these values:
+  NX_ERROR_INVALID
+    Which is: 1
+  nx_eth_port_attach_wake(&port, in_dma, 0)
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:584&#x0A;Expected equality of these values:&#x0A;  nullptr&#x0A;    Which is: NULL&#x0A;  mac.wake&#x0A;    Which is: 0x559a9efa0598&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:584
+Expected equality of these values:
+  nullptr
+    Which is: NULL
+  mac.wake
+    Which is: 0x559a9efa0598
+]]></failure>
+    </testcase>
+    <testcase name="KnownWakeStorageCannotBeUsedAsMutableOutput" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="586" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac">
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:593&#x0A;Expected equality of these values:&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;  nx_mdio_read(&amp;mdio, 1, 2, reinterpret_cast&lt;uint16_t*&gt;(storage), now + 100)&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:593
+Expected equality of these values:
+  NX_ERROR_INVALID
+    Which is: 1
+  nx_mdio_read(&mdio, 1, 2, reinterpret_cast<uint16_t*>(storage), now + 100)
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:596&#x0A;Expected equality of these values:&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;  nx_eth_port_state(&amp;port, reinterpret_cast&lt;nx_eth_state_t*&gt;(storage))&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:596
+Expected equality of these values:
+  NX_ERROR_INVALID
+    Which is: 1
+  nx_eth_port_state(&port, reinterpret_cast<nx_eth_state_t*>(storage))
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:599&#x0A;Expected equality of these values:&#x0A;  0&#x0A;  std::memcmp(storage, &amp;wake, sizeof(wake))&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:599
+Expected equality of these values:
+  0
+  std::memcmp(storage, &wake, sizeof(wake))
+    Which is: 1
+]]></failure>
+    </testcase>
+    <testcase name="RequestMetadataCannotOverwriteBorrowedWakeTarget" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="601" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac">
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:615&#x0A;Expected equality of these values:&#x0A;  NX_ERROR_INVALID&#x0A;    Which is: 1&#x0A;  nx_eth_port_submit(&amp;port, aliased)&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:615
+Expected equality of these values:
+  NX_ERROR_INVALID
+    Which is: 1
+  nx_eth_port_submit(&port, aliased)
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:616&#x0A;Expected equality of these values:&#x0A;  NX_REQUEST_READY&#x0A;    Which is: 0&#x0A;  nx_request_state(&amp;aliased-&gt;base)&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:616
+Expected equality of these values:
+  NX_REQUEST_READY
+    Which is: 0
+  nx_request_state(&aliased->base)
+    Which is: 2
+]]></failure>
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:617&#x0A;Expected equality of these values:&#x0A;  nullptr&#x0A;    Which is: NULL&#x0A;  txslots[0].request&#x0A;    Which is: 0x7ffc40815f20&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:617
+Expected equality of these values:
+  nullptr
+    Which is: NULL
+  txslots[0].request
+    Which is: 0x7ffc40815f20
+]]></failure>
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:618&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  tx[0].status &amp; own&#x0A;    Which is: 2147483648&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:618
+Expected equality of these values:
+  0U
+    Which is: 0
+  tx[0].status & own
+    Which is: 2147483648
+]]></failure>
+    </testcase>
+    <testcase name="WakeReplacementRechecksPublisherAfterColdValidation" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="650" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.086" classname="EthernetMac">
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:662&#x0A;Expected equality of these values:&#x0A;  NX_ERROR_BUSY&#x0A;    Which is: 2&#x0A;  replaced&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:662
+Expected equality of these values:
+  NX_ERROR_BUSY
+    Which is: 2
+  replaced
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:663&#x0A;Expected equality of these values:&#x0A;  &amp;old_wake&#x0A;    Which is: 0x7ffc40815f40&#x0A;  mac.wake&#x0A;    Which is: 0x7ffc40815f20&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:663
+Expected equality of these values:
+  &old_wake
+    Which is: 0x7ffc40815f40
+  mac.wake
+    Which is: 0x7ffc40815f20
+]]></failure>
+    </testcase>
+    <testcase name="StopRechecksCapturedPublisherAfterNvicDisableBoundary" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp" line="666" status="run" result="completed" time="0." timestamp="2026-10-11T18:09:41.087" classname="EthernetMac">
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:678&#x0A;Expected equality of these values:&#x0A;  NX_ERROR_BUSY&#x0A;    Which is: 2&#x0A;  nx_eth_port_stop(&amp;port)&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:678
+Expected equality of these values:
+  NX_ERROR_BUSY
+    Which is: 2
+  nx_eth_port_stop(&port)
+    Which is: 0
+]]></failure>
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:679&#x0A;Value of: mac.retained&#x0A;  Actual: false&#x0A;Expected: true&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:679
+Value of: mac.retained
+  Actual: false
+Expected: true
+]]></failure>
+      <failure message="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:680&#x0A;Expected equality of these values:&#x0A;  &amp;wake&#x0A;    Which is: 0x7ffc40815ed0&#x0A;  mac.wake&#x0A;    Which is: NULL&#x0A;" type=""><![CDATA[/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_mac_test.cpp:680
+Expected equality of these values:
+  &wake
+    Which is: 0x7ffc40815ed0
+  mac.wake
+    Which is: NULL
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,126 @@
+{
+  "board": "gd32f470zg-controller-link-fixture",
+  "budget": {
+    "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/nexus-sdk/generated/resource-budget.json",
+    "sha256": "4f7ab7028e51eda4f011fe5bdbf6293365cf49554b5685ff746f97a76d3e6b00",
+    "size": 207
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/assembly.toml",
+        "sha256": "1aef561365c91557f1cdd60f0b81d881741568112de963a1660395dc89496e07",
+        "size": 301
+      },
+      "label": "external/assembly.toml"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+        "size": 585
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/gd32f470/routes.json",
+        "sha256": "94a5fc91b937528f1584e664e8579752501510849880e8042f5dba7af21e3fcf",
+        "size": 9902
+      },
+      "label": "soc/gd32f470/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/gd32f470/soc.json",
+        "sha256": "e7fc188046b6c1cd0acd760ab59739c549e0532dc30498ee0bbe4a83b7fc465f",
+        "size": 9471
+      },
+      "label": "soc/gd32f470/soc.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tests/contracts/gd32_assembly/software_board/board.json",
+        "sha256": "114399829ffc7af5be1ea6932122aa3bab8bf01f4cdfea000e31e9caf1dc78f9",
+        "size": 2216
+      },
+      "label": "tests/contracts/gd32_assembly/software_board/board.json"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/bin/lowpower_fixture.elf",
+    "sha256": "71a8c082068673375bbfb793d285c4f9fdb6f96f0abea6ebb0285739b5b6a67e",
+    "size": 24916
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 1048576,
+      "footprint_bytes": 7376,
+      "loaded_bytes": 7376,
+      "ranges": [
+        [
+          134217728,
+          134225104
+        ]
+      ]
+    },
+    "ram": {
+      "addsram": {
+        "capacity_bytes": 262144,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      },
+      "sram": {
+        "capacity_bytes": 196608,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536871864
+          ],
+          [
+            537065472,
+            537067520
+          ]
+        ],
+        "reserved_bytes": 3000
+      },
+      "tcm": {
+        "capacity_bytes": 65536,
+        "linker_supported": false,
+        "ranges": [],
+        "reserved_bytes": 0
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "sram",
+        "end": 536871864,
+        "start": 536871864
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "sram",
+        "end": 537067520,
+        "start": 537065472
+      }
+    }
+  },
+  "part": "GD32F470ZGT6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-io-implementation-evidence/lowpower-timebase-tdd/arm-green-tools/gd32f470-custom/build/nexus-sdk/generated/resolved.json",
+    "sha256": "4e9ed39fa391f32bd59d81e11a2e29cb223fa3428b9b07b9b5107b976f7cffd0",
+    "size": 25517
+  },
+  "schema_version": 1,
+  "soc_family": "gd32f470",
+  "status": "passed",
+  "violations": []
+}

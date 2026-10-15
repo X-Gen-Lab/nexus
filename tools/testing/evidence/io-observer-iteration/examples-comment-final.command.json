@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/workspace/nexus/.venv/bin/python",
+    "/workspace/nexus/scripts/ci/comment_style.py",
+    "--root",
+    "/workspace/nexus-examples",
+    "--files",
+    "apps/uart_owner_runtime/main.c",
+    "apps/uart_owner_runtime/quarantine_policy.c",
+    "apps/uart_owner_runtime/quarantine_policy.h",
+    "tests/quarantine_policy_test.cpp",
+    "--json"
+  ],
+  "returncode": 2,
+  "start": 1791740443.4964695,
+  "end": 1791740443.53784
+}

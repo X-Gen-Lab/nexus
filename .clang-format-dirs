@@ -1,58 +1,30 @@
-# Nexus Code Formatting Configuration
-# This file specifies which directories should be formatted by clang-format
-# Lines starting with '#' are comments
-# Lines starting with '!' are exclusion patterns
-
-# =============================================================================
-# Directories to format (relative to project root)
-# =============================================================================
-
-# Hardware Abstraction Layer
-hal
-
-# Operating System Abstraction Layer
-osal
-
-# Platform-specific code
-platforms
-
-# Application code
-applications
-
-# Framework code
-framework
-
-# Unit tests and integration tests
+# Owned C/C++ source. New/changed files use the unchanged root style strictly.
+core
+io
+os
+components
+arch
+soc
+boards
 tests
+tools/measurement
 
-# =============================================================================
-# Directories to exclude (third-party code)
-# Use '!' prefix to mark exclusion patterns
-# =============================================================================
-
-# Third-party libraries
+# External source and generated outputs are not maintained source.
 !ext
 !ext/*
-
-# Vendor SDKs
 !vendors
 !vendors/*
-
-# Build directories
+!vendor
+!vendor/*
+!*/vendor
+!*/vendor/*
 !build
 !build-*
 !_build
 !cmake-build-*
-
-# Documentation
 !docs
-
-# Scripts (not C/C++ code)
 !scripts
 
-# =============================================================================
-# File extensions to format
-# =============================================================================
 [extensions]
 .c
 .h
@@ -60,3 +32,4 @@ tests
 .hpp
 .cc
 .hh
+.inc

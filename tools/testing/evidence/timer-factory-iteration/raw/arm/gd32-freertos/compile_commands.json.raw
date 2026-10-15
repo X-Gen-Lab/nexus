@@ -1,0 +1,422 @@
+[
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/include -I/workspace/nexus/os/freertos/../../ext/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/portable/GCC/ARM_CM4F -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj -c /workspace/nexus/tests/contracts/timer_assembly/controller_main.c",
+  "file": "/workspace/nexus/tests/contracts/timer_assembly/controller_main.c",
+  "output": "CMakeFiles/timer_controller_fixture.dir/controller_main.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -o CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S.obj -c /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S",
+  "file": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S",
+  "output": "CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/gd32f470/system.c.obj -c /workspace/nexus/soc/gd32f470/system.c",
+  "file": "/workspace/nexus/soc/gd32f470/system.c",
+  "output": "CMakeFiles/timer_controller_fixture_nexus_startup.dir/workspace/nexus/soc/gd32f470/system.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/io/private -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj -c /workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated/bindings.c",
+  "file": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated/bindings.c",
+  "output": "nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/core/CMakeFiles/nexus_core.dir/src/time.c.obj -c /workspace/nexus/core/src/time.c",
+  "file": "/workspace/nexus/core/src/time.c",
+  "output": "nexus-sdk/core/CMakeFiles/nexus_core.dir/src/time.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request.c.obj -c /workspace/nexus/core/src/request.c",
+  "file": "/workspace/nexus/core/src/request.c",
+  "output": "nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request_observer.c.obj -c /workspace/nexus/core/src/request_observer.c",
+  "file": "/workspace/nexus/core/src/request_observer.c",
+  "output": "nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request_observer.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/core/CMakeFiles/nexus_core.dir/src/stack_observation.c.obj -c /workspace/nexus/core/src/stack_observation.c",
+  "file": "/workspace/nexus/core/src/stack_observation.c",
+  "output": "nexus-sdk/core/CMakeFiles/nexus_core.dir/src/stack_observation.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/core/CMakeFiles/nexus_core.dir/src/fault.c.obj -c /workspace/nexus/core/src/fault.c",
+  "file": "/workspace/nexus/core/src/fault.c",
+  "output": "nexus-sdk/core/CMakeFiles/nexus_core.dir/src/fault.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DNEXUS_ARCH_DCACHE_LINE_BYTES=0 -DNEXUS_ARCH_HAS_DWT_CYCCNT=1 -DNEXUS_ARCH_HAS_SAU=0 -DNEXUS_ARCH_ICACHE_LINE_BYTES=0 -DNEXUS_ARCH_MPU_VERSION=7 -DNEXUS_ARCH_SECURITY_STATE=0 -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cortex_m.c.obj -c /workspace/nexus/arch/cortex_m/nx_arch_cortex_m.c",
+  "file": "/workspace/nexus/arch/cortex_m/nx_arch_cortex_m.c",
+  "output": "nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cortex_m.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DNEXUS_ARCH_DCACHE_LINE_BYTES=0 -DNEXUS_ARCH_HAS_DWT_CYCCNT=1 -DNEXUS_ARCH_HAS_SAU=0 -DNEXUS_ARCH_ICACHE_LINE_BYTES=0 -DNEXUS_ARCH_MPU_VERSION=7 -DNEXUS_ARCH_SECURITY_STATE=0 -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.obj -c /workspace/nexus/arch/cortex_m/nx_arch_cache.c",
+  "file": "/workspace/nexus/arch/cortex_m/nx_arch_cache.c",
+  "output": "nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DNEXUS_ARCH_DCACHE_LINE_BYTES=0 -DNEXUS_ARCH_HAS_DWT_CYCCNT=1 -DNEXUS_ARCH_HAS_SAU=0 -DNEXUS_ARCH_ICACHE_LINE_BYTES=0 -DNEXUS_ARCH_MPU_VERSION=7 -DNEXUS_ARCH_SECURITY_STATE=0 -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.obj -c /workspace/nexus/arch/cortex_m/nx_arch_mpu.c",
+  "file": "/workspace/nexus/arch/cortex_m/nx_arch_mpu.c",
+  "output": "nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DNEXUS_ARCH_DCACHE_LINE_BYTES=0 -DNEXUS_ARCH_HAS_DWT_CYCCNT=1 -DNEXUS_ARCH_HAS_SAU=0 -DNEXUS_ARCH_ICACHE_LINE_BYTES=0 -DNEXUS_ARCH_MPU_VERSION=7 -DNEXUS_ARCH_SECURITY_STATE=0 -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.obj -c /workspace/nexus/arch/cortex_m/nx_arch_security.c",
+  "file": "/workspace/nexus/arch/cortex_m/nx_arch_security.c",
+  "output": "nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DNEXUS_ARCH_DCACHE_LINE_BYTES=0 -DNEXUS_ARCH_HAS_DWT_CYCCNT=1 -DNEXUS_ARCH_HAS_SAU=0 -DNEXUS_ARCH_ICACHE_LINE_BYTES=0 -DNEXUS_ARCH_MPU_VERSION=7 -DNEXUS_ARCH_SECURITY_STATE=0 -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.obj -c /workspace/nexus/arch/cortex_m/nx_arch_sleep.c",
+  "file": "/workspace/nexus/arch/cortex_m/nx_arch_sleep.c",
+  "output": "nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/gpio.c.obj -c /workspace/nexus/io/src/gpio.c",
+  "file": "/workspace/nexus/io/src/gpio.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/gpio.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart.c.obj -c /workspace/nexus/io/src/uart.c",
+  "file": "/workspace/nexus/io/src/uart.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/spi.c.obj -c /workspace/nexus/io/src/spi.c",
+  "file": "/workspace/nexus/io/src/spi.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/spi.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c.c.obj -c /workspace/nexus/io/src/i2c.c",
+  "file": "/workspace/nexus/io/src/i2c.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash.c.obj -c /workspace/nexus/io/src/flash.c",
+  "file": "/workspace/nexus/io/src/flash.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/watchdog.c.obj -c /workspace/nexus/io/src/watchdog.c",
+  "file": "/workspace/nexus/io/src/watchdog.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/watchdog.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/exti.c.obj -c /workspace/nexus/io/src/exti.c",
+  "file": "/workspace/nexus/io/src/exti.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/exti.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer.c.obj -c /workspace/nexus/io/src/timer.c",
+  "file": "/workspace/nexus/io/src/timer.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc.c.obj -c /workspace/nexus/io/src/adc.c",
+  "file": "/workspace/nexus/io/src/adc.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash_region.c.obj -c /workspace/nexus/io/src/flash_region.c",
+  "file": "/workspace/nexus/io/src/flash_region.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash_region.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/dma.c.obj -c /workspace/nexus/io/src/dma.c",
+  "file": "/workspace/nexus/io/src/dma.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/dma.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream.c.obj -c /workspace/nexus/io/src/stream.c",
+  "file": "/workspace/nexus/io/src/stream.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/wake.c.obj -c /workspace/nexus/io/src/wake.c",
+  "file": "/workspace/nexus/io/src/wake.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/wake.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.obj -c /workspace/nexus/io/src/i2c_bus_clear.c",
+  "file": "/workspace/nexus/io/src/i2c_bus_clear.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc_observer.c.obj -c /workspace/nexus/io/src/adc_observer.c",
+  "file": "/workspace/nexus/io/src/adc_observer.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc_observer.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.obj -c /workspace/nexus/io/src/uart_rs485.c",
+  "file": "/workspace/nexus/io/src/uart_rs485.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream_budget.c.obj -c /workspace/nexus/io/src/stream_budget.c",
+  "file": "/workspace/nexus/io/src/stream_budget.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream_budget.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/can.c.obj -c /workspace/nexus/io/src/can.c",
+  "file": "/workspace/nexus/io/src/can.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/can.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/ethernet.c.obj -c /workspace/nexus/io/src/ethernet.c",
+  "file": "/workspace/nexus/io/src/ethernet.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/ethernet.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/mdio.c.obj -c /workspace/nexus/io/src/mdio.c",
+  "file": "/workspace/nexus/io/src/mdio.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/mdio.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/usb_device.c.obj -c /workspace/nexus/io/src/usb_device.c",
+  "file": "/workspace/nexus/io/src/usb_device.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/usb_device.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer_capture.c.obj -c /workspace/nexus/io/src/timer_capture.c",
+  "file": "/workspace/nexus/io/src/timer_capture.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer_capture.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/io/include -I/workspace/nexus/io/private -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -I/workspace/nexus/arch/include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.obj -c /workspace/nexus/io/src/advanced_pwm.c",
+  "file": "/workspace/nexus/io/src/advanced_pwm.c",
+  "output": "nexus-sdk/io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/include -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/CMakeFiles/nexus_os_wait.dir/wait.c.obj -c /workspace/nexus/os/wait.c",
+  "file": "/workspace/nexus/os/wait.c",
+  "output": "nexus-sdk/os/CMakeFiles/nexus_os_wait.dir/wait.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/CMakeFiles/nexus_os_diagnostic.dir/diagnostic.c.obj -c /workspace/nexus/os/diagnostic.c",
+  "file": "/workspace/nexus/os/diagnostic.c",
+  "output": "nexus-sdk/os/CMakeFiles/nexus_os_diagnostic.dir/diagnostic.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/CMakeFiles/nexus_os_baremetal.dir/baremetal/notify.c.obj -c /workspace/nexus/os/baremetal/notify.c",
+  "file": "/workspace/nexus/os/baremetal/notify.c",
+  "output": "nexus-sdk/os/CMakeFiles/nexus_os_baremetal.dir/baremetal/notify.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/portable/GCC/ARM_CM4F -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/tasks.c.obj -c /workspace/nexus/ext/freertos/tasks.c",
+  "file": "/workspace/nexus/ext/freertos/tasks.c",
+  "output": "nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/tasks.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/portable/GCC/ARM_CM4F -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/queue.c.obj -c /workspace/nexus/ext/freertos/queue.c",
+  "file": "/workspace/nexus/ext/freertos/queue.c",
+  "output": "nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/queue.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/portable/GCC/ARM_CM4F -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/list.c.obj -c /workspace/nexus/ext/freertos/list.c",
+  "file": "/workspace/nexus/ext/freertos/list.c",
+  "output": "nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/list.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/portable/GCC/ARM_CM4F -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/portable/GCC/ARM_CM4F/port.c.obj -c /workspace/nexus/ext/freertos/portable/GCC/ARM_CM4F/port.c",
+  "file": "/workspace/nexus/ext/freertos/portable/GCC/ARM_CM4F/port.c",
+  "output": "nexus-sdk/os/freertos/CMakeFiles/nx_freertos_kernel.dir/workspace/nexus/ext/freertos/portable/GCC/ARM_CM4F/port.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/portable/GCC/ARM_CM4F -I/workspace/nexus/os/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj -c /workspace/nexus/os/freertos/hooks.c",
+  "file": "/workspace/nexus/os/freertos/hooks.c",
+  "output": "nexus-sdk/os/freertos/CMakeFiles/nx_freertos_hooks.dir/hooks.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/include -I/workspace/nexus/core/include -I/workspace/nexus/os/freertos/../../ext/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/portable/GCC/ARM_CM4F -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/freertos/CMakeFiles/nexus_os_freertos.dir/freertos.c.obj -c /workspace/nexus/os/freertos/freertos.c",
+  "file": "/workspace/nexus/os/freertos/freertos.c",
+  "output": "nexus-sdk/os/freertos/CMakeFiles/nexus_os_freertos.dir/freertos.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/portable/GCC/ARM_CM4F -I/workspace/nexus/os/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj -c /workspace/nexus/os/freertos/lowpower.c",
+  "file": "/workspace/nexus/os/freertos/lowpower.c",
+  "output": "nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/lowpower.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/os/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/include -I/workspace/nexus/os/freertos/../../ext/freertos/portable/GCC/ARM_CM4F -I/workspace/nexus/os/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj -c /workspace/nexus/os/freertos/diagnostics.c",
+  "file": "/workspace/nexus/os/freertos/diagnostics.c",
+  "output": "nexus-sdk/os/freertos/CMakeFiles/nx_freertos_optional_hooks.dir/diagnostics.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/bus_owner/include -I/workspace/nexus/core/include -I/workspace/nexus/os/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/components/CMakeFiles/nexus_bus_owner.dir/bus_owner/src/bus_owner.c.obj -c /workspace/nexus/components/bus_owner/src/bus_owner.c",
+  "file": "/workspace/nexus/components/bus_owner/src/bus_owner.c",
+  "output": "nexus-sdk/components/CMakeFiles/nexus_bus_owner.dir/bus_owner/src/bus_owner.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/bus_owner/include -I/workspace/nexus/core/include -I/workspace/nexus/os/include -I/workspace/nexus/io/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/components/CMakeFiles/nexus_spi_owner.dir/bus_owner/src/spi_owner.c.obj -c /workspace/nexus/components/bus_owner/src/spi_owner.c",
+  "file": "/workspace/nexus/components/bus_owner/src/spi_owner.c",
+  "output": "nexus-sdk/components/CMakeFiles/nexus_spi_owner.dir/bus_owner/src/spi_owner.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/bus_owner/include -I/workspace/nexus/core/include -I/workspace/nexus/os/include -I/workspace/nexus/io/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/components/CMakeFiles/nexus_spi_async_owner.dir/bus_owner/src/spi_async_owner.c.obj -c /workspace/nexus/components/bus_owner/src/spi_async_owner.c",
+  "file": "/workspace/nexus/components/bus_owner/src/spi_async_owner.c",
+  "output": "nexus-sdk/components/CMakeFiles/nexus_spi_async_owner.dir/bus_owner/src/spi_async_owner.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/bus_owner/include -I/workspace/nexus/core/include -I/workspace/nexus/os/include -I/workspace/nexus/io/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/components/CMakeFiles/nexus_uart_owner.dir/bus_owner/src/uart_owner.c.obj -c /workspace/nexus/components/bus_owner/src/uart_owner.c",
+  "file": "/workspace/nexus/components/bus_owner/src/uart_owner.c",
+  "output": "nexus-sdk/components/CMakeFiles/nexus_uart_owner.dir/bus_owner/src/uart_owner.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/bmp280/include -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/components/CMakeFiles/nexus_bmp280.dir/bmp280/src/bmp280.c.obj -c /workspace/nexus/components/bmp280/src/bmp280.c",
+  "file": "/workspace/nexus/components/bmp280/src/bmp280.c",
+  "output": "nexus-sdk/components/CMakeFiles/nexus_bmp280.dir/bmp280/src/bmp280.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/bmp280/include -I/workspace/nexus/core/include -I/workspace/nexus/io/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/components/CMakeFiles/nexus_bmp280_spi.dir/bmp280/src/spi_transport.c.obj -c /workspace/nexus/components/bmp280/src/spi_transport.c",
+  "file": "/workspace/nexus/components/bmp280/src/spi_transport.c",
+  "output": "nexus-sdk/components/CMakeFiles/nexus_bmp280_spi.dir/bmp280/src/spi_transport.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/log/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/components/CMakeFiles/nexus_log.dir/log/src/log.c.obj -c /workspace/nexus/components/log/src/log.c",
+  "file": "/workspace/nexus/components/log/src/log.c",
+  "output": "nexus-sdk/components/CMakeFiles/nexus_log.dir/log/src/log.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/storage/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/components/CMakeFiles/nexus_storage.dir/storage/src/storage.c.obj -c /workspace/nexus/components/storage/src/storage.c",
+  "file": "/workspace/nexus/components/storage/src/storage.c",
+  "output": "nexus-sdk/components/CMakeFiles/nexus_storage.dir/storage/src/storage.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/modbus/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/components/CMakeFiles/nexus_modbus.dir/modbus/src/modbus_rtu.c.obj -c /workspace/nexus/components/modbus/src/modbus_rtu.c",
+  "file": "/workspace/nexus/components/modbus/src/modbus_rtu.c",
+  "output": "nexus-sdk/components/CMakeFiles/nexus_modbus.dir/modbus/src/modbus_rtu.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/storage/include -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -Os -ffunction-sections -fdata-sections -o nexus-sdk/components/CMakeFiles/nexus_flash_storage.dir/storage/src/flash_storage.c.obj -c /workspace/nexus/components/storage/src/flash_storage.c",
+  "file": "/workspace/nexus/components/storage/src/flash_storage.c",
+  "output": "nexus-sdk/components/CMakeFiles/nexus_flash_storage.dir/storage/src/flash_storage.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/owner_observer/include -I/workspace/nexus/components/bus_owner/include -I/workspace/nexus/core/include -I/workspace/nexus/os/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/components/owner_observer/CMakeFiles/nexus_owner_observer.dir/src/owner_observer.c.obj -c /workspace/nexus/components/owner_observer/src/owner_observer.c",
+  "file": "/workspace/nexus/components/owner_observer/src/owner_observer.c",
+  "output": "nexus-sdk/components/owner_observer/CMakeFiles/nexus_owner_observer.dir/src/owner_observer.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/dp83848/include -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/components/dp83848/CMakeFiles/nexus_dp83848.dir/src/dp83848.c.obj -c /workspace/nexus/components/dp83848/src/dp83848.c",
+  "file": "/workspace/nexus/components/dp83848/src/dp83848.c",
+  "output": "nexus-sdk/components/dp83848/CMakeFiles/nexus_dp83848.dir/src/dp83848.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/clock_domain/include -I/workspace/nexus/components/clock_domain/private -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/components/clock_domain/CMakeFiles/nexus_clock_domain.dir/src/clock_domain.c.obj -c /workspace/nexus/components/clock_domain/src/clock_domain.c",
+  "file": "/workspace/nexus/components/clock_domain/src/clock_domain.c",
+  "output": "nexus-sdk/components/clock_domain/CMakeFiles/nexus_clock_domain.dir/src/clock_domain.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -I/workspace/nexus/components/user_io_broker/include -I/workspace/nexus/components/user_io_broker/private -I/workspace/nexus/core/include -I/workspace/nexus/io/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/components/user_io_broker/CMakeFiles/nexus_user_io_broker.dir/src/user_io_broker.c.obj -c /workspace/nexus/components/user_io_broker/src/user_io_broker.c",
+  "file": "/workspace/nexus/components/user_io_broker/src/user_io_broker.c",
+  "output": "nexus-sdk/components/user_io_broker/CMakeFiles/nexus_user_io_broker.dir/src/user_io_broker.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=c11 -Os -ffunction-sections -fdata-sections -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -o nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c.obj -c /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c",
+  "file": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c",
+  "output": "nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=c11 -Os -ffunction-sections -fdata-sections -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -o nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fmc.c.obj -c /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fmc.c",
+  "file": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fmc.c",
+  "output": "nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fmc.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=c11 -Os -ffunction-sections -fdata-sections -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -o nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_timer.c.obj -c /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_timer.c",
+  "file": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_timer.c",
+  "output": "nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_timer.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -std=c11 -Os -ffunction-sections -fdata-sections -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -o nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.obj -c /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c",
+  "file": "/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c",
+  "output": "nexus-sdk/soc/gd32f470/CMakeFiles/nexus_gd32_sdk.dir/workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/soc/gd32f470/../common -I/workspace/nexus/soc/gd32f470/../../io/private -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_usb_library/driver/Include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/timebase.c.obj -c /workspace/nexus/soc/gd32f470/timebase.c",
+  "file": "/workspace/nexus/soc/gd32f470/timebase.c",
+  "output": "nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/timebase.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/soc/gd32f470/../common -I/workspace/nexus/soc/gd32f470/../../io/private -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_usb_library/driver/Include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/timer_capture.c.obj -c /workspace/nexus/soc/gd32f470/drivers/timer_capture.c",
+  "file": "/workspace/nexus/soc/gd32f470/drivers/timer_capture.c",
+  "output": "nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/timer_capture.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/soc/gd32f470/../common -I/workspace/nexus/soc/gd32f470/../../io/private -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_usb_library/driver/Include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/gpio.c.obj -c /workspace/nexus/soc/gd32f470/drivers/gpio.c",
+  "file": "/workspace/nexus/soc/gd32f470/drivers/gpio.c",
+  "output": "nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/gpio.c.obj"
+},
+{
+  "directory": "/workspace/nexus-industrial-design/timer-arm/gd32-freertos",
+  "command": "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DGD32F470 -DHXTAL_VALUE=25000000 -I/workspace/nexus/soc/gd32f470 -I/workspace/nexus/soc/gd32f470/private -I/workspace/nexus/soc/gd32f470/../common -I/workspace/nexus/soc/gd32f470/../../io/private -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -I/workspace/nexus-industrial-design/timer-arm/gd32-freertos/nexus-sdk/generated -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/CMSIS/GD/GD32F4xx/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include -isystem /workspace/nexus/vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_usb_library/driver/Include -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/advanced_pwm.c.obj -c /workspace/nexus/soc/gd32f470/drivers/advanced_pwm.c",
+  "file": "/workspace/nexus/soc/gd32f470/drivers/advanced_pwm.c",
+  "output": "nexus-sdk/soc/gd32f470/CMakeFiles/nexus_soc_gd32f470.dir/drivers/advanced_pwm.c.obj"
+}
+]

@@ -1,0 +1,267 @@
+....EEEEEEEE.FFFFFFFFEE
+======================================================================
+ERROR: test_each_receive_mode_claims_only_its_reviewed_directional_engines (test_stream_modes.UartReceiveConfigurationTests.test_each_receive_mode_claims_only_its_reviewed_directional_engines) (family='stm32f407', mode='rx-dma-idle')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 125, in test_each_receive_mode_claims_only_its_reviewed_directional_engines
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 769, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 497, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode rx-dma-idle for uart1
+
+======================================================================
+ERROR: test_each_receive_mode_claims_only_its_reviewed_directional_engines (test_stream_modes.UartReceiveConfigurationTests.test_each_receive_mode_claims_only_its_reviewed_directional_engines) (family='stm32f407', mode='dma-duplex')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 125, in test_each_receive_mode_claims_only_its_reviewed_directional_engines
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 769, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 497, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-duplex for uart1
+
+======================================================================
+ERROR: test_each_receive_mode_claims_only_its_reviewed_directional_engines (test_stream_modes.UartReceiveConfigurationTests.test_each_receive_mode_claims_only_its_reviewed_directional_engines) (family='stm32f407', mode='rx-dma-continuous')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 125, in test_each_receive_mode_claims_only_its_reviewed_directional_engines
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 769, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 497, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode rx-dma-continuous for uart1
+
+======================================================================
+ERROR: test_each_receive_mode_claims_only_its_reviewed_directional_engines (test_stream_modes.UartReceiveConfigurationTests.test_each_receive_mode_claims_only_its_reviewed_directional_engines) (family='stm32f407', mode='dma-duplex-continuous')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 125, in test_each_receive_mode_claims_only_its_reviewed_directional_engines
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 769, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 497, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-duplex-continuous for uart1
+
+======================================================================
+ERROR: test_each_receive_mode_claims_only_its_reviewed_directional_engines (test_stream_modes.UartReceiveConfigurationTests.test_each_receive_mode_claims_only_its_reviewed_directional_engines) (family='gd32f470', mode='rx-dma-idle')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 125, in test_each_receive_mode_claims_only_its_reviewed_directional_engines
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 769, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 497, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode rx-dma-idle for uart0
+
+======================================================================
+ERROR: test_each_receive_mode_claims_only_its_reviewed_directional_engines (test_stream_modes.UartReceiveConfigurationTests.test_each_receive_mode_claims_only_its_reviewed_directional_engines) (family='gd32f470', mode='dma-duplex')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 125, in test_each_receive_mode_claims_only_its_reviewed_directional_engines
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 769, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 497, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-duplex for uart0
+
+======================================================================
+ERROR: test_each_receive_mode_claims_only_its_reviewed_directional_engines (test_stream_modes.UartReceiveConfigurationTests.test_each_receive_mode_claims_only_its_reviewed_directional_engines) (family='gd32f470', mode='rx-dma-continuous')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 125, in test_each_receive_mode_claims_only_its_reviewed_directional_engines
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 769, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 497, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode rx-dma-continuous for uart0
+
+======================================================================
+ERROR: test_each_receive_mode_claims_only_its_reviewed_directional_engines (test_stream_modes.UartReceiveConfigurationTests.test_each_receive_mode_claims_only_its_reviewed_directional_engines) (family='gd32f470', mode='dma-duplex-continuous')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 125, in test_each_receive_mode_claims_only_its_reviewed_directional_engines
+    ir = gate.resolve_ir(path)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 769, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 497, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-duplex-continuous for uart0
+
+======================================================================
+ERROR: test_rx_only_does_not_acquire_a_reserved_tx_dma_engine (test_stream_modes.UartReceiveConfigurationTests.test_rx_only_does_not_acquire_a_reserved_tx_dma_engine) (family='stm32f407')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 155, in test_rx_only_does_not_acquire_a_reserved_tx_dma_engine
+    gate.resolve_ir(self.authored(family, "rx-dma-idle",
+  File "/workspace/nexus/tools/configure/configure.py", line 769, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 497, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode rx-dma-idle for uart1
+
+======================================================================
+ERROR: test_rx_only_does_not_acquire_a_reserved_tx_dma_engine (test_stream_modes.UartReceiveConfigurationTests.test_rx_only_does_not_acquire_a_reserved_tx_dma_engine) (family='gd32f470')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 155, in test_rx_only_does_not_acquire_a_reserved_tx_dma_engine
+    gate.resolve_ir(self.authored(family, "rx-dma-idle",
+  File "/workspace/nexus/tools/configure/configure.py", line 769, in resolve_ir
+    resolve(assembly_path, root, input_paths=input_paths))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/nexus/tools/configure/configure.py", line 497, in resolve
+    fail(f"Unsupported mode {mode} for {selection['binding']}")
+  File "/workspace/nexus/tools/configure/providers/common.py", line 14, in fail
+    raise ConfigurationError(message)
+tools.configure.providers.common.ConfigurationError: Unsupported mode rx-dma-idle for uart0
+
+======================================================================
+FAIL: test_receive_blocks_reject_a_hidden_generated_payload_ring (test_stream_modes.UartReceiveConfigurationTests.test_receive_blocks_reject_a_hidden_generated_payload_ring) (family='stm32f407', mode='rx-dma-idle')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode rx-dma-idle for uart1
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 149, in test_receive_blocks_reject_a_hidden_generated_payload_ring
+    with self.assertRaisesRegex(ValueError, "caller-owned"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "caller-owned" does not match "Unsupported mode rx-dma-idle for uart1"
+
+======================================================================
+FAIL: test_receive_blocks_reject_a_hidden_generated_payload_ring (test_stream_modes.UartReceiveConfigurationTests.test_receive_blocks_reject_a_hidden_generated_payload_ring) (family='stm32f407', mode='dma-duplex')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-duplex for uart1
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 149, in test_receive_blocks_reject_a_hidden_generated_payload_ring
+    with self.assertRaisesRegex(ValueError, "caller-owned"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "caller-owned" does not match "Unsupported mode dma-duplex for uart1"
+
+======================================================================
+FAIL: test_receive_blocks_reject_a_hidden_generated_payload_ring (test_stream_modes.UartReceiveConfigurationTests.test_receive_blocks_reject_a_hidden_generated_payload_ring) (family='stm32f407', mode='rx-dma-continuous')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode rx-dma-continuous for uart1
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 149, in test_receive_blocks_reject_a_hidden_generated_payload_ring
+    with self.assertRaisesRegex(ValueError, "caller-owned"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "caller-owned" does not match "Unsupported mode rx-dma-continuous for uart1"
+
+======================================================================
+FAIL: test_receive_blocks_reject_a_hidden_generated_payload_ring (test_stream_modes.UartReceiveConfigurationTests.test_receive_blocks_reject_a_hidden_generated_payload_ring) (family='stm32f407', mode='dma-duplex-continuous')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-duplex-continuous for uart1
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 149, in test_receive_blocks_reject_a_hidden_generated_payload_ring
+    with self.assertRaisesRegex(ValueError, "caller-owned"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "caller-owned" does not match "Unsupported mode dma-duplex-continuous for uart1"
+
+======================================================================
+FAIL: test_receive_blocks_reject_a_hidden_generated_payload_ring (test_stream_modes.UartReceiveConfigurationTests.test_receive_blocks_reject_a_hidden_generated_payload_ring) (family='gd32f470', mode='rx-dma-idle')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode rx-dma-idle for uart0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 149, in test_receive_blocks_reject_a_hidden_generated_payload_ring
+    with self.assertRaisesRegex(ValueError, "caller-owned"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "caller-owned" does not match "Unsupported mode rx-dma-idle for uart0"
+
+======================================================================
+FAIL: test_receive_blocks_reject_a_hidden_generated_payload_ring (test_stream_modes.UartReceiveConfigurationTests.test_receive_blocks_reject_a_hidden_generated_payload_ring) (family='gd32f470', mode='dma-duplex')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-duplex for uart0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 149, in test_receive_blocks_reject_a_hidden_generated_payload_ring
+    with self.assertRaisesRegex(ValueError, "caller-owned"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "caller-owned" does not match "Unsupported mode dma-duplex for uart0"
+
+======================================================================
+FAIL: test_receive_blocks_reject_a_hidden_generated_payload_ring (test_stream_modes.UartReceiveConfigurationTests.test_receive_blocks_reject_a_hidden_generated_payload_ring) (family='gd32f470', mode='rx-dma-continuous')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode rx-dma-continuous for uart0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 149, in test_receive_blocks_reject_a_hidden_generated_payload_ring
+    with self.assertRaisesRegex(ValueError, "caller-owned"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "caller-owned" does not match "Unsupported mode rx-dma-continuous for uart0"
+
+======================================================================
+FAIL: test_receive_blocks_reject_a_hidden_generated_payload_ring (test_stream_modes.UartReceiveConfigurationTests.test_receive_blocks_reject_a_hidden_generated_payload_ring) (family='gd32f470', mode='dma-duplex-continuous')
+----------------------------------------------------------------------
+tools.configure.providers.common.ConfigurationError: Unsupported mode dma-duplex-continuous for uart0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_stream_modes.py", line 149, in test_receive_blocks_reject_a_hidden_generated_payload_ring
+    with self.assertRaisesRegex(ValueError, "caller-owned"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "caller-owned" does not match "Unsupported mode dma-duplex-continuous for uart0"
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.118s
+
+FAILED (failures=8, errors=10)

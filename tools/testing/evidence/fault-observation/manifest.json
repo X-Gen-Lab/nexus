@@ -1,0 +1,207 @@
+{
+  "schema": 1,
+  "kind": "default-failstop-development-evidence",
+  "qualifies_candidate": false,
+  "cases": 8,
+  "sources": {
+    "core/include/nexus/core/fault.h": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b",
+    "core/src/fault.c": "976a3af81cfefa6d7185b7328162825eb08fc4ae25042a543de1fc8369a8367f",
+    "os/freertos/hooks.c": "08f2b17edeb716fbdacce01b473537fca777e215a7c26569b1680daeabfa6298",
+    "os/freertos/include/FreeRTOSConfig.h": "a66625ab819e4a978092ee74faba38f13315aa2c032ab8bda83825370f18e428",
+    "tests/google/freertos_failstop_test.cpp": "61f5fa073588525ebcf5a22dfa271ff04b23d5981431dac715c22b216efa01ef",
+    "tests/google/failstop.cmake": "b19ddc57a9f6ad5a849e6bdd3812aff286ac4ff18022d0cabba85f70462b605e",
+    "docs/design/fault-observation.md": "5c27e53893554215b6117fbe80a8b5f8cb6908dccb97ba4e228d7217582c166f"
+  },
+  "actual_dependency": {
+    "path": "os/freertos/CMakeLists.txt",
+    "sha256": "999f97ddf82ba9aad6548ed517a681a0606ddc5aad7fff89112e0dd60eb5032a",
+    "requirement": "nx_freertos_hooks PRIVATE nexus_arch, owned by root"
+  },
+  "raw": [
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-green.log",
+      "stored_path": "raw/fault-green.log",
+      "sha256": "56c72493a9a6b67af61358c10f5f4856a545fdc0c2dcccc0795b09fd9f0231f1"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-all-mask-red.log",
+      "stored_path": "raw/fault-all-mask-red.log",
+      "sha256": "cbed3ac0f6334ea56bd3407f70d82506dda5dbb003fe9b25a89358176be78287"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-mask-red.log",
+      "stored_path": "raw/fault-mask-red.log",
+      "sha256": "2685965083f0169111d20873ab3bb94ed6a94cfc189a78481e3242d5d50bb753"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-layout-0.command.json",
+      "stored_path": "raw/fault-layout-0.command.json",
+      "sha256": "70f26329f5ad92d2bd920d1bd092144da0dcdd85d84cd89eaca2007ec04777d3"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-mask-red.command.json",
+      "stored_path": "raw/fault-mask-red.command.json",
+      "sha256": "d11d4f57ffcdf8675812b74503644940f338233f7d2208b86d63b777de0ddc5d"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-green-build.command.json",
+      "stored_path": "raw/fault-green-build.command.json",
+      "sha256": "acd83bcbca83e198a7abacbf8c37ca078991d7e405643e680a265ea072ecd6ec"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-red.command.json",
+      "stored_path": "raw/fault-red.command.json",
+      "sha256": "933310714bc34a303fb8445d02e8416d018014df7588b7b463cea090dc2d44d0"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-green-build.log",
+      "stored_path": "raw/fault-green-build.log",
+      "sha256": "183bbde66e55f21241e77af2d645011174c9a00c02e242aed3060a80dd1249d4"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-green.command.json",
+      "stored_path": "raw/fault-green.command.json",
+      "sha256": "f7ae35b670f9bb00413f26a67953ed9997a6a1a03da066f21ca28c95c5a375a5"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-layout-0.log",
+      "stored_path": "raw/fault-layout-0.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-mask-red-build.log",
+      "stored_path": "raw/fault-mask-red-build.log",
+      "sha256": "aba8b05e69837c21b6d5b828e34dab41b34fc036ca7aa457db516dd78f9d0a4b"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-default-arm.o",
+      "stored_path": "raw/fault-default-arm.o",
+      "sha256": "3db487bc8e5783ee803dead0b4361ae329ba6d38c2bf44f8a494f3f52b8b6e28"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-layout-1.command.json",
+      "stored_path": "raw/fault-layout-1.command.json",
+      "sha256": "0412836ade4525eb2fedda7a0707d27464eac6dc52e953d016042bca673bc7a2"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-final-source-build.log",
+      "stored_path": "raw/fault-final-source-build.log",
+      "sha256": "08ec617bf36baaf402ea82add95180ff2e9872d763af99888ac8e0aeaf5a923b"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-red-build.log",
+      "stored_path": "raw/fault-red-build.log",
+      "sha256": "ad938153b05e3d7dac9065ef194a69326fc2aa56f20519afdcc29c23c2757387"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-layout-3.log",
+      "stored_path": "raw/fault-layout-3.log",
+      "sha256": "8b3c18961c4f8e95b551079cd7649b7699b1776d7612d0d8d346eebd42af8ce3"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-all-mask-red-build.command.json",
+      "stored_path": "raw/fault-all-mask-red-build.command.json",
+      "sha256": "acd83bcbca83e198a7abacbf8c37ca078991d7e405643e680a265ea072ecd6ec"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-layout-2.command.json",
+      "stored_path": "raw/fault-layout-2.command.json",
+      "sha256": "176eb532ccea61ef85e8022d271fa08980f81df69ca0f146042643a2f533c8dc"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-all-mask-red-build.log",
+      "stored_path": "raw/fault-all-mask-red-build.log",
+      "sha256": "4222dac7290f804b1ac72e4bddc71d8443ecab120cb09473be90cb63117349e9"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-layout-1.log",
+      "stored_path": "raw/fault-layout-1.log",
+      "sha256": "820af1f3715a40f8cd4393b43d6bc72dd8576599995e1d9809e282e320176728"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-final-source.log",
+      "stored_path": "raw/fault-final-source.log",
+      "sha256": "25ce3935a0eb66e5830290449a54ffbb410b6206df52b72e6aefb47b4404f6ad"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-final-source.xml",
+      "stored_path": "raw/fault-final-source.xml",
+      "sha256": "ec7bafeb1a56d9ef87ee30b9ea379c7e1b3b629270473a85796f994cef6049b8"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-mask-red-build.command.json",
+      "stored_path": "raw/fault-mask-red-build.command.json",
+      "sha256": "acd83bcbca83e198a7abacbf8c37ca078991d7e405643e680a265ea072ecd6ec"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-mask-red.xml",
+      "stored_path": "raw/fault-mask-red.xml",
+      "sha256": "2c1b91a4e34b125d7de014a5db237d50f2b34798e489273e357f036e81f5365e"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-red-build.command.json",
+      "stored_path": "raw/fault-red-build.command.json",
+      "sha256": "df95ceaba4299b91a56f400bbcc10b459ca3f7561f319959fdd53bbb8c302db2"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-final-source-build.command.json",
+      "stored_path": "raw/fault-final-source-build.command.json",
+      "sha256": "88373bcc598baa85120d857a7f472bffc1c325125ca70a81fbbc592a4592ccde"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-layout-3.command.json",
+      "stored_path": "raw/fault-layout-3.command.json",
+      "sha256": "132c8a60e8e58d87a28189eedeea37c8cc2ddd3b723c73500a5e9085ee15e093"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-final-source.command.json",
+      "stored_path": "raw/fault-final-source.command.json",
+      "sha256": "6774c3bce7d18e279ccfa52d7fda984994755e855343358b135d68077d546610"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-red.xml",
+      "stored_path": "raw/fault-red.xml",
+      "sha256": "04bcdf76cec92db19c3bd064ee8ebfeea76d80a56f7e9c637a5a95daf970c88c"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-all-mask-red.xml",
+      "stored_path": "raw/fault-all-mask-red.xml",
+      "sha256": "9bed88504c850b5c56cb0ed2c2176d803a9895d13c0a75bbe6039feacbed678e"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-green.xml",
+      "stored_path": "raw/fault-green.xml",
+      "sha256": "0e394de7c87d046a8507fe163b52d2936f9668e73aaddd479d8e646ae6b7b522"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-red.log",
+      "stored_path": "raw/fault-red.log",
+      "sha256": "5aaf7ee754b9cb2d70c942a9457d2bfc5c42c165f24f51ea165614bac59e300b"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-all-mask-red.command.json",
+      "stored_path": "raw/fault-all-mask-red.command.json",
+      "sha256": "0d57822cf3e0dee2a35ed2f0b924729a41f6cdeeeded1de8138fa6e2c0e44c99"
+    },
+    {
+      "original_path": "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-layout-2.log",
+      "stored_path": "raw/fault-layout-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "review_sha256": "7dd7b5d7f4b7af27f731cd7bc53b8de157d57fedfa790c4ff51be2188a17d6b2",
+  "arm_probe": {
+    "abi": "Cortex-M4 -fshort-enums -Os",
+    "weak_default_text_object_bytes": 2,
+    "weak_default_data_bss_bytes": 0,
+    "product_record_bytes": 24,
+    "product_snapshot_bytes": 12
+  },
+  "limitations": [
+    "Actual default-hook/port-leaf modeled death tests; not real kernel corruption or physical masked IRQ timing.",
+    "ARM probe is an object ABI measurement, not final linked image overhead.",
+    "Strong terminal-hook overrides must preserve observation and never return.",
+    "No kernel/clock/stack integrity, peripheral quiescence, safe outputs or physical HIL proof.",
+    "Initial historical RED source bytes were not archived; preserve actual logs, never reconstruct historical source."
+  ]
+}

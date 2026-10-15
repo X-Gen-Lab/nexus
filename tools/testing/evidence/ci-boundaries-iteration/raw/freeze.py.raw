@@ -1,0 +1,233 @@
+"""Freeze narrow corrective development evidence without changing raw bytes."""
+
+import hashlib
+import json
+import re
+import shutil
+import subprocess
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+ROOT = Path('/workspace/nexus')
+BASE = Path('/workspace/nexus-ci-boundaries')
+DEST = ROOT / 'tools/testing/evidence/ci-boundaries-iteration'
+REVIEW = Path('/workspace/nexus-industrial-design/reviews/ci-boundaries-independent.json')
+
+
+def identity(path):
+    data = path.read_bytes()
+    return {'path': str(path), 'bytes': len(data),
+            'sha256': hashlib.sha256(data).hexdigest()}
+
+
+def write_new(path, value):
+    with path.open('x', encoding='utf-8') as stream:
+        json.dump(value, stream, indent=2)
+        stream.write('\n')
+
+
+def load(path):
+    return json.loads(path.read_text())
+
+
+def validate_command(name, expected=0):
+    command = load(BASE / name / 'command.json')
+    assert command['exit_code'] == expected, (name, command['exit_code'])
+    assert command['ended_ns'] >= command['started_ns']
+    for key in ('stdout', 'stderr'):
+        assert identity(Path(command[key]['path'])) == command[key], (name, key)
+    return command
+
+
+def google(name, count, expected=0):
+    command = validate_command(name, expected)
+    report = BASE / name / 'report.xml'
+    root = ET.parse(report).getroot()
+    cases = root.findall('.//testcase')
+    assert len(cases) == count
+    assert len({(c.attrib['classname'], c.attrib['name']) for c in cases}) == count
+    assert not root.findall('.//skipped')
+    if expected == 0:
+        assert not root.findall('.//failure') and not root.findall('.//error')
+        assert all(c.get('status') == 'run' for c in cases)
+    else:
+        assert root.findall('.//failure')
+    return {'command': command, 'xml': identity(report), 'cases': count,
+            'unique_cases': sorted(c.attrib['classname'] + '.' + c.attrib['name']
+                                   for c in cases)}
+
+
+def stored_name(path):
+    if path.suffix in {'.c', '.cpp', '.h', '.py', '.cmake', '.ld', '.S', '.toml'}:
+        return path.name + '.raw'
+    if path.name == 'CMakeLists.txt':
+        return path.name + '.raw'
+    if path.suffix == '.json' and not path.read_bytes().endswith(b'\n'):
+        return path.name + '.raw'
+    return path.name
+
+
+def main():
+    assert not DEST.exists(), 'Refuse to overwrite a frozen archive.'
+    snapshot = load(BASE / 'final-source-before.json')
+    for item in snapshot['source_inputs']:
+        assert identity(Path(item['path'])) == item, item['path']
+    red = [google('memory-default-red', 3, 1),
+           google('memory-both-red', 3, 1)]
+    builds = {'regular': 'ci-boundary-memory2',
+              'sanitizer': 'ci-boundary-memory-asan2',
+              'tsan': 'ci-boundary-memory-tsan2'}
+    executions = []
+    artifacts = []
+    for profile, build in builds.items():
+        validate_command(f'memory-fresh-{profile}-configure')
+        validate_command(f'memory-fresh-{profile}-build')
+        for variant in ('default', 'both'):
+            name = f'memory-final-{profile}-{variant}'
+            result = google(name, 4)
+            discovery = validate_command(f'memory-final-discovery-{profile}-{variant}')
+            lines = Path(discovery['stdout']['path']).read_text().splitlines()
+            discovered = []
+            suite = None
+            for line in lines:
+                if line and not line.startswith(' '):
+                    suite = line.rstrip('.')
+                elif line.strip():
+                    assert suite is not None
+                    discovered.append(suite + '.' + line.strip())
+            assert sorted(discovered) == result['unique_cases'], name
+            executable = Path(result['command']['argv'][0])
+            assert executable == ROOT / 'build' / build / 'bin' / (
+                f'nexus_gd32_memory_boot_{variant}_test')
+            result.update(profile=profile, variant=variant,
+                          executable=identity(executable), discovery=discovery)
+            executions.append(result)
+            artifacts.append((executable, Path('host-elf') / profile / executable.name))
+        commands = ROOT / 'build' / build / 'compile_commands.json'
+        artifacts.append((commands, Path('graphs') / profile / 'compile_commands.json.raw'))
+
+    runtime = validate_command('runtime-suite-run1')
+    runtime_text = Path(runtime['stderr']['path']).read_text()
+    assert re.search(r'Ran 21 tests in [0-9.]+s\s+OK\s*$', runtime_text)
+    children = load(BASE / 'runtime-suite-run1/children/commands.json')
+    assert len(children) == 118
+    assert all(c['seconds'] < 180 for c in children)
+    ctest = validate_command('runtime-ctest-green')
+    ctest_text = Path(ctest['stdout']['path']).read_text()
+    assert '100% tests passed, 0 tests failed out of 1' in ctest_text
+    catalogue = load(BASE / 'runtime-catalogue.json')
+    assert len(catalogue['tests']) == 1
+    assert catalogue['tests'][0]['name'] == 'contract_runtime_sdk'
+    properties = {p['name']: p['value'] for p in catalogue['tests'][0]['properties']}
+    assert properties['TIMEOUT'] == 900
+    assert 'timeout=180' in (ROOT / 'tests/contracts/test_runtime_sdk.py').read_text()
+    validate_command('backend-contract-green')
+    assert re.search(r'Ran 19 tests in [0-9.]+s\s+OK\s*$',
+                     (BASE / 'backend-contract-green/stderr.txt').read_text())
+    validate_command('backend-native-green-launch')
+    backend = load(BASE / 'backend-native-green/report.json')
+    assert backend['status'] == 'passed' and backend['source_inputs_stable'] is True
+    assert backend['physical_status'] == 'not_executed'
+    assert backend['candidate_status'] == 'not_qualified'
+    assert len(backend['commands']) == 10 and len(backend['completed_cases']) == 28
+    assert all(c['returncode'] == 0 for c in backend['commands'])
+    for command in backend['commands']:
+        for key in ('stdout', 'stderr'):
+            assert identity(Path(command[key]['path'])) == command[key]
+    for name in ('comment-style-final', 'source-format-final', 'host-elf-layout'):
+        validate_command(name)
+    review = load(REVIEW)
+    assert len(review['sources']) == 4
+    for item in review['sources']:
+        assert identity(ROOT / item['path'])['sha256'] == item['sha256']
+
+    after = {'scope': snapshot['scope'],
+             'git_commit': subprocess.check_output(
+                 ['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], text=True).strip(),
+             'source_inputs': [identity(Path(i['path'])) for i in snapshot['source_inputs']]}
+    assert after['source_inputs'] == snapshot['source_inputs']
+    write_new(BASE / 'final-source-after.json', after)
+
+    DEST.mkdir()
+    index = []
+
+    def archive(source, relative):
+        target = DEST / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        source_identity = identity(source)
+        with target.open('xb') as out:
+            out.write(source.read_bytes())
+        copied = identity(target)
+        assert copied['sha256'] == source_identity['sha256']
+        assert copied['bytes'] == source_identity['bytes']
+        index.append({'original': source_identity,
+                      'original_output_name': source.name,
+                      'stored_path': str(target.relative_to(ROOT)),
+                      'bytes': copied['bytes'], 'sha256': copied['sha256']})
+        return copied
+
+    for path in sorted(BASE.rglob('*')):
+        if path.is_file():
+            relative = path.relative_to(BASE)
+            archive(path, Path('raw') / relative.parent / stored_name(path))
+    for item in snapshot['source_inputs']:
+        source = Path(item['path'])
+        archive(source, Path('sources') / source.relative_to(ROOT).parent / stored_name(source))
+    for source, relative in artifacts:
+        archive(source, relative)
+    review_identity = archive(REVIEW, Path('review/ci-boundaries-independent.json'))
+    archive_index = DEST / 'archive-index.json'
+    write_new(archive_index, {'schema_version': 1,
+                             'scope': 'raw-byte-preserving-development-archive',
+                             'entries': index})
+    manifest = {
+        'schema_version': 1,
+        'kind': 'narrow_ci_boundary_corrective_development',
+        'status': 'passed_for_scopes_below',
+        'source_status': 'working_tree_development_not_clean_candidate',
+        'source_before': snapshot,
+        'source_after': after,
+        'source_inputs_stable': True,
+        'owned_sources': snapshot['source_inputs'][:4],
+        'archive_index': identity(archive_index),
+        'memory': {'scope': 'actual_production_SystemInit_and_memory_helper_host_models',
+                   'red_executions': red,
+                   'final_executions': executions,
+                   'distinct_contracts': 4, 'test_executions': 24,
+                   'profiles': list(builds), 'failures': 0, 'skipped': 0,
+                   'red_capture_limit': 'RED commands/logs/XML retained; pre-GREEN RED executable/source snapshot was not captured.'},
+        'runtime_sdk': {'tests': 21, 'actual_child_commands': 118,
+                        'children_expected_nonzero': sum(c['return_code'] != 0 for c in children),
+                        'child_timeout_seconds': 180, 'aggregate_timeout_seconds': 900,
+                        'longest_child_seconds': max(c['seconds'] for c in children),
+                        'sum_child_seconds': sum(c['seconds'] for c in children),
+                        'direct_suite': runtime, 'actual_ctest': ctest},
+        'backend': {'unit_tests': 19, 'actual_native_probe_cases': 28,
+                    'actual_probe_commands': 10,
+                    'report': identity(BASE / 'backend-native-green/report.json'),
+                    'registration': 'not_performed', 'support_promoted': False},
+        'retained_intermediate_failures': [
+            'memory-tsan-build', 'memory-final-regular-build',
+            'memory-final-sanitizer-build'],
+        'intermediate_failure_reason': 'Correct fail-closed rejection of a stale ThreadX derived overlay after independent root-owned overlay source change; fresh current graphs used for final executions.',
+        'independent_review': review_identity,
+        'physical_status': 'not_executed',
+        'remote_ci': 'requires_fresh_post_commit_execution',
+        'limits': ['No clean whole-source qualification or MCU memory timing inferred.',
+                   'No remote CodeQL success inferred from local Python contracts.',
+                   'No global test skips, timeout removal, firmware memory behavior change or hook bypass.'],
+    }
+    write_new(DEST / 'development.json', manifest)
+    for item in index:
+        stored = identity(ROOT / item['stored_path'])
+        assert stored['bytes'] == item['bytes'] and stored['sha256'] == item['sha256']
+    for item in snapshot['source_inputs']:
+        assert identity(Path(item['path'])) == item
+    print(json.dumps({'manifest': identity(DEST / 'development.json'),
+                      'archive_index': identity(archive_index),
+                      'raw_files': len(index),
+                      'raw_bytes': sum(i['bytes'] for i in index)}, indent=2))
+
+
+if __name__ == '__main__':
+    main()

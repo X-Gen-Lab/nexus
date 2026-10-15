@@ -1,0 +1,22 @@
+[
+  {
+    "path": "tools/maintenance/threadx_lock.py",
+    "sha256": "f26e16b27982ce17bb633cf7fa3e6c5666ec5f192a0d51b88de016b85a8d1af4",
+    "size": 11276
+  },
+  {
+    "path": "tools/maintenance/stm32g4_lock.py",
+    "sha256": "3bd3f728aee55e427ee7027facd6deaa927088d4c4bd92742857f89a53227625",
+    "size": 6817
+  },
+  {
+    "path": "tools/testing/test_threadx_lock.py",
+    "sha256": "8b8a996534a3cd8310638480b5892d4a6d1f3b76cbd6634a97a651921bb7bfaf",
+    "size": 10865
+  },
+  {
+    "path": "tools/testing/test_stm32g4_lock.py",
+    "sha256": "2b8eb8fe0f9dda25e8d9e52c593c634abd5eb639f6340a9231922b27c6768401",
+    "size": 11193
+  }
+]

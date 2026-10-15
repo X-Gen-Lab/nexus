@@ -1,0 +1,12 @@
+Running main() from gmock_main.cc
+Stm32UartDma.
+  DmaTransferCompleteCannotSettleUntilUartTc
+  CancellationCountsOnlyProvenWireBytesAndRetainsDrainBorrow
+  InvalidDomainRejectsWithoutBorrowOrRegisterWrites
+  ExpiredDrainQuarantinesUntilActualWireIdle
+  WireIdleCannotReleaseMemoryWhenEngineRefusesDisable
+  DmaCompletionBoundsWireDrainWithoutRequestDeadline
+  LateServiceWithWireAndEngineProofPreservesSuccess
+  BlockRxRequiresTheSeparateStreamProvider
+  DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx
+  DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx

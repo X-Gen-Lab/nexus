@@ -1,0 +1,79 @@
+[
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus",
+      "worktree",
+      "remove",
+      "--force",
+      "/workspace/nexus-g4-source-proof"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-default-git-00.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof",
+      "init",
+      "--quiet"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-default-git-01.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof",
+      "add",
+      "--all"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-default-git-02.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof",
+      "-c",
+      "user.name=SDK test",
+      "-c",
+      "user.email=sdk-test@local.invalid",
+      "commit",
+      "--quiet",
+      "-m",
+      "test: standalone actual five-source SDK fixture"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-default-git-03.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof",
+      "status",
+      "--short"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-default-git-04.log"
+  },
+  {
+    "command": [
+      "git",
+      "-C",
+      "/workspace/nexus-g4-source-proof",
+      "ls-tree",
+      "HEAD",
+      "--",
+      "ext/threadx",
+      "vendors/st/cmsis_device_g4"
+    ],
+    "returncode": 0,
+    "output": "/workspace/nexus/tools/testing/evidence/g474-iteration/fixture-default-git-05.log"
+  }
+]

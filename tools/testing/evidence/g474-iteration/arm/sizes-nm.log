@@ -1,0 +1,4 @@
+00000000 0000000c R nx_size_gpio
+00000000 00000020 R nx_size_request
+00000000 00000038 R nx_size_system
+00000000 00000048 R nx_size_uart

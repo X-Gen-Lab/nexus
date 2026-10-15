@@ -1,0 +1,11 @@
+{
+  "command": [
+    "/workspace/nexus/build/uart-iteration/bin/nexus_stm32_uart_receive_test",
+    "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/uart-receive-tdd/stm32_uart_receive-final-qualified.xml"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T17:00:47.629725+00:00",
+  "ended_at": "2026-10-11T17:00:47.635030+00:00",
+  "returncode": 0,
+  "log": "/workspace/nexus-io-implementation-evidence/uart-receive-tdd/stm32_uart_receive-final-qualified.txt"
+}

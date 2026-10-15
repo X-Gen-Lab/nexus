@@ -1,0 +1,15 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "-v",
+    "tests.contracts.test_memory_placement"
+  ],
+  "cwd": "/workspace/nexus",
+  "started_at": "2026-10-11T16:58:40.051755+00:00",
+  "ended_at": "2026-10-11T16:58:40.437554+00:00",
+  "exit_code": 1,
+  "log": "/workspace/nexus/tools/testing/evidence/memory-iteration/memory-placement-gc-red.log"
+}

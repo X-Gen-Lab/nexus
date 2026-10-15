@@ -1,0 +1,7 @@
+{
+  "boards/stm32f407_qiming_v31/board.json": "/workspace/nexus/boards/stm32f407_qiming_v31/board.json",
+  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
+  "external/stm32-first-freertos.toml": "/workspace/nexus-config-iteration-evidence/can-arm-matrix-final/stm32-first-freertos.toml",
+  "soc/stm32f407/routes.json": "/workspace/nexus/soc/stm32f407/routes.json",
+  "soc/stm32f407/soc.json": "/workspace/nexus/soc/stm32f407/soc.json"
+}

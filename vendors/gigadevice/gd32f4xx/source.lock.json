@@ -1,0 +1,954 @@
+{
+  "vendor": "GigaDevice",
+  "package": "GD32F4xx Firmware Library",
+  "version": "3.3.3",
+  "catalog": "https://www.gd32mcu.com/en/download?kw=GD32F4xx",
+  "source_url": "https://www.gd32mcu.com/download/down/document_id/247/path_type/1",
+  "download_sha256": "17cbe7e0d03b00255109197bb320ca4d4f796f6df937deeab997e214961753d3",
+  "nested_archive_sha256": "8dd2fd5f310ec175082074a656143dfaecd1159dd7e7eae1bf038d1c924595a5",
+  "scope": "Unmodified Firmware subtree only; examples and tools excluded",
+  "files": [
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Include/gd32f4xx.h",
+      "sha256": "db6de53203fa053d6e789ef86908195f84b7664753bdf0aa7ca74f62025573ef",
+      "bytes": 28917,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Include/system_gd32f4xx.h",
+      "sha256": "6077ccbeff029a0058465172607481158b202d5687e2e87a0ed13ff6a9b2633a",
+      "bytes": 2740,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/ARM/startup_gd32f405_425.s",
+      "sha256": "2042e3137abc0991d6d06be4a09b478f0c13ff3a0f5f8ae6c9ef2b934c751805",
+      "bytes": 21757,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/ARM/startup_gd32f407_427.s",
+      "sha256": "601053cf3122fb88c0c240746bd1c89acb9adee85f72b46278e1bb7c6d6bcdce",
+      "bytes": 22101,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/ARM/startup_gd32f450_470.s",
+      "sha256": "02bc08314d054cfa9415c475a3bb4d12577d103ac3bb3c18a0ca49f82453ee1d",
+      "bytes": 23659,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f405_407_xE_flash.ld",
+      "sha256": "c322ea796251a78d3ef89d9c1c72e35751abf6633d191c76890250e03438ad11",
+      "bytes": 4263,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f405_407_xG_flash.ld",
+      "sha256": "1ae94c2572792a1a56207c14b12f4cc38db51d4ba6c27ce8fda6f525417c6761",
+      "bytes": 4264,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f405_407_xK_flash.ld",
+      "sha256": "e253d20aa7ada08fb4326e256f81b55561e5406c1df4765229af36786b0d57d6",
+      "bytes": 4264,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f425_427_xE_flash.ld",
+      "sha256": "a62e9828aaf0a8cebee1b5ef7f9b57f2dcfa399cdd2f50446171128c1cf3ae28",
+      "bytes": 4263,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f425_427_xG_flash.ld",
+      "sha256": "e204c143b0bc85d8fde2d795945a196aec308308adf11f22ea3bc942b124e6c7",
+      "bytes": 4264,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f425_427_xK_flash.ld",
+      "sha256": "8dbc359ce799f083e2d4f512518bd614b859354d5533513b537179a22d186de7",
+      "bytes": 4264,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f450xE_flash.ld",
+      "sha256": "b656eefaf053ac6033f643c195efd53b1ea24277246794ad35dcdc393c69522e",
+      "bytes": 4258,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f450xG_flash.ld",
+      "sha256": "fc77e9378ce1a8bfc7a423fd5fb82237be9c4c9271859609f69e1ae82d4fb7e6",
+      "bytes": 4259,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f450xI_flash.ld",
+      "sha256": "288e7078e4ed6c7314ecfe92dea801f7342cb82a92cf4d7d1062dc9fa44e4b45",
+      "bytes": 4257,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f450xK_flash.ld",
+      "sha256": "5649c7de59d827f171bfcdca1ae4a007836c376a605f26791fab55a4ebaff73a",
+      "bytes": 4259,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f470xE_flash.ld",
+      "sha256": "1d690385ba2098f5a633035504ed03a31567d1ea80a5c056dbd43fc98a87d68a",
+      "bytes": 4258,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f470xG_flash.ld",
+      "sha256": "5ed2a887f41a2b467188498bc62c03da6b0ff788b4f8fdd093ad1e5de2213b1d",
+      "bytes": 4258,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f470xI_flash.ld",
+      "sha256": "8bd860e9d0910cdc91a34ec51ed80db410120b6dcfc747a18110a245eaaaf5f8",
+      "bytes": 4259,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/Ld/gd32f470xK_flash.ld",
+      "sha256": "20af848e99f3e338522b22d5ea24b7cc735b7981bc4815482cf85dc619213277",
+      "bytes": 4259,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/newlib/syscalls.c",
+      "sha256": "10e13517b1bfcd08517383b7bbab165510e0378079050651eb4abd4a7cfe3432",
+      "bytes": 4041,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f405_425.S",
+      "sha256": "c157dc037518343c9e332338f92444ecb396dd6d0a8bafef0a9a256a7332059a",
+      "bytes": 19271,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f407_427.S",
+      "sha256": "9991cb322317cc8079b992fe08327e6a08381201758ac3afe9f856a587d8dd24",
+      "bytes": 19513,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/GCC/startup_gd32f450_470.S",
+      "sha256": "ad26e5ba7b4a8d2ba6a449994eb64dfd5825213732d8a3947148b8e3369c92db",
+      "bytes": 20972,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/IAR/startup_gd32f405_425.s",
+      "sha256": "1cc7d3492d9b4625f8086d25a3daafcda880e985959c015173c8afd67e1e1ae1",
+      "bytes": 25159,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/IAR/startup_gd32f407_427.s",
+      "sha256": "2e88aaf4367ffa5af102318d204a7b942e9eeede9226a79e735b1a383d2975d7",
+      "bytes": 25736,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/IAR/startup_gd32f450_470.s",
+      "sha256": "2a48d4cca15a419cf6c553ec421626eac86325150cf6d6b82f99628a061035a2",
+      "bytes": 27837,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F4xx/Source/system_gd32f4xx.c",
+      "sha256": "2c8d872b5841d9af0ffddc8e97d6c3c5017249cb0920249cefd84487a02fbc16",
+      "bytes": 40595,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/core_cm4.h",
+      "sha256": "4756546e1449d17b1a7dee2f3307f2c92c9f1d669c3f5dfc3ee1dec8aee9a8f7",
+      "bytes": 109878,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/core_cm4_simd.h",
+      "sha256": "0c2a0c2d66c7791b82ca19d10336c96518830ef359f6bfd9da7477bc2cbccbbb",
+      "bytes": 22959,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/core_cmFunc.h",
+      "sha256": "5075ff67c8e264b83d9b391c07c6512e26abbc189e321de0d8b4375476980e5e",
+      "bytes": 15828,
+      "license": "LicenseRef-Arm-Cortex-M-2012"
+    },
+    {
+      "path": "Firmware/CMSIS/core_cmInstr.h",
+      "sha256": "c35ddca16ca04646dc70acf2d592ad9eaeaaecd8125a32abb710069648266eb5",
+      "bytes": 17205,
+      "license": "LicenseRef-Arm-Cortex-M-2012"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_adc.h",
+      "sha256": "9fa1a80b64d18512729af4d22602d5761ec0758d970fb5d15f7f8a96244607d3",
+      "bytes": 41521,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_can.h",
+      "sha256": "f760aeda3aec42af2b2f8013ac4dc8c9949e3ba079db41ff0b1932ec9d1a3662",
+      "bytes": 54600,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_crc.h",
+      "sha256": "79255fe26069554b4383663a209f2eb9460d85c4c4da89bdfa5d96f9678519d6",
+      "bytes": 3380,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_ctc.h",
+      "sha256": "cde53f39bc090274d8cd49713b4412628a5dc688bc06bbfd2ff49fb4ee330f0b",
+      "bytes": 11513,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dac.h",
+      "sha256": "d6354a03c6e3964621a16f0fc411692739d8db28e6c4f2baf81c4949ceae963d",
+      "bytes": 18761,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dbg.h",
+      "sha256": "0a403f37714cbb585a26cb54c7c5cc6776fa9ec23459a70369d9342805713998",
+      "bytes": 9890,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dci.h",
+      "sha256": "d81f42dba43cd29e7f9ef27918a181ab06170da47bef4c27cceca905750f394d",
+      "bytes": 13665,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_dma.h",
+      "sha256": "b5796d1e0017994a232a53613f2d50566b8c00dd43d4049eab26cee1e04f37eb",
+      "bytes": 32675,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_enet.h",
+      "sha256": "edfac20116c43192c0252516cb5ead60b679c581ec910bbcf918a65a5f154ee5",
+      "bytes": 145037,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exmc.h",
+      "sha256": "d08efc408ec8aa10f274b756c8a3fdab9c467d621b3d6b938c5b5e85066ff96a",
+      "bytes": 64299,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_exti.h",
+      "sha256": "dd78502366ba631e32841db28711976d51f7e71417bb2006ba82dc89404eba66",
+      "bytes": 20470,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fmc.h",
+      "sha256": "a6bd45fe828fda8cc19b3b1958470ac1bb115cc162b89963f5391028c9bdc192",
+      "bytes": 28322,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_fwdgt.h",
+      "sha256": "e83161e6700a28f9f0d475405c4a94a03a88e9576b6d8f41c5a9bd96daf5ff08",
+      "bytes": 5863,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h",
+      "sha256": "6551fd3fb673b3e34d5f62b72cba8a0482ce051bf29ed475015b1f9ad178a57a",
+      "bytes": 29164,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_i2c.h",
+      "sha256": "42498aa2016958a5d351577f3caeca0f7c8334ab25b704a95acb7b73001a1019",
+      "bytes": 29826,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_ipa.h",
+      "sha256": "4c083fdcd361270cf21b68dccc25c6c9508fc530420de942a39ab2dea57f911d",
+      "bytes": 25918,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_iref.h",
+      "sha256": "534e29fdeb5c62b3fb235cd17447274ef641a9d313a7f02709eadd90bbd7db40",
+      "bytes": 13448,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_misc.h",
+      "sha256": "a9a16e37b061aba51925824c92b6c740516ec40cad60f228207bba5a4f6a1db7",
+      "bytes": 4695,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_pmu.h",
+      "sha256": "0275375eff0d339ec2b16c1a0d4c67721be6bff63c1516bdc4a614bb5ed98b03",
+      "bytes": 11878,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rcu.h",
+      "sha256": "38d97fe3994cefdcb1109192a5854c29ad2af364558f499878c4a5510b26e45d",
+      "bytes": 95768,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_rtc.h",
+      "sha256": "8211842f10c7f5c7b50c5819f2da2ae10726d1add65db802b81c9447885db6c6",
+      "bytes": 52407,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_sdio.h",
+      "sha256": "8adfa194b0f4ab40bb366ca4ebb5edf5586e3435ab467c93e5e8c125595bf85e",
+      "bytes": 30655,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_spi.h",
+      "sha256": "e2bc6524ff9fc2604f3e947c68ca419ff35bc029904ea8163c10510f85728c10",
+      "bytes": 25504,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_syscfg.h",
+      "sha256": "0e37ca2af26c3563712cf33aca9cf85b0489df10526c8336e0e75518a86f3cd2",
+      "bytes": 11558,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_timer.h",
+      "sha256": "b22f7cc8d1a7cf16326163982b9d6a34829ca55f6491fdea21d07b6e6dcd5668",
+      "bytes": 59717,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_tli.h",
+      "sha256": "8ace2973fabff0f410464388440bf26f5a7d085e6710e61c6d37d17e32f01d33",
+      "bytes": 23557,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_trng.h",
+      "sha256": "d29fec269c5425815aba65d24b65c617f068adbfb5e7dfef1f17d625789b7daf",
+      "bytes": 4431,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_usart.h",
+      "sha256": "7adb26fb6e10f5ce29612aff5f580eafb787311bc982c629ffdf415ddf3dc973",
+      "bytes": 31652,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_wwdgt.h",
+      "sha256": "9d143557c0ca6a5146c853d9c8e1a53f4dae8c90d10b1af53bfd79a1a86fbe7e",
+      "bytes": 4561,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_adc.c",
+      "sha256": "569e3988965032cbf68ab05bca2e46f9106273f0471c6e9e4edef9b826e641b1",
+      "bytes": 49331,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_can.c",
+      "sha256": "db5c61addb25d2016bd857d1959ce6b634b8e3f0c26385ae4101d0d9feba4ad2",
+      "bytes": 42241,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_crc.c",
+      "sha256": "1926afa6c27862234d9ccd6a884cc9725b490ffa211f14c20e5f26eb97734b09",
+      "bytes": 3904,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_ctc.c",
+      "sha256": "b6837b9cb0b7153a26b2e3516b00ccc103d0fdaa233f97a6244a95b2646d1234",
+      "bytes": 13048,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_dac.c",
+      "sha256": "7b16837aa4654129c108b9705a329c9399fc5e5edd4a6d2c4e6d21278314e5ab",
+      "bytes": 22730,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_dbg.c",
+      "sha256": "16e0a2b6097b3395cb051aff6d7c19e840d901f573e96de0fd56899951dd49ed",
+      "bytes": 7772,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_dci.c",
+      "sha256": "76a3d18d36e20bb9b14047a129fdd775bafb2aa3d6ae0fece994ff436bc0fd3b",
+      "bytes": 10404,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_dma.c",
+      "sha256": "464af0cef929cbe2bff5c3c29e2c3d32da7011046259429eee74daa59bd1ef96",
+      "bytes": 36612,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_enet.c",
+      "sha256": "1e45611a2e5fc230434829421fe58ccc65c6202474673bbffa6bef528d3eed4e",
+      "bytes": 152710,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_exmc.c",
+      "sha256": "a95461ad37390efa27acf34db5caf1b1782073673432f7cd34f16ea519ab1ecd",
+      "bytes": 57141,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_exti.c",
+      "sha256": "f4538efcc7b30f78eb0a10932e73951b4be02883f23305169b4456a6b637eb8c",
+      "bytes": 8527,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fmc.c",
+      "sha256": "9d92cc681c71045bdf0df8ebd132626ca598f52f6d0a43abfd72bdcb930daafc",
+      "bytes": 34974,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_fwdgt.c",
+      "sha256": "ddcabec311261a864e322c98f89eee25d0dfb0439d7815e700efbe54873ceec3",
+      "bytes": 7220,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_gpio.c",
+      "sha256": "d700a902dfec2cdcf4979c675812cd1d3656c53adc288be6c188cab51ed98098",
+      "bytes": 15213,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_i2c.c",
+      "sha256": "9c95205edf953a2c2fb6e4fb75bc6c3dffcac8a0ed7f6b7a9a00076fcafb2983",
+      "bytes": 30925,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_ipa.c",
+      "sha256": "5f898dd0d5ff1adec15dc44fbe4506a00b184aefc4e7d728e1e8d024ebbab352",
+      "bytes": 26774,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_iref.c",
+      "sha256": "906ea7cdee5ed2f9979b0b869c14990f92affa46e93fe24458ed40ccc1e19fdb",
+      "bytes": 3544,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_misc.c",
+      "sha256": "59b243d3feb3ad2042f4db71080ba62d48a79bc6afa769f5c1807aa5799f8e1e",
+      "bytes": 6581,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_pmu.c",
+      "sha256": "852df6a147c5eda409cc7c67b3c893c5316aac3760ee0bba35ef6cac61caf5ac",
+      "bytes": 11993,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c",
+      "sha256": "25b11ab26ecbe945a485e6fe263d6a346648f1d1ffbbe563b21cde5af6f704d3",
+      "bytes": 50221,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_rtc.c",
+      "sha256": "f90fd8271cfc067957b84d2b6e67f7bcaa307736e8b18ddbf91c20df8a1c9888",
+      "bytes": 46877,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_sdio.c",
+      "sha256": "4e70d7a039da3d624ace98b99336dafe8ba27cdcc570aa887afefcb5a54eaf39",
+      "bytes": 28412,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_spi.c",
+      "sha256": "ab604680a9f6772ab5e97a1a79a6843e569ee1598d8e6a4620f7441c3d243f39",
+      "bytes": 30254,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_syscfg.c",
+      "sha256": "36b018b3ef03def37ff792fb155fb7f52751694545550b18115a6144f966bde6",
+      "bytes": 8005,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_timer.c",
+      "sha256": "d8df83299f14b69aa91be785b455cdfeb28e5bd26709b99195998cb208355ebe",
+      "bytes": 89569,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_tli.c",
+      "sha256": "447a9bf5cdffb811de2cf8df71be7bb1e99a8d2aab75c25e8bfba8aff0e8e198",
+      "bytes": 24728,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_trng.c",
+      "sha256": "9cbcc76ce4922cd8490160e8cc871dceb3bb03e7c216892b34c3f0f9f0c4c3c2",
+      "bytes": 4607,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_usart.c",
+      "sha256": "96f0a2cf0f5e67797fd15334042699210eedc3058c3913c423be5a38a706a6fc",
+      "bytes": 34807,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_standard_peripheral/Source/gd32f4xx_wwdgt.c",
+      "sha256": "37a2b8ab8048c7d6584b853bc75d73436464dc402fbbebabe9f160fe0a4e4b11",
+      "bytes": 4183,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/audio/Include/audio_core.h",
+      "sha256": "b82c92f22862f4c10fec9ce8d54b93c8f74f12444e45fcd5bdcab171f46c3e43",
+      "bytes": 21965,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/audio/Include/audio_out_itf.h",
+      "sha256": "35bea9e27f3cf3e4bc6bcf04d63fba92ce8858866efaf711073e3d4e4f5dde63",
+      "bytes": 2107,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/audio/Source/audio_core.c",
+      "sha256": "58de8e44177aeae16b266c9bee6b94a8f1f53bbb07116b56b8f6db4a65bfb01c",
+      "bytes": 32575,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/audio/Source/audio_out_itf.c",
+      "sha256": "363dfe6cf2a40c379b3ea0bb321346c92a44aaafb97e91a56f9da42942141752",
+      "bytes": 5560,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/cdc/Include/cdc_acm_core.h",
+      "sha256": "d7fb14ef8b778837b7cddbf8ce32b909f44c945036e909c145ed6e5ffcb1814d",
+      "bytes": 3003,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/cdc/Source/cdc_acm_core.c",
+      "sha256": "0a25f248685ae5f5c4e249dc89e22fd5fa1430ba346072b990f66cb94566855e",
+      "bytes": 16254,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/dfu/Include/dfu_core.h",
+      "sha256": "02074e663d99e43dd7aeeae65e9dbef3701b8bcc3ca4c40103d13b3542cb3fa0",
+      "bytes": 9684,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/dfu/Include/dfu_mem.h",
+      "sha256": "b6c00f4887f70b5e027c16d95e227e1bb828c28d3664a420e0c3b232d14c8c2a",
+      "bytes": 3622,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/dfu/Source/dfu_core.c",
+      "sha256": "079f9f8a811e94e58d9574de55bf90eb3703cb4f5159f38df4afe1344acbaf52",
+      "bytes": 22810,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/dfu/Source/dfu_mem.c",
+      "sha256": "12db034333d98d566a9d0e74fc3f18a9ac13ee68822b441c4dd795fe9e231676",
+      "bytes": 7402,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/hid/Include/custom_hid_core.h",
+      "sha256": "7e2bb8bc64f15f7c2d1bba08c489a7192e2eb382a4c2044c48456c2ca4edbe8e",
+      "bytes": 3109,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/hid/Include/standard_hid_core.h",
+      "sha256": "e628ac2492c5affb680ec69d602285dd7a8ca746688b1d2460ac10151b571a77",
+      "bytes": 3079,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/hid/Source/custom_hid_core.c",
+      "sha256": "f3fb2f35fe98dead736bc2668227bcd905123d32353296a544d3e7bf6341340b",
+      "bytes": 15354,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/hid/Source/standard_hid_core.c",
+      "sha256": "b5ab5f0db8967947d90e4523a337aa42295377b2429e34d121b6385826b8fba2",
+      "bytes": 14501,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/iap/Include/usb_iap_core.h",
+      "sha256": "a744482c1629369340a8ad4c26209b53ffe0f4287dec630a7bda9ade6ca2de0c",
+      "bytes": 6068,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/iap/Source/usb_iap_core.c",
+      "sha256": "11efca7e7c884745822d12847338b8252ca41d0b8ccb0e6989b192aba13fdbcd",
+      "bytes": 21263,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/msc/Include/usbd_msc_bbb.h",
+      "sha256": "189744cd816409d9e70c178e714cebb9a1205a462ac8c17a6b2155c67c2c67bf",
+      "bytes": 4743,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/msc/Include/usbd_msc_core.h",
+      "sha256": "ecab51311d3bba62d67c58f2d2a90589fa0d31c19ee9163457ed2c556b8e7d29",
+      "bytes": 2833,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/msc/Include/usbd_msc_mem.h",
+      "sha256": "ba8b770c2cccc7ca79c332db996298cdc4defd5adbed4e7c5a6c76e534d54770",
+      "bytes": 2719,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/msc/Include/usbd_msc_scsi.h",
+      "sha256": "671a2f2876e0b7c841c00519b255b2f8d7114323e11a124a5865fe64a0ee2f20",
+      "bytes": 2646,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/msc/Source/usbd_msc_bbb.c",
+      "sha256": "0cbbe6d9e4efaad60f1eb7ea85e15300e918dfddc09ae4e830534b8b090e1d6f",
+      "bytes": 9529,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/msc/Source/usbd_msc_core.c",
+      "sha256": "816af325db508ba4adb6f90cbf77f949af0621513e3e12a4585d8cb5cf2cf62a",
+      "bytes": 12092,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/msc/Source/usbd_msc_scsi.c",
+      "sha256": "2f3f8be8fbe80a8f7f8f049a04376c607a0f4d0fae05155550db98fdf57aba72",
+      "bytes": 23702,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/printer/Include/printer_core.h",
+      "sha256": "cfbbd53c7ee77dde2122b88c6fbdeeadb2c3787ae6b5cdd9828a7d7ab79a50d7",
+      "bytes": 3469,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/class/printer/Source/printer_core.c",
+      "sha256": "bbf87fd36305c26d28237765563a14d8022c30bf508d56d6e7bb6a1bc3613f2a",
+      "bytes": 10023,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/core/Include/usbd_core.h",
+      "sha256": "c8cec3b5b20e9f967facc02c57b17096ea5beab44a9d8f9c1f7fdc1ebcd43ae4",
+      "bytes": 4258,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/core/Include/usbd_enum.h",
+      "sha256": "441345ac951a788cf40dd7371f75bdcb9a71ec7983cfea395a02f7ddc0aa121d",
+      "bytes": 4452,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/core/Include/usbd_transc.h",
+      "sha256": "c09e3dceb5e912fa1a6278b6cb524b7c724f1c936a08ca5fe03aeb8f882012bd",
+      "bytes": 2545,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/core/Source/usbd_core.c",
+      "sha256": "3e4ea8b570846b849239715ef0042aad13cc3f73f2a46a53875d01464af1690b",
+      "bytes": 9738,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/core/Source/usbd_enum.c",
+      "sha256": "56d11e7e9d6b89b387c4000cc80c414ba381d2e692d65dd7a9b6065740d73a7b",
+      "bytes": 24777,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/device/core/Source/usbd_transc.c",
+      "sha256": "924f8e27895104ec8897c8e4be5ceb6adfce6d905b79a8d25422568f55683b28",
+      "bytes": 8174,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Include/drv_usb_core.h",
+      "sha256": "ea06199da3f1b6b409c3f9f2437a5865245b9813be3ff7235423eebf9a25d169",
+      "bytes": 19816,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Include/drv_usb_dev.h",
+      "sha256": "613728619bf245c9bee3dc2f8add5ec3eca1ada4eda3c91fa7b82046436245f3",
+      "bytes": 7390,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Include/drv_usb_host.h",
+      "sha256": "a0d82d84126010e0a2c4bebeda70def181257b502f3f65f054ada80c4d754f95",
+      "bytes": 4074,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Include/drv_usb_hw.h",
+      "sha256": "fc3a8bc4a3c65e068df3c1427d9bebf2f99aa90cf41549d5e4f0ff83c468b962",
+      "bytes": 2510,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Include/drv_usb_regs.h",
+      "sha256": "18aebc7f97d182f7366af5433ad3867328c25c08198a2e80fc64caddbf297685",
+      "bytes": 47756,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Include/drv_usbd_int.h",
+      "sha256": "bdc2c5b51fcd08f7d956798d6c115742705c7e2d8dde002c02b19493fab44427",
+      "bytes": 2315,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Include/drv_usbh_int.h",
+      "sha256": "8857e503a5524fcf70cf37a435e1f6dac63df8f9fb4f0aa0a0e01098b85ad748",
+      "bytes": 2199,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Source/drv_usb_core.c",
+      "sha256": "917b0bff881a256595db9bce0f14431a5ce7675d101d736bff0587f0b878af49",
+      "bytes": 12048,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Source/drv_usb_dev.c",
+      "sha256": "7f05c43a0425516cf4d24ba7f1279752e73213298fe38a9b2e6f7bc355538060",
+      "bytes": 19990,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Source/drv_usb_host.c",
+      "sha256": "4630f3489a346fba6bcfaa3d80fab6327658e02380bc24975037cbd504c66604",
+      "bytes": 13930,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Source/drv_usbd_int.c",
+      "sha256": "b793a75c3576e3b05acfd05e9116113a31fd343b44a2a2b43e688dc70430fcf6",
+      "bytes": 18602,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/driver/Source/drv_usbh_int.c",
+      "sha256": "d8b40d1fd618e88e48cb382e175ffe74dfe0f1e42a3e4a4fc3ff25a0cf675af8",
+      "bytes": 19843,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/hid/Include/usbh_hid_core.h",
+      "sha256": "cf8f713675d98ce07cd5153d376009865180f760ccd9c95d78daa4099cd6b3bd",
+      "bytes": 6602,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/hid/Include/usbh_standard_hid.h",
+      "sha256": "207bda3836cf4b22d463896d507eee1e8460b9e54690e5ae26c66806f7e0a8bf",
+      "bytes": 5388,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/hid/Source/usbh_hid_core.c",
+      "sha256": "70fdd9bb46e23a48af1cf1ebf4b904e90195983f01f6c138594a411927063e80",
+      "bytes": 19546,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/hid/Source/usbh_standard_hid.c",
+      "sha256": "32f422179a3163ec22da489476685e116b3d5e67686d875cec12738c83f52a70",
+      "bytes": 12214,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/msc/Include/usbh_msc_bbb.h",
+      "sha256": "f246bef31e4b891b0c90497fb3e744a2021705a29a8ceec852e3e4aa18316c4d",
+      "bytes": 7974,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/msc/Include/usbh_msc_core.h",
+      "sha256": "9c84d877a86fe653ce6c44554a6f60cb17acf50683ea8c718fa0ec47bc8d4af8",
+      "bytes": 6359,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/msc/Include/usbh_msc_scsi.h",
+      "sha256": "1acc6f4c8f17df32d8b92e43cb8524b0f1d768970725b6f79b16d0853830c023",
+      "bytes": 5066,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/msc/Source/usbh_msc_bbb.c",
+      "sha256": "a38b86ba118a6d83b778a1fb44415c8f5b3a8e189df0cea5365c27f1ff15ef52",
+      "bytes": 12688,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/msc/Source/usbh_msc_core.c",
+      "sha256": "e6723dd94c9446768252f7b8ea150f68305e15f3e5c7e14ecdfa93e9fdc15273",
+      "bytes": 19015,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/msc/Source/usbh_msc_fatfs.c",
+      "sha256": "dce58b26f56daff298c7e625d98fa2617faebbe21dfd16de237fe919c17d6194",
+      "bytes": 6520,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/class/msc/Source/usbh_msc_scsi.c",
+      "sha256": "5d4714b90cc7ba38fa97540fd8b36f11804a0d3655dee9fd66d87e19175c57a8",
+      "bytes": 13443,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/core/Include/usbh_core.h",
+      "sha256": "fb304180e5d73d9403461d8733396801263ba44a370604ecd409a985676d68f6",
+      "bytes": 14485,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/core/Include/usbh_enum.h",
+      "sha256": "68f453f3819785e5a81a4023ea3a5c14b9cfeb0cb823017032ef5cf82e41e363",
+      "bytes": 3708,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/core/Include/usbh_pipe.h",
+      "sha256": "17b2efd57e08cac5939b6b40ff41bb1c39e00a845355bfc2691e5de701c664dc",
+      "bytes": 3994,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/core/Include/usbh_transc.h",
+      "sha256": "1f0939de22b9fb1753a8d202c6c600d03fb3e41e0b85c8d0c563e4fce4b815b7",
+      "bytes": 2372,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/core/Source/usbh_core.c",
+      "sha256": "5966e89f96e25746fc9f0834e3dcbca77c9fe90448b87b895d7965c240b375fc",
+      "bytes": 21158,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/core/Source/usbh_enum.c",
+      "sha256": "852e068f75c7ee87f3fa9053d3477f9ca41b28d3c882adcfa8d6979e455204ff",
+      "bytes": 22580,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/core/Source/usbh_pipe.c",
+      "sha256": "784ed67e59c689a9cbb52c888646b17f24bc7ff64dcc0693030224d7de741a1f",
+      "bytes": 5646,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/host/core/Source/usbh_transc.c",
+      "sha256": "8df7931eb052e67ed595e50a6ee4f03fe62b658190f920b1804ef31c336d6b9d",
+      "bytes": 10937,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/ustd/class/cdc/usb_cdc.h",
+      "sha256": "5146f3aa25cb6cc58c12dcfd6a9ea4beee7b0c4cffc94b72c6f1f57649f748b8",
+      "bytes": 11567,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/ustd/class/hid/usb_hid.h",
+      "sha256": "34797e2d333871fbddeb26dbb0326754e8d1659d054397ce5301d471ef6c6cb4",
+      "bytes": 3893,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/ustd/class/msc/msc_bbb.h",
+      "sha256": "b844312326f2dabf89b872795e8b148bd962b5ced63ee99665beea400f209fed",
+      "bytes": 3275,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/ustd/class/msc/msc_scsi.h",
+      "sha256": "db1043c8fbbece1ef703731525c155a041e0a3537f08686be98a7cef27bd634a",
+      "bytes": 7878,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/ustd/class/msc/usb_msc.h",
+      "sha256": "26e07d7e0886519a9f83144e9db98a1c6d4748d9dcca9ec4e19eae3d3f79ec0a",
+      "bytes": 3549,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F4xx_usb_library/ustd/common/usb_ch9_std.h",
+      "sha256": "8041cf7eca2250bd748872f3750839b91f32e99a97f438b5fc63cb55598c049d",
+      "bytes": 13801,
+      "license": "BSD-3-Clause"
+    }
+  ]
+}

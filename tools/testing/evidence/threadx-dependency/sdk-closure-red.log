@@ -1,0 +1,14 @@
+test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required (sdk_contracts.SourceSDKThreadXSelectionTests.test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required) ... FAIL
+
+======================================================================
+FAIL: test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required (sdk_contracts.SourceSDKThreadXSelectionTests.test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus-threadx-sdk-design/tests/contracts/test_source_sdk.py", line 62, in test_all_reviewed_threadx_sources_headers_license_and_owned_composition_are_required
+    self.assertTrue((official | owned).issubset(set(source_sdk.REQUIRED_FILES)))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

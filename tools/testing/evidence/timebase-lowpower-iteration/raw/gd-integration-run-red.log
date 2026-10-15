@@ -1,0 +1,72 @@
+Running main() from gmock_main.cc
+[==========] Running 3 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 3 tests from TimebaseIntegration
+[ RUN      ] TimebaseIntegration.VectorDispatchesCompareAfterMonotonicOverflow
+/workspace/nexus/tests/google/timebase_soc_integration_test.cpp:125: Failure
+Expected equality of these values:
+  (*(volatile uint32_t *)(uint32_t)((((((uint32_t)0x40000000U) + 0x00000000U) + 0x00000000U)) + 0x10U)) & 3U
+    Which is: 2
+  0U
+    Which is: 0
+
+/workspace/nexus/tests/google/timebase_soc_integration_test.cpp:126: Failure
+Expected equality of these values:
+  (*(volatile uint32_t *)(uint32_t)((((((uint32_t)0x40000000U) + 0x00000000U) + 0x00000000U)) + 0x0CU))
+    Which is: 3
+  1U
+    Which is: 1
+
+/workspace/nexus/tests/google/timebase_soc_integration_test.cpp:129: Failure
+Value of: state->armed
+  Actual: true
+Expected: false
+
+[  FAILED  ] TimebaseIntegration.VectorDispatchesCompareAfterMonotonicOverflow (0 ms)
+[ RUN      ] TimebaseIntegration.FreshCompareBetweenFlagReadAndAckStillWakes
+/workspace/nexus/tests/google/timebase_soc_integration_test.cpp:138: Failure
+Value of: state->armed
+  Actual: true
+Expected: false
+
+/workspace/nexus/tests/google/timebase_soc_integration_test.cpp:139: Failure
+Expected equality of these values:
+  (*(volatile uint32_t *)(uint32_t)((((((uint32_t)0x40000000U) + 0x00000000U) + 0x00000000U)) + 0x0CU))
+    Which is: 3
+  1U
+    Which is: 1
+
+[  FAILED  ] TimebaseIntegration.FreshCompareBetweenFlagReadAndAckStillWakes (0 ms)
+[ RUN      ] TimebaseIntegration.ClockStopRejectsOutstandingPauseBeforeAnyRelease
+/workspace/nexus/tests/google/timebase_soc_integration_test.cpp:148: Failure
+Expected equality of these values:
+  nx_gd32_soc_stop()
+    Which is: 0
+  -1
+
+/workspace/nexus/tests/google/timebase_soc_integration_test.cpp:152: Failure
+Expected equality of these values:
+  (*(volatile uint32_t *)(uint32_t)((((((uint32_t)0x40000000U) + 0x00000000U) + 0x00000000U)) + 0x00U)) & 1U
+    Which is: 0
+  1U
+    Which is: 1
+
+/workspace/nexus/tests/google/timebase_soc_integration_test.cpp:153: Failure
+Expected equality of these values:
+  (*(volatile uint32_t *)(uint32_t)((((((uint32_t)0x40000000U) + 0x00000000U) + 0x00000000U)) + 0x0CU))
+    Which is: 0
+  1U
+    Which is: 1
+
+[  FAILED  ] TimebaseIntegration.ClockStopRejectsOutstandingPauseBeforeAnyRelease (0 ms)
+[----------] 3 tests from TimebaseIntegration (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 3 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 3 tests, listed below:
+[  FAILED  ] TimebaseIntegration.VectorDispatchesCompareAfterMonotonicOverflow
+[  FAILED  ] TimebaseIntegration.FreshCompareBetweenFlagReadAndAckStillWakes
+[  FAILED  ] TimebaseIntegration.ClockStopRejectsOutstandingPauseBeforeAnyRelease
+
+ 3 FAILED TESTS

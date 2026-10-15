@@ -1,0 +1,2 @@
+[1/2] Building CXX object CMakeFiles/i2c_async_register_test.dir/tests/i2c_async_register_test.cpp.o
+[2/2] Linking CXX executable i2c_async_register_test

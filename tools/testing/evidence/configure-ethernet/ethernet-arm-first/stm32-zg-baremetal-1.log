@@ -1,0 +1,56 @@
+[1/49] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/stack_observation.c.obj
+[2/49] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/time.c.obj
+[3/49] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request_observer.c.obj
+[4/49] Building C object nexus-sdk/core/CMakeFiles/nexus_core.dir/src/request.c.obj
+[5/49] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.obj
+[6/49] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cortex_m.c.obj
+[7/49] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.obj
+[8/49] Linking C static library nexus-sdk/lib/libnexus_core.a
+[9/49] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.obj
+[10/49] Building C object nexus-sdk/arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.obj
+[11/49] Linking C static library nexus-sdk/lib/libnexus_arch.a
+[12/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart.c.obj
+[13/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/gpio.c.obj
+[14/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash.c.obj
+[15/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c.c.obj
+[16/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/spi.c.obj
+[17/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/exti.c.obj
+[18/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/watchdog.c.obj
+[19/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer.c.obj
+[20/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/flash_region.c.obj
+[21/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc.c.obj
+[22/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/dma.c.obj
+[23/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/wake.c.obj
+[24/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.obj
+[25/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/adc_observer.c.obj
+[26/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream_budget.c.obj
+[27/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/stream.c.obj
+[28/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/can.c.obj
+[29/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/mdio.c.obj
+[30/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.obj
+[31/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/ethernet.c.obj
+[32/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/usb_device.c.obj
+[33/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/timer_capture.c.obj
+[34/49] Building C object nexus-sdk/os/CMakeFiles/nexus_os_wait.dir/wait.c.obj
+[35/49] Building C object nexus-sdk/io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.obj
+[36/49] Linking C static library nexus-sdk/lib/libnexus_io.a
+[37/49] Building C object nexus-sdk/soc/stm32f407/CMakeFiles/nexus_soc_stm32f407.dir/drivers/ethernet.c.obj
+[38/49] Linking C static library nexus-sdk/lib/libnexus_os_wait.a
+[39/49] Building C object nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj
+FAILED: [code=1] nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj 
+/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc -DSTM32F407xx -I/workspace/nexus-config-iteration-evidence/ethernet-arm-first/stm32-zg-baremetal/nexus-sdk/generated -I/workspace/nexus/io/private -I/workspace/nexus/soc/stm32f407/private -I/workspace/nexus/vendors/st/cmsis_device_f4/Include -I/workspace/nexus/vendors/arm/CMSIS_5/CMSIS/Core/Include -I/workspace/nexus/io/include -I/workspace/nexus/core/include -I/workspace/nexus/arch/include -O3 -DNDEBUG -std=c11 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fshort-enums -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -MD -MT nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj -MF nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj.d -o nexus-sdk/CMakeFiles/nexus_platform.dir/generated/bindings.c.obj -c /workspace/nexus-config-iteration-evidence/ethernet-arm-first/stm32-zg-baremetal/nexus-sdk/generated/bindings.c
+In file included from /workspace/nexus-config-iteration-evidence/ethernet-arm-first/stm32-zg-baremetal/nexus-sdk/generated/bindings.c:9:
+/workspace/nexus-config-iteration-evidence/ethernet-arm-first/stm32-zg-baremetal/nexus-sdk/generated/nexus_bindings.h:30:14: error: unknown type name 'nx_mdio_port_t'; did you mean 'nx_eth_port_t'?
+   30 | extern const nx_mdio_port_t* const nx_binding_mac_mdio;
+      |              ^~~~~~~~~~~~~~
+      |              nx_eth_port_t
+/workspace/nexus-config-iteration-evidence/ethernet-arm-first/stm32-zg-baremetal/nexus-sdk/generated/bindings.c:49:29: error: conflicting types for 'nx_binding_mac_mdio'; have 'const nx_mdio_port_t * const'
+   49 | const nx_mdio_port_t* const nx_binding_mac_mdio = &s_nx_face_mdio_mac;
+      |                             ^~~~~~~~~~~~~~~~~~~
+/workspace/nexus-config-iteration-evidence/ethernet-arm-first/stm32-zg-baremetal/nexus-sdk/generated/nexus_bindings.h:30:36: note: previous declaration of 'nx_binding_mac_mdio' with type 'const int * const'
+   30 | extern const nx_mdio_port_t* const nx_binding_mac_mdio;
+      |                                    ^~~~~~~~~~~~~~~~~~~
+[40/49] Building C object nexus-sdk/soc/stm32f407/CMakeFiles/nexus_soc_stm32f407.dir/drivers/gpio.c.obj
+[41/49] Building C object nexus-sdk/os/CMakeFiles/nexus_os_baremetal.dir/baremetal/notify.c.obj
+[42/49] Building C object nexus-sdk/soc/stm32f407/CMakeFiles/nexus_soc_stm32f407.dir/workspace/nexus/io/src/eth_mac.c.obj
+ninja: build stopped: subcommand failed.

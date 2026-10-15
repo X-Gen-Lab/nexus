@@ -1,0 +1,217 @@
+/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ * Copyright (c) 2026-present Eclipse ThreadX contributors
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
+
+// Portions of this file were generated with AI assistance.
+
+
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** ThreadX Component                                                     */
+/**                                                                       */
+/**   Thread                                                              */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
+
+#define TX_SOURCE_CODE
+
+
+/* Include necessary system files.  */
+
+#include "tx_api.h"
+#include "tx_thread.h"
+
+
+/**************************************************************************/
+/*                                                                        */
+/*  FUNCTION                                               RELEASE        */
+/*                                                                        */
+/*    _tx_thread_shell_entry                              PORTABLE C      */
+/*                                                           6.1          */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    William E. Lamie, Microsoft Corporation                             */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This function calls the specified entry function of the thread.  It */
+/*    also provides a place for the thread's entry function to return.    */
+/*    If the thread returns, this function places the thread in a         */
+/*    "COMPLETED" state.                                                  */
+/*                                                                        */
+/*  INPUT                                                                 */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  OUTPUT                                                                */
+/*                                                                        */
+/*    None                                                                */
+/*                                                                        */
+/*  CALLS                                                                 */
+/*                                                                        */
+/*    thread_entry                      Thread's entry function           */
+/*    _tx_thread_system_suspend         Thread suspension routine         */
+/*    _tx_thread_system_ni_suspend      Non-interruptable suspend thread  */
+/*                                                                        */
+/*  CALLED BY                                                             */
+/*                                                                        */
+/*    Initial thread stack frame                                          */
+/*                                                                        */
+/**************************************************************************/
+VOID  _tx_thread_shell_entry(VOID)
+{
+
+TX_INTERRUPT_SAVE_AREA
+
+TX_THREAD       *thread_ptr;
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
+VOID            (*entry_exit_notify)(TX_THREAD *notify_thread_ptr, UINT type);
+#endif
+
+
+    /* Pickup thread pointer.  */
+    TX_THREAD_GET_CURRENT(thread_ptr)
+
+    /* Perform any additional activities for tool or user purpose.  */
+    TX_THREAD_STARTED_EXTENSION(thread_ptr)
+
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
+
+    /* Disable interrupts.  */
+    TX_DISABLE
+
+    /* Pickup the entry/exit application callback routine.  */
+    entry_exit_notify =  thread_ptr -> tx_thread_entry_exit_notify;
+
+    /* Restore interrupts.  */
+    TX_RESTORE
+
+    /* Determine if an application callback routine is specified.  */
+    if (entry_exit_notify != TX_NULL)
+    {
+
+        /* Yes, notify application that this thread has been entered!  */
+        (entry_exit_notify)(thread_ptr, TX_THREAD_ENTRY);
+    }
+#endif
+
+    /* Call current thread's entry function.  */
+    (thread_ptr -> tx_thread_entry) (thread_ptr -> tx_thread_entry_parameter);
+
+    /* Suspend thread with a "completed" state.  */
+
+    /* Determine if the application is using mutexes.  */
+    if (_tx_thread_mutex_release != TX_NULL)
+    {
+
+        /* Yes, call the mutex release function via a function pointer that
+           is setup during mutex initialization.  */
+        (_tx_thread_mutex_release)(thread_ptr);
+    }
+
+    /* Lockout interrupts while the thread state is setup.  */
+    TX_DISABLE
+
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
+
+    /* Pickup the entry/exit application callback routine again.  */
+    entry_exit_notify =  thread_ptr -> tx_thread_entry_exit_notify;
+#endif
+
+    /* Set the status to suspending, in order to indicate the suspension
+       is in progress.  */
+    thread_ptr -> tx_thread_state =  TX_COMPLETED;
+
+    /* Thread state change.  */
+    TX_THREAD_STATE_CHANGE(thread_ptr, TX_COMPLETED)
+
+#ifdef TX_NOT_INTERRUPTABLE
+
+    /* Set the suspending flag, so that the completion transition is marked as in
+       progress for the same interval it is marked in the interruptable
+       configuration below.  Nothing in this configuration needs the flag to cancel
+       an interrupted suspension -- interrupts stay disabled through the whole
+       transition -- but the notification callback and the completion extension
+       below are application code, reached by a direct call, and interrupt lockout
+       does not stop either of them from calling a thread lifecycle service on this
+       same control block.  The flag is what _tx_thread_delete and _tx_thread_reset
+       test in order to refuse one.  */
+    thread_ptr -> tx_thread_suspending =  TX_TRUE;
+
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
+
+    /* Determine if an application callback routine is specified.  */
+    if (entry_exit_notify != TX_NULL)
+    {
+
+        /* Yes, notify application that this thread has exited!  */
+        (entry_exit_notify)(thread_ptr, TX_THREAD_EXIT);
+    }
+#endif
+
+    /* Perform any additional activities for tool or user purpose.  */
+    TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
+
+    /* Clear the suspending flag.  It has to be cleared here rather than after the
+       call below, because _tx_thread_system_ni_suspend returns to the scheduler for
+       a thread that is the current thread, which this one is, and so does not come
+       back.  Clearing it afterwards would leave a normally completed thread marked
+       as transitioning for ever and therefore permanently undeletable.  Clearing it
+       here loses nothing: everything from this point to the detachment runs with
+       interrupts disabled and calls no application code.  */
+    thread_ptr -> tx_thread_suspending =  TX_FALSE;
+
+    /* Call actual non-interruptable thread suspension routine.  */
+    _tx_thread_system_ni_suspend(thread_ptr, ((ULONG) 0));
+
+    /* Restore interrupts.  */
+    TX_RESTORE
+#else
+
+    /* Set the suspending flag. */
+    thread_ptr -> tx_thread_suspending =  TX_TRUE;
+
+    /* Setup for no timeout period.  */
+    thread_ptr -> tx_thread_timer.tx_timer_internal_remaining_ticks =  ((ULONG) 0);
+
+    /* Temporarily disable preemption.  */
+    _tx_thread_preempt_disable++;
+
+    /* Restore interrupts.  */
+    TX_RESTORE
+
+    /* Perform any additional activities for tool or user purpose.  */
+    TX_THREAD_COMPLETED_EXTENSION(thread_ptr)
+
+#ifndef TX_DISABLE_NOTIFY_CALLBACKS
+
+    /* Determine if an application callback routine is specified.  */
+    if (entry_exit_notify != TX_NULL)
+    {
+
+        /* Yes, notify application that this thread has exited!  */
+        (entry_exit_notify)(thread_ptr, TX_THREAD_EXIT);
+    }
+#endif
+
+    /* Call actual thread suspension routine.  */
+    _tx_thread_system_suspend(thread_ptr);
+#endif
+
+
+#ifdef TX_SAFETY_CRITICAL
+
+    /* If we ever get here, raise safety critical exception.  */
+    TX_SAFETY_CRITICAL_EXCEPTION(__FILE__, __LINE__, 0);
+#endif
+}
+

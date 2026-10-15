@@ -1,0 +1,78 @@
+name: Record Nexus Job Identity
+description: Bind published bytes to the actual checkout, inputs and tools
+
+inputs:
+  job:
+    description: Unique job and matrix identity
+    required: true
+  result:
+    description: Actual job.status before this observation step
+    required: true
+  expected-commit:
+    description: Exact checkout SHA, including a PR merge or head selection
+    required: true
+  artifacts:
+    description: Explicit newline-separated paths that the upload publishes
+    required: true
+  tools:
+    description: Newline-separated tool name=executable identities
+    required: true
+  output:
+    description: Fresh identity output directory inside the checkout
+    required: true
+  require-dependencies:
+    description: Require all locked source dependencies for successful jobs
+    default: 'true'
+  dependency-preparation:
+    description: Optional verified preset preparation receipt selecting the job closure
+    default: ''
+  dependency-preset:
+    description: Expected job preset bound to the selected preparation and configuration
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Observe source, configuration closure and artifact bytes
+      shell: bash
+      env:
+        NEXUS_IDENTITY_JOB: ${{ inputs.job }}
+        NEXUS_IDENTITY_RESULT: ${{ inputs.result }}
+        NEXUS_IDENTITY_COMMIT: ${{ inputs.expected-commit }}
+        NEXUS_IDENTITY_ARTIFACTS: ${{ inputs.artifacts }}
+        NEXUS_IDENTITY_TOOLS: ${{ inputs.tools }}
+        NEXUS_IDENTITY_OUTPUT: ${{ inputs.output }}
+        NEXUS_IDENTITY_DEPENDENCIES: ${{ inputs.require-dependencies }}
+        NEXUS_IDENTITY_PREPARATION: ${{ inputs.dependency-preparation }}
+        NEXUS_IDENTITY_PRESET: ${{ inputs.dependency-preset }}
+      run: |
+        python3 - <<'PY'
+        import os
+        import subprocess
+        import sys
+
+        def required(name):
+            value = os.environ['NEXUS_IDENTITY_' + name]
+            if not value.strip():
+                raise SystemExit('missing identity input: ' + name)
+            return value
+
+        arguments = [sys.executable, 'tools/maintenance/job_identity.py',
+                     '--job', required('JOB'), '--result', required('RESULT'),
+                     '--expected-commit', required('COMMIT'),
+                     '--output', required('OUTPUT')]
+        for name, flag in (('ARTIFACTS', '--artifact'), ('TOOLS', '--tool')):
+            for value in required(name).splitlines():
+                if value.strip():
+                    arguments.extend([flag, value.strip()])
+        dependencies = required('DEPENDENCIES')
+        if dependencies == 'false':
+            arguments.append('--observe-uninitialized-dependencies')
+        elif dependencies != 'true':
+            raise SystemExit('invalid identity dependency policy')
+        preparation = os.environ['NEXUS_IDENTITY_PREPARATION'].strip()
+        if preparation:
+            arguments.extend(['--dependency-preparation', preparation,
+                              '--expected-preset', required('PRESET')])
+        raise SystemExit(subprocess.call(arguments))
+        PY

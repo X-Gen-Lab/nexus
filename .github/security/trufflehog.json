@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "version": "3.99.1",
+  "archive_url": "https://github.com/trufflesecurity/trufflehog/releases/download/v3.99.1/trufflehog_3.99.1_linux_amd64.tar.gz",
+  "archive_sha256": "a15492ba041e4574ed604ba52a6a49b5f628ff0f13833c18e3cb617021c37d86",
+  "binary_sha256": "df190aa9f2833297dca7d287c3ba274819d17002f18b938421f594e453f60d83",
+  "reviewed_unknowns": [
+    {
+      "detector": "URI",
+      "detector_type": 17,
+      "source_type": 16,
+      "path": "tools/testing/test_dependency_proposals.py",
+      "function": "test_sources_with_credentials_or_non_https_reject",
+      "raw_sha256": "8d3331ee208c72c30fba199e4e2b8a65d69a5034e49875a2f20dbea3a4f2f976",
+      "context_sha256": "56211b4ee3d342cb108261592c0c16398492446a281d1f4a64b2bc9cf0ee6ca5",
+      "reason": "Synthetic credential URI negative test; production rejects it before any upstream network request. Verified candidates remain blocking."
+    },
+    {
+      "detector": "URI",
+      "detector_type": 17,
+      "source_type": 16,
+      "path": "tools/testing/test_dependency_proposals.py",
+      "function": "test_upstream_origin_without_public_allowed_host_rejects_before_request",
+      "raw_sha256": "1340e191f197d87f9a6b772ca28aab13ba201dcff4036b49b531df0945c3a66a",
+      "context_sha256": "bd3dc68cf4b2e52351178d8ba7d40471b7cfd7bf2c3194aa60d18f2e3feee0b1",
+      "reason": "Synthetic credential URI negative test; production rejects it before any upstream network request. Verified candidates remain blocking."
+    }
+  ]
+}

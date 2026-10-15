@@ -1,0 +1,73 @@
+schema = 2
+board_package = "stm32-zg-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[uart.primary_uart]
+binding = "primary-uart"
+mode = "dma-tx"
+baud = 115200
+[uart.primary_uart.rx]
+format = "bytes"
+capacity = 32
+[uart.primary_uart.irq]
+priority = 5
+calls_os = false
+
+[uart.secondary_uart]
+binding = "secondary-uart"
+mode = "dma-tx"
+baud = 115200
+[uart.secondary_uart.rx]
+format = "bytes"
+capacity = 32
+[uart.secondary_uart.irq]
+priority = 5
+calls_os = false
+
+[spi.primary_spi]
+binding = "primary-spi"
+mode = "dma"
+max_hz = 1000000
+[spi.primary_spi.irq]
+priority = 5
+calls_os = false
+[spi_device.primary_sensor]
+controller = "primary_spi"
+mode = 0
+max_hz = 1000000
+cs_binding = "primary-cs"
+
+[spi.secondary_spi]
+binding = "secondary-spi"
+mode = "dma"
+max_hz = 1000000
+[spi.secondary_spi.irq]
+priority = 5
+calls_os = false
+[spi_device.secondary_sensor]
+controller = "secondary_spi"
+mode = 0
+max_hz = 1000000
+cs_binding = "secondary-cs"
+
+[i2c.secondary_i2c]
+binding = "secondary-i2c"
+mode = "dma-messages"
+max_hz = 100000
+[i2c.secondary_i2c.irq]
+priority = 5
+calls_os = false
+[i2c_device.secondary_sensor_i2c]
+controller = "secondary_i2c"
+address = 80

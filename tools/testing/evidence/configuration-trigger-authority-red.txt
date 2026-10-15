@@ -1,0 +1,23 @@
+FF
+======================================================================
+FAIL: test_fixed_adc_trigger_cannot_omit_its_physical_timer_claim (test_toml.TomlConfigurationTests.test_fixed_adc_trigger_cannot_omit_its_physical_timer_claim) (family='stm32f407')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 484, in test_fixed_adc_trigger_cannot_omit_its_physical_timer_claim
+    with self.assertRaisesRegex(gate.ConfigurationError, "Trigger resource differs from fixed provider"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+======================================================================
+FAIL: test_fixed_adc_trigger_cannot_omit_its_physical_timer_claim (test_toml.TomlConfigurationTests.test_fixed_adc_trigger_cannot_omit_its_physical_timer_claim) (family='gd32f470')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/nexus/tools/configure/test_toml.py", line 484, in test_fixed_adc_trigger_cannot_omit_its_physical_timer_claim
+    with self.assertRaisesRegex(gate.ConfigurationError, "Trigger resource differs from fixed provider"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConfigurationError not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.056s
+
+FAILED (failures=2)

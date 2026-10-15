@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "item": "IO55-generated-ETH-lifecycle",
+  "reviewer": "/root/arch_runtime",
+  "method": "read-only selected cold construction/rollback and actual referenced MAC init/stop portions; no edits or test reruns",
+  "captured_at_utc": "2026-10-11T19:29:36.084569+00:00",
+  "status": "no new lifecycle blocker found under explicit trusted cold owner contract",
+  "source": [
+    {
+      "path": "tools/configure/ethernet.py",
+      "sha256": "a5ac645aec49996d7c0635015086d528b4fcb148b6f0823383b2592166918f02"
+    },
+    {
+      "path": "tools/configure/bindings.py",
+      "sha256": "81d57ed6752ad5bb085ae8ff77ccbf5d59e3f004f404c03ad0a13f96ff6fd417"
+    },
+    {
+      "path": "tools/configure/providers/stm32f407/emission.py",
+      "sha256": "e74e0755b3f2169244e19d6a129f1f222ac95bba0af4e84205fbeafd51c8181e"
+    },
+    {
+      "path": "tools/configure/providers/gd32f470/emission.py",
+      "sha256": "e24222e0f7499f69e5ce918df3c2f283824d39578763bfd7dab567b0fc0d02d1"
+    },
+    {
+      "path": "tools/configure/providers/stm32f407/bindings.py",
+      "sha256": "163fe6071e3475252856424a1e568cafa8467d8375758734a8b8948ad276852d"
+    },
+    {
+      "path": "tools/configure/providers/gd32f470/bindings.py",
+      "sha256": "5f4a08fa74e5dbf65b12c28d4e338be3e7bfe291c0525886836c3f9df66abf94"
+    },
+    {
+      "path": "io/src/eth_mac.c",
+      "sha256": "9123d006b36a8bd26ca1137093fd245d88dd9602a7fb4bfab17b1c0049a0c566"
+    },
+    {
+      "path": "soc/stm32f407/drivers/ethernet.c",
+      "sha256": "ff4edd1671aac5dc0a85ff5554f1a54a0735f513ca447e69c093e46db887dbd3"
+    },
+    {
+      "path": "soc/gd32f470/drivers/ethernet.c",
+      "sha256": "befdeb0084e868422c40fe31b5673e8da356352c252ce457a3319ffb3e0ea491"
+    }
+  ],
+  "checked_invariants": [
+    "common platform marks ETH count before prepare so all cold partial effects enter reverse cleanup",
+    "gate ownership captured before any pin or controller initialization, preexisting gates preserved",
+    "pin snapshot and lease bit recorded before pin configure; failed mutation participates in restore/readback retry",
+    "generated MAC state preserves 64-bit epoch across reconstruction; actual common initializer refuses maximum, so stale RX frame token cannot be made current by restarting",
+    "all selected interface stop operations complete before global clock cleanup",
+    "ETH per-instance stop requires actual MAC drain/retained=false final access proof before restoring pins and RMII selector",
+    "pin and selector readback failure preserves remaining lease markers, platform count and started state; retry does not replay admission",
+    "owned MAC/SYSCFG/GPIO gate clear independently read back before clearing each marker; failed store retains corresponding marker",
+    "MDIO face is immutable and paired with same selected MAC context; no hidden PHY or worker instantiated",
+    "exact selected arrays/counts and fixed main-SRAM DMA region are software inputs; actual ELF budget remains separate execution proof"
+  ],
+  "contracts": [
+    "one trusted serialized privileged lifecycle owner; generated lifecycle is not a userspace security gateway",
+    "all external provider users and PHY/network actors quiesce according to their own lifetime contracts before platform teardown",
+    "platform controls shared clock/pin resources until all selected interfaces drain; concurrent independent RCC/SYSCFG owners excluded",
+    "reviewed SoC pad route is not evidence of a populated Board PHY or REFCLK electrical/timing qualification"
+  ],
+  "execution": {
+    "tests_rerun_by_reviewer": 0,
+    "arm_rerun_by_reviewer": 0,
+    "physical_hil": "not_executed",
+    "owner_tests": "not adopted as reviewer execution"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "checked_files": 4,
+  "failing_diagnostics": 0,
+  "files": {
+    "components/user_io_broker/include/nexus/components/user_io_broker.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "d5682f58e77cf6de5a5c5100956374d928981c44a0b65e52bba18f7e70196921"
+    },
+    "components/user_io_broker/private/user_io_broker_impl.h": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "31a4c66c5b7f1519e2b74b04fcf581cc912f90ed805a42cb7d22fa64e02e5557"
+    },
+    "components/user_io_broker/src/user_io_broker.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "aa1a4485d7ec333ce02877481da9377154d0eae1f04c3a394c9f93df9a3436e6"
+    },
+    "tests/google/user_io_broker_test.cpp": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "a3395c05e1f108d281e363c0a2dec8e7a7baf7c1cbc304018872c77fc2e0382e"
+    }
+  },
+  "limitations": [
+    "Mechanical comment syntax and header fields only; no authorship verification.",
+    "No proof of ownership, ISR safety, deadlines, API coverage or contract correctness.",
+    "Baseline authenticity and changes require the separate review/CI policy."
+  ],
+  "ruleset_version": 1,
+  "schema_version": 1,
+  "status": "passed"
+}

@@ -1,0 +1,118 @@
+{
+  "board": "stm32g474re-hse24-reference",
+  "budget": {
+    "path": "/workspace/nexus-g474-iteration-evidence/arm-four-run2/empty-freertos/build/nexus-sdk/generated/resource-budget.json",
+    "sha256": "48de0ebb0d028088225a617b25a1b5031ff4f8541d120b56464d537014eb6d6f",
+    "size": 174
+  },
+  "configuration_inputs": [
+    {
+      "file": {
+        "path": "/workspace/nexus/boards/stm32g474re_hse24_reference/board.json",
+        "sha256": "6db394749153f691d43343eb78e105aa329dabe9ea1d65ed7f3bcb449f1bfa1c",
+        "size": 1776
+      },
+      "label": "boards/stm32g474re_hse24_reference/board.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/dependencies/platform-compatibility.json",
+        "sha256": "cd8c58f48f176fc62dcb09e982b97f4a5295c56466730498781be72df41ed7ae",
+        "size": 585
+      },
+      "label": "dependencies/platform-compatibility.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32g474/routes.json",
+        "sha256": "b731f659b0afd3fff78ccefd1f7b410370a3358bfebb5bf412403bab5699c874",
+        "size": 1118
+      },
+      "label": "soc/stm32g474/routes.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/soc/stm32g474/soc.json",
+        "sha256": "0c8e4ece490edd06190295601139b0182a29249d6734744892c272e74420dd56",
+        "size": 6459
+      },
+      "label": "soc/stm32g474/soc.json"
+    },
+    {
+      "file": {
+        "path": "/workspace/nexus/tests/contracts/g474_assembly/empty-freertos.toml",
+        "sha256": "cadd56c1ea34d711f1d2e36f1efe26aa783686812a99710276ffcbe56a191806",
+        "size": 351
+      },
+      "label": "tests/contracts/g474_assembly/empty-freertos.toml"
+    }
+  ],
+  "elf": {
+    "path": "/workspace/nexus-g474-iteration-evidence/arm-four-run2/empty-freertos/build/bin/g474_assembly.elf",
+    "sha256": "a0d50d01eefe661e23a9335c5ae706afebee561a4a4446e6181cd27912727a58",
+    "size": 24756
+  },
+  "kind": "elf_resource_budget",
+  "metrics": {
+    "accounting": "LOAD physical file bytes include RAM initialization; RAM is allocated-section/reservation interval union, excluding unallocated segment address gaps and never adding MSP/heap twice",
+    "cycles_latency": "not_measured",
+    "dynamic_high_water": "not_measured",
+    "flash": {
+      "capacity_bytes": 524288,
+      "footprint_bytes": 7680,
+      "loaded_bytes": 7680,
+      "ranges": [
+        [
+          134217728,
+          134225408
+        ]
+      ]
+    },
+    "ram": {
+      "cpu-sram": {
+        "capacity_bytes": 131072,
+        "linker_supported": true,
+        "ranges": [
+          [
+            536870912,
+            536870972
+          ],
+          [
+            536870976,
+            536872592
+          ],
+          [
+            536999936,
+            537001984
+          ]
+        ],
+        "reserved_bytes": 3724
+      }
+    },
+    "reservations": {
+      "heap": {
+        "bytes": 0,
+        "domain": "cpu-sram",
+        "end": 536872592,
+        "start": 536872592
+      },
+      "msp": {
+        "bytes": 2048,
+        "domain": "cpu-sram",
+        "end": 537001984,
+        "start": 536999936
+      }
+    }
+  },
+  "part": "STM32G474RET6",
+  "physical_status": "not_executed",
+  "resolved": {
+    "path": "/workspace/nexus-g474-iteration-evidence/arm-four-run2/empty-freertos/build/nexus-sdk/generated/resolved.json",
+    "sha256": "59f2c9259962a58d4a4b96f336d21c039864f2cc470c119dcd7458d456b01c54",
+    "size": 15463
+  },
+  "schema_version": 1,
+  "soc_family": "stm32g474",
+  "status": "passed",
+  "violations": []
+}
