@@ -372,6 +372,31 @@
       "path": "docs-release-0.1.0-58297516d707-postintegration/verify-postintegration.py",
       "bytes": 3187,
       "sha256": "0757224f57dcd2dca650f9da4add0a52225bfb8a09d4f8b7f99c972a83dbc4b0"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration-restore/README.txt",
+      "bytes": 952,
+      "sha256": "8b89f3068fbef7d4c68275e94bdb444197d928cb4c0d8c38f0b4d7ffb3f20c4a"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration-restore/SHA256SUMS",
+      "bytes": 338,
+      "sha256": "64b91b3804bb58f34cf41cdd95d7a6c54faa6caebde1a15a730ac282947bf7e5"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration-restore/member-observations.json",
+      "bytes": 36070,
+      "sha256": "dc1ef9db803024b5019d9a49391939680611a037023a6425b90f1f7a4a4ec53d"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration-restore/restore.json",
+      "bytes": 5643,
+      "sha256": "f0637d860d1e924f59fa777f50fecfac66eede2e13bb7876d899e7c104483706"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-postintegration-restore/verify-remote-restore.py",
+      "bytes": 6104,
+      "sha256": "cf42c0d7a5551586181a34cc302c0dbc82ea34e2dbb7318b6fa9c393d1966443"
     }
   ],
   "physical_hil": "not_executed",

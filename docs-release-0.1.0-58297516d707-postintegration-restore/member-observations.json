@@ -1,0 +1,964 @@
+{
+  "kind": "independent_downloaded_local_addendum_members",
+  "input_asset_commit": "b6dd7cbe53658fe855f335081084680ce909e582",
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "postintegration_members": [
+    {
+      "path": "actual-main-C-browser-v2.execution.command.json",
+      "bytes": 1832,
+      "sha256": "b9f246d4c0ac11b55b4b1f7ea413aef02712e69f4702cc66e27d9b9c4a7aa119"
+    },
+    {
+      "path": "actual-main-C-browser-v2.execution.json",
+      "bytes": 1853,
+      "sha256": "d9fc819b11ceeaf2831c392a562a810d95854720dbce423a0110528bf54a3422"
+    },
+    {
+      "path": "actual-main-C-browser-v2.execution.log",
+      "bytes": 144,
+      "sha256": "bbf3739e31a1f915f77a28bffe8ce7125f26ea96ad425d7525f88aedd302248c"
+    },
+    {
+      "path": "actual-main-C-browser-v2/acceptance-summary.json",
+      "bytes": 6456,
+      "sha256": "790b4e260da60fc529e6fcd4f250be4459da78087260d78ec82c197ff1f24474"
+    },
+    {
+      "path": "actual-main-C-browser-v2/browser-report.json",
+      "bytes": 489155,
+      "sha256": "04f5eb848277068796c50a2608006a6f04bc40c117d965fb1039ab626bc5a910"
+    },
+    {
+      "path": "actual-main-C-browser-v2/narrow-en-release.png",
+      "bytes": 85253,
+      "sha256": "3a0716374d038f5f9b78cba73be350523b34dd47d9eabbe7c5c525fdf6395130"
+    },
+    {
+      "path": "actual-main-C-browser-v2/narrow-zh_CN-release.png",
+      "bytes": 111730,
+      "sha256": "e1c4e16314c1b433be7f7e6702d361bbd7030f29799fb1aa2d67a5de65512897"
+    },
+    {
+      "path": "actual-main-C-browser-v2/reflow200-zh_CN-reference-documentation-delivery.png",
+      "bytes": 221462,
+      "sha256": "fecaadec5597569c2a3d9f82e55da5e26f6070e0c41be8adb63be3dedaa20184"
+    },
+    {
+      "path": "actual-main-C-browser-v2/search-en.png",
+      "bytes": 168160,
+      "sha256": "c2cda1deb63405e11968fbcc03c93d273c78d77cf0f04dfd4ff78bfb9938c66e"
+    },
+    {
+      "path": "actual-main-C-browser-v2/search-zh_CN.png",
+      "bytes": 231896,
+      "sha256": "31bf3fcd1d60d33d84fdedd09683b84329429374dc8e1c28219816c29cd63ecb"
+    },
+    {
+      "path": "actual-main-C-browser-v2/verified-payload-inventory.json",
+      "bytes": 248328,
+      "sha256": "6a660eaf62f1c1f92fa986970a2b78ebbcc01f0794ffc9181588c6c404186508"
+    },
+    {
+      "path": "actual-main-C-browser-v2/zoom200-en-design-source-compatibility.png",
+      "bytes": 158435,
+      "sha256": "9002cb56a0f0fd56e40a6a9c8a5c2c0780b61585f3bb271053121b26621201d5"
+    },
+    {
+      "path": "actual-main-C-browser.execution.command.json",
+      "bytes": 1815,
+      "sha256": "0958ede3c626096f02bdecfef7543dfbbf5cc1e202542078838738923b288aa7"
+    },
+    {
+      "path": "actual-main-C-browser.execution.json",
+      "bytes": 1530,
+      "sha256": "e1cfb29520805ec013d1fa2656cc9505746fe9f5caa146e3e94f47f6ecf31111"
+    },
+    {
+      "path": "actual-main-C-browser.execution.log",
+      "bytes": 1802,
+      "sha256": "9467427798d8e072ebbc5699a18a3e8eb6397d7832738c3e7fa8b8969228c5ef"
+    },
+    {
+      "path": "actual-main-C-browser/browser-report.json",
+      "bytes": 533767,
+      "sha256": "5a3f3ef83aa9fde43c2daa39b815fe7ac94e346ec22a1787a1b675356df66dae"
+    },
+    {
+      "path": "actual-main-C-browser/narrow-en-release.png",
+      "bytes": 85253,
+      "sha256": "3a0716374d038f5f9b78cba73be350523b34dd47d9eabbe7c5c525fdf6395130"
+    },
+    {
+      "path": "actual-main-C-browser/narrow-zh_CN-release.png",
+      "bytes": 111730,
+      "sha256": "e1c4e16314c1b433be7f7e6702d361bbd7030f29799fb1aa2d67a5de65512897"
+    },
+    {
+      "path": "actual-main-C-browser/reflow200-zh_CN-reference-documentation-delivery.png",
+      "bytes": 221462,
+      "sha256": "fecaadec5597569c2a3d9f82e55da5e26f6070e0c41be8adb63be3dedaa20184"
+    },
+    {
+      "path": "actual-main-C-browser/search-en.png",
+      "bytes": 168160,
+      "sha256": "c2cda1deb63405e11968fbcc03c93d273c78d77cf0f04dfd4ff78bfb9938c66e"
+    },
+    {
+      "path": "actual-main-C-browser/search-zh_CN.png",
+      "bytes": 231896,
+      "sha256": "31bf3fcd1d60d33d84fdedd09683b84329429374dc8e1c28219816c29cd63ecb"
+    },
+    {
+      "path": "actual-main-C-browser/verified-payload-inventory.json",
+      "bytes": 248328,
+      "sha256": "6a660eaf62f1c1f92fa986970a2b78ebbcc01f0794ffc9181588c6c404186508"
+    },
+    {
+      "path": "actual-main-C-browser/zoom200-en-design-source-compatibility.png",
+      "bytes": 158435,
+      "sha256": "9002cb56a0f0fd56e40a6a9c8a5c2c0780b61585f3bb271053121b26621201d5"
+    },
+    {
+      "path": "browser-preparation/help.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "browser-preparation/help.stdout.txt",
+      "bytes": 1030,
+      "sha256": "dc5619abcc35fc55922385f98dbfb55656f47abe20a9f890cd0124fa900928ef"
+    },
+    {
+      "path": "browser-preparation/independent-review.json",
+      "bytes": 2488,
+      "sha256": "73d099f99c80521e1b9c464843450a6be2074f32c5da9ee6b7d73535f8ad8475"
+    },
+    {
+      "path": "browser-preparation/offline-diagnostic-postnavigation.json",
+      "bytes": 9423,
+      "sha256": "3a5af855ce132a6a1a170e4f7fe55d40b56339c0a4fb1b99621a394a39170d03"
+    },
+    {
+      "path": "browser-preparation/offline-diagnostic.json",
+      "bytes": 5038,
+      "sha256": "3a0f0d02f3931b45a144d3a5a9aef6b0965cde8d5093798026483696b63b4875"
+    },
+    {
+      "path": "browser-preparation/offline_diagnostic.py",
+      "bytes": 5193,
+      "sha256": "f0a2eddbb278400d87492164f8c47347d84aa09ae6d89f220b86292b0887b0fb"
+    },
+    {
+      "path": "browser-preparation/offline_diagnostic_postnavigation.py",
+      "bytes": 6142,
+      "sha256": "4f3329aaac8443b16f67caf8d5b244291d51970682d0b3d01dcd54acd1b02ffc"
+    },
+    {
+      "path": "browser-preparation/preparation-receipt.json",
+      "bytes": 2416,
+      "sha256": "21e61d5387ceb44c8e1c82dab7aaa225d50aa2e9f1a14df93af28e22b0de61ff"
+    },
+    {
+      "path": "browser-preparation/v2-help.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "browser-preparation/v2-help.stdout.txt",
+      "bytes": 1042,
+      "sha256": "b827c02b00e87505529bdd5c31f23f8c804ee83d125aeca304e69157770e58ab"
+    },
+    {
+      "path": "browser-preparation/v2-independent-review.json",
+      "bytes": 1610,
+      "sha256": "8886cd8792cf21ea9d0fe1009a8721ac7aa1a1cc9d3c080b307a9b1de7a45e6d"
+    },
+    {
+      "path": "browser-preparation/v2-preparation.json",
+      "bytes": 1051,
+      "sha256": "492e8758940d4296f7617c1d6650ebe0b020f76ee30e199594c5786b2a6561c1"
+    },
+    {
+      "path": "browser-preparation/validate_release_site.py",
+      "bytes": 23217,
+      "sha256": "5ddaad509badc0698470ac22d2252464aa6444372923103e281c63b9169904a2"
+    },
+    {
+      "path": "browser-preparation/validate_release_site_v2.py",
+      "bytes": 24424,
+      "sha256": "2ac50989d194f360c6eefa7343d939b0aa497a7f863e637101f7316373c3e7aa"
+    },
+    {
+      "path": "cleanup-plan/browser-v2-independent-review.json",
+      "bytes": 3253,
+      "sha256": "d4342b530ef8bd7d9a902b81110f76e24d0ebd9560aac0cda9e7d58390fc8bc6"
+    },
+    {
+      "path": "cleanup-plan/browser-v2-independent.diff",
+      "bytes": 5547,
+      "sha256": "e779a2dee9367b62adc1f226fb63aa14267fadb1dee17231ce0fe013069a3bf3"
+    },
+    {
+      "path": "main-documentation/verification.json",
+      "bytes": 1421,
+      "sha256": "dcf5edf7e65d82aa3ea014b2a4aac0eec54a460e696a9fa9f8258783ff14990c"
+    },
+    {
+      "path": "publisher-assembly-58297516d707fdee117bd27b5df6af09d72edd2e.json",
+      "bytes": 1663,
+      "sha256": "e0fee0ec8538a7fb7d116c2386884e2b1dd8e243ca1b9207f3cc106241b98d88"
+    },
+    {
+      "path": "publisher-commit.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "publisher-commit.log",
+      "bytes": 151438,
+      "sha256": "108fb57c876e04a9fd1dbd2e5bdde2ab146bac5244d5832ea3fb0ba9969bc649"
+    },
+    {
+      "path": "publisher-local-commit.json",
+      "bytes": 650,
+      "sha256": "2f4d5c9391b8d4922bc8a6cf51ef4ea3476901e8509c43bf9b8e8d187c359d21"
+    },
+    {
+      "path": "publisher-local-http-58297516d707.json",
+      "bytes": 667268,
+      "sha256": "a1e387885cddd483d2cf83ab7ee2bd272e8a969294aa51f944a923891147717e"
+    },
+    {
+      "path": "publisher-local-http.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "publisher-local-http.log",
+      "bytes": 533,
+      "sha256": "149d8977f94d64f6dca877070494123522aeae8f3cc1e2985b4c546f1778e684"
+    },
+    {
+      "path": "publisher-prepare.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "publisher-prepare.log",
+      "bytes": 1663,
+      "sha256": "e0fee0ec8538a7fb7d116c2386884e2b1dd8e243ca1b9207f3cc106241b98d88"
+    },
+    {
+      "path": "publisher-trusted-source-C.json",
+      "bytes": 1123,
+      "sha256": "4ec582c3e159e63800072b9cf372db3848d40e742e2cc9744f0c9daf776e5611"
+    },
+    {
+      "path": "restore-tools/checksums.txt",
+      "bytes": 1971,
+      "sha256": "afe49e9affa232faa8212aed035417166f6ade9b9470acb53d4dbd28c0504e8d"
+    },
+    {
+      "path": "restore-tools/preparation.json",
+      "bytes": 758,
+      "sha256": "d5cb1500c66b5838c28bbb949c429b1e54ffcb1adcbc477808d42f57c452959e"
+    }
+  ],
+  "examples_members": [
+    {
+      "path": "cleanup-plan/examples-independent-pin-docs-review.json",
+      "bytes": 3237,
+      "sha256": "c1763e577ea0b943b1f3158c5866fe9f4a323f76d29bb91253a45a9e257953c8"
+    },
+    {
+      "path": "docs/examples-integration-plan.md",
+      "bytes": 4587,
+      "sha256": "78700ac5138e7b0441aa9805a6291967bd36d5c5ffbd84c4be847f4a449fc758"
+    },
+    {
+      "path": "docs/examples-preparation/command-00.log",
+      "bytes": 82,
+      "sha256": "f21425fe3af03eca0a1f388481cd1f9825b0b9703f7a55b6ed84808af23aad19"
+    },
+    {
+      "path": "docs/examples-preparation/command-01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/examples-preparation/command-02.log",
+      "bytes": 83,
+      "sha256": "9510b45aa305a8538d90dfc41e92df7ad8e2dc33ca3d511d4b7a878ef59b3cee"
+    },
+    {
+      "path": "docs/examples-preparation/command-03.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/examples-preparation/command-04.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/examples-preparation/command-05.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/examples-preparation/command-06.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/examples-preparation/command-07.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/examples-preparation/command-08.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/examples-preparation/command-09.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/examples-preparation/command-10.log",
+      "bytes": 1391,
+      "sha256": "a59e7edb3b6593c41115a6458d94e9eaaf0ed8877708910326351985cfe16919"
+    },
+    {
+      "path": "docs/examples-preparation/command-11.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/examples-preparation/command-12.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/examples-preparation/command-13.log",
+      "bytes": 516,
+      "sha256": "4c5b4c2afd539fadf7c7f18b15e1d31c7332aac3cdc8a20d8de3cc41707a591c"
+    },
+    {
+      "path": "docs/examples-preparation/commands.json",
+      "bytes": 6059,
+      "sha256": "88da475e3552c28874a56a41038fe3dd408407e11a3d476c398ecddcf843aad1"
+    },
+    {
+      "path": "docs/examples-preparation/dependency-preparation.json",
+      "bytes": 2651,
+      "sha256": "ae93b12a54eb8214d75f745a676117e2b8f6e476e30ced6fc4eea7572e88e8c0"
+    },
+    {
+      "path": "docs/examples-preparation/tool-preparation-00.log",
+      "bytes": 4349,
+      "sha256": "9e54cca3243491ae6e71031cc7804af9b055f789ad5b0005141dcedc260f8b7c"
+    },
+    {
+      "path": "docs/examples-preparation/tool-preparation-01.log",
+      "bytes": 844,
+      "sha256": "694a3033c780dc0fa6ce79c5001555ee9ab681c41a54c3aa5337c18b65a31d99"
+    },
+    {
+      "path": "docs/examples-preparation/tool-preparation-commands.json",
+      "bytes": 798,
+      "sha256": "78f4f3ef8b562deb1747c8eeba8acc187e72ab69d742fcfb73135fc5bd11d100"
+    },
+    {
+      "path": "docs/examples-preparation/tool-preparation.json",
+      "bytes": 4719,
+      "sha256": "26a0079a41a506dc4c1fdffb045fee455d45616b98b5ca5b3b27c66c2170c85b"
+    },
+    {
+      "path": "docs/examples-remote-audit.json",
+      "bytes": 1807,
+      "sha256": "998f3bdabb19c79055f78079bab50d9badc708f14c34fa8920d7d45d2a271c88"
+    },
+    {
+      "path": "docs/examples-worktree-create.log",
+      "bytes": 135,
+      "sha256": "59dd2f1fdb64f947fa870e5b6d9a3f33cf88b55064e0b8d865d4abc1960b8469"
+    },
+    {
+      "path": "docs/examples-worktree-preparation.json",
+      "bytes": 1686,
+      "sha256": "c1287960760aeefab9291be58cecde948573d9a8fb46e2e00cfb051d054dac15"
+    },
+    {
+      "path": "examples-integration/attempt-1-build-artifacts-manifest.json",
+      "bytes": 54541,
+      "sha256": "76e2bc2b4aed169e4fb6828b809b09bd307ab172c91a109c3dfac2d19abe1ab0"
+    },
+    {
+      "path": "examples-integration/attempt-1-build-artifacts.tar.gz",
+      "bytes": 8663363,
+      "sha256": "1da0614e959c2bec47ed74c7ee4d828c8a0d9fc0c66e7157b3b5c3bca569d4bf"
+    },
+    {
+      "path": "examples-integration/attempt-2/examples-index-source.json",
+      "bytes": 427,
+      "sha256": "0a9c831a88a147e27dfc5db98b66bc37c2bc0755e889243042893c28094e278e"
+    },
+    {
+      "path": "examples-integration/attempt-2/examples-index-source.tar",
+      "bytes": 16773120,
+      "sha256": "22501e8274da8d2041ce1dd3300eebe2e7878e05eca8ed5739a8902dcf99df87"
+    },
+    {
+      "path": "examples-integration/attempt-2/execution-environment.json",
+      "bytes": 1185,
+      "sha256": "e79216f9ca809d636a1ef14ec8ef695182698dee12b585b049a92164ad207767"
+    },
+    {
+      "path": "examples-integration/attempt-2/gd32-liangshan-baremetal-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/attempt-2/gd32-liangshan-baremetal-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/gd32-liangshan-baremetal-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/gd32-liangshan-baremetal.log",
+      "bytes": 1237,
+      "sha256": "e08c47efa44d5fe98337039a1dce0b8f9f566825d9cfe0ebc1f47c921bdb861f"
+    },
+    {
+      "path": "examples-integration/attempt-2/gd32-liangshan-freertos-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/attempt-2/gd32-liangshan-freertos-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/gd32-liangshan-freertos-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/gd32-liangshan-freertos.log",
+      "bytes": 1231,
+      "sha256": "9b17c9883d8d203dbc023da42d3726f878b5867a8a955e716c61db4cd61a6527"
+    },
+    {
+      "path": "examples-integration/attempt-2/matrix-build-artifacts-manifest.json",
+      "bytes": 78798,
+      "sha256": "8c76a4135016ed713f880d21e19f82071dd4249fdee8108f286761434d8893ec"
+    },
+    {
+      "path": "examples-integration/attempt-2/matrix-build-artifacts.tar.gz",
+      "bytes": 8926090,
+      "sha256": "637beebd2eed903c7a50b9185d7e391e2181dd002d6921b9989de24739f49aef"
+    },
+    {
+      "path": "examples-integration/attempt-2/matrix-execution.json",
+      "bytes": 44307,
+      "sha256": "e7da68ece5941b25c03f97f43502ef0bbb9ad12f5eab0a1f76e6e01a5f8e4c23"
+    },
+    {
+      "path": "examples-integration/attempt-2/matrix-summary.json",
+      "bytes": 1929,
+      "sha256": "4e21ccee19d8552f9acf2b80393c1093616097f41363d10b5f4e14e21f1a20d9"
+    },
+    {
+      "path": "examples-integration/attempt-2/native-debug.log",
+      "bytes": 3655,
+      "sha256": "0489c18bb8cb2b887e39a164c5f7e12a9c566c473cf5ae889fad75da7e9ce936"
+    },
+    {
+      "path": "examples-integration/attempt-2/python-tools.log",
+      "bytes": 12303,
+      "sha256": "630fb6deb6f03e3add6f1cab549f8751736be622305dd464e7a51cda177465b6"
+    },
+    {
+      "path": "examples-integration/attempt-2/run_matrix.py",
+      "bytes": 5220,
+      "sha256": "a5c14760e5df8f381774f47f82ef07f76baf81474cf93c77da99836f9f5aa961"
+    },
+    {
+      "path": "examples-integration/attempt-2/source-after.json",
+      "bytes": 2259,
+      "sha256": "61c223332c07d0dc341416ca8dcbc5a2181f26b5424a3e0e10f01f58b3bff6a7"
+    },
+    {
+      "path": "examples-integration/attempt-2/source-after.log",
+      "bytes": 131,
+      "sha256": "77fd041117aa8dc7827063da5a3cc90c5390a4196c0325822f91aadf75732010"
+    },
+    {
+      "path": "examples-integration/attempt-2/source-before.json",
+      "bytes": 2259,
+      "sha256": "61c223332c07d0dc341416ca8dcbc5a2181f26b5424a3e0e10f01f58b3bff6a7"
+    },
+    {
+      "path": "examples-integration/attempt-2/source-before.log",
+      "bytes": 131,
+      "sha256": "77fd041117aa8dc7827063da5a3cc90c5390a4196c0325822f91aadf75732010"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-h743-nucleo-baremetal-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-h743-nucleo-baremetal-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-h743-nucleo-baremetal-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-h743-nucleo-baremetal.log",
+      "bytes": 6994,
+      "sha256": "5f9d7085ddc9dc4904841058f6117f836ce5ce28d0a0b342ac868177b3575884"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-h743-nucleo-freertos-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-h743-nucleo-freertos-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-h743-nucleo-freertos-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-h743-nucleo-freertos.log",
+      "bytes": 8475,
+      "sha256": "d42b530c1dd353c8b92222d9ee54533c6f1940998e78fdcdf5b29bb7ea5fff04"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-qiming-baremetal-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-qiming-baremetal-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-qiming-baremetal-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-qiming-baremetal.log",
+      "bytes": 1227,
+      "sha256": "b37b5e00900670638475743abc488e76bb2186cca027a1e3c81bc84767ee7213"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-qiming-freertos-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-qiming-freertos-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-qiming-freertos-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-qiming-freertos.log",
+      "bytes": 1221,
+      "sha256": "8266061755e1fc4b55d1dc5a30ada017937260ebdf51c4be3c2e43780c4bb1c8"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-sky-baremetal-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-sky-baremetal-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-sky-baremetal-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-sky-baremetal.log",
+      "bytes": 1212,
+      "sha256": "89cf6e072fa92f804a84691262355b9334dfa23ca3c5fcfdf3fa05db9bfb4052"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-sky-freertos-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-sky-freertos-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-sky-freertos-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-sky-freertos.log",
+      "bytes": 1206,
+      "sha256": "2db1d421fcbff07544577ffeab5d71e5fc6ccd35b23b0ad1a2ccaaa379a5188a"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-u575-nucleo-baremetal-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-u575-nucleo-baremetal-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-u575-nucleo-baremetal-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-u575-nucleo-baremetal.log",
+      "bytes": 7418,
+      "sha256": "617bd93f0ebfd7e2dad16a44fdfb7ad52f1b152ad76f6b4924c15abfc4fc1997"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-u575-nucleo-freertos-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-u575-nucleo-freertos-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-u575-nucleo-freertos-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/attempt-2/stm32-u575-nucleo-freertos.log",
+      "bytes": 8391,
+      "sha256": "6a597cb80a62876a20d1256f73eaa37c8322768f662082f1c5e59cc191176d01"
+    },
+    {
+      "path": "examples-integration/attempt-2/style-all.log",
+      "bytes": 33,
+      "sha256": "3fa66ea9890a088b91a5207dfd077b06aea6306b41c336ad305f5bbb66517aa2"
+    },
+    {
+      "path": "examples-integration/branch-push.json",
+      "bytes": 563,
+      "sha256": "f6cef2cdcf944902eb37d2735c53d325d402f24a479bde80ea9af21b64c0b205"
+    },
+    {
+      "path": "examples-integration/branch-push.log",
+      "bytes": 389,
+      "sha256": "b8819b0f2f3f779bf9b89f8c6e6066876abf2551ccca523b932aea8527fd1e8c"
+    },
+    {
+      "path": "examples-integration/ci-selection.json",
+      "bytes": 489,
+      "sha256": "6c0ea17d3c8a8ee4a0daa36695e3636aa071e653650fdb50d68902fc1750a3c7"
+    },
+    {
+      "path": "examples-integration/examples-pr-body.md",
+      "bytes": 1480,
+      "sha256": "3d823a3c31b553d9f7ec3f04a023997f64279a078503a1a38ecf484efa557875"
+    },
+    {
+      "path": "examples-integration/execution-environment.json",
+      "bytes": 1185,
+      "sha256": "e79216f9ca809d636a1ef14ec8ef695182698dee12b585b049a92164ad207767"
+    },
+    {
+      "path": "examples-integration/first-hook-environment-error.log",
+      "bytes": 2694,
+      "sha256": "f215c7ad0177605a5c33a6ff49f51e74576d97e809b0ca06341c47f35a7cdb50"
+    },
+    {
+      "path": "examples-integration/gd32-liangshan-baremetal-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/gd32-liangshan-baremetal-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/gd32-liangshan-baremetal-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/gd32-liangshan-baremetal.log",
+      "bytes": 8460,
+      "sha256": "51ead73bd36a6fee68e758e9a2909328d337c749047993f969b900ce9b671f40"
+    },
+    {
+      "path": "examples-integration/gd32-liangshan-freertos-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/gd32-liangshan-freertos-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/gd32-liangshan-freertos-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/gd32-liangshan-freertos.log",
+      "bytes": 9270,
+      "sha256": "95c9db9a3924e747896ee89286deb259a6b542a4842ab0cde686ee388a128b1c"
+    },
+    {
+      "path": "examples-integration/independent-final-review.json",
+      "bytes": 27316,
+      "sha256": "f1a02aaaadf913ab6ee102f4c5456aceeeb69be76d7ce00686b7f1596c53ace2"
+    },
+    {
+      "path": "examples-integration/local-release-validation-receipt.json",
+      "bytes": 3712,
+      "sha256": "cccd3e28c0fac78355878b0207dfd2b23b87bab76f92f75121aa8f9c1eaa6ffc"
+    },
+    {
+      "path": "examples-integration/matrix-execution.json",
+      "bytes": 27467,
+      "sha256": "9542ed695096314b0e37559e103e0241bec48df7f2c81a19dca391991ff7b917"
+    },
+    {
+      "path": "examples-integration/native-debug.log",
+      "bytes": 14584,
+      "sha256": "e967a60a0bae9eae186d6a43d73b9639c5cb15e740c63d0830420c021b7cd42f"
+    },
+    {
+      "path": "examples-integration/normal-commit-attempt-2.json",
+      "bytes": 850,
+      "sha256": "755a869f1387799d51900336f6aa9c3ced4b9a77720a47a3aa677d5758775122"
+    },
+    {
+      "path": "examples-integration/normal-commit-attempt-2.log",
+      "bytes": 676,
+      "sha256": "62eb8ed8500efb6cc7bc3dddf041c5c669d794f0389bebf2a40cd3c81c895c12"
+    },
+    {
+      "path": "examples-integration/normal-commit.json",
+      "bytes": 921,
+      "sha256": "df1cd88270ffe9ae0d5f69d4179a7f9114bd09ff851ed97a42ebf28f738db149"
+    },
+    {
+      "path": "examples-integration/normal-commit.log",
+      "bytes": 782,
+      "sha256": "df7870ad3f37c86936abd92fe7cb2f33eff393deb1b25adfd55cc908c4b340a0"
+    },
+    {
+      "path": "examples-integration/normal-hook-artifacts-manifest.json",
+      "bytes": 6794,
+      "sha256": "f0079870e36192920b9531e0ebf1487c5e5046ac2d0cf32e6bdf7bbe3c3bd851"
+    },
+    {
+      "path": "examples-integration/normal-hook-artifacts.tar.gz",
+      "bytes": 13259,
+      "sha256": "f430d0b6f7e66b5e7bef44b7bef9ad84e9e47239186427e4e39c6720f2981c1f"
+    },
+    {
+      "path": "examples-integration/official-dependency-origin-restoration.json",
+      "bytes": 3716,
+      "sha256": "0aecb10388e6a619924b55e7e4a509ee455e4495a7ce9e4249d89831c48c2f20"
+    },
+    {
+      "path": "examples-integration/post-normal-commit-identity.json",
+      "bytes": 2104,
+      "sha256": "63e19ac6cc4f3c11fd8b4f374c43b2b13299a4c7671e0dd5ffe08ab16c8c36f1"
+    },
+    {
+      "path": "examples-integration/pr-create.json",
+      "bytes": 754,
+      "sha256": "72e52db22661e5684e9ce1ebcf2da0790a10c7ce051b951be727bd385413a8a3"
+    },
+    {
+      "path": "examples-integration/pr-create.log",
+      "bytes": 51,
+      "sha256": "6ee792c3f10446337addb0853f7618fdb715376c9b2e2b7334881b91b352b1a1"
+    },
+    {
+      "path": "examples-integration/preparation-00.log",
+      "bytes": 122,
+      "sha256": "3f3b218e36f0f6539cf74681d42997935940935bd76132eb7336767350530011"
+    },
+    {
+      "path": "examples-integration/preparation-01.log",
+      "bytes": 190,
+      "sha256": "9cc1ed7489d3b5fa9e07792f3a223793606d3175f548571b5088998b7242e2c2"
+    },
+    {
+      "path": "examples-integration/preparation-02.log",
+      "bytes": 164,
+      "sha256": "94373afde8cc3ce2cc2af79e8cb6fe7d763e608ae2b2ae259ac7d692d1fb8c1f"
+    },
+    {
+      "path": "examples-integration/preparation-commands.json",
+      "bytes": 1526,
+      "sha256": "b28e25b26f53843783edc92801557988060edd95004ff29e940f92346acadb0e"
+    },
+    {
+      "path": "examples-integration/published-pr.json",
+      "bytes": 999,
+      "sha256": "27f1031316c6cf7602257c29f67103fe757eaf4207d6e9cba3ef0acf2484ab44"
+    },
+    {
+      "path": "examples-integration/published-remote.txt",
+      "bytes": 129,
+      "sha256": "8fcd3a99443eb54db72cd4bf3cb130665a0e9f4a817810de4b3008df7a82dc3e"
+    },
+    {
+      "path": "examples-integration/published-runs.json",
+      "bytes": 668,
+      "sha256": "7082b65b2ebd0427589826e444f8d8a65f66c883e24fbff6c7a150ad9af377a3"
+    },
+    {
+      "path": "examples-integration/python-tools.log",
+      "bytes": 12303,
+      "sha256": "995a259e0b857453d741684332e848d4609902f45105aa1747c575f9cd68b589"
+    },
+    {
+      "path": "examples-integration/run_matrix.py",
+      "bytes": 5210,
+      "sha256": "8be8e4be82d283552cb4eb17763d174ce3b3bc69e63f367171b7bda56d3dc4fc"
+    },
+    {
+      "path": "examples-integration/source-before.json",
+      "bytes": 2259,
+      "sha256": "61c223332c07d0dc341416ca8dcbc5a2181f26b5424a3e0e10f01f58b3bff6a7"
+    },
+    {
+      "path": "examples-integration/source-before.log",
+      "bytes": 131,
+      "sha256": "77fd041117aa8dc7827063da5a3cc90c5390a4196c0325822f91aadf75732010"
+    },
+    {
+      "path": "examples-integration/stm32-h743-nucleo-baremetal.log",
+      "bytes": 1385,
+      "sha256": "80a46301cffb2d8ddac5ac07164dbbcf7474a093520bb0b91bde64f8e4e95b1f"
+    },
+    {
+      "path": "examples-integration/stm32-qiming-baremetal-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/stm32-qiming-baremetal-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/stm32-qiming-baremetal-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/stm32-qiming-baremetal.log",
+      "bytes": 7392,
+      "sha256": "1a92063008d42fbf18870825e188c21949d86703aac5fa65e3dd183771d6625c"
+    },
+    {
+      "path": "examples-integration/stm32-qiming-freertos-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/stm32-qiming-freertos-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/stm32-qiming-freertos-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/stm32-qiming-freertos.log",
+      "bytes": 8202,
+      "sha256": "2b5049c2191ec6ddf9efd9c5ce0e70ee12aefe8faeef4bb5c960fb058c87025f"
+    },
+    {
+      "path": "examples-integration/stm32-sky-baremetal-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/stm32-sky-baremetal-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/stm32-sky-baremetal-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/stm32-sky-baremetal.log",
+      "bytes": 7377,
+      "sha256": "f44f6e6f66de5ad6e7617b21957ea35b86a03b5e44d4ef62bf8e63aef1df5128"
+    },
+    {
+      "path": "examples-integration/stm32-sky-freertos-hil-preparation.log",
+      "bytes": 58,
+      "sha256": "e4f2ce644ed55f43ed2c9b0d503c82493d324a06488a7b3bf4b1c711b782abcf"
+    },
+    {
+      "path": "examples-integration/stm32-sky-freertos-platform_reference-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/stm32-sky-freertos-uart_owner_runtime-resources.log",
+      "bytes": 19,
+      "sha256": "a3c3dcf8b720c9a3f8a22ac1cfd0479ee1b0a134269848af167d6c0009d63e84"
+    },
+    {
+      "path": "examples-integration/stm32-sky-freertos.log",
+      "bytes": 8187,
+      "sha256": "f8fa3836f4c8baf08291eecda864b7436b7b7f7e572e0ec58d9282036ddd4da3"
+    },
+    {
+      "path": "examples-integration/style-all.log",
+      "bytes": 33,
+      "sha256": "3fa66ea9890a088b91a5207dfd077b06aea6306b41c336ad305f5bbb66517aa2"
+    }
+  ]
+}
