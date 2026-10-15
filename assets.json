@@ -297,6 +297,31 @@
       "path": "docs-release-0.1.0-58297516d707/verify-local-evidence.py",
       "bytes": 2632,
       "sha256": "d1e4778f64d001bf44724eef99650d9da9cf73a813defd278e332a38cc365cbd"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-restore/README.txt",
+      "bytes": 1124,
+      "sha256": "c185089fabdead30aa13dc68c0cfdc9fecfb2bd7965f9e91025eb2d45a6d0640"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-restore/SHA256SUMS",
+      "bytes": 338,
+      "sha256": "b39cff96331f679b27e964f5432a8eb911993349ed9509f1d27e6b961d91e290"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-restore/member-observations.json",
+      "bytes": 70266,
+      "sha256": "c87ecc394d58d087353913d639f70046b8aea44b07f8615b724147e8978c830e"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-restore/restore.json",
+      "bytes": 6864,
+      "sha256": "5521bff80bffc1a4b12b0839ebe7cfcfe81c5df7c6d7b39f9f1398e22d25ce2f"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-restore/verify-remote-restore.py",
+      "bytes": 7463,
+      "sha256": "1e7a0b2740cc8215891e7fde45c4e521e43a60a9aabe0bc902d5cbad6e6b99d2"
     }
   ],
   "physical_hil": "not_executed",
