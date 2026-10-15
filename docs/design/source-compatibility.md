@@ -13,7 +13,7 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 
 | 项目 | 当前值 | 合同 |
 |---|---|---|
-| 平台 semantic version | `1.0.0` | 必须与实际 CMake project 版本一致 |
+| 平台 semantic version | `0.1.0` | 唯一人工维护值来自兼容性 JSON；CMake、生成头文件和包元数据派生并保持一致 |
 | `factory_abi_epoch` | `1` | 当前唯一认可的生成源码接口代际；不是 binary ABI 保证 |
 | source SDK | `source_only` / `exact` | CMake package 只接受相同完整版本，拒绝 ranges |
 | authored assembly | `2` | 简化的 TOML 选择面；不改变 Board/SoC 事实 |
@@ -26,6 +26,12 @@ provider、生成 bindings 和调用者；当前不交付稳定二进制 ABI。�
 意味着生产 validator/emitter 明确维护了新的格式，并更新策略断言与负测。策略不能
 使尚未实现的 schema 获得支持。SDK manifest 增加一个被 file-map 覆盖的源码文件，
 不等于修改 manifest 格式。
+
+`0.1.0` 是 2026-10-15（Asia/Shanghai）首个公开源码 SDK 开发者预览版。
+之前源码快照中的 `1.0.0` 是公开发行前的版本值；本次规范版本不改变 epoch `1`、
+exact 匹配或 authored schema `2`，也不把旧 SDK／候选的资格转移到新源码。
+2026-01-12 第一阶段的旧 `0.1.0` 文字保留为历史里程碑。当前发行范围和实际证据
+定位见[发行状态](../status/release-0.1.0.md)；准确 source／tree 以发行 manifest 为准。
 
 factory 的 compact ID 只在该生成 bundle 内有意义。它返回既有静态 readonly face，
 不分配、不初始化硬件。重新排序实例或改变配置可能改变 ID；不能把 ID 持久化后

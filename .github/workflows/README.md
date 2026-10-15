@@ -10,16 +10,19 @@ Workflow edits require build, tool, analyzer and documentation validation.
 | `quality-checks.yml` | Same staged style policy as local hooks; actual compile-database clang-tidy/cppcheck; missing tools or empty scope fail. |
 | `enterprise-tools.yml` | Configuration, artifact tamper, budget, HIL admission, real source SDK relocation and command-failure boundaries. |
 | `performance.yml` | Three-board O2/Os/O3 ±LTO minimum-image resource comparisons; GC and budget checks; no inferred cycles. |
-| `release.yml` | Manual clean source SDK packaging and strict consumers after platform/tool checks; artifact retention, no tag/release/promotion. |
+| `release.yml` | Exact-SHA source SDK packaging and strict consumers; optional `v0.1.0` software preview publication requires fresh complete main CI, existing matching tag, verified assets and actual provenance. Product promotion remains separate. |
 | `security.yml` | Resolved Python dependency audit, actual Native CodeQL contexts and secret scanning. |
-| `docs-build.yml` | Public-only Doxygen and warning-blocking Sphinx; existing main-only Pages deployment. |
+| `docs-build.yml` | Public-only Doxygen, strict bilingual Sphinx, locked documentation tools and verified prepared publication bytes. |
+| `docs-publish.yml` | Verify trusted prepared documentation bytes before Pages deployment; publication has its own source and receipts. |
 
 One authored TOML assembly generates one atomic resolved configuration, typed
 factory IDs, readonly polymorphic faces and fixed typed bindings
 and physical memory input. CMake owns the code dependency graph. SDK and SoC
 implementation headers compile privately; startup/system objects enter firmware
-once. Only the three used Git dependencies are initialized, including the pinned
-FreeRTOS recursive dependencies. ARM uses the checksum-locked GNU distribution.
+once. Dependency preparation initializes the declared selected closure, including
+the pinned recursive FreeRTOS dependencies and required CMSIS/ThreadX inputs.
+Source SDK packaging requires its complete declared closure. ARM uses the
+checksum-locked GNU distribution.
 
 Native test execution deletes stale JUnit and verifies the actual fresh nonempty
 CTest report. ARM compilation and software-register fixtures have distinct scopes
@@ -66,6 +69,29 @@ protection, product deployments, signing and release promotion retain their
 separate actual states; workflow files do not establish remote permissions or
 physical qualifications.
 
+Nexus 0.1.0 is the first public Source SDK developer preview, dated 2026-10-15
+(Asia/Shanghai). Its source commit, package hashes, pinned dependencies, licenses
+and executed tool tuple belong in the release asset manifests and receipts.
+The release process must publish and re-download those exact bytes; a successful
+Actions artifact upload alone does not establish durable release delivery.
+Historical `cc6a065c` candidates retain their original source and cannot qualify
+a new source or version. Their eight archive paths currently point through a
+broken relocated `/tmp` directory; retain that availability limitation until
+the original bytes are recovered. The [release guide](../../docs/status/release-0.1.0.md)
+records scope and verification without rewriting historical result indices.
+
+SDK preparation and strict consumers run in `RUNNER_TEMP`; verified copies enter
+owned `build/delivery` staging for observed job identities. Publication requires
+all 29 exact CI jobs to succeed on the final main commit within 24 hours. It
+checks the existing main and tag again before making the release public.
+
+A failed upload or verification leaves the release as a draft. A retry refuses
+an existing release. Inspect its tag, source, uploaded bytes and failure logs;
+remove only the incomplete draft after preserving that evidence, then retry the
+same reviewed commit with fresh CI. Never delete or overwrite a public release
+or move its tag as routine recovery. Source-only preview publication does not
+establish physical acceptance or signed firmware qualification.
+
 Every ordinary artifact upload now retains an observed job identity and its
 tool-version command logs for 30 days. Documentation uploads include the same
 record in the published tree. Actual checkout SHA/tree, recursive gitlinks,
@@ -74,8 +100,9 @@ file digests are checked together. A metadata success cannot replace successful
 test execution. Failed or cancelled jobs retain their actual partial outputs.
 The source SDK workflow requests provenance for this digest-bearing manifest,
 then preserves the actual returned attestation bundle in a separate upload.
-Signing is pending until GitHub executes that workflow; this configuration does
-not establish a signature, a production release or physical qualification.
+Attestation status comes from an actual successful workflow and its returned
+bundle. This configuration alone does not establish an attestation, a signed
+product release or physical qualification.
 
 
 `dependency-maintenance.yml` defines a Monday 03:00 UTC read-only observation

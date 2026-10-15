@@ -228,11 +228,13 @@ def navigation(path, contents):
                                and item != path and (item.name != "README.md"
                                or item.parent.name in {"design", "delivery"}))
                 continue
-            if not destination.suffix:
-                destination = next((destination.with_suffix(suffix)
-                                    for suffix in (".md", ".rst")
-                                    if destination.with_suffix(suffix).is_file()),
-                                   destination.with_suffix(".md"))
+            if destination.suffix not in {".md", ".rst"}:
+                # Dots belong to the docname unless they identify a source
+                # suffix: release-0.1.0 resolves to release-0.1.0.md.
+                candidates = [destination.with_name(destination.name + suffix)
+                              for suffix in (".md", ".rst")]
+                destination = next((item for item in candidates if item.is_file()),
+                                   candidates[0])
             entries.append(destination.resolve())
     return entries
 

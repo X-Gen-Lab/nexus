@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 09ced6a63126e816f4d5b3ffbe222afb8265d04d58aa1fd87ae5d7778334a653\n"
+"X-Nexus-Source-SHA256: 6b89c334b35f7f1475e81552cda98f43030879841233b557f4f7efbb804bf495\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:1
 msgid "Nexus 文档系统架构与交付规划"
@@ -820,6 +820,13 @@ msgstr ""
 msgid "10. 版本和发布身份"
 msgstr "10. 版本和发布身份"
 
+msgid ""
+"文档 manifest 复用既有 identity 和证据定位结构。下表只映射实际 schema-1 字段， "
+"完整格式以[唯一交付合同](../reference/documentation-delivery.md)和生产打包器为准："
+msgstr ""
+"文档 manifest 复用既有 identity 和证据定位结构。下表只映射实际 schema-1 字段， "
+"完整格式以[唯一交付合同](../reference/documentation-delivery.md)和生产打包器为准："
+
 #: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:0
 msgid "字段"
 msgstr "字段"
@@ -828,13 +835,56 @@ msgstr "字段"
 msgid "来源与意义"
 msgstr "来源与意义"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:0
-msgid "现有平台版本 policy，核对 CMake，不另写常量"
-msgstr "现有平台版本 policy，核对 CMake，不另写常量"
+msgid "`version`"
+msgstr "`version`"
+
+msgid "严格 loader 读取唯一人工维护的兼容性 JSON；CMake 派生同值，不另写版本常量"
+msgstr "严格 loader 读取唯一人工维护的兼容性 JSON；CMake 派生同值，不另写版本常量"
+
+msgid "`code_source.commit`、`code_source.tree`"
+msgstr "`code_source.commit`、`code_source.tree`"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:0
 msgid "被文档描述的实际代码源码"
 msgstr "被文档描述的实际代码源码"
+
+msgid "`documentation_source.commit`、`documentation_source.tree`"
+msgstr "`documentation_source.commit`、`documentation_source.tree`"
+
+msgid "本次正文、配置和翻译源码"
+msgstr "本次正文、配置和翻译源码"
+
+msgid "`qualified_code.commit`、`qualified_code.tree`"
+msgstr "`qualified_code.commit`、`qualified_code.tree`"
+
+msgid "当前引用资格的精确源码，保留原scope"
+msgstr "当前引用资格的精确源码，保留原scope"
+
+msgid "`qualified_code.index`、`qualified_code.index_sha256`"
+msgstr "`qualified_code.index`、`qualified_code.index_sha256`"
+
+msgid "既有结果索引路径和摘要，保留其配置与执行身份"
+msgstr "既有结果索引路径和摘要，保留其配置与执行身份"
+
+msgid "`tool_versions`"
+msgstr "`tool_versions`"
+
+msgid "实际工具、安装回执及依赖锁身份，不由版本字符串推断执行"
+msgstr "实际工具、安装回执及依赖锁身份，不由版本字符串推断执行"
+
+msgid "`languages`"
+msgstr "`languages`"
+
+msgid "实际构建的locale数组；逐页翻译审查状态记录在构建结果中"
+msgstr "实际构建的locale数组；逐页翻译审查状态记录在构建结果中"
+
+msgid "`files`"
+msgstr "`files`"
+
+msgid ""
+"成功payload的`path`、`bytes`、`sha256`；不列manifest/checksums/archive/外层receipt"
+msgstr ""
+"成功payload的`path`、`bytes`、`sha256`；不列manifest/checksums/archive/外层receipt"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:271
 msgid ""
@@ -887,6 +937,18 @@ msgid ""
 msgstr ""
 "HTML、图、搜索和内部链接全部相对化，不依赖 CDN。公开定位不要求原 workspace 路径；历史 receipts "
 "的绝对路径保留原样，新增归档/member导航提供取得步骤。 大型原始档案单独发布，不默认装入整个网站；缺少可下载对象时明确记录 local-only。"
+
+msgid ""
+"manifest 绑定输入与payload；checksums 覆盖payload和manifest，不包含自身。 外层 archive hash "
+"放在独立 receipt，不形成包内自引用。使用既有归档/校验工具， 不建立第二个平台候选状态机。HTML 包只证明文档交付，不替代 "
+"SDK/MCU/HIL。 HTML 可以显示输入身份，不能嵌入覆盖自身的最终 manifest hash；manifest 与 checksums "
+"都不进入 `manifest.files`，避免间接形成自引用。"
+msgstr ""
+"manifest 绑定输入与payload；checksums 覆盖payload和manifest，不包含自身。 外层 archive hash "
+"放在独立 receipt，不形成包内自引用。使用既有归档/校验工具， 不建立第二个平台候选状态机。HTML 包只证明文档交付，不替代 "
+"SDK/MCU/HIL。 HTML 可以显示输入身份，不能嵌入覆盖自身的最终 manifest hash；manifest 与 checksums "
+"都不进入 `manifest.files`，避免间接形成自引用。"
+
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:322
 msgid ""
@@ -1097,65 +1159,3 @@ msgstr "{download}`文档系统实施台账 <documentation-system-execution.csv>
 #: ../../../workspace/nexus-build-system-20261012/docs/design/documentation-system.md:374
 msgid "{download}`迁移映射 <documentation-migration.csv>`"
 msgstr "{download}`迁移映射 <documentation-migration.csv>`"
-
-msgid ""
-"文档 manifest 复用既有 identity 和证据定位结构。下表只映射实际 schema-1 字段， "
-"完整格式以[唯一交付合同](../reference/documentation-delivery.md)和生产打包器为准："
-msgstr ""
-"文档 manifest 复用既有 identity 和证据定位结构。下表只映射实际 schema-1 字段， "
-"完整格式以[唯一交付合同](../reference/documentation-delivery.md)和生产打包器为准："
-
-msgid "`version`"
-msgstr "`version`"
-
-msgid "`code_source.commit`、`code_source.tree`"
-msgstr "`code_source.commit`、`code_source.tree`"
-
-msgid "`documentation_source.commit`、`documentation_source.tree`"
-msgstr "`documentation_source.commit`、`documentation_source.tree`"
-
-msgid "本次正文、配置和翻译源码"
-msgstr "本次正文、配置和翻译源码"
-
-msgid "`qualified_code.commit`、`qualified_code.tree`"
-msgstr "`qualified_code.commit`、`qualified_code.tree`"
-
-msgid "当前引用资格的精确源码，保留原scope"
-msgstr "当前引用资格的精确源码，保留原scope"
-
-msgid "`qualified_code.index`、`qualified_code.index_sha256`"
-msgstr "`qualified_code.index`、`qualified_code.index_sha256`"
-
-msgid "既有结果索引路径和摘要，保留其配置与执行身份"
-msgstr "既有结果索引路径和摘要，保留其配置与执行身份"
-
-msgid "`tool_versions`"
-msgstr "`tool_versions`"
-
-msgid "实际工具、安装回执及依赖锁身份，不由版本字符串推断执行"
-msgstr "实际工具、安装回执及依赖锁身份，不由版本字符串推断执行"
-
-msgid "`languages`"
-msgstr "`languages`"
-
-msgid "实际构建的locale数组；逐页翻译审查状态记录在构建结果中"
-msgstr "实际构建的locale数组；逐页翻译审查状态记录在构建结果中"
-
-msgid "`files`"
-msgstr "`files`"
-
-msgid ""
-"成功payload的`path`、`bytes`、`sha256`；不列manifest/checksums/archive/外层receipt"
-msgstr ""
-"成功payload的`path`、`bytes`、`sha256`；不列manifest/checksums/archive/外层receipt"
-
-msgid ""
-"manifest 绑定输入与payload；checksums 覆盖payload和manifest，不包含自身。 外层 archive hash "
-"放在独立 receipt，不形成包内自引用。使用既有归档/校验工具， 不建立第二个平台候选状态机。HTML 包只证明文档交付，不替代 "
-"SDK/MCU/HIL。 HTML 可以显示输入身份，不能嵌入覆盖自身的最终 manifest hash；manifest 与 checksums "
-"都不进入 `manifest.files`，避免间接形成自引用。"
-msgstr ""
-"manifest 绑定输入与payload；checksums 覆盖payload和manifest，不包含自身。 外层 archive hash "
-"放在独立 receipt，不形成包内自引用。使用既有归档/校验工具， 不建立第二个平台候选状态机。HTML 包只证明文档交付，不替代 "
-"SDK/MCU/HIL。 HTML 可以显示输入身份，不能嵌入覆盖自身的最终 manifest hash；manifest 与 checksums "
-"都不进入 `manifest.files`，避免间接形成自引用。"

@@ -25,7 +25,7 @@ sys.path.insert(0, str(SOURCE_ROOT))
 try:
     from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES, declared_modules
     from tools.maintenance import cmsis_device_lock, stm32g4_lock, threadx_lock
-    from tools.configure.metadata import parse_json, snapshot
+    from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure.providers import descriptor as provider_descriptors
 except ImportError as error:
     # Missing verifier modules are an incomplete SDK, including after an
@@ -594,14 +594,12 @@ def prepare(source, output, development_fixture=False):
                     "reviewed_imports": imports,
                     "toolchains_lock_sha256": files["dependencies/toolchains.lock.json"],
                     "snapshot_sha256": digest(json.dumps(files, sort_keys=True, separators=(",", ":")).encode())}
-        version_match = re.search(r"project\(nexus VERSION ([0-9]+\.[0-9]+\.[0-9]+)", (sdk / "CMakeLists.txt").read_text())
-        if not version_match:
-            raise SDKError("Source SDK requires a declared semantic project version")
-        config = (sdk / "cmake/package/NexusConfig.cmake.in").read_text().replace("@NEXUS_SDK_VERSION@", version_match[1])
+        semantic_version = load_policy(sdk)["semantic_version"]
+        config = (sdk / "cmake/package/NexusConfig.cmake.in").read_text().replace("@NEXUS_SDK_VERSION@", semantic_version)
         package = temporary / "lib/cmake/Nexus"
         package.mkdir(parents=True)
         (package / "NexusConfig.cmake").write_text(config)
-        version = (sdk / "cmake/package/NexusConfigVersion.cmake.in").read_text().replace("@NEXUS_SDK_VERSION@", version_match[1])
+        version = (sdk / "cmake/package/NexusConfigVersion.cmake.in").read_text().replace("@NEXUS_SDK_VERSION@", semantic_version)
         (package / "NexusConfigVersion.cmake").write_text(version)
         manifest["package_files_sha256"] = {
             "lib/cmake/Nexus/NexusConfig.cmake": digest((package / "NexusConfig.cmake").read_bytes()),

@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a3a17cb8c40c75faf1d25351fb597123fbb45aebc5135034457332c2f9e7bcfa\n"
+"X-Nexus-Source-SHA256: 0c61b664e277c0504531dd708674bf8e4580f29045b9ad84fe1659bb34e1dfa7\n"
 
 msgid "Status and evidence"
 msgstr "状态与证据"

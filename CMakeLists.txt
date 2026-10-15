@@ -4,10 +4,23 @@ nexus_require_build_generator()
 if(TARGET Nexus::Config)
     message(FATAL_ERROR "One build may contain only one resolved Nexus assembly")
 endif()
-project(nexus VERSION 1.0.0 LANGUAGES C ASM)
+set(NEXUS_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}")
+find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
+# Validate source SDK bytes before loading its resolver or metadata modules.
+include("${NEXUS_SOURCE_DIR}/cmake/platform/SDK.cmake")
+execute_process(
+    COMMAND "${Python3_EXECUTABLE}" -B
+        "${CMAKE_CURRENT_LIST_DIR}/tools/configure/metadata.py" --version
+    RESULT_VARIABLE _nexus_version_result
+    OUTPUT_VARIABLE NEXUS_PLATFORM_VERSION
+    ERROR_VARIABLE _nexus_version_error
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(NOT _nexus_version_result EQUAL 0)
+    message(FATAL_ERROR "Nexus version policy rejected: ${_nexus_version_error}")
+endif()
+project(nexus VERSION "${NEXUS_PLATFORM_VERSION}" LANGUAGES C ASM)
 
 # A consumer selects one assembly; there is no Kconfig/cache fallback truth.
-set(NEXUS_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}")
 set(NEXUS_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 if(NEXUS_SOURCE_DIR STREQUAL NEXUS_BINARY_DIR)
     message(FATAL_ERROR "Nexus requires an out-of-source build")
@@ -18,9 +31,6 @@ set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${NEXUS_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${NEXUS_BINARY_DIR}/bin")
-find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
-# Validate source SDK bytes before loading its resolver or provider modules.
-include("${NEXUS_SOURCE_DIR}/cmake/platform/SDK.cmake")
 set(NEXUS_ASSEMBLY_FILE "" CACHE FILEPATH "One external authored TOML assembly")
 if(NOT NEXUS_ASSEMBLY_FILE)
     if(NOT PROJECT_IS_TOP_LEVEL)

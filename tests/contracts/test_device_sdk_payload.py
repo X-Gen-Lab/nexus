@@ -1,6 +1,7 @@
 """SDK device components retain exactly their reviewed upstream closure."""
 from pathlib import Path
 import sys
+import shutil
 import tempfile
 import unittest
 
@@ -16,6 +17,9 @@ class DeviceSDKPayloadTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="modern consumer inputs ") as value:
             directory = Path(value)
             prefix = directory / "prefix"
+            policy = prefix / "share/nexus/src/dependencies/platform-compatibility.json"
+            policy.parent.mkdir(parents=True)
+            shutil.copyfile(ROOT / "dependencies/platform-compatibility.json", policy)
             for family, clock in (("h743", "hsi64-fixed-cache-off"),
                                   ("u575", "msis4")):
                 for backend in ("baremetal", "freertos"):

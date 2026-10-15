@@ -8,6 +8,9 @@ import shutil
 import subprocess
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.configure.metadata import load_policy  # noqa: E402
+
 
 def clean_environment():
     environment = os.environ.copy()
@@ -19,10 +22,12 @@ def clean_environment():
 
 def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
                      arm=False, chip="stm32", expected_revision=None,
-                     version="1.0.0", contracts=False):
+                     version=None, contracts=False):
     """One public consumer template shared by qualification and boundary tests."""
     prefix = Path(prefix)
     sdk = prefix / "share/nexus/src"
+    if version is None:
+        version = load_policy(sdk)["semantic_version"]
     source = directory / (name + " source")
     build = directory / (name + " build")
     source.mkdir()
@@ -101,6 +106,7 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
     board, clock, uart, pin = choices[family]
     prefix = Path(prefix)
     sdk = prefix / "share/nexus/src"
+    version = load_policy(sdk)["semantic_version"]
     source = directory / (family + " " + backend + " source")
     build = directory / (family + " " + backend + " build")
     source.mkdir()
@@ -110,7 +116,7 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
         'cmake_minimum_required(VERSION 3.31)\n'
         'project(installed_modern_consumer LANGUAGES C ASM)\n'
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
-        'find_package(Nexus 1.0.0 EXACT CONFIG REQUIRED)\n'
+        f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
         f'nexus_add_firmware(installed_modern SOURCES main.c{kernel})\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'

@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "cmake/package"))
 import verify_consumers as consumer_gate
 import package_source_sdk as source_sdk
+from tools.configure.metadata import load_policy
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
@@ -61,6 +62,9 @@ class SourceSDKSelectionTests(unittest.TestCase):
     def test_consumer_uses_authored_toml_for_each_maintained_family(self):
         with tempfile.TemporaryDirectory(prefix="SDK consumer inputs ") as value:
             directory = Path(value)
+            policy = directory / "prefix/share/nexus/src/dependencies/platform-compatibility.json"
+            policy.parent.mkdir(parents=True)
+            shutil.copyfile(ROOT / "dependencies/platform-compatibility.json", policy)
             for name, arm, chip in (("native", False, "native"),
                                     ("stm32", True, "stm32"),
                                     ("gd32", True, "gd32")):
@@ -392,6 +396,39 @@ class SourceSDKTests(unittest.TestCase):
         for entry in compile_commands:
             self.assertNotIn(str(ROOT) + "/", entry.get("command", ""))
 
+    def test_relocated_sdk_exports_policy_version_and_rejects_other_versions(self):
+        version = load_policy(self.sdk)["semantic_version"]
+        project_build = self.directory / "policy source project"
+        self.run_ok(["cmake", "-S", str(self.sdk), "-B", str(project_build),
+                     "-G", "Ninja", "-DNEXUS_BUILD_TESTS=OFF",
+                     "-DNEXUS_BUILD_WORKLOAD=OFF"])
+        cache = (project_build / "CMakeCache.txt").read_text().splitlines()
+        observed = next(line.split("=", 1)[1] for line in cache
+                        if line.startswith("CMAKE_PROJECT_VERSION:STATIC="))
+        self.assertEqual(observed, version)
+        source, build, result = self.consumer("policy version", fixture=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        with (source / "CMakeLists.txt").open("a") as stream:
+            stream.write('file(WRITE "${CMAKE_BINARY_DIR}/package-version.txt" '
+                         '"${Nexus_VERSION}")\n')
+        self.run_ok(["cmake", "-S", str(source), "-B", str(build)])
+        self.assertEqual((build / "package-version.txt").read_text(), version)
+        major, minor, patch = map(int, version.split("."))
+        wrong = f"{major}.{minor}.{patch + 1}"
+        _, _, rejected = self.consumer("wrong policy version", fixture=True,
+                                        version=wrong)
+        self.assertNotEqual(rejected.returncode, 0)
+        self.assertIn("requested version", rejected.stderr)
+        source, build, command = consumer_gate.prepare_consumer(
+            self.prefix, self.directory, "ranged policy version", self.run_ok,
+            fixture=True, version=version)
+        cmake = source / "CMakeLists.txt"
+        cmake.write_text(cmake.read_text().replace(
+            f"Nexus {version} EXACT", f"Nexus {version}...{wrong}"))
+        rejected = self.run_process(command)
+        self.assertNotEqual(rejected.returncode, 0)
+        self.assertIn("requested version range", rejected.stderr)
+
     @unittest.skipUnless(shutil.which("arm-none-eabi-gcc"), "ARM GNU toolchain unavailable: no ARM execution claim")
     def test_relocated_arm_consumer_compiles_real_startup_and_linker(self):
         _, build, result = self.consumer("arm", arm=True, fixture=True)
@@ -430,7 +467,7 @@ class SourceSDKTests(unittest.TestCase):
                     'cmake_minimum_required(VERSION 3.31)\n'
                     'project(installed_g474_consumer LANGUAGES C ASM)\n'
                     'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
-                    'find_package(Nexus 1.0.0 EXACT CONFIG REQUIRED)\n'
+                    f'find_package(Nexus {load_policy(self.sdk)["semantic_version"]} EXACT CONFIG REQUIRED)\n'
                     f'nexus_add_firmware(installed_g474 SOURCES main.c{kernel})\n'
                     f'target_compile_definitions(installed_g474 PRIVATE {definitions})\n'
                     'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
@@ -542,7 +579,7 @@ class SourceSDKTests(unittest.TestCase):
             'cmake_minimum_required(VERSION 3.31)\n'
             'project(installed_threadx_consumer LANGUAGES C ASM)\n'
             'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
-            'find_package(Nexus 1.0.0 EXACT CONFIG REQUIRED)\n'
+            f'find_package(Nexus {load_policy(self.sdk)["semantic_version"]} EXACT CONFIG REQUIRED)\n'
             'nexus_add_firmware(installed_threadx SOURCES main.c '
             'LIBRARIES Nexus::OSThreadX)\n'
             'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'

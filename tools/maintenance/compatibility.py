@@ -124,7 +124,9 @@ def observe(root=ROOT):
         inputs.append(observed)
         return data.decode("utf-8")
     project = re.sub(r"#[^\n]*", "", source("CMakeLists.txt"))
-    version = one(re.findall(r"\bproject\s*\(\s*nexus\s+VERSION\s+([0-9]+\.[0-9]+\.[0-9]+)\b", project, re.IGNORECASE), "CMake project version")
+    if not re.search(r'\bproject\s*\(\s*nexus\s+VERSION\s+"\$\{NEXUS_PLATFORM_VERSION\}"', project, re.IGNORECASE):
+        raise ValueError("CMake project must consume the source policy version")
+    version = load_policy(root)["semantic_version"]
     authored = ast.parse(source("tools/configure/authored.py"))
     configured = ast.parse(source("tools/configure/configure.py"))
     runtime = ast.parse(source("tools/configure/runtime.py"))

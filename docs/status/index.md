@@ -13,6 +13,7 @@ Use these maintained records to locate implementation, software verification and
 :maxdepth: 2
 
 support
+release-0.1.0
 software-verification
 documentation-acceptance
 hardware

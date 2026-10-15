@@ -6,6 +6,12 @@ Applications, workers, product roles, private PCB data, Flash reservations and
 recovery policy live in [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples)
 or private product repositories. [中文入口](README_CN.md).
 
+**Nexus 0.1.0 is the first public Source SDK developer preview**, dated
+2026-10-15 (Asia/Shanghai). It provides source for consumer recompilation under
+the exact selected configuration and toolchain. Read the
+[release scope and verification guide](docs/status/release-0.1.0.md) and
+[changelog](CHANGELOG.md) before integration. Physical MCU HIL is `not_executed`.
+
 One authored TOML assembly selects reviewed SoC/Board facts and exact instances.
 The typed factory returns existing immutable polymorphic faces; it does not
 allocate, initialize hardware, lock or discover devices. Ordinary I/O dispatches
@@ -62,6 +68,14 @@ Use the exact maintained preset and locked ARM GNU distribution for MCU builds.
 External products consume `Nexus::Platform` and `nexus_add_firmware()` from a
 verified Source SDK. Platform start does not generate tasks or start a scheduler.
 GoogleTest/GoogleMock is pinned and host-only; firmware remains C11.
+
+The release SDK requires the complete pinned dependency and license closure.
+Its manifest records the exact clean source commit/tree, recursive dependencies
+and every packaged file. Use `find_package(Nexus 0.1.0 EXACT CONFIG REQUIRED)`;
+the source interface epoch remains `1` and authored assembly schema remains `2`.
+The compatibility JSON is the sole authored version authority. The release
+receipts identify the tools actually executed; declared minimum versions and
+old CI results do not establish a new tool tuple or release qualification.
 
 ## Support and evidence boundaries
 

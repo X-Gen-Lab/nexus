@@ -244,5 +244,52 @@ class DocumentationCheckTests(unittest.TestCase):
         self.assertEqual(failed[0]["status"], "network_error")
 
 
+class DottedDocnameRegression(unittest.TestCase):
+    def test_actual_scan_reaches_dotted_docnames_and_explicit_source_names(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            docs = root / "docs"
+            (docs / "status").mkdir(parents=True)
+            (docs / "index.md").write_text(
+                "# Start\n\n```{toctree}\nstatus/release-0.1.0\n"
+                "Migration <status/migration.v2>\nstatus/explicit-0.1.0.md\n"
+                "status/explicit-v2.0.rst\n```\n")
+            for name, contents in (
+                    ("release-0.1.0.md", "# Release\n"),
+                    ("migration.v2.rst", "Migration\n=========\n"),
+                    ("explicit-0.1.0.md", "# Explicit Markdown\n"),
+                    ("explicit-v2.0.rst", "Explicit RST\n============\n")):
+                (docs / "status" / name).write_text(contents)
+            result = check.scan(root, check_diagrams=False, check_configuration=False)
+            self.assertEqual(result["errors"], [])
+            self.assertEqual(result["pages"], 5)
+
+    def test_dotted_rst_toctree_resolves_full_name_before_suffix_fallback(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            docs = root / "docs"
+            docs.mkdir()
+            (docs / "index.md").write_text(
+                "# Start\n\n```{toctree}\nstatus\n```\n")
+            (docs / "status.rst").write_text(
+                "Status\n======\n\n.. toctree::\n\n    release-0.1.0\n")
+            (docs / "release-0.1.0.rst").write_text("Release\n=======\n")
+            result = check.scan(root, check_diagrams=False, check_configuration=False)
+            self.assertEqual(result["errors"], [])
+
+    def test_missing_dotted_target_never_resolves_a_truncated_decoy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            docs = root / "docs"
+            docs.mkdir()
+            index = docs / "index.md"
+            index.write_text("# Start\n\n```{toctree}\nrelease-0.1.0\n```\n")
+            (docs / "release-0.1.md").write_text("# Decoy\n")
+            self.assertEqual(check.navigation(index, index.read_text()),
+                             [(docs / "release-0.1.0.md").resolve()])
+            result = check.scan(root, check_diagrams=False, check_configuration=False)
+            self.assertIn("missing toctree target", " ".join(result["errors"]))
+
+
 if __name__ == "__main__":
     unittest.main()

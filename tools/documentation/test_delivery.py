@@ -29,8 +29,10 @@ class DeliveryTests(unittest.TestCase):
             "project(nexus VERSION 1.0.0 LANGUAGES C ASM)\n")
         policy = self.source / "dependencies/platform-compatibility.json"
         policy.parent.mkdir()
-        policy.write_bytes((Path(__file__).resolve().parents[2] /
-                            "dependencies/platform-compatibility.json").read_bytes())
+        policy_data = json.loads((Path(__file__).resolve().parents[2] /
+                                 "dependencies/platform-compatibility.json").read_bytes())
+        policy_data["semantic_version"] = "1.0.0"
+        policy.write_text(json.dumps(policy_data))
         index = self.source / "docs/delivery/build-system-results.json"
         index.parent.mkdir(parents=True)
         index.write_text(json.dumps({"schema_version": 1, "source": {
@@ -90,7 +92,7 @@ class DeliveryTests(unittest.TestCase):
                          policy["factory_abi_epoch"])
         self.assertEqual(manifest["source_interface"]["schemas"], policy["schemas"])
 
-    def test_duplicate_metadata_keys_and_version_policy_disagreement_reject(self):
+    def test_duplicate_metadata_keys_and_invalid_policy_version_reject(self):
         metadata_path = self.build / "documentation-build.json"
         original = metadata_path.read_text()
         metadata_path.write_text(original.replace('"schema_version": 1',
@@ -99,7 +101,7 @@ class DeliveryTests(unittest.TestCase):
             self.package()
         policy_path = self.source / "dependencies/platform-compatibility.json"
         policy = json.loads(policy_path.read_bytes())
-        policy["semantic_version"] = "9.0.0"
+        policy["semantic_version"] = "not-a-version"
         policy_path.write_text(json.dumps(policy))
         self.git("add", ".")
         self.git("-c", "user.name=Test", "-c", "user.email=test@example.com",

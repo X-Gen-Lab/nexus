@@ -14,7 +14,11 @@ ROOT = Path(__file__).resolve().parents[2]
 class CompatibilityTests(unittest.TestCase):
     def setUp(self):
         self.policy = json.loads((ROOT / compatibility.POLICY).read_text())
-        self.observed = {"semantic_version": "1.0.0", "schemas": dict(self.policy["schemas"]),
+        self.version = self.policy["semantic_version"]
+        major, minor, patch_version = map(int, self.version.split("."))
+        self.other_version = f"{major}.{minor}.{patch_version + 1}"
+        self.observed = {"semantic_version": self.version,
+                         "schemas": dict(self.policy["schemas"]),
                          "source_sdk_exact_only": True, "factory_abi_epoch": 1}
 
     def test_current_policy_matches_actual_authorities(self):
@@ -33,9 +37,10 @@ class CompatibilityTests(unittest.TestCase):
 
     def test_header_lines_come_from_validated_policy(self):
         self.assertEqual(metadata.header_lines(self.policy), [
-            '#define NEXUS_PLATFORM_VERSION "1.0.0"',
+            f'#define NEXUS_PLATFORM_VERSION "{self.version}"',
             '#define NEXUS_FACTORY_ABI_EPOCH 1U'])
-        invalid = copy.deepcopy(self.policy); invalid["semantic_version"] = '1.0.0"'
+        invalid = copy.deepcopy(self.policy)
+        invalid["semantic_version"] = self.version + '"'
         with self.assertRaises(ValueError): metadata.header_lines(invalid)
 
     def test_supported_factory_code_generation_is_observed(self):
@@ -48,7 +53,7 @@ class CompatibilityTests(unittest.TestCase):
 
     def test_exact_source_generation_is_accepted(self):
         report = compatibility.validate(self.policy, self.observed, 1)
-        self.assertEqual(report["semantic_version"], "1.0.0")
+        self.assertEqual(report["semantic_version"], self.version)
 
     def test_unknown_requested_epoch_is_rejected(self):
         for epoch in (0, 2, 999, True, "1"):
@@ -98,7 +103,8 @@ class CompatibilityTests(unittest.TestCase):
                 compatibility.validate(changed, self.observed)
 
     def test_actual_project_semantic_version_must_match(self):
-        observed = copy.deepcopy(self.observed); observed["semantic_version"] = "1.0.1"
+        observed = copy.deepcopy(self.observed)
+        observed["semantic_version"] = self.other_version
         with self.assertRaisesRegex(ValueError, "version"):
             compatibility.validate(self.policy, observed)
 
@@ -121,21 +127,24 @@ class CompatibilityTests(unittest.TestCase):
     def test_generated_factory_macro_mismatch_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             header = Path(directory) / "nexus_factory.h"
-            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 2U\n#define NEXUS_PLATFORM_VERSION "1.0.0"\n')
+            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 2U\n'
+                              f'#define NEXUS_PLATFORM_VERSION "{self.version}"\n')
             with self.assertRaisesRegex(ValueError, "epoch"):
                 compatibility.check(ROOT, generated=header)
 
     def test_generated_factory_version_mismatch_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             header = Path(directory) / "nexus_factory.h"
-            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 1U\n#define NEXUS_PLATFORM_VERSION "1.0.1"\n')
+            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 1U\n'
+                              f'#define NEXUS_PLATFORM_VERSION "{self.other_version}"\n')
             with self.assertRaisesRegex(ValueError, "version"):
                 compatibility.check(ROOT, generated=header)
 
     def test_generated_factory_matching_macros_are_accepted(self):
         with tempfile.TemporaryDirectory() as directory:
             header = Path(directory) / "nexus_factory.h"
-            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 1U\n#define NEXUS_PLATFORM_VERSION "1.0.0"\n')
+            header.write_text('#define NEXUS_FACTORY_ABI_EPOCH 1U\n'
+                              f'#define NEXUS_PLATFORM_VERSION "{self.version}"\n')
             self.assertEqual(compatibility.check(ROOT, generated=header)["status"], "consistent")
 
     def test_package_inspection_verifies_real_manifest_not_marker(self):
@@ -186,7 +195,7 @@ class CompatibilityTests(unittest.TestCase):
             source = (ROOT / "cmake/package/NexusConfigVersion.cmake.in").read_text()
             path.write_text(source.replace('NOT PACKAGE_FIND_VERSION_RANGE AND ', ''))
             with self.assertRaisesRegex(ValueError, "exact"):
-                compatibility.package_exact(path, "1.0.0")
+                compatibility.package_exact(path, self.version)
 
     def test_zero_semantic_version_still_uses_distinct_negative_probe(self):
         self.assertTrue(compatibility.package_exact(

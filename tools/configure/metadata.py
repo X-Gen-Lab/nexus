@@ -106,3 +106,17 @@ def header_lines(policy):
 
 def load_policy(root=ROOT, expected_factory_epoch=None):
     return policy_contract(read_json(Path(root) / POLICY), expected_factory_epoch)
+
+
+if __name__ == "__main__":
+    import argparse
+    import sys
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--version", action="store_true", required=True,
+                        help="Print the validated platform semantic version")
+    parser.parse_args()
+    try:
+        print(load_policy()["semantic_version"])
+    except ValueError as error:
+        print("Source compatibility policy rejected: " + str(error), file=sys.stderr)
+        raise SystemExit(1) from error

@@ -260,7 +260,7 @@ Breathe XML 路径由本次输出根注入，不能继续固定读取 docs/api �
 
 | 字段 | 来源与意义 |
 | --- | --- |
-| `version` | 现有平台版本 policy，核对 CMake，不另写常量 |
+| `version` | 严格 loader 读取唯一人工维护的兼容性 JSON；CMake 派生同值，不另写版本常量 |
 | `code_source.commit`、`code_source.tree` | 被文档描述的实际代码源码 |
 | `documentation_source.commit`、`documentation_source.tree` | 本次正文、配置和翻译源码 |
 | `qualified_code.commit`、`qualified_code.tree` | 当前引用资格的精确源码，保留原scope |

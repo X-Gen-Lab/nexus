@@ -1,6 +1,7 @@
 # Current public C contracts; vendor/private/history inputs are excluded.
 PROJECT_NAME           = "Nexus Embedded Platform"
-PROJECT_NUMBER         = "1.0.0"
+# The maintained docs CLI derives the release number from the compatibility JSON.
+PROJECT_NUMBER         = "source-preview"
 PROJECT_BRIEF          = "Statically assembled reusable embedded mechanisms"
 OUTPUT_DIRECTORY       = docs/api
 OUTPUT_LANGUAGE        = English

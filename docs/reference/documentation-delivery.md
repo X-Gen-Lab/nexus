@@ -26,11 +26,13 @@
 版本，`languages` 固定为 `en`、`zh_CN`。交付工具拒绝脏源码、缺失或偏离锁定版本
 的 submodule，以及与当前源码不一致的陈旧构建。
 
-版本号读取根 `CMakeLists.txt` 的 `project(nexus VERSION ...)`，并使用既有严格 policy
-loader 核对 `dependencies/platform-compatibility.json`。manifest 同时记录该 policy
-的摘要、接口 epoch 和 schema epochs；版本不一致、重复 JSON 键和非法常量均拒绝。
+版本号由既有严格 policy loader 从 `dependencies/platform-compatibility.json` 读取，
+该 JSON 是唯一人工维护的版本权威。CMake 调用同一 loader 派生版本，不从
+`project(nexus VERSION ...)` 文本反向推断版本。manifest 同时记录该 policy 的摘要、
+接口 epoch 和 schema epochs；版本不一致、重复 JSON 键和非法常量均拒绝。
 版本身份另外使用
-明确的 `release_id`；例如 `1.0.0-docs-g<commit>`。这个身份只允许字母、数字、点、
+明确的 `release_id`；格式示例为 `1.0.0-docs-g<commit>`，不表示当前平台版本。
+这个身份只允许字母、数字、点、
 下划线和短横线，不能携带目录或 URL。
 
 manifest 分开记录三类身份：

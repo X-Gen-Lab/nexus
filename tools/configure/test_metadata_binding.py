@@ -21,6 +21,9 @@ class MetadataBindingTests(unittest.TestCase):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / name, target)
         self.policy_path = self.root / metadata.POLICY
+        self.version = json.loads(self.policy_path.read_text())["semantic_version"]
+        major, minor, patch_version = map(int, self.version.split("."))
+        self.other_version = f"{major}.{minor}.{patch_version + 1}"
         self.assembly = self.root / "assembly.toml"
         self.assembly.write_text('schema=2\nboard="native_reference"\n'
                                  'backend="native"\nclock="model"\n'
@@ -52,16 +55,16 @@ class MetadataBindingTests(unittest.TestCase):
         self.assertEqual(identity["sha256"], hashlib.sha256(
             self.policy_path.read_bytes()).hexdigest())
         header = (output / "nexus_config.h").read_text()
-        self.assertIn('#define NEXUS_PLATFORM_VERSION "1.0.0"', header)
+        self.assertIn(f'#define NEXUS_PLATFORM_VERSION "{self.version}"', header)
         self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 1U', header)
         self.assertEqual(factory.FACTORY_ABI_EPOCH, 1)
 
     def test_assembly_policy_change_invalidates_configuration_identity(self):
         before = gate.resolve_ir(self.assembly, self.root)["configuration_sha256"]
-        self.change_policy(semantic_version="1.0.1")
+        self.change_policy(semantic_version=self.other_version)
         result = gate.configure(self.assembly, self.root / "changed", self.root)
         self.assertNotEqual(before, result["configuration_sha256"])
-        self.assertIn('#define NEXUS_PLATFORM_VERSION "1.0.1"',
+        self.assertIn(f'#define NEXUS_PLATFORM_VERSION "{self.other_version}"',
                       (self.root / "changed/nexus_config.h").read_text())
 
     def test_unsupported_factory_epoch_rejects_owned_assembly_bundle(self):
@@ -88,9 +91,9 @@ class MetadataBindingTests(unittest.TestCase):
             self.assertEqual(before.inputs["platform_metadata"], str(self.policy_path))
             self.assertIn(str(self.policy_path), before.snapshots)
             header = (output / "nexus_config.h").read_text()
-            self.assertIn('#define NEXUS_PLATFORM_VERSION "1.0.0"', header)
+            self.assertIn(f'#define NEXUS_PLATFORM_VERSION "{self.version}"', header)
             self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 1U', header)
-            self.change_policy(semantic_version="1.0.1")
+            self.change_policy(semantic_version=self.other_version)
             after = runtime.configure(self.runtime, output)
             self.assertNotEqual(before.input_sha256, after.input_sha256)
             self.assertNotEqual(before.configuration_sha256,
@@ -111,7 +114,7 @@ class MetadataBindingTests(unittest.TestCase):
 
         def changing(result, directory):
             original(result, directory)
-            self.change_policy(semantic_version="1.0.1")
+            self.change_policy(semantic_version=self.other_version)
 
         with patch.object(gate, "generate", changing):
             with self.assertRaisesRegex(ValueError, "changed"):
@@ -124,7 +127,7 @@ class MetadataBindingTests(unittest.TestCase):
 
         def changing(*args, **kwargs):
             result = original(*args, **kwargs)
-            self.change_policy(semantic_version="1.0.1")
+            self.change_policy(semantic_version=self.other_version)
             return result
 
         with patch.object(runtime, "ROOT", self.root, create=True):
@@ -142,7 +145,7 @@ class MetadataBindingTests(unittest.TestCase):
             before = json.loads((output / "resolved-cpu.json").read_text())
             self.assertIn('#define NEXUS_FACTORY_ABI_EPOCH 1U',
                           (output / "nexus_config.h").read_text())
-            self.change_policy(semantic_version="1.0.1")
+            self.change_policy(semantic_version=self.other_version)
             self.assertEqual(cpu.main(args), 0)
             after = json.loads((output / "resolved-cpu.json").read_text())
             self.assertNotEqual(before['input_sha256'], after['input_sha256'])

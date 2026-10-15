@@ -6,20 +6,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Next-generation platform refactor (unreleased)
+## [0.1.0] - 2026-10-15 (Asia/Shanghai)
 
-Static typed I/O and caller-owned requests replace HAL factories, runtime
-registries, universal pools and Kconfig assembly. Core/Arch/SoC/Board/OS/component
-boundaries, one strict JSON resolution bundle, explicit firmware targets and
-private vendor compilation now form the maintained platform. STM32F407ZG/VE and
-GD32F470ZG have exact part inputs, production providers and software-only advanced
-mode fixtures. External examples consume a locked independent source SDK.
+First public Source SDK developer preview. The January Phase 1 entry below is a
+historical project milestone; it does not identify this platform release.
 
-Commit hooks retain the existing style. Host/model/sanitizer, six ARM assemblies,
-component/advanced-mode link checks, resource budgets, strict source consumption,
-HIL admission tooling and offline artifact evidence have distinct qualification
-scopes. Physical execution remains unexecuted until boards are connected. See
-[delivery](docs/delivery/README.md) for current scope and evidence.
+### Added
+
+- A relocatable source SDK with exact version selection, pinned recursive
+  dependencies, license notices and a complete file manifest. Consumers rebuild
+  the platform and their application together; no stable binary ABI is promised.
+- Static C11 Core/Arch/SoC/Board, typed I/O, optional OS and component mechanisms.
+  One authored TOML assembly resolves through validated typed IR into one atomic
+  bundle. Generated factories return existing readonly faces without allocation
+  or hardware startup; shared operations tables dispatch to private contexts.
+- Exact F407ZG Qiming, F407VE Sky and GD32F470ZG Liangshan assemblies; separate
+  G474 EXTI, H743 fixed-clock/cache/TX-DMA and U575 single-world or synchronous
+  dual-world reference scopes. CPU-only Runtime profiles do not grant SoC/Board
+  support. ThreadX maintains its explicit Native/M4 subset.
+- Bilingual task documentation, public API references, software evidence indices
+  and executable HIL preparation tools. Applications and product policy remain
+  in external consumer repositories.
+
+### Changed
+
+- Normalize the prepublication `1.0.0` source version to the first public `0.1.0`.
+  `dependencies/platform-compatibility.json` is the sole authored version policy;
+  CMake, generated headers and package metadata derive their version from it.
+  Source interface epoch `1`, exact SDK matching and authored schema `2` remain.
+- Replace the superseded HAL/OSAL/Kconfig assembly path with static typed I/O,
+  caller-owned requests and explicit ownership, configuration and target graphs.
+
+### Verification and limitations
+
+Release asset manifests and execution receipts identify the exact released
+source, dependencies, tools and observed software checks. Historical evidence
+keeps its original source: the build-system baseline is `cc6a065c`, with earlier
+SoC baselines recorded separately. Those results do not transfer to this release.
+The eight old H743/U575 candidate archives are currently unavailable at their
+recorded paths because their relocated `/tmp` target is absent; old passed
+receipts are preserved and do not make those archives downloadable.
+
+Physical MCU HIL remains `not_executed`. Source distribution, host models, ARM
+linking and documentation publication do not establish physical timing,
+electrical safety, signed product qualification, certification or LTS. See the
+[release guide](docs/status/release-0.1.0.md) for exact support, verification and
+remaining acceptance, and [delivery](docs/delivery/README.md) for original records.
 
 ## Pre-refactor working history (superseded)
 
@@ -250,7 +282,12 @@ scopes. Physical execution remains unexecuted until boards are connected. See
 
 ---
 
-## [0.1.0] - 2026-01-12 (Phase 1 Complete)
+## Historical Phase 1 milestone - 2026-01-12
+
+This entry preserves the early development record, which originally used the
+label `0.1.0`. No corresponding public platform GitHub tag/release was observed
+during the 2026-10-15 release inventory. Its old architecture and platform claims
+describe that milestone and do not establish current support or qualification.
 
 ### Added
 
