@@ -457,6 +457,36 @@
       "path": "docs-release-0.1.0-58297516d707-qualification/verify-qualification.py",
       "bytes": 4798,
       "sha256": "ccd29536d45ade421422bc801be199af052f5c9d9e2d46b579c288548c4d9718"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification-restore/README.txt",
+      "bytes": 1925,
+      "sha256": "e8f6e159d9a4fd7e97e08aa1c666151bca366111f95c66c07303509830775670"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification-restore/SHA256SUMS",
+      "bytes": 434,
+      "sha256": "f50b9e5c993dcad9796e478f0b12f5c75b2935da3abcf87fbea58de2f8bef5c3"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification-restore/local-invocation-failure.json",
+      "bytes": 598,
+      "sha256": "b20918acea081f093272fe3467ce207fd6a55f4c4ad9274f18037244002ce3dc"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification-restore/member-observations.json",
+      "bytes": 33026,
+      "sha256": "ca8f1a9b5737e550baa46d33b159d02c58fbd0fa81169556de383b53761c1315"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification-restore/restore.json",
+      "bytes": 6921,
+      "sha256": "1181a126e406e8ad4c99251c58043311a72d1cd213ba868f14afff5e4708b112"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification-restore/verify-remote-restore.py",
+      "bytes": 6854,
+      "sha256": "fef21daf156337dc614c43011bf511e610658a346eb8040014d2218215188ea9"
     }
   ],
   "physical_hil": "not_executed",

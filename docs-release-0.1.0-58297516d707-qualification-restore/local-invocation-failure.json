@@ -1,0 +1,9 @@
+{
+  "status": "failed",
+  "kind": "restore_utility_invocation_attempt",
+  "observed_at_utc": "2026-10-15T05:21:27.203093+00:00",
+  "utility_sha256": "71f265beaea78e04f70898c7bc9efd2a913d47950133d82a6dec1eb89dd97b20",
+  "input_asset_commit": "c90efc92259ddd7da28c65406d5a5e4268840b8e",
+  "destination": "restored-c90efc92259d",
+  "result": "All 12 pinned files were downloaded and verified before local reader invocation failed. Relative destination was repeated under subprocess cwd; no evidence-byte failure or remote qualification failure inferred. Fresh absolute-resolved invocation follows."
+}

@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "kind": "independent_qualification_asset_restoration",
+  "status": "passed",
+  "started_at_utc": "2026-10-15T05:21:27.286733+00:00",
+  "finished_at_utc": "2026-10-15T05:21:27.913648+00:00",
+  "input_asset_commit": "c90efc92259ddd7da28c65406d5a5e4268840b8e",
+  "input_asset_prefix": "docs-release-0.1.0-58297516d707-qualification",
+  "source_commit": "58297516d707fdee117bd27b5df6af09d72edd2e",
+  "asset_registry_url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/assets.json",
+  "asset_registry_sha256": "cfd96fb5639ced8a0d612a21d7217265fc7c1e92753e90aefdbce6000c384657",
+  "files": [
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/README.txt",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/README.txt",
+      "http_status": 200,
+      "bytes": 2240,
+      "sha256": "bb1db08e03c164d1e16ae3277ccb51df3d6be6714e001aafaa54bf1d00177cd7"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/SHA256SUMS",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/SHA256SUMS",
+      "http_status": 200,
+      "bytes": 1056,
+      "sha256": "4dff7b1f16325e5fb1c16acb036b92da6dfc168c6a91f3d14a18cf4cced37669"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-delivery-final.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/examples-delivery-final.json",
+      "http_status": 200,
+      "bytes": 8674,
+      "sha256": "37daa9d328ef6d386eff5b61ad58dfe4f4c10fc8d4879be4309c0490a5f68ebb"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-main-ci-evidence-manifest.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/examples-main-ci-evidence-manifest.json",
+      "http_status": 200,
+      "bytes": 11132,
+      "sha256": "d530b9ce8484428f88dc7d1e13293913d979dec161afebed85992080f82b707a"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-main-ci-evidence.tar.gz",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/examples-main-ci-evidence.tar.gz",
+      "http_status": 200,
+      "bytes": 2163380,
+      "sha256": "3a6e286f3ccfd2dbbfb18ecf63871ebf3d71ae046db7b06f64925ef2f6156d3e"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-pr3-ci-evidence-manifest.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/examples-pr3-ci-evidence-manifest.json",
+      "http_status": 200,
+      "bytes": 11288,
+      "sha256": "b31a1500f6e135682ce7bdee668b9cdcd62bdea209ae03a649e0e23420f2a786"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/examples-pr3-ci-evidence.tar.gz",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/examples-pr3-ci-evidence.tar.gz",
+      "http_status": 200,
+      "bytes": 2172960,
+      "sha256": "370afb8a8766101623201506a064e0ad792d38123c1b9b6c8d46bc521f5494e3"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/independent-allowlist-review.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/independent-allowlist-review.json",
+      "http_status": 200,
+      "bytes": 810,
+      "sha256": "8da7a4638e7618adc4528d14f0d170b24a7eec7012253341ea2a49cedab47d8e"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/qualification-allowlist.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/qualification-allowlist.json",
+      "http_status": 200,
+      "bytes": 13858,
+      "sha256": "c2e5180813007c2c1f4f30e14d4926e51a6859cb36654ec48e9f1ca3d50e830f"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/qualification-evidence.tar.gz",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/qualification-evidence.tar.gz",
+      "http_status": 200,
+      "bytes": 225281,
+      "sha256": "2c04d546f3403b0dbd67dd23fe8259c7266adbf821a0e7c103c75a280a8323a8"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/qualification-retention.json",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/qualification-retention.json",
+      "http_status": 200,
+      "bytes": 3062,
+      "sha256": "bbbaef812aab2842ba1b0203cdf57029ecf4990455f095d82c47bb4d1ee14222"
+    },
+    {
+      "path": "docs-release-0.1.0-58297516d707-qualification/verify-qualification.py",
+      "url": "https://raw.githubusercontent.com/X-Gen-Lab/nexus/c90efc92259ddd7da28c65406d5a5e4268840b8e/docs-release-0.1.0-58297516d707-qualification/verify-qualification.py",
+      "http_status": 200,
+      "bytes": 4798,
+      "sha256": "ccd29536d45ade421422bc801be199af052f5c9d9e2d46b579c288548c4d9718"
+    }
+  ],
+  "reader_execution": {
+    "returncode": 0,
+    "stdout": "{\"status\": \"passed\", \"source_commit\": \"58297516d707fdee117bd27b5df6af09d72edd2e\", \"qualification_members\": 58, \"examples_archive_members\": [51, 51], \"observed_main_ci_jobs\": 29, \"observed_security_jobs\": 4, \"observed_examples_pr_and_main_jobs\": [11, 11], \"observed_pages\": \"published_and_http_verified\", \"sdk_attempt_38684283007\": \"failed_without_attestation_or_release\", \"physical_hil\": \"not_executed\"}\n",
+    "stderr": ""
+  },
+  "qualification_members_verified": 58,
+  "examples_members_verified_by_archive": {
+    "examples-pr3-ci-evidence": 51,
+    "examples-main-ci-evidence": 51
+  },
+  "member_observations_sha256": "ca8f1a9b5737e550baa46d33b159d02c58fbd0fa81169556de383b53761c1315",
+  "scope": "Immutable-URL byte download and restoration of actual remote qualification records: main CI 29/29, Security 4/4, Pages publication and HTTP, examples PR/main 11/11. SDK attempt 38684283007 failed without attestation or Release; this restoration performs no new CI or publication and establishes no successful SDK public Release.",
+  "code_scanning_alert_inventory": "unavailable_403",
+  "firmware_candidate_qualification": false,
+  "physical_hil": "not_executed"
+}
