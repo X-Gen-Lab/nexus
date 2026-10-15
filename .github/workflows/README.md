@@ -10,7 +10,7 @@ Workflow edits require build, tool, analyzer and documentation validation.
 | `quality-checks.yml` | Same staged style policy as local hooks; actual compile-database clang-tidy/cppcheck; missing tools or empty scope fail. |
 | `enterprise-tools.yml` | Configuration, artifact tamper, budget, HIL admission, real source SDK relocation and command-failure boundaries. |
 | `performance.yml` | Three-board O2/Os/O3 ±LTO minimum-image resource comparisons; GC and budget checks; no inferred cycles. |
-| `release.yml` | Exact-SHA source SDK packaging and strict consumers; optional `v0.1.0` software preview publication requires fresh complete main CI, existing matching tag, verified assets and actual provenance. Product promotion remains separate. |
+| `release.yml` | Exact-SHA source SDK packaging and strict consumers; optional policy-versioned software preview publication from the trusted main workflow requires fresh complete main CI, existing matching tag, verified assets and actual provenance. Product promotion remains separate. |
 | `security.yml` | Resolved Python dependency audit, actual Native CodeQL contexts and secret scanning. |
 | `docs-build.yml` | Public-only Doxygen, strict bilingual Sphinx, locked documentation tools and verified prepared publication bytes. |
 | `docs-publish.yml` | Verify trusted prepared documentation bytes before Pages deployment; publication has its own source and receipts. |
@@ -112,3 +112,7 @@ It never changes a dependency lock or opens an unverified upgrade. A candidate
 upgrade needs license, model, ARM, SDK and reproducibility evidence for that
 exact source. Scheduled execution begins only when this workflow is present
 on the default branch; the definition does not claim an executed weekly run.
+
+The [release maintenance guide](../../tools/release/README.md) defines the sole
+version policy, source and builder identities, complete raw consumer transport,
+and the separate roles of historical delivery and evidence branches.

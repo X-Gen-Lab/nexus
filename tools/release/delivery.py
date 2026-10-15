@@ -22,7 +22,8 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.dont_write_bytecode = True
-TAG = "v0.1.0"
+
+from tools.configure.metadata import load_policy
 
 
 def read(path):
@@ -224,6 +225,7 @@ def archive_evidence(inputs, destination):
 def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, attempt):
     from tools.documentation import delivery
     source, inputs, output = Path(source), Path(inputs), Path(output)
+    version = load_policy(source)["semantic_version"]
     if output.exists():
         raise ValueError("Release asset staging must be fresh")
     run = require_ci(read(inputs / "ci-run.json"), expected_commit)
@@ -233,6 +235,8 @@ def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, a
     sdk, docs = inputs / "sdk", inputs / "docs"
     prefix, checks = sdk / "delivery/source-sdk", sdk / "delivery/sdk-consumers"
     verify_sdk(source, prefix, expected_commit)
+    if load_policy(prefix / "share/nexus/src")["semantic_version"] != version:
+        raise ValueError("SDK version differs from this release source policy")
     consumers(checks, expected_commit)
     sdk_identity = sdk / "job-identities/source-sdk/identity.json"
     docs_identity = docs / "docs-job-identity/identity.json"
@@ -245,7 +249,7 @@ def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, a
     documentation = delivery.verify(archives[0])
     if (documentation["documentation_source"]["commit"] != expected_commit or
             documentation["code_source"]["commit"] != expected_commit or
-            documentation["version"] != "0.1.0"):
+            documentation["version"] != version):
         raise ValueError("Documentation code/version identity differs from this release")
     doc_payload = docs / "documentation-package" / documentation["release_id"]
     manifest = doc_payload / delivery.MANIFEST
@@ -254,10 +258,12 @@ def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, a
     if not isinstance(read(attestation), dict):
         raise ValueError("Actual source SDK attestation bundle is required")
     output.mkdir(parents=True)
-    archive = output / "nexus-source-sdk-0.1.0.tar.gz"
+    sdk_root = "nexus-source-sdk-" + version
+    raw_archive = "nexus-verification-evidence-" + version + ".tar.gz"
+    archive = output / (sdk_root + ".tar.gz")
     expected_files = inventory(prefix)
     with tarfile.open(archive, "w:gz") as stream:
-        stream.add(prefix, arcname="nexus-source-sdk-0.1.0")
+        stream.add(prefix, arcname=sdk_root)
     with tempfile.TemporaryDirectory(prefix="nexus-release-archive-") as directory:
         with tarfile.open(archive) as stream:
             for member in stream.getmembers():
@@ -266,7 +272,7 @@ def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, a
                         not (member.isdir() or member.isfile())):
                     raise ValueError("SDK release archive contains an unsafe entry")
             stream.extractall(directory, filter="data")
-        restored = Path(directory) / "nexus-source-sdk-0.1.0"
+        restored = Path(directory) / sdk_root
         if inventory(restored) != expected_files:
             raise ValueError("SDK archive differs from verified installed bytes")
         verify_sdk(source, restored, expected_commit)
@@ -285,18 +291,19 @@ def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, a
         shutil.copyfile(original, output / name)
         if digest(original) != digest(output / name):
             raise ValueError("Release asset copy changed")
-    archive_evidence(inputs, output / "nexus-verification-evidence-0.1.0.tar.gz")
+    archive_evidence(inputs, output / raw_archive)
     assets = [{"name": path.name, "size": path.stat().st_size, "sha256": digest(path)}
               for path in sorted(output.iterdir())]
     write(output / "release-manifest.json", {"schema_version": 1,
-          "kind": "nexus_software_preview", "tag": TAG, "source_commit": expected_commit,
+          "kind": "nexus_software_preview", "tag": "v" + version,
+          "source_commit": expected_commit,
           "ci_run_id": ci_run_id, "ci_run_attempt": run["run_attempt"],
           "source_sdk_run_id": release_run_id, "assets": assets,
           "physical_hil": "not_executed", "software_candidate": False,
           "production_qualification": False,
-          "evidence_layout": {"sdk_archive_root": "nexus-source-sdk-0.1.0",
+          "evidence_layout": {"sdk_archive_root": sdk_root,
                               "sdk_restore_path": "sdk/delivery/source-sdk",
-                              "raw_records": "nexus-verification-evidence-0.1.0.tar.gz"}})
+                              "raw_records": raw_archive}})
 
 
 class GitHub:
@@ -345,8 +352,8 @@ class GitHub:
                             {"draft": False, "prerelease": True})
 
 
-def require_refs(api, expected_commit):
-    for ref in ("heads/main", "tags/" + TAG):
+def require_refs(api, expected_commit, tag):
+    for ref in ("heads/main", "tags/" + tag):
         value = api.get("/git/ref/" + ref)
         if value is None:
             raise ValueError("Explicit existing main and release tag are required")
@@ -357,10 +364,12 @@ def require_refs(api, expected_commit):
             raise ValueError("Main or existing release tag differs from the expected commit")
 
 
-def publish(output, expected_commit, ci_run_id, *, api):
+def publish(output, expected_commit, ci_run_id, *, api, source=None):
+    version = load_policy(ROOT if source is None else source)["semantic_version"]
+    tag = "v" + version
     output = Path(output)
     release_manifest = read(output / "release-manifest.json")
-    if (release_manifest.get("tag") != TAG or
+    if (release_manifest.get("tag") != tag or
             release_manifest.get("source_commit") != commit(expected_commit)):
         raise ValueError("Release manifest source/tag mismatch")
     assets = release_manifest["assets"]
@@ -380,16 +389,17 @@ def publish(output, expected_commit, ci_run_id, *, api):
     jobs_path = ("/actions/runs/" + str(ci_run_id) + "/attempts/" +
                  str(observed_run["run_attempt"]) + "/jobs?per_page=100")
     require_jobs(api.get(jobs_path))
-    require_refs(api, expected_commit)
-    if api.get("/releases/tags/" + TAG) is not None:
+    require_refs(api, expected_commit, tag)
+    if api.get("/releases/tags/" + tag) is not None:
         raise ValueError("Release already exists; inspect its bytes before any retry")
-    release = api.create({"tag_name": TAG, "target_commitish": expected_commit,
-        "name": "Nexus 0.1.0 software preview", "draft": True, "prerelease": True,
+    release = api.create({"tag_name": tag, "target_commitish": expected_commit,
+        "name": "Nexus " + version + " software preview",
+        "draft": True, "prerelease": True,
         "body": "Source SDK and bilingual offline documentation validated for commit `" +
         expected_commit + "`. See release-manifest.json for exact byte identities and CI run.\n\n"
         "This is a software preview. Physical HIL is not executed; this is not a production "
         "qualification, safety certification, signed firmware release or LTS promise.\n\n"
-        "Nexus 0.1.0 源码软件预览：本次提交为 `" + expected_commit +
+        "Nexus " + version + " 源码软件预览：本次提交为 `" + expected_commit +
         "`，交付经验证的源码 SDK、双语离线文档与原始软件证据；精确字节身份和 CI "
         "见 release-manifest.json。物理 HIL 尚未执行；不构成生产资格、安全认证、"
         "已签名固件发布或 LTS 承诺。"})
@@ -405,7 +415,7 @@ def publish(output, expected_commit, ci_run_id, *, api):
     if final_run["run_attempt"] != observed_run["run_attempt"]:
         raise ValueError("CI was rerun during publication; release remains draft")
     require_jobs(api.get(jobs_path))
-    require_refs(api, expected_commit)
+    require_refs(api, expected_commit, tag)
     return api.publish(release["id"])
 
 
@@ -434,6 +444,7 @@ def main(arguments=None):
     child.add_argument("--jobs", type=Path, required=True)
     child.add_argument("--expected-commit", required=True)
     child = commands.add_parser("publish")
+    child.add_argument("--source", type=Path, default=ROOT)
     child.add_argument("--output", type=Path, required=True)
     child.add_argument("--expected-commit", required=True)
     child.add_argument("--ci-run-id", type=int, required=True)
@@ -453,7 +464,7 @@ def main(arguments=None):
             require_jobs(read(args.jobs))
         else:
             publish(args.output, args.expected_commit, args.ci_run_id,
-                    api=GitHub(args.repository))
+                    api=GitHub(args.repository), source=args.source)
     except (ValueError, OSError, subprocess.SubprocessError, KeyError) as error:
         print("Release rejected: " + str(error), file=sys.stderr)
         return 1

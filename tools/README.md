@@ -37,6 +37,10 @@ recipe uses a pinned base and observed dependencies; it does not promise that
 mutable preparation repositories recreate the same image. Firmware runs offline
 with read-only SDK/toolchain, separate outputs and no credentials mounted.
 
+`release/` maintains Source SDK software-preview publication and complete raw
+consumer evidence transport. See [release maintenance](release/README.md) for
+the version authority, trusted workflow and historical branch responsibilities.
+
 Candidate sealing requires all executed software qualification scopes and
 recursively retains actual raw logs and referenced artifacts. Evidence reports
 belong outside the source tree to avoid self-referential source identity. Hardware
