@@ -36,11 +36,21 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.expected_commit }}
           persist-credentials: false
       - name: Require the exact requested checkout before any qualification
         env:
           NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+          NEXUS_PUBLISH: ${{ inputs.publish }}
         run: |
+          case "$GITHUB_REF" in
+            refs/heads/main|refs/heads/delivery/0.1.0) ;;
+            *) echo 'Unauthorized delivery workflow ref' >&2; exit 1 ;;
+          esac
+          if [[ "$NEXUS_PUBLISH" != true && "$NEXUS_EXPECTED_COMMIT" != "$GITHUB_SHA" ]]; then
+            echo 'Standalone qualification requires the workflow source commit' >&2
+            exit 1
+          fi
           python3 tools/release/delivery.py guard \
             --expected-commit "$NEXUS_EXPECTED_COMMIT" \
             --actual-commit "$(git rev-parse HEAD)"
@@ -52,7 +62,6 @@ jobs:
           NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
           NEXUS_CI_RUN_ID: ${{ inputs.ci_run_id }}
         run: |
-          test "$GITHUB_REF" = refs/heads/main
           [[ "$NEXUS_CI_RUN_ID" =~ ^[1-9][0-9]*$ ]]
           gh api "repos/$GH_REPO/actions/runs/$NEXUS_CI_RUN_ID" > "$RUNNER_TEMP/ci-run.json"
           attempt=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_attempt"])' "$RUNNER_TEMP/ci-run.json")
@@ -82,6 +91,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.expected_commit }}
           fetch-depth: 0
           submodules: false
       - uses: ./.github/actions/setup-build
@@ -105,13 +115,22 @@ jobs:
           .venv/bin/python cmake/package/verify_consumers.py
           --prefix "$RUNNER_TEMP/nexus-source-sdk"
           --output "$RUNNER_TEMP/nexus-sdk-consumers"
+      - name: Preserve complete raw consumer evidence with the versioned builder
+        env:
+          NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+        run: |
+          git show "$GITHUB_SHA:tools/release/transport.py" > "$RUNNER_TEMP/nexus-consumer-transport.py"
+          .venv/bin/python "$RUNNER_TEMP/nexus-consumer-transport.py" pack \
+            --raw "$RUNNER_TEMP/nexus-sdk-consumers" \
+            --output "$RUNNER_TEMP/nexus-sdk-consumer-transport" \
+            --expected-commit "$NEXUS_EXPECTED_COMMIT"
       - name: Stage verified SDK and strict consumer bytes inside owned build paths
         env:
           NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
         run: |
           .venv/bin/python tools/release/delivery.py stage \
             --source "$GITHUB_WORKSPACE" --prefix "$RUNNER_TEMP/nexus-source-sdk" \
-            --consumers "$RUNNER_TEMP/nexus-sdk-consumers" \
+            --consumers "$RUNNER_TEMP/nexus-sdk-consumer-transport" \
             --output "$GITHUB_WORKSPACE/build/delivery" \
             --expected-commit "$NEXUS_EXPECTED_COMMIT"
       - name: Bind the upload to observed execution identity
@@ -120,7 +139,7 @@ jobs:
         with:
           job: source-sdk
           result: ${{ job.status }}
-          expected-commit: ${{ github.sha }}
+          expected-commit: ${{ inputs.expected_commit }}
           output: build/job-identities/source-sdk
           require-dependencies: 'true'
           artifacts: |
@@ -135,7 +154,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: nexus-source-sdk-${{ github.sha }}
+          name: nexus-source-sdk-${{ inputs.expected_commit }}
           path: |
             build/delivery/source-sdk/
             build/delivery/sdk-consumers/
@@ -164,7 +183,7 @@ jobs:
         with:
           job: source-sdk-attestation
           result: ${{ job.status }}
-          expected-commit: ${{ github.sha }}
+          expected-commit: ${{ inputs.expected_commit }}
           output: build/job-identities/source-sdk-attestation
           artifacts: build/delivery/attestation/
           tools: python=python3
@@ -172,7 +191,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: nexus-source-sdk-attestation-${{ github.sha }}
+          name: nexus-source-sdk-attestation-${{ inputs.expected_commit }}
           path: |
             build/delivery/attestation/
             build/job-identities/source-sdk-attestation/
@@ -199,6 +218,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.expected_commit }}
+          fetch-depth: 0
           persist-credentials: false
       - name: Download this run's SDK and exact qualified CI documentation
         run: |
@@ -207,22 +228,31 @@ jobs:
           gh api "repos/$GH_REPO/actions/runs/$NEXUS_CI_RUN_ID" > "$RUNNER_TEMP/release-inputs/ci-run.json"
           attempt=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_attempt"])' "$RUNNER_TEMP/release-inputs/ci-run.json")
           gh api "repos/$GH_REPO/actions/runs/$NEXUS_CI_RUN_ID/attempts/$attempt/jobs?per_page=100" > "$RUNNER_TEMP/release-inputs/ci-jobs.json"
-          gh run download "$GITHUB_RUN_ID" --name "nexus-source-sdk-$GITHUB_SHA" --dir "$RUNNER_TEMP/release-inputs/sdk"
-          gh run download "$GITHUB_RUN_ID" --name "nexus-source-sdk-attestation-$GITHUB_SHA" --dir "$RUNNER_TEMP/release-inputs/attestation"
-          gh run download "$NEXUS_CI_RUN_ID" --name "nexus-documentation-$GITHUB_SHA" --dir "$RUNNER_TEMP/release-inputs/docs"
+          gh run download "$GITHUB_RUN_ID" --name "nexus-source-sdk-$NEXUS_EXPECTED_COMMIT" --dir "$RUNNER_TEMP/release-inputs/sdk"
+          gh run download "$GITHUB_RUN_ID" --name "nexus-source-sdk-attestation-$NEXUS_EXPECTED_COMMIT" --dir "$RUNNER_TEMP/release-inputs/attestation"
+          gh run download "$NEXUS_CI_RUN_ID" --name "nexus-documentation-$NEXUS_EXPECTED_COMMIT" --dir "$RUNNER_TEMP/release-inputs/docs"
           gh run download "$NEXUS_CI_RUN_ID" --dir "$RUNNER_TEMP/release-inputs/ci-evidence"
       - name: Verify the actual GitHub source SDK attestation
         run: |
           gh attestation verify "$RUNNER_TEMP/release-inputs/sdk/job-identities/source-sdk/identity.json" \
             --bundle "$RUNNER_TEMP/release-inputs/attestation/delivery/attestation/bundle.json" \
             --repo "$GH_REPO" --signer-workflow "$GH_REPO/.github/workflows/release.yml" \
-            --signer-digest "$NEXUS_EXPECTED_COMMIT"
+            --signer-digest "$GITHUB_SHA" --source-digest "$GITHUB_SHA" \
+            --source-ref "$GITHUB_REF"
       - name: Verify and assemble immutable release assets
         run: |
           python3 tools/release/delivery.py bundle \
             --inputs "$RUNNER_TEMP/release-inputs" --output "$RUNNER_TEMP/release-assets" \
             --expected-commit "$NEXUS_EXPECTED_COMMIT" --ci-run-id "$NEXUS_CI_RUN_ID" \
             --release-run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT"
+      - name: Disclose the separate source and versioned delivery workflow identities
+        run: |
+          git show "$GITHUB_SHA:tools/release/transport.py" > "$RUNNER_TEMP/nexus-consumer-transport.py"
+          python3 "$RUNNER_TEMP/nexus-consumer-transport.py" attach \
+            --inputs "$RUNNER_TEMP/release-inputs" --output "$RUNNER_TEMP/release-assets" \
+            --source-commit "$NEXUS_EXPECTED_COMMIT" --builder-commit "$GITHUB_SHA" \
+            --workflow-ref "$GITHUB_WORKFLOW_REF" \
+            --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT"
       - name: Publish only the complete verified asset set on the existing exact tag
         run: |
           python3 tools/release/delivery.py publish \

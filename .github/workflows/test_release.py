@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta, timezone
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -22,6 +23,14 @@ COMMIT = "a" * 40
 def workflow():
     return yaml.load((ROOT / ".github/workflows/release.yml").read_text(),
                      Loader=yaml.BaseLoader)
+
+
+def consumer_module():
+    specification = importlib.util.spec_from_file_location(
+        "release_consumer_fixture", ROOT / "cmake/package/verify_consumers.py")
+    module = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(module)
+    return module
 
 
 class SDKWorkflowExecutionTests(unittest.TestCase):
@@ -52,20 +61,37 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
                 " if (d/'payload').read_bytes()!=b'approved source bytes':raise SystemExit('changed payload')\n"
                 " print((d/'.nexus-source-sdk.json').read_text())\n")
             (source / "cmake/package/verify_consumers.py").write_text(
-                "import argparse,json\nfrom pathlib import Path\n"
+                "import argparse,importlib.util,json,subprocess,sys\nfrom pathlib import Path\n"
+                f"sys.path.insert(0, {str(ROOT)!r})\n"
+                f"s=importlib.util.spec_from_file_location('consumer_fixture', {str(ROOT / 'cmake/package/verify_consumers.py')!r})\n"
+                "m=importlib.util.module_from_spec(s);s.loader.exec_module(m)\n"
                 "p=argparse.ArgumentParser();p.add_argument('--prefix');"
                 "p.add_argument('--output');a=p.parse_args();o=Path(a.output)\n"
                 "o.mkdir(parents=True)\n"
-                f"(o/'verification.json').write_text(json.dumps({{'kind': 'source_sdk_consumer_verification', 'status': 'passed', 'source_revision': {COMMIT!r}, 'physical_status': 'not_executed'}}))\n")
+                "(o/'.nexus-sdk-consumer-check').write_text('owned SDK consumer verification\\n')\n"
+                "for n in ('native','stm32','gd32','h743 baremetal','h743 freertos','u575 baremetal','u575 freertos'):\n"
+                " m.prepare_consumer(Path(a.prefix),o,n,lambda c: subprocess.run(c,check=True,capture_output=True),version='0.1.0')\n"
+                "(o/'command-00.log').write_text('passed consumer command\\n')\n"
+                f"(o/'verification.json').write_text(json.dumps({{'kind': 'source_sdk_consumer_verification', 'status': 'passed', 'source_revision': {COMMIT!r}, 'physical_status': 'not_executed', 'commands': [{{'argv': ['git','init'], 'exit_code': 0, 'log': 'command-00.log'}}]}}))\n")
             (source / "tools").mkdir()
             shutil.copytree(ROOT / "tools/release", source / "tools/release")
+            for command in (["git", "init", "--quiet"],
+                            ["git", "add", "tools/release/transport.py"],
+                            ["git", "-c", "user.name=Fixture", "-c",
+                             "user.email=fixture@example.invalid", "commit",
+                             "--quiet", "-m", "Versioned transport builder"]):
+                subprocess.run(command, cwd=source, check=True,
+                               capture_output=True)
+            builder = subprocess.check_output(["git", "rev-parse", "HEAD"],
+                                              cwd=source, text=True).strip()
             environment = {**os.environ, "GITHUB_WORKSPACE": str(source),
-                           "RUNNER_TEMP": str(temporary), "GITHUB_SHA": COMMIT,
+                           "RUNNER_TEMP": str(temporary), "GITHUB_SHA": builder,
                            "NEXUS_EXPECTED_COMMIT": COMMIT}
             steps = workflow()["jobs"]["source-sdk"]["steps"]
             selected = [step for step in steps if step.get("run") and any(
                 value in step["run"] for value in
-                ("package_source_sdk.py", "verify_consumers.py", "tools/release/delivery.py stage"))]
+                ("package_source_sdk.py", "verify_consumers.py",
+                 "nexus-consumer-transport.py", "tools/release/delivery.py stage"))]
             self.assertGreaterEqual(len(selected), 3)
             for step in selected:
                 result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
@@ -76,6 +102,254 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
             staged = source / "build/delivery/source-sdk/share/nexus/src/payload"
             self.assertEqual(staged.read_bytes(), b"approved source bytes")
             self.assertTrue((source / "build/delivery/staging-copy.json").is_file())
+
+    def test_workflow_keeps_source_checkout_and_names_separate_from_builder_signer(self):
+        document = workflow()
+        for job_name in ("guard", "source-sdk", "publish"):
+            checkout = document["jobs"][job_name]["steps"][0]
+            self.assertEqual(checkout["with"]["ref"],
+                             "${{ inputs.expected_commit }}")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            calls = root / "calls.jsonl"
+            gh = root / "gh"
+            gh.write_text("#!" + sys.executable + "\nimport json,os,sys\n"
+                "with open(os.environ['CALLS'],'a') as f: f.write(json.dumps(sys.argv[1:])+'\\n')\n"
+                "print(json.dumps({'run_attempt':1}))\n")
+            gh.chmod(0o755)
+            environment = {**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                "CALLS": str(calls), "RUNNER_TEMP": str(root),
+                "NEXUS_EXPECTED_COMMIT": COMMIT, "GITHUB_SHA": "b" * 40,
+                "GITHUB_REF": "refs/heads/delivery/0.1.0", "GITHUB_RUN_ID": "321",
+                "NEXUS_CI_RUN_ID": "123", "GH_REPO": "X-Gen-Lab/nexus"}
+            steps = document["jobs"]["publish"]["steps"]
+            for step in steps:
+                if step.get("name", "").startswith(("Download this run", "Verify the actual GitHub")):
+                    subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
+                        cwd=ROOT, env=environment, capture_output=True, check=True)
+            observed = [json.loads(line) for line in calls.read_text().splitlines()]
+            downloads = [call for call in observed if call[:2] == ["run", "download"]
+                         and "--name" in call]
+            self.assertEqual({call[call.index("--name") + 1] for call in downloads},
+                {"nexus-source-sdk-" + COMMIT, "nexus-source-sdk-attestation-" + COMMIT,
+                 "nexus-documentation-" + COMMIT})
+            verify = next(call for call in observed if call[:2] == ["attestation", "verify"])
+            self.assertEqual(verify[verify.index("--signer-digest") + 1], "b" * 40)
+            self.assertEqual(verify[verify.index("--source-digest") + 1], "b" * 40)
+            self.assertEqual(verify[verify.index("--source-ref") + 1],
+                             "refs/heads/delivery/0.1.0")
+
+    def test_workflow_guard_rejects_arbitrary_dispatch_refs(self):
+        step = workflow()["jobs"]["guard"]["steps"][1]
+        actual = subprocess.check_output(["git", "rev-parse", "HEAD"],
+                                         cwd=ROOT, text=True).strip()
+        for ref in ("refs/heads/main", "refs/heads/delivery/0.1.0",
+                    "refs/heads/unreviewed", "refs/tags/v0.1.0"):
+            result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
+                cwd=ROOT, env={**os.environ, "GITHUB_REF": ref,
+                    "NEXUS_EXPECTED_COMMIT": actual, "NEXUS_PUBLISH": "true"},
+                capture_output=True, text=True)
+            self.assertEqual(result.returncode == 0,
+                             ref in {"refs/heads/main", "refs/heads/delivery/0.1.0"})
+        result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
+            cwd=ROOT, env={**os.environ, "GITHUB_REF": "refs/heads/delivery/0.1.0",
+                "NEXUS_EXPECTED_COMMIT": actual, "NEXUS_PUBLISH": "false",
+                "GITHUB_SHA": "b" * 40}, capture_output=True, text=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Standalone qualification", result.stderr)
+
+
+class ConsumerTransportTests(unittest.TestCase):
+    def fixture(self):
+        prepare_consumer = consumer_module().prepare_consumer
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        base = Path(temporary.name)
+        raw = base / "raw consumers"
+        raw.mkdir()
+        (raw / ".nexus-sdk-consumer-check").write_text(
+            "owned SDK consumer verification\n")
+        for name in ("native", "stm32", "gd32", "h743 baremetal",
+                     "h743 freertos", "u575 baremetal", "u575 freertos"):
+            prepare_consumer(base / "prefix", raw, name,
+                lambda command: subprocess.run(command, check=True,
+                    capture_output=True), version="0.1.0")
+        (raw / "command-00.log").write_bytes(b"actual consumer output\n")
+        (raw / "verification.json").write_text(json.dumps({
+            "kind": "source_sdk_consumer_verification", "status": "passed",
+            "source_revision": COMMIT, "physical_status": "not_executed",
+            "commands": [{"argv": ["git", "init"], "exit_code": 0,
+                          "log": "command-00.log"}]}))
+        return base, raw
+
+    def test_real_consumer_git_metadata_survives_transport_and_identity_boundary(self):
+        from tools.maintenance.job_identity import _inventory
+        from tools.release import transport
+        from tools.release.delivery import stage
+        base, raw = self.fixture()
+        (raw / "verification.json").chmod(0o600)
+        (raw / "consumer.elf").write_bytes(b"\x7fELF consumer bytes")
+        (raw / "consumer.elf").chmod(0o755)
+        source = base / "checkout"
+        source.mkdir()
+        prefix = base / "prefix"
+        payload = prefix / "share/nexus/src"
+        payload.mkdir(parents=True)
+        (payload / "payload").write_bytes(b"verified SDK")
+        # SDK verification is an external port; the real stage and identity
+        # inventory execute against the actual git-init consumer fixtures.
+        with unittest.mock.patch("tools.release.delivery.verify_sdk"):
+            stage(source, prefix, raw, source / "build/raw", COMMIT)
+            with self.assertRaisesRegex(ValueError,
+                    "artifact must remain inside the checkout"):
+                _inventory(source, [source / "build/raw"],
+                           source / "build/job-identities/raw")
+            packed = base / "transport"
+            transport.pack(raw, packed, COMMIT)
+            # Actions normalizes outer artifact file permissions to 0644.
+            # Original raw modes are evidence inside the immutable archive.
+            for item in packed.iterdir():
+                item.chmod(0o644)
+            transport.verify(packed, COMMIT)
+            stage(source, prefix, packed, source / "build/packed", COMMIT)
+        selected, missing = _inventory(source, [source / "build/packed"],
+                                      source / "build/job-identities/packed")
+        self.assertTrue(selected)
+        self.assertEqual(missing, [])
+        transport.verify(packed, COMMIT)
+        self.assertEqual((packed / "verification.json").read_bytes(),
+                         (raw / "verification.json").read_bytes())
+        with tarfile.open(packed / "consumer-raw.tar.gz") as archive:
+            self.assertEqual(archive.getmember("verification.json").mode, 0o600)
+            self.assertEqual(archive.getmember("consumer.elf").mode, 0o755)
+            restored = {member.name: archive.extractfile(member).read()
+                        for member in archive if member.isfile()}
+        original = {path.relative_to(raw).as_posix(): path.read_bytes()
+                    for path in raw.rglob("*") if path.is_file()}
+        self.assertEqual(restored, original)
+        self.assertEqual(len(list(raw.rglob(".git"))), 7)
+
+    def test_rejects_links_overlap_existing_output_and_unowned_raw(self):
+        from tools.release import transport
+        for change in ("symlink", "overlap", "existing", "unowned", "hardlink"):
+            with self.subTest(change=change):
+                base, raw = self.fixture()
+                output = base / "transport"
+                if change == "symlink":
+                    (raw / "linked").symlink_to(raw / "verification.json")
+                elif change == "overlap":
+                    output = raw / "transport"
+                elif change == "existing":
+                    output.mkdir()
+                elif change == "unowned":
+                    (raw / ".nexus-sdk-consumer-check").unlink()
+                else:
+                    os.link(raw / "verification.json", raw / "hardlinked")
+                with self.assertRaises(ValueError):
+                    transport.pack(raw, output, COMMIT)
+
+    def test_git_metadata_must_remain_empty_init_fixture(self):
+        from tools.release import transport
+        for name, contents in (("config", "[remote \"origin\"]\nurl=secret\n"),
+                               ("index", "tracked index"),
+                               ("objects/ab/object", "history"),
+                               ("hooks/pre-commit", "active hook")):
+            with self.subTest(name=name):
+                base, raw = self.fixture()
+                path = raw / "native source/.git" / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(contents)
+                with self.assertRaises(ValueError):
+                    transport.pack(raw, base / "transport", COMMIT)
+
+    def test_modified_report_archive_traversal_and_duplicate_entries_are_rejected(self):
+        from tools.release import transport
+        for change in ("report", "traversal", "duplicate", "archive-link", "mode"):
+            with self.subTest(change=change):
+                base, raw = self.fixture()
+                output = base / "transport"
+                transport.pack(raw, output, COMMIT)
+                if change == "report":
+                    (output / "verification.json").write_text("{}")
+                elif change == "mode":
+                    rewritten = base / "modified.tar.gz"
+                    with tarfile.open(output / "consumer-raw.tar.gz") as original:
+                        with tarfile.open(rewritten, "w:gz") as archive:
+                            for entry in original:
+                                if entry.name == "verification.json":
+                                    entry.mode ^= 1
+                                archive.addfile(entry, original.extractfile(entry)
+                                                if entry.isfile() else None)
+                    rewritten.replace(output / "consumer-raw.tar.gz")
+                else:
+                    with tarfile.open(output / "consumer-raw.tar.gz", "w:gz") as archive:
+                        for _ in range(2 if change == "duplicate" else 1):
+                            entry = tarfile.TarInfo("../escape" if
+                                change == "traversal" else "verification.json")
+                            if change == "archive-link":
+                                entry.type, entry.linkname = tarfile.SYMTYPE, "../escape"
+                                archive.addfile(entry)
+                            elif change == "duplicate":
+                                entry.size = (raw / "verification.json").stat().st_size
+                                with (raw / "verification.json").open("rb") as stream:
+                                    archive.addfile(entry, stream)
+                            else:
+                                archive.addfile(entry)
+                if change != "report":
+                    manifest = json.loads((output / "consumer-raw-manifest.json").read_text())
+                    manifest["archive"] = {key: value for key, value in
+                        transport.identity(output / "consumer-raw.tar.gz").items()
+                        if key in {"sha256", "size"}}
+                    (output / "consumer-raw-manifest.json").write_text(json.dumps(manifest))
+                expected = {"report": "report|Passed strict", "traversal": "Unsafe transport member",
+                            "duplicate": "Duplicate", "archive-link": "nonregular",
+                            "mode": "complete raw inventory"}[change]
+                with self.assertRaisesRegex(ValueError, expected):
+                    transport.verify(output, COMMIT)
+
+    def test_failed_source_mismatched_or_unbounded_raw_evidence_is_rejected(self):
+        from tools.release import transport
+        for change in ("source", "command", "count", "bytes"):
+            with self.subTest(change=change):
+                base, raw = self.fixture()
+                report = json.loads((raw / "verification.json").read_text())
+                if change == "source":
+                    report["source_revision"] = "b" * 40
+                elif change == "command":
+                    report["commands"][0]["exit_code"] = 1
+                (raw / "verification.json").write_text(json.dumps(report))
+                limits = {"MAX_FILES": 2 if change == "count" else transport.MAX_FILES,
+                          "MAX_BYTES": 2 if change == "bytes" else transport.MAX_BYTES}
+                with unittest.mock.patch.multiple(transport, **limits):
+                    with self.assertRaises(ValueError):
+                        transport.pack(raw, base / "transport", COMMIT)
+
+    def test_builder_receipt_extends_exact_release_closure_without_rewriting_source(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        inputs = base / "inputs"
+        packed = inputs / "sdk/delivery/sdk-consumers"
+        transport.pack(raw, packed, COMMIT)
+        output = base / "assets"
+        output.mkdir()
+        evidence = output / "source-sdk-identity.json"
+        evidence.write_bytes(b"original C identity")
+        manifest = {"source_commit": COMMIT, "tag": "v0.1.0",
+            "source_sdk_run_id": 321, "assets": [{"name": evidence.name,
+                "size": evidence.stat().st_size,
+                "sha256": hashlib.sha256(evidence.read_bytes()).hexdigest()}]}
+        (output / "release-manifest.json").write_text(json.dumps(manifest))
+        workflow_ref = "X-Gen-Lab/nexus/.github/workflows/release.yml@refs/heads/delivery/0.1.0"
+        transport.attach(output, inputs, COMMIT, "b" * 40,
+                         workflow_ref, 321, 1)
+        receipt = json.loads((output / "delivery-workflow.json").read_text())
+        self.assertEqual(receipt["source_commit"], COMMIT)
+        self.assertEqual(receipt["builder_commit"], "b" * 40)
+        self.assertEqual(receipt["original_failed_run_id"], 38684283007)
+        self.assertEqual(evidence.read_bytes(), b"original C identity")
+        extended = json.loads((output / "release-manifest.json").read_text())
+        self.assertEqual({item["name"] for item in extended["assets"]},
+                         {"delivery-workflow.json", evidence.name})
 
 
 class ReleaseAdmissionTests(unittest.TestCase):
