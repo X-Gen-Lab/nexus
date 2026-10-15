@@ -1,0 +1,53 @@
+{
+  "commit": "b6f0ed3829f3829eb358a2e7417d80bba1a42db7",
+  "files": {
+    "Inc/stm32f4xx_ll_adc.h": {
+      "bytes": 284748,
+      "sha256": "fabfc9706709a9997e96d87aee25356b3ca84021668a915ad816ba42e1babadc"
+    },
+    "Inc/stm32f4xx_ll_gpio.h": {
+      "bytes": 37445,
+      "sha256": "e46857f5f9a5f5a2d13ca2d6925dc9e66dfa7fc56a2cc72e54b891bdb88e2f16"
+    },
+    "Inc/stm32f4xx_ll_i2c.h": {
+      "bytes": 67469,
+      "sha256": "d675d5e20effac4790a2664eed686ed1caa9af86e5f542bda7f6c05927d00d1d"
+    },
+    "Inc/stm32f4xx_ll_iwdg.h": {
+      "bytes": 9098,
+      "sha256": "755bdf0e666bc8023fb154734726a681fae718edeb346c60b63534223c57e1ad"
+    },
+    "Inc/stm32f4xx_ll_spi.h": {
+      "bytes": 66631,
+      "sha256": "3b053ed6c58bc9ae4de03fcae86f64a14fb86ad4a36ef27a3bdf1524e93e9b54"
+    },
+    "Inc/stm32f4xx_ll_tim.h": {
+      "bytes": 174976,
+      "sha256": "0d7eb3fd74100ee33cf592c6edb2e340d85ac320364702a6cc1d0e9d22da66d2"
+    },
+    "Inc/stm32f4xx_ll_usart.h": {
+      "bytes": 97617,
+      "sha256": "982c4448c49ddc7c6c71bd788e5354f05e96aca5e98edd0626f8ffcaefc65e79"
+    },
+    "LICENSE.md": {
+      "bytes": 1485,
+      "sha256": "376c82bcef0be563bf59b93d05cfdd4b6295e4660b55b31dd8a883bf1d6637f7"
+    }
+  },
+  "kind": "nexus-reviewed-official-driver",
+  "license": {
+    "expression": "BSD-3-Clause",
+    "path": "LICENSE.md"
+  },
+  "pairing": {
+    "cmsis_commit": "3c77349ce04c8af401454cc51f85ea9a50e34fc1",
+    "cmsis_repository": "https://github.com/STMicroelectronics/cmsis_device_f4.git",
+    "commit": "94cae6e83f00e276a11957e7833c01ac3d0bd7af",
+    "release": "v1.28.3",
+    "repository": "https://github.com/STMicroelectronics/STM32CubeF4.git"
+  },
+  "release": "v1.8.5",
+  "repository": "https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git",
+  "schema_version": 1,
+  "selected_api": "stm32f407-ll-inline"
+}

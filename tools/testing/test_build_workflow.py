@@ -302,50 +302,108 @@ class ProcessExecutionTests(unittest.TestCase):
     def test_repeated_cancellation_during_timeout_cannot_escape_cleanup(self):
         import signal
         from tools.dev import dev
+        from tools.dev.process import _linux_process
+        linux = os.name == "posix" and Path("/proc/self/stat").is_file()
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             marker, started = root / "survived.txt", root / "started.txt"
-            owned_pid = root / "owned.pid"
-            child = ("import pathlib,signal,time; "
+            owned_pid, leaf_pid = root / "owned.pid", root / "leaf.pid"
+            withdrawing, proceed = root / "withdrawing", root / "proceed"
+            term_seen, int_seen = root / "term-seen", root / "int-seen"
+            child = ("import os,pathlib,signal,time; "
                      "signal.signal(signal.SIGTERM,signal.SIG_IGN); "
+                     f"pathlib.Path({str(leaf_pid)!r}).write_text(str(os.getpid())); "
                      f"pathlib.Path({str(started)!r}).write_text('started'); "
-                     "time.sleep(3); "
+                     "time.sleep(30); "
                      f"pathlib.Path({str(marker)!r}).write_text('survived')")
             parent = ("import os,pathlib,signal,subprocess,sys,time; "
                       "signal.signal(signal.SIGTERM,signal.SIG_IGN); "
                       f"pathlib.Path({str(owned_pid)!r}).write_text(str(os.getpid())); "
                       f"subprocess.Popen([sys.executable,'-c',{child!r}]); "
                       "time.sleep(10)")
-            launcher = ("import os,pathlib,sys; "
-                        f"sys.path.insert(0,{str(dev.ROOT)!r}); "
-                        "from tools.dev.process import run; "
-                        f"result=run([sys.executable,'-c',{parent!r}], "
+            # Hold the real timeout withdrawal at its entry until both real
+            # cancellation handlers have returned. Elapsed sleeps cannot prove
+            # that run() has not already restored the caller's signal handlers.
+            launcher = ("import os,pathlib,signal,sys,time\n"
+                        f"sys.path.insert(0,{str(dev.ROOT)!r})\n"
+                        "from tools.dev import process as execution\n"
+                        "terminate=execution._terminate\n"
+                        "def synchronized_terminate(child):\n"
+                        " handlers={s:signal.getsignal(s) for s in "
+                        "(signal.SIGTERM,signal.SIGINT)}\n"
+                        " def observed(signum,frame):\n"
+                        "  handlers[signum](signum,frame)\n"
+                        f"  path={str(term_seen)!r} if signum==signal.SIGTERM "
+                        f"else {str(int_seen)!r}\n"
+                        "  pathlib.Path(path).write_text('handled')\n"
+                        " for signum in handlers: signal.signal(signum,observed)\n"
+                        f" pathlib.Path({str(withdrawing)!r}).write_text('ready')\n"
+                        " deadline=time.monotonic()+5\n"
+                        f" while not pathlib.Path({str(proceed)!r}).exists():\n"
+                        "  if time.monotonic()>=deadline: "
+                        "raise RuntimeError('withdrawal handshake timed out')\n"
+                        "  time.sleep(0.001)\n"
+                        " return terminate(child)\n"
+                        "execution._terminate=synchronized_terminate\n"
+                        f"result=execution.run([sys.executable,'-c',{parent!r}], "
                         f"cwd={str(root)!r},env=os.environ.copy(), "
                         f"log=pathlib.Path({str(root / 'timeout.txt')!r}), "
                         "timeout=0.35); raise SystemExit(result.returncode)")
             process = subprocess.Popen([sys.executable, "-c", launcher],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            deadline = time.monotonic() + 5
-            while not started.exists() and time.monotonic() < deadline:
-                time.sleep(0.01)
-            self.assertTrue(started.exists())
-            time.sleep(0.36)
-            process.send_signal(signal.SIGTERM)
-            time.sleep(0.02)
-            if process.poll() is None:
+
+            def wait_for(path):
+                deadline = time.monotonic() + 5
+                while not path.exists() and time.monotonic() < deadline:
+                    if process.poll() is not None:
+                        out, err = process.communicate(timeout=5)
+                        self.fail(f"Launcher exited before {path.name}: " + out + err)
+                    time.sleep(0.001)
+                self.assertTrue(path.exists(), "Missing handshake: " + path.name)
+
+            identities = []
+            try:
+                wait_for(withdrawing)
+                wait_for(started)
+                if linux:
+                    identities = [_linux_process(int(path.read_text()))
+                                  for path in (owned_pid, leaf_pid)]
+                    self.assertTrue(all(identity is not None for identity in identities))
+                process.send_signal(signal.SIGTERM)
+                wait_for(term_seen)
                 process.send_signal(signal.SIGINT)
-            out, err = process.communicate(timeout=5)
-            # Always allow any escaped descendant to finish before temp cleanup.
-            time.sleep(1.1)
-            if os.name == "posix" and owned_pid.exists():
-                try:
-                    os.killpg(int(owned_pid.read_text()), signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-            self.assertEqual(process.returncode, 124, out + err)
-            self.assertFalse(marker.exists())
-            record = json.loads((root / "timeout.command.json").read_text())
-            self.assertEqual(record["outcome"], "timed_out")
+                wait_for(int_seen)
+                proceed.write_text("continue actual withdrawal")
+                out, err = process.communicate(timeout=5)
+                self.assertEqual(process.returncode, 124, out + err)
+                self.assertFalse(marker.exists())
+                record = json.loads((root / "timeout.command.json").read_text())
+                self.assertEqual(record["outcome"], "timed_out")
+                self.assertTrue(record["withdrawal_complete"])
+                if linux:
+                    withdrawn = {item["pid"] for item in record["withdrawn_processes"]}
+                    self.assertTrue({item["pid"] for item in identities} <= withdrawn)
+                    for identity in identities:
+                        current = _linux_process(identity["pid"])
+                        self.assertTrue(current is None or
+                                        current["start_time"] != identity["start_time"] or
+                                        current["state"] in {"Z", "X"})
+            finally:
+                # A failed handshake must not leave the real fixture running.
+                proceed.touch()
+                if process.poll() is None:
+                    process.kill()
+                if os.name == "posix" and owned_pid.exists():
+                    pid = int(owned_pid.read_text())
+                    owner = _linux_process(pid) if linux else None
+                    original = identities[0] if identities else None
+                    if not linux or (owner is not None and (original is None or
+                            owner["start_time"] == original["start_time"])):
+                        try:
+                            os.killpg(pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+                process.communicate(timeout=5)
 
     def test_nested_runner_timeout_and_cancel_withdraw_all_owned_sessions(self):
         import signal

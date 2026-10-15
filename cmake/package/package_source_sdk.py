@@ -24,7 +24,9 @@ SOURCE_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(SOURCE_ROOT))
 try:
     from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES, declared_modules
-    from tools.maintenance import cmsis_device_lock, stm32g4_lock, threadx_lock
+    from tools.maintenance import (
+        cmsis_device_lock, stm32f4_hal_lock, stm32g4_lock, threadx_lock,
+    )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure.providers import descriptor as provider_descriptors
 except ImportError as error:
@@ -187,6 +189,13 @@ _g4_lock = parse_json((SOURCE_ROOT / "dependencies/stm32g4.lock.json").read_byte
 stm32g4_lock.contract(_g4_lock)
 REQUIRED_FILES += tuple("vendors/st/cmsis_device_g4/" + name
                         for name in _g4_lock["files"])
+REQUIRED_FILES += ("dependencies/stm32f4-hal.lock.json",
+                   "tools/maintenance/stm32f4_hal_lock.py",
+                   "cmake/platform/STM32Official.cmake")
+_f4_hal_lock = parse_json((SOURCE_ROOT / "dependencies/stm32f4-hal.lock.json").read_bytes())
+stm32f4_hal_lock.contract(_f4_hal_lock)
+REQUIRED_FILES += tuple("vendors/st/stm32f4_hal/" + name
+                        for name in _f4_hal_lock["files"])
 # Complete declared platform surfaces must remain present after an attacker
 # removes a payload and rehashes its file map. This is a required-source identity
 # contract, not another build graph: CMake still owns every selected target.
@@ -394,15 +403,35 @@ def git(root, *args):
     return result.stdout
 
 
-def tree_entries(root):
+def tree_entries(root, revision="HEAD"):
     entries = {}
-    for row in git(root, "ls-tree", "-r", "-z", "HEAD").split(b"\0"):
+    for row in git(root, "ls-tree", "-r", "-z", revision).split(b"\0"):
         if not row:
             continue
         meta, name = row.split(b"\t", 1)
         mode, kind, oid = meta.decode().split()
         entries[name.decode()] = (mode, kind, oid)
     return entries
+
+
+def dependency_snapshot(root, development_fixture=False):
+    """Bind only explicit development dependencies to the real stage-0 index.
+
+    A staged new or updated Gitlink is part of the nonpublishable worktree
+    overlay. write-tree rejects conflicts and never stages or changes entries.
+    Published sources continue to require the exact committed HEAD graph.
+    """
+    index = (git(root, "write-tree").decode().strip()
+             if development_fixture else None)
+    return tree_entries(root, index if index is not None else "HEAD"), index
+
+
+def verify_preparation_snapshot(root, revision, index):
+    """Reject source or staged dependency changes across package preparation."""
+    if git(root, "rev-parse", "HEAD").decode().strip() != revision:
+        raise SDKError("Source commit changed while preparing the package")
+    if index is not None and git(root, "write-tree").decode().strip() != index:
+        raise SDKError("Source index changed while preparing the development fixture")
 
 
 def dependency_entries(root, dependency):
@@ -420,6 +449,12 @@ def dependency_entries(root, dependency):
         names = stm32g4_lock.contract(parse_json(raw))
         if not names.issubset(entries):
             raise SDKError("G4 committed source graph is incomplete")
+        entries = {name: entries[name] for name in names}
+    elif dependency == stm32f4_hal_lock.DIRECTORY:
+        raw, _ = snapshot(root / stm32f4_hal_lock.LOCK_NAME)
+        names = stm32f4_hal_lock.contract(parse_json(raw))
+        if not names.issubset(entries):
+            raise SDKError("STM32F4 official committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
     else:
         for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
@@ -545,10 +580,14 @@ def prepare(source, output, development_fixture=False):
     if dirty and not development_fixture:
         raise SDKError("Publishable source SDK preparation rejects a dirty source checkout")
     entries = tree_entries(source)
-    dependencies = dependency_records(source, entries)
+    dependency_graph, index = dependency_snapshot(source, development_fixture)
+    dependencies = dependency_records(source, dependency_graph)
     threadx_lock.verify(source / "ext/threadx", source / "dependencies/threadx.lock.json", "linux")
     stm32g4_lock.verify(source / "vendors/st/cmsis_device_g4",
                        source / "dependencies/stm32g4.lock.json")
+    stm32f4_hal_lock.verify(source / stm32f4_hal_lock.DIRECTORY,
+                           source / stm32f4_hal_lock.LOCK_NAME,
+                           source / stm32f4_hal_lock.CMSIS_DIRECTORY)
     for review in cmsis_device_lock.REVIEWED_DEVICES.values():
         cmsis_device_lock.verify(source / review["directory"],
                                  source / review["lock_name"])
@@ -585,8 +624,7 @@ def prepare(source, output, development_fixture=False):
         for name in REQUIRED_FILES:
             if name not in files:
                 raise SDKError(f"Source SDK is incomplete: {name}")
-        if git(source, "rev-parse", "HEAD").decode().strip() != revision:
-            raise SDKError("Source commit changed while preparing the package")
+        verify_preparation_snapshot(source, revision, index)
         manifest = {"schema": 1, "kind": "nexus-installed-source-sdk",
                     "source_revision": revision, "source_tree": source_tree,
                     "publishable": not development_fixture, "source_dirty": dirty,
@@ -606,6 +644,9 @@ def prepare(source, output, development_fixture=False):
             "lib/cmake/Nexus/NexusConfigVersion.cmake": digest((package / "NexusConfigVersion.cmake").read_bytes())}
         (sdk / MANIFEST).write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
         verify(sdk)
+        verify_preparation_snapshot(source, revision, index)
+        if dependency_records(source, dependency_graph) != dependencies:
+            raise SDKError("Source dependencies changed while preparing the package")
         temporary.rename(output)
     except BaseException:
         shutil.rmtree(temporary, ignore_errors=True)
@@ -693,6 +734,15 @@ def verify(root):
     stm32g4_lock.verify(root / "vendors/st/cmsis_device_g4",
                        root / "dependencies/stm32g4.lock.json",
                        packaged_commit=g4["commit"])
+    f4_hal = next(record for record in records
+                  if record["path"] == stm32f4_hal_lock.DIRECTORY)
+    f4_cmsis = next(record for record in records
+                    if record["path"] == stm32f4_hal_lock.CMSIS_DIRECTORY)
+    stm32f4_hal_lock.verify(root / stm32f4_hal_lock.DIRECTORY,
+                           root / stm32f4_hal_lock.LOCK_NAME,
+                           root / stm32f4_hal_lock.CMSIS_DIRECTORY,
+                           packaged_commit=f4_hal["commit"],
+                           packaged_cmsis_commit=f4_cmsis["commit"])
     for review in cmsis_device_lock.REVIEWED_DEVICES.values():
         matching = [record for record in records
                     if record["path"] == review["directory"]]

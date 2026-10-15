@@ -213,6 +213,8 @@ class STM32G4LockTests(unittest.TestCase):
         self.write_lock()
         shutil.copyfile(ROOT / "dependencies/threadx.lock.json",
                         sdk / "dependencies/threadx.lock.json")
+        shutil.copyfile(ROOT / "dependencies/stm32f4-hal.lock.json",
+                        sdk / "dependencies/stm32f4-hal.lock.json")
         checker = sdk / "cmake/package/package_source_sdk.py"
         checker.parent.mkdir(parents=True)
         shutil.copyfile(ROOT / "cmake/package/package_source_sdk.py", checker)

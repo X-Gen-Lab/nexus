@@ -25,3 +25,6 @@
 [submodule "vendors/st/cmsis_device_u5"]
 	path = vendors/st/cmsis_device_u5
 	url = https://github.com/STMicroelectronics/cmsis-device-u5.git
+[submodule "vendors/st/stm32f4_hal"]
+	path = vendors/st/stm32f4_hal
+	url = https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git

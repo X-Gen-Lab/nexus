@@ -117,6 +117,36 @@ class SourceSDKSelectionTests(unittest.TestCase):
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
 
 
+class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
+    def test_official_f4_ll_dependency_and_verifier_closure_are_required(self):
+        required = {
+            "dependencies/stm32f4-hal.lock.json",
+            "tools/maintenance/stm32f4_hal_lock.py",
+            "cmake/platform/STM32Official.cmake",
+            "vendors/st/stm32f4_hal/LICENSE.md",
+            "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_gpio.h",
+            "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_usart.h",
+            "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_spi.h",
+            "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_adc.h",
+            "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_tim.h",
+            "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_iwdg.h",
+            "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_i2c.h",
+        }
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        self.assertIn("vendors/st/stm32f4_hal", source_sdk.REQUIRED_DEPENDENCIES)
+
+    def test_f4_sdk_redistributes_only_selected_ll_headers_and_notice(self):
+        selected = source_sdk.dependency_entries(ROOT, "vendors/st/stm32f4_hal")
+        self.assertEqual(set(selected), {
+            "Inc/stm32f4xx_ll_gpio.h", "Inc/stm32f4xx_ll_usart.h",
+            "LICENSE.md",
+            "Inc/stm32f4xx_ll_spi.h", "Inc/stm32f4xx_ll_adc.h",
+            "Inc/stm32f4xx_ll_tim.h", "Inc/stm32f4xx_ll_iwdg.h",
+            "Inc/stm32f4xx_ll_i2c.h",
+        })
+
+
 class SourceSDKThreadXSelectionTests(unittest.TestCase):
     def test_threadx_dependency_snapshot_is_exact_reviewed_source_closure(self):
         lock = json.loads((ROOT / "dependencies/threadx.lock.json").read_text())
@@ -173,6 +203,107 @@ class SourceSDKG4SelectionTests(unittest.TestCase):
             "tools/configure/providers/stm32g474/emission.py"}
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
+
+
+class SourceSDKDependencySnapshotTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="SDK staged dependency ")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.environment = {key: value for key, value in os.environ.items()
+                            if not key.startswith("GIT_")}
+        self.git(self.root, "init", "--quiet")
+        from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES
+        (self.root / ".gitmodules").write_text("".join(
+            f'[submodule "{item.path}"]\npath = {item.path}\nurl = {item.origin}\n'
+            for item in SOURCE_DEPENDENCIES))
+        (self.root / "baseline").write_text("committed source baseline\n")
+        self.git(self.root, "add", ".")
+        self.commit(self.root, "committed baseline without new dependency")
+        self.baseline = self.git(self.root, "rev-parse", "HEAD").strip()
+        self.path = "vendors/st/stm32f4_hal"
+        self.checkout = self.root / self.path
+        self.checkout.parent.mkdir(parents=True)
+        self.git(self.root, "clone", "--quiet", "--shared",
+                 str(ROOT / self.path), str(self.checkout))
+        self.git(self.checkout, "remote", "set-url", "origin",
+                 "https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git")
+        self.git(self.root, "add", self.path)
+        self.git(self.root, "submodule", "init", "--", self.path)
+        # This test exercises the source-snapshot boundary using one real,
+        # clean official dependency. Full SDK tests below retain every source.
+        patch = mock.patch.object(source_sdk, "REQUIRED_DEPENDENCIES", (self.path,))
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def git(self, root, *arguments, input=None):
+        result = subprocess.run(["git", "-C", str(root), *arguments],
+                                input=input, capture_output=True,
+                                env=self.environment, timeout=30)
+        self.assertEqual(result.returncode, 0,
+                         result.stdout.decode() + result.stderr.decode())
+        return result.stdout.decode()
+
+    def commit(self, root, message):
+        self.git(root, "-c", "user.name=SDK snapshot test", "-c",
+                 "user.email=sdk-snapshot@local.invalid", "commit", "--quiet",
+                 "--allow-empty", "-m", message)
+
+    def test_explicit_development_fixture_uses_staged_clean_gitlink(self):
+        before = self.git(self.root, "write-tree").strip()
+        entries, index = source_sdk.dependency_snapshot(self.root, True)
+        self.assertEqual(index, before)
+        records = source_sdk.dependency_records(self.root, entries)
+        self.assertEqual([record["path"] for record in records], [self.path])
+        self.assertEqual(records[0]["commit"],
+                         self.git(self.checkout, "rev-parse", "HEAD").strip())
+        source_sdk.verify_preparation_snapshot(self.root, self.baseline, index)
+        self.assertEqual(self.git(self.root, "write-tree").strip(), before)
+        self.assertEqual(self.git(self.root, "rev-parse", "HEAD").strip(), self.baseline)
+
+    def test_publishable_selection_stays_on_head_and_rejects_staged_addition(self):
+        entries, index = source_sdk.dependency_snapshot(self.root, False)
+        self.assertIsNone(index)
+        self.assertNotIn(self.path, entries)
+        with self.assertRaisesRegex(ValueError, "required dependency Gitlink"):
+            source_sdk.dependency_records(self.root, entries)
+        with self.assertRaisesRegex(ValueError, "dirty source checkout"):
+            source_sdk.prepare(self.root, self.root.parent / (self.root.name + " output"))
+
+    def test_unmerged_dependency_index_rejects_without_changing_index(self):
+        commit = self.git(self.checkout, "rev-parse", "HEAD").strip()
+        self.git(self.root, "update-index", "--index-info", input=(
+            f'0 {"0" * 40}\t{self.path}\n'
+            f'160000 {commit} 1\t{self.path}\n'
+            f'160000 {commit} 2\t{self.path}\n').encode())
+        before = self.git(self.root, "ls-files", "--stage")
+        with self.assertRaises(ValueError):
+            source_sdk.dependency_snapshot(self.root, True)
+        self.assertEqual(self.git(self.root, "ls-files", "--stage"), before)
+
+    def test_clean_checkout_different_from_staged_pin_and_dirty_source_reject(self):
+        entries, _ = source_sdk.dependency_snapshot(self.root, True)
+        extra = self.checkout / "untracked-source.c"
+        extra.write_text("int untracked_dependency;\n")
+        with self.assertRaisesRegex(ValueError, "dirty"):
+            source_sdk.dependency_records(self.root, entries)
+        extra.unlink()
+        self.commit(self.checkout, "different local dependency revision")
+        with self.assertRaisesRegex(ValueError, "pinned dependency"):
+            source_sdk.dependency_records(self.root, entries)
+
+    def test_staged_index_change_during_preparation_rejects(self):
+        _, index = source_sdk.dependency_snapshot(self.root, True)
+        (self.root / "later").write_text("index changed during preparation\n")
+        self.git(self.root, "add", "later")
+        with self.assertRaisesRegex(ValueError, "index changed"):
+            source_sdk.verify_preparation_snapshot(self.root, self.baseline, index)
+
+    def test_head_change_during_preparation_rejects(self):
+        _, index = source_sdk.dependency_snapshot(self.root, True)
+        self.commit(self.root, "HEAD changed during preparation")
+        with self.assertRaisesRegex(ValueError, "commit changed"):
+            source_sdk.verify_preparation_snapshot(self.root, self.baseline, index)
 
 
 class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
@@ -946,6 +1077,81 @@ class SourceSDKTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
         finally:
             source.write_bytes(old_source)
+
+    def test_rehashed_official_f4_source_notice_and_verifier_omissions_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        old_identity = identity.read_bytes()
+        lock = json.loads((self.sdk / "dependencies/stm32f4-hal.lock.json").read_text())
+        names = ["vendors/st/stm32f4_hal/" + name for name in lock["files"]]
+        names.extend(("dependencies/stm32f4-hal.lock.json",
+                      "tools/maintenance/stm32f4_hal_lock.py",
+                      "cmake/platform/STM32Official.cmake"))
+        for name in names:
+            with self.subTest(name=name):
+                file = self.sdk / name
+                old_source = file.read_bytes()
+                try:
+                    file.unlink()
+                    manifest = json.loads(old_identity)
+                    manifest["files_sha256"].pop(name)
+                    manifest["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                        manifest["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode())
+                    identity.write_text(json.dumps(manifest) + "\n")
+                    self.assertNotEqual(self.verify().returncode, 0)
+                finally:
+                    file.write_bytes(old_source)
+                    identity.write_bytes(old_identity)
+
+    def test_rehashed_official_f4_wrong_pairing_source_or_lock_reject(self):
+        identity = self.sdk / source_sdk.MANIFEST
+        original_identity = identity.read_bytes()
+        source = self.sdk / "vendors/st/stm32f4_hal/Inc/stm32f4xx_ll_usart.h"
+        lock_path = self.sdk / "dependencies/stm32f4-hal.lock.json"
+        original_source = source.read_bytes()
+        original_lock = lock_path.read_bytes()
+        try:
+            for dependency in ("vendors/st/stm32f4_hal",
+                               "vendors/st/cmsis_device_f4"):
+                manifest = json.loads(original_identity)
+                next(record for record in manifest["dependencies"]
+                     if record["path"] == dependency)["commit"] = "a" * 40
+                identity.write_text(json.dumps(manifest))
+                self.assertNotEqual(self.verify().returncode, 0)
+            for file, data in ((source, original_source + b"\n/* changed */\n"),
+                               (lock_path, json.dumps({**json.loads(original_lock),
+                                                       "files": {}}).encode())):
+                self.rehash_manifest_file(json.loads(original_identity), file, data)
+                self.assertNotEqual(self.verify().returncode, 0)
+                source.write_bytes(original_source)
+                lock_path.write_bytes(original_lock)
+        finally:
+            source.write_bytes(original_source)
+            lock_path.write_bytes(original_lock)
+            identity.write_bytes(original_identity)
+
+    def test_installed_official_f4_cli_requires_complete_sdk_and_is_read_only(self):
+        command = [sys.executable, "-B",
+                   str(self.sdk / "tools/maintenance/stm32f4_hal_lock.py"),
+                   "--source", str(self.sdk / "vendors/st/stm32f4_hal"),
+                   "--lock", str(self.sdk / "dependencies/stm32f4-hal.lock.json"),
+                   "--cmsis-source", str(self.sdk / "vendors/st/cmsis_device_f4")]
+        before = {path.relative_to(self.sdk).as_posix()
+                  for path in self.sdk.rglob("*") if path.is_file()}
+        result = self.run_process(command)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["verified_files"], 8)
+        self.assertEqual(json.loads(result.stdout)["source_kind"],
+                         "installed_source_sdk")
+        self.assertEqual({path.relative_to(self.sdk).as_posix()
+                          for path in self.sdk.rglob("*") if path.is_file()}, before)
+        file = self.sdk / "core/src/time.c"
+        original = file.read_bytes()
+        try:
+            file.write_bytes(original + b"\n/* unrelated payload tamper */\n")
+            self.assertNotEqual(self.run_process(command).returncode, 0)
+        finally:
+            file.write_bytes(original)
 
     def test_rehashed_g4_source_notice_lock_and_verifier_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
