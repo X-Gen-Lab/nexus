@@ -83,7 +83,8 @@ extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
                 return;
             g_u575_flash_erase = value;
             const uint32_t page =
-                ((value & FLASH_NSCR_PNB) >> FLASH_NSCR_PNB_Pos) +
+                ((value & static_cast<uint32_t>(FLASH_NSCR_PNB)) >>
+                 FLASH_NSCR_PNB_Pos) +
                 ((value & FLASH_NSCR_BKER) != 0U ? 128U : 0U);
             std::memset(const_cast<uint8_t*>(g_u575_flash_memory) +
                             page * 8192U,
@@ -139,7 +140,8 @@ extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
             reg != g_u575_model.ignore_write)
             std::memset(g_u575_i2c, 0, sizeof(*g_u575_i2c));
         if (reg == &g_u575_i2c->cr2 && (value & I2C_CR2_NBYTES) != 0U) {
-            i2c_remaining = (value & I2C_CR2_NBYTES) >> I2C_CR2_NBYTES_Pos;
+            i2c_remaining = (value & static_cast<uint32_t>(I2C_CR2_NBYTES)) >>
+                            I2C_CR2_NBYTES_Pos;
             g_u575_i2c->isr =
                 I2C_ISR_BUSY |
                 ((value & I2C_CR2_RD_WRN) != 0U ? I2C_ISR_RXNE : I2C_ISR_TXIS);
