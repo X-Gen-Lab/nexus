@@ -198,6 +198,8 @@ def main(argv=None):
         packaged_commit = None
         identity_path = sdk / ".nexus-source-sdk.json"
         if identity_path.exists() or identity_path.is_symlink():
+            if identity_path.is_symlink():
+                raise ValueError("SDK manifest cannot follow symlinks")
             if source != sdk / "ext/threadx" or args.lock.absolute() != sdk / "dependencies/threadx.lock.json":
                 raise ValueError("Installed ThreadX requires its exact SDK source and lock paths")
             # Verify the whole package before consuming its recorded commit.

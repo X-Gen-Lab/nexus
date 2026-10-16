@@ -45,6 +45,15 @@ SOURCE_DEPENDENCIES = (
     SourceDependency("stm32u5_cmsis", "vendors/st/cmsis_device_u5",
                      "https://github.com/STMicroelectronics/cmsis-device-u5.git", "LICENSE.md",
                      "dependencies/stm32u5.lock.json"),
+    SourceDependency("stm32g4_hal", "vendors/st/stm32g4_hal",
+                     "https://github.com/STMicroelectronics/stm32g4xx_hal_driver.git",
+                     "LICENSE.md", "dependencies/stm32g4-hal.lock.json"),
+    SourceDependency("stm32h7_hal", "vendors/st/stm32h7_hal",
+                     "https://github.com/STMicroelectronics/stm32h7xx_hal_driver.git",
+                     "LICENSE.md", "dependencies/stm32h7-hal.lock.json"),
+    SourceDependency("stm32u5_hal", "vendors/st/stm32u5_hal",
+                     "https://github.com/STMicroelectronics/stm32u5xx_hal_driver.git",
+                     "LICENSE.md", "dependencies/stm32u5-hal.lock.json"),
 )
 
 

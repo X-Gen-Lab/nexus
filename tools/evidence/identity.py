@@ -6,6 +6,7 @@ import hashlib
 from functools import lru_cache
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 
@@ -22,7 +23,9 @@ def observe_git_source(root: Path) -> dict:
     root = root.resolve()
     def git(*args):
         result = subprocess.run(["git", "-C", str(root), *args],
-                                capture_output=True, check=False)
+            capture_output=True, check=False,
+            env={key: value for key, value in os.environ.items()
+                 if not key.startswith("GIT_")})
         if result.returncode:
             raise EvidenceError("source identity requires a complete Git checkout")
         return result.stdout.decode().strip()

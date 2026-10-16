@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus_bindings.h"
+#include "nexus_factory.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -24,6 +25,7 @@ class Ports {
   public:
     MOCK_METHOD(nx_platform_start_result_t, start, ());
     MOCK_METHOD(nx_result_t, stop, ());
+    MOCK_METHOD(const nx_uart_port_t*, factory, (nx_uart_id_t id));
     MOCK_METHOD(nx_result_t, submit, (nx_uart_tx_request_t * request));
     MOCK_METHOD(void, service, ());
 };
@@ -69,6 +71,8 @@ TEST_F(UART3Workload, StartsSelectedInstanceAndStopsOnlyAfterSettlement) {
     EXPECT_CALL(hardware, start())
         .WillOnce(
             Return(nx_platform_start_result_t{NX_SUCCESS, NX_SUCCESS, 0}));
+    EXPECT_CALL(hardware, factory(NEXUS_WORKLOAD_UART_ID))
+        .WillOnce(Return(&uart3));
     EXPECT_CALL(hardware, submit(_))
         .WillOnce(Invoke([&](nx_uart_tx_request_t* request) {
             EXPECT_EQ(request->length, 2u);
@@ -102,13 +106,19 @@ TEST_F(UART3Workload, RejectedSubmitDoesNotServiceOrAssumePlatformStopped) {
     EXPECT_CALL(hardware, start())
         .WillOnce(
             Return(nx_platform_start_result_t{NX_SUCCESS, NX_SUCCESS, 0}));
+    EXPECT_CALL(hardware, factory(NEXUS_WORKLOAD_UART_ID))
+        .WillOnce(Return(&uart3));
     EXPECT_CALL(hardware, submit(_)).WillOnce(Return(NX_ERROR_BUSY));
     EXPECT_EQ(nx_workload_uart3_main(), 5);
 }
 } /* namespace */
 
 extern "C" {
-const nx_uart_port_t* const nx_binding_uart3 = &uart3;
+/** \brief Exercise the public typed factory without any legacy binding alias.
+ */
+const nx_uart_port_t* nx_factory_uart(nx_uart_id_t id) {
+    return ports->factory(id);
+}
 
 /** \brief Record hardware startup without modeling the production owner. */
 nx_platform_start_result_t nx_platform_start(void) {
