@@ -31,7 +31,10 @@ signature does not establish a different SDK source commit by itself.
 
 ## Raw evidence and publication
 
-Strict consumer output includes seven unborn Git fixtures. Transport archives
+Strict consumer output includes exactly thirteen unborn Git fixtures: Native,
+STM32F407 and GD32F470, plus H743, U575, F103, GD303 and G474 with each of the
+baremetal and FreeRTOS backends. Missing or additional fixture roots are rejected;
+the historical seven-consumer set is not a current fallback. Transport archives
 retain their original bytes, file modes and empty directories, then verify the
 complete inventory before crossing the artifact identity boundary. The outer
 artifact contains an inert archive, manifest and original consumer report.

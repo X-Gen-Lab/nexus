@@ -82,7 +82,9 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
                 "p.add_argument('--output');a=p.parse_args();o=Path(a.output)\n"
                 "o.mkdir(parents=True)\n"
                 "(o/'.nexus-sdk-consumer-check').write_text('owned SDK consumer verification\\n')\n"
-                "for n in ('native','stm32','gd32','h743 baremetal','h743 freertos','u575 baremetal','u575 freertos'):\n"
+                "for n in ('native','stm32','gd32','h743 baremetal','h743 freertos',"
+                "'u575 baremetal','u575 freertos','f103 baremetal','f103 freertos',"
+                "'gd303 baremetal','gd303 freertos','g474 baremetal','g474 freertos'):\n"
                 " m.prepare_consumer(Path(a.prefix),o,n,lambda c: subprocess.run(c,check=True,capture_output=True),version='0.1.0')\n"
                 "(o/'command-00.log').write_text('passed consumer command\\n')\n"
                 f"(o/'verification.json').write_text(json.dumps({{'kind': 'source_sdk_consumer_verification', 'status': 'passed', 'source_revision': {COMMIT!r}, 'physical_status': 'not_executed', 'commands': [{{'argv': ['git','init'], 'exit_code': 0, 'log': 'command-00.log'}}]}}))\n")
@@ -304,7 +306,9 @@ class ConsumerTransportTests(unittest.TestCase):
         (raw / ".nexus-sdk-consumer-check").write_text(
             "owned SDK consumer verification\n")
         for name in ("native", "stm32", "gd32", "h743 baremetal",
-                     "h743 freertos", "u575 baremetal", "u575 freertos"):
+                     "h743 freertos", "u575 baremetal", "u575 freertos",
+                     "f103 baremetal", "f103 freertos", "gd303 baremetal",
+                     "gd303 freertos", "g474 baremetal", "g474 freertos"):
             prepare_consumer(base / "prefix", raw, name,
                 lambda command: subprocess.run(command, check=True,
                     capture_output=True), version="0.1.0")
@@ -361,7 +365,49 @@ class ConsumerTransportTests(unittest.TestCase):
         original = {path.relative_to(raw).as_posix(): path.read_bytes()
                     for path in raw.rglob("*") if path.is_file()}
         self.assertEqual(restored, original)
-        self.assertEqual(len(list(raw.rglob(".git"))), 7)
+        self.assertEqual(len(list(raw.rglob(".git"))), 13)
+        manifest = json.loads((packed / "consumer-raw-manifest.json").read_text())
+        self.assertEqual(manifest["git_metadata"], "thirteen_unborn_init_fixtures")
+
+    def test_missing_each_new_consumer_fixture_is_rejected(self):
+        from tools.release import transport
+        for family in ("f103", "gd303", "g474"):
+            for backend in ("baremetal", "freertos"):
+                with self.subTest(family=family, backend=backend):
+                    base, raw = self.fixture()
+                    shutil.rmtree(raw / (family + " " + backend + " source"))
+                    with self.assertRaisesRegex(ValueError, "Exactly thirteen"):
+                        transport.pack(raw, base / "transport", COMMIT)
+
+    def test_legacy_seven_consumer_set_is_not_a_current_transport_fallback(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        for family in ("f103", "gd303", "g474"):
+            for backend in ("baremetal", "freertos"):
+                shutil.rmtree(raw / (family + " " + backend + " source"))
+        with self.assertRaisesRegex(ValueError, "Exactly thirteen"):
+            transport.pack(raw, base / "transport", COMMIT)
+
+    def test_unreviewed_consumer_root_is_rejected(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        consumer_module().prepare_consumer(base / "prefix", raw,
+            "unreviewed baremetal", lambda command: subprocess.run(command,
+                check=True, capture_output=True), version="0.1.0")
+        with self.assertRaisesRegex(ValueError, "Exactly thirteen"):
+            transport.pack(raw, base / "transport", COMMIT)
+
+    def test_manifest_cannot_describe_seven_fixtures_for_current_raw_bytes(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        output = base / "transport"
+        transport.pack(raw, output, COMMIT)
+        manifest_path = output / "consumer-raw-manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        manifest["git_metadata"] = "seven_unborn_init_fixtures"
+        manifest_path.write_text(json.dumps(manifest))
+        with self.assertRaises(ValueError):
+            transport.verify(output, COMMIT)
 
     def test_rejects_links_overlap_existing_output_and_unowned_raw(self):
         from tools.release import transport
