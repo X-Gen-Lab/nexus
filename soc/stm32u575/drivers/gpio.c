@@ -59,8 +59,7 @@ nx_result_t nx_stm32u575_gpio_initialize(nx_stm32u575_gpio_state_t* p,
      * establish its supply and remove isolation; a pad lease grants no power
      * policy. IO2SV observes configuration, never the actual rail voltage. */
     if (p->registers == NX_U575_GPIOG && (p->mask & ~3U) != 0U &&
-        ((NX_U575_READ(&g_nx_stm32u575_system.rcc->AHB3ENR) &
-          RCC_AHB3ENR_PWREN) == 0U ||
+        ((NX_U575_READ(&NX_U575_RCC->AHB3ENR) & RCC_AHB3ENR_PWREN) == 0U ||
          (NX_U575_READ(&NX_U575_PWR->SVMCR) & PWR_SVMCR_IO2SV) == 0U))
         return NX_ERROR_STATE;
     p->retained = true;
@@ -113,10 +112,10 @@ nx_result_t nx_stm32u575_gpio_stop(nx_stm32u575_gpio_state_t* p,
 nx_result_t nx_stm32u575_gpio_clock_enable(unsigned index) {
     if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
         return NX_ERROR_CONTEXT;
-    if (index > 7U || g_nx_stm32u575_system.rcc == NULL)
+    if (index > 7U)
         return NX_ERROR_UNSUPPORTED;
     uint32_t bit = 1U << index;
-    volatile uint32_t* gate = &g_nx_stm32u575_system.rcc->AHB2ENR1;
+    volatile uint32_t* gate = &NX_U575_RCC->AHB2ENR1;
     NX_U575_WRITE(gate, NX_U575_READ(gate) | bit);
     nx_arch_dsb();
     return (NX_U575_READ(gate) & bit) != 0U ? NX_SUCCESS : NX_ERROR_IO;
@@ -125,8 +124,8 @@ static nx_result_t serial_pins_prepare(bool first) {
     nx_result_t result = nx_stm32u575_gpio_clock_enable(0U);
     if (result != NX_SUCCESS)
         return result;
-    volatile uint32_t* gate = first ? &g_nx_stm32u575_system.rcc->APB2ENR
-                                    : &g_nx_stm32u575_system.rcc->APB1ENR1;
+    volatile uint32_t* gate =
+        first ? &NX_U575_RCC->APB2ENR : &NX_U575_RCC->APB1ENR1;
     const uint32_t gate_mask =
         first ? RCC_APB2ENR_USART1EN : RCC_APB1ENR1_USART2EN;
     NX_U575_WRITE(gate, NX_U575_READ(gate) | gate_mask);

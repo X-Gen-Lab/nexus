@@ -78,6 +78,7 @@ void nx_u575_model_irq_restore(nx_arch_irq_state_t previous);
 #define NX_U575_GPIOA             (&g_u575_model.gpioa)
 #define NX_U575_GPIOG             (&g_u575_model.extra_gpio[4])
 #define NX_U575_PWR               (&g_u575_model.power)
+#define NX_U575_RCC               (&g_u575_model.rcc)
 #define NX_U575_CPU_SCB           (&g_u575_model.cpu)
 #define NX_U575_CPU_GROUP(value)  (g_u575_model.group = (value))
 #define NX_U575_READ(reg)         nx_u575_model_read(reg)

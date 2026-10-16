@@ -18,6 +18,9 @@
 #ifndef NX_U575_PWR
 #define NX_U575_PWR PWR
 #endif
+#ifndef NX_U575_RCC
+#define NX_U575_RCC RCC
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif

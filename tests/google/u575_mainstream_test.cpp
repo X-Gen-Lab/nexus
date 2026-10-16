@@ -85,6 +85,24 @@ TEST_F(U575Mainstream, FailedPortGateIsObservedWithoutPinEffects) {
     EXPECT_EQ(0U, g_u575_model.gpio_writes);
 }
 
+TEST_F(U575Mainstream, GpioLeavesDoNotRequireTzen0PlatformContext) {
+    g_nx_stm32u575_system.rcc = nullptr;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_gpio_clock_enable(6U));
+    EXPECT_NE(0U, g_u575_model.rcc.AHB2ENR1 & RCC_AHB2ENR1_GPIOGEN);
+    nx_stm32u575_gpio_state_t gpio{NX_U575_GPIOG, 1U << 2U, false, false,
+                                   false};
+    uint32_t writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32u575_gpio_initialize(&gpio, 0U));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    g_u575_model.rcc.AHB3ENR = RCC_AHB3ENR_PWREN;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32u575_gpio_initialize(&gpio, 0U));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    g_u575_model.power.SVMCR = PWR_SVMCR_IO2SV;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_gpio_initialize(&gpio, 0U));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_gpio_stop(&gpio, 0U));
+    EXPECT_EQ(nullptr, g_nx_stm32u575_system.rcc);
+}
+
 TEST_F(U575Mainstream, Vddio2PadsRejectBeforeWritesWithoutPreparedSupply) {
     nx_stm32u575_gpio_state_t gpio{NX_U575_GPIOG, 1U << 2U, false, false,
                                    false};
