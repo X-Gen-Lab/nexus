@@ -41,6 +41,7 @@ typedef struct nx_stm32g474_system {
     volatile nx_result_t timer_error;
     bool owned_power_clock;
     bool power_snapshotted;
+    bool timer_quiet;
     volatile bool started;
 } nx_stm32g474_system_t;
 typedef struct {

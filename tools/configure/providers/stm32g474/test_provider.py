@@ -68,7 +68,7 @@ class G474ProviderTests(unittest.TestCase):
                            ("uart", "irq-bytes"), ("exti", "edge-event")):
             self.assertEqual(self.provider.mode_implementation(kind, mode), kind)
         for kind, mode in (("uart", "irq-byte-event"), ("uart", "irq-blocks"),
-                           ("uart", "dma-tx"), ("spi", "short-poll"),
+                           ("uart", "dma-tx"), ("spi", "dma"),
                            ("flash", "poll-word"), ("can", "classic-irq")):
             with self.subTest(kind=kind, mode=mode):
                 with self.assertRaises(ConfigurationError):
@@ -133,7 +133,8 @@ class G474ProviderTests(unittest.TestCase):
              "dma": False, "linker": True}])
         self.assertEqual(variant["flash"]["erase_blocks"], [2048] * 256)
         self.assertEqual(facts["reserved_resources"],
-                         ["timer:TIM2", "irq:TIM2_IRQn"])
+                         ["timer:TIM2", "irq:TIM2_IRQn",
+                          "pin:PF0", "pin:PF1", "pin:PG10"])
 
     def test_reference_board_is_explicit_about_physical_uncertainty(self):
         board = json.loads((ROOT / "boards/stm32g474re_hse24_reference/"

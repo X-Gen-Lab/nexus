@@ -103,6 +103,16 @@ nx_result_t nx_stm32g474_validate_identity(void) {
         return NX_ERROR_IO;
     return NX_SUCCESS;
 }
+/** \brief UG must not drive a retained trigger, slave or output route. */
+static bool timer_cold(const nx_stm32g474_system_t* s) {
+    return NX_G474_READ(&s->timer->CR1) == 0U &&
+           NX_G474_READ(&s->timer->CR2) == 0U &&
+           NX_G474_READ(&s->timer->SMCR) == 0U &&
+           NX_G474_READ(&s->timer->DIER) == 0U &&
+           NX_G474_READ(&s->timer->CCER) == 0U &&
+           NX_G474_READ(&s->timer->CCMR1) == 0U &&
+           NX_G474_READ(&s->timer->CCMR2) == 0U;
+}
 /** \brief Inspect cold prerequisites before any clock or Flash writes. */
 nx_result_t nx_stm32g474_system_preflight(const nx_stm32g474_system_t* s) {
     if (!task_context())
@@ -120,9 +130,8 @@ nx_result_t nx_stm32g474_system_preflight(const nx_stm32g474_system_t* s) {
         (cfgr & (RCC_CFGR_SW | RCC_CFGR_SWS | RCC_CFGR_HPRE | RCC_CFGR_PPRE1 |
                  RCC_CFGR_PPRE2)) != (RCC_CFGR_SW_HSI | RCC_CFGR_SWS_HSI) ||
         (NX_G474_READ(&s->rcc->APB1ENR1) & RCC_APB1ENR1_TIM2EN) != 0U ||
-        NX_G474_READ(&s->timer->CR1) != 0U ||
-        NX_G474_READ(&s->timer->DIER) != 0U ||
-        (NX_G474_READ(&s->flash->SR) & FLASH_SR_BSY) != 0U ||
+        (NX_G474_READ(&s->rcc->APB1RSTR1) & RCC_APB1RSTR1_TIM2RST) != 0U ||
+        !timer_cold(s) || (NX_G474_READ(&s->flash->SR) & FLASH_SR_BSY) != 0U ||
         !NX_G474_IRQ_AVAILABLE(TIM2_IRQn))
         return NX_ERROR_BUSY;
     return NX_SUCCESS;
@@ -223,10 +232,28 @@ nx_stm32g474_start_result_t nx_stm32g474_system_start(nx_stm32g474_system_t* s,
         r.primary = NX_ERROR_IO;
         goto rollback;
     }
-    NX_G474_WRITE(&s->rcc->APB1RSTR1,
-                  NX_G474_READ(&s->rcc->APB1RSTR1) | RCC_APB1RSTR1_TIM2RST);
-    NX_G474_WRITE(&s->rcc->APB1RSTR1, NX_G474_READ(&s->rcc->APB1RSTR1) &
-                                          ~(uint32_t)RCC_APB1RSTR1_TIM2RST);
+    /* Gate-off reads can return zero. Re-admit before reset or any UG write. */
+    if (!timer_cold(s)) {
+        r.primary = NX_ERROR_BUSY;
+        goto rollback;
+    }
+    if (!write_checked(&s->rcc->APB1RSTR1,
+                       NX_G474_READ(&s->rcc->APB1RSTR1) | RCC_APB1RSTR1_TIM2RST,
+                       RCC_APB1RSTR1_TIM2RST) ||
+        !write_checked(&s->rcc->APB1RSTR1,
+                       NX_G474_READ(&s->rcc->APB1RSTR1) &
+                           ~(uint32_t)RCC_APB1RSTR1_TIM2RST,
+                       RCC_APB1RSTR1_TIM2RST)) {
+        r.primary = NX_ERROR_IO;
+        goto rollback;
+    }
+    /* MMS=reset exports UG as TRGO. Hold TRGO at disabled CEN while loading
+     * shadows; no selected timer/ADC may observe the bootstrap update pulse. */
+    s->timer_quiet = true;
+    if (!write_checked(&s->timer->CR2, TIM_CR2_MMS_0, UINT32_MAX)) {
+        r.primary = NX_ERROR_IO;
+        goto rollback;
+    }
     bool valid = write_checked(&s->timer->PSC, 169U, UINT32_MAX) &&
                  write_checked(&s->timer->ARR, UINT32_MAX, UINT32_MAX) &&
                  write_checked(&s->timer->SR, 0U, UINT32_MAX);
@@ -242,6 +269,11 @@ nx_stm32g474_start_result_t nx_stm32g474_system_start(nx_stm32g474_system_t* s,
         r.primary = NX_ERROR_TIMEOUT;
         goto rollback;
     }
+    if (!write_checked(&s->timer->CR2, 0U, UINT32_MAX)) {
+        r.primary = NX_ERROR_IO;
+        goto rollback;
+    }
+    s->timer_quiet = false;
     if (!write_checked(&s->timer->SR, 0U, UINT32_MAX) ||
         !write_checked(&s->timer->CNT, 0U, UINT32_MAX)) {
         r.primary = NX_ERROR_IO;
@@ -272,13 +304,26 @@ nx_result_t nx_stm32g474_system_stop(nx_stm32g474_system_t* s, uint32_t limit) {
         return NX_ERROR_INVALID;
     if ((s->remaining_effects & NX_STM32G474_EFFECT_TIMER) != 0U) {
         s->started = false;
-        nx_result_t irq = NX_G474_IRQ_CONTROL(TIM2_IRQn, false, 0U);
-        if (irq != NX_SUCCESS)
-            return irq;
-        if (!write_checked(&s->timer->DIER, 0U, UINT32_MAX) ||
-            !write_checked(&s->timer->CR1, 0U, UINT32_MAX))
+        if ((NX_G474_READ(&s->rcc->APB1RSTR1) & RCC_APB1RSTR1_TIM2RST) != 0U &&
+            !write_checked(&s->rcc->APB1RSTR1,
+                           NX_G474_READ(&s->rcc->APB1RSTR1) &
+                               ~(uint32_t)RCC_APB1RSTR1_TIM2RST,
+                           RCC_APB1RSTR1_TIM2RST))
             return NX_ERROR_IO;
-        NX_G474_WRITE(&s->timer->SR, 0U);
+        if (s->timer_quiet) {
+            if (!write_checked(&s->timer->CR2, 0U, UINT32_MAX))
+                return NX_ERROR_IO;
+            s->timer_quiet = false;
+        }
+        /* A wrap may pend while UIE is being withdrawn. Try every source
+         * withdrawal, then perform the final NVIC proof before dropping its
+         * clock or owner. A failed clear retains the complete timer lease. */
+        bool sources = write_checked(&s->timer->DIER, 0U, UINT32_MAX);
+        sources = write_checked(&s->timer->CR1, 0U, UINT32_MAX) && sources;
+        sources = write_checked(&s->timer->SR, 0U, UINT32_MAX) && sources;
+        nx_result_t irq = NX_G474_IRQ_CONTROL(TIM2_IRQn, false, 0U);
+        if (!sources || irq != NX_SUCCESS)
+            return irq != NX_SUCCESS ? irq : NX_ERROR_IO;
         if (!write_checked(&s->rcc->APB1ENR1,
                            NX_G474_READ(&s->rcc->APB1ENR1) &
                                ~(uint32_t)RCC_APB1ENR1_TIM2EN,

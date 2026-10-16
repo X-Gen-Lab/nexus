@@ -21,7 +21,7 @@ from tools.evidence.common import (EvidenceError, atomic_json, command, fields,
     file_identity, parse_json, regular_file, run_adapter, verify_file_identity)
 from tools.evidence.identity import resolved_identity, resolved_input_files
 from tools.measurement.elf import Elf32
-from tools.measurement.resources import measure
+from tools.measurement.resources import measure, resolved_float_abi
 
 MAX_INPUT = 16 * 1024 * 1024
 PROVENANCE = {"configuration_sha256", "inputs", "source_dependencies",
@@ -237,7 +237,7 @@ def observe(elf_path, resolved_path, budget_path, compile_commands_path, *,
     tools = {"observer": file_identity(__file__),
              "objdump": file_identity(objdump),
              "compilers": compilers}
-    abi = resolved["cpu"]["float_abi"]
+    abi = resolved_float_abi(resolved, require_cpu=True)
     resources = measure(Path(elf_path), Path(resolved_path), Path(budget_path),
                         float_abi=abi)
     if resources["status"] != "passed":
@@ -357,7 +357,7 @@ def validate_observation(report):
     paths = {name: Path(item["path"])
              for name, item in report["inputs"].items()}
     resolved, _ = resolved_identity(paths["resolved"])
-    abi = resolved["cpu"]["float_abi"]
+    abi = resolved_float_abi(resolved, require_cpu=True)
     resources = measure(paths["elf"], paths["resolved"], paths["budget"],
                         float_abi=abi)
     profiles, compilers, sources = compiler_commands(

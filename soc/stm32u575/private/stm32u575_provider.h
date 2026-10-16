@@ -10,7 +10,14 @@
 #define NX_STM32U575_PROVIDER_H
 #include "nexus/io/gpio.h"
 #include "nexus/io/uart.h"
+#include "nexus/io/watchdog.h"
 #include "stm32u575_system.h"
+#ifndef NX_U575_GPIOG
+#define NX_U575_GPIOG GPIOG
+#endif
+#ifndef NX_U575_PWR
+#define NX_U575_PWR PWR
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,8 +51,22 @@ typedef struct {
     bool initialized;
     bool retained;
 } nx_stm32u575_uart_state_t;
+typedef struct {
+    IWDG_TypeDef* registers;
+    RCC_TypeDef* rcc;
+    FLASH_TypeDef* flash;
+    DBGMCU_TypeDef* debug;
+    uint32_t poll_limit;
+    nx_watchdog_state_t state;
+    bool lsi_added;
+    bool debug_pending;
+    uint32_t previous_debug;
+} nx_stm32u575_watchdog_state_t;
 extern const nx_gpio_ops_t nx_stm32u575_gpio_ops;
 extern const nx_uart_ops_t nx_stm32u575_uart_ops;
+extern const nx_watchdog_ops_t nx_stm32u575_watchdog_ops;
+/** \brief Retry preactivation cleanup; an active IWDG remains irreversible. */
+nx_result_t nx_stm32u575_watchdog_stop(nx_stm32u575_watchdog_state_t* port);
 /** \brief Cold owner configures authorized pins after acquiring clocks. */
 nx_result_t nx_stm32u575_gpio_initialize(nx_stm32u575_gpio_state_t* port,
                                          uint32_t initial);
@@ -56,6 +77,8 @@ nx_result_t nx_stm32u575_gpio_stop(nx_stm32u575_gpio_state_t* port,
 nx_result_t nx_stm32u575_gpio_clock_enable(unsigned port_index);
 /** \brief Source-reviewed PA9/PA10 AF7; caller owns Board bridge choice. */
 nx_result_t nx_stm32u575_usart1_pins_prepare(void);
+/** \brief Fixed PA2/PA3 AF7, APB1 USART2; external wiring stays Board-owned. */
+nx_result_t nx_stm32u575_usart2_pins_prepare(void);
 /**
  * \brief Configure explicit byte ring,8N1,PCLK4MHz/PRESC1; no FIFO/DMA.
  * \param[in,out] port: Exact static instance with unused hardware and ring.

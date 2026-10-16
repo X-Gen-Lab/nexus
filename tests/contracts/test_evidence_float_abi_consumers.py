@@ -46,8 +46,8 @@ class ConsumerAbiTests(unittest.TestCase):
             manifest["qualifications"].append(file_identity(path))
         return fixture, manifest
 
-    def test_candidates_seal_and_verify_actual_hard_and_soft_images(self):
-        for abi in ("hard", "soft"):
+    def test_candidates_seal_and_verify_all_three_declared_cpu_abis(self):
+        for abi in ("hard", "soft", "softfp"):
             with self.subTest(abi=abi):
                 fixture, manifest = self.candidate_fixture(abi)
                 path = fixture.root / "manifest.json"
@@ -60,7 +60,8 @@ class ConsumerAbiTests(unittest.TestCase):
                     candidate.verify(fixture.root / "sealed/candidate.json")
 
     def test_candidate_rejects_both_abi_mismatch_directions(self):
-        for declared, linked in (("soft", "hard"), ("hard", "soft")):
+        for declared, linked in (("soft", "hard"), ("hard", "soft"),
+                                 ("softfp", "hard"), ("hard", "softfp")):
             with self.subTest(declared=declared):
                 _, manifest = self.candidate_fixture(declared, linked=linked)
                 with patch.object(candidate, "verify_environment", return_value={}):
@@ -68,7 +69,7 @@ class ConsumerAbiTests(unittest.TestCase):
                         candidate.validate_manifest(manifest)
 
     def test_candidate_rejects_malformed_present_cpu(self):
-        for cpu in (None, {}, {"float_abi": "softfp"}, {"float_abi": 1}):
+        for cpu in (None, {}, {"float_abi": "auto"}, {"float_abi": 1}):
             with self.subTest(cpu=cpu):
                 _, manifest = self.candidate_fixture("hard", cpu=cpu)
                 with patch.object(candidate, "verify_environment", return_value={}):
@@ -92,7 +93,8 @@ class ConsumerAbiTests(unittest.TestCase):
         elf, resolved_path, budget = link_abi_fixture(self.root, declared, **kwargs)
         resolved = load_json(resolved_path)
         producer = kwargs.get("linked", declared)
-        metrics, violations = measure_data(Elf32(elf.read_bytes(), float_abi=producer),
+        elf_abi = "hard" if producer == "hard" else "soft"
+        metrics, violations = measure_data(Elf32(elf.read_bytes(), float_abi=elf_abi),
                                            resolved, load_json(budget))
         evidence = {"kind": "elf_resource_budget", "status": "passed",
             "physical_status": "not_executed", "elf": file_identity(elf),
@@ -106,22 +108,24 @@ class ConsumerAbiTests(unittest.TestCase):
                 {"configuration": file_identity(resolved_path),
                  "artifacts": {"elf": file_identity(elf)}}, resolved)
 
-    def test_resource_scope_rechecks_actual_soft_and_hard_elf(self):
-        for abi in ("hard", "soft"):
+    def test_resource_scope_rechecks_all_three_declared_cpu_abis(self):
+        for abi in ("hard", "soft", "softfp"):
             with self.subTest(abi=abi):
                 validate_resources(*self.resource_fixture(abi), verify_file_identity)
 
     def test_resource_scope_rejects_both_abi_mismatches_and_malformed_cpu(self):
         for declared, linked, cpu in (("soft", "hard", {"float_abi": "soft"}),
                                      ("hard", "soft", {"float_abi": "hard"}),
+                                     ("softfp", "hard", {"float_abi": "softfp"}),
+                                     ("hard", "softfp", {"float_abi": "hard"}),
                                      ("hard", "hard", None)):
             with self.subTest(declared=declared, linked=linked, cpu=cpu):
                 args = self.resource_fixture(declared, linked=linked, cpu=cpu)
                 with self.assertRaisesRegex(EvidenceError, "ABI required|resolved CPU"):
                     validate_resources(*args, verify_file_identity)
 
-    def test_reproduction_validates_actual_soft_and_hard_build_outputs(self):
-        for abi in ("hard", "soft"):
+    def test_reproduction_validates_all_three_declared_cpu_abis(self):
+        for abi in ("hard", "soft", "softfp"):
             with self.subTest(abi=abi):
                 root = self.root / abi
                 elf, _, _ = build_layout(root, abi)
@@ -132,6 +136,8 @@ class ConsumerAbiTests(unittest.TestCase):
         for index, (declared, linked, cpu) in enumerate((
                 ("soft", "hard", {"float_abi": "soft"}),
                 ("hard", "soft", {"float_abi": "hard"}),
+                ("softfp", "hard", {"float_abi": "softfp"}),
+                ("hard", "softfp", {"float_abi": "hard"}),
                 ("hard", "hard", {}))):
             with self.subTest(declared=declared, linked=linked):
                 root = self.root / str(index)
@@ -145,11 +151,14 @@ class ConsumerAbiTests(unittest.TestCase):
         elf, _, _ = build_layout(root, "hard", cpu="absent")
         reproduce.validate_build_artifacts(root, {"elf": file_identity(elf),
             "bin": file_identity(elf.with_suffix(".bin"))})
-        root = self.root / "soft"
-        elf, _, _ = build_layout(root, "soft", cpu="absent")
-        with self.assertRaisesRegex(EvidenceError, "hard-float ABI required"):
-            reproduce.validate_build_artifacts(root, {"elf": file_identity(elf),
-                "bin": file_identity(elf.with_suffix(".bin"))})
+        for abi in ("soft", "softfp"):
+            with self.subTest(abi=abi):
+                root = self.root / abi
+                elf, _, _ = build_layout(root, abi, cpu="absent")
+                with self.assertRaisesRegex(EvidenceError, "hard-float ABI required"):
+                    reproduce.validate_build_artifacts(root,
+                        {"elf": file_identity(elf),
+                         "bin": file_identity(elf.with_suffix(".bin"))})
 
     def interface_cli(self, elf, resolved=None, output=None):
         argv = ["--elf", str(elf), "--output", str(output or self.root / "interface.json")]
@@ -163,8 +172,8 @@ class ConsumerAbiTests(unittest.TestCase):
                 code = error.code
         return code, stderr.getvalue()
 
-    def test_interface_cli_binds_soft_and_hard_to_canonical_cpu(self):
-        for abi in ("hard", "soft"):
+    def test_interface_cli_binds_all_three_abis_to_canonical_cpu(self):
+        for abi in ("hard", "soft", "softfp"):
             with self.subTest(abi=abi):
                 elf, resolved, _ = link_abi_fixture(self.root, abi)
                 code, error = self.interface_cli(elf, resolved)
@@ -173,6 +182,8 @@ class ConsumerAbiTests(unittest.TestCase):
     def test_interface_cli_rejects_both_abi_mismatches_and_malformed_cpu(self):
         for declared, linked, cpu in (("soft", "hard", {"float_abi": "soft"}),
                                      ("hard", "soft", {"float_abi": "hard"}),
+                                     ("softfp", "hard", {"float_abi": "softfp"}),
+                                     ("hard", "softfp", {"float_abi": "hard"}),
                                      ("hard", "hard", None)):
             with self.subTest(declared=declared, linked=linked):
                 elf, resolved, _ = link_abi_fixture(self.root, declared, linked=linked, cpu=cpu)
@@ -182,7 +193,7 @@ class ConsumerAbiTests(unittest.TestCase):
                 self.assertFalse((self.root / "interface.json").exists())
 
     def test_interface_cli_legacy_without_resolved_is_hard_only(self):
-        for abi, expected in (("hard", 0), ("soft", 1)):
+        for abi, expected in (("hard", 0), ("soft", 1), ("softfp", 1)):
             with self.subTest(abi=abi):
                 elf, _, _ = link_abi_fixture(self.root, abi)
                 code, error = self.interface_cli(elf)
@@ -229,7 +240,7 @@ class ConsumerAbiTests(unittest.TestCase):
                 workloads=("empty",), optimizations=("Os",))
 
     def test_compare_reparses_actual_elf_with_resolved_abi(self):
-        for abi in ("hard", "soft"):
+        for abi in ("hard", "soft", "softfp"):
             with self.subTest(abi=abi):
                 report = self.matrix_fixture(abi)
                 self.assertEqual(report["status"], "passed", report.get("failure"))

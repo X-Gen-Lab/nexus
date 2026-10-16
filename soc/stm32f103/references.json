@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "documents": {
+    "datasheet": {
+      "kind": "datasheet",
+      "document_id": "DS5319",
+      "revision": "20",
+      "document_date": "July 2025",
+      "url": "https://www.st.com/resource/en/datasheet/stm32f103rb.pdf",
+      "sha256": "1e54ce18e6c34c5b4a78986f26e245e143748c721009fc9af5953795c30686bc",
+      "bytes": 1965230,
+      "anchors": {
+        "exact_part": "STM32F103x8/xB medium-density ordering: RB 128 KiB Flash, 20 KiB SRAM and LQFP64; package pinout and alternate functions.",
+        "watchdog": "DS5319 Rev20 Table25: LSI minimum30 kHz, typical40 kHz, maximum60 kHz. These differ from STM32F4 LSI limits."
+      }
+    },
+    "reference_manual": {
+      "kind": "reference_manual",
+      "document_id": "RM0008",
+      "revision": "21",
+      "document_date": "February 2021",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "sha256": "4c1b8ac2729cc1f45a4685eea9e91e6139e24e58804fba21e27201dfcc2ad149",
+      "bytes": 13119424,
+      "anchors": {
+        "clock": "RCC reset HSI8 MHz, CFGR dividers and TIM2 APB clock; fixed reset-like profile only.",
+        "gpio": "GPIO CRL/CRH CNF/MODE nibbles, BSRR atomic preload and AFIO_MAPR default USART2 mapping.",
+        "uart": "USART SR read followed by DR read clears RXNE/error flags; TC write0 or SR read followed by DR write. No ICR/RDR/TDR or TEACK/REACK on F1.",
+        "timer": "16-bit TIM2 counter/ARR, PSC preload UG update, SR W0C; nominal1 MHz overflow65.536 ms.",
+        "watchdog": "Chapter19 sections19.3/19.4: IWDG KR CCCC enable, 5555 access, AAAA feed; initial counter4096, PR/RLR independent updates and SR PVU/RVU. FLASH_OBR IWDG_SW observed only; DBGMCU_CR IWDG freeze.",
+        "exti": "AFIO EXTICR GPIOA mux0; CRL floating input nibble4; EXTI IMR/EMR/RTSR/FTSR/PR W1C and independent EXTI0/1 IRQ6/7.",
+        "spi": "SPI1 master default PA5/PA6/PA7; CR1 BR=APB2/2..256, CPOL/CPHA, 8-bit DR accesses, RXNE/TXE/BSY, RCC APB2RSTR reset and exclusive software PA4 CS."
+      }
+    },
+    "errata": {
+      "kind": "errata",
+      "document_id": "ES096",
+      "revision": "15",
+      "document_date": "March 2022",
+      "url": "https://www.st.com/resource/en/errata_sheet/es096-stm32f101x8b-stm32f102x8b-and-stm32f103x8b-mediumdensity-device-limitations-stmicroelectronics.pdf",
+      "sha256": "7bcdf58d8b602292d68abb59e181a4f44a038f215d8b01b0167f6d7139285490",
+      "bytes": 956332,
+      "anchors": {
+        "applicability": "Medium-density STM32F103x8/xB; actual revision not observed. Used-mode errata require explicit applicability review before physical qualification.",
+        "usart2_profile": "ES096 Rev15 section2.3.9: receive-only TE0 TX pad cannot share another alternate output. The maintained profile always uses TE+RE with exclusive PA2/PA3 leases. Stop restores input/analog only after withdrawal. RX-only and a complete errata audit are not claimed."
+      }
+    }
+  },
+  "package_review": {
+    "document": "datasheet",
+    "variants": [
+      "STM32F103RBT6"
+    ],
+    "status": "package_gpio_reviewed",
+    "scope": "LQFP64 package inventory only; other densities and packages are excluded."
+  },
+  "errata_review": {
+    "document": "errata",
+    "status": "applicability_only",
+    "silicon_revision": "not_observed",
+    "mode_workarounds": "not_fully_audited",
+    "hardware_qualification": "not_executed",
+    "identification": "Medium-density DEV_ID0x410 plus FLASH_SIZE128 KiB cannot identify package or Board."
+  },
+  "limitations": [
+    "Official source identity is recorded; this is not a complete errata workaround audit.",
+    "No physical measurements or Board inspection. GPIOA PA5,USART2 IRQ bytes,IWDG,EXTI0/1 and bounded SPI1 polling with PA4 CS only; all other peripheral modes fail configuration admission."
+  ]
+}

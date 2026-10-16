@@ -424,18 +424,22 @@ static void watchdog_cases(bool late_failure) {
     CHECK(nx_watchdog_port_feed(&port_api) == NX_ERROR_STATE);
     nx_watchdog_state_t state;
     RCU_RSTSCK |= RCU_RSTSCK_IRC32KSTB;
-    g_gd32_model_fwdgt_config_fails = true;
-    CHECK(nx_watchdog_port_enable(&port_api, 1000000u, false, &state) ==
-          NX_ERROR_IO);
-    CHECK(!state.enabled && !port.state.enabled);
     g_gd32_model_fwdgt_config_fails = false;
     g_gd32_model_debug_freeze_fails = late_failure;
     CHECK(nx_watchdog_port_enable(&port_api, 1000000u, true, &state) ==
           (late_failure ? NX_ERROR_IO : NX_SUCCESS));
-    CHECK(state.enabled && state.irreversible &&
-          state.debug_freeze == !late_failure);
-    CHECK(state.minimum_timeout_us == 0u &&
-          state.maximum_timeout_us == UINT32_MAX);
+    if (late_failure) {
+        CHECK(!state.enabled && !state.irreversible);
+        CHECK(nx_gd32_watchdog_stop(&port) == NX_SUCCESS);
+        g_gd32_model_debug_freeze_fails = false;
+        CHECK(nx_gd32_watchdog_initialize(&port) == NX_SUCCESS);
+        CHECK(nx_watchdog_port_enable(&port_api, 1000000u, true, &state) ==
+              NX_SUCCESS);
+    }
+    CHECK(state.enabled && state.irreversible && state.debug_freeze);
+    CHECK(state.minimum_timeout_us == 0u && state.maximum_timeout_us == 0u);
+    CHECK(FWDGT_PSC == 1u && FWDGT_RLD == 4000u);
+    CHECK(nx_watchdog_port_state(&port_api, &state) == NX_ERROR_UNSUPPORTED);
     CHECK(nx_watchdog_port_enable(&port_api, 1000000u, false, &state) ==
           NX_ERROR_STATE);
     CHECK(nx_watchdog_port_feed(&port_api) == NX_SUCCESS);
@@ -573,19 +577,44 @@ int main(int argc, char** argv) {
         return 0;
     }
     if (argc == 2 && strcmp(argv[1], "watchdog-hardware-enabled") == 0) {
-        nx_gd32_watchdog_state_t port;
+        nx_gd32_watchdog_state_t port = {0};
         const nx_watchdog_port_t port_api = {&nx_gd32_watchdog_ops, &port};
         (void)port_api;
         FMC_OBCTL0 = 0u;
         CHECK(nx_gd32_watchdog_initialize(&port) == NX_SUCCESS);
         nx_watchdog_state_t state;
-        CHECK(nx_watchdog_port_state(&port_api, &state) == NX_SUCCESS);
+        CHECK(nx_watchdog_port_state(&port_api, &state) ==
+              NX_ERROR_UNSUPPORTED);
         CHECK(state.enabled && state.irreversible);
+        CHECK(state.minimum_timeout_us == 0u && state.maximum_timeout_us == 0u);
         CHECK(FWDGT_CTL == 0u);
         CHECK(nx_gd32_watchdog_stop(&port) == NX_ERROR_UNSUPPORTED);
         CHECK(nx_watchdog_port_feed(&port_api) == NX_SUCCESS);
         CHECK(FWDGT_CTL == FWDGT_KEY_RELOAD);
         printf("GD32 hardware watchdog model: %u checks passed\n", s_checks);
+        return 0;
+    }
+    if (argc == 2 && strcmp(argv[1], "watchdog-config-failure") == 0) {
+        nx_gd32_watchdog_state_t port = {0};
+        const nx_watchdog_port_t port_api = {&nx_gd32_watchdog_ops, &port};
+        nx_watchdog_state_t state;
+        FMC_OBCTL0 = FMC_OBCTL0_NWDG_HW;
+        RCU_RSTSCK |= RCU_RSTSCK_IRC32KSTB;
+        CHECK(nx_gd32_watchdog_initialize(&port) == NX_SUCCESS);
+        g_gd32_model_fwdgt_config_fails = true;
+        CHECK(nx_watchdog_port_enable(&port_api, 1000000u, true, &state) ==
+              NX_ERROR_IO);
+        CHECK(state.enabled && state.irreversible && state.debug_freeze);
+        CHECK(port.state.enabled && port.initialized);
+        CHECK((RCU_RSTSCK & RCU_RSTSCK_IRC32KEN) != 0u);
+        CHECK(state.minimum_timeout_us == 0u && state.maximum_timeout_us == 0u);
+        CHECK(nx_gd32_watchdog_stop(&port) == NX_ERROR_UNSUPPORTED);
+        CHECK(nx_watchdog_port_enable(&port_api, 2000000u, false, &state) ==
+              NX_ERROR_STATE);
+        CHECK(nx_watchdog_port_feed(&port_api) == NX_SUCCESS);
+        CHECK(FWDGT_CTL == FWDGT_KEY_RELOAD);
+        printf("GD32 post-enable configuration failure: %u checks passed\n",
+               s_checks);
         return 0;
     }
     CHECK(argc == 1);

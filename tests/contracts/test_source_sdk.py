@@ -398,6 +398,80 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
 
 
 class SourceSDKTests(unittest.TestCase):
+    def test_rehashed_import_cannot_add_an_unreviewed_firmware_file(self):
+        import hashlib
+        manifest = self.sdk / ".nexus-source-sdk.json"
+        original_manifest = manifest.read_bytes()
+        for family in ("gd32f30x", "gd32f4xx"):
+            with self.subTest(family=family):
+                name = "vendors/gigadevice/" + family + "/Firmware/unreviewed.h"
+                target = self.sdk / name
+                self.assertFalse(target.exists())
+                try:
+                    target.write_bytes(b"/* outside the original vendor lock */\n")
+                    identity = json.loads(original_manifest)
+                    identity["files_sha256"][name] = hashlib.sha256(target.read_bytes()).hexdigest()
+                    identity["snapshot_sha256"] = hashlib.sha256(json.dumps(
+                        identity["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode()).hexdigest()
+                    manifest.write_text(json.dumps(identity, indent=2, sort_keys=True) + "\n")
+                    result = self.verify()
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("outside the reviewed import", result.stderr)
+                finally:
+                    target.unlink(missing_ok=True)
+                    manifest.write_bytes(original_manifest)
+
+    def test_rehashed_import_cannot_add_an_unreviewed_auxiliary_file(self):
+        import hashlib
+        manifest = self.sdk / ".nexus-source-sdk.json"
+        original_manifest = manifest.read_bytes()
+        for family in ("gd32f30x", "gd32f4xx"):
+            with self.subTest(family=family):
+                name = "vendors/gigadevice/" + family + "/unreviewed.txt"
+                target = self.sdk / name
+                self.assertFalse(target.exists())
+                try:
+                    target.write_bytes(b"outside the reviewed import notice set\n")
+                    identity = json.loads(original_manifest)
+                    identity["files_sha256"][name] = hashlib.sha256(target.read_bytes()).hexdigest()
+                    identity["snapshot_sha256"] = hashlib.sha256(json.dumps(
+                        identity["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode()).hexdigest()
+                    manifest.write_text(json.dumps(identity, indent=2, sort_keys=True) + "\n")
+                    result = self.verify()
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("outside the reviewed import", result.stderr)
+                finally:
+                    target.unlink(missing_ok=True)
+                    manifest.write_bytes(original_manifest)
+
+    def test_rehashed_vendor_import_bytes_still_must_match_original_lock(self):
+        import hashlib
+        manifest = self.sdk / ".nexus-source-sdk.json"
+        original_manifest = manifest.read_bytes()
+        for family in ("gd32f30x", "gd32f4xx"):
+            with self.subTest(family=family):
+                directory = "vendors/gigadevice/" + family
+                lock = json.loads((self.sdk / directory / "source.lock.json").read_text())
+                name = directory + "/" + lock["files"][0]["path"]
+                target = self.sdk / name
+                original = target.read_bytes()
+                try:
+                    target.write_bytes(bytes([original[0] ^ 1]) + original[1:])
+                    identity = json.loads(original_manifest)
+                    identity["files_sha256"][name] = hashlib.sha256(target.read_bytes()).hexdigest()
+                    identity["snapshot_sha256"] = hashlib.sha256(json.dumps(
+                        identity["files_sha256"], sort_keys=True,
+                        separators=(",", ":")).encode()).hexdigest()
+                    manifest.write_text(json.dumps(identity, indent=2, sort_keys=True) + "\n")
+                    result = self.verify()
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("Imported source changed", result.stderr)
+                finally:
+                    target.write_bytes(original)
+                    manifest.write_bytes(original_manifest)
+
     @classmethod
     def setUpClass(cls):
         cls.temporary = tempfile.TemporaryDirectory(prefix="nexus installed source sdk ")
@@ -654,8 +728,10 @@ class SourceSDKTests(unittest.TestCase):
             self.assertNotIn("-DGD32F470", command)
 
     def modern_consumer(self, family, board, backend):
+        consumers = self.directory / "typed platform consumers"
+        consumers.mkdir(exist_ok=True)
         source, build, arguments = consumer_gate.prepare_modern_consumer(
-            self.prefix, self.directory, family, backend, self.run_ok,
+            self.prefix, consumers, family, backend, self.run_ok,
             fixture=True)
         self.assertIn(str(self.sdk / "boards" / board),
                       (source / "assembly.toml").read_text())
@@ -672,6 +748,7 @@ class SourceSDKTests(unittest.TestCase):
         self.run_ok([sys.executable, "-B",
             str(self.sdk / "tools/measurement/retention.py"),
             "--elf", str(image), "--bindings", str(config / "bindings.c"),
+            "--resolved", str(config / "resolved.json"),
             "--output", str(build / "provider-retention.json")])
         retention = json.loads((build / "provider-retention.json").read_text())
         self.assertEqual(retention["status"], "passed")
@@ -681,12 +758,15 @@ class SourceSDKTests(unittest.TestCase):
         self.assertEqual(len(products), 1)
         for entry in commands:
             self.assertNotIn(str(ROOT) + "/", entry["command"])
-        for private in ("/vendors/", "/soc/", "-DSTM32H743", "-DSTM32U575"):
+        for private in ("/vendors/", "/soc/", "-DSTM32", "-DGD32"):
             self.assertNotIn(private, products[0]["command"])
         # The SDK must supply the selected original vector table, exactly once.
-        part = "stm32h743xx" if family == "h743" else "stm32u575xx"
+        startup_name = {
+            "h743": "startup_stm32h743xx.s", "u575": "startup_stm32u575xx.s",
+            "f103": "startup_stm32f103xb.s", "gd303": "startup_gd32f30x_hd.S",
+            "g474": "startup_stm32g474xx.s"}[family]
         startup = [entry for entry in commands
-                   if Path(entry["file"]).name == f"startup_{part}.s"]
+                   if Path(entry["file"]).name == startup_name]
         self.assertEqual(len(startup), 1)
         self.assertTrue(Path(startup[0]["file"]).is_relative_to(self.sdk))
 
@@ -701,6 +781,16 @@ class SourceSDKTests(unittest.TestCase):
         for backend in ("baremetal", "freertos"):
             with self.subTest(backend=backend):
                 self.modern_consumer("u575", "stm32u575_nucleo_zi_q", backend)
+
+    def test_relocated_mainstream_consumers_use_their_actual_startup_and_abi(self):
+        self.assertIsNotNone(shutil.which("arm-none-eabi-gcc"),
+                             "ARM GNU toolchain required for MCU consumers")
+        for family, board in (("f103", "stm32f103_reference"),
+                              ("gd303", "gd32f303_reference"),
+                              ("g474", "stm32g474re_hse24_reference")):
+            for backend in ("baremetal", "freertos"):
+                with self.subTest(family=family, backend=backend):
+                    self.modern_consumer(family, board, backend)
 
     def threadx_consumer(self, name, board, clock, *, arm):
         source, build, arguments = consumer_gate.prepare_consumer(
@@ -1302,7 +1392,8 @@ class SourceSDKTests(unittest.TestCase):
         old_identity = identity.read_bytes()
         for review in source_sdk.cmsis_device_lock.REVIEWED_DEVICES.values():
             with self.subTest(part=review["directory"]):
-                source = self.sdk / review["directory"] / "LICENSE.md"
+                source = (self.sdk / review["directory"] /
+                          review.get("license_path", "LICENSE.md"))
                 lock = self.sdk / review["lock_name"]
                 old_source, old_lock = source.read_bytes(), lock.read_bytes()
                 try:

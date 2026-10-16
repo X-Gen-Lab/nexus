@@ -24,9 +24,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define NX_STM32H743_EFFECT_TIMER   1U
-#define NX_STM32H743_EFFECT_DIVIDER 2U
-#define NX_STM32H743_EFFECT_CACHE   4U
+#define NX_STM32H743_EFFECT_TIMER       1U
+#define NX_STM32H743_EFFECT_DIVIDER     2U
+#define NX_STM32H743_EFFECT_CACHE       4U
+#define NX_STM32H743_EFFECT_TIMER_GATE  8U
+#define NX_STM32H743_EFFECT_TIMER_QUIET 16U
 typedef struct nx_stm32h743_system {
     RCC_TypeDef* rcc;
     FLASH_TypeDef* flash;

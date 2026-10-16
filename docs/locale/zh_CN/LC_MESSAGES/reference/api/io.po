@@ -865,8 +865,8 @@ msgstr "watchdog.h"
 msgid "Irreversible IWDG effects and neutral hardware reset causes."
 msgstr "不可逆 IWDG 效果与中立硬件复位原因。"
 
-msgid "Enable IWDG with reviewed bounds; activation is irreversible."
-msgstr "在已审查边界内启用 IWDG；激活不可逆。"
+msgid "Enable IWDG and report its effect and known timing bounds; activation is irreversible."
+msgstr "启用 IWDG，并报告其生效状态及已知的时间范围；激活不可逆。"
 
 msgid "Feed an enabled IWDG without changing product health policy."
 msgstr "喂已启用 IWDG，不改变产品健康策略。"

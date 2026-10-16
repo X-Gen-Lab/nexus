@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "gd32f303-rct6-reference",
+  "soc": "GD32F303RCT6",
+  "soc_family": "gd32f303",
+  "source_revision": "GD32F303xx Datasheet Rev3.0 LQFP64 bare-chip software fixture",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "gpio0",
+      "controller": "GPIOA",
+      "route": "gpio-pa5",
+      "initial": 0,
+      "mask": 32
+    },
+    {
+      "id": "uart0",
+      "controller": "USART0",
+      "route": "usart0-pa9-pa10"
+    },
+    {
+      "id": "spi0",
+      "controller": "SPI0",
+      "route": "spi0-pa5-pa6-pa7"
+    },
+    {
+      "id": "spi0-cs",
+      "controller": "GPIOA",
+      "route": "gpio-pa4",
+      "initial": 16,
+      "mask": 16
+    },
+    {
+      "id": "watchdog0",
+      "controller": "FWDGT",
+      "route": "fwdgt-internal"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14",
+    "PA15",
+    "PB3",
+    "PB4"
+  ],
+  "unknowns": [
+    "No specific PCB, connector, LED or debugger wiring is asserted.",
+    "No physical HIL executed; IRC8 tolerance and UART electrical behavior unqualified.",
+    "External oscillators, supply, boot straps, reset and pull resistors require external Board evidence.",
+    "Exact GPIOA PA4/PA5, USART0 IRQ-byte, SPI0 finitepoll+PA4CS and internal FWDGT software mechanisms only; other controllers/modes unsupported."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.gd32mcu.com/data/documents/datasheet/GD32F303xx_Datasheet_Rev3.0.pdf",
+      "scope": "Exact GD32F303RCT6 LQFP64 pin Table2-6; silicon fixture only."
+    }
+  ]
+}

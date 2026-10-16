@@ -1,4 +1,4 @@
-"""Source-reviewed G474 GPIO, LPUART bytes and exact EXTI line contracts."""
+"""Source-reviewed G474 GPIO, IRQ UART, FIFO SPI, IWDG and EXTI contracts."""
 from types import MappingProxyType
 from .. import common, descriptor
 
@@ -20,17 +20,22 @@ FACT_REFERENCES = descriptor.maintained("stm32g474").references
 CAN_CONTROLLERS = ()
 ETH_CONTROLLER = None
 USB_CONTROLLER = None
-SPI_REQUIRES_ENDPOINT = False
+SPI_REQUIRES_ENDPOINT = True
 DMA_VECTOR = None
 DMA_TOPOLOGY = (frozenset(), range(0), range(0))
 CLOCK_PROFILES = MappingProxyType({
     "hse24-pll170": MappingProxyType({
         "hse_hz": 24000000, "core_hz": 170000000,
         "apb1_hz": 170000000, "apb2_hz": 170000000})})
-LIMITS = MappingProxyType({"uart_baud": (2594, 1000000)})
+LIMITS = MappingProxyType({"uart_baud": (2594, 1000000),
+                           "spi_hz": (664063, 42500000),
+                           "pwm_period": 65535, "timer_hz": 170000000})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
-    ("uart", "irq-bytes"): "uart", ("exti", "edge-event"): "exti"})
+    ("uart", "irq-bytes"): "uart", ("exti", "edge-event"): "exti",
+    ("watchdog", "independent"): "watchdog",
+    ("spi", "short-poll"): "spi",
+    ("pwm", "fixed-pwm"): "pwm"})
 
 
 def mode_implementation(kind, mode):
@@ -45,31 +50,75 @@ def validate_selection(selection, route):
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
     if kind == "uart":
-        expected = (("PA2", "tx", 12), ("PA3", "rx", 12))
+        reviewed = {
+            "LPUART1": (("PA2", "tx", 12), ("PA3", "rx", 12)),
+            "USART1": (("PA9", "tx", 7), ("PA10", "rx", 7)),
+            "USART2": (("PA2", "tx", 7), ("PA3", "rx", 7)),
+            "USART3": (("PB10", "tx", 7), ("PB11", "rx", 7)),
+            "UART4": (("PC10", "tx", 5), ("PC11", "rx", 5)),
+            "UART5": (("PC12", "tx", 5), ("PD2", "rx", 5))}
         actual = tuple((pin["pin"], pin["function"], pin["af"])
                        for pin in route["pins"])
-        if route["controller"] != "LPUART1" or actual != expected:
-            common.fail("Only reviewed LPUART1 PA2/PA3 AF12 is maintained")
+        if actual != reviewed.get(route["controller"]):
+            common.fail("G474 UART requires an exact reviewed controller route")
         baud = common.integer(selection["baud"], *LIMITS["uart_baud"],
-                              "LPUART baud")
-        divisor = (170000000 * 16 + baud // 2) // baud
-        if not 0x300 <= divisor <= 0xfffff:
-            common.fail("LPUART baud differs from the actual PRESC16 divider")
+                              "UART baud")
+        low_power = route["controller"] == "LPUART1"
+        divisor = (170000000 * (16 if low_power else 1) + baud // 2) // baud
+        if not (0x300 if low_power else 16) <= divisor <= (
+                0xfffff if low_power else 0xffff):
+            common.fail("UART baud differs from its selected hardware divider")
         if selection["rx_profile"] != "bytes":
-            common.fail("G474 LPUART provider requires byte reception")
+            common.fail("G474 UART provider requires byte reception")
         if type(selection.get("irq_priority")) is not int or selection["irq_priority"] != 5:
-            common.fail("G474 LPUART provider implements IRQ priority5 only")
+            common.fail("G474 UART provider implements IRQ priority5 only")
     elif kind == "gpio":
         pins = route["pins"]
-        if (route["controller"] != "GPIOA" or not pins or
-                any(pin["pin"] != "PA5" or pin["af"] != 0 for pin in pins)):
-            common.fail("Only reviewed GPIOA PA5 route is maintained")
-        mask = common.integer(selection.get("mask", 32), 1, 0xffff,
+        controller = route["controller"]
+        if controller not in {"GPIOA", "GPIOB", "GPIOC", "GPIOD", "GPIOF", "GPIOG"} or not pins:
+            common.fail("G474 GPIO requires a package port and explicit pins")
+        expected = 0
+        available = {"A": range(16), "B": range(16), "C": range(16),
+                     "D": (2,), "F": (0, 1), "G": (10,)}
+        bank = controller[-1]
+        for pin in pins:
+            name = pin["pin"]
+            if (not name.startswith("P" + bank) or not name[2:].isdigit() or
+                    int(name[2:]) not in available[bank] or pin["af"] != 0):
+                common.fail("G474 GPIO route differs from the exact RE package")
+            bit = 1 << int(name[2:])
+            if expected & bit:
+                common.fail("G474 GPIO route repeats a pin")
+            expected |= bit
+        mask = common.integer(selection.get("mask", expected), 1, 0xffff,
                               "GPIO mask")
         initial = common.integer(selection.get("initial", 0), 0, 0xffff,
                                  "GPIO initial")
-        if mask != 32 or initial & ~mask:
-            common.fail("GPIO mask/initial differs from the reviewed PA5 route")
+        if mask != expected or initial & ~mask:
+            common.fail("GPIO mask/initial differs from the reviewed route")
+    elif kind == "spi":
+        reviewed = {
+            "SPI1": (("PA5", "sck", 5), ("PA6", "miso", 5), ("PA7", "mosi", 5)),
+            "SPI2": (("PB13", "sck", 5), ("PB14", "miso", 5), ("PB15", "mosi", 5))}
+        actual = tuple((pin["pin"], pin["function"], pin["af"])
+                       for pin in route["pins"])
+        if actual != reviewed.get(route["controller"]):
+            common.fail("G474 SPI requires its exact reviewed AF5 route")
+        common.integer(selection.get("max_hz"), *LIMITS["spi_hz"],
+                       "G474 SPI maximum frequency")
+    elif kind == "pwm":
+        expected = {"TIM3": "PA6", "TIM4": "PB6"}.get(route["controller"])
+        if tuple((pin["pin"], pin["function"], pin["af"])
+                 for pin in route["pins"]) != ((expected, "ch1", 2),):
+            common.fail("G474 PWM requires exact TIM3/4 CH1 AF2 route")
+        tick = common.integer(selection.get("tick_hz"), 1, 170000000, "PWM tick")
+        if 170000000 % tick or 170000000 // tick > 65536:
+            common.fail("PWM tick must exactly divide the 170MHz timer clock")
+        period = common.integer(selection.get("period_ticks"), 1, 65535, "PWM period")
+        common.integer(selection.get("duty_ticks"), 0, period, "PWM duty")
+    elif kind == "watchdog":
+        if route["controller"] != "IWDG" or route["pins"]:
+            common.fail("G474 independent watchdog requires internal IWDG")
     elif kind == "exti":
         controller = route["controller"]
         if controller not in {"EXTI0", "EXTI1"}:

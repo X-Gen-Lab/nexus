@@ -293,10 +293,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                  f"    s_nx_port_{name}.flash = FLASH;", f"    s_nx_port_{name}.debug = DBGMCU;",
                  f"    s_nx_port_{name}.rcc = RCC;", f"    s_nx_port_{name}.poll_limit = 1000000u;"]
         declarations += [f"static nx_result_t stop_{name}(void) {{",
-                         "    nx_watchdog_state_t state;",
-                         f"    nx_result_t result = nx_watchdog_port_state(&s_nx_face_{name}, &state);",
-                         "    if (result != NX_SUCCESS) { return result; }",
-                         "    return state.enabled ? NX_ERROR_STATE : NX_SUCCESS;", "}"]
+                         f"    return nx_stm32_watchdog_stop(&s_nx_port_{name});", "}"]
         stop = [f"stop_{name}()"]
     elif kind == "exti":
         if item["controller"] not in {"EXTI0", "EXTI5", "EXTI6"} or len(item["pins"]) != 1:

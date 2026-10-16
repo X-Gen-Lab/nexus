@@ -66,6 +66,10 @@ void nx_arch_irq_restore(nx_arch_irq_state_t old) {
 bool nx_arch_in_isr(void) {
     return s_isr;
 }
+/** \brief Model the privileged owner used by legacy controller contracts. */
+bool nx_arch_is_privileged(void) {
+    return true;
+}
 /** \brief Report the configured exception mask. */
 bool nx_arch_irq_is_masked(void) {
     return s_mask != 0U;
@@ -544,7 +548,8 @@ static void flash_test(void) {
     assert(nx_flash_port_geometry(&port_api)->size == 1048576U);
 }
 
-/** \brief Verify pre-enable failure and irreversible post-enable failure. */
+/** \brief Verify pre-enable refusals and irreversible enabled responsibility.
+ */
 static void watchdog_test(void) {
     IWDG_TypeDef registers = {0};
     RCC_TypeDef rcc = {0};
@@ -565,14 +570,21 @@ static void watchdog_test(void) {
     s_fault = 9U;
     registers.SR = 1U;
     assert(nx_watchdog_port_enable(&port_api, 1000000U, true, &state) ==
-           NX_ERROR_IO);
+           NX_ERROR_BUSY);
+    assert(!state.enabled && !state.irreversible && registers.KR == 0U);
+    registers.SR = 0U;
+    s_fault = 0U;
+    assert(nx_watchdog_port_enable(&port_api, 1000000U, true, &state) ==
+           NX_SUCCESS);
     assert(state.enabled && state.irreversible && state.debug_freeze);
     assert(nx_watchdog_port_enable(&port_api, 1000000U, false, &state) ==
            NX_ERROR_STATE);
     assert(nx_watchdog_port_feed(&port_api) == NX_SUCCESS &&
            registers.KR == 0xAAAAU);
-    assert(state.minimum_timeout_us < 1000000U &&
-           state.maximum_timeout_us > 1000000U);
+    assert(state.minimum_timeout_us == 0U && state.maximum_timeout_us == 0U);
+    assert(nx_watchdog_port_state(&port_api, &state) == NX_ERROR_UNSUPPORTED);
+    assert(state.enabled && state.irreversible);
+    assert(nx_stm32_watchdog_stop(&port) == NX_ERROR_UNSUPPORTED);
     g_nx_stm32_system.reset_cause = RCC_CSR_PORRSTF | RCC_CSR_IWDGRSTF;
     assert(nx_reset_cause() == (NX_RESET_POWER_ON | NX_RESET_IWDG));
 }

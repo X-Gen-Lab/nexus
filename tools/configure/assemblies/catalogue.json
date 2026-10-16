@@ -1,5 +1,11 @@
 {
   "assemblies": [
+    "gd32-f303-baremetal-empty.toml",
+    "gd32-f303-baremetal-io.toml",
+    "gd32-f303-baremetal-spi-watchdog.toml",
+    "gd32-f303-freertos-empty.toml",
+    "gd32-f303-freertos-io.toml",
+    "gd32-f303-freertos-spi-watchdog.toml",
     "liangshan-baremetal-empty.toml",
     "liangshan-baremetal-gpio.toml",
     "liangshan-baremetal-spi.toml",
@@ -40,7 +46,12 @@
     "sky-freertos-empty.toml",
     "sky-freertos-gpio.toml",
     "sky-freertos-uart.toml",
-    "sky-freertos.toml"
+    "sky-freertos.toml",
+    "stm32-f103-baremetal.toml",
+    "stm32-f103-exti.toml",
+    "stm32-f103-freertos.toml",
+    "stm32-f103-spi.toml",
+    "stm32-f103-watchdog.toml"
   ],
   "schema_version": 1
 }

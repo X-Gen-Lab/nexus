@@ -29,3 +29,13 @@ checkout cannot establish a clean candidate and no physical tests are implied.
 The existing `--elf image.elf --disassembly executed-objdump.txt --output report.json`
 mode checks the bounded power leaf alone, including a standalone mutation fixture.
 It does not substitute for the full matrix or for a hardware power observation.
+
+The `rx*.toml` fixtures select exact USART3 `rx-dma-idle`: DMA1 Stream1,
+DMAMUX1 Channel1/request45 and caller-owned normal-mode blocks. The `rx32`
+variants select HSI32; ordinary `rx` selects HSI64. Cache-off/on and
+baremetal/FreeRTOS are separate compositions. The link-only main retains
+`nx_stream_initialize`, explicit RX start/stop, independent IRQ TX and the actual
+generated Stream1 vector. Complete-line buffers are aligned to 32 bytes even in
+the cache-off reference, keeping the fixture valid under either reviewed cache
+profile. Actual per-profile builds prove linking, budgets and retention; they
+do not prove physical RX timing, coherency, RTOS execution or no-gap reception.

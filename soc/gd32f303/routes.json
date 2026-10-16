@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "id": "gpio-pa5",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "GD32F303xx Datasheet Rev3.0 Table2-6 PA5 LQFP64 pad21. Bare-chip software reference only; no LED or PCB connection asserted."
+    },
+    {
+      "id": "usart0-pa9-pa10",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "USART0",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA9",
+          "function": "tx",
+          "af": 0
+        },
+        {
+          "pin": "PA10",
+          "function": "rx",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "irq-bytes"
+      ],
+      "source": "GD32F303xx Datasheet Rev3.0 Table2-6 PA9pad42/PA10pad43, default USART0 without AFIO remap; GD32F30x User Manual Rev3.4 legacy CTL1 nibble alternate output/floating input. Bare-chip route only."
+    },
+    {
+      "id": "gpio-pa4",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "Datasheet Rev3.0 Table2-6 PA4 LQFP64 pad20. Software active-low CS fixture, not attached device wiring."
+    },
+    {
+      "id": "spi0-pa5-pa6-pa7",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "SPI0",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "sck",
+          "af": 0
+        },
+        {
+          "pin": "PA6",
+          "function": "miso",
+          "af": 0
+        },
+        {
+          "pin": "PA7",
+          "function": "mosi",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "Datasheet Rev3.0 Table2-6 default SPI0 PA5/6/7; Table4-33 ratedSPI clock30MHz, below which IRC8/APB8 divided2 yields4MHz ceiling. Explicit childCS separate; no unreviewed AFIO remap."
+    },
+    {
+      "id": "fwdgt-internal",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "FWDGT",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "independent"
+      ],
+      "source": "User Manual Rev3.4 FWDGT14.1.3/Table14-1, datasheetRev3.0Table4-18 IRC40Ktyp40kHz withoutMin/Max,Table4-49nominalreload formula. No physicaltimeoutaccuracyclaim."
+    }
+  ]
+}

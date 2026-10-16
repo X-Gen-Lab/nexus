@@ -366,19 +366,26 @@ nx_result_t nx_stm32u575_uart_initialize(nx_stm32u575_uart_state_t* p,
         return NX_ERROR_UNSUPPORTED;
     if (p->baud < 62U || p->baud > 250000U)
         return NX_ERROR_UNSUPPORTED;
-    if (p->irq != USART1_IRQn)
+    if (p->irq != USART1_IRQn && p->irq != USART2_IRQn)
         return NX_ERROR_UNSUPPORTED;
     if (p->initialized || p->retained || p->active != NULL || p->wake != NULL ||
         NX_U575_READ(&p->registers->CR1) != 0U ||
         NX_U575_READ(&p->registers->CR3) != 0U ||
         !NX_U575_IRQ_AVAILABLE(p->irq))
         return NX_ERROR_BUSY;
+    if (g_nx_stm32u575_system.rcc == NULL)
+        return NX_ERROR_STATE;
+    const bool first = p->irq == USART1_IRQn;
+    volatile uint32_t* gate = first ? &g_nx_stm32u575_system.rcc->APB2ENR
+                                    : &g_nx_stm32u575_system.rcc->APB1ENR1;
+    const uint32_t gate_mask =
+        first ? RCC_APB2ENR_USART1EN : RCC_APB1ENR1_USART2EN;
+    const uint32_t mux_mask =
+        first ? RCC_CCIPR1_USART1SEL : RCC_CCIPR1_USART2SEL;
     if (!g_nx_stm32u575_system.started ||
         g_nx_stm32u575_system.core_hz != clock ||
-        (NX_U575_READ(&g_nx_stm32u575_system.rcc->APB2ENR) &
-         RCC_APB2ENR_USART1EN) == 0U ||
-        (NX_U575_READ(&g_nx_stm32u575_system.rcc->CCIPR1) &
-         RCC_CCIPR1_USART1SEL) != 0U)
+        (NX_U575_READ(gate) & gate_mask) == 0U ||
+        (NX_U575_READ(&g_nx_stm32u575_system.rcc->CCIPR1) & mux_mask) != 0U)
         return NX_ERROR_STATE;
     if (overlap(p->rx_storage, p->rx_capacity, p, sizeof(*p)) ||
         overlap(p->rx_storage, p->rx_capacity, p->registers,

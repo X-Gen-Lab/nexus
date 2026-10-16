@@ -1,0 +1,13 @@
+schema = 2
+board = "gd32f303_reference"
+backend = "baremetal"
+clock = "irc8"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536

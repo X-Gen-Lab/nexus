@@ -67,6 +67,7 @@ nx_result_t nx_stm32u575_validate_identity(void) {
                ? NX_SUCCESS
                : NX_ERROR_UNSUPPORTED;
 }
+static bool timer_available(TIM_TypeDef* timer);
 nx_result_t nx_stm32u575_system_preflight(const nx_stm32u575_system_t* s) {
     if (!task_context())
         return NX_ERROR_CONTEXT;
@@ -99,11 +100,18 @@ nx_result_t nx_stm32u575_system_preflight(const nx_stm32u575_system_t* s) {
         (NX_U575_READ(&s->dcache->CR) & DCACHE_CR_EN) != 0U ||
         (NX_U575_READ(&s->flash->NSSR) & FLASH_NSSR_BSY) != 0U ||
         (NX_U575_READ(&s->rcc->APB1ENR1) & RCC_APB1ENR1_TIM2EN) != 0U ||
-        NX_U575_READ(&s->timer->CR1) != 0U ||
-        NX_U575_READ(&s->timer->DIER) != 0U ||
-        !NX_U575_IRQ_AVAILABLE(TIM2_IRQn))
+        !timer_available(s->timer) || !NX_U575_IRQ_AVAILABLE(TIM2_IRQn))
         return NX_ERROR_BUSY;
     return NX_SUCCESS;
+}
+/** \brief UG is safe only after excluding trigger and channel ownership. */
+static bool timer_available(TIM_TypeDef* timer) {
+    return NX_U575_READ(&timer->CR1) == 0U && NX_U575_READ(&timer->CR2) == 0U &&
+           NX_U575_READ(&timer->SMCR) == 0U &&
+           NX_U575_READ(&timer->DIER) == 0U &&
+           NX_U575_READ(&timer->CCER) == 0U &&
+           NX_U575_READ(&timer->CCMR1) == 0U &&
+           NX_U575_READ(&timer->CCMR2) == 0U;
 }
 nx_result_t nx_stm32u575_system_stop(nx_stm32u575_system_t* s, uint32_t limit) {
     if (!task_context())
@@ -113,17 +121,23 @@ nx_result_t nx_stm32u575_system_stop(nx_stm32u575_system_t* s, uint32_t limit) {
     if (s->remaining_effects == 0U)
         return NX_SUCCESS;
     s->started = false;
-    nx_result_t irq = NX_U575_IRQ_CONTROL(TIM2_IRQn, false, 0U);
-    if (irq != NX_SUCCESS)
-        return irq;
-    if ((NX_U575_READ(&s->rcc->APB1ENR1) & RCC_APB1ENR1_TIM2EN) != 0U) {
+    if ((s->remaining_effects & NX_STM32U575_EFFECT_TIMER) != 0U &&
+        (NX_U575_READ(&s->rcc->APB1ENR1) & RCC_APB1ENR1_TIM2EN) != 0U) {
         if (!write_checked(&s->timer->DIER, 0U, UINT32_MAX) ||
-            !write_checked(&s->timer->CR1, 0U, UINT32_MAX))
+            !write_checked(&s->timer->CR1, 0U, UINT32_MAX) ||
+            !write_checked(&s->timer->CR2, 0U, UINT32_MAX))
             return NX_ERROR_IO;
         NX_U575_WRITE(&s->timer->SR, 0U);
         nx_arch_dsb();
         if (NX_U575_READ(&s->timer->SR) != 0U)
             return NX_ERROR_IO;
+    }
+    if ((s->remaining_effects & NX_STM32U575_EFFECT_TIMER) != 0U) {
+        /* Source withdrawal may itself race the last overflow. Clear/read
+         * NVIC only after DIER/CEN and the peripheral flag are observed off. */
+        nx_result_t irq = NX_U575_IRQ_CONTROL(TIM2_IRQn, false, 0U);
+        if (irq != NX_SUCCESS)
+            return irq;
     }
     if (!write_checked(&s->rcc->APB1ENR1,
                        NX_U575_READ(&s->rcc->APB1ENR1) &
@@ -146,12 +160,26 @@ nx_stm32u575_start_result_t nx_stm32u575_system_start(nx_stm32u575_system_t* s,
     /* No RCC, power, Flash or option-byte reset sequence is needed. A verified
      * existing 4MHz source remains unchanged; only the reserved timer is owned.
      */
-    s->remaining_effects = NX_STM32U575_EFFECT_TIMER;
+    s->remaining_effects = NX_STM32U575_EFFECT_TIMER_GATE;
     s->timer_error = NX_SUCCESS;
     s->reset_cause = NX_U575_READ(&s->rcc->CSR);
     if (!write_checked(&s->rcc->APB1ENR1,
                        NX_U575_READ(&s->rcc->APB1ENR1) | RCC_APB1ENR1_TIM2EN,
-                       RCC_APB1ENR1_TIM2EN) ||
+                       RCC_APB1ENR1_TIM2EN)) {
+        r.primary = NX_ERROR_IO;
+        goto rollback;
+    }
+    /* An unclocked APB read may return zero. Recheck the actual timer after
+     * observing its gate, before the first timer write or UG side effect. */
+    if (!timer_available(s->timer)) {
+        r.primary = NX_ERROR_BUSY;
+        goto rollback;
+    }
+    s->remaining_effects = NX_STM32U575_EFFECT_TIMER;
+    /* Reset MMS exports UG as TRGO. Select CEN while CEN=0 so the prescaler
+     * update cannot stimulate an external timer/ADC consumer. CR2 was admitted
+     * unused and is now owned through cleanup, including failed readback. */
+    if (!write_checked(&s->timer->CR2, TIM_CR2_MMS_0, UINT32_MAX) ||
         !write_checked(&s->timer->PSC, 3U, UINT32_MAX) ||
         !write_checked(&s->timer->ARR, UINT32_MAX, UINT32_MAX) ||
         !write_checked(&s->timer->CNT, 0U, UINT32_MAX) ||
@@ -165,7 +193,8 @@ nx_stm32u575_start_result_t nx_stm32u575_system_start(nx_stm32u575_system_t* s,
         r.primary = NX_ERROR_TIMEOUT;
         goto rollback;
     }
-    if (!write_checked(&s->timer->SR, 0U, UINT32_MAX)) {
+    if (!write_checked(&s->timer->SR, 0U, UINT32_MAX) ||
+        !write_checked(&s->timer->CR2, 0U, UINT32_MAX)) {
         r.primary = NX_ERROR_IO;
         goto rollback;
     }

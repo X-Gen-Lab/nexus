@@ -484,3 +484,52 @@ TEST_F(G474Provider, UnprivilegedGpioToggleRejectsBeforeAnyRegisterAccess) {
     EXPECT_EQ(writes, g_g474_model.writes);
     EXPECT_EQ(0U, g_g474_model.gpio.ODR);
 }
+
+TEST_F(G474Provider, StandardUartsUseTheirOwnGateAndOversampling16Divider) {
+    const IRQn_Type irqs[] = {USART1_IRQn, USART2_IRQn, USART3_IRQn, UART4_IRQn,
+                              UART5_IRQn};
+    for (IRQn_Type irq : irqs) {
+        nx_g474_model_reset();
+        registers = {};
+        registers.ISR = USART_ISR_TXE | USART_ISR_TC;
+        g_g474_model.uart = &registers;
+        g_nx_stm32g474_system.started = true;
+        g_nx_stm32g474_system.core_hz = 170000000;
+        g_g474_model.rcc.APB2ENR = RCC_APB2ENR_USART1EN;
+        g_g474_model.rcc.APB1ENR1 = RCC_APB1ENR1_USART2EN |
+                                    RCC_APB1ENR1_USART3EN |
+                                    RCC_APB1ENR1_UART4EN | RCC_APB1ENR1_UART5EN;
+        state = {};
+        state.registers = &registers;
+        state.rx_storage = ring;
+        state.rx_capacity = sizeof(ring);
+        state.baud = 115200;
+        state.irq = irq;
+        state.profile = NX_UART_RX_BYTES;
+        state.irq_policy = {NX_IRQ_KERNEL_NONE, 102, 4, 0};
+        EXPECT_EQ(NX_SUCCESS,
+                  nx_stm32g474_uart_initialize(&state, 170000000, 8));
+        EXPECT_EQ(0U, registers.PRESC);
+        EXPECT_EQ(1476U, registers.BRR);
+        EXPECT_TRUE(g_g474_model.irq_enabled[irq]);
+        EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&port));
+    }
+}
+TEST_F(G474Provider, AllImplementedGpioBankGatesHaveReadback) {
+    for (unsigned bank = 0; bank < 7; ++bank) {
+        EXPECT_EQ(NX_SUCCESS, nx_stm32g474_gpio_clock_enable(bank));
+        EXPECT_NE(0U, g_g474_model.rcc.AHB2ENR & (1U << bank));
+    }
+    const uint32_t writes = g_g474_model.writes;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_stm32g474_gpio_clock_enable(7));
+    EXPECT_EQ(writes, g_g474_model.writes);
+}
+TEST_F(G474Provider, GeneralUartClockSourceRejectsBeforeAnyWrite) {
+    state.irq = USART1_IRQn;
+    g_g474_model.rcc.APB2ENR = RCC_APB2ENR_USART1EN;
+    g_g474_model.rcc.CCIPR = RCC_CCIPR_USART1SEL_0;
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_stm32g474_uart_initialize(&state, 170000000, 8));
+    EXPECT_EQ(0U, g_g474_model.writes);
+    EXPECT_FALSE(state.retained);
+}

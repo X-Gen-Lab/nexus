@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103",
+  "variants": {
+    "STM32F103RBT6": {
+      "package": "LQFP64",
+      "flash": {
+        "origin": 134217728,
+        "size": 131072,
+        "erase_blocks": [
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024,
+          1024
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram",
+          "origin": 536870912,
+          "size": 20480,
+          "dma": false,
+          "linker": true
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD0",
+        "PD1",
+        "PD2"
+      ]
+    }
+  },
+  "cpu": {
+    "arch": "cortex-m3",
+    "fpu": "none",
+    "float_abi": "soft",
+    "dsp": false,
+    "dwt_cyccnt": true,
+    "mpu_version": 0,
+    "mpu_regions": 0,
+    "icache_line_bytes": 0,
+    "dcache_line_bytes": 0,
+    "security": "single",
+    "sau": false,
+    "mve": "none"
+  },
+  "irq": {
+    "priority_bits": 4,
+    "external_count": 43
+  },
+  "clock_profiles": {
+    "hsi8-fixed": {
+      "source": "hsi",
+      "input_hz": 8000000,
+      "core_hz": 8000000,
+      "apb1_hz": 8000000,
+      "apb2_hz": 8000000
+    }
+  },
+  "controllers": {
+    "GPIOA": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PA4",
+        "PA5"
+      ]
+    },
+    "USART2": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "USART2_IRQn"
+      ],
+      "irq_numbers": [
+        38
+      ],
+      "clock_hz": 8000000,
+      "pins": [
+        "PA2",
+        "PA3"
+      ]
+    },
+    "IWDG": {
+      "kind": "watchdog",
+      "modes": [
+        "independent"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "EXTI0": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI0_IRQn"
+      ],
+      "irq_numbers": [
+        6
+      ],
+      "pins": [
+        "PA0"
+      ]
+    },
+    "EXTI1": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI1_IRQn"
+      ],
+      "irq_numbers": [
+        7
+      ],
+      "pins": [
+        "PA1"
+      ]
+    },
+    "SPI1": {
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "irq": [],
+      "max_hz": 4000000,
+      "pins": [
+        "PA5",
+        "PA6",
+        "PA7"
+      ]
+    }
+  },
+  "reserved_resources": [
+    "timer:TIM2",
+    "irq:TIM2_IRQn"
+  ],
+  "source_lock": {
+    "cmsis_core": "55b19837f5703e418ca37894d5745b1dc05e4c91",
+    "cmsis_device_f1": "c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22",
+    "hal_driver_f1": "fee494a92b5ad331f92ad21f76c66a5cb83773ee"
+  },
+  "provenance": [
+    "DS5319 Rev20 July2025 exact STM32F103RB LQFP64,128KiB Flash,20KiB SRAM,51 GPIO package inventory; pins sharing oscillators/debug retain their documented restrictions.",
+    "RM0008 Rev21 February2021: reset HSI8MHz,AHB/APB div1; TIM2 is16-bit,PSC7 and ARR65535 yield1MHz with65.536ms overflow service bound. No HSE/PLL adoption or dynamic clock.",
+    "Official CubeF1v1.8.7 pair,CMSISdevice c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22,HALdriver fee494a92b5ad331f92ad21f76c66a5cb83773ee; STM32F103xB IRQ last USBWakeUp42,4 prioritybits,noMPU; private LL GPIO/USART leafoperations only."
+  ],
+  "references": "references.json"
+}

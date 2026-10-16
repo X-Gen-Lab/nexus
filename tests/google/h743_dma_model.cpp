@@ -12,8 +12,10 @@ extern "C" {
 DMA_TypeDef g_h743_dma_registers;
 DMA_Stream_TypeDef g_h743_dma_stream;
 DMAMUX_Channel_TypeDef g_h743_dma_mux;
+uint32_t g_h743_dma_tc_flag;
 void (*g_h743_dma_after_write)(volatile uint32_t*, uint32_t);
 nx_arch_result_t (*g_h743_dma_clean)(uintptr_t, size_t);
+nx_arch_result_t (*g_h743_dma_invalidate)(uintptr_t, size_t);
 void nx_h743_dma_model_reset(void) {
     nx_h743_model_reset();
     std::memset(&g_h743_dma_registers, 0, sizeof(g_h743_dma_registers));
@@ -21,9 +23,16 @@ void nx_h743_dma_model_reset(void) {
     std::memset(&g_h743_dma_mux, 0, sizeof(g_h743_dma_mux));
     g_h743_dma_after_write = nullptr;
     g_h743_dma_clean = nullptr;
+    g_h743_dma_invalidate = nullptr;
+    g_h743_dma_tc_flag = DMA_LISR_TCIF0;
 }
 void nx_h743_dma_model_write(volatile uint32_t* reg, uint32_t value) {
+    bool interrupt_stream = reg == &g_h743_dma_stream.CR &&
+                            (g_h743_dma_stream.CR & DMA_SxCR_EN) != 0U &&
+                            (value & DMA_SxCR_EN) == 0U;
     nx_h743_model_write(reg, value);
+    if (interrupt_stream && g_h743_model.ignore_write != reg)
+        g_h743_dma_registers.LISR |= g_h743_dma_tc_flag;
     if (reg == &g_h743_dma_registers.LIFCR && g_h743_model.ignore_write != reg)
         g_h743_dma_registers.LISR &= ~value;
     if (g_h743_dma_after_write != nullptr)
@@ -32,5 +41,10 @@ void nx_h743_dma_model_write(volatile uint32_t* reg, uint32_t value) {
 nx_arch_result_t nx_h743_dma_model_clean(uintptr_t address, size_t bytes) {
     return g_h743_dma_clean == nullptr ? NX_ARCH_OK
                                        : g_h743_dma_clean(address, bytes);
+}
+nx_arch_result_t nx_h743_dma_model_invalidate(uintptr_t address, size_t bytes) {
+    return g_h743_dma_invalidate == nullptr
+               ? NX_ARCH_OK
+               : g_h743_dma_invalidate(address, bytes);
 }
 }

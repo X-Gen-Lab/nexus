@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {
+      "id": "gpio-pa5",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS5319 Rev20 LQFP64 PA5; RM0008 GPIO CRL/CNF/MODE; UM1724 LD2 PA5 source reference only."
+    },
+    {
+      "id": "usart2-pa2-pa3",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "USART2",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "tx",
+          "af": 0
+        },
+        {
+          "pin": "PA3",
+          "function": "rx",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "irq-bytes"
+      ],
+      "source": "DS5319 Rev20 PA2 USART2_TX/PA3 USART2_RX default mapping; RM0008 AFIO_MAPR USART2_REMAP=0, 8N1, oversample16. UM1724 VCP route requires actual solder bridge inspection."
+    },
+    {
+      "id": "iwdg",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "IWDG",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "independent"
+      ],
+      "source": "RM0008 IWDG KR/PR/RLR/SR and FLASH_OBR_IWDG_SW; DS5319 Rev20 Table25 LSI 30/40/60 kHz; DBGMCU_CR_DBG_IWDG_STOP. Products own feed and recovery policy."
+    },
+    {
+      "id": "exti0-pa0",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "EXTI0",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "RM0008 AFIO EXTICR GPIOA mux0, EXTI IMR/RTSR/FTSR/PR W1C and independent IRQ6/7; DS5319 PA0/PA1. UM1724 Rev17 Fig13 p31/Table12 p40: CN8 A0 PA0 pin1/A1 PA1 pin2. Actual stimulus and electrical route are uninspected."
+    },
+    {
+      "id": "exti1-pa1",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "EXTI1",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "RM0008 AFIO EXTICR GPIOA mux0, EXTI IMR/RTSR/FTSR/PR W1C and independent IRQ6/7; DS5319 PA0/PA1. UM1724 Rev17 Fig13 p31/Table12 p40: CN8 A0 PA0 pin1/A1 PA1 pin2. Actual stimulus and electrical route are uninspected."
+    },
+    {
+      "id": "gpio-pa4",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS5319 PA4 GPIO pad; RM0008 CRL floating input4/output2 and BSRR. Software SPI CS source route only; no external peripheral wiring is inferred."
+    },
+    {
+      "id": "spi1-pa5-pa6-pa7",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "SPI1",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "sck",
+          "af": 0
+        },
+        {
+          "pin": "PA6",
+          "function": "miso",
+          "af": 0
+        },
+        {
+          "pin": "PA7",
+          "function": "mosi",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "DS5319 default SPI1 alternate functions PA5 SCK/PA6 MISO/PA7 MOSI; RM0008 AFIO_SPI1_REMAP=0, 8-bit master and APB divider2..256. PA5 also serves LD2, so one assembly cannot select both SPI1 and the LED."
+    }
+  ]
+}

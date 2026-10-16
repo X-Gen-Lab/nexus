@@ -96,14 +96,17 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
 
 def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
                             *, fixture=False, expected_revision=None):
-    """Prepare explicit H743/U575 public consumers, with actual kernel use."""
+    """Prepare exact MCU public consumers, with actual selected kernel use."""
     choices = {
-        "h743": ("stm32h743_nucleo_zi2", "hsi64-fixed-cache-off", "uart3", 0),
-        "u575": ("stm32u575_nucleo_zi_q", "msis4", "uart1", 7),
+        "h743": ("stm32h743_nucleo_zi2", "hsi64-fixed-cache-off", "led0", "uart3", 0),
+        "u575": ("stm32u575_nucleo_zi_q", "msis4", "led0", "uart1", 7),
+        "f103": ("stm32f103_reference", "hsi8-fixed", "led0", "uart1", 5),
+        "gd303": ("gd32f303_reference", "irc8", "gpio0", "uart0", 5),
+        "g474": ("stm32g474re_hse24_reference", "hse24-pll170", "led0", "uart1", 5),
     }
     if family not in choices or backend not in {"baremetal", "freertos"}:
         raise ValueError("Unreviewed modern consumer family/backend")
-    board, clock, uart, pin = choices[family]
+    board, clock, gpio, uart, pin = choices[family]
     prefix = Path(prefix)
     sdk = prefix / "share/nexus/src"
     version = load_policy(sdk)["semantic_version"]
@@ -129,17 +132,22 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
         '[factory]\ncapabilities = true\n'
         '[memory]\nmain_stack_bytes = 2048\nlibc_heap_bytes = 0\n'
         'static_ram_limit_bytes = 16384\nflash_load_limit_bytes = 65536\n'
-        '[gpio.led]\nbinding = "led0"\nmode = "output"\n'
+        f'[gpio.led]\nbinding = "{gpio}"\nmode = "output"\n'
         f'[uart.console]\nbinding = "{uart}"\n'
         'mode = "irq-bytes"\nbaud = 115200\n'
         '[uart.console.rx]\nformat = "bytes"\ncapacity = 64\n'
         '[uart.console.irq]\npriority = 5\ncalls_os = false\n')
     code = (
         '#include "nexus_bindings.h"\n#include "nexus_factory.h"\n'
-        '#if __has_include("stm32h7xx.h") || __has_include("stm32u5xx.h")\n'
+        '#if __has_include("stm32h7xx.h") || __has_include("stm32u5xx.h") || '
+        '__has_include("stm32f1xx.h") || __has_include("gd32f30x.h") || '
+        '__has_include("stm32g4xx.h")\n'
         '#error Vendor SDK leaked into the product\n#endif\n'
         '#if __has_include("stm32h743_provider.h") || '
-        '__has_include("stm32u575_provider.h")\n'
+        '__has_include("stm32u575_provider.h") || '
+        '__has_include("stm32f103_provider.h") || '
+        '__has_include("gd32f303_provider.h") || '
+        '__has_include("stm32g474_provider.h")\n'
         '#error Provider implementation leaked into the product\n#endif\n'
         'static nx_uart_tx_request_t request;\n'
         'static uint8_t data[2] = {0x12U, 0x34U};\n')
@@ -245,7 +253,7 @@ def main(argv=None):
             else:
                 for application in ("installed_c", "installed_cpp"):
                     run_checked([str(build / "bin" / application)])
-        for family in ("h743", "u575"):
+        for family in ("h743", "u575", "f103", "gd303", "g474"):
             for backend in ("baremetal", "freertos"):
                 source, build, command = prepare_modern_consumer(
                     prefix, output, family, backend, run_checked,
@@ -257,7 +265,7 @@ def main(argv=None):
                 products = [entry for entry in commands
                             if Path(entry["file"]).resolve() == source / "main.c"]
                 if len(products) != 1 or any(value in products[0]["command"]
-                        for value in ("/vendors/", "/soc/", "-DSTM32H743", "-DSTM32U575")):
+                        for value in ("/vendors/", "/soc/", "-DSTM32", "-DGD32")):
                     raise ValueError("Modern consumer private inputs leaked into product")
                 image = build / "bin/installed_modern.elf"
                 resources = json.loads(
@@ -269,6 +277,7 @@ def main(argv=None):
                 run_checked([sys.executable, "-B",
                     str(sdk / "tools/measurement/retention.py"),
                     "--elf", str(image), "--bindings", str(config / "bindings.c"),
+                    "--resolved", str(config / "resolved.json"),
                     "--output", str(retention_path)])
                 if json.loads(retention_path.read_text())["status"] != "passed":
                     raise ValueError("Modern consumer provider retention failed")

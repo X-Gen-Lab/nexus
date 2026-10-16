@@ -18,6 +18,9 @@ def includes(result):
     source = ['#include "stm32h743_provider.h"']
     if _dma(result):
         source.append('#include "stm32h743_dma.h"')
+    if any(item.kind == "uart" and item.mode == "rx-dma-idle"
+           for item in result.controllers):
+        source.append('#include "stm32h743_uart_receive.h"')
     return source + ['void _init(void);', 'void _fini(void);',
                     r'/** \brief C runtime hooks; constructors use .init_array. */',
                     'void _init(void) {}', 'void _fini(void) {}']
@@ -53,7 +56,7 @@ def _uart(result):
 
 
 def _dma(result):
-    return any(item.kind == "uart" and item.mode == "dma-tx"
+    return any(item.kind == "uart" and item.mode in ("dma-tx", "rx-dma-idle")
                for item in result.controllers)
 
 
@@ -120,12 +123,14 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
     if _uart(result):
         source += ['    s_nx_uart_clocks_added = ~NX_H743_READ(&RCC->APB1LENR) & RCC_APB1LENR_USART3EN;']
     if _dma(result):
+        lane = 1 if any(item.kind == "uart" and item.mode == "rx-dma-idle"
+                        for item in result.controllers) else 0
         source += ['    s_nx_dma_clocks_added = ~NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN;',
                    '    NX_H743_WRITE(&RCC->AHB1ENR, NX_H743_READ(&RCC->AHB1ENR) | RCC_AHB1ENR_DMA1EN);',
                    '    nx_arch_dsb();',
                    '    const bool dma_clock_ready = (NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u;',
-                   '    if (!dma_clock_ready || NX_H743_READ(&DMA1_Stream0->CR) != 0u ||',
-                   '        NX_H743_READ(&DMAMUX1_Channel0->CCR) != 0u || !NX_H743_IRQ_AVAILABLE(DMA1_Stream0_IRQn)) {',
+                   f'    if (!dma_clock_ready || NX_H743_READ(&DMA1_Stream{lane}->CR) != 0u ||',
+                   f'        NX_H743_READ(&DMAMUX1_Channel{lane}->CCR) != 0u || !NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane}_IRQn)) {{',
                    '        result.primary = dma_clock_ready ? NX_ERROR_BUSY : NX_ERROR_IO;',
                    f'        result.cleanup = {cleanup};',
                    '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',

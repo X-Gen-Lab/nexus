@@ -903,6 +903,10 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             source_dependencies.append(
                 imported_dependency_identity(root, lock, read))
             inputs.append(contained_file(root, lock))
+            # A reviewed archive may consume separately pinned CMSIS inputs.
+            # Its original archive identity cannot stand in for those bytes.
+            for _, path in descriptor.maintained(family).git_dependencies:
+                source_dependencies.append(source_dependency(path))
         else:
             dependencies = descriptor.maintained(family).git_dependencies
             if not dependencies:

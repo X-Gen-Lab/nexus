@@ -1,9 +1,7 @@
 /**
  * \file            gpio.c
- * \brief           G474 authorized GPIO latch and source-reviewed AF12 pins
- * \author          Nexus Team
- * \version         1.0.0
- * \date            2026-10-11
+ * \brief           G474 authorized GPIO latches and reviewed alternate-function
+ * pins \author          Nexus Team \version         1.0.0 \date 2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32g474_provider.h"
@@ -103,13 +101,74 @@ nx_result_t nx_stm32g474_gpio_stop(nx_stm32g474_gpio_state_t* p,
 nx_result_t nx_stm32g474_gpio_clock_enable(unsigned index) {
     if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
         return NX_ERROR_CONTEXT;
-    if (index != 0U || g_nx_stm32g474_system.rcc == NULL)
+    if (index > 6U || g_nx_stm32g474_system.rcc == NULL)
         return NX_ERROR_UNSUPPORTED;
     volatile uint32_t* gate = &g_nx_stm32g474_system.rcc->AHB2ENR;
-    NX_G474_WRITE(gate, NX_G474_READ(gate) | RCC_AHB2ENR_GPIOAEN);
+    NX_G474_WRITE(gate, NX_G474_READ(gate) | (RCC_AHB2ENR_GPIOAEN << index));
     nx_arch_dsb();
-    return (NX_G474_READ(gate) & RCC_AHB2ENR_GPIOAEN) != 0U ? NX_SUCCESS
-                                                            : NX_ERROR_IO;
+    return (NX_G474_READ(gate) & (RCC_AHB2ENR_GPIOAEN << index)) != 0U
+               ? NX_SUCCESS
+               : NX_ERROR_IO;
+}
+/** \brief Configure electrical fields before publishing the alternate mode. */
+static nx_result_t configure_pin(GPIO_TypeDef* gpio, unsigned pin, unsigned af,
+                                 uint32_t pull, uint32_t speed) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (gpio == NULL || pin > 15U || af > 15U)
+        return NX_ERROR_INVALID;
+    /* Different leased pads share full-word configuration registers. */
+    nx_arch_irq_state_t previous = nx_arch_irq_save();
+    uint32_t shift = pin * 2U;
+    uint32_t af_shift = (pin % 8U) * 4U;
+    NX_G474_WRITE(&gpio->OTYPER, NX_G474_READ(&gpio->OTYPER) & ~(1U << pin));
+    NX_G474_WRITE(&gpio->OSPEEDR,
+                  (NX_G474_READ(&gpio->OSPEEDR) & ~(3U << shift)) |
+                      (speed << shift));
+    NX_G474_WRITE(&gpio->PUPDR, (NX_G474_READ(&gpio->PUPDR) & ~(3U << shift)) |
+                                    (pull << shift));
+    NX_G474_WRITE(&gpio->AFR[pin / 8U],
+                  (NX_G474_READ(&gpio->AFR[pin / 8U]) & ~(15U << af_shift)) |
+                      (af << af_shift));
+    nx_arch_dsb();
+    if ((NX_G474_READ(&gpio->OTYPER) & (1U << pin)) != 0U ||
+        ((NX_G474_READ(&gpio->OSPEEDR) >> shift) & 3U) != speed ||
+        ((NX_G474_READ(&gpio->PUPDR) >> shift) & 3U) != pull ||
+        ((NX_G474_READ(&gpio->AFR[pin / 8U]) >> af_shift) & 15U) != af) {
+        nx_arch_irq_restore(previous);
+        return NX_ERROR_IO;
+    }
+    NX_G474_WRITE(&gpio->MODER, (NX_G474_READ(&gpio->MODER) & ~(3U << shift)) |
+                                    (2U << shift));
+    nx_arch_dsb();
+    nx_result_t result = ((NX_G474_READ(&gpio->MODER) >> shift) & 3U) == 2U
+                             ? NX_SUCCESS
+                             : NX_ERROR_IO;
+    nx_arch_irq_restore(previous);
+    return result;
+}
+nx_result_t nx_stm32g474_pin_alternate(GPIO_TypeDef* gpio, unsigned pin,
+                                       unsigned af) {
+    /* DS12288 SPI characterization requires OSPEEDRy11. PWM uses this
+     * fast AF policy too; Board voltage/load limits remain independent. */
+    return configure_pin(gpio, pin, af, 0U, 3U);
+}
+/** \brief Latch TX idle before publishing AF; RX has an explicit pull-up. */
+nx_result_t nx_stm32g474_uart_pins_prepare(GPIO_TypeDef* tx, unsigned tx_pin,
+                                           GPIO_TypeDef* rx, unsigned rx_pin,
+                                           unsigned af) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (tx == NULL || rx == NULL || tx_pin > 15U || rx_pin > 15U || af > 15U ||
+        (tx == rx && tx_pin == rx_pin))
+        return NX_ERROR_INVALID;
+    NX_G474_WRITE(&tx->BSRR, 1U << tx_pin);
+    nx_arch_dsb();
+    if ((NX_G474_READ(&tx->ODR) & (1U << tx_pin)) == 0U)
+        return NX_ERROR_IO;
+    nx_result_t status = configure_pin(tx, tx_pin, af, 0U, 1U);
+    return status == NX_SUCCESS ? configure_pin(rx, rx_pin, af, 1U, 1U)
+                                : status;
 }
 nx_result_t nx_stm32g474_lpuart1_pins_prepare(void) {
     nx_result_t result = nx_stm32g474_gpio_clock_enable(0U);
@@ -123,36 +182,7 @@ nx_result_t nx_stm32g474_lpuart1_pins_prepare(void) {
 #ifndef NX_G474_GPIOA
 #define NX_G474_GPIOA GPIOA
 #endif
-    GPIO_TypeDef* gpio = NX_G474_GPIOA;
-    uint32_t mask = (3U << 4U) | (3U << 6U);
-    NX_G474_WRITE(&gpio->BSRR, 1U << 2U);
-    nx_arch_dsb();
-    if ((NX_G474_READ(&gpio->ODR) & (1U << 2U)) == 0U)
-        return NX_ERROR_IO;
-    NX_G474_WRITE(&gpio->OTYPER,
-                  NX_G474_READ(&gpio->OTYPER) & ~((1U << 2U) | (1U << 3U)));
-    NX_G474_WRITE(&gpio->OSPEEDR, (NX_G474_READ(&gpio->OSPEEDR) & ~mask) |
-                                      (1U << 4U) | (1U << 6U));
-    NX_G474_WRITE(&gpio->PUPDR,
-                  (NX_G474_READ(&gpio->PUPDR) & ~mask) | (1U << 6U));
-    NX_G474_WRITE(&gpio->AFR[0], (NX_G474_READ(&gpio->AFR[0]) &
-                                  ~((15U << 8U) | (15U << 12U))) |
-                                     (12U << 8U) | (12U << 12U));
-    nx_arch_dsb();
-    if ((NX_G474_READ(&gpio->OTYPER) & ((1U << 2U) | (1U << 3U))) != 0U ||
-        (NX_G474_READ(&gpio->OSPEEDR) & mask) != ((1U << 4U) | (1U << 6U)) ||
-        (NX_G474_READ(&gpio->PUPDR) & mask) != (1U << 6U) ||
-        (NX_G474_READ(&gpio->AFR[0]) & ((15U << 8U) | (15U << 12U))) !=
-            ((12U << 8U) | (12U << 12U)))
-        return NX_ERROR_IO;
-    NX_G474_WRITE(&gpio->MODER, (NX_G474_READ(&gpio->MODER) & ~mask) |
-                                    (2U << 4U) | (2U << 6U));
-    nx_arch_dsb();
-    return (NX_G474_READ(&gpio->MODER) & mask) == ((2U << 4U) | (2U << 6U)) &&
-                   (NX_G474_READ(&gpio->AFR[0]) &
-                    ((15U << 8U) | (15U << 12U))) ==
-                       ((12U << 8U) | (12U << 12U))
-               ? NX_SUCCESS
-               : NX_ERROR_IO;
+    return nx_stm32g474_uart_pins_prepare(NX_G474_GPIOA, 2U, NX_G474_GPIOA, 3U,
+                                          12U);
 }
 const nx_gpio_ops_t nx_stm32g474_gpio_ops = {write, read, toggle};

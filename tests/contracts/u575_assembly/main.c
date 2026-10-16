@@ -36,6 +36,12 @@ int main(void) {
     (void)nx_uart_port_cancel(console, &s_request);
     nx_uart_port_service(console);
 #endif
+#ifdef NX_U575_WATCHDOG_FIXTURE
+    /* Consume the selected face without activating irreversible hardware. */
+    nx_watchdog_state_t watchdog;
+    (void)nx_watchdog_port_state(nx_factory_watchdog(NX_WATCHDOG_ID_HEALTH),
+                                 &watchdog);
+#endif
 #ifdef NX_U575_FREERTOS_FIXTURE
     /* Retain the real static kernel graph. This ELF is not executed by HIL. */
     (void)nx_freertos_task_start(&s_task, "u5-link", s_task_stack, 128U, 1U,

@@ -33,17 +33,24 @@ def shared_irqs(result):
     return []
 
 
-def _uart(result):
-    return any(item.kind == "uart" for item in result.controllers)
-
-
 def _exti(result):
     return any(item.kind == "exti" for item in result.controllers)
 
 
+def _peripheral_gates(result):
+    selected = {item.controller for item in result.controllers
+                if item.kind in {"uart", "spi", "pwm"}}
+    groups = (("APB1ENR1", ("USART2", "USART3", "UART4", "UART5", "SPI2", "TIM3", "TIM4")),
+              ("APB1ENR2", ("LPUART1",)), ("APB2ENR", ("USART1", "SPI1")))
+    return tuple((register, " | ".join(
+        f"RCC_{register}_{controller}EN" for controller in controllers
+        if controller in selected)) for register, controllers in groups
+        if selected.intersection(controllers))
+
+
 def state_declarations(result):
-    source = (['static uint32_t s_nx_platform_uart_clocks_added;']
-              if _uart(result) else [])
+    source = [f'static uint32_t s_nx_platform_peripheral_{register.lower()}_added;'
+              for register, _ in _peripheral_gates(result)]
     if _exti(result):
         source += ['static uint32_t s_nx_platform_syscfg_clock_added;']
     return source
@@ -65,8 +72,17 @@ def start_system(result):
 
 
 def start_resources(result, *, cleanup="nx_platform_stop()"):
-    source = (['    s_nx_platform_uart_clocks_added = ~NX_G474_READ(&RCC->APB1ENR2) & RCC_APB1ENR2_LPUART1EN;']
-              if _uart(result) else [])
+    source = []
+    for register, gates in _peripheral_gates(result):
+        slot = f's_nx_platform_peripheral_{register.lower()}_added'
+        source += [f'    {slot} = ~NX_G474_READ(&RCC->{register}) & ({gates});',
+                   f'    NX_G474_WRITE(&RCC->{register}, NX_G474_READ(&RCC->{register}) | ({gates}));',
+                   '    nx_arch_dsb();',
+                   f'    if ((NX_G474_READ(&RCC->{register}) & ({gates})) != ({gates})) {{',
+                   '        result.primary = NX_ERROR_IO;',
+                   f'        result.cleanup = {cleanup};',
+                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+                   '        return result;', '    }']
     if _exti(result):
         source += ['    s_nx_platform_syscfg_clock_added = ~NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_SYSCFGEN;',
                    '    NX_G474_WRITE(&RCC->APB2ENR, NX_G474_READ(&RCC->APB2ENR) | RCC_APB2ENR_SYSCFGEN);',
@@ -87,12 +103,13 @@ def stop_system(result, *, system_phase=None):
                    '        nx_arch_dsb();',
                    '        if ((NX_G474_READ(&RCC->APB2ENR) & s_nx_platform_syscfg_clock_added) != 0u) { return NX_ERROR_IO; }',
                    '        s_nx_platform_syscfg_clock_added = 0u;', '    }']
-    if _uart(result):
-        source += ['    if (s_nx_platform_started) {',
-                   '        NX_G474_WRITE(&RCC->APB1ENR2, NX_G474_READ(&RCC->APB1ENR2) & ~s_nx_platform_uart_clocks_added);',
+    for register, _ in reversed(_peripheral_gates(result)):
+        slot = f's_nx_platform_peripheral_{register.lower()}_added'
+        source += [f'    if ({slot} != 0u) {{',
+                   f'        NX_G474_WRITE(&RCC->{register}, NX_G474_READ(&RCC->{register}) & ~{slot});',
                    '        nx_arch_dsb();',
-                   '        if ((NX_G474_READ(&RCC->APB1ENR2) & s_nx_platform_uart_clocks_added) != 0u) { return NX_ERROR_IO; }',
-                   '        s_nx_platform_uart_clocks_added = 0u;', '    }']
+                   f'        if ((NX_G474_READ(&RCC->{register}) & {slot}) != 0u) {{ return NX_ERROR_IO; }}',
+                   f'        {slot} = 0u;', '    }']
     if system_phase is not None:
         source.append(f'    {system_phase};')
     return source + ['    if (s_nx_platform_started) {',

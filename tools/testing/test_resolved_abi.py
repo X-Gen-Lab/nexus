@@ -70,7 +70,8 @@ class ResolvedAbiTests(unittest.TestCase):
                                "fpu": "none" if selected == "soft" else "fpv4-sp-d16",
                                "float_abi": selected}
         source = self.root / "image.c"
-        source.write_text(IMAGE)
+        source.write_text(IMAGE + ("\nfloat nx_abi_add(float a, float b) { return a + b; }\n"
+                                  if actual in {"hard", "softfp"} else ""))
         resolved["inputs"][0]["sha256"] = digest(source)
         resolved["configuration_sha256"] = canonical_digest(
             {key: value for key, value in resolved.items()
@@ -86,7 +87,7 @@ class ResolvedAbiTests(unittest.TestCase):
         command = [self.compiler, "-mcpu=" + ("cortex-m3" if actual == "soft" else "cortex-m4"),
                    "-mthumb", "-mfloat-abi=" + actual, "-nostdlib", "-Os",
                    "-T", str(linker), str(source), "-o", str(self.elf)]
-        if actual == "hard":
+        if actual in {"hard", "softfp"}:
             command.insert(3, "-mfpu=fpv4-sp-d16")
         subprocess.run(command, capture_output=True, check=True)
 
@@ -114,6 +115,58 @@ class ResolvedAbiTests(unittest.TestCase):
         self.assertEqual(resources.measure(self.elf, self.resolved, self.budget)["status"],
                          "passed")
 
+    def test_resource_cli_admits_softfp_without_changing_canonical_cpu(self):
+        self.prepare("softfp")
+        before = self.resolved.read_bytes()
+        self.assertEqual(self.resources_cli("--require-cpu"), 0)
+        self.assertEqual(self.resolved.read_bytes(), before)
+        self.assertEqual(json.loads(before)["cpu"]["float_abi"], "softfp")
+
+    def test_resource_softfp_override_uses_only_elf_base_calling_convention(self):
+        self.prepare("softfp")
+        self.assertEqual(resources.measure(self.elf, self.resolved, self.budget,
+                                            float_abi="soft")["status"], "passed")
+        for override in ("hard", "softfp"):
+            with self.subTest(override=override):
+                with self.assertRaisesRegex(EvidenceError, "resolved CPU"):
+                    resources.measure(self.elf, self.resolved, self.budget,
+                                      float_abi=override)
+
+    def test_resource_cli_soft_override_asserts_softfp_base_calling_convention(self):
+        self.prepare("softfp")
+        self.assertEqual(self.resources_cli("--float-abi", "soft"), 0)
+        self.assertEqual(self.resources_cli("--float-abi", "hard"), 1)
+
+    def test_resource_cli_soft_override_cannot_hide_a_hard_cpu(self):
+        self.prepare("hard", actual="softfp")
+        self.assertEqual(self.resources_cli("--float-abi", "soft"), 1)
+
+    def test_integer_mve_softfp_keeps_cpu_flags_and_compiles_without_fpu(self):
+        from scripts.ci.arch_compile import reference_facts
+        from tools.configure import cpu
+        facts = reference_facts("cortex-m55", mve="integer", float_abi="softfp")
+        profile = cpu.resolve(facts["cpu"], facts["irq"], "baremetal").to_dict()
+        self.assertEqual(profile["cpu"]["fpu"], "none")
+        self.assertIn("-mfloat-abi=softfp", profile["compile_options"])
+        source = self.root / "integer_mve.c"
+        source.write_text("#include <arm_mve.h>\n"
+                          "uint32x4_t nx_abi_add(uint32x4_t v) {\n"
+                          "    return vaddq_n_u32(v, 1U);\n}\n")
+        subprocess.run([self.compiler, *profile["compile_options"], "-Os", "-c",
+                        str(source), "-o", str(self.root / "integer_mve.o")],
+                       capture_output=True, check=True)
+        before = dict(profile["cpu"])
+        self.assertEqual(resources.resolved_float_abi({"cpu": profile["cpu"]}), "soft")
+        self.assertEqual(profile["cpu"], before)
+
+    def test_resource_cli_rejects_hard_image_under_softfp_ir(self):
+        self.prepare("softfp", actual="hard")
+        self.assertEqual(self.resources_cli(), 1)
+
+    def test_resource_cli_rejects_softfp_image_under_hard_ir(self):
+        self.prepare("hard", actual="softfp")
+        self.assertEqual(self.resources_cli(), 1)
+
     def test_resource_api_explicit_hard_override_cannot_hide_soft_ir(self):
         self.prepare("soft", actual="hard")
         with self.assertRaisesRegex(EvidenceError, "resolved CPU"):
@@ -131,7 +184,7 @@ class ResolvedAbiTests(unittest.TestCase):
     def test_resource_cli_rejects_unknown_present_cpu_abi(self):
         self.prepare("hard")
         data = json.loads(self.resolved.read_text())
-        data["cpu"]["float_abi"] = "softfp"
+        data["cpu"]["float_abi"] = "auto"
         data["configuration_sha256"] = canonical_digest(
             {key: value for key, value in data.items() if key != "configuration_sha256"})
         atomic_json(self.resolved, data)
@@ -152,6 +205,23 @@ class ResolvedAbiTests(unittest.TestCase):
         self.assertEqual(report["face_count"], 1)
         self.assertEqual(report["method_count"], 3)
         self.assertEqual(report["resolved"]["sha256"], digest(self.resolved))
+
+    def test_retention_cli_admits_softfp_with_unchanged_resolved_binding(self):
+        self.prepare("softfp")
+        before = self.resolved.read_bytes()
+        self.assertEqual(self.retention_cli(), 0)
+        self.assertEqual(self.resolved.read_bytes(), before)
+        self.assertEqual(json.loads(self.report.read_text())["face_count"], 1)
+
+    def test_retention_cli_rejects_hard_image_under_softfp_ir(self):
+        self.prepare("softfp", actual="hard")
+        self.assertEqual(self.retention_cli(), 1)
+        self.assertFalse(self.report.exists())
+
+    def test_retention_cli_rejects_softfp_image_under_hard_ir(self):
+        self.prepare("hard", actual="softfp")
+        self.assertEqual(self.retention_cli(), 1)
+        self.assertFalse(self.report.exists())
 
     def test_retention_cli_legacy_scope_does_not_autodetect_soft_image(self):
         self.prepare("soft")

@@ -1,4 +1,4 @@
-"""Actual linked Cortex-M3 soft and M4F hard ELF fixtures for consumer gates."""
+"""Actual linked M3 soft and M4F hard/softfp ELF fixtures for consumer gates."""
 
 import os
 from pathlib import Path
@@ -20,9 +20,14 @@ def link_abi_fixture(root, declared="hard", *, linked=None, cpu=DEFAULT_CPU,
     root.mkdir(parents=True, exist_ok=True)
     elf, resolved_path, budget = link_fixture(root)
     resolved = load_json(resolved_path)
-    if extra_source:
+    producer = linked or declared
+    if producer not in {"hard", "soft", "softfp"}:
+        raise ValueError("Unsupported linked fixture float ABI")
+    if extra_source or producer in {"hard", "softfp"}:
         source = root / "image.c"
-        source.write_text(source.read_text() + extra_source)
+        source.write_text(source.read_text() + extra_source +
+                          ("\nfloat nx_abi_add(float a, float b) { return a + b; }\n"
+                           if producer in {"hard", "softfp"} else ""))
         resolved["inputs"][0]["sha256"] = digest(source)
     if cpu is DEFAULT_CPU:
         resolved["cpu"] = {"core": "cortex-m3" if declared == "soft" else "cortex-m4",
@@ -39,15 +44,16 @@ def link_abi_fixture(root, declared="hard", *, linked=None, cpu=DEFAULT_CPU,
         text = re.sub(rf"__nx_resolved_sha256_{index} = 0x[0-9a-f]+;",
                       f"__nx_resolved_sha256_{index} = 0x{word};", text)
     script.write_text(text)
-    producer = linked or declared
     flags = (["-mcpu=cortex-m3", "-mfloat-abi=soft"] if producer == "soft"
-             else ["-mcpu=cortex-m4", "-mfpu=fpv4-sp-d16", "-mfloat-abi=hard"])
+             else ["-mcpu=cortex-m4", "-mfpu=fpv4-sp-d16",
+                   "-mfloat-abi=" + producer])
     compiler = os.environ.get("NEXUS_ARM_GCC") or shutil.which("arm-none-eabi-gcc")
     subprocess.run([compiler, *flags, "-mthumb", "-nostdlib", "-Os",
         "-Wl,-Map=" + str(root / "image.map"), "-T", str(script),
         str(root / "image.c"), "-o", str(elf)], capture_output=True, check=True)
     (root / "image.bin").write_bytes(binary_from_elf(
-        Elf32(elf.read_bytes(), float_abi=producer), 0x08000000, 0x08100000))
+        Elf32(elf.read_bytes(), float_abi="hard" if producer == "hard" else "soft"),
+        0x08000000, 0x08100000))
     return elf, resolved_path, budget
 
 

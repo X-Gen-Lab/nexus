@@ -11,7 +11,10 @@
       "bytes": 3062163,
       "anchors": {
         "package_gpio": "Table12, Section4.10 printed pp57ff; independent LQFP64 Figure7 p50; Table2 p16 gives52 GPIOs",
-        "nrst_gpio_condition": "PG10 shares NRST; inventory does not authorize reset-pin option changes or Board wiring"
+        "nrst_gpio_condition": "PG10 shares NRST; inventory does not authorize reset-pin option changes or Board wiring",
+        "spi_master_clock": "DS12288 Rev6 Table89 printedp172: SPI master SCK<=75MHz only at2.7<VDD<3.6V; <=50MHz at1.71<VDD<3.6V. Fixed APB170 provider limits SCK toAPB/4=42.5MHz, becauseAPB/2=85MHz exceeds both. Section5.3.27 SPI Table89 conditions explicitly require OSPEEDRy11 and30pF load; maintained SPI AF helper selects11. Board voltage/load and physical waveforms remain unqualified.",
+        "iwdg_lsi_bounds": "Table45 printedp122, full VDD1.62--3.6V and TA-40--125C LSI29.5--34kHz; typicalnominal32kHz is not a physical timeout guarantee.",
+        "pwm_routes": "Table13 alternate-function mapping: PA6 AF2 TIM3_CH1, PB6 AF2 TIM4_CH1. Exact RE package presence is reviewed separately from unobserved Board connector/load facts. Table56 IO electrical frequency limits depend on supply voltage/load (speed11:50MHz atlowVDD/30pF;120MHz athighVDD/30pF). PWM timer arithmetic does not guarantee pad waveforms; Board qualification is required."
       }
     },
     "reference_manual": {
@@ -25,7 +28,10 @@
       "anchors": {
         "applicability": "Introduction p1, exact memory/peripheral categories Section1.5/Table1 pp75ff; selected G474 is Category3, not all STM32G4 devices.",
         "revision_identification": "Section47.6.1 p2095: DBGMCU_IDCODE at0xE0042000 read-only, 32-bit access; REV_ID occupies31:16, DEV_ID11:0; category3 DEV_ID0x469.",
-        "silicon_revision_information": "Family-wide RM includes other-category revision codes. Apply ES0430Table2 exactselectedfamily revision codes, not an unqualified union of all RM codes."
+        "silicon_revision_information": "Family-wide RM includes other-category revision codes. Apply ES0430Table2 exactselectedfamily revision codes, not an unqualified union of all RM codes.",
+        "spi_fifo": "Chapter42: SPI_CR2 DS=7 and FRXTH=1, 8-bit DR transactions; FIFO levels and BSY must drain before disabling the shifter.",
+        "iwdg_sequence": "Sections35.3.1--35.3.6: irreversible start0xCCCC, access0x5555, PR/RLR update, SRzero wait then0xAAAA refresh. WINRdefault4095 disables window; option automatic start and APB1FZR1 debug freeze remain explicit. Section35.3.1 printedp1557: CCCC starts from reset counter0xFFF, independently of an inactive RLR value; pending-update bounds include4096 initial counts.",
+        "fixed_pwm": "Chapter30 TIM2/TIM3/TIM4/TIM5: 16-bit TIM3/4, PWM1 compare with OC1PE/ARPE, edge-aligned upcount; CR2 MMS001 exports disabled CEN during software UG, restored to000 before CEN. Maintained timer ownership is exclusive with fixed PSC/ARR."
       }
     },
     "errata": {

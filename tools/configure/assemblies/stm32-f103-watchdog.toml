@@ -1,0 +1,35 @@
+schema = 2
+board = "stm32f103_reference"
+backend = "baremetal"
+clock = "hsi8-fixed"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 8192
+flash_load_limit_bytes = 32768
+
+[gpio.led0]
+binding = "led0"
+mode = "output"
+
+[uart.uart1]
+binding = "uart1"
+mode = "irq-bytes"
+baud = 115200
+
+[uart.uart1.rx]
+format = "bytes"
+capacity = 64
+
+[uart.uart1.irq]
+priority = 5
+calls_os = false
+
+[watchdog.iwdg]
+binding = "iwdg"
+mode = "independent"

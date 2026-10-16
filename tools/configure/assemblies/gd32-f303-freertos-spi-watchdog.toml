@@ -1,0 +1,29 @@
+schema = 2
+board = "gd32f303_reference"
+backend = "freertos"
+clock = "irc8"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[spi.bus]
+binding = "spi0"
+mode = "short-poll"
+max_hz = 1000000
+
+[spi_device.peripheral]
+controller = "bus"
+driver = "spi-endpoint"
+cs_binding = "spi0-cs"
+mode = 0
+max_hz = 1000000
+
+[watchdog.independent]
+binding = "watchdog0"
+mode = "independent"

@@ -1,4 +1,4 @@
-"""Source-reviewed U575 GPIO/USART byte-mode capability contract."""
+"""Source-reviewed U575 GPIO/USART byte-mode and inactive IWDG contract."""
 from types import MappingProxyType
 from .. import common
 
@@ -30,7 +30,15 @@ CLOCK_PROFILES = MappingProxyType({
 LIMITS = MappingProxyType({"uart_baud": (62, 250000)})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
-    ("uart", "irq-bytes"): "uart"})
+    ("uart", "irq-bytes"): "uart",
+    ("watchdog", "independent"): "watchdog"})
+_GPIO_MASKS = MappingProxyType({
+    "GPIOA": 0xffff, "GPIOB": 0xefff, "GPIOC": 0xffcf,
+    "GPIOD": 0xffff, "GPIOE": 0xffff, "GPIOF": 0xffff,
+    "GPIOG": 0xf7ff, "GPIOH": 0x000b})
+_SERIAL_PINS = MappingProxyType({
+    "USART1": (("PA9", "tx", 7), ("PA10", "rx", 7)),
+    "USART2": (("PA2", "tx", 7), ("PA3", "rx", 7))})
 
 
 def mode_implementation(kind, mode):
@@ -45,11 +53,11 @@ def validate_selection(selection, route):
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
     if kind == "uart":
-        expected = (("PA9", "tx", 7), ("PA10", "rx", 7))
+        expected = _SERIAL_PINS.get(route["controller"])
         actual = tuple((pin["pin"], pin["function"], pin["af"])
                        for pin in route["pins"])
-        if route["controller"] != "USART1" or actual != expected:
-            common.fail("Only reviewed USART1 PA9/PA10 AF7 is maintained")
+        if expected is None or actual != expected:
+            common.fail("Only reviewed USART1 PA9/PA10 and USART2 PA2/PA3 AF7 are maintained")
         baud = common.integer(selection["baud"], *LIMITS["uart_baud"],
                               "USART baud")
         divisor = (4000000 + baud // 2) // baud
@@ -61,15 +69,27 @@ def validate_selection(selection, route):
             common.fail("U575 USART provider implements IRQ priority5 only")
     elif kind == "gpio":
         pins = route["pins"]
-        if (route["controller"] != "GPIOC" or not pins or
-                any(pin["pin"] != "PC7" or pin["af"] != 0 for pin in pins)):
-            common.fail("Only reviewed GPIOC PC7 route is maintained")
-        mask = common.integer(selection.get("mask", 128), 1, 0xffff,
+        available = _GPIO_MASKS.get(route["controller"], 0)
+        route_mask = 0
+        for pin in pins:
+            name = pin["pin"]
+            if (len(name) < 3 or name[:2] != "P" + route["controller"][-1]
+                    or not name[2:].isdigit() or int(name[2:]) > 15
+                    or pin["af"] != 0
+                    or pin["function"] not in {"input", "output"}):
+                common.fail("GPIO route requires exact package pins and GPIO function")
+            route_mask |= 1 << int(name[2:])
+        if not route_mask or route_mask & ~available:
+            common.fail("GPIO route exceeds the exact U575ZIQ pin inventory")
+        mask = common.integer(selection.get("mask", route_mask), 1, 0xffff,
                               "GPIO mask")
         initial = common.integer(selection.get("initial", 0), 0, 0xffff,
                                  "GPIO initial")
-        if mask != 128 or initial & ~mask:
-            common.fail("GPIO mask/initial differs from the reviewed PC7 route")
+        if mask != route_mask or initial & ~mask:
+            common.fail("GPIO mask/initial differs from the reviewed route")
+    elif kind == "watchdog":
+        if route["controller"] != "IWDG" or route["pins"]:
+            common.fail("Only the pinless independent IWDG is maintained")
 
 
 def validate_dma(route, mode, normalize):

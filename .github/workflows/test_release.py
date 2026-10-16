@@ -758,7 +758,8 @@ class ReleaseAdmissionTests(unittest.TestCase):
         require_jobs(valid)
         for name in ("Build Docs", "Native contracts (native-tsan)",
                      "ARM link and budgets (stm32-sky-baremetal)",
-                     "Provider assembly audits (h743_assembly)"):
+                     "Provider assembly audits (h743_assembly)",
+                     "Provider assembly audits (mainstream_assembly)"):
             jobs = [job for job in valid["jobs"] if job["name"] != name]
             with self.subTest(name=name), self.assertRaises(ValueError):
                 require_jobs({"total_count": len(jobs), "jobs": jobs})

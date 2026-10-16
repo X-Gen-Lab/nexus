@@ -292,6 +292,234 @@
                 "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native-step-debug.toml",
                 "NEXUS_BUILD_TESTS": "ON"
             }
+        },
+        {
+            "name": "gd32-f303-baremetal-empty",
+            "displayName": "gd32-f303-baremetal-empty software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/gd32-f303-baremetal-empty",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-baremetal-empty.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "gd32-f303-baremetal-io",
+            "displayName": "gd32-f303-baremetal-io software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/gd32-f303-baremetal-io",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-baremetal-io.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "gd32-f303-baremetal-spi-watchdog",
+            "displayName": "gd32-f303-baremetal-spi-watchdog software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/gd32-f303-baremetal-spi-watchdog",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-baremetal-spi-watchdog.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "gd32-f303-freertos-empty",
+            "displayName": "gd32-f303-freertos-empty software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/gd32-f303-freertos-empty",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-freertos-empty.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "gd32-f303-freertos-io",
+            "displayName": "gd32-f303-freertos-io software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/gd32-f303-freertos-io",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-freertos-io.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "gd32-f303-freertos-spi-watchdog",
+            "displayName": "gd32-f303-freertos-spi-watchdog software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/gd32-f303-freertos-spi-watchdog",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-freertos-spi-watchdog.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-f103-baremetal",
+            "displayName": "stm32-f103-baremetal software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-f103-baremetal",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/stm32-f103-baremetal.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-f103-exti",
+            "displayName": "stm32-f103-exti software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-f103-exti",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/stm32-f103-exti.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-f103-freertos",
+            "displayName": "stm32-f103-freertos software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-f103-freertos",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/stm32-f103-freertos.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-f103-watchdog",
+            "displayName": "stm32-f103-watchdog software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-f103-watchdog",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/stm32-f103-watchdog.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-mainstream",
+            "displayName": "G474 baremetal mainstream software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-baremetal-mainstream",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/mainstream.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-spi",
+            "displayName": "G474 baremetal spi software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-baremetal-spi",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/spi.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-watchdog",
+            "displayName": "G474 baremetal watchdog software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-baremetal-watchdog",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/watchdog.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-mainstream",
+            "displayName": "G474 freertos mainstream software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-freertos-mainstream",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/mainstream-freertos.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-spi",
+            "displayName": "G474 freertos spi software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-freertos-spi",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/spi-freertos.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-watchdog",
+            "displayName": "G474 freertos watchdog software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-freertos-watchdog",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/watchdog-freertos.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "stm32-f103-spi",
+            "displayName": "F103 SPI software reference; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/stm32-f103-spi",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/stm32-f103-spi.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-pwm",
+            "displayName": "G474 baremetal PWM software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-baremetal-pwm",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/pwm.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-pwm",
+            "displayName": "G474 freertos PWM software fixture; PCB/HIL unqualified",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/fixture-stm32-g474-freertos-pwm",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_assembly/pwm-freertos.toml",
+                "NEXUS_BUILD_TESTS": "OFF"
+            },
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
         }
     ],
     "buildPresets": [
@@ -394,6 +622,82 @@
         {
             "name": "native-step-debug",
             "configurePreset": "native-step-debug"
+        },
+        {
+            "name": "gd32-f303-baremetal-empty",
+            "configurePreset": "gd32-f303-baremetal-empty"
+        },
+        {
+            "name": "gd32-f303-baremetal-io",
+            "configurePreset": "gd32-f303-baremetal-io"
+        },
+        {
+            "name": "gd32-f303-baremetal-spi-watchdog",
+            "configurePreset": "gd32-f303-baremetal-spi-watchdog"
+        },
+        {
+            "name": "gd32-f303-freertos-empty",
+            "configurePreset": "gd32-f303-freertos-empty"
+        },
+        {
+            "name": "gd32-f303-freertos-io",
+            "configurePreset": "gd32-f303-freertos-io"
+        },
+        {
+            "name": "gd32-f303-freertos-spi-watchdog",
+            "configurePreset": "gd32-f303-freertos-spi-watchdog"
+        },
+        {
+            "name": "stm32-f103-baremetal",
+            "configurePreset": "stm32-f103-baremetal"
+        },
+        {
+            "name": "stm32-f103-exti",
+            "configurePreset": "stm32-f103-exti"
+        },
+        {
+            "name": "stm32-f103-freertos",
+            "configurePreset": "stm32-f103-freertos"
+        },
+        {
+            "name": "stm32-f103-watchdog",
+            "configurePreset": "stm32-f103-watchdog"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-mainstream",
+            "configurePreset": "fixture-stm32-g474-baremetal-mainstream"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-spi",
+            "configurePreset": "fixture-stm32-g474-baremetal-spi"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-watchdog",
+            "configurePreset": "fixture-stm32-g474-baremetal-watchdog"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-mainstream",
+            "configurePreset": "fixture-stm32-g474-freertos-mainstream"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-spi",
+            "configurePreset": "fixture-stm32-g474-freertos-spi"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-watchdog",
+            "configurePreset": "fixture-stm32-g474-freertos-watchdog"
+        },
+        {
+            "name": "stm32-f103-spi",
+            "configurePreset": "stm32-f103-spi"
+        },
+        {
+            "name": "fixture-stm32-g474-baremetal-pwm",
+            "configurePreset": "fixture-stm32-g474-baremetal-pwm"
+        },
+        {
+            "name": "fixture-stm32-g474-freertos-pwm",
+            "configurePreset": "fixture-stm32-g474-freertos-pwm"
         }
     ],
     "testPresets": [

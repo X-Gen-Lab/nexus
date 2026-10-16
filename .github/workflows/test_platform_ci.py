@@ -265,7 +265,7 @@ class WorkflowContracts(unittest.TestCase):
             'stm32_assembly', 'gd32_assembly', 'can_assembly', 'usb_assembly',
             'ethernet_assembly', 'timer_assembly', 'g474_assembly',
             'h743_assembly', 'u575_assembly',
-            'multi_controller_assembly'})
+            'multi_controller_assembly', 'mainstream_assembly'})
         for name in selected:
             self.assertTrue(list((ROOT / 'tests/contracts' / name).glob('*.toml')))
         commands = '\n'.join(step.get('run', '') for step in job['steps'])

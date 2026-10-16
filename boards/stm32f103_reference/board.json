@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "stm32f103rb-nucleo-reference",
+  "soc": "STM32F103RBT6",
+  "soc_family": "stm32f103",
+  "source_revision": "UM1724 MB1136 NUCLEO-F103RB source reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "led0",
+      "controller": "GPIOA",
+      "route": "gpio-pa5",
+      "initial": 0,
+      "mask": 32
+    },
+    {
+      "id": "uart1",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3"
+    },
+    {
+      "id": "iwdg",
+      "controller": "IWDG",
+      "route": "iwdg"
+    },
+    {
+      "id": "exti0",
+      "controller": "EXTI0",
+      "route": "exti0-pa0"
+    },
+    {
+      "id": "exti1",
+      "controller": "EXTI1",
+      "route": "exti1-pa1"
+    },
+    {
+      "id": "spi1",
+      "controller": "SPI1",
+      "route": "spi1-pa5-pa6-pa7"
+    },
+    {
+      "id": "spi1-cs",
+      "controller": "GPIOA",
+      "route": "gpio-pa4",
+      "initial": 16,
+      "mask": 16
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Physical PCB revision, solder bridges and pin loads have not been inspected.",
+    "PA5 LD2 population and PA2/PA3 USART2 ST-LINK VCP bridges have not been inspected.",
+    "Nominal HSI 8 MHz retains datasheet tolerance; calibrated timing, baud and physical HIL have not been measured.",
+    "GPIOA PA4/PA5, USART2 PA2/PA3, IWDG, EXTI0/1 and SPI1 PA5/PA6/PA7 with PA4 CS are source references. PA5 LD2 loads SPI SCK; actual peripheral wiring and electrical behavior remain uninspected."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf",
+      "scope": "UM1724 Rev17: Fig13 p31 PA5 D13/LD2; section7.10 p25 USART2 PA2/PA3 VCP requires SB13/SB14 ON and SB62/SB63 OFF. Fig13 p31 and Table12 p40 CN8 A0=PA0 pin1, A1=PA1 pin2. Actual Board bridges are unobserved; no HSE is assumed. PDF SHA256 576d9bee3bc32c8ee70bf0d77cf9494cec06ea7c1d9ff98eebf2738cb9314a14."
+    }
+  ]
+}

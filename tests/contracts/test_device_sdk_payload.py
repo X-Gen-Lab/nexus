@@ -1,8 +1,11 @@
 """SDK device components retain exactly their reviewed upstream closure."""
 from pathlib import Path
+import json
+import re
 import sys
 import shutil
 import tempfile
+import tomllib
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,7 +24,10 @@ class DeviceSDKPayloadTests(unittest.TestCase):
             policy.parent.mkdir(parents=True)
             shutil.copyfile(ROOT / "dependencies/platform-compatibility.json", policy)
             for family, clock in (("h743", "hsi64-fixed-cache-off"),
-                                  ("u575", "msis4")):
+                                  ("u575", "msis4"),
+                                  ("f103", "hsi8-fixed"),
+                                  ("gd303", "irc8"),
+                                  ("g474", "hse24-pll170")):
                 for backend in ("baremetal", "freertos"):
                     with self.subTest(family=family, backend=backend):
                         source, _, command = consumers.prepare_modern_consumer(
@@ -35,6 +41,19 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                         code = (source / "main.c").read_text()
                         self.assertIn("nx_factory_uart", code)
                         self.assertIn("nx_gpio_port_write", code)
+                        authored = tomllib.loads(text)
+                        board_name = Path(authored["board_package"]).name
+                        board = json.loads((ROOT / "boards" / board_name /
+                                            "board.json").read_text())
+                        binding_id = authored["gpio"]["led"]["binding"]
+                        binding = next(item for item in board["bindings"]
+                                       if item["id"] == binding_id)
+                        self.assertIn(authored["uart"]["console"]["binding"],
+                                      {item["id"] for item in board["bindings"]})
+                        match = re.search(r"nx_gpio_port_write\(led, 1U << (\d+)U", code)
+                        self.assertIsNotNone(match)
+                        self.assertEqual((1 << int(match[1])) & ~binding["mask"], 0,
+                                         "Consumer write exceeds its Board pin lease")
                         self.assertEqual("vTaskStartScheduler" in code,
                                          backend == "freertos")
                         self.assertIn("-DNEXUS_EXPECTED_SOURCE_REVISION=" + "a" * 40,
@@ -50,7 +69,10 @@ class DeviceSDKPayloadTests(unittest.TestCase):
     def test_new_soc_payload_requires_its_actual_owned_firmware_sources(self):
         required = set(sdk.REQUIRED_FILES)
         for family, board in (("stm32h743", "stm32h743_nucleo_zi2"),
-                              ("stm32u575", "stm32u575_nucleo_zi_q")):
+                              ("stm32u575", "stm32u575_nucleo_zi_q"),
+                              ("stm32f103", "stm32f103_reference"),
+                              ("gd32f303", "gd32f303_reference"),
+                              ("stm32g474", "stm32g474re_hse24_reference")):
             names = (f"soc/{family}/CMakeLists.txt", f"soc/{family}/system.c",
                      f"soc/{family}/drivers/gpio.c", f"soc/{family}/drivers/uart.c",
                      f"soc/{family}/private/{family}_system.h",

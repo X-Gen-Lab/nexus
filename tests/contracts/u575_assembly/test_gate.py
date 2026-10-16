@@ -67,6 +67,15 @@ class U575ReferenceGateTests(unittest.TestCase):
         with self.assertRaises(EvidenceError):
             self.gate.validate_profile(profile)
 
+    def test_mainstream_gpio_usart2_and_inactive_watchdog_are_exact_modes(self):
+        profile = copy.deepcopy(self.profile)
+        profile["controllers"] = [
+            {"kind": "gpio", "controller": "GPIO" + bank, "mode": "input"}
+            for bank in "ABCDEFGH"] + [
+            {"kind": "uart", "controller": "USART2", "mode": "irq-bytes"},
+            {"kind": "watchdog", "controller": "IWDG", "mode": "independent"}]
+        self.gate.validate_profile(profile)
+
     def test_cpu_boolean_and_count_types_cannot_use_numeric_equality(self):
         for field, value in (("dsp", 1), ("dwt_cyccnt", 0),
                              ("sau", 0), ("mpu_regions", 8.0),
@@ -118,6 +127,7 @@ class U575ActualVectorGateTests(unittest.TestCase):
 void SystemInit(void) {}
 void TIM2_IRQHandler(void) {}
 void USART1_IRQHandler(void) { __asm__ volatile("nop"); }
+void USART2_IRQHandler(void) { __asm__ volatile("nop; nop"); }
 void __libc_init_array(void) {}
 int main(void) { for (;;) {} }
 """)
@@ -170,6 +180,20 @@ _sidata = LOADADDR(.data);
             with self.subTest(slot=slot):
                 with self.assertRaises(EvidenceError):
                     self.gate.validate_image(Elf32(bytes(data)), self.profile)
+
+    def test_selected_usart2_vector_is_independent_of_usart1(self):
+        self.profile["controllers"] = [{"kind": "uart", "controller": "USART2",
+                                        "mode": "irq-bytes"}]
+        image = self.image.read_bytes()
+        elf = Elf32(image)
+        result = self.gate.validate_image(elf, self.profile)
+        self.assertEqual(["USART2"], result["selected_uarts"])
+        vector = next(s for s in elf.sections if s["name"] == ".isr_vector")
+        corrupted = bytearray(image)
+        struct.pack_into("<I", corrupted, vector["offset"] + 78 * 4,
+                         elf.symbol("USART1_IRQHandler"))
+        with self.assertRaises(EvidenceError):
+            self.gate.validate_image(Elf32(bytes(corrupted)), self.profile)
 
     def test_matrix_bytes_identity_verifies_the_actual_linked_artifact(self):
         identity = self.gate.arch_compile.digest(self.image)

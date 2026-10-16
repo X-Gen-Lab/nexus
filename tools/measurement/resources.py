@@ -27,18 +27,22 @@ def resolved_float_abi(resolved: dict, *, float_abi: str | None = None,
                        require_cpu: bool = False) -> str:
     """Bind an explicit ELF interpretation to the sole resolved CPU contract.
 
-    CPU-absent historical documents retain their hard-only scope. Present but
-    malformed metadata never falls back, and current firmware requires CPU
-    metadata explicitly. ELF flags are validated afterwards, never autodetected.
+    The canonical CPU retains its code-generation ABI: softfp may use FPU/MVE
+    instructions but shares the ELF base calling convention with soft. Only
+    hard selects the VFP argument convention. An explicit override asserts that
+    ELF convention (hard/soft); it never changes CPU facts or compiler flags.
+    CPU-absent historical documents retain their hard-only scope. Malformed
+    present metadata never falls back. ELF flags are validated, never guessed.
     """
     if "cpu" not in resolved and not require_cpu:
         selected = "hard"
     else:
         cpu = resolved.get("cpu")
         if (not isinstance(cpu, dict) or type(cpu.get("float_abi")) is not str
-                or cpu["float_abi"] not in {"hard", "soft"}):
-            raise EvidenceError("resolved CPU requires an explicit hard or soft float ABI")
-        selected = cpu["float_abi"]
+                or cpu["float_abi"] not in {"hard", "soft", "softfp"}):
+            raise EvidenceError(
+                "resolved CPU requires an explicit hard, soft or softfp float ABI")
+        selected = "hard" if cpu["float_abi"] == "hard" else "soft"
     if float_abi is not None and (type(float_abi) is not str or
             float_abi not in {"hard", "soft"} or float_abi != selected):
         raise EvidenceError("explicit resource ABI differs from resolved CPU")
@@ -248,6 +252,8 @@ def main() -> int:
     parser.add_argument("--qualification", type=Path)
     parser.add_argument("--require-cpu", action="store_true",
                         help="require current resolved CPU metadata; no legacy hard-only scope")
+    parser.add_argument("--float-abi", choices=("hard", "soft"),
+                        help="assert ELF calling convention against CPU; softfp uses soft")
     parser.add_argument("--source", type=Path, default=Path(__file__).resolve().parents[2])
     args = parser.parse_args()
     protected = {args.elf.resolve(), args.resolved.resolve(), args.budget.resolve()}
@@ -260,7 +266,7 @@ def main() -> int:
         parser.exit(1, "report cannot overwrite a measured input\n")
     try:
         report = measure(args.elf, args.resolved, args.budget,
-                         require_cpu=args.require_cpu)
+                         float_abi=args.float_abi, require_cpu=args.require_cpu)
     except (EvidenceError, OSError, KeyError, TypeError) as error:
         report = {"schema_version": 1, "kind": "elf_resource_budget",
                   "status": "failed", "failure": str(error)}

@@ -9,6 +9,7 @@
 #include "gd32f470_provider.h"
 #include "gd32f4xx.h"
 #include "private/system.h"
+#include "watchdog_port.h"
 #include <string.h>
 
 NVIC_Type g_gd32_model_nvic;
@@ -221,12 +222,18 @@ fmc_state_enum fmc_page_erase(uint32_t address) {
     memset((void*)(uintptr_t)address, 0xFF, 4096u);
     return FMC_READY;
 }
-/** \brief           Inject watchdog configuration failure before enable. */
-ErrStatus fwdgt_config(uint16_t reload, uint8_t prescaler) {
-    if (g_gd32_model_fwdgt_config_fails) {
-        return ERROR;
+/** \brief           Model register synchronization, not a pure SDK helper. */
+void nx_gd32_watchdog_model_write(volatile uint32_t* address, uint32_t value) {
+    *address = value;
+    if (g_gd32_model_fwdgt_config_fails &&
+        (address == &FWDGT_PSC || address == &FWDGT_RLD)) {
+        FWDGT_STAT = FWDGT_STAT_PUD | FWDGT_STAT_RUD;
     }
-    FWDGT_RLD = reload;
-    FWDGT_PSC = prescaler;
-    return SUCCESS;
+}
+/** \brief           Keep configured shadow-update failures active. */
+void nx_gd32_watchdog_model_poll(void* port) {
+    (void)port;
+    if (!g_gd32_model_fwdgt_config_fails) {
+        FWDGT_STAT = 0U;
+    }
 }

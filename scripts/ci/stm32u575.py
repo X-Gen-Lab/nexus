@@ -70,8 +70,11 @@ def validate_profile(resolved):
         "dma_engines": {"GPDMA1": True, "LPDMA1": False}}]
     if not exact_profile(resolved.get("memory"), expected_memory):
         raise EvidenceError("U575 default physical SRAM1 profile differs")
-    allowed = {("gpio", "GPIOC", "input"), ("gpio", "GPIOC", "output"),
-               ("uart", "USART1", "irq-bytes")}
+    allowed = {("gpio", "GPIO" + bank, mode)
+               for bank in "ABCDEFGH" for mode in ("input", "output")}
+    allowed.update({("uart", "USART1", "irq-bytes"),
+                    ("uart", "USART2", "irq-bytes"),
+                    ("watchdog", "IWDG", "independent")})
     for item in resolved.get("controllers", []):
         if (item.get("kind"), item.get("controller"), item.get("mode")) not in allowed:
             raise EvidenceError("unmaintained U575 controller mode")
@@ -94,9 +97,13 @@ def validate_image(elf, resolved):
             entries[1] != elf.symbol("Reset_Handler") or
             entries[61] != elf.symbol("TIM2_IRQHandler")):
         raise EvidenceError("U575 reset/time/stack vector differs from ELF")
-    selected = any(item["kind"] == "uart" for item in resolved["controllers"])
-    if selected and entries[77] != elf.symbol("USART1_IRQHandler"):
-        raise EvidenceError("selected USART1 vector differs from actual handler")
+    selected_uarts = sorted(item["controller"]
+        for item in resolved["controllers"] if item["kind"] == "uart")
+    for controller in selected_uarts:
+        slot = 77 if controller == "USART1" else 78
+        if entries[slot] != elf.symbol(controller + "_IRQHandler"):
+            raise EvidenceError(
+                "selected USART vector differs from actual handler")
     symbols = {item["name"] for item in elf.defined_symbols}
     if symbols.intersection({"malloc", "calloc", "realloc", "free", "_malloc_r",
                              "SystemCoreClock", "SystemCoreClockUpdate"}):
@@ -107,7 +114,9 @@ def validate_image(elf, resolved):
                 definitions[0]["type"] != 2):
             raise EvidenceError("one strong owned U575 function required")
     return {"vector_count": len(entries), "stack_end": entries[0],
-            "selected_uart": selected, "physical_status": "not_executed"}
+            "selected_uart": bool(selected_uarts),
+            "selected_uarts": selected_uarts,
+            "physical_status": "not_executed"}
 
 
 def tool_inputs(root):
@@ -133,7 +142,8 @@ def run(root, compiler, output, *, parallel=2):
         report["tool_inputs"] = tool_inputs(root)
         fixture = root / "tests/contracts/u575_assembly"
         assemblies = [fixture / name for name in (
-            "empty.toml", "io.toml", "empty-freertos.toml", "io-freertos.toml")]
+            "empty.toml", "io.toml", "empty-freertos.toml", "io-freertos.toml",
+            "mainstream.toml", "mainstream-freertos.toml")]
         fixtures = provider_assemblies.validate_fixtures(
             root, assemblies, family="stm32u575")
         if provider_assemblies.run(root, assemblies, compiler, output / "matrix",

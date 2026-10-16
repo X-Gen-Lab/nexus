@@ -320,7 +320,8 @@
       "kind": "uart",
       "modes": [
         "irq-bytes",
-        "dma-tx"
+        "dma-tx",
+        "rx-dma-idle"
       ],
       "irq": [
         "USART3_IRQn"

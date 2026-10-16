@@ -70,19 +70,20 @@ TEST_F(Stm32Watchdog,
     EXPECT_EQ(registers.KR, 0xAAAAU);
 }
 
-TEST_F(Stm32Watchdog, UpdateFailureRetainsIrreversibleActivationAndBounds) {
+TEST_F(Stm32Watchdog, ForeignPendingUpdateRejectsBeforeActivation) {
     rcc.CSR = RCC_CSR_LSION | RCC_CSR_LSIRDY;
     registers.RLR = 4095U;
     registers.PR = 6U;
     registers.SR = IWDG_SR_RVU;
     ASSERT_EQ(nx_stm32_watchdog_enable(&port, 1000000U, false, &observed),
-              NX_ERROR_IO);
-    EXPECT_TRUE(observed.enabled);
-    EXPECT_TRUE(observed.irreversible);
-    EXPECT_EQ(registers.KR, 0x5555U);
-    EXPECT_GT(observed.maximum_timeout_us, 1000000U);
+              NX_ERROR_BUSY);
+    EXPECT_FALSE(observed.enabled);
+    EXPECT_FALSE(observed.irreversible);
+    EXPECT_EQ(registers.KR, 0U);
+    EXPECT_EQ(0U, observed.minimum_timeout_us);
+    EXPECT_EQ(0U, observed.maximum_timeout_us);
     EXPECT_EQ(nx_stm32_watchdog_enable(&port, 1000000U, false, &observed),
-              NX_ERROR_STATE);
+              NX_ERROR_BUSY);
 }
 
 TEST_F(Stm32Watchdog, InvalidTimeoutHasNoClockOrDebugEffects) {

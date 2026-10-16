@@ -14,7 +14,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define NX_STM32U575_EFFECT_TIMER 1U
+#define NX_STM32U575_EFFECT_TIMER      1U
+#define NX_STM32U575_EFFECT_TIMER_GATE 2U
 typedef struct nx_stm32u575_system {
     RCC_TypeDef* rcc;
     FLASH_TypeDef* flash;
