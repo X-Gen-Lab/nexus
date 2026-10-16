@@ -208,11 +208,10 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
     if (result != NX_SUCCESS)
         return result;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
-    if (!s->initialized || s->closing)
-        result = NX_ERROR_STATE;
-    else if ((NX_UART_V1_READ(&s->registers->control1) &
-              ((UINT32_C(1) << 13U) | (UINT32_C(1) << 3U))) !=
-             ((UINT32_C(1) << 13U) | (UINT32_C(1) << 3U)))
+    if (!s->initialized || s->closing ||
+        (NX_UART_V1_READ(&s->registers->control1) &
+         ((UINT32_C(1) << 13U) | (UINT32_C(1) << 3U))) !=
+            ((UINT32_C(1) << 13U) | (UINT32_C(1) << 3U)))
         result = NX_ERROR_STATE;
     else if (s->active != NULL ||
              (NX_UART_V1_READ(&s->tx->control) & (ENABLE | CHANNEL_IRQS)) != 0U)

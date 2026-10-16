@@ -267,7 +267,7 @@ static nx_result_t program(void* context, uint32_t offset, const void* data,
          * quad-word. Input data is copied before the first write; the brief
          * incoming-mask-preserving exclusion cannot interleave another ISR. */
         nx_arch_irq_state_t saved = nx_arch_irq_save();
-        for (unsigned word = 0U; word < 4U; ++word)
+        for (size_t word = 0U; word < 4U; ++word)
             NX_U575_FLASH_PROGRAM32(p->memory + offset + index + word * 4U,
                                     words[word]);
         nx_arch_dsb();

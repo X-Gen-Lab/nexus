@@ -1468,7 +1468,7 @@ class SourceSDKTests(unittest.TestCase):
                 result = self.run_process(command)
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 report = json.loads(result.stdout)
-                self.assertEqual(report["verified_files"], 5)
+                self.assertEqual(report["verified_files"], len(review["files"]))
                 self.assertEqual(report["source_kind"], "installed_source_sdk")
                 source = self.sdk / "core/src/request.c"
                 old_source = source.read_bytes()

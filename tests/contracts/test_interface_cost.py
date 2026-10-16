@@ -9,8 +9,12 @@ from tools.measurement.interfaces import inspect_interfaces
 def image(objects, writable=False):
     section = {"name": ".data" if writable else ".rodata",
                "flags": 3 if writable else 2, "address": 0x08001000,
-               "size": 1024}
-    return SimpleNamespace(sections=[section], defined_symbols=[
+               "size": 1024, "offset": 256}
+    load = {"virtual": section["address"], "offset": section["offset"],
+            "files": section["size"], "memory": section["size"],
+            "flags": 6 if writable else 4}
+    return SimpleNamespace(sections=[section], loads=[load],
+        data=bytes(section["offset"] + section["size"]), defined_symbols=[
         {"name": name, "size": size, "value": 0x08001000 + index * 128,
          "type": 1, "binding": 0, "section": 0}
         for index, (name, size) in enumerate(objects)])
@@ -49,6 +53,30 @@ class InterfaceCostTests(unittest.TestCase):
         with self.assertRaisesRegex(EvidenceError, "duplicate"):
             inspect_interfaces(image([("s_nx_face_first", 8),
                                       ("s_nx_face_first", 8)]))
+
+    def test_readonly_section_without_a_load_segment_is_not_flash_proof(self):
+        model = image([("s_nx_face_first", 8)])
+        model.loads.clear()
+        with self.assertRaisesRegex(EvidenceError, "LOAD coverage"):
+            inspect_interfaces(model)
+
+    def test_readonly_section_in_a_writable_load_segment_is_rejected(self):
+        model = image([("s_nx_face_first", 8)])
+        model.loads[0]["flags"] |= 2
+        with self.assertRaisesRegex(EvidenceError, "LOAD coverage"):
+            inspect_interfaces(model)
+
+    def test_section_file_offset_must_match_the_load_mapping(self):
+        model = image([("s_nx_face_first", 8)])
+        model.sections[0]["offset"] += 4
+        with self.assertRaisesRegex(EvidenceError, "LOAD coverage"):
+            inspect_interfaces(model)
+
+    def test_truncated_interface_bytes_cannot_establish_flash_cost(self):
+        model = image([("s_nx_face_first", 8)])
+        model.data = model.data[:model.sections[0]["offset"] + 7]
+        with self.assertRaisesRegex(EvidenceError, "LOAD coverage"):
+            inspect_interfaces(model)
 
 
 if __name__ == "__main__":

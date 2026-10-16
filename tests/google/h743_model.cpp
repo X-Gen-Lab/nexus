@@ -147,7 +147,8 @@ void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
             if (reg == cr && (value & FLASH_CR_START) != 0U) {
                 if (g_h743_model.hold_flash_start)
                     return;
-                uint32_t sector = (value & FLASH_CR_SNB) >> FLASH_CR_SNB_Pos;
+                uint32_t sector =
+                    (value & (uint32_t)FLASH_CR_SNB) >> FLASH_CR_SNB_Pos;
                 std::memset(
                     (void*)(p->memory + bank * 1048576U + sector * 131072U),
                     0xff, 131072U);
