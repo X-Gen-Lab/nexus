@@ -19,8 +19,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.evidence.common import (EvidenceError, atomic_json, command,
     fields, file_identity, load_json, regular_file, stream_digest, verify_file_identity)
 from tools.evidence.container import docker_prefix, verify as verify_environment
-from tools.evidence.identity import git_source, verify_source, verify_sdk_package
+from tools.evidence.identity import (git_source, verify_source, verify_sdk_package,
+                                     resolved_identity)
 from tools.measurement.elf import Elf32, binary_from_elf
+from tools.measurement.resources import resolved_float_abi, validate_elf_configuration
 
 
 def tree_identity(root: Path) -> dict:
@@ -223,6 +225,18 @@ def validate_spec(spec: dict) -> None:
             raise EvidenceError("declared artifact/assembly must be contained relative path")
 
 
+def validate_build_artifacts(build: Path, artifacts: dict) -> None:
+    """Recheck the actual linked ELF/BIN against this build's resolved input."""
+    resolved, _ = resolved_identity(build / "generated/resolved.json")
+    flash = resolved["flash"]
+    elf = Elf32(Path(artifacts["elf"]["path"]).read_bytes(),
+                float_abi=resolved_float_abi(resolved))
+    validate_elf_configuration(elf, resolved)
+    if Path(artifacts["bin"]["path"]).read_bytes() != binary_from_elf(
+            elf, flash["origin"], flash["origin"] + flash["size"]):
+        raise EvidenceError("offline BIN bytes differ from linked ELF")
+
+
 def reproduce(spec_path: Path, report_path: Path, *, docker: str = "docker") -> dict:
     spec = load_json(spec_path)
     report = {"schema_version": 1, "kind": "offline_clean_rebuild",
@@ -300,16 +314,8 @@ def reproduce(spec_path: Path, report_path: Path, *, docker: str = "docker") -> 
                 raise EvidenceError("read-only source SDK prefix snapshot changed")
             for role, relative in spec["artifacts"].items():
                 path = regular_file(build / relative)
-                if role == "elf":
-                    Elf32(path.read_bytes())
                 run["artifacts"][role] = file_identity(path)
-            from tools.evidence.identity import resolved_identity
-            resolved, _ = resolved_identity(build / "generated/resolved.json")
-            flash = resolved["flash"]
-            elf = Elf32(Path(run["artifacts"]["elf"]["path"]).read_bytes())
-            if Path(run["artifacts"]["bin"]["path"]).read_bytes() != binary_from_elf(
-                    elf, flash["origin"], flash["origin"] + flash["size"]):
-                raise EvidenceError("offline BIN bytes differ from linked ELF")
+            validate_build_artifacts(build, run["artifacts"])
             run["status"] = "passed"
         verify_source(spec["source"], clean=True)
         verify_source_sdk(spec["source_sdk"], spec["source"])

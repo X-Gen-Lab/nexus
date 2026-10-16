@@ -15,9 +15,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
     load_json, regular_file)
-from tools.evidence.identity import git_source
+from tools.evidence.identity import git_source, resolved_identity
 from tools.evidence.reproduce import run_logged
-from tools.measurement.resources import measure
+from tools.measurement.resources import (measure, resolved_float_abi,
+                                         validate_elf_configuration)
 from tools.measurement.elf import Elf32
 from tools.measurement.interfaces import inspect_interfaces
 
@@ -110,6 +111,11 @@ def compare(source: Path, assembly_path: Path, build_root: Path,
             try:
                 resources = measure(profile / "bin/nexus_firmware.elf",
                     profile / "generated/resolved.json", profile / "generated/resource-budget.json")
+                resolved, _ = resolved_identity(profile / "generated/resolved.json")
+                linked = Elf32(Path(resources["elf"]["path"]).read_bytes(),
+                               float_abi=resolved_float_abi(resolved))
+                validate_elf_configuration(linked, resolved)
+                interface_storage = inspect_interfaces(linked)
             except (EvidenceError, OSError, KeyError, TypeError) as error:
                 image["failure"] = str(error)
                 report["failure"] = "actual linked resource measurement rejected: " + profile.name
@@ -119,17 +125,16 @@ def compare(source: Path, assembly_path: Path, build_root: Path,
             image["resources"] = file_identity(profile / "resources.json")
             image["resolved"] = resources["resolved"]
             image["elf"] = resources["elf"]
-            image["configuration_sha256"] = load_json(profile / "generated/resolved.json")["configuration_sha256"]
+            image["configuration_sha256"] = resolved["configuration_sha256"]
             image["metrics"] = resources["metrics"]
             image["compile_commands"] = file_identity(profile / "compile_commands.json")
             image["map"] = file_identity(profile / "bin/nexus_firmware.map")
             image["status"] = resources["status"]
-            linked = Elf32(Path(resources["elf"]["path"]).read_bytes())
-            image["interface_storage"] = inspect_interfaces(linked)
+            image["interface_storage"] = interface_storage
             if workload == "empty":
                 active = sorted({item["name"] for item in linked.defined_symbols
                     if item["binding"] != 2 and re.match(
-                        r"nx_(?:binding_|(?:stm32|gd32)_(?:gpio|uart|spi|i2c|flash|adc|pwm|exti|watchdog))",
+                        r"nx_(?:binding_|(?:stm32|gd32)[a-z0-9]*_(?:gpio|uart|spi|i2c|flash|adc|pwm|exti|watchdog))",
                         item["name"])})
                 image["unreferenced_device_gc"] = {"status": "failed" if active else "passed",
                     "active_device_provider_symbols": active,

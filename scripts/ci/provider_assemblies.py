@@ -207,19 +207,26 @@ def inspect(build, fixture, compiler, *, root=ROOT):
     if marker.read_text().strip() != resolved["configuration_sha256"]:
         raise EvidenceError("generated bundle completion marker is stale")
     budget_path = generated / "resource-budget.json"
-    measured = resources.measure(elf_path, resolved_path, budget_path)
+    measured = resources.measure(elf_path, resolved_path, budget_path,
+                                 require_cpu=True)
     require_budget(measured)
     original = load_json(elf_path.with_suffix(".resources.json"))
     if original != measured:
         raise EvidenceError("post-link budget report is stale or differs from actual ELF")
-    elf = Elf32(elf_path.read_bytes())
+    abi = resources.resolved_float_abi(resolved, require_cpu=True)
+    elf = Elf32(elf_path.read_bytes(), float_abi=abi)
     bindings = regular_file(generated / "bindings.c")
     source = bindings.read_text()
     if retention.FACE_DECLARATION.search(source):
-        retained = retention.inspect_provider_retention(elf, source, root=root)
-        retained["elf"] = retention.file_identity(elf_path)
-        retained["bindings"] = retention.file_identity(bindings)
-        if load_json(build / "bin/provider-retention.json") != retained:
+        original_retention = load_json(build / "bin/provider-retention.json")
+        if abi == "soft" or "resolved" in original_retention:
+            retained = retention.inspect_files(
+                elf_path, bindings, resolved_path=resolved_path, root=root)
+        else:
+            retained = retention.inspect_provider_retention(elf, source, root=root)
+            retained["elf"] = retention.file_identity(elf_path)
+            retained["bindings"] = retention.file_identity(bindings)
+        if original_retention != retained:
             raise EvidenceError("post-link retention report is stale")
     else:
         retained = empty_retention(elf, source, resolved, root=root)

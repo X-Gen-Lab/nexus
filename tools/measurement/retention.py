@@ -11,6 +11,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.measurement.elf import Elf32
+from tools.evidence.identity import resolved_identity, resolved_input_files
+from tools.measurement.resources import (resolved_float_abi,
+                                         validate_elf_configuration,
+                                         input_protection_paths)
 
 ROOT = Path(__file__).resolve().parents[2]
 FACE_DECLARATION = re.compile(
@@ -376,21 +380,43 @@ def inspect_provider_retention(elf, bindings, *, root=ROOT):
                             "not execution, electrical or timing evidence."]}
 
 
+def inspect_files(elf_path, bindings_path, *, resolved_path=None, root=ROOT):
+    """Keep legacy hard-only reports and optionally bind exact resolved inputs."""
+    resolved = None
+    abi = "hard"
+    if resolved_path is not None:
+        resolved, config = resolved_identity(resolved_path)
+        abi = resolved_float_abi(resolved, require_cpu=True)
+        inputs = resolved_input_files(resolved_path, resolved)
+    elf = Elf32(elf_path.read_bytes(), float_abi=abi)
+    if resolved is not None:
+        validate_elf_configuration(elf, resolved)
+    report = inspect_provider_retention(elf, bindings_path.read_text(), root=root)
+    report["elf"] = file_identity(elf_path)
+    report["bindings"] = file_identity(bindings_path)
+    if resolved is not None:
+        report["resolved"] = config
+        report["configuration_inputs"] = inputs
+    return report
+
+
 def main(arguments=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--elf", type=Path, required=True)
     parser.add_argument("--bindings", type=Path, required=True)
+    parser.add_argument("--resolved", type=Path,
+                        help="bind current CPU ABI, linked configuration and declared inputs")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(arguments)
     try:
-        if args.output.resolve() in (args.elf.resolve(),
-                                     args.bindings.resolve()):
+        protected = {args.elf.resolve(), args.bindings.resolve()}
+        if args.resolved is not None:
+            protected.update(input_protection_paths(args.resolved))
+        if args.output.resolve() in protected:
             raise EvidenceError("retention output must not overwrite an input")
         args.output.unlink(missing_ok=True)
-        report = inspect_provider_retention(Elf32(args.elf.read_bytes()),
-                                            args.bindings.read_text())
-        report["elf"] = file_identity(args.elf)
-        report["bindings"] = file_identity(args.bindings)
+        report = inspect_files(args.elf, args.bindings,
+                               resolved_path=args.resolved)
         atomic_json(args.output, report)
         print(f"Retained {report['face_count']} selected faces, "
               f"{report['operations_table_count']} concrete tables and "

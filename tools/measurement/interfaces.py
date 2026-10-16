@@ -8,9 +8,13 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.measurement.elf import Elf32
+from tools.evidence.identity import resolved_identity, resolved_input_files
+from tools.measurement.resources import (resolved_float_abi,
+                                         validate_elf_configuration,
+                                         input_protection_paths)
 
 FACE = re.compile(r"s_nx_(?:device_)?face_[A-Za-z0-9_]+(?:\.\d+)?\Z")
-OPERATIONS = re.compile(r"nx_(?:stm32|gd32|native)_[A-Za-z0-9_]+_ops\Z")
+OPERATIONS = re.compile(r"nx_(?:(?:stm32|gd32)[a-z0-9]*|native)_[A-Za-z0-9_]+_ops\Z")
 
 
 def inspect_interfaces(elf, *, require_interfaces=False):
@@ -62,18 +66,35 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--elf", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--resolved", type=Path,
+                        help="bind current CPU ABI, linked configuration and declared inputs")
     parser.add_argument("--require-interfaces", action="store_true")
     args = parser.parse_args(argv)
     try:
-        report = inspect_interfaces(Elf32(args.elf.read_bytes()),
-                                    require_interfaces=args.require_interfaces)
+        protected = {args.elf.resolve()}
+        if args.resolved is not None:
+            protected.update(input_protection_paths(args.resolved))
+        if args.output.resolve() in protected:
+            raise EvidenceError("interface output must not overwrite an input")
+        args.output.unlink(missing_ok=True)
+        resolved, config, inputs = None, None, None
+        if args.resolved is not None:
+            resolved, config = resolved_identity(args.resolved)
+            inputs = resolved_input_files(args.resolved, resolved)
+        abi = resolved_float_abi(resolved) if resolved is not None else "hard"
+        elf = Elf32(args.elf.read_bytes(), float_abi=abi)
+        if resolved is not None:
+            validate_elf_configuration(elf, resolved)
+        report = inspect_interfaces(elf, require_interfaces=args.require_interfaces)
         report["elf"] = file_identity(args.elf)
+        if resolved is not None:
+            report["resolved"] = config
+            report["configuration_inputs"] = inputs
         atomic_json(args.output, report)
         print(f"Interface storage: {report['interface_flash_bytes']} Flash bytes; "
               f"shared operations: {report['operations_flash_bytes']} Flash bytes")
         return 0
     except (OSError, ValueError, EvidenceError) as error:
-        args.output.unlink(missing_ok=True)
         print(f"Interface audit failed: {error}", file=sys.stderr)
         return 1
 
