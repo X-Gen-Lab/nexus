@@ -25,7 +25,8 @@ sys.path.insert(0, str(SOURCE_ROOT))
 try:
     from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES, declared_modules
     from tools.maintenance import (
-        cmsis_device_lock, stm32f4_hal_lock, stm32g4_lock, threadx_lock,
+        cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
+        stm32g4_lock, threadx_lock,
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure.providers import descriptor as provider_descriptors
@@ -43,6 +44,7 @@ ROOT_FILES = {"CMakeLists.txt", "LICENSE", "README.md", "AGENTS.md", ".gitmodule
 ROOT_DIRS = {"arch", "boards", "cmake", "dependencies", "core", "io", "os",
              "components", "tools", "scripts", "soc"}
 REQUIRED_DEPENDENCIES = tuple(item.path for item in SOURCE_DEPENDENCIES)
+OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock)
 REQUIRED_FILES = (
     "CMakeLists.txt", "LICENSE", ".gitmodules", "dependencies/toolchains.lock.json",
     "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
@@ -190,13 +192,14 @@ _g4_lock = parse_json((SOURCE_ROOT / "dependencies/stm32g4.lock.json").read_byte
 stm32g4_lock.contract(_g4_lock)
 REQUIRED_FILES += tuple("vendors/st/cmsis_device_g4/" + name
                         for name in _g4_lock["files"])
-REQUIRED_FILES += ("dependencies/stm32f4-hal.lock.json",
-                   "tools/maintenance/stm32f4_hal_lock.py",
-                   "cmake/platform/STM32Official.cmake")
-_f4_hal_lock = parse_json((SOURCE_ROOT / "dependencies/stm32f4-hal.lock.json").read_bytes())
-stm32f4_hal_lock.contract(_f4_hal_lock)
-REQUIRED_FILES += tuple("vendors/st/stm32f4_hal/" + name
-                        for name in _f4_hal_lock["files"])
+REQUIRED_FILES += ("cmake/platform/STM32Official.cmake",)
+for _official in OFFICIAL_DRIVERS:
+    REQUIRED_FILES += (_official.LOCK_NAME,
+                       "tools/maintenance/" + _official.__name__.split(".")[-1] + ".py")
+    _official_lock = parse_json((SOURCE_ROOT / _official.LOCK_NAME).read_bytes())
+    _official.contract(_official_lock)
+    REQUIRED_FILES += tuple(_official.DIRECTORY + "/" + name
+                            for name in _official_lock["files"])
 # Complete declared platform surfaces must remain present after an attacker
 # removes a payload and rehashes its file map. This is a required-source identity
 # contract, not another build graph: CMake still owns every selected target.
@@ -274,12 +277,11 @@ for _component, _include, _private in (
         "CMakeLists.txt", "src/" + _component + ".c", "include/" + _include))
     if _private is not None:
         REQUIRED_FILES += ("components/" + _component + "/private/" + _private,)
-# G474 owned support joins only after the actual generated factory and four
-# bare-metal/FreeRTOS ARM links passed. The official vendor closure stays five
-# locked files; no additional MCU headers or unreviewed SDK unit is selected.
+# G474 owned support retains its selected production units independently of
+# test fixtures. The official device closure stays five locked files.
 REQUIRED_FILES += tuple("soc/stm32g474/" + name for name in (
     "CMakeLists.txt", "system.c", "drivers/gpio.c", "drivers/uart.c",
-    "drivers/exti.c",
+    "drivers/exti.c", "drivers/spi.c", "drivers/watchdog.c", "drivers/pwm.c",
     "private/stm32g474_system.h", "private/stm32g474_provider.h",
     "soc.json", "routes.json"))
 REQUIRED_FILES += ("boards/stm32g474re_hse24_reference/board.json",)
@@ -451,11 +453,14 @@ def dependency_entries(root, dependency):
         if not names.issubset(entries):
             raise SDKError("G4 committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
-    elif dependency == stm32f4_hal_lock.DIRECTORY:
-        raw, _ = snapshot(root / stm32f4_hal_lock.LOCK_NAME)
-        names = stm32f4_hal_lock.contract(parse_json(raw))
+    elif dependency in {official.DIRECTORY for official in OFFICIAL_DRIVERS}:
+        official = next(official for official in OFFICIAL_DRIVERS
+                        if official.DIRECTORY == dependency)
+        raw, _ = snapshot(root / official.LOCK_NAME)
+        names = official.contract(parse_json(raw))
         if not names.issubset(entries):
-            raise SDKError("STM32F4 official committed source graph is incomplete")
+            raise SDKError("Official committed source graph is incomplete: "
+                           + dependency)
         entries = {name: entries[name] for name in names}
     else:
         for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
@@ -480,7 +485,8 @@ def selected(name):
     if name.startswith("dependencies/source/"):
         return False
     return (name in ROOT_FILES or name.split("/", 1)[0] in ROOT_DIRS
-            or name.startswith("vendors/gigadevice/gd32f4xx/"))
+            or any(name.startswith(directory + "/")
+                   for directory in reviewed_import_directories()))
 
 
 def snapshot_files(source, entries, development_fixture=False):
@@ -564,6 +570,27 @@ def copy_file(source, output, name, data=None, executable=None):
     return digest(data)
 
 
+def reviewed_import_directories():
+    """Use maintained family declarations, never discover an installed file set."""
+    return tuple(sorted({Path(item.import_lock).parent.as_posix()
+                         for item in provider_descriptors.families()
+                         if item.import_lock is not None}))
+
+
+def validate_import_records(identity):
+    """Require every reviewed import exactly once and bind its source tree."""
+    records = identity["reviewed_imports"]
+    expected = set(reviewed_import_directories())
+    if (not isinstance(records, list) or len(records) != len(expected) or
+            any(not isinstance(record, dict) or
+                not isinstance(record.get("path"), str) or
+                record.get("source_tree") != identity["source_tree"]
+                for record in records) or
+            {record["path"] for record in records} != expected):
+        raise SDKError("Source SDK requires exact reviewed imports and owner tree")
+    return records
+
+
 def prepare(source, output, development_fixture=False):
     source = source.resolve()
     output = output.absolute()
@@ -586,15 +613,17 @@ def prepare(source, output, development_fixture=False):
     threadx_lock.verify(source / "ext/threadx", source / "dependencies/threadx.lock.json", "linux")
     stm32g4_lock.verify(source / "vendors/st/cmsis_device_g4",
                        source / "dependencies/stm32g4.lock.json")
-    stm32f4_hal_lock.verify(source / stm32f4_hal_lock.DIRECTORY,
-                           source / stm32f4_hal_lock.LOCK_NAME,
-                           source / stm32f4_hal_lock.CMSIS_DIRECTORY)
+    for official in OFFICIAL_DRIVERS:
+        official.verify(source / official.DIRECTORY,
+                        source / official.LOCK_NAME,
+                        source / official.CMSIS_DIRECTORY)
     for review in cmsis_device_lock.REVIEWED_DEVICES.values():
         cmsis_device_lock.verify(source / review["directory"],
                                  source / review["lock_name"])
     sys.path.insert(0, str(source / "scripts/ci"))
     from vendor_import_identity import reviewed_import
-    imports = [reviewed_import(source / "vendors/gigadevice/gd32f4xx", source)]
+    imports = [reviewed_import(source / directory, source)
+               for directory in reviewed_import_directories()]
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix=".nexus-source-sdk-", dir=output.parent))
     sdk = temporary / "share/nexus/src"
@@ -735,15 +764,16 @@ def verify(root):
     stm32g4_lock.verify(root / "vendors/st/cmsis_device_g4",
                        root / "dependencies/stm32g4.lock.json",
                        packaged_commit=g4["commit"])
-    f4_hal = next(record for record in records
-                  if record["path"] == stm32f4_hal_lock.DIRECTORY)
-    f4_cmsis = next(record for record in records
-                    if record["path"] == stm32f4_hal_lock.CMSIS_DIRECTORY)
-    stm32f4_hal_lock.verify(root / stm32f4_hal_lock.DIRECTORY,
-                           root / stm32f4_hal_lock.LOCK_NAME,
-                           root / stm32f4_hal_lock.CMSIS_DIRECTORY,
-                           packaged_commit=f4_hal["commit"],
-                           packaged_cmsis_commit=f4_cmsis["commit"])
+    for official in OFFICIAL_DRIVERS:
+        driver = next(record for record in records
+                      if record["path"] == official.DIRECTORY)
+        cmsis = next(record for record in records
+                     if record["path"] == official.CMSIS_DIRECTORY)
+        official.verify(root / official.DIRECTORY,
+                        root / official.LOCK_NAME,
+                        root / official.CMSIS_DIRECTORY,
+                        packaged_commit=driver["commit"],
+                        packaged_cmsis_commit=cmsis["commit"])
     for review in cmsis_device_lock.REVIEWED_DEVICES.values():
         matching = [record for record in records
                     if record["path"] == review["directory"]]
@@ -754,15 +784,25 @@ def verify(root):
                                  packaged_commit=matching[0]["commit"])
     sys.path.insert(0, str(root / "scripts/ci"))
     from vendor_import_identity import validate_import_record
-    imports = identity["reviewed_imports"]
-    if not isinstance(imports, list) or len(imports) != 1:
-        raise SDKError("Source SDK requires its reviewed GD32 source import")
-    record = imports[0]
-    if not isinstance(record, dict) or record.get("path") != "vendors/gigadevice/gd32f4xx" or record.get("source_tree") != identity["source_tree"]:
-        raise SDKError("Source import has a different owner tree")
-    imported = root / record["path"]
-    notices = {item["path"]: regular(imported, item["path"]).read_bytes() for item in record.get("notices", [])}
-    validate_import_record(record, regular(imported, "source.lock.json").read_bytes(), notices, identity["source_revision"])
+    from verify_vendor_source import verify as verify_vendor_import
+    for record in validate_import_records(identity):
+        imported = root / record["path"]
+        notices = {item["path"]: regular(imported, item["path"]).read_bytes()
+                   for item in record.get("notices", [])}
+        lock_contents = regular(imported, "source.lock.json").read_bytes()
+        validate_import_record(record, lock_contents, notices,
+                               identity["source_revision"])
+        # A rehashed package map cannot replace the reviewed upstream closure.
+        # Reuse the same byte verifier used during preparation, then close its
+        # auxiliary file set against the recorded origin and license notices.
+        verify_vendor_import(imported)
+        expected = {"source.lock.json", *notices,
+                    *(item["path"] for item in parse_json(lock_contents)["files"])}
+        actual_import = {path.relative_to(imported).as_posix()
+                         for path in imported.rglob("*")
+                         if path.is_file() or path.is_symlink()}
+        if actual_import != expected:
+            raise SDKError("Source SDK contains files outside the reviewed import")
     # An external verifier can take time. Reject late rewrites, same-content
     # replacements, chmod and file-set changes rather than returning an old
     # proof for the current SDK. Every hash and filesystem identity is retained.

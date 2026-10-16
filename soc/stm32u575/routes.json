@@ -44,6 +44,2243 @@
         "irq-bytes"
       ],
       "source": "Official ST Nucleo BSP ed50f1d2d4940e4efe23104027b8008ce79037f5 PA9/PA10 AF7 USART1 VCP; CMSIS U575 IRQ61. UM2861 SB32/SB34ON,SB24/SB26/SB31/SB33OFF; actual wiring unknown."
+    },
+    {
+      "id": "gpio-pa0",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa1",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa10",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa11",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA11",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa12",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA12",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa13",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa14",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa15",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa2",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa3",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa4",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa5",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa6",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa7",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa8",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pa9",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb0",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb1",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb10",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb11",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB11",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb13",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb14",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb15",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb2",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb3",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb4",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb5",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb6",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb7",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb8",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pb9",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc0",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc1",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc10",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc11",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC11",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc12",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC12",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc13",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc14",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc15",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc2",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc3",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc6",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc8",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pc9",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd0",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd1",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd10",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd11",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD11",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd12",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD12",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd13",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd14",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd15",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd2",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd3",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd4",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd5",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd6",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd7",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd8",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pd9",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe0",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe1",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe10",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe11",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE11",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe12",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE12",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe13",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe14",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe15",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe2",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe3",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe4",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe5",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe6",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe7",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe8",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pe9",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf0",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf1",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf10",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf11",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF11",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf12",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF12",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf13",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf14",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf15",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf2",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf3",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf4",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf5",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf6",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf7",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf8",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pf9",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg0",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg1",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg10",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg12",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG12",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg13",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg14",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg15",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg2",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg3",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg4",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg5",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg6",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg7",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg8",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-pg9",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-ph0",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOH",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PH0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-ph1",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOH",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PH1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "gpio-ph3",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "GPIOH",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PH3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output",
+        "input"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column/Figure18 exact package GPIO; route is a silicon pad selection, not attached-device or PCB electrical qualification."
+    },
+    {
+      "id": "usart2-pa2-pa3",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "USART2",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PA3",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-bytes"
+      ],
+      "source": "DS13737 Rev10 Table27 PA2/PA3 AF7 USART2 TX/RX; CMSIS U575 IRQ62, RCC APB1ENR1 and CCIPR1 USART2SEL. External connector/load/PCB electrical state unobserved."
+    },
+    {
+      "id": "independent-watchdog",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "IWDG",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "independent"
+      ],
+      "source": "RM0456 Rev7 Chapter61, unprescaled LSI32kHz only. Assembly does not enable; application owns enable/feed policy; irreversible activation is retained."
     }
   ]
 }

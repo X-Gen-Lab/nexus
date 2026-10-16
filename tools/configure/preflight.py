@@ -52,30 +52,42 @@ def _modern_selected(result):
     source = []
     pads = {}
     for item in result.controllers:
-        if item.kind not in {"gpio", "uart"}:
+        allowed = {"gpio", "uart"} if h7 else {"gpio", "uart", "watchdog"}
+        if item.kind not in allowed:
             fail("New SoC cold profile has no maintained controller admission")
         if item.kind == "uart":
+            if not h7:
+                uart = item.controller
+                if uart not in {"USART1", "USART2"}:
+                    fail("U575 cold profile requires a reviewed USART")
+                gate_register = "APB2ENR" if uart == "USART1" else "APB1ENR1"
+                mux = "RCC_CCIPR1_" + uart + "SEL"
             if item.controller != uart:
                 fail("New SoC cold profile requires its exact reviewed UART")
             source += _reject(f"(NX_{hook}_READ(&RCC->{gate_register}) & "
                               f"RCC_{gate_register}_{uart}EN) != 0u")
             source += _reject(f"(NX_{hook}_READ(&RCC->{mux_register}) & {mux}) != 0u")
             source += _reject(f"!NX_{hook}_IRQ_AVAILABLE((IRQn_Type){uart}_IRQn)")
-            if h7 and item.get("mode") == "dma-tx":
+            if h7 and item.get("mode") in {"dma-tx", "rx-dma-idle"}:
+                lane = 1 if item.get("mode") == "rx-dma-idle" else 0
                 source += _reject(
-                    "!NX_H743_IRQ_AVAILABLE(DMA1_Stream0_IRQn)")
+                    f"!NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane}_IRQn)")
                 source.append(
                     "    if ((NX_H743_READ(&RCC->AHB1ENR) & "
                     "RCC_AHB1ENR_DMA1EN) != 0u) {")
                 source += _reject(
-                    "NX_H743_READ(&DMA1_Stream0->CR) != 0u || "
-                    "NX_H743_READ(&DMAMUX1_Channel0->CCR) != 0u", indent=8)
+                    f"NX_H743_READ(&DMA1_Stream{lane}->CR) != 0u || "
+                    f"NX_H743_READ(&DMAMUX1_Channel{lane}->CCR) != 0u", indent=8)
                 source.append("    }")
         for pin in item["pins"]:
             name = pin["pin"]
             pads.setdefault(name[1], set()).add(int(name[2:]))
     for port, numbers in sorted(pads.items()):
         mask = sum(1 << number for number in numbers)
+        if not h7 and port == "G" and mask & ~3:
+            source += _reject(
+                "(NX_U575_READ(&RCC->AHB3ENR) & RCC_AHB3ENR_PWREN) == 0u || "
+                "(NX_U575_READ(&NX_U575_PWR->SVMCR) & PWR_SVMCR_IO2SV) == 0u")
         source += [f"    if ((NX_{hook}_READ(&RCC->{gpio_register}) & "
                    f"RCC_{gpio_register}_GPIO{port}EN) != 0u) {{",
                    f"        uint32_t mode = NX_{hook}_READ(&GPIO{port}->MODER);"]
@@ -99,9 +111,23 @@ def selected(result):
     owners = {item.id for item in result.controllers}
     claims = tuple(owned_claims(result, owners))
     if family == "stm32g474":
-        if any(item.kind == "uart" for item in result.controllers):
-            source += _reject("(NX_G474_READ(&RCC->APB1ENR2) & "
-                              "RCC_APB1ENR2_LPUART1EN) != 0u")
+        for item in result.controllers:
+            if item.kind in {"uart", "spi", "pwm"}:
+                controller = item.controller
+                register = ("APB1ENR2" if controller == "LPUART1" else
+                            "APB2ENR" if controller in {"USART1", "SPI1"} else
+                            "APB1ENR1")
+                source += _reject(
+                    f"(NX_G474_READ(&RCC->{register}) & "
+                    f"RCC_{register}_{controller}EN) != 0u")
+                if item.kind == "pwm":
+                    source += _reject(
+                        f"(NX_G474_READ(&RCC->APB1RSTR1) & "
+                        f"RCC_APB1RSTR1_{controller}RST) != 0u")
+                if item.kind == "uart":
+                    source += _reject(
+                        f"(NX_G474_READ(&RCC->CCIPR) & "
+                        f"RCC_CCIPR_{controller}SEL) != 0u")
         for item in result.controllers:
             if item.kind == "exti":
                 line = int(item.controller.removeprefix("EXTI"))

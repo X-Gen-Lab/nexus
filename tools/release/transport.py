@@ -20,7 +20,8 @@ ARCHIVE = "consumer-raw.tar.gz"
 MANIFEST = "consumer-raw-manifest.json"
 FIXTURES = {name + " source/.git" for name in (
     "native", "stm32", "gd32", "h743 baremetal", "h743 freertos",
-    "u575 baremetal", "u575 freertos")}
+    "u575 baremetal", "u575 freertos", "f103 baremetal", "f103 freertos",
+    "gd303 baremetal", "gd303 freertos", "g474 baremetal", "g474 freertos")}
 
 
 def commit(value):
@@ -131,7 +132,7 @@ def report(data, expected_commit, files):
 def git_metadata(files, directories, contents):
     observed = {entry for entry in directories if entry.endswith("/.git")}
     if observed != FIXTURES:
-        raise ValueError("Exactly seven empty git-init consumer fixtures required")
+        raise ValueError("Exactly thirteen empty git-init consumer fixtures required")
     allowed_dirs = {"", "branches", "hooks", "info", "objects",
                     "objects/info", "objects/pack", "refs", "refs/heads", "refs/tags"}
     for entry in [*directories, *files]:
@@ -185,6 +186,8 @@ def verify(output, expected_commit):
             manifest.get("source_commit") != commit(expected_commit) or
             manifest.get("archive") != byte_identity(output / ARCHIVE)):
         raise ValueError("Transport archive identity changed")
+    if manifest.get("git_metadata") != "thirteen_unborn_init_fixtures":
+        raise ValueError("Transport Git fixture inventory claim changed")
     expected, expected_dirs = manifest["files"], manifest["directories"]
     if (not isinstance(expected, dict) or not isinstance(expected_dirs, list) or
             len(expected) + len(expected_dirs) > MAX_FILES or
@@ -253,7 +256,7 @@ def pack(raw, output, expected_commit):
     write(output / MANIFEST, {"schema_version": 1,
         "kind": "source_sdk_consumer_transport", "source_commit": expected_commit,
         "archive": byte_identity(output / ARCHIVE), "files": files,
-        "directories": directories, "git_metadata": "seven_unborn_init_fixtures",
+        "directories": directories, "git_metadata": "thirteen_unborn_init_fixtures",
         "raw_bytes_pruned": False})
     if scan(raw) != (files, directories):
         raise ValueError("Raw consumer bytes changed during transport")

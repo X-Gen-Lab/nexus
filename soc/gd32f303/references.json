@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "documents": {
+    "datasheet": {
+      "kind": "datasheet",
+      "document_id": "GD32F303xx Datasheet",
+      "revision": "3.0",
+      "document_date": "Jan. 2024",
+      "url": "https://www.gd32mcu.com/data/documents/datasheet/GD32F303xx_Datasheet_Rev3.0.pdf",
+      "sha256": "08119c470f3e98df6a2448720d9307dc82dcc059244818ae76a95e4b5fe158b9",
+      "bytes": 2394885,
+      "anchors": {
+        "package_gpio": "Table2-6 pp37-40; Figure2-4 p14",
+        "device_features": "Table2-1 RC256KiB/48KiB SRAM",
+        "alternate_functions": "Table2-6 USART0 default PA9 TX/PA10 RX"
+      }
+    },
+    "reference_manual": {
+      "kind": "reference_manual",
+      "document_id": "GD32F30x User Manual",
+      "revision": "3.4",
+      "document_date": "Dec. 2025",
+      "url": "https://www.gd32mcu.com/data/documents/userManual/GD32F30x_User_Manual_Rev3.4.pdf",
+      "sha256": "693e0bb40800447daf52783535fd06a7abad5a76deb0b1439f7f4530344516d6",
+      "bytes": 12202150,
+      "anchors": {
+        "memory": "FMC2.2/2.3 bank0 page2KiB; high-density256KiB",
+        "clock": "RCU reset IRC8; fixed APB/AHB div1",
+        "timer": "TIMER_CNT/CAR bits15:0; overflow service <65536us at1MHz"
+      }
+    },
+    "errata": {
+      "kind": "errata",
+      "document_id": "Device limitations of GD32F30x",
+      "revision": "1.4",
+      "document_date": "Apr. 2026",
+      "url": "https://www.gd32mcu.com/data/documents/errataSheet/Device%20limitations%20of%20GD32F30x_Rev1.4.pdf",
+      "sha256": "5154b936ad2f7283fd5359dedfc137612666c0dc6af2734a5f325a609cbc459e",
+      "bytes": 259206,
+      "anchors": {
+        "applicability": "Exact device marking/revision applicability remains unobserved; source reviewed USART2.7 DMA restrictions are not opened by IRQ-only mode."
+      }
+    }
+  },
+  "package_review": {
+    "document": "datasheet",
+    "variants": [
+      "GD32F303RCT6"
+    ],
+    "status": "package_gpio_reviewed",
+    "scope": "Exact LQFP64 Table2-6 pin inventory, not Board access or electrical qualification."
+  },
+  "errata_review": {
+    "document": "errata",
+    "status": "applicability_only",
+    "silicon_revision": "not_observed",
+    "mode_workarounds": "not_fully_audited",
+    "hardware_qualification": "not_executed",
+    "identification": "Actual package marking and silicon revision required before physical qualification."
+  },
+  "limitations": [
+    "Reference source index and tested finite provider scope only; no full-family electrical, timing or errata qualification.",
+    "Flash physical geometry is metadata only; no Flash program/erase provider or product reservation is advertised."
+  ]
+}

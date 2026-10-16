@@ -32,6 +32,15 @@ TEST_F(U575System, ResetMsisProfileStartsExactOneMhzTimer) {
     EXPECT_EQ(0U, g_u575_model.rcc.CFGR1);
     EXPECT_EQ(0U, g_u575_model.flash.OPTR);
 }
+TEST_F(U575System, WrapDuringSourceWithdrawalIsClearedBeforeDroppingTimer) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_system_start(system, 8U).primary);
+    g_u575_model.timer_pending_on_dier = true;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_system_stop(system, 8U));
+    EXPECT_FALSE(g_u575_model.irq_pending[TIM2_IRQn]);
+    EXPECT_FALSE(g_u575_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(0U, g_u575_model.timer.SR);
+    EXPECT_EQ(0U, system->remaining_effects);
+}
 TEST_F(U575System, WrongSelectedRangeRejectsBeforeAnyWrite) {
     g_u575_model.rcc.CSR = 5U << RCC_CSR_MSISSRANGE_Pos;
     EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_system_start(system, 8).primary);
@@ -39,6 +48,50 @@ TEST_F(U575System, WrongSelectedRangeRejectsBeforeAnyWrite) {
     g_u575_model.rcc.ICSCR1 =
         RCC_ICSCR1_MSIRGSEL | (4U << RCC_ICSCR1_MSISRANGE_Pos);
     EXPECT_EQ(NX_SUCCESS, nx_stm32u575_system_start(system, 8).primary);
+}
+TEST_F(U575System, ForeignTimerTriggerAndChannelStateRejectBeforeWrites) {
+    for (auto* reg : {&g_u575_model.timer.SMCR, &g_u575_model.timer.CR2,
+                      &g_u575_model.timer.CCER, &g_u575_model.timer.CCMR1,
+                      &g_u575_model.timer.CCMR2}) {
+        *reg = 1U;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_system_start(system, 8U).primary);
+        EXPECT_EQ(0U, g_u575_model.writes);
+        *reg = 0U;
+    }
+}
+TEST_F(U575System, HiddenForeignTimerIsRejectedAfterGateWithoutTimerWrites) {
+    g_u575_model.hide_unclocked_timer = true;
+    g_u575_model.timer.SMCR = TIM_SMCR_SMS_0;
+    g_u575_model.timer.CCMR1 = 1U;
+    auto result = nx_stm32u575_system_start(system, 8U);
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(TIM_SMCR_SMS_0, g_u575_model.timer.SMCR);
+    EXPECT_EQ(1U, g_u575_model.timer.CCMR1);
+    EXPECT_EQ(0U, g_u575_model.timer.PSC);
+    EXPECT_EQ(0U, g_u575_model.timer.EGR);
+    EXPECT_EQ(0U, g_u575_model.rcc.APB1ENR1);
+    EXPECT_FALSE(g_u575_model.irq_enabled[TIM2_IRQn]);
+}
+TEST_F(U575System, PrescalerUgDoesNotExportResetModeTrgo) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_system_start(system, 8U).primary);
+    EXPECT_EQ(TIM_CR2_MMS_0, g_u575_model.timer_ug_mms);
+    EXPECT_EQ(0U, g_u575_model.timer_trgo_pulses);
+    EXPECT_EQ(0U, g_u575_model.timer.CR2);
+}
+TEST_F(U575System, RefusedQuietMuxCleanupRetainsTimerUntilRetry) {
+    g_u575_model.refuse_timer_quiet_clear = true;
+    auto result = nx_stm32u575_system_start(system, 8U);
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_ERROR_IO, result.cleanup);
+    EXPECT_EQ(NX_STM32U575_EFFECT_TIMER, result.remaining_effects);
+    EXPECT_FALSE(system->started);
+    EXPECT_EQ(TIM_CR2_MMS_0, g_u575_model.timer.CR2);
+    g_u575_model.refuse_timer_quiet_clear = false;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_system_stop(system, 8U));
+    EXPECT_EQ(0U, g_u575_model.timer.CR2);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_system_start(system, 8U).primary);
 }
 TEST_F(U575System, UnsupportedSecurityAndDensityDoNotChangeOptionBytes) {
     g_u575_model.flash.OPTR = FLASH_OPTR_TZEN;

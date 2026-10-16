@@ -1,0 +1,33 @@
+{
+  "commit": "c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22",
+  "files": {
+    "Include/stm32f103xb.h": {
+      "bytes": 842883,
+      "sha256": "d9c7c613d9fea74220892b4fbc3e80617493acad82a04bafadab2b4a7198399c"
+    },
+    "Include/stm32f1xx.h": {
+      "bytes": 10110,
+      "sha256": "05e93fa3ddefb2e83d762b9ca4de36e3bba9cd8e9690400fe9f2c11fc0a3cef5"
+    },
+    "Include/system_stm32f1xx.h": {
+      "bytes": 1758,
+      "sha256": "a54dfbb3480c672f532d472a6e84bcf34df6551771d2e9966c5a3503c676b6ab"
+    },
+    "License.md": {
+      "bytes": 11357,
+      "sha256": "b645e89bbfb6accf914cf7adca011712bf90055391fdd55f2af6439d98aa36d4"
+    },
+    "Source/Templates/gcc/startup_stm32f103xb.s": {
+      "bytes": 9725,
+      "sha256": "a9a5fc7ed5ff617527dd98b3092830f4d17ed4bf57c99eac2c53bdb514ce138c"
+    }
+  },
+  "kind": "nexus-reviewed-device-source",
+  "license": {
+    "expression": "Apache-2.0",
+    "path": "License.md"
+  },
+  "repository": "https://github.com/STMicroelectronics/cmsis-device-f1.git",
+  "schema_version": 1,
+  "selected_part": "STM32F103RBT6"
+}

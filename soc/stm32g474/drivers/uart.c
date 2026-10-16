@@ -1,6 +1,6 @@
 /**
  * \file            uart.c
- * \brief           G474 LPUART IRQ bytes,real TC and explicit caller ring
+ * \brief           G474 UART IRQ bytes,real TC and explicit caller ring
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-12
@@ -355,6 +355,51 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     nx_arch_irq_restore(guard);
     return result;
 }
+/** \brief Select the exact G4 APB gate and kernel-clock mux by vector. */
+static bool clock_ready(IRQn_Type irq) {
+    RCC_TypeDef* r = g_nx_stm32g474_system.rcc;
+    if (r == NULL)
+        return false;
+    uint32_t gate;
+    uint32_t mux;
+    volatile uint32_t* enable;
+    switch (irq) {
+        case USART1_IRQn:
+            enable = &r->APB2ENR;
+            gate = RCC_APB2ENR_USART1EN;
+            mux = RCC_CCIPR_USART1SEL;
+            break;
+        case USART2_IRQn:
+            enable = &r->APB1ENR1;
+            gate = RCC_APB1ENR1_USART2EN;
+            mux = RCC_CCIPR_USART2SEL;
+            break;
+        case USART3_IRQn:
+            enable = &r->APB1ENR1;
+            gate = RCC_APB1ENR1_USART3EN;
+            mux = RCC_CCIPR_USART3SEL;
+            break;
+        case UART4_IRQn:
+            enable = &r->APB1ENR1;
+            gate = RCC_APB1ENR1_UART4EN;
+            mux = RCC_CCIPR_UART4SEL;
+            break;
+        case UART5_IRQn:
+            enable = &r->APB1ENR1;
+            gate = RCC_APB1ENR1_UART5EN;
+            mux = RCC_CCIPR_UART5SEL;
+            break;
+        case LPUART1_IRQn:
+            enable = &r->APB1ENR2;
+            gate = RCC_APB1ENR2_LPUART1EN;
+            mux = RCC_CCIPR_LPUART1SEL;
+            break;
+        default:
+            return false;
+    }
+    return (NX_G474_READ(enable) & gate) != 0U &&
+           (NX_G474_READ(&r->CCIPR) & mux) == 0U;
+}
 nx_result_t nx_stm32g474_uart_initialize(nx_stm32g474_uart_state_t* p,
                                          uint32_t clock, uint32_t limit) {
     if (!task_context())
@@ -364,7 +409,9 @@ nx_result_t nx_stm32g474_uart_initialize(nx_stm32g474_uart_state_t* p,
         return NX_ERROR_INVALID;
     if (p->profile != NX_UART_RX_BYTES || clock != 170000000U)
         return NX_ERROR_UNSUPPORTED;
-    if (p->irq != LPUART1_IRQn)
+    if (p->irq != LPUART1_IRQn && p->irq != USART1_IRQn &&
+        p->irq != USART2_IRQn && p->irq != USART3_IRQn &&
+        p->irq != UART4_IRQn && p->irq != UART5_IRQn)
         return NX_ERROR_UNSUPPORTED;
     if (p->initialized || p->retained || p->active != NULL || p->wake != NULL ||
         NX_G474_READ(&p->registers->CR1) != 0U ||
@@ -372,11 +419,7 @@ nx_result_t nx_stm32g474_uart_initialize(nx_stm32g474_uart_state_t* p,
         !NX_G474_IRQ_AVAILABLE(p->irq))
         return NX_ERROR_BUSY;
     if (!g_nx_stm32g474_system.started ||
-        g_nx_stm32g474_system.core_hz != clock ||
-        (NX_G474_READ(&g_nx_stm32g474_system.rcc->APB1ENR2) &
-         RCC_APB1ENR2_LPUART1EN) == 0U ||
-        (NX_G474_READ(&g_nx_stm32g474_system.rcc->CCIPR) &
-         RCC_CCIPR_LPUART1SEL) != 0U)
+        g_nx_stm32g474_system.core_hz != clock || !clock_ready(p->irq))
         return NX_ERROR_STATE;
     if (overlap(p->rx_storage, p->rx_capacity, p, sizeof(*p)) ||
         overlap(p->rx_storage, p->rx_capacity, p->registers,
@@ -387,8 +430,11 @@ nx_result_t nx_stm32g474_uart_initialize(nx_stm32g474_uart_state_t* p,
     nx_result_t policy = nx_irq_wake_validate(NULL, &p->irq_policy, &source);
     if (policy != NX_SUCCESS)
         return policy;
-    uint64_t divisor = ((uint64_t)clock * 16U + p->baud / 2U) / p->baud;
-    if (divisor < 0x300U || divisor > 0xfffffU)
+    bool low_power = p->irq == LPUART1_IRQn;
+    uint64_t scaled = (uint64_t)clock * (low_power ? 16U : 1U);
+    uint64_t divisor = (scaled + p->baud / 2U) / p->baud;
+    if (divisor < (low_power ? 0x300U : 16U) ||
+        divisor > (low_power ? 0xfffffU : 0xffffU))
         return NX_ERROR_UNSUPPORTED;
     p->retained = true;
     p->closing = false;
@@ -400,7 +446,7 @@ nx_result_t nx_stm32g474_uart_initialize(nx_stm32g474_uart_state_t* p,
     bool valid =
         write_checked(&p->registers->CR2, 0U, UINT32_MAX) &&
         write_checked(&p->registers->CR3, USART_CR3_EIE, UINT32_MAX) &&
-        write_checked(&p->registers->PRESC, 7U, UINT32_MAX) &&
+        write_checked(&p->registers->PRESC, low_power ? 7U : 0U, UINT32_MAX) &&
         write_checked(&p->registers->BRR, (uint32_t)divisor, UINT32_MAX);
     NX_G474_WRITE(&p->registers->RQR, USART_RQR_RXFRQ);
     NX_G474_WRITE(&p->registers->ICR, RX_ERRORS | USART_ICR_TCCF);

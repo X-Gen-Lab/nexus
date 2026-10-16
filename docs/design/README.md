@@ -19,6 +19,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [构建系统合同](build-system.md) | 配置事务、增量依赖、目标策略、开发入口与交付边界 |
 | [构建系统48项台账](build-system-execution.csv) | 原始退出条件、实现路径与本轮执行证据 |
 | [官方驱动与 provider 迭代](official-stm32-provider.md) | 私有 HAL/LL 复用、typed Construction、工作包退出条件及资格边界 |
+| [主流 MCU 接入与反馈](mainstream-mcu-adaptation.md) | 八个精确料号、官方与 Zephyr 来源、有限外设边界及跨系列平台反馈 |
 | [接入契约](integration-contracts.md) | SoC/Board/器件/组件/外部工程的严格资源合同 |
 | [OS 执行与生命周期合同](os-contracts.md) | deadline、IRQ policy、任务/队列、低功耗与扩展边界 |
 | [后端接入与执行探针](os-backend-integration.md) | 新 RTOS 的能力合同、实际执行和不得自动扩大支持 |
@@ -31,8 +32,8 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [用户 I/O broker](user-io-broker.md) | kernel-invoked scalar GPIO、可信 principal/pin/copy；U575 同步参考 transport 另见双域合同 |
 | [选定装配资格门禁](provider-assemblies.md) | 逐个 authored fixture 实际 ARM 构建、资源预算、链接保留和不可变输入 |
 | [多控制器](multiple-controllers.md) | 独立 provider/IRQ/DMA 所有权；配置开放与硅片实现分别记录 |
-| [STM32G474 接入](stm32g474.md) | 精确型号、MB1367 来源、clock/startup/time/GPIO/LPUART 与 PA0/PA1 EXTI 软件夹具 |
-| [STM32H743 接入](../../soc/stm32h743/README.md) | 四种固定 HSI/cache 配置、冷态 cache 所有权与 USART3 DMA TX；RX 仍为 IRQ bytes |
+| [STM32G474 接入](stm32g474.md) | 精确型号、MB1367、六 UART、封装 GPIO、有限 SPI、TIM3/4 CH1 PWM、IWDG 与 PA0/PA1 EXTI |
+| [STM32H743 接入](../../soc/stm32h743/README.md) | 四种固定 HSI/cache 配置、冷态 cache 所有权、USART3 DMA TX 与有限 RX DMA block；不代表连续 RX |
 | [U575 双域参考合同](u575-trustzone-contract.md) | 独立 Secure/NS Runtime、冷态归属封存、固定 NS world 与同步 GPIO；无 RTOS/factory/async/HIL 扩大承诺 |
 | [SoC 完善与 55 项台账](soc-refinement.md) | 实现范围、原始退出条件、软件机制与实板验收分列 |
 | [I2C 总线恢复](i2c-bus-clear.md) | 调用者独占 GPIO、有限时序与失败后继续清理的合同 |
@@ -60,10 +61,14 @@ CPU runtime 不生成 SoC/Board/factory；ThreadX 另有明确的 Native/M4 子�
 [九核支持说明](../delivery/cortex-m.md)。这不扩大完整平台的芯片/板卡范围。
 
 首发为启明STM32F407ZGT6、天空星STM32F407VET6和梁山派GD32F470ZGT6，裸机/
-FreeRTOS、显式 ThreadX 及Native模型。新增模式和 G474／H743／U575 纵切片按各文档的配置、
-完整镜像与 SDK 退出条件验收，不从公共类型推断全芯片接入。G474 的新增范围是
-PA0/PA1 EXTI 事件；H743 支持 HSI 32/64 MHz 与 Cache off/on 的四种固定启动组合、
-有限 DMA TX，未实现运行时调频或 DMA RX。U575 现有 TZEN0 平台与独立 TZEN1
+FreeRTOS、显式 ThreadX 及 Native 模型。新增 F103RBT6／GD32F303RCT6 参考及
+G474／H743／U575 增量按各文档的精确配置、完整镜像与 SDK 退出条件验收，不从公共
+类型推断完整系列或全部外设。F103 选定 GPIO、USART2、SPI1、EXTI0/1 和 IWDG；
+GD303 选定 GPIO、USART0、SPI0 和 FWDGT。G474 增加封装 GPIO、六 UART、有限
+SPI1/2、TIM3/4 CH1 固定 PWM 和 IWDG，保留 PA0/PA1 EXTI。H743 的四种固定
+HSI/cache 启动组合支持 USART3 有限 DMA TX 与 RX block，后者需要所有者重启且有间隙，
+不代表循环或连续接收。U575 增加 USART2、受电源准入约束的封装 GPIO 与 IWDG。
+现有 TZEN0 平台与独立 TZEN1
 无 OS 同步 GPIO 双域参考保持分开，后者不代表通用双域 factory、NS RTOS 或异步借用。
 SOC-33–35 仍未实现；SOC-36 保留 partial，SOC-37–55 的物理验收仍为 not_executed。
 三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实

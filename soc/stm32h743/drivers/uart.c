@@ -190,16 +190,9 @@ static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
     nx_arch_irq_restore(guard);
     return NX_SUCCESS;
 }
-void nx_stm32h743_uart_irq(nx_stm32h743_uart_state_t* p) {
-    if (p == NULL)
-        return;
-    nx_arch_irq_state_t guard = nx_arch_irq_save();
-    if (!p->initialized) {
-        nx_arch_irq_restore(guard);
-        return;
-    }
+void nx_stm32h743_uart_transmit_irq(nx_stm32h743_uart_state_t* p,
+                                    uint32_t status) {
     nx_time_us_t now = nx_time_now_us();
-    uint32_t status = NX_H743_READ(&p->registers->ISR);
     bool loaded = false;
     if (p->active != NULL && !p->tx_complete) {
         if (p->terminal == NX_SUCCESS &&
@@ -221,6 +214,17 @@ void nx_stm32h743_uart_irq(nx_stm32h743_uart_state_t* p) {
         if (!loaded)
             observe_tc(p, now);
     }
+}
+void nx_stm32h743_uart_irq(nx_stm32h743_uart_state_t* p) {
+    if (p == NULL)
+        return;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!p->initialized) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
+    uint32_t status = NX_H743_READ(&p->registers->ISR);
+    nx_stm32h743_uart_transmit_irq(p, status);
     nx_arch_irq_restore(guard);
     nx_stm32h743_uart_receive_irq(p, status);
 }
@@ -267,6 +271,8 @@ static nx_result_t read_bytes(void* context, uint8_t* output, size_t capacity,
     nx_stm32h743_uart_state_t* p = context;
     if (!task_context())
         return NX_ERROR_CONTEXT;
+    if (p != NULL && p->profile != NX_UART_RX_BYTES)
+        return NX_ERROR_UNSUPPORTED;
     if (p == NULL || capacity == 0U || output_alias(p, output, capacity) ||
         output_alias(p, count, sizeof(*count)) ||
         overlap(output, capacity, count, sizeof(*count)))
@@ -373,10 +379,14 @@ nx_result_t nx_stm32h743_uart_initialize(nx_stm32h743_uart_state_t* p,
                                          uint32_t clock, uint32_t limit) {
     if (!task_context())
         return NX_ERROR_CONTEXT;
-    if (p == NULL || p->registers == NULL || p->baud == 0U || limit == 0U ||
-        !span(p->rx_storage, p->rx_capacity))
+    if (p == NULL || p->registers == NULL || p->baud == 0U || limit == 0U)
         return NX_ERROR_INVALID;
-    if (p->profile != NX_UART_RX_BYTES ||
+    if ((p->profile == NX_UART_RX_BYTES &&
+         !span(p->rx_storage, p->rx_capacity)) ||
+        (p->profile == NX_UART_RX_BLOCKS &&
+         (p->rx_storage != NULL || p->rx_capacity != 0U)))
+        return NX_ERROR_INVALID;
+    if ((p->profile != NX_UART_RX_BYTES && p->profile != NX_UART_RX_BLOCKS) ||
         (clock != 64000000U && clock != 32000000U))
         return NX_ERROR_UNSUPPORTED;
     if (p->irq != USART3_IRQn)
@@ -414,14 +424,19 @@ nx_result_t nx_stm32h743_uart_initialize(nx_stm32h743_uart_state_t* p,
     p->wake_publishers = 0U;
     bool valid =
         write_checked(&p->registers->CR2, 0U, UINT32_MAX) &&
-        write_checked(&p->registers->CR3, USART_CR3_EIE, UINT32_MAX) &&
+        write_checked(&p->registers->CR3,
+                      p->profile == NX_UART_RX_BYTES ? USART_CR3_EIE : 0U,
+                      UINT32_MAX) &&
         write_checked(&p->registers->PRESC, 0U, UINT32_MAX) &&
         write_checked(&p->registers->BRR, (uint32_t)divisor, UINT32_MAX);
     NX_H743_WRITE(&p->registers->RQR, USART_RQR_RXFRQ);
     NX_H743_WRITE(&p->registers->ICR, RX_ERRORS | USART_ICR_TCCF);
+    uint32_t receive_sources = p->profile == NX_UART_RX_BYTES
+                                   ? USART_CR1_RXNEIE_RXFNEIE | USART_CR1_PEIE
+                                   : 0U;
     valid = write_checked(&p->registers->CR1,
                           USART_CR1_UE | USART_CR1_TE | USART_CR1_RE |
-                              USART_CR1_RXNEIE_RXFNEIE | USART_CR1_PEIE,
+                              receive_sources,
                           UINT32_MAX) &&
             valid;
     if (!valid) {

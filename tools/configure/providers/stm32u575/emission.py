@@ -49,6 +49,12 @@ def _uart(result):
     return any(item.kind == 'uart' for item in result.controllers)
 
 
+def _uart_gates(result):
+    return tuple(("APB2ENR", "USART1") if item.controller == "USART1"
+                 else ("APB1ENR1", "USART2")
+                 for item in result.controllers if item.kind == "uart")
+
+
 def _fields(bits, fields, af0, af1):
     return [('MODER', 'mode', fields), ('OTYPER', 'type', bits),
             ('OSPEEDR', 'speed', fields), ('PUPDR', 'pull', fields),
@@ -60,8 +66,8 @@ def state_declarations(result):
     if not leases:
         return []
     source = ['static uint32_t s_nx_platform_gpio_clocks_added;']
-    if _uart(result):
-        source += ['static uint32_t s_nx_platform_uart_clocks_added;']
+    for register, _ in _uart_gates(result):
+        source += [f'static uint32_t s_nx_uart_{register.lower()}_added;']
     for name, bits, fields, af0, af1 in leases:
         gpio, lease = 'GPIO' + name, 's_nx_gpio' + name.lower() + '_lease'
         source += ['static struct {',
@@ -106,8 +112,8 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
     gates = ' | '.join('RCC_AHB2ENR1_GPIO' + n + 'EN'
                        for n, *_ in leases)
     source = [f'    s_nx_platform_gpio_clocks_added = ~NX_U575_READ(&RCC->AHB2ENR1) & ({gates});']
-    if _uart(result):
-        source += ['    s_nx_platform_uart_clocks_added = ~NX_U575_READ(&RCC->APB2ENR) & RCC_APB2ENR_USART1EN;']
+    for register, controller in _uart_gates(result):
+        source += [f'    s_nx_uart_{register.lower()}_added = ~NX_U575_READ(&RCC->{register}) & RCC_{register}_{controller}EN;']
     for name, bits, fields, af0, af1 in leases:
         gpio, lease = 'GPIO' + name, 's_nx_gpio' + name.lower() + '_lease'
         source += [f'    {lease}.captured = false;',
@@ -147,11 +153,12 @@ def stop_system(result, *, system_phase=None):
     for name, *_ in reversed(_leases(result)):
         source += [f'        nx_result_t gpio_{name.lower()} = restore_gpio{name.lower()}();',
             f'        if (gpio_{name.lower()} != NX_SUCCESS) {{ return gpio_{name.lower()}; }}']
-    if _uart(result):
-        source += ['        NX_U575_WRITE(&RCC->APB2ENR, NX_U575_READ(&RCC->APB2ENR) & ~s_nx_platform_uart_clocks_added);',
+    for register, _ in _uart_gates(result):
+        added = f's_nx_uart_{register.lower()}_added'
+        source += [f'        NX_U575_WRITE(&RCC->{register}, NX_U575_READ(&RCC->{register}) & ~{added});',
             '        nx_arch_dsb();',
-            '        if ((NX_U575_READ(&RCC->APB2ENR) & s_nx_platform_uart_clocks_added) != 0u) { return NX_ERROR_IO; }',
-            '        s_nx_platform_uart_clocks_added = 0u;']
+            f'        if ((NX_U575_READ(&RCC->{register}) & {added}) != 0u) {{ return NX_ERROR_IO; }}',
+            f'        {added} = 0u;']
     if _leases(result):
         source += ['        NX_U575_WRITE(&RCC->AHB2ENR1, NX_U575_READ(&RCC->AHB2ENR1) & ~s_nx_platform_gpio_clocks_added);',
             '        nx_arch_dsb();',

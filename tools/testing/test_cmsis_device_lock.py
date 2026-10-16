@@ -199,7 +199,7 @@ class DeviceLockContracts:
         alias.symlink_to(self.lock_path)
         with self.assertRaises(ValueError):
             cmsis_device_lock.verify(self.source, alias)
-        file = self.source / "LICENSE.md"
+        file = self.source / self.lock["license"]["path"]
         actual = self.folder / "notice"
         file.rename(actual)
         file.symlink_to(actual)
@@ -251,7 +251,7 @@ class DeviceLockContracts:
                 self.verify()
 
     def test_same_hash_source_and_lock_replacement_during_verify_reject(self):
-        for file in (self.source / "LICENSE.md", self.lock_path):
+        for file in (self.source / self.lock["license"]["path"], self.lock_path):
             heads = 0
 
             def rewritten(source, *arguments):
@@ -271,7 +271,7 @@ class DeviceLockContracts:
 
     def test_same_bytes_in_place_rewrite_and_rewrite_during_read_reject(self):
         original_snapshot = cmsis_device_lock.snapshot
-        target = self.source / "LICENSE.md"
+        target = self.source / self.lock["license"]["path"]
         changed = False
 
         def rewritten(path):
@@ -398,6 +398,10 @@ class DeviceLockContracts:
             with self.subTest(marker=marker):
                 self.assertNotEqual(result.returncode, 0, result.stdout)
                 self.assertIn("rejected", result.stderr)
+
+
+class STM32F1LockTests(DeviceLockContracts, unittest.TestCase):
+    family = "f1"
 
 
 class STM32H7LockTests(DeviceLockContracts, unittest.TestCase):

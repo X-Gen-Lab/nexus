@@ -24,6 +24,11 @@ typedef struct nx_watchdog_port nx_watchdog_port_t;
 /**
  * \brief           Hardware-selected timeout bounds, including declared LSI
  *                  uncertainty.
+ *
+ * \note            A zero minimum and maximum mean the timeout bounds are
+ *                  unknown, for example while hardware shadow updates remain
+ *                  pending or no oscillator limits have been reviewed. The
+ *                  enabled, irreversible and debug_freeze facts remain valid.
  */
 typedef struct {
     uint32_t minimum_timeout_us;
@@ -57,8 +62,8 @@ struct nx_watchdog_port {
 };
 
 /**
- * \brief           Enable IWDG with reviewed bounds; activation is
- *                  irreversible.
+ * \brief           Enable IWDG and report its effect and known timing bounds;
+ *                  activation is irreversible.
  *
  * \param[in,out]   port: Fixed provider; product owns feed/recovery policy.
  *
@@ -73,6 +78,15 @@ struct nx_watchdog_port {
  * \return          Success or INVALID/STATE/IO; never claims enabled hardware
  *                  was disabled during rollback. Existing enable is
  *                  identified.
+ *
+ * \note            Success establishes nominal hardware programming, not a
+ *                  guaranteed deadline. Both timeout bounds remain zero when
+ *                  oscillator limits are unknown. A product requiring bounded
+ *                  timing must admit the oscillator profile before activation.
+ *                  Enable runs in a privileged task and is serialized with
+ *                  feed, state and platform stop. Install IRQ feeding only
+ *                  after this call returns; activation does not support a
+ *                  concurrent reload during shadow-register programming.
  */
 nx_result_t nx_watchdog_port_enable(const nx_watchdog_port_t* port,
                                     uint32_t timeout_us, bool debug_freeze,
@@ -94,7 +108,10 @@ nx_result_t nx_watchdog_port_feed(const nx_watchdog_port_t* port);
  *
  * \param[out]      state: Current hardware/remembered initialization state.
  *
- * \return          Success or INVALID.
+ * \return          Success or INVALID; UNSUPPORTED retains observed hardware
+ *                  effects with both timeout bounds zero when those bounds
+ *                  cannot be established. Never infer a disabled watchdog
+ *                  from a failed query or unknown timeout.
  */
 nx_result_t nx_watchdog_port_state(const nx_watchdog_port_t* port,
                                    nx_watchdog_state_t* state);

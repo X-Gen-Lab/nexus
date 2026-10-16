@@ -96,6 +96,7 @@ function(nexus_add_firmware target)
                 "${NEXUS_SOURCE_DIR}/tools/measurement/resources.py"
                 --elf "$<TARGET_FILE:${target}>"
                 --resolved "${NEXUS_CONFIG_DIR}/resolved.json"
+                --require-cpu
                 --budget "${NEXUS_CONFIG_DIR}/resource-budget.json"
                 --report "${resources}"
             VERBATIM)

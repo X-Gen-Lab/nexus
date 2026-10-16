@@ -16,6 +16,7 @@ from tools.evidence.common import (EvidenceError, atomic_json, digest, fields,
 from tools.evidence.identity import resolved_identity, verify_source
 from tools.evidence.container import verify as verify_environment
 from tools.measurement.elf import Elf32, binary_from_elf
+from tools.measurement.resources import resolved_float_abi, validate_elf_configuration
 from tools.evidence.proof import validate_scope_proof, verify_sdk_file
 
 REQUIRED_SCOPES = frozenset({"host_contracts", "arm_link", "resource_budget",
@@ -134,7 +135,9 @@ def validate_manifest(manifest: dict, *, sdk_packages_out=None) -> tuple[dict, l
     fields(manifest["artifacts"], {"elf", "bin", "map"})
     for identity in manifest["artifacts"].values():
         verify_file_identity(identity)
-    elf = Elf32(Path(manifest["artifacts"]["elf"]["path"]).read_bytes())
+    elf = Elf32(Path(manifest["artifacts"]["elf"]["path"]).read_bytes(),
+                float_abi=resolved_float_abi(resolved))
+    validate_elf_configuration(elf, resolved)
     flash = resolved["flash"]
     if Path(manifest["artifacts"]["bin"]["path"]).read_bytes() != binary_from_elf(
             elf, flash["origin"], flash["origin"] + flash["size"]):
@@ -255,7 +258,9 @@ def verify(candidate_path: Path) -> dict:
         if identity["sha256"] != candidate["artifacts"][role]["sha256"]:
             raise EvidenceError("same-artifact seal changed")
         packed(identity)
-    elf = Elf32(packed(manifest["artifacts"]["elf"]).read_bytes())
+    elf = Elf32(packed(manifest["artifacts"]["elf"]).read_bytes(),
+                float_abi=resolved_float_abi(resolved))
+    validate_elf_configuration(elf, resolved)
     flash = resolved["flash"]
     if packed(manifest["artifacts"]["bin"]).read_bytes() != binary_from_elf(
             elf, flash["origin"], flash["origin"] + flash["size"]):

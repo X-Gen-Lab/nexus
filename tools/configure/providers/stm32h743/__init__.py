@@ -21,7 +21,7 @@ ETH_CONTROLLER = None
 USB_CONTROLLER = None
 SPI_REQUIRES_ENDPOINT = False
 DMA_VECTOR = "Stream"
-DMA_TOPOLOGY = (frozenset((1,)), range(1), range(46, 47))
+DMA_TOPOLOGY = (frozenset((1,)), range(2), range(45, 47))
 DMA_MEMORY_ENGINES = ("DMA1", "DMA2", "BDMA", "MDMA")
 CONDITIONAL_PACKAGE_PADS = ("PC2_C", "PC3_C")
 CLOCK_PROFILES = MappingProxyType({
@@ -32,7 +32,8 @@ CLOCK_PROFILES = MappingProxyType({
 LIMITS = MappingProxyType({"uart_baud": (977, 1000000)})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
-    ("uart", "irq-bytes"): "uart", ("uart", "dma-tx"): "uart_dma"})
+    ("uart", "irq-bytes"): "uart", ("uart", "dma-tx"): "uart_dma",
+    ("uart", "rx-dma-idle"): "uart_receive"})
 
 
 def cache_mask(profile):
@@ -64,8 +65,9 @@ def validate_selection(selection, route):
         divisor = (64000000 + baud // 2) // baud
         if not 16 <= divisor <= 0xffff:
             common.fail("USART baud differs from the actual PRESC1 divider")
-        if selection["rx_profile"] != "bytes":
-            common.fail("H743 USART provider requires byte reception")
+        profile = "blocks" if selection["mode"] == "rx-dma-idle" else "bytes"
+        if selection["rx_profile"] != profile:
+            common.fail(f"H743 selected USART provider requires {profile} reception")
         if type(selection.get("irq_priority")) is not int or selection["irq_priority"] != 5:
             common.fail("H743 USART provider implements IRQ priority5 only")
     elif kind == "gpio":
@@ -82,9 +84,9 @@ def validate_selection(selection, route):
 
 
 def validate_dma(route, mode, normalize):
-    expected = (("DMA1:stream0:channel46",)
-                if route["controller"] == "USART3" and mode == "dma-tx"
-                else None)
+    expected = ({"dma-tx": ("DMA1:stream0:channel46",),
+                 "rx-dma-idle": ("DMA1:stream1:channel45",)}.get(mode)
+                if route["controller"] == "USART3" else None)
     common.validate_dma(route, mode, expected, "stm32h743", normalize)
 
 

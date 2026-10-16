@@ -53,9 +53,16 @@ bool nx_u575_model_privileged(void) {
 }
 uint32_t nx_u575_model_read(volatile uint32_t* reg) {
     g_u575_model.reads++;
+    if (g_u575_model.hide_unclocked_timer &&
+        (g_u575_model.rcc.APB1ENR1 & RCC_APB1ENR1_TIM2EN) == 0U &&
+        (uintptr_t)reg >= (uintptr_t)&g_u575_model.timer &&
+        (uintptr_t)reg <
+            (uintptr_t)&g_u575_model.timer + sizeof(g_u575_model.timer))
+        return 0U;
     uint32_t value = *reg;
-    if (g_u575_model.uart != nullptr && reg == &g_u575_model.uart->RDR)
-        g_u575_model.uart->ISR &= ~static_cast<uint32_t>(USART_ISR_RXNE);
+    for (auto* uart : {g_u575_model.uart, g_u575_model.uart2})
+        if (uart != nullptr && reg == &uart->RDR)
+            uart->ISR &= ~static_cast<uint32_t>(USART_ISR_RXNE);
     if (reg == &g_u575_model.timer.CNT && g_u575_model.wrap_after_count) {
         g_u575_model.wrap_after_count = false;
         g_u575_model.timer.CNT = 3U;
@@ -64,26 +71,60 @@ uint32_t nx_u575_model_read(volatile uint32_t* reg) {
     return value;
 }
 void nx_u575_model_write(volatile uint32_t* reg, uint32_t value) {
+    if (reg == &g_u575_model.timer.DIER && value == 0U &&
+        g_u575_model.timer_pending_on_dier) {
+        g_u575_model.timer_pending_on_dier = false;
+        g_u575_model.timer.SR |= TIM_SR_UIF;
+        g_u575_model.irq_pending[TIM2_IRQn] = true;
+    }
     g_u575_model.writes++;
-    for (auto* gpio : {&g_u575_model.gpio, &g_u575_model.gpioa})
+    for (auto* gpio :
+         {&g_u575_model.gpio, &g_u575_model.gpioa, &g_u575_model.extra_gpio[0],
+          &g_u575_model.extra_gpio[1], &g_u575_model.extra_gpio[2],
+          &g_u575_model.extra_gpio[3], &g_u575_model.extra_gpio[4],
+          &g_u575_model.extra_gpio[5]})
         if ((uintptr_t)reg >= (uintptr_t)gpio &&
             (uintptr_t)reg < (uintptr_t)gpio + sizeof(*gpio))
             g_u575_model.gpio_writes++;
     if (reg == g_u575_model.ignore_write)
         return;
+    if (reg == &g_u575_model.rcc.BDCR && g_u575_model.hold_lsi_off &&
+        (value & RCC_BDCR_LSION) == 0U)
+        value |= g_u575_model.rcc.BDCR & (uint32_t)RCC_BDCR_LSION;
+    if (reg == &g_u575_model.timer.CR2 &&
+        g_u575_model.refuse_timer_quiet_clear && value == 0U &&
+        g_u575_model.timer.CR2 == TIM_CR2_MMS_0)
+        return;
+    if (g_u575_model.watchdog != nullptr && reg == &g_u575_model.watchdog->KR &&
+        value == 0xCCCCU) {
+        if (g_u575_model.watchdog_start_observer != nullptr)
+            g_u575_model.watchdog_start_observer(
+                g_u575_model.watchdog_start_context);
+        if (g_u575_model.watchdog_stuck_after_start)
+            g_u575_model.watchdog->SR = IWDG_SR_PVU;
+    }
     if (reg == &g_u575_model.timer.SR) {
         *reg &= value;
         return;
     }
-    if (reg == &g_u575_model.timer.EGR && (value & TIM_EGR_UG) != 0U)
+    if (reg == &g_u575_model.timer.EGR && (value & TIM_EGR_UG) != 0U) {
+        g_u575_model.timer_ug_mms = g_u575_model.timer.CR2 & TIM_CR2_MMS;
+        if (g_u575_model.timer_ug_mms == 0U)
+            g_u575_model.timer_trgo_pulses++;
         g_u575_model.timer.SR |= TIM_SR_UIF;
-    for (auto* gpio : {&g_u575_model.gpio, &g_u575_model.gpioa})
+    }
+    for (auto* gpio :
+         {&g_u575_model.gpio, &g_u575_model.gpioa, &g_u575_model.extra_gpio[0],
+          &g_u575_model.extra_gpio[1], &g_u575_model.extra_gpio[2],
+          &g_u575_model.extra_gpio[3], &g_u575_model.extra_gpio[4],
+          &g_u575_model.extra_gpio[5]})
         if (reg == &gpio->BSRR) {
             gpio->ODR |= value & 0xffffU;
             gpio->ODR &= ~(value >> 16U);
         }
-    if (g_u575_model.uart != nullptr) {
-        auto* uart = g_u575_model.uart;
+    for (auto* uart : {g_u575_model.uart, g_u575_model.uart2}) {
+        if (uart == nullptr)
+            continue;
         if (reg == &uart->ICR) {
             uart->ISR &= ~value;
             *reg = value;

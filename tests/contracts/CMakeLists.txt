@@ -101,7 +101,8 @@ target_compile_options(contract_gd32_system PRIVATE -Wno-int-to-pointer-cast)
 target_include_directories(contract_gd32_system SYSTEM PRIVATE
     "${gd32_vendor_root}/CMSIS/GD/GD32F4xx/Include"
     "${gd32_vendor_root}/GD32F4xx_standard_peripheral/Include")
-foreach(scenario watchdog-late-failure watchdog-hardware-enabled)
+foreach(scenario watchdog-late-failure watchdog-hardware-enabled
+        watchdog-config-failure)
     add_test(NAME contract_gd32_${scenario} COMMAND contract_gd32_io ${scenario})
     set_tests_properties(contract_gd32_${scenario} PROPERTIES TIMEOUT 30)
 endforeach()

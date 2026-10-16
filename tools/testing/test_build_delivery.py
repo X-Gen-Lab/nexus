@@ -70,6 +70,112 @@ class BuildDeliveryTests(unittest.TestCase):
         archive.unlink()
         self.assertEqual(store.verify_external(adopted)["status"], "verified")
 
+    def test_hardlink_receipt_does_not_assert_durable_storage(self):
+        self.file("source/input")
+        package = store.export_tree(self.root / "source", self.root / "store")
+        adopted = store.adopt(Path(package["archive"]["path"]),
+                              self.root / "local")
+        self.assertEqual(adopted["kind"], "preserved_external_archive")
+        self.assertEqual(adopted["persistence_status"], "not_established")
+        self.assertEqual(store.verify_external(adopted)["persistence_status"],
+                         "not_established")
+
+    def test_independent_copy_survives_source_mutation_and_restores(self):
+        self.file("source/input", b"executed command\n")
+        package = store.export_tree(self.root / "source", self.root / "store")
+        archive = Path(package["archive"]["path"])
+        copied = store.copy_archive(archive, self.root / "separate")
+        destination = Path(copied["archive"]["path"])
+        self.assertFalse(archive.samefile(destination))
+        self.assertEqual(copied["storage"], "independent_copy")
+        self.assertEqual(copied["persistence_status"], "not_established")
+        archive.write_bytes(b"source damaged after preservation")
+        receipt = store.restore_tree(package, self.root / "restored",
+                                     archive_override=destination)
+        self.assertEqual(receipt["status"], "verified")
+        self.assertEqual((self.root / "restored/input").read_bytes(),
+                         b"executed command\n")
+        self.assertEqual(store.verify_external(copied)["status"], "verified")
+
+    def test_copy_rejects_existing_hardlink_to_original(self):
+        import os
+        self.file("source/input")
+        package = store.export_tree(self.root / "source", self.root / "store")
+        archive = Path(package["archive"]["path"])
+        destination = self.root / "copy" / archive.name
+        destination.parent.mkdir()
+        os.link(archive, destination)
+        with self.assertRaises(EvidenceError):
+            store.copy_archive(archive, destination.parent)
+        self.assertTrue(archive.samefile(destination))
+
+    def test_copy_rejects_unsafe_archive_without_publishing(self):
+        import io
+        import tarfile
+        archive = self.root / "unsafe.tar.gz"
+        with tarfile.open(archive, "w:gz") as stream:
+            item = tarfile.TarInfo("../outside")
+            item.size = 1
+            stream.addfile(item, io.BytesIO(b"x"))
+        with self.assertRaises(EvidenceError):
+            store.copy_archive(archive, self.root / "copy")
+        self.assertEqual(list((self.root / "copy").iterdir()), [])
+
+    def test_copy_is_idempotent_and_does_not_replace_existing_archive(self):
+        self.file("source/input")
+        package = store.export_tree(self.root / "source", self.root / "store")
+        archive = Path(package["archive"]["path"])
+        first = store.copy_archive(archive, self.root / "copy")
+        before = Path(first["archive"]["path"]).stat().st_ino
+        second = store.copy_archive(archive, self.root / "copy")
+        self.assertEqual(first, second)
+        self.assertEqual(Path(second["archive"]["path"]).stat().st_ino,
+                         before)
+
+    def test_external_receipt_rejects_false_status_and_storage_claims(self):
+        self.file("source/input")
+        package = store.export_tree(self.root / "source", self.root / "store")
+        adopted = store.adopt(Path(package["archive"]["path"]),
+                              self.root / "local")
+        for field, value in (("signature_status", "signed"),
+                             ("status", "passed"),
+                             ("storage", "offsite_redundant"),
+                             ("scope", "qualified product"),
+                             ("files", True),
+                             ("schema_version", True)):
+            with self.subTest(field=field), self.assertRaises(EvidenceError):
+                store.verify_external({**adopted, field: value})
+
+    def test_legacy_external_receipt_verifies_without_inheriting_durability(self):
+        self.file("source/input")
+        package = store.export_tree(self.root / "source", self.root / "store")
+        adopted = store.adopt(Path(package["archive"]["path"]),
+                              self.root / "local")
+        legacy = {key: value for key, value in adopted.items()
+                  if key != "persistence_status"}
+        legacy["kind"] = "durable_external_archive"
+        result = store.verify_external(legacy)
+        self.assertEqual(result["persistence_status"], "not_established")
+
+    def test_copy_cli_protects_original_and_records_preservation(self):
+        self.file("source/input")
+        package = store.export_tree(self.root / "source", self.root / "store")
+        archive = Path(package["archive"]["path"])
+        original = archive.read_bytes()
+        result = store.main(["copy", "--source", str(archive),
+                             "--store", str(self.root / "copy"),
+                             "--report", str(archive)])
+        self.assertEqual(result, 1)
+        self.assertEqual(archive.read_bytes(), original)
+        report = self.root / "copy-report.json"
+        result = store.main(["copy", "--source", str(archive),
+                             "--store", str(self.root / "copy"),
+                             "--report", str(report)])
+        self.assertEqual(result, 0)
+        recorded = json.loads(report.read_text())
+        self.assertEqual(recorded["kind"], "preserved_external_archive")
+        self.assertEqual(recorded["persistence_status"], "not_established")
+
     def test_moved_archive_requires_explicit_navigation_override(self):
         self.file("source/input")
         package = store.export_tree(self.root / "source", self.root / "store")

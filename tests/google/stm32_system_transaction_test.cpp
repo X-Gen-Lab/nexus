@@ -33,11 +33,13 @@ bool irq_enabled;
 bool irq_pending;
 bool irq_active;
 bool refuse_irq_disable;
+bool source_prevents_vector_proof;
 bool hold_hse;
 bool hold_hsi;
 bool hold_pll;
 bool hold_switch;
 bool update_observed;
+bool update_trigger_observed;
 void (*before_save)();
 
 class Stm32System : public testing::Test {
@@ -63,8 +65,10 @@ class Stm32System : public testing::Test {
         handler = false;
         irq_enabled = irq_pending = irq_active = false;
         refuse_irq_disable = false;
+        source_prevents_vector_proof = false;
         hold_hse = hold_hsi = hold_pll = hold_switch = false;
         update_observed = false;
+        update_trigger_observed = false;
         before_save = nullptr;
         hardware_port = &hardware_mock;
         EXPECT_CALL(hardware_mock, Write(testing::_, testing::_))
@@ -79,6 +83,8 @@ class Stm32System : public testing::Test {
                 }
                 if (reg == &hardware_timer->EGR && (value & TIM_EGR_UG) != 0U) {
                     update_observed = true;
+                    if ((hardware_timer->CR2 & TIM_CR2_MMS) == 0U)
+                        update_trigger_observed = true;
                     hardware_timer->SR |= TIM_SR_UIF;
                     hardware_timer->CNT = 0U;
                 }
@@ -90,6 +96,7 @@ class Stm32System : public testing::Test {
         testing::Mock::VerifyAndClearExpectations(&hardware_mock);
         hold_hse = hold_hsi = hold_pll = hold_switch = false;
         refuse_irq_disable = false;
+        source_prevents_vector_proof = false;
         before_save = nullptr;
         irq_active = false;
         mask = 0U;
@@ -115,6 +122,45 @@ TEST_F(Stm32System, ExactClockAndIndependentTimerHaveOneLiveEpoch) {
     EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
 }
 
+TEST_F(Stm32System, PendingAtSourceWithdrawalIsClearedBeforeOwnerRelease) {
+    ASSERT_EQ(0, Start().primary);
+    EXPECT_CALL(hardware_mock, Write(&timer.DIER, 0U))
+        .WillOnce([](volatile uint32_t* reg, uint32_t value) {
+            irq_pending = true;
+            *reg = value;
+        })
+        .RetiresOnSaturation();
+    EXPECT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_FALSE(irq_pending);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32_system_preflight(&g_nx_stm32_system));
+}
+
+TEST_F(Stm32System, RefusedStopFlagClearRetainsTimerAndClockForRetry) {
+    ASSERT_EQ(0, Start().primary);
+    timer.SR = TIM_SR_UIF;
+    EXPECT_CALL(hardware_mock, Write(&timer.SR, 0U))
+        .WillOnce([](volatile uint32_t*, uint32_t) {})
+        .RetiresOnSaturation();
+    EXPECT_NE(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_NE(0U, g_nx_stm32_system.remaining_effects);
+    EXPECT_NE(0U, rcc.APB1ENR & RCC_APB1ENR_TIM2EN);
+    EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
+    EXPECT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_EQ(0U, g_nx_stm32_system.remaining_effects);
+}
+
+TEST_F(Stm32System, AssertedSourceCannotPreventItsOwnWithdrawal) {
+    ASSERT_EQ(0, Start().primary);
+    timer.SR = TIM_SR_UIF;
+    irq_pending = true;
+    source_prevents_vector_proof = true;
+    EXPECT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_EQ(0U, timer.DIER);
+    EXPECT_EQ(0U, timer.SR);
+    EXPECT_FALSE(irq_pending);
+    EXPECT_EQ(0U, g_nx_stm32_system.remaining_effects);
+}
+
 TEST_F(Stm32System, SoftwareUpdateIsClearedBeforePublishingAZeroEpoch) {
     ASSERT_EQ(0, Start().primary);
     EXPECT_TRUE(update_observed);
@@ -124,19 +170,26 @@ TEST_F(Stm32System, SoftwareUpdateIsClearedBeforePublishingAZeroEpoch) {
     EXPECT_TRUE(g_nx_stm32_system.started);
 }
 
+TEST_F(Stm32System, PrescalerShadowUpdateDoesNotEmitAResetModeTrigger) {
+    ASSERT_EQ(0, Start().primary);
+    EXPECT_TRUE(update_observed);
+    EXPECT_FALSE(update_trigger_observed);
+    EXPECT_EQ(0U, timer.CR2 & TIM_CR2_MMS);
+}
+
 TEST_F(Stm32System, RefusedInitialUpdateClearCannotPublishLiveTime) {
     EXPECT_CALL(hardware_mock, Write(&timer.SR, 0U))
         .WillRepeatedly([](volatile uint32_t*, uint32_t) {});
     auto result = Start();
     EXPECT_NE(0, result.primary);
-    EXPECT_EQ(0, result.cleanup);
-    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_NE(0, result.cleanup);
+    EXPECT_NE(0U, result.remaining_effects);
     EXPECT_FALSE(g_nx_stm32_system.started);
     EXPECT_FALSE(irq_enabled);
     EXPECT_EQ(0U, nx_stm32_system_now(&g_nx_stm32_system));
     EXPECT_EQ(0U, timer.CR1 & TIM_CR1_CEN);
     EXPECT_EQ(0U, timer.DIER);
-    EXPECT_EQ(0U, rcc.APB1ENR & RCC_APB1ENR_TIM2EN);
+    EXPECT_NE(0U, rcc.APB1ENR & RCC_APB1ENR_TIM2EN);
 }
 
 TEST_F(Stm32System, RefusedSoftwareUpdateCannotReuseAnOldUpdateFlag) {
@@ -240,6 +293,79 @@ TEST_F(Stm32System, PendingReservedIrqIsAColdAdmissionConflict) {
     EXPECT_NE(0, Start().primary);
     EXPECT_TRUE(irq_pending);
     irq_pending = false;
+}
+
+TEST_F(Stm32System, RetainedTimerModesRejectBeforeClockOrUpdateEffects) {
+    EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
+    for (volatile uint32_t* field : {&timer.CR2, &timer.SMCR, &timer.CCMR1,
+                                     &timer.CCMR2, &timer.CCER, &timer.DCR}) {
+        *field = 1U;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_system_preflight(&g_nx_stm32_system));
+        EXPECT_EQ(1U, *field);
+        EXPECT_FALSE(update_observed);
+        *field = 0U;
+    }
+}
+
+TEST_F(Stm32System, PoweredForeignTimerKeepsItsRegistersDuringCleanupRetry) {
+    bool refuse_gate_drop = true;
+    EXPECT_CALL(hardware_mock, Write(&timer.CR1, testing::_)).Times(0);
+    EXPECT_CALL(hardware_mock, Write(&timer.DIER, testing::_)).Times(0);
+    EXPECT_CALL(hardware_mock, Write(&timer.EGR, testing::_)).Times(0);
+    EXPECT_CALL(hardware_mock, Write(&rcc.APB1ENR, testing::_))
+        .WillRepeatedly([&](volatile uint32_t* reg, uint32_t value) {
+            if ((value & RCC_APB1ENR_TIM2EN) != 0U) {
+                *reg = value;
+                timer.SMCR = 1U;
+            } else if ((*reg & RCC_APB1ENR_TIM2EN) == 0U || !refuse_gate_drop) {
+                *reg = value;
+            }
+        });
+    auto result = Start();
+    EXPECT_NE(0, result.primary);
+    EXPECT_NE(0, result.cleanup);
+    EXPECT_EQ(1U, timer.SMCR);
+    EXPECT_NE(0U, result.remaining_effects);
+    refuse_gate_drop = false;
+    EXPECT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_EQ(1U, timer.SMCR);
+    EXPECT_EQ(0U, g_nx_stm32_system.remaining_effects);
+}
+
+TEST_F(Stm32System, RefusedTimerResetCannotPublishAnUpdateOrLiveEpoch) {
+    EXPECT_CALL(hardware_mock, Write(&rcc.APB1RSTR, testing::_))
+        .WillRepeatedly([](volatile uint32_t*, uint32_t) {});
+    EXPECT_CALL(hardware_mock, Write(&timer.EGR, testing::_)).Times(0);
+    auto result = Start();
+    EXPECT_NE(0, result.primary);
+    EXPECT_EQ(0, result.cleanup);
+    EXPECT_FALSE(g_nx_stm32_system.started);
+    EXPECT_FALSE(update_observed);
+}
+
+TEST_F(Stm32System, ForeignAssertedTimerResetIsNotAnAvailableResource) {
+    rcc.APB1RSTR = RCC_APB1RSTR_TIM2RST;
+    EXPECT_CALL(hardware_mock, Write(testing::_, testing::_)).Times(0);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32_system_preflight(&g_nx_stm32_system));
+    EXPECT_EQ(RCC_APB1RSTR_TIM2RST, rcc.APB1RSTR);
+}
+
+TEST_F(Stm32System, RefusedOwnedResetReleaseRetainsCleanupUntilRetry) {
+    bool refuse_reset_release = true;
+    EXPECT_CALL(hardware_mock, Write(&rcc.APB1RSTR, testing::_))
+        .WillRepeatedly([&](volatile uint32_t* reg, uint32_t value) {
+            if ((value & RCC_APB1RSTR_TIM2RST) != 0U || !refuse_reset_release)
+                *reg = value;
+        });
+    auto result = Start();
+    EXPECT_NE(0, result.primary);
+    EXPECT_NE(0, result.cleanup);
+    EXPECT_NE(0U, result.remaining_effects);
+    EXPECT_NE(0U, rcc.APB1RSTR & RCC_APB1RSTR_TIM2RST);
+    refuse_reset_release = false;
+    EXPECT_EQ(0, nx_stm32_system_stop(&g_nx_stm32_system, 8U));
+    EXPECT_EQ(0U, rcc.APB1RSTR & RCC_APB1RSTR_TIM2RST);
+    EXPECT_EQ(0U, g_nx_stm32_system.remaining_effects);
 }
 
 TEST_F(Stm32System, MaskedOrUnprivilegedStartHasNoEffects) {
@@ -486,6 +612,12 @@ extern "C" bool nx_stm32_system_model_irq_available(int) {
 extern "C" int nx_stm32_system_model_irq_control(int, bool enabled) {
     if (!enabled && refuse_irq_disable)
         return -1;
+    if (!enabled && source_prevents_vector_proof &&
+        (g_nx_stm32_system.timer->DIER & TIM_DIER_UIE) != 0U &&
+        (g_nx_stm32_system.timer->SR & TIM_SR_UIF) != 0U) {
+        irq_pending = true;
+        return -1;
+    }
     irq_enabled = enabled;
     irq_pending = false;
     return 0;

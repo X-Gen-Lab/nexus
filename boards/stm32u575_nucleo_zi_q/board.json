@@ -18,6 +18,72 @@
       "id": "uart1",
       "controller": "USART1",
       "route": "usart1-pa9-pa10"
+    },
+    {
+      "id": "gpio-a0",
+      "controller": "GPIOA",
+      "route": "gpio-pa0",
+      "initial": 0,
+      "mask": 1
+    },
+    {
+      "id": "gpio-b0",
+      "controller": "GPIOB",
+      "route": "gpio-pb0",
+      "initial": 0,
+      "mask": 1
+    },
+    {
+      "id": "gpio-c0",
+      "controller": "GPIOC",
+      "route": "gpio-pc0",
+      "initial": 0,
+      "mask": 1
+    },
+    {
+      "id": "gpio-d0",
+      "controller": "GPIOD",
+      "route": "gpio-pd0",
+      "initial": 0,
+      "mask": 1
+    },
+    {
+      "id": "gpio-e0",
+      "controller": "GPIOE",
+      "route": "gpio-pe0",
+      "initial": 0,
+      "mask": 1
+    },
+    {
+      "id": "gpio-f0",
+      "controller": "GPIOF",
+      "route": "gpio-pf0",
+      "initial": 0,
+      "mask": 1
+    },
+    {
+      "id": "gpio-g0",
+      "controller": "GPIOG",
+      "route": "gpio-pg0",
+      "initial": 0,
+      "mask": 1
+    },
+    {
+      "id": "gpio-h3",
+      "controller": "GPIOH",
+      "route": "gpio-ph3",
+      "initial": 0,
+      "mask": 8
+    },
+    {
+      "id": "uart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3"
+    },
+    {
+      "id": "iwdg",
+      "controller": "IWDG",
+      "route": "independent-watchdog"
     }
   ],
   "reserved_resources": [
@@ -30,7 +96,8 @@
     "PC7 LD1 SB21ON/SB23OFF and PA9/PA10 VCP SB32/SB34ON source defaults not physically inspected",
     "Silicon revision, supply/SMPS population and USART ES0499 noise behavior remain unobserved",
     "No physical HIL executed; clock accuracy, interrupts and UART electrical traffic unqualified",
-    "Only PC7 GPIO and USART1 IRQ bytes maintained; DMA/cache/TrustZone/deepSTOP and other routes unsupported"
+    "Additional single-pad GPIO bindings and USART2 PA2/PA3 are software reference selections from exact silicon pad facts; PCB connector availability, attached loads, wiring and electrical compatibility are unobserved. They do not claim additional on-board devices.",
+    "IWDG assembly stays inactive; explicit application enable is irreversible. LSI electrical bounds are datasheet characterization, not station measurements. Window/EWI and LSIPREDIV250Hz unsupported."
   ],
   "provenance": [
     {

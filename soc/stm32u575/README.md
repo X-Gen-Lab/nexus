@@ -2,10 +2,12 @@
 
 This provider targets exact STM32U575ZIT6Q and the source-reviewed NUCLEO-U575ZI-Q
 MB1549 reference. The maintained slice is CPU startup, reset-like MSIS 4 MHz,
-reserved TIM2, PC7 GPIO and USART1 PA9/PA10 AF7 IRQ bytes. The default linker RAM
+reserved TIM2, exact-package GPIOA through GPIOH, USART1 PA9/PA10 and USART2
+PA2/PA3 AF7 IRQ bytes, and an explicitly enabled independent watchdog. The default linker RAM
 is SRAM1 192 KiB. It does not allocate storage or create tasks, workers or runtime
 registries. The typed factory returns existing readonly faces; instances own
-private state and share readonly GPIO/UART operations.
+private state and share readonly GPIO/UART/watchdog operations. Each package GPIO
+pad has a source-reviewed route; its inventory does not establish Board wiring.
 
 The official STM32U5 CMSIS device source is pinned to
 `624374fa1e21ca195d6f2102ac0caaa50d0ea4c8` (v1.4.3, Cube v1.9.0). The original
@@ -45,13 +47,29 @@ consumers. A product may supply separately reviewed non-returning recovery;
 normal stop/restart does not resume this terminal path.
 No ISR polling, kernel calls or borrow release is authorized by this failure.
 Stop observes timer, IRQ and added gate withdrawal before releasing effects.
+Cold admission excludes SMCR, CR2, CCER and CCMR trigger/channel state as well as
+CR1/DIER. Because unclocked APB reads may return zero, it repeats this admission
+after observing the TIM2 gate, before PSC, CNT or UG writes. A rejected foreign
+timer releases only the added gate; it never clears foreign timer fields or IRQs.
+Owned setup temporarily selects `MMS=1` while `CEN=0`, so UG cannot export the
+reset-mode TRGO pulse. It observes update and clear, restores `MMS=0` before
+starting the counter, and retains ownership if clearing its quiet mux fails.
 Timing accuracy and latency remain physical measurements. Dynamic clocking,
 bootloader handoff, NMI/HardFault time calls and deep STOP continuity are outside
 this contract.
 
 ## GPIO and serial ownership
 
-The Board selects PC7/LD1 active high and PA9/PA10 USART1/VCP AF7. Cold assembly
+The Board selects PC7/LD1 active high and PA9/PA10 USART1/VCP AF7. The additional
+PA2/PA3 USART2 and single-pad GPIO bindings are software reference selections;
+connector availability, attached devices and electrical state remain unobserved.
+PG[15:2] additionally require an externally prepared VDDIO2 rail, a live PWR
+register clock and observed `PWR_SVMCR.IO2SV`. Cold preflight rejects missing
+configuration before acquiring gates; the GPIO provider repeats the check before
+pin effects. It never enables a supply monitor, changes isolation or infers rail
+voltage from IO2SV. RM0456 10.4.5/10.6.3 supply sequencing and physical validation
+remain the external Board power owner's responsibility. PG0/PG1 use VDD.
+Cold assembly
 leases only selected pin fields, preserving adjacent pins and preexisting shared
 GPIO clocks. Input/analog pins may be leased; locked, alternate-function and
 output owners are rejected. Assembly observes all selected port gates, validates
@@ -64,7 +82,8 @@ GPIO preloads and observes the output latch before publishing output mode.
 Masked BSRR writes are direct hardware commands. Toggle requires serialization
 with every owner of the same pins. Startup/stop are privileged task operations.
 
-USART1 selects IRQ 61 priority 5, PCLK2=4 MHz, PRESC 1, oversampling 16, 8N1
+USART1 selects IRQ 61 with PCLK2, USART2 selects IRQ62 with PCLK1. Both use
+priority 5, 4 MHz, PRESC 1, oversampling 16, 8N1
 and FIFO disabled. BRR is the rounded clock/baud divisor 16..65535; accepted baud bounds
 are 62..250000. For 115200 the encoded divisor is 35, nominal 114285.7 baud, about
 -0.794%; oscillator/remote errors require external electrical validation. The
@@ -77,6 +96,38 @@ release-publication of SETTLED. Cancel/deadline begin drain; failed drain leaves
 QUARANTINED storage borrowed. Stop joins captured wake callbacks and observes
 UE/TEACK/REACK/NVIC withdrawal before releasing ring/wake references. Wake is a
 hint, and selected kernel IRQ policy is validated before kernel notifications.
+
+## Independent watchdog
+
+Static assembly only binds IWDG, RCC, FLASH and DBGMCU; it never starts the
+watchdog or changes LSI. The application explicitly chooses enable, feed and
+recovery policy. RM0456 Rev7 Chapter61 requires activation before PR/RLR shadow
+updates; the provider retains `enabled=true, irreversible=true` on any later
+failure. Platform stop cannot revoke activation or release a retained LSI gate.
+Before activation, private stop retries withdrawal of only its added LSI enable
+and debug-freeze change; failed withdrawal blocks another enable and remains
+retryable through platform stop.
+The bounded enable path observes LSI and debug-freeze writes, then observes
+shadow synchronization and PR/RLR before reload. Failure bounds include mixed
+old/new prescaler and reload values. Failed LSI startup withdraws only the enable
+introduced by that attempt, preserving a preexisting shared source.
+
+The maintained mode has window and EWI disabled and `LSIPREDIV=0`. A 250 Hz LSI,
+foreign window/EWI or shadow update is rejected without adoption. Unlike F4,
+the U5 four-bit PR supports divisors /4 through /1024. Nominal timeout range is
+375 us through 131072000 us. The minimum reload is two, as recommended by
+RM0456 61.7.3. DS13737 Rev10 Table84 characterizes LSI at
+30.4--33.6 kHz over its declared voltage/temperature range; reported bounds use
+that envelope and are not physical measurements. Refresh must occur before
+counter one. Hardware-option activation is observed without reprogramming;
+unmaintained prescaled or updating option-start state reports `UNSUPPORTED` with
+the irreversible effect retained and unknown timeout fields zero. Reset causes
+come from captured boot flags without acknowledging hardware; BOR alone does
+not invent a separate power-on cause.
+
+The maintained `mainstream.toml` and `mainstream-freertos.toml` fixtures select
+both USARTs, eight GPIO banks and an inactive watchdog. They exercise actual
+static construction, selective CMake sources, ARM linking and SDK consumption.
 
 ## Capability and physical limits
 

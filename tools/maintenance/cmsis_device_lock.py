@@ -24,6 +24,18 @@ from tools.configure.metadata import (  # noqa: E402
 )
 
 REVIEWED_DEVICES = {
+    "STM32F103RBT6": {
+        "origin": "https://github.com/STMicroelectronics/cmsis-device-f1.git",
+        "commit": "c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22",
+        "directory": "vendors/st/cmsis_device_f1",
+        "lock_name": "dependencies/stm32f1.lock.json",
+        "license_path": "License.md",
+        "files": frozenset({
+            "Include/stm32f103xb.h", "Include/stm32f1xx.h",
+            "Include/system_stm32f1xx.h",
+            "Source/Templates/gcc/startup_stm32f103xb.s", "License.md",
+        }),
+    },
     "STM32H743ZIT6": {
         "origin": "https://github.com/STMicroelectronics/cmsis-device-h7.git",
         "commit": "8f922cdc7cc6de2344e75ddd657889f4ff761790",
@@ -75,7 +87,7 @@ def contract(lock):
                 not re.fullmatch(r"[0-9a-f]{64}", record["sha256"])):
             raise ValueError("Nonempty exact device file identity required")
     fields(lock["license"], {"path", "expression"}, "CMSIS-device license")
-    if (lock["license"]["path"] != "LICENSE.md" or
+    if (lock["license"]["path"] != review.get("license_path", "LICENSE.md") or
             lock["license"]["expression"] != "Apache-2.0"):
         raise ValueError("Original reviewed Apache-2.0 notice required")
     return set(lock["files"])

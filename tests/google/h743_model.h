@@ -57,6 +57,13 @@ typedef struct {
     uint32_t writes;
     uint32_t gpio_writes;
     uint32_t transmitted;
+    bool hide_timer_when_gated;
+    bool hold_timer_gate_off;
+    bool hold_timer_mms_restore;
+    uint32_t timer_trgo_pulses;
+    bool timer_pending_on_dier;
+    uint32_t timer_writes;
+    uint32_t timer_reset_writes;
     void (*critical_observer)(void* context, bool entering);
     void* critical_context;
     bool observing_critical;

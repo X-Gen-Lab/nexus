@@ -429,7 +429,20 @@
       ],
       "irq": [],
       "pins": [
-        "PC7"
+        "PC0",
+        "PC1",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PC2",
+        "PC3",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9"
       ]
     },
     "USART1": {
@@ -448,6 +461,198 @@
         "PA9",
         "PA10"
       ]
+    },
+    "GPIOA": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9"
+      ]
+    },
+    "GPIOB": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PB0",
+        "PB1",
+        "PB10",
+        "PB11",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9"
+      ]
+    },
+    "GPIOD": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PD0",
+        "PD1",
+        "PD10",
+        "PD11",
+        "PD12",
+        "PD13",
+        "PD14",
+        "PD15",
+        "PD2",
+        "PD3",
+        "PD4",
+        "PD5",
+        "PD6",
+        "PD7",
+        "PD8",
+        "PD9"
+      ]
+    },
+    "GPIOE": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PE0",
+        "PE1",
+        "PE10",
+        "PE11",
+        "PE12",
+        "PE13",
+        "PE14",
+        "PE15",
+        "PE2",
+        "PE3",
+        "PE4",
+        "PE5",
+        "PE6",
+        "PE7",
+        "PE8",
+        "PE9"
+      ]
+    },
+    "GPIOF": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PF0",
+        "PF1",
+        "PF10",
+        "PF11",
+        "PF12",
+        "PF13",
+        "PF14",
+        "PF15",
+        "PF2",
+        "PF3",
+        "PF4",
+        "PF5",
+        "PF6",
+        "PF7",
+        "PF8",
+        "PF9"
+      ]
+    },
+    "GPIOG": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PG0",
+        "PG1",
+        "PG10",
+        "PG12",
+        "PG13",
+        "PG14",
+        "PG15",
+        "PG2",
+        "PG3",
+        "PG4",
+        "PG5",
+        "PG6",
+        "PG7",
+        "PG8",
+        "PG9"
+      ]
+    },
+    "GPIOH": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PH0",
+        "PH1",
+        "PH3"
+      ]
+    },
+    "USART2": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "USART2_IRQn"
+      ],
+      "irq_numbers": [
+        62
+      ],
+      "clock_hz": 4000000,
+      "pins": [
+        "PA2",
+        "PA3"
+      ]
+    },
+    "IWDG": {
+      "kind": "watchdog",
+      "modes": [
+        "independent"
+      ],
+      "irq": [],
+      "pins": []
     }
   },
   "reserved_resources": [
@@ -460,9 +665,10 @@
   },
   "provenance": [
     "DS13737 Rev10 exact STM32U575ZIT6Q LQFP144-SMPS inventory111GPIO; Table26 Q-column and Figure18 independently reviewed. PB12/PC4/PC5/PG11 absent; pin inventory never authorizes PCB routes. Source PDF SHA256f3de0b5e62ad45ed46bdaf8dbebec358edae1fd3305c558c5835589085454345.",
-    "Official CMSIS Device U5 v1.4.3 pin624374fa1e21ca195d6f2102ac0caaa50d0ea4c8: M33F/DSP,IRQ126,priority4. Physically16MPU/8SAU regions; selected single-state TZEN0 does not authorize SAU access. ICACHE/DCACHE are SoC peripherals, not SCB cache lines.",
+    "Official CMSIS Device U5 v1.4.3 pin624374fa1e21ca195d6f2102ac0caaa50d0ea4c8: M33F/DSP,IRQ126,priority4. RM0456 Rev7 sections3.5.2/3.7.1 exact8MPU/8SAU regions (DS13737 up-to16 wording is not the exact tuple); selected single-state TZEN0 does not authorize SAU access. ICACHE/DCACHE are SoC peripherals, not SCB cache lines.",
     "DS13737 Rev10 sections3.5/3.15: default SRAM1 192KiB at NS0x20000000; GPDMA1 main-bus path, LPDMA1 restricted lower bus/SRAM4 path. Security, privilege, clocks, link and cache ownership required separately; no implemented DMA mode. Remaining physical SRAM2/3/4/BKPSRAM and Secure aliases are deliberately not selectable in this minimal provider, never double-counted.",
     "Official reset clock template MSIS4MHz range4, no HSE/PLL. TIM2 IRQ45 PSC3 reserves1MHz; selected profile requires TZEN0 and no bank swap without ever modifying option bytes. Flash2MiB consists of dual-bank256 total8KiB pages; no programming provider.",
-    "ES0499 Rev12 June2026 section2.21.1 noisy receive glitch limitation on W/U has no software workaround; official measures are a noiseless line or external glitch filter; IRQ bytes cannot infer noise immunity. Section2.21.2 DMAT toggling pending-request erratum is not claimed solved, DMA modes excluded."
+    "ES0499 Rev12 June2026 section2.21.1 noisy receive glitch limitation on W/U has no software workaround; official measures are a noiseless line or external glitch filter; IRQ bytes cannot infer noise immunity. Section2.21.2 DMAT toggling pending-request erratum is not claimed solved, DMA modes excluded.",
+    "RM0456 Rev7 sections11.4.8/61.4.4/61.7.2: IWDG unprescaled LSI only, irreversible start before PR/RLR synchronization,4-bit PR /4..1024. DS13737 Rev10 Table84 full-temperature characterizedLSI30.4..33.6kHz; not measured. Exact GPIOA-H inventory excludes PB12/PC4/PC5/PG11; PH0/PH1/PH3 only. USART2 PA2/PA3 AF7 source Table27,IRQ62 CMSIS; external wiring unobserved."
   ]
 }

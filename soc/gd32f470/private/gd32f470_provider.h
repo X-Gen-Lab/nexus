@@ -138,7 +138,11 @@ typedef struct {
 } nx_gd32_flash_state_t;
 typedef struct {
     nx_watchdog_state_t state;
+    uint32_t saved_debug;
     bool initialized;
+    bool lsi_owned;
+    bool debug_owned;
+    bool preparation_retained;
 } nx_gd32_watchdog_state_t;
 typedef struct nx_gd32_exti_state nx_gd32_exti_state_t;
 /** \brief Immutable selected states; all storage outlives every domain owner.
@@ -261,7 +265,7 @@ nx_result_t nx_gd32_flash_initialize(nx_gd32_flash_state_t* port);
  * \param[out]      port: Fresh unique watchdog storage.
  * \return          Success or INVALID/BUSY; hardware option activation is
  * identified; external software enable must not bypass this unique provider.
- * IRC32K physical bounds remain 0..UINT32_MAX until product characterization.
+ * IRC32K has no reviewed guaranteed Min/Max; both timeout bounds stay zero.
  */
 nx_result_t nx_gd32_watchdog_initialize(nx_gd32_watchdog_state_t* port);
 /**

@@ -11,7 +11,7 @@ from tools.evidence.common import (EvidenceError, fields, file_identity, load_js
     regular_file, sha256_value, stream_digest, verify_file_identity)
 from tools.evidence.identity import verify_sdk_package
 from tools.measurement.elf import Elf32
-from tools.measurement.resources import measure_data
+from tools.measurement.resources import measure_data, resolved_float_abi
 
 
 def referenced(value) -> list[dict]:
@@ -44,8 +44,9 @@ def validate_resources(report, manifest, resolved, resolver):
             or evidence["elf"]["sha256"] != manifest["artifacts"]["elf"]["sha256"]
             or evidence["resolved"]["sha256"] != manifest["configuration"]["sha256"]):
         raise EvidenceError("resource qualification differs from candidate identity")
-    metrics, violations = measure_data(Elf32(resolver(evidence["elf"]).read_bytes()),
-        resolved, load_json(resolver(evidence["budget"])))
+    metrics, violations = measure_data(Elf32(resolver(evidence["elf"]).read_bytes(),
+        float_abi=resolved_float_abi(resolved)), resolved,
+        load_json(resolver(evidence["budget"])))
     if metrics != evidence.get("metrics") or violations or evidence.get("violations") != []:
         raise EvidenceError("resource evidence differs from actual ELF/budget measurement")
     inputs = evidence.get("configuration_inputs", [])

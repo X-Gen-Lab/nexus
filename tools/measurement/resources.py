@@ -23,6 +23,57 @@ def integer(value, name: str, *, minimum: int = 0) -> int:
     return value
 
 
+def resolved_float_abi(resolved: dict, *, float_abi: str | None = None,
+                       require_cpu: bool = False) -> str:
+    """Bind an explicit ELF interpretation to the sole resolved CPU contract.
+
+    The canonical CPU retains its code-generation ABI: softfp may use FPU/MVE
+    instructions but shares the ELF base calling convention with soft. Only
+    hard selects the VFP argument convention. An explicit override asserts that
+    ELF convention (hard/soft); it never changes CPU facts or compiler flags.
+    CPU-absent historical documents retain their hard-only scope. Malformed
+    present metadata never falls back. ELF flags are validated, never guessed.
+    """
+    if "cpu" not in resolved and not require_cpu:
+        selected = "hard"
+    else:
+        cpu = resolved.get("cpu")
+        if (not isinstance(cpu, dict) or type(cpu.get("float_abi")) is not str
+                or cpu["float_abi"] not in {"hard", "soft", "softfp"}):
+            raise EvidenceError(
+                "resolved CPU requires an explicit hard, soft or softfp float ABI")
+        selected = "hard" if cpu["float_abi"] == "hard" else "soft"
+    if float_abi is not None and (type(float_abi) is not str or
+            float_abi not in {"hard", "soft"} or float_abi != selected):
+        raise EvidenceError("explicit resource ABI differs from resolved CPU")
+    return selected
+
+
+def validate_elf_configuration(elf: Elf32, resolved: dict) -> None:
+    """Require the actual linked configuration symbols, not matching filenames."""
+    actual = "".join(f"{elf.symbol(f'__nx_resolved_sha256_{index}'):08x}"
+                     for index in range(8))
+    if actual != resolved["configuration_sha256"]:
+        raise EvidenceError("ELF does not bind this resolved configuration")
+
+
+def input_protection_paths(resolved_path: Path) -> set[Path]:
+    """Protect navigation and every located source before any output mutation.
+
+    Navigation can only deny an overwrite here. It never authorizes an ABI,
+    selection or input identity; the actual measurement revalidates the sole
+    resolved digest and exact declared-input closure through the shared reader.
+    """
+    navigation = resolved_path.parent / "input_paths.json"
+    protected = {resolved_path.resolve(), navigation.resolve()}
+    if navigation.exists():
+        paths = load_json(navigation).values()
+        if any(not isinstance(path, str) or not path for path in paths):
+            raise EvidenceError("invalid configuration input navigation path")
+        protected.update(Path(path).resolve() for path in paths)
+    return protected
+
+
 def validate_budget(budget: dict, memory: list[dict]) -> None:
     fields(budget, {"schema_version", "flash_loaded_max", "flash_footprint_max",
                     "ram_reserved_max", "msp_max", "heap_max"})
@@ -149,10 +200,7 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
             raise EvidenceError("invalid resolved memory budget contract") from error
         if budget != expected:
             raise EvidenceError("resource budget differs from the resolved memory contract")
-    configuration_sha256 = "".join(f"{elf.symbol(f'__nx_resolved_sha256_{i}'):08x}"
-                                    for i in range(8))
-    if configuration_sha256 != resolved["configuration_sha256"]:
-        raise EvidenceError("ELF does not bind this resolved configuration")
+    validate_elf_configuration(elf, resolved)
     vectors = [section for section in elf.sections if section["name"] == ".isr_vector"]
     if len(vectors) != 1 or vectors[0]["size"] < 8 or vectors[0]["address"] != flash["origin"]:
         raise EvidenceError("physical reset vector missing or relocated")
@@ -179,15 +227,13 @@ def measure_data(elf: Elf32, resolved: dict, budget: dict) -> tuple[dict, list]:
 
 
 def measure(elf_path: Path, resolved_path: Path, budget_path: Path, *,
-            float_abi: str = "hard") -> dict:
+            float_abi: str | None = None, require_cpu: bool = False) -> dict:
     resolved, config = resolved_identity(resolved_path)
-    cpu = resolved.get("cpu")
-    if float_abi == "soft" and (not isinstance(cpu, dict) or
-            cpu.get("float_abi") != "soft"):
-        raise EvidenceError("explicit resource ABI differs from resolved CPU")
+    abi = resolved_float_abi(resolved, float_abi=float_abi,
+                             require_cpu=require_cpu)
     input_files = resolved_input_files(resolved_path, resolved)
     metrics, violations = measure_data(Elf32(regular_file(elf_path).read_bytes(),
-                                           float_abi=float_abi),
+                                           float_abi=abi),
                                        resolved, load_json(budget_path))
     return {"schema_version": 1, "kind": "elf_resource_budget",
             "status": "failed" if violations else "passed",
@@ -204,14 +250,23 @@ def main() -> int:
     for name in ("elf", "resolved", "budget", "report"):
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--qualification", type=Path)
+    parser.add_argument("--require-cpu", action="store_true",
+                        help="require current resolved CPU metadata; no legacy hard-only scope")
+    parser.add_argument("--float-abi", choices=("hard", "soft"),
+                        help="assert ELF calling convention against CPU; softfp uses soft")
     parser.add_argument("--source", type=Path, default=Path(__file__).resolve().parents[2])
     args = parser.parse_args()
     protected = {args.elf.resolve(), args.resolved.resolve(), args.budget.resolve()}
+    try:
+        protected.update(input_protection_paths(args.resolved))
+    except (EvidenceError, OSError, TypeError) as error:
+        parser.exit(1, f"input protection rejected: {error}\n")
     if args.report.resolve() in protected or (args.qualification is not None and
             args.qualification.resolve() in protected | {args.report.resolve()}):
         parser.exit(1, "report cannot overwrite a measured input\n")
     try:
-        report = measure(args.elf, args.resolved, args.budget)
+        report = measure(args.elf, args.resolved, args.budget,
+                         float_abi=args.float_abi, require_cpu=args.require_cpu)
     except (EvidenceError, OSError, KeyError, TypeError) as error:
         report = {"schema_version": 1, "kind": "elf_resource_budget",
                   "status": "failed", "failure": str(error)}

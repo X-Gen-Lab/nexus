@@ -55,6 +55,13 @@ nx_result_t nx_stm32u575_gpio_initialize(nx_stm32u575_gpio_state_t* p,
         return NX_ERROR_PERMISSION;
     if (p->initialized || p->retained)
         return NX_ERROR_BUSY;
+    /* PG[15:2] are isolated after reset. The external rail owner must already
+     * establish its supply and remove isolation; a pad lease grants no power
+     * policy. IO2SV observes configuration, never the actual rail voltage. */
+    if (p->registers == NX_U575_GPIOG && (p->mask & ~3U) != 0U &&
+        ((NX_U575_READ(&NX_U575_RCC->AHB3ENR) & RCC_AHB3ENR_PWREN) == 0U ||
+         (NX_U575_READ(&NX_U575_PWR->SVMCR) & PWR_SVMCR_IO2SV) == 0U))
+        return NX_ERROR_STATE;
     p->retained = true;
     NX_U575_WRITE(&p->registers->BSRR, initial | ((p->mask & ~initial) << 16U));
     nx_arch_dsb();
@@ -105,56 +112,69 @@ nx_result_t nx_stm32u575_gpio_stop(nx_stm32u575_gpio_state_t* p,
 nx_result_t nx_stm32u575_gpio_clock_enable(unsigned index) {
     if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
         return NX_ERROR_CONTEXT;
-    if ((index != 0U && index != 2U) || g_nx_stm32u575_system.rcc == NULL)
+    if (index > 7U)
         return NX_ERROR_UNSUPPORTED;
     uint32_t bit = 1U << index;
-    volatile uint32_t* gate = &g_nx_stm32u575_system.rcc->AHB2ENR1;
+    volatile uint32_t* gate = &NX_U575_RCC->AHB2ENR1;
     NX_U575_WRITE(gate, NX_U575_READ(gate) | bit);
     nx_arch_dsb();
     return (NX_U575_READ(gate) & bit) != 0U ? NX_SUCCESS : NX_ERROR_IO;
 }
-nx_result_t nx_stm32u575_usart1_pins_prepare(void) {
+static nx_result_t serial_pins_prepare(bool first) {
     nx_result_t result = nx_stm32u575_gpio_clock_enable(0U);
     if (result != NX_SUCCESS)
         return result;
-    volatile uint32_t* gate = &g_nx_stm32u575_system.rcc->APB2ENR;
-    NX_U575_WRITE(gate, NX_U575_READ(gate) | RCC_APB2ENR_USART1EN);
+    volatile uint32_t* gate =
+        first ? &NX_U575_RCC->APB2ENR : &NX_U575_RCC->APB1ENR1;
+    const uint32_t gate_mask =
+        first ? RCC_APB2ENR_USART1EN : RCC_APB1ENR1_USART2EN;
+    NX_U575_WRITE(gate, NX_U575_READ(gate) | gate_mask);
     nx_arch_dsb();
-    if ((NX_U575_READ(gate) & RCC_APB2ENR_USART1EN) == 0U)
+    if ((NX_U575_READ(gate) & gate_mask) == 0U)
         return NX_ERROR_IO;
 #ifndef NX_U575_GPIOA
 #define NX_U575_GPIOA GPIOA
 #endif
     GPIO_TypeDef* gpio = NX_U575_GPIOA;
-    const uint32_t bits = (1U << 9U) | (1U << 10U);
-    const uint32_t fields = (3U << 18U) | (3U << 20U);
-    const uint32_t af = (15U << 4U) | (15U << 8U);
-    NX_U575_WRITE(&gpio->BSRR, 1U << 9U);
+    const unsigned tx = first ? 9U : 2U;
+    const unsigned rx = tx + 1U;
+    const unsigned af_word = tx / 8U;
+    const unsigned tx_af_shift = (tx % 8U) * 4U;
+    const unsigned rx_af_shift = (rx % 8U) * 4U;
+    const uint32_t bits = (1U << tx) | (1U << rx);
+    const uint32_t fields = (3U << (2U * tx)) | (3U << (2U * rx));
+    const uint32_t af = (15U << tx_af_shift) | (15U << rx_af_shift);
+    const uint32_t af_value = (7U << tx_af_shift) | (7U << rx_af_shift);
+    const uint32_t speed = (1U << (2U * tx)) | (1U << (2U * rx));
+    const uint32_t pull = 1U << (2U * rx);
+    const uint32_t mode = (2U << (2U * tx)) | (2U << (2U * rx));
+    NX_U575_WRITE(&gpio->BSRR, 1U << tx);
     nx_arch_dsb();
-    if ((NX_U575_READ(&gpio->ODR) & (1U << 9U)) == 0U)
+    if ((NX_U575_READ(&gpio->ODR) & (1U << tx)) == 0U)
         return NX_ERROR_IO;
     NX_U575_WRITE(&gpio->OTYPER, NX_U575_READ(&gpio->OTYPER) & ~bits);
-    NX_U575_WRITE(&gpio->OSPEEDR, (NX_U575_READ(&gpio->OSPEEDR) & ~fields) |
-                                      (1U << 18U) | (1U << 20U));
-    NX_U575_WRITE(&gpio->PUPDR,
-                  (NX_U575_READ(&gpio->PUPDR) & ~fields) | (1U << 20U));
-    NX_U575_WRITE(&gpio->AFR[1], (NX_U575_READ(&gpio->AFR[1]) & ~af) |
-                                     (7U << 4U) | (7U << 8U));
+    NX_U575_WRITE(&gpio->OSPEEDR,
+                  (NX_U575_READ(&gpio->OSPEEDR) & ~fields) | speed);
+    NX_U575_WRITE(&gpio->PUPDR, (NX_U575_READ(&gpio->PUPDR) & ~fields) | pull);
+    NX_U575_WRITE(&gpio->AFR[af_word],
+                  (NX_U575_READ(&gpio->AFR[af_word]) & ~af) | af_value);
     nx_arch_dsb();
     if ((NX_U575_READ(&gpio->OTYPER) & bits) != 0U ||
-        (NX_U575_READ(&gpio->OSPEEDR) & fields) !=
-            ((1U << 18U) | (1U << 20U)) ||
-        (NX_U575_READ(&gpio->PUPDR) & fields) != (1U << 20U) ||
-        (NX_U575_READ(&gpio->AFR[1]) & af) != ((7U << 4U) | (7U << 8U)))
+        (NX_U575_READ(&gpio->OSPEEDR) & fields) != speed ||
+        (NX_U575_READ(&gpio->PUPDR) & fields) != pull ||
+        (NX_U575_READ(&gpio->AFR[af_word]) & af) != af_value)
         return NX_ERROR_IO;
-    NX_U575_WRITE(&gpio->MODER, (NX_U575_READ(&gpio->MODER) & ~fields) |
-                                    (2U << 18U) | (2U << 20U));
+    NX_U575_WRITE(&gpio->MODER, (NX_U575_READ(&gpio->MODER) & ~fields) | mode);
     nx_arch_dsb();
-    return (NX_U575_READ(&gpio->MODER) & fields) ==
-                       ((2U << 18U) | (2U << 20U)) &&
-                   (NX_U575_READ(&gpio->AFR[1]) & af) ==
-                       ((7U << 4U) | (7U << 8U))
+    return (NX_U575_READ(&gpio->MODER) & fields) == mode &&
+                   (NX_U575_READ(&gpio->AFR[af_word]) & af) == af_value
                ? NX_SUCCESS
                : NX_ERROR_IO;
+}
+nx_result_t nx_stm32u575_usart1_pins_prepare(void) {
+    return serial_pins_prepare(true);
+}
+nx_result_t nx_stm32u575_usart2_pins_prepare(void) {
+    return serial_pins_prepare(false);
 }
 const nx_gpio_ops_t nx_stm32u575_gpio_ops = {write, read, toggle};

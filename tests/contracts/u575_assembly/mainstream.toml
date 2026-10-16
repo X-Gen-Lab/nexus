@@ -1,0 +1,75 @@
+schema = 2
+board_package = "../../../boards/stm32u575_nucleo_zi_q"
+backend = "baremetal"
+clock = "msis4"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[gpio.led]
+binding = "led0"
+mode = "output"
+
+[uart.console]
+binding = "uart1"
+mode = "irq-bytes"
+baud = 115200
+[uart.console.rx]
+format = "bytes"
+capacity = 64
+[uart.console.irq]
+priority = 5
+calls_os = false
+
+[gpio.bank_a]
+binding = "gpio-a0"
+mode = "input"
+
+[gpio.bank_b]
+binding = "gpio-b0"
+mode = "input"
+
+[gpio.bank_c]
+binding = "gpio-c0"
+mode = "input"
+
+[gpio.bank_d]
+binding = "gpio-d0"
+mode = "input"
+
+[gpio.bank_e]
+binding = "gpio-e0"
+mode = "input"
+
+[gpio.bank_f]
+binding = "gpio-f0"
+mode = "input"
+
+[gpio.bank_g]
+binding = "gpio-g0"
+mode = "input"
+
+[gpio.bank_h]
+binding = "gpio-h3"
+mode = "input"
+
+[uart.serial2]
+binding = "uart2"
+mode = "irq-bytes"
+baud = 115200
+[uart.serial2.rx]
+format = "bytes"
+capacity = 33
+[uart.serial2.irq]
+priority = 5
+calls_os = false
+
+[watchdog.health]
+binding = "iwdg"
+mode = "independent"

@@ -82,6 +82,1255 @@
         "edge-event"
       ],
       "source": "DS12288 Rev6 LQFP64 PA0/PA1 inventory; RM0440 Rev9 sections10.2.3 and15.3-15.5, GPIOA EXTICR mux0 and EXTI0/1. Official CMSIS independent IRQ6/7. Silicon route only; no Board wiring or physical qualification asserted."
+    },
+    {
+      "id": "gpio-pa0",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa1",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa2",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa3",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa4",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa6",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa7",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa8",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa9",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa10",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa11",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA11",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa12",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA12",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa13",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa14",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pa15",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PA15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb0",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb1",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb2",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb3",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb4",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb5",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb6",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb7",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb8",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb9",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb10",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb11",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB11",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb12",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB12",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb13",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb14",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pb15",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOB",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PB15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc0",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc1",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc2",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc3",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC3",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc4",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC4",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc5",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC5",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc6",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC6",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc7",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC7",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc8",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC8",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc9",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC9",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc10",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc11",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC11",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc12",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC12",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc13",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC13",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc14",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC14",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pc15",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOC",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PC15",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pd2",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOD",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PD2",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pf0",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF0",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pf1",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOF",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PF1",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "gpio-pg10",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "GPIOG",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PG10",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "input",
+        "output"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "usart1-pa9-pa10",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "USART1",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA9",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PA10",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-bytes"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "usart2-pa2-pa3",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "USART2",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA2",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PA3",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-bytes"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "usart3-pb10-pb11",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "USART3",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PB10",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PB11",
+          "function": "rx",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-bytes"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "uart4-pc10-pc11",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "UART4",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PC10",
+          "function": "tx",
+          "af": 5
+        },
+        {
+          "pin": "PC11",
+          "function": "rx",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "irq-bytes"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "uart5-pc12-pd2",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "UART5",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PC12",
+          "function": "tx",
+          "af": 5
+        },
+        {
+          "pin": "PD2",
+          "function": "rx",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "irq-bytes"
+      ],
+      "source": "DS12288 Rev6 Table12/Table13 exact LQFP64 silicon pad/AF; RM0440 Rev9 GPIO/USART chapters. Board connectivity and physical qualification remain independent."
+    },
+    {
+      "id": "iwdg",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "IWDG",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "independent"
+      ],
+      "source": "RM0440 Rev9 chapter35 IWDG; DS12288 Rev6 Table45 29.5--34kHz LSI bounds. No window configuration or physical qualification."
+    },
+    {
+      "id": "spi1-pa5-pa6-pa7",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "SPI1",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "sck",
+          "af": 5
+        },
+        {
+          "pin": "PA6",
+          "function": "miso",
+          "af": 5
+        },
+        {
+          "pin": "PA7",
+          "function": "mosi",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "DS12288 Rev6 Table13 AF5 exact package pins; RM0440 Rev9 chapter42 G4 SPI byte FIFO DS/FRXTH and 8-bit DR access. No IRQ/DMA or physical qualification."
+    },
+    {
+      "id": "spi2-pb13-pb14-pb15",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "SPI2",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PB13",
+          "function": "sck",
+          "af": 5
+        },
+        {
+          "pin": "PB14",
+          "function": "miso",
+          "af": 5
+        },
+        {
+          "pin": "PB15",
+          "function": "mosi",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "DS12288 Rev6 Table13 AF5 exact package pins; RM0440 Rev9 chapter42 G4 SPI byte FIFO DS/FRXTH and 8-bit DR access. No IRQ/DMA or physical qualification."
+    },
+    {
+      "id": "tim3-ch1-pa6",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "TIM3",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "ch1",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS12288 Rev6 Table13 PA6 TIM3_CH1 AF2 and PB6 TIM4_CH1 AF2; RM0440 Rev9 general-purpose TIM3/4 16-bit PWM1 CCR preload and MMS/CEN trigger selection. Silicon software fixture only; no physical loads qualified."
+    },
+    {
+      "id": "tim4-ch1-pb6",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "TIM4",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "ch1",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS12288 Rev6 Table13 PA6 TIM3_CH1 AF2 and PB6 TIM4_CH1 AF2; RM0440 Rev9 general-purpose TIM3/4 16-bit PWM1 CCR preload and MMS/CEN trigger selection. Silicon software fixture only; no physical loads qualified."
     }
   ]
 }

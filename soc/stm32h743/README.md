@@ -3,7 +3,8 @@
 This provider maintains a narrow STM32H743ZIT6/NUCLEO-H743ZI2 vertical slice:
 official Cortex-M7 startup, MMIO-only bounded LDO power entry, fixed HSI32 or
 HSI64 with explicit Cache off/on, TIM2 1 MHz time, authorized GPIOB PB0 and
-USART3 PD8/PD9 AF7 IRQ bytes or finite DMA transmission with IRQ-byte reception.
+USART3 PD8/PD9 AF7 IRQ bytes, finite DMA transmission with IRQ-byte reception,
+or finite DMA receive blocks with independent IRQ transmission.
 Public C11 GPIO/UART faces remain immutable; each static instance owns its
 private state and caller-explicit byte ring. Shared readonly ops perform hot
 I/O directly. No allocator, worker, registry or DMA fallback is introduced.
@@ -30,6 +31,14 @@ state is silently adopted. Runtime owns reserved TIM2/IRQ; failure preserves
 cleanup responsibility for retry. HSI/LDO/Flash are boot prerequisites and are
 not withdrawn when runtime stops.
 
+TIM2 cold admission checks CR1, CR2, SMCR, DIER, CCER and both CCMR registers:
+an inactive CEN alone cannot exclude foreign trigger or pin/capture ownership.
+Because a disabled peripheral gate can hide retained registers, startup first
+takes only the reversible gate and repeats this observation before reset, UG,
+divider or cache changes. A failed second admission restores only that gate;
+it never clears the foreign timer, reset, flags or vector. Refused gate rollback
+retains a distinct gate responsibility for retry without acquiring the timer.
+
 The authored clock profile selects `hsi32-fixed-cache-off`,
 `hsi32-fixed-cache-on`, `hsi64-fixed-cache-off` or `hsi64-fixed-cache-on`.
 HSI32 changes HSIDIV only after cold admission and confirms HSIRDY, HSIDIV and
@@ -49,6 +58,10 @@ object sizes, not measured cache latency or physical coherency evidence.
 
 Prescaler update starts with an observed W0C clear of stale UIF. Only a new UIF
 after UG, followed by another observed clear, can publish the time domain.
+Reset MMS exports UG on TRGO, so the owner first observes MMS=1 with CEN=0.
+After UG/UIF are consumed it restores and observes MMS=0 before starting CEN.
+A refused restoration retains only the explicitly owned quiet-MMS responsibility
+alongside the timer; stop cannot release its gate until that state is cleared.
 Overflow IRQs count only acknowledged flags. ACK failure
 invalidates the live epoch, records `timer_error`, retains TIM2 responsibility
 and attempts finite DIER/CEN/NVIC withdrawal. The lost deadline domain is always
@@ -80,7 +93,8 @@ before platform stop.
 
 `dma-tx` selects USART3 TX through DMA1 Stream0, DMAMUX1 Channel0 request46;
 its vector is independent of the USART3 vector. RX remains an explicit bounded
-IRQ-byte ring. There is no receive DMA, circular mode, stream pool or fallback.
+IRQ-byte ring. This TX selection does not enable receive DMA, circular mode,
+a stream pool or a fallback.
 Cold admission rejects an already owned lane, request mux or vector. Generated
 assembly records only clock gates it added and retains them while cleanup fails.
 
@@ -98,6 +112,39 @@ DMA completion is separate from UART wire TC. DMAT, stream EN, transfer sources
 and retained references must withdraw before SETTLED; a refusal quarantines the
 loan for retry. Late DMA errors take precedence over success. Failed transfers
 report zero bytes rather than infer wire progress from NDTR.
+
+`rx-dma-idle` instead selects USART3 RX through DMA1 Stream1, DMAMUX1 Channel1
+request45 and its exact vector. TX reuses the ordinary IRQ provider. The assembly
+creates no byte ring: the caller initializes and supplies an `nx_stream_t` and
+its exact block array through `rx_start`. Every block is validated before the
+first loan against the selected initialized AXI SRAM DMA-write region, provider
+state, hardware registers, region descriptors, stream/slot metadata, wake and
+active TX storage. Cache-off accepts 1..65535 bytes; Cache-on requires aligned,
+exclusive whole 32-byte lines, up to 65504 bytes. No range rounding occurs.
+
+Normal-mode DMA writes one producer loan. Full completion or USART IDLE causes
+bounded source withdrawal. RM0433 section 15.3.16 permits TCIF with nonzero NDTR
+after software interruption: only after EN and DMAR read back disabled does the
+provider use the stable remaining count for a valid IDLE prefix. The USART IRQ
+never reads RDR while this DMA selection owns reception. DMA/UART errors discard
+the affected loan after proven drain and record one loss boundary rather than
+publish uncertain bytes. Acknowledgements clear only the selected stream flags.
+
+With Cache on, complete owned lines are invalidated before DMA and again after
+drain, before producer publication. Both operations run in owner task context
+outside the IRQ mask; PREPARING/PROCESSING retain the producer loan throughout
+maintenance. A refused EN/DMAR/source withdrawal or cache operation keeps the
+loan and marks the private state quarantined for explicit retry. Neither a TC
+flag nor cancellation revokes the loan. Stop retains stream and platform clock,
+cache and time ownership while a producer, READY block or consumer loan remains.
+After all loans end, a successful RX stop permits a new explicitly initialized
+stream without restarting the controller.
+
+The owner calls service to publish and arm the next free block. Restart gaps
+are possible, and borrowed blocks are never overwritten. This is neither
+circular DMA nor continuous no-gap reception; no byte-exact loss count is
+inferred. Additional H7 DMA engines, RX continuous/double-buffer modes and
+physical cache coherence remain separate acceptance scopes.
 
 ## Memory and evidence
 

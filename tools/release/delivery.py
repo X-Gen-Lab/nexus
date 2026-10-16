@@ -151,7 +151,7 @@ def require_jobs(document):
         "Provider assembly audits": (
             "stm32_assembly", "gd32_assembly", "can_assembly", "usb_assembly",
             "ethernet_assembly", "timer_assembly", "g474_assembly", "h743_assembly",
-            "u575_assembly", "multi_controller_assembly")}
+            "u575_assembly", "multi_controller_assembly", "mainstream_assembly")}
     for label, selections in matrices.items():
         expected = {f"{label} ({selection})" for selection in selections}
         observed = {name for name in names if name.startswith(label + " (")}

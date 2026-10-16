@@ -33,8 +33,6 @@ def _banks(result):
     banks = {}
     for pin in selected_pins(result):
         banks.setdefault(pin[1], []).append(int(pin[2:]))
-    if result.soc_family == "stm32g474" and set(banks) != {"A"}:
-        fail("G474 cold GPIO lease requires its exact GPIOA routes")
     return banks
 
 
@@ -76,14 +74,14 @@ def _lock(result, port):
 def _capture(result, pin):
     port, number = pin[1], int(pin[2:])
     if result.soc_family == "stm32g474":
-        return f"nx_platform_pin_capture({number}u)"
+        return f"nx_platform_pin_capture(GPIO{port}, {number}u)"
     prefix = "stm32" if result.soc_family == "stm32f407" else "gd32"
     return f"nx_{prefix}_pin_capture(GPIO{port}, {number}u)"
 
 
 def _restore(result, pin, saved):
     if result.soc_family == "stm32g474":
-        return f"nx_platform_pin_restore({int(pin[2:])}u, {saved});"
+        return f"nx_platform_pin_restore(GPIO{pin[1]}, {int(pin[2:])}u, {saved});"
     prefix = "stm32" if result.soc_family == "stm32f407" else "gd32"
     return f"nx_{prefix}_pin_restore(GPIO{pin[1]}, {int(pin[2:])}u, {saved});"
 
@@ -156,27 +154,27 @@ def add_snapshots(result, item, offered, snapshots):
 def _g4_pin_helpers():
     # The private G474 provider has no packed pin primitive. Emit the same
     # twelve-bit cold state used by F407/GD470, using its real MMIO boundary.
-    source = ["static uint16_t nx_platform_pin_capture(unsigned pin) {",
+    source = ["static uint16_t nx_platform_pin_capture(GPIO_TypeDef* gpio, unsigned pin) {",
               "    uint32_t shift = pin * 2u;",
-              "    uint32_t state = ((NX_G474_READ(&GPIOA->MODER) >> shift) & 3u)",
-              "        | (((NX_G474_READ(&GPIOA->OTYPER) >> pin) & 1u) << 2u)",
-              "        | (((NX_G474_READ(&GPIOA->OSPEEDR) >> shift) & 3u) << 3u)",
-              "        | (((NX_G474_READ(&GPIOA->PUPDR) >> shift) & 3u) << 5u)",
-              "        | (((NX_G474_READ(&GPIOA->AFR[pin / 8u]) >> ((pin % 8u) * 4u)) & 15u) << 7u)",
-              "        | (((NX_G474_READ(&GPIOA->ODR) >> pin) & 1u) << 11u);",
+              "    uint32_t state = ((NX_G474_READ(&gpio->MODER) >> shift) & 3u)",
+              "        | (((NX_G474_READ(&gpio->OTYPER) >> pin) & 1u) << 2u)",
+              "        | (((NX_G474_READ(&gpio->OSPEEDR) >> shift) & 3u) << 3u)",
+              "        | (((NX_G474_READ(&gpio->PUPDR) >> shift) & 3u) << 5u)",
+              "        | (((NX_G474_READ(&gpio->AFR[pin / 8u]) >> ((pin % 8u) * 4u)) & 15u) << 7u)",
+              "        | (((NX_G474_READ(&gpio->ODR) >> pin) & 1u) << 11u);",
               "    return (uint16_t)state;", "}",
-              "static void nx_platform_pin_restore(unsigned pin, uint16_t state) {",
+              "static void nx_platform_pin_restore(GPIO_TypeDef* gpio, unsigned pin, uint16_t state) {",
               "    uint32_t bit = 1u << pin;",
               "    uint32_t shift = pin * 2u;",
               "    uint32_t af_shift = (pin % 8u) * 4u;",
-              "    NX_G474_WRITE(&GPIOA->BSRR, (state & (1u << 11u)) != 0u ? bit : bit << 16u);"]
+              "    NX_G474_WRITE(&gpio->BSRR, (state & (1u << 11u)) != 0u ? bit : bit << 16u);"]
     for register, mask, value in (
             ("AFR[pin / 8u]", "15u << af_shift", "((uint32_t)state >> 7u & 15u) << af_shift"),
             ("OTYPER", "bit", "((uint32_t)state >> 2u & 1u) << pin"),
             ("OSPEEDR", "3u << shift", "((uint32_t)state >> 3u & 3u) << shift"),
             ("PUPDR", "3u << shift", "((uint32_t)state >> 5u & 3u) << shift"),
             ("MODER", "3u << shift", "((uint32_t)state & 3u) << shift")):
-        source.append(f"    NX_G474_WRITE(&GPIOA->{register}, (NX_G474_READ(&GPIOA->{register}) & ~({mask})) | ({value}));")
+        source.append(f"    NX_G474_WRITE(&gpio->{register}, (NX_G474_READ(&gpio->{register}) & ~({mask})) | ({value}));")
     return source + ["    nx_arch_dsb();", "}"]
 
 

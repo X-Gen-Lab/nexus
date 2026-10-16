@@ -3,6 +3,9 @@
 [派生能力矩阵](capabilities.md) 自动核对 SoC/route 的 mode、参考 Board binding
 与实际 resolver/emitter 选择的生产源码。叙述表说明运行合同，派生表说明精确
 身份与有限源码一致性；两者均不继承旧 HEAD 的资格或替代实板执行。
+本轮有限芯片接入与平台反馈流程见
+[主流 MCU 接入](../design/mainstream-mcu-adaptation.md)；同系列其他型号、封装和模式
+不能自动继承本页范围。
 
 ## 芯片、板卡与系统
 
@@ -11,10 +14,12 @@
 | STM32F407ZGT6 / 启明欣欣 V3.1 | Cortex-M4F；1 MiB Flash；主 SRAM 128 KiB、CCM 64 KiB；声明 clock/profile 与 reviewed routes | 实际 PCB 修订、晶振、供电、连续性、波形与负载 |
 | STM32F407VET6 / 天空星青春版 | Cortex-M4F；512 KiB Flash；主 SRAM 128 KiB、CCM 64 KiB；独立 Board 资源 | 相同类别的实际 PCB／电气／HIL 验收 |
 | GD32F470ZGT6 / 梁山派 | Cortex-M4F；1 MiB Flash；主 SRAM 192 KiB、ADDSRAM 256 KiB、TCM 64 KiB；25 MHz 声明输入、200 MHz profile；可选 USB 独立 48 MHz owner | 未观察 PCB/晶振/电气；默认 linker 只用主 SRAM；实际 USB clock/PHY 仍未测量 |
-| STM32G474RET6 / MB1367 来源参考配置 | Cortex-M4F；512 KiB Flash；128 KiB 连续 CPU SRAM alias；HSE24/170 MHz、独立 TIM2；GPIOA PA5、LPUART1 PA2/PA3 IRQ bytes；另有 PA0/PA1 selected EXTI 软件夹具；生成 factory 和裸机/FreeRTOS ELF | 实际 PCB／晶振／焊桥／EXTI 接线未观察；未授权 DMA；软件报告与实际 PCB／电气验收分开 |
-| STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置 | Cortex-M7F；2 MiB Flash；默认 AXI SRAM 512 KiB；pre-RAM LDO、固定 HSI32／HSI64 × Cache off/on、TIM2；PB0 GPIO、USART3 PD8/PD9 IRQ bytes 或有限 TX DMA；裸机／FreeRTOS 静态装配 | PCB／供电／硅片修订／焊桥／Cache 一致性未观察；RX 仍为 IRQ bytes；未实现 RX DMA、其他 RAM 放置或运行状态接管；最终软件资格独立记录 |
-| STM32U575ZIT6Q / NUCLEO-U575ZI-Q 单状态参考配置 | Cortex-M33F；2 MiB Flash；默认 SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；PC7 GPIO、USART1 PA9/PA10 IRQ bytes；裸机／FreeRTOS 静态装配 | PCB／SMPS／硅片修订／option bytes 未观察；Cache 关闭；此 Platform 配置未开放 DMA、双域 factory 或其他 RAM 放置；最终软件资格独立记录 |
+| STM32G474RET6 / MB1367 来源参考配置 | Cortex-M4F；512 KiB Flash；96 KiB SRAM 加 32 KiB CCM 的连续 CPU alias；HSE24/170 MHz、独立 TIM2；封装有效 GPIO、六个 UART 的 IRQ bytes、SPI1/2 有限轮询、TIM3/4 CH1 PWM、IWDG、PA0/PA1 EXTI；静态 factory，裸机／FreeRTOS 夹具 | 52 个封装 GPIO 不等于六个完整 bank 或 PCB 接线；PF0/PF1 为晶振保留，PG10/NRST 保留；实际 PCB／晶振／焊桥／电气／HIL 未观察；无 DMA |
+| STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置 | Cortex-M7F；2 MiB Flash；默认 AXI SRAM 512 KiB；pre-RAM LDO、固定 HSI32／HSI64 × Cache off/on、TIM2；PB0 GPIO、USART3 PD8/PD9 IRQ bytes、有限 TX DMA 或有限 RX DMA／IDLE blocks；裸机／FreeRTOS 静态装配 | PCB／供电／硅片修订／焊桥／Cache 一致性未观察；不含连续／双缓冲 RX、其他 DMA 引擎、其他 RAM 放置或运行状态接管；最终软件资格独立记录 |
+| STM32U575ZIT6Q / NUCLEO-U575ZI-Q 单状态参考配置 | Cortex-M33F；2 MiB Flash；默认 SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；封装有效 GPIOA..H、USART1 PA9/PA10 与 USART2 PA2/PA3 IRQ bytes、IWDG；裸机／FreeRTOS 静态装配 | PCB／SMPS／硅片修订／option bytes／VDDIO2 未测量；Cache 关闭；此 Platform 不开放 DMA、SPI、I2C、ADC、PWM、Flash 编程、双域 factory 或其他 RAM 放置 |
 | STM32U575 独立 TZEN=1 双域参考 | 外部预先配置 option bytes；两个 Runtime 镜像、冷启动 SAU／MPU／SRAM 归属 owner、真实 CMSE SG；单一非特权 NonSecure Thread 通过同步复制消息访问受限 PC7 GPIO | 未执行实板隔离验收；无 OS、通用双域 factory、NS 任务身份、异步借用／跨域 DMA 或产品镜像认证；不改变上列 TZEN=0 默认装配 |
+| STM32F103RBT6 / NUCLEO-F103RB 来源参考配置 | Cortex-M3，无 FPU；LQFP64、128 KiB Flash、20 KiB SRAM；HSI8、独立 16-bit TIM2；GPIOA PA5、USART2 PA2/PA3 IRQ bytes、SPI1 PA5/PA6/PA7 与 PA4 CS、PA0/PA1 EXTI、IWDG；裸机／FreeRTOS 静态装配 | PCB／ST-LINK VCP 焊桥／引脚负载／HSI 精度未观察；PA5 LED 与 SPI 时钟冲突；无 DMA、I2C、ADC、PWM、Flash 编程或其他 F1 型号支持 |
+| GD32F303RCT6 / 芯片软件参考 | Cortex-M4F；LQFP64、256 KiB Flash、48 KiB SRAM；IRC8M、独立 16-bit TIMER1；GPIOA PA4/PA5、USART0 PA9/PA10 IRQ bytes、SPI0 PA5/PA6/PA7 与 PA4 CS、FWDGT；裸机／FreeRTOS 静态装配 | 没有已审查 PCB、LED、外部晶振、串口适配器或 connector 接线；无 DMA、I2C、ADC、PWM、EXTI、Flash 编程或其他 F30x 型号支持 |
 | Native | Linux/POSIX 行为模型、实际线程与持久化文件故障模型 | 不构成 MCU 或电气资格 |
 
 裸机和锁定 FreeRTOS 均为显式选择的薄适配。启动只建立平台时钟／接口，不创建
@@ -56,10 +61,9 @@ privileged single-world；MPU+split 明确拒绝，未新增实板 HIL。范围�
 
 ## 首发模式
 
-以下完整外设表对应 F407/F470 首发实现。G474 另维护 selected EXTI，H743
-另维护固定 Cache 配置和有限 UART TX DMA；U575 默认装配仍为 GPIO／IRQ UART，
-双域同步 GPIO 参考单独维护。不从芯片型号或通用接口推断其他外设、DMA、
-ThreadX 或低功耗模式。
+以下完整外设表只对应 F407/F470 首发实现。F103、GD303、G474、H743、U575
+仅维护上表与各 SoC 合同明确列出的切片，不继承这张完整 I/O 表。U575 双域同步
+GPIO 参考单独维护；不从芯片型号或通用接口推断其他外设、DMA、ThreadX 或低功耗模式。
 
 | 接口 | 已实现模式与限制 |
 |---|---|
@@ -68,12 +72,20 @@ ThreadX 或低功耗模式。
 | SPI | 8-bit MSB-first；短轮询每笔最多 256 bytes；有限 DMA 最多 65535 bytes；双向递增或调用者单字节固定 dummy/discard；单 wire-active、完整 CS interval；独立 CS endpoint |
 | I2C | 100 kHz；最多 8 条消息、每条 read/write 1–256 bytes；轮询、中断及 DMA 消息；1/2/末三字节 ACK、repeated START/NACK/仲裁/STOP；恢复检查 BUSY 与所选 SCL/SDA 电平；独立有界 GPIO bus-clear 工具 |
 | Flash | STM 精确 16/64/128 KiB sector 几何与 x32 program（4-byte alignment/length，声明供电 2.7–3.6 V）；GD 官方独立 4 KiB page erase 与 halfword program；全物理空间、外部受限 region |
-| Watchdog | 独立 enable/feed/reset cause；启用不可逆，late failure 不擦除责任；GD IRC32K 物理 timeout bounds 未保证 |
+| Watchdog | 独立 enable/feed/reset cause；名义配置成功返回 SUCCESS，启用不可逆，启用后的失败保留责任；F407 和 GD470 当前物理 timeout bounds 均为 `0/0 unknown`，已启用 state 查询返回 UNSUPPORTED 并保留 enabled／irreversible／实际 debug 事实；失败的启用前 LSI／debug 清理可经平台 stop 重试 |
 | EXTI | selected line、共享 vector、caller-sized event queue、丢失／coalescing 可见；无 debounce 政策 |
 | PWM | 固定 timer/channel/base、CCR shadow、0/100%、safe inactive；公共 stop 可以 restart，平台 teardown 释放 owner |
 | ADC | reviewed channel、single-shot/低速 scan、有限及连续双缓冲定时触发 DMA blocks；显式 sample time/reference；只发布完整扫描；可选外部序列与软件观测时间记录 |
 | Classic CAN | 11/29-bit DATA/RTR、0–8 bytes、真实三邮箱、共享 filter domain、显式 abort/bus-off recovery；没有 CAN FD 或自动重发 |
 | USB FS device | internal PHY PIO、EP0 control IN/OUT64、EP1–3 bulk8/16/32/64、packet loan、SETUP epoch、reset/stop drain、独立 48 MHz owner；没有 Host/HS/DMA/ISO/class stack |
+
+F407 名义周期使用 `(RLR + 1) × divisor / 32000`，GD470 使用
+`(RLD × divisor + 1) / 32000`，不能套用同一公式。F407 数据手册的 17..47 kHz
+是 VDD=3 V、TA=-40..105 °C 的表征条件，当前没有声明满足条件的 operating profile；
+GD470 数据手册只给 IRC32K 典型频率，没有已审查的保证 Min/Max。因此两者当前均报告
+未知物理边界。SUCCESS 表示名义寄存器配置完成，不证明物理超时；启用后的
+UNSUPPORTED 查询也不表示计数器已关闭。需要保证时限的产品必须在不可逆启用前
+拒绝不满足其时限合同的 profile。
 
 USB 配置/factory 已在两 STM 封装与 GD470 的软件 Board 夹具执行真实 ARM 链接，
 默认参考 Board 不自动暴露 USB connector/VBUS 电气。`vbus_sensing=true` 缺少
@@ -97,22 +109,48 @@ ESD；它与 CAN1/USART1 flow-control 的资源冲突必须拒绝。详见
 [Ethernet](../design/ethernet.md)、[高级 timer](../design/timer-advanced.md)、
 [用户 I/O broker](../design/user-io-broker.md) 与 [G474](../design/stm32g474.md)。
 
-G474 维护真实 generated factory 主机合同、独立 system/provider 回归，以及
-empty／GPIO-UART／selected-EXTI 的裸机／FreeRTOS ARM 夹具；门禁检查预算、
-操作表保留、未选驱动裁剪和向量字节。它们使用 reviewed Board 资料与锁定的
-官方 CMSIS，不能证明某块实物的 MCU、X3 晶振或 VCP／LD2 焊桥。
+G474 的封装 GPIO、六个 UART、SPI1/2、IWDG 与 PA0/PA1 EXTI 分别具有明确的
+生产实现和生成夹具。LPUART1、USART1/2/3、UART4/5 只维护 IRQ bytes；SPI 为
+8-bit、mode 0..3、显式 active-low CS，每笔最多 256 bytes，当前 170 MHz profile
+接纳 requested SCK 664063 Hz..42.5 MHz；无 DMA、RX event/block 或任意 AF 自动选择。
+实际接线仍须 Board 授权；源码、预算、方法保留和向量检查不证明实物的 MCU、X3
+晶振、VCP／LD2 焊桥或 SPI 电气。
 [初次 SoC 执行记录](soc-refinement-verification.md) 保留其历史 code revision；
 [扩展执行记录](soc-extensions-verification.md) 单独绑定后续扩展的源码和证据。
 离线复现与候选封存仍有独立
 退出条件，不能继承此前 F407/F470 候选的资格。
 
-H743 的有限 TX DMA 仅维护 USART3、DMA1 Stream0、DMAMUX1 channel0/request46
-和 AXI SRAM 可达域。Cache on 要求完整 32-byte cache line 的调用者所有权，
-clean 后才启动 DMA；准备和 drain 未完成都不能解除借用。Cache 生命周期在
-平台启停时固定，全部 provider 排空后才能撤回系统时基并 clean/disable Cache。
-不开放 RX DMA、其他 DMA engine、可选 RAM 布局或运行中变频。独立 U575 双域
-参考的分区、固定 principal 和同步借用前提见
-[TrustZone 合同](../design/u575-trustzone-contract.md)。
+G474 的 `fixed-pwm` 仅维护 TIM3 CH1／PA6 AF2 与 TIM4 CH1／PB6 AF2，分别独占整个
+controller。`tick_hz` 必须与 170 MHz 时钟形成 1..65536 的整数分频；固定 period
+为 1..65535 ticks，duty 为 0..period，active-high、edge-aligned，显式处理 0/100%。
+stop 先观察 CCER/CEN 关闭，再建立 Board 声明的 GPIO inactive；无法证明停止时保留
+fault 与 clock lease，交给私有 close 重试。PA6 与 SPI1 MISO 冲突；不提供共享 timer
+base、互补输出、capture、break、PWM IRQ 或 DMA。模型、factory 和 ARM 夹具不能
+证明真实输出频率、负载或电气安全。
+
+H743 USART3 的 `dma-tx` 使用 DMA1 Stream0、DMAMUX1 channel0/request46，RX
+保持 IRQ byte ring；`rx-dma-idle` 使用 DMA1 Stream1、DMAMUX1 channel1/request45，
+TX 保持 IRQ。二者是显式替代模式，不自动组合成 DMA duplex。仅接纳所选 AXI SRAM；
+Cache off 每块／每笔为 1..65535 bytes，Cache on 地址和长度必须按 32 bytes 对齐、
+长度最多 65504 bytes，调用者独占完整 cache line。TX 在 clean 后启动；RX 在 DMA
+前及排空后 invalidate，稳定剩余计数和维护完成后才发布完整块或 IDLE prefix。
+引用、通道、DMAR 或 cache 维护未排空都保留借用；消费者持有块时保留 stream 与
+平台依赖。owner service 发布并重新接纳下一块，可能出现间隙；不提供 circular、
+continuous、双缓冲 RX、其他 DMA engine、其他 RAM 放置或运行中变频。Cache
+配置在平台生命周期内固定，全部 provider 排空后才能关闭时基及 Cache。
+
+U575 仅开放所选封装 GPIO 与 USART1/2 IRQ bytes、IWDG；GPIOH 只接纳 PH0/PH1/PH3。
+PG2..PG15 还要求外部电源 owner 已建立 VDDIO2、PWR clock 和 IO2SV；平台不打开
+未知外部电源，也不把 IO2SV 当作电压测量。独立 TZEN=1 参考的分区、固定 principal
+和同步借用前提见 [TrustZone 合同](../design/u575-trustzone-contract.md)，不能扩大
+TZEN=0 factory 或授予异步跨域 DMA。
+
+F103 与 GD303 的 1 MHz timebase 都基于 16-bit timer，overflow IRQ 的服务和
+中断屏蔽间隔必须小于名义 65.536 ms；单一 pending wrap 不能补回多次未观察溢出。
+两者的 SPI 均为 8-bit、mode 0..3、有界轮询，每笔最多 256 bytes，31.25 kHz..4 MHz；
+F103 使用 SPI1，GD303 使用 SPI0。F103 的 PA5 同时连接 LED 与 SPI SCK，不能冲突
+选择。具体接入与失败停止合同见 [F103](../../soc/stm32f103/README.md) 和
+[GD303](../../soc/gd32f303/README.md)；没有把这些切片提升为全系列或全外设支持。
 
 Ethernet 生成夹具保留精确 TX/RX descriptors 与 RX buffers，只接纳 STM 主 SRAM
 128 KiB 或 GD 主 SRAM192 KiB。四个 ZG ARM graph 的开发预算/retention 通过不

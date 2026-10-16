@@ -42,7 +42,10 @@ ClockPort* clock_port;
 bool hold_timer_count;
 bool hold_timer_update_clear;
 bool hold_timer_gate_drop;
+bool hold_timer_reset_release;
 bool update_observed;
+bool update_trigger_observed;
+bool inject_timer_slave_after_gate;
 bool hold_irq_disable;
 void (*before_save)(void);
 
@@ -68,7 +71,10 @@ class Gd32Timebase : public testing::Test {
         hold_timer_count = false;
         hold_timer_update_clear = false;
         hold_timer_gate_drop = false;
+        hold_timer_reset_release = false;
         update_observed = false;
+        update_trigger_observed = false;
+        inject_timer_slave_after_gate = false;
         hold_irq_disable = false;
         before_save = nullptr;
         ON_CALL(clock_mock, Start()).WillByDefault(testing::Return(0));
@@ -104,6 +110,8 @@ class Gd32Timebase : public testing::Test {
                 if (reg == &TIMER_SWEVG(TIMER1) &&
                     (value & TIMER_SWEVG_UPG) != 0U) {
                     update_observed = true;
+                    if ((TIMER_CTL1(TIMER1) & TIMER_CTL1_MMC) == 0U)
+                        update_trigger_observed = true;
                     TIMER_INTF(TIMER1) |= TIMER_INTF_UPIF;
                     TIMER_CNT(TIMER1) = hold_timer_count ? 37U : 0U;
                 }
@@ -173,7 +181,10 @@ TEST_F(Gd32Timebase, RefusedInitialUpdateClearCannotPublishLiveTime) {
     EXPECT_EQ(0U, nx_gd32_now_us());
     EXPECT_EQ(0U, TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN);
     EXPECT_EQ(0U, TIMER_DMAINTEN(TIMER1));
-    EXPECT_EQ(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+    EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+    hold_timer_update_clear = false;
+    EXPECT_EQ(0, nx_gd32_soc_stop());
 }
 
 TEST_F(Gd32Timebase, RefusedSoftwareUpdateCannotPublishAClockEpoch) {
@@ -215,6 +226,32 @@ TEST_F(Gd32Timebase, SuccessfulDomainEndsBeforeStaleCounterCanBeObserved) {
     EXPECT_EQ(53U, nx_gd32_now_us());
     ASSERT_EQ(0, nx_gd32_soc_stop());
     EXPECT_EQ(0U, nx_gd32_now_us());
+}
+
+TEST_F(Gd32Timebase, RefusedSourceDisableRetainsOwnedTimerForRetry) {
+    ASSERT_EQ(0, nx_gd32_soc_start());
+    EXPECT_CALL(clock_mock, TimerWrite(&TIMER_DMAINTEN(TIMER1), 0U))
+        .WillOnce([](volatile uint32_t*, uint32_t) {})
+        .RetiresOnSaturation();
+    EXPECT_NE(0, nx_gd32_soc_stop());
+    EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+    EXPECT_EQ(0U, nx_gd32_now_us());
+    EXPECT_EQ(0, nx_gd32_soc_stop());
+    EXPECT_EQ(NX_SUCCESS, nx_gd32_soc_preflight());
+}
+
+TEST_F(Gd32Timebase, RefusedPendingClearRetainsOwnedTimerForRetry) {
+    ASSERT_EQ(0, nx_gd32_soc_start());
+    TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
+    hold_timer_update_clear = true;
+    EXPECT_NE(0, nx_gd32_soc_stop());
+    EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+    EXPECT_EQ(0U, nx_gd32_now_us());
+    hold_timer_update_clear = false;
+    EXPECT_EQ(0, nx_gd32_soc_stop());
+    EXPECT_EQ(NX_SUCCESS, nx_gd32_soc_preflight());
 }
 
 TEST_F(Gd32Timebase, PendingWrapIsNotConsumedBySnapshot) {
@@ -415,6 +452,71 @@ TEST_F(Gd32Timebase, ForeignReservedTimerRejectsBeforeClockMutation) {
     TIMER_CTL0(TIMER1) = 0U;
 }
 
+TEST_F(Gd32Timebase, RetainedTimerModesRejectBeforeClockOrUpdateEffects) {
+    EXPECT_CALL(clock_mock, Start()).Times(0);
+    EXPECT_CALL(clock_mock, TimerWrite(testing::_, testing::_)).Times(0);
+    for (volatile uint32_t* field :
+         {&TIMER_CTL1(TIMER1), &TIMER_SMCFG(TIMER1), &TIMER_CHCTL0(TIMER1),
+          &TIMER_CHCTL1(TIMER1), &TIMER_CHCTL2(TIMER1),
+          &TIMER_DMACFG(TIMER1)}) {
+        *field = 1U;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+        EXPECT_EQ(1U, *field);
+        EXPECT_FALSE(update_observed);
+        *field = 0U;
+    }
+}
+
+TEST_F(Gd32Timebase, PoweredForeignTimerKeepsItsRegistersDuringCleanupRetry) {
+    inject_timer_slave_after_gate = true;
+    hold_timer_gate_drop = true;
+    EXPECT_CALL(clock_mock, TimerWrite(testing::_, testing::_)).Times(0);
+    EXPECT_NE(0, nx_gd32_soc_start());
+    EXPECT_EQ(1U, TIMER_SMCFG(TIMER1));
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+    hold_timer_gate_drop = false;
+    EXPECT_EQ(0, nx_gd32_soc_stop());
+    EXPECT_EQ(1U, TIMER_SMCFG(TIMER1));
+    EXPECT_FALSE(update_observed);
+}
+
+TEST_F(Gd32Timebase, PreexistingSleepClockSurvivesTheOwnedTimerEpoch) {
+    RCU_APB1SPEN |= RCU_APB1SPEN_TIMER1SPEN;
+    ASSERT_EQ(0, nx_gd32_soc_start());
+    ASSERT_EQ(0, nx_gd32_soc_stop());
+    EXPECT_NE(0U, RCU_APB1SPEN & RCU_APB1SPEN_TIMER1SPEN);
+}
+
+TEST_F(Gd32Timebase, PrescalerShadowUpdateDoesNotEmitAResetModeTrigger) {
+    ASSERT_EQ(0, nx_gd32_soc_start());
+    EXPECT_TRUE(update_observed);
+    EXPECT_FALSE(update_trigger_observed);
+    EXPECT_EQ(0U, TIMER_CTL1(TIMER1) & TIMER_CTL1_MMC);
+}
+
+TEST_F(Gd32Timebase, ForeignAssertedTimerResetIsNotAnAvailableResource) {
+    RCU_APB1RST = RCU_APB1RST_TIMER1RST;
+    EXPECT_CALL(clock_mock, Start()).Times(0);
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32_soc_preflight());
+    EXPECT_EQ(RCU_APB1RST_TIMER1RST, RCU_APB1RST);
+}
+
+TEST_F(Gd32Timebase, RefusedOwnedResetReleaseRetainsCleanupUntilRetry) {
+    hold_timer_reset_release = true;
+    EXPECT_CALL(clock_mock, TimerWrite(&RCU_APB1RST, testing::_))
+        .WillRepeatedly([](volatile uint32_t* reg, uint32_t value) {
+            if ((value & RCU_APB1RST_TIMER1RST) != 0U ||
+                !hold_timer_reset_release)
+                *reg = value;
+        });
+    EXPECT_NE(0, nx_gd32_soc_start());
+    EXPECT_NE(0U, RCU_APB1RST & RCU_APB1RST_TIMER1RST);
+    EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+    hold_timer_reset_release = false;
+    EXPECT_EQ(0, nx_gd32_soc_stop());
+    EXPECT_EQ(0U, RCU_APB1RST & RCU_APB1RST_TIMER1RST);
+}
+
 TEST_F(Gd32Timebase, SecondaryPollingControllersPreventClockWithdrawal) {
     ASSERT_EQ(0, nx_gd32_soc_start());
     EXPECT_CALL(clock_mock, Stop()).Times(0);
@@ -496,6 +598,8 @@ extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
 extern "C" void rcu_periph_clock_enable(rcu_periph_enum peripheral) {
     REG32(RCU + ((uint32_t)peripheral >> 6U)) |=
         UINT32_C(1) << ((uint32_t)peripheral & 31U);
+    if (peripheral == RCU_TIMER1 && inject_timer_slave_after_gate)
+        TIMER_SMCFG(TIMER1) = 1U;
 }
 /** \brief Release only the requested modeled run-clock bit. */
 extern "C" void rcu_periph_clock_disable(rcu_periph_enum peripheral) {
@@ -516,5 +620,8 @@ rcu_periph_clock_sleep_disable(rcu_periph_sleep_enum peripheral) {
 }
 /** \brief Reset the external timer register bank before production setup. */
 extern "C" void timer_deinit(uint32_t timer) {
+    RCU_APB1RST |= RCU_APB1RST_TIMER1RST;
     std::memset(reinterpret_cast<void*>((uintptr_t)timer), 0, 0x50U);
+    if (!hold_timer_reset_release)
+        RCU_APB1RST &= ~(uint32_t)RCU_APB1RST_TIMER1RST;
 }

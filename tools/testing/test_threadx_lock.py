@@ -227,6 +227,8 @@ class ThreadXLockTests(unittest.TestCase):
                         sdk / "dependencies/stm32g4.lock.json")
         shutil.copyfile(ROOT / "dependencies/stm32f4-hal.lock.json",
                         sdk / "dependencies/stm32f4-hal.lock.json")
+        shutil.copyfile(ROOT / "dependencies/stm32f1-hal.lock.json",
+                        sdk / "dependencies/stm32f1-hal.lock.json")
         checker = sdk / "cmake/package/package_source_sdk.py"
         checker.parent.mkdir(parents=True)
         shutil.copyfile(ROOT / "cmake/package/package_source_sdk.py", checker)

@@ -237,11 +237,42 @@ TEST_F(GD32Arch, PendingWrapSamplingPreservesFlagUntilTheOwnedHandler) {
         .WillRepeatedly(::testing::Return(false));
     EXPECT_CALL(boundary, ClockPreflight())
         .WillOnce(::testing::Return(NX_SUCCESS));
-    EXPECT_CALL(boundary, ClockStart()).WillOnce(::testing::Return(0));
-    EXPECT_CALL(boundary, ClockStop()).WillOnce(::testing::Return(0));
-    /* Six bootstrap barriers plus the observed runtime W0C acknowledgement. */
-    EXPECT_CALL(boundary, CompleteWrites()).Times(7);
-    EXPECT_CALL(boundary, SynchronizeInstructions()).Times(2);
+    ::testing::Sequence lifecycle;
+    EXPECT_CALL(boundary, ClockStart())
+        .InSequence(lifecycle)
+        .WillOnce(::testing::Return(0));
+    /* Gate, sleep gate, initial clear, quiet TRGO, UG, update clear, CNT,
+     * restored TRGO and live publication each require completed writes. */
+    EXPECT_CALL(boundary, CompleteWrites()).Times(9).InSequence(lifecycle);
+    EXPECT_CALL(boundary, SynchronizeInstructions())
+        .InSequence(lifecycle)
+        .WillOnce([] {
+            EXPECT_NE(TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN, 0U);
+            EXPECT_NE(TIMER_DMAINTEN(TIMER1) & TIMER_DMAINTEN_UPIE, 0U);
+            EXPECT_EQ(TIMER_CTL1(TIMER1), 0U);
+            EXPECT_EQ(TIMER_INTF(TIMER1), 0U);
+        });
+    EXPECT_CALL(boundary, CompleteWrites()).InSequence(lifecycle).WillOnce([] {
+        EXPECT_EQ(TIMER_INTF(TIMER1) & TIMER_INTF_UPIF, 0U);
+        EXPECT_NE(TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN, 0U);
+    });
+    /* Stop proves reset release, then source/vector withdrawal before gates. */
+    EXPECT_CALL(boundary, CompleteWrites()).Times(2).InSequence(lifecycle);
+    EXPECT_CALL(boundary, SynchronizeInstructions())
+        .InSequence(lifecycle)
+        .WillOnce([] {
+            const uint32_t bank = (uint32_t)TIMER1_IRQn / 32U;
+            const uint32_t bit = 1U << ((uint32_t)TIMER1_IRQn % 32U);
+            EXPECT_EQ(TIMER_CTL0(TIMER1) & TIMER_CTL0_CEN, 0U);
+            EXPECT_EQ(TIMER_DMAINTEN(TIMER1), 0U);
+            EXPECT_EQ(TIMER_INTF(TIMER1), 0U);
+            EXPECT_EQ((NVIC->ISER[bank] | NVIC->ISPR[bank]) & bit, 0U);
+            EXPECT_NE(RCU_APB1EN & RCU_APB1EN_TIMER1EN, 0U);
+        });
+    EXPECT_CALL(boundary, ClockStop()).InSequence(lifecycle).WillOnce([] {
+        EXPECT_EQ(RCU_APB1EN & RCU_APB1EN_TIMER1EN, 0U);
+        return 0;
+    });
     EXPECT_CALL(boundary, Save())
         .Times(5)
         .WillRepeatedly(::testing::Return(nx_arch_irq_state_t{1U}));

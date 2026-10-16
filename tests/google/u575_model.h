@@ -13,17 +13,24 @@ extern "C" {
 #endif
 typedef struct {
     RCC_TypeDef rcc;
+    PWR_TypeDef power;
     FLASH_TypeDef flash;
     TIM_TypeDef timer;
     ICACHE_TypeDef icache;
     DCACHE_TypeDef dcache;
     GPIO_TypeDef gpio;
     GPIO_TypeDef gpioa;
+    GPIO_TypeDef extra_gpio[6];
     struct {
         uint32_t CPACR;
         uint32_t VTOR;
     } cpu;
     USART_TypeDef* uart;
+    USART_TypeDef* uart2;
+    IWDG_TypeDef* watchdog;
+    bool watchdog_stuck_after_start;
+    void (*watchdog_start_observer)(void* context);
+    void* watchdog_start_context;
     volatile uint32_t* ignore_write;
     bool irq_enabled[126];
     bool irq_pending[126];
@@ -37,6 +44,12 @@ typedef struct {
     bool hold_irq_on;
     bool hold_irq_off;
     bool wrap_after_count;
+    bool hide_unclocked_timer;
+    bool refuse_timer_quiet_clear;
+    bool timer_pending_on_dier;
+    bool hold_lsi_off;
+    uint32_t timer_trgo_pulses;
+    uint32_t timer_ug_mms;
     uint32_t reads;
     uint32_t writes;
     uint32_t gpio_writes;
@@ -63,6 +76,9 @@ void nx_u575_model_irq_restore(nx_arch_irq_state_t previous);
     (!g_u575_model.irq_enabled[(irq)] && !g_u575_model.irq_pending[(irq)] &&   \
      !g_u575_model.irq_active[(irq)])
 #define NX_U575_GPIOA             (&g_u575_model.gpioa)
+#define NX_U575_GPIOG             (&g_u575_model.extra_gpio[4])
+#define NX_U575_PWR               (&g_u575_model.power)
+#define NX_U575_RCC               (&g_u575_model.rcc)
 #define NX_U575_CPU_SCB           (&g_u575_model.cpu)
 #define NX_U575_CPU_GROUP(value)  (g_u575_model.group = (value))
 #define NX_U575_READ(reg)         nx_u575_model_read(reg)

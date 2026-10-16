@@ -72,13 +72,16 @@ TEST_F(G474System, RefusedInitialUpdateClearCannotPublishLiveTime) {
     g_g474_model.ignore_write = &g_g474_model.timer.SR;
     auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8U);
     EXPECT_EQ(NX_ERROR_IO, result.primary);
-    EXPECT_EQ(NX_SUCCESS, result.cleanup);
-    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(NX_ERROR_IO, result.cleanup);
+    EXPECT_NE(0U, result.remaining_effects & NX_STM32G474_EFFECT_TIMER);
     EXPECT_FALSE(g_nx_stm32g474_system.started);
     EXPECT_FALSE(g_g474_model.irq_enabled[TIM2_IRQn]);
     EXPECT_EQ(0U, nx_stm32g474_system_now(&g_nx_stm32g474_system));
     EXPECT_EQ(0U, g_g474_model.timer.CR1 & TIM_CR1_CEN);
     EXPECT_EQ(0U, g_g474_model.timer.DIER);
+    EXPECT_NE(0U, g_g474_model.rcc.APB1ENR1 & RCC_APB1ENR1_TIM2EN);
+    g_g474_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
     EXPECT_EQ(0U, g_g474_model.rcc.APB1ENR1 & RCC_APB1ENR1_TIM2EN);
 }
 TEST_F(G474System, RefusedSoftwareUpdateCannotReuseAnOldUpdateFlag) {
@@ -480,4 +483,106 @@ TEST_F(G474System, FaultBeforeIrqSaveCannotEscapeAsAStaleTimeSnapshot) {
 extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
                                  const char* file, unsigned line) {
     fault_port->Observe(domain, reason, file, line);
+}
+
+TEST_F(G474System, ForeignTimerControlModesRejectBeforeGlobalClockEffects) {
+    volatile uint32_t* fields[] = {
+        &g_g474_model.timer.CR2, &g_g474_model.timer.SMCR,
+        &g_g474_model.timer.CCER, &g_g474_model.timer.CCMR1,
+        &g_g474_model.timer.CCMR2};
+    for (auto* field : fields) {
+        nx_g474_model_reset();
+        *field = 1U;
+        const auto result =
+            nx_stm32g474_system_start(&g_nx_stm32g474_system, 8);
+        EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+        EXPECT_EQ(0U, g_g474_model.writes);
+        EXPECT_FALSE(g_g474_model.timer_update_observed);
+    }
+}
+TEST_F(G474System, PoweredTimerIsReadmittedBeforeResetAndUpdateEvent) {
+    g_g474_model.timer_off_reads_zero = true;
+    g_g474_model.timer.CR2 = TIM_CR2_MMS_1;
+    const auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8);
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_FALSE(g_g474_model.timer_update_observed);
+    EXPECT_EQ(TIM_CR2_MMS_1, g_g474_model.timer.CR2);
+    EXPECT_EQ(0U, g_g474_model.rcc.APB1RSTR1 & RCC_APB1RSTR1_TIM2RST);
+    EXPECT_EQ(0U, g_g474_model.rcc.APB1ENR1 & RCC_APB1ENR1_TIM2EN);
+}
+
+TEST_F(G474System, InitialSoftwareUpdateCannotEscapeAsATriggerOutput) {
+    const auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8);
+    ASSERT_EQ(NX_SUCCESS, result.primary);
+    EXPECT_TRUE(g_g474_model.timer_update_observed);
+    EXPECT_FALSE(g_g474_model.timer_trigger_observed);
+    EXPECT_EQ(0U, g_g474_model.timer.CR2);
+}
+
+TEST_F(G474System, RefusedTriggerRestoreRetainsTimerUntilStopRetry) {
+    g_g474_model.hold_timer_trigger_restore = true;
+    const auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8);
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_ERROR_IO, result.cleanup);
+    EXPECT_NE(0U, result.remaining_effects & NX_STM32G474_EFFECT_TIMER);
+    EXPECT_FALSE(g_g474_model.timer_trigger_observed);
+    g_g474_model.hold_timer_trigger_restore = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
+    EXPECT_EQ(0U, g_g474_model.timer.CR2);
+    EXPECT_EQ(NX_SUCCESS,
+              nx_stm32g474_system_start(&g_nx_stm32g474_system, 8).primary);
+}
+TEST_F(G474System, RefusedResetReleaseRetainsItsGateAndEffectForRetry) {
+    g_g474_model.hold_timer_reset_release = true;
+    const auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8);
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_ERROR_IO, result.cleanup);
+    EXPECT_NE(0U, result.remaining_effects & NX_STM32G474_EFFECT_TIMER);
+    EXPECT_NE(0U, g_g474_model.rcc.APB1ENR1 & RCC_APB1ENR1_TIM2EN);
+    EXPECT_FALSE(g_g474_model.timer_update_observed);
+    g_g474_model.hold_timer_reset_release = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
+    EXPECT_EQ(0U, g_g474_model.rcc.APB1RSTR1 & RCC_APB1RSTR1_TIM2RST);
+}
+TEST_F(G474System, ForeignAssertedTimerResetRejectsBeforeAnyMutation) {
+    g_g474_model.rcc.APB1RSTR1 = RCC_APB1RSTR1_TIM2RST;
+    const auto result = nx_stm32g474_system_start(&g_nx_stm32g474_system, 8);
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(0U, g_g474_model.writes);
+}
+
+TEST_F(G474System, PendingDuringSourceWithdrawalCannotOutliveSuccessfulStop) {
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32g474_system_start(&g_nx_stm32g474_system, 8).primary);
+    g_g474_model.timer_repend_on_dier_off = true;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
+    EXPECT_FALSE(g_g474_model.irq_pending[TIM2_IRQn]);
+    EXPECT_FALSE(g_g474_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(0U, g_nx_stm32g474_system.remaining_effects);
+}
+TEST_F(G474System, RefusedFinalPendingClearRetainsTheGateForStopRetry) {
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32g474_system_start(&g_nx_stm32g474_system, 8).primary);
+    g_g474_model.timer_repend_on_dier_off = true;
+    g_g474_model.hold_timer_pending_clear = true;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
+    EXPECT_TRUE(g_g474_model.irq_pending[TIM2_IRQn]);
+    EXPECT_NE(0U, g_nx_stm32g474_system.remaining_effects &
+                      NX_STM32G474_EFFECT_TIMER);
+    EXPECT_NE(0U, g_g474_model.rcc.APB1ENR1 & RCC_APB1ENR1_TIM2EN);
+    g_g474_model.hold_timer_pending_clear = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
+    EXPECT_FALSE(g_g474_model.irq_pending[TIM2_IRQn]);
+}
+TEST_F(G474System, UnacknowledgedStatusKeepsTimebaseOwnershipUntilRetry) {
+    ASSERT_EQ(NX_SUCCESS,
+              nx_stm32g474_system_start(&g_nx_stm32g474_system, 8).primary);
+    g_g474_model.timer.SR = TIM_SR_UIF;
+    g_g474_model.ignore_write = &g_g474_model.timer.SR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
+    EXPECT_NE(0U, g_nx_stm32g474_system.remaining_effects &
+                      NX_STM32G474_EFFECT_TIMER);
+    g_g474_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32g474_system_stop(&g_nx_stm32g474_system, 8));
 }

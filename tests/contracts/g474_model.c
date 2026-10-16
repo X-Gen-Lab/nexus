@@ -37,6 +37,11 @@ nx_arch_irq_state_t nx_g474_model_irq_save(void) {
 }
 void nx_g474_model_irq_restore(nx_arch_irq_state_t previous) {
     nx_arch_irq_restore(previous);
+    if (!nx_arch_irq_is_masked() && g_g474_model.pending_register != NULL) {
+        volatile uint32_t* reg = g_g474_model.pending_register;
+        *reg = (*reg & ~g_g474_model.preempt_mask) | g_g474_model.preempt_value;
+        g_g474_model.pending_register = NULL;
+    }
     if (previous.value == 0U)
         critical_observe(false);
 }
@@ -49,7 +54,7 @@ void nx_g474_model_reset(void) {
     g_g474_model.power.CR1 = PWR_CR1_VOS_0;
     g_g474_model.power.CR5 = PWR_CR5_R1MODE;
     g_g474_model.flash.ACR = FLASH_ACR_LATENCY_1WS;
-    g_g474_model.flash.OPTR = FLASH_OPTR_DBANK;
+    g_g474_model.flash.OPTR = FLASH_OPTR_DBANK | FLASH_OPTR_IWDG_SW;
     g_g474_model.flash_kib = 512;
     g_g474_model.device_id = 0x469;
     g_nx_stm32g474_system.rcc = &g_g474_model.rcc;
@@ -62,22 +67,84 @@ bool nx_g474_model_privileged(void) {
 }
 uint32_t nx_g474_model_read(volatile uint32_t* reg) {
     g_g474_model.reads++;
+    if (g_g474_model.timer_off_reads_zero &&
+        (uintptr_t)reg >= (uintptr_t)&g_g474_model.timer &&
+        (uintptr_t)reg <
+            (uintptr_t)&g_g474_model.timer + sizeof(g_g474_model.timer) &&
+        (g_g474_model.rcc.APB1ENR1 & RCC_APB1ENR1_TIM2EN) == 0U)
+        return 0U;
     if ((reg == &g_g474_model.power.CR1 || reg == &g_g474_model.power.CR5 ||
          reg == &g_g474_model.power.SR2) &&
         (g_g474_model.rcc.APB1ENR1 & RCC_APB1ENR1_PWREN) == 0U)
         return 0U;
     uint32_t value = *reg;
-    if (g_g474_model.uart != NULL && reg == &g_g474_model.uart->RDR)
-        g_g474_model.uart->ISR &= ~(uint32_t)USART_ISR_RXNE;
+    if (reg == g_g474_model.preempt_register) {
+        g_g474_model.preempt_register = NULL;
+        if (nx_arch_irq_is_masked())
+            g_g474_model.pending_register = reg;
+        else
+            *reg = (*reg & ~g_g474_model.preempt_mask) |
+                   g_g474_model.preempt_value;
+    }
+    for (size_t index = 0U; index < 6U; ++index) {
+        USART_TypeDef* u = index == 0U ? g_g474_model.uart
+                                       : g_g474_model.other_uarts[index - 1U];
+        if (u != NULL && reg == &u->RDR)
+            u->ISR &= ~(uint32_t)USART_ISR_RXNE;
+    }
     return value;
 }
 void nx_g474_model_write(volatile uint32_t* reg, uint32_t value) {
     g_g474_model.writes++;
     if (reg == g_g474_model.ignore_write)
         return;
+    if (reg == &g_g474_model.timer.CR2 && value == 0U && *reg != 0U &&
+        g_g474_model.hold_timer_trigger_restore)
+        return;
+    if (reg == &g_g474_model.rcc.APB1RSTR1 &&
+        (*reg & RCC_APB1RSTR1_TIM2RST) != 0U &&
+        g_g474_model.hold_timer_reset_release)
+        value |= RCC_APB1RSTR1_TIM2RST;
+    if (g_g474_model.hold_spi_reset_release) {
+        if (reg == &g_g474_model.rcc.APB2RSTR &&
+            (*reg & RCC_APB2RSTR_SPI1RST) != 0U)
+            value |= RCC_APB2RSTR_SPI1RST;
+        if (reg == &g_g474_model.rcc.APB1RSTR1 &&
+            (*reg & RCC_APB1RSTR1_SPI2RST) != 0U)
+            value |= RCC_APB1RSTR1_SPI2RST;
+    }
+    if (g_g474_model.hold_pwm_reset_release &&
+        reg == &g_g474_model.rcc.APB1RSTR1)
+        value |= *reg & (RCC_APB1RSTR1_TIM3RST | RCC_APB1RSTR1_TIM4RST);
+    for (unsigned index = 0U; index < 2U; ++index) {
+        TIM_TypeDef* timer = g_g474_model.pwm[index];
+        if (timer == NULL)
+            continue;
+        if (reg == &timer->SR) {
+            *reg &= value;
+            return;
+        }
+        if (reg == &timer->EGR && (value & TIM_EGR_UG) != 0U &&
+            !g_g474_model.hold_pwm_update) {
+            nx_g474_model_pwm_update(index);
+            timer->CNT = 0U;
+            if ((timer->CR2 & TIM_CR2_MMS) == 0U)
+                g_g474_model.pwm_trigger_observed = true;
+        }
+        uint32_t mask =
+            index == 0U ? RCC_APB1RSTR1_TIM3RST : RCC_APB1RSTR1_TIM4RST;
+        if (reg == &g_g474_model.rcc.APB1RSTR1 && (value & mask) != 0U &&
+            !g_g474_model.hold_pwm_reset) {
+            memset(timer, 0, sizeof(*timer));
+            g_g474_model.pwm_compare_live[index] = 0U;
+        }
+    }
     if (reg == &g_g474_model.timer.SR && value != 0U &&
         (value & TIM_SR_UIF) == 0U && g_g474_model.hold_timer_ack)
         return;
+    if (reg == &g_g474_model.timer.DIER && value == 0U &&
+        (*reg & TIM_DIER_UIE) != 0U && g_g474_model.timer_repend_on_dier_off)
+        g_g474_model.irq_pending[TIM2_IRQn] = true;
     if (reg == &g_g474_model.timer.DIER && value == 0U &&
         g_g474_model.hold_timer_source_off)
         return;
@@ -88,6 +155,9 @@ void nx_g474_model_write(volatile uint32_t* reg, uint32_t value) {
     if (reg == &g_g474_model.rcc.APB1ENR1 && g_g474_model.hold_timer_gate_off &&
         (*reg & RCC_APB1ENR1_TIM2EN) != 0U)
         value |= RCC_APB1ENR1_TIM2EN;
+    if (reg == &g_g474_model.rcc.CSR && g_g474_model.hold_lsi_off &&
+        (*reg & RCC_CSR_LSION) != 0U)
+        value |= RCC_CSR_LSION;
     if (reg == &g_g474_model.rcc.CFGR) {
         value = (value & ~(uint32_t)RCC_CFGR_SWS) | (*reg & RCC_CFGR_SWS);
         if ((value & RCC_CFGR_SWS) == RCC_CFGR_SWS_PLL &&
@@ -100,15 +170,28 @@ void nx_g474_model_write(volatile uint32_t* reg, uint32_t value) {
     }
     if (reg == &g_g474_model.timer.EGR && (value & TIM_EGR_UG) != 0U) {
         g_g474_model.timer_update_observed = true;
+        if ((g_g474_model.timer.CR2 & TIM_CR2_MMS) == 0U)
+            g_g474_model.timer_trigger_observed = true;
         g_g474_model.timer.SR |= TIM_SR_UIF;
         g_g474_model.timer.CNT = g_g474_model.hold_timer_count ? 37U : 0U;
     }
-    if (reg == &g_g474_model.gpio.BSRR) {
-        g_g474_model.gpio.ODR |= value & 0xffffU;
-        g_g474_model.gpio.ODR &= ~(value >> 16U);
+    GPIO_TypeDef* gpios[] = {&g_g474_model.gpio, &g_g474_model.gpio_b,
+                             &g_g474_model.gpio_c, &g_g474_model.gpio_d};
+    for (size_t index = 0U; index < 4U; ++index) {
+        GPIO_TypeDef* gpio = gpios[index];
+        if (reg == &gpio->BSRR) {
+            if (g_g474_model.hold_spi_cs_release &&
+                g_g474_model.spi_transmitted != 0U && (value & 0xffffU) != 0U)
+                return;
+            gpio->ODR |= value & 0xffffU;
+            gpio->ODR &= ~(value >> 16U);
+        }
     }
-    if (g_g474_model.uart != NULL) {
-        USART_TypeDef* u = g_g474_model.uart;
+    for (size_t index = 0U; index < 6U; ++index) {
+        USART_TypeDef* u = index == 0U ? g_g474_model.uart
+                                       : g_g474_model.other_uarts[index - 1U];
+        if (u == NULL)
+            continue;
         if (reg == &u->ICR) {
             u->ISR &= ~value;
             *reg = value;
@@ -121,7 +204,30 @@ void nx_g474_model_write(volatile uint32_t* reg, uint32_t value) {
         if (reg == &u->RQR && (value & USART_RQR_RXFRQ) != 0U)
             u->ISR &= ~(uint32_t)USART_ISR_RXNE;
     }
+    for (size_t index = 0U; index < 2U; ++index) {
+        SPI_TypeDef* spi = g_g474_model.spi[index];
+        volatile uint32_t* reset = index == 0U ? &g_g474_model.rcc.APB2RSTR
+                                               : &g_g474_model.rcc.APB1RSTR1;
+        uint32_t mask =
+            index == 0U ? RCC_APB2RSTR_SPI1RST : RCC_APB1RSTR1_SPI2RST;
+        if (spi != NULL && reg == reset && (value & mask) != 0U &&
+            !g_g474_model.hold_spi_reset) {
+            memset(spi, 0, sizeof(*spi));
+            spi->CR2 = 7U << SPI_CR2_DS_Pos;
+            spi->SR = SPI_SR_TXE;
+        }
+    }
+    if (g_g474_model.watchdog != NULL && g_g474_model.hold_watchdog_update) {
+        if (reg == &g_g474_model.watchdog->PR)
+            g_g474_model.watchdog->SR |= IWDG_SR_PVU;
+        if (reg == &g_g474_model.watchdog->RLR)
+            g_g474_model.watchdog->SR |= IWDG_SR_RVU;
+    }
     *reg = value;
+    if (g_g474_model.watchdog != NULL && reg == &g_g474_model.watchdog->KR &&
+        value == 0xCCCCU && g_g474_model.watchdog_start_observer != NULL)
+        g_g474_model.watchdog_start_observer(
+            g_g474_model.watchdog_start_context);
 }
 void nx_g474_model_system_poll(void* system) {
     nx_stm32g474_system_t* s = system;
@@ -171,7 +277,53 @@ nx_result_t nx_g474_model_irq_control(int irq, bool enabled, uint8_t priority) {
     }
     if (!enabled && !g_g474_model.hold_irq_off) {
         g_g474_model.irq_enabled[irq] = false;
-        g_g474_model.irq_pending[irq] = false;
+        if (irq != TIM2_IRQn || !g_g474_model.hold_timer_pending_clear ||
+            g_g474_model.timer.DIER != 0U)
+            g_g474_model.irq_pending[irq] = false;
     }
-    return g_g474_model.irq_enabled[irq] == enabled ? NX_SUCCESS : NX_ERROR_IO;
+    return g_g474_model.irq_enabled[irq] == enabled &&
+                   (enabled || !g_g474_model.irq_pending[irq])
+               ? NX_SUCCESS
+               : NX_ERROR_IO;
+}
+
+void nx_g474_model_spi_poll(void* port) {
+    (void)port;
+    g_g474_model.timer.CNT++;
+}
+void nx_g474_model_spi_write(volatile uint32_t* reg, uint8_t value) {
+    for (size_t index = 0U; index < 2U; ++index) {
+        SPI_TypeDef* spi = g_g474_model.spi[index];
+        if (spi != NULL && reg == &spi->DR) {
+            g_g474_model.spi_transmitted++;
+            spi->DR = (uint32_t)value ^ 0xffU;
+            if (g_g474_model.hold_spi_progress)
+                spi->SR = SPI_SR_BSY;
+            else
+                spi->SR = SPI_SR_TXE | SPI_SR_RXNE | SPI_SR_FRLVL_0;
+            return;
+        }
+    }
+}
+uint8_t nx_g474_model_spi_read(volatile uint32_t* reg) {
+    uint8_t value = (uint8_t)*reg;
+    for (size_t index = 0U; index < 2U; ++index) {
+        SPI_TypeDef* spi = g_g474_model.spi[index];
+        if (spi != NULL && reg == &spi->DR)
+            spi->SR &= ~(uint32_t)(SPI_SR_RXNE | SPI_SR_FRLVL);
+    }
+    return value;
+}
+
+void nx_g474_model_pwm_poll(void* port) {
+    (void)port;
+    g_g474_model.timer.CNT++;
+}
+void nx_g474_model_pwm_update(unsigned index) {
+    TIM_TypeDef* timer = g_g474_model.pwm[index];
+    if (timer != NULL) {
+        g_g474_model.pwm_compare_live[index] = timer->CCR1;
+        g_g474_model.pwm_updates[index]++;
+        timer->SR |= TIM_SR_UIF;
+    }
 }

@@ -751,7 +751,7 @@ class DeveloperWorkflowTests(unittest.TestCase):
         self.assertEqual(len({name for name in names
                               if name.startswith("stm32-nucleo-")}), 8)
         self.assertEqual(len({name for name in names
-                              if name.startswith("fixture-stm32-g474-")}), 6)
+                              if name.startswith("fixture-stm32-g474-")}), 14)
         for row in configurations:
             self.assertIn(row["name"], builds)
             selected = selected_configure(dev.ROOT, row["name"])

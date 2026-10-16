@@ -55,9 +55,20 @@ class PackagePinContractTests(unittest.TestCase):
         self.assertEqual({f"P{port}{pin}" for port in "ABC"
                           for pin in range(16)} | {"PD2", "PF0", "PF1", "PG10"},
                          set(pins))
-        self.assertEqual(set(soc["controllers"]),
-                         {"GPIOA", "LPUART1", "EXTI0", "EXTI1"})
-        self.assertEqual(soc["controllers"]["LPUART1"]["modes"], ["irq-bytes"])
+        expected = {"GPIO" + bank: ("gpio", ["input", "output"])
+                    for bank in "ABCDFG"}
+        expected.update({name: ("uart", ["irq-bytes"])
+                         for name in ("LPUART1", "USART1", "USART2", "USART3",
+                                      "UART4", "UART5")})
+        expected.update({name: ("spi", ["short-poll"])
+                         for name in ("SPI1", "SPI2")})
+        expected.update({name: ("pwm", ["fixed-pwm"])
+                         for name in ("TIM3", "TIM4")})
+        expected.update({"IWDG": ("watchdog", ["independent"]),
+                         "EXTI0": ("exti", ["edge-event"]),
+                         "EXTI1": ("exti", ["edge-event"])})
+        self.assertEqual({name: (item["kind"], item["modes"])
+                          for name, item in soc["controllers"].items()}, expected)
         for line in (0, 1):
             self.assertEqual(soc["controllers"][f"EXTI{line}"]["modes"],
                              ["edge-event"])

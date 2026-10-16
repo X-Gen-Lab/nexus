@@ -14,6 +14,16 @@ class AdmissionInput(dict):
 
 
 class ColdPreflightGenerationTests(unittest.TestCase):
+    def test_h743_rx_checks_its_own_stream_mux_and_vector_before_system_start(self):
+        source = self.start("tests/contracts/h743_assembly/rx-cache.toml")
+        before = source[:source.index("nx_stm32h743_system_start")]
+        for resource in ("DMA1_Stream1_IRQn", "RCC_AHB1ENR_DMA1EN",
+                         "DMA1_Stream1->CR", "DMAMUX1_Channel1->CCR"):
+            self.assertIn(resource, before)
+        self.assertNotIn("DMA1_Stream0", before)
+        self.assertNotIn("DMAMUX1_Channel0", before)
+        self.assertNotIn("NX_H743_WRITE", before)
+
     def test_h743_dma_rejects_live_lane_mux_and_vector_before_system_start(self):
         source = self.start("tests/contracts/h743_assembly/dma.toml")
         before = source[:source.index("nx_stm32h743_system_start")]

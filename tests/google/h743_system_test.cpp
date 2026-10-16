@@ -32,6 +32,36 @@ TEST_F(H743System, Hsi64EstablishesIndependentOneMhzTimer) {
     EXPECT_EQ(g_h743_model.rcc.CR, RCC_CR_HSION | RCC_CR_HSIRDY);
     EXPECT_EQ(g_h743_model.power.CR3, PWR_CR3_LDOEN);
 }
+TEST_F(H743System, TimebasePrescalerUpdateNeverExportsATrgoPulse) {
+    ASSERT_EQ(NX_SUCCESS, Start().primary);
+    EXPECT_EQ(0U, g_h743_model.timer_trgo_pulses);
+    EXPECT_EQ(0U, g_h743_model.timer.CR2 & TIM_CR2_MMS);
+    EXPECT_NE(0U, g_h743_model.timer.CR1 & TIM_CR1_CEN);
+}
+TEST_F(H743System, WrapDuringSourceWithdrawalIsClearedBeforeDroppingTimer) {
+    ASSERT_EQ(NX_SUCCESS, Start().primary);
+    g_h743_model.timer_pending_on_dier = true;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U));
+    EXPECT_FALSE(g_h743_model.irq_pending[TIM2_IRQn]);
+    EXPECT_FALSE(g_h743_model.irq_enabled[TIM2_IRQn]);
+    EXPECT_EQ(0U, g_h743_model.timer.SR);
+    EXPECT_EQ(0U, g_nx_stm32h743_system.remaining_effects);
+}
+TEST_F(H743System, RefusedQuietMmsRestorationKeepsQuiescentTimerAndGate) {
+    g_h743_model.hold_timer_mms_restore = true;
+    const auto result = Start();
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_ERROR_IO, result.cleanup);
+    EXPECT_NE(0U, result.remaining_effects);
+    EXPECT_EQ(0U, g_h743_model.timer.CR1 & TIM_CR1_CEN);
+    EXPECT_EQ(TIM_CR2_MMS_0, g_h743_model.timer.CR2 & TIM_CR2_MMS);
+    EXPECT_NE(0U, g_h743_model.rcc.APB1LENR & RCC_APB1LENR_TIM2EN);
+    EXPECT_EQ(0U, g_h743_model.timer_trgo_pulses);
+    g_h743_model.hold_timer_mms_restore = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8));
+    EXPECT_EQ(0U, g_nx_stm32h743_system.remaining_effects);
+    EXPECT_EQ(0U, g_h743_model.timer.CR2 & TIM_CR2_MMS);
+}
 TEST_F(H743System, CacheOrUnknownClockIsRejectedWithoutWrites) {
     for (unsigned fault = 0U; fault < 4U; ++fault) {
         nx_h743_model_reset();
@@ -56,6 +86,52 @@ TEST_F(H743System, ExistingTimerOrIrqCannotBeAdopted) {
     g_h743_model.irq_enabled[TIM2_IRQn] = true;
     EXPECT_EQ(Start().primary, NX_ERROR_BUSY);
     EXPECT_EQ(g_h743_model.writes, 0U);
+}
+TEST_F(H743System, ForeignTimerTriggerOutputAndCaptureRejectBeforeMutation) {
+    for (unsigned field = 0; field < 5; ++field) {
+        nx_h743_model_reset();
+        volatile uint32_t* registers[] = {
+            &g_h743_model.timer.CR2, &g_h743_model.timer.SMCR,
+            &g_h743_model.timer.CCER, &g_h743_model.timer.CCMR1,
+            &g_h743_model.timer.CCMR2};
+        *registers[field] = 1U;
+        const auto result = Start();
+        EXPECT_EQ(NX_ERROR_BUSY, result.primary) << field;
+        EXPECT_EQ(0U, result.remaining_effects) << field;
+        EXPECT_EQ(0U, g_h743_model.writes) << field;
+        EXPECT_EQ(1U, *registers[field]) << field;
+    }
+}
+TEST_F(H743System, LatentTimerStateRejectsAfterGateWithoutResetOrTimerWrites) {
+    g_h743_model.hide_timer_when_gated = true;
+    g_h743_model.timer.SMCR = TIM_SMCR_SMS_0;
+    const auto result = Start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(TIM_SMCR_SMS_0, g_h743_model.timer.SMCR);
+    EXPECT_EQ(0U, g_h743_model.timer_writes);
+    EXPECT_EQ(0U, g_h743_model.timer_reset_writes);
+    EXPECT_EQ(0U, g_h743_model.rcc.APB1LENR & RCC_APB1LENR_TIM2EN);
+    EXPECT_FALSE(g_nx_stm32h743_system.started);
+}
+TEST_F(H743System,
+       RefusedGateRollbackRetainsOnlyGateWithoutTakingForeignTimer) {
+    g_h743_model.hide_timer_when_gated = true;
+    g_h743_model.hold_timer_gate_off = true;
+    g_h743_model.timer.SMCR = TIM_SMCR_SMS_0;
+    const auto result = Start();
+    EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+    EXPECT_EQ(NX_ERROR_IO, result.cleanup);
+    EXPECT_EQ(NX_STM32H743_EFFECT_TIMER_GATE, result.remaining_effects);
+    EXPECT_EQ(0U, g_h743_model.timer_writes);
+    EXPECT_EQ(0U, g_h743_model.timer_reset_writes);
+    g_h743_model.hold_timer_gate_off = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8));
+    EXPECT_EQ(0U, g_nx_stm32h743_system.remaining_effects);
+    EXPECT_EQ(TIM_SMCR_SMS_0, g_h743_model.timer.SMCR);
+    EXPECT_EQ(0U, g_h743_model.timer_writes);
+    EXPECT_EQ(0U, g_h743_model.timer_reset_writes);
 }
 TEST_F(H743System, TimerWriteRefusalRetainsFailedCleanupForRetry) {
     g_h743_model.ignore_write = &g_h743_model.timer.DIER;

@@ -1,0 +1,33 @@
+{
+  "commit": "fee494a92b5ad331f92ad21f76c66a5cb83773ee",
+  "files": {
+    "Inc/stm32f1xx_ll_gpio.h": {
+      "bytes": 88034,
+      "sha256": "c26c8e6cf44e838326a01baa73337938fce71a6e77d0670c0ad33fdc586629ae"
+    },
+    "Inc/stm32f1xx_ll_usart.h": {
+      "bytes": 99185,
+      "sha256": "8684e487827c318256ba7ae36841bd2c7fa2438c0cc5c8aa36b555f607873e77"
+    },
+    "LICENSE.md": {
+      "bytes": 1485,
+      "sha256": "dff179cfe1405dc3381dc6865bf4a5173b35605b65694d73356b01aaec1f09f1"
+    }
+  },
+  "kind": "nexus-reviewed-official-driver",
+  "license": {
+    "expression": "BSD-3-Clause",
+    "path": "LICENSE.md"
+  },
+  "pairing": {
+    "cmsis_commit": "c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22",
+    "cmsis_repository": "https://github.com/STMicroelectronics/cmsis-device-f1.git",
+    "commit": "d12e75247d5bcedc734f829b394517ab4c2726e3",
+    "release": "v1.8.7",
+    "repository": "https://github.com/STMicroelectronics/STM32CubeF1.git"
+  },
+  "release": "STM32CubeF1-v1.8.7-pinned-driver",
+  "repository": "https://github.com/STMicroelectronics/stm32f1xx-hal-driver.git",
+  "schema_version": 1,
+  "selected_api": "stm32f103-ll-inline"
+}

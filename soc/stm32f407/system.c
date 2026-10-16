@@ -52,8 +52,10 @@ void TIM2_IRQHandler(void) {
 #define NX_STM32_POLL(system) ((void)(system))
 #endif
 
-#define NX_STM32_EFFECT_CLOCK 1U
-#define NX_STM32_EFFECT_TIMER 2U
+#define NX_STM32_EFFECT_CLOCK       1U
+#define NX_STM32_EFFECT_TIMER       2U
+#define NX_STM32_EFFECT_TIMER_GATE  4U
+#define NX_STM32_EFFECT_TIMER_QUIET 8U
 #ifndef NX_STM32_WRITE
 #define NX_STM32_WRITE(reg, value) (*(reg) = (uint32_t)(value))
 #endif
@@ -132,6 +134,13 @@ static bool write_checked(volatile uint32_t* reg, uint32_t value,
     return (*reg & mask) == (value & mask);
 }
 
+/** \brief Exclude retained slave, trigger, channel and DMA-burst owners. */
+static bool timer_mode_idle(const TIM_TypeDef* timer) {
+    return timer->CR1 == 0U && timer->CR2 == 0U && timer->SMCR == 0U &&
+           timer->DIER == 0U && timer->CCMR1 == 0U && timer->CCMR2 == 0U &&
+           timer->CCER == 0U && timer->DCR == 0U;
+}
+
 /** \brief Check cold ownership before any global clock or Flash change. */
 nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system) {
     if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
@@ -153,7 +162,8 @@ nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system) {
         (system->rcc->CFGR & bus_mask) != 0U ||
         (system->rcc->SSCGR & RCC_SSCGR_SSCGEN) != 0U ||
         (system->rcc->APB1ENR & RCC_APB1ENR_TIM2EN) != 0U ||
-        system->timer->CR1 != 0U || system->timer->DIER != 0U ||
+        (system->rcc->APB1RSTR & RCC_APB1RSTR_TIM2RST) != 0U ||
+        !timer_mode_idle(system->timer) ||
         (system->flash->SR & FLASH_SR_BSY) != 0U ||
         !NX_STM32_IRQ_AVAILABLE(TIM2_IRQn)) {
         return NX_ERROR_BUSY;
@@ -326,22 +336,43 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
         result.primary = -5;
         goto rollback;
     }
-    system->remaining_effects |= NX_STM32_EFFECT_TIMER;
+    system->remaining_effects |= NX_STM32_EFFECT_TIMER_GATE;
     if (!write_checked(&system->rcc->APB1ENR,
                        system->rcc->APB1ENR | RCC_APB1ENR_TIM2EN,
                        RCC_APB1ENR_TIM2EN)) {
         result.primary = -6;
         goto rollback;
     }
-    NX_STM32_WRITE(&system->rcc->APB1RSTR,
-                   system->rcc->APB1RSTR | RCC_APB1RSTR_TIM2RST);
-    NX_STM32_WRITE(&system->rcc->APB1RSTR,
-                   system->rcc->APB1RSTR & ~(uint32_t)RCC_APB1RSTR_TIM2RST);
+    /* Gated MMIO may have read as zero during preflight. A foreign timer
+     * discovered now lends no register or IRQ ownership to cleanup. */
+    if (!timer_mode_idle(system->timer) ||
+        (system->rcc->APB1RSTR & RCC_APB1RSTR_TIM2RST) != 0U) {
+        result.primary = -6;
+        goto rollback;
+    }
+    system->remaining_effects |= NX_STM32_EFFECT_TIMER;
+    if (!write_checked(&system->rcc->APB1RSTR,
+                       system->rcc->APB1RSTR | RCC_APB1RSTR_TIM2RST,
+                       RCC_APB1RSTR_TIM2RST) ||
+        !write_checked(&system->rcc->APB1RSTR,
+                       system->rcc->APB1RSTR & ~(uint32_t)RCC_APB1RSTR_TIM2RST,
+                       RCC_APB1RSTR_TIM2RST) ||
+        !timer_mode_idle(system->timer)) {
+        result.primary = -6;
+        goto rollback;
+    }
     bool valid = write_checked(&system->timer->CR1, 0U, UINT32_MAX) &&
                  write_checked(&system->timer->PSC, 83U, UINT32_MAX) &&
                  write_checked(&system->timer->ARR, UINT32_MAX, UINT32_MAX) &&
                  write_checked(&system->timer->SR, 0U, UINT32_MAX);
     if (!valid) {
+        result.primary = -6;
+        goto rollback;
+    }
+    /* MMS=reset exports UG as TRGO. While CEN is zero, MMS=enable keeps
+     * TRGO quiet through shadow transfer. Restore reset before enabling. */
+    system->remaining_effects |= NX_STM32_EFFECT_TIMER_QUIET;
+    if (!write_checked(&system->timer->CR2, TIM_CR2_MMS_0, TIM_CR2_MMS)) {
         result.primary = -6;
         goto rollback;
     }
@@ -352,10 +383,12 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
     if (!wait_bits(system, &system->timer->SR, TIM_SR_UIF, TIM_SR_UIF,
                    poll_limit) ||
         !write_checked(&system->timer->SR, 0U, UINT32_MAX) ||
-        !write_checked(&system->timer->CNT, 0U, UINT32_MAX)) {
+        !write_checked(&system->timer->CNT, 0U, UINT32_MAX) ||
+        !write_checked(&system->timer->CR2, 0U, TIM_CR2_MMS)) {
         result.primary = -6;
         goto rollback;
     }
+    system->remaining_effects &= ~NX_STM32_EFFECT_TIMER_QUIET;
     system->overflow_us = 0U;
     valid = write_checked(&system->timer->DIER, TIM_DIER_UIE, UINT32_MAX) &&
             write_checked(&system->timer->CR1, TIM_CR1_CEN, UINT32_MAX) &&
@@ -386,15 +419,36 @@ int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit) {
 #endif
     if ((system->remaining_effects & NX_STM32_EFFECT_TIMER) != 0U) {
         system->started = false;
-        if (NX_STM32_IRQ_CONTROL(TIM2_IRQn, false) != 0 ||
+        /* Initial withdrawal is best effort: an asserted source can repend
+         * while it is still enabled. Its final proof follows source clear. */
+        (void)NX_STM32_IRQ_CONTROL(TIM2_IRQn, false);
+        if (!write_checked(&system->rcc->APB1RSTR,
+                           system->rcc->APB1RSTR &
+                               ~(uint32_t)RCC_APB1RSTR_TIM2RST,
+                           RCC_APB1RSTR_TIM2RST) ||
             !write_checked(&system->timer->DIER, 0U, UINT32_MAX) ||
             !write_checked(&system->timer->CR1, 0U, UINT32_MAX) ||
-            !write_checked(&system->rcc->APB1ENR,
+            !write_checked(&system->timer->SR, 0U, UINT32_MAX)) {
+            return -1;
+        }
+        if ((system->remaining_effects & NX_STM32_EFFECT_TIMER_QUIET) != 0U) {
+            if (!write_checked(&system->timer->CR2, 0U, TIM_CR2_MMS))
+                return -1;
+            system->remaining_effects &= ~NX_STM32_EFFECT_TIMER_QUIET;
+        }
+        /* The source can repend after the first vector withdrawal. Only a
+         * stopped, cleared peripheral permits final vector/owner release. */
+        if (NX_STM32_IRQ_CONTROL(TIM2_IRQn, false) != 0)
+            return -1;
+        system->remaining_effects &= ~NX_STM32_EFFECT_TIMER;
+    }
+    if ((system->remaining_effects & NX_STM32_EFFECT_TIMER_GATE) != 0U) {
+        if (!write_checked(&system->rcc->APB1ENR,
                            system->rcc->APB1ENR & ~(uint32_t)RCC_APB1ENR_TIM2EN,
                            RCC_APB1ENR_TIM2EN)) {
             return -1;
         }
-        system->remaining_effects &= ~NX_STM32_EFFECT_TIMER;
+        system->remaining_effects &= ~NX_STM32_EFFECT_TIMER_GATE;
     }
     if ((system->remaining_effects & NX_STM32_EFFECT_CLOCK) != 0U) {
         return restore_hsi(system, poll_limit);

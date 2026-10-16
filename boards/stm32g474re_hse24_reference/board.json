@@ -20,6 +20,88 @@
       "id": "uart1",
       "controller": "LPUART1",
       "route": "lpuart1-pa2-pa3"
+    },
+    {
+      "id": "gpio-b0",
+      "controller": "GPIOB",
+      "route": "gpio-pb0",
+      "mask": 1,
+      "initial": 0
+    },
+    {
+      "id": "gpio-c0",
+      "controller": "GPIOC",
+      "route": "gpio-pc0",
+      "mask": 1,
+      "initial": 0
+    },
+    {
+      "id": "usart1",
+      "controller": "USART1",
+      "route": "usart1-pa9-pa10"
+    },
+    {
+      "id": "usart2",
+      "controller": "USART2",
+      "route": "usart2-pa2-pa3"
+    },
+    {
+      "id": "usart3",
+      "controller": "USART3",
+      "route": "usart3-pb10-pb11"
+    },
+    {
+      "id": "uart4",
+      "controller": "UART4",
+      "route": "uart4-pc10-pc11"
+    },
+    {
+      "id": "uart5",
+      "controller": "UART5",
+      "route": "uart5-pc12-pd2"
+    },
+    {
+      "id": "watchdog0",
+      "controller": "IWDG",
+      "route": "iwdg"
+    },
+    {
+      "id": "spi1",
+      "controller": "SPI1",
+      "route": "spi1-pa5-pa6-pa7"
+    },
+    {
+      "id": "spi2",
+      "controller": "SPI2",
+      "route": "spi2-pb13-pb14-pb15"
+    },
+    {
+      "id": "spi1-cs",
+      "controller": "GPIOA",
+      "route": "gpio-pa4",
+      "initial": 16,
+      "mask": 16
+    },
+    {
+      "id": "spi2-cs",
+      "controller": "GPIOB",
+      "route": "gpio-pb12",
+      "initial": 4096,
+      "mask": 4096
+    },
+    {
+      "id": "pwm3",
+      "controller": "TIM3",
+      "route": "tim3-ch1-pa6",
+      "mask": 64,
+      "initial": 0
+    },
+    {
+      "id": "pwm4",
+      "controller": "TIM4",
+      "route": "tim4-ch1-pb6",
+      "mask": 64,
+      "initial": 0
     }
   ],
   "reserved_resources": [
@@ -31,7 +113,9 @@
     "X3 crystal population/frequency and SB25/SB26/SB24/SB28/SB27 electrical states not inspected",
     "PA5 LD2/SB6 fitting and LPUART1 VCP SB17/SB23/SB18/SB22/SB13/SB19 paths not inspected",
     "No physical HIL executed; clock timing, serial traffic and electrical behavior unqualified",
-    "All peripheral modes other than GPIOA PA5 and LPUART1 IRQ bytes remain unsupported"
+    "Additional USART1/2/3, UART4/5 and GPIOB0/GPIOC0 bindings are silicon-route software fixtures only; connector exposure, solder bridges and attached loads are not inspected. PF0/PF1 HSE and PG10 reset are not exposed as Board bindings.",
+    "SPI1/2 bindings and PA4/PB12 active-low chip selects are unattached silicon-route software fixtures; no external device, connector voltage or bus electrical facts have been observed.",
+    "TIM3 CH1 PA6 and TIM4 CH1 PB6 PWM bindings are unattached silicon-route software fixtures; connector exposure, idle-level suitability and electrical loads have not been inspected."
   ],
   "provenance": [
     {

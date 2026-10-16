@@ -45,14 +45,31 @@ bool nx_h743_model_privileged(void) {
 }
 uint32_t nx_h743_model_read(volatile uint32_t* reg) {
     ++g_h743_model.reads;
+    uintptr_t address = reinterpret_cast<uintptr_t>(reg);
+    uintptr_t timer = reinterpret_cast<uintptr_t>(&g_h743_model.timer);
+    if (g_h743_model.hide_timer_when_gated && address >= timer &&
+        address < timer + sizeof(g_h743_model.timer) &&
+        (g_h743_model.rcc.APB1LENR & RCC_APB1LENR_TIM2EN) == 0U)
+        return 0U;
     uint32_t value = *reg;
     if (g_h743_model.uart != nullptr && reg == &g_h743_model.uart->RDR)
         g_h743_model.uart->ISR &= ~(uint32_t)USART_ISR_RXNE_RXFNE;
     return value;
 }
 void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
+    if (reg == &g_h743_model.timer.DIER && value == 0U &&
+        g_h743_model.timer_pending_on_dier) {
+        g_h743_model.timer_pending_on_dier = false;
+        g_h743_model.timer.SR |= TIM_SR_UIF;
+        g_h743_model.irq_pending[TIM2_IRQn] = true;
+    }
+    uintptr_t address = reinterpret_cast<uintptr_t>(reg);
+    uintptr_t timer = reinterpret_cast<uintptr_t>(&g_h743_model.timer);
+    if (address >= timer && address < timer + sizeof(g_h743_model.timer))
+        ++g_h743_model.timer_writes;
+    if (reg == &g_h743_model.rcc.APB1LRSTR)
+        ++g_h743_model.timer_reset_writes;
     ++g_h743_model.writes;
-    const uintptr_t address = reinterpret_cast<uintptr_t>(reg);
     GPIO_TypeDef* banks[] = {&g_h743_model.gpio_b, &g_h743_model.gpio_d};
     for (GPIO_TypeDef* gpio : banks) {
         const uintptr_t base = reinterpret_cast<uintptr_t>(gpio);
@@ -60,6 +77,14 @@ void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
             ++g_h743_model.gpio_writes;
     }
     if (reg == g_h743_model.ignore_write)
+        return;
+    if (reg == &g_h743_model.timer.CR2 && g_h743_model.hold_timer_mms_restore &&
+        (g_h743_model.timer.CR2 & TIM_CR2_MMS) == TIM_CR2_MMS_0 &&
+        (value & TIM_CR2_MMS) == 0U)
+        return;
+    if (reg == &g_h743_model.rcc.APB1LENR && g_h743_model.hold_timer_gate_off &&
+        (g_h743_model.rcc.APB1LENR & RCC_APB1LENR_TIM2EN) != 0U &&
+        (value & RCC_APB1LENR_TIM2EN) == 0U)
         return;
     if (reg == &g_h743_model.rcc.CR) {
         const uint32_t readonly = RCC_CR_HSIRDY | RCC_CR_HSIDIVF;
@@ -71,8 +96,16 @@ void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
         }
         return;
     }
-    if (reg == &g_h743_model.timer.EGR && (value & TIM_EGR_UG) != 0U)
+    if (reg == &g_h743_model.timer.EGR && (value & TIM_EGR_UG) != 0U) {
+        if ((g_h743_model.timer.CR2 & TIM_CR2_MMS) == 0U)
+            ++g_h743_model.timer_trgo_pulses;
         g_h743_model.timer.SR |= TIM_SR_UIF;
+    }
+    if (reg == &g_h743_model.timer.CR1 &&
+        (g_h743_model.timer.CR1 & TIM_CR1_CEN) == 0U &&
+        (value & TIM_CR1_CEN) != 0U &&
+        (g_h743_model.timer.CR2 & TIM_CR2_MMS) == TIM_CR2_MMS_0)
+        ++g_h743_model.timer_trgo_pulses;
     if (reg == &g_h743_model.timer.SR) {
         *reg &= value;
         return;

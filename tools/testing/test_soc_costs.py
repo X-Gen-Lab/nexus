@@ -369,6 +369,22 @@ class SocCostsTests(unittest.TestCase):
         self.assertEqual(candidate["status"], "observed")
         self.assertGreater(candidate["functions"][0]["static_instructions"], 0)
 
+    def test_actual_softfp_fpu_observation_and_reverification_keep_compile_abi(self):
+        candidate = self.candidate(
+            cpu={"arch": "cortex-m4", "fpu": "fpv4-sp-d16",
+                 "float_abi": "softfp"},
+            code=lambda source: source +
+                "\nfloat nx_abi_add(float a, float b) { return a + b; }\n")
+        self.assertEqual(candidate["status"], "observed")
+        self.assertGreater(candidate["functions"][0]["static_instructions"], 0)
+        resolved = json.loads(
+            (self.output / "candidate-source/resolved.json").read_text())
+        self.assertEqual(resolved["cpu"]["float_abi"], "softfp")
+        commands = json.loads(
+            (self.output / "candidate-source/compile_commands.json").read_text())
+        self.assertIn("-mfloat-abi=softfp", commands[0]["arguments"])
+        soc_costs.validate_observation(candidate)
+
     def test_actual_no_fpu_object_rejects_hard_abi_interpretation(self):
         from tools.measurement.elf import Elf32
         self.candidate(cpu={"arch": "cortex-m0", "fpu": "none",

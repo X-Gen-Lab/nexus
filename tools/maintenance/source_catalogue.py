@@ -18,6 +18,12 @@ class SourceDependency(NamedTuple):
 
 
 SOURCE_DEPENDENCIES = (
+    SourceDependency("stm32f1_cmsis", "vendors/st/cmsis_device_f1",
+                     "https://github.com/STMicroelectronics/cmsis-device-f1.git",
+                     "License.md", "dependencies/stm32f1.lock.json"),
+    SourceDependency("stm32f1_hal", "vendors/st/stm32f1_hal",
+                     "https://github.com/STMicroelectronics/stm32f1xx-hal-driver.git",
+                     "LICENSE.md", "dependencies/stm32f1-hal.lock.json"),
     SourceDependency("freertos", "ext/freertos",
                      "https://github.com/FreeRTOS/FreeRTOS-Kernel.git", "LICENSE.md"),
     SourceDependency("cmsis5", "vendors/arm/CMSIS_5",

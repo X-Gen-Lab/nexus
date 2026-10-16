@@ -24,6 +24,13 @@ _Alignas(32) static uint8_t s_data[32] = {0x12U, 0x34U};
 static uint8_t s_data[2] = {0x12U, 0x34U};
 #endif
 #endif
+#ifdef NX_H743_RX_FIXTURE
+_Alignas(32) static uint8_t s_rx_data[2][64];
+static nx_stream_slot_t s_rx_slots[2] = {
+    {.data = s_rx_data[0], .capacity = sizeof(s_rx_data[0])},
+    {.data = s_rx_data[1], .capacity = sizeof(s_rx_data[1])}};
+static nx_stream_t s_rx_stream;
+#endif
 int main(void) {
     nx_platform_start_result_t start = nx_platform_start();
     if (start.primary != NX_SUCCESS) {
@@ -32,6 +39,10 @@ int main(void) {
 #ifdef NX_H743_IO_FIXTURE
     const nx_gpio_port_t* led = nx_factory_gpio(NX_GPIO_ID_LED);
     const nx_uart_port_t* console = nx_factory_uart(NX_UART_ID_CONSOLE);
+#ifdef NX_H743_RX_FIXTURE
+    (void)nx_stream_initialize(&s_rx_stream, s_rx_slots, 2U);
+    (void)nx_uart_port_rx_start(console, &s_rx_stream);
+#endif
     nx_request_initialize(&s_request.base);
     (void)nx_gpio_port_write(led, 1U << 0U, 0U);
     (void)nx_uart_tx_prepare(&s_request, s_data, sizeof(s_data),
@@ -39,6 +50,9 @@ int main(void) {
     (void)nx_uart_port_submit(console, &s_request);
     (void)nx_uart_port_cancel(console, &s_request);
     nx_uart_port_service(console);
+#ifdef NX_H743_RX_FIXTURE
+    (void)nx_uart_port_rx_stop(console);
+#endif
 #endif
 #ifdef NX_H743_FREERTOS_FIXTURE
     /* Retain the real static kernel graph. This ELF is not executed by HIL. */

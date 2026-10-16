@@ -42,6 +42,13 @@ static bool write_checked(volatile uint32_t* reg, uint32_t value,
     nx_arch_dsb();
     return (NX_H743_READ(reg) & mask) == (value & mask);
 }
+/** \brief CEN/DIER alone cannot exclude trigger or pin/capture owners. */
+static bool timer_idle(const nx_stm32h743_system_t* s) {
+    return (NX_H743_READ(&s->timer->CR1) | NX_H743_READ(&s->timer->CR2) |
+            NX_H743_READ(&s->timer->SMCR) | NX_H743_READ(&s->timer->DIER) |
+            NX_H743_READ(&s->timer->CCER) | NX_H743_READ(&s->timer->CCMR1) |
+            NX_H743_READ(&s->timer->CCMR2)) == 0U;
+}
 static bool wait_update(nx_stm32h743_system_t* s, uint32_t limit) {
     while (limit-- != 0U) {
         NX_H743_SYSTEM_POLL(s);
@@ -124,9 +131,7 @@ nx_result_t nx_stm32h743_system_preflight(const nx_stm32h743_system_t* s) {
         ((NX_H743_READ(&s->flash->SR1) | NX_H743_READ(&s->flash->SR2)) &
          FLASH_SR_BSY) != 0U ||
         (NX_H743_READ(&s->rcc->APB1LENR) & RCC_APB1LENR_TIM2EN) != 0U ||
-        NX_H743_READ(&s->timer->CR1) != 0U ||
-        NX_H743_READ(&s->timer->DIER) != 0U ||
-        !NX_H743_IRQ_AVAILABLE(TIM2_IRQn))
+        !timer_idle(s) || !NX_H743_IRQ_AVAILABLE(TIM2_IRQn))
         return NX_ERROR_BUSY;
     return NX_SUCCESS;
 }
@@ -153,8 +158,22 @@ nx_stm32h743_start_result_t nx_stm32h743_system_start(nx_stm32h743_system_t* s,
     s->timer_error = NX_SUCCESS;
     s->core_hz = 64000000U;
     s->reset_cause = NX_H743_READ(&s->rcc->RSR);
+    /* An off peripheral gate can hide retained controls. Only the reversible
+     * gate is ours until a second observation proves the timer is unowned. */
+    s->remaining_effects = NX_STM32H743_EFFECT_TIMER_GATE;
+    if (!write_checked(&s->rcc->APB1LENR,
+                       NX_H743_READ(&s->rcc->APB1LENR) | RCC_APB1LENR_TIM2EN,
+                       RCC_APB1LENR_TIM2EN)) {
+        r.primary = NX_ERROR_IO;
+        goto rollback;
+    }
+    if (!timer_idle(s)) {
+        r.primary = NX_ERROR_BUSY;
+        goto rollback;
+    }
+    s->remaining_effects = NX_STM32H743_EFFECT_TIMER;
     if (core_hz == 32000000U) {
-        s->remaining_effects = NX_STM32H743_EFFECT_DIVIDER;
+        s->remaining_effects |= NX_STM32H743_EFFECT_DIVIDER;
         NX_H743_WRITE(&s->rcc->CR,
                       (NX_H743_READ(&s->rcc->CR) & ~(uint32_t)RCC_CR_HSIDIV) |
                           RCC_CR_HSIDIV_2);
@@ -186,13 +205,6 @@ nx_stm32h743_start_result_t nx_stm32h743_system_start(nx_stm32h743_system_t* s,
         }
     }
 #endif
-    s->remaining_effects |= NX_STM32H743_EFFECT_TIMER;
-    if (!write_checked(&s->rcc->APB1LENR,
-                       NX_H743_READ(&s->rcc->APB1LENR) | RCC_APB1LENR_TIM2EN,
-                       RCC_APB1LENR_TIM2EN)) {
-        r.primary = NX_ERROR_IO;
-        goto rollback;
-    }
     /* Reset only the reserved controller, never another peripheral domain. */
     if (!write_checked(&s->rcc->APB1LRSTR,
                        NX_H743_READ(&s->rcc->APB1LRSTR) | RCC_APB1LRSTR_TIM2RST,
@@ -207,6 +219,14 @@ nx_stm32h743_start_result_t nx_stm32h743_system_start(nx_stm32h743_system_t* s,
         r.primary = NX_ERROR_IO;
         goto rollback;
     }
+    /* MMS=000 exports UG on TRGO. Select the disabled CEN signal instead
+     * while updating the prescaler, then restore reset MMS before CEN starts.
+     */
+    s->remaining_effects |= NX_STM32H743_EFFECT_TIMER_QUIET;
+    if (!write_checked(&s->timer->CR2, TIM_CR2_MMS_0, UINT32_MAX)) {
+        r.primary = NX_ERROR_IO;
+        goto rollback;
+    }
     NX_H743_WRITE(&s->timer->EGR, TIM_EGR_UG);
     nx_arch_dsb();
     if (!wait_update(s, limit)) {
@@ -217,6 +237,13 @@ nx_stm32h743_start_result_t nx_stm32h743_system_start(nx_stm32h743_system_t* s,
         r.primary = NX_ERROR_IO;
         goto rollback;
     }
+    if (!write_checked(&s->timer->CR2,
+                       NX_H743_READ(&s->timer->CR2) & ~(uint32_t)TIM_CR2_MMS,
+                       TIM_CR2_MMS)) {
+        r.primary = NX_ERROR_IO;
+        goto rollback;
+    }
+    s->remaining_effects &= ~NX_STM32H743_EFFECT_TIMER_QUIET;
     NX_H743_WRITE(&s->timer->CNT, 0U);
     s->overflow_us = 0U;
     if (!write_checked(&s->timer->DIER, TIM_DIER_UIE, UINT32_MAX) ||
@@ -241,14 +268,24 @@ nx_result_t nx_stm32h743_system_stop(nx_stm32h743_system_t* s, uint32_t limit) {
         return NX_ERROR_INVALID;
     if ((s->remaining_effects & NX_STM32H743_EFFECT_TIMER) != 0U) {
         s->started = false;
-        nx_result_t irq = NX_H743_IRQ_CONTROL(TIM2_IRQn, false, 0U);
-        if (irq != NX_SUCCESS)
-            return irq;
         if (!write_checked(&s->timer->DIER, 0U, UINT32_MAX) ||
             !write_checked(&s->timer->CR1, 0U, UINT32_MAX))
             return NX_ERROR_IO;
+        if ((s->remaining_effects & NX_STM32H743_EFFECT_TIMER_QUIET) != 0U) {
+            if (!write_checked(&s->timer->CR2,
+                               NX_H743_READ(&s->timer->CR2) &
+                                   ~(uint32_t)TIM_CR2_MMS,
+                               TIM_CR2_MMS))
+                return NX_ERROR_IO;
+            s->remaining_effects &= ~NX_STM32H743_EFFECT_TIMER_QUIET;
+        }
         if (!write_checked(&s->timer->SR, 0U, UINT32_MAX))
             return NX_ERROR_IO;
+        /* A wrap can pend while DIER/CEN withdraw. Only after the peripheral
+         * is quiet can final NVIC disable/clear prove no future publication. */
+        nx_result_t irq = NX_H743_IRQ_CONTROL(TIM2_IRQn, false, 0U);
+        if (irq != NX_SUCCESS)
+            return irq;
         if (!write_checked(&s->rcc->APB1LRSTR,
                            NX_H743_READ(&s->rcc->APB1LRSTR) &
                                ~(uint32_t)RCC_APB1LRSTR_TIM2RST,
@@ -259,6 +296,16 @@ nx_result_t nx_stm32h743_system_stop(nx_stm32h743_system_t* s, uint32_t limit) {
                            RCC_APB1LENR_TIM2EN))
             return NX_ERROR_IO;
         s->remaining_effects &= ~NX_STM32H743_EFFECT_TIMER;
+    }
+    if ((s->remaining_effects & NX_STM32H743_EFFECT_TIMER_GATE) != 0U) {
+        /* Foreign retained timer state was never acquired: do not touch its
+         * registers, reset, pending flags or vector during gate rollback. */
+        if (!write_checked(&s->rcc->APB1LENR,
+                           NX_H743_READ(&s->rcc->APB1LENR) &
+                               ~(uint32_t)RCC_APB1LENR_TIM2EN,
+                           RCC_APB1LENR_TIM2EN))
+            return NX_ERROR_IO;
+        s->remaining_effects &= ~NX_STM32H743_EFFECT_TIMER_GATE;
     }
 #if NX_H743_CACHE_CONTROL_ENABLED
     if ((s->remaining_effects & NX_STM32H743_EFFECT_CACHE) != 0U) {

@@ -366,7 +366,22 @@
       ],
       "irq": [],
       "pins": [
-        "PA5"
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15"
       ]
     },
     "LPUART1": {
@@ -415,11 +430,243 @@
       "pins": [
         "PA1"
       ]
+    },
+    "GPIOB": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15"
+      ]
+    },
+    "GPIOC": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15"
+      ]
+    },
+    "GPIOD": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PD2"
+      ]
+    },
+    "GPIOF": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PF0",
+        "PF1"
+      ]
+    },
+    "GPIOG": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PG10"
+      ]
+    },
+    "USART1": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "USART1_IRQn"
+      ],
+      "irq_numbers": [
+        37
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA9",
+        "PA10"
+      ]
+    },
+    "USART2": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "USART2_IRQn"
+      ],
+      "irq_numbers": [
+        38
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA2",
+        "PA3"
+      ]
+    },
+    "USART3": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "USART3_IRQn"
+      ],
+      "irq_numbers": [
+        39
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PB10",
+        "PB11"
+      ]
+    },
+    "UART4": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "UART4_IRQn"
+      ],
+      "irq_numbers": [
+        52
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PC10",
+        "PC11"
+      ]
+    },
+    "UART5": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "UART5_IRQn"
+      ],
+      "irq_numbers": [
+        53
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PC12",
+        "PD2"
+      ]
+    },
+    "IWDG": {
+      "kind": "watchdog",
+      "modes": [
+        "independent"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "SPI1": {
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "irq": [],
+      "clock_hz": 170000000,
+      "max_hz": 42500000,
+      "pins": [
+        "PA5",
+        "PA6",
+        "PA7"
+      ]
+    },
+    "SPI2": {
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "irq": [],
+      "clock_hz": 170000000,
+      "max_hz": 42500000,
+      "pins": [
+        "PB13",
+        "PB14",
+        "PB15"
+      ]
+    },
+    "TIM3": {
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "irq": [],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA6"
+      ]
+    },
+    "TIM4": {
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "irq": [],
+      "clock_hz": 170000000,
+      "pins": [
+        "PB6"
+      ]
     }
   },
   "reserved_resources": [
     "timer:TIM2",
-    "irq:TIM2_IRQn"
+    "irq:TIM2_IRQn",
+    "pin:PF0",
+    "pin:PF1",
+    "pin:PG10"
   ],
   "source_lock": {
     "cmsis_core": "55b19837f5703e418ca37894d5745b1dc05e4c91",
@@ -431,7 +678,8 @@
     "https://www.st.com/resource/en/datasheet/stm32g474rc.pdf",
     "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
     "https://github.com/STMicroelectronics/cmsis-device-g4/tree/626ee412334a5ed2e5b320af5a8d77d69f03a558",
-    "DS12288 Rev6 November2021; Table12 Section4.10 LQFP64 column; Figure7 p50; Table2 p16 independently confirm52 package GPIOs. PDF SHA256 b018e20dbe34b63a43e49365518b186ef0e0e8e899deeabc1c9f53a3a10c1add. PG10 shares NRST and option-byte/electrical restrictions; inventory does not open new Board routes or provider modes."
+    "DS12288 Rev6 November2021; Table12 Section4.10 LQFP64 column; Figure7 p50; Table2 p16 independently confirm52 package GPIOs. PDF SHA256 b018e20dbe34b63a43e49365518b186ef0e0e8e899deeabc1c9f53a3a10c1add. PG10 shares NRST and option-byte/electrical restrictions; inventory does not open new Board routes or provider modes.",
+    "Fixed HSE24 profile reserves PF0/PF1 oscillator pads. Conditional PG10/NRST GPIO remains reserved until a reviewed option-byte/Board policy is implemented; inventory52 does not authorize these pads."
   ],
   "references": "references.json"
 }
