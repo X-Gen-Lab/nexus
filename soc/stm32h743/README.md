@@ -14,11 +14,27 @@ I/O directly. No allocator, worker, registry or DMA fallback is introduced.
 Official reset calls `ExitRun0Mode` before `SystemInit`, DATA/BSS initialization
 and constructors. RM0433 Rev9 section 6.4.1 forbids every RAM write during
 Run-star until ACTVOSRDY. The power entry uses only scratch registers and PWR
-MMIO; it never pushes, spills, calls another function or touches main RAM. It
+MMIO until the supply is ready; it never pushes, spills, calls another function
+or touches main RAM. It
 checks LDO/BYPASS readback and polls at most one million observations. A refusal
 masks IRQs and retains reason 1 (ready timeout) or 2 (supply readback failure) in
 r0 before a terminal loop. Poll counts do not promise measured wall-clock time.
 Production C asserts the exact assembly addresses/bits against the fixed SDK.
+
+Before returning to any C stack use, the entry reads `DBGMCU.IDCODE.REV_ID`.
+For revisions below `0x2000`, ES0392 section 2.2.10 requires
+`GPV.AXI_TARG7_FN_MOD.READ_ISS_OVERRIDE=1`. The entry preserves other bits,
+performs DSB and verifies the write; refusal parks with reason 3. Newer revisions
+skip this write. This predicate follows the exact pinned ST system template
+`8f922cdc7cc6de2344e75ddd657889f4ff761790`, not an inferred silicon revision.
+The ARM gate checks the complete 140-byte leaf, both conditional paths, MMIO
+addresses, barriers and fault exits. These are static machine-code checks;
+old-cut SRAM reliability still requires physical qualification.
+
+在任何 C 栈访问前，启动入口读取芯片修订号。小于 `0x2000` 的旧修订按
+ES0392 第 2.2.10 节设置 AXI SRAM 目标的 `READ_ISS_OVERRIDE`，保留其他位，
+执行屏障并检查读回；失败以原因 3 停驻。新修订跳过写入。该判断遵循锁定的
+ST 官方系统模板；完整 140 字节 ARM 指令和分支验收不能替代旧硅片的实板验证。
 
 `SystemInit` uses only CPU/system registers after power entry permits stack
 writes. It sets the explicit FPU/vector/grouping ABI without initialized globals.

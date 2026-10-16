@@ -126,8 +126,8 @@ def validate_power_entry(elf, disassembly):
     # machine-code decoder: bind the entire reviewed opcode sequence as well.
     offset = section['offset'] + start - section['address']
     machine = elf.data[offset:offset + function['size']]
-    reviewed_opcode_hash = '1ab6b2c08510786db2837d0350e1e9d81eb7bea70d920bb4dc106692bef4e969'
-    if len(machine) != 90 or hashlib.sha256(machine).hexdigest() != reviewed_opcode_hash:
+    reviewed_opcode_hash = '3d34b43bf7e706bd5c24df0eb0d522109bb39476f628bb9d892a3c286f160ba6'
+    if len(machine) != 140 or hashlib.sha256(machine).hexdigest() != reviewed_opcode_hash:
         raise ValueError('Unreviewed actual power-entry opcode bytes')
     registers = {}
     reads, stores = [], []
@@ -149,19 +149,21 @@ def validate_power_entry(elf, disassembly):
                 registers[reg] = value
         elif mnemonic in {'ldr', 'str'}:
             match = re.fullmatch(r'r1, \[r0(?:, #0)?\]', operands)
-            if not match or registers.get('r0') not in {0x5802480c, 0x58024804}:
+            if not match or registers.get('r0') not in {
+                    0x5802480c, 0x58024804, 0x5c001000, 0x51008108}:
                 raise ValueError('Power entry accesses stack/RAM/unknown MMIO')
             if mnemonic == 'str':
-                if registers['r0'] != 0x5802480c:
-                    raise ValueError('Power entry writes outside PWR CR3')
+                if registers['r0'] not in {0x5802480c, 0x51008108}:
+                    raise ValueError('Power entry writes outside reviewed PWR/AXI controls')
                 stores.append(address)
             else:
                 reads.append((address, registers['r0']))
-        elif mnemonic not in {'bic.w', 'orr.w', 'and.w', 'cmp', 'tst.w',
-                              'bne.n', 'b.n', 'subs', 'cpsid', 'dsb', 'isb', 'bx'}:
+        elif mnemonic not in {'bic.w', 'orr.w', 'and.w', 'cmp', 'cmp.w', 'tst.w',
+                              'bne.n', 'bcs.n', 'b.n', 'subs', 'lsrs',
+                              'cpsid', 'dsb', 'isb', 'bx'}:
             raise ValueError('Power entry contains a call/stack/unknown instruction')
-    if cursor != end or len(stores) != 1:
-        raise ValueError('Whole power entry and one MMIO-only store required')
+    if cursor != end or len(stores) != 2:
+        raise ValueError('Whole power entry and two reviewed MMIO-only stores required')
     operations = [(row[2], row[3]) for row in rows]
     # The proof is intentionally a closed instruction shape. Count/presence
     # alone would admit value mutations or a store without its following DSB.
@@ -177,6 +179,14 @@ def validate_power_entry(elf, disassembly):
         ('subs', 'r2, #1'), ('bne.n', None), ('movs', 'r0, #1'),
         ('b.n', None), ('movs', 'r0, #2'), ('cpsid', 'i'),
         ('dsb', 'sy'), ('isb', 'sy'), ('b.n', None),
+        ('movw', 'r0, #4096'), ('movt', 'r0, #23552'),
+        ('ldr', 'r1, [r0, #0]'), ('lsrs', 'r1, r1, #16'),
+        ('cmp.w', 'r1, #8192'), ('bcs.n', None),
+        ('movw', 'r0, #33032'), ('movt', 'r0, #20736'),
+        ('ldr', 'r1, [r0, #0]'), ('orr.w', 'r1, r1, #1'),
+        ('str', 'r1, [r0, #0]'), ('dsb', 'sy'),
+        ('ldr', 'r1, [r0, #0]'), ('tst.w', 'r1, #1'),
+        ('bne.n', None), ('movs', 'r0, #3'), ('b.n', None),
         ('dsb', 'sy'), ('isb', 'sy'), ('bx', 'lr')]
     if len(operations) != len(expected) or any(
             op != actual_op or (arg is not None and arg != actual_arg)
@@ -188,8 +198,9 @@ def validate_power_entry(elf, disassembly):
                 ('cpsid', 'i'), ('bx', 'lr')]
     if any(operations.count(item) != 1 for item in required):
         raise ValueError('Missing/expanded power guard, finite poll or return')
-    if sum(reg == 0x58024804 for _, reg in reads) != 1 or len(reads) != 3:
-        raise ValueError('Required CR3 readback/CSR1 poll missing')
+    if ([reg for _, reg in reads] != [0x5802480c, 0x5802480c, 0x58024804,
+                                     0x5c001000, 0x51008108, 0x51008108]):
+        raise ValueError('Required power/revision/AXI readback order missing')
     # Control flow is verified against decoded addresses, not source spelling.
     index = {address: i for i, (address, _, _, _) in enumerate(rows)}
     def target(i):
@@ -204,10 +215,17 @@ def validate_power_entry(elf, disassembly):
             target(decrement + 1) != poll_address or
             rows[compare + 1][2] != 'bne.n'):
         raise ValueError('Power-entry ready/readback/backedge guards differ')
-    success = index.get(target(test + 1))
-    if success is None or operations[success:] != [('dsb', 'sy'), ('isb', 'sy'),
-                                                 ('bx', 'lr')]:
-        raise ValueError('Return is not exclusively ready-guarded')
+    revision = next(i for i, row in enumerate(rows) if row[2] == 'cmp.w')
+    ready = next(i for i, operation in enumerate(operations)
+                 if operation == ('movw', 'r0, #4096'))
+    if index.get(target(test + 1)) != ready:
+        raise ValueError('AXI admission is not exclusively power-ready guarded')
+    success = index.get(target(revision + 1))
+    axi = next(i for i, operation in enumerate(operations)
+               if operation == ('tst.w', 'r1, #1'))
+    if (success is None or operations[success:] != [('dsb', 'sy'), ('isb', 'sy'), ('bx', 'lr')]
+            or index.get(target(axi + 1)) != success):
+        raise ValueError('Return must follow new revision or proved AXI readback')
     bad = index.get(target(compare + 1))
     if bad is None or operations[bad] != ('movs', 'r0, #2'):
         raise ValueError('Readback failure reason is missing')
@@ -225,9 +243,14 @@ def validate_power_entry(elf, disassembly):
         raise ValueError('Power failure does not mask IRQs and retain r0')
     if rows[fail + 3][2] != 'b.n' or target(fail + 3) != rows[fail + 3][0]:
         raise ValueError('Power failure can return or write RAM')
+    if operations[axi + 2] != ('movs', 'r0, #3') or index.get(target(axi + 3)) != fail:
+        raise ValueError('AXI readback failure does not enter the no-RAM fault park')
     return {'symbol': 'ExitRun0Mode', 'bytes': function['size'],
-            'instructions': len(rows), 'mmio_stores': 1, 'ram_stores': 0,
+            'instructions': len(rows), 'mmio_stores': 2, 'ram_stores': 0,
             'nested_calls': 0, 'poll_limit': 1000000,
+            'axi_workaround': {'register': 0x51008108, 'read_iss_override': 1,
+                'revision_limit_exclusive': 0x2000, 'readback_required': True,
+                'phase': 'after_power_ready_before_ram'},
             'evidence_kind': 'actual_elf_control_flow_not_physical_execution'}
 
 

@@ -57,6 +57,11 @@ class PowerGate(unittest.TestCase):
         self.assertEqual(report['ram_stores'], 0)
         self.assertEqual(report['nested_calls'], 0)
         self.assertEqual(report['poll_limit'], 1000000)
+        self.assertEqual(report['mmio_stores'], 2)
+        self.assertEqual(report['axi_workaround'], {
+            'register': 0x51008108, 'read_iss_override': 1,
+            'revision_limit_exclusive': 0x2000, 'readback_required': True,
+            'phase': 'after_power_ready_before_ram'})
         self.assertEqual(report['evidence_kind'],
                          'actual_elf_control_flow_not_physical_execution')
 
@@ -71,6 +76,24 @@ class PowerGate(unittest.TestCase):
 
     def test_failure_without_irq_mask_rejected(self):
         self.rejects(self.source.replace('cpsid i', 'nop'))
+
+    def test_older_revision_cannot_bypass_the_axi_write(self):
+        self.rejects(self.source.replace('bhs .Lboot_complete', 'b .Lboot_complete'))
+
+    def test_axi_write_and_readback_guard_cannot_be_removed(self):
+        for replacement in ('orr r1, r1, #NX_H743_BOOT_AXI_READ',
+                            'tst r1, #NX_H743_BOOT_AXI_READ',
+                            'bne .Lboot_complete'):
+            with self.subTest(instruction=replacement):
+                self.assertIn(replacement, self.source)
+                self.rejects(self.source.replace(replacement, 'nop'))
+
+    def test_axi_store_barrier_order_and_failed_readback_are_closed(self):
+        self.rejects(self.source.replace(
+            'str r1, [r0]\n    dsb sy\n    ldr r1, [r0]\n    tst r1, #NX_H743_BOOT_AXI_READ',
+            'dsb sy\n    str r1, [r0]\n    ldr r1, [r0]\n    tst r1, #NX_H743_BOOT_AXI_READ'))
+        self.rejects(self.source.replace('movs r0, #3\n    b .Lfailed',
+                                        'movs r0, #3\n    bx lr'))
 
     def test_unreviewed_value_mutation_rejected(self):
         self.rejects(self.source.replace('bic r1, r1, #NX_H743_BOOT_BYPASS',

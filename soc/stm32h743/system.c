@@ -11,6 +11,11 @@
 #include "nexus/core/time.h"
 #include "stm32h743_system.h"
 #include <stddef.h>
+_Static_assert(DBGMCU_BASE + offsetof(DBGMCU_TypeDef, IDCODE) ==
+                       NX_H743_BOOT_DBG_ID &&
+                   GPV_BASE + offsetof(GPV_TypeDef, AXI_TARG7_FN_MOD) ==
+                       NX_H743_BOOT_AXI_FN,
+               "Actual SDK revision/AXI addresses differ from pre-RAM entry");
 _Static_assert(PWR_BASE + offsetof(PWR_TypeDef, CR3) == NX_H743_BOOT_PWR_CR3,
                "Actual SDK PWR CR3 differs from pre-RAM assembly");
 _Static_assert(PWR_BASE + offsetof(PWR_TypeDef, CSR1) == NX_H743_BOOT_PWR_CSR1,
