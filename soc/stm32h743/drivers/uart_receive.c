@@ -371,9 +371,7 @@ static nx_result_t rx_stop(void* context) {
     finish(s);
     guard = nx_arch_irq_save();
     nx_result_t result = NX_SUCCESS;
-    if (s->filling)
-        result = NX_ERROR_BUSY;
-    else if (!checked(&s->rx->CR, 0U, UINT32_MAX))
+    if (s->filling || !checked(&s->rx->CR, 0U, UINT32_MAX))
         result = NX_ERROR_BUSY;
     else if (s->stream != NULL) {
         result = nx_stream_stop(s->stream);

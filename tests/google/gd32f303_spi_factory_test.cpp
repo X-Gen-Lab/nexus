@@ -16,16 +16,12 @@
 class GD303SPIFactory : public testing::Test {
   protected:
     void* mmio = MAP_FAILED;
-    void* debug = MAP_FAILED;
     void SetUp() override {
         mmio = mmap(reinterpret_cast<void*>(0x40000000U), 0x30000U,
                     PROT_READ | PROT_WRITE,
                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(mmio, reinterpret_cast<void*>(0x40000000U));
-        debug = mmap(reinterpret_cast<void*>(0xe0042000U), 0x1000U,
-                     PROT_READ | PROT_WRITE,
-                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
-        ASSERT_EQ(debug, reinterpret_cast<void*>(0xe0042000U));
+        g_gd303_debug_ctl0 = 0U;
         std::memset(g_gd303_irq, 0, sizeof(g_gd303_irq));
         std::memset(g_gd303_pending, 0, sizeof(g_gd303_pending));
         g_gd303_ignore = nullptr;
@@ -39,12 +35,10 @@ class GD303SPIFactory : public testing::Test {
         FMC_OBSTAT = 4U;
     }
     void TearDown() override {
-        if (mmio != MAP_FAILED && debug != MAP_FAILED) {
+        if (mmio != MAP_FAILED) {
             g_gd303_ignore = nullptr;
             EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
         }
-        if (debug != MAP_FAILED)
-            munmap(debug, 0x1000U);
         if (mmio != MAP_FAILED)
             munmap(mmio, 0x30000U);
     }

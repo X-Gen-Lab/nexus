@@ -22,12 +22,16 @@ void nx_gd303_model_spi_poll(void) {
     TIMER_CNT(TIMER1)++;
 }
 uint32_t g_gd303_density = (48U << 16U) | 256U;
+uint32_t g_gd303_debug_ctl0;
 bool g_gd303_hold_irq_off;
 bool g_gd303_pend_on_timer_withdraw;
 bool g_gd303_hold_late_irq_off;
 bool g_gd303_hold_cs_release;
 bool g_gd303_hold_spi_reset_release;
 uint32_t nx_gd303_model_read(volatile uint32_t* reg) {
+    /* The real debug address lies inside ASan ShadowGap on x86_64. */
+    if (reg == &DBG_CTL0)
+        return g_gd303_debug_ctl0;
     uint32_t value = *reg;
     if (reg == &SPI_DATA(SPI0)) {
         SPI_STAT(SPI0) &= ~(SPI_STAT_RBNE | SPI_STAT_TRANS);
@@ -43,6 +47,10 @@ void nx_gd303_model_write(volatile uint32_t* reg, uint32_t value) {
     ++g_gd303_writes;
     if (reg == g_gd303_ignore)
         return;
+    if (reg == &DBG_CTL0) {
+        g_gd303_debug_ctl0 = value;
+        return;
+    }
     if (reg == &RCU_APB2RST) {
         if (g_gd303_hold_spi_reset_release &&
             (value & RCU_APB2RST_SPI0RST) == 0U)

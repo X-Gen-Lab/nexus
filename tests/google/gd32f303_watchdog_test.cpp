@@ -15,16 +15,12 @@ class GD303Watchdog : public testing::Test {
     nx_gd32f303_watchdog_state_t state{};
     const nx_watchdog_port_t port{&nx_gd32f303_watchdog_ops, &state};
     void* mmio = MAP_FAILED;
-    void* debug = MAP_FAILED;
     void SetUp() override {
         mmio = mmap(reinterpret_cast<void*>(0x40000000U), 0x30000U,
                     PROT_READ | PROT_WRITE,
                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_EQ(mmio, reinterpret_cast<void*>(0x40000000U));
-        debug = mmap(reinterpret_cast<void*>(0xe0042000U), 0x1000U,
-                     PROT_READ | PROT_WRITE,
-                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
-        ASSERT_EQ(debug, reinterpret_cast<void*>(0xe0042000U));
+        g_gd303_debug_ctl0 = 0U;
         g_gd303_ignore = nullptr;
         g_gd303_writes = 0;
         FMC_OBSTAT = 4U;
@@ -33,8 +29,6 @@ class GD303Watchdog : public testing::Test {
         ASSERT_EQ(NX_SUCCESS, nx_gd32f303_watchdog_initialize(&state));
     }
     void TearDown() override {
-        if (debug != MAP_FAILED)
-            munmap(debug, 0x1000U);
         if (mmio != MAP_FAILED)
             munmap(mmio, 0x30000U);
     }
@@ -93,7 +87,7 @@ TEST_F(GD303Watchdog, PostActivationUpdateFailureNeverRollsBackItsOscillator) {
     EXPECT_TRUE(observed.enabled);
     EXPECT_TRUE(observed.irreversible);
     EXPECT_NE(0U, RCU_RSTSCK & RCU_RSTSCK_IRC40KEN);
-    EXPECT_NE(0U, DBG_CTL0 & DBG_CTL0_FWDGT_HOLD);
+    EXPECT_NE(0U, g_gd303_debug_ctl0 & DBG_CTL0_FWDGT_HOLD);
     EXPECT_EQ(0U, observed.minimum_timeout_us);
     EXPECT_EQ(0U, observed.maximum_timeout_us);
     EXPECT_EQ(NX_ERROR_STATE, nx_gd32f303_watchdog_stop(&state));
@@ -174,4 +168,23 @@ TEST_F(GD303Watchdog, LiveOptionReadErrorRetainsOwnerWithoutInventingFacts) {
     EXPECT_EQ(NX_ERROR_IO, nx_gd32f303_watchdog_stop(&state));
     EXPECT_TRUE(state.initialized);
     EXPECT_EQ(0U, g_gd303_writes);
+}
+
+TEST_F(GD303Watchdog, DebugWriteRefusalPreservesForeignBitsAndAllowsRetry) {
+    RCU_RSTSCK = RCU_RSTSCK_IRC40KSTB;
+    g_gd303_debug_ctl0 = DBG_CTL0_SLP_HOLD;
+    g_gd303_ignore = &DBG_CTL0;
+    nx_watchdog_state_t observed{};
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_watchdog_port_enable(&port, 1000U, true, &observed));
+    EXPECT_FALSE(observed.enabled);
+    EXPECT_FALSE(state.preparation_retained);
+    EXPECT_EQ(DBG_CTL0_SLP_HOLD, g_gd303_debug_ctl0);
+    EXPECT_EQ(0U, FWDGT_CTL);
+    g_gd303_ignore = nullptr;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_watchdog_port_enable(&port, 1000U, true, &observed));
+    EXPECT_TRUE(observed.enabled);
+    EXPECT_TRUE(observed.debug_freeze);
+    EXPECT_EQ(DBG_CTL0_SLP_HOLD | DBG_CTL0_FWDGT_HOLD, g_gd303_debug_ctl0);
 }

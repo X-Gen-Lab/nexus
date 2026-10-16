@@ -203,6 +203,7 @@ TEST_F(H743Receive, FailedPostDmaInvalidateRetainsLoanUntilActualRetry) {
     EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_rx_stop(&port));
     EXPECT_EQ(NX_STREAM_SLOT_FILLING, slots[0].state);
     EXPECT_TRUE(state.quarantined);
+    EXPECT_NE(0U, g_h743_dma_stream.CR & DMA_SxCR_MINC);
     EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_rx_stop(&port));
     EXPECT_EQ(NX_STREAM_SLOT_READY, slots[0].state);
 }
@@ -294,6 +295,16 @@ TEST_F(H743Receive, StopKeepsUartAndDmaOwnershipWhileConsumerStillBorrows) {
 TEST_F(H743Receive, SuccessfulRxStopAllowsFreshStreamWithoutControllerRestart) {
     Start();
     ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    g_h743_dma_after_write = [](volatile uint32_t* reg, uint32_t value) {
+        if (reg == &g_h743_dma_stream.CR && value == 0U)
+            g_h743_dma_stream.CR = DMA_SxCR_MINC;
+    };
+    EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_rx_stop(&port));
+    EXPECT_FALSE(state.filling);
+    EXPECT_EQ(&stream, state.stream);
+    EXPECT_EQ(0U, stream.outstanding);
+    EXPECT_FALSE(stream.stopping);
+    g_h743_dma_after_write = nullptr;
     ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_stop(&port));
     ASSERT_EQ(NX_SUCCESS, nx_stream_initialize(&stream, slots, 2));
     EXPECT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));

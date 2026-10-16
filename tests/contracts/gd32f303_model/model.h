@@ -20,6 +20,7 @@ extern unsigned g_gd303_writes;
 extern volatile uint32_t* g_gd303_ignore;
 extern bool g_gd303_hold_update;
 extern uint32_t g_gd303_density;
+extern uint32_t g_gd303_debug_ctl0;
 extern bool g_gd303_update_trgo;
 extern bool g_gd303_spi_hold_rx;
 extern bool g_gd303_spi_bad_cs;
