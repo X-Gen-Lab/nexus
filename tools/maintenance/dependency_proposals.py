@@ -27,7 +27,8 @@ from tools.maintenance.source_catalogue import (  # noqa: E402
     SOURCE_DEPENDENCIES, declared_modules,
 )
 from tools.maintenance import (  # noqa: E402
-    cmsis_device_lock, stm32f4_hal_lock, stm32g4_lock, threadx_lock,
+    cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
+    stm32g4_lock, threadx_lock,
 )
 
 GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
@@ -95,9 +96,11 @@ def inventory(root=ROOT):
             locked = parse_json(lock_bytes)
             if name == "threadx":
                 threadx_lock.verify(checkout, lock_path, "linux")
-            elif name == "stm32f4_hal":
-                stm32f4_hal_lock.verify(checkout, lock_path,
-                                       root / stm32f4_hal_lock.CMSIS_DIRECTORY)
+            elif name in {"stm32f1_hal", "stm32f4_hal"}:
+                official = (stm32f1_hal_lock if name == "stm32f1_hal"
+                            else stm32f4_hal_lock)
+                official.verify(checkout, lock_path,
+                                root / official.CMSIS_DIRECTORY)
             elif name == "stm32g4_cmsis":
                 stm32g4_lock.verify(checkout, lock_path)
             elif any(review["directory"] == path for review in

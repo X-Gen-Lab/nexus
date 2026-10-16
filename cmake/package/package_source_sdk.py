@@ -25,7 +25,8 @@ sys.path.insert(0, str(SOURCE_ROOT))
 try:
     from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES, declared_modules
     from tools.maintenance import (
-        cmsis_device_lock, stm32f4_hal_lock, stm32g4_lock, threadx_lock,
+        cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
+        stm32g4_lock, threadx_lock,
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
     from tools.configure.providers import descriptor as provider_descriptors
@@ -43,6 +44,7 @@ ROOT_FILES = {"CMakeLists.txt", "LICENSE", "README.md", "AGENTS.md", ".gitmodule
 ROOT_DIRS = {"arch", "boards", "cmake", "dependencies", "core", "io", "os",
              "components", "tools", "scripts", "soc"}
 REQUIRED_DEPENDENCIES = tuple(item.path for item in SOURCE_DEPENDENCIES)
+OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock)
 REQUIRED_FILES = (
     "CMakeLists.txt", "LICENSE", ".gitmodules", "dependencies/toolchains.lock.json",
     "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
@@ -190,13 +192,14 @@ _g4_lock = parse_json((SOURCE_ROOT / "dependencies/stm32g4.lock.json").read_byte
 stm32g4_lock.contract(_g4_lock)
 REQUIRED_FILES += tuple("vendors/st/cmsis_device_g4/" + name
                         for name in _g4_lock["files"])
-REQUIRED_FILES += ("dependencies/stm32f4-hal.lock.json",
-                   "tools/maintenance/stm32f4_hal_lock.py",
-                   "cmake/platform/STM32Official.cmake")
-_f4_hal_lock = parse_json((SOURCE_ROOT / "dependencies/stm32f4-hal.lock.json").read_bytes())
-stm32f4_hal_lock.contract(_f4_hal_lock)
-REQUIRED_FILES += tuple("vendors/st/stm32f4_hal/" + name
-                        for name in _f4_hal_lock["files"])
+REQUIRED_FILES += ("cmake/platform/STM32Official.cmake",)
+for _official in OFFICIAL_DRIVERS:
+    REQUIRED_FILES += (_official.LOCK_NAME,
+                       "tools/maintenance/" + _official.__name__.split(".")[-1] + ".py")
+    _official_lock = parse_json((SOURCE_ROOT / _official.LOCK_NAME).read_bytes())
+    _official.contract(_official_lock)
+    REQUIRED_FILES += tuple(_official.DIRECTORY + "/" + name
+                            for name in _official_lock["files"])
 # Complete declared platform surfaces must remain present after an attacker
 # removes a payload and rehashes its file map. This is a required-source identity
 # contract, not another build graph: CMake still owns every selected target.
@@ -451,11 +454,14 @@ def dependency_entries(root, dependency):
         if not names.issubset(entries):
             raise SDKError("G4 committed source graph is incomplete")
         entries = {name: entries[name] for name in names}
-    elif dependency == stm32f4_hal_lock.DIRECTORY:
-        raw, _ = snapshot(root / stm32f4_hal_lock.LOCK_NAME)
-        names = stm32f4_hal_lock.contract(parse_json(raw))
+    elif dependency in {official.DIRECTORY for official in OFFICIAL_DRIVERS}:
+        official = next(official for official in OFFICIAL_DRIVERS
+                        if official.DIRECTORY == dependency)
+        raw, _ = snapshot(root / official.LOCK_NAME)
+        names = official.contract(parse_json(raw))
         if not names.issubset(entries):
-            raise SDKError("STM32F4 official committed source graph is incomplete")
+            raise SDKError("Official committed source graph is incomplete: "
+                           + dependency)
         entries = {name: entries[name] for name in names}
     else:
         for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
@@ -586,9 +592,10 @@ def prepare(source, output, development_fixture=False):
     threadx_lock.verify(source / "ext/threadx", source / "dependencies/threadx.lock.json", "linux")
     stm32g4_lock.verify(source / "vendors/st/cmsis_device_g4",
                        source / "dependencies/stm32g4.lock.json")
-    stm32f4_hal_lock.verify(source / stm32f4_hal_lock.DIRECTORY,
-                           source / stm32f4_hal_lock.LOCK_NAME,
-                           source / stm32f4_hal_lock.CMSIS_DIRECTORY)
+    for official in OFFICIAL_DRIVERS:
+        official.verify(source / official.DIRECTORY,
+                        source / official.LOCK_NAME,
+                        source / official.CMSIS_DIRECTORY)
     for review in cmsis_device_lock.REVIEWED_DEVICES.values():
         cmsis_device_lock.verify(source / review["directory"],
                                  source / review["lock_name"])
@@ -735,15 +742,16 @@ def verify(root):
     stm32g4_lock.verify(root / "vendors/st/cmsis_device_g4",
                        root / "dependencies/stm32g4.lock.json",
                        packaged_commit=g4["commit"])
-    f4_hal = next(record for record in records
-                  if record["path"] == stm32f4_hal_lock.DIRECTORY)
-    f4_cmsis = next(record for record in records
-                    if record["path"] == stm32f4_hal_lock.CMSIS_DIRECTORY)
-    stm32f4_hal_lock.verify(root / stm32f4_hal_lock.DIRECTORY,
-                           root / stm32f4_hal_lock.LOCK_NAME,
-                           root / stm32f4_hal_lock.CMSIS_DIRECTORY,
-                           packaged_commit=f4_hal["commit"],
-                           packaged_cmsis_commit=f4_cmsis["commit"])
+    for official in OFFICIAL_DRIVERS:
+        driver = next(record for record in records
+                      if record["path"] == official.DIRECTORY)
+        cmsis = next(record for record in records
+                     if record["path"] == official.CMSIS_DIRECTORY)
+        official.verify(root / official.DIRECTORY,
+                        root / official.LOCK_NAME,
+                        root / official.CMSIS_DIRECTORY,
+                        packaged_commit=driver["commit"],
+                        packaged_cmsis_commit=cmsis["commit"])
     for review in cmsis_device_lock.REVIEWED_DEVICES.values():
         matching = [record for record in records
                     if record["path"] == review["directory"]]

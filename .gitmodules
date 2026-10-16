@@ -28,3 +28,11 @@
 [submodule "vendors/st/stm32f4_hal"]
 	path = vendors/st/stm32f4_hal
 	url = https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git
+
+[submodule "vendors/st/cmsis_device_f1"]
+	path = vendors/st/cmsis_device_f1
+	url = https://github.com/STMicroelectronics/cmsis-device-f1.git
+
+[submodule "vendors/st/stm32f1_hal"]
+	path = vendors/st/stm32f1_hal
+	url = https://github.com/STMicroelectronics/stm32f1xx-hal-driver.git
