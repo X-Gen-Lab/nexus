@@ -1,5 +1,6 @@
 """Maintained gd32f470 capability and static assembly contract."""
 from types import MappingProxyType
+
 from .. import common, descriptor, hardware
 
 CPU_ABI = MappingProxyType({'arch': 'cortex-m4', 'fpu': 'fpv4-sp-d16', 'float_abi': 'hard'})
@@ -15,6 +16,8 @@ CPU_FEATURES = MappingProxyType({
 })
 PREFIX = 'gd32'
 MODEL = False
+FLASH_PROGRAM_UNIT = 2
+FLASH_INPUT_ALIGNMENT = 1
 FACT_REFERENCES = descriptor.maintained("gd32f470").references
 SOURCE_IMPORT_LOCK = descriptor.maintained("gd32f470").import_lock
 ETH_CONTROLLER = 'ENET'

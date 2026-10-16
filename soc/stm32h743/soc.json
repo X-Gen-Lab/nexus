@@ -334,6 +334,109 @@
         "PD8",
         "PD9"
       ]
+    },
+    "GPIOE": {
+      "kind": "gpio",
+      "modes": [
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PE11"
+      ]
+    },
+    "SPI4": {
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "irq": [],
+      "pins": [
+        "PE12",
+        "PE13",
+        "PE14"
+      ],
+      "clock_hz": 64000000,
+      "max_hz": 16000000
+    },
+    "TIM3": {
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "irq": [],
+      "pins": [
+        "PA6"
+      ],
+      "clock_hz": 64000000
+    },
+    "IWDG1": {
+      "kind": "watchdog",
+      "modes": [
+        "independent"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "EXTI0": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI0_IRQn"
+      ],
+      "irq_numbers": [
+        6
+      ],
+      "pins": [
+        "PA0"
+      ]
+    },
+    "EXTI1": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI1_IRQn"
+      ],
+      "irq_numbers": [
+        7
+      ],
+      "pins": [
+        "PA1"
+      ]
+    },
+    "I2C1": {
+      "kind": "i2c",
+      "modes": [
+        "poll-messages"
+      ],
+      "irq": [],
+      "pins": [
+        "PB8",
+        "PB9"
+      ],
+      "max_hz": 100000
+    },
+    "ADC1": {
+      "kind": "adc",
+      "modes": [
+        "single-shot"
+      ],
+      "irq": [],
+      "pins": [
+        "PA3"
+      ]
+    },
+    "FLASH": {
+      "kind": "flash",
+      "modes": [
+        "poll-word"
+      ],
+      "irq": [],
+      "pins": []
     }
   },
   "reserved_resources": [
@@ -350,6 +453,7 @@
     "RM0433 Rev9 section6.4.1 p262: Run* forbids any RAM write before ACTVOSRDY; ExitRun0Mode must not use stack. Fixed HSI64 profile uses conservative reset Flash7WS and LDO; Cache remains off.",
     "https://www.st.com/resource/en/datasheet/stm32h743zi.pdf",
     "https://www.st.com/resource/en/reference_manual/rm0433-stm32h742-stm32h743753-and-stm32h750-value-line-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
-    "https://github.com/STMicroelectronics/cmsis-device-h7/tree/8f922cdc7cc6de2344e75ddd657889f4ff761790"
+    "https://github.com/STMicroelectronics/cmsis-device-h7/tree/8f922cdc7cc6de2344e75ddd657889f4ff761790",
+    "RM0433 Rev9 SPI v3 TSIZE/EOT/TXC/IFCR and APB2-clocked SPI4 SPI45SEL=0; DS12110 AF5 PE12/PE13/PE14 and TIM3 CH1 PA6 AF2. Selected finite software references only; ES0392 silicon revision and physical electrical timing remain unqualified."
   ]
 }

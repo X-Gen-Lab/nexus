@@ -69,7 +69,7 @@ class G474ProviderTests(unittest.TestCase):
             self.assertEqual(self.provider.mode_implementation(kind, mode), kind)
         for kind, mode in (("uart", "irq-byte-event"), ("uart", "irq-blocks"),
                            ("uart", "dma-tx"), ("spi", "dma"),
-                           ("flash", "poll-word"), ("can", "classic-irq")):
+                           ("flash", "poll-byte"), ("can", "classic-irq")):
             with self.subTest(kind=kind, mode=mode):
                 with self.assertRaises(ConfigurationError):
                     self.provider.mode_implementation(kind, mode)
@@ -105,7 +105,7 @@ class G474ProviderTests(unittest.TestCase):
                     self.provider.validate_selection(gpio(**changes),
                                                      gpio(**changes))
 
-    def test_dma_resource_and_dma_routes_are_unimplemented(self):
+    def test_only_exact_adc_dma_resource_and_route_are_maintained(self):
         for call in (lambda: self.provider.validate_dma_resource(
                 "dma:DMA1:stream0:channel0"),
                      lambda: self.provider.dma_irq("DMA1:stream0:channel0"),
@@ -113,7 +113,10 @@ class G474ProviderTests(unittest.TestCase):
                          uart(), "irq-bytes", lambda item: item)):
             with self.assertRaises(ConfigurationError):
                 call()
-        self.assertEqual(self.provider.DMA_TOPOLOGY[0], frozenset())
+        self.assertEqual(self.provider.validate_dma_resource(
+            "dma:DMA1:stream1:channel5"), (1, 1, 5))
+        self.assertEqual(self.provider.dma_irq("DMA1:stream1:channel5"),
+                         "irq:DMA1_Channel1")
         self.assertFalse(self.provider.shares_irq("uart", "irq:LPUART1"))
 
     def test_clock_metadata_cannot_drift_from_fixed_implementation(self):
@@ -123,14 +126,16 @@ class G474ProviderTests(unittest.TestCase):
         with self.assertRaises(ConfigurationError):
             validate_clock_profiles(facts, self.provider)
 
-    def test_memory_alias_is_counted_once_without_dma_advertisement(self):
+    def test_memory_domains_count_once_and_exclude_ccm_from_dma(self):
         facts = json.loads((ROOT / "soc/stm32g474/soc.json").read_text())
         variant = facts["variants"]["STM32G474RET6"]
         self.assertEqual(sum(item["size"] for item in variant["memory"]),
                          128 * 1024)
         self.assertEqual(variant["memory"], [
-            {"id": "cpu-sram", "origin": 0x20000000, "size": 131072,
-             "dma": False, "linker": True}])
+            {"id": "sram1-sram2", "origin": 0x20000000, "size": 98304,
+             "dma": True, "linker": True},
+            {"id": "ccm-sram", "origin": 0x10000000, "size": 32768,
+             "dma": False, "linker": False}])
         self.assertEqual(variant["flash"]["erase_blocks"], [2048] * 256)
         self.assertEqual(facts["reserved_resources"],
                          ["timer:TIM2", "irq:TIM2_IRQn",

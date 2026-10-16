@@ -74,7 +74,14 @@ def validate_profile(resolved):
                for bank in "ABCDEFGH" for mode in ("input", "output")}
     allowed.update({("uart", "USART1", "irq-bytes"),
                     ("uart", "USART2", "irq-bytes"),
-                    ("watchdog", "IWDG", "independent")})
+                    ("watchdog", "IWDG", "independent"),
+                    ("spi", "SPI1", "short-poll"),
+                    ("i2c", "I2C1", "poll-messages"),
+                    ("adc", "ADC4", "single-shot"),
+                    ("pwm", "TIM3", "fixed-pwm"),
+                    ("exti", "EXTI0", "edge-event"),
+                    ("exti", "EXTI1", "edge-event"),
+                    ("flash", "FLASH", "poll-word")})
     for item in resolved.get("controllers", []):
         if (item.get("kind"), item.get("controller"), item.get("mode")) not in allowed:
             raise EvidenceError("unmaintained U575 controller mode")
@@ -104,6 +111,12 @@ def validate_image(elf, resolved):
         if entries[slot] != elf.symbol(controller + "_IRQHandler"):
             raise EvidenceError(
                 "selected USART vector differs from actual handler")
+    selected_exti = sorted(item["controller"]
+        for item in resolved["controllers"] if item["kind"] == "exti")
+    for controller in selected_exti:
+        slot = 27 + int(controller[-1])
+        if entries[slot] != elf.symbol(controller + "_IRQHandler"):
+            raise EvidenceError("selected EXTI vector differs from actual handler")
     symbols = {item["name"] for item in elf.defined_symbols}
     if symbols.intersection({"malloc", "calloc", "realloc", "free", "_malloc_r",
                              "SystemCoreClock", "SystemCoreClockUpdate"}):
@@ -116,6 +129,7 @@ def validate_image(elf, resolved):
     return {"vector_count": len(entries), "stack_end": entries[0],
             "selected_uart": bool(selected_uarts),
             "selected_uarts": selected_uarts,
+            "selected_exti": selected_exti,
             "physical_status": "not_executed"}
 
 
@@ -143,7 +157,9 @@ def run(root, compiler, output, *, parallel=2):
         fixture = root / "tests/contracts/u575_assembly"
         assemblies = [fixture / name for name in (
             "empty.toml", "io.toml", "empty-freertos.toml", "io-freertos.toml",
-            "mainstream.toml", "mainstream-freertos.toml")]
+            "mainstream.toml", "mainstream-freertos.toml",
+            "peripherals.toml", "peripherals-freertos.toml",
+            "pwm.toml", "pwm-freertos.toml")]
         fixtures = provider_assemblies.validate_fixtures(
             root, assemblies, family="stm32u575")
         if provider_assemblies.run(root, assemblies, compiler, output / "matrix",

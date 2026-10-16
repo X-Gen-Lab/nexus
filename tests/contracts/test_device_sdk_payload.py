@@ -1,5 +1,6 @@
 """SDK device components retain exactly their reviewed upstream closure."""
 from pathlib import Path
+import hashlib
 import json
 import re
 import sys
@@ -13,9 +14,88 @@ sys.path.insert(0, str(ROOT / "cmake/package"))
 import package_source_sdk as sdk
 import verify_consumers as consumers
 from tools.maintenance import cmsis_device_lock
+from tools.configure.providers import descriptor
 
 
 class DeviceSDKPayloadTests(unittest.TestCase):
+    def test_expanded_soc_ownership_is_complete_and_required_by_sdk(self):
+        required = set(sdk.REQUIRED_FILES)
+        for family in ("stm32f103", "gd32f303", "stm32g474",
+                       "stm32h743", "stm32u575"):
+            directory = ROOT / "soc" / family
+            # This independent boundary inventories owned firmware files; it
+            # does not discover or select production translation units.
+            expected = {path.relative_to(ROOT).as_posix()
+                        for path in directory.rglob("*")
+                        if path.is_file() and path.suffix in {".c", ".h", ".S"}}
+            expected.add(f"soc/{family}/CMakeLists.txt")
+            payload = set(descriptor.maintained(family).owned_payload)
+            with self.subTest(family=family):
+                self.assertFalse(expected - payload,
+                                 "Incomplete owned payload: " +
+                                 repr(sorted(expected - payload)))
+                self.assertFalse(expected - required,
+                                 "SDK accepts truncated firmware: " +
+                                 repr(sorted(expected - required)))
+
+    def test_rehashed_omission_cannot_remove_new_provider_inputs(self):
+        names = {
+            "soc/common/legacy_adc.c", "soc/common/legacy_pwm.c",
+            "soc/common/legacy_flash.c", "soc/common/uart_v1_channel_dma.c",
+            "soc/common/i2c_v1_async.h", "soc/common/i2c_v2.c",
+            "soc/stm32g474/drivers/adc_stream.c",
+            "soc/stm32g474/private/stm32g474_acquisition.h",
+            "soc/stm32h743/memory_init.c",
+            "soc/stm32h743/private/memory_init.h",
+            "soc/stm32h743/drivers/adc.c", "soc/stm32h743/drivers/flash.c",
+            "soc/stm32u575/secure_batch.c",
+            "soc/stm32u575/private/stm32u575_secure_batch.h",
+        }
+        names.update(
+            "vendors/gigadevice/gd32f30x/Firmware/"
+            "GD32F30x_standard_peripheral/Include/gd32f30x_" + kind + ".h"
+            for kind in ("adc", "dma", "exti", "i2c"))
+        self.assertFalse(names - set(sdk.REQUIRED_FILES),
+                         "Missing immutable omission guard: " +
+                         repr(sorted(names - set(sdk.REQUIRED_FILES))))
+        # Exercise the real early completeness verifier with a byte-consistent
+        # rehashed map. Dependency contents are intentionally outside this
+        # early metadata boundary; no downstream provenance check is mocked.
+        with tempfile.TemporaryDirectory(prefix="required SDK omission ") as value:
+            root = Path(value) / "prefix/share/nexus/src"
+            files = {}
+            for name in sdk.REQUIRED_FILES:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"owned input\n")
+                files[name] = hashlib.sha256(path.read_bytes()).hexdigest()
+            identity = {
+                "schema": 1, "kind": "nexus-installed-source-sdk",
+                "source_revision": "a" * 40, "source_tree": "b" * 40,
+                "publishable": False, "source_dirty": True,
+                "files_sha256": files, "dependencies": [],
+                "reviewed_imports": [],
+                "toolchains_lock_sha256": files["dependencies/toolchains.lock.json"],
+                "snapshot_sha256": "", "package_files_sha256": {},
+            }
+            for name in sorted(names):
+                with self.subTest(omitted=name):
+                    target = root / name
+                    original = target.read_bytes()
+                    expected = files.pop(name)
+                    target.unlink()
+                    identity["snapshot_sha256"] = hashlib.sha256(json.dumps(
+                        files, sort_keys=True,
+                        separators=(",", ":")).encode()).hexdigest()
+                    (root / sdk.MANIFEST).write_text(json.dumps(identity) + "\n")
+                    try:
+                        with self.assertRaisesRegex(
+                                sdk.SDKError, "missing required sources/licenses"):
+                            sdk.verify(root)
+                    finally:
+                        target.write_bytes(original)
+                        files[name] = expected
+
     def test_modern_consumer_inputs_are_explicit_and_use_only_relocated_sdk(self):
         with tempfile.TemporaryDirectory(prefix="modern consumer inputs ") as value:
             directory = Path(value)
@@ -91,11 +171,10 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                 self.assertTrue(name in required,
                                 "SDK omitted the actual H743 pre-RAM startup input")
 
-    def test_full_upstream_checkout_exports_only_the_reviewed_five_files(self):
+    def test_upstream_checkout_exports_only_the_exact_reviewed_component(self):
         for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
             with self.subTest(part=part):
                 entries = sdk.dependency_entries(ROOT, review["directory"])
-                self.assertEqual(len(entries), 5)
                 self.assertEqual(set(entries), review["files"])
                 self.assertTrue(all(mode in {"100644", "100755"}
                                     and kind == "blob"

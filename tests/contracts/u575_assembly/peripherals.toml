@@ -1,0 +1,55 @@
+schema = 2
+board_package = "../../../boards/stm32u575_nucleo_zi_q"
+backend = "baremetal"
+clock = "msis4"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[spi.bus]
+binding = "spi1"
+mode = "short-poll"
+max_hz = 1000000
+
+[spi_device.device]
+controller = "bus"
+driver = "spi-endpoint"
+cs_binding = "spi1-cs"
+mode = 0
+max_hz = 1000000
+
+[i2c.control]
+binding = "i2c1"
+mode = "poll-messages"
+max_hz = 100000
+
+[i2c_device.sensor]
+controller = "control"
+driver = "i2c-endpoint"
+address = 80
+
+[adc.sense]
+binding = "adc4"
+mode = "single-shot"
+channels = [1]
+sample_times = [7]
+reference_mv = 3300
+
+[exti.edge]
+binding = "edge1"
+mode = "edge-event"
+edge = "both"
+event_capacity = 3
+[exti.edge.irq]
+priority = 5
+calls_os = false
+
+[flash.storage]
+binding = "flash"
+mode = "poll-word"

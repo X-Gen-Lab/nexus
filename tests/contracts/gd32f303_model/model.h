@@ -25,8 +25,15 @@ extern bool g_gd303_update_trgo;
 extern bool g_gd303_spi_hold_rx;
 extern bool g_gd303_spi_bad_cs;
 extern unsigned g_gd303_spi_bytes;
+extern bool g_gd303_exti_hold_pending;
+extern bool g_gd303_exti_reassert_pending;
+extern bool g_gd303_carry_on_low_read;
 void nx_gd303_model_spi_poll(void);
-#define NX_GD303_SPI_POLL() nx_gd303_model_spi_poll()
+void nx_gd303_model_device_poll(unsigned kind, void* port);
+#define NX_LEGACY_READ(reg)         nx_gd303_model_read(reg)
+#define NX_LEGACY_WRITE(reg, value) nx_gd303_model_write(reg, value)
+#define NX_LEGACY_POLL(kind, port)  nx_gd303_model_device_poll(kind, port)
+#define NX_GD303_SPI_POLL()         nx_gd303_model_spi_poll()
 extern bool g_gd303_hold_irq_off;
 extern bool g_gd303_pend_on_timer_withdraw;
 extern bool g_gd303_hold_late_irq_off;

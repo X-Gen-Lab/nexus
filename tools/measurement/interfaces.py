@@ -8,6 +8,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.measurement.elf import Elf32
+from tools.measurement.retention import linked_object
 from tools.evidence.identity import resolved_identity, resolved_input_files
 from tools.measurement.resources import (resolved_float_abi,
                                          validate_elf_configuration,
@@ -17,14 +18,32 @@ FACE = re.compile(r"s_nx_(?:device_)?face_[A-Za-z0-9_]+(?:\.\d+)?\Z")
 OPERATIONS = re.compile(r"nx_(?:(?:stm32|gd32)[a-z0-9]*|native)_[A-Za-z0-9_]+_ops\Z")
 
 
+def shared_operation_symbols(root=None):
+    """Read exact concrete shared tables from reviewed owned C declarations.
+
+    A prefix alone cannot admit an arbitrary shared object. Reuse retention's
+    strict public-layout/initializer parser, then retain only translation units
+    actually owned by the shared SoC or I/O directories. This observes source;
+    it does not become a provider selection or software-build authority.
+    """
+    from tools.measurement.retention import source_contracts
+    root = Path(root or Path(__file__).resolve().parents[2]).resolve()
+    _, _, providers, _ = source_contracts(root)
+    directories = {root / "soc/common", root / "io/src"}
+    return frozenset(name for name, provider in providers.items()
+                     if Path(provider["source"]["path"]).parent in directories)
+
+
 def inspect_interfaces(elf, *, require_interfaces=False):
     """Fail on writable faces/tables and report actual surviving objects."""
     faces, tables, names = [], [], set()
+    shared = shared_operation_symbols()
     for symbol in elf.defined_symbols:
         if symbol["type"] != 1:
             continue
         name = symbol["name"]
-        face, table = FACE.fullmatch(name), OPERATIONS.fullmatch(name)
+        face = FACE.fullmatch(name)
+        table = OPERATIONS.fullmatch(name) or name in shared
         if not face and not table:
             continue
         if name in names:
@@ -44,6 +63,9 @@ def inspect_interfaces(elf, *, require_interfaces=False):
             raise EvidenceError("ARM interface must contain two pointers: " + name)
         if table and symbol["size"] % 4:
             raise EvidenceError("operations table is not pointer-aligned: " + name)
+        # An allocated read-only section alone does not establish that the
+        # image actually loads these bytes through a read-only segment.
+        linked_object(elf, name, "interface" if face else "operations")
         record = {"name": name, "bytes": symbol["size"],
                   "section": section["name"]}
         (faces if face else tables).append(record)

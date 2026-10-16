@@ -21,8 +21,11 @@ CAN_CONTROLLERS = ()
 ETH_CONTROLLER = None
 USB_CONTROLLER = None
 SPI_REQUIRES_ENDPOINT = True
-DMA_VECTOR = None
-DMA_TOPOLOGY = (frozenset(), range(0), range(0))
+DMA_VECTOR = "Channel"
+DMA_TOPOLOGY = (frozenset((1,)), range(1, 2), range(5, 6))
+ADC_PIN_CHANNELS = MappingProxyType({("ADC1", "PA0"): 1})
+FLASH_PROGRAM_UNIT = 8
+FLASH_INPUT_ALIGNMENT = 1
 CLOCK_PROFILES = MappingProxyType({
     "hse24-pll170": MappingProxyType({
         "hse_hz": 24000000, "core_hz": 170000000,
@@ -35,7 +38,11 @@ _MODES = MappingProxyType({
     ("uart", "irq-bytes"): "uart", ("exti", "edge-event"): "exti",
     ("watchdog", "independent"): "watchdog",
     ("spi", "short-poll"): "spi",
-    ("pwm", "fixed-pwm"): "pwm"})
+    ("pwm", "fixed-pwm"): "pwm",
+    ("adc", "single-shot"): "adc",
+    ("adc", "trigger-dma"): "adc_stream",
+    ("flash", "poll-word"): "flash",
+    ("i2c", "poll-messages"): "i2c"})
 
 
 def mode_implementation(kind, mode):
@@ -116,6 +123,26 @@ def validate_selection(selection, route):
             common.fail("PWM tick must exactly divide the 170MHz timer clock")
         period = common.integer(selection.get("period_ticks"), 1, 65535, "PWM period")
         common.integer(selection.get("duty_ticks"), 0, period, "PWM duty")
+    elif kind == "adc":
+        if (route["controller"] != "ADC1" or
+                tuple((pin["pin"], pin["function"], pin["af"])
+                      for pin in route["pins"]) != (("PA0", "analog", 0),) or
+                tuple(selection["channels"]) != (1,) or
+                tuple(selection["sample_times"]) != (0,)):
+            common.fail("G474 ADC requires ADC1 PA0 channel1 sample code0")
+        common.integer(selection["reference_mv"], 1620, 3600, "ADC reference")
+        if selection["mode"] == "trigger-dma" and selection.get("irq_priority") != 5:
+            common.fail("G474 ADC DMA requires fixed IRQ priority5")
+    elif kind == "i2c":
+        if (route["controller"] != "I2C1" or
+                tuple((pin["pin"], pin["function"], pin["af"])
+                      for pin in route["pins"]) !=
+                (("PB8", "scl", 4), ("PB9", "sda", 4)) or
+                selection.get("max_hz", 100000) != 100000):
+            common.fail("G474 I2C1 requires PB8/PB9 AF4 and fixed100kHz")
+    elif kind == "flash":
+        if route["controller"] != "FLASH" or route["pins"]:
+            common.fail("G474 physical Flash requires internal dual-bank512KiB")
     elif kind == "watchdog":
         if route["controller"] != "IWDG" or route["pins"]:
             common.fail("G474 independent watchdog requires internal IWDG")
@@ -137,8 +164,10 @@ def validate_selection(selection, route):
 
 
 def validate_dma(route, mode, normalize):
-    del route, mode, normalize
-    common.fail("G474 DMA provider is unimplemented")
+    expected = (("DMA1:stream1:channel5",) if route["controller"] == "ADC1" and
+                mode == "trigger-dma" else None)
+    common.validate_dma(route, mode, expected, "stm32g474", normalize,
+                        trigger="TIM6")
 
 
 def validate_dma_resource(resource):

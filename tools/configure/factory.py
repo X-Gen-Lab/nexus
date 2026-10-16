@@ -1,10 +1,12 @@
 """Generate pure, typed static lookup without registration or construction."""
 
 try:
-    from .providers.common import mode_traits
+    from .providers.common import mode_traits, fail
+    from .providers import maintained
     from .ir import ConfigurationIR
 except ImportError:
-    from providers.common import mode_traits
+    from providers.common import mode_traits, fail
+    from providers import maintained
     from ir import ConfigurationIR
 
 FACTORY_ABI_EPOCH = 1
@@ -192,7 +194,15 @@ def _capability(item, model, endpoint=None):
         units = endpoint.options.max_packet if endpoint is not None else 64
         unit_bytes, messages = 1, 1
     elif kind == "flash":
-        unit_bytes = alignment = 1 if model else 4
+        if model:
+            unit_bytes = alignment = 1
+        else:
+            provider = maintained(item.provider)
+            unit_bytes = getattr(provider, "FLASH_PROGRAM_UNIT", None)
+            alignment = getattr(provider, "FLASH_INPUT_ALIGNMENT", None)
+            if any(type(value) is not int or not 1 <= value <= 65535 or
+                   value & (value - 1) for value in (unit_bytes, alignment)):
+                fail("Flash provider requires exact power-of-two units/alignment")
     return " | ".join(flags) or "0U", units, unit_bytes, alignment, messages
 
 
@@ -213,6 +223,8 @@ def emit_capabilities(result):
         ' * \\brief Readonly bounds of the selected provider/mode.',
         ' * \\note Zero units/messages means no bound described, not unlimited.',
         ' * For I2C, units bounds each message; unit_bytes is the payload unit.',
+        ' * For Flash, unit_bytes constrains destination offset and length;',
+        ' * buffer_alignment describes caller input, independently of that unit.',
         ' * Board wiring, memory domains and deadlines remain separate contracts.',
         ' */', 'typedef struct {', '    uint32_t features;',
         '    uint32_t max_transfer_units;', '    uint16_t unit_bytes;',

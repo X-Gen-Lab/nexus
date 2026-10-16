@@ -1,0 +1,39 @@
+schema = 2
+board = "gd32f303_reference"
+backend = "freertos"
+clock = "irc8"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[adc.input]
+binding = "adc0"
+mode = "single-shot"
+channels = [0]
+sample_times = [7]
+reference_mv = 3300
+
+[pwm.output]
+binding = "pwm0"
+mode = "fixed-pwm"
+period_ticks = 1000
+duty_ticks = 100
+tick_hz = 1000000
+
+[flash.physical]
+binding = "flash0"
+mode = "poll-word"
+
+[exti.edge]
+binding = "exti1"
+mode = "edge-event"
+edge = "both"
+event_capacity = 3
+irq = { priority = 5, calls_os = false }

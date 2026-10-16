@@ -9,6 +9,14 @@ registries. The typed factory returns existing readonly faces; instances own
 private state and share readonly GPIO/UART/watchdog operations. Each package GPIO
 pad has a source-reviewed route; its inventory does not establish Board wiring.
 
+The selected finite peripheral extension adds SPI1, I2C1, ADC4, TIM3 CH1,
+EXTI0/1 and physical Flash. These reference selections keep TZEN0, MSIS4MHz,
+static typed factory objects and caller execution. They add no DMA engine,
+task, runtime registry or automatic clock adoption. The paired official U5 LL
+headers are private, hash-locked CubeU5 v1.9.0 inputs; readonly configuration
+queries and encodings are reused without HAL handles, vendor IRQ callbacks,
+HAL ticks or a second transfer owner.
+
 The official STM32U5 CMSIS device source is pinned to
 `624374fa1e21ca195d6f2102ac0caaa50d0ea4c8` (v1.4.3, Cube v1.9.0). The original
 Apache-2.0 license and ST notices remain intact. SDK register types remain private.
@@ -128,6 +136,104 @@ not invent a separate power-on cause.
 The maintained `mainstream.toml` and `mainstream-freertos.toml` fixtures select
 both USARTs, eight GPIO banks and an inactive watchdog. They exercise actual
 static construction, selective CMake sources, ARM linking and SDK consumption.
+
+## Finite peripheral selections
+
+| Class | Exact software selection | Ownership and limit |
+|---|---|---|
+| SPI | SPI1 PA5/PA6/PA7 AF5, separate PA4 active-low CS | Full duplex8bit,1..256bytes, finite deadline, TSIZE/CSTART and EOT/TXC; controller reset precedes CS release. Failed drain parks with the caller frame retained. No DMA or async request admission. |
+| I2C | I2C1 PB8/PB9 AF4, independent HSI16 | Shared audited V2 prefix,7bit endpoints,1..8 messages,1..256bytes/message, repeated START, RELOAD for256bytes, final STOP/idle. Separate8byte ARM cold lease owns HSION/I2C1SEL and restores them after the actual V2 port stops, preserving SYSCLK/TIM2. TIMINGR0x10f42f2f keeps SCL below100kHz; external pull-ups, rise/fall and voltage remain Board requirements. |
+| ADC | ADC4 PC0/channel1,12bit, samplecode7 | Single software shot,814.5sample+12.5conversion cycles at4MHz; no stream/trigger/DMA. Require externally prepared VDDA, live PWR gate and observed ASV before any acquisition. Observe LDO ready, calibrate, wait four ADC cycles and observe ADRDY. ADSTP completes before return; failed stop resets or parks. |
+| PWM | Exclusive TIM3 CH1 PA6 AF2 | Fixed exact4MHz divisor,1..65535period ticks,0..100percent duty. Idle GPIO latch precedes output mode; stop restores the declared inactive level. No advanced timer, break or capture claim. |
+| EXTI | PA0/EXTI0 and PA1/EXTI1 | Distinct IRQ11/12,8bit mux stride, separate rising/falling W1C banks, explicit bounded event ring and ordered loss facts. Events are coalesced observations, not complete edge history. Stop retains ring/wake storage until all source/IRQ withdrawal is observed. |
+| Flash | Full STM32U575ZIT6Q2MiB |256x8KiB pages,128pages/bank,16byte programming unit and byte-aligned input copied to four words. TZEN0/SWAP0 only. Deadlines stop between pulses; each started pulse settles before return and relock. Products supply regions and voltage, watchdog, same-bank stall and power-loss policy. No option-byte writes or reserved product partition. |
+
+`peripherals.toml` and its explicit FreeRTOS variant exercise SPI/I2C/ADC/EXTI/
+Flash construction; `pwm.toml` and its FreeRTOS variant keep PA6 PWM separate
+from SPI1 MISO. Selecting both conflicting PA6 owners is rejected by resource
+resolution. The ADC reference is a link fixture whose external boot/power owner
+must prepare VDDA/ASV before `nx_platform_start`; it does not invent a powered
+Board route. Factory lookup remains a cold readonly face lookup.
+
+### 中文范围说明
+
+本次补齐六类选定外设：SPI1 有限轮询、I2C1 有限消息、ADC4 PC0 单次采样、
+TIM3 CH1 固定 PWM、PA0/PA1 EXTI 和完整物理 Flash。实例仍由 TOML 与不可变 IR
+静态生成，使用共享只读方法表及独立私有状态，没有隐藏任务或运行时注册表。
+官方 U5 LL 仅作为私有锁定依赖复用配置编码和只读查询，不引入 HAL 句柄、tick
+或第二个中断/传输所有者。
+
+SPI 的 DMA 完成概念不适用于此轮询模式；本实现明确等待 EOT/TXC，复位控制器后
+才释放 CS。I2C 支持重复 START 与256字节 RELOAD，STOP 和 BUSY 均需排空。
+ADC 要求外部已准备 VDDA 并观察 ASV，先等待稳压器、校准和 ADRDY，再单次采样。
+PWM 停止先撤销通道和计数器，再恢复板级声明的安全输出。EXTI 的双 pending bank
+分别清除，环满后按顺序报告丢失，不声称恢复所有物理边沿。
+
+Flash 的完整物理容量为2MiB，256个8KiB页，编程粒度16字节。四次32位写入前先
+复制输入，并保持进入前的中断屏蔽状态；超时不能中止已开始的物理脉冲，必须等
+空闲后清模式并重新上锁。产品分区、掉电恢复、供电和看门狗策略由外部工程负责。
+全部物理 HIL 仍为 `not_executed`，主机模型和 ARM 链接不能替代实板测量。
+
+## Selected errata controls
+
+The source review uses official ES0499 Rev12, June2026, PDF SHA256
+`52dac38c801ae72c42ebffd39296ddf7c80ae378cd555f1a1d1baf49daf86a56`.
+SPI keeps CRCSIZE=7 even with CRC disabled to address2.23.1, accepts the real
+reset CFG1 fields, and waits one actual SCK period plus two1MHz timer ticks
+after EOT/TXC before reset to address2.23.7. Poll counts are progress bounds,
+never measured microseconds. I2C uses the reviewed2.20.2 spurious master BERR
+clear-and-continue policy. A separately acquired HSI16 kernel avoids the
+4MHz MSI tolerance boundary in2.20.1 while preserving the4MHz system and1MHz
+TIM2 domain. At DS13737 Table81's15.65..16.25MHz envelope, the selected
+prescaler/counters give low/high periods above5.9us and SCLDEL above1.96us,
+allowing rise<=1000ns/fall<=300ns and Standard250ns setup. Package/solder,
+pull-up and real bus timing still require station measurements. Cold admission
+rejects foreign HSI/HSIKERON or I2C1SEL owners and nondefault HSITRIM;
+factory calibration is preserved without rewriting the trim. Failed source/mux withdrawal
+retains ownership and blocks global teardown. H7-only receive reload policies
+are not inferred for U5.
+
+ADC4 admission rejects an enabled ADC1/2 interface owner to keep the selected
+single-converter contract separate from2.9.1 simultaneous-conversion conditions.
+It does not adopt ADC12 prescalers or linearity state. Calibration must be
+observed as accepted before waiting for completion; regulator/ready/sample
+status flags must be observed clear before new evidence can be accepted.
+The declared reference is1000..3600mV per ADC4 Table106; external VDDA must be
+at least1.62V and at least VREF+. Neither the number nor ASV measures supply
+quality. Flash never starts an
+erase while WDW is set, and supplies all four quad-word writes before another
+operation, excluding the2.2.25 partial-write-buffer/STRT sequence. Its geometry
+declares fresh-erase provenance: callers must erase a sector before programming
+each16byte unit once, and erase again after a failed/interrupted pulse. Visible
+non-FF targets reject before unlock; FF reads cannot prove hidden ECC history.
+All-FF source units issue no programming pulse.
+Every physical pulse requires observed clearing of previous EOP/error flags
+and a fresh EOP after BUSY/WDW drain; idle status alone cannot certify a refused
+erase/program command. RM0456 gates EOP with EOPIE, so admission exclusively
+leases a disabled/inactive/not-pending FLASH IRQ; checked EOPIE is set for the
+pulse while NVIC stays disabled. Cleanup clears mode/EOPIE and locks before
+observing pending withdrawal, preserving IRQ priority. Failed cleanup retains
+the port for retry and blocks global teardown. Low-power,
+autonomous modes, SPI CRC/Ready, advanced timer break/ocref_clr and Flash option
+programming are not selected by these finite providers.
+
+中文：已按 ES0499 Rev12 审查选定模式。SPI 保留 CRCSIZE=7，并在 EOT/TXC 后保留
+至少一个实际 SCK 周期加两个1MHz计时 tick 后再复位。I2C 单独取得 HSI16 和内核
+选择器，避开4MHz边界及振荡器容差，保持 SYSCLK 与 TIM2 不变。按数据手册频率范围
+计算低高电平均超过5.9us、SCLDEL 超过1.96us；仍需验证外部上拉和总线电气时序。
+拒绝已有时钟所有者和非默认 HSITRIM，保留工厂校准且不改写微调值；清理失败保留租约
+并阻止平台退出，BERR 按对应勘误清除后继续。
+ADC4 拒绝已使能的 ADC1/2 所有者，不擅自采用其他 ADC 的校准状态。
+ADC 校准命令必须先观察到接受，稳压器、就绪和采样状态须先确认清除，才能接收新完成。
+声明参考范围为1000..3600mV，外部 VDDA 须至少1.62V且不低于 VREF+；配置数值和
+ASV 不能测量供电质量。Flash 拒绝已有
+WDW，四字写完且脉冲排空后才启动下一次操作；调用方必须保证每个16字节单元在新擦除
+扇区中仅写一次，失败或中断后重新擦除。全 FF 输入不产生编程脉冲，读回 FF 不能证明
+隐藏 ECC 已擦除。
+每次脉冲必须取得新的 EOP；由于 EOP 受 EOPIE 控制，Flash 独占一个保持禁用的
+FLASH IRQ，清理先撤销模式/EOPIE并上锁，再确认 pending 清除且保留中断优先级。
+清理失败保留所有权并阻止平台退出。软件措施不替代实板
+对时序、电气条件和芯片 revision 的验证。
 
 ## Capability and physical limits
 

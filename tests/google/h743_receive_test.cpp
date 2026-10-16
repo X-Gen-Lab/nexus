@@ -8,6 +8,7 @@
  */
 #include "h743_dma_model.h"
 #include "stm32h743_uart_receive.h"
+#include <algorithm>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 class ReceiveCache {
@@ -24,7 +25,7 @@ class H743Receive : public testing::Test {
   protected:
     USART_TypeDef registers{};
     alignas(32) uint8_t bytes[2][64]{};
-    nx_dma_memory_region_t regions[1]{};
+    nx_dma_memory_region_t regions[2]{};
     nx_stream_slot_t slots[2]{};
     nx_stream_t stream{};
     nx_stm32h743_uart_receive_state_t state{};
@@ -80,6 +81,20 @@ TEST_F(H743Receive, ExactLaneStartsOnlyAfterExplicitStreamBorrow) {
     EXPECT_EQ(NX_STREAM_SLOT_FILLING, slots[0].state);
     EXPECT_EQ(64U, g_h743_dma_stream.NDTR);
     EXPECT_NE(0U, registers.CR3 & USART_CR3_DMAR);
+}
+
+TEST_F(H743Receive, UnpoweredSelectedSram1RejectsAllBlocksBeforeTheFirstLoan) {
+    Start();
+    regions[0] = {0x30000000U, 131072U, NX_DMA_MEMORY_WRITE};
+    slots[0].data = reinterpret_cast<uint8_t*>(0x30000000U);
+    slots[1].data = reinterpret_cast<uint8_t*>(0x30000040U);
+    const uint32_t writes = g_h743_model.writes;
+    nx_result_t result = nx_uart_port_rx_start(&port, &stream);
+    EXPECT_EQ(NX_ERROR_STATE, result);
+    EXPECT_EQ(NX_STREAM_SLOT_FREE, slots[0].state);
+    EXPECT_EQ(writes, g_h743_model.writes);
+    if (result == NX_SUCCESS)
+        (void)nx_uart_port_rx_stop(&port);
 }
 TEST_F(H743Receive, FullCompletionPublishesOnlyAfterOwnerService) {
     Start();
@@ -460,4 +475,36 @@ TEST_F(H743Receive,
     nx_uart_port_service(&port);
     EXPECT_EQ(0U, registers.ISR & USART_ISR_ORE);
     EXPECT_EQ(NX_STREAM_SLOT_FILLING, slots[0].state);
+}
+
+TEST_F(H743Receive, DistinctSelectedDomainsRetainEachLoanDuringBackpressure) {
+    regions[0].size = sizeof(bytes[0]);
+    regions[1] = {reinterpret_cast<uintptr_t>(bytes[1]), sizeof(bytes[1]),
+                  NX_DMA_MEMORY_WRITE};
+    state.region_count = 2U;
+    Start(true);
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    std::fill_n(bytes[0], sizeof(bytes[0]), 0x35U);
+    Full();
+    nx_uart_port_service(&port);
+    nx_stream_block_t first{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &first));
+    std::fill_n(bytes[1], sizeof(bytes[1]), 0x76U);
+    Full();
+    nx_uart_port_service(&port);
+    for (unsigned i = 0U; i < 8U; ++i)
+        nx_uart_port_service(&port);
+    EXPECT_FALSE(state.filling);
+    EXPECT_EQ(0U, g_h743_dma_stream.CR & DMA_SxCR_EN);
+    for (uint8_t value : bytes[0])
+        EXPECT_EQ(0x35U, value);
+    ASSERT_EQ(NX_SUCCESS, nx_stream_release(&stream, &first));
+    nx_uart_port_service(&port);
+    EXPECT_TRUE(state.filling);
+    EXPECT_EQ(bytes[0], state.fill.data);
+    nx_stream_block_t second{};
+    ASSERT_EQ(NX_SUCCESS, nx_stream_acquire(&stream, &second));
+    EXPECT_EQ(bytes[1], second.data);
+    for (uint8_t value : bytes[1])
+        EXPECT_EQ(0x76U, value);
 }

@@ -437,13 +437,18 @@ def resolve_bindings(board, routes, part):
     """Validate Board electrical bindings and materialize safe masks."""
     bindings = {}
     for binding in sequence(board["bindings"], "Board bindings"):
-        obj(binding, {"id", "controller", "route"}, {"initial", "mask"}, "binding")
+        obj(binding, {"id", "controller", "route"},
+            {"initial", "mask", "supply_mv"}, "binding")
         identity(binding["id"], "binding id")
         if binding["id"] in bindings:
             fail(f"Duplicate Board binding: {binding['id']}")
         route = routes.get(binding["route"])
         if not route or part not in route["variants"] or route["controller"] != binding["controller"]:
             fail(f"Board binding {binding['id']} has no reviewed exact-part route")
+        if "supply_mv" in binding:
+            if route["kind"] not in {"flash", "adc"}:
+                fail("Supply voltage belongs to a Flash or ADC binding")
+            integer(binding["supply_mv"], 1, 5000, "Supply millivolts")
         if "initial" in binding:
             integer(binding["initial"], 0, UINT32_MAX, "GPIO initial")
         actual_mask = sum(1 << int(PIN.fullmatch(pin["pin"])[2])

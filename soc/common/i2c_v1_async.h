@@ -62,7 +62,7 @@ typedef struct {
     const nx_irq_wake_t* wake;
     nx_result_t (*validate_wake)(void*, const nx_irq_wake_t*, uint8_t);
     void (*ack_irqs)(void*);
-    void (*stop_irqs)(void*);
+    nx_result_t (*stop_irqs)(void*);
     uint16_t index;
     uint16_t transferred;
     uint8_t message;
@@ -70,6 +70,7 @@ typedef struct {
     nx_i2c_v1_phase_t phase;
     uint8_t address;
     uint8_t peripheral_mhz;
+    uint16_t wake_publishers;
     bool initialized;
     bool stopping;
     bool faulted;

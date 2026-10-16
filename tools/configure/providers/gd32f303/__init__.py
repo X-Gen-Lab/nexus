@@ -15,6 +15,8 @@ CPU_FEATURES = MappingProxyType({
     "icache_line_bytes": 0, "dcache_line_bytes": 0, "security": "single",
     "sau": False, "mve": "none", "dsp": True})
 PREFIX = "gd32f303"
+FLASH_PROGRAM_UNIT = 2
+FLASH_INPUT_ALIGNMENT = 1
 MODEL = False
 FACT_REFERENCES = descriptor.maintained(PREFIX).references
 SOURCE_IMPORT_LOCK = descriptor.maintained(PREFIX).import_lock
@@ -22,18 +24,23 @@ CAN_CONTROLLERS = ()
 ETH_CONTROLLER = None
 USB_CONTROLLER = None
 SPI_REQUIRES_ENDPOINT = True
-DMA_VECTOR = None
-DMA_TOPOLOGY = (frozenset(), range(0), range(0))
+DMA_VECTOR = "Channel"
+DMA_TOPOLOGY = (frozenset((0,)), range(7), range(1))
 CLOCK_PROFILES = MappingProxyType({
     "irc8": MappingProxyType({
         "source": "hsi", "input_hz": 8000000, "core_hz": 8000000,
         "apb1_hz": 8000000, "apb2_hz": 8000000})})
 LIMITS = MappingProxyType({"uart_baud": (123, 500000),
-                           "spi_hz": (31250, 4000000)})
+                           "i2c_hz": (80000, 80000),
+                           "spi_hz": (31250, 4000000), "pwm_period": 65535})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart", ("spi", "short-poll"): "spi",
-    ("watchdog", "independent"): "watchdog"})
+    ("uart", "dma-tx"): "uart_dma", ("uart", "dma-duplex"): "uart_dma",
+    ("i2c", "irq-messages"): "i2c_async",
+    ("watchdog", "independent"): "watchdog", ("flash", "poll-word"): "flash",
+    ("adc", "single-shot"): "adc", ("pwm", "fixed-pwm"): "pwm",
+    ("exti", "edge-event"): "exti"})
 
 
 def mode_implementation(kind, mode):
@@ -58,11 +65,18 @@ def validate_selection(selection, route):
         divisor = (8000000 + baud // 2) // baud
         if not 16 <= divisor <= 0xffff:
             common.fail("GD303 baud exceeds actual oversample16 divider")
-        if selection["rx_profile"] != "bytes":
-            common.fail("GD303 USART supports an explicit byte ring only")
+        if selection["rx_profile"] != ("blocks" if selection["mode"] == "dma-duplex" else "bytes"):
+            common.fail("Legacy USART mode requires its exact byte/block profile")
         if (type(selection.get("irq_priority")) is not int or
                 selection["irq_priority"] != 5):
             common.fail("GD303 USART implements IRQ priority5 only")
+    elif kind == "i2c":
+        if (route["controller"] != "I2C0" or actual != (
+                ("PB6", "scl", 0), ("PB7", "sda", 0)) or
+                selection.get("max_hz") != 80000 or
+                type(selection.get("irq_priority")) is not int or
+                selection["irq_priority"] != 0 or selection.get("calls_os", False)):
+            common.fail("Legacy I2C requires PB6/PB7, nominal80kHz, IRQ0 and no kernel calls")
     elif kind == "gpio":
         if route["controller"] != "GPIOA" or actual not in {
                 (("PA5", "output", 0),), (("PA4", "output", 0),)}:
@@ -83,11 +97,44 @@ def validate_selection(selection, route):
     elif kind == "watchdog":
         if route["controller"] != "FWDGT" or route["pins"]:
             common.fail("GD303 watchdog requires internal FWDGT")
+    elif kind == "exti":
+        controller = route["controller"]
+        if controller not in {"EXTI0", "EXTI1"} or actual != (
+                ("PA" + controller[-1], "input", 0),):
+            common.fail("GD303 requires exact independent PA0/PA1 EXTI")
+        if (type(selection.get("edge")) is not str or
+                selection["edge"] not in {"rising", "falling", "both"}):
+            common.fail("GD303 EXTI requires explicit raw edge selection")
+        common.integer(selection.get("event_capacity"), 1, 4096,
+                       "GD303 EXTI event capacity")
+        common.integer(selection.get("irq_priority"), 0, 15,
+                       "GD303 EXTI priority")
+    elif kind == "flash":
+        if route["controller"] != "FMC" or actual:
+            common.fail("GD303 requires exact full physical FMC bank0")
+    elif kind == "adc":
+        if (route["controller"] != "ADC0" or actual != (("PA0", "analog", 0),)
+                or tuple(selection.get("channels", ())) != (0,)
+                or tuple(selection.get("sample_times", ())) != (7,)):
+            common.fail("GD303 requires PA0 channel0 sample239.5cycles")
+        common.integer(selection.get("reference_mv"), 2700, 3600,
+                       "GD303 nominal ADC reference")
+    elif kind == "pwm":
+        if route["controller"] != "TIMER2" or actual != (("PA6", "ch0", 0),):
+            common.fail("GD303 requires default TIMER2 CH0 PA6")
+        tick = common.integer(selection.get("tick_hz"), 1, 8000000,
+                              "GD303 PWM tick")
+        if 8000000 % tick or 8000000 // tick > 65536:
+            common.fail("GD303 PWM requires exact IRC8 divisor")
+        period = common.integer(selection.get("period_ticks"), 1, 65535,
+                                 "GD303 PWM period")
+        common.integer(selection.get("duty_ticks"), 0, period, "GD303 PWM duty")
 
 
 def validate_dma(route, mode, normalize):
-    del route, mode, normalize
-    common.fail("GD303 DMA provider is unimplemented")
+    expected = {"dma-tx": ("DMA0:stream3:channel0",),
+                "dma-duplex": ("DMA0:stream3:channel0", "DMA0:stream4:channel0")}.get(mode)
+    common.validate_dma(route, mode, expected, "gd32f303", normalize)
 
 
 def validate_dma_resource(resource):

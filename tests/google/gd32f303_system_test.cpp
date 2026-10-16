@@ -44,6 +44,7 @@ class GD303System : public testing::Test {
         g_gd303_ignore = nullptr;
         g_gd303_writes = 0;
         g_gd303_update_trgo = false;
+        g_gd303_carry_on_low_read = false;
         g_gd303_density = (48U << 16U) | 256U;
         g_gd303_hold_update = g_gd303_hold_irq_off = false;
         g_gd303_pend_on_timer_withdraw = false;
@@ -67,6 +68,69 @@ TEST_F(GD303System, StartsExactSixteenBitOneMegahertzTimer) {
     EXPECT_EQ(65535U, TIMER_CAR(TIMER1));
     EXPECT_EQ(TIMER_CTL0_CEN, TIMER_CTL0(TIMER1));
     EXPECT_TRUE(g_gd303_irq[TIMER1_IRQn]);
+}
+TEST_F(GD303System, CascadeReservesTimer4AndCountsLowOverflowViaIti0) {
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_start(&system, 4U).primary);
+    EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER4EN);
+    EXPECT_EQ(7U, TIMER_SMCFG(TIMER4));
+    EXPECT_EQ(0U, TIMER_PSC(TIMER4));
+    EXPECT_EQ(65535U, TIMER_CAR(TIMER4));
+    EXPECT_EQ(2U << 4U, TIMER_CTL1(TIMER1));
+    EXPECT_TRUE(g_gd303_irq[TIMER4_IRQn]);
+}
+TEST_F(GD303System, SixteenLowWrapsSurviveDelayedIrqAndLongFlashPulse) {
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_start(&system, 4U).primary);
+    TIMER_CNT(TIMER4) = 16U;
+    TIMER_CNT(TIMER1) = 3456U;
+    TIMER_INTF(TIMER1) = TIMER_INTF_UPIF;
+    EXPECT_EQ(16U * 65536U + 3456U, nx_gd32f303_system_now(&system));
+    nx_gd32f303_system_timer_irq(&system);
+    EXPECT_EQ(16U * 65536U + 3456U, nx_gd32f303_system_now(&system));
+}
+TEST_F(GD303System, HighWordPendingWrapIsCorrectedBeforeAndAfterItsIrq) {
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_start(&system, 4U).primary);
+    TIMER_CNT(TIMER4) = 65535U;
+    TIMER_CNT(TIMER1) = 65535U;
+    EXPECT_EQ(UINT64_C(4294967295), nx_gd32f303_system_now(&system));
+    TIMER_CNT(TIMER4) = 0U;
+    TIMER_CNT(TIMER1) = 7U;
+    TIMER_INTF(TIMER4) = TIMER_INTF_UPIF;
+    EXPECT_EQ(UINT64_C(4294967303), nx_gd32f303_system_now(&system));
+    nx_gd32f303_system_cascade_irq(&system);
+    EXPECT_EQ(UINT64_C(4294967303), nx_gd32f303_system_now(&system));
+    nx_gd32f303_system_cascade_irq(&system);
+    EXPECT_EQ(UINT64_C(4294967303), nx_gd32f303_system_now(&system));
+}
+TEST_F(GD303System, ForeignHighGateAndSlaveRejectWithoutResettingIt) {
+    RCU_APB1EN = RCU_APB1EN_TIMER4EN;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_gd32f303_system_start(&system, 4U).primary);
+    EXPECT_EQ(0U, g_gd303_writes);
+    RCU_APB1EN = 0U;
+    TIMER_SMCFG(TIMER4) = 1U;
+    auto start = nx_gd32f303_system_start(&system, 4U);
+    EXPECT_EQ(NX_ERROR_BUSY, start.primary);
+    EXPECT_EQ(NX_SUCCESS, start.cleanup);
+    EXPECT_EQ(1U, TIMER_SMCFG(TIMER4));
+}
+TEST_F(GD303System, CarryBetweenWordReadsRereadsLowInNewHighEpoch) {
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_start(&system, 4U).primary);
+    TIMER_CNT(TIMER4) = 2U;
+    TIMER_CNT(TIMER1) = 65535U;
+    g_gd303_carry_on_low_read = true;
+    EXPECT_EQ(3U * 65536U, nx_gd32f303_system_now(&system));
+    EXPECT_FALSE(g_gd303_carry_on_low_read);
+}
+TEST_F(GD303System, HighSourceWithdrawalFailureRetainsBothClockLeases) {
+    ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_start(&system, 4U).primary);
+    g_gd303_ignore = &TIMER_CTL0(TIMER4);
+    EXPECT_EQ(NX_ERROR_IO, nx_gd32f303_system_stop(&system));
+    EXPECT_NE(0U, system.remaining_effects & 4U);
+    EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER1EN);
+    EXPECT_NE(0U, RCU_APB1EN & RCU_APB1EN_TIMER4EN);
+    EXPECT_EQ(0U, TIMER_CTL1(TIMER1));
+    EXPECT_FALSE(g_gd303_irq[TIMER4_IRQn]);
+    g_gd303_ignore = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_gd32f303_system_stop(&system));
 }
 
 TEST_F(GD303System, RejectWrongPhysicalDensityWithoutWrites) {
@@ -103,6 +167,7 @@ TEST_F(GD303System, TimerWrapIsCountedExactlyOnceBeforeAndAfterIrq) {
     TIMER_CNT(TIMER1) = 0xfffe;
     EXPECT_EQ(65534U, nx_gd32f303_system_now(&system));
     TIMER_CNT(TIMER1) = 2;
+    TIMER_CNT(TIMER4) = 1;
     TIMER_INTF(TIMER1) |= TIMER_INTF_UPIF;
     EXPECT_EQ(65538U, nx_gd32f303_system_now(&system));
     nx_gd32f303_system_timer_irq(&system);
@@ -187,7 +252,7 @@ TEST_F(GD303System, SnapshotPreservesAnIncomingInterruptMask) {
 TEST_F(GD303System, PrescalerUpdateDoesNotPublishAResetModeTrgoPulse) {
     ASSERT_EQ(NX_SUCCESS, nx_gd32f303_system_start(&system, 4).primary);
     EXPECT_FALSE(g_gd303_update_trgo);
-    EXPECT_EQ(0U, TIMER_CTL1(TIMER1));
+    EXPECT_EQ(2U << 4U, TIMER_CTL1(TIMER1));
 }
 
 TEST_F(GD303System, LatePendingVectorIsWithdrawnAfterTimerSources) {

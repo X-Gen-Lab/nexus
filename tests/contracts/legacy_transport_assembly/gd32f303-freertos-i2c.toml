@@ -1,0 +1,28 @@
+schema = 2
+board = "gd32f303_reference"
+backend = "freertos"
+clock = "irc8"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[i2c.bus]
+binding = "i2c0"
+mode = "irq-messages"
+max_hz = 80000
+
+[i2c.bus.irq]
+priority = 0
+calls_os = false
+
+[i2c_device.sensor]
+controller = "bus"
+driver = "i2c-endpoint"
+address = 80

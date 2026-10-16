@@ -85,6 +85,23 @@ TEST_F(H743Dma, ExactSelectedStreamAndMuxAdmitWithoutFallback) {
     EXPECT_EQ(0U, registers.CR1 & USART_CR1_TXEIE_TXFNFIE);
     EXPECT_NE(0U, registers.CR3 & USART_CR3_DMAT);
 }
+
+TEST_F(H743Dma, UnpoweredSelectedSram1RejectsBeforeRequestBorrowOrDmaEffects) {
+    Start();
+    regions[0] = {0x30000000U, 131072U, NX_DMA_MEMORY_READ};
+    ASSERT_EQ(NX_SUCCESS, nx_uart_tx_prepare(
+                              &request, reinterpret_cast<uint8_t*>(0x30000000U),
+                              32U, 10000U));
+    const uint32_t writes = g_h743_model.writes;
+    nx_result_t result = nx_uart_port_submit(&port, &request);
+    EXPECT_EQ(NX_ERROR_STATE, result);
+    EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    if (result == NX_SUCCESS) {
+        (void)nx_uart_port_cancel(&port, &request);
+        nx_uart_port_service(&port);
+    }
+}
 TEST_F(H743Dma, DmaCompletionRetainsBorrowUntilIndependentWireTc) {
     Start();
     ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));

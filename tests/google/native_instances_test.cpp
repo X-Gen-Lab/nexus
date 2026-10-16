@@ -246,7 +246,7 @@ TEST_F(NativeInstances, FlashProgramAndFaultsDoNotCrossInstanceMemory) {
     uint8_t first_memory[8] = {};
     uint8_t second_memory[8] = {};
     const nx_flash_sector_t sectors[] = {{0, 8}};
-    const nx_flash_geometry_t geometry = {0, 8, 1, sectors, 1};
+    const nx_flash_geometry_t geometry = {0, 8, 1, sectors, 1, 0};
     ASSERT_EQ(
         nx_native_flash_configure_instance(&first, first_memory, &geometry),
         NX_SUCCESS);
@@ -352,7 +352,7 @@ TEST_F(NativeInstances, PlatformStopWithdrawsFlashADCAndPWMAdmission) {
     const nx_flash_port_t flash_api = {&nx_native_flash_ops, &flash};
     uint8_t bytes[8] = {};
     const nx_flash_sector_t sector = {0, 8};
-    const nx_flash_geometry_t geometry = {0, 8, 1, &sector, 1};
+    const nx_flash_geometry_t geometry = {0, 8, 1, &sector, 1, 0};
     ASSERT_EQ(nx_native_flash_configure_instance(&flash, bytes, &geometry),
               NX_SUCCESS);
     ASSERT_EQ(nx_native_flash_stop_instance(&flash), NX_SUCCESS);
@@ -485,6 +485,60 @@ TEST_F(NativeInstances, I2CDeadlineIncludesTheLastByteInterval) {
     EXPECT_EQ(transferred, 3U);
     EXPECT_THAT(output, testing::ElementsAre(1, 2, 3));
     EXPECT_FALSE(state.active);
+}
+
+TEST_F(NativeInstances, ErasedFlashInputDoesNotConsumeFaultBudgetOrTime) {
+    nx_native_flash_state_t state{};
+    const nx_flash_port_t face{&nx_native_flash_ops, &state};
+    uint8_t memory[8]{};
+    const nx_flash_sector_t sector{0U, 8U};
+    const nx_flash_geometry_t geometry{0U, 8U, 2U, &sector, 1U, 0U};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_native_flash_configure_instance(&state, memory, &geometry));
+    nx_native_flash_fault_instance(&state, 0U);
+    const uint8_t erased[4]{0xffU, 0xffU, 0xffU, 0xffU};
+    EXPECT_EQ(NX_SUCCESS,
+              nx_flash_port_program(&face, 0U, erased, sizeof(erased), 100U));
+    EXPECT_EQ(0U, nx_time_now_us());
+    EXPECT_EQ(0U, state.pulses_left);
+    EXPECT_EQ(0U, nx_flash_port_geometry(&face)->program_flags);
+    const uint16_t value = 0U;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_flash_port_program(&face, 0U, &value, sizeof(value), 100U));
+}
+
+TEST_F(NativeInstances,
+       NorModelRejectsUnimplementedEccEraseHistoryRequirements) {
+    nx_native_flash_state_t state{};
+    uint8_t memory[8]{};
+    const nx_flash_sector_t sector{0U, 8U};
+    const nx_flash_geometry_t geometry{
+        0U, 8U, 2U, &sector, 1U, NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE};
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_native_flash_configure_instance(&state, memory, &geometry));
+    EXPECT_EQ(nullptr, state.geometry);
+    EXPECT_EQ(0U, memory[0]);
+}
+
+TEST_F(NativeInstances, ErasedInputLeavesPreviouslyProgrammedBytesUnchanged) {
+    nx_native_flash_state_t state{};
+    const nx_flash_port_t face{&nx_native_flash_ops, &state};
+    uint8_t memory[8]{};
+    const nx_flash_sector_t sector{0U, 8U};
+    const nx_flash_geometry_t geometry{0U, 8U, 2U, &sector, 1U, 0U};
+    ASSERT_EQ(NX_SUCCESS,
+              nx_native_flash_configure_instance(&state, memory, &geometry));
+    const uint16_t value = 0U;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_flash_port_program(&face, 0U, &value, sizeof(value), 100U));
+    const auto before = nx_time_now_us();
+    nx_native_flash_fault_instance(&state, 0U);
+    const uint16_t erased = UINT16_MAX;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_flash_port_program(&face, 0U, &erased, sizeof(erased), 100U));
+    EXPECT_EQ(before, nx_time_now_us());
+    EXPECT_EQ(0U, memory[0]);
+    EXPECT_EQ(0U, memory[1]);
 }
 
 } /* namespace */

@@ -207,6 +207,8 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
         s->cached ? 32U : 1U, NX_DMA_TO_DEVICE);
     if (result != NX_SUCCESS)
         return result;
+    if (!nx_stm32h743_dma_memory_powered(request->data, request->length))
+        return NX_ERROR_STATE;
     if (s->cached && request->length % 32U != 0U)
         return NX_ERROR_INVALID;
     nx_arch_irq_state_t guard = nx_arch_irq_save();

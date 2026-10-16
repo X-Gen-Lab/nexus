@@ -110,7 +110,7 @@ static void acknowledge(void* context) {
 }
 
 /** \brief Disabled NVIC sources and pending detach precede sink release. */
-static void stop_irqs(void* context) {
+static nx_result_t stop_irqs(void* context) {
     const nx_i2c_v1_state_t* state = context;
 #ifndef NEXUS_STM32_MODEL
     NVIC_DisableIRQ(event_irq(state));
@@ -123,6 +123,20 @@ static void stop_irqs(void* context) {
     (void)state;
 #endif
     acknowledge(context);
+#ifndef NEXUS_STM32_MODEL
+    if (NVIC_GetEnableIRQ(event_irq(state)) != 0U ||
+        NVIC_GetEnableIRQ(error_irq(state)) != 0U ||
+        NVIC_GetPendingIRQ(event_irq(state)) != 0U ||
+        NVIC_GetPendingIRQ(error_irq(state)) != 0U ||
+        (state->dma != NULL &&
+         (NVIC_GetEnableIRQ(dma_irq(state, true)) != 0U ||
+          NVIC_GetEnableIRQ(dma_irq(state, false)) != 0U ||
+          NVIC_GetPendingIRQ(dma_irq(state, true)) != 0U ||
+          NVIC_GetPendingIRQ(dma_irq(state, false)) != 0U))) {
+        return NX_ERROR_IO;
+    }
+#endif
+    return NX_SUCCESS;
 }
 
 /** \brief Validate every possible publisher using actual selected IRQ policy.

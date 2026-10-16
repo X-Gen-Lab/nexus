@@ -32,6 +32,9 @@ static nx_result_t configure(nx_native_flash_state_t* port, uint8_t* memory,
         geometry->size % geometry->program_unit != 0) {
         return NX_ERROR_INVALID;
     }
+    if (geometry->program_flags != 0U) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     uint32_t end = 0;
     for (size_t i = 0; i < geometry->sector_count; i++) {
         const nx_flash_sector_t* sector = &geometry->sectors[i];
@@ -141,6 +144,16 @@ static nx_result_t begin_pulse(nx_native_flash_state_t* port,
     return NX_SUCCESS;
 }
 
+/** \brief An all-0xff unit never consumes a modeled physical program pulse. */
+static bool erased_input(const uint8_t* source, size_t length) {
+    for (size_t i = 0U; i < length; ++i) {
+        if (source[i] != UINT8_MAX) {
+            return false;
+        }
+    }
+    return true;
+}
+
 /** \brief Model whole program pulses, preserving NOR zero-to-one constraints.
  */
 static nx_result_t native_flash_program(void* context, uint32_t offset,
@@ -159,14 +172,27 @@ static nx_result_t native_flash_program(void* context, uint32_t offset,
         return NX_ERROR_BUSY;
     }
     const uint8_t* source = data;
-    for (size_t i = 0; i < length; i++) {
-        if ((port->memory[offset + i] & source[i]) != source[i]) {
-            return NX_ERROR_IO;
+    const size_t unit = port->geometry->program_unit;
+    for (size_t i = 0U; i < length; i += unit) {
+        if (erased_input(source + i, unit)) {
+            continue;
         }
+        for (size_t byte = 0U; byte < unit; ++byte) {
+            if ((port->memory[offset + i + byte] & source[i + byte]) !=
+                source[i + byte]) {
+                return NX_ERROR_IO;
+            }
+        }
+    }
+    if (nx_deadline_expired(deadline, nx_time_now_us())) {
+        return NX_ERROR_TIMEOUT;
     }
     port->active = true;
     nx_result_t result = NX_SUCCESS;
     for (size_t i = 0; i < length; i += port->geometry->program_unit) {
+        if (erased_input(source + i, unit)) {
+            continue;
+        }
         result = begin_pulse(port, deadline);
         if (result != NX_SUCCESS) {
             break;

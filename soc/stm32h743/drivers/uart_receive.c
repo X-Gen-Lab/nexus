@@ -169,6 +169,8 @@ static nx_result_t validate_stream(nx_stm32h743_uart_receive_state_t* s,
             s->cached ? 32U : 1U, NX_DMA_FROM_DEVICE);
         if (result != NX_SUCCESS)
             return result;
+        if (!nx_stm32h743_dma_memory_powered(slot->data, slot->capacity))
+            return NX_ERROR_STATE;
         for (size_t j = 0U; j < i; ++j)
             if (overlaps(slot->data, slot->capacity, stream->slots[j].data,
                          stream->slots[j].capacity))

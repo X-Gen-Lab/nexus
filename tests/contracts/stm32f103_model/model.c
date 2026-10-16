@@ -86,6 +86,9 @@ void nx_f103_model_write(volatile uint32_t* reg, uint32_t value) {
         !g_f103_model.hold_update) {
         g_f103_model.timer.SR |= TIM_SR_UIF;
     }
+    if (reg == &g_f103_model.pwm.EGR && (value & TIM_EGR_UG) != 0U &&
+        !g_f103_model.hold_update)
+        g_f103_model.pwm.SR |= TIM_SR_UIF;
     if (reg == &g_f103_model.timer.CNT && g_f103_model.hold_counter) {
         *reg = 17U;
         return;
@@ -205,4 +208,16 @@ uint8_t nx_f103_model_spi_read(SPI_TypeDef* spi) {
     uint8_t value = (uint8_t)spi->DR;
     spi->SR &= ~(uint32_t)SPI_SR_RXNE;
     return value;
+}
+void nx_f103_model_device_poll(unsigned kind, void* port) {
+    ++g_f103_model.timer.CNT;
+    if (kind == 1U) {
+        nx_legacy_adc_state_t* p = port;
+        p->registers->control2 &= ~12U;
+        if ((p->registers->control2 & (1U << 22U)) != 0U) {
+            p->registers->control2 &= ~(1U << 22U);
+            p->registers->data = 1234U;
+            p->registers->status |= 2U;
+        }
+    }
 }

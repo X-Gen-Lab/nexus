@@ -1,7 +1,7 @@
 /**
  * \file            gd32_flash_fault_test.cpp
  *
- * \brief           Failed Flash relock retains the controller until reset.
+ * \brief           Flash relock and real NVIC model ownership regressions.
  *
  * \author          Nexus Team
  *
@@ -25,6 +25,34 @@ extern "C" void USART0_IRQHandler(void) {
 }
 
 namespace {
+TEST(GD32NvicModel, QueriesKeepEnablePendingAndActiveAsIndependentFacts) {
+    g_gd32_model_nvic = {};
+    NVIC->ISER[0] = 1U << 4U;
+    NVIC->ISPR[1] = 1U << 5U;
+    NVIC->IABR[1] = 1U << 5U;
+    EXPECT_EQ(1U, NVIC_GetEnableIRQ(FMC_IRQn));
+    EXPECT_EQ(0U, NVIC_GetPendingIRQ(FMC_IRQn));
+    EXPECT_EQ(0U, NVIC_GetActive(FMC_IRQn));
+    EXPECT_EQ(0U, NVIC_GetEnableIRQ(USART0_IRQn));
+    EXPECT_EQ(1U, NVIC_GetPendingIRQ(USART0_IRQn));
+    EXPECT_EQ(1U, NVIC_GetActive(USART0_IRQn));
+    g_gd32_model_nvic = {};
+}
+TEST(GD32NvicModel, PendingClearAndDisableCannotClearAnActiveHandler) {
+    g_gd32_model_nvic = {};
+    NVIC->ISER[0] = (1U << 4U) | (1U << 7U);
+    NVIC->ISPR[0] = (1U << 4U) | (1U << 7U);
+    NVIC->IABR[0] = 1U << 4U;
+    NVIC_ClearPendingIRQ(FMC_IRQn);
+    EXPECT_EQ(1U << 7U, NVIC->ISPR[0]);
+    EXPECT_EQ(1U, NVIC_GetEnableIRQ(FMC_IRQn));
+    EXPECT_EQ(1U, NVIC_GetActive(FMC_IRQn));
+    NVIC_DisableIRQ(FMC_IRQn);
+    EXPECT_EQ(1U << 7U, NVIC->ISER[0]);
+    EXPECT_EQ(1U, NVIC_GetActive(FMC_IRQn));
+    EXPECT_EQ(1U << 7U, NVIC->ISPR[0]);
+    g_gd32_model_nvic = {};
+}
 /** \brief Model real MMIO and Flash addresses without a firmware reset stub. */
 class GD32FlashFault : public ::testing::Test {
   protected:
@@ -62,9 +90,8 @@ class GD32FlashFault : public ::testing::Test {
     void* identity = MAP_FAILED;
 };
 
-TEST_F(GD32FlashFault, RelockFailureCannotReleaseOrReacquireController) {
-    /* Sticky relock quarantine outlives TestBody and fixture teardown. */
-    static nx_gd32_flash_state_t state = {};
+TEST_F(GD32FlashFault, RelockFailureRetainsControllerUntilStopRetryProvesLock) {
+    nx_gd32_flash_state_t state = {};
     nx_gd32_flash_state_t replacement = {};
     const nx_flash_port_t port = {&nx_gd32_flash_ops, &state};
     ASSERT_EQ(nx_gd32_flash_initialize(&state), NX_SUCCESS);
@@ -73,26 +100,28 @@ TEST_F(GD32FlashFault, RelockFailureCannotReleaseOrReacquireController) {
     ASSERT_EQ(nx_flash_port_program(&port, 0U, &word, sizeof(word),
                                     NX_DEADLINE_NEVER),
               NX_ERROR_IO);
-    EXPECT_FALSE(state.initialized);
+    EXPECT_TRUE(state.initialized);
     EXPECT_FALSE(state.active);
     EXPECT_EQ(FMC_CTL & FMC_CTL_LK, 0U);
     EXPECT_EQ(*static_cast<const uint16_t*>(flash), word);
     EXPECT_EQ(g_gd32_model_pulses, 1U);
     uint16_t output = 0;
-    EXPECT_EQ(nx_flash_port_geometry(&port), nullptr);
+    EXPECT_NE(nx_flash_port_geometry(&port), nullptr);
     EXPECT_EQ(nx_flash_port_read(&port, 0U, &output, sizeof(output)),
-              NX_ERROR_INVALID);
-    EXPECT_EQ(nx_flash_port_program(&port, 2U, &word, sizeof(word),
-                                    NX_DEADLINE_NEVER),
-              NX_ERROR_INVALID);
-    EXPECT_EQ(nx_flash_port_erase(&port, 0U, 4096U, NX_DEADLINE_NEVER),
-              NX_ERROR_INVALID);
-    EXPECT_EQ(nx_gd32_flash_stop(&state), NX_ERROR_INVALID);
+              NX_SUCCESS);
+    EXPECT_EQ(output, word);
+    EXPECT_EQ(nx_gd32_flash_stop(&state), NX_ERROR_IO);
+    EXPECT_TRUE(state.initialized);
     EXPECT_EQ(nx_gd32_flash_initialize(&replacement), NX_ERROR_BUSY);
-    /* A later successful lock cannot turn a sticky failure into normal stop. */
+    /* No replacement can acquire the retained controller. Ordinary stop must
+     * prove source, lock and pending withdrawal before releasing it. */
     g_gd32_model_flash_lock_works = true;
-    EXPECT_EQ(nx_gd32_flash_stop(&state), NX_ERROR_INVALID);
-    EXPECT_EQ(nx_gd32_flash_initialize(&replacement), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_gd32_flash_stop(&state), NX_SUCCESS);
+    EXPECT_FALSE(state.initialized);
+    EXPECT_EQ(NVIC_GetPendingIRQ(FMC_IRQn), 0U);
+    EXPECT_EQ(NVIC_GetActive(FMC_IRQn), 0U);
+    EXPECT_EQ(nx_gd32_flash_initialize(&replacement), NX_SUCCESS);
+    EXPECT_EQ(nx_gd32_flash_stop(&replacement), NX_SUCCESS);
     EXPECT_EQ(g_gd32_model_pulses, 1U);
 }
 } /* namespace */

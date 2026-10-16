@@ -15,11 +15,14 @@ CPU_FEATURES = MappingProxyType({
     "icache_line_bytes": 32, "dcache_line_bytes": 32, "security": "single",
     "sau": False, "mve": "none", "dsp": True})
 PREFIX = "stm32h743"
+FLASH_PROGRAM_UNIT = 32
+FLASH_INPUT_ALIGNMENT = 1
+ADC_PIN_CHANNELS = MappingProxyType({("ADC1", "PA3"): 15})
 MODEL = False
 CAN_CONTROLLERS = ()
 ETH_CONTROLLER = None
 USB_CONTROLLER = None
-SPI_REQUIRES_ENDPOINT = False
+SPI_REQUIRES_ENDPOINT = True
 DMA_VECTOR = "Stream"
 DMA_TOPOLOGY = (frozenset((1,)), range(2), range(45, 47))
 DMA_MEMORY_ENGINES = ("DMA1", "DMA2", "BDMA", "MDMA")
@@ -29,11 +32,16 @@ CLOCK_PROFILES = MappingProxyType({
         "source": "hsi", "input_hz": 64000000, "core_hz": mhz * 1000000,
         "apb1_hz": mhz * 1000000, "apb2_hz": mhz * 1000000})
     for mhz in (32, 64) for cache in ("off", "on")})
-LIMITS = MappingProxyType({"uart_baud": (977, 1000000)})
+LIMITS = MappingProxyType({"uart_baud": (977, 1000000), "spi_hz": (250000, 16000000), "pwm_period": 65535, "timer_hz": 64000000})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart", ("uart", "dma-tx"): "uart_dma",
-    ("uart", "rx-dma-idle"): "uart_receive"})
+    ("uart", "rx-dma-idle"): "uart_receive",
+    ("spi", "short-poll"): "spi", ("pwm", "fixed-pwm"): "pwm",
+    ("exti", "edge-event"): "exti",
+    ("watchdog", "independent"): "watchdog",
+    ("i2c", "poll-messages"): "i2c",
+    ("adc", "single-shot"): "adc", ("flash", "poll-word"): "flash"})
 
 
 def cache_mask(profile):
@@ -71,16 +79,59 @@ def validate_selection(selection, route):
         if type(selection.get("irq_priority")) is not int or selection["irq_priority"] != 5:
             common.fail("H743 USART provider implements IRQ priority5 only")
     elif kind == "gpio":
+        permitted = {"GPIOB": {"PB0"}, "GPIOE": {"PE11"}}
         pins = route["pins"]
-        if (route["controller"] != "GPIOB" or not pins or
-                any(pin["pin"] != "PB0" or pin["af"] != 0 for pin in pins)):
-            common.fail("Only reviewed GPIOB PB0 route is maintained")
-        mask = common.integer(selection.get("mask", 1), 1, 0xffff,
-                              "GPIO mask")
-        initial = common.integer(selection.get("initial", 0), 0, 0xffff,
-                                 "GPIO initial")
-        if mask != 1 or initial & ~mask:
-            common.fail("GPIO mask/initial differs from the reviewed PB0 route")
+        names = {pin["pin"] for pin in pins}
+        if (not pins or len(names) != len(pins) or
+                not names <= permitted.get(route["controller"], set()) or
+                any(pin["af"] != 0 for pin in pins)):
+            common.fail("H743 GPIO requires an exact reviewed package route")
+        expected = sum(1 << int(pin[2:]) for pin in names)
+        mask = common.integer(selection.get("mask", expected), 1, 0xffff, "GPIO mask")
+        initial = common.integer(selection.get("initial", 0), 0, 0xffff, "GPIO initial")
+        if mask != expected or initial & ~mask:
+            common.fail("GPIO mask/initial differs from the selected route")
+    elif kind == "spi":
+        expected = (("PE12", "sck", 5), ("PE13", "miso", 5), ("PE14", "mosi", 5))
+        actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
+        if route["controller"] != "SPI4" or actual != expected:
+            common.fail("H743 SPI4 requires exact PE12/13/14 AF5")
+        common.integer(selection.get("max_hz"), *LIMITS["spi_hz"], "SPI rate")
+    elif kind == "pwm":
+        expected = (("PA6", "ch1", 2),)
+        actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
+        if route["controller"] != "TIM3" or actual != expected:
+            common.fail("H743 PWM requires TIM3 CH1 PA6 AF2")
+        tick = common.integer(selection.get("tick_hz"), 1, 32000000, "PWM tick")
+        if 32000000 % tick or 64000000 // tick > 65536:
+            common.fail("PWM tick must divide both selected fixed timer clocks")
+        period = common.integer(selection.get("period_ticks"), 1, 65535, "PWM period")
+        common.integer(selection.get("duty_ticks"), 0, period, "PWM duty")
+    elif kind == "exti":
+        controller = route["controller"]
+        if controller not in {"EXTI0", "EXTI1"}:
+            common.fail("H743 maintains exact independent EXTI0/1")
+        actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
+        if actual != (("PA" + controller[-1], "input", 0),):
+            common.fail("H743 EXTI requires its exact PA0/PA1 input")
+        if selection.get("edge") not in {"rising", "falling", "both"}:
+            common.fail("H743 EXTI requires explicit raw edge")
+        common.integer(selection.get("event_capacity"), 1, 4096, "EXTI capacity")
+        common.integer(selection.get("irq_priority"), 0, 15, "EXTI priority")
+    elif kind == "i2c":
+        actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
+        if route["controller"] != "I2C1" or actual != (("PB8", "scl", 4), ("PB9", "sda", 4)) or selection.get("max_hz", 100000) != 100000:
+            common.fail("H743 I2C1 requires PB8/PB9 AF4 fixed100kHz")
+    elif kind == "adc":
+        actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
+        if route["controller"] != "ADC1" or actual != (("PA3", "analog", 0),) or tuple(selection.get("channels", ())) != (15,) or tuple(selection.get("sample_times", ())) != (7,):
+            common.fail("H743 ADC1 requires PA3 INP15 and sample code7")
+    elif kind == "flash":
+        if route["controller"] != "FLASH" or route["pins"]:
+            common.fail("H743 Flash requires exact internal two-bank2MiB")
+    elif kind == "watchdog":
+        if route["controller"] != "IWDG1" or route["pins"]:
+            common.fail("H743 watchdog requires internal IWDG1")
 
 
 def validate_dma(route, mode, normalize):

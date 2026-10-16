@@ -1,10 +1,21 @@
+# Authored translation; review state is explicit in catalog metadata.
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: a5f53133afdb560bcef446bfcc833ddbf8fc66f73b64833e5759efaedd6312c9\nX-Nexus-Reviewed: true\n"
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: a5f53133afdb560bcef446bfcc833ddbf8fc66f73b64833e5759efaedd6312c9\n"
 
 msgid "Typed I/O: devices and execution contracts"
 msgstr "类型化 I/O：设备与执行合同"
 
-msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+msgid ""
+"These declarations come from public header files. Selection, lifecycle, "
+"supported execution modes and physical authorization remain bounded by the "
+"corresponding design and support records."
 msgstr "这些声明来自公共头文件。选择、生命周期、支持的执行模式和物理资源授权范围仍以对应设计及支持记录为准。"
 
 msgid "adc.h"
@@ -55,7 +66,8 @@ msgstr "消费者排空后，显式恢复离散块采集。"
 msgid "Attach an optional hint sink after checking publisher IRQ priority."
 msgstr "检查发布者 IRQ 优先级后，附加可选提示接收端。"
 
-msgid "Raw count facts; nominal Vref is not a calibrated physical measurement."
+msgid ""
+"Raw count facts; nominal Vref is not a calibrated physical measurement."
 msgstr "原始计数事实；标称 Vref 不是经过校准的物理测量。"
 
 msgid "Public Members"
@@ -82,7 +94,9 @@ msgstr "宏定义"
 msgid "Initialize fresh unborrowed optional observation storage."
 msgstr "初始化全新、尚未借用的可选观察存储。"
 
-msgid "Provider-only cold bind validates every metadata/payload span before the first DMA loan."
+msgid ""
+"Provider-only cold bind validates every metadata/payload span before the "
+"first DMA loan."
 msgstr "仅提供者可执行的冷绑定；第一次 DMA 借用之前验证每个元数据／载荷范围。"
 
 msgid "Provider-only record before matching release-publication."
@@ -286,6 +300,9 @@ msgstr "flash.h"
 msgid "Full physical Flash geometry and explicit bounded regions."
 msgstr "完整物理 Flash 几何与显式有界区域。"
 
+msgid "Physical programming requirements beyond unit alignment."
+msgstr "超出单元对齐要求的物理编程约束。"
+
 msgid "Query exact physical Flash geometry without side effects."
 msgstr "无副作用地查询准确物理 Flash 几何。"
 
@@ -340,7 +357,8 @@ msgstr "i2c.h"
 msgid "Address endpoints, repeated START and explicit STOP settlement."
 msgstr "地址端点、重复 START 与显式 STOP 结清。"
 
-msgid "Maintained finite-message admission bounds, checked before hardware access."
+msgid ""
+"Maintained finite-message admission bounds, checked before hardware access."
 msgstr "维护范围内的有限消息准入边界，访问硬件之前检查。"
 
 msgid "Execute a polling 7-bit-address message transaction."
@@ -376,7 +394,8 @@ msgstr "关闭准入，全部借用者排空后才停止。"
 msgid "Attach one optional hint sink after actual IRQ policy checks."
 msgstr "检查实际 IRQ 策略后附加一个可选提示接收端。"
 
-msgid "One message; a new message starts with repeated START, final with STOP."
+msgid ""
+"One message; a new message starts with repeated START, final with STOP."
 msgstr "一个消息；新消息以重复 START 开始，最后以 STOP 结束。"
 
 msgid "Caller-owned finite message sequence."
@@ -535,7 +554,8 @@ msgstr "变量"
 msgid "Fixed model bindings; no allocation, lookup, probe or construction."
 msgstr "固定模型绑定；不分配、不查找、不探测、不构造。"
 
-msgid "UART storage belongs to the fixture until port stop and IRQ quiescence."
+msgid ""
+"UART storage belongs to the fixture until port stop and IRQ quiescence."
 msgstr "UART 存储归夹具所有，直到端口停止且 IRQ 静止。"
 
 msgid "spi.h"
@@ -865,7 +885,9 @@ msgstr "watchdog.h"
 msgid "Irreversible IWDG effects and neutral hardware reset causes."
 msgstr "不可逆 IWDG 效果与中立硬件复位原因。"
 
-msgid "Enable IWDG and report its effect and known timing bounds; activation is irreversible."
+msgid ""
+"Enable IWDG and report its effect and known timing bounds; activation is "
+"irreversible."
 msgstr "启用 IWDG，并报告其生效状态及已知的时间范围；激活不可逆。"
 
 msgid "Feed an enabled IWDG without changing product health policy."

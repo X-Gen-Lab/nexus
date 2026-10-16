@@ -208,11 +208,21 @@ void fmc_lock(void) {
 void fmc_flag_clear(uint32_t flags) {
     FMC_STAT &= ~flags;
 }
+/** \brief Latch completion and its pending vector only when ENDIE is set. */
+static void flash_completed(void) {
+    FMC_STAT &= ~FMC_STAT_BUSY;
+    if ((FMC_CTL & FMC_CTL_ENDIE) != 0U) {
+        FMC_STAT |= FMC_STAT_END;
+        NVIC->ISPR[(unsigned)FMC_IRQn / 32U] |= 1U
+                                                << ((unsigned)FMC_IRQn % 32U);
+    }
+}
 /** \brief           Model one settled halfword pulse and count its occurrence.
  */
 fmc_state_enum fmc_halfword_program(uint32_t address, uint16_t value) {
     ++g_gd32_model_pulses;
     *(uint16_t*)(uintptr_t)address &= value;
+    flash_completed();
     return FMC_READY;
 }
 /** \brief           Model one settled 4 KiB page erase, not MCU qualification.
@@ -220,6 +230,7 @@ fmc_state_enum fmc_halfword_program(uint32_t address, uint16_t value) {
 fmc_state_enum fmc_page_erase(uint32_t address) {
     ++g_gd32_model_pulses;
     memset((void*)(uintptr_t)address, 0xFF, 4096u);
+    flash_completed();
     return FMC_READY;
 }
 /** \brief           Model register synchronization, not a pure SDK helper. */

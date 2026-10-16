@@ -42,6 +42,31 @@ int main(void) {
     (void)nx_watchdog_port_state(nx_factory_watchdog(NX_WATCHDOG_ID_HEALTH),
                                  &watchdog);
 #endif
+#ifdef NX_U575_SPI_FIXTURE
+    (void)nx_spi_endpoint_on_port(nx_device_device,
+                                  nx_factory_spi(NX_SPI_ID_BUS));
+#endif
+#ifdef NX_U575_I2C_FIXTURE
+    (void)nx_i2c_endpoint_on_port(nx_device_sensor,
+                                  nx_factory_i2c(NX_I2C_ID_CONTROL));
+#endif
+#ifdef NX_U575_ADC_FIXTURE
+    nx_adc_info_t adc;
+    (void)nx_adc_port_info(nx_factory_adc(NX_ADC_ID_SENSE), &adc);
+#endif
+#ifdef NX_U575_PWM_FIXTURE
+    nx_pwm_state_t pwm;
+    (void)nx_pwm_port_state(nx_factory_pwm(NX_PWM_ID_DRIVE), &pwm);
+#endif
+#ifdef NX_U575_EXTI_FIXTURE
+    nx_exti_event_t event;
+    size_t count;
+    (void)nx_exti_port_read(nx_factory_exti(NX_EXTI_ID_EDGE), &event, 1U,
+                            &count);
+#endif
+#ifdef NX_U575_FLASH_FIXTURE
+    (void)nx_flash_port_geometry(nx_factory_flash(NX_FLASH_ID_STORAGE));
+#endif
 #ifdef NX_U575_FREERTOS_FIXTURE
     /* Retain the real static kernel graph. This ELF is not executed by HIL. */
     (void)nx_freertos_task_start(&s_task, "u5-link", s_task_stack, 128U, 1U,

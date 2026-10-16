@@ -281,7 +281,7 @@ for _component, _include, _private in (
     if _private is not None:
         REQUIRED_FILES += ("components/" + _component + "/private/" + _private,)
 # G474 owned support retains its selected production units independently of
-# test fixtures. The official device closure stays five locked files.
+# test fixtures. The device closure follows each exact reviewed source lock.
 REQUIRED_FILES += tuple("soc/stm32g474/" + name for name in (
     "CMakeLists.txt", "system.c", "drivers/gpio.c", "drivers/uart.c",
     "drivers/exti.c", "drivers/spi.c", "drivers/watchdog.c", "drivers/pwm.c",

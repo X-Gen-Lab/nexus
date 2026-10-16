@@ -15,6 +15,12 @@ import verify_consumers as consumer_gate
 import package_source_sdk as source_sdk
 from tools.configure.metadata import load_policy
 
+# Fixture repositories are disposable; automatic maintenance must neither
+# detach nor outlive the Git command that owns their temporary directory.
+GIT_FIXTURE_OPTIONS = ("-c", "maintenance.auto=false", "-c", "gc.auto=0",
+                       "-c", "maintenance.autoDetach=false",
+                       "-c", "gc.autoDetach=false")
+
 
 class SourceSDKSelectionTests(unittest.TestCase):
     def test_build_policy_and_tool_module_closure_is_required(self):
@@ -237,7 +243,7 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         self.addCleanup(patch.stop)
 
     def git(self, root, *arguments, input=None):
-        result = subprocess.run(["git", "-C", str(root), *arguments],
+        result = subprocess.run(["git", *GIT_FIXTURE_OPTIONS, "-C", str(root), *arguments],
                                 input=input, capture_output=True,
                                 env=self.environment, timeout=30)
         self.assertEqual(result.returncode, 0,
@@ -248,6 +254,36 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         self.git(root, "-c", "user.name=SDK snapshot test", "-c",
                  "user.email=sdk-snapshot@local.invalid", "commit", "--quiet",
                  "--allow-empty", "-m", message)
+
+    def test_parent_and_cloned_dependency_do_not_start_auto_maintenance(self):
+        # A host may enable maintenance even for a tiny temporary repository.
+        # Each Git child must finish before TemporaryDirectory removes it.
+        for name, repository in (("owner", self.root),
+                                 ("dependency", self.checkout)):
+            with self.subTest(repository=name):
+                for key, value in (("maintenance.auto", "true"),
+                                   ("maintenance.autoDetach", "true"),
+                                   ("maintenance.gc.enabled", "false"),
+                                   ("maintenance.loose-objects.enabled", "true"),
+                                   ("maintenance.loose-objects.auto", "1"),
+                                   ("gc.auto", "1"),
+                                   ("gc.autoDetach", "true")):
+                    self.git(repository, "config", key, value)
+                trace = self.root / (name + "-git-trace.json")
+                self.environment["GIT_TRACE2_EVENT"] = str(trace)
+                try:
+                    self.commit(repository, "fixture lifetime boundary")
+                finally:
+                    self.environment.pop("GIT_TRACE2_EVENT", None)
+                events = [json.loads(line) for line in trace.read_text().splitlines()]
+                self.assertTrue(any(event.get("event") == "exit" and
+                                    event.get("code") == 0 for event in events),
+                                events)
+                started = [event.get("argv", []) for event in events
+                           if event.get("event") == "child_start"]
+                self.assertFalse(
+                    [command for command in started
+                     if "maintenance" in command or "gc" in command], started)
 
     def test_explicit_development_fixture_uses_staged_clean_gitlink(self):
         before = self.git(self.root, "write-tree").strip()
@@ -332,7 +368,7 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
 
     def git(self, *arguments):
         result = subprocess.run(
-            ["git", "-C", str(self.repository), *arguments],
+            ["git", *GIT_FIXTURE_OPTIONS, "-C", str(self.repository), *arguments],
             env=self.environment, capture_output=True, timeout=30)
         self.assertEqual(result.returncode, 0,
                          result.stdout.decode() + result.stderr.decode())
@@ -497,6 +533,8 @@ class SourceSDKTests(unittest.TestCase):
                     "CMAKE_INCLUDE_PATH", "CMAKE_LIBRARY_PATH", "LIBRARY_PATH"):
             environment.pop(key, None)
         kwargs.setdefault("env", environment)
+        if arguments[0] == "git":
+            arguments = ["git", *GIT_FIXTURE_OPTIONS, *arguments[1:]]
         return subprocess.run(arguments, text=True, capture_output=True, timeout=180, **kwargs)
 
     @classmethod

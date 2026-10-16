@@ -28,7 +28,7 @@ static bool latch(uint32_t mask, uint32_t value) {
     return (NX_GD303_READ(&GPIO_OCTL(GPIOA)) & mask) == value;
 }
 static bool valid_mask(uint32_t mask) {
-    return mask != 0U && (mask & ~0x6f0U) == 0U;
+    return mask != 0U && (mask & ~0x6f3U) == 0U;
 }
 static bool pins_available(uint32_t mask) {
     bool available = (NX_GD303_READ(&GPIO_LOCK(GPIOA)) & mask) == 0U;

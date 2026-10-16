@@ -1,10 +1,13 @@
 # STM32H743 software reference
 
-This provider maintains a narrow STM32H743ZIT6/NUCLEO-H743ZI2 vertical slice:
+This provider maintains exact STM32H743ZIT6 software references. The original
+NUCLEO-H743ZI2 GPIO/UART slice uses
 official Cortex-M7 startup, MMIO-only bounded LDO power entry, fixed HSI32 or
 HSI64 with explicit Cache off/on, TIM2 1 MHz time, authorized GPIOB PB0 and
 USART3 PD8/PD9 AF7 IRQ bytes, finite DMA transmission with IRQ-byte reception,
-or finite DMA receive blocks with independent IRQ transmission.
+or finite DMA receive blocks with independent IRQ transmission. A separate
+`stm32h743zi_hsi_reference` package declares the selected reusable peripheral
+wiring below without asserting that a physical PCB or attached device exists.
 Public C11 GPIO/UART faces remain immutable; each static instance owns its
 private state and caller-explicit byte ring. Shared readonly ops perform hot
 I/O directly. No allocator, worker, registry or DMA fallback is introduced.
@@ -114,7 +117,8 @@ a stream pool or a fallback.
 Cold admission rejects an already owned lane, request mux or vector. Generated
 assembly records only clock gates it added and retains them while cleanup fails.
 
-Only the selected AXI SRAM linker region is admitted for TX buffers. TCM, Flash,
+Only selected initialized AXI SRAM and explicitly budgeted D2 SRAM1 are admitted
+for TX buffers. TCM, Flash,
 unpowered/unselected D2/D3 memory and arithmetic overflow are rejected before
 borrowing. Cache-off accepts 1..65535 bytes. Cache-on requires an aligned address
 and a positive multiple of 32 bytes, up to 65504; the caller exclusively owns
@@ -133,7 +137,7 @@ report zero bytes rather than infer wire progress from NDTR.
 request45 and its exact vector. TX reuses the ordinary IRQ provider. The assembly
 creates no byte ring: the caller initializes and supplies an `nx_stream_t` and
 its exact block array through `rx_start`. Every block is validated before the
-first loan against the selected initialized AXI SRAM DMA-write region, provider
+first loan against selected initialized AXI/SRAM1 DMA-write regions, provider
 state, hardware registers, region descriptors, stream/slot metadata, wake and
 active TX storage. Cache-off accepts 1..65535 bytes; Cache-on requires aligned,
 exclusive whole 32-byte lines, up to 65504 bytes. No range rounding occurs.
@@ -164,11 +168,21 @@ physical cache coherence remain separate acceptance scopes.
 
 ## Memory and evidence
 
-AXI SRAM 512 KiB is the only initial linker domain. Physical ITCM/DTCM, D2/D3 and
+AXI SRAM512KiB is the default linker domain. Optional D2 SRAM1 is selected by
+an explicit `[memory.regions.sram1]` byte budget. Reset enables and observes its
+SRAM1 clock after the MMIO power entry permits RAM, then copies selected DATA
+and clears selected BSS from checked linker bounds before primary DATA/BSS or
+constructors. NOINIT remains caller-initialized. The boot-owned SRAM1 clock is
+not withdrawn at Platform stop; every consumer must join before any external
+power policy changes it. DMA admission rechecks this clock before borrowing.
+`NX_MEMORY_SRAM1_DATA`, `NX_MEMORY_SRAM1_BSS` and `NX_MEMORY_SRAM1_NOINIT` place
+only variable storage; selection does not authorize instruction execution.
+DMA1 providers admit selected initialized AXI/SRAM1 only, with the same exact
+exclusive-line policy when Cache is enabled. Other domains remain unselected. Physical ITCM/DTCM, D2/D3 and
 backup SRAM facts preserve per-engine DMA1/DMA2/BDMA/MDMA reachability. MDMA can
 reach TCM; no generic DMA boolean erases that distinction. Reachability does not
 authorize placement, cached buffer ownership, power retention or execution.
-Optional domains, additional DMA routes, dynamic PLL, deep STOP and bootloader
+Additional domains, DMA routes, dynamic PLL, deep STOP and bootloader
 handoff have separate implementation and acceptance exits.
 
 Official Apache-2.0 CMSIS Device H7 v1.10.7 is pinned to
@@ -183,3 +197,110 @@ boundaries. Actual ARM ELF/disassembly checks establish code generation,
 resources and the pre-RAM closure. Neither establishes physical power behavior,
 oscillator accuracy, UART traffic or safety. All physical acceptance remains
 `not_executed`; clean candidate, offline reproducibility and HIL are separate.
+
+
+## Selected reusable peripherals
+
+The software-only peripheral assembly is
+[`peripherals.toml`](../../tests/contracts/h743_assembly/peripherals.toml).
+The32/64MHz HSI, Cache-off variants link the same seven new selected classes
+with baremetal or FreeRTOS. UART and GPIO remain independently selectable.
+Applications, Flash reservations, safe output policy and external devices remain
+outside this platform repository. Modes not listed are rejected at configuration.
+
+| Controller | Selected mode and exact boundary |
+|---|---|
+| SPI4 | PE12/13/14 AF5, explicit active-low PE11 CS endpoint,8-bit full-duplex polling1..256bytes, finite absolute deadline,<=16MHz requested SCK; default APB2 kernel selector must be observed |
+| I2C1 | PB8/PB9 AF4 open drain, standard-mode ceiling100kHz, explicit7-bit endpoint, repeated START and bounded message chunks; final STOPF/BUSY drain or explicit reset; external pull-ups required |
+| ADC1 | PA3 INP15,16-bit single conversion, sample code7(810.5cycles), synchronous HCLK/4, single-ended offset+linearity calibration; no trigger/DMA/injected acquisition |
+| TIM3 CH1 | PA6 AF2, fixed PSC/ARR and caller-staged CCR1 preload;0/100percent supported, explicit Board inactive latch restored after timer withdrawal |
+| EXTI0/1 | PA0/PA1 raw edge facts in caller-sized rings; bounded selected W1C, coalescing/loss visible; no debounce guarantee |
+| IWDG1 | Explicit irreversible start/feed, no window mode, observed debug-freeze and latched reset facts; LSI timing envelope remains unknown(0/0), enabled-state queries return UNSUPPORTED while preserving enabled responsibility |
+| FLASH | Full2MiB,16physical128KiB sectors, two1MiB banks,32-byte ECC flashwords, explicit erase-aligned consumer regions; no product partition |
+
+SPI v3 uses TSIZE, byte-width TXDR/RXDR, explicit CSTART and observed EOT/TXC;
+DMA completion or TX FIFO space cannot substitute for wire completion. A reset
+follows a quiet guard of at least one actual SCK period plus two timer quanta,
+independent of caller expiry, before releasing CS (ES0392 section2.22.6).
+CFG1 retains CRCSIZE7 even with CRC disabled (section2.22.5). Failed reset
+parks with the calling frame and CS responsibility retained. I2C reuses the
+reviewed private V2 engine after independent H743 register/bit layout assertions;
+it never acquires a vendor HAL handle, tick, worker, IRQ or DMA owner. The fixed
+TIMINGR values are0x70f22727(HSI64) and0x30f22727(HSI32), with analog filter on,
+DNF0 and a standard-mode electrical envelope of rise<=1000ns/fall<=300ns.
+They bound the nominal requested rate; real bus timing remains unmeasured.
+I2C123SEL must remain the admitted APB1 selector; a foreign selector rejects
+before private pin changes. ES0392 sections2.19.4/2.19.5 select master-only
+spurious BERR clearing and NBYTES1 throughout receptions requiring RELOAD.
+ARLO, NACK and overrun remain errors; TIMEOUTR must be cold-zero.
+
+ADC boost selection preserves the official LL cut1/cut2 encoding difference.
+The old-cut encoding is masked to its actual single BOOST bit, excluding LL
+transport bits that are reserved/read-zero in old hardware. The selected8/16MHz
+ADC clocks therefore leave old-cut boost off; newer cuts select their own range.
+A nominal25us regulator guard and a two-tick guard after calibration precede
+ADEN; the latter covers one timer quantum of phase and four ADC clock cycles.
+Readback of ADRDY precedes interface publication. Calibration failure keeps
+the ADC12 common-domain lease. ADC2 must be cold, and only ADC1's selected regular
+conversion is admitted. Stop withdraws conversion/enable before restoring common
+clock fields. Full calibration must expose all six LINCALRDYW flags; control
+writes preserve these handshakes across enable, stop and restart. No factor
+read/restore handshake is performed. Each deep-powerdown exit recalibrates.
+The Board must explicitly declare actual VDDA in2400..3300mV and a reference
+2000mV or higher and no greater than VDDA; this admits the conservative16-bit
+mode across unqualified older cuts (ES0392 section2.9.10). Counts and nominal reference voltage are not
+calibrated volts or a guaranteed effective resolution.
+
+Flash writes require an explicit Board binding `supply_mv` in2700..3600 and the
+Cache-off profile, unswapped banks, no active foreign mode and erased complete
+flashwords. Input bytes are copied to eight local words; caller input alignment1
+is independent of destination/program length alignment32. Each flashword is
+subject to a caller-proved fresh erase before programming, because ECC bits
+also participate. A visible all-FF scan only rejects visible prior writes; it
+cannot prove virgin ECC cells across reset or foreign writers. An all-FF input
+flashword is a no-op without controller writes or programming pulse. Bank flags,
+program modes and locks
+are checked. Pulse error is returned only after BSY/QW/WBNE withdraw. A stuck
+pulse or refused final control/lock write retains the active caller and enters a
+nonreturning fault path; timeout never aborts a pulse or releases storage early.
+
+Execution or IRQ/vector fetch from a busy bank can stall until its physical
+pulse ends. This synchronous mode provides no tight interrupt-latency or wall-time
+deadline ceiling; deadline expiry is observed after the unabortable operation
+settles. The32-bit TIM2 timebase can recover one pending wrap, and consumers must
+still respect its documented service interval. Interrupt-safe RAM execution,
+Cache-on self-programming, bank swapping, option/OTP programming, ECC exception
+recovery and product boot/update policy are separate scopes. The reference's3.3V
+is an authored software assumption; no voltage or analog path has been measured.
+
+The selected private LL SPI/ADC headers and original BSD-3-Clause notice are
+paired with STM32CubeH7v1.13.0 by the reviewed source lock. Public faces retain
+Nexus types. Official LL field encodings and pure TSIZE access are reused while
+Nexus remains the single transfer, time, IRQ and shutdown owner.
+
+## 中文范围说明
+
+本轮接入精确STM32H743ZIT6软件参考的SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、
+IWDG1与双Bank物理Flash。原NUCLEO GPIO/USART3参考保持独立；新增引脚组合位于
+明确的软件参考Board包，不能据此推断实板接线、电压或外设已验证。typed factory只查找
+静态face，热路径直接调用共享只读ops与独立context，不分配对象，不启动隐藏线程。
+
+可选D2 SRAM1必须通过独立容量预算选择。复位阶段确认供电与时钟后，按链接边界复制
+DATA并清零BSS，NOINIT由调用者初始化；DMA只准入已初始化的AXI/SRAM1，并在借用前
+检查SRAM1时钟。Cache打开时仍要求独占完整32字节行。已有有限RX正常模式以owner
+service发布和重启，背压期间不会覆盖已借出的block，重启间隙仍然存在，不能宣称无缝连续。
+
+ADC提供PA3/INP15的16位单次采样，包含稳压等待、偏移与线性校准，以及不同硅片cut的
+官方LL boost编码；旧cut只保留实际BOOST位，屏蔽编码中保留且读回为零的位。校准完成必须观察到全部六个线性校准握手标志，控制寄存器写入
+保留这些标志，停止和重启不隐式同时切换；每次退出深度掉电均重新校准。ADC的
+Board supply_mv必须明确为2400..3300mV，参考电压必须至少2.0V且不得超过VDDA；16位数据格式
+不代表已测量有效精度。SPI保留CRCSIZE7，并在EOT后独立等待一个实际SCK周期加
+两个时基量化间隔后才复位和释放CS，调用者deadline不能截断最终边沿。I2C按勘误
+对需要RELOAD的长接收采用单字节重装，忽略规定的master伪BERR，仍保留NACK、
+仲裁丢失和溢出错误。Flash提供完整2MiB几何：每Bank1MiB、共16个128KiB sector、
+32字节ECC flashword；目标地址和长度按32对齐，输入buffer可按1字节对齐。电压来自
+明确的Board supply_mv，3.3V仅是软件参考假定；调用者必须证明目标自上次编程
+后已成功擦除，全FF读回不能证明ECC单元尚未编程；全FF输入跳过物理脉冲。Cache-on、Bank swap、OTP与option
+byte写入均未开放。正在执行的Flash脉冲不能被timeout撤销；必须等硬件排空后才返回，
+排空或最终锁定失败将保留调用帧并进入终止故障路径。同Bank取指和中断可能停顿，
+因此不承诺严格中断延迟或硬实时deadline。所有物理HIL仍为not_executed。

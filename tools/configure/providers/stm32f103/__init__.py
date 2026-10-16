@@ -14,26 +14,33 @@ CPU_FEATURES = MappingProxyType({
     "icache_line_bytes": 0, "dcache_line_bytes": 0, "security": "single",
     "sau": False, "mve": "none", "dsp": False})
 PREFIX = "stm32f103"
+FLASH_PROGRAM_UNIT = 2
+FLASH_INPUT_ALIGNMENT = 1
 MODEL = False
 FACT_REFERENCES = descriptor.maintained("stm32f103").references
 CAN_CONTROLLERS = ()
 ETH_CONTROLLER = None
 USB_CONTROLLER = None
 SPI_REQUIRES_ENDPOINT = True
-DMA_VECTOR = None
-DMA_TOPOLOGY = (frozenset(), range(0), range(0))
+DMA_VECTOR = "Channel"
+DMA_TOPOLOGY = (frozenset((1,)), range(1, 8), range(1))
 CLOCK_PROFILES = MappingProxyType({
     "hsi8-fixed": MappingProxyType({
         "source": "hsi", "input_hz": 8000000, "core_hz": 8000000,
         "apb1_hz": 8000000, "apb2_hz": 8000000})})
 LIMITS = MappingProxyType({"uart_baud": (123, 500000),
-                           "spi_hz": (31250, 4000000)})
+                           "i2c_hz": (80000, 80000),
+                           "spi_hz": (31250, 4000000), "pwm_period": 65535})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart",
+    ("uart", "dma-tx"): "uart_dma",
+    ("uart", "dma-duplex"): "uart_dma",
+    ("i2c", "irq-messages"): "i2c_async",
     ("watchdog", "independent"): "watchdog",
     ("exti", "edge-event"): "exti",
-    ("spi", "short-poll"): "spi"})
+    ("spi", "short-poll"): "spi", ("flash", "poll-word"): "flash",
+    ("adc", "single-shot"): "adc", ("pwm", "fixed-pwm"): "pwm"})
 
 
 def mode_implementation(kind, mode):
@@ -58,11 +65,18 @@ def validate_selection(selection, route):
         divisor = (8000000 + baud // 2) // baud
         if not 16 <= divisor <= 0xffff:
             common.fail("F103 USART baud exceeds oversample16 divisor")
-        if selection["rx_profile"] != "bytes":
-            common.fail("F103 USART2 requires byte reception")
+        if selection["rx_profile"] != ("blocks" if selection["mode"] == "dma-duplex" else "bytes"):
+            common.fail("Legacy USART mode requires its exact byte/block profile")
         if (type(selection.get("irq_priority")) is not int or
                 selection["irq_priority"] != 5):
             common.fail("F103 USART2 provider implements IRQ priority5 only")
+    elif kind == "i2c":
+        if (route["controller"] != "I2C1" or actual != (
+                ("PB6", "scl", 0), ("PB7", "sda", 0)) or
+                selection.get("max_hz") != 80000 or
+                type(selection.get("irq_priority")) is not int or
+                selection["irq_priority"] != 0 or selection.get("calls_os", False)):
+            common.fail("Legacy I2C requires PB6/PB7, nominal80kHz, IRQ0 and no kernel calls")
     elif kind == "gpio":
         if (route["controller"] != "GPIOA" or len(actual) != 1 or
                 actual[0] not in {("PA4", "output", 0), ("PA5", "output", 0)}):
@@ -97,11 +111,32 @@ def validate_selection(selection, route):
             common.fail("F103 SPI requires exact default PA5/PA6/PA7 route")
         common.integer(selection.get("max_hz"), *LIMITS["spi_hz"],
                        "F103 SPI maximum frequency")
+    elif kind == "flash":
+        if route["controller"] != "FLASH" or actual:
+            common.fail("F103 requires exact full physical Flash")
+    elif kind == "adc":
+        if (route["controller"] != "ADC1" or actual != (("PA0", "analog", 0),)
+                or tuple(selection.get("channels", ())) != (0,)
+                or tuple(selection.get("sample_times", ())) != (7,)):
+            common.fail("F103 requires PA0 channel0 sample239.5cycles")
+        common.integer(selection.get("reference_mv"), 2700, 3600,
+                       "F103 nominal ADC reference")
+    elif kind == "pwm":
+        if route["controller"] != "TIM3" or actual != (("PA6", "ch1", 0),):
+            common.fail("F103 requires default TIM3 CH1 PA6")
+        tick = common.integer(selection.get("tick_hz"), 1, 8000000,
+                              "F103 PWM tick")
+        if 8000000 % tick or 8000000 // tick > 65536:
+            common.fail("F103 PWM requires exact 8MHz divisor")
+        period = common.integer(selection.get("period_ticks"), 1, 65535,
+                                 "F103 PWM period")
+        common.integer(selection.get("duty_ticks"), 0, period, "F103 PWM duty")
 
 
 def validate_dma(route, mode, normalize):
-    del route, mode, normalize
-    common.fail("F103 DMA provider is unimplemented")
+    expected = {"dma-tx": ("DMA1:stream7:channel0",),
+                "dma-duplex": ("DMA1:stream7:channel0", "DMA1:stream6:channel0")}.get(mode)
+    common.validate_dma(route, mode, expected, "stm32f103", normalize)
 
 
 def validate_dma_resource(resource):

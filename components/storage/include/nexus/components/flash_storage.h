@@ -30,7 +30,13 @@ typedef struct {
  *                  platform. Mixed sector geometries require another explicit
  *                  storage adapter; this one rejects them. IO pulse settlement
  *                  guarantees sync durability; no caller buffer survives a port
- *                  call. Physical power-loss remains unqualified.
+ *                  call. Physical power-loss remains unqualified. The caller
+ *                  must honor geometry.program_flags when using this port
+ *                  directly: ECC units require actual erase provenance, not an
+ *                  all-0xff read. nx_storage_save erases its inactive bank and
+ *                  writes each distinct full program unit at most once before
+ *                  its next erase, including its separate final commit marker.
+ *                  This adapter does not track hidden program-pulse history.
  */
 nx_result_t nx_flash_storage_bind(nx_flash_storage_adapter_t* adapter,
                                   nx_flash_region_t region,

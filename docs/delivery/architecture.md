@@ -6,7 +6,7 @@
 |---|---|---|
 | `core/` | 中性结果、绝对 monotonic deadline、caller-owned request 状态 | C11；无 Board、RTOS、SDK |
 | `arch/` | 编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot；显式选入的 Cache／MPU／SAU 与 Secure CMSE 权限观察 | 无 SDK／OS／SoC 政策；原语编译与整平台资格分别记录 |
-| `soc/<family>/` | F407、F470、G474、H743、U575 的精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；各家族只开放已维护模式 |
+| `soc/<family>/` | F103、GD303、F407、F470、G474、H743、U575 的精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；各家族只开放已维护模式 |
 | `boards/<board>/board.json` | 精确型号、已审 route、晶振声明、safe initial、来源与未知 PCB 项 | 只读资源包；不创建产品任务 |
 | `io/` | typed 多态合同、共享操作表、DMA/stream/wake；可选 CAN、USB、Ethernet 与高级 timer 合同 | 公共头不含厂商类型；Native 是行为模型 |
 | `os/` | 可选 wait/wake、按对象静态 task/stack/TCB/queue 适配 | driver 不依赖 OS；不创建应用 worker |
@@ -25,27 +25,41 @@ CMake 从同一 resolved 结果读取选中的 controller kind/mode，仅查询�
 按组合补齐。STM 空配置不编译外设驱动；GD 保留 system/timebase 所需的基础
 SDK 源码。最终 section GC 继续消除未引用函数，编译裁剪与镜像裁剪分别验证。
 
-G474 的 HSE24/170 MHz 参考配置维护真实生成 factory、时钟／GPIO／LPUART／EXTI
-算法，以及 empty／GPIO-UART／selected-EXTI 的裸机／FreeRTOS ARM 夹具。
-PA0/PA1 EXTI 使用独立 caller-sized event ring，并拥有自己的中断源撤回责任。
-空配置没有 GPIO／UART provider；选中 LPUART 的 IRQ91 和系统 TIM2 的 IRQ28
-实际绑定到向量字节。FreeRTOS 保留真实 SVC／PendSV／SysTick，170 MHz 时钟和
-1 kHz Tick 对应 reload169999。启动先拒绝被占用的 LPUART 控制寄存器，再改动
-系统时钟；失败构造对象进入逆序清理，撤销失败仍保留时钟／引脚／状态责任。
-这些是独立开发证据，未建立参考 PCB、实板时序或 ThreadX G474 支持。
+G474 的 HSE24/170 MHz 参考维护静态 GPIO、六 UART、SPI1/2、TIM3/4 PWM、IWDG
+与 EXTI。独立 acquisition 夹具选择 ADC1 bulb 单次／TIM6 有限 DMA、I2C1 和
+物理 Flash。ADC DMA 仅开放 SRAM1/2；CCM 的 CPU／DMA alias 仍作为同一物理
+容量计数，当前策略不选入。每种模式只生成其状态、ring、block 扩展和 IRQ 入口；
+空装配不驻留这些外设。PA0/PA1 EXTI 各有调用者容量的事件环及撤回责任。
+失败构造对象逆序清理，撤销失败保留原时钟／引脚／状态；源码、模型或 ARM 链接
+不建立参考 PCB、模拟时序、ThreadX G474 或物理资格。
 
 H743 与 U575 分别增加 M7／M33 的具体 SoC 装配。H743 维护 LDO、固定
-HSI32／HSI64 × Cache off/on、TIM2、PB0 与 USART3 PD8/PD9；UART RX 仍为
-IRQ bytes，TX 可选 IRQ 或有限 DMA。U575 默认 Platform 维护外部已确认的 TZEN=0、
+HSI32／HSI64 × Cache off/on、TIM2、PB0 与 USART3 PD8/PD9；UART 可选 IRQ bytes、
+有限 TX DMA 或有限 RX DMA-IDLE，RX 由 owner service 重启且有间隙。默认 AXI SRAM
+之外可显式预算 D2 SRAM1；启动复制 DATA／清 BSS，NOINIT 由调用者初始化，DMA
+只接纳已初始化的所选域并再次检查 gate。Cache-on 仍要求完整独占 32-byte lines。
+H743 的独立软件 Board 夹具另选择 SPI4、I2C1、ADC1、TIM3、EXTI、IWDG1 与
+Cache-off 物理 Flash。U575 默认 Platform 维护外部已确认的 TZEN=0、
 SWAP_BANK=0、MSIS4 MHz、Cache off、TIM2、PC7 与 USART1 PA9/PA10。
-这两类 Platform 均维护裸机／FreeRTOS，不从芯片事实自动派生其他外设支持。
+U575 的独立有限夹具增加 SPI1、I2C1、ADC4、TIM3、EXTI 与物理 Flash；ADC 的外部
+VDDA/ASV 与 GPIO 的 VDDIO2 准入仍由实际电源所有者负责。这两类 Platform 均维护
+裸机／FreeRTOS，不从芯片事实自动派生其他模式或 PCB 接线。
 H743 在主 RAM 可写前执行独立的有界电源入口。U575 另有无 OS 的 TZEN=1
 双域参考：两个 Runtime 镜像、冷归属 owner 与同步 CMSE GPIO gateway，独立于
-TZEN=0 factory。两条 U575 路径都不修改 option bytes，双域参考要求外部预先
+TZEN=0 factory。第二个窄 SG 入口复制最多八个 PC7 命令到单一 Secure slot，SERVICE
+每次只推进一项，POLL／CANCEL／CONSUME 使用不回绕 ticket；返回后不保留 NS 指针，
+不建立异步借用。两条 U575 路径都不修改 option bytes，双域参考要求外部预先
 完成其启动配置。精确范围见 [SoC 完善合同](../design/soc-refinement.md) 与
 [U575 双域合同](../design/u575-trustzone-contract.md)；
 [初次执行记录](soc-refinement-verification.md) 保留历史资格，
 [扩展执行记录](soc-extensions-verification.md) 单独记录后续证据。
+
+F103/GD303 通过私有 legacy 引擎复用实际兼容的 UART channel-DMA、I2C V1、ADC、
+PWM 和半字 Flash 算法；家族层检查官方寄存器 ABI、时钟、IRQ 和内存事实。TX-only
+UART 状态不包含 duplex RX block 扩展，方法表和直接 IRQ 按模式选入。F103 的
+16-bit TIM2 要求 65.536 ms 内处理 overflow；GD303 使用 TIMER1/TIMER4 硬件级联，
+避免把最长 800 ms Flash 擦除停顿误当作可由单个低位 IRQ 补回。实际 timer carry、
+同 bank 取指停顿和内核 tick 丢失仍需实板测量；时间域不负责替内核补 tick。
 
 Board 不复制 SoC 驱动。GD32 的 I2C/PWM/ADC/EXTI route、STM32 的高级控制器 route
 可以在明确标为软件测试夹具的外部 Board 包中编译／链接；这不意味着三块参考 PCB
@@ -159,8 +173,9 @@ bank 再因另一个 bank 冲突而假称未产生效果。控制器路线和 en
 
 H743 从可信复位或已成功完成自有 clean/disable 的冷状态建立固定时钟和 Cache
 配置，不能仅凭 CCR 关闭位认领未知 bootloader 状态。Arch 冷 Cache 控制对象
-保留已取得的 I/D Cache 与 selector 恢复责任；当前机制只维护 M7。所选 TX DMA
-仅访问 AXI SRAM，Cache on 时要求完整 32-byte line 的独占借用。提交先取得
+保留已取得的 I/D Cache 与 selector 恢复责任；当前机制只维护 M7。有限 UART
+DMA 只接纳选中且已初始化的 AXI SRAM 或显式预算的 D2 SRAM1；未选中的域、
+TCM 与未就绪的 SRAM1 gate 均被拒绝。Cache on 时要求完整 32-byte line 的独占借用。TX 提交先取得
 PREPARING 借用，再在长中断屏蔽区外 clean；取消不得在准备结束前发布 SETTLED。
 平台停止先排空 provider，再撤回 TIM2、clean/disable Cache，最后恢复 HSI
 divider。任何未清理效果继续由原 owner 持有；这些是冷生命周期，不是运行中变频。
@@ -204,6 +219,11 @@ SPI/I2C controller factory 返回真实控制器，device factory 返回 CS/addr
 | 多 producer owner | 外部按容量提供 slot/storage；唯一 admission；slot/epoch 防止旧取消命中新请求 |
 | OS wait/wake | sequence/predicate 防 lost wake；通知是提示，client 不 service hardware |
 | shutdown | 拒绝 producer→保持 executor drain→结清 borrow/通知发布者→join→逆序释放接口；仍运行的内核保留 clock/Tick，产品决定 park 或 reset |
+
+Flash geometry 的 `program_flags` 将 ECC 新擦除前提暴露给调用者。要求 fresh erase
+的单元在一次脉冲后不可仅凭 FF 读回重用；失败／中断后重新擦除，全 FF 输入不发脉冲。
+每个已经启动的脉冲先取得新完成证据并实际排空，再返回或启动下一脉冲。deadline
+不能中断硬件脉冲。供电声明、可写 region、执行停顿、watchdog 与掉电恢复属于产品。
 
 CAN 使用真实三邮箱和共享 filter domain；USB FS 使用显式 endpoint/FIFO/event
 容量、PIO packet loan 和独立 48 MHz owner；Ethernet 使用 caller-sized normal

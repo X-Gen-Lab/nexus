@@ -268,11 +268,18 @@
       },
       "memory": [
         {
-          "id": "cpu-sram",
+          "id": "sram1-sram2",
           "origin": 536870912,
-          "size": 131072,
-          "dma": false,
+          "size": 98304,
+          "dma": true,
           "linker": true
+        },
+        {
+          "id": "ccm-sram",
+          "origin": 268435456,
+          "size": 32768,
+          "dma": false,
+          "linker": false
         }
       ],
       "pins": [
@@ -649,6 +656,28 @@
         "PA6"
       ]
     },
+    "ADC1": {
+      "kind": "adc",
+      "modes": ["single-shot", "trigger-dma"],
+      "irq": [],
+      "pins": ["PA0"],
+      "clock_hz": 1328125
+    },
+    "I2C1": {
+      "kind": "i2c",
+      "modes": ["poll-messages"],
+      "irq": [],
+      "pins": ["PB8", "PB9"],
+      "clock_hz": 16000000,
+      "max_hz": 100000
+    },
+    "FLASH": {
+      "kind": "flash",
+      "modes": ["poll-word"],
+      "irq": ["FLASH_IRQn"],
+      "irq_numbers": [4],
+      "pins": []
+    },
     "TIM4": {
       "kind": "pwm",
       "modes": [
@@ -673,7 +702,7 @@
     "cmsis_device_g4": "626ee412334a5ed2e5b320af5a8d77d69f03a558"
   },
   "provenance": [
-    "DS12288 Rev6 STM32G474xx: exact RE512KiB/LQFP64; SRAM1 80KiB+SRAM2 16KiB+CCM32KiB system alias counted once as contiguous CPU128KiB. No initial DMA provider claim.",
+    "DS12288 Rev6 STM32G474xx: exact RE512KiB/LQFP64; SRAM1 80KiB+SRAM2 16KiB are DMA-visible96KiB at0x20000000. CCM32KiB is declared once at0x10000000. RM0440p89 also permits DMA through its0x20018000 SRAM-bus alias; the selected linker/DMA policy deliberately excludes both CCM addresses rather than claiming a silicon restriction. Default linker and generated DMA domains select96KiB SRAM1/2 only.",
     "RM0440 Rev9: DBANK=1 required,256 physical2KiB pages; startup validates option/density/category without writing Flash. HSE24 PLLM6/N85/R2, boost170MHz/APB170MHz; TIM2 PSC169 reserved.",
     "https://www.st.com/resource/en/datasheet/stm32g474rc.pdf",
     "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",

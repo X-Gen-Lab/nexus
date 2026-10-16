@@ -10,6 +10,9 @@
 #include "nexus/core/fault.h"
 #include "nexus/core/time.h"
 #include "stm32h743_system.h"
+#if defined(NEXUS_MEMORY_SRAM1) && NEXUS_MEMORY_SRAM1 == 1
+#include "memory_init.h"
+#endif
 #include <stddef.h>
 _Static_assert(DBGMCU_BASE + offsetof(DBGMCU_TypeDef, IDCODE) ==
                        NX_H743_BOOT_DBG_ID &&
@@ -108,6 +111,10 @@ nx_result_t nx_stm32h743_system_preflight(const nx_stm32h743_system_t* s) {
         return NX_ERROR_INVALID;
     if (s->started || s->remaining_effects != 0U)
         return NX_ERROR_BUSY;
+#if defined(NEXUS_MEMORY_SRAM1) && NEXUS_MEMORY_SRAM1 == 1
+    if ((NX_H743_READ(&s->rcc->AHB2ENR) & RCC_AHB2ENR_SRAM1EN) == 0U)
+        return NX_ERROR_STATE;
+#endif
 #if NX_H743_CACHE_CONTROL_ENABLED
     if (s->cache.owned_mask != 0U || s->cache.selector_pending)
         return NX_ERROR_BUSY;
@@ -392,6 +399,18 @@ void SystemInit(void) {
     nx_arch_isb();
     SCB->VTOR = FLASH_BASE;
     NVIC_SetPriorityGrouping(3U);
+#if defined(NEXUS_MEMORY_SRAM1) && NEXUS_MEMORY_SRAM1 == 1
+    /* Boot-owned selected SRAM1 remains powered for its complete lifetime.
+     * Only Flash/linker symbols and the already permitted main MSP are used. */
+    RCC->AHB2ENR |= RCC_AHB2ENR_SRAM1EN;
+    nx_arch_dsb();
+    if ((RCC->AHB2ENR & RCC_AHB2ENR_SRAM1EN) == 0U ||
+        !nx_stm32h743_memory_boot()) {
+        (void)nx_arch_irq_save();
+        for (;;) {
+        }
+    }
+#endif
 #endif
 }
 nx_time_us_t nx_time_now_us(void) {

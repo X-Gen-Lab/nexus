@@ -28,30 +28,41 @@ except ImportError:
 
 
 def validate_profile(resolved):
-    """Keep the exact reviewed chip, board, CPU ABI and HSI64 source contract."""
+    """Keep exact reviewed chip, Board, CPU ABI and fixed HSI source contracts."""
     if (resolved.get('part') != 'STM32H743ZIT6' or
             resolved.get('soc_family') != 'stm32h743' or
-            resolved.get('board') != 'stm32h743-nucleo-zi2' or
+            resolved.get('board') not in {'stm32h743-nucleo-zi2',
+                                        'stm32h743zi-hsi-reference'} or
             resolved.get('backend') not in {'baremetal', 'freertos'}):
         raise EvidenceError('Exact H743ZI reference part/board/backend required')
     expected_cpu = {'arch': 'cortex-m7', 'fpu': 'fpv5-d16', 'float_abi': 'hard',
         'dsp': True, 'dwt_cyccnt': True, 'mpu_version': 7, 'mpu_regions': 16,
         'icache_line_bytes': 32, 'dcache_line_bytes': 32, 'security': 'single',
         'sau': False, 'mve': 'none'}
+    profile = resolved.get('clock_profile')
+    if profile not in {'hsi32-fixed-cache-off', 'hsi32-fixed-cache-on',
+                       'hsi64-fixed-cache-off', 'hsi64-fixed-cache-on'}:
+        raise EvidenceError('Unreviewed H743 fixed clock/Cache profile')
+    frequency = 32000000 if profile.startswith('hsi32-') else 64000000
     expected_clock = {'source': 'hsi', 'input_hz': 64000000,
-        'core_hz': 64000000, 'apb1_hz': 64000000, 'apb2_hz': 64000000}
+        'core_hz': frequency, 'apb1_hz': frequency, 'apb2_hz': frequency}
     if (resolved.get('cpu') != expected_cpu or
             any(type(resolved['cpu'][key]) is not type(value)
                 for key, value in expected_cpu.items()) or
-            resolved.get('clock_profile') != 'hsi64-fixed-cache-off' or
             resolved.get('clock') != expected_clock or
             any(type(resolved['clock'][key]) is not type(value)
                 for key, value in expected_clock.items()) or
             resolved.get('enum_abi') != 'short-enums'):
-        raise EvidenceError('Exact H743 HSI64/cache-off CPU and enum ABI required')
+        raise EvidenceError('Exact H743 fixed HSI CPU and enum ABI required')
     validate_memory_facts(resolved)
     allowed = {('gpio', 'GPIOB', 'input'), ('gpio', 'GPIOB', 'output'),
-               ('uart', 'USART3', 'irq-bytes')}
+               ('uart', 'USART3', 'irq-bytes'), ('uart', 'USART3', 'dma-tx'),
+               ('uart', 'USART3', 'rx-dma-idle'),
+               ('spi', 'SPI4', 'short-poll'), ('i2c', 'I2C1', 'poll-messages'),
+               ('adc', 'ADC1', 'single-shot'), ('pwm', 'TIM3', 'fixed-pwm'),
+               ('exti', 'EXTI0', 'edge-event'), ('exti', 'EXTI1', 'edge-event'),
+               ('watchdog', 'IWDG1', 'independent'),
+               ('flash', 'FLASH', 'poll-word')}
     for item in resolved.get('controllers', []):
         if (item.get('kind'), item.get('controller'), item.get('mode')) not in allowed:
             raise EvidenceError('Unmaintained H743 controller mode')
@@ -70,13 +81,20 @@ MEMORY_FACTS = {
 
 
 def validate_memory_facts(resolved):
-    """Require exact chip/physical domains/engine maps and AXI-only selection."""
+    """Require exact physical domains/engine maps and explicit SRAM1 selection."""
     regions = resolved.get('memory', ())
     if resolved.get('part') != 'STM32H743ZIT6' or len(regions) != 8:
         raise ValueError('Exact H743ZI chip/eight physical domains required')
     domains = {region['id']: region for region in regions}
     if set(domains) != set(MEMORY_FACTS):
         raise ValueError('Missing/duplicate/expanded H743 memory domain')
+    optional = resolved.get('memory_budgets', {}).get('regions', {})
+    if set(optional) - {'sram1'}:
+        raise ValueError('Unreviewed optional H743 initialization region')
+    if 'sram1' in optional:
+        limit = optional['sram1'].get('limit_bytes')
+        if type(limit) is not int or not 0 < limit <= 131072 or limit % 4:
+            raise ValueError('Explicit bounded aligned SRAM1 budget required')
     engines = ('DMA1', 'DMA2', 'BDMA', 'MDMA')
     for name, (origin, size, reaches) in MEMORY_FACTS.items():
         region = domains[name]
@@ -85,7 +103,7 @@ def validate_memory_facts(resolved):
         if (type(region.get('origin')) is not int or
                 type(region.get('size')) is not int or
                 region['origin'] != origin or region['size'] != size or
-                region.get('linker') is not (name == 'axi-sram') or
+                region.get('linker') is not (name == 'axi-sram' or name in optional) or
                 'dma' in region or not isinstance(actual, dict) or
                 actual != expected or
                 any(type(value) is not bool for value in actual.values())):
@@ -270,6 +288,22 @@ PRE_RAM_SHAPES = {
         '712b33b2a976799524c3cf520969bceee85afd1bc652c50c35c806a5898d0cda')}
 
 
+# Independently reviewed optional-SRAM1 call closure. Only the Flash descriptor
+# pointer is relocated; its nine words are bound to actual linker sections below.
+SRAM1_PRE_RAM_SHAPES = {
+    **PRE_RAM_SHAPES,
+    'SystemInit': (100, {16: 'nx_arch_dsb', 20: 'nx_arch_isb',
+        60: 'nx_arch_dsb', 72: 'nx_arch_irq_save',
+        78: 'nx_stm32h743_memory_boot'},
+        '002a6140a2b8065a8fbeebb9f88a314fd5cb29a4f595a3ed8d763955cc804b87'),
+    'nx_stm32h743_memory_boot': (72, {44: 'nx_stm32h743_memory_initialize'},
+        'c66d6d303c458a8fbe7daf9d5ec84af481f029a3da4a433c8e1126605916ecc6'),
+    'nx_stm32h743_memory_initialize': (190, {},
+        '0e13dd1e3c9758a2465897d2a14848b0290c810b0670813b8d62a5e336eaa30a'),
+    'nx_arch_irq_save': (16, {},
+        '8b009a1adcdb5bee673c7a0c1b700186e8677c9bcf7fa006d8e7c77ac354c26a')}
+
+
 def image_bytes(elf, address, size):
     for section in elf.sections:
         if (section['kind'] != 8 and section['flags'] & 2 and
@@ -295,14 +329,14 @@ def bl_target(address, encoded):
     return address + 4 + offset
 
 
-def pre_ram_function(elf, name, disassembly):
+def pre_ram_function(elf, name, disassembly, *, shapes=PRE_RAM_SHAPES):
     function = [s for s in elf.defined_symbols
                 if s['name'] == name and s['type'] == 2]
     if len(function) != 1:
         raise EvidenceError('Unique pre-RAM function required: ' + name)
     symbol = function[0]
     start, size = symbol['value'] & ~1, symbol['size']
-    expected_size, calls, expected_hash = PRE_RAM_SHAPES[name]
+    expected_size, calls, expected_hash = shapes[name]
     if size != expected_size or not 0x08000000 <= start < start + size <= 0x08200000:
         raise EvidenceError('Pre-RAM function left the reviewed Flash shape')
     selected = []
@@ -316,6 +350,8 @@ def pre_ram_function(elf, name, disassembly):
         if bl_target(start + offset, code[offset:offset + 4]) != elf.symbol(target) & ~1:
             raise EvidenceError('Pre-RAM call order/target differs: ' + target)
         code[offset:offset + 4] = bytes(4)
+    if name == 'nx_stm32h743_memory_boot':
+        code[56:60] = bytes(4)
     if hashlib.sha256(code).hexdigest() != expected_hash:
         raise EvidenceError('Unreviewed pre-RAM opcode/literal shape: ' + name)
     return {'symbol': name, 'bytes': size,
@@ -357,6 +393,64 @@ def primary_ram_initialization(elf):
     return result
 
 
+def sram1_initialization(elf):
+    """Bind the source-closed copy/zero descriptor to exact alloc/LOAD ranges."""
+    boot = elf.symbol('nx_stm32h743_memory_boot') & ~1
+    table, = struct.unpack('<I', image_bytes(elf, boot + 56, 4))
+    if table % 4 or not 0x08000000 <= table < table + 36 <= 0x08200000:
+        raise EvidenceError('SRAM1 boot descriptor must be aligned immutable Flash')
+    words = struct.unpack('<9I', image_bytes(elf, table, 36))
+    symbols = ('__nx_sram1_region_start', '__nx_sram1_region_end',
+               '__nx_sram1_data_load', '__nx_sram1_data_start',
+               '__nx_sram1_data_end', '__nx_sram1_bss_start',
+               '__nx_sram1_bss_end', '__nx_sram1_noinit_start',
+               '__nx_sram1_noinit_end')
+    if words != tuple(elf.symbol(name) for name in symbols):
+        raise EvidenceError('SRAM1 boot descriptor differs from exact linker symbols')
+    begin, end, load, data, data_end, bss, bss_end, noinit, noinit_end = words
+    if (begin != 0x30000000 or end != 0x30020000 or
+            any(value % 4 for value in words) or
+            not begin <= data <= data_end <= bss <= bss_end <= noinit <= noinit_end <= end):
+        raise EvidenceError('SRAM1 boot regions leave reviewed aligned ordering')
+    if not 0x08000000 <= load <= 0x08200000 or data_end - data > 0x08200000 - load:
+        raise EvidenceError('SRAM1 DATA source must remain within physical Flash')
+    result = {}
+    for name, kind, start, finish in (
+            ('.nx_sram1_data', 1, data, data_end),
+            ('.nx_sram1_bss', 8, bss, bss_end),
+            ('.nx_sram1_noinit', 8, noinit, noinit_end)):
+        sections = [item for item in elf.sections if item['name'] == name]
+        if start == finish:
+            # GNU ld can retain an empty linker-symbol-only PROGBITS section
+            # without SHF_ALLOC, including a declared NOLOAD output section.
+            if len(sections) > 1 or (sections and (
+                    sections[0]['address'] != start or sections[0]['size'] != 0 or
+                    sections[0]['flags'] not in {1, 3} or
+                    sections[0]['kind'] not in {1, 8})):
+                raise EvidenceError('Empty SRAM1 linker section differs: ' + name)
+            result[name] = {'address': start, 'bytes': 0}
+            continue
+        if len(sections) != 1:
+            raise EvidenceError('One exact SRAM1 section required: ' + name)
+        section = sections[0]
+        if (section['kind'] != kind or section['flags'] != 3 or
+                section['address'] != start or section['size'] != finish - start):
+            raise EvidenceError('SRAM1 initialization differs from actual section: ' + name)
+        result[name] = {'address': start, 'bytes': finish - start}
+        if kind == 1 and finish > start:
+            loads = [item for item in elf.loads if item['flags'] == 6 and
+                item['offset'] <= section['offset'] <
+                section['offset'] + section['size'] <= item['offset'] + item['files'] and
+                item['virtual'] + section['offset'] - item['offset'] == start]
+            if len(loads) != 1:
+                raise EvidenceError('Unique SRAM1 DATA load mapping required')
+            actual = loads[0]['physical'] + section['offset'] - loads[0]['offset']
+            if actual != load or not 0x08000000 <= load < load + finish - start <= 0x08200000:
+                raise EvidenceError('SRAM1 DATA source differs from actual LOAD LMA')
+            result[name]['load_address'] = load
+    return result
+
+
 def validate_image(elf, resolved, disassembly):
     """Bind vectors and every pre-DATA call to reviewed actual Thumb bytes."""
     validate_profile(resolved)
@@ -376,6 +470,15 @@ def validate_image(elf, resolved, disassembly):
             entries[44] != elf.symbol('TIM2_IRQHandler')):
         raise EvidenceError('Actual H743 reset/time/MSP vector differs')
     selected_uart = any(s['kind'] == 'uart' for s in resolved['controllers'])
+    for item in resolved['controllers']:
+        if item['kind'] == 'exti':
+            line = int(item['controller'][4:])
+            if entries[22 + line] != elf.symbol('EXTI' + str(line) + '_IRQHandler'):
+                raise EvidenceError('Selected EXTI vector differs from actual handler')
+        if item['kind'] == 'uart' and item['mode'] in {'dma-tx', 'rx-dma-idle'}:
+            stream = 0 if item['mode'] == 'dma-tx' else 1
+            if entries[27 + stream] != elf.symbol('DMA1_Stream' + str(stream) + '_IRQHandler'):
+                raise EvidenceError('Selected DMA vector differs from actual handler')
     if selected_uart and entries[55] != elf.symbol('USART3_IRQHandler'):
         raise EvidenceError('Selected USART3 vector differs from actual handler')
     names = {s['name'] for s in elf.defined_symbols}
@@ -387,7 +490,12 @@ def validate_image(elf, resolved, disassembly):
         if len(definitions) != 1 or definitions[0]['binding'] != 1 or definitions[0]['type'] != 2:
             raise EvidenceError('One strong owned H743 function required')
     power = validate_power_entry(elf, disassembly)
-    closure = [pre_ram_function(elf, name, disassembly) for name in PRE_RAM_SHAPES]
+    sram1 = any(item['id'] == 'sram1' and item['linker']
+                for item in resolved['memory'])
+    shapes = SRAM1_PRE_RAM_SHAPES if sram1 else PRE_RAM_SHAPES
+    closure = [pre_ram_function(elf, name, disassembly, shapes=shapes)
+               for name in shapes]
+    optional_initialized = sram1_initialization(elf) if sram1 else {}
     reset = elf.symbol('Reset_Handler') & ~1
     literals = struct.unpack('<6I', image_bytes(elf, reset + 60, 24))
     if literals != tuple(elf.symbol(name) for name in (
@@ -403,8 +511,9 @@ def validate_image(elf, resolved, disassembly):
     return {'vector_count': 166, 'selected_uart': selected_uart,
         'power_entry': power, 'pre_ram_closure': closure,
         'primary_ram_initialization': initialized,
+        'optional_sram1_initialization': optional_initialized,
         'pre_supply_stack_stores': 0, 'pre_ram_initialized_global_accesses': 0,
-        'after_supply_c_stack_bytes': 8, 'physical_status': 'not_executed',
+        'after_supply_c_stack_bytes': 100 if sram1 else 8, 'physical_status': 'not_executed',
         'limitations': 'Reviewed compiler shapes, not an Arm emulator or measured cycles'}
 
 
@@ -425,6 +534,17 @@ def matrix_artifact(identity):
                                  'sha256': identity['sha256']})
 
 
+ASSEMBLIES = (
+    'empty.toml', 'io.toml', 'empty-freertos.toml', 'io-freertos.toml',
+    'dma.toml', 'dma32.toml', 'dma-cache.toml', 'dma32-cache.toml',
+    'dma-freertos.toml', 'dma32-freertos.toml', 'dma-cache-freertos.toml',
+    'dma32-cache-freertos.toml', 'rx.toml', 'rx32.toml', 'rx-cache.toml',
+    'rx32-cache.toml', 'rx-freertos.toml', 'rx32-freertos.toml',
+    'rx-cache-freertos.toml', 'rx32-cache-freertos.toml',
+    'peripherals.toml', 'peripherals32.toml', 'peripherals-freertos.toml',
+    'peripherals32-freertos.toml', 'rx-sram1.toml', 'rx-sram1-cache.toml')
+
+
 def run(root, compiler, output, *, parallel=2):
     root, output = root.resolve(), Path(output).absolute()
     output = provider_assemblies.fresh_output(output, root)
@@ -437,8 +557,7 @@ def run(root, compiler, output, *, parallel=2):
         source_before = git_source(root)
         report['tool_inputs'] = tool_inputs(root)
         fixture = root / 'tests/contracts/h743_assembly'
-        assemblies = [fixture / name for name in (
-            'empty.toml', 'io.toml', 'empty-freertos.toml', 'io-freertos.toml')]
+        assemblies = [fixture / name for name in ASSEMBLIES]
         if provider_assemblies.run(root, assemblies, compiler, output / 'matrix',
                                    family='stm32h743', parallel=parallel):
             raise EvidenceError('Actual fresh H743 assembly matrix rejected')

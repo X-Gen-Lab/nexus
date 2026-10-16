@@ -27,6 +27,43 @@ typedef struct {
     SCB_Type* core;
     GPIO_TypeDef gpio_b;
     GPIO_TypeDef gpio_d;
+    GPIO_TypeDef gpio_a;
+    GPIO_TypeDef gpio_e;
+    TIM_TypeDef pwm_registers;
+    SPI_TypeDef spi_registers;
+    I2C_TypeDef i2c_registers;
+    ADC_TypeDef adc_registers;
+    ADC_TypeDef adc_peer;
+    ADC_Common_TypeDef adc_common;
+    IWDG_TypeDef watchdog_registers;
+    DBGMCU_TypeDef debug;
+    TIM_TypeDef* pwm;
+    SPI_TypeDef* spi;
+    IWDG_TypeDef* watchdog;
+    EXTI_TypeDef exti;
+    SYSCFG_TypeDef mux;
+    bool hold_pwm_update;
+    bool hold_pwm_reset;
+    bool hold_watchdog_update;
+    bool hold_spi_progress;
+    bool hold_spi_reset;
+    uint32_t spi_sent;
+    uint32_t spi_received;
+    uint32_t spi_tail_until;
+    bool spi_tail_truncated;
+    bool hold_spi_time;
+    ADC_TypeDef* adc;
+    bool adc_calibrated;
+    unsigned adc_illegal_linear_writes;
+    bool hold_adc_calibration;
+    bool refuse_adc_calibration_command;
+    bool hold_adc_conversion;
+    void* physical_flash;
+    bool flash_pulse_error;
+    unsigned flash_store_count;
+    bool hold_flash_busy;
+    bool hold_flash_start;
+    uint32_t flash_poll_advance;
     USART_TypeDef* uart;
     bool irq_enabled[150];
     bool irq_pending[150];
@@ -35,6 +72,7 @@ typedef struct {
     uint8_t group;
     uint16_t flash_kib;
     uint16_t device_id;
+    uint32_t silicon_id;
     bool privileged;
     bool hold_uart_on;
     bool hold_uart_off;
@@ -75,6 +113,13 @@ uint32_t nx_h743_model_read(volatile uint32_t* reg);
 void nx_h743_model_write(volatile uint32_t* reg, uint32_t value);
 nx_result_t nx_h743_model_irq_control(int irq, bool enabled, uint8_t priority);
 void nx_h743_model_uart_poll(void* port);
+void nx_h743_model_watchdog_poll(void* port);
+void nx_h743_model_adc_poll(void* port);
+void nx_h743_model_flash_poll(void* port);
+void nx_h743_model_flash_write32(volatile uint32_t* address, uint32_t value);
+void nx_h743_model_spi_write8(volatile uint32_t* reg, uint8_t value);
+uint8_t nx_h743_model_spi_read8(volatile uint32_t* reg);
+void nx_h743_model_spi_poll(void* port);
 void nx_h743_model_system_poll(void* system);
 nx_arch_cache_control_result_t
 nx_h743_model_cache_enable(nx_arch_cache_control_t* control, uint32_t mask);
@@ -93,13 +138,22 @@ void nx_h743_model_irq_restore(nx_arch_irq_state_t previous);
 #define NX_H743_IRQ_AVAILABLE(irq)                                             \
     (!g_h743_model.irq_enabled[(irq)] && !g_h743_model.irq_pending[(irq)] &&   \
      !g_h743_model.irq_active[(irq)])
-#define NX_H743_IRQ_PRIORITY(irq)   g_h743_model.priority[(irq)]
-#define NX_H743_IRQ_GROUP()         g_h743_model.group
-#define NX_H743_FLASH_KIB()         g_h743_model.flash_kib
-#define NX_H743_DEVICE_ID()         g_h743_model.device_id
-#define NX_H743_GPIOB               (&g_h743_model.gpio_b)
-#define NX_H743_GPIOD               (&g_h743_model.gpio_d)
-#define NX_H743_UART_POLL(port)     nx_h743_model_uart_poll(port)
+#define NX_H743_IRQ_PRIORITY(irq)      g_h743_model.priority[(irq)]
+#define NX_H743_IRQ_GROUP()            g_h743_model.group
+#define NX_H743_FLASH_KIB()            g_h743_model.flash_kib
+#define NX_H743_DEVICE_ID()            g_h743_model.device_id
+#define NX_H743_SILICON_ID()           g_h743_model.silicon_id
+#define NX_H743_GPIOB                  (&g_h743_model.gpio_b)
+#define NX_H743_GPIOD                  (&g_h743_model.gpio_d)
+#define NX_H743_UART_POLL(port)        nx_h743_model_uart_poll(port)
+#define NX_H743_WATCHDOG_POLL(port)    nx_h743_model_watchdog_poll(port)
+#define NX_H743_SPI_WRITE8(reg, value) nx_h743_model_spi_write8((reg), (value))
+#define NX_H743_SPI_READ8(reg)         nx_h743_model_spi_read8(reg)
+#define NX_H743_SPI_POLL(port)         nx_h743_model_spi_poll(port)
+#define NX_H743_ADC_POLL(port)         nx_h743_model_adc_poll(port)
+#define NX_H743_FLASH_POLL(port)       nx_h743_model_flash_poll(port)
+#define NX_H743_FLASH_WRITE32(address, value)                                  \
+    nx_h743_model_flash_write32((address), (value))
 #define NX_H743_SYSTEM_POLL(system) nx_h743_model_system_poll(system)
 #define NX_H743_CACHE_ENABLE(control, mask)                                    \
     nx_h743_model_cache_enable((control), (mask))

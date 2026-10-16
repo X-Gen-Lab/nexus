@@ -1,5 +1,9 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
 from ..common import Construction, controller_ir, fail, kernel_policy_constant
+try:
+    from ...emission import dma_regions
+except ImportError:
+    from emission import dma_regions
 
 
 def constructor(item, result, board_bindings, routes, devices):
@@ -131,6 +135,71 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.poll_limit = 1000000u;",
                         f"    return nx_stm32g474_pwm_initialize(&{state});", "}"]
         stop = f"nx_stm32g474_pwm_close(&{state})"
+    elif item.kind == "i2c":
+        definitions += [f"static nx_result_t prepare_{name}(void) {{",
+                        f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
+                        f"    {state}.registers = (nx_i2c_v2_registers_t*)(void*)I2C1;",
+                        f"    {state}.reset = &RCC->APB1RSTR1;",
+                        f"    {state}.reset_mask = RCC_APB1RSTR1_I2C1RST;",
+                        f"    {state}.timing = 0x30420f13u;",
+                        f"    {state}.poll_limit = 1000000u;",
+                        f"    {state}.ignore_master_berr = true;",
+                        "    nx_result_t status = nx_stm32g474_i2c_pins_prepare();",
+                        "    if (status != NX_SUCCESS) { return status; }",
+                        f"    return nx_i2c_v2_initialize(&{state});", "}"]
+        for child in devices:
+            if child["controller"] != item.id:
+                continue
+            child_name = child["id"].replace("-", "_")
+            endpoint = "s_nx_endpoint_" + child_name
+            definitions += [f"static nx_i2c_v2_endpoint_state_t {endpoint} = {{ &{state}, {child['address']}u }};",
+                            f"static const nx_i2c_endpoint_t s_nx_device_face_{child_name} = {{ &nx_i2c_v2_endpoint_ops, &{endpoint} }};",
+                            f"const nx_i2c_endpoint_t* const nx_device_{child_name} = &s_nx_device_face_{child_name};"]
+        stop = f"nx_i2c_port_stop(&s_nx_face_{name})"
+    elif item.kind == "flash":
+        definitions += [f"static nx_result_t prepare_{name}(void) {{",
+                        f"    if ({state}.active || {state}.restore_pending || (FLASH->SR & FLASH_SR_BSY) != 0u) {{ return NX_ERROR_BUSY; }}",
+                        f"    {state}.registers = FLASH;",
+                        f"    {state}.memory = (volatile uint8_t*)FLASH_BASE;",
+                        f"    {state}.supply_mv = 3300u;",
+                        "    return NX_SUCCESS;", "}"]
+        stop = f"nx_stm32g474_flash_close(&{state})"
+    elif item.kind == "adc":
+        stream = item.mode == "trigger-dma"
+        target = state + (".adc" if stream else "")
+        if stream:
+            lines, count = dma_regions(name, result)
+            if count == 0:
+                fail("G474 ADC DMA requires an explicit visible SRAM domain")
+            definitions += lines
+        definitions += [f"static nx_result_t prepare_{name}(void) {{",
+                        f"    if ({target}.retained || {target}.initialized || {target}.active) {{ return NX_ERROR_BUSY; }}",
+                        f"    {target}.registers = ADC1;",
+                        f"    {target}.peer = ADC2;",
+                        f"    {target}.common = ADC12_COMMON;",
+                        f"    {target}.reference_mv = {item.options.reference_mv}u;",
+                        f"    {target}.poll_limit = 1000000u;",
+                        "    NX_G474_WRITE(&GPIOA->PUPDR, NX_G474_READ(&GPIOA->PUPDR) & ~3u);",
+                        "    NX_G474_WRITE(&GPIOA->MODER, NX_G474_READ(&GPIOA->MODER) | 3u);",
+                        "    nx_arch_dsb();",
+                        "    if ((NX_G474_READ(&GPIOA->MODER) & 3u) != 3u || (NX_G474_READ(&GPIOA->PUPDR) & 3u) != 0u) { return NX_ERROR_IO; }"]
+        if stream:
+            irq = result["irq"]
+            definitions += [f"    {state}.timer = TIM6;",
+                            f"    {state}.dma = DMA1;",
+                            f"    {state}.channel = DMA1_Channel1;",
+                            f"    {state}.mux = DMAMUX1_Channel0;",
+                            f"    {state}.regions = s_nx_dma_regions_{name};",
+                            f"    {state}.region_count = {count}u;",
+                            f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
+                            f"    return nx_stm32g474_adc_stream_initialize(&{state});", "}",
+                            "void DMA1_Channel1_IRQHandler(void);",
+                            r"/** \brief One selected finite ADC block terminal observation. */",
+                            f"void DMA1_Channel1_IRQHandler(void) {{ nx_stm32g474_adc_stream_irq(&{state}); }}"]
+            stop = f"nx_stm32g474_adc_stream_close(&{state})"
+        else:
+            definitions += [f"    return nx_stm32g474_adc_initialize(&{state});", "}"]
+            stop = f"nx_stm32g474_adc_close(&{state})"
     elif item.kind == "watchdog":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.state.enabled || {state}.lsi_added || {state}.debug_pending) {{ return NX_ERROR_BUSY; }}",
@@ -167,7 +236,11 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"nx_exti_port_stop(&s_nx_face_{name})"
     else:
         raise ValueError("Unmaintained G474 constructor")
+    state_type = ("nx_i2c_v2_state_t" if item.kind == "i2c" else
+                  "nx_stm32g474_adc_stream_state_t" if item.kind == "adc" and
+                  item.mode == "trigger-dma" else
+                  f"nx_stm32g474_{item.kind}_state_t")
     return Construction(
-        state_type=f"nx_stm32g474_{item.kind}_state_t",
+        state_type=state_type,
         definitions=definitions, initialize=f"prepare_{name}()",
         stop=[stop], retain_on_failed_init=True)

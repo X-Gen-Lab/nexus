@@ -73,6 +73,22 @@ int main(void) {
         (void)nx_watchdog_port_state(nx_factory_watchdog(id), &state);
     }
 #endif
+#ifdef NX_MAINSTREAM_ADC
+    for (nx_adc_id_t id = 0U; id < NX_ADC_ID_COUNT; ++id) {
+        nx_adc_info_t info;
+        (void)nx_adc_port_info(nx_factory_adc(id), &info);
+    }
+#endif
+#ifdef NX_MAINSTREAM_PWM
+    for (nx_pwm_id_t id = 0U; id < NX_PWM_ID_COUNT; ++id) {
+        nx_pwm_state_t state;
+        (void)nx_pwm_port_state(nx_factory_pwm(id), &state);
+    }
+#endif
+#ifdef NX_MAINSTREAM_FLASH
+    for (nx_flash_id_t id = 0U; id < NX_FLASH_ID_COUNT; ++id)
+        (void)nx_flash_port_geometry(nx_factory_flash(id));
+#endif
 #ifdef NX_MAINSTREAM_FREERTOS
     /* Retain the real static kernel graph; this image is never a HIL result. */
     (void)nx_freertos_task_start(&s_task, "mainstream-link", s_task_stack, 128U,

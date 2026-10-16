@@ -46,8 +46,11 @@ class FamilyDescriptor:
     @property
     def configuration_modules(self):
         directory = f"tools/configure/providers/{self.family}"
-        return tuple(f"{directory}/{name}" for name in (
+        modules = tuple(f"{directory}/{name}" for name in (
             "__init__.py", "bindings.py", "emission.py"))
+        if self.family in {"stm32f103", "gd32f303"}:
+            modules += ("tools/configure/providers/legacy_transport.py",)
+        return modules
 
     @property
     def fact_files(self):
@@ -70,6 +73,16 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32f103/drivers/watchdog.c",
             "soc/stm32f103/drivers/exti.c",
             "soc/stm32f103/drivers/spi.c",
+            "soc/stm32f103/drivers/uart_dma.c",
+            "soc/stm32f103/drivers/i2c_async.c",
+            "soc/stm32f103/private/stm32f103_transport.h",
+            "soc/common/uart_v1_channel_dma.c",
+            "soc/common/uart_v1_channel_dma.h",
+            "soc/common/i2c_v1_async.c", "soc/common/i2c_v1_async.h",
+            "soc/stm32f103/drivers/devices.c",
+            "soc/stm32f103/private/stm32f103_devices.h",
+            "soc/common/legacy_devices.h", "soc/common/legacy_adc.c",
+            "soc/common/legacy_pwm.c", "soc/common/legacy_flash.c",
             "soc/stm32f103/private/stm32f103_system.h",
             "soc/stm32f103/private/stm32f103_provider.h",
             "boards/stm32f103_reference/board.json")),
@@ -87,6 +100,17 @@ _DESCRIPTORS = MappingProxyType({
             "soc/gd32f303/CMakeLists.txt", "soc/gd32f303/system.c",
             "soc/gd32f303/drivers/gpio.c", "soc/gd32f303/drivers/uart.c",
             "soc/gd32f303/drivers/spi.c", "soc/gd32f303/drivers/watchdog.c",
+            "soc/gd32f303/drivers/uart_dma.c",
+            "soc/gd32f303/drivers/i2c_async.c",
+            "soc/gd32f303/private/gd32f303_transport.h",
+            "soc/common/uart_v1_channel_dma.c",
+            "soc/common/uart_v1_channel_dma.h",
+            "soc/common/i2c_v1_async.c", "soc/common/i2c_v1_async.h",
+            "soc/gd32f303/drivers/devices.c", "soc/gd32f303/drivers/exti.c",
+            "soc/gd32f303/private/gd32f303_devices.h",
+            "soc/gd32f303/private/gd32f303_exti.h",
+            "soc/common/legacy_devices.h", "soc/common/legacy_adc.c",
+            "soc/common/legacy_pwm.c", "soc/common/legacy_flash.c",
             "soc/gd32f303/private/gd32f303_system.h",
             "soc/gd32f303/private/gd32f303_provider.h",
             "soc/gd32f303/private/gd32f30x_libopt.h",
@@ -99,6 +123,10 @@ _DESCRIPTORS = MappingProxyType({
             "vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Include/gd32f30x.h",
             "vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Include/system_gd32f30x.h",
             "vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Source/GCC/startup_gd32f30x_hd.S",
+            "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_adc.h",
+            "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_dma.h",
+            "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_exti.h",
+            "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_i2c.h",
             "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_gpio.h",
             "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_usart.h",
             "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_timer.h",
@@ -109,7 +137,19 @@ _DESCRIPTORS = MappingProxyType({
             "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_dbg.h")),
     "stm32g474": FamilyDescriptor("stm32g474", (
         ("cmsis_core", "cmsis5"),
-        ("cmsis_device_g4", "stm32g4_cmsis")), references="references.json"),
+        ("cmsis_device_g4", "stm32g4_cmsis")), references="references.json",
+        owned_payload=(
+            "soc/stm32g474/CMakeLists.txt", "soc/stm32g474/system.c",
+            "soc/stm32g474/drivers/gpio.c", "soc/stm32g474/drivers/uart.c",
+            "soc/stm32g474/drivers/exti.c", "soc/stm32g474/drivers/spi.c",
+            "soc/stm32g474/drivers/watchdog.c", "soc/stm32g474/drivers/pwm.c",
+            "soc/stm32g474/drivers/adc.c", "soc/stm32g474/drivers/adc_stream.c",
+            "soc/stm32g474/drivers/i2c.c", "soc/stm32g474/drivers/flash.c",
+            "soc/stm32g474/private/stm32g474_acquisition.h",
+            "soc/stm32g474/private/stm32g474_system.h",
+            "soc/stm32g474/private/stm32g474_provider.h",
+            "soc/common/i2c_v2.c", "soc/common/i2c_v2.h",
+            "boards/stm32g474re_hse24_reference/board.json")),
     "stm32h743": FamilyDescriptor("stm32h743", (
         ("cmsis_core", "cmsis5"),
         ("cmsis_device_h7", "stm32h7_cmsis")), owned_payload=(
@@ -117,6 +157,13 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32h743/drivers/gpio.c", "soc/stm32h743/drivers/uart.c",
             "soc/stm32h743/drivers/uart_dma.c",
             "soc/stm32h743/drivers/uart_receive.c",
+            "soc/stm32h743/drivers/spi.c", "soc/stm32h743/drivers/pwm.c",
+            "soc/stm32h743/drivers/exti.c", "soc/stm32h743/drivers/watchdog.c",
+            "soc/stm32h743/drivers/i2c.c", "soc/stm32h743/drivers/adc.c",
+            "soc/stm32h743/drivers/flash.c",
+            "soc/stm32h743/memory_init.c",
+            "soc/stm32h743/private/memory_init.h",
+            "soc/common/i2c_v2.c", "soc/common/i2c_v2.h",
             "soc/stm32h743/private/stm32h743_dma.h",
             "soc/stm32h743/private/stm32h743_uart_receive.h",
             "soc/stm32h743/private/stm32h743_system.h",
@@ -130,6 +177,18 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32u575/CMakeLists.txt", "soc/stm32u575/system.c",
             "soc/stm32u575/drivers/gpio.c", "soc/stm32u575/drivers/uart.c",
             "soc/stm32u575/drivers/watchdog.c",
+            "soc/stm32u575/drivers/spi.c",
+            "soc/stm32u575/drivers/i2c.c",
+            "soc/stm32u575/drivers/adc.c",
+            "soc/stm32u575/drivers/pwm.c",
+            "soc/stm32u575/drivers/exti.c",
+            "soc/stm32u575/drivers/flash.c",
+            "soc/stm32u575/secure_batch.c",
+            "soc/stm32u575/private/stm32u575_secure_batch.h",
+            "soc/stm32u575/security.c",
+            "soc/stm32u575/private/stm32u575_security.h",
+            "soc/stm32u575/private/stm32u575_security_hw.h",
+            "soc/common/i2c_v2.c", "soc/common/i2c_v2.h",
             "soc/stm32u575/private/stm32u575_system.h",
             "soc/stm32u575/private/stm32u575_provider.h",
             "boards/stm32u575_nucleo_zi_q/board.json")),

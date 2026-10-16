@@ -19,10 +19,11 @@ current detailed limits; this page explains how to select them.
 | Native | Independent host models, POSIX behavior and real selected RTOS host tests; no MCU qualification |
 | F407ZG Qiming / F407VE Sky | Exact M4F parts and separate Board facts; broad explicit F407 modes, baremetal/FreeRTOS and reviewed ThreadX M4 subset |
 | F470ZG Liangshan | Exact GD32 M4F provider and Board; broad explicit modes, baremetal/FreeRTOS and reviewed ThreadX M4 subset |
-| G474RE source reference | GPIO/LPUART baseline plus selected EXTI; no inherited F407 DMA or all-peripheral support |
-| H743ZI NUCLEO reference | Exact fixed HSI32/HSI64 and Cache off/on profiles, GPIO/IRQ UART and finite USART3 TX DMA; no RX DMA or runtime handoff |
-| U575ZI-Q default reference | Externally established TZEN=0/SWAP_BANK=0, MSIS4, GPIO/IRQ UART; no default DMA or dual-domain factory |
-| U575 separate dual-domain reference | TZEN=1, no OS, synchronous copied GPIO gateway; no generic asynchronous cross-domain transport |
+| F103RB / GD303RC references | Exact legacy GPIO/UART/SPI plus finite channel-DMA UART, IRQ-message I2C, physical Flash, single ADC and fixed PWM; finite RX has rearm gaps and I2C priority-zero IRQs cannot notify a kernel |
+| G474RE source reference | GPIO, six IRQ UARTs, polling SPI, fixed PWM, IWDG and EXTI; selected ADC1 bulb shots/finite TIM6 DMA, polling I2C1 and ECC Flash; no continuous ADC or inherited F407 modes |
+| H743ZI reference selections | Fixed HSI32/HSI64 and Cache off/on; finite USART3 TX DMA or RX DMA-IDLE, optional initialized D2 SRAM1 and selected SPI/I2C/ADC/PWM/EXTI/IWDG/Flash; Flash requires Cache off; no continuous RX or running-state handoff |
+| U575ZI-Q default reference | Externally established TZEN=0/SWAP_BANK=0 and MSIS4; selected GPIO/UART/IWDG and finite SPI/I2C/ADC/PWM/EXTI/Flash; external ADC supply admission; no DMA or dual-domain factory |
+| U575 separate dual-domain reference | TZEN=1, no OS; synchronous scalar gateway and copied cooperative jobs of at most eight PC7 commands in Secure storage; no retained NS pointer or generic asynchronous cross-domain transport |
 | CPU-only Runtime | M0/M0+/M3/M4/M7/M23/M33/M55/M85 Core/Arch and selected baremetal/FreeRTOS software profiles; no generated SoC/Board/factory |
 
 ThreadX currently maintains Native Linux GNU and M4 GNU profiles; it does not
@@ -48,6 +49,11 @@ Default Board bindings do not cover every connector, transceiver or external par
 Finite block modes include rearm gaps. Continuous modes need explicit replacement
 storage and service budgets; they do not promise losslessness under arbitrary load.
 Flash geometry is physical, while product partitions and update policy are external.
+ECC `program_flags` can require proven fresh erase before each program unit;
+all-FF readback cannot establish erased ECC history. Every started pulse settles
+before return, and deadlines only prevent later pulses. These source mechanisms
+and their developer tests do not inherit final qualification from historical
+results. Exact current-source software execution is recorded separately.
 
 ![Selected U575 synchronous Secure/NonSecure reference](../../assets/diagrams/u575-security-domains.svg)
 

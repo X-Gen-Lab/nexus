@@ -105,9 +105,9 @@ nx_result_t nx_stm32h743_gpio_stop(nx_stm32h743_gpio_state_t* p,
 nx_result_t nx_stm32h743_gpio_clock_enable(unsigned index) {
     if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
         return NX_ERROR_CONTEXT;
-    if ((index != 1U && index != 3U) || g_nx_stm32h743_system.rcc == NULL)
+    if (index > 7U || g_nx_stm32h743_system.rcc == NULL)
         return NX_ERROR_UNSUPPORTED;
-    uint32_t bit = index == 1U ? RCC_AHB4ENR_GPIOBEN : RCC_AHB4ENR_GPIODEN;
+    uint32_t bit = 1U << index;
     volatile uint32_t* gate = &g_nx_stm32h743_system.rcc->AHB4ENR;
     NX_H743_WRITE(gate, NX_H743_READ(gate) | bit);
     nx_arch_dsb();
@@ -156,3 +156,36 @@ nx_result_t nx_stm32h743_usart3_pins_prepare(void) {
                : NX_ERROR_IO;
 }
 const nx_gpio_ops_t nx_stm32h743_gpio_ops = {write, read, toggle};
+
+nx_result_t nx_stm32h743_pin_alternate(GPIO_TypeDef* gpio, unsigned pin,
+                                       unsigned af) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (gpio == NULL || pin > 15U || af > 15U)
+        return NX_ERROR_INVALID;
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    uint32_t bit = 1U << pin;
+    uint32_t fields = 3U << (pin * 2U);
+    uint32_t af_mask = 15U << ((pin % 8U) * 4U);
+    NX_H743_WRITE(&gpio->OTYPER, NX_H743_READ(&gpio->OTYPER) & ~bit);
+    NX_H743_WRITE(&gpio->OSPEEDR, NX_H743_READ(&gpio->OSPEEDR) | fields);
+    NX_H743_WRITE(&gpio->PUPDR, NX_H743_READ(&gpio->PUPDR) & ~fields);
+    NX_H743_WRITE(&gpio->AFR[pin / 8U],
+                  (NX_H743_READ(&gpio->AFR[pin / 8U]) & ~af_mask) |
+                      (af << ((pin % 8U) * 4U)));
+    nx_arch_dsb();
+    bool valid = (NX_H743_READ(&gpio->OTYPER) & bit) == 0U &&
+                 (NX_H743_READ(&gpio->OSPEEDR) & fields) == fields &&
+                 (NX_H743_READ(&gpio->PUPDR) & fields) == 0U &&
+                 (NX_H743_READ(&gpio->AFR[pin / 8U]) & af_mask) ==
+                     (af << ((pin % 8U) * 4U));
+    if (valid) {
+        uint32_t mode =
+            (NX_H743_READ(&gpio->MODER) & ~fields) | (2U << (pin * 2U));
+        NX_H743_WRITE(&gpio->MODER, mode);
+        nx_arch_dsb();
+        valid = (NX_H743_READ(&gpio->MODER) & fields) == (2U << (pin * 2U));
+    }
+    nx_arch_irq_restore(saved);
+    return valid ? NX_SUCCESS : NX_ERROR_IO;
+}

@@ -54,6 +54,180 @@
           "DMA1:stream1:channel45"
         ]
       }
+    },
+    {
+      "id": "gpio-pe11",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "GPIOE",
+      "kind": "gpio",
+      "pins": [
+        {
+          "pin": "PE11",
+          "function": "output",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "output"
+      ],
+      "source": "DS12110 Rev11 STM32H743ZI package and alternate function table; RM0433 Rev9 selected finite software reference. External PCB wiring unknown; no physical HIL."
+    },
+    {
+      "id": "spi4-pe12-pe13-pe14",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "SPI4",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PE12",
+          "function": "sck",
+          "af": 5
+        },
+        {
+          "pin": "PE13",
+          "function": "miso",
+          "af": 5
+        },
+        {
+          "pin": "PE14",
+          "function": "mosi",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "DS12110 Rev11 STM32H743ZI package and alternate function table; RM0433 Rev9 selected finite software reference. External PCB wiring unknown; no physical HIL."
+    },
+    {
+      "id": "tim3-pa6",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "TIM3",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "ch1",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS12110 Rev11 STM32H743ZI package and alternate function table; RM0433 Rev9 selected finite software reference. External PCB wiring unknown; no physical HIL."
+    },
+    {
+      "id": "iwdg1",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "IWDG1",
+      "kind": "watchdog",
+      "pins": [],
+      "modes": [
+        "independent"
+      ],
+      "source": "DS12110 Rev11 STM32H743ZI package and alternate function table; RM0433 Rev9 selected finite software reference. External PCB wiring unknown; no physical HIL."
+    },
+    {
+      "id": "exti0-pa0",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "EXTI0",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "DS12110 Rev11 STM32H743ZI package and alternate function table; RM0433 Rev9 selected finite software reference. External PCB wiring unknown; no physical HIL."
+    },
+    {
+      "id": "exti1-pa1",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "EXTI1",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "DS12110 Rev11 STM32H743ZI package and alternate function table; RM0433 Rev9 selected finite software reference. External PCB wiring unknown; no physical HIL."
+    },
+    {
+      "id": "i2c1-pb8-pb9",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "I2C1",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PB8",
+          "function": "scl",
+          "af": 4
+        },
+        {
+          "pin": "PB9",
+          "function": "sda",
+          "af": 4
+        }
+      ],
+      "modes": [
+        "poll-messages"
+      ],
+      "source": "DS12110 Rev11 exact PA3 ADC1_INP15 and PB8/PB9 AF4; RM0433 Rev9 ADC/I2C and2MiB dual-bank Flash. Source-reviewed software-only fixture; VDDA, supply voltage, I2C pull-ups/rise/fall and external wiring physically unqualified."
+    },
+    {
+      "id": "adc1-pa3",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA3",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot"
+      ],
+      "source": "DS12110 Rev11 exact PA3 ADC1_INP15 and PB8/PB9 AF4; RM0433 Rev9 ADC/I2C and2MiB dual-bank Flash. Source-reviewed software-only fixture; VDDA, supply voltage, I2C pull-ups/rise/fall and external wiring physically unqualified."
+    },
+    {
+      "id": "flash-internal",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "FLASH",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "poll-word"
+      ],
+      "source": "DS12110 Rev11 exact PA3 ADC1_INP15 and PB8/PB9 AF4; RM0433 Rev9 ADC/I2C and2MiB dual-bank Flash. Source-reviewed software-only fixture; VDDA, supply voltage, I2C pull-ups/rise/fall and external wiring physically unqualified."
     }
   ]
 }

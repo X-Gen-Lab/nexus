@@ -41,7 +41,11 @@ void nx_stm32_model_nvic_disable(int irq) {
 /** \brief Record vector pending acknowledgement without invoking host MMIO. */
 void nx_stm32_model_nvic_clear(int irq) {
     ++s_nvic_clear;
-    assert(irq == s_nvic_irq);
+    if (irq == (int)FLASH_IRQn) {
+        assert(NVIC_GetEnableIRQ(FLASH_IRQn) == 0U);
+    } else {
+        assert(irq == s_nvic_irq);
+    }
     NVIC->ISPR[(unsigned)irq / 32U] &= ~(1U << ((unsigned)irq % 32U));
 }
 
@@ -117,7 +121,9 @@ void nx_stm32_model_io_poll(unsigned kind, void* raw) {
     } else if (kind == 3U) {
         nx_stm32_flash_state_t* port = raw;
         port->registers->CR &= ~(uint32_t)FLASH_CR_LOCK;
-        if (s_fault == 7U) {
+        bool pulse =
+            (port->registers->CR & (FLASH_CR_PG | FLASH_CR_STRT)) != 0U;
+        if (pulse && s_fault == 7U) {
             port->registers->SR = FLASH_SR_WRPERR;
         } else {
             port->registers->SR = 0U;
@@ -128,6 +134,11 @@ void nx_stm32_model_io_poll(unsigned kind, void* raw) {
                 memset((void*)(port->memory + sector->offset), 0xFF,
                        sector->size);
                 port->registers->CR &= ~(uint32_t)FLASH_CR_STRT;
+            }
+            if (pulse && (port->registers->CR & FLASH_CR_EOPIE) != 0U) {
+                port->registers->SR |= FLASH_SR_EOP;
+                NVIC->ISPR[(unsigned)FLASH_IRQn / 32U] |=
+                    1U << ((unsigned)FLASH_IRQn % 32U);
             }
         }
     } else if (kind == 4U) {

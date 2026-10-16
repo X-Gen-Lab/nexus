@@ -99,31 +99,45 @@ def validate_pair(secure_bytes, nonsecure_bytes, imported):
         # A copied SG section outside LOAD bytes cannot become flash evidence.
         binary_from_elf(elf, flash[0], flash[1])
     nsc = section(secure, ".gnu.sgstubs")
-    gateway = secure.symbol("nx_reference_gpio") & ~1
+    gateway_names = ("nx_reference_gpio", "nx_reference_gpio_batch")
+    gateways = {name: secure.symbol(name) & ~1 for name in gateway_names}
+    gateway = gateways["nx_reference_gpio"]
     if (nsc["address"] != 0x0c0fe000 or nsc["size"] == 0
             or nsc["size"] > 0x2000 or nsc["address"] & 31
-            or not nsc["address"] <= gateway < nsc["address"] + nsc["size"]
-            or bytes_at(secure, gateway, 4) != b"\x7f\xe9\x7f\xe9"):
+            or len(set(gateways.values())) != len(gateway_names)
+            or any(not nsc["address"] <= address < nsc["address"] + nsc["size"]
+                   or bytes_at(secure, address, 4) != b"\x7f\xe9\x7f\xe9"
+                   for address in gateways.values())):
         raise EvidenceError("actual SG veneer missing from exact NSC partition")
-    if (type(imported) is not int or imported != gateway
-            or nonsecure.symbol("nx_reference_gpio") & ~1 != gateway):
+    if (type(imported) is not dict or set(imported) != set(gateway_names)
+            or any(type(imported[name]) is not int or
+                   imported[name] != address or
+                   nonsecure.symbol(name) & ~1 != address
+                   for name, address in gateways.items())):
         raise EvidenceError("Secure import and NS gateway addresses differ")
     for name in ("nx_stm32u575_tz_prepare", "nx_stm32u575_tz_launch",
-                 "nx_arch_nonsecure_check", "nx_user_io_broker_gpio"):
+                 "nx_arch_nonsecure_check", "nx_user_io_broker_gpio",
+                 "nx_stm32u575_secure_batch_submit",
+                 "nx_stm32u575_secure_batch_service",
+                 "nx_stm32u575_secure_batch_ns_spans"):
         if not 0x0c000000 <= secure.symbol(name) & ~1 < 0x0c0fe000:
             raise EvidenceError("trusted implementation missing from Secure Flash")
-    return {"gateway_address": gateway, "nsc_bytes": nsc["size"],
+    return {"gateway_address": gateway, "gateways": gateways,
+            "nsc_bytes": nsc["size"],
             "ns_vector_count": 142, "ns_exception_handlers": 0,
             "secure_stack_bytes": stacks[0], "nonsecure_stack_bytes": stacks[1],
             "float_abi": "soft", "principal": "one fixed NS world"}
 
 
-def imported_gateway(raw):
-    matches = re.findall(r"^nx_reference_gpio\s+[TtAa]\s+([0-9a-fA-F]+)(?:\s|$)",
-                         raw, re.MULTILINE)
-    if len(matches) != 1:
-        raise EvidenceError("one actual gateway import symbol required")
-    return int(matches[0], 16) & ~1
+def imported_gateways(raw):
+    values = {}
+    for name in ("nx_reference_gpio", "nx_reference_gpio_batch"):
+        matches = re.findall(r"^" + name + r"\s+[TtAa]\s+([0-9a-fA-F]+)(?:\s|$)",
+                             raw, re.MULTILINE)
+        if len(matches) != 1:
+            raise EvidenceError("both actual gateway import symbols required")
+        values[name] = int(matches[0], 16) & ~1
+    return values
 
 
 def source_inputs(root):
@@ -216,7 +230,7 @@ def run(root, output, compiler="arm-none-eabi-gcc", parallel=2):
                                 str(import_path)], "import-library")
         report["checks"] = validate_pair(
             secure_path.read_bytes(), nonsecure_path.read_bytes(),
-            imported_gateway(raw))
+            imported_gateways(raw))
         secure = Elf32(secure_path.read_bytes(), float_abi="soft")
         nonsecure = Elf32(nonsecure_path.read_bytes(), float_abi="soft")
         cross_call = recorder.execute([tools["objdump"], "-d", "-z",
@@ -234,8 +248,8 @@ def run(root, output, compiler="arm-none-eabi-gcc", parallel=2):
             if symbol["type"] != 2 or symbol["size"] == 0:
                 continue
             # GNU CMSE import symbols are absolute gateways, not local NS code.
-            # validate_pair already binds this sole import to actual Secure SG.
-            if (symbol["name"] == "nx_reference_gpio"
+            # validate_pair binds both imports to their actual Secure SG bytes.
+            if (symbol["name"] in {"nx_reference_gpio", "nx_reference_gpio_batch"}
                     and symbol["section"] == 0xfff1):
                 continue
             name = symbol["name"]

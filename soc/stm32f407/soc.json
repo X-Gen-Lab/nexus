@@ -459,8 +459,16 @@
       "modes": [
         "poll-word"
       ],
-      "irq": [],
-      "pins": []
+      "irq": [
+        "FLASH_IRQn"
+      ],
+      "pins": [],
+      "irq_numbers": {
+        "FLASH_IRQn": 4
+      },
+      "resources": [
+        "irq:FLASH_IRQn"
+      ]
     },
     "IWDG": {
       "kind": "watchdog",

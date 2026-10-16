@@ -47,6 +47,10 @@ function(nexus_google_test name)
     set_tests_properties(${name} PROPERTIES TIMEOUT 30 LABELS "GoogleTest")
 endfunction()
 
+include("${CMAKE_CURRENT_LIST_DIR}/uart_v1_channel_dma.cmake")
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/legacy_devices.cmake")
+
 nexus_google_test(nexus_owner_mock_test SOURCES owner_mock_test.cpp
     LIBRARIES Nexus::BusOwner)
 nexus_google_test(nexus_realtime_metadata_test SOURCES realtime_metadata_test.cpp
@@ -73,6 +77,8 @@ nexus_google_test(nexus_io_state_machine_test SOURCES io_state_machine_test.cpp
     INCLUDES "${NEXUS_SOURCE_DIR}/io/native")
 nexus_google_test(nexus_stream_storage_test SOURCES stream_storage_test.cpp
     LIBRARIES Nexus::IO Nexus::Arch)
+nexus_google_test(nexus_flash_provenance_test SOURCES flash_provenance_test.cpp
+    LIBRARIES Nexus::FlashStorage Nexus::NativeModel)
 nexus_google_test(nexus_native_instances_test SOURCES native_instances_test.cpp
     LIBRARIES Nexus::NativeModel
     INCLUDES "${NEXUS_SOURCE_DIR}/io/native")

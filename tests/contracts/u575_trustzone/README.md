@@ -73,3 +73,25 @@ ELF bytes. These checks prove software linkage and declared boundaries, not MCU
 execution, secure boot authentication, physical isolation or certification.
 The current single-ELF candidate schema cannot seal this pair as one qualified
 unit. Pair sealing needs an explicit reviewed multi-image artifact contract.
+
+## Copied cooperative GPIO jobs
+
+The second SG entry `nx_reference_gpio_batch` accepts one fixed76byte scalar
+message and a16byte reply. Complete aligned NS SRAM spans, overflow, input/reply
+aliasing and real CMSE unprivileged permissions are checked before the input is
+copied. No NS pointer is retained after return. One static Secure slot copies
+at most eight disjoint granted PC7 set/clear commands. Admission does no GPIO I/O.
+An explicit SERVICE call executes at most one command; POLL only observes status.
+CANCEL settles future work while prior writes remain effective. CONSUME releases
+only a terminal ticket. Epochs increase monotonically and exhaust at UINT32_MAX;
+stale tickets never address another job. Failed writes latch FAILED for polling.
+
+This is cooperative deferred work, with no timing, gap-free, Secure UART,
+NS IRQ, NS RTOS, arbitrary callback or retained user-buffer promise. Both actual
+SG veneers and both import symbols are checked against the paired ARM bytes.
+
+中文：新增窄范围异步场景为 Secure 私有 GPIO 命令批次。完整检查 NS 输入/输出跨度、
+溢出、对齐、别名和 CMSE 权限后先复制，再受理；跨返回不保留任何 NS 指针。最多8条
+PC7 命令使用1个静态槽，SERVICE 每次最多执行1条，POLL 只读取状态，CANCEL 停止
+后续命令，CONSUME 仅消费终态。单调 epoch 与不回绕规则拒绝旧票据和重放。此场景
+不引入隐藏工作线程，不保证执行间隔，不扩大为通用 TrustZone 异步缓冲或 NS RTOS。

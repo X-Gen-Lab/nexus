@@ -2,6 +2,7 @@
 from __future__ import annotations
 import copy
 import io
+import importlib.util
 import json
 from pathlib import Path
 import shutil
@@ -85,7 +86,8 @@ class DeviceLockContracts:
                          "nexus-cmsis-device-source-verification")
         self.assertEqual(result["commit"], self.lock["commit"])
         self.assertEqual(result["selected_part"], self.lock["selected_part"])
-        self.assertEqual(result["verified_files"], 5)
+        self.assertEqual(result["verified_files"],
+                         len(self.lock["files"]))
         self.assertEqual(result["license"], "Apache-2.0")
         self.assertEqual(result["source_kind"], "git_checkout")
         self.assertFalse(result["software_qualified"])
@@ -95,7 +97,8 @@ class DeviceLockContracts:
         name = "stm32" + self.family + ".lock.json"
         lock_path = ROOT / "dependencies" / name
         result = cmsis_device_lock.verify(self.original, lock_path)
-        self.assertEqual(result["verified_files"], 5)
+        self.assertEqual(result["verified_files"],
+                         len(self.lock["files"]))
         command = [sys.executable, "-B", str(ROOT /
                    "tools/maintenance/cmsis_device_lock.py"),
                    "--source", str(self.original), "--lock", str(lock_path)]
@@ -143,7 +146,7 @@ class DeviceLockContracts:
                 with self.assertRaises(ValueError):
                     self.verify(packaged_commit=changed["commit"])
 
-    def test_five_file_graph_cannot_omit_license_or_select_other_part(self):
+    def test_reviewed_file_graph_cannot_omit_license_or_select_other_part(self):
         for name in self.lock["files"]:
             changed = copy.deepcopy(self.lock)
             del changed["files"][name]
@@ -406,6 +409,17 @@ class STM32F1LockTests(DeviceLockContracts, unittest.TestCase):
 
 class STM32H7LockTests(DeviceLockContracts, unittest.TestCase):
     family = "h7"
+
+    def test_axi_boot_reference_is_in_verified_and_packaged_closure(self):
+        name = "Source/Templates/system_stm32h7xx.c"
+        self.assertIn(name, self.lock["files"])
+        self.assertIn(name, cmsis_device_lock.contract(self.lock))
+        path = ROOT / "cmake/package/package_source_sdk.py"
+        spec = importlib.util.spec_from_file_location("boot_reference_sdk", path)
+        package_source_sdk = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(package_source_sdk)
+        self.assertIn("vendors/st/cmsis_device_h7/" + name,
+                      package_source_sdk.REQUIRED_FILES)
 
 
 class STM32U5LockTests(DeviceLockContracts, unittest.TestCase):

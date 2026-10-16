@@ -31,7 +31,7 @@ class G474ConfigurationTests(unittest.TestCase):
         self.assertEqual(result["irq"]["external_count"], 102)
         self.assertEqual(result["clock"]["core_hz"], 170000000)
         self.assertEqual([(item["origin"], item["size"]) for item in result["memory"]],
-                         [(0x20000000, 131072)])
+                         [(0x20000000, 98304), (0x10000000, 32768)])
         self.assertEqual([(item.kind, item.mode) for item in result.controllers],
                          [("gpio", "output"), ("uart", "irq-bytes")])
         self.assertFalse(result["physical_qualified"])

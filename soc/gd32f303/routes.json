@@ -41,9 +41,20 @@
         }
       ],
       "modes": [
-        "irq-bytes"
+        "irq-bytes",
+        "dma-tx",
+        "dma-duplex"
       ],
-      "source": "GD32F303xx Datasheet Rev3.0 Table2-6 PA9pad42/PA10pad43, default USART0 without AFIO remap; GD32F30x User Manual Rev3.4 legacy CTL1 nibble alternate output/floating input. Bare-chip route only."
+      "source": "GD32F303xx Datasheet Rev3.0 Table2-6 PA9pad42/PA10pad43, default USART0 without AFIO remap; GD32F30x User Manual Rev3.4 legacy CTL1 nibble alternate output/floating input. Bare-chip route only. Exact fixed-channel DMA normal mode; memory TC is separate from wire TC; RX owner-service restart gaps are explicit. No circular claim.",
+      "mode_dma": {
+        "dma-tx": [
+          "DMA0:stream3:channel0"
+        ],
+        "dma-duplex": [
+          "DMA0:stream3:channel0",
+          "DMA0:stream4:channel0"
+        ]
+      }
     },
     {
       "id": "gpio-pa4",
@@ -106,6 +117,119 @@
         "independent"
       ],
       "source": "User Manual Rev3.4 FWDGT14.1.3/Table14-1, datasheetRev3.0Table4-18 IRC40Ktyp40kHz withoutMin/Max,Table4-49nominalreload formula. No physicaltimeoutaccuracyclaim."
+    },
+    {
+      "id": "i2c0-pb6-pb7",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "I2C0",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "scl",
+          "af": 0
+        },
+        {
+          "pin": "PB7",
+          "function": "sda",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "irq-messages"
+      ],
+      "source": "Exact reference manual legacy I2C default PB6/PB7 AF open-drain, APB8MHz, nominal80kHz CCR50/TRISE9 IRQ0 non-kernel, avoiding88..100kHz repeated-START errata; external pullups and wiring remain uninspected."
+    },
+    {
+      "id": "adc-pa0",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "ADC0",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot"
+      ],
+      "source": "GD32F30xManualRev3.4/DatasheetRev3.0/ErrataRev1.4 exact part: PA0 channel0 ADC4MHz sample239.5cycles; PA6 default timer CH1/CH0; physical Flash halfword programming and exact pages. No physical qualification."
+    },
+    {
+      "id": "pwm-pa6",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "TIMER2",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "ch0",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "GD32F30xManualRev3.4/DatasheetRev3.0/ErrataRev1.4 exact part: PA0 channel0 ADC4MHz sample239.5cycles; PA6 default timer CH1/CH0; physical Flash halfword programming and exact pages. No physical qualification."
+    },
+    {
+      "id": "flash-internal",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "FMC",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "poll-word"
+      ],
+      "source": "GD32F30xManualRev3.4/DatasheetRev3.0/ErrataRev1.4 exact part: PA0 channel0 ADC4MHz sample239.5cycles; PA6 default timer CH1/CH0; physical Flash halfword programming and exact pages. No physical qualification."
+    },
+    {
+      "id": "exti0-pa0",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "EXTI0",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "GD32F30xManualRev3.4 EXTI INTEN/EVEN/RTEN/FTEN/PD W1C, AFIO_EXTISS0 GPIOA mux0; officialSDK3.0.3 IRQ6/7. Raw coalesced events; external electrical routes unqualified."
+    },
+    {
+      "id": "exti1-pa1",
+      "variants": [
+        "GD32F303RCT6"
+      ],
+      "controller": "EXTI1",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "GD32F30xManualRev3.4 EXTI INTEN/EVEN/RTEN/FTEN/PD W1C, AFIO_EXTISS0 GPIOA mux0; officialSDK3.0.3 IRQ6/7. Raw coalesced events; external electrical routes unqualified."
     }
   ]
 }

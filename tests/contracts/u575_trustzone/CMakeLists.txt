@@ -7,6 +7,7 @@ if(NEXUS_TRUSTZONE_STAGE STREQUAL "secure")
     nexus_add_runtime(ASSEMBLY "${CMAKE_CURRENT_LIST_DIR}/secure.toml")
     add_executable(u575_secure secure.c secure_start.S
         "${nexus_source}/soc/stm32u575/security.c"
+        "${nexus_source}/soc/stm32u575/secure_batch.c"
         "${nexus_source}/soc/stm32u575/drivers/gpio.c")
     target_link_libraries(u575_secure PRIVATE Nexus::Runtime
         Nexus::UserIoBroker nexus_owned_warnings)
@@ -32,6 +33,7 @@ elseif(NEXUS_TRUSTZONE_STAGE STREQUAL "nonsecure")
     target_link_libraries(u575_nonsecure PRIVATE Nexus::Runtime
         nexus_owned_warnings "${NEXUS_SECURE_IMPORT_LIBRARY}")
     target_include_directories(u575_nonsecure PRIVATE
+        "${nexus_source}/soc/stm32u575/private"
         "${nexus_source}/components/user_io_broker/include")
     target_link_options(u575_nonsecure PRIVATE
         "-T${CMAKE_CURRENT_LIST_DIR}/nonsecure.ld"

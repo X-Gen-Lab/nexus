@@ -1,0 +1,66 @@
+schema = 2
+board_package = "../../../boards/stm32h743zi_hsi_reference"
+backend = "freertos"
+clock = "hsi64-fixed-cache-off"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[spi.bus4]
+binding = "spi4"
+mode = "short-poll"
+max_hz = 1000000
+
+[spi_device.device4]
+controller = "bus4"
+driver = "spi-endpoint"
+cs_binding = "spi4-cs"
+mode = 0
+max_hz = 1000000
+
+[pwm.wave3]
+binding = "pwm3"
+mode = "fixed-pwm"
+period_ticks = 1000
+duty_ticks = 250
+tick_hz = 1000000
+
+[watchdog.watchdog0]
+binding = "watchdog0"
+mode = "independent"
+
+[exti.edge0]
+binding = "edge0"
+mode = "edge-event"
+edge = "both"
+event_capacity = 4
+[exti.edge0.irq]
+priority = 5
+calls_os = false
+
+[i2c.bus1]
+binding = "i2c1"
+mode = "poll-messages"
+max_hz = 100000
+
+[i2c_device.device1]
+controller = "bus1"
+driver = "i2c-endpoint"
+address = 80
+
+[adc.sensor]
+binding = "adc1"
+mode = "single-shot"
+channels = [15]
+sample_times = [7]
+reference_mv = 3300
+
+[flash.storage]
+binding = "flash0"
+mode = "poll-word"

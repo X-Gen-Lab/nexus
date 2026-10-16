@@ -147,6 +147,15 @@ class MemoryFacts(unittest.TestCase):
     def test_actual_chip_and_all_bus_facts(self):
         self.assertIsNone(validate_memory_facts(self.resolved))
 
+    def test_only_explicit_sram1_is_additional_initialized_memory(self):
+        self.resolved['memory_budgets'] = {'regions': {'sram1': {'limit_bytes': 256}}}
+        self.resolved['memory'][3]['linker'] = True
+        self.assertEqual('sram1', self.resolved['memory'][3]['id'])
+        self.assertIsNone(validate_memory_facts(self.resolved))
+        self.resolved['memory'][4]['linker'] = True
+        with self.assertRaises(ValueError):
+            validate_memory_facts(self.resolved)
+
     def test_omitted_physical_domain_rejected(self):
         self.resolved['memory'].pop()
         with self.assertRaises(ValueError):
@@ -191,6 +200,14 @@ class ReferenceProfile(unittest.TestCase):
 
     def test_exact_maintained_profile(self):
         self.assertIsNone(stm32h743.validate_profile(self.resolved))
+
+    def test_exact_new_peripheral_and_sram1_profiles(self):
+        for name in ('peripherals', 'peripherals32', 'peripherals-freertos',
+                     'peripherals32-freertos', 'rx-sram1', 'rx-sram1-cache'):
+            with self.subTest(name=name):
+                resolved = resolve_ir(ROOT / (
+                    'tests/contracts/h743_assembly/' + name + '.toml'), ROOT)
+                self.assertIsNone(stm32h743.validate_profile(resolved.to_dict()))
 
     def test_integer_cannot_substitute_for_boolean_cpu_fact(self):
         self.resolved['cpu']['dsp'] = 1
@@ -262,9 +279,16 @@ class StartupClosure(unittest.TestCase):
         cls.addClassCleanup(cls.temporary.cleanup)
         directory = Path(cls.temporary.name)
         generated = directory / 'generated'
+        assembly = ROOT / 'tests/contracts/h743_assembly/empty.toml'
+        if getattr(cls, 'optional_sram1', False):
+            authored = assembly.read_text().replace(
+                '../../../boards/stm32h743_nucleo_zi2',
+                str(ROOT / 'boards/stm32h743_nucleo_zi2'))
+            assembly = directory / 'assembly.toml'
+            assembly.write_text(authored + '\n[memory.regions.sram1]\nlimit_bytes=256\n')
         configured = subprocess.run([sys.executable,
             str(ROOT / 'tools/configure/configure.py'), '--source-root', str(ROOT),
-            '--assembly', str(ROOT / 'tests/contracts/h743_assembly/empty.toml'),
+            '--assembly', str(assembly),
             '--output', str(generated)], capture_output=True, timeout=30)
         if configured.returncode:
             raise RuntimeError(configured.stderr.decode())
@@ -272,8 +296,15 @@ class StartupClosure(unittest.TestCase):
         # Only the external application entry is a test fixture. Startup,
         # supply entry, SystemInit, barriers and libc constructors are real.
         main = directory / 'main.c'
-        main.write_text('void _init(void) {}\nvoid _fini(void) {}\n'
-                        'int main(void) { return 0; }\n')
+        main.write_text('#include \"nexus/core/memory.h\"\n'
+            + ('NX_MEMORY_SRAM1_DATA unsigned boot_data = 0x12345678U;\n'
+               'NX_MEMORY_SRAM1_BSS unsigned boot_bss;\n'
+               'NX_MEMORY_SRAM1_NOINIT unsigned boot_noinit;\n'
+               if getattr(cls, 'optional_sram1', False) else '')
+            + 'void _init(void) {}\nvoid _fini(void) {}\n'
+            + ('int main(void) { boot_noinit = 0; return boot_data + boot_bss + boot_noinit; }\n'
+               if getattr(cls, 'optional_sram1', False) else
+               'int main(void) { return 0; }\n'))
         image = directory / 'startup.elf'
         command = [compiler, '-mcpu=cortex-m7', '-mthumb', '-mfpu=fpv5-d16',
             '-mfloat-abi=hard', '-fshort-enums', '-Os', '-ffunction-sections',
@@ -284,12 +315,15 @@ class StartupClosure(unittest.TestCase):
             '-I' + str(ROOT / 'vendors/st/cmsis_device_h7/Include'),
             '-I' + str(ROOT / 'vendors/arm/CMSIS_5/CMSIS/Core/Include'),
             str(ROOT / 'soc/stm32h743/system.c'),
+            str(ROOT / 'soc/stm32h743/memory_init.c'),
             str(ROOT / 'soc/stm32h743/power_boot.S'),
             str(ROOT / 'vendors/st/cmsis_device_h7/Source/Templates/gcc/startup_stm32h743xx.s'),
             str(ROOT / 'arch/cortex_m/nx_arch_cortex_m.c'),
             str(ROOT / 'core/src/fault.c'), str(main), '-nostartfiles',
             '-Wl,--gc-sections', '-Wl,--build-id=none',
             '-T' + str(generated / 'memory.ld'), '-lc', '-lgcc', '-o', str(image)]
+        if not getattr(cls, 'optional_sram1', False):
+            command.remove(str(ROOT / 'soc/stm32h743/memory_init.c'))
         compiled = subprocess.run(command, capture_output=True, timeout=30)
         if compiled.returncode:
             raise RuntimeError(compiled.stderr.decode())
@@ -297,6 +331,8 @@ class StartupClosure(unittest.TestCase):
                                  capture_output=True, timeout=30)
         if decoded.returncode:
             raise RuntimeError(decoded.stderr.decode())
+        cls.command = command
+        cls.main = main
         cls.elf = Elf32(image.read_bytes())
         cls.disassembly = decoded.stdout.decode()
         cls.objdump = objdump
@@ -406,6 +442,67 @@ class StartupClosure(unittest.TestCase):
                                                self.elf.symbol('_ebss') + 4)
         with self.assertRaises(ValueError):
             stm32h743.validate_image(elf, self.resolved, raw)
+
+
+class OptionalStartupClosure(StartupClosure):
+    optional_sram1 = True
+
+    def test_complete_optional_closure_and_real_data_zero_noinit_sections(self):
+        report = stm32h743.validate_image(self.elf, self.resolved,
+                                         self.disassembly)
+        self.assertEqual(100, report['after_supply_c_stack_bytes'])
+        self.assertEqual(7, len(report['pre_ram_closure']))
+        for kind in ('data', 'bss', 'noinit'):
+            self.assertEqual(4, report['optional_sram1_initialization']
+                             ['.nx_sram1_' + kind]['bytes'])
+
+    def test_empty_data_and_noinit_linker_sections_require_no_copy(self):
+        with tempfile.TemporaryDirectory(prefix='h743-empty-sram1-') as temp:
+            directory = Path(temp)
+            main, image = directory / 'main.c', directory / 'empty.elf'
+            main.write_text('#include "nexus/core/memory.h"\n'
+                'NX_MEMORY_SRAM1_BSS unsigned payload;\n'
+                'void _init(void) {}\nvoid _fini(void) {}\n'
+                'int main(void) { return payload; }\n')
+            command = [str(main) if part == str(self.main) else part
+                       for part in self.command]
+            command[-1] = str(image)
+            compiled = subprocess.run(command, capture_output=True, timeout=30)
+            self.assertEqual(0, compiled.returncode, compiled.stderr.decode())
+            decoded = subprocess.run([self.objdump, '-d', '-z', str(image)],
+                                     capture_output=True, timeout=30)
+            self.assertEqual(0, decoded.returncode, decoded.stderr.decode())
+            report = stm32h743.validate_image(Elf32(image.read_bytes()),
+                self.resolved, decoded.stdout.decode())
+            initialized = report['optional_sram1_initialization']
+            self.assertEqual(0, initialized['.nx_sram1_data']['bytes'])
+            self.assertEqual(0, initialized['.nx_sram1_noinit']['bytes'])
+            self.assertEqual(4, initialized['.nx_sram1_bss']['bytes'])
+
+    def test_descriptor_pointer_cannot_point_into_mutable_ram(self):
+        boot = self.elf.symbol('nx_stm32h743_memory_boot') & ~1
+        self.rejects_bytes(boot + 56, struct.pack('<I', 0x24000000))
+
+    def test_descriptor_words_cannot_silently_widen_copy_or_zero(self):
+        boot = self.elf.symbol('nx_stm32h743_memory_boot') & ~1
+        table, = struct.unpack('<I', stm32h743.image_bytes(self.elf, boot + 56, 4))
+        for index in (2, 4, 6, 8):
+            word, = struct.unpack('<I', stm32h743.image_bytes(
+                self.elf, table + index * 4, 4))
+            with self.subTest(word=index):
+                self.rejects_bytes(table + index * 4, struct.pack('<I', word + 4))
+
+    def test_actual_sram1_gate_enable_and_readback_cannot_be_removed(self):
+        system = self.elf.symbol('SystemInit') & ~1
+        for offset in (56, 64):
+            with self.subTest(offset=offset):
+                self.rejects_bytes(system + offset, bytes.fromhex('00bf00bf'))
+
+    def test_source_closed_word_copy_and_zero_cannot_be_removed(self):
+        initialize = self.elf.symbol('nx_stm32h743_memory_initialize') & ~1
+        for offset in (174, 180):
+            with self.subTest(offset=offset):
+                self.rejects_bytes(initialize + offset, bytes.fromhex('00bf00bf'))
 
 
 class MatrixArtifact(unittest.TestCase):

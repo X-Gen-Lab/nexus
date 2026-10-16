@@ -14,7 +14,9 @@ def select(regions, budgets, family, part, *, obj, integer, fail):
     maintained = ({"addsram", "tcm"} if (
         family == "gd32f470" and part == "GD32F470ZGT6") else
         {"ccm"} if family == "stm32f407" and part in {
-            "STM32F407VET6", "STM32F407ZGT6"} else set())
+            "STM32F407VET6", "STM32F407ZGT6"} else
+        {"sram1"} if family == "stm32h743" and part == "STM32H743ZIT6"
+        else set())
     for name, choice in choices.items():
         if name not in maintained or name not in available:
             fail(f"Unsupported optional memory region: {name}")
@@ -59,7 +61,7 @@ def resource_budget(result):
 def selections(result):
     selected = {region["id"] for region in result["memory"] if region["linker"]}
     return [("NEXUS_MEMORY_" + name.upper(), int(name in selected))
-            for name in ("addsram", "tcm", "ccm")]
+            for name in ("addsram", "tcm", "ccm", "sram1")]
 
 
 def header_lines(result):
