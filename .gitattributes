@@ -1,6 +1,7 @@
 * text=auto eol=lf
 # Preserve byte-identical vendor imports, including their original CRLF files.
 vendors/gigadevice/gd32f4xx/Firmware/** -text -whitespace
+vendors/gigadevice/gd32f30x/Firmware/** -text -whitespace
 # Execution logs and compiled-source snapshots retain their exact original bytes.
 tools/testing/evidence/** -text -whitespace
 tests/evidence/** -text -whitespace

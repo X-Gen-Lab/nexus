@@ -1,0 +1,78 @@
+{
+  "vendor": "GigaDevice",
+  "package": "GD32F30x Firmware Library",
+  "version": "3.0.3",
+  "catalog": "https://www.gd32mcu.com/en/download?kw=GD32F30x",
+  "source_url": "https://www.gd32mcu.com/download/down/document_id/129/path_type/1",
+  "download_sha256": "1cd66b58fc182ee6e2d2d98d78660bb0b822d642489997e9848d5ecb1f6657e1",
+  "nested_archive_sha256": "6b51dd89352d49b8401ba53808d2cba5a8a9684c728946058150f75ed1934754",
+  "scope": "Unmodified exact GD32F303RCT6 HD startup and register definition headers only; no examples, peripheral C engines or alternate-device startup. ARM CMSIS Core supplied by existing pinned Nexus CMSIS dependency.",
+  "files": [
+    {
+      "path": "Firmware/CMSIS/GD/GD32F30x/Include/gd32f30x.h",
+      "sha256": "e573c11e017c15140495c935196d9e396a71e5c84d6280f6111e438261e5850f",
+      "bytes": 27607,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F30x/Include/system_gd32f30x.h",
+      "sha256": "090fe8f6fc564faeb294ee796b057216eaaa4a1dcd5f7e35a6f9b021eec69b23",
+      "bytes": 2740,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/CMSIS/GD/GD32F30x/Source/GCC/startup_gd32f30x_hd.S",
+      "sha256": "6ac761bf99159b4e25f7c7b8b6129154d6a9fad339648403c6a1c33769a15d67",
+      "bytes": 15396,
+      "license": "Apache-2.0"
+    },
+    {
+      "path": "Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_dbg.h",
+      "sha256": "24269bc683cdb8578520a5b365f20b9680ca6f81a4f752b7532387bcaa330197",
+      "bytes": 9280,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_fmc.h",
+      "sha256": "632fcbe4e4712c1aaccbbf5f12990ffc996da252187781228fdab1f97e2ef8f7",
+      "bytes": 23635,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_fwdgt.h",
+      "sha256": "35ea885f06771c7c7d7afbe48b8be65ee5dc72f273db72598ae3ffb293d51843",
+      "bytes": 6109,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_gpio.h",
+      "sha256": "af14884481fe01a6107b5df471258771069d4c474d31df3b5cef3b1f51c629ea",
+      "bytes": 41573,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_rcu.h",
+      "sha256": "d083a3fedeb2f23cbb524142a2968b31fb83d4c43247cb50b2b270f3d2f67814",
+      "bytes": 82981,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_spi.h",
+      "sha256": "0814ce6180c638d73159cfe9c580283b361e4804c53640ebcac23f4fe1f04401",
+      "bytes": 24622,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_timer.h",
+      "sha256": "a9afe895b82e3ba1839dca7f32dd4d2eae118f56116ce53df149f38f77d2cc35",
+      "bytes": 56670,
+      "license": "BSD-3-Clause"
+    },
+    {
+      "path": "Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_usart.h",
+      "sha256": "9c2d751cce3c2c59ec56e13ca1f733ae9715c510ad94c461f6b1e96008d2f2bd",
+      "bytes": 29224,
+      "license": "BSD-3-Clause"
+    }
+  ]
+}
