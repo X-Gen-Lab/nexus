@@ -17,7 +17,13 @@ import tempfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import (EvidenceError, atomic_json, digest, fields,
-    file_identity, load_json, regular_file, separate_outputs, stream_digest, verify_file_identity)
+    file_identity, load_json, regular_file, separate_outputs, sha256_value,
+    stream_digest, verify_file_identity)
+
+
+EXTERNAL_SCOPE = (
+    "archive bytes and safe member closure; inner reports retain their own "
+    "qualification")
 
 
 def _safe_path(name: str) -> str:
@@ -245,9 +251,27 @@ def _external_metrics(archive: Path) -> dict:
 def verify_external(record: dict, *, archive_override: Path | None = None) -> dict:
     fields(record, {"schema_version", "kind", "archive", "original", "storage",
                     "signature_status", "status", "members", "files", "bytes",
-                    "member_inventory_sha256", "scope"})
-    if record["schema_version"] != 1 or record["kind"] != "durable_external_archive":
+                    "member_inventory_sha256", "scope"},
+           {"persistence_status"})
+    if (type(record["schema_version"]) is not int or
+            record["schema_version"] != 1 or record["kind"] not in
+            ("preserved_external_archive", "durable_external_archive")):
         raise EvidenceError("unsupported external archive receipt")
+    if (record["signature_status"] != "unsigned" or
+            record["status"] != "all_members_read" or
+            record["scope"] != EXTERNAL_SCOPE or
+            record["storage"] not in ("independent_hardlink", "independent_copy") or
+            not isinstance(record["original"], str) or not record["original"] or
+            any(type(record[key]) is not int or record[key] <= 0
+                for key in ("members", "files", "bytes")) or
+            record["files"] > record["members"]):
+        raise EvidenceError("invalid external archive preservation claims")
+    if (record.get("persistence_status", "not_established") !=
+            "not_established" or
+            (record["kind"] == "preserved_external_archive" and
+             "persistence_status" not in record)):
+        raise EvidenceError("local archive verification cannot establish persistence")
+    sha256_value(record["member_inventory_sha256"])
     identity = dict(record["archive"])
     if archive_override is not None:
         identity["path"] = str(archive_override.absolute())
@@ -257,11 +281,24 @@ def verify_external(record: dict, *, archive_override: Path | None = None) -> di
         raise EvidenceError("durable archive member inventory changed")
     verify_file_identity(identity)
     return {"status": "verified", **measured,
-            "archive_sha256": record["archive"]["sha256"]}
+            "archive_sha256": record["archive"]["sha256"],
+            "persistence_status": "not_established"}
+
+
+def _external_receipt(archive: Path, destination: Path, storage: Path,
+                      measured: dict, method: str) -> dict:
+    record = {"schema_version": 1, "kind": "preserved_external_archive",
+              "archive": file_identity(destination), "original": str(archive),
+              "storage": method, "signature_status": "unsigned",
+              "status": "all_members_read", **measured,
+              "persistence_status": "not_established", "scope": EXTERNAL_SCOPE}
+    atomic_json(storage / (record["archive"]["sha256"] + ".external.json"),
+                record)
+    return record
 
 
 def adopt(archive: Path, storage: Path) -> dict:
-    """Hard-link existing evidence into its durable identity and read all bytes."""
+    """Preserve a local name; a hardlink does not establish durable storage."""
     archive = regular_file(archive)
     storage = _safe_directory(storage)
     storage.mkdir(parents=True, exist_ok=True)
@@ -270,7 +307,7 @@ def adopt(archive: Path, storage: Path) -> dict:
     created = not destination.exists()
     if destination.exists():
         if digest(destination) != sha:
-            raise EvidenceError("existing durable evidence identity changed")
+            raise EvidenceError("existing preserved evidence identity changed")
     else:
         try:
             os.link(archive, destination)
@@ -284,18 +321,47 @@ def adopt(archive: Path, storage: Path) -> dict:
         if created:
             destination.unlink(missing_ok=True)
         raise
-    record = {"schema_version": 1, "kind": "durable_external_archive",
-              "archive": file_identity(destination), "original": str(archive),
-              "storage": "independent_hardlink", "signature_status": "unsigned",
-              "status": "all_members_read", **measured,
-              "scope": "archive bytes and safe member closure; inner reports retain their own qualification"}
-    atomic_json(storage / (sha + ".external.json"), record)
-    return record
+    return _external_receipt(archive, destination, storage, measured,
+                             "independent_hardlink")
+
+
+def copy_archive(archive: Path, storage: Path) -> dict:
+    """Copy and verify independent bytes without inferring retention guarantees."""
+    archive, storage = regular_file(archive), _safe_directory(storage)
+    original = file_identity(archive)
+    storage.mkdir(parents=True, exist_ok=True)
+    destination = storage / (original["sha256"] + ".tar.gz")
+    if destination.exists() and archive.samefile(destination):
+        raise EvidenceError("independent copy cannot alias the original archive")
+    descriptor, name = tempfile.mkstemp(prefix=".incoming-", suffix=".tar.gz",
+                                       dir=storage)
+    temporary = Path(name)
+    try:
+        with os.fdopen(descriptor, "wb") as target, archive.open("rb") as source:
+            shutil.copyfileobj(source, target, 1024 * 1024)
+            target.flush()
+            os.fsync(target.fileno())
+        verify_file_identity({**original, "path": str(temporary)})
+        measured = _external_metrics(temporary)
+        verify_file_identity(original)
+        try:
+            # A fresh link publishes complete bytes without replacing a racing
+            # writer. Its inode is independent of the original archive.
+            os.link(temporary, destination)
+        except FileExistsError:
+            if archive.samefile(destination):
+                raise EvidenceError("independent copy aliases the original archive")
+        verify_file_identity({**original, "path": str(destination)})
+        return _external_receipt(archive, destination, storage, measured,
+                                 "independent_copy")
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=("export", "verify", "restore", "adopt"))
+    parser.add_argument("operation", choices=("export", "verify", "restore",
+                                              "adopt", "copy"))
     parser.add_argument("--source", type=Path)
     parser.add_argument("--store", type=Path)
     parser.add_argument("--package", type=Path)
@@ -309,16 +375,17 @@ def main(argv=None) -> int:
                          [path for path in (args.source, args.package) if path is not None],
                          [path for path in (args.source, args.destination)
                           if path is not None and (path.is_dir() or path == args.destination)])
-        if args.archive and args.operation in ("export", "adopt"):
+        if args.archive and args.operation in ("export", "adopt", "copy"):
             parser.error("--archive is only for verify/restore")
         if args.operation == "export":
             if args.source is None or args.store is None:
                 parser.error("export requires --source and --store")
             result = export_tree(args.source, args.store)
-        elif args.operation == "adopt":
+        elif args.operation in ("adopt", "copy"):
             if args.source is None or args.store is None:
-                parser.error("adopt requires --source and --store")
-            result = adopt(args.source, args.store)
+                parser.error(args.operation + " requires --source and --store")
+            result = (adopt if args.operation == "adopt" else copy_archive)(
+                args.source, args.store)
         else:
             if args.package is None:
                 parser.error("verify/restore requires --package")
@@ -331,7 +398,8 @@ def main(argv=None) -> int:
                 result = restore_tree(package, args.destination, archive_override=args.archive)
             else:
                 result = (verify_external(package, archive_override=args.archive) if
-                          package.get("kind") == "durable_external_archive" else
+                          package.get("kind") in ("durable_external_archive",
+                                                  "preserved_external_archive") else
                           verify_package(package, archive_override=args.archive))
         if "archive" in result:
             separate_outputs([args.report], [Path(result["archive"]["path"])])

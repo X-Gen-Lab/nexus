@@ -37,6 +37,31 @@ complete inventory before crossing the artifact identity boundary. The outer
 artifact contains an inert archive, manifest and original consumer report.
 Verification rejects unsafe paths, links, extra files and changed bytes.
 
+Local evidence storage is handled by `tools/evidence/store.py`. Its `copy`
+operation preserves an independent content-addressed archive, reads every safe
+member, verifies the original again, and writes a preservation receipt. Unlike
+`adopt`, which adds a hardlink name, a copy survives later writes to the original
+inode. Neither operation establishes offsite retention or durable publication:
+new receipts explicitly retain `persistence_status: not_established`, including
+when a directory happens to be called `durable`. Legacy receipts remain readable
+without inheriting a durability claim.
+
+```sh
+python tools/evidence/store.py copy --source candidate.tar.gz \
+    --store /path/to/independent-storage --report preservation.json
+python tools/evidence/store.py verify --package preservation.json \
+    --report verification.json
+```
+
+After transporting a portable evidence archive, use its original package with
+`restore --archive /new/location/archive.tar.gz --destination /new/restore` and
+an explicit `--report` to verify an independent restoration. Preserve the package
+and raw verification report alongside the copied bytes. A temporary directory,
+local hardlink, file checksum or successful local restore is not an external
+retention guarantee. Actual durable delivery also needs a retained remote copy,
+its byte identity and availability, and an independent recovery exercise before
+the original execution storage is retired.
+
 The publisher verifies the attestation, assembles the complete SDK,
 documentation and raw qualification assets, creates a draft, uploads and
 downloads every asset for a byte comparison, then publishes the verified set as
