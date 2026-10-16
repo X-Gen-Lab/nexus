@@ -31,8 +31,10 @@ void nx_h743_model_reset(void) {
     g_h743_model.flash.ACR = FLASH_ACR_LATENCY_7WS;
     g_h743_model.flash_kib = 2048;
     g_h743_model.device_id = 0x450;
+    g_h743_model.silicon_id = 0x20030450U;
     g_h743_model.group = 3U;
     g_h743_model.actual_core_hz = 64000000U;
+    g_h743_model.spi_registers.CFG1 = 7U | (7U << SPI_CFG1_CRCSIZE_Pos);
     g_h743_model.cache_context_valid = true;
     g_nx_stm32h743_system.rcc = &g_h743_model.rcc;
     g_nx_stm32h743_system.flash = &g_h743_model.flash;
@@ -70,7 +72,8 @@ void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
     if (reg == &g_h743_model.rcc.APB1LRSTR)
         ++g_h743_model.timer_reset_writes;
     ++g_h743_model.writes;
-    GPIO_TypeDef* banks[] = {&g_h743_model.gpio_b, &g_h743_model.gpio_d};
+    GPIO_TypeDef* banks[] = {&g_h743_model.gpio_b, &g_h743_model.gpio_d,
+                             &g_h743_model.gpio_a, &g_h743_model.gpio_e};
     for (GPIO_TypeDef* gpio : banks) {
         const uintptr_t base = reinterpret_cast<uintptr_t>(gpio);
         if (address >= base && address - base < sizeof(*gpio))
@@ -78,6 +81,105 @@ void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
     }
     if (reg == g_h743_model.ignore_write)
         return;
+    if (g_h743_model.pwm != nullptr) {
+        TIM_TypeDef* pwm = g_h743_model.pwm;
+        if (reg == &pwm->EGR && (value & TIM_EGR_UG) != 0U &&
+            !g_h743_model.hold_pwm_update)
+            pwm->SR |= TIM_SR_UIF;
+        if (reg == &pwm->SR) {
+            *reg &= value;
+            return;
+        }
+        if (reg == &g_h743_model.rcc.APB1LRSTR &&
+            (value & RCC_APB1LRSTR_TIM3RST) != 0U &&
+            !g_h743_model.hold_pwm_reset)
+            std::memset(pwm, 0, sizeof(*pwm));
+    }
+    if (reg == &g_h743_model.exti.PR1) {
+        *reg &= ~value;
+        return;
+    }
+    if (g_h743_model.adc != nullptr && reg == &g_h743_model.adc->CR) {
+        if ((g_h743_model.silicon_id & 0x30000000U) == 0x10000000U)
+            value &= ~(uint32_t)(ADC_CR_BOOST_1 | (3U << 6U));
+        if ((value & ADC_CR_ADCAL) != 0U &&
+            g_h743_model.refuse_adc_calibration_command)
+            return;
+        const uint32_t linear = ADC_CR_LINCALRDYW1 | ADC_CR_LINCALRDYW2 |
+                                ADC_CR_LINCALRDYW3 | ADC_CR_LINCALRDYW4 |
+                                ADC_CR_LINCALRDYW5 | ADC_CR_LINCALRDYW6;
+        const uint32_t changed = (*reg ^ value) & linear;
+        if ((value & ADC_CR_DEEPPWD) != 0U)
+            g_h743_model.adc_calibrated = false;
+        if (changed != 0U &&
+            (((changed & (changed - 1U)) != 0U) || (*reg & ADC_CR_ADEN) == 0U ||
+             (*reg & (ADC_CR_ADSTART | ADC_CR_JADSTART)) != 0U)) {
+            ++g_h743_model.adc_illegal_linear_writes;
+            value = (value & ~linear) | (*reg & linear);
+        }
+    }
+    if (g_h743_model.adc != nullptr && reg == &g_h743_model.adc->ISR) {
+        *reg &= ~value;
+        return;
+    }
+    if (reg == &g_h743_model.rcc.APB1LRSTR &&
+        (value & RCC_APB1LRSTR_I2C1RST) != 0U)
+        std::memset(&g_h743_model.i2c_registers, 0,
+                    sizeof(g_h743_model.i2c_registers));
+    if (g_h743_model.physical_flash != nullptr) {
+        auto* p = static_cast<nx_stm32h743_flash_state_t*>(
+            g_h743_model.physical_flash);
+        for (unsigned bank = 0; bank < 2U; ++bank) {
+            volatile uint32_t* cr =
+                bank == 0U ? &p->registers->CR1 : &p->registers->CR2;
+            volatile uint32_t* key =
+                bank == 0U ? &p->registers->KEYR1 : &p->registers->KEYR2;
+            volatile uint32_t* sr =
+                bank == 0U ? &p->registers->SR1 : &p->registers->SR2;
+            volatile uint32_t* ccr =
+                bank == 0U ? &p->registers->CCR1 : &p->registers->CCR2;
+            if (reg == key && value == 0xcdef89abU)
+                *cr &= ~(uint32_t)FLASH_CR_LOCK;
+            if (reg == ccr) {
+                *sr &= ~value;
+                return;
+            }
+            if (reg == cr && (value & FLASH_CR_START) != 0U) {
+                if (g_h743_model.hold_flash_start)
+                    return;
+                uint32_t sector =
+                    (value & (uint32_t)FLASH_CR_SNB) >> FLASH_CR_SNB_Pos;
+                std::memset(
+                    (void*)(p->memory + bank * 1048576U + sector * 131072U),
+                    0xff, 131072U);
+                *sr |= g_h743_model.flash_pulse_error ? FLASH_SR_OPERR
+                                                      : FLASH_SR_EOP;
+            }
+        }
+    }
+    if (g_h743_model.spi != nullptr) {
+        SPI_TypeDef* spi = g_h743_model.spi;
+        if (reg == &g_h743_model.rcc.APB2RSTR &&
+            (value & RCC_APB2RSTR_SPI4RST) != 0U &&
+            !g_h743_model.hold_spi_reset) {
+            if ((spi->SR & SPI_SR_EOT) != 0U &&
+                g_h743_model.timer.CNT < g_h743_model.spi_tail_until)
+                g_h743_model.spi_tail_truncated = true;
+            std::memset(spi, 0, sizeof(*spi));
+            spi->CFG1 = 7U | (7U << SPI_CFG1_CRCSIZE_Pos);
+            spi->SR = SPI_SR_TXP | SPI_SR_TXC;
+            g_h743_model.spi_sent = g_h743_model.spi_received = 0U;
+        }
+        if (reg == &spi->IFCR) {
+            spi->SR &= ~value;
+            return;
+        }
+    }
+    if (g_h743_model.watchdog != nullptr &&
+        (reg == &g_h743_model.watchdog->PR ||
+         reg == &g_h743_model.watchdog->RLR) &&
+        g_h743_model.hold_watchdog_update)
+        g_h743_model.watchdog->SR |= IWDG_SR_PVU | IWDG_SR_RVU;
     if (reg == &g_h743_model.timer.CR2 && g_h743_model.hold_timer_mms_restore &&
         (g_h743_model.timer.CR2 & TIM_CR2_MMS) == TIM_CR2_MMS_0 &&
         (value & TIM_CR2_MMS) == 0U)
@@ -147,6 +249,82 @@ void nx_h743_model_uart_poll(void* context) {
         port->registers->ISR |= USART_ISR_TEACK | USART_ISR_REACK;
     if (!on && !g_h743_model.hold_uart_off)
         port->registers->ISR &= ~(uint32_t)(USART_ISR_TEACK | USART_ISR_REACK);
+}
+void nx_h743_model_watchdog_poll(void* context) {
+    (void)context;
+    if (g_h743_model.watchdog != nullptr && !g_h743_model.hold_watchdog_update)
+        g_h743_model.watchdog->SR = 0U;
+}
+void nx_h743_model_adc_poll(void* context) {
+    (void)context;
+    ++g_h743_model.timer.CNT;
+    ADC_TypeDef* adc = g_h743_model.adc;
+    if (adc == nullptr)
+        return;
+    if ((adc->CR & ADC_CR_ADCAL) != 0U && !g_h743_model.hold_adc_calibration) {
+        g_h743_model.adc_calibrated = (adc->CR & ADC_CR_ADCALLIN) != 0U;
+        adc->CR &= ~(uint32_t)ADC_CR_ADCAL;
+        if (g_h743_model.adc_calibrated)
+            adc->CR |= ADC_CR_LINCALRDYW1 | ADC_CR_LINCALRDYW2 |
+                       ADC_CR_LINCALRDYW3 | ADC_CR_LINCALRDYW4 |
+                       ADC_CR_LINCALRDYW5 | ADC_CR_LINCALRDYW6;
+    }
+    if ((adc->CR & ADC_CR_ADSTP) != 0U)
+        adc->CR &= ~(uint32_t)(ADC_CR_ADSTART | ADC_CR_ADSTP);
+    if ((adc->CR & ADC_CR_ADDIS) != 0U)
+        adc->CR &= ~(uint32_t)(ADC_CR_ADEN | ADC_CR_ADDIS);
+    if ((adc->CR & ADC_CR_ADEN) != 0U)
+        adc->ISR |= ADC_ISR_ADRDY;
+    if ((adc->CR & ADC_CR_ADSTART) != 0U && !g_h743_model.hold_adc_conversion) {
+        adc->DR = 0xabcdU;
+        adc->ISR |= ADC_ISR_EOC | ADC_ISR_EOS;
+        adc->CR &= ~(uint32_t)ADC_CR_ADSTART;
+    }
+}
+void nx_h743_model_flash_poll(void* context) {
+    (void)context;
+    g_h743_model.timer.CNT += g_h743_model.flash_poll_advance;
+}
+void nx_h743_model_flash_write32(volatile uint32_t* address, uint32_t value) {
+    ++g_h743_model.flash_store_count;
+    *address = value;
+    auto* p =
+        static_cast<nx_stm32h743_flash_state_t*>(g_h743_model.physical_flash);
+    uintptr_t offset = reinterpret_cast<uintptr_t>(address) -
+                       reinterpret_cast<uintptr_t>(p->memory);
+    if ((offset & 31U) == 28U) {
+        volatile uint32_t* sr =
+            offset < 1048576U ? &p->registers->SR1 : &p->registers->SR2;
+        *sr |= g_h743_model.flash_pulse_error ? FLASH_SR_OPERR : FLASH_SR_EOP;
+        if (g_h743_model.hold_flash_busy)
+            *sr |= FLASH_SR_BSY | FLASH_SR_QW;
+    }
+}
+void nx_h743_model_spi_write8(volatile uint32_t* reg, uint8_t value) {
+    *reg = value;
+    ++g_h743_model.spi_sent;
+    if (!g_h743_model.hold_spi_progress) {
+        g_h743_model.spi->RXDR = (uint8_t)~value;
+        g_h743_model.spi->SR |= SPI_SR_RXP;
+    }
+}
+uint8_t nx_h743_model_spi_read8(volatile uint32_t* reg) {
+    ++g_h743_model.spi_received;
+    g_h743_model.spi->SR &= ~(uint32_t)SPI_SR_RXP;
+    if (g_h743_model.spi_received == g_h743_model.spi->CR2) {
+        g_h743_model.spi->SR |= SPI_SR_EOT | SPI_SR_TXC;
+        uint32_t divisor =
+            2U << ((g_h743_model.spi->CFG1 & SPI_CFG1_MBR) >> SPI_CFG1_MBR_Pos);
+        uint32_t clock = g_nx_stm32h743_system.core_hz;
+        g_h743_model.spi_tail_until =
+            g_h743_model.timer.CNT + (divisor * 1000000U + clock - 1U) / clock;
+    }
+    return (uint8_t)*reg;
+}
+void nx_h743_model_spi_poll(void* context) {
+    (void)context;
+    if (!g_h743_model.hold_spi_time)
+        ++g_h743_model.timer.CNT;
 }
 void nx_h743_model_system_poll(void* system) {
     (void)system;

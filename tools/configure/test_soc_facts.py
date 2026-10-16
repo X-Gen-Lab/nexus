@@ -46,7 +46,7 @@ class PackagePinContractTests(unittest.TestCase):
         self.assertEqual(gate.validate_soc(soc, "NATIVE_MODEL")["package"],
                          soc["variants"]["NATIVE_MODEL"]["package"])
 
-    def test_g474_package_inventory_does_not_expand_reviewed_controller_modes(self):
+    def test_g474_package_inventory_matches_reviewed_controller_modes(self):
         soc = self.facts("stm32g474")
         pins = soc["variants"]["STM32G474RET6"]["pins"]
         # DS12288 Rev6 Table2 lists52 GPIOs for Rx/LQFP64. Table12 and
@@ -64,7 +64,10 @@ class PackagePinContractTests(unittest.TestCase):
                          for name in ("SPI1", "SPI2")})
         expected.update({name: ("pwm", ["fixed-pwm"])
                          for name in ("TIM3", "TIM4")})
-        expected.update({"IWDG": ("watchdog", ["independent"]),
+        expected.update({"ADC1": ("adc", ["single-shot", "trigger-dma"]),
+                         "I2C1": ("i2c", ["poll-messages"]),
+                         "FLASH": ("flash", ["poll-word"]),
+                         "IWDG": ("watchdog", ["independent"]),
                          "EXTI0": ("exti", ["edge-event"]),
                          "EXTI1": ("exti", ["edge-event"])})
         self.assertEqual({name: (item["kind"], item["modes"])

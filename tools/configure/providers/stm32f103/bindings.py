@@ -9,6 +9,9 @@ def constructor(item, result, board_bindings, routes, devices):
     if item.provider != "stm32f103":
         fail("F103 constructor cannot reinterpret a foreign provider decision")
     validate_selection(item, item)
+    if item.kind == "i2c" or (item.kind == "uart" and item.mode != "irq-bytes"):
+        from ..legacy_transport import constructor as transport_constructor
+        return transport_constructor(item, result, devices, "stm32f103")
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
@@ -113,9 +116,55 @@ def constructor(item, result, board_bindings, routes, devices):
                         r"/** \brief One selected line, one bounded coalesced edge fact. */",
                         f"void EXTI{line}_IRQHandler(void) {{ nx_stm32f103_exti_irq(&{state}); }}"]
         stop = f"nx_exti_port_stop(&s_nx_face_{name})"
+    elif item.kind in {"adc", "pwm", "flash"}:
+        definitions += [f"static nx_result_t prepare_{name}(void) {{"]
+        if item.kind == "flash":
+            supply = board_bindings[item.binding].get("supply_mv")
+            if type(supply) is not int or not 2700 <= supply <= 3600:
+                fail("F103 Flash requires explicit Board supply_mv2700..3600")
+            definitions += [
+                f"    if ({state}.initialized || {state}.active || {state}.fault) {{ return NX_ERROR_BUSY; }}",
+                f"    {state}.registers = (nx_legacy_flash_registers_t*)FLASH;",
+                f"    {state}.geometry = &g_nx_stm32f103_flash_geometry;",
+                f"    {state}.memory = (volatile uint8_t*)(uintptr_t)0x08000000u;",
+                f"    {state}.supply_mv = {supply}u;",
+                f"    return nx_legacy_flash_initialize(&{state});", "}"]
+            stop = f"nx_legacy_flash_close(&{state})"
+        else:
+            definitions += [
+                f"    if ({state}.retained || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
+                f"    {state}.clock_started = &g_nx_stm32f103_system.started;",
+                f"    {state}.pin_mode = &GPIOA->CRL;",
+                f"    {state}.pin_lock = &GPIOA->LCKR;",
+                f"    {state}.poll_limit = 1000000u;"]
+            if item.kind == "adc":
+                definitions += [
+                    f"    {state}.registers = (nx_legacy_adc_registers_t*)ADC1;",
+                    f"    {state}.gate = &RCC->APB2ENR;",
+                    f"    {state}.gate_mask = RCC_APB2ENR_ADC1EN;",
+                    f"    {state}.divider = &RCC->CFGR;",
+                    f"    {state}.divider_mask = RCC_CFGR_ADCPRE;",
+                    f"    {state}.reference_mv = {item.options.reference_mv}u;",
+                    f"    {state}.startup_delay_us = 4u;"]
+            else:
+                initial = board_bindings[item.binding].get("initial")
+                if type(initial) is not int or initial not in {0, 64}:
+                    fail("F103 PWM requires explicit PA6 inactive level")
+                definitions += [
+                    f"    {state}.registers = (nx_legacy_pwm_registers_t*)TIM3;",
+                    f"    {state}.gate = &RCC->APB1ENR;",
+                    f"    {state}.gate_mask = RCC_APB1ENR_TIM3EN;",
+                    f"    {state}.pin_latch = &GPIOA->ODR;",
+                    f"    {state}.pin_set = &GPIOA->BSRR;",
+                    f"    {state}.inactive = {initial}u;",
+                    f"    {state}.tick_hz = {item.options.tick_hz}u;",
+                    f"    {state}.period_ticks = {item.options.period_ticks}u;",
+                    f"    {state}.duty_ticks = {item.options.duty_ticks}u;"]
+            definitions += [f"    return nx_legacy_{item.kind}_initialize(&{state});", "}"]
+            stop = f"nx_legacy_{item.kind}_close(&{state})"
     else:
         raise ValueError("Unmaintained F103 constructor")
     return Construction(
         state_type=f"nx_stm32f103_{item.kind}_state_t",
         definitions=definitions, initialize=f"prepare_{name}()",
-        stop=[stop], retain_on_failed_init=True)
+        stop=[stop], retain_on_failed_init=item.kind != "flash")

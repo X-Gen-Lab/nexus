@@ -28,6 +28,7 @@ from tools.maintenance.source_catalogue import (  # noqa: E402
 )
 from tools.maintenance import (  # noqa: E402
     cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
+    stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
     stm32g4_lock, threadx_lock,
 )
 
@@ -45,6 +46,10 @@ WORKLOADS = {
     "offline_reproduction": "Two fresh network-disabled builds in the bound environment, identical same ELF/BIN/map bytes",
     "static_analysis": "Owned-source ClangTidy/Cppcheck and style/comments; retain raw failures and reviewed vendor ownership scope",
 }
+OFFICIAL_DRIVERS = {name: module for name, module in (
+    ("stm32f1_hal", stm32f1_hal_lock), ("stm32f4_hal", stm32f4_hal_lock),
+    ("stm32g4_hal", stm32g4_hal_lock), ("stm32h7_hal", stm32h7_hal_lock),
+    ("stm32u5_hal", stm32u5_hal_lock))}
 
 
 def git(root, *arguments):
@@ -96,9 +101,8 @@ def inventory(root=ROOT):
             locked = parse_json(lock_bytes)
             if name == "threadx":
                 threadx_lock.verify(checkout, lock_path, "linux")
-            elif name in {"stm32f1_hal", "stm32f4_hal"}:
-                official = (stm32f1_hal_lock if name == "stm32f1_hal"
-                            else stm32f4_hal_lock)
+            elif name in OFFICIAL_DRIVERS:
+                official = OFFICIAL_DRIVERS[name]
                 official.verify(checkout, lock_path,
                                 root / official.CMSIS_DIRECTORY)
             elif name == "stm32g4_cmsis":

@@ -52,6 +52,7 @@ NVIC_Type g_gd32_model_nvic;
 namespace {
 uint32_t mask;
 bool isr;
+bool model_privileged;
 nx_time_us_t now;
 volatile uint32_t* held_engine;
 testing::MockFunction<nx_time_us_t()>* clock_observer;
@@ -81,6 +82,7 @@ class I2CMultiple : public testing::Test {
         ASSERT_EQ(mapping, (void*)(uintptr_t)0x40000000U);
         mask = 0U;
         isr = false;
+        model_privileged = true;
         now = 100U;
         held_engine = nullptr;
         clock_observer = nullptr;
@@ -101,6 +103,9 @@ class I2CMultiple : public testing::Test {
         }
     }
     void TearDown() override {
+        mask = 0U;
+        isr = false;
+        model_privileged = true;
         held_engine = nullptr;
         clock_observer = nullptr;
         for (unsigned i = 0U; i < 2U; ++i) {
@@ -276,6 +281,46 @@ TEST_F(I2CMultiple, IsrInitializationCannotMutateDisabledControllerOrIrqs) {
     EXPECT_FALSE(enabled(RX1));
 }
 
+TEST_F(I2CMultiple, UnprivilegedInitializationCannotAcquireEitherController) {
+    const auto* mmio = reinterpret_cast<const uint8_t*>(uintptr_t{0x40000000U});
+    const std::vector<uint8_t> before(mmio, mmio + 0x80000U);
+    const auto nvic = g_gd32_model_nvic;
+    model_privileged = false;
+    for (unsigned i = 0U; i < 2U; ++i) {
+        EXPECT_EQ(NX_ERROR_CONTEXT, INITIALIZE(&states[i], 5U));
+        EXPECT_FALSE(states[i].initialized);
+        EXPECT_EQ(nullptr, states[i].active);
+    }
+    EXPECT_EQ(0, std::memcmp(before.data(), mmio, before.size()));
+    EXPECT_EQ(0, std::memcmp(&nvic, &g_gd32_model_nvic, sizeof(nvic)));
+}
+
+TEST_F(I2CMultiple, UnprivilegedPublicCallsCannotMutateOrBorrowEitherInstance) {
+    ASSERT_NO_FATAL_FAILURE(Both());
+    for (unsigned i = 0U; i < 2U; ++i) {
+        ASSERT_EQ(NX_SUCCESS, nx_i2c_request_prepare(&requests[i], &messages[i],
+                                                     1U, 1000U));
+    }
+    const auto* mmio = reinterpret_cast<const uint8_t*>(uintptr_t{0x40000000U});
+    const std::vector<uint8_t> before(mmio, mmio + 0x80000U);
+    const auto nvic = g_gd32_model_nvic;
+    model_privileged = false;
+    for (unsigned i = 0U; i < 2U; ++i) {
+        EXPECT_EQ(NX_ERROR_CONTEXT,
+                  nx_i2c_endpoint_submit(&devices[i], &requests[i]));
+        EXPECT_EQ(NX_ERROR_CONTEXT,
+                  nx_i2c_port_cancel(&buses[i], &requests[i]));
+        EXPECT_EQ(NX_ERROR_CONTEXT, nx_i2c_port_recover(&buses[i]));
+        EXPECT_EQ(NX_ERROR_CONTEXT, nx_i2c_port_stop(&buses[i]));
+        nx_i2c_port_service(&buses[i]);
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&requests[i].base));
+        EXPECT_EQ(nullptr, states[i].active);
+        EXPECT_TRUE(states[i].initialized);
+    }
+    EXPECT_EQ(0, std::memcmp(before.data(), mmio, before.size()));
+    EXPECT_EQ(0, std::memcmp(&nvic, &g_gd32_model_nvic, sizeof(nvic)));
+}
+
 TEST_F(I2CMultiple, FiniteDmaCompletionPreservesPeerFlagsEngineAndBorrow) {
     ASSERT_NO_FATAL_FAILURE(Both());
     ASSERT_NO_FATAL_FAILURE(Submit(0U));
@@ -352,6 +397,10 @@ extern "C" bool nx_arch_in_isr(void) {
 /** \brief Expose the external incoming mask admission boundary. */
 extern "C" bool nx_arch_irq_is_masked(void) {
     return mask != 0U;
+}
+/** \brief Inject CPU privilege without replacing real controller admission. */
+extern "C" bool nx_i2c_v1_model_privileged(void) {
+    return model_privileged;
 }
 /** \brief Preserve incoming metadata exclusion on the single model CPU. */
 extern "C" nx_arch_irq_state_t nx_arch_irq_save(void) {

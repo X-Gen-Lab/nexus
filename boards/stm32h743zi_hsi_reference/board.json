@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "id": "stm32h743zi-hsi-reference",
+  "soc": "STM32H743ZIT6",
+  "soc_family": "stm32h743",
+  "source_revision": "DS12110 Rev11/RM0433 Rev9 software-only selected peripheral wiring",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "led0",
+      "controller": "GPIOB",
+      "route": "gpio-pb0",
+      "initial": 0,
+      "mask": 1
+    },
+    {
+      "id": "uart3",
+      "controller": "USART3",
+      "route": "usart3-pd8-pd9"
+    },
+    {
+      "id": "spi4",
+      "controller": "SPI4",
+      "route": "spi4-pe12-pe13-pe14"
+    },
+    {
+      "id": "spi4-cs",
+      "controller": "GPIOE",
+      "route": "gpio-pe11",
+      "mask": 2048,
+      "initial": 2048
+    },
+    {
+      "id": "pwm3",
+      "controller": "TIM3",
+      "route": "tim3-pa6",
+      "mask": 64,
+      "initial": 0
+    },
+    {
+      "id": "edge0",
+      "controller": "EXTI0",
+      "route": "exti0-pa0"
+    },
+    {
+      "id": "edge1",
+      "controller": "EXTI1",
+      "route": "exti1-pa1"
+    },
+    {
+      "id": "watchdog0",
+      "controller": "IWDG1",
+      "route": "iwdg1"
+    },
+    {
+      "id": "i2c1",
+      "controller": "I2C1",
+      "route": "i2c1-pb8-pb9"
+    },
+    {
+      "id": "adc1",
+      "controller": "ADC1",
+      "route": "adc1-pa3",
+      "supply_mv": 3300
+    },
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-internal",
+      "supply_mv": 3300
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software-only explicit peripheral fixture; no physical board, attached SPI device, pull-up/bias or PWM safe output assertion.",
+    "Software reference only; actual PCB revision, regulator fitting and solder bridges uninspected",
+    "LED1 PB0 requires SB39 ON and SB47 OFF; alternative PA5 fitting is a different reference route",
+    "USART3 PD8/PD9 ST-LINK VCP requires reviewed SB19/SB12 path; actual electrical path unknown",
+    "No physical HIL has executed; power entry, clock accuracy, DMA/cache coherence, serial traffic and safe GPIO levels unqualified",
+    "Authored software reference assumes nominal3.3V programming supply; physical VDD/VDDA not measured. ADC16-bit reference requires actualVDDA2.4..3.3V/reference<=VDDA. Flash pulses require actual2.7..3.6V throughout.",
+    "I2C standard-mode external pull-ups, rise<=1000ns, fall<=300ns required by timing reference; not physically measured."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/user_manual/um2407-stm32h7-nucleo144-boards-mb1364-stmicroelectronics.pdf",
+      "scope": "UM2407 Rev6 April2026 source-reviewed MB1364 NUCLEO-H743ZI2 LED1 PB0 active high SB39 ON/SB47 OFF and USART3 PD8/PD9 AF7 VCP SB19/SB12 ON. Actual Board uninspected."
+    },
+    {
+      "repository": "https://github.com/STMicroelectronics/cmsis-device-h7",
+      "tree": "8f922cdc7cc6de2344e75ddd657889f4ff761790",
+      "scope": "Official register layout/startup/IRQ range; no physical Board qualification."
+    }
+  ]
+}

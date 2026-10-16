@@ -52,10 +52,14 @@ class GD303ProviderTests(unittest.TestCase):
     def test_capability_does_not_advertise_sdk_peripheral_potential(self):
         for kind, mode in (("gpio", "input"), ("gpio", "output"),
                            ("uart", "irq-bytes"), ("spi", "short-poll"),
-                           ("watchdog", "independent")):
+                           ("watchdog", "independent"), ("flash", "poll-word"),
+                           ("adc", "single-shot"), ("pwm", "fixed-pwm")):
             self.assertEqual(kind, self.provider.mode_implementation(kind, mode))
-        for kind, mode in (("uart", "dma-tx"), ("uart", "irq-blocks"),
-                           ("spi", "dma-full-duplex"), ("flash", "poll-word")):
+        self.assertEqual("uart_dma", self.provider.mode_implementation("uart", "dma-tx"))
+        self.assertEqual("uart_dma", self.provider.mode_implementation("uart", "dma-duplex"))
+        self.assertEqual("i2c_async", self.provider.mode_implementation("i2c", "irq-messages"))
+        for kind, mode in (("uart", "rx-dma-continuous"), ("uart", "irq-blocks"),
+                           ("spi", "dma-full-duplex"), ("adc", "trigger-dma")):
             with self.subTest(kind=kind, mode=mode):
                 with self.assertRaises(ConfigurationError):
                     self.provider.mode_implementation(kind, mode)
@@ -109,7 +113,7 @@ class GD303ProviderTests(unittest.TestCase):
             self.provider.constructor(ControllerIR.create(uart(), "stm32f407"),
                                       Result(), {}, {}, ())
         with self.assertRaises(ConfigurationError):
-            self.provider.constructor(uart(mode="dma-tx"), Result(), {}, {}, ())
+            self.provider.constructor(uart(mode="rx-dma-continuous"), Result(), {}, {}, ())
 
     def test_backend_policy_is_generated_not_a_hidden_scheduler(self):
         result = Result(uart(), backend="freertos")
@@ -137,7 +141,7 @@ class GD303ProviderTests(unittest.TestCase):
         self.assertEqual(part["flash"]["erase_blocks"], [2048] * 128)
         self.assertEqual(part["memory"][0]["size"], 48 * 1024)
         self.assertEqual(len(part["pins"]), 51)
-        self.assertFalse(part["memory"][0]["dma"])
+        self.assertTrue(part["memory"][0]["dma"])
         self.assertIn("timer:TIMER1", facts["reserved_resources"])
 
     def test_reference_fixture_never_invents_a_board_led_or_crystal(self):

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "stm32g474re-acquisition-software-fixture",
+  "soc": "STM32G474RET6",
+  "soc_family": "stm32g474",
+  "source_revision": "software-fixture-v1",
+  "physical_pcb_revision": null,
+  "clocks": {"hse_hz": 24000000},
+  "bindings": [
+    {"id": "sensor", "controller": "ADC1", "route": "adc1-in1-pa0"},
+    {"id": "bus", "controller": "I2C1", "route": "i2c1-pb8-pb9"},
+    {"id": "physical", "controller": "FLASH", "route": "internal-flash"}
+  ],
+  "reserved_resources": ["PA13", "PA14"],
+  "unknowns": [
+    "Software reference only; no fitted analog circuit, I2C pullups or connector is asserted.",
+    "3300mV Flash programming assumption requires Board confirmation; no product Flash region is reserved.",
+    "All physical HIL remains not executed."
+  ],
+  "provenance": [{
+    "scope": "DS12288 PA0 ADC1_IN1 and PB8/PB9 AF4; RM0440 ADC12, TIM6, DMA/DMAMUX, I2C V2 and DBANK1 Flash; no physical Board route claim.",
+    "url": "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf"
+  }]
+}

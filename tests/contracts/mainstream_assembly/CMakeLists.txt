@@ -11,7 +11,7 @@ nexus_add_firmware(mainstream_assembly SOURCES main.c)
 get_target_property(mainstream_config Nexus::Platform NEXUS_CONFIG_DIR)
 get_target_property(mainstream_backend Nexus::Platform NEXUS_BACKEND)
 include("${mainstream_config}/selection.cmake")
-foreach(kind gpio uart spi watchdog exti)
+foreach(kind gpio uart spi watchdog exti adc pwm flash)
     if(kind IN_LIST NEXUS_SELECTED_KINDS)
         string(TOUPPER "${kind}" feature)
         target_compile_definitions(mainstream_assembly PRIVATE

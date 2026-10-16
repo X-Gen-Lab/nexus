@@ -22,8 +22,16 @@ typedef struct {
     uint32_t size;
 } nx_flash_sector_t;
 /**
+ * \brief           Physical programming requirements beyond unit alignment.
+ */
+enum nx_flash_program_flags {
+    NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE = 1U << 0U
+};
+/**
  * \brief           Read-only physical geometry; platform reserves no product
  *                  storage.
+ * \note            program_flags states additional unit requirements. Zero
+ *                  does not waive the selected provider's programming rules.
  */
 typedef struct {
     uint32_t base_address;
@@ -31,6 +39,7 @@ typedef struct {
     uint32_t program_unit;
     const nx_flash_sector_t* sectors;
     size_t sector_count;
+    uint32_t program_flags;
 } nx_flash_geometry_t;
 /**
  * \brief           Explicit consumer-selected bounds; no implicit product
@@ -115,6 +124,16 @@ nx_result_t nx_flash_port_read(const nx_flash_port_t* port, uint32_t offset,
  * \note            Task-only CPU-active operation. Product owns
  *                  execution-from- Flash stall, watchdog and power-loss
  *                  policy. No RAM fake on MCU.
+ *
+ * \note            With NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE, each programmed
+ *                  unit needs a successful erase and no later program pulse.
+ *                  Reading all 0xff cannot prove this on ECC Flash. A failed
+ *                  or interrupted pulse consumes its unit until the next
+ *                  successful sector erase. The caller owns this provenance;
+ *                  providers keep no implicit erase-history bitmap.
+ *
+ * \note            All-0xff input units must not issue a program pulse. A
+ *                  provider may reject a visibly non-erased destination.
  */
 nx_result_t nx_flash_port_program(const nx_flash_port_t* port, uint32_t offset,
                                   const void* data, size_t length,

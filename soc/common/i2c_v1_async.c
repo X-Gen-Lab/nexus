@@ -183,7 +183,8 @@ static nx_result_t start(void* context, nx_i2c_request_t* request,
         endpoint->address > 119U) {
         return NX_ERROR_INVALID;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
     nx_result_t result = nx_i2c_request_validate(request);
@@ -262,10 +263,12 @@ nx_result_t nx_i2c_v1_initialize(nx_i2c_v1_state_t* state) {
     if (state == NULL || state->registers == NULL ||
         state->line_inputs == NULL || state->line_mask == 0U ||
         (state->line_mask & ~UINT32_C(0xFFFF)) != 0U ||
-        (state->peripheral_mhz != 42U && state->peripheral_mhz != 50U)) {
+        (state->peripheral_mhz != 8U && state->peripheral_mhz != 42U &&
+         state->peripheral_mhz != 50U)) {
         return NX_ERROR_INVALID;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
     if (state->dma != NULL &&
@@ -274,7 +277,8 @@ nx_result_t nx_i2c_v1_initialize(nx_i2c_v1_state_t* state) {
          state->dma->regions == NULL || state->dma->region_count == 0U)) {
         return NX_ERROR_INVALID;
     }
-    if (state->initialized || state->active != NULL ||
+    if (state->initialized || state->active != NULL || state->wake != NULL ||
+        state->wake_publishers != 0U ||
         (state->registers[STAT1] & BUS_BUSY) != 0U || !wire_idle(state) ||
         (state->dma != NULL &&
          ((*state->dma->rx.control | *state->dma->tx.control) & DMA_ENABLE) !=
@@ -283,13 +287,18 @@ nx_result_t nx_i2c_v1_initialize(nx_i2c_v1_state_t* state) {
     }
     state->registers[CTL0] = 0U;
     state->registers[CTL1] = state->peripheral_mhz;
-    state->registers[CKCFG] = (uint32_t)state->peripheral_mhz * 5U;
+    /* ES096 2.8.5 excludes 88..100 kHz repeated START on the admitted
+     * low-clock F103 profile. CCR50 at APB8 MHz yields nominal 80 kHz. */
+    state->registers[CKCFG] = state->peripheral_mhz == 8U
+                                  ? 50U
+                                  : (uint32_t)state->peripheral_mhz * 5U;
     state->registers[RT] = (uint32_t)state->peripheral_mhz + 1U;
     state->registers[ADDR0] = 1U << 14U;
     state->registers[CTL0] = ENABLE;
     state->phase = NX_I2C_V1_IDLE;
     state->stopping = false;
     state->faulted = false;
+    state->wake_publishers = 0U;
     state->initialized = true;
     return NX_SUCCESS;
 }
@@ -314,11 +323,17 @@ void nx_i2c_v1_irq(nx_i2c_v1_state_t* state) {
         return;
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
-    if (state->active == NULL || state->phase == NX_I2C_V1_DRAIN) {
+    if (!state->initialized || state->active == NULL ||
+        state->phase == NX_I2C_V1_DRAIN) {
         nx_arch_irq_restore(mask);
         return;
     }
     const nx_irq_wake_t* wake = state->wake;
+    if (wake != NULL && state->wake_publishers != UINT16_MAX) {
+        state->wake_publishers++;
+    } else {
+        wake = NULL;
+    }
     uint32_t flags = state->registers[STAT0];
     if (!error(state, flags)) {
         if (nx_deadline_expired(state->active->base.deadline,
@@ -417,6 +432,11 @@ void nx_i2c_v1_irq(nx_i2c_v1_state_t* state) {
     }
     nx_arch_irq_restore(mask);
     (void)nx_irq_wake_signal(wake);
+    if (wake != NULL) {
+        mask = nx_arch_irq_save();
+        state->wake_publishers--;
+        nx_arch_irq_restore(mask);
+    }
 }
 
 /** \brief TC acknowledges memory progress, then separately proves the wire. */
@@ -425,6 +445,10 @@ void nx_i2c_v1_dma_irq(nx_i2c_v1_state_t* state, bool receive) {
         return;
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
+    if (!state->initialized) {
+        nx_arch_irq_restore(mask);
+        return;
+    }
     const nx_i2c_v1_dma_engine_t* engine =
         receive ? &state->dma->rx : &state->dma->tx;
     uint32_t flags = (*engine->flags >> engine->flag_shift) & DMA_FLAGS;
@@ -434,6 +458,11 @@ void nx_i2c_v1_dma_irq(nx_i2c_v1_state_t* state, bool receive) {
         return;
     }
     const nx_irq_wake_t* wake = state->wake;
+    if (wake != NULL && state->wake_publishers != UINT16_MAX) {
+        state->wake_publishers++;
+    } else {
+        wake = NULL;
+    }
     if (error(state, state->registers[STAT0])) {
         /* Peripheral terminal facts outrank an independent DMA TC. */
     } else if (state->phase !=
@@ -464,6 +493,11 @@ void nx_i2c_v1_dma_irq(nx_i2c_v1_state_t* state, bool receive) {
     }
     nx_arch_irq_restore(mask);
     (void)nx_irq_wake_signal(wake);
+    if (wake != NULL) {
+        mask = nx_arch_irq_save();
+        state->wake_publishers--;
+        nx_arch_irq_restore(mask);
+    }
 }
 
 /** \brief Cancellation changes terminal intent, never invalidates memory. */
@@ -472,7 +506,8 @@ static nx_result_t cancel(void* context, nx_i2c_request_t* request) {
     if (state == NULL || request == NULL) {
         return NX_ERROR_INVALID;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
@@ -487,8 +522,8 @@ static nx_result_t cancel(void* context, nx_i2c_request_t* request) {
 /** \brief Retain quarantine permanently until an explicit hardware proof. */
 static void service(void* context) {
     nx_i2c_v1_state_t* state = context;
-    if (state == NULL || !state->initialized || nx_arch_in_isr() ||
-        nx_arch_irq_is_masked()) {
+    if (state == NULL || !state->initialized || !nx_arch_is_privileged() ||
+        nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return;
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
@@ -546,7 +581,8 @@ static nx_result_t stop(void* context) {
     if (state->registers == NULL) {
         return NX_ERROR_STATE;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
     state->stopping = true;
@@ -558,6 +594,10 @@ static nx_result_t stop(void* context) {
         }
     }
     nx_arch_irq_state_t mask = nx_arch_irq_save();
+    if (state->wake_publishers != 0U) {
+        nx_arch_irq_restore(mask);
+        return NX_ERROR_BUSY;
+    }
     state->registers[CTL1] = state->peripheral_mhz;
     if (state->dma != NULL) {
         detach_engine(&state->dma->tx);
@@ -574,7 +614,11 @@ static nx_result_t stop(void* context) {
         state->ack_irqs(state);
     }
     if (state->stop_irqs != NULL) {
-        state->stop_irqs(state);
+        nx_result_t result = state->stop_irqs(state);
+        if (result != NX_SUCCESS) {
+            nx_arch_irq_restore(mask);
+            return result;
+        }
     }
     state->registers[CTL0] = 0U;
     state->wake = NULL;
@@ -590,7 +634,8 @@ static nx_result_t recover(void* context) {
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
     if (!state->initialized || state->stopping) {
@@ -618,7 +663,8 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     if (state == NULL || (wake != NULL && wake->notify == NULL)) {
         return NX_ERROR_INVALID;
     }
-    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() ||
+        nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
     if (!state->initialized || state->stopping || state->active != NULL) {
@@ -630,7 +676,11 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
     nx_result_t result = state->validate_wake(state, wake, syscall_ceiling);
     if (result == NX_SUCCESS) {
         nx_arch_irq_state_t mask = nx_arch_irq_save();
-        state->wake = wake;
+        if (state->wake_publishers != 0U) {
+            result = NX_ERROR_BUSY;
+        } else {
+            state->wake = wake;
+        }
         nx_arch_irq_restore(mask);
     }
     return result;

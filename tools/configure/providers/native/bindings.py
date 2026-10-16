@@ -67,7 +67,7 @@ def constructor(item, result, board_bindings, routes, devices):
         definitions += ["};",
                         f"static const nx_flash_geometry_t s_nx_geometry_{name} = {{",
                         f"    {flash['origin']}u, {flash['size']}u, 1u,",
-                        f"    s_nx_sectors_{name}, {len(flash['erase_blocks'])}u",
+                        f"    s_nx_sectors_{name}, {len(flash['erase_blocks'])}u, 0u",
                         "};"]
         initialize = (f"nx_native_flash_initialize_instance({state}, "
                       f"s_nx_model_flash_{name}, &s_nx_geometry_{name})")

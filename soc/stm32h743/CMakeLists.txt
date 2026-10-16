@@ -17,12 +17,20 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${h7_device}/Include/stm32h743xx.h"
     "${h7_device}/Include/stm32h7xx.h"
     "${h7_device}/Include/system_stm32h7xx.h"
-    "${h7_device}/Source/Templates/gcc/startup_stm32h743xx.s")
+    "${h7_device}/Source/Templates/gcc/startup_stm32h743xx.s"
+    "${h7_device}/Source/Templates/system_stm32h7xx.c")
 include("${NEXUS_SOURCE_DIR}/cmake/platform/ControllerModes.cmake")
 set(h7_sources)
 nexus_controller_modes(h7_gpio_modes gpio)
 nexus_controller_modes(h7_uart_modes uart)
-if(h7_gpio_modes OR h7_uart_modes)
+nexus_controller_modes(h7_spi_modes spi)
+nexus_controller_modes(h7_pwm_modes pwm)
+nexus_controller_modes(h7_exti_modes exti)
+nexus_controller_modes(h7_watchdog_modes watchdog)
+nexus_controller_modes(h7_i2c_modes i2c)
+nexus_controller_modes(h7_adc_modes adc)
+nexus_controller_modes(h7_flash_modes flash)
+if(h7_gpio_modes OR h7_uart_modes OR h7_spi_modes OR h7_pwm_modes OR h7_exti_modes OR h7_i2c_modes OR h7_adc_modes)
     list(APPEND h7_sources drivers/gpio.c)
 endif()
 if(h7_uart_modes)
@@ -34,15 +42,28 @@ if(h7_uart_modes)
         list(APPEND h7_sources drivers/uart_receive.c)
     endif()
 endif()
+foreach(kind spi pwm exti watchdog adc flash i2c)
+    if(h7_${kind}_modes)
+        list(APPEND h7_sources drivers/${kind}.c)
+    endif()
+endforeach()
+if(h7_i2c_modes)
+    list(APPEND h7_sources "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c")
+endif()
 if(h7_sources)
     add_library(nexus_soc_stm32h743 STATIC ${h7_sources})
     target_link_libraries(nexus_soc_stm32h743 PUBLIC nexus_io
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
     target_include_directories(nexus_soc_stm32h743 PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/private")
+        "${CMAKE_CURRENT_SOURCE_DIR}/private"
+        "${NEXUS_SOURCE_DIR}/soc/common")
     target_include_directories(nexus_soc_stm32h743 SYSTEM PRIVATE
         "${h7_device}/Include" "${h7_cmsis}")
     target_compile_definitions(nexus_soc_stm32h743 PRIVATE STM32H743xx)
+    if(h7_spi_modes OR h7_adc_modes)
+        include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
+        nexus_stm32_official(nexus_soc_stm32h743 h7)
+    endif()
 else()
     add_library(nexus_soc_stm32h743 INTERFACE)
     target_link_libraries(nexus_soc_stm32h743 INTERFACE nexus_io)
@@ -51,6 +72,11 @@ set(NEXUS_STARTUP_SOURCE
     "${h7_device}/Source/Templates/gcc/startup_stm32h743xx.s" PARENT_SCOPE)
 set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/power_boot.S" PARENT_SCOPE)
+if(NEXUS_MEMORY_SRAM1)
+    set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/power_boot.S"
+        "${CMAKE_CURRENT_SOURCE_DIR}/memory_init.c" PARENT_SCOPE)
+endif()
 set(NEXUS_SYSTEM_PRIVATE_INCLUDES
     "${CMAKE_CURRENT_SOURCE_DIR}/private" PARENT_SCOPE)
 set(NEXUS_SYSTEM_VENDOR_INCLUDES "${h7_device}/Include" "${h7_cmsis}"

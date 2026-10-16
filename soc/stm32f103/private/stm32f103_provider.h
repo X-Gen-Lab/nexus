@@ -13,6 +13,7 @@
 #include "nexus/io/spi.h"
 #include "nexus/io/uart.h"
 #include "nexus/io/watchdog.h"
+#include "stm32f103_devices.h"
 #include "stm32f103_system.h"
 #ifdef __cplusplus
 extern "C" {

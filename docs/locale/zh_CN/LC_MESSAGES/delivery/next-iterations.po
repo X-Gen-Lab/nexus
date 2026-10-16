@@ -1,4 +1,4 @@
-# Authored translation; independent semantic review pending.
+# Authored translation; review state is explicit in catalog metadata.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,17 +7,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 891feca7918429b53d077178038b632c46365dbaf81e5b1f74102ca3e0ed631c\n"
+"X-Nexus-Source-SHA256: ebadb74337357a4c4328799c28ff908ce7306d3d13ef83e8502388777152e223\n"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:1
 msgid "后续迭代与团队执行"
 msgstr "后续迭代与团队执行"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:3
 msgid "第一阶段：把软件候选变成实板证据"
 msgstr "第一阶段：把软件候选变成实板证据"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:5
 msgid ""
 "当前最高优先级是接入三块首发实际 Board、记录 PCB/晶振/供电/接线，建立 probe、serial 和 waveform/power-cut "
 "station。G474、H743、U575 来源参考配置另行核对实际板卡， H743 还需观察供电模式，U575 需在执行镜像前确认 option "
@@ -31,7 +28,6 @@ msgstr ""
 " EXTI/PWM/ADC。每种 mode 只在实际执行过的 target tuple 上资格化。试验输出保持脱离产品负载，具体现场操作由 "
 "station 合同约束。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:12
 msgid ""
 "以同一 candidate ELF 做 cycles、IRQ latency、最长 service 间隔、stack high-water、 "
 "丢失、长负载测量。源码／汇编推断只能帮助定位，不写成真实时序结果。需要调整 预算或 provider 时重新生成对应 "
@@ -41,11 +37,9 @@ msgstr ""
 "丢失、长负载测量。源码／汇编推断只能帮助定位，不写成真实时序结果。需要调整 预算或 provider 时重新生成对应 "
 "source/config/artifact 证据。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:16
 msgid "第二阶段：按测量增加能力"
 msgstr "第二阶段：按测量增加能力"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:18
 msgid ""
 "F407/F470 已有 UART/SPI 有限 DMA、UART 连续 RX／双向 DMA、ADC 有限／连续 trigger blocks、I2C "
 "IRQ／DMA、Classic CAN、USB FS PIO，以及精确软件夹具的 Ethernet、capture 和 complementary "
@@ -59,73 +53,73 @@ msgstr ""
 "IRQ 延迟或消费者速度下无丢失。I2C 保持 100 kHz、7-bit address，每条1–256 bytes、 最多8条消息和精确 "
 "route；10-bit 或更长事务仍是独立扩展。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:25
 msgid ""
-"H743 当前维护固定 HSI 时钟、timebase、GPIO、IRQ UART 和显式有限 UART TX DMA； Cache-on TX "
-"只接受独占完整 Cache line 的 AXI SRAM payload，RX 仍是 IRQ bytes。 U575 的默认 TZEN0 "
-"Platform 与独立 TZEN1 双域同步 GPIO 参考分别维护；双域参考 不提供 RTOS、factory 或异步 "
-"DMA。芯片事实不授权其他模式、路由或实板资格。 后续顺序与明确退出条件见 [SOC-28–36](../design/soc-"
-"refinement.md)："
+"F103/GD303 新增有限 UART channel-DMA、正常 RX block、I2C IRQ 消息及物理 Flash／单次 ADC／固定 "
+"PWM；GD303 另维护 EXTI。有限 RX 依赖 owner service 重新装填，必须测量间隙、背压和丢失；I2C priority0 "
+"不允许内核通知。GD303 的硬件 timer 级联还需实测跨域 carry 与 Flash 停顿，不能由主机模型推断传播延迟。"
 msgstr ""
-"H743 当前维护固定 HSI 时钟、timebase、GPIO、IRQ UART 和显式有限 UART TX DMA； Cache-on TX "
-"只接受独占完整 Cache line 的 AXI SRAM payload，RX 仍是 IRQ bytes。 U575 的默认 TZEN0 "
-"Platform 与独立 TZEN1 双域同步 GPIO 参考分别维护；双域参考 不提供 RTOS、factory 或异步 "
-"DMA。芯片事实不授权其他模式、路由或实板资格。 后续顺序与明确退出条件见 [SOC-28–36](../design/soc-"
-"refinement.md)："
+"F103/GD303 新增有限 UART channel-DMA、正常 RX block、I2C IRQ 消息及物理 Flash／单次 ADC／固定 "
+"PWM；GD303 另维护 EXTI。有限 RX 依赖 owner service 重新装填，必须测量间隙、背压和丢失；I2C priority0 "
+"不允许内核通知。GD303 的硬件 timer 级联还需实测跨域 carry 与 Flash 停顿，不能由主机模型推断传播延迟。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
+msgid ""
+"G474 新增 ADC1 bulb 单次／TIM6 正常 DMA block、I2C1 polling 和 ECC Flash； "
+"必须实测首次转换丢弃、预热、2.5–50 kHz 精确触发范围与真实采样孔径。H743 已维护 有限 UART RX DMA-IDLE、可选已初始化 "
+"D2 SRAM1 和七类有限外设；Cache-on DMA 仍要求独占完整 lines，RX 有 service/rearm 间隙，Flash 仅开放 "
+"Cache off。U575 TZEN0 已有 SPI/I2C/ADC/PWM/EXTI/Flash 的有限夹具；VDDA/ASV、VDDIO2 与真实"
+" 总线电气须单独验收。独立 TZEN1 参考仅新增复制最多八个 PC7 命令的 cooperative job，Secure 私有存储保留状态，NS "
+"地址不跨调用保留；没有通用异步借用、RTOS、 双域 factory 或跨域 DMA。芯片事实不授权其他模式、路由或实板资格。 后续顺序与明确退出条件见"
+" [SOC-28–36](../design/soc-refinement.md)："
+msgstr ""
+"G474 新增 ADC1 bulb 单次／TIM6 正常 DMA block、I2C1 polling 和 ECC Flash； "
+"必须实测首次转换丢弃、预热、2.5–50 kHz 精确触发范围与真实采样孔径。H743 已维护 有限 UART RX DMA-IDLE、可选已初始化 "
+"D2 SRAM1 和七类有限外设；Cache-on DMA 仍要求独占完整 lines，RX 有 service/rearm 间隙，Flash 仅开放 "
+"Cache off。U575 TZEN0 已有 SPI/I2C/ADC/PWM/EXTI/Flash 的有限夹具；VDDA/ASV、VDDIO2 与真实"
+" 总线电气须单独验收。独立 TZEN1 参考仅新增复制最多八个 PC7 命令的 cooperative job，Secure 私有存储保留状态，NS "
+"地址不跨调用保留；没有通用异步借用、RTOS、 双域 factory 或跨域 DMA。芯片事实不授权其他模式、路由或实板资格。 后续顺序与明确退出条件见"
+" [SOC-28–36](../design/soc-refinement.md)："
+
 msgid "方向"
 msgstr "方向"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "进入实现前必须固定的合同"
 msgstr "进入实现前必须固定的合同"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "G474 新模式或更多 controller/route"
 msgstr "G474 新模式或更多 controller/route"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
-msgid "精确寄存器、IRQ／DMA 冲突、Board 来源、实例隔离与预算"
-msgstr "精确寄存器、IRQ／DMA 冲突、Board 来源、实例隔离与预算"
+msgid "已有 bulb/有限 DMA/I2C/Flash 的实测边界；新控制器另固定 IRQ／DMA 冲突、Board 来源、实例隔离与预算"
+msgstr "已有 bulb/有限 DMA/I2C/Flash 的实测边界；新控制器另固定 IRQ／DMA 冲突、Board 来源、实例隔离与预算"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "H743 DMA 与 Cache"
 msgstr "H743 DMA 与 Cache"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
-msgid "DMA1/2、BDMA、MDMA 各自可达域，cache-line 所有权，对齐和 clean/invalidate 时序，失败后保留借用"
-msgstr "DMA1/2、BDMA、MDMA 各自可达域，cache-line 所有权，对齐和 clean/invalidate 时序，失败后保留借用"
+msgid ""
+"已有 AXI/SRAM1 有限路径的实测一致性；其他 DMA1/2、BDMA、MDMA 分别审查可达域、cache-line 所有权、维护时点与失败借用"
+msgstr ""
+"已有 AXI/SRAM1 有限路径的实测一致性；其他 DMA1/2、BDMA、MDMA 分别审查可达域、cache-line 所有权、维护时点与失败借用"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "U575 DMA 与安全域"
 msgstr "U575 DMA 与安全域"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "GPDMA/LPDMA descriptor 生命周期、内存和外设归属、GTZC/MPCBB、实际 TZEN 入口与错误处理"
 msgstr "GPDMA/LPDMA descriptor 生命周期、内存和外设归属、GTZC/MPCBB、实际 TZEN 入口与错误处理"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "新固定时钟或运行时变频"
 msgstr "新固定时钟或运行时变频"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "供电／Flash／bus 顺序、consumer 重配置、回滚和 deadline domain；固定 profile 与动态转换分别实现"
 msgstr "供电／Flash／bus 顺序、consumer 重配置、回滚和 deadline domain；固定 profile 与动态转换分别实现"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "bootloader 接管或 deep STOP"
 msgstr "bootloader 接管或 deep STOP"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "VTOR／mask／FP／DMA 活跃状态、RAM 所有权，RTC/LPTIM 连续域、wake 恢复与精度"
 msgstr "VTOR／mask／FP／DMA 活跃状态、RAM 所有权，RTC/LPTIM 连续域、wake 恢复与精度"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "userspace I/O transport"
 msgstr "用户空间 I/O 传输"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid ""
 "真实 principal、权限、copy/pin、异步借用、退出回收和 SVC/MPU/TZ gateway；现有 scalar broker 不代替 "
 "transport"
@@ -133,7 +127,6 @@ msgstr ""
 "真实 principal、权限、copy/pin、异步借用、退出回收和 SVC/MPU/TZ gateway；现有 scalar broker 不代替 "
 "transport"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:38
 msgid ""
 "每次扩展先明确 owner、buffer、cancel/drain、ISR、deadline、对齐/cache 与停止 合同，再用 "
 "GoogleTest/GoogleMock 做真实 RED→GREEN 的生产 provider 纵切片， 随后验证实际生成 factory、ARM "
@@ -143,7 +136,17 @@ msgstr ""
 "GoogleTest/GoogleMock 做真实 RED→GREEN 的生产 provider 纵切片， 随后验证实际生成 factory、ARM "
 "ELF、SDK 与物理边界。未选择模式不驻留资源， 不把不断扩大的通用对象成本摊到全部产品。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:43
+msgid ""
+"本轮源实现、定向开发执行与最终集成软件资格分开记录。最终验收须绑定冻结后的 精确 "
+"source/config/tool/artifact；新文档、源码合并或旧测试计数不替代实际执行。 ECC Flash 的 "
+"`program_flags`、fresh-erase 来源及逐脉冲完成证据也要进入产品调用 合同。实板未接入，物理项继续为 "
+"`not_executed`，不提升为安全认证或生产发布。"
+msgstr ""
+"本轮源实现、定向开发执行与最终集成软件资格分开记录。最终验收须绑定冻结后的 精确 "
+"source/config/tool/artifact；新文档、源码合并或旧测试计数不替代实际执行。 ECC Flash 的 "
+"`program_flags`、fresh-erase 来源及逐脉冲完成证据也要进入产品调用 合同。实板未接入，物理项继续为 "
+"`not_executed`，不提升为安全认证或生产发布。"
+
 msgid ""
 "优先复用已有窄端口与静态装配；当现有合同无法表达硬件事实时允许明确版本化的 破坏性变更。Flash "
 "认证、升级、制造密钥与工业安全政策属于外部产品／独立机制， 不能因已有 storage CRC 或 watchdog feed 就声称完成。"
@@ -151,79 +154,60 @@ msgstr ""
 "优先复用已有窄端口与静态装配；当现有合同无法表达硬件事实时允许明确版本化的 破坏性变更。Flash "
 "认证、升级、制造密钥与工业安全政策属于外部产品／独立机制， 不能因已有 storage CRC 或 watchdog feed 就声称完成。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:47
 msgid "十人角色与企业工作流"
 msgstr "十人角色与企业工作流"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "角色"
 msgstr "角色"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "席位"
 msgstr "席位"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "负责的可复核产物"
 msgstr "负责的可复核产物"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "技术负责人"
 msgstr "技术负责人"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "1"
 msgstr "1"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "契约、边界、预算与支持 scope，跨层设计审查"
 msgstr "契约、边界、预算与支持 scope，跨层设计审查"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "Core/I/O/OS"
 msgstr "Core/I/O/OS"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "2"
 msgstr "2"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "所有权、并发、时间、静态资源与公共 ABI"
 msgstr "所有权、并发、时间、静态资源与公共 ABI"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "STM32/GD32 BSP"
 msgstr "STM32/GD32 BSP"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "精确 facts/routes、SDK/startup/provider、故障模型"
 msgstr "精确 facts/routes、SDK/startup/provider、故障模型"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "通用器件／通信与外部应用"
 msgstr "通用器件／通信与外部应用"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "窄端口组件、器件 driver、外部 composition"
 msgstr "窄端口组件、器件 driver、外部 composition"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "QA/HIL"
 msgstr "QA/HIL"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "软件故障、实际 station、时序／掉电／长期负载证据"
 msgstr "软件故障、实际 station、时序／掉电／长期负载证据"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "构建发布"
 msgstr "构建发布"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:0
 msgid "唯一配置／CMake图、锁与 SDK、CI、候选／复现证据"
 msgstr "唯一配置／CMake图、锁与 SDK、CI、候选／复现证据"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:58
 msgid ""
 "维护责任由 Codex 全部承担，`.github/maintainer-roles.json` 使用 `agent_managed` "
 "策略。十人角色保留为领域与容量划分，不再要求实名账号；安全、 制造和现场接口也由同一维护责任覆盖，产品权限／流程留在外部应用仓库。"
@@ -231,7 +215,6 @@ msgstr ""
 "维护责任由 Codex 全部承担，`.github/maintainer-roles.json` 使用 `agent_managed` "
 "策略。十人角色保留为领域与容量划分，不再要求实名账号；安全、 制造和现场接口也由同一维护责任覆盖，产品权限／流程留在外部应用仓库。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:62
 msgid ""
 "`python tools/maintenance/ownership.py --require-assigned` 验证负责 agent、 "
 "路径覆盖、备用领域和强制门禁。GoogleTest／GoogleMock、配置、ARM、预算、SDK 和证据身份检查继续执行。该策略不生成虚构 "
@@ -245,7 +228,6 @@ msgstr ""
 "具体命令见[维护工具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tools/maintenance/README.md)。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/next-iterations.md:68
 msgid ""
 "Issue 描述具体触发和可观察结果；PR 明确源／配置／依赖／工具与影响的合同。每次 commit 自动检查 staged 内容和 "
 "Conventional Commit，CI 用同一整文件规范。 新行为和缺陷修复必须 TDD，主机合同采用 "

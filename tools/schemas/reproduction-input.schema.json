@@ -5,7 +5,7 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": 1
+      "enum": [1, 2]
     },
     "source": {
       "type": "object"
@@ -46,6 +46,29 @@
     "assembly": {
       "type": "string",
       "minLength": 1
+    },
+    "resolved": {
+      "type": "string",
+      "minLength": 1
+    },
+    "consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "project", "snapshot"],
+      "properties": {
+        "source": {"type": "object"},
+        "project": {"type": "string", "minLength": 1},
+        "snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sha256", "files", "bytes"],
+          "properties": {
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "files": {"type": "integer", "minimum": 1},
+            "bytes": {"type": "integer", "minimum": 1}
+          }
+        }
+      }
     },
     "commands": {
       "type": "array",
@@ -108,6 +131,13 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {"properties": {"schema_version": {"const": 2}}},
+      "then": {"required": ["consumer", "resolved"]},
+      "else": {"not": {"anyOf": [{"required": ["consumer"]}, {"required": ["resolved"]}]}}
+    }
+  ],
   "required": [
     "schema_version",
     "source",

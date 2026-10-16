@@ -11,7 +11,7 @@ def implementation(item):
 
 
 def operations(item):
-    return f"nx_stm32h743_{implementation(item)}_ops"
+    return "nx_i2c_v2_ops" if item.kind == "i2c" else f"nx_stm32h743_{implementation(item)}_ops"
 
 
 def includes(result):
@@ -42,6 +42,11 @@ def _ports(result):
         for pin in item["pins"]:
             bank = pin["pin"][1]
             ports.setdefault(bank, set()).add(int(pin["pin"][2:]))
+    for item in result.get("devices", ()):
+        binding = result["board_bindings"].get(item.get("cs_binding"))
+        if binding is not None:
+            for pin in result["routes"][binding["route"]]["pins"]:
+                ports.setdefault(pin["pin"][1], set()).add(int(pin["pin"][2:]))
     return tuple((bank, tuple(sorted(pins))) for bank, pins in sorted(ports.items()))
 
 
@@ -60,8 +65,23 @@ def _dma(result):
                for item in result.controllers)
 
 
+def _extra_gates(result):
+    selected = {item.controller for item in result.controllers}
+    groups = (("APB2ENR", ("SPI4",)), ("APB1LENR", ("TIM3", "I2C1")),
+              ("AHB1ENR", ("ADC12",)),
+              ("APB4ENR", ("SYSCFG",)))
+    if "ADC1" in selected:
+        selected.add("ADC12")
+    if selected.intersection({"EXTI0", "EXTI1"}):
+        selected.add("SYSCFG")
+    return tuple((reg, " | ".join(f"RCC_{reg}_{name}EN" for name in names
+                                  if name in selected)) for reg, names in groups
+                 if selected.intersection(names))
+
+
 def state_declarations(result):
-    source = []
+    source = [f'static uint32_t s_nx_extra_{reg.lower()}_added;'
+              for reg, _ in _extra_gates(result)]
     if _dma(result):
         source.append('static uint32_t s_nx_dma_clocks_added;')
     if _ports(result):
@@ -74,7 +94,7 @@ def state_declarations(result):
         lease = f's_nx_gpio{bank.lower()}_lease'
         af_index = pins[0] // 8
         source += ['static struct {',
-                   '    uint32_t mode, type, speed, pull, af, odr;',
+                   '    uint32_t mode, type, speed, pull, af0, af1, odr;',
                    '    bool captured;', f'}} {lease};',
                    f'static nx_result_t restore_gpio{bank.lower()}(void) {{',
                    f'    if (!{lease}.captured) {{ return NX_SUCCESS; }}',
@@ -86,7 +106,8 @@ def state_declarations(result):
                    f'    NX_H743_WRITE(&{reg}->BSRR, {lease}.odr | (({bits}u & ~{lease}.odr) << 16u));',
                    '    nx_arch_dsb();',
                    f'    if ((NX_H743_READ(&{reg}->ODR) & {bits}u) != {lease}.odr) {{ return NX_ERROR_IO; }}']
-        for register, field, mask in ((f'AFR[{af_index}]', 'af', af),
+        for register, field, mask in ((f'AFR[0]', 'af0', sum(15 << (4 * pin) for pin in pins if pin < 8)),
+                                      (f'AFR[1]', 'af1', sum(15 << (4 * (pin % 8)) for pin in pins if pin >= 8)),
                                       ('OTYPER', 'type', bits),
                                       ('OSPEEDR', 'speed', fields),
                                       ('PUPDR', 'pull', fields),
@@ -118,8 +139,19 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
     ports = _ports(result)
     if not ports:
         return []
-    gates = ' | '.join(f'RCC_AHB4ENR_GPIO{bank}EN' for bank, _ in ports)
-    source = [f'    s_nx_gpio_clocks_added = ~NX_H743_READ(&RCC->AHB4ENR) & ({gates});']
+    gpio_gates = ' | '.join(f'RCC_AHB4ENR_GPIO{bank}EN' for bank, _ in ports)
+    source = []
+    for register, gates in _extra_gates(result):
+        slot = f's_nx_extra_{register.lower()}_added'
+        source += [f'    {slot} = ~NX_H743_READ(&RCC->{register}) & ({gates});',
+                   f'    NX_H743_WRITE(&RCC->{register}, NX_H743_READ(&RCC->{register}) | ({gates}));',
+                   '    nx_arch_dsb();',
+                   f'    if ((NX_H743_READ(&RCC->{register}) & ({gates})) != ({gates})) {{',
+                   '        result.primary = NX_ERROR_IO;',
+                   f'        result.cleanup = {cleanup};',
+                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+                   '        return result;', '    }']
+    source += [f'    s_nx_gpio_clocks_added = ~NX_H743_READ(&RCC->AHB4ENR) & ({gpio_gates});']
     if _uart(result):
         source += ['    s_nx_uart_clocks_added = ~NX_H743_READ(&RCC->APB1LENR) & RCC_APB1LENR_USART3EN;']
     if _dma(result):
@@ -164,7 +196,8 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
                                       ('OTYPER', 'type', bits),
                                       ('OSPEEDR', 'speed', fields),
                                       ('PUPDR', 'pull', fields),
-                                      (f'AFR[{pins[0] // 8}]', 'af', af),
+                                      (f'AFR[0]', 'af0', sum(15 << (4 * pin) for pin in pins if pin < 8)),
+                                      (f'AFR[1]', 'af1', sum(15 << (4 * (pin % 8)) for pin in pins if pin >= 8)),
                                       ('ODR', 'odr', bits)):
             source.append(f'    {lease}.{field} = NX_H743_READ(&{reg}->{register}) & {mask}u;')
         source.append(f'    {lease}.captured = true;')
@@ -192,6 +225,13 @@ def stop_system(result, *, system_phase=None):
                    '        nx_arch_dsb();',
                    '        if ((NX_H743_READ(&RCC->AHB4ENR) & s_nx_gpio_clocks_added) != 0u) { return NX_ERROR_IO; }',
                    '        s_nx_gpio_clocks_added = 0u;', '    }']
+    for register, _ in reversed(_extra_gates(result)):
+        slot = f's_nx_extra_{register.lower()}_added'
+        source += [f'    if ({slot} != 0u) {{',
+                   f'        NX_H743_WRITE(&RCC->{register}, NX_H743_READ(&RCC->{register}) & ~{slot});',
+                   '        nx_arch_dsb();',
+                   f'        if ((NX_H743_READ(&RCC->{register}) & {slot}) != 0u) {{ return NX_ERROR_IO; }}',
+                   f'        {slot} = 0u;', '    }']
     if system_phase is not None:
         source.append(f'    {system_phase};')
     return source + ['    if (s_nx_platform_started) {',

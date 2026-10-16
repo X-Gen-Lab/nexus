@@ -76,6 +76,19 @@ class U575ReferenceGateTests(unittest.TestCase):
             {"kind": "watchdog", "controller": "IWDG", "mode": "independent"}]
         self.gate.validate_profile(profile)
 
+    def test_selected_finite_peripherals_remain_in_single_state_profile(self):
+        profile = copy.deepcopy(self.profile)
+        profile["controllers"] = [
+            {"kind": kind, "controller": controller, "mode": mode}
+            for kind, controller, mode in (
+                ("spi", "SPI1", "short-poll"),
+                ("i2c", "I2C1", "poll-messages"),
+                ("adc", "ADC4", "single-shot"),
+                ("pwm", "TIM3", "fixed-pwm"),
+                ("exti", "EXTI1", "edge-event"),
+                ("flash", "FLASH", "poll-word"))]
+        self.gate.validate_profile(profile)
+
     def test_cpu_boolean_and_count_types_cannot_use_numeric_equality(self):
         for field, value in (("dsp", 1), ("dwt_cyccnt", 0),
                              ("sau", 0), ("mpu_regions", 8.0),
@@ -128,6 +141,8 @@ void SystemInit(void) {}
 void TIM2_IRQHandler(void) {}
 void USART1_IRQHandler(void) { __asm__ volatile("nop"); }
 void USART2_IRQHandler(void) { __asm__ volatile("nop; nop"); }
+void EXTI0_IRQHandler(void) { __asm__ volatile("nop; nop; nop"); }
+void EXTI1_IRQHandler(void) { __asm__ volatile("nop; nop; nop; nop"); }
 void __libc_init_array(void) {}
 int main(void) { for (;;) {} }
 """)
@@ -192,6 +207,19 @@ _sidata = LOADADDR(.data);
         corrupted = bytearray(image)
         struct.pack_into("<I", corrupted, vector["offset"] + 78 * 4,
                          elf.symbol("USART1_IRQHandler"))
+        with self.assertRaises(EvidenceError):
+            self.gate.validate_image(Elf32(bytes(corrupted)), self.profile)
+
+    def test_selected_exti_vector_cannot_substitute_the_adjacent_line(self):
+        self.profile["controllers"] = [{"kind": "exti", "controller": "EXTI1",
+                                        "mode": "edge-event"}]
+        image = self.image.read_bytes()
+        elf = Elf32(image)
+        self.gate.validate_image(elf, self.profile)
+        vector = next(s for s in elf.sections if s["name"] == ".isr_vector")
+        corrupted = bytearray(image)
+        struct.pack_into("<I", corrupted, vector["offset"] + 28 * 4,
+                         elf.symbol("EXTI0_IRQHandler"))
         with self.assertRaises(EvidenceError):
             self.gate.validate_image(Elf32(bytes(corrupted)), self.profile)
 

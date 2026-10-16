@@ -1,6 +1,6 @@
 /**
  * \file            gd32f303_system.h
- * \brief           Private GD32F303RCT6 IRC8 clock and TIMER1 ownership
+ * \brief           Private GD32F303RCT6 IRC8 and cascaded timer ownership
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-16
@@ -14,7 +14,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/** \brief One reserved 16-bit timer; no dynamic clock or sleep continuation. */
+/** \brief Two reserved16-bit timers; no dynamic clock/deep STOP continuation.
+ */
 typedef struct {
     uint64_t overflow_us;
     uint32_t remaining_effects;
@@ -29,14 +30,14 @@ typedef struct {
     uint32_t remaining_effects;
 } nx_gd32f303_start_result_t;
 extern nx_gd32f303_system_t g_nx_gd32f303_system;
-/** \brief Reject a foreign clock, live reserved timer or pending vector.
+/** \brief Reject a foreign clock, either reserved timer or pending vector.
  * \param[in] system: Static cold context, privileged unmasked task only.
  * \return SUCCESS or error before hardware writes; no running-state adoption.
  */
 nx_result_t nx_gd32f303_system_preflight(const nx_gd32f303_system_t* system);
-/** \brief Start IRC8 8MHz and reserved TIMER1 at 1MHz with bounded checks.
+/** \brief Start IRC8 and TIMER1/TIMER4 as a32-bit1MHz hardware cascade.
  * \param[in,out] system: Static state retained after incomplete cleanup.
- * \param[in] poll_limit: Positive finite timer-update observation budget.
+ * \param[in] poll_limit: Positive finite update budget for each counter.
  * \return Primary, cleanup and actual remaining effects; no scheduler start.
  */
 nx_gd32f303_start_result_t
@@ -46,20 +47,28 @@ nx_gd32f303_system_start(nx_gd32f303_system_t* system, uint32_t poll_limit);
  * \return SUCCESS only after timer source, vector and owned gate withdraw.
  */
 nx_result_t nx_gd32f303_system_stop(nx_gd32f303_system_t* system);
-/** \brief Snapshot 16-bit time plus one pending wrap under the saved mask.
+/** \brief Snapshot hardware high/low/high and one pending32-bit wrap.
  * \param[in,out] system: Live epoch, privileged task/configurable IRQ only.
  * \return Microseconds; zero outside a live epoch is not readiness proof.
- * \note TIMER1 overflow must be serviced within 65536us, including masks.
+ * \note TIMER4 overflow must be serviced within4294967296us, including
+ *       Flash stalls and masks. Low TIMER1 IRQs may coalesce without time loss.
  *       No NMI/HardFault, dynamic-clock, deep-sleep or missed-wrap recovery.
  */
 uint64_t nx_gd32f303_system_now(nx_gd32f303_system_t* system);
-/** \brief Extend only after successful W0C; failed ack is terminal fail-stop.
+/** \brief Ack low W0C only; hardware owns carries, failed ack is fail-stop.
  */
 void nx_gd32f303_system_timer_irq(nx_gd32f303_system_t* system);
+/** \brief Acknowledge high-cascade overflow before extending2^32us.
+ * \param[in,out] system: Live static time-domain owner, bounded IRQ only.
+ * \note Failed acknowledgement isolates and parks without returning owners.
+ */
+void nx_gd32f303_system_cascade_irq(nx_gd32f303_system_t* system);
 /** \brief CPU-only setup; official reset startup calls after RAM init. */
 void SystemInit(void);
 /** \brief Exact vector for the reserved monotonic TIMER1 owner. */
 void TIMER1_IRQHandler(void);
+/** \brief Exact high-word overflow vector; no low-word service gap issue. */
+void TIMER4_IRQHandler(void);
 #ifndef NX_GD303_READ
 #define NX_GD303_READ(reg) (*(reg))
 #endif

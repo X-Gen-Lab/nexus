@@ -1,5 +1,6 @@
 """Maintained stm32f407 capability and static assembly contract."""
 from types import MappingProxyType
+
 from .. import common, descriptor, hardware
 
 CPU_ABI = MappingProxyType({'arch': 'cortex-m4', 'fpu': 'fpv4-sp-d16', 'float_abi': 'hard'})
@@ -15,6 +16,8 @@ CPU_FEATURES = MappingProxyType({
 })
 PREFIX = 'stm32'
 MODEL = False
+FLASH_PROGRAM_UNIT = 4
+FLASH_INPUT_ALIGNMENT = 1
 FACT_REFERENCES = descriptor.maintained("stm32f407").references
 ETH_CONTROLLER = 'ETH'
 USB_CONTROLLER = 'OTG_FS'

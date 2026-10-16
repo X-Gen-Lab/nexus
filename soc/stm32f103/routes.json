@@ -41,9 +41,20 @@
         }
       ],
       "modes": [
-        "irq-bytes"
+        "irq-bytes",
+        "dma-tx",
+        "dma-duplex"
       ],
-      "source": "DS5319 Rev20 PA2 USART2_TX/PA3 USART2_RX default mapping; RM0008 AFIO_MAPR USART2_REMAP=0, 8N1, oversample16. UM1724 VCP route requires actual solder bridge inspection."
+      "source": "DS5319 Rev20 PA2 USART2_TX/PA3 USART2_RX default mapping; RM0008 AFIO_MAPR USART2_REMAP=0, 8N1, oversample16. UM1724 VCP route requires actual solder bridge inspection. Exact fixed-channel DMA normal mode; memory TC is separate from wire TC; RX owner-service restart gaps are explicit. No circular claim.",
+      "mode_dma": {
+        "dma-tx": [
+          "DMA1:stream7:channel0"
+        ],
+        "dma-duplex": [
+          "DMA1:stream7:channel0",
+          "DMA1:stream6:channel0"
+        ]
+      }
     },
     {
       "id": "iwdg",
@@ -144,6 +155,81 @@
         "short-poll"
       ],
       "source": "DS5319 default SPI1 alternate functions PA5 SCK/PA6 MISO/PA7 MOSI; RM0008 AFIO_SPI1_REMAP=0, 8-bit master and APB divider2..256. PA5 also serves LD2, so one assembly cannot select both SPI1 and the LED."
+    },
+    {
+      "id": "i2c1-pb6-pb7",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "I2C1",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PB6",
+          "function": "scl",
+          "af": 0
+        },
+        {
+          "pin": "PB7",
+          "function": "sda",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "irq-messages"
+      ],
+      "source": "Exact reference manual legacy I2C default PB6/PB7 AF open-drain, APB8MHz, nominal80kHz CCR50/TRISE9 IRQ0 non-kernel, avoiding88..100kHz repeated-START errata; external pullups and wiring remain uninspected."
+    },
+    {
+      "id": "adc-pa0",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot"
+      ],
+      "source": "RM0008Rev21/DS5319Rev20/ES096Rev15 exact part: PA0 channel0 ADC4MHz sample239.5cycles; PA6 default timer CH1/CH0; physical Flash halfword programming and exact pages. No physical qualification."
+    },
+    {
+      "id": "pwm-pa6",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "TIM3",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "ch1",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "RM0008Rev21/DS5319Rev20/ES096Rev15 exact part: PA0 channel0 ADC4MHz sample239.5cycles; PA6 default timer CH1/CH0; physical Flash halfword programming and exact pages. No physical qualification."
+    },
+    {
+      "id": "flash-internal",
+      "variants": [
+        "STM32F103RBT6"
+      ],
+      "controller": "FLASH",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "poll-word"
+      ],
+      "source": "RM0008Rev21/DS5319Rev20/ES096Rev15 exact part: PA0 channel0 ADC4MHz sample239.5cycles; PA6 default timer CH1/CH0; physical Flash halfword programming and exact pages. No physical qualification."
     }
   ]
 }

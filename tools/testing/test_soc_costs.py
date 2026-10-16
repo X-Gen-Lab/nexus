@@ -140,6 +140,26 @@ class SocCostsTests(unittest.TestCase):
         self.assertTrue(all(value == 0
                             for value in comparison["delta"].values()))
 
+    def test_same_profile_private_state_subset_has_its_own_growth_ceiling(self):
+        baseline = self.observe()
+        candidate = self.candidate(code=lambda text: text.replace(
+            "zeroed", "s_nx_port_fixture"))
+        values = soc_costs.cost_values(baseline["metrics"])
+        self.assertIn("static.provider_state_bytes", values)
+        growth = {key: 4096 for key in values}
+        growth["static.provider_state_bytes"] = 0
+        result = soc_costs.compare(baseline, candidate, growth)
+        self.assertEqual(result["status"], "growth_exceeded")
+        self.assertEqual(result["delta"]["static.provider_state_bytes"], 16)
+        self.assertEqual(result["delta"]["ram.sram"], 0)
+
+    def test_static_storage_summary_is_recomputed_from_actual_elf(self):
+        report = self.observe()
+        self.assertIn("static_storage", report["metrics"])
+        report["metrics"]["static_storage"]["bytes"]["provider_state"] += 1
+        with self.assertRaises(EvidenceError):
+            soc_costs.validate_observation(report)
+
     def test_unknown_function_is_rejected(self):
         self.bad_observe(symbols=["no_such_function"])
 

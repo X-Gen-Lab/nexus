@@ -1,0 +1,41 @@
+{
+  "commit": "2552682ee5a0d6f826a6435750fc9267be65868b",
+  "files": {
+    "Inc/stm32u5xx_ll_adc.h": {
+      "bytes": 533860,
+      "sha256": "13e9cfc1df70a4dd34234bbad84def36e71bd8032f4ddbb6f29ac5d9e872c071"
+    },
+    "Inc/stm32u5xx_ll_i2c.h": {
+      "bytes": 97434,
+      "sha256": "8b7b9ad4cb5aeff1df318c042399f55726e745f129146f7ba27cec3d4623449d"
+    },
+    "Inc/stm32u5xx_ll_spi.h": {
+      "bytes": 96901,
+      "sha256": "3526ac7c129a1053790bf218aa982621a09df81d02c3e9f7fb6a42acc5fb6890"
+    },
+    "Inc/stm32u5xx_ll_tim.h": {
+      "bytes": 298912,
+      "sha256": "02157f3fbfcce84f5223d6d7486da02e4eb4e22949ff170ade76ac25115c3178"
+    },
+    "LICENSE.md": {
+      "bytes": 1484,
+      "sha256": "3ef135517604c828e7e2ac60daa5d34ce90a258dd0dfbec140651ac173b45ced"
+    }
+  },
+  "kind": "nexus-reviewed-official-driver",
+  "license": {
+    "expression": "BSD-3-Clause",
+    "path": "LICENSE.md"
+  },
+  "pairing": {
+    "cmsis_commit": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",
+    "cmsis_repository": "https://github.com/STMicroelectronics/cmsis-device-u5.git",
+    "commit": "d88042df24f16799957c24f00c2b234c9e306188",
+    "release": "v1.9.0",
+    "repository": "https://github.com/STMicroelectronics/STM32CubeU5.git"
+  },
+  "release": "STM32CubeU5-v1.9.0-pinned-driver",
+  "repository": "https://github.com/STMicroelectronics/stm32u5xx_hal_driver.git",
+  "schema_version": 1,
+  "selected_api": "stm32u575-ll-inline"
+}

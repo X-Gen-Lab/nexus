@@ -66,7 +66,10 @@ class F103ProviderTests(unittest.TestCase):
                            ("uart", "irq-bytes"), ("watchdog", "independent"),
                            ("exti", "edge-event"), ("spi", "short-poll")):
             self.assertEqual(kind, self.provider.mode_implementation(kind, mode))
-        for kind, mode in (("uart", "dma-tx"), ("uart", "irq-blocks"),
+        self.assertEqual("uart_dma", self.provider.mode_implementation("uart", "dma-tx"))
+        self.assertEqual("uart_dma", self.provider.mode_implementation("uart", "dma-duplex"))
+        self.assertEqual("i2c_async", self.provider.mode_implementation("i2c", "irq-messages"))
+        for kind, mode in (("uart", "rx-dma-continuous"), ("uart", "irq-blocks"),
                            ("uart", "irq-byte-event"), ("spi", "dma"),
                            ("i2c", "poll-messages"), ("can", "classic-irq")):
             with self.subTest(kind=kind, mode=mode):
@@ -137,7 +140,7 @@ class F103ProviderTests(unittest.TestCase):
         self.assertEqual(part["flash"]["size"], 128 * 1024)
         self.assertEqual(part["flash"]["erase_blocks"], [1024] * 128)
         self.assertEqual(part["memory"], [{"id": "sram", "origin": 0x20000000,
-                                         "size": 20480, "dma": False,
+                                              "size": 20480, "dma": True,
                                          "linker": True}])
         self.assertEqual(len(part["pins"]), 51)
         self.assertEqual(facts["reserved_resources"],

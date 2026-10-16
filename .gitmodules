@@ -36,3 +36,15 @@
 [submodule "vendors/st/stm32f1_hal"]
 	path = vendors/st/stm32f1_hal
 	url = https://github.com/STMicroelectronics/stm32f1xx-hal-driver.git
+
+[submodule "vendors/st/stm32g4_hal"]
+	path = vendors/st/stm32g4_hal
+	url = https://github.com/STMicroelectronics/stm32g4xx_hal_driver.git
+
+[submodule "vendors/st/stm32h7_hal"]
+	path = vendors/st/stm32h7_hal
+	url = https://github.com/STMicroelectronics/stm32h7xx_hal_driver.git
+
+[submodule "vendors/st/stm32u5_hal"]
+	path = vendors/st/stm32u5_hal
+	url = https://github.com/STMicroelectronics/stm32u5xx_hal_driver.git

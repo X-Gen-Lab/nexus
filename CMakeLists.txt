@@ -137,6 +137,21 @@ if(NEXUS_BUILD_WORKLOAD)
     endif()
     target_compile_definitions(nexus_firmware PRIVATE
         "NEXUS_WORKLOAD_${NEXUS_WORKLOAD}=1")
+    if(NEXUS_WORKLOAD MATCHES "^(gpio|uart)$")
+        include("${NEXUS_SOURCE_DIR}/cmake/platform/Workload.cmake")
+        string(TOUPPER "${NEXUS_WORKLOAD}" workload_kind)
+        set(NEXUS_WORKLOAD_${workload_kind}_ID "" CACHE STRING
+            "Assembly-local typed factory ID used only by the workload")
+        nexus_workload_identity("${NEXUS_CONFIG_DIR}" "${workload_kind}"
+            "${NEXUS_WORKLOAD_${workload_kind}_ID}" workload_identity)
+        target_compile_definitions(nexus_firmware PRIVATE
+            "NEXUS_WORKLOAD_${workload_kind}_ID=${workload_identity}")
+        if(NEXUS_WORKLOAD STREQUAL "gpio")
+            string(REGEX REPLACE "^NX_GPIO_ID_" "" workload_gpio "${workload_identity}")
+            target_compile_definitions(nexus_firmware PRIVATE
+                "NEXUS_WORKLOAD_GPIO_MASK=NEXUS_${workload_gpio}_MASK")
+        endif()
+    endif()
 endif()
 message(STATUS "Nexus: ${NEXUS_EXACT_PART}/${NEXUS_BACKEND}, ${NEXUS_OPTIMIZATION}")
 message(STATUS "Sole resolved configuration: ${NEXUS_CONFIG_DIR}/resolved.json")

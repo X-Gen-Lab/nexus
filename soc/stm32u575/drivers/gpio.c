@@ -177,4 +177,30 @@ nx_result_t nx_stm32u575_usart1_pins_prepare(void) {
 nx_result_t nx_stm32u575_usart2_pins_prepare(void) {
     return serial_pins_prepare(false);
 }
+nx_result_t nx_stm32u575_pin_alternate(GPIO_TypeDef* gpio, unsigned pin,
+                                       unsigned af) {
+    if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
+        return NX_ERROR_CONTEXT;
+    if (gpio == NULL || pin > 15U || af > 15U)
+        return NX_ERROR_INVALID;
+    if ((NX_U575_READ(&gpio->LCKR) & (1U << pin)) != 0U)
+        return NX_ERROR_BUSY;
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    uint32_t shift = (pin % 8U) * 4U;
+    uint32_t af_value =
+        (NX_U575_READ(&gpio->AFR[pin / 8U]) & ~(15U << shift)) | (af << shift);
+    NX_U575_WRITE(&gpio->AFR[pin / 8U], af_value);
+    nx_arch_dsb();
+    nx_result_t result = NX_ERROR_IO;
+    if (NX_U575_READ(&gpio->AFR[pin / 8U]) == af_value) {
+        uint32_t mode = (NX_U575_READ(&gpio->MODER) & ~(3U << (pin * 2U))) |
+                        (2U << (pin * 2U));
+        NX_U575_WRITE(&gpio->MODER, mode);
+        nx_arch_dsb();
+        if (NX_U575_READ(&gpio->MODER) == mode)
+            result = NX_SUCCESS;
+    }
+    nx_arch_irq_restore(saved);
+    return result;
+}
 const nx_gpio_ops_t nx_stm32u575_gpio_ops = {write, read, toggle};

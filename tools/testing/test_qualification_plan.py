@@ -60,6 +60,29 @@ class QualificationPlanTests(unittest.TestCase):
         self.assertEqual(selected[0]["args"], [])
         validate_plan(self.plan)
 
+    def test_each_expanded_provider_fixture_is_explicitly_qualified_once(self):
+        for directory in ("legacy_transport_assembly", "mainstream_assembly",
+                          "g474_assembly", "h743_assembly", "u575_assembly"):
+            with self.subTest(directory=directory):
+                stages = [stage for stage in self.stages
+                          if stage["name"] == "providers-" + directory]
+                self.assertEqual(len(stages), 1,
+                                 "Missing complete maintained fixture stage")
+                stage = stages[0]
+                self.assertEqual(stage["checker"], "provider_assemblies")
+                fixtures = [stage["args"][index + 1]
+                            for index, value in enumerate(stage["args"])
+                            if value == "--fixture"]
+                expected = {"{root}/" + path.relative_to(ROOT).as_posix()
+                            for path in (ROOT / "tests/contracts" /
+                                         directory).glob("*.toml")}
+                self.assertTrue(expected)
+                self.assertEqual(len(fixtures), len(set(fixtures)),
+                                 "Duplicate fixture is not another execution")
+                self.assertEqual(set(fixtures), expected,
+                                 "New fixture omitted from formal software plan")
+        validate_plan(self.plan)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,6 +10,7 @@ import sys
 from tools.maintenance import dependency_proposals as proposals
 from tools.maintenance import (cmsis_device_lock, source_catalogue,
                                stm32f1_hal_lock, stm32f4_hal_lock)
+from tools.maintenance.stm32_ll_lock import PROFILES
 import shutil
 import os
 
@@ -254,6 +255,10 @@ class DependencyInventoryGitTests(unittest.TestCase):
                     review = {"commit": (official.COMMIT
                                           if item.path == official.DIRECTORY
                                           else official.CMSIS_COMMIT)}
+            for official in PROFILES.values():
+                if item.path in {official.directory, official.cmsis_directory}:
+                    review = {"commit": (official.commit
+                        if item.path == official.directory else official.cmsis_commit)}
             if review is not None:
                 # Fixed device pins use real local official Git objects. A
                 # fabricated fixture commit must never relax the source lock.

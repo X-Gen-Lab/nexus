@@ -1,0 +1,41 @@
+{
+  "commit": "f5929f431f9effe45fbe18f5337e4753ced9ac92",
+  "files": {
+    "Inc/stm32g4xx_ll_adc.h": {
+      "bytes": 530084,
+      "sha256": "c76242a6b0786d4f4f9f8c1b534350702cbf98b154f654d4b53d0684e92493a9"
+    },
+    "Inc/stm32g4xx_ll_dmamux.h": {
+      "bytes": 94605,
+      "sha256": "ae7fa0016736254d0bef8527893ac93bbe5ff6a740aae7438431ac65dc6a0d0c"
+    },
+    "LICENSE.md": {
+      "bytes": 1484,
+      "sha256": "1a0c3a2cf55d2d808048d452c6598d441f89890d62d0890147459ec6db61037a"
+    }
+  },
+  "kind": "nexus-reviewed-official-driver",
+  "license": {
+    "expression": "BSD-3-Clause",
+    "path": "LICENSE.md"
+  },
+  "pairing": {
+    "cmsis_commit": "626ee412334a5ed2e5b320af5a8d77d69f03a558",
+    "cmsis_repository": "https://github.com/STMicroelectronics/cmsis-device-g4.git",
+    "commit": "d11b194a9f05d1b143d154771f3dbc282c8052a5",
+    "compatibility": {
+      "files": [
+        "Include/stm32g4xx.h"
+      ],
+      "kind": "reviewed_comment_only_child",
+      "paired_cmsis_commit": "25664ddc3a7624ae9627ae8c4c672073dc5b2539",
+      "scope": "two comment apostrophes; no declarations or macros changed"
+    },
+    "release": "v1.6.3",
+    "repository": "https://github.com/STMicroelectronics/STM32CubeG4.git"
+  },
+  "release": "STM32CubeG4-v1.6.3-pinned-driver",
+  "repository": "https://github.com/STMicroelectronics/stm32g4xx_hal_driver.git",
+  "schema_version": 1,
+  "selected_api": "stm32g474-ll-inline"
+}

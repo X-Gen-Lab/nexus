@@ -84,6 +84,7 @@ class ClockPort {
 };
 ClockPort* clock_port;
 nx_time_us_t now;
+bool model_privileged;
 int refused_irq;
 volatile uint32_t* held_engine;
 volatile uint32_t* refused_register;
@@ -133,6 +134,7 @@ class I2CPairFactory : public testing::Test {
         g_gd32_model_systick = {};
         g_gd32_model_mask = 0U;
         g_gd32_model_isr = false;
+        model_privileged = true;
         now = 100U;
         refused_irq = -1;
         held_engine = nullptr;
@@ -159,6 +161,7 @@ class I2CPairFactory : public testing::Test {
     void TearDown() override {
         g_gd32_model_mask = 0U;
         g_gd32_model_isr = false;
+        model_privileged = true;
         refused_irq = -1;
         held_engine = nullptr;
         refused_register = nullptr;
@@ -293,6 +296,57 @@ TEST_F(I2CPairFactory, BasePreflightRejectsBeforeEitherControllerLease) {
     EXPECT_EQ(0, std::memcmp(before.data(), mmio, before.size()));
     EXPECT_FALSE(states[0]->initialized);
     EXPECT_FALSE(states[1]->initialized);
+}
+
+TEST_F(I2CPairFactory,
+       UnprivilegedColdStartRejectsBeforeEitherControllerLease) {
+    const auto* first = static_cast<const uint8_t*>(mmio);
+    const std::vector<uint8_t> before(first, first + 0x80000U);
+    const auto nvic = g_gd32_model_nvic;
+    EXPECT_CALL(clocks, Preflight()).Times(0);
+    EXPECT_CALL(clocks, Start()).Times(0);
+    model_privileged = false;
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_CONTEXT, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_platform_stop());
+    EXPECT_EQ(0U, writes);
+    EXPECT_EQ(0, std::memcmp(before.data(), mmio, before.size()));
+    EXPECT_EQ(0, std::memcmp(&nvic, &g_gd32_model_nvic, sizeof(nvic)));
+    for (unsigned i = 0U; i < 2U; ++i) {
+        EXPECT_FALSE(states[i]->initialized);
+        EXPECT_EQ(nullptr, states[i]->active);
+    }
+}
+
+TEST_F(I2CPairFactory,
+       UnprivilegedPublicCallsCannotBorrowOrChangeEitherController) {
+    Start();
+    for (unsigned i = 0U; i < 2U; ++i) {
+        ASSERT_EQ(NX_SUCCESS, nx_i2c_request_prepare(&requests[i], &messages[i],
+                                                     1U, 1000U));
+    }
+    const auto* first = static_cast<const uint8_t*>(mmio);
+    const std::vector<uint8_t> before(first, first + 0x80000U);
+    const auto nvic = g_gd32_model_nvic;
+    const auto writes_before = writes;
+    model_privileged = false;
+    for (unsigned i = 0U; i < 2U; ++i) {
+        EXPECT_EQ(NX_ERROR_CONTEXT,
+                  nx_i2c_endpoint_submit(endpoints[i], &requests[i]));
+        EXPECT_EQ(NX_ERROR_CONTEXT, nx_i2c_port_cancel(ports[i], &requests[i]));
+        EXPECT_EQ(NX_ERROR_CONTEXT, nx_i2c_port_recover(ports[i]));
+        EXPECT_EQ(NX_ERROR_CONTEXT, nx_i2c_port_stop(ports[i]));
+        nx_i2c_port_service(ports[i]);
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&requests[i].base));
+        EXPECT_EQ(nullptr, states[i]->active);
+        EXPECT_TRUE(states[i]->initialized);
+    }
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_platform_stop());
+    EXPECT_EQ(writes_before, writes);
+    EXPECT_EQ(0, std::memcmp(before.data(), mmio, before.size()));
+    EXPECT_EQ(0, std::memcmp(&nvic, &g_gd32_model_nvic, sizeof(nvic)));
 }
 
 TEST_F(I2CPairFactory, BothControllersUseExactPinsClockAndPublisherTuples) {
@@ -449,8 +503,10 @@ TEST_F(I2CPairFactory, RefusedInterruptWithdrawalRetainsPlatformClockAndPins) {
     Start();
     const uint32_t mode = PIN_MODE;
     refused_irq = static_cast<int>(event_irqs[1]);
-    EXPECT_EQ(NX_ERROR_BUSY, nx_platform_stop());
+    EXPECT_EQ(NX_ERROR_IO, nx_platform_stop());
     EXPECT_TRUE(enabled(event_irqs[1]));
+    EXPECT_TRUE(states[1]->initialized);
+    EXPECT_TRUE(states[1]->stopping);
     EXPECT_EQ(mode, PIN_MODE);
     EXPECT_EQ(controller_gate, GATE & controller_gate);
     refused_irq = -1;
@@ -571,6 +627,11 @@ extern "C" bool nx_i2c_pair_isr(void) {
 /** \brief Inject the incoming admission mask only. */
 extern "C" bool nx_i2c_pair_masked(void) {
     return g_gd32_model_mask != 0U;
+}
+/** \brief Expose configurable CPU privilege to real platform and I2C admission.
+ */
+extern "C" bool nx_i2c_v1_model_privileged(void) {
+    return model_privileged;
 }
 /** \brief Apply the hardware ISER set operation to one external interrupt. */
 extern "C" void nx_i2c_pair_irq_enable(IRQn_Type irq) {

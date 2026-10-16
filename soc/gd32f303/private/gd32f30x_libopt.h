@@ -8,7 +8,9 @@
  */
 #ifndef NX_GD32F30X_LIBOPT_H
 #define NX_GD32F30X_LIBOPT_H
+#include "gd32f30x_adc.h"
 #include "gd32f30x_dbg.h"
+#include "gd32f30x_exti.h"
 #include "gd32f30x_fmc.h"
 #include "gd32f30x_fwdgt.h"
 #include "gd32f30x_gpio.h"

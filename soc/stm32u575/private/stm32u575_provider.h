@@ -8,7 +8,13 @@
  */
 #ifndef NX_STM32U575_PROVIDER_H
 #define NX_STM32U575_PROVIDER_H
+#include "../../common/i2c_v2.h"
+#include "nexus/io/adc.h"
+#include "nexus/io/exti.h"
+#include "nexus/io/flash.h"
 #include "nexus/io/gpio.h"
+#include "nexus/io/spi.h"
+#include "nexus/io/timer.h"
 #include "nexus/io/uart.h"
 #include "nexus/io/watchdog.h"
 #include "stm32u575_system.h"
@@ -65,6 +71,157 @@ typedef struct {
     bool debug_pending;
     uint32_t previous_debug;
 } nx_stm32u575_watchdog_state_t;
+/** \brief Fixed TIM3 CH1 PA6/AF2; one exclusive timer and safe idle pin. */
+typedef struct {
+    TIM_TypeDef* registers;
+    nx_stm32u575_gpio_state_t* idle;
+    volatile uint32_t* reset;
+    uint32_t reset_mask;
+    uint32_t inactive;
+    uint32_t period_ticks;
+    uint32_t duty_ticks;
+    uint32_t tick_hz;
+    uint32_t poll_limit;
+    uint8_t pin;
+    bool initialized;
+    bool retained;
+    bool running;
+    bool fault;
+} nx_stm32u575_pwm_state_t;
+extern const nx_pwm_ops_t nx_stm32u575_pwm_ops;
+/** \brief Acquire the admitted fixed TIM3 base with a safe GPIO output. */
+nx_result_t nx_stm32u575_pwm_initialize(nx_stm32u575_pwm_state_t* port);
+/** \brief Observe reset and safe GPIO before releasing partial ownership. */
+nx_result_t nx_stm32u575_pwm_close(nx_stm32u575_pwm_state_t* port);
+/** \brief Configure a leased exact-package alternate pin without a registry. */
+nx_result_t nx_stm32u575_pin_alternate(GPIO_TypeDef* gpio, unsigned pin,
+                                       unsigned af);
+#ifndef NX_U575_PWM_POLL
+#define NX_U575_PWM_POLL(port) ((void)(port))
+#endif
+typedef nx_i2c_v2_state_t nx_stm32u575_i2c_state_t;
+typedef nx_i2c_v2_endpoint_state_t nx_stm32u575_i2c_endpoint_state_t;
+/** \brief Separate cold clock ownership keeps the actual V2 hot context. */
+typedef struct {
+    nx_i2c_v2_state_t* port;
+    bool retained;
+    bool source_added;
+    bool mux_owned;
+} nx_stm32u575_i2c_clock_t;
+/** \brief Acquire unused HSI16 and I2C1SEL without changing SYSCLK or TIM2.
+ * \note Failed acquisition retains cleanup ownership until clock_stop.
+ */
+nx_result_t nx_stm32u575_i2c_clock_start(nx_stm32u575_i2c_clock_t* clock,
+                                         nx_i2c_v2_state_t* port);
+/** \brief Restore selector and source only after the V2 port has joined. */
+nx_result_t nx_stm32u575_i2c_clock_stop(nx_stm32u575_i2c_clock_t* clock);
+/** \brief Admit I2C1/HSI16, finite polling, reviewed conservative timing. */
+nx_result_t nx_stm32u575_i2c_initialize(nx_stm32u575_i2c_state_t* port);
+/** \brief Prepare leased PB8/PB9 AF4, open drain; pull-ups remain external. */
+nx_result_t nx_stm32u575_i2c1_pins_prepare(void);
+/** \brief SPI1 V3 finite polling, byte FIFO and explicit TSIZE/CSTART. */
+typedef struct {
+    SPI_TypeDef* registers;
+    nx_stm32u575_gpio_state_t* held_cs;
+    uint32_t held_cs_mask;
+    volatile uint32_t* reset;
+    uint32_t reset_mask;
+    uint32_t clock_hz;
+    uint32_t poll_limit;
+    bool initialized;
+    bool retained;
+    bool active;
+    bool fault;
+} nx_stm32u575_spi_state_t;
+typedef struct {
+    nx_stm32u575_spi_state_t* port;
+    nx_stm32u575_gpio_state_t* cs;
+    uint32_t cs_mask;
+    uint32_t frequency_hz;
+    uint8_t mode;
+} nx_stm32u575_spi_endpoint_state_t;
+extern const nx_spi_ops_t nx_stm32u575_spi_ops;
+extern const nx_spi_endpoint_ops_t nx_stm32u575_spi_endpoint_ops;
+/** \brief Acquire cold SPI1/PCLK2 at4MHz, no DMA/interrupt ownership. */
+nx_result_t nx_stm32u575_spi_initialize(nx_stm32u575_spi_state_t* port);
+#ifndef NX_U575_SPI_POLL
+#define NX_U575_SPI_POLL(port) ((void)(port))
+#endif
+#ifndef NX_U575_SPI_READ8
+#define NX_U575_SPI_READ8(reg) (*(volatile uint8_t*)(reg))
+#endif
+#ifndef NX_U575_SPI_WRITE8
+#define NX_U575_SPI_WRITE8(reg, value) (*(volatile uint8_t*)(reg) = (value))
+#endif
+/** \brief Exact PA0/PA1 IRQ rings; U5 owns its EXTI mux and two pending banks.
+ */
+typedef struct {
+    EXTI_TypeDef* registers;
+    EXTI_TypeDef* mux;
+    GPIO_TypeDef* gpio;
+    nx_exti_event_t* storage;
+    const nx_irq_wake_t* wake;
+    size_t capacity;
+    size_t head;
+    size_t tail;
+    size_t count;
+    nx_irq_policy_t irq_policy;
+    nx_exti_edge_t edge;
+    uint16_t wake_publishers;
+    uint8_t line;
+    uint8_t priority;
+    uint8_t saved_mux;
+    bool initialized;
+    bool retained;
+    bool closing;
+    bool loss;
+} nx_stm32u575_exti_state_t;
+extern const nx_exti_ops_t nx_stm32u575_exti_ops;
+/** \brief Admit only unowned GPIOA EXTI0/1; ring lives until successful stop.
+ */
+nx_result_t nx_stm32u575_exti_initialize(nx_stm32u575_exti_state_t* port);
+/** \brief Observe/ack both W1C pending banks once; no edge history promise. */
+void nx_stm32u575_exti_irq(nx_stm32u575_exti_state_t* port);
+/** \brief ADC4 channel1 PC0, fixed12bit software shot, no DMA or trigger. */
+typedef struct {
+    ADC_TypeDef* registers;
+    ADC_Common_TypeDef* common;
+    uint32_t reference_mv;
+    uint32_t poll_limit;
+    bool initialized;
+    bool retained;
+    bool active;
+    bool fault;
+} nx_stm32u575_adc_state_t;
+extern const nx_adc_ops_t nx_stm32u575_adc_ops;
+/** \brief Require externally prepared VDDA/ASV, then LDO/calibration/ready. */
+nx_result_t nx_stm32u575_adc_initialize(nx_stm32u575_adc_state_t* port);
+/** \brief Observe exclusive ADC4 reset before releasing retained ownership. */
+nx_result_t nx_stm32u575_adc_close(nx_stm32u575_adc_state_t* port);
+#ifndef NX_U575_ADC_POLL
+#define NX_U575_ADC_POLL(port) ((void)(port))
+#endif
+/** \brief Physical2MiB Flash,256x8KiB pages,128bit programming, TZEN0 only. */
+typedef struct {
+    FLASH_TypeDef* registers;
+    volatile uint8_t* memory;
+    bool initialized;
+    bool retained;
+    bool active;
+} nx_stm32u575_flash_state_t;
+extern const nx_flash_geometry_t g_nx_stm32u575_flash_geometry;
+extern const nx_flash_ops_t nx_stm32u575_flash_ops;
+/** \brief Observe exact density and locked idle control without unlocking. */
+nx_result_t nx_stm32u575_flash_initialize(nx_stm32u575_flash_state_t* port);
+/** \brief Retry idle mode withdrawal/relock, never revoke an active pulse. */
+nx_result_t nx_stm32u575_flash_close(nx_stm32u575_flash_state_t* port);
+#ifndef NX_U575_FLASH_POLL
+#define NX_U575_FLASH_POLL(port) ((void)(port))
+#endif
+#ifndef NX_U575_FLASH_PROGRAM32
+#define NX_U575_FLASH_PROGRAM32(address, value)                                \
+    (*(volatile uint32_t*)(address) = (value))
+#endif
 extern const nx_gpio_ops_t nx_stm32u575_gpio_ops;
 extern const nx_uart_ops_t nx_stm32u575_uart_ops;
 extern const nx_watchdog_ops_t nx_stm32u575_watchdog_ops;

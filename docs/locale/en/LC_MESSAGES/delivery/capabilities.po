@@ -1,4 +1,4 @@
-#
+# Authored translation; review state is explicit in catalog metadata.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4005862781d94b861c3604fc338736bdbd7c665a56d4589f664c6e702f91e2bc\n"
+"X-Nexus-Source-SHA256: 6abce6603446572cd3ceb93100baf9c6824af94284ced18732a3157f8550f3a8\n"
 
 msgid "派生能力与接入矩阵"
 msgstr "Derived capabilities and integration matrix"
@@ -17,12 +17,12 @@ msgid ""
 "Board `board.json`，并运行现有软件 assembly 的生产 resolver 和 binding emitter "
 "生成。表格不是另一份配置输入；修改能力从原始事实、实现和 回归开始，随后执行 `--write` 更新本派生文本，`--check` 拒绝任何过时内容。"
 msgstr ""
-"`tools/maintenance/capabilities.py` derives this table by reading maintained "
-"`soc.json`, `routes.json` and reference-Board `board.json`, then running the "
-"production resolver/binding emitter on software assemblies. The table is not "
-"another configuration input. Capability changes start with original facts, "
-"implementation and regressions, then `--write` refreshes derived prose and "
-"`--check` rejects stale content."
+"`tools/maintenance/capabilities.py` derives this table by reading maintained"
+" `soc.json`, `routes.json` and reference-Board `board.json`, then running "
+"the production resolver/binding emitter on software assemblies. The table is"
+" not another configuration input. Capability changes start with original "
+"facts, implementation and regressions, then `--write` refreshes derived "
+"prose and `--check` rejects stale content."
 
 msgid "**Mode** 是 SoC 声明的有限模式；无 route 的模式不能据此选择连接。"
 msgstr ""
@@ -51,9 +51,9 @@ msgid ""
 "中已初始化的导出定义；注释、字符串、声明和相似前缀不算定义。这是有限源码 一致性证据，不替代编译、执行或物理测量。空白列明确没有该类证据。"
 msgstr ""
 "**Selected production source** reads full ops identifiers from actual "
-"generated faces and matches initialized exported definitions in production C;"
-" comments, strings, declarations and similar prefixes are not definitions. "
-"This is bounded source-consistency evidence, not "
+"generated faces and matches initialized exported definitions in production "
+"C; comments, strings, declarations and similar prefixes are not definitions."
+" This is bounded source-consistency evidence, not "
 "compilation/execution/physical measurement. Blank columns explicitly lack "
 "such evidence."
 
@@ -61,8 +61,8 @@ msgid ""
 "表格不从旧候选继承新 HEAD 的软件资格，也不推断物理结果。三板实物未连接，HIL 保持 "
 "`not_executed`。精确模式限制及所有权合同见[支持范围](support.md)。"
 msgstr ""
-"The table inherits no old-candidate qualification for new HEAD and infers no "
-"physical results. The three actual Boards are disconnected; HIL remains "
+"The table inherits no old-candidate qualification for new HEAD and infers no"
+" physical results. The three actual Boards are disconnected; HIL remains "
 "`not_executed`. Exact mode limits/ownership are in [support "
 "scope](support.md)."
 
@@ -93,6 +93,70 @@ msgstr "Selected production source"
 msgid "gd32f303"
 msgstr "gd32f303"
 
+msgid "ADC0"
+msgstr "ADC0"
+
+msgid "adc"
+msgstr "adc"
+
+msgid "single-shot"
+msgstr "single-shot"
+
+msgid "`adc-pa0`"
+msgstr "`adc-pa0`"
+
+msgid "`gd32f303-rct6-reference`"
+msgstr "`gd32f303-rct6-reference`"
+
+msgid ""
+"`tests/contracts/mainstream_assembly/gd303-devices-freertos.toml`, "
+"`tests/contracts/mainstream_assembly/gd303-devices.toml`"
+msgstr ""
+"`tests/contracts/mainstream_assembly/gd303-devices-freertos.toml`, "
+"`tests/contracts/mainstream_assembly/gd303-devices.toml`"
+
+msgid "`soc/common/legacy_adc.c`"
+msgstr "`soc/common/legacy_adc.c`"
+
+msgid "EXTI0"
+msgstr "EXTI0"
+
+msgid "exti"
+msgstr "exti"
+
+msgid "edge-event"
+msgstr "edge-event"
+
+msgid "`exti0-pa0`"
+msgstr "`exti0-pa0`"
+
+msgid "—"
+msgstr "—"
+
+msgid "EXTI1"
+msgstr "EXTI1"
+
+msgid "`exti1-pa1`"
+msgstr "`exti1-pa1`"
+
+msgid "`soc/gd32f303/drivers/exti.c`"
+msgstr "`soc/gd32f303/drivers/exti.c`"
+
+msgid "FMC"
+msgstr "FMC"
+
+msgid "flash"
+msgstr "flash"
+
+msgid "poll-word"
+msgstr "poll-word"
+
+msgid "`flash-internal`"
+msgstr "`flash-internal`"
+
+msgid "`soc/common/legacy_flash.c`"
+msgstr "`soc/common/legacy_flash.c`"
+
 msgid "FWDGT"
 msgstr "FWDGT"
 
@@ -104,9 +168,6 @@ msgstr "independent"
 
 msgid "`fwdgt-internal`"
 msgstr "`fwdgt-internal`"
-
-msgid "`gd32f303-rct6-reference`"
-msgstr "`gd32f303-rct6-reference`"
 
 msgid ""
 "`tests/contracts/mainstream_assembly/gd303-spi-watchdog-freertos.toml`, "
@@ -134,9 +195,6 @@ msgstr "input"
 msgid "`gpio-pa4`, `gpio-pa5`"
 msgstr "`gpio-pa4`, `gpio-pa5`"
 
-msgid "—"
-msgstr "—"
-
 msgid "output"
 msgstr "output"
 
@@ -154,6 +212,28 @@ msgstr ""
 msgid "`soc/gd32f303/drivers/gpio.c`"
 msgstr "`soc/gd32f303/drivers/gpio.c`"
 
+msgid "I2C0"
+msgstr "I2C0"
+
+msgid "i2c"
+msgstr "i2c"
+
+msgid "irq-messages"
+msgstr "irq-messages"
+
+msgid "`i2c0-pb6-pb7`"
+msgstr "`i2c0-pb6-pb7`"
+
+msgid ""
+"`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-i2c.toml`, "
+"`tests/contracts/legacy_transport_assembly/gd32f303-freertos-i2c.toml`"
+msgstr ""
+"`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-i2c.toml`, "
+"`tests/contracts/legacy_transport_assembly/gd32f303-freertos-i2c.toml`"
+
+msgid "`soc/common/i2c_v1_async.c`"
+msgstr "`soc/common/i2c_v1_async.c`"
+
 msgid "SPI0"
 msgstr "SPI0"
 
@@ -169,29 +249,78 @@ msgstr "`spi0-pa5-pa6-pa7`"
 msgid "`soc/gd32f303/drivers/spi.c`"
 msgstr "`soc/gd32f303/drivers/spi.c`"
 
+msgid "TIMER2"
+msgstr "TIMER2"
+
+msgid "pwm"
+msgstr "pwm"
+
+msgid "fixed-pwm"
+msgstr "fixed-pwm"
+
+msgid "`pwm-pa6`"
+msgstr "`pwm-pa6`"
+
+msgid "`soc/common/legacy_pwm.c`"
+msgstr "`soc/common/legacy_pwm.c`"
+
 msgid "USART0"
 msgstr "USART0"
 
 msgid "uart"
 msgstr "uart"
 
-msgid "irq-bytes"
-msgstr "irq-bytes"
+msgid "dma-duplex"
+msgstr "dma-duplex"
 
 msgid "`usart0-pa9-pa10`"
 msgstr "`usart0-pa9-pa10`"
+
+msgid ""
+"`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-"
+"duplex.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-"
+"dma-duplex.toml`"
+msgstr ""
+"`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-"
+"duplex.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-"
+"dma-duplex.toml`"
+
+msgid "`soc/common/uart_v1_channel_dma.c`"
+msgstr "`soc/common/uart_v1_channel_dma.c`"
+
+msgid "dma-tx"
+msgstr "dma-tx"
+
+msgid ""
+"`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-tx.toml`, "
+"`tests/contracts/legacy_transport_assembly/gd32f303-freertos-dma-tx.toml`"
+msgstr ""
+"`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-dma-tx.toml`, "
+"`tests/contracts/legacy_transport_assembly/gd32f303-freertos-dma-tx.toml`"
+
+msgid "irq-bytes"
+msgstr "irq-bytes"
+
+msgid ""
+"`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-irq-"
+"bytes.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-"
+"irq-bytes.toml`, `tests/contracts/mainstream_assembly/gd303-io-"
+"freertos.toml`, `tests/contracts/mainstream_assembly/gd303-io.toml`, "
+"`tools/configure/assemblies/gd32-f303-baremetal-io.toml`, "
+"`tools/configure/assemblies/gd32-f303-freertos-io.toml`"
+msgstr ""
+"`tests/contracts/legacy_transport_assembly/gd32f303-baremetal-irq-"
+"bytes.toml`, `tests/contracts/legacy_transport_assembly/gd32f303-freertos-"
+"irq-bytes.toml`, `tests/contracts/mainstream_assembly/gd303-io-"
+"freertos.toml`, `tests/contracts/mainstream_assembly/gd303-io.toml`, "
+"`tools/configure/assemblies/gd32-f303-baremetal-io.toml`, "
+"`tools/configure/assemblies/gd32-f303-freertos-io.toml`"
 
 msgid "`soc/gd32f303/drivers/uart.c`"
 msgstr "`soc/gd32f303/drivers/uart.c`"
 
 msgid "gd32f470"
 msgstr "gd32f470"
-
-msgid "ADC0"
-msgstr "ADC0"
-
-msgid "adc"
-msgstr "adc"
 
 msgid "low-rate-scan"
 msgstr "low-rate-scan"
@@ -204,9 +333,6 @@ msgstr "`tests/contracts/gd32_assembly/adc-scan.toml`"
 
 msgid "`soc/gd32f470/drivers/adc.c`"
 msgstr "`soc/gd32f470/drivers/adc.c`"
-
-msgid "single-shot"
-msgstr "single-shot"
 
 msgid "`adc0-pa0`"
 msgstr "`adc0-pa0`"
@@ -291,12 +417,6 @@ msgstr "`io/src/eth_mac.c`"
 msgid "EXTI3"
 msgstr "EXTI3"
 
-msgid "exti"
-msgstr "exti"
-
-msgid "edge-event"
-msgstr "edge-event"
-
 msgid "`exti3-pe3`"
 msgstr "`exti3-pe3`"
 
@@ -305,15 +425,6 @@ msgstr "`tests/contracts/gd32_assembly/exti.toml`"
 
 msgid "`soc/gd32f470/drivers/exti.c`"
 msgstr "`soc/gd32f470/drivers/exti.c`"
-
-msgid "FMC"
-msgstr "FMC"
-
-msgid "flash"
-msgstr "flash"
-
-msgid "poll-word"
-msgstr "poll-word"
 
 msgid "`physical-flash`"
 msgstr "`physical-flash`"
@@ -364,18 +475,9 @@ msgstr ""
 msgid "`soc/gd32f470/drivers/gpio.c`"
 msgstr "`soc/gd32f470/drivers/gpio.c`"
 
-msgid "I2C0"
-msgstr "I2C0"
-
-msgid "i2c"
-msgstr "i2c"
-
 msgid "dma-messages"
 msgstr "dma-messages"
 
-msgid "`i2c0-pb6-pb7`"
-msgstr "`i2c0-pb6-pb7`"
-
 msgid ""
 "`tests/contracts/gd32_assembly/i2c-dma.toml`, "
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair-freertos.toml`, "
@@ -385,20 +487,14 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair-freertos.toml`, "
 "`tests/contracts/multi_controller_assembly/gd32-i2c-pair.toml`"
 
-msgid "`soc/common/i2c_v1_async.c`"
-msgstr "`soc/common/i2c_v1_async.c`"
-
-msgid "irq-messages"
-msgstr "irq-messages"
-
 msgid ""
 "`tests/contracts/gd32_assembly/i2c-irq.toml`, "
-"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
+"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
 msgstr ""
 "`tests/contracts/gd32_assembly/i2c-irq.toml`, "
-"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
+"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
 
 msgid "poll-messages"
 msgstr "poll-messages"
@@ -435,11 +531,11 @@ msgstr ""
 "`tests/contracts/multi_controller_assembly/gd32.toml`"
 
 msgid ""
-"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
+"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
 msgstr ""
-"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
+"`tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/gd32-i2c-pair-irq.toml`"
 
 msgid ""
 "`tests/contracts/gd32_assembly/blocks.toml`, "
@@ -519,15 +615,6 @@ msgstr ""
 msgid "`soc/gd32f470/drivers/advanced_pwm.c`"
 msgstr "`soc/gd32f470/drivers/advanced_pwm.c`"
 
-msgid "TIMER2"
-msgstr "TIMER2"
-
-msgid "pwm"
-msgstr "pwm"
-
-msgid "fixed-pwm"
-msgstr "fixed-pwm"
-
 msgid "`timer2-pa6`"
 msgstr "`timer2-pa6`"
 
@@ -552,9 +639,6 @@ msgstr "`capture-pb6`"
 msgid "`soc/gd32f470/drivers/timer_capture.c`"
 msgstr "`soc/gd32f470/drivers/timer_capture.c`"
 
-msgid "dma-duplex"
-msgstr "dma-duplex"
-
 msgid "`tests/contracts/gd32_assembly/dma-duplex.toml`"
 msgstr "`tests/contracts/gd32_assembly/dma-duplex.toml`"
 
@@ -566,9 +650,6 @@ msgstr "dma-duplex-continuous"
 
 msgid "`tests/contracts/gd32_assembly/dma-duplex-continuous.toml`"
 msgstr "`tests/contracts/gd32_assembly/dma-duplex-continuous.toml`"
-
-msgid "dma-tx"
-msgstr "dma-tx"
 
 msgid "`soc/gd32f470/drivers/uart_dma.c`"
 msgstr "`soc/gd32f470/drivers/uart_dma.c`"
@@ -648,14 +729,18 @@ msgstr "`io/src/usb_device_controller.c`"
 msgid "stm32f103"
 msgstr "stm32f103"
 
-msgid "EXTI0"
-msgstr "EXTI0"
-
-msgid "`exti0-pa0`"
-msgstr "`exti0-pa0`"
+msgid "ADC1"
+msgstr "ADC1"
 
 msgid "`stm32f103rb-nucleo-reference`"
 msgstr "`stm32f103rb-nucleo-reference`"
+
+msgid ""
+"`tests/contracts/mainstream_assembly/f103-devices-freertos.toml`, "
+"`tests/contracts/mainstream_assembly/f103-devices.toml`"
+msgstr ""
+"`tests/contracts/mainstream_assembly/f103-devices-freertos.toml`, "
+"`tests/contracts/mainstream_assembly/f103-devices.toml`"
 
 msgid ""
 "`tests/contracts/mainstream_assembly/f103-exti.toml`, "
@@ -667,11 +752,8 @@ msgstr ""
 msgid "`soc/stm32f103/drivers/exti.c`"
 msgstr "`soc/stm32f103/drivers/exti.c`"
 
-msgid "EXTI1"
-msgstr "EXTI1"
-
-msgid "`exti1-pa1`"
-msgstr "`exti1-pa1`"
+msgid "FLASH"
+msgstr "FLASH"
 
 msgid ""
 "`tests/contracts/mainstream_assembly/f103-exti.toml`, "
@@ -694,6 +776,16 @@ msgstr ""
 
 msgid "`soc/stm32f103/drivers/gpio.c`"
 msgstr "`soc/stm32f103/drivers/gpio.c`"
+
+msgid "`i2c1-pb6-pb7`"
+msgstr "`i2c1-pb6-pb7`"
+
+msgid ""
+"`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-i2c.toml`, "
+"`tests/contracts/legacy_transport_assembly/stm32f103-freertos-i2c.toml`"
+msgstr ""
+"`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-i2c.toml`, "
+"`tests/contracts/legacy_transport_assembly/stm32f103-freertos-i2c.toml`"
 
 msgid "IWDG"
 msgstr "IWDG"
@@ -729,20 +821,59 @@ msgstr ""
 msgid "`soc/stm32f103/drivers/spi.c`"
 msgstr "`soc/stm32f103/drivers/spi.c`"
 
+msgid "TIM3"
+msgstr "TIM3"
+
 msgid "USART2"
 msgstr "USART2"
 
 msgid "`usart2-pa2-pa3`"
 msgstr "`usart2-pa2-pa3`"
 
+msgid ""
+"`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-dma-"
+"duplex.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-"
+"dma-duplex.toml`"
+msgstr ""
+"`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-dma-"
+"duplex.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-"
+"dma-duplex.toml`"
+
+msgid ""
+"`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-dma-tx.toml`,"
+" `tests/contracts/legacy_transport_assembly/stm32f103-freertos-dma-tx.toml`"
+msgstr ""
+"`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-dma-tx.toml`,"
+" `tests/contracts/legacy_transport_assembly/stm32f103-freertos-dma-tx.toml`"
+
+msgid ""
+"`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-irq-"
+"bytes.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-"
+"irq-bytes.toml`, `tests/contracts/mainstream_assembly/f103-exti.toml`, "
+"`tests/contracts/mainstream_assembly/f103-io-freertos.toml`, "
+"`tests/contracts/mainstream_assembly/f103-io.toml`, "
+"`tests/contracts/mainstream_assembly/f103-watchdog.toml`, "
+"`tools/configure/assemblies/stm32-f103-baremetal.toml`, "
+"`tools/configure/assemblies/stm32-f103-exti.toml`, "
+"`tools/configure/assemblies/stm32-f103-freertos.toml`, "
+"`tools/configure/assemblies/stm32-f103-watchdog.toml`"
+msgstr ""
+"`tests/contracts/legacy_transport_assembly/stm32f103-baremetal-irq-"
+"bytes.toml`, `tests/contracts/legacy_transport_assembly/stm32f103-freertos-"
+"irq-bytes.toml`, `tests/contracts/mainstream_assembly/f103-exti.toml`, "
+"`tests/contracts/mainstream_assembly/f103-io-freertos.toml`, "
+"`tests/contracts/mainstream_assembly/f103-io.toml`, "
+"`tests/contracts/mainstream_assembly/f103-watchdog.toml`, "
+"`tools/configure/assemblies/stm32-f103-baremetal.toml`, "
+"`tools/configure/assemblies/stm32-f103-exti.toml`, "
+"`tools/configure/assemblies/stm32-f103-freertos.toml`, "
+"`tools/configure/assemblies/stm32-f103-watchdog.toml`"
+
 msgid "`soc/stm32f103/drivers/uart.c`"
 msgstr "`soc/stm32f103/drivers/uart.c`"
 
 msgid "stm32f407"
 msgstr "stm32f407"
-
-msgid "ADC1"
-msgstr "ADC1"
 
 msgid "`adc1-ch0-pa0`, `adc1-scan-pa0-pa1`"
 msgstr "`adc1-ch0-pa0`, `adc1-scan-pa0-pa1`"
@@ -837,12 +968,6 @@ msgstr "EXTI6"
 msgid "`exti6-pa6`"
 msgstr "`exti6-pa6`"
 
-msgid "FLASH"
-msgstr "FLASH"
-
-msgid "`flash-internal`"
-msgstr "`flash-internal`"
-
 msgid "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31`"
 msgstr "`stm32f407ve-sky-qingchun`, `stm32f407zg-qiming-v31`"
 
@@ -901,34 +1026,35 @@ msgstr "GPIOG"
 msgid "`gpio-pg9`"
 msgstr "`gpio-pg9`"
 
-msgid "`i2c1-pb6-pb7`"
-msgstr "`i2c1-pb6-pb7`"
-
 msgid ""
-"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, "
 "`tests/contracts/stm32_assembly/zg-i2c-dma.toml`"
 msgstr ""
-"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, "
 "`tests/contracts/stm32_assembly/zg-i2c-dma.toml`"
 
 msgid ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-"
-"freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-"
-"irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-"
-"freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-"
-"irq.toml`, `tests/contracts/stm32_assembly/zg-i2c-irq.toml`"
+"freertos.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-"
+"freertos.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`, "
+"`tests/contracts/stm32_assembly/zg-i2c-irq.toml`"
 msgstr ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-"
-"freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-"
-"irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-"
-"freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-"
-"irq.toml`, `tests/contracts/stm32_assembly/zg-i2c-irq.toml`"
+"freertos.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-"
+"freertos.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`, "
+"`tests/contracts/stm32_assembly/zg-i2c-irq.toml`"
 
 msgid ""
 "`tests/contracts/stm32_assembly/ve-i2c.toml`, "
@@ -948,35 +1074,37 @@ msgstr "`i2c2-pb10-pb11`"
 
 msgid ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-ve.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-zg.toml`"
 msgstr ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-ve.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-zg-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`, "
-"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-freertos.toml`,"
+" `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair.toml`, "
 "`tests/contracts/multi_controller_assembly/stm32-zg.toml`"
 
 msgid ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-"
-"freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-"
-"irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-"
-"freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-"
-"irq.toml`"
+"freertos.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-"
+"freertos.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`"
 msgstr ""
 "`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq-"
-"freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-"
-"irq.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-"
-"freertos.toml`, `tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-"
-"irq.toml`"
+"freertos.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-ve-i2c-pair-irq.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq-"
+"freertos.toml`, "
+"`tests/contracts/multi_controller_assembly/stm32-zg-i2c-pair-irq.toml`"
 
 msgid ""
 "`tests/contracts/stm32_assembly/ve-watchdog.toml`, "
@@ -1071,9 +1199,6 @@ msgstr ""
 msgid "`soc/stm32f407/drivers/advanced_pwm.c`"
 msgstr "`soc/stm32f407/drivers/advanced_pwm.c`"
 
-msgid "TIM3"
-msgstr "TIM3"
-
 msgid "`tim3-ch1-pa6`"
 msgstr "`tim3-ch1-pa6`"
 
@@ -1159,6 +1284,29 @@ msgstr "`tests/contracts/stm32_assembly/zg-rx-dma-idle.toml`"
 msgid "stm32g474"
 msgstr "stm32g474"
 
+msgid "`adc1-in1-pa0`"
+msgstr "`adc1-in1-pa0`"
+
+msgid ""
+"`tests/contracts/g474_assembly/acquisition-freertos.toml`, "
+"`tests/contracts/g474_assembly/acquisition.toml`"
+msgstr ""
+"`tests/contracts/g474_assembly/acquisition-freertos.toml`, "
+"`tests/contracts/g474_assembly/acquisition.toml`"
+
+msgid "`soc/stm32g474/drivers/adc.c`"
+msgstr "`soc/stm32g474/drivers/adc.c`"
+
+msgid ""
+"`tests/contracts/g474_assembly/acquisition-dma-freertos.toml`, "
+"`tests/contracts/g474_assembly/acquisition-dma.toml`"
+msgstr ""
+"`tests/contracts/g474_assembly/acquisition-dma-freertos.toml`, "
+"`tests/contracts/g474_assembly/acquisition-dma.toml`"
+
+msgid "`soc/stm32g474/drivers/adc_stream.c`"
+msgstr "`soc/stm32g474/drivers/adc_stream.c`"
+
 msgid ""
 "`tests/contracts/g474_assembly/exti-freertos.toml`, "
 "`tests/contracts/g474_assembly/exti.toml`"
@@ -1168,6 +1316,23 @@ msgstr ""
 
 msgid "`soc/stm32g474/drivers/exti.c`"
 msgstr "`soc/stm32g474/drivers/exti.c`"
+
+msgid "`internal-flash`"
+msgstr "`internal-flash`"
+
+msgid ""
+"`tests/contracts/g474_assembly/acquisition-dma-freertos.toml`, "
+"`tests/contracts/g474_assembly/acquisition-dma.toml`, "
+"`tests/contracts/g474_assembly/acquisition-freertos.toml`, "
+"`tests/contracts/g474_assembly/acquisition.toml`"
+msgstr ""
+"`tests/contracts/g474_assembly/acquisition-dma-freertos.toml`, "
+"`tests/contracts/g474_assembly/acquisition-dma.toml`, "
+"`tests/contracts/g474_assembly/acquisition-freertos.toml`, "
+"`tests/contracts/g474_assembly/acquisition.toml`"
+
+msgid "`soc/stm32g474/drivers/flash.c`"
+msgstr "`soc/stm32g474/drivers/flash.c`"
 
 msgid ""
 "`gpio-pa0`, `gpio-pa1`, `gpio-pa10`, `gpio-pa11`, `gpio-pa12`, `gpio-pa13`, "
@@ -1234,6 +1399,12 @@ msgstr "`gpio-pf0`, `gpio-pf1`"
 
 msgid "`gpio-pg10`"
 msgstr "`gpio-pg10`"
+
+msgid "`i2c1-pb8-pb9`"
+msgstr "`i2c1-pb8-pb9`"
+
+msgid "`soc/common/i2c_v2.c`"
+msgstr "`soc/common/i2c_v2.c`"
 
 msgid ""
 "`tests/contracts/g474_assembly/spi-freertos.toml`, "
@@ -1309,11 +1480,37 @@ msgstr "`usart3-pb10-pb11`"
 msgid "stm32h743"
 msgstr "stm32h743"
 
+msgid "`adc1-pa3`"
+msgstr "`adc1-pa3`"
+
+msgid "`stm32h743zi-hsi-reference`"
+msgstr "`stm32h743zi-hsi-reference`"
+
+msgid ""
+"`tests/contracts/h743_assembly/peripherals-freertos.toml`, "
+"`tests/contracts/h743_assembly/peripherals.toml`, "
+"`tests/contracts/h743_assembly/peripherals32-freertos.toml`, "
+"`tests/contracts/h743_assembly/peripherals32.toml`"
+msgstr ""
+"`tests/contracts/h743_assembly/peripherals-freertos.toml`, "
+"`tests/contracts/h743_assembly/peripherals.toml`, "
+"`tests/contracts/h743_assembly/peripherals32-freertos.toml`, "
+"`tests/contracts/h743_assembly/peripherals32.toml`"
+
+msgid "`soc/stm32h743/drivers/adc.c`"
+msgstr "`soc/stm32h743/drivers/adc.c`"
+
+msgid "`soc/stm32h743/drivers/exti.c`"
+msgstr "`soc/stm32h743/drivers/exti.c`"
+
+msgid "`soc/stm32h743/drivers/flash.c`"
+msgstr "`soc/stm32h743/drivers/flash.c`"
+
 msgid "`gpio-pb0`"
 msgstr "`gpio-pb0`"
 
-msgid "`stm32h743-nucleo-zi2`"
-msgstr "`stm32h743-nucleo-zi2`"
+msgid "`stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference`"
+msgstr "`stm32h743-nucleo-zi2`, `stm32h743zi-hsi-reference`"
 
 msgid ""
 "`tests/contracts/h743_assembly/dma-cache-freertos.toml`, "
@@ -1328,6 +1525,8 @@ msgid ""
 "`tests/contracts/h743_assembly/io.toml`, `tests/contracts/h743_assembly/rx-"
 "cache-freertos.toml`, `tests/contracts/h743_assembly/rx-cache.toml`, "
 "`tests/contracts/h743_assembly/rx-freertos.toml`, "
+"`tests/contracts/h743_assembly/rx-sram1-cache.toml`, "
+"`tests/contracts/h743_assembly/rx-sram1.toml`, "
 "`tests/contracts/h743_assembly/rx.toml`, "
 "`tests/contracts/h743_assembly/rx32-cache-freertos.toml`, "
 "`tests/contracts/h743_assembly/rx32-cache.toml`, "
@@ -1348,6 +1547,8 @@ msgstr ""
 "`tests/contracts/h743_assembly/io.toml`, `tests/contracts/h743_assembly/rx-"
 "cache-freertos.toml`, `tests/contracts/h743_assembly/rx-cache.toml`, "
 "`tests/contracts/h743_assembly/rx-freertos.toml`, "
+"`tests/contracts/h743_assembly/rx-sram1-cache.toml`, "
+"`tests/contracts/h743_assembly/rx-sram1.toml`, "
 "`tests/contracts/h743_assembly/rx.toml`, "
 "`tests/contracts/h743_assembly/rx32-cache-freertos.toml`, "
 "`tests/contracts/h743_assembly/rx32-cache.toml`, "
@@ -1358,6 +1559,30 @@ msgstr ""
 
 msgid "`soc/stm32h743/drivers/gpio.c`"
 msgstr "`soc/stm32h743/drivers/gpio.c`"
+
+msgid "`gpio-pe11`"
+msgstr "`gpio-pe11`"
+
+msgid "IWDG1"
+msgstr "IWDG1"
+
+msgid "`iwdg1`"
+msgstr "`iwdg1`"
+
+msgid "`soc/stm32h743/drivers/watchdog.c`"
+msgstr "`soc/stm32h743/drivers/watchdog.c`"
+
+msgid "`spi4-pe12-pe13-pe14`"
+msgstr "`spi4-pe12-pe13-pe14`"
+
+msgid "`soc/stm32h743/drivers/spi.c`"
+msgstr "`soc/stm32h743/drivers/spi.c`"
+
+msgid "`tim3-pa6`"
+msgstr "`tim3-pa6`"
+
+msgid "`soc/stm32h743/drivers/pwm.c`"
+msgstr "`soc/stm32h743/drivers/pwm.c`"
 
 msgid "`usart3-pd8-pd9`"
 msgstr "`usart3-pd8-pd9`"
@@ -1402,6 +1627,8 @@ msgid ""
 "`tests/contracts/h743_assembly/rx-cache-freertos.toml`, "
 "`tests/contracts/h743_assembly/rx-cache.toml`, "
 "`tests/contracts/h743_assembly/rx-freertos.toml`, "
+"`tests/contracts/h743_assembly/rx-sram1-cache.toml`, "
+"`tests/contracts/h743_assembly/rx-sram1.toml`, "
 "`tests/contracts/h743_assembly/rx.toml`, "
 "`tests/contracts/h743_assembly/rx32-cache-freertos.toml`, "
 "`tests/contracts/h743_assembly/rx32-cache.toml`, "
@@ -1411,6 +1638,8 @@ msgstr ""
 "`tests/contracts/h743_assembly/rx-cache-freertos.toml`, "
 "`tests/contracts/h743_assembly/rx-cache.toml`, "
 "`tests/contracts/h743_assembly/rx-freertos.toml`, "
+"`tests/contracts/h743_assembly/rx-sram1-cache.toml`, "
+"`tests/contracts/h743_assembly/rx-sram1.toml`, "
 "`tests/contracts/h743_assembly/rx.toml`, "
 "`tests/contracts/h743_assembly/rx32-cache-freertos.toml`, "
 "`tests/contracts/h743_assembly/rx32-cache.toml`, "
@@ -1423,8 +1652,30 @@ msgstr "`soc/stm32h743/drivers/uart_receive.c`"
 msgid "stm32u575"
 msgstr "stm32u575"
 
+msgid "ADC4"
+msgstr "ADC4"
+
+msgid "`adc4-pc0`"
+msgstr "`adc4-pc0`"
+
 msgid "`stm32u575-nucleo-zi-q`"
 msgstr "`stm32u575-nucleo-zi-q`"
+
+msgid ""
+"`tests/contracts/u575_assembly/peripherals-freertos.toml`, "
+"`tests/contracts/u575_assembly/peripherals.toml`"
+msgstr ""
+"`tests/contracts/u575_assembly/peripherals-freertos.toml`, "
+"`tests/contracts/u575_assembly/peripherals.toml`"
+
+msgid "`soc/stm32u575/drivers/adc.c`"
+msgstr "`soc/stm32u575/drivers/adc.c`"
+
+msgid "`soc/stm32u575/drivers/exti.c`"
+msgstr "`soc/stm32u575/drivers/exti.c`"
+
+msgid "`soc/stm32u575/drivers/flash.c`"
+msgstr "`soc/stm32u575/drivers/flash.c`"
 
 msgid ""
 "`tests/contracts/u575_assembly/mainstream-freertos.toml`, "
@@ -1513,6 +1764,19 @@ msgstr "`gpio-ph0`, `gpio-ph1`, `gpio-ph3`"
 
 msgid "`soc/stm32u575/drivers/watchdog.c`"
 msgstr "`soc/stm32u575/drivers/watchdog.c`"
+
+msgid "`soc/stm32u575/drivers/spi.c`"
+msgstr "`soc/stm32u575/drivers/spi.c`"
+
+msgid ""
+"`tests/contracts/u575_assembly/pwm-freertos.toml`, "
+"`tests/contracts/u575_assembly/pwm.toml`"
+msgstr ""
+"`tests/contracts/u575_assembly/pwm-freertos.toml`, "
+"`tests/contracts/u575_assembly/pwm.toml`"
+
+msgid "`soc/stm32u575/drivers/pwm.c`"
+msgstr "`soc/stm32u575/drivers/pwm.c`"
 
 msgid "`soc/stm32u575/drivers/uart.c`"
 msgstr "`soc/stm32u575/drivers/uart.c`"

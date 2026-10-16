@@ -84,6 +84,50 @@
       "id": "iwdg",
       "controller": "IWDG",
       "route": "independent-watchdog"
+    },
+    {
+      "id": "spi1",
+      "controller": "SPI1",
+      "route": "spi1-pa5-pa6-pa7"
+    },
+    {
+      "id": "i2c1",
+      "controller": "I2C1",
+      "route": "i2c1-pb8-pb9"
+    },
+    {
+      "id": "pwm3",
+      "controller": "TIM3",
+      "route": "tim3-pa6",
+      "initial": 0,
+      "mask": 64
+    },
+    {
+      "id": "adc4",
+      "controller": "ADC4",
+      "route": "adc4-pc0"
+    },
+    {
+      "id": "edge0",
+      "controller": "EXTI0",
+      "route": "exti0-pa0"
+    },
+    {
+      "id": "edge1",
+      "controller": "EXTI1",
+      "route": "exti1-pa1"
+    },
+    {
+      "id": "flash",
+      "controller": "FLASH",
+      "route": "physical-flash"
+    },
+    {
+      "id": "spi1-cs",
+      "controller": "GPIOA",
+      "route": "gpio-pa4",
+      "initial": 16,
+      "mask": 16
     }
   ],
   "reserved_resources": [
@@ -97,7 +141,8 @@
     "Silicon revision, supply/SMPS population and USART ES0499 noise behavior remain unobserved",
     "No physical HIL executed; clock accuracy, interrupts and UART electrical traffic unqualified",
     "Additional single-pad GPIO bindings and USART2 PA2/PA3 are software reference selections from exact silicon pad facts; PCB connector availability, attached loads, wiring and electrical compatibility are unobserved. They do not claim additional on-board devices.",
-    "IWDG assembly stays inactive; explicit application enable is irreversible. LSI electrical bounds are datasheet characterization, not station measurements. Window/EWI and LSIPREDIV250Hz unsupported."
+    "IWDG assembly stays inactive; explicit application enable is irreversible. LSI electrical bounds are datasheet characterization, not station measurements. Window/EWI and LSIPREDIV250Hz unsupported.",
+    "SPI1 CS/data, I2C1 pull-ups/targets, TIM3 load, ADC4PC0 input and EXTI PA0/1 are software reference routes only. ADC requires externally preparedVDDA and observedPWR.SVMCR.ASV, never inferred from nominalreference_mv. Flash power/watchdog/stall/power-loss policy remains external; no physical HIL executed."
   ],
   "provenance": [
     {

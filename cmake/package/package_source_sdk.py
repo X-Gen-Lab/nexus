@@ -26,6 +26,7 @@ try:
     from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES, declared_modules
     from tools.maintenance import (
         cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
+        stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
         stm32g4_lock, threadx_lock,
     )
     from tools.configure.metadata import load_policy, parse_json, snapshot
@@ -44,7 +45,8 @@ ROOT_FILES = {"CMakeLists.txt", "LICENSE", "README.md", "AGENTS.md", ".gitmodule
 ROOT_DIRS = {"arch", "boards", "cmake", "dependencies", "core", "io", "os",
              "components", "tools", "scripts", "soc"}
 REQUIRED_DEPENDENCIES = tuple(item.path for item in SOURCE_DEPENDENCIES)
-OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock)
+OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock, stm32g4_hal_lock,
+                    stm32h7_hal_lock, stm32u5_hal_lock)
 REQUIRED_FILES = (
     "CMakeLists.txt", "LICENSE", ".gitmodules", "dependencies/toolchains.lock.json",
     "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
@@ -88,6 +90,7 @@ REQUIRED_FILES = (
     "tools/dev/qualification.py", "tools/dev/provenance.py",
     "tools/evidence/store.py",
     "tools/evidence/environment.py", "tools/evidence/recipe.py",
+    "tools/maintenance/stm32_ll_lock.py", "cmake/platform/Workload.cmake",
     "tools/configure/authored.py", "tools/configure/ir.py",
     "tools/configure/cpu.py", "tools/configure/runtime.py",
     "tools/configure/kernel.py", "tools/configure/metadata.py",
@@ -278,7 +281,7 @@ for _component, _include, _private in (
     if _private is not None:
         REQUIRED_FILES += ("components/" + _component + "/private/" + _private,)
 # G474 owned support retains its selected production units independently of
-# test fixtures. The official device closure stays five locked files.
+# test fixtures. The device closure follows each exact reviewed source lock.
 REQUIRED_FILES += tuple("soc/stm32g474/" + name for name in (
     "CMakeLists.txt", "system.c", "drivers/gpio.c", "drivers/uart.c",
     "drivers/exti.c", "drivers/spi.c", "drivers/watchdog.c", "drivers/pwm.c",

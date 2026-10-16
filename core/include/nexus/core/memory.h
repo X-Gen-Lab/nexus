@@ -70,4 +70,15 @@
 #define NX_MEMORY_CCM_NOINIT NX_MEMORY_CCM_DATA
 #endif
 
+#if defined(NEXUS_MEMORY_SRAM1) && NEXUS_MEMORY_SRAM1 == 1
+#define NX_MEMORY_SRAM1_DATA   NX_CORE_MEMORY_ATTRIBUTE(".nx_sram1_data")
+#define NX_MEMORY_SRAM1_BSS    NX_CORE_MEMORY_ATTRIBUTE(".bss.nx_sram1")
+#define NX_MEMORY_SRAM1_NOINIT NX_CORE_MEMORY_ATTRIBUTE(".bss.nx_sram1_noinit")
+#else
+#define NX_MEMORY_SRAM1_DATA                                                   \
+    _Pragma("GCC error \"SRAM1 memory region is not selected\"")
+#define NX_MEMORY_SRAM1_BSS    NX_MEMORY_SRAM1_DATA
+#define NX_MEMORY_SRAM1_NOINIT NX_MEMORY_SRAM1_DATA
+#endif
+
 #endif

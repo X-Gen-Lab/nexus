@@ -31,6 +31,25 @@ typedef struct {
 } NVIC_Type;
 extern NVIC_Type g_gd32_model_nvic;
 #define NVIC (&g_gd32_model_nvic)
+/** \brief Read one external-vector fact without changing another bank. */
+static inline uint32_t nx_gd32_model_irq_bit(const uint32_t* words,
+                                             IRQn_Type irq) {
+    if ((int)irq < 0 || (unsigned)irq >= 256U)
+        return 0U;
+    return (words[(unsigned)irq / 32U] >> ((unsigned)irq % 32U)) & 1U;
+}
+/** \brief Observe the actual model enable bit, not pending or handler state. */
+static inline uint32_t NVIC_GetEnableIRQ(IRQn_Type irq) {
+    return nx_gd32_model_irq_bit(NVIC->ISER, irq);
+}
+/** \brief Observe the latched pending bit even when the vector is disabled. */
+static inline uint32_t NVIC_GetPendingIRQ(IRQn_Type irq) {
+    return nx_gd32_model_irq_bit(NVIC->ISPR, irq);
+}
+/** \brief Observe an active handler until the model explicitly returns it. */
+static inline uint32_t NVIC_GetActive(IRQn_Type irq) {
+    return nx_gd32_model_irq_bit(NVIC->IABR, irq);
+}
 /** \brief Model an enabled external interrupt bit. */
 static inline void NVIC_EnableIRQ(IRQn_Type irq) {
     NVIC->ISER[(unsigned)irq / 32u] |= 1u << ((unsigned)irq % 32u);
