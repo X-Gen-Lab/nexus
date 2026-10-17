@@ -71,7 +71,7 @@ def emit(result):
                        {"spi_transaction_device", "i2c_long_device",
                         "spi_dma_transaction_device"}):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
-    if any(item.kind == "eth" for item in selections):
+    if any(item.kind in {"eth", "eth_frames"} for item in selections):
         header.append('#include "nexus/io/mdio.h"')
     header += ['#ifdef __cplusplus', 'extern "C" {', '#endif', 'typedef struct {', '    nx_result_t primary;',
                '    nx_result_t cleanup;', '    uint32_t remaining_effects;',

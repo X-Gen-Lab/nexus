@@ -18,6 +18,9 @@ def includes(result):
     source = ['#include "stm32h743_provider.h"']
     if result.clock_plan is not None:
         source.append('#include "stm32h743_clock.h"')
+    if any(item.kind == "uart" and item.mode == "irq-fifo-bytes"
+           for item in result.controllers):
+        source.append('#include "stm32h743_uart_fifo.h"')
     if _dma(result):
         source.append('#include "stm32h743_dma.h"')
     if any(item.kind == "uart" and item.mode == "rx-dma-idle"

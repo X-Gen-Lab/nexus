@@ -28,7 +28,7 @@ duty array and sample array. The arrows retain their generation, lookup and
 call meanings. Factory lookup never primes ADC, starts PWM or schedules work.
 
 The normal input is
-[the maintained TOML fixture](../../tests/contracts/g474_control_assembly/pwm-adc.toml).
+[the maintained TOML fixture](../../cmake/package/verification/io_evolution/g474-pwm-adc.toml).
 Its software-only Board package supplies silicon pin and voltage assumptions;
 it does not establish a fitted analog circuit. The strict resolver selects a
 single Construction, a compact `NX_PWM_ADC_ID_WINDOW` and

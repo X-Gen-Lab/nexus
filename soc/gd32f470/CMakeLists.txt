@@ -18,7 +18,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/platform/ControllerModes.cmake")
 # SystemInit needs RCU/FMC; the always-present monotonic timebase needs TIMER.
 set(gd_sdk_units rcu fmc timer)
 set(gd_sources timebase.c)
-foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth
+foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth eth_frames
         timer_capture advanced_pwm)
     nexus_controller_modes(modes "${kind}")
     if(NOT modes)
@@ -26,13 +26,15 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth
     endif()
     if(kind STREQUAL "eth")
         list(APPEND gd_sources drivers/ethernet.c)
+    elseif(kind STREQUAL "eth_frames")
+        list(APPEND gd_sources drivers/ethernet_frames.c)
     elseif(kind STREQUAL "pwm")
         list(APPEND gd_sources drivers/timer.c)
     else()
         list(APPEND gd_sources "drivers/${kind}.c")
     endif()
     # Selected pin owners share capture/restore for the global Platform lease.
-    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can|usb_device|eth|timer_capture|advanced_pwm)$")
+    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can|usb_device|eth|eth_frames|timer_capture|advanced_pwm)$")
         list(APPEND gd_sources drivers/gpio.c)
         list(APPEND gd_sdk_units gpio)
     endif()
@@ -72,6 +74,9 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth
     elseif(kind STREQUAL "eth")
         list(APPEND gd_sources
             "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/eth_mac.c")
+    elseif(kind STREQUAL "eth_frames")
+        list(APPEND gd_sources
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/eth_frames_mac.c")
     elseif(kind STREQUAL "usb_device")
         list(APPEND gd_sources usb_clock.c
             "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/usb_device_controller.c")

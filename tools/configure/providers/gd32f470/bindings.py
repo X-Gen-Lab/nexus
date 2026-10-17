@@ -449,7 +449,7 @@ def constructor(item, result, board_bindings, routes, devices):
         return timer_advanced.constructor(item, result, "gd32")
     if item.kind == "can":
         return can.constructor(item, result, "gd32")
-    if item.kind == "eth":
+    if item.kind in {"eth", "eth_frames"}:
         return ethernet.constructor(item, result, "gd32")
     if item.kind == "usb_device":
         return usb_device.constructor(item, result, "gd32")

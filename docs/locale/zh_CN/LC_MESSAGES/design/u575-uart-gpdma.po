@@ -1,6 +1,6 @@
 # Authored translation; independent semantic review completed.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: a60ad12a86758f20319670a37813c74177e9f8630598fae0e05c267c96619597\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 0b5a581ac0c38b0c3b0531720fcbfaa92d4ff37266987a0a2b9570f96fd5fee3\n"
 
 msgid "Finite USART1 GPDMA TX on STM32U575"
 msgstr "STM32U575 USART1 有限 GPDMA TX"

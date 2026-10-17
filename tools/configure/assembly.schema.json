@@ -119,6 +119,90 @@
         "additionalProperties": false
       }
     },
+    "adc_group": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "exclusive": {
+            "type": "boolean"
+          },
+          "irq": {
+            "type": "object",
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "additionalProperties": false
+          },
+          "mode": {
+            "type": "string"
+          },
+          "period_us": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reference_mv": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sample_times": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "silicon_profile": {
+            "type": "string"
+          },
+          "trigger": {
+            "type": "string"
+          },
+          "watchdog": {
+            "type": "object",
+            "properties": {
+              "lower": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "upper": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "lower",
+              "upper"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
     "advanced_pwm": {
       "type": "object",
       "additionalProperties": {
@@ -294,8 +378,32 @@
                 "type": "string"
               },
               "fifo": {
-                "type": "integer",
-                "minimum": 0
+                "type": "object",
+                "properties": {
+                  "rx_budget_bytes": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 16
+                  },
+                  "rx_threshold": {
+                    "type": "string"
+                  },
+                  "tx_budget_bytes": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 16
+                  },
+                  "tx_threshold": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "rx_budget_bytes",
+                  "rx_threshold",
+                  "tx_budget_bytes",
+                  "tx_threshold"
+                ],
+                "additionalProperties": false
               },
               "format": {
                 "type": "string"
@@ -483,6 +591,71 @@
       }
     },
     "eth": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "array",
+            "minItems": 6,
+            "maxItems": 6,
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            }
+          },
+          "binding": {
+            "type": "string"
+          },
+          "drain_timeout_us": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "init_timeout_us": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "irq": {
+            "type": "object",
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "additionalProperties": false
+          },
+          "mode": {
+            "type": "string"
+          },
+          "rx_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "rx_storage_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "tx_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "eth_frames": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
@@ -1220,6 +1393,34 @@
           },
           "binding": {
             "type": "string"
+          },
+          "fifo": {
+            "type": "object",
+            "properties": {
+              "rx_budget_bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16
+              },
+              "rx_threshold": {
+                "type": "string"
+              },
+              "tx_budget_bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16
+              },
+              "tx_threshold": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rx_budget_bytes",
+              "rx_threshold",
+              "tx_budget_bytes",
+              "tx_threshold"
+            ],
+            "additionalProperties": false
           },
           "frame": {
             "type": "object",

@@ -656,6 +656,68 @@
           "DMA1:stream7:channel7"
         ]
       }
+    },
+    {
+      "id": "rmii-frames-a-c-g",
+      "controller": "ETH",
+      "kind": "eth_frames",
+      "variants": [
+        "STM32F407ZGT6"
+      ],
+      "modes": [
+        "rmii-vlan-sg-ptp"
+      ],
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "refclk",
+          "af": 11
+        },
+        {
+          "pin": "PA2",
+          "function": "mdio",
+          "af": 11
+        },
+        {
+          "pin": "PA7",
+          "function": "crs_dv",
+          "af": 11
+        },
+        {
+          "pin": "PC1",
+          "function": "mdc",
+          "af": 11
+        },
+        {
+          "pin": "PC4",
+          "function": "rxd0",
+          "af": 11
+        },
+        {
+          "pin": "PC5",
+          "function": "rxd1",
+          "af": 11
+        },
+        {
+          "pin": "PG11",
+          "function": "txen",
+          "af": 11
+        },
+        {
+          "pin": "PG13",
+          "function": "txd0",
+          "af": 11
+        },
+        {
+          "pin": "PG14",
+          "function": "txd1",
+          "af": 11
+        }
+      ],
+      "source": "RMII AF11 silicon pad mux only. PHY, reset, external 50MHz clock and Board electric route remain external, unqualified. STM32F407 DS8626 AF11 / RM0090 Rev21 Selected enhanced SG/VLAN/PTP interface shares the physical MAC; external PHY and reference-clock/electrical qualification remain unknown.",
+      "resources": [
+        "clock:ETHMACPTP"
+      ]
     }
   ]
 }

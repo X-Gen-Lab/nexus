@@ -9,6 +9,10 @@
       "bytes": 125330,
       "sha256": "637d0822e248429fd87182786f1e727860dc52645440405642e08f5df13bf565"
     },
+    "Inc/stm32h7xx_ll_usart.h": {
+      "bytes": 175243,
+      "sha256": "0a739716ed496ee660c25a16b0e90a40bb83998fb83107fa778164dd6419403a"
+    },
     "LICENSE.md": {
       "bytes": 1485,
       "sha256": "376c82bcef0be563bf59b93d05cfdd4b6295e4660b55b31dd8a883bf1d6637f7"

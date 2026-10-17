@@ -27,8 +27,8 @@ Here the selected face is `nx_can_fd_port_t`, the compact lookup is
 RAM. Generation arrows, lookup arrows and runtime calls keep their original
 meanings. Lookup neither reads hardware nor starts a transmission.
 
-The [normal fixture](../../tests/contracts/g474_control_assembly/can-fd-normal.toml)
-and [loopback fixture](../../tests/contracts/g474_control_assembly/can-fd.toml)
+The [normal fixture](../../cmake/package/verification/io_evolution/g474-can-fd-normal.toml)
+and [loopback fixture](../../cmake/package/verification/io_evolution/g474-can-fd-loopback.toml)
 use the same software Board and physical claims. The strict resolver selects
 one mode, validates exact rates, masks, ring capacity and IRQ policy, then
 publishes immutable typed IR and one generated bundle. Conflicting controller,

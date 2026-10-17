@@ -54,6 +54,25 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         document = (ROOT / capabilities.DOCUMENT).read_text()
         capabilities.check_block(document, expected)
 
+    def test_redistributed_references_preserve_selected_source_provenance(self):
+        directory = ROOT / "cmake/package/verification/io_evolution"
+        fixtures = sorted(directory.glob("*.toml"))
+        self.assertTrue(fixtures)
+        rows = capabilities.collect(ROOT)
+        for fixture in fixtures:
+            resolved = capabilities.configure.resolve(fixture, ROOT)
+            relative = fixture.relative_to(ROOT).as_posix()
+            for item in resolved["controllers"]:
+                with self.subTest(fixture=fixture.name, device=item["id"]):
+                    selected = [row for row in rows if
+                                (row["family"], row["controller"], row["kind"],
+                                 row["mode"]) ==
+                                (resolved["soc_family"], item["controller"],
+                                 item["kind"], item["mode"])]
+                    self.assertEqual(len(selected), 1)
+                    self.assertIn(relative, selected[0]["fixtures"])
+                    self.assertTrue(selected[0]["exports"])
+
     def test_alternate_interface_uses_its_exact_route_and_source_on_one_timer(self):
         rows = capabilities.collect(ROOT)
         timer = [row for row in rows if row["family"] == "stm32g474" and

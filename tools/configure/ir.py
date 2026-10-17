@@ -213,6 +213,14 @@ class StreamProfileIR(Record):
 
 
 @dataclass(frozen=True)
+class UartFifoOptions:
+    rx_threshold: str
+    tx_threshold: str
+    rx_budget_bytes: int
+    tx_budget_bytes: int
+
+
+@dataclass(frozen=True)
 class UartOptions:
     baud: int
     rx_profile: str
@@ -220,6 +228,7 @@ class UartOptions:
     irq: IrqOptions
     frame: UartFrameOptions | None = None
     stream_profile: StreamProfileIR | None = None
+    fifo: UartFifoOptions | None = None
 
 
 @dataclass(frozen=True)
@@ -295,6 +304,63 @@ class AdcOptions:
 
 
 @dataclass(frozen=True)
+class SiliconRevisionRuleIR:
+    revision_id: int
+    required_workarounds: int
+
+
+@dataclass(frozen=True)
+class SiliconAdmissionIR:
+    """Named software expectation; hardware is read only at cold admission."""
+    profile: str
+    provider: str
+    part: str
+    device_id: int
+    flash_bytes: int
+    rules: tuple[SiliconRevisionRuleIR, ...]
+    applied_workarounds: int
+    review_sha256: str
+    review_scope: str
+    unknown_revision: str = "reject"
+    physical_qualified: bool = False
+
+    @classmethod
+    def from_validated(cls, record):
+        return cls(*(record[key] for key in (
+            "profile", "provider", "part", "device_id", "flash_bytes")),
+            tuple(SiliconRevisionRuleIR(**rule) for rule in record["rules"]),
+            *(record[key] for key in ("applied_workarounds", "review_sha256",
+                                     "review_scope")))
+
+
+@dataclass(frozen=True)
+class AdcWatchdogOptions:
+    lower: int
+    upper: int
+
+
+@dataclass(frozen=True)
+class AdcGroupOptions:
+    channels: tuple[int, ...]
+    sample_times: tuple[int, ...]
+    reference_mv: int
+    exclusive: bool
+    silicon_profile: str
+    trigger: str
+    period_us: int
+    watchdog: AdcWatchdogOptions | None
+    irq: IrqOptions
+    rank_repeat: int
+    sample_stride: int
+    scan_stride: int
+    max_frames: int
+    adc_clock_hz: int
+    hclk_hz: int
+    trigger_identity: int
+    admission: SiliconAdmissionIR
+
+
+@dataclass(frozen=True)
 class TimerCaptureOptions:
     tick_hz: int
     edge: str
@@ -324,6 +390,12 @@ class EthernetOptions:
     init_timeout_us: int
     drain_timeout_us: int
     irq: IrqOptions
+
+
+@dataclass(frozen=True)
+class EthernetFramesOptions(EthernetOptions):
+    """One selected MAC counter; domain identity is never authored or measured."""
+    clock_domain: int
 
 
 @dataclass(frozen=True)
@@ -428,8 +500,10 @@ class CanFdOptions:
 
 ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
                      ExtiOptions | PwmOptions | PwmGroupOptions | EncoderOptions | AdcOptions | CanOptions |
-                     UsbDeviceOptions | EthernetOptions | TimerCaptureOptions |
-                     AdvancedPwmOptions | PwmAdcOptions | CanFdOptions | NoOptions)
+                     UsbDeviceOptions | EthernetOptions | EthernetFramesOptions |
+                     TimerCaptureOptions |
+                     AdvancedPwmOptions | PwmAdcOptions | CanFdOptions |
+                     AdcGroupOptions | NoOptions)
 
 
 def mode_options(values):
@@ -438,6 +512,19 @@ def mode_options(values):
     irq = (IrqOptions(values["irq_priority"], values.get("calls_os", False),
                       values.get("irq_probe", False))
            if "irq_priority" in values else None)
+    if kind == "adc_group":
+        plan = values["adc_group_resolution"]
+        return AdcGroupOptions(
+            tuple(values["channels"]), tuple(values["sample_times"]),
+            values["reference_mv"], values["exclusive"],
+            values["silicon_profile"], values["trigger"],
+            values.get("period_us", 0),
+            (AdcWatchdogOptions(**values["watchdog"])
+             if "watchdog" in values else None), irq,
+            *(plan[key] for key in (
+                "rank_repeat", "sample_stride", "scan_stride", "max_frames",
+                "adc_clock_hz", "hclk_hz", "trigger_identity")),
+            SiliconAdmissionIR.from_validated(plan["admission"]))
     if kind == "pwm_adc":
         return PwmAdcOptions(*(values[key] for key in (
             "tick_hz", "period_ticks", "trigger_ticks", "deadtime_ticks")),
@@ -472,10 +559,12 @@ def mode_options(values):
         return AdvancedPwmOptions(*(values[key] for key in (
             "tick_hz", "period_ticks", "deadtime_ticks", "break_active_high",
             "idle_high", "idle_complement_high", "exclusive")), irq)
-    if kind == "eth":
-        return EthernetOptions(values["tx_count"], values["rx_count"],
-                               values["rx_storage_bytes"], tuple(values["address"]),
-                               values["init_timeout_us"], values["drain_timeout_us"], irq)
+    if kind in {"eth", "eth_frames"}:
+        arguments = (values["tx_count"], values["rx_count"],
+                     values["rx_storage_bytes"], tuple(values["address"]),
+                     values["init_timeout_us"], values["drain_timeout_us"], irq)
+        return (EthernetFramesOptions(*arguments, values["clock_domain"])
+                if kind == "eth_frames" else EthernetOptions(*arguments))
     if kind == "gpio":
         return GpioOptions(values["mask"], values["initial"])
     if kind == "uart":
@@ -485,7 +574,9 @@ def mode_options(values):
                            if "frame" in values else None,
                            StreamProfileIR.from_validated(
                                values["stream_resolution"])
-                           if "stream_resolution" in values else None)
+                           if "stream_resolution" in values else None,
+                           UartFifoOptions(**values["fifo"])
+                           if "fifo" in values else None)
     if kind == "spi":
         return SpiOptions(values.get("max_hz", 1000000), irq)
     if kind == "i2c":

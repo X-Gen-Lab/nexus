@@ -1,6 +1,6 @@
 # Actual normal TOML bundle; model only external register and time behavior.
 set(g4_pwm_adc_input
-    "${NEXUS_SOURCE_DIR}/tests/contracts/g474_control_assembly/pwm-adc.toml")
+    "${NEXUS_SOURCE_DIR}/cmake/package/verification/io_evolution/g474-pwm-adc.toml")
 set(g4_pwm_adc_bundle "${CMAKE_CURRENT_BINARY_DIR}/g474-pwm-adc-factory")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
     "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"

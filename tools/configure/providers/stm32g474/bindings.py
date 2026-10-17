@@ -17,6 +17,9 @@ def constructor(item, result, board_bindings, routes, devices):
     item = controller_ir(item, "stm32g474")
     if item.provider != "stm32g474":
         fail("G474 constructor cannot reinterpret a foreign provider decision")
+    if item.kind == "adc_group":
+        from . import adc_group
+        return adc_group.constructor(item, result, board_bindings[item.binding])
     validate_selection(item, routes[item["route"]] if item.kind in {
         "pwm_adc", "can_fd"} else item)
     if item.kind in {"pwm_adc", "can_fd"}:

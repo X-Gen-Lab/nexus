@@ -1,6 +1,6 @@
 # Software-only V-cut reference: electrical assumptions require physical review.
 schema = 2
-board_package = "../../../boards/stm32h743zi_hsi_reference"
+board_package = "../../../../boards/stm32h743zi_hsi_reference"
 backend = "baremetal"
 clock = "hsi64-pll384-cache-off"
 

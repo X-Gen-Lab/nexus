@@ -21,6 +21,9 @@ FLASH_INPUT_ALIGNMENT = 1
 FACT_REFERENCES = descriptor.maintained("gd32f470").references
 SOURCE_IMPORT_LOCK = descriptor.maintained("gd32f470").import_lock
 ETH_CONTROLLER = 'ENET'
+CONTROLLER_INTERFACES = MappingProxyType({
+    'ENET': MappingProxyType({
+        'eth_frames': ('rmii-vlan-sg-ptp',)})})
 USB_CONTROLLER = 'USBFS'
 CAN_CONTROLLERS = ('CAN0', 'CAN1')
 CAN_CLOCK_HZ = 50000000
@@ -45,6 +48,7 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('timer_capture', 'edge-capture'): 'timer_capture',
     ('advanced_pwm', 'complementary-pwm'): 'advanced_pwm',
     ('eth', 'raw-rmii'): 'eth',
+    ('eth_frames', 'rmii-vlan-sg-ptp'): 'eth_frames',
     ('usb_device', 'device-fs'): 'usb_device',
     ('can', 'classic-irq'): 'can',
     ('gpio', 'input'): 'gpio',

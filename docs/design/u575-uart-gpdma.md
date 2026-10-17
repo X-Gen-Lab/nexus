@@ -43,7 +43,7 @@ The normal fixture supplies the existing Board package and UART mode. Physical
 engine, channel, request and vector facts come from the exact SoC descriptor;
 there is no competing authored DMA register configuration.
 
-```{literalinclude} ../../tests/contracts/u575_assembly/usart1-dma-tx.toml
+```{literalinclude} ../../cmake/package/verification/io_evolution/u575-uart-gpdma.toml
 :language: toml
 ```
 

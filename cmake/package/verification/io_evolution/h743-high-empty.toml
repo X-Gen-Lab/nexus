@@ -1,5 +1,5 @@
 schema = 2
-board_package = "../../../boards/stm32h743_nucleo_zi2"
+board_package = "../../../../boards/stm32h743_nucleo_zi2"
 backend = "baremetal"
 clock = "hsi64-pll384-cache-off"
 

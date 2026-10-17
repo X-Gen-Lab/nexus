@@ -647,7 +647,12 @@
         "clock:ETHMACTX",
         "clock:ETHMACRX",
         "controller:SYSCFG_RMII"
-      ]
+      ],
+      "interfaces": {
+        "eth_frames": [
+          "rmii-vlan-sg-ptp"
+        ]
+      }
     },
     "TIM4": {
       "kind": "timer_capture",

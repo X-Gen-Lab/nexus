@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "soc": "STM32G474RET6",
+  "soc_family": "stm32g474",
+  "source_revision": "DS12288 Rev6 exact silicon routes; software-only ADC group reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 24000000
+  },
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32g474re.pdf",
+      "scope": "DS12288 Table12 PA0 ADC12_IN1 / PA1 ADC12_IN2; no inspected Board circuit or electrical source."
+    }
+  ],
+  "id": "stm32g474re-adc-group-software-fixture",
+  "bindings": [
+    {
+      "id": "samples",
+      "controller": "ADC1",
+      "route": "adc1-sequence-pa0-pa1",
+      "supply_mv": 3300
+    }
+  ],
+  "unknowns": [
+    "Not a connected Board: physical PCB and oscillator population are unknown.",
+    "24MHz HSE and3300mV supply/reference are software fixture declarations, not measurements.",
+    "No external analog source impedance, calibration, accuracy, aperture or HIL is observed."
+  ]
+}

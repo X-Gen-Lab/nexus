@@ -1,16 +1,16 @@
 # Real selected FDCAN assemblies; only external register/clock ports modeled.
 foreach(g4_fdcan_mode loopback normal)
     if(g4_fdcan_mode STREQUAL normal)
-        set(g4_fdcan_input_name can-fd-normal)
+        set(g4_fdcan_input_name g474-can-fd-normal)
         set(g4_fdcan_target nexus_g474_fdcan_normal_factory_test)
         set(g4_fdcan_normal 1)
     else()
-        set(g4_fdcan_input_name can-fd)
+        set(g4_fdcan_input_name g474-can-fd-loopback)
         set(g4_fdcan_target nexus_g474_fdcan_factory_test)
         set(g4_fdcan_normal 0)
     endif()
 set(g4_fdcan_input
-    "${NEXUS_SOURCE_DIR}/tests/contracts/g474_control_assembly/${g4_fdcan_input_name}.toml")
+    "${NEXUS_SOURCE_DIR}/cmake/package/verification/io_evolution/${g4_fdcan_input_name}.toml")
 set(g4_fdcan_bundle "${CMAKE_CURRENT_BINARY_DIR}/g474-fdcan-factory-${g4_fdcan_mode}")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
     "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"

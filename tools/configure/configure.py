@@ -63,8 +63,8 @@ UINT32_MAX = (1 << 32) - 1
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = physical_facts.GPIO_PIN
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
-         "pwm", "adc", "can", "usb_device", "eth",
-         "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd"}
+         "pwm", "adc", "can", "usb_device", "eth", "eth_frames",
+         "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd", "adc_group"}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
 
 
@@ -253,7 +253,7 @@ def contained_file(package, name):
 def validate_soc(soc, part):
     obj(soc, {"schema_version", "id", "variants", "cpu", "irq", "clock_profiles",
               "controllers"}, {"provenance", "source_lock", "reserved_resources",
-                               "can_domain", "references"},
+                               "can_domain", "references", "adc_group_review"},
         "SoC")
     integer(soc["schema_version"], 1, 1, "SoC schema")
     identity(soc["id"], "SoC id")
@@ -474,7 +474,7 @@ def resolve_bindings(board, routes, part):
         if not route or part not in route["variants"] or route["controller"] != binding["controller"]:
             fail(f"Board binding {binding['id']} has no reviewed exact-part route")
         if "supply_mv" in binding:
-            if route["kind"] not in {"flash", "adc", "pwm_adc"}:
+            if route["kind"] not in {"flash", "adc", "pwm_adc", "adc_group"}:
                 fail("Supply voltage belongs to a Flash or ADC binding")
             integer(binding["supply_mv"], 1, 5000, "Supply millivolts")
         if "initial" in binding:
@@ -700,6 +700,14 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             claim("irq:" + irq, "threadx", "kernel",
                   "ThreadX " + irq_profile["kernel_port"])
     selected = []
+    adc_group_review = None
+    if any(item.get("authored_kind") == "adc_group"
+           for item in assembly["controllers"]):
+        if family != "stm32g474":
+            fail("ADC group has no maintained provider")
+        adc_group_path = contained_file(root, soc.get("adc_group_review", ""))
+        adc_group_review = read(adc_group_path)
+        adc_group_digest = hashlib.sha256(snapshots[adc_group_path]).hexdigest()
     instance_ids = []
     irq_owners = {}
     for selection in sequence(assembly["controllers"], "selected controllers"):
@@ -720,7 +728,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                  "filter", "exclusive", "deadtime_ticks", "break_active_high", "idle_high",
                  "idle_complement_high", "frame", "stream", "irq_probe",
                  "counting", "filter_a", "filter_b", "invert_a", "invert_b",
-                 "trigger_ticks", "data_bitrate", "filters"}, "controller selection")
+                 "trigger_ticks", "data_bitrate", "filters", "silicon_profile",
+                 "trigger", "period_us", "watchdog", "fifo"}, "controller selection")
             name = identity(selection["id"], "instance id")
             c_identity(name)
             instance_ids.append(name)
@@ -737,6 +746,10 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 fail(f"Unsupported mode {mode} for {selection['binding']}; "
                      f"allowed: {', '.join(route['modes'])}")
             validate_selection(selection, route, provider, ram["size"])
+            if mode == "irq-fifo-bytes" and assembly["clock_profile"] != (
+                    "hsi64-fixed-cache-off"
+                    if family == "stm32h743" else "msis4"):
+                fail("FIFO UART requires its reviewed fixed clock profile")
             for numeric in {"rx_capacity", "baud", "max_hz", "event_capacity",
                             "period_ticks", "sample_cycles", "timeout_ms"} & selection.keys():
                 integer(selection[numeric], 1, context=numeric)
@@ -787,6 +800,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
 
             for resource in hardware.get("resources", []) + route.get("resources", []) + route.get("mode_resources", {}).get(mode, []):
                 claim(resource, name, mode, route["id"])
+            if route["kind"] == "adc_group" and selection["trigger"] == "tim6-trgo":
+                claim("controller:TIM6", name, mode, route["id"])
             if traits.dma:
                 for dma in route_dma(route, mode):
                     claim("dma:" + dma, name, mode, route["id"])
@@ -817,9 +832,18 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                              **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
             if route["kind"] == "can_fd":
                 selected[-1]["message_ram_words"] = hardware["message_ram_words"]
+            if route["kind"] == "adc_group":
+                try:
+                    from .providers.stm32g474 import adc_group
+                except ImportError:
+                    from providers.stm32g474 import adc_group
+                selected[-1]["adc_group_resolution"] = adc_group.resolve(
+                    selection, adc_group_review, adc_group_digest,
+                    part=part, clock=clock)
     if (family == "stm32h743" and provider.cache_mask(assembly["clock_profile"]) != 0
             and any(item["kind"] == "flash" for item in selected)):
         fail("H743 physical Flash requires the reviewed cache-off timing owner")
+    ethernet.resolve_counter_domains(selected)
     unique(instance_ids, "controller instance IDs")
     unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
     can_domain = can.resolve_domain(assembly.get("can_domain"), selected,
@@ -953,6 +977,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail("SPI requires at least one reviewed CS endpoint")
     layout = variant["flash"].copy()
     inputs = [assembly_path, board_path, soc_path, routes_path, policy_path]
+    if adc_group_review is not None:
+        inputs.append(adc_group_path)
     if reference_path is not None:
         inputs.append(reference_path)
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
@@ -1045,6 +1071,12 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         result["clock_plan"] = clock_plan
     result["resource_plan"] = resource_graph.resolve(claim_list).to_dict()
     result["trigger_plan"] = trigger_graph.resolve_fixed(selected, routes).to_dict()
+    for item in selected:
+        if item["kind"] == "adc_group" and item["trigger"] == "tim6-trgo":
+            item["adc_group_resolution"]["trigger_identity"] = next(
+                index + 1 for index, edge in enumerate(
+                    result["trigger_plan"]["edges"])
+                if edge["target"] == item["id"] + ":adc")
     result["dma_topology"] = dma_topology.resolve_selected(selected, provider).to_dict()
     if references is not None:
         result["fact_references"] = references

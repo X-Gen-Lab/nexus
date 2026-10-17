@@ -384,3 +384,600 @@ msgstr "完整初始化的复制结果；错误或 WRITE 时 value 为零。"
 
 msgid "Distinguish admission, cleanup retention and possible effect."
 msgstr "区分准入、保留清理责任与可能发生的效果。"
+
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+msgid "[in] Register block beginning at 0x88"
+msgstr "[in] 从 0x88 开始的寄存器块"
+
+msgid "[in] Must be exactly 24"
+msgstr "[in] 必须恰为 24"
+
+msgid "[out] Written only on success"
+msgstr "[out] 仅成功时写入"
+
+msgid "SUCCESS or INVALID for length/zero pressure divisor"
+msgstr "SUCCESS；长度错误或压力除数为零时为 INVALID"
+
+msgid "[in] Parsed calibration"
+msgstr "[in] 已解析的校准数据"
+
+msgid "[in] Unsigned 20-bit ADC value"
+msgstr "[in] 无符号 20 位 ADC 值"
+
+msgid "SUCCESS, INVALID for malformed/overflow calibration or IO for disabled ADC sentinel/out-of-datasheet-range physical output"
+msgstr "SUCCESS；校准格式错误或溢出时为 INVALID；ADC 禁用哨兵值或物理输出超出数据手册范围时为 IO"
+
+msgid "Task context; failure leaves initialized false and no borrow. Does not soft-reset the part or create a wait loop/task. Retry BUSY explicitly."
+msgstr "任务上下文；失败时 initialized 保持 false，且无借用。不软复位器件，也不创建等待循环或任务。BUSY 必须由调用者显式重试。"
+
+msgid "[out] Zero-initialized unused instance"
+msgstr "[out] 零初始化且尚未使用的实例"
+
+msgid "[in] Synchronous settled port and live monotonic clock"
+msgstr "[in] 调用返回前已结清的同步接口，以及有效的单调时钟"
+
+msgid "[in] Absolute deadline for all initialization accesses"
+msgstr "[in] 覆盖全部初始化访问的绝对截止时间"
+
+msgid "SUCCESS, BUSY for NVM update, or transport/identity error"
+msgstr "SUCCESS；NVM 更新期间为 BUSY；也可能返回传输或身份错误"
+
+msgid "Task-only serialized driver owner; oversampling x1/x1."
+msgstr "仅限任务上下文的串行驱动所有者；过采样为 x1/x1。"
+
+msgid "[inout] Initialized non-measuring instance"
+msgstr "[inout] 已初始化且未在测量的实例"
+
+msgid "[in] Absolute deadline covering conversion and reads"
+msgstr "[in] 覆盖转换与读取的绝对截止时间"
+
+msgid "SUCCESS, BUSY, TIMEOUT or transport error"
+msgstr "SUCCESS、BUSY、TIMEOUT 或传输错误"
+
+msgid "Task-only. Every port call releases temporary buffers before return. BUSY retains device conversion state, never stack or caller buffers. After terminal failure, begin may retry; the external owner chooses policy."
+msgstr "仅限任务上下文。每次接口调用在返回前释放临时缓冲。BUSY 保留器件转换状态，不保留栈或调用者缓冲。终止失败后可再次 begin；策略由外部所有者选择。"
+
+msgid "[inout] Instance with a previously started conversion"
+msgstr "[inout] 已启动过转换的实例"
+
+msgid "[out] Written only on SUCCESS"
+msgstr "[out] 仅在 SUCCESS 时写入"
+
+msgid "SUCCESS, BUSY while converting, TIMEOUT or transport error"
+msgstr "SUCCESS；转换期间为 BUSY；也可能返回 TIMEOUT 或传输错误"
+
+msgid "Does not power off or reset a physical part. Sensor-internal conversion can finish without accessing MCU storage. No MCU borrow remains."
+msgstr "不为物理器件断电或复位。传感器内部转换可在不访问 MCU 存储的情况下完成。不再存在 MCU 借用。"
+
+msgid "[inout] Quiesced driver instance"
+msgstr "[inout] 已静默的驱动实例"
+
+msgid "exchange always releases every TX/RX buffer before returning, including TIMEOUT/error. One CS interval covers all bytes; mode 0 or 3, 8-bit words, <=10 MHz. Caller serializes this device and its bus owner. Driver stack transactions never cross asynchronous borrowing boundaries."
+msgstr "exchange 始终在返回前释放全部 TX/RX 缓冲，包括 TIMEOUT 或错误路径。一个 CS 区间覆盖全部字节；采用模式 0 或 3、8 位字、频率不超过 10 MHz。调用者串行使用该器件及其总线所有者。驱动的栈上事务不会跨越异步借用边界。"
+
+msgid "[in] Fixed endpoint kept alive throughout device use"
+msgstr "[in] 在器件使用期间始终保持有效的固定端点"
+
+msgid "[in] Same monotonic domain as IO transfer deadlines"
+msgstr "[in] 与 I/O 传输截止时间相同的单调时钟域"
+
+msgid "Narrow transport; no global discovery or CS selection"
+msgstr "窄传输接口；不进行全局发现或 CS 选择"
+
+msgid "Startup context; no task, worker, timer or heap is created."
+msgstr "启动上下文；不创建任务、工作线程、定时器或堆。"
+
+msgid "[out] Unused caller-owned adapter storage"
+msgstr "[out] 尚未使用且由调用者拥有的适配器存储"
+
+msgid "[in] Exact queue capacity, no maximum pool"
+msgstr "[in] 精确队列容量，不使用最大容量池"
+
+msgid "[in] Number of slots, greater than zero"
+msgstr "[in] 槽数量，必须大于零"
+
+msgid "[in] Live short exclusion port"
+msgstr "[in] 保持有效的短临界区接口"
+
+msgid "[in] Single real execution port"
+msgstr "[in] 单个真实执行接口"
+
+msgid "[in] Same monotonic domain as request deadlines"
+msgstr "[in] 与请求截止时间相同的单调时钟域"
+
+msgid "[in] Optional static executor notification, or NULL"
+msgstr "[in] 可选的静态执行者通知，或 NULL"
+
+msgid "SUCCESS or INVALID"
+msgstr "SUCCESS 或 INVALID"
+
+msgid "Task multi-producer context. Free-slot admission and FIFO insertion use constant metadata work under the guard. An exhausted epoch permanently retires its slot. Deadline includes queue residence. Caller must not modify request, operation or buffers after admission. A notification error after admission cannot change SUCCESS to rejection; executor must recheck/pump periodically."
+msgstr "任务中的多生产者上下文。空槽准入和 FIFO 入队在保护域内只执行常量规模的元数据操作。epoch 耗尽的槽永久退役。截止时间包含排队驻留。准入后调用者不得修改请求、操作或缓冲。准入后的通知错误不能将 SUCCESS 改为拒绝；执行者必须定期重新检查并推进。"
+
+msgid "[inout] Live accepting adapter"
+msgstr "[inout] 有效且接受准入的适配器"
+
+msgid "[inout] Prepared READY storage, retained until SETTLED"
+msgstr "[inout] 已准备为 READY 的存储，持续保留至 SETTLED"
+
+msgid "[in] Executor-specific descriptor and payload storage"
+msgstr "[in] 特定执行者使用的描述符及载荷存储"
+
+msgid "[in] Optional static caller wake port, or NULL"
+msgstr "[in] 可选的静态调用者唤醒接口，或 NULL"
+
+msgid "[out] Stable cancellation identity, valid on SUCCESS"
+msgstr "[out] 稳定的取消身份，在 SUCCESS 时有效"
+
+msgid "SUCCESS means ACCEPTED; rejection retains zero references"
+msgstr "SUCCESS 表示 ACCEPTED；拒绝时不保留任何引用"
+
+msgid "Task multi-producer context. No request pointer is accepted. Queued cancellation settles without starting. Active cancellation drains cooperatively; an irreversible operation may already have transferred data."
+msgstr "任务中的多生产者上下文。不接受请求指针。排队中的取消在不启动操作的情况下结清。活动操作的取消通过协作排空推进；不可逆操作可能已经传输了数据。"
+
+msgid "[inout] Live adapter"
+msgstr "[inout] 有效的适配器"
+
+msgid "[in] Previously accepted slot/epoch"
+msgstr "[in] 先前接受的槽及 epoch"
+
+msgid "SUCCESS when marked, STATE for stale/released identity"
+msgstr "标记成功时为 SUCCESS；身份过期或已释放时为 STATE"
+
+msgid "Task/explicit loop only. Consumers never service through wait. Keep calling during stop until idle; no callback creates a worker."
+msgstr "仅限任务或显式循环。消费者不得通过等待操作执行服务。停止期间持续调用至空闲；回调不会创建工作线程。"
+
+msgid "[inout] Live adapter, called by its unique executor"
+msgstr "[inout] 有效的适配器，由其唯一执行者调用"
+
+msgid "SUCCESS for progress/idle, BUSY for provider wait/contention, or provider error while retaining ownership for continued recovery"
+msgstr "取得进展或空闲时为 SUCCESS；等待提供者或存在争用时为 BUSY；也可能返回提供者错误，同时保留所有权以继续恢复"
+
+msgid "Task context. Executor must keep servicing/draining while producers wait/join. Stop is not settlement or storage reclamation."
+msgstr "任务上下文。生产者等待或汇合期间，执行者必须持续服务并排空。停止不表示已结清，也不表示可以回收存储。"
+
+msgid "Join producers and any wake publishers before reclaiming owner, slots, guard or notifications. No future submit/cancel is permitted."
+msgstr "回收所有者、槽、保护接口或通知存储前，必须等待生产者和所有唤醒发布者退出。此后不得再次 submit 或 cancel。"
+
+msgid "True if no queue/active/service publisher remains"
+msgstr "队列、活动操作和服务发布者均不存在时为 true"
+
+msgid "Task producer calls only. enter/leave must serialize all producers and the executor. Never hold this guard over start/service/cancel, waiting, payload copies or notification callbacks. State restores incoming interrupt mask when an architecture guard is used. Port storage stays live."
+msgstr "仅由任务生产者调用。enter/leave 必须串行化全部生产者与执行者。不得在 start/service/cancel、等待、载荷复制或通知回调期间持有该保护。使用架构保护时，状态会恢复进入时的中断屏蔽。接口存储必须保持有效。"
+
+msgid "terminal_authority selects providers that observe deadlines and latch their first terminal hardware fact themselves. Their final result survives late cancellation/publication. Other executors use adapter deadline/cancellation results. Queued deadlines always belong to the adapter."
+msgstr "terminal_authority 选择自行观察截止时间并锁存首个终止硬件事实的提供者。其最终结果不会被晚到的取消或发布覆盖。其他执行者使用适配器的截止时间和取消结果。排队请求的截止时间始终由适配器负责。"
+
+msgid "1.0.0"
+msgstr "1.0.0"
+
+msgid "2026-10-11"
+msgstr "2026-10-11"
+
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+msgid "Zero-initialize before first acquisition. On SUCCESS the provider borrows this exact object; do not copy, mutate or reclaim it until release succeeds. Internal fields are not application controls. A release is the provider's final access, not proof that a peripheral has stopped. Release only after that consumer's IRQ, DMA and observer drain."
+msgstr "首次取得前必须零初始化。SUCCESS 后提供者借用该精确对象；释放成功前不得复制、修改或回收。内部字段不是应用控制项。释放是提供者的最终访问，不证明外设已停止。只有该消费者的 IRQ、DMA 和观测者均已排空后才释放。"
+
+msgid "Privileged Thread or configurable IRQ only; same CPU, saved-mask metadata guard. NMI/HardFault/SMP excluded. Capacity bounds token/alias scans. Token remains borrowed until successful release, even while admission is closed."
+msgstr "仅限特权 Thread 或可配置 IRQ；同一 CPU，以保存并恢复屏蔽状态的保护执行元数据操作。不支持 NMI、HardFault 或 SMP。容量限制令牌和别名扫描。即使准入已关闭，令牌仍持续借用至释放成功。"
+
+msgid "SUCCESS, BUSY for closed admission, EXHAUSTED for budget, or INVALID/STATE/CONTEXT with no retained token or effects"
+msgstr "SUCCESS；准入关闭时为 BUSY；预算耗尽时为 EXHAUSTED；或 INVALID/STATE/CONTEXT，此时不保留令牌或效果"
+
+msgid "Same contexts as acquire. Copied tokens cannot release the original. There is no callback or last access after SUCCESS."
+msgstr "上下文与 acquire 相同。复制的令牌不能释放原令牌。SUCCESS 后不存在回调或最后一次访问。"
+
+msgid "SUCCESS or INVALID/STATE/CONTEXT without removing a borrow"
+msgstr "SUCCESS；或 INVALID/STATE/CONTEXT，此时不移除借用"
+
+msgid "Serialized privileged Thread only. No waiting, cancellation, clock writes or implicit consumer shutdown. Idempotent in the same closed epoch; output must not alias live storage."
+msgstr "仅限串行的特权 Thread。不等待、不取消、不写时钟，也不隐式关闭消费者。在同一关闭 epoch 内幂等；输出不得与活动存储重叠。"
+
+msgid "Same CPU privileged Thread. This certifies only explicitly enrolled consumers. It does not authorize PLL reprogramming, suspend kernel Tick or change the Core deadline domain."
+msgstr "同一 CPU 上的特权 Thread。该证明仅涵盖显式登记的消费者。不授权重新配置 PLL、暂停内核 Tick 或改变 Core 截止时间域。"
+
+msgid "SUCCESS, BUSY while consumers remain, STATE for stale/open control, INVALID or CONTEXT; no state changes"
+msgstr "SUCCESS；消费者仍存在时为 BUSY；控制身份过期或处于开放状态时为 STATE；也可能为 INVALID 或 CONTEXT，均不改变状态"
+
+msgid "Serialized privileged Thread. Does not restart the clock or reinterpret existing deadlines. Actual cold clock changes additionally require all Tick/time providers stopped and a new explicit deadline domain; this API performs neither."
+msgstr "串行的特权 Thread。不重启时钟，也不重新解释现有截止时间。真正的冷态时钟变更还要求停止全部 Tick/时间提供者，并显式建立新的截止时间域；本 API 不执行这两项操作。"
+
+msgid "SUCCESS, BUSY, STATE, EXHAUSTED or CONTEXT without changes"
+msgstr "SUCCESS、BUSY、STATE、EXHAUSTED 或 CONTEXT，不产生变更"
+
+msgid "A value copy is allowed. This is not an authorization token or proof about unregistered consumers. Domain storage lives longer than every copy. A successful reopen invalidates all prior controls without resetting the epoch."
+msgstr "允许按值复制。该值不是授权令牌，也不能证明未登记消费者的状态。时钟域存储的寿命必须长于每份副本。成功重新开放会使全部旧控制身份失效，但不重置 epoch。"
+
+msgid "[inout] Explicit MDIO face, address and expected supported model."
+msgstr "[inout] 显式的 MDIO 接口、地址及预期支持的型号。"
+
+msgid "[in] Finite absolute MDIO clock deadline."
+msgstr "[in] MDIO 时钟域中的有限绝对截止时间。"
+
+msgid "Success, UNSUPPORTED for identity mismatch, or MDIO error."
+msgstr "成功；身份不符时为 UNSUPPORTED；或 MDIO 错误。"
+
+msgid "Task-only finite absolute deadline; reset restraps the device and clears configured truth. This is not a GPIO, power or strap proof."
+msgstr "仅限任务上下文，使用有限绝对截止时间；复位会重新采样器件 strap，并清除已配置事实。这不证明 GPIO、电源或 strap 正确。"
+
+msgid "[inout] Proved identity and caller-owned component state."
+msgstr "[inout] 已证明的身份及调用者拥有的组件状态。"
+
+msgid "Success after real reset acknowledgement, or state/MDIO error."
+msgstr "真实复位得到确认后成功；否则返回状态或 MDIO 错误。"
+
+msgid "Task-only; identity must be proved. SUCCESS means registers configured, not autonegotiation complete. Failures retain configured=false."
+msgstr "仅限任务上下文；必须已证明身份。SUCCESS 表示寄存器已配置，不表示自协商已完成。失败时 configured 保持 false。"
+
+msgid "[inout] Proved identity, kept live through operations."
+msgstr "[inout] 已证明的身份，操作期间持续保持有效。"
+
+msgid "[in] Explicit fixed mode or negotiation advertisement."
+msgstr "[in] 显式的固定模式或协商通告。"
+
+msgid "Success means configured registers; otherwise no configured truth."
+msgstr "成功表示寄存器已配置；其他结果不建立已配置事实。"
+
+msgid "Task-only; output changes only on SUCCESS. up requires actual link and complete autonegotiation when selected. Protocol or remote fault does not invent speed/link. MAC application remains an external action."
+msgstr "仅限任务上下文；只在 SUCCESS 时改变输出。up 要求真实链路有效，且选用自协商时必须完成自协商。协议或远端故障不能虚构速率或链路状态。向 MAC 应用该状态仍是外部动作。"
+
+msgid "[inout] Probed and configured caller-owned component."
+msgstr "[inout] 已探测并配置、由调用者拥有的组件。"
+
+msgid "[out] Observed value, separate from component storage."
+msgstr "[out] 观察值，必须与组件存储分离。"
+
+msgid "Success copies observed link; other results preserve output."
+msgstr "成功时复制观察到的链路；其他结果保持输出不变。"
+
+msgid "expected_id selects TI or NS model, ignoring revision nibble only. One task owner serializes this component and the shared MDIO port."
+msgstr "expected_id 选择 TI 或 NS 型号，仅忽略修订号的四位字段。由一个任务所有者串行使用该组件及共享 MDIO 接口。"
+
+msgid "2026-10-09"
+msgstr "2026-10-09"
+
+msgid "Task-only POSIX model. Does not qualify MCU Flash or actual power loss; existing file size mismatch is rejected without truncation."
+msgstr "仅限任务上下文的 POSIX 模型。不为 MCU Flash 或真实掉电建立资格；现有文件大小不匹配时拒绝，不截断文件。"
+
+msgid "[out] Unused caller-owned storage"
+msgstr "[out] 尚未使用且由调用者拥有的存储"
+
+msgid "[in] Regular-file path; symlink traversal rejected"
+msgstr "[in] 普通文件路径；拒绝符号链接遍历"
+
+msgid "[in] Exact persistent byte size"
+msgstr "[in] 精确的持久字节数"
+
+msgid "[in] Uniform erase block bytes"
+msgstr "[in] 均匀擦除块的字节数"
+
+msgid "[in] Aligned program bytes, 1..256"
+msgstr "[in] 对齐的编程字节数，范围 1..256"
+
+msgid "OK or INVALID/IO; failed open retains no file descriptor"
+msgstr "OK 或 INVALID/IO；打开失败时不保留文件描述符"
+
+msgid "No future port calls are permitted until explicit reopen."
+msgstr "显式重新打开前不得再次调用接口。"
+
+msgid "[inout] Open serialized model"
+msgstr "[inout] 已打开且串行使用的模型"
+
+msgid "Zero simulates power-off until explicitly cleared."
+msgstr "零表示模拟断电，直到显式清除。"
+
+msgid "[inout] Serialized open model"
+msgstr "[inout] 串行使用的已打开模型"
+
+msgid "[in] Programmed/erased bytes and sync attempts permitted; negative disables"
+msgstr "[in] 允许编程或擦除的字节数及同步尝试次数；负值表示禁用限制"
+
+msgid "Task-only, serialized caller. No region is reserved by the platform. Mixed sector geometries require another explicit storage adapter; this one rejects them. IO pulse settlement guarantees sync durability; no caller buffer survives a port call. Physical power-loss remains unqualified. The caller must honor geometry.program_flags when using this port directly: ECC units require actual erase provenance, not an all-0xff read. nx_storage_save erases its inactive bank and writes each distinct full program unit at most once before its next erase, including its separate final commit marker. This adapter does not track hidden program-pulse history."
+msgstr "仅限任务上下文，由调用者串行使用。平台不保留任何区域。混合扇区几何需要另一个显式存储适配器，本适配器会拒绝。I/O 脉冲结清保证同步持久化；接口调用返回后不保留任何调用者缓冲。物理掉电仍未取得资格。直接使用该接口时，调用者必须遵守 geometry.program_flags：ECC 单元需要真实擦除来源证明，不能凭全 0xff 读取推断。nx_storage_save 擦除非活动 bank，在下次擦除前对每个不同的完整编程单元最多写入一次，包括独立的最终提交标记。本适配器不跟踪隐藏的编程脉冲历史。"
+
+msgid "[out] Unused caller storage kept through all store calls"
+msgstr "[out] 尚未使用的调用者存储，在全部存储调用期间保持有效"
+
+msgid "[in] Externally selected writable physical region"
+msgstr "[in] 由外部选定的可写物理区域"
+
+msgid "[in] Absolute whole-transaction deadline for mutations"
+msgstr "[in] 覆盖完整修改事务的绝对截止时间"
+
+msgid "[out] Narrow synchronous persistent port, valid on SUCCESS"
+msgstr "[out] 窄同步持久化接口，在 SUCCESS 时有效"
+
+msgid "SUCCESS or INVALID/PERMISSION/UNSUPPORTED geometry error"
+msgstr "SUCCESS；或 INVALID/PERMISSION/UNSUPPORTED 几何错误"
+
+msgid "Caller serializes and sets this before open/save/recovery. Per-pulse timeouts cannot preempt hardware pulses; IO settles before return."
+msgstr "调用者必须串行使用，并在 open/save/recovery 前设置该值。逐脉冲超时不能抢占硬件脉冲；I/O 在返回前结清。"
+
+msgid "[inout] Bound adapter with no active store operation"
+msgstr "[inout] 已绑定且无活动存储操作的适配器"
+
+msgid "[in] Absolute deadline in nx_time_now_us domain"
+msgstr "[in] nx_time_now_us 域中的绝对截止时间"
+
+msgid "[out] Unused caller storage"
+msgstr "[out] 尚未使用的调用者存储"
+
+msgid "[in] Required bounded synchronous sink"
+msgstr "[in] 必需的有界同步输出端"
+
+msgid "[in] Minimum accepted severity"
+msgstr "[in] 接受的最低严重级别"
+
+msgid "Task multi-producer entry with nonblocking serialization. M0/M0+ use CPU-local saved-PRIMASK metadata exclusion and require privileged callers on one CPU. Sink calls run after restoring the incoming mask. This does not make NMI/HardFault or cross-security-domain writers valid. IRQ use is prohibited. Drop/retry policy remains with the external caller."
+msgstr "任务中的多生产者入口，使用非阻塞串行化。M0/M0+ 使用 CPU 本地保存并恢复 PRIMASK 的元数据临界区，要求调用者在同一 CPU 上具有特权。恢复进入时的屏蔽状态后才调用输出端。这不允许 NMI/HardFault 或跨安全域写入者使用。禁止 IRQ 调用。丢弃或重试策略由外部调用者负责。"
+
+msgid "[inout] Live instance"
+msgstr "[inout] 有效的实例"
+
+msgid "[in] Message severity"
+msgstr "[in] 消息严重级别"
+
+msgid "[in] Message bytes, borrowed only during this call"
+msgstr "[in] 消息字节，仅在本次调用期间借用"
+
+msgid "[in] Byte count; zero permits NULL"
+msgstr "[in] 字节数；为零时允许 NULL"
+
+msgid "[in] Absolute deadline understood by sink"
+msgstr "[in] 输出端理解的绝对截止时间"
+
+msgid "SUCCESS for filtered/sent bytes, BUSY for concurrent/recursive writes, STATE after stop, otherwise sink error"
+msgstr "被过滤或已发送的字节返回 SUCCESS；并发或递归写入返回 BUSY；停止后为 STATE；其他情况返回输出端错误"
+
+msgid "Same task/privilege/CPU domain as write."
+msgstr "与 write 相同的任务、权限和 CPU 域。"
+
+msgid "[in] Absolute sink deadline"
+msgstr "[in] 输出端的绝对截止时间"
+
+msgid "SUCCESS, BUSY, STATE, UNSUPPORTED or sink error"
+msgstr "SUCCESS、BUSY、STATE、UNSUPPORTED 或输出端错误"
+
+msgid "Task context. A stop caller may retry; no active sink call is forcibly cancelled. Join publishers before reclaiming logger/sink storage."
+msgstr "任务上下文。停止调用者可以重试；不会强行取消活动的输出端调用。回收日志器或输出端存储前必须等待发布者退出。"
+
+msgid "[inout] Live instance; external users must eventually join"
+msgstr "[inout] 有效实例；外部使用者最终必须退出并完成汇合"
+
+msgid "SUCCESS when no sink call is active, BUSY while draining"
+msgstr "没有活动的输出端调用时为 SUCCESS；排空期间为 BUSY"
+
+msgid "write/flush release every byte buffer before returning even on timeout/error; asynchronous/DMA sinks require their own settled adapter. Calls are bounded by absolute monotonic deadlines, in task context. No sink discovery, allocation, formatting, worker or global error handler exists."
+msgstr "write/flush 即使超时或出错，也在返回前释放每个字节缓冲；异步或 DMA 输出端需要自行提供已结清的适配器。调用位于任务上下文，并受绝对单调截止时间约束。不存在输出端发现、分配、格式化、工作线程或全局错误处理器。"
+
+msgid "[in] Input, NULL only when length is zero"
+msgstr "[in] 输入，仅长度为零时允许 NULL"
+
+msgid "[in] Byte count"
+msgstr "[in] 字节数"
+
+msgid "CRC16; zero for invalid NULL input with nonzero length"
+msgstr "CRC16；非零长度配合无效 NULL 输入时返回零"
+
+msgid "Task-only; configuration is copied, contexts stay live. First direction(false) failure is reported; no worker or UART is created. Reinitializing a faulted TX borrow is prohibited; stop/recover it first."
+msgstr "仅限任务上下文；配置被复制，各 context 保持有效。报告首次 direction(false) 失败；不创建工作线程或 UART。禁止重新初始化仍持有故障 TX 借用的实例，必须先 stop/recover。"
+
+msgid "[out] Caller-owned storage, no existing transport borrow"
+msgstr "[out] 调用者拥有的存储，不存在先前的传输借用"
+
+msgid "[in] Explicit register/RS485 ports and finite budgets"
+msgstr "[in] 显式的寄存器及 RS485 接口，以及有限预算"
+
+msgid "True when initialized into RX silence acquisition"
+msgstr "初始化成功进入 RX 静默判定阶段时为 true"
+
+msgid "Task-only. IRQ queues are external, bounded and explicit; queue overflow must call rx_error. No live UART discovery or ISR callback."
+msgstr "仅限任务上下文。IRQ 队列在外部显式提供且容量有界；队列溢出时必须调用 rx_error。不进行活动 UART 发现，也没有 ISR 回调。"
+
+msgid "[inout] Initialized instance, serialized by caller"
+msgstr "[inout] 已初始化的实例，由调用者串行使用"
+
+msgid "[in] Wire byte"
+msgstr "[in] 线上字节"
+
+msgid "[in] Capture timestamp in port monotonic domain"
+msgstr "[in] 接口单调时钟域中的捕获时间戳"
+
+msgid "True if byte joined the frame, false for discard/error"
+msgstr "字节并入帧时为 true；丢弃或出错时为 false"
+
+msgid "Task-only, explicit external scheduling. RS485 drain must observe the final stop bit. Failed abort retains TX bytes and asserted DE in LINK_FAULTED; keep instance/port alive until successful recover or stop."
+msgstr "仅限任务上下文，由外部显式调度。RS485 排空必须观察最终停止位。中止失败时，LINK_FAULTED 保留 TX 字节并保持 DE 置位；直到 recover 或 stop 成功前，必须保持实例及接口有效。"
+
+msgid "[inout] Initialized instance, single execution owner"
+msgstr "[inout] 已初始化且具有单一执行所有者的实例"
+
+msgid "[in] Snapshot in the same monotonic domain"
+msgstr "[in] 同一单调时钟域中的快照"
+
+msgid "True for successful progress, false for clock/transport error"
+msgstr "取得进展时为 true；时钟或传输错误时为 false"
+
+msgid "Task-only. Does not discard a retained faulted TX borrow."
+msgstr "仅限任务上下文。不丢弃仍保留的故障 TX 借用。"
+
+msgid "[inout] Initialized serialized instance"
+msgstr "[inout] 已初始化且串行使用的实例"
+
+msgid "[in] Error timestamp in port's monotonic domain"
+msgstr "[in] 接口单调时钟域中的错误时间戳"
+
+msgid "Explicit task maintenance action, no fabricated recovery."
+msgstr "显式的任务维护动作，不虚构恢复。"
+
+msgid "[inout] Initialized serialized instance with live ports"
+msgstr "[inout] 已初始化且串行使用的实例，各接口保持有效"
+
+msgid "True only after actual port abort/drain and receive direction"
+msgstr "只有实际完成接口中止和排空，并切换到接收方向后才为 true"
+
+msgid "Stop future feed/poll users first. No future use except explicit initialization is allowed after successful stop."
+msgstr "必须先停止将来可能调用 feed/poll 的使用者。成功停止后，除显式初始化外不得再次使用。"
+
+msgid "[inout] Initialized, exclusively owned instance"
+msgstr "[inout] 已初始化且独占拥有的实例"
+
+msgid "True when no transport borrow remains and instance is stopped; false preserves fault state, TX bytes and all port lifetime obligations"
+msgstr "传输借用全部结束且实例已停止时为 true；false 保留故障状态、TX 字节及全部接口生命周期责任"
+
+msgid "[inout] Fresh zero/detached sidecar, distinct from owner."
+msgstr "[inout] 新的零初始化或已分离附属状态，与所有者分开存储。"
+
+msgid "[inout] Initialized stable owner, no concurrent lifecycle."
+msgstr "[inout] 已初始化的稳定所有者，不存在并发生命周期操作。"
+
+msgid "SUCCESS or INVALID/STATE, no service or borrow on rejection."
+msgstr "SUCCESS 或 INVALID/STATE；拒绝时不执行服务，也不建立借用。"
+
+msgid "Clock reversal never blocks drain or rewrites its result. Snapshot uses the existing guard outside hardware service. No callback, slot scan or worker occurs under that guard. Quarantine and elapsed deadlines never release a loan. Output also excludes accepted descriptors and payloads. Only the owner/slot control spans are checked here."
+msgstr "时钟倒退不会阻止排空或重写结果。快照在硬件服务之外使用现有保护。该保护内不执行回调、槽扫描或工作线程。隔离状态和已到期截止时间都不会释放借用。输出还必须避开已接受的描述符及载荷。这里只检查所有者和槽控制对象的存储区间。"
+
+msgid "[inout] Bound sidecar on the unique executor."
+msgstr "[inout] 由唯一执行者使用的已绑定附属状态。"
+
+msgid "[in] Monotonic timestamp, independent of service result."
+msgstr "[in] 单调时间戳，与服务结果独立。"
+
+msgid "[out] Distinct stable output, no retained references."
+msgstr "[out] 独立且稳定的输出，不保留引用。"
+
+msgid "Actual service result; invalid bindings reject beforehand."
+msgstr "实际服务结果；无效绑定在执行前拒绝。"
+
+msgid "[inout] Caller-serialized sidecar, no remaining readers."
+msgstr "[inout] 由调用者串行使用的附属状态，不再存在读取者。"
+
+msgid "Exact owner, slots and guard remain live until detach and all observer calls exit. The same unique owner executor calls this wrapper; producer calls retain the owner guard. Never reinitialize/replace the bound owner underneath it."
+msgstr "精确的所有者、槽和保护接口必须保持有效，直到分离完成且全部观测者调用退出。同一唯一所有者执行者调用该包装接口；生产者调用继续使用所有者保护。不得在绑定期间重新初始化或替换底层所有者。"
+
+msgid "Startup/task context. Operations use nx_spi_owner_operation_t endpoints on this bus only; membership is checked before admission. No polling fallback is selected. Controller and executor remain live through drain, control acknowledgement and observer exit. QUARANTINED retains both buffer loans. Hardware stop and IRQ/notification destruction are explicit external steps after owner shutdown, not part of this bind."
+msgstr "启动或任务上下文。操作仅使用本总线上的 nx_spi_owner_operation_t 端点；准入前检查成员关系。不选择轮询回退。控制器和执行者必须保持有效，直到排空、控制确认及观测者退出全部完成。QUARANTINED 保留两项缓冲借用。所有者关闭后，硬件停止及 IRQ/通知销毁仍是外部显式步骤，不属于此次绑定。"
+
+msgid "[out] Fresh storage with no previous outstanding loans."
+msgstr "[out] 新存储，不存在先前尚未结束的借用。"
+
+msgid "[in] Initialized controller exclusively owned by this executor; direct clients and other owners must quiesce."
+msgstr "[in] 已初始化且由该执行者独占拥有的控制器；直接客户端和其他所有者必须静默。"
+
+msgid "Valid executor port, or a zero port for incomplete methods."
+msgstr "有效的执行接口；方法不完整时返回全零接口。"
+
+msgid "inner is a private publication object. Its borrow must end before the outer owner publishes SETTLED. No queue, payload copy, allocation or hidden worker is created."
+msgstr "inner 是私有发布对象。外层所有者发布 SETTLED 前，必须先结束其借用。不创建队列、不复制载荷，也不分配或创建隐藏工作线程。"
+
+msgid "start executes a real CPU-active polling transaction and releases all IO buffers before returning. Owner service later publishes its caller-owned request. Polling cannot be preempted by another task's cancel; once the polling call returns, its result is final despite later cancellation or publication delay. Do not claim IRQ/DMA mode or low-CPU asynchronous hardware execution. Endpoints must prove their controller identity before any wire effect; distinct chip selects on this controller remain valid. The controller and executor outlive owner shutdown and all observers."
+msgstr "start 执行真实的 CPU 主动轮询事务，并在返回前释放全部 I/O 缓冲。所有者的 service 随后才发布调用者拥有的请求。另一任务的 cancel 不能抢占轮询；轮询调用返回后，即使取消或发布延迟随后到来，其结果仍为最终结果。不得宣称 IRQ/DMA 模式或低 CPU 占用的异步硬件执行。产生任何线上效果前，端点必须证明其控制器身份；同一控制器上的不同片选仍然有效。控制器和执行者的寿命必须覆盖所有者关闭及全部观测者。"
+
+msgid "[out] Fresh storage with no outstanding operation"
+msgstr "[out] 新存储，不存在尚未结束的操作"
+
+msgid "[in] Controller exclusively serviced by this owner"
+msgstr "[in] 仅由该所有者服务的控制器"
+
+msgid "Port for nx_bus_owner_init, or a zero port for invalid input"
+msgstr "供 nx_bus_owner_init 使用的接口；输入无效时为全零接口"
+
+msgid "Task-only bounded scan over both bank payloads. Workspace remains borrowed by the instance through every subsequent load/save call."
+msgstr "仅限任务上下文，对两个 bank 的载荷执行有界扫描。工作区由实例持续借用，覆盖此后每次 load/save 调用。"
+
+msgid "[out] Unused or quiesced instance, no concurrent calls"
+msgstr "[out] 尚未使用或已静默的实例，不存在并发调用"
+
+msgid "[in] Persistent settled port, may be storage's existing port"
+msgstr "[in] 返回前已结清的持久化接口，可以是存储对象原有的接口"
+
+msgid "[in] Erase-aligned start within port region"
+msgstr "[in] 接口区域内按擦除粒度对齐的起点"
+
+msgid "[in] Each bank's erase-aligned byte size"
+msgstr "[in] 每个 bank 按擦除粒度对齐的字节数"
+
+msgid "[in] Caller buffer, disjoint from instance/payload"
+msgstr "[in] 调用者缓冲，与实例及载荷不重叠"
+
+msgid "[in] At least max(32, port.program_size)"
+msgstr "[in] 至少为 max(32, port.program_size)"
+
+msgid "OK for recovered/empty store, CORRUPT for ambiguous or only invalid committed generations, IO/INVALID for port/geometry failures"
+msgstr "恢复成功或存储为空时为 OK；代次有歧义，或仅存在无效的已提交代次时为 CORRUPT；接口或几何错误时为 IO/INVALID"
+
+msgid "Output bytes valid only on OK; failure may partially write output. No destination pointer is retained after returning."
+msgstr "只有 OK 时输出字节才有效；失败时可能已部分写入输出。返回后不保留目标指针。"
+
+msgid "[inout] Open instance, exclusively owned for this call"
+msgstr "[inout] 已打开的实例，本次调用期间独占拥有"
+
+msgid "[out] Destination; NULL requests only required size"
+msgstr "[out] 目标；NULL 表示只查询所需大小"
+
+msgid "[inout] Input capacity, output payload/required bytes"
+msgstr "[inout] 输入为容量，输出为载荷字节数或所需字节数"
+
+msgid "OK, NOT_FOUND, NO_SPACE, CORRUPT or IO/INVALID"
+msgstr "OK、NOT_FOUND、NO_SPACE、CORRUPT 或 IO/INVALID"
+
+msgid "Marker is programmed last after sync. Failed mutation keeps the previous bank and requires reopen; ambiguous marker failure can mean the new blob committed. Product owns migration/authentication/recovery policy."
+msgstr "同步后最后编程提交标记。修改失败时保留先前的 bank，并要求重新打开；标记失败有歧义时，新 blob 可能已经提交。迁移、认证及恢复策略由产品负责。"
+
+msgid "[inout] Open exclusively owned instance"
+msgstr "[inout] 已打开且独占拥有的实例"
+
+msgid "[in] Payload disjoint from workspace, borrowed during call"
+msgstr "[in] 与工作区不重叠的载荷，仅调用期间借用"
+
+msgid "[in] Payload bytes; zero permits NULL"
+msgstr "[in] 载荷字节数；为零时允许 NULL"
+
+msgid "OK, NO_SPACE, INVALID or underlying port error"
+msgstr "OK、NO_SPACE、INVALID 或底层接口错误"
+
+msgid "[in] Geometry-established instance, or NULL"
+msgstr "[in] 已建立几何信息的实例，或 NULL"
+
+msgid "Payload bytes per bank, or zero for invalid geometry"
+msgstr "每个 bank 的载荷字节数；几何无效时为零"
+
+msgid "Task-only; caller serializes every operation. Offsets are byte-relative to the supplied region. program changes only 1 to 0 in complete aligned program units; erase uses complete uniform erase units. sync makes earlier successful writes durable. Errors can change a subset of addressed units, but never retain caller buffers after returning. RAM is a model, not a persistent implementation. Product owns the region/layout and power policy."
+msgstr "仅限任务上下文；调用者串行使用全部操作。偏移以所提供区域的起点为基准，单位为字节。program 只在完整且对齐的编程单元内将 1 改为 0；erase 使用完整且均匀的擦除单元。sync 使先前成功的写入持久化。错误可能改变所寻址单元的一部分，但返回后绝不保留调用者缓冲。RAM 是模型，不是持久化实现。区域、布局及电源策略由产品负责。"
+
+msgid "Two independently erasable banks commit whole blobs. No heap, global registry, maximum pool or default product reservation. Wire format v1 is explicit little-endian and CRC-protected, not authenticated. Keep instance, port context and workspace alive through close/quiescence. A mutating I/O error invalidates opened; reopen to establish which commit actually survived."
+msgstr "两个可独立擦除的 bank 提交完整 blob。不使用堆、全局注册表、最大容量池或默认产品预留。线上格式 v1 显式采用小端和 CRC 保护，不提供认证。实例、接口 context 和工作区必须保持有效，直到关闭并静默。修改性 I/O 错误会使 opened 失效；需要重新打开，才能确定哪个提交实际保留。"
+
+msgid "Startup/task context. Controller and executor remain alive through owner stop/drain and external observer quiescence. Direct UART users must not share this controller. Queued time belongs to the bus owner; after start the UART's first terminal TC/error/cancel/deadline fact is authoritative. cancel observes provider completion/deadline before asking it to abort. Failed drain keeps both requests QUARANTINED; service must continue during recovery. Outer SETTLED never precedes inner acquire-observed SETTLED and pointer detach. The application separately stops hardware and RX consumers only after all owner operations and controls quiesce."
+msgstr "启动或任务上下文。控制器和执行者保持有效，直到所有者停止、排空及外部观测者静默。直接 UART 使用者不得共享该控制器。排队时间由总线所有者负责；启动后，以 UART 首次观察到的终止 TC、错误、取消或截止时间事实为准。cancel 先观察提供者完成或截止时间，再请求中止。排空失败时，两个请求均保持 QUARANTINED；恢复期间必须持续 service。外层 SETTLED 绝不能早于以 acquire 语义观察到的内层 SETTLED 及指针分离。只有全部所有者操作和控制均静默后，应用才分别停止硬件及 RX 消费者。"
+
+msgid "[inout] Unused caller-owned storage, no concurrent calls"
+msgstr "[inout] 尚未使用且由调用者拥有的存储，不存在并发调用"
+
+msgid "[inout] Initialized UART exclusively owned by this executor"
+msgstr "[inout] 已初始化且由该执行者独占拥有的 UART"
+
+msgid "Port for nx_bus_owner_init, or an invalid zero port for NULL"
+msgstr "供 nx_bus_owner_init 使用的接口；NULL 输入时为无效的全零接口"
+
+msgid "inner is a separate publication object, not another outer queue or caller admission. Only this executor accesses it; producers retain their outer request and payload until the bus owner publishes outer SETTLED. No buffer copy, heap, worker or pool. Never pass inner to application observers."
+msgstr "inner 是独立的发布对象，不是另一个外层队列或调用者准入。只有该执行者访问 inner；总线所有者发布外层 SETTLED 前，生产者持续保留外层请求及载荷。不复制缓冲，不使用堆、工作线程或池。绝不将 inner 交给应用观测者。"
+
+msgid "Kernel-invoked privileged Thread with incoming masks clear, one serialized broker executor. Principal comes from the configured trusted kernel identity port. Pin both validated memory ranges before any GPIO call; snapshot input once, copy an initialized reply. Kernel call storage is zero-initialized outside user RAM and must outlive retained pins. No OS SVC/MPU/TZ wiring or user privilege elevation is provided by this component."
+msgstr "由内核调用的特权 Thread，进入时屏蔽状态必须清除，只有一个串行 broker 执行者。principal 来自配置的可信内核身份接口。在调用任何 GPIO 前，必须固定两个已经验证的内存区间；输入只快照一次，复制已初始化的回复。内核调用存储在用户 RAM 外零初始化，其寿命必须覆盖保留的固定区间。该组件不提供 OS SVC/MPU/TZ 接线，也不提升用户权限。"
+
+msgid "REJECTED has accepted=false, no pin/effect. ACCEPTED may already be detached or retain cleanup after a failure."
+msgstr "REJECTED 表示 accepted=false，不保留固定区间，也不产生效果。ACCEPTED 可能已经分离，也可能在失败后继续保留清理责任。"
+
+msgid "Same privileged serialized kernel owner, incoming masks clear. Successful unpin follows actual provider/observer drain; a failed unpin keeps memory, call slot and identity retained. Does not imply that a previously performed GPIO write can be reversed."
+msgstr "同一特权串行内核所有者，进入时屏蔽状态必须清除。只有实际排空提供者和观测者后才能成功解除固定；解除固定失败时，内存、调用槽及身份继续保留。这不表示可以逆转先前已执行的 GPIO 写入。"
+
+msgid "No arbitrary port, MMIO, callback, slot or principal pointer. reserved words must be zero. WRITE has read_mask=0 and disjoint set/reset masks. READ has zero set/reset masks and a positive authorized read_mask. Caller keeps storage immutable until the gateway completes or retains its pin."
+msgstr "不接受任意接口、MMIO、回调、槽或 principal 指针。reserved 字必须为零。WRITE 要求 read_mask=0，且 set/reset 掩码不重叠。READ 要求 set/reset 掩码为零，并使用非零且已授权的 read_mask。网关完成前，或固定区间仍保留期间，调用者必须保持存储不可变。"
+
+msgid "accepted means at least one memory pin was acquired. On retained=true the exact kernel call slot and user address space remain borrowed. device_effect_possible is set before a WRITE provider call; an error cannot authorize replay. result describes admission/device execution; cleanup_result separately describes the most recent release attempt. This is software responsibility, not physical pin evidence."
+msgstr "accepted 表示至少成功固定了一个内存区间。retained=true 时，精确的内核调用槽及用户地址空间继续被借用。device_effect_possible 在调用 WRITE 提供者前置位；出错不能授权重放。result 描述准入及器件执行结果；cleanup_result 独立描述最近一次释放尝试。这是软件责任，不是物理引脚证据。"

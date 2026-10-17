@@ -23,8 +23,8 @@ def operations(item):
     selected = implementation(item)
     if item.interface_kind == "spi_dma_transaction":
         return "nx_spi_dma_sequence_port_ops"
-    if item.kind == "eth":
-        return "nx_eth_mac_ops"
+    if item.kind in {"eth", "eth_frames"}:
+        return f"nx_{item.kind}_mac_ops"
     if item.kind == "can":
         return "nx_classic_can_ops"
     if item.kind == "usb_device":
@@ -68,6 +68,8 @@ def includes(result):
         source.append('#include "gd32f4xx_gpio.h"')
     if any(item.kind == "eth" for item in selections):
         source.append('#include "gd32f470_eth.h"')
+    if any(item.kind == "eth_frames" for item in selections):
+        source.append('#include "gd32f470_eth_frames.h"')
         source.append('#include "gd32f4xx_syscfg.h"')
     if any(item.kind == "can" for item in selections):
         source.append('#include "gd32f470_can.h"')

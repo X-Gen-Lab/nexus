@@ -23,6 +23,128 @@ GIT_FIXTURE_OPTIONS = ("-c", "maintenance.auto=false", "-c", "gc.auto=0",
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_enhanced_ethernet_canonical_inputs_and_public_smoke_are_required(self):
+        directory = "cmake/package/verification/io_evolution/"
+        required = {directory + name for name in (
+            "f407zg-eth-frames.toml", "gd470-eth-frames.toml",
+            "boards/f407zg-eth-frames/board.json",
+            "boards/gd470-eth-frames/board.json",
+            "consumers/ethernet-frames.c")}
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in required:
+            with self.subTest(name=name):
+                self.assertTrue((ROOT / name).is_file())
+                self.assertTrue(source_sdk.selected(name))
+
+    def test_enhanced_frames_common_and_native_sources_are_required(self):
+        required = {
+            "io/include/nexus/io/ethernet_frames.h",
+            "io/private/eth_frames_mac.h",
+            "io/private/eth_frames_validation.h",
+            "io/src/ethernet_frames.c", "io/src/eth_frames_mac.c",
+            "io/native/ethernet_frames.c", "io/native/ethernet_frames.h",
+            "io/native/ethernet_frames_access.h"}
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in required:
+            with self.subTest(name=name):
+                self.assertTrue((ROOT / name).is_file())
+                self.assertTrue(source_sdk.selected(name))
+
+    def test_selected_family_extensions_belong_to_provider_payloads(self):
+        additions = {
+            "stm32h743": ("drivers/flash_execution.c",
+                          "private/stm32h743_flash_execution.h",
+                          "drivers/uart_fifo.c",
+                          "private/stm32h743_uart_fifo.h"),
+            "stm32u575": ("drivers/uart_fifo.c",
+                          "private/stm32u575_uart_fifo.h"),
+            "stm32f407": ("drivers/ethernet_frames.c",
+                          "private/stm32f407_eth_frames.h"),
+            "gd32f470": ("drivers/ethernet_frames.c",
+                         "private/gd32f470_eth_frames.h")}
+        for family, relative in additions.items():
+            with self.subTest(family=family):
+                descriptor = source_sdk.provider_descriptors.maintained(family)
+                required = {f"soc/{family}/" + name for name in relative}
+                self.assertTrue(required.issubset(set(descriptor.owned_payload)),
+                                sorted(required - set(descriptor.owned_payload)))
+                self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                                sorted(required - set(source_sdk.REQUIRED_FILES)))
+
+    def test_fifo_verification_inputs_and_public_smoke_are_required(self):
+        directory = "cmake/package/verification/io_evolution/"
+        required = {directory + name for name in (
+            "h743-uart-fifo.toml", "u575-uart-fifo.toml",
+            "consumers/uart-fifo.c")}
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in required:
+            with self.subTest(name=name):
+                self.assertTrue((ROOT / name).is_file())
+                self.assertTrue(source_sdk.selected(name))
+
+    def test_finite_adc_group_inputs_public_smoke_and_real_sources_are_required(self):
+        directory = "cmake/package/verification/io_evolution/"
+        required = {directory + name for name in (
+            "g474-adc-group-regular-software.toml",
+            "g474-adc-group-regular-timer.toml",
+            "g474-adc-group-injected-software.toml",
+            "g474-adc-group-injected-timer.toml",
+            "boards/g474-adc-group/board.json", "consumers/g474-adc-group.c")}
+        required.update({
+            "tools/configure/providers/stm32g474/adc_group.py",
+            "soc/stm32g474/reviews/adc-group.json",
+            "io/include/nexus/io/adc_group.h", "io/src/adc_group.c",
+            "soc/stm32g474/private/stm32g474_adc_group.h",
+            "soc/stm32g474/drivers/adc_group.c",
+            "soc/common/stm32_identity.h", "core/include/nexus/core/silicon.h",
+            "core/src/silicon.c"})
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in required:
+            with self.subTest(name=name):
+                self.assertTrue(source_sdk.selected(name))
+
+    def test_fifo_template_and_both_selected_family_leaves_are_required(self):
+        required = {"io/private/uart_fifo_impl.h"}
+        for family in ("stm32h743", "stm32u575"):
+            required.update({f"soc/{family}/drivers/uart_fifo.c",
+                             f"soc/{family}/private/{family}_uart_fifo.h"})
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+
+    def test_selected_contract_helper_is_an_explicit_sdk_requirement(self):
+        self.assertIn("tools/configure/selected_contracts.py",
+                      source_sdk.REQUIRED_FILES)
+
+    def test_portable_io_verification_inputs_and_public_smokes_are_required(self):
+        directory = "cmake/package/verification/io_evolution/"
+        names = {
+            "h743-high-empty.toml", "h743-high-uart.toml",
+            "h743-high-peripherals.toml", "u575-uart-gpdma.toml",
+            "g474-can-fd-loopback.toml", "g474-can-fd-normal.toml",
+            "g474-pwm-adc.toml", "boards/g474-fdcan/board.json",
+            "boards/g474-pwm-adc/board.json", "consumers/h743-high.c",
+            "consumers/u575-uart-gpdma.c", "consumers/g474-can-fd.c",
+            "consumers/g474-pwm-adc.c"}
+        required = {directory + name for name in names}
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in required:
+            with self.subTest(name=name):
+                self.assertTrue(source_sdk.selected(name))
+
+    def test_portable_verification_namespace_rejects_unreviewed_payloads(self):
+        for name in ("model.c", "tests/consumer_test.cpp", "trace.raw",
+                     "boards/unreviewed/board.json", "consumers/product.c",
+                     "consumers/GoogleTest.cpp", "capture.xml"):
+            with self.subTest(name=name):
+                self.assertFalse(source_sdk.selected(
+                    "cmake/package/verification/io_evolution/" + name))
+        self.assertNotIn("tests", source_sdk.ROOT_DIRS)
+
     def test_coupled_io_public_private_and_generator_payloads_are_required(self):
         required = {
             "io/include/nexus/io/can_fd.h", "io/include/nexus/io/pwm_adc.h",
@@ -147,6 +269,124 @@ class SourceSDKSelectionTests(unittest.TestCase):
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
 
 
+class SourceSDKPortableVerificationTests(unittest.TestCase):
+    """One authored input is shared by models, ARM presets and installed SDKs."""
+
+    def test_canonical_inputs_resolve_and_old_authored_copies_are_removed(self):
+        from tools.configure import configure
+        directory = ROOT / "cmake/package/verification/io_evolution"
+        moves = {
+            "h743-high-empty.toml": "h743_high_assembly/empty.toml",
+            "h743-high-uart.toml": "h743_high_assembly/io.toml",
+            "h743-high-peripherals.toml": "h743_high_assembly/peripherals.toml",
+            "u575-uart-gpdma.toml": "u575_assembly/usart1-dma-tx.toml",
+            "g474-can-fd-loopback.toml": "g474_control_assembly/can-fd.toml",
+            "g474-can-fd-normal.toml": "g474_control_assembly/can-fd-normal.toml",
+            "g474-pwm-adc.toml": "g474_control_assembly/pwm-adc.toml"}
+        for current, previous in moves.items():
+            with self.subTest(assembly=current):
+                self.assertTrue((directory / current).is_file())
+                result = configure.resolve(directory / current, ROOT)
+                self.assertEqual(result["backend"], "baremetal")
+                self.assertFalse((ROOT / "tests/contracts" / previous).exists())
+        for current, previous in (
+                ("g474-fdcan", "fdcan_board"),
+                ("g474-pwm-adc", "pwm_adc_board")):
+            with self.subTest(board=current):
+                board = json.loads((directory / "boards" / current /
+                                    "board.json").read_text())
+                self.assertIsNone(board["physical_pcb_revision"])
+                self.assertFalse((ROOT / "tests/contracts/g474_control_assembly" /
+                                  previous / "board.json").exists())
+
+    def test_all_seven_normal_presets_select_the_installed_canonical_inputs(self):
+        presets = json.loads((ROOT / "CMakePresets.json").read_text())
+        expected = {
+            "h743-high-empty", "h743-high-uart", "h743-high-peripherals",
+            "u575-uart-gpdma", "g474-can-fd", "g474-can-fd-normal",
+            "g474-pwm-adc"}
+        selected = {}
+        for preset in presets["configurePresets"]:
+            name = preset["name"].removeprefix("fixture-io-evolution-")
+            if name not in expected:
+                continue
+            value = preset["cacheVariables"]["NEXUS_ASSEMBLY_FILE"]
+            self.assertTrue(value.startswith(
+                "${sourceDir}/cmake/package/verification/io_evolution/"), value)
+            selected[name] = Path(value).name
+        self.assertEqual(set(selected), expected)
+        self.assertEqual(len(set(selected.values())), 7)
+
+    def test_public_smokes_do_not_import_concrete_providers_or_vendor_headers(self):
+        directory = ROOT / "cmake/package/verification/io_evolution/consumers"
+        for name in ("h743-high", "u575-uart-gpdma", "g474-can-fd",
+                     "g474-pwm-adc", "g474-adc-group", "uart-fifo",
+                     "ethernet-frames"):
+            with self.subTest(smoke=name):
+                source = (directory / (name + ".c")).read_text()
+                self.assertIn('#include "nexus_factory.h"', source)
+                self.assertIn("nx_platform_start()", source)
+                self.assertIn("nx_platform_stop()", source)
+                self.assertNotIn("#include \"stm32", source)
+                self.assertNotIn("/private/", source)
+                self.assertNotIn("GoogleTest", source)
+
+    def test_four_adc_group_normal_presets_share_one_canonical_software_board(self):
+        import tomllib
+        from tools.configure import configure
+        directory = ROOT / "cmake/package/verification/io_evolution"
+        expected = {"g474-adc-group-" + name + ".toml" for name in (
+            "regular-software", "regular-timer", "injected-software",
+            "injected-timer")}
+        presets = json.loads((ROOT / "CMakePresets.json").read_text())
+        selected = [preset.get("cacheVariables", {}).get("NEXUS_ASSEMBLY_FILE", "")
+                    for preset in presets["configurePresets"]]
+        for name in expected:
+            with self.subTest(assembly=name):
+                file = directory / name
+                result = configure.resolve_ir(file, ROOT)
+                self.assertEqual(result.controllers[0].kind, "adc_group")
+                package = tomllib.loads(file.read_text())["board_package"]
+                self.assertEqual((file.parent / package).resolve(),
+                                 directory / "boards/g474-adc-group")
+                canonical = "${sourceDir}/" + file.relative_to(ROOT).as_posix()
+                self.assertEqual(selected.count(canonical), 1)
+
+    def test_enhanced_ethernet_inputs_keep_software_only_board_boundaries(self):
+        import tomllib
+        from tools.configure import configure
+        directory = ROOT / "cmake/package/verification/io_evolution"
+        presets = json.loads((ROOT / "CMakePresets.json").read_text())
+        selected = [preset.get("cacheVariables", {}).get("NEXUS_ASSEMBLY_FILE", "")
+                    for preset in presets["configurePresets"]]
+        for part in ("f407zg", "gd470"):
+            with self.subTest(part=part):
+                file = directory / (part + "-eth-frames.toml")
+                result = configure.resolve_ir(file, ROOT)
+                self.assertEqual(result.controllers[0].kind, "eth_frames")
+                self.assertEqual(result.controllers[0].mode, "rmii-vlan-sg-ptp")
+                package = tomllib.loads(file.read_text())["board_package"]
+                board = json.loads((file.parent / package / "board.json").read_text())
+                self.assertIsNone(board["physical_pcb_revision"])
+                self.assertTrue(board["unknowns"])
+                canonical = "${sourceDir}/" + file.relative_to(ROOT).as_posix()
+                self.assertEqual(selected.count(canonical), 1)
+
+    def test_both_fifo_normal_presets_reuse_the_installed_canonical_inputs(self):
+        from tools.configure import configure
+        directory = ROOT / "cmake/package/verification/io_evolution"
+        presets = json.loads((ROOT / "CMakePresets.json").read_text())
+        selected = [preset.get("cacheVariables", {}).get("NEXUS_ASSEMBLY_FILE", "")
+                    for preset in presets["configurePresets"]]
+        for family in ("h743", "u575"):
+            with self.subTest(family=family):
+                file = directory / (family + "-uart-fifo.toml")
+                result = configure.resolve_ir(file, ROOT)
+                self.assertEqual(result.controllers[0].mode, "irq-fifo-bytes")
+                canonical = "${sourceDir}/" + file.relative_to(ROOT).as_posix()
+                self.assertEqual(selected.count(canonical), 1)
+
+
 class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
     def test_official_f4_ll_dependency_and_verifier_closure_are_required(self):
         required = {
@@ -166,7 +406,7 @@ class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
         self.assertIn("vendors/st/stm32f4_hal", source_sdk.REQUIRED_DEPENDENCIES)
 
-    def test_f4_sdk_redistributes_only_selected_ll_headers_and_notice(self):
+    def test_f4_sdk_redistributes_only_selected_headers_and_notice(self):
         selected = source_sdk.dependency_entries(ROOT, "vendors/st/stm32f4_hal")
         self.assertEqual(set(selected), {
             "Inc/stm32f4xx_ll_gpio.h", "Inc/stm32f4xx_ll_usart.h",
@@ -174,6 +414,8 @@ class SourceSDKSTM32OfficialSelectionTests(unittest.TestCase):
             "Inc/stm32f4xx_ll_spi.h", "Inc/stm32f4xx_ll_adc.h",
             "Inc/stm32f4xx_ll_tim.h", "Inc/stm32f4xx_ll_iwdg.h",
             "Inc/stm32f4xx_ll_i2c.h",
+            "Inc/stm32f4xx_hal_eth.h", "Inc/stm32f4xx_hal_def.h",
+            "Inc/Legacy/stm32_hal_legacy.h",
         })
 
 

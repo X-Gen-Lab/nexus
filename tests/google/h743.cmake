@@ -157,3 +157,12 @@ target_include_directories(nexus_h743_i2c_v2_test SYSTEM PRIVATE
 target_compile_definitions(nexus_h743_i2c_v2_test PRIVATE STM32H743xx)
 target_compile_options(nexus_h743_i2c_v2_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_i2c_v2_model.h")
+
+# One external physical image is shared by unit and normal factory consumers.
+foreach(h743_flash_target nexus_h743_conversion_test
+        nexus_h743_peripheral_factory_test)
+    target_sources(${h743_flash_target} PRIVATE h743_flash_image_model.cpp
+        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c")
+    target_compile_options(${h743_flash_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_image_model.h")
+endforeach()

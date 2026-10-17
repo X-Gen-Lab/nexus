@@ -1,5 +1,5 @@
 schema = 2
-board_package = "fdcan_board"
+board_package = "boards/g474-fdcan"
 backend = "baremetal"
 clock = "hse24-pll170"
 optimization = "Os"

@@ -172,7 +172,7 @@ static bool protected_storage(const nx_stm32g474_fdcan_state_t* state,
            overlap(storage, bytes, state->domain->configuration,
                    sizeof(*state->domain->configuration)) ||
            overlap(storage, bytes, (const void*)state->domain->ram,
-                   3U * FDCAN_RAM_WORDS * sizeof(uint32_t)) ||
+                   (size_t)3U * FDCAN_RAM_WORDS * sizeof(uint32_t)) ||
            overlap(storage, bytes, state->domain->rcc,
                    sizeof(*state->domain->rcc));
 }

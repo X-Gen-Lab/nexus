@@ -1059,7 +1059,7 @@
             "displayName": "h743-high-empty software fixture; PCB/HIL unqualified",
             "binaryDir": "${sourceDir}/build/fixture-io-evolution-h743-high-empty",
             "cacheVariables": {
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/h743_high_assembly/empty.toml",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/h743-high-empty.toml",
                 "NEXUS_BUILD_TESTS": "OFF",
                 "NEXUS_BUILD_WORKLOAD": "ON",
                 "NEXUS_WORKLOAD": "empty",
@@ -1072,7 +1072,7 @@
             "displayName": "h743-high-uart software fixture; PCB/HIL unqualified",
             "binaryDir": "${sourceDir}/build/fixture-io-evolution-h743-high-uart",
             "cacheVariables": {
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/h743_high_assembly/io.toml",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/h743-high-uart.toml",
                 "NEXUS_BUILD_TESTS": "OFF",
                 "NEXUS_BUILD_WORKLOAD": "OFF",
                 "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
@@ -1086,7 +1086,7 @@
             "displayName": "h743-high-peripherals software fixture; PCB/HIL unqualified",
             "binaryDir": "${sourceDir}/build/fixture-io-evolution-h743-high-peripherals",
             "cacheVariables": {
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/h743_high_assembly/peripherals.toml",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/h743-high-peripherals.toml",
                 "NEXUS_BUILD_TESTS": "OFF",
                 "NEXUS_BUILD_WORKLOAD": "OFF",
                 "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
@@ -1100,7 +1100,7 @@
             "displayName": "g474-pwm-adc software fixture; PCB/HIL unqualified",
             "binaryDir": "${sourceDir}/build/fixture-io-evolution-g474-pwm-adc",
             "cacheVariables": {
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_control_assembly/pwm-adc.toml",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/g474-pwm-adc.toml",
                 "NEXUS_BUILD_TESTS": "OFF",
                 "NEXUS_BUILD_WORKLOAD": "OFF",
                 "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
@@ -1114,7 +1114,7 @@
             "displayName": "g474-can-fd software fixture; PCB/HIL unqualified",
             "binaryDir": "${sourceDir}/build/fixture-io-evolution-g474-can-fd",
             "cacheVariables": {
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_control_assembly/can-fd.toml",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/g474-can-fd-loopback.toml",
                 "NEXUS_BUILD_TESTS": "OFF",
                 "NEXUS_BUILD_WORKLOAD": "OFF",
                 "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
@@ -1128,7 +1128,7 @@
             "displayName": "g474-can-fd-normal software fixture; PCB/HIL unqualified",
             "binaryDir": "${sourceDir}/build/fixture-io-evolution-g474-can-fd-normal",
             "cacheVariables": {
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/g474_control_assembly/can-fd-normal.toml",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/g474-can-fd-normal.toml",
                 "NEXUS_BUILD_TESTS": "OFF",
                 "NEXUS_BUILD_WORKLOAD": "OFF",
                 "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
@@ -1142,12 +1142,124 @@
             "displayName": "u575-uart-gpdma software fixture; PCB/HIL unqualified",
             "binaryDir": "${sourceDir}/build/fixture-io-evolution-u575-uart-gpdma",
             "cacheVariables": {
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/u575_assembly/usart1-dma-tx.toml",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/u575-uart-gpdma.toml",
                 "NEXUS_BUILD_TESTS": "OFF",
                 "NEXUS_BUILD_WORKLOAD": "OFF",
                 "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
                 "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
                 "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": ""
+            }
+        },
+        {
+            "name": "fixture-io-evolution-g474-adc-group-regular-software",
+            "inherits": "fixture-stm32-g474-baremetal-empty",
+            "displayName": "g474-adc-group-regular-software software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-g474-adc-group-regular-software",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/g474-adc-group-regular-software.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_ADC_GROUP"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-g474-adc-group-regular-timer",
+            "inherits": "fixture-stm32-g474-baremetal-empty",
+            "displayName": "g474-adc-group-regular-timer software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-g474-adc-group-regular-timer",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/g474-adc-group-regular-timer.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_ADC_GROUP"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-g474-adc-group-injected-software",
+            "inherits": "fixture-stm32-g474-baremetal-empty",
+            "displayName": "g474-adc-group-injected-software software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-g474-adc-group-injected-software",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/g474-adc-group-injected-software.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_ADC_GROUP"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-g474-adc-group-injected-timer",
+            "inherits": "fixture-stm32-g474-baremetal-empty",
+            "displayName": "g474-adc-group-injected-timer software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-g474-adc-group-injected-timer",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/g474-adc-group-injected-timer.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_ADC_GROUP"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-h743-uart-fifo",
+            "inherits": "stm32-nucleo-h743-baremetal-empty",
+            "displayName": "h743-uart-fifo software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-h743-uart-fifo",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/h743-uart-fifo.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": ""
+            }
+        },
+        {
+            "name": "fixture-io-evolution-u575-uart-fifo",
+            "inherits": "stm32-nucleo-u575-baremetal-empty",
+            "displayName": "u575-uart-fifo software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-u575-uart-fifo",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/u575-uart-fifo.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": ""
+            }
+        },
+        {
+            "name": "fixture-io-evolution-f407zg-eth-frames",
+            "inherits": "stm32-qiming-baremetal",
+            "displayName": "f407zg-eth-frames software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-f407zg-eth-frames",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/f407zg-eth-frames.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_ETH_FRAMES"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-gd470-eth-frames",
+            "inherits": "gd32-liangshan-baremetal",
+            "displayName": "gd470-eth-frames software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-gd470-eth-frames",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/gd470-eth-frames.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_ETH_FRAMES"
             }
         }
     ],
@@ -1631,6 +1743,62 @@
         {
             "name": "fixture-io-evolution-u575-uart-gpdma",
             "configurePreset": "fixture-io-evolution-u575-uart-gpdma",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-g474-adc-group-regular-software",
+            "configurePreset": "fixture-io-evolution-g474-adc-group-regular-software",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-g474-adc-group-regular-timer",
+            "configurePreset": "fixture-io-evolution-g474-adc-group-regular-timer",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-g474-adc-group-injected-software",
+            "configurePreset": "fixture-io-evolution-g474-adc-group-injected-software",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-g474-adc-group-injected-timer",
+            "configurePreset": "fixture-io-evolution-g474-adc-group-injected-timer",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-h743-uart-fifo",
+            "configurePreset": "fixture-io-evolution-h743-uart-fifo",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-u575-uart-fifo",
+            "configurePreset": "fixture-io-evolution-u575-uart-fifo",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-f407zg-eth-frames",
+            "configurePreset": "fixture-io-evolution-f407zg-eth-frames",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-gd470-eth-frames",
+            "configurePreset": "fixture-io-evolution-gd470-eth-frames",
             "targets": [
                 "io_evolution_fixture"
             ]

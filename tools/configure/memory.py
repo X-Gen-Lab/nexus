@@ -128,6 +128,21 @@ def linker(result):
                              f"0x{region['origin']:08x}, LENGTH = {region['size']}"
                              for region in selected)
     extra_sections = _extra_sections(extras)
+    # Only the selected H743 Flash provider consumes this immutable record.
+    # Linker LONG expressions preserve physical addresses without C pointer-to-
+    # integer initializers, static RAM, or product partition assumptions.
+    flash_image_record = ""
+    if result["soc_family"] == "stm32h743" and any(
+            item["kind"] == "flash" for item in result["controllers"]):
+        flash_image_record = """    .nx_flash_image (READONLY) : ALIGN(4) {
+        g_nx_stm32h743_flash_image = .;
+        LONG(__nx_flash_live_start)
+        LONG(__nx_flash_live_end)
+        LONG(__nx_flash_image_load_start)
+        LONG(__nx_flash_image_load_end)
+    } > FLASH :flash
+    ASSERT(SIZEOF(.nx_flash_image) == 16, "Flash image record ABI differs")
+"""
     return f'''/* Exact resolved physical layout; no product reservation. */
 ENTRY(Reset_Handler)
 PHDRS {{
@@ -144,6 +159,8 @@ MEMORY {{
 }}
 __nx_flash_start = ORIGIN(FLASH);
 __nx_flash_end = ORIGIN(FLASH) + LENGTH(FLASH);
+__nx_flash_live_start = ORIGIN(FLASH);
+__nx_flash_image_load_start = ORIGIN(FLASH);
 _estack = ORIGIN(RAM) + LENGTH(RAM);
 _sp = _estack;
 _Min_Stack_Size = {stack};
@@ -166,9 +183,11 @@ SECTIONS {{
     .preinit_array : {{ PROVIDE_HIDDEN(__preinit_array_start = .); KEEP(*(.preinit_array*)) PROVIDE_HIDDEN(__preinit_array_end = .); }} > FLASH :flash
     .init_array : {{ PROVIDE_HIDDEN(__init_array_start = .); KEEP(*(SORT(.init_array.*))) KEEP(*(.init_array*)) PROVIDE_HIDDEN(__init_array_end = .); }} > FLASH :flash
     .fini_array : {{ PROVIDE_HIDDEN(__fini_array_start = .); KEEP(*(SORT(.fini_array.*))) KEEP(*(.fini_array*)) PROVIDE_HIDDEN(__fini_array_end = .); }} > FLASH :flash
+{flash_image_record}    __nx_flash_live_end = .;
 {extra_sections}
     _sidata = LOADADDR(.data);
     .data : ALIGN(4) {{ . = ALIGN(4); _sdata = .; *(.data*) . = ALIGN(4); _edata = .; }} > RAM AT> FLASH :data
+    __nx_flash_image_load_end = LOADADDR(.data) + SIZEOF(.data);
     .bss (NOLOAD) : AT(ADDR(.bss)) {{ . = ALIGN(4); _sbss = .; *(.bss*) *(COMMON) . = ALIGN(4); _ebss = .; }} > RAM :ram
     .reserved (NOLOAD) : AT(ADDR(.reserved)) {{ . = ALIGN(8); __heap_start = .; __nx_heap_start = .; . += _Min_Heap_Size; __heap_end = .; __nx_heap_end = .; }} > RAM :ram
     .msp __nx_msp_start (NOLOAD) : AT(__nx_msp_start) {{ . += _Min_Stack_Size; }} > RAM :stack

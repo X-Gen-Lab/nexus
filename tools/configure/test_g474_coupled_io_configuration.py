@@ -2,6 +2,7 @@
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 import tempfile
+import tomllib
 import unittest
 
 from tools.configure import bindings, configure, factory, ir
@@ -10,12 +11,20 @@ from tools.configure import bindings, configure, factory, ir
 class G474CoupledIOConfiguration(unittest.TestCase):
     root = configure.ROOT / "tests/contracts/g474_control_assembly"
 
+    def fixture(self, name):
+        choices = {"pwm-adc": "g474-pwm-adc",
+                   "can-fd": "g474-can-fd-loopback",
+                   "can-fd-normal": "g474-can-fd-normal"}
+        return (configure.ROOT / "cmake/package/verification/io_evolution" /
+                (choices[name] + ".toml"))
+
     def resolve(self, name, before=None, after=None, extra=""):
-        fixture = self.root / (name + ".toml")
-        package = "pwm_adc_board" if name == "pwm-adc" else "fdcan_board"
-        contents = fixture.read_text().replace(
+        fixture = self.fixture(name)
+        contents = fixture.read_text()
+        package = tomllib.loads(contents)["board_package"]
+        contents = contents.replace(
             'board_package = "' + package + '"',
-            'board_package = "' + str(self.root / package) + '"')
+            'board_package = "' + str(fixture.parent / package) + '"')
         if before is not None:
             self.assertIn(before, contents)
             contents = contents.replace(before, after)
@@ -232,7 +241,7 @@ class G474CoupledIOConfiguration(unittest.TestCase):
     def test_can_fd_normal_reaches_the_atomic_bundle(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary) / "normal"
-            configure.configure(self.root / "can-fd-normal.toml", output)
+            configure.configure(self.fixture("can-fd-normal"), output)
             self.assertTrue((output / ".nexus-config-bundle").is_file())
             self.assertIn("NX_STM32G474_FDCAN_NORMAL",
                           (output / "bindings.c").read_text())
@@ -244,7 +253,7 @@ class G474CoupledIOConfiguration(unittest.TestCase):
             for name in ("pwm-adc", "can-fd"):
                 with self.subTest(name=name):
                     output = Path(temporary) / name
-                    configure.configure(self.root / (name + ".toml"), output)
+                    configure.configure(self.fixture(name), output)
                     self.assertTrue((output / ".nexus-config-bundle").is_file())
                     self.assertIn("nx_factory_" + name.replace("-", "_"),
                                   (output / "nexus_factory.h").read_text())

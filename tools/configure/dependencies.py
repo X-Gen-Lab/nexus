@@ -10,6 +10,7 @@ COMMON = (
     "threadx", "lowpower", "providers/__init__", "providers/common",
     "providers/descriptor",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
+    "selected_contracts",
     "enhanced_endpoints", "uart_formats", "stream_profiles",
 )
 PLATFORM = (

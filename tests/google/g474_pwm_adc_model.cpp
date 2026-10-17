@@ -101,7 +101,8 @@ void edge() {
     g_pa.conversion_done = g_pa.cycles + conversion_cycles + 320U;
 }
 bool output_trigger() {
-    const uint32_t selection = (TIM1->CR2 & TIM_CR2_MMS2) >> 20U;
+    const uint32_t selection =
+        static_cast<uint32_t>((TIM1->CR2 & TIM_CR2_MMS2) >> 20U);
     if (selection == 1U) {
         return (TIM1->CR1 & TIM_CR1_CEN) != 0U;
     }

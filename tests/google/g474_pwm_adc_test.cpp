@@ -454,24 +454,18 @@ TEST_F(G474PWMADC, StateCannotOverwriteItsKnownNvicControlStorage) {
     ASSERT_NO_FATAL_FAILURE(Initialize());
     EXPECT_EXIT(
         {
-            void* page = mmap(reinterpret_cast<void*>(SCS_BASE), 4096U,
-                              PROT_READ | PROT_WRITE,
-                              MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+            void* page =
+                mmap(reinterpret_cast<void*>(SCS_BASE), 4096U, PROT_NONE,
+                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
             if (page != reinterpret_cast<void*>(SCS_BASE)) {
                 std::_Exit(2);
             }
             auto* output = reinterpret_cast<nx_pwm_adc_state_t*>(
                 const_cast<uint32_t*>(&NVIC->ISER[0]));
-            auto* bytes = reinterpret_cast<uint8_t*>(output);
-            for (size_t i = 0U; i != sizeof(*output); ++i) {
-                bytes[i] = 0xA5U;
-            }
+            /* The guard faults on either a read or a write, including under
+             * ASan where the physical SCS address is not application memory. */
             const nx_result_t result = nx_pwm_adc_state(&port, output);
-            bool unchanged = true;
-            for (size_t i = 0U; i != sizeof(*output); ++i) {
-                unchanged = unchanged && bytes[i] == 0xA5U;
-            }
-            std::_Exit(result == NX_ERROR_INVALID && unchanged ? 0 : 3);
+            std::_Exit(result == NX_ERROR_INVALID ? 0 : 3);
         },
         testing::ExitedWithCode(0), "");
 }

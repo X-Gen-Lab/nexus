@@ -10,6 +10,25 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.configure.metadata import load_policy  # noqa: E402
+from tools.evidence.common import file_identity  # noqa: E402
+
+
+SELECTED_CONSUMERS = (
+    ("h743 high", "h743-high-peripherals", "h743-high"),
+    ("u575 gpdma", "u575-uart-gpdma", "u575-uart-gpdma"),
+    ("g474 fd normal", "g474-can-fd-normal", "g474-can-fd"),
+    ("g474 fd loopback", "g474-can-fd-loopback", "g474-can-fd"),
+    ("g474 pwm adc", "g474-pwm-adc", "g474-pwm-adc"),
+    ("g474 adc regular software", "g474-adc-group-regular-software",
+     "g474-adc-group"),
+    ("g474 adc regular timer", "g474-adc-group-regular-timer", "g474-adc-group"),
+    ("g474 adc injected software", "g474-adc-group-injected-software",
+     "g474-adc-group"),
+    ("g474 adc injected timer", "g474-adc-group-injected-timer", "g474-adc-group"),
+    ("h743 fifo", "h743-uart-fifo", "uart-fifo"),
+    ("u575 fifo", "u575-uart-fifo", "uart-fifo"),
+    ("f407 frames", "f407zg-eth-frames", "ethernet-frames"),
+    ("gd470 frames", "gd470-eth-frames", "ethernet-frames"))
 
 
 def clean_environment():
@@ -193,6 +212,99 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
     return source, build, arguments
 
 
+def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name,
+                              run_checked, *, expected_revision):
+    """Reuse installed canonical inputs through a separate public C project."""
+    sdk = prefix / "share/nexus/src"
+    verification = sdk / "cmake/package/verification/io_evolution"
+    assembly = verification / (assembly_name + ".toml")
+    smoke = verification / "consumers" / (smoke_name + ".c")
+    if not assembly.is_file() or not smoke.is_file():
+        raise ValueError("Installed selected-consumer input is missing")
+    source = directory / ("selected " + name + " source")
+    build = directory / ("selected " + name + " build")
+    source.mkdir()
+    run_checked(["git", "init", "--quiet", str(source)])
+    version = load_policy(sdk)["semantic_version"]
+    (source / "CMakeLists.txt").write_text(
+        'cmake_minimum_required(VERSION 3.31)\n'
+        'project(installed_selected_consumer LANGUAGES C ASM)\n'
+        'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+        f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
+        'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c)\n'
+        'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
+        'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
+        'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
+        'file(WRITE "${CMAKE_BINARY_DIR}/resolved-config.txt" "${config_root}")\n')
+    shutil.copyfile(smoke, source / "main.c")
+    (source / "private_headers.c").write_text(
+        '#if __has_include("stm32h7xx.h") || '
+        '__has_include("stm32u5xx.h") || __has_include("stm32g4xx.h") || '
+        '__has_include("stm32f4xx.h") || __has_include("gd32f4xx.h")\n'
+        '#error Vendor SDK leaked into product source\n#endif\n'
+        '#if __has_include("stm32h743_clock.h") || '
+        '__has_include("stm32h743_provider.h") || '
+        '__has_include("stm32u575_uart_gpdma.h") || '
+        '__has_include("stm32u575_provider.h") || '
+        '__has_include("stm32g474_fdcan.h") || '
+        '__has_include("stm32g474_pwm_adc.h") || '
+        '__has_include("stm32g474_adc_group.h") || '
+        '__has_include("stm32f407_eth_frames.h") || '
+        '__has_include("gd32f470_eth_frames.h") || '
+        '__has_include("stm32g474_provider.h")\n'
+        '#error Private provider leaked into product source\n#endif\n'
+        '_Static_assert(1, "Public source include isolation");\n')
+    command = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
+               "-DCMAKE_BUILD_TYPE=Release",
+               f"-DNexus_DIR={prefix / 'lib/cmake/Nexus'}",
+               "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF",
+               f"-DNEXUS_ASSEMBLY_FILE={assembly}",
+               f"-DCMAKE_TOOLCHAIN_FILE={sdk / 'cmake/toolchains/arm-gcc.cmake'}",
+               "-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision]
+    return source, build, command
+
+
+def check_selected_image(sdk, source, build, run_checked):
+    """Bind selected artifacts to actual resources and the retained provider."""
+    if (build / "resolved-sdk.txt").read_text() != str(sdk):
+        raise ValueError("Selected consumer resolved another source SDK")
+    commands = json.loads((build / "compile_commands.json").read_text())
+    products = [entry for entry in commands
+                if Path(entry["file"]).resolve() in
+                {source / "main.c", source / "private_headers.c"}]
+    if (len(products) != 2 or
+            {Path(entry["file"]).name for entry in products} !=
+            {"main.c", "private_headers.c"} or
+            any(value in entry["command"] for entry in products for value in
+                ("/vendors/", "/soc/", "-DSTM32", "-DGD32"))):
+        raise ValueError("Selected consumer private inputs leaked into product")
+    artifacts = {suffix: file_identity(build / "bin" /
+                                      ("installed_selected." + suffix))
+                 for suffix in ("elf", "bin", "map")}
+    if any(record["size"] == 0 for record in artifacts.values()):
+        raise ValueError("Selected consumer artifact is empty")
+    config = Path((build / "resolved-config.txt").read_text())
+    resources_path = build / "bin/installed_selected.resources.json"
+    resources = json.loads(resources_path.read_text())
+    if (resources["status"] != "passed" or
+            resources["elf"] != artifacts["elf"] or
+            resources["resolved"] != file_identity(config / "resolved.json")):
+        raise ValueError("Selected consumer resource/configuration binding failed")
+    retention_path = build / "provider-retention.json"
+    run_checked([sys.executable, "-B", str(sdk / "tools/measurement/retention.py"),
+                 "--elf", artifacts["elf"]["path"],
+                 "--bindings", str(config / "bindings.c"),
+                 "--resolved", str(config / "resolved.json"),
+                 "--output", str(retention_path)])
+    retention = json.loads(retention_path.read_text())
+    if (retention["status"] != "passed" or
+            retention["elf"] != artifacts["elf"]):
+        raise ValueError("Selected consumer provider retention failed")
+    return {"artifacts": artifacts, "resources": file_identity(resources_path),
+            "resolved": file_identity(config / "resolved.json"),
+            "retention": file_identity(retention_path)}
+
+
 def positive_parallel(value):
     """Require a canonical positive job count, without a policy maximum."""
     try:
@@ -216,7 +328,8 @@ def main(argv=None):
     records = []
     report = {"schema_version": 1, "kind": "source_sdk_consumer_verification",
               "prefix": str(prefix), "status": "failed",
-              "physical_status": "not_executed", "commands": records}
+              "physical_status": "not_executed", "commands": records,
+              "selected_images": []}
     try:
         if prefix.resolve() != prefix or output.resolve() != output or output.is_relative_to(prefix):
             raise ValueError("Consumer output must be canonical and outside the SDK")
@@ -297,6 +410,19 @@ def main(argv=None):
                     "--output", str(retention_path)])
                 if json.loads(retention_path.read_text())["status"] != "passed":
                     raise ValueError("Modern consumer provider retention failed")
+        for name, assembly, smoke in SELECTED_CONSUMERS:
+            source, build, command = prepare_selected_consumer(
+                prefix, output, name, assembly, smoke, run_checked,
+                expected_revision=identity["source_revision"])
+            run_checked(command)
+            run_checked(["cmake", "--build", str(build), "--parallel",
+                         str(args.parallel) if args.parallel is not None else "2",
+                         "--target", "installed_selected"])
+            image = check_selected_image(sdk, source, build, run_checked)
+            image.update({"name": name, "assembly": str(
+                sdk / "cmake/package/verification/io_evolution" /
+                (assembly + ".toml"))})
+            report["selected_images"].append(image)
         report["status"] = "passed"
     except (OSError, ValueError, subprocess.TimeoutExpired, KeyError) as error:
         report["error"] = str(error)

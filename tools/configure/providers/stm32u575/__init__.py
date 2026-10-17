@@ -38,6 +38,7 @@ ADC_PIN_CHANNELS = MappingProxyType({("ADC4", "PC0"): 1})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart",
+    ("uart", "irq-fifo-bytes"): "uart_fifo",
     ("uart", "dma-tx"): "uart_gpdma",
     ("watchdog", "independent"): "watchdog",
     ("spi", "short-poll"): "spi", ("i2c", "poll-messages"): "i2c",

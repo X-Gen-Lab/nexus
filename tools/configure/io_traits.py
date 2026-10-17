@@ -11,26 +11,15 @@ import re
 from types import MappingProxyType
 
 try:
-    from .providers import maintained
-    from .providers.common import fail, integer, mode_traits
+    from . import selected_contracts
+    from .providers.common import fail, integer
 except ImportError:
-    from providers import maintained
-    from providers.common import fail, integer, mode_traits
+    import selected_contracts
+    from providers.common import fail, integer
 
 
-_KINDS = ("uart", "spi", "i2c", "adc", "can", "eth")
-# Explicit review scope of the current fixed byte/word public contracts. Adding
-# a mode or family does not acquire a format review through ModeTraits flags.
-_PROVIDERS = frozenset(("native", "stm32f103", "stm32f407", "stm32g474",
-                        "stm32h743", "stm32u575", "gd32f303", "gd32f470"))
-_FIELDS = MappingProxyType({
-    "uart": ("data_bits", "parity", "stop_half_bits", "requested_baud"),
-    "spi": ("word_bits", "configured_max_hz"),
-    "i2c": ("address_bits", "configured_max_hz"),
-    "adc": ("storage_bits", "signed_samples", "scan_channels"),
-    "can": ("classic_payload_bytes", "hardware_tx_mailboxes"),
-    "eth": ("vlan", "scatter_gather"),
-})
+_KINDS = selected_contracts.FORMAT_KINDS
+_FIELDS = selected_contracts.FORMAT_FIELDS
 
 
 @dataclass(frozen=True)
@@ -58,54 +47,10 @@ def describe(item):
     """
     if item.kind not in _KINDS:
         return None
-    if item.provider not in _PROVIDERS:
-        fail("I/O traits require an explicit provider format review")
-    provider = maintained(item.provider)
-    provider.mode_implementation(item.kind, item.mode)
-    shape = mode_traits(item.kind, item.mode)
-    model = provider.MODEL
-    kind, options = item.kind, item.options
-    continuity, source = "not_applicable", "unknown"
-    abort = "request" if shape.irq and kind != "adc" else "not_applicable"
-    if kind == "uart":
-        frame = options.frame
-        fields = dict(data_bits=frame.data_bits if frame is not None else 8,
-                      parity=({"none": 0, "even": 1, "odd": 2}[frame.parity]
-                              if frame is not None else 0),
-                      stop_half_bits=frame.stop_bits * 2
-                      if frame is not None else 2,
-                      requested_baud=options.baud)
-        continuity = ("model" if model else "double_buffer"
-                      if shape.continuous else "rearm_gap"
-                      if shape.rx_dma else "irq_buffered")
-        if not model and options.rx_profile == "events":
-            source = "irq_observation"
-    elif kind == "spi":
-        fields = dict(word_bits=(0 if item.interface_kind ==
-                                 "spi_dma_transaction" else 8),
-                      configured_max_hz=options.max_hz)
-    elif kind == "i2c":
-        fields = dict(address_bits=7, configured_max_hz=options.max_hz)
-    elif kind == "adc":
-        fields = dict(storage_bits=16, signed_samples=0,
-                      scan_channels=len(options.channels))
-        if shape.block_stream:
-            continuity = ("double_buffer" if shape.continuous else "rearm_gap")
-            source = "irq_observation"
-    elif kind == "can":
-        # Only the maintained bxCAN engine has this reviewed specialization.
-        if item.provider not in {"stm32f407", "gd32f470"}:
-            fail("CAN traits require a reviewed physical mailbox topology")
-        fields = dict(classic_payload_bytes=8, hardware_tx_mailboxes=3)
-        source = "irq_observation"
-    else:
-        fields = dict(vlan=0, scatter_gather=0)
-        abort, source = "controller_pending", "acquire_observation"
-    dma = not model and (shape.dma or shape.bus_master)
-    line = provider.CPU_FEATURES["dcache_line_bytes"] if dma else 0
-    policy = ("domain_cache_line" if line else "provider_domain")
-    policy = policy if dma else "none"
-    return SelectedTraits(kind, fields, abort, continuity, source, policy, line)
+    selected = selected_contracts.describe(item)
+    return SelectedTraits(item.kind, selected.fields, selected.abort_scope,
+                          selected.continuity, selected.timestamp_source,
+                          selected.dma_policy, selected.cache_line_bytes)
 
 
 def emit_controllers(controllers):

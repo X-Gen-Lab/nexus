@@ -34,11 +34,12 @@ class H743HighClockConfigurationTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
-        self.fixture = gate.ROOT / "tests/contracts/h743_high_assembly/empty.toml"
+        self.fixture = (gate.ROOT /
+                        "cmake/package/verification/io_evolution/h743-high-empty.toml")
 
     def assembly(self, profile=PROFILE):
         text = self.fixture.read_text().replace(
-            '"../../../boards/stm32h743_nucleo_zi2"',
+            '"../../../../boards/stm32h743_nucleo_zi2"',
             '"' + str(gate.ROOT / "boards/stm32h743_nucleo_zi2") + '"')
         path = self.directory / "assembly.toml"
         path.write_text(text.replace(PROFILE, profile))
@@ -198,9 +199,9 @@ class H743SelectedKernelConfigurationTests(unittest.TestCase):
 
     def resolved(self, selection):
         prefix = (gate.ROOT /
-                  "tests/contracts/h743_high_assembly/empty.toml").read_text()
+                  "cmake/package/verification/io_evolution/h743-high-empty.toml").read_text()
         prefix = prefix.replace(
-            '"../../../boards/stm32h743_nucleo_zi2"',
+            '"../../../../boards/stm32h743_nucleo_zi2"',
             '"' + str(gate.ROOT / "boards/stm32h743zi_hsi_reference") + '"')
         path = self.directory / "selected.toml"
         path.write_text(prefix + "\n" + selection)

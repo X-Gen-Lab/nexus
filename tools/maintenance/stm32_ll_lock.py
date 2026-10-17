@@ -205,7 +205,7 @@ PROFILES = {
         api_scope="ll-inline-fdcan-definitions"),
     "h7": Profile("h7", "stm32h743", "a1996eed9172b59887bafaaa0ea1816ea14d48b5",
         "8f922cdc7cc6de2344e75ddd657889f4ff761790", "v1.13.0",
-        "5abb9764b32e11a6557b90bf39531528019b5761", ("adc", "spi")),
+        "5abb9764b32e11a6557b90bf39531528019b5761", ("adc", "spi", "usart")),
     "u5": Profile("u5", "stm32u575", "2552682ee5a0d6f826a6435750fc9267be65868b",
         "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8", "v1.9.0",
         "d88042df24f16799957c24f00c2b234c9e306188", ("adc", "spi", "i2c", "tim", "dma", "usart")),

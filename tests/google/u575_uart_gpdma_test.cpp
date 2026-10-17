@@ -694,43 +694,49 @@ TEST_F(U575UartGpdma, ColdZeroStopPerformsNoMmio) {
 }
 
 TEST_F(U575UartGpdma, SystemControlAliasesCannotBecomeOutputsOrColdRxStorage) {
-    constexpr uintptr_t scs_page = 0xe000e000U;
-    void* mapped = mmap(
-        reinterpret_cast<void*>(scs_page), kPageSize, PROT_READ | PROT_WRITE,
-        MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
-    ASSERT_EQ(reinterpret_cast<void*>(scs_page), mapped);
     ASSERT_NO_FATAL_FAILURE(Open());
-    NVIC->ISER[0] = 0x12345678U;
-    NVIC->ISER[2] = 0xabcdef01U;
     USART1_NS->RDR = 0xa5U;
     USART1_NS->ISR |= USART_ISR_RXNE;
     nx_stm32u575_uart_gpdma_uart_irq(&state);
-    size_t count = 99U;
-    auto* enable_output =
-        reinterpret_cast<uint8_t*>(const_cast<uint32_t*>(&NVIC->ISER[0]));
-    EXPECT_EQ(NX_ERROR_INVALID,
-              nx_uart_port_read_bytes(&face, enable_output, 1U, &count));
-    EXPECT_EQ(0x12345678U, NVIC->ISER[0]);
-    EXPECT_EQ(99U, count);
-    uint8_t byte = 0U;
-    auto* enable_count =
-        reinterpret_cast<size_t*>(const_cast<uint32_t*>(&NVIC->ISER[2]));
-    EXPECT_EQ(NX_ERROR_INVALID,
-              nx_uart_port_read_bytes(&face, &byte, 1U, enable_count));
-    EXPECT_EQ(0xabcdef01U, NVIC->ISER[2]);
-    EXPECT_EQ(0U, byte);
-    EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&face));
-    state.uart.rx_storage = enable_output;
-    state.uart.rx_capacity = 8U;
-    const auto writes = g_u575_model.writes;
-    EXPECT_EQ(NX_ERROR_INVALID,
-              nx_stm32u575_uart_gpdma_initialize(&state, 4000000U, 8U));
-    EXPECT_FALSE(state.uart.retained);
-    EXPECT_EQ(writes, g_u575_model.writes);
-    EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&face));
-    state.uart.rx_storage = ring;
-    state.uart.rx_capacity = sizeof(ring);
-    EXPECT_EQ(0, munmap(mapped, kPageSize));
+    EXPECT_EXIT(
+        {
+            constexpr uintptr_t scs_page = 0xe000e000U;
+            void* mapped =
+                mmap(reinterpret_cast<void*>(scs_page), kPageSize, PROT_NONE,
+                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+            if (mapped != reinterpret_cast<void*>(scs_page)) {
+                _exit(2);
+            }
+            /* Either a read or a write to this physical control page must
+             * fault, including when ASan reserves the address as shadow. */
+            size_t count = 99U;
+            auto* enable_output = reinterpret_cast<uint8_t*>(
+                const_cast<uint32_t*>(&NVIC->ISER[0]));
+            if (nx_uart_port_read_bytes(&face, enable_output, 1U, &count) !=
+                    NX_ERROR_INVALID ||
+                count != 99U) {
+                _exit(3);
+            }
+            uint8_t byte = 0U;
+            auto* enable_count = reinterpret_cast<size_t*>(
+                const_cast<uint32_t*>(&NVIC->ISER[2]));
+            if (nx_uart_port_read_bytes(&face, &byte, 1U, enable_count) !=
+                    NX_ERROR_INVALID ||
+                byte != 0U || nx_uart_port_stop(&face) != NX_SUCCESS) {
+                _exit(4);
+            }
+            state.uart.rx_storage = enable_output;
+            state.uart.rx_capacity = 8U;
+            const auto writes = g_u575_model.writes;
+            const nx_result_t initialized =
+                nx_stm32u575_uart_gpdma_initialize(&state, 4000000U, 8U);
+            _exit(initialized == NX_ERROR_INVALID && !state.uart.retained &&
+                          writes == g_u575_model.writes &&
+                          nx_uart_port_stop(&face) == NX_SUCCESS
+                      ? 0
+                      : 5);
+        },
+        testing::ExitedWithCode(0), "");
 }
 
 TEST_F(U575UartGpdma, ModelEnZeroIsIgnoredAndResetIsLegalOnlyAtSteadyState) {

@@ -1,8 +1,9 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
 try:
-    from ... import enhanced_endpoints
+    from ... import enhanced_endpoints, uart_formats
 except ImportError:
     import enhanced_endpoints
+    import uart_formats
 from ..common import Construction, controller_ir, fail, kernel_policy_constant
 
 
@@ -29,9 +30,12 @@ def constructor(item, result, board_bindings, routes, devices):
         options = item.options
         receive = item.mode == "rx-dma-idle"
         dma = item.mode in ("dma-tx", "rx-dma-idle")
+        fifo = item.mode == "irq-fifo-bytes"
         owner = state
-        if dma:
+        if dma or fifo:
             state += ".uart"
+        if fifo:
+            definitions += uart_formats.fifo_definitions(item)
         plan = result.get("clock_plan")
         clock = (plan["domains"]["usart3"]["nominal_hz"] if plan is not None
                  else result["clock"]["apb1_hz"])
@@ -69,7 +73,11 @@ def constructor(item, result, board_bindings, routes, devices):
                         "    nx_result_t status = nx_stm32h743_usart3_pins_prepare();",
                         "    if (status != NX_SUCCESS) { return status; }",
                         ]
-        if dma:
+        if fifo:
+            definitions += [f"    {owner}.fifo = &s_nx_fifo_profile_{name};",
+                            "    return nx_stm32h743_uart_fifo_initialize("
+                            f"&{owner}, {clock}u, 1000000u);"]
+        elif dma:
             lane = 1 if receive else 0
             member = "rx" if receive else "tx"
             initialize = "uart_receive" if receive else "uart_dma"
@@ -82,9 +90,11 @@ def constructor(item, result, board_bindings, routes, devices):
         else:
             definitions += [f"    return nx_stm32h743_uart_initialize(&{state}, {clock}u, 1000000u);"]
         handler = ("uart_receive_uart" if receive else
-                   "uart_dma_uart" if dma else "uart")
+                   "uart_dma_uart" if dma else "uart_fifo" if fifo else "uart")
+        brief = ("Selected bounded FIFO RX/TX budgets." if fifo else
+                 "One selected controller, at most one TX/RX byte.")
         definitions += ["}", "void USART3_IRQHandler(void);",
-                        r"/** \brief One selected controller, at most one TX/RX byte. */",
+                        "/** \\brief " + brief + " */",
                         f"void USART3_IRQHandler(void) {{ nx_stm32h743_{handler}_irq(&{owner}); }}"]
         if dma:
             dma_handler = "uart_receive_dma" if receive else "uart_dma"

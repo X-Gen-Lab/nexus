@@ -92,7 +92,8 @@ GPIO preloads and observes the output latch before publishing output mode.
 Masked BSRR writes are direct hardware commands. Toggle requires serialization
 with every owner of the same pins. Startup/stop are privileged task operations.
 
-USART1 selects IRQ 61 with PCLK2, USART2 selects IRQ62 with PCLK1. Both use
+Ordinary IRQ-byte USART1 selects IRQ61 with PCLK2; USART2 selects IRQ62 with
+PCLK1. Both use
 priority 5, 4 MHz, PRESC 1, oversampling 16, 8N1
 and FIFO disabled. BRR is the rounded clock/baud divisor 16..65535; accepted baud bounds
 are 62..250000. For 115200 the encoded divisor is 35, nominal 114285.7 baud, about
@@ -109,7 +110,7 @@ hint, and selected kernel IRQ policy is validated before kernel notifications.
 
 ### Optional USART1 finite GPDMA TX
 
-The maintained [normal TOML fixture](../../tests/contracts/u575_assembly/usart1-dma-tx.toml)
+The maintained [normal TOML fixture](../../cmake/package/verification/io_evolution/u575-uart-gpdma.toml)
 selects `dma-tx`: USART1 PA9/PA10 AF7,8N1/FIFO-off at4MHz; GPDMA1 channel0,
 request25/IRQ29 and USART1 IRQ61, both priority5. Its single UART prefix retains
 independent IRQ-byte RX; the selected-only extension does not grow ordinary
@@ -130,6 +131,37 @@ provider-retention checks. They do not establish a clean-source full-gate
 candidate, physical erratum qualification or measured cycles. HIL is
 `not_executed`. USART2 DMA, RX DMA, linked lists, continuous streaming,
 low-power/autonomous operation and a TrustZone broker remain unselected.
+
+### Optional USART1 bounded hardware FIFO bytes
+
+The independent `irq-fifo-bytes` selection uses USART1 PA9/PA10 AF7, 8N1,
+priority 5 and the existing TZEN0/MSIS4 reference. Hardware RX/TX FIFO depth is
+8 bytes per direction, with one additional RDR receive stage. Its explicit
+thresholds and independent RX/TX byte budgets bound one handler entry. A
+checked RX-not-empty fallback drains subthreshold tails without another IDLE;
+per-head error ACK precedes RDR pop. TX space or FIFO-empty never substitutes
+for wire TC. Cancel and stop retain storage until required source, vector,
+publisher and UE/ACK withdrawal is proved.
+
+Only this selected state adds a const-profile link. Ordinary UART state/ops,
+initialization and the separate FIFO-disabled GPDMA mode remain unchanged.
+The implementation shares one compile-time algorithm with the H743 selection
+and uses the already pinned official U5 LL USART leaves. It does not enable
+USART2 FIFO, DMA/FIFO combinations, non-8N1, flow control, TrustZone or
+autonomous/low-power behavior. See the
+[FIFO selection and lifecycle contract](../../docs/design/uart-fifo.md).
+Its 45 real-provider and 9 normal-TOML/generated-factory model cases passed,
+along with the selected normal ARM build, resource and retention checks.
+Physical HIL is `not_executed`;
+neither register counts nor model success establish noise immunity or latency.
+
+中文：USART1 的独立可选模式 `irq-fifo-bytes` 使用现有 TZEN0/MSIS4、8N1 和
+优先级5，每方向 FIFO 为8字节，RX 另有1字节 RDR。阈值与每次中断 RX/TX 字节
+预算分别配置；短尾使用读回确认的 RX 非空中断，错误在弹出当前队首前确认。
+TX 空间或 FIFO 空不等于线上完成；取消、排空和停止的借用约束保持不变。
+普通状态与方法表不增长，不与现有 FIFO 关闭的 GPDMA 模式混用。45项外部模型和
+9项正常生成工厂用例，以及选定 ARM 链接/资源/保留检查已通过；这些结果不代表
+抗噪声或实板时延，物理 HIL 为 `not_executed`。
 
 ## Independent watchdog
 

@@ -459,10 +459,10 @@ class H743HighFlash : public H743HighReference {
 TEST_F(H743HighFlash, ExactVos1Hclk192TwoWsWr2AllowsAnActualFlashword) {
     std::array<uint8_t, 32U> input{};
     input.fill(0x55U);
-    ASSERT_EQ(NX_SUCCESS, nx_flash_port_program(&face, 0U, input.data(),
+    ASSERT_EQ(NX_SUCCESS, nx_flash_port_program(&face, 131072U, input.data(),
                                                 input.size(), 10000U));
     EXPECT_EQ(8U, g_h743_model.flash_store_count);
-    EXPECT_EQ(0x55U, memory[0]);
+    EXPECT_EQ(0x55U, memory[131072U]);
     EXPECT_EQ(0U, g_h743_high_behavior.unsafe_flash_unlocks);
     EXPECT_EQ(FLASH_ACR_LATENCY_2WS | FLASH_ACR_WRHIGHFREQ_1,
               state.registers->ACR);
@@ -481,8 +481,9 @@ TEST_F(H743HighFlash, ReadLatencyCannotExcuseAnUnsafeProgrammingDelay) {
     state.registers->ACR = FLASH_ACR_LATENCY_2WS | FLASH_ACR_WRHIGHFREQ_0;
     std::array<uint8_t, 32U> input{};
     const uint32_t writes = g_h743_model.writes;
-    EXPECT_EQ(NX_ERROR_STATE, nx_flash_port_program(&face, 0U, input.data(),
-                                                    input.size(), 10000U));
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_flash_port_program(&face, 131072U, input.data(), input.size(),
+                                    10000U));
     EXPECT_EQ(writes, g_h743_model.writes);
     EXPECT_EQ(0U, g_h743_model.flash_store_count);
     state.registers->ACR = FLASH_ACR_LATENCY_2WS | FLASH_ACR_WRHIGHFREQ_1;
@@ -491,8 +492,9 @@ TEST_F(H743HighFlash, CorrectWrDelayCannotExcuseAnUnsafeCpuReadLatency) {
     state.registers->ACR = FLASH_ACR_LATENCY_1WS | FLASH_ACR_WRHIGHFREQ_1;
     std::array<uint8_t, 32U> input{};
     const uint32_t writes = g_h743_model.writes;
-    EXPECT_EQ(NX_ERROR_STATE, nx_flash_port_program(&face, 0U, input.data(),
-                                                    input.size(), 10000U));
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_flash_port_program(&face, 131072U, input.data(), input.size(),
+                                    10000U));
     EXPECT_EQ(writes, g_h743_model.writes);
     EXPECT_EQ(0U, g_h743_model.flash_store_count);
     state.registers->ACR = FLASH_ACR_LATENCY_2WS | FLASH_ACR_WRHIGHFREQ_1;
@@ -502,8 +504,9 @@ TEST_F(H743HighFlash, UnreadyActualVosRejectsBeforeUnlockOrDataStore) {
     g_h743_model.power.CSR1 &= ~(uint32_t)PWR_CSR1_ACTVOSRDY;
     std::array<uint8_t, 32U> input{};
     const uint32_t writes = g_h743_model.writes;
-    EXPECT_EQ(NX_ERROR_STATE, nx_flash_port_program(&face, 0U, input.data(),
-                                                    input.size(), 10000U));
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_flash_port_program(&face, 131072U, input.data(), input.size(),
+                                    10000U));
     EXPECT_EQ(writes, g_h743_model.writes);
     EXPECT_EQ(0U, g_h743_model.flash_store_count);
     g_h743_model.power.CSR1 = csr;
@@ -513,8 +516,9 @@ TEST_F(H743HighFlash, Cpu384DoesNotAuthorizeForeignHclkOrFlashGeometry) {
     g_h743_model.rcc.D1CFGR &= ~(uint32_t)RCC_D1CFGR_HPRE;
     std::array<uint8_t, 32U> input{};
     const uint32_t writes = g_h743_model.writes;
-    EXPECT_EQ(NX_ERROR_STATE, nx_flash_port_program(&face, 0U, input.data(),
-                                                    input.size(), 10000U));
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_flash_port_program(&face, 131072U, input.data(), input.size(),
+                                    10000U));
     EXPECT_EQ(writes, g_h743_model.writes);
     g_h743_model.rcc.D1CFGR = d1;
 }
@@ -522,9 +526,9 @@ TEST_F(H743HighFlash, CacheOnFlashRemainsExplicitlyUnsupportedBeforeAnyPulse) {
     g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
     std::array<uint8_t, 32U> input{};
     const uint32_t writes = g_h743_model.writes;
-    EXPECT_EQ(
-        NX_ERROR_UNSUPPORTED,
-        nx_flash_port_program(&face, 0U, input.data(), input.size(), 10000U));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_flash_port_program(&face, 131072U, input.data(), input.size(),
+                                    10000U));
     EXPECT_EQ(writes, g_h743_model.writes);
     EXPECT_EQ(0U, g_h743_model.flash_store_count);
     g_h743_model.core->CCR &= ~(uint32_t)SCB_CCR_DC_Msk;

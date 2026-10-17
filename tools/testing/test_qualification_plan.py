@@ -96,6 +96,24 @@ class QualificationPlanTests(unittest.TestCase):
                                  ["configure", "build"])
         validate_plan(self.plan)
 
+    def test_redistributed_io_references_have_one_qualified_preset(self):
+        directory = ROOT / "cmake/package/verification/io_evolution"
+        fixtures = sorted(directory.glob("*.toml"))
+        self.assertTrue(fixtures, "Redistributed references must not disappear")
+        presets = load_json(ROOT / "CMakePresets.json")["configurePresets"]
+        for fixture in fixtures:
+            with self.subTest(fixture=fixture.name):
+                source = "${sourceDir}/" + fixture.relative_to(ROOT).as_posix()
+                selected = [preset["name"] for preset in presets
+                            if preset.get("cacheVariables", {}).get(
+                                "NEXUS_ASSEMBLY_FILE") == source]
+                self.assertEqual(len(selected), 1)
+                stages = [stage for stage in self.stages
+                          if stage["args"] == ["--preset", selected[0]]]
+                self.assertEqual([stage["checker"] for stage in stages],
+                                 ["configure", "build"])
+        validate_plan(self.plan)
+
 
 if __name__ == "__main__":
     unittest.main()

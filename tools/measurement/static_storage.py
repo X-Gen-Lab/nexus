@@ -12,9 +12,11 @@ from tools.measurement.elf import interval_bytes
 
 CLASSES = (
     ("provider_state", re.compile(
-        r"s_nx_(?:port|endpoint|cs|eth_tx_slots|eth_rx_slots)_[A-Za-z0-9_]+(?:\.[\w.]+)?\Z")),
+        r"s_nx_(?:port|endpoint|cs|eth(?:_frames)?_(?:tx|rx)_slots)_"
+        r"[A-Za-z0-9_]+(?:\.[\w.]+)?\Z")),
     ("buffers", re.compile(
-        r"s_nx_(?:rx|events|can_events|eth_tx|eth_rx|eth_storage)_[A-Za-z0-9_]+(?:\.[\w.]+)?\Z")),
+        r"s_nx_(?:rx|events|can_events|eth(?:_frames)?_(?:tx|rx|storage))_"
+        r"[A-Za-z0-9_]+(?:\.[\w.]+)?\Z")),
     ("rtos_stack", re.compile(
         r"ux(?:Idle|Timer|PassiveIdle)TaskStack(?:\.[\w.]+)?\Z")),
     ("rtos_control", re.compile(

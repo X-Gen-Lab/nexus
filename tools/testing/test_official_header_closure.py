@@ -15,6 +15,10 @@ sys.path.insert(0, str(ROOT))
 from tools.maintenance.stm32_ll_lock import PROFILES
 
 ADDITIONS = {
+    'h7': {
+        'Inc/stm32h7xx_ll_usart.h': {
+            'bytes': 175243,
+            'sha256': '0a739716ed496ee660c25a16b0e90a40bb83998fb83107fa778164dd6419403a'}},
     'u5': {
         'Inc/stm32u5xx_ll_dma.h': {
             'bytes': 322291,
@@ -33,6 +37,8 @@ ADDITIONS = {
             'bytes': 238453,
             'sha256': '97a63cd0d7e27f692d92f475179ea949751f790a08b7d80fb5f611792be98236'}}}
 BASE_FILES = {
+    'h7': {'LICENSE.md', 'Inc/stm32h7xx_ll_adc.h',
+           'Inc/stm32h7xx_ll_spi.h'},
     'u5': {'LICENSE.md', *(f'Inc/stm32u5xx_ll_{unit}.h'
                           for unit in ('adc', 'spi', 'i2c', 'tim'))},
     'g4': {'LICENSE.md', 'Inc/stm32g4xx_ll_adc.h', 'Inc/stm32g4xx_ll_dmamux.h'}}
@@ -47,6 +53,52 @@ def proposed_lock(family):
 
 
 class OfficialHeaderClosureTests(unittest.TestCase):
+    def test_h7_exact_closed_graph_adds_only_usart_inline_header(self):
+        profile = PROFILES['h7']
+        expected = BASE_FILES['h7'] | ADDITIONS['h7'].keys()
+        self.assertEqual(profile.selected_files, expected)
+        self.assertEqual(profile.contract(proposed_lock('h7')), expected)
+
+    def test_f4_eth_definitions_close_exact_transitive_headers_without_vendor_c(self):
+        from tools.maintenance import stm32f4_hal_lock as f4
+        additions = {
+            'Inc/stm32f4xx_hal_eth.h': {
+                'bytes': 89154,
+                'sha256': '596e6eb83351a5cb3cad97750f2c7536069c278bb58fc52ccce74a0bfc34beb5'},
+            'Inc/stm32f4xx_hal_def.h': {
+                'bytes': 7563,
+                'sha256': 'c8eb3f7b393f8c5a0c32e16ccfa101c83ddb59e96bd42239b8a5c5d4da83e97f'},
+            'Inc/Legacy/stm32_hal_legacy.h': {
+                'bytes': 240833,
+                'sha256': '8c2d2feb90e8ed88fe5756f3f1616a2b67aa1cd0858da8b130ed69607688c8c0'}}
+        original = json.loads((ROOT / f4.LOCK_NAME).read_text())
+        candidate = copy.deepcopy(original)
+        candidate['files'].update(additions)
+        candidate['selected_api'] = 'stm32f407-ll-inline-eth-definitions'
+        expected = {'LICENSE.md', *(f'Inc/stm32f4xx_ll_{unit}.h' for unit in
+                    ('gpio', 'usart', 'spi', 'adc', 'tim', 'iwdg', 'i2c')),
+                    *additions}
+        self.assertEqual(f4.REVIEWED_FILES, expected)
+        self.assertEqual(f4.contract(candidate), expected)
+        for name, identity in additions.items():
+            self.assertEqual(original['files'][name], identity)
+            reduced = copy.deepcopy(candidate)
+            del reduced['files'][name]
+            with self.subTest(missing=name), self.assertRaises(ValueError):
+                f4.contract(reduced)
+        unsafe = copy.deepcopy(candidate)
+        unsafe['files']['Src/stm32f4xx_hal_eth.c'] = {
+            'bytes': 1, 'sha256': '0' * 64}
+        with self.assertRaises(ValueError):
+            f4.contract(unsafe)
+        with tempfile.TemporaryDirectory() as temporary:
+            lock = Path(temporary) / 'f4.lock.json'
+            lock.write_text(json.dumps(candidate))
+            result = f4.verify(ROOT / f4.DIRECTORY, lock,
+                               ROOT / f4.CMSIS_DIRECTORY)
+            self.assertEqual(result['verified_files'], 11)
+            self.assertFalse(result['software_qualified'])
+
     def test_u5_exact_closed_graph_adds_only_dma_and_usart(self):
         profile = PROFILES['u5']
         expected = BASE_FILES['u5'] | ADDITIONS['u5'].keys()

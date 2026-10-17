@@ -54,6 +54,15 @@ int main(void) {
     NX_FIXTURE_RETAIN_FACES(timer_capture, nx_timer_capture_t,
                             NX_TIMER_CAPTURE_ID_COUNT);
     NX_FIXTURE_RETAIN_FACES(encoder, nx_encoder_t, NX_ENCODER_ID_COUNT);
+#if defined(NX_FIXTURE_ADC_GROUP)
+    NX_FIXTURE_RETAIN_FACES(adc_group, nx_adc_group_port_t,
+                            NX_ADC_GROUP_ID_COUNT);
+#endif
+#if defined(NX_FIXTURE_ETH_FRAMES)
+    NX_FIXTURE_RETAIN_FACES(eth_frames, nx_eth_frames_port_t,
+                            NX_ETH_FRAMES_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(mdio, nx_mdio_port_t, NX_MDIO_ID_COUNT);
+#endif
 #if defined(NX_FIXTURE_PWM_ADC)
     NX_FIXTURE_RETAIN_FACES(pwm_adc, nx_pwm_adc_t, NX_PWM_ADC_ID_COUNT);
 #endif

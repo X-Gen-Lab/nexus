@@ -107,7 +107,9 @@ def collect(root=ROOT):
     selected = defaultdict(lambda: {"fixtures": set(), "exports": set()})
     assembly_paths = (root / "tools/configure/assemblies").glob("*.toml")
     contract_paths = (root / "tests/contracts").glob("*_assembly/*.toml")
-    fixture_paths = sorted(set(assembly_paths) | set(contract_paths))
+    sdk_paths = (root / "cmake/package/verification/io_evolution").glob("*.toml")
+    fixture_paths = sorted(set(assembly_paths) | set(contract_paths)
+                           | set(sdk_paths))
     for fixture in fixture_paths:
         result = configure.resolve(fixture, root)
         if result["soc_family"] == "native":

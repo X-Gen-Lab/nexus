@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/core/fault.h"
+#include "stm32h743_flash_execution.h"
 #include "stm32h743_provider.h"
 #if NEXUS_CORE_HZ == 384000000U
 #include "stm32h743_clock.h"
@@ -21,6 +22,12 @@
     ((uint32_t)(FLASH_SR_WRPERR | FLASH_SR_PGSERR | FLASH_SR_STRBERR |         \
                 FLASH_SR_INCERR | FLASH_SR_OPERR | FLASH_SR_RDPERR |           \
                 FLASH_SR_RDSERR | FLASH_SR_SNECCERR | FLASH_SR_DBECCERR))
+#ifndef NX_H743_FLASH_IMAGE
+/* The selected linker output emits these four physical endpoints as LONGs.
+ * This immutable record needs no runtime registry or RAM initialization. */
+extern const nx_stm32h743_flash_image_t g_nx_stm32h743_flash_image;
+#define NX_H743_FLASH_IMAGE() (&g_nx_stm32h743_flash_image)
+#endif
 static const nx_flash_sector_t s_sectors[16] = {
     {0U, NX_H743_SECTOR_BYTES},        {0x20000U, NX_H743_SECTOR_BYTES},
     {0x40000U, NX_H743_SECTOR_BYTES},  {0x60000U, NX_H743_SECTOR_BYTES},
@@ -320,6 +327,10 @@ static nx_result_t program(void* context, uint32_t offset, const void* data,
     nx_result_t result = admission(p, deadline);
     if (result != NX_SUCCESS)
         return result;
+    result =
+        nx_stm32h743_flash_image_check(NX_H743_FLASH_IMAGE(), offset, length);
+    if (result != NX_SUCCESS)
+        return result;
     /* The caller proves fresh erase provenance; visible all-FF data cannot
      * prove virgin ECC cells. Reject visible prior writes before any pulse. */
     for (size_t i = 0U; i < length; ++i)
@@ -378,6 +389,10 @@ static nx_result_t erase(void* context, uint32_t offset, size_t length,
         length % NX_H743_SECTOR_BYTES != 0U)
         return NX_ERROR_INVALID;
     nx_result_t result = admission(p, deadline);
+    if (result != NX_SUCCESS)
+        return result;
+    result =
+        nx_stm32h743_flash_image_check(NX_H743_FLASH_IMAGE(), offset, length);
     if (result != NX_SUCCESS)
         return result;
     for (size_t i = 0U; i < length; i += NX_H743_SECTOR_BYTES) {

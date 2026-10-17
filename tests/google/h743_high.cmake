@@ -30,7 +30,7 @@ foreach(h743_high_target nexus_h743_high_system_test nexus_h743_high_kernel_test
 endforeach()
 
 # Exercise normal TOML generation, static factory and real lifecycle owners.
-set(h7_high_input "${NEXUS_SOURCE_DIR}/tests/contracts/h743_high_assembly/peripherals.toml")
+set(h7_high_input "${NEXUS_SOURCE_DIR}/cmake/package/verification/io_evolution/h743-high-peripherals.toml")
 set(h7_high_bundle "${CMAKE_CURRENT_BINARY_DIR}/h743-high-factory")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
     "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
@@ -71,3 +71,12 @@ target_compile_definitions(nexus_h743_high_factory_test PRIVATE STM32H743xx
     _init=nx_h743_high_fixture_init _fini=nx_h743_high_fixture_fini)
 target_compile_options(nexus_h743_high_factory_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_high_factory_model.h")
+
+# Keep linked-image admission in both isolated and generated high-profile paths.
+foreach(h743_high_flash_target nexus_h743_high_kernel_test
+        nexus_h743_high_factory_test)
+    target_sources(${h743_high_flash_target} PRIVATE h743_flash_image_model.cpp
+        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c")
+    target_compile_options(${h743_high_flash_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_image_model.h")
+endforeach()

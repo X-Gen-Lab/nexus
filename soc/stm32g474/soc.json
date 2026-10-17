@@ -675,9 +675,16 @@
       ],
       "irq": [],
       "pins": [
-        "PA0"
+        "PA0",
+        "PA1"
       ],
-      "clock_hz": 1328125
+      "clock_hz": 1328125,
+      "interfaces": {
+        "adc_group": [
+          "regular-sequence-dma",
+          "injected-sequence"
+        ]
+      }
     },
     "I2C1": {
       "kind": "i2c",
@@ -815,5 +822,6 @@
     "DS12288 Rev6 November2021; Table12 Section4.10 LQFP64 column; Figure7 p50; Table2 p16 independently confirm52 package GPIOs. PDF SHA256 b018e20dbe34b63a43e49365518b186ef0e0e8e899deeabc1c9f53a3a10c1add. PG10 shares NRST and option-byte/electrical restrictions; inventory does not open new Board routes or provider modes.",
     "Fixed HSE24 profile reserves PF0/PF1 oscillator pads. Conditional PG10/NRST GPIO remains reserved until a reviewed option-byte/Board policy is implemented; inventory52 does not authorize these pads."
   ],
-  "references": "references.json"
+  "references": "references.json",
+  "adc_group_review": "soc/stm32g474/reviews/adc-group.json"
 }

@@ -1571,6 +1571,47 @@
         "iso-fd-normal"
       ],
       "source": "DS12288 G474RE PA11/PA12 FDCAN1 RX/TX AF9; RM0440 Rev9 reduced M_CAN FDCAN1 physical message RAM212words at0x4000A400, HSE24 kernel, explicit ISO FD+BRS internal monitored loopback or normal controller mode. IT0 publishes; IT1 reserved/cold checked. TSS0 disables hardware timestamps. Normal mode establishes controller behavior only; transceiver, termination, external traffic, SOF time and physical bus qualification remain unobserved."
+    },
+    {
+      "id": "adc1-sequence-pa0-pa1",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "ADC1",
+      "kind": "adc_group",
+      "modes": [
+        "regular-sequence-dma",
+        "injected-sequence"
+      ],
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "adc1-in1",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "adc1-in2",
+          "af": 0
+        }
+      ],
+      "resources": [
+        "controller:ADC2",
+        "controller:ADC345",
+        "clock:ADC12",
+        "irq:ADC1_2"
+      ],
+      "mode_dma": {
+        "regular-sequence-dma": [
+          "DMA1:stream1:channel5"
+        ]
+      },
+      "mode_resources": {
+        "regular-sequence-dma": [
+          "controller:DMAMUX1_Channel0"
+        ]
+      },
+      "source": "DS12288 Rev6 Table12 PA0/PA1; RM0440 Rev9 ADC1 SQR/JSQR, SYSCLK/8=21.25MHz, optional TIM6 regular EXTSEL13/injected JEXTSEL14, finite DMA1 channel1 request5. ES0430 Rev9 named X/Y/Z layout expectations require actual cold IDCODE matching. Software route only; analog wiring/accuracy/HIL unknown."
     }
   ]
 }

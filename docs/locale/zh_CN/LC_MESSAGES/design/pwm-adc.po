@@ -1,6 +1,6 @@
 #
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 8b03a9175964b78933f92b1f0c7e87a99f4c0c7f627bb39170e5725401b86107\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: e20d49807a1347cb91530762c3c490c880d47f59a8f1ec6f52fe67a26ef55bdb\n"
 
 msgid "Finite PWM and ADC windows with one hardware owner"
 msgstr "由同一硬件 owner 管理的有限 PWM 与 ADC 窗口"
@@ -20,8 +20,8 @@ msgstr "FIG-16：当前构建期装配与运行时所有权；联合窗口只选
 msgid "**FIG-16 describes current shared mechanisms, not a measured PWM/ADC timing diagram.** In this selection, its generated face is `nx_pwm_adc_t`, its provider is the joint TIM1/ADC1 owner, and its application-owned storage is the request, duty array and sample array. The arrows retain their generation, lookup and call meanings. Factory lookup never primes ADC, starts PWM or schedules work."
 msgstr "**FIG-16 描述当前共用机制，不是经过测量的 PWM/ADC 时序图。** 在本装配中，生成的接口为 `nx_pwm_adc_t`，provider 统一拥有 TIM1/ADC1；请求、占空比数组和采样数组由应用提供。箭头仍分别表示生成、查找和调用。factory 查找不会预转换 ADC、启动 PWM 或调度工作。"
 
-msgid "The normal input is [the maintained TOML fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/g474_control_assembly/pwm-adc.toml). Its software-only Board package supplies silicon pin and voltage assumptions; it does not establish a fitted analog circuit. The strict resolver selects a single Construction, a compact `NX_PWM_ADC_ID_WINDOW` and `nx_factory_pwm_adc`. It rejects conflicting TIM1, ADC/common, comparator, DMA, vector and pad claims before publishing an atomic bundle. Ordinary PWM-group and ADC faces do not independently expose this selection's hardware."
-msgstr "正常输入为[维护中的 TOML 夹具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/g474_control_assembly/pwm-adc.toml)。其纯软件 Board 包提供芯片引脚和供电假设，不建立已安装模拟电路的事实。严格解析器选择一个 Construction、紧凑的 `NX_PWM_ADC_ID_WINDOW` 和 `nx_factory_pwm_adc`，在发布原子 bundle 前拒绝 TIM1、ADC/common、比较器、DMA、向量和引脚的资源冲突。普通 PWM-group 与 ADC 接口不会再独立暴露该装配的硬件。"
+msgid "The normal input is [the maintained TOML fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-pwm-adc.toml). Its software-only Board package supplies silicon pin and voltage assumptions; it does not establish a fitted analog circuit. The strict resolver selects a single Construction, a compact `NX_PWM_ADC_ID_WINDOW` and `nx_factory_pwm_adc`. It rejects conflicting TIM1, ADC/common, comparator, DMA, vector and pad claims before publishing an atomic bundle. Ordinary PWM-group and ADC faces do not independently expose this selection's hardware."
+msgstr "正常输入为[维护中的 TOML 夹具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-pwm-adc.toml)。其纯软件 Board 包提供芯片引脚和供电假设，不建立已安装模拟电路的事实。严格解析器选择一个 Construction、紧凑的 `NX_PWM_ADC_ID_WINDOW` 和 `nx_factory_pwm_adc`，在发布原子 bundle 前拒绝 TIM1、ADC/common、比较器、DMA、向量和引脚的资源冲突。普通 PWM-group 与 ADC 接口不会再独立暴露该装配的硬件。"
 
 msgid "Layer"
 msgstr "层"

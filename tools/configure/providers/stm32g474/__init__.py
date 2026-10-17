@@ -16,6 +16,8 @@ CPU_FEATURES = MappingProxyType({
     "sau": False, "mve": "none", "dsp": True})
 PREFIX = "stm32g474"
 CONTROLLER_INTERFACES = MappingProxyType({
+    "ADC1": MappingProxyType({"adc_group": (
+        "regular-sequence-dma", "injected-sequence")}),
     "TIM3": MappingProxyType({"encoder": ("quadrature",)}),
     "TIM1": MappingProxyType({"pwm_adc": ("finite-regular-dma",)})})
 MODEL = False
@@ -37,6 +39,8 @@ LIMITS = MappingProxyType({"uart_baud": (2594, 1000000),
                            "spi_hz": (664063, 42500000),
                            "pwm_period": 65535, "timer_hz": 170000000})
 _MODES = MappingProxyType({
+    ("adc_group", "regular-sequence-dma"): "adc_group",
+    ("adc_group", "injected-sequence"): "adc_group",
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart", ("exti", "edge-event"): "exti",
     ("watchdog", "independent"): "watchdog",
@@ -65,7 +69,10 @@ def validate_selection(selection, route):
     """Accept only the actual fixed provider and reviewed route, not SKU potential."""
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
-    if kind in {"pwm_adc", "can_fd"}:
+    if kind == "adc_group":
+        from . import adc_group
+        adc_group.validate_selection(selection, route)
+    elif kind in {"pwm_adc", "can_fd"}:
         try:
             from ... import coupled_io
         except ImportError:
@@ -217,7 +224,8 @@ def validate_selection(selection, route):
 
 def validate_dma(route, mode, normalize):
     expected = (("DMA1:stream1:channel5",) if (
-        route["controller"] == "ADC1" and mode == "trigger-dma" or
+        route["controller"] == "ADC1" and mode in {
+            "trigger-dma", "regular-sequence-dma"} or
         route["controller"] == "TIM1" and mode == "finite-regular-dma") else None)
     common.validate_dma(route, mode, expected, "stm32g474", normalize,
                         trigger="TIM6")

@@ -223,6 +223,25 @@ format, finite deadline observation, failure and software-test boundaries are in
 [the coupled acquisition contract](../../docs/design/pwm-adc.md). HIL remains
 `not_executed`.
 
+## Finite ordered ADC groups
+
+The separate `adc_group` selections own ADC1/common and expose one static
+`nx_adc_group_port_t`. At SYSCLK/8=21.25 MHz they execute regular sequences with
+real CONT1 or TIM6-triggered finite normal DMA, or one injected frame through
+software/JQDIS1 or a single TIM6 OPM trigger. Ordered logical channels, integer
+stride/padding, actual sample codes and trigger provenance are explicit.
+Named X/Y/Z layouts use the shared observed-IDCODE/Flash-size policy; Z rank
+duplication changes physical rank count and raw stride without a hidden buffer.
+
+Accepted arrays include whole-frame padding and remain borrowed through actual
+trigger, ADC, DMA and vector withdrawal. Real priming and a checked freshness
+budget prevent stale idle conversions from becoming valid data; failed drain
+retains the request and outer leases for retry. Ordinary ADC and PWM/ADC owners
+remain separate, mutually conflicting selections. The four canonical software
+assemblies, internal-channel limits, failure contract and software/physical
+boundaries are in [the ADC sequence contract](../../docs/design/adc-group.md).
+HIL remains `not_executed`.
+
 ## SDK and evidence
 
 The official CMSIS Device G4 source is pinned to
@@ -284,6 +303,19 @@ TC 后覆写缓冲区，但不会停止 PWM。任务 service 先证明 CEN0，�
 和时钟。不会另暴露可独立启动的 ADC/group 接口。精确格式、有限 deadline 的观察
 规则、失败及软件测试范围见[联合采样合同](../../docs/design/pwm-adc.md)；HIL 仍为
 `not_executed`。
+
+独立 `adc_group` 装配统一拥有 ADC1/common，以一个静态 `nx_adc_group_port_t`
+暴露有序整数帧。SYSCLK/8=21.25 MHz 下，regular 使用真实 CONT1 或 TIM6 触发的
+有限普通 DMA；injected 只接收一次软件/JQDIS1 或 TIM6 OPM 触发的完整帧。
+逻辑通道顺序、整数步幅/填充、采样时间码和触发来源均显式报告；X/Y/Z 命名布局
+通过同一实读 IDCODE/Flash 大小策略准入，Z 重复物理 rank，改变步幅而不增加
+隐藏打包缓冲区。
+
+已接受数组包含完整帧填充，直到触发、ADC、DMA 和向量实际撤离后才归还。真实
+预转换和新鲜度预算防止空闲后的陈旧转换成为有效数据；排空失败保留请求及外层
+租约，允许重试。普通 ADC、PWM/ADC 和本组模式为独立且互斥的选择。四个规范
+软件装配、内部通道限制、失败合同及软件/实板边界见
+[ADC 序列合同](../../docs/design/adc-group.md)；HIL 仍为 `not_executed`。
 
 I2C1 为 PB8/PB9 AF4 开漏、HSI16、100 kHz 标准模式的固定 timing，外部上拉与
 上升/下降时间由 Board 验证。每次最多八条消息，每条 1--256 字节；支持 repeated

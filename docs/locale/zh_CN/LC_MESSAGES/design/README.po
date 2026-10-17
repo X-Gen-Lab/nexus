@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: fef2c2545d56b6c7b3b15d06c60dc578015db279d55ef61123b948676096f302\n"
+"X-Nexus-Source-SHA256: c1bb1e2324db56950f93c39ef77bbde7203ad209d69b3a1afcc88fc714b572d0\n"
 
 msgid "当前设计与实施台账"
 msgstr "当前设计与实施台账"
@@ -382,3 +382,21 @@ msgstr "[本轮 I/O 与时钟交付观察](../delivery/io-evolution-next-wave.md
 
 msgid "逐配置开发证据、待冻结源码与最终资格分别记录，不继承旧 CI 或实板资格"
 msgstr "逐配置开发证据、待冻结源码与最终资格分别记录，不继承旧 CI 或实板资格"
+
+msgid "[UART FIFO 有界中断服务](uart-fifo.md)"
+msgstr "[UART FIFO 有界中断服务](uart-fifo.md)"
+
+msgid "H743/U575 官方 LL 阈值、收发预算、IDLE 短尾和 TC 排空；正式配置与实板边界"
+msgstr "H743/U575 官方 LL 阈值、收发预算、IDLE 短尾和 TC 排空；正式配置与实板边界"
+
+msgid "[ADC 分组采集](adc-group.md)"
+msgstr "[ADC 分组采集](adc-group.md)"
+
+msgid "G474 regular/injected、硅版本准入、采样格式、校准时效和真实停止；产品算法外置"
+msgstr "G474 regular/injected、硅版本准入、采样格式、校准时效和真实停止；产品算法外置"
+
+msgid "[增强以太网帧](ethernet-frames.md)"
+msgstr "[增强以太网帧](ethernet-frames.md)"
+
+msgid "F407/GD470 SG/VLAN、帧借用、硬件时间戳和全局中止；PHY 与协议政策外置"
+msgstr "F407/GD470 SG/VLAN、帧借用、硬件时间戳和全局中止；PHY 与协议政策外置"

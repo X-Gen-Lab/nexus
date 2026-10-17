@@ -41,6 +41,7 @@ LIMITS = MappingProxyType({"uart_baud": (977, 1000000), "spi_hz": (250000, 16000
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart", ("uart", "dma-tx"): "uart_dma",
+    ("uart", "irq-fifo-bytes"): "uart_fifo",
     ("uart", "rx-dma-idle"): "uart_receive",
     ("spi", "short-poll"): "spi", ("pwm", "fixed-pwm"): "pwm",
     ("exti", "edge-event"): "exti",

@@ -20,6 +20,9 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [有限 PWM/ADC 联合采样](pwm-adc.md) | 单 owner、两次预热、TIM1 触发的 regular ADC DMA、排空与冷态恢复；软件参考/HIL 边界 |
 | [U575 有限 UART GPDMA](u575-uart-gpdma.md) | 精确 TZEN0 USART1 有限 GPDMA TX、persistent DMAT、SRAM1 准入及请求/线上/IRQ 排空 |
 | [G474 CAN FD](can-fd.md) | 固定 FDCAN1 消息 RAM、显式模式、TX 物理完成与引用排空；收发器和实板边界 |
+| [UART FIFO 有界中断服务](uart-fifo.md) | H743/U575 官方 LL 阈值、收发预算、IDLE 短尾和 TC 排空；正式配置与实板边界 |
+| [ADC 分组采集](adc-group.md) | G474 regular/injected、硅版本准入、采样格式、校准时效和真实停止；产品算法外置 |
+| [增强以太网帧](ethernet-frames.md) | F407/GD470 SG/VLAN、帧借用、硬件时间戳和全局中止；PHY 与协议政策外置 |
 | [本轮 I/O 与时钟交付观察](../delivery/io-evolution-next-wave.md) | 逐配置开发证据、待冻结源码与最终资格分别记录，不继承旧 CI 或实板资格 |
 | [工程手册](engineering-handbook.md) | 既有格式/注释、工具、自动化、证据与发布 |
 | [构建系统合同](build-system.md) | 配置事务、增量依赖、目标策略、开发入口与交付边界 |

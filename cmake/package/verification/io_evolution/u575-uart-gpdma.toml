@@ -2,7 +2,7 @@
 # Resolve DMA engine/channel/request/vector from exact SoC facts, not a new
 # authored option or alternate build authority. Physical HIL remains pending.
 schema = 2
-board_package = "../../../boards/stm32u575_nucleo_zi_q"
+board_package = "../../../../boards/stm32u575_nucleo_zi_q"
 backend = "baremetal"
 clock = "msis4"
 optimization = "Os"

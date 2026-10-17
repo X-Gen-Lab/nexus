@@ -111,10 +111,11 @@ class U575GpdmaSelectionTests(unittest.TestCase):
         self.provider = importlib.import_module(
             "tools.configure.providers.stm32u575")
 
-    def resolve(self, filename="usart1-dma-tx.toml"):
+    def resolve(self):
         from tools.configure import configure
         return configure.resolve_ir(
-            ROOT / "tests/contracts/u575_assembly" / filename, ROOT)
+            ROOT / "cmake/package/verification/io_evolution/u575-uart-gpdma.toml",
+            ROOT)
 
     def test_exact_dma_mode_uses_selected_extension_without_public_new_face(self):
         item = uart(mode="dma-tx")

@@ -584,20 +584,15 @@ TEST_F(G474Fdcan, PublicFaceAndNvicControlCannotBecomeOutputs) {
     EXPECT_EXIT(
         {
             void* page =
-                mmap(reinterpret_cast<void*>(0xE000E000U), 4096U,
-                     PROT_READ | PROT_WRITE,
-                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
-            if (page == MAP_FAILED) {
+                mmap(reinterpret_cast<void*>(0xE000E000U), 4096U, PROT_NONE,
+                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+            if (page != reinterpret_cast<void*>(0xE000E000U)) {
                 _exit(2);
             }
             auto* output = reinterpret_cast<nx_can_fd_state_t*>(0xE000E100U);
-            std::memset(output, 0xA5, sizeof(*output));
-            uint8_t before[sizeof(*output)] = {};
-            std::memcpy(before, output, sizeof(before));
+            /* A physical SCS alias must be rejected before any access. */
             const auto result = nx_can_fd_port_state(&port, output);
-            const bool unchanged =
-                std::memcmp(before, output, sizeof(before)) == 0;
-            _exit(result == NX_ERROR_INVALID && unchanged ? 0 : 3);
+            _exit(result == NX_ERROR_INVALID ? 0 : 3);
         },
         testing::ExitedWithCode(0), "");
 }

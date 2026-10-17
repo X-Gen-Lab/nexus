@@ -261,3 +261,285 @@ msgstr "Wait once with configurable exceptions already masked."
 
 msgid "Atomically recheck a published sequence before WFI."
 msgstr "Atomically recheck a published sequence before WFI."
+
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+msgid "Privileged Task/configurable-IRQ short metadata sections only; do not block, allocate, call OS functions, copy large buffers or invoke callbacks. NMI/HardFault remain unmasked. Native uses a recursive host exclusion model, not physical IRQ timing or signal safety. NMI/HardFault must not access shared metadata protected by this mask. ARM unprivileged callers need an explicit privileged gateway owned by their OS."
+msgstr "Privileged Task/configurable-IRQ short metadata sections only; do not block, allocate, call OS functions, copy large buffers or invoke callbacks. NMI/HardFault remain unmasked. Native uses a recursive host exclusion model, not physical IRQ timing or signal safety. NMI/HardFault must not access shared metadata protected by this mask. ARM unprivileged callers need an explicit privileged gateway owned by their OS."
+
+msgid "Token to restore exactly once in reverse nesting order."
+msgstr "Token to restore exactly once in reverse nesting order."
+
+msgid "Privileged contexts only. Restores PRIMASK only; BASEPRI/FAULTMASK, where present, are not modified."
+msgstr "Privileged contexts only. Restores PRIMASK only; BASEPRI/FAULTMASK, where present, are not modified."
+
+msgid "[in] Token from this CPU/thread's latest unmatched save."
+msgstr "[in] Token from this CPU/thread's latest unmatched save."
+
+msgid "Bounded read-only privileged task/IRQ query. Does not mask interrupts or grant a stable critical section. Values refer to this CPU/security state, not another security world or an SMP peer. Unprivileged reads do not establish mask state."
+msgstr "Bounded read-only privileged task/IRQ query. Does not mask interrupts or grant a stable critical section. Values refer to this CPU/security state, not another security world or an SMP peer. Unprivileged reads do not establish mask state."
+
+msgid "Current PRIMASK and implemented BASEPRI/FAULTMASK values."
+msgstr "Current PRIMASK and implemented BASEPRI/FAULTMASK values."
+
+msgid "Bounded privileged task/IRQ query, no state change. ARM unprivileged reads do not establish the actual mask state."
+msgstr "Bounded privileged task/IRQ query, no state change. ARM unprivileged reads do not establish the actual mask state."
+
+msgid "True for PRIMASK, implemented BASEPRI/FAULTMASK, or Native thread nesting. Baseline Cortex-M cores query PRIMASK only."
+msgstr "True for PRIMASK, implemented BASEPRI/FAULTMASK, or Native thread nesting. Baseline Cortex-M cores query PRIMASK only."
+
+msgid "Bounded read-only task/IRQ query. The identity belongs to the current CPU/security state; it is not a portable SoC IRQ number or evidence that a kernel ISR call is allowed."
+msgstr "Bounded read-only task/IRQ query. The identity belongs to the current CPU/security state; it is not a portable SoC IRQ number or evidence that a kernel ISR call is allowed."
+
+msgid "IPSR exception number, zero for Thread mode or Native."
+msgstr "IPSR exception number, zero for Thread mode or Native."
+
+msgid "Bounded read-only task/IRQ query. Handler privilege does not depend on the interrupted Thread's CONTROL.nPRIV. This query does not establish Secure-world ownership."
+msgstr "Bounded read-only task/IRQ query. Handler privilege does not depend on the interrupted Thread's CONTROL.nPRIV. This query does not establish Secure-world ownership."
+
+msgid "True in Handler mode or privileged Thread mode. Native always returns true because it has no CPU privilege model."
+msgstr "True in Handler mode or privileged Thread mode. Native always returns true because it has no CPU privilege model."
+
+msgid "Cortex-M IPSR is nonzero; Native has no hardware ISR and always returns false. Host signals are unsupported contexts."
+msgstr "Cortex-M IPSR is nonzero; Native has no hardware ISR and always returns false. Host signals are unsupported contexts."
+
+msgid "Cortex-M DMB; Native sequentially consistent thread fence. Does not prove DMA idle or clean noncoherent cache lines."
+msgstr "Cortex-M DMB; Native sequentially consistent thread fence. Does not prove DMA idle or clean noncoherent cache lines."
+
+msgid "Cortex-M DSB; Native thread fence is a behavioral model, not a physical bus/DMA completion guarantee."
+msgstr "Cortex-M DSB; Native thread fence is a behavioral model, not a physical bus/DMA completion guarantee."
+
+msgid "Cortex-M ISB; Native thread fence has no pipeline semantics."
+msgstr "Cortex-M ISB; Native thread fence has no pipeline semantics."
+
+msgid "Counter frequency follows CPU clock. Use unsigned snapshot subtraction only for intervals shorter than 2^32 cycles; this counter is neither shared monotonic time nor a deadline."
+msgstr "Counter frequency follows CPU clock. Use unsigned snapshot subtraction only for intervals shorter than 2^32 cycles; this counter is neither shared monotonic time nor a deadline."
+
+msgid "[out] DWT CYCCNT snapshot, unchanged when unavailable."
+msgstr "[out] DWT CYCCNT snapshot, unchanged when unavailable."
+
+msgid "True when a maintained CPU counter is enabled; false on Native, an unreviewed/disabled/unavailable DWT, or an unprivileged caller. Does not enable/reset it. Only a reviewed CPU profile may read the optional DWT registers."
+msgstr "True when a maintained CPU counter is enabled; false on Native, an unreviewed/disabled/unavailable DWT, or an unprivileged caller. Does not enable/reset it. Only a reviewed CPU profile may read the optional DWT registers."
+
+msgid "Restore on the same CPU/thread in strict reverse order. This is neither a FreeRTOS BASEPRI token nor an SMP lock."
+msgstr "Restore on the same CPU/thread in strict reverse order. This is neither a FreeRTOS BASEPRI token nor an SMP lock."
+
+msgid "Absent BASEPRI/FAULTMASK registers are zero. Native reports PRIMASK as zero or one according to current thread nesting. This snapshot is neither a restore token nor a kernel lock."
+msgstr "Absent BASEPRI/FAULTMASK registers are zero. Native reports PRIMASK as zero or one according to current thread nesting. This snapshot is neither a restore token nor a kernel lock."
+
+msgid "Storage is a live, naturally aligned uint32_t; all concurrent accesses use these helpers or compatible compiler atomics. Initialize before publishing storage. Load/store use compiler acquire/release operations on all maintained CPUs and never mask interrupts. Other than ARMv6-M, RMW uses compiler lock-free operations; exclusive instruction retries do not establish a fixed cycle bound."
+msgstr "Storage is a live, naturally aligned uint32_t; all concurrent accesses use these helpers or compatible compiler atomics. Initialize before publishing storage. Load/store use compiler acquire/release operations on all maintained CPUs and never mask interrupts. Other than ARMv6-M, RMW uses compiler lock-free operations; exclusive instruction retries do not establish a fixed cycle bound."
+
+msgid "ARMv6-M RMW is CPU-local, bounded saved-PRIMASK exclusion. Only privileged Thread/configurable-IRQ contexts on one CPU may access this domain. NMI/HardFault, unprivileged callers, another core, DMA and another security domain must not access its storage concurrently. It is not an SMP or bus atomic operation. No callback, allocation, blocking call or payload copy occurs while masked."
+msgstr "ARMv6-M RMW is CPU-local, bounded saved-PRIMASK exclusion. Only privileged Thread/configurable-IRQ contexts on one CPU may access this domain. NMI/HardFault, unprivileged callers, another core, DMA and another security domain must not access its storage concurrently. It is not an SMP or bus atomic operation. No callback, allocation, blocking call or payload copy occurs while masked."
+
+msgid "[inout] Live naturally aligned word in the caller-owned atomic domain; all concurrent accesses use this contract."
+msgstr "[inout] Live naturally aligned word in the caller-owned atomic domain; all concurrent accesses use this contract."
+
+msgid "[inout] Separate, private caller storage; failure replaces it with the observed value. Success leaves it unchanged."
+msgstr "[inout] Separate, private caller storage; failure replaces it with the observed value. Success leaves it unchanged."
+
+msgid "[in] Replacement word stored only when comparison succeeds."
+msgstr "[in] Replacement word stored only when comparison succeeds."
+
+msgid "True only when the original word equals expected and the desired word was stored. No spurious failure is allowed."
+msgstr "True only when the original word equals expected and the desired word was stored. No spurious failure is allowed."
+
+msgid "ARMv6-M conservatively acquires the observed word too."
+msgstr "ARMv6-M conservatively acquires the observed word too."
+
+msgid "Privileged task/configurable-IRQ context in the current security domain only. The caller excludes other CPU, security-world and DMA users of every complete line until return, and keeps cache configuration stable. No hidden IRQ mask, allocation or cache enable occurs. Supported geometry is an explicitly reviewed 32-byte line; range rounding is forbidden. Work is bounded by bytes/32 and is not a DMA drain, device completion or transfer of ownership."
+msgstr "Privileged task/configurable-IRQ context in the current security domain only. The caller excludes other CPU, security-world and DMA users of every complete line until return, and keeps cache configuration stable. No hidden IRQ mask, allocation or cache enable occurs. Supported geometry is an explicitly reviewed 32-byte line; range rounding is forbidden. Work is bounded by bytes/32 and is not a DMA drain, device completion or transfer of ownership."
+
+msgid "[in] First byte of exclusively owned complete lines."
+msgstr "[in] First byte of exclusively owned complete lines."
+
+msgid "[in] Nonzero whole-line length in the CPU address space."
+msgstr "[in] Nonzero whole-line length in the CPU address space."
+
+msgid "OK after maintenance and barriers; INVALID for partial lines or an overflowing/non-32-bit range; CONTEXT for an unprivileged caller; UNSUPPORTED for an absent or disabled reviewed cache. Rejection performs no maintenance writes."
+msgstr "OK after maintenance and barriers; INVALID for partial lines or an overflowing/non-32-bit range; CONTEXT for an unprivileged caller; UNSUPPORTED for an absent or disabled reviewed cache. Rejection performs no maintenance writes."
+
+msgid "The caller permits all dirty data in these lines to be discarded and satisfies clean's exclusion/context contract. No adjacent line is touched or rounded into the range. For DMA receive, providers coordinate both pre-DMA and post-drain maintenance; this call does not establish idle."
+msgstr "The caller permits all dirty data in these lines to be discarded and satisfies clean's exclusion/context contract. No adjacent line is touched or rounded into the range. For DMA receive, providers coordinate both pre-DMA and post-drain maintenance; this call does not establish idle."
+
+msgid "The same context, range and capability results as clean."
+msgstr "The same context, range and capability results as clean."
+
+msgid "Satisfies clean's exclusion/context contract. Distinct from invalidate: dirty contents are written before discard."
+msgstr "Satisfies clean's exclusion/context contract. Distinct from invalidate: dirty contents are written before discard."
+
+msgid "Satisfies clean's exclusion/context contract. All present caches are checked before any maintenance. With only one reviewed cache, only that cache is maintained. The caller prevents execution from the changing range, including other security-world users. This is not code validation, an MPU policy change or a global cache/branch-predictor flush."
+msgstr "Satisfies clean's exclusion/context contract. All present caches are checked before any maintenance. With only one reviewed cache, only that cache is maintained. The caller prevents execution from the changing range, including other security-world users. This is not code validation, an MPU policy change or a global cache/branch-predictor flush."
+
+msgid "OK after data clean, instruction invalidate and execution barriers; INVALID/CONTEXT as above; UNSUPPORTED when both reviewed caches are absent or a present cache is disabled."
+msgstr "OK after data clean, instruction invalidate and execution barriers; INVALID/CONTEXT as above; UNSUPPORTED when both reviewed caches are absent or a present cache is disabled."
+
+msgid "Reviewed M7 only. Requires privileged Thread, PRIMASK=1, BASEPRI=FAULTMASK=0 and known-clean caches from a trusted reset or prior successful owned clean/disable. CCR bits being zero alone do not prove clean foreign state; never adopt an unknown bootloader state. Caller excludes all other cache users, DMA, NMI and HardFault access to affected memory throughout the transition. It owns memory attributes, execution and coherency policy; enabling a cache does not establish DMA coherence. No IRQ mask changes, allocation or cache adoption occur. Rejected initial admission has no retained responsibility. An IO failure can retain owned_mask/selector_pending; call cold_disable and retain storage until it succeeds."
+msgstr "Reviewed M7 only. Requires privileged Thread, PRIMASK=1, BASEPRI=FAULTMASK=0 and known-clean caches from a trusted reset or prior successful owned clean/disable. CCR bits being zero alone do not prove clean foreign state; never adopt an unknown bootloader state. Caller excludes all other cache users, DMA, NMI and HardFault access to affected memory throughout the transition. It owns memory attributes, execution and coherency policy; enabling a cache does not establish DMA coherence. No IRQ mask changes, allocation or cache adoption occur. Rejected initial admission has no retained responsibility. An IO failure can retain owned_mask/selector_pending; call cold_disable and retain storage until it succeeds."
+
+msgid "[inout] Exclusively owned, initially empty control object."
+msgstr "[inout] Exclusively owned, initially empty control object."
+
+msgid "[in] Nonzero combination of DATA and INSTRUCTION bits."
+msgstr "[in] Nonzero combination of DATA and INSTRUCTION bits."
+
+msgid "OK after verified enable and selector restoration; INVALID for arguments; CONTEXT for unsafe context; UNSUPPORTED for an unreviewed CPU/geometry; STATE for live/foreign caches; IO when a register write is not confirmed by readback."
+msgstr "OK after verified enable and selector restoration; INVALID for arguments; CONTEXT for unsafe context; UNSUPPORTED for an unreviewed CPU/geometry; STATE for live/foreign caches; IO when a register write is not confirmed by readback."
+
+msgid "Satisfies enable's exclusion and context contract after every DMA/provider has drained. Rejects enabled caches outside owned_mask. The data clean/disable transition uses a stack-free leaf so no local dirty line can appear between the final clean and CCR update. Its bounded work is four ways times the verified set count, not constant latency. Failed operations remain retryable without adopting a new cache or forgetting the original selector. A zero object is an idempotent no-op on a supported CPU profile."
+msgstr "Satisfies enable's exclusion and context contract after every DMA/provider has drained. Rejects enabled caches outside owned_mask. The data clean/disable transition uses a stack-free leaf so no local dirty line can appear between the final clean and CCR update. Its bounded work is four ways times the verified set count, not constant latency. Failed operations remain retryable without adopting a new cache or forgetting the original selector. A zero object is an idempotent no-op on a supported CPU profile."
+
+msgid "[inout] Same live object passed to cold_enable."
+msgstr "[inout] Same live object passed to cold_enable."
+
+msgid "OK only after cache disable and selector restoration; INVALID, CONTEXT, UNSUPPORTED, STATE or IO retain ownership."
+msgstr "OK only after cache disable and selector restoration; INVALID, CONTEXT, UNSUPPORTED, STATE or IO retain ownership."
+
+msgid "Zero initialize before first use; do not modify fields or copy a live object. Retain the object until owned_mask and selector_pending are both zero. owned_mask conservatively records cleanup responsibility, not enabled hardware bits."
+msgstr "Zero initialize before first use; do not modify fields or copy a live object. Retain the object until owned_mask and selector_pending are both zero. owned_mask conservatively records cleanup responsibility, not enabled hardware bits."
+
+msgid "Read-only Task/IRQ query, no hardware access or discovery."
+msgstr "Read-only Task/IRQ query, no hardware access or discovery."
+
+msgid "Exact reviewed CPU facts; Native reports absent hardware."
+msgstr "Exact reviewed CPU facts; Native reports absent hardware."
+
+msgid "Cache sizes are zero when absent, MPU version is zero, seven or eight. These facts do not prove enabled hardware, memory reachability, cross-domain ownership or HIL status."
+msgstr "Cache sizes are zero when absent, MPU version is zero, seven or eight. These facts do not prove enabled hardware, memory reachability, cross-domain ownership or HIL status."
+
+msgid "Pure bounded task/IRQ function. Inputs and output must not overlap. This encodes fields, not SoC memory reachability, cache ownership, DMA coherency or product protection policy."
+msgstr "Pure bounded task/IRQ function. Inputs and output must not overlap. This encodes fields, not SoC memory reachability, cache ownership, DMA coherency or product protection policy."
+
+msgid "[in] Size exponent 5..32, aligned base, AP 0/1/2/3/5/6, TEX 0..7 and raw S/C/B bits. Subregion mask is at most 255 and must be zero for sizes below 256 bytes. A 4 GiB region has base zero. Reserved/implementation-defined TEX/C/B encodings are rejected, never truncated or rounded."
+msgstr "[in] Size exponent 5..32, aligned base, AP 0/1/2/3/5/6, TEX 0..7 and raw S/C/B bits. Subregion mask is at most 255 and must be zero for sizes below 256 bytes. A 4 GiB region has base zero. Reserved/implementation-defined TEX/C/B encodings are rejected, never truncated or rounded."
+
+msgid "[out] RBAR and enabled RASR; unchanged on failure."
+msgstr "[out] RBAR and enabled RASR; unchanged on failure."
+
+msgid "NX_ARCH_OK or NX_ARCH_INVALID, independent of CPU profile."
+msgstr "NX_ARCH_OK or NX_ARCH_INVALID, independent of CPU profile."
+
+msgid "Pure bounded task/IRQ function. Inputs and output must not overlap. No address rounding or v7/v8 policy conversion."
+msgstr "Pure bounded task/IRQ function. Inputs and output must not overlap. No address rounding or v7/v8 policy conversion."
+
+msgid "[in] 32-byte aligned base, inclusive limit ending in 0x1f, base not above limit, AP 0..3, SH 0/2/3 and MAIR index 0..7. The caller owns the corresponding MAIR policy."
+msgstr "[in] 32-byte aligned base, inclusive limit ending in 0x1f, base not above limit, AP 0..3, SH 0/2/3 and MAIR index 0..7. The caller owns the corresponding MAIR policy."
+
+msgid "[out] RBAR and enabled RLAR; unchanged on failure."
+msgstr "[out] RBAR and enabled RLAR; unchanged on failure."
+
+msgid "Privileged Thread only with PRIMASK set and exclusive caller ownership of this MPU. NMI/HardFault/another security world must not modify it. Disables only the selected region, writes its fields, restores incoming RNR and leaves CTRL unchanged. No allocation, OS calls, implicit MPU enable, bulk clear or Secure access to the Non-secure alias."
+msgstr "Privileged Thread only with PRIMASK set and exclusive caller ownership of this MPU. NMI/HardFault/another security world must not modify it. Disables only the selected region, writes its fields, restores incoming RNR and leaves CTRL unchanged. No allocation, OS calls, implicit MPU enable, bulk clear or Secure access to the Non-secure alias."
+
+msgid "[in] Region number below actual MPU_TYPE.DREGION."
+msgstr "[in] Region number below actual MPU_TYPE.DREGION."
+
+msgid "[in] Fields validated by nx_arch_mpu_v7_encode."
+msgstr "[in] Fields validated by nx_arch_mpu_v7_encode."
+
+msgid "NX_ARCH_UNSUPPORTED before MMIO for a different/absent compiled MPU; NX_ARCH_INVALID for invalid fields or index; NX_ARCH_CONTEXT for an unprivileged, Handler, unmasked or enabled-MPU caller. Rejection performs no register writes."
+msgstr "NX_ARCH_UNSUPPORTED before MMIO for a different/absent compiled MPU; NX_ARCH_INVALID for invalid fields or index; NX_ARCH_CONTEXT for an unprivileged, Handler, unmasked or enabled-MPU caller. Rejection performs no register writes."
+
+msgid "Privileged masked Thread, disabled MPU and exclusive local ownership required. No MAIR updates or cross-world alias access. Incoming RNR and CTRL are preserved."
+msgstr "Privileged masked Thread, disabled MPU and exclusive local ownership required. No MAIR updates or cross-world alias access. Incoming RNR and CTRL are preserved."
+
+msgid "[in] Fields validated by nx_arch_mpu_v8_encode."
+msgstr "[in] Fields validated by nx_arch_mpu_v8_encode."
+
+msgid "Same rejection and ownership rules as v7_program; the compiled MPU must specifically implement Armv8-M."
+msgstr "Same rejection and ownership rules as v7_program; the compiled MPU must specifically implement Armv8-M."
+
+msgid "Caller owns valid memory attributes and all regions using this slot. Privileged masked Thread, disabled MPU and exclusive local ownership required. No CTRL or RNR writes, no cache maintenance, and no cross-world register access."
+msgstr "Caller owns valid memory attributes and all regions using this slot. Privileged masked Thread, disabled MPU and exclusive local ownership required. No CTRL or RNR writes, no cache maintenance, and no cross-world register access."
+
+msgid "[in] Attribute slot 0..7."
+msgstr "[in] Attribute slot 0..7."
+
+msgid "[in] Architectural MAIR byte, at most 255. Device encodings are 0x00/0x04/0x08/0x0c; Normal memory uses nonzero outer/inner nibbles other than reserved 0x8."
+msgstr "[in] Architectural MAIR byte, at most 255. Device encodings are 0x00/0x04/0x08/0x0c; Normal memory uses nonzero outer/inner nibbles other than reserved 0x8."
+
+msgid "NX_ARCH_OK, NX_ARCH_UNSUPPORTED for absent/v7 MPU, NX_ARCH_INVALID for an out-of-range field, or NX_ARCH_CONTEXT under the programming context rules."
+msgstr "NX_ARCH_OK, NX_ARCH_UNSUPPORTED for absent/v7 MPU, NX_ARCH_INVALID for an out-of-range field, or NX_ARCH_CONTEXT under the programming context rules."
+
+msgid "Allocation-free permission observation only. Hardware CMSE checks both security attribution and NonSecure MPU rights as an unprivileged caller. Adjacent permitted regions may be conservatively rejected. No memory is copied, pinned or borrowed. Success neither authenticates a gateway caller nor proves RAM, DMA reachability, lifetime or fault safety. The integrating owner must exclude MMIO through its SoC RAM policy and prevent attribution/mapping changes through the subsequent access. Interrupts, another world, DMA and faults are not excluded here; no masks or hardware policy are changed. A gateway must separately snapshot its input and validate output before any irreversible operation."
+msgstr "Allocation-free permission observation only. Hardware CMSE checks both security attribution and NonSecure MPU rights as an unprivileged caller. Adjacent permitted regions may be conservatively rejected. No memory is copied, pinned or borrowed. Success neither authenticates a gateway caller nor proves RAM, DMA reachability, lifetime or fault safety. The integrating owner must exclude MMIO through its SoC RAM policy and prevent attribution/mapping changes through the subsequent access. Interrupts, another world, DMA and faults are not excluded here; no masks or hardware policy are changed. A gateway must separately snapshot its input and validate output before any irreversible operation."
+
+msgid "[in] Non-null start; never dereferenced by this API."
+msgstr "[in] Non-null start; never dereferenced by this API."
+
+msgid "[in] Positive length with a representable inclusive end."
+msgstr "[in] Positive length with a representable inclusive end."
+
+msgid "[in] Exact READ or READWRITE access, never a bit mask."
+msgstr "[in] Exact READ or READWRITE access, never a bit mask."
+
+msgid "OK for complete current access; INVALID for malformed or denied spans; CONTEXT outside privileged Secure Thread; UNSUPPORTED in Native, single-state or NonSecure images."
+msgstr "OK for complete current access; INVALID for malformed or denied spans; CONTEXT outside privileged Secure Thread; UNSUPPORTED in Native, single-state or NonSecure images."
+
+msgid "Bounded read-only Task/IRQ query, no hardware access. This does not grant access to another world's memory or devices."
+msgstr "Bounded read-only Task/IRQ query, no hardware access. This does not grant access to another world's memory or devices."
+
+msgid "Single-domain, Secure or NonSecure reviewed image state."
+msgstr "Single-domain, Secure or NonSecure reviewed image state."
+
+msgid "Pure Task/IRQ operation. Encoding marks the requested region enabled but does not enable SAU hardware. External policy owns overlap, IDAU restrictions and NSC veneers."
+msgstr "Pure Task/IRQ operation. Encoding marks the requested region enabled but does not enable SAU hardware. External policy owns overlap, IDAU restrictions and NSC veneers."
+
+msgid "[in] Base aligned to 32 bytes; inclusive limit ending at a complete 32-byte boundary. Base must not exceed limit."
+msgstr "[in] Base aligned to 32 bytes; inclusive limit ending at a complete 32-byte boundary. Base must not exceed limit."
+
+msgid "[out] Encoded region, unchanged on failure."
+msgstr "[out] Encoded region, unchanged on failure."
+
+msgid "OK or INVALID for null arguments or invalid boundaries."
+msgstr "OK or INVALID for null arguments or invalid boundaries."
+
+msgid "Secure privileged Thread with incoming PRIMASK set only. Caller excludes all other region/selector users and keeps NMI/HardFault outside this metadata. Requires reviewed SAU region support. Does not modify CTRL, ALLNS, another region, another security world's registers or enable the SAU. Current RNR is restored; DSB/ISB complete region writes. Policy, secure gateways and IDAU configuration stay external."
+msgstr "Secure privileged Thread with incoming PRIMASK set only. Caller excludes all other region/selector users and keeps NMI/HardFault outside this metadata. Requires reviewed SAU region support. Does not modify CTRL, ALLNS, another region, another security world's registers or enable the SAU. Current RNR is restored; DSB/ISB complete region writes. Policy, secure gateways and IDAU configuration stay external."
+
+msgid "[in] Region index below the actual hardware TYPE count."
+msgstr "[in] Region index below the actual hardware TYPE count."
+
+msgid "[in] Explicit reviewed region and NSC permission."
+msgstr "[in] Explicit reviewed region and NSC permission."
+
+msgid "OK, INVALID, CONTEXT or UNSUPPORTED without retained state."
+msgstr "OK, INVALID, CONTEXT or UNSUPPORTED without retained state."
+
+msgid "Same context and ownership contract as nx_arch_sau_write. Preserves CTRL, ALLNS, other regions and incoming RNR."
+msgstr "Same context and ownership contract as nx_arch_sau_write. Preserves CTRL, ALLNS, other regions and incoming RNR."
+
+msgid "OK, INVALID, CONTEXT or UNSUPPORTED without other writes."
+msgstr "OK, INVALID, CONTEXT or UNSUPPORTED without other writes."
+
+msgid "1.0.0"
+msgstr "1.0.0"
+
+msgid "2026-10-11"
+msgstr "2026-10-11"
+
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+msgid "Privileged Thread mode, incoming PRIMASK=1, BASEPRI and FAULTMASK clear. SCR.SLEEPDEEP must be clear. The caller owns the final readiness check and timer/wake source. WFI wakes for a pending enabled interrupt despite PRIMASK; the interrupt runs after the caller restores its saved mask. No register, mask, clock or pending interrupt is changed. Current CPU/security state only; no physical HIL claim."
+msgstr "Privileged Thread mode, incoming PRIMASK=1, BASEPRI and FAULTMASK clear. SCR.SLEEPDEEP must be clear. The caller owns the final readiness check and timer/wake source. WFI wakes for a pending enabled interrupt despite PRIMASK; the interrupt runs after the caller restores its saved mask. No register, mask, clock or pending interrupt is changed. Current CPU/security state only; no physical HIL claim."
+
+msgid "OK after wake, CONTEXT or UNSUPPORTED without sleeping."
+msgstr "OK after wake, CONTEXT or UNSUPPORTED without sleeping."
+
+msgid "Privileged Thread mode with all incoming masks clear. Saves PRIMASK, performs acquire observation under that mask, optionally sleeps, and restores the exact mask. Publishers must be same-CPU configurable IRQs or Threads; NMI/HardFault, DMA, SMP and other security-world publishers are excluded. The caller keeps storage alive, owns an enabled IRQ timer for finite deadlines, and retries the authoritative predicate after wake. Native is unsupported."
+msgstr "Privileged Thread mode with all incoming masks clear. Saves PRIMASK, performs acquire observation under that mask, optionally sleeps, and restores the exact mask. Publishers must be same-CPU configurable IRQs or Threads; NMI/HardFault, DMA, SMP and other security-world publishers are excluded. The caller keeps storage alive, owns an enabled IRQ timer for finite deadlines, and retries the authoritative predicate after wake. Native is unsupported."
+
+msgid "[in] Naturally aligned, shared 32-bit wake sequence."
+msgstr "[in] Naturally aligned, shared 32-bit wake sequence."
+
+msgid "[in] Snapshot before the caller's readiness check."
+msgstr "[in] Snapshot before the caller's readiness check."
+
+msgid "[out] True only when WFI was executed."
+msgstr "[out] True only when WFI was executed."
+
+msgid "OK, INVALID, CONTEXT or UNSUPPORTED."
+msgstr "OK, INVALID, CONTEXT or UNSUPPORTED."

@@ -35,6 +35,9 @@ if(h7_gpio_modes OR h7_uart_modes OR h7_spi_modes OR h7_pwm_modes OR h7_exti_mod
 endif()
 if(h7_uart_modes)
     list(APPEND h7_sources drivers/uart.c)
+    if("irq-fifo-bytes" IN_LIST h7_uart_modes)
+        list(APPEND h7_sources drivers/uart_fifo.c)
+    endif()
     if("dma-tx" IN_LIST h7_uart_modes)
         list(APPEND h7_sources drivers/uart_dma.c)
     endif()
@@ -50,17 +53,21 @@ endforeach()
 if(h7_i2c_modes)
     list(APPEND h7_sources "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c")
 endif()
+if(h7_flash_modes)
+    list(APPEND h7_sources drivers/flash_execution.c)
+endif()
 if(h7_sources)
     add_library(nexus_soc_stm32h743 STATIC ${h7_sources})
     target_link_libraries(nexus_soc_stm32h743 PUBLIC nexus_io
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
     target_include_directories(nexus_soc_stm32h743 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
-        "${NEXUS_SOURCE_DIR}/soc/common")
+        "${NEXUS_SOURCE_DIR}/soc/common"
+        "${NEXUS_SOURCE_DIR}/io/private")
     target_include_directories(nexus_soc_stm32h743 SYSTEM PRIVATE
         "${h7_device}/Include" "${h7_cmsis}")
     target_compile_definitions(nexus_soc_stm32h743 PRIVATE STM32H743xx)
-    if(h7_spi_modes OR h7_adc_modes)
+    if(h7_spi_modes OR h7_adc_modes OR "irq-fifo-bytes" IN_LIST h7_uart_modes)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
         nexus_stm32_official(nexus_soc_stm32h743 h7)
     endif()

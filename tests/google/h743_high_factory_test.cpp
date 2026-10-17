@@ -137,11 +137,12 @@ TEST_F(H743HighFactory, GeneratedFlashUsesPhysicalWordPathWithoutRetuning) {
         static_cast<nx_stm32h743_flash_state_t*>(port->context);
     std::array<uint8_t, 32U> input{};
     input.fill(0x55U);
-    ASSERT_EQ(NX_SUCCESS, nx_flash_port_erase(port, 0U, 131072U, 10000U));
-    ASSERT_EQ(NX_SUCCESS, nx_flash_port_program(port, 0U, input.data(),
+    /* Keep the running image's first sector intact in the physical example. */
+    ASSERT_EQ(NX_SUCCESS, nx_flash_port_erase(port, 131072U, 131072U, 10000U));
+    ASSERT_EQ(NX_SUCCESS, nx_flash_port_program(port, 131072U, input.data(),
                                                 input.size(), 10000U));
     EXPECT_EQ(8U, g_h743_model.flash_store_count);
-    EXPECT_EQ(0x55555555U, g_h743_high_factory_flash_words[0]);
+    EXPECT_EQ(0x55555555U, g_h743_high_factory_flash_words[32768U]);
     EXPECT_EQ(FLASH_ACR_LATENCY_2WS | FLASH_ACR_WRHIGHFREQ_1, FLASH->ACR);
     EXPECT_EQ(0U, g_h743_high_behavior.unsafe_flash_unlocks);
 }

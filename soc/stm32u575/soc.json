@@ -449,7 +449,8 @@
       "kind": "uart",
       "modes": [
         "irq-bytes",
-        "dma-tx"
+        "dma-tx",
+        "irq-fifo-bytes"
       ],
       "irq": [
         "USART1_IRQn"

@@ -2,6 +2,9 @@
 import tomllib
 
 INSTANCE_FIELDS = {
+    "adc_group": {"binding", "mode", "channels", "sample_times",
+                  "reference_mv", "exclusive", "silicon_profile", "trigger",
+                  "period_us", "watchdog", "irq"},
     "pwm_adc": {"binding", "mode", "tick_hz", "period_ticks", "trigger_ticks",
                 "deadtime_ticks", "channels", "sample_times", "reference_mv",
                 "exclusive", "irq"},
@@ -20,7 +23,8 @@ INSTANCE_FIELDS = {
     "can": {"binding", "mode", "operation", "event_capacity", "bitrate",
             "timing", "irq", "drain_timeout_us", "poll_limit", "fifo_order"},
     "gpio": {"binding", "mode"},
-    "uart": {"binding", "mode", "baud", "rx", "irq", "frame", "stream"},
+    "uart": {"binding", "mode", "baud", "rx", "irq", "frame", "stream",
+             "fifo"},
     "spi": {"binding", "mode", "max_hz", "irq"},
     "i2c": {"binding", "mode", "max_hz", "irq", "timing"},
     "flash": {"binding", "mode"},
@@ -29,6 +33,7 @@ INSTANCE_FIELDS = {
     "pwm": {"binding", "mode", "period_ticks", "duty_ticks", "tick_hz"},
     "adc": {"binding", "mode", "channels", "sample_times", "reference_mv", "timeout_ms", "irq", "stream"},
 }
+INSTANCE_FIELDS["eth_frames"] = set(INSTANCE_FIELDS["eth"])
 KINDS = set(INSTANCE_FIELDS)
 MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes",
                  "flash_load_limit_bytes", "regions"}
@@ -78,7 +83,7 @@ def normalize(data, path, root, fail, obj, integer, text):
             selection["authored_kind"] = kind
             if kind == "uart":
                 obj(selection, {"id", "authored_kind", "binding", "mode", "baud", "rx", "irq"},
-                    {"frame", "stream"}, f"uart.{name}")
+                    {"frame", "stream", "fifo"}, f"uart.{name}")
                 rx = obj(selection.pop("rx"), {"format"}, {"capacity"}, f"uart.{name}.rx")
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os", "probe"}, f"uart.{name}.irq")
                 selection.update(rx_profile=rx["format"], irq_priority=irq["priority"])
@@ -90,7 +95,7 @@ def normalize(data, path, root, fail, obj, integer, text):
                     selection["irq_probe"] = irq["probe"]
                 if selection["mode"] == "irq":
                     selection["mode"] = "irq-byte-event"
-            elif kind in {"exti", "spi", "adc", "i2c", "can", "can_fd", "pwm_adc", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group"} and "irq" in selection:
+            elif kind in {"exti", "spi", "adc", "adc_group", "i2c", "can", "can_fd", "pwm_adc", "usb_device", "eth", "eth_frames", "timer_capture", "advanced_pwm", "pwm_group"} and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
                 if "calls_os" in irq:
@@ -160,7 +165,8 @@ def editor_schema():
                    "rx_fifo_words", "clock_timeout_us", "number", "max_packet", "fifo_words",
                    "tx_count", "rx_count", "rx_storage_bytes", "init_timeout_us",
                    "filter", "filter_a", "filter_b", "deadtime_ticks",
-                   "trigger_ticks", "data_bitrate"}
+                   "trigger_ticks", "data_bitrate", "period_us", "lower",
+                   "upper"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & {"channels", "sample_times"}:
@@ -199,6 +205,16 @@ def editor_schema():
             stream["properties"]["on_exhaustion"] = {
                 "const": "stop-and-report-gap"}
             properties["stream"] = stream
+        if "watchdog" in fields:
+            properties["watchdog"] = record({"lower", "upper"},
+                                             {"lower", "upper"})
+        if "fifo" in fields:
+            names = {"rx_threshold", "tx_threshold", "rx_budget_bytes",
+                     "tx_budget_bytes"}
+            properties["fifo"] = record(names, names)
+            for name in ("rx_budget_bytes", "tx_budget_bytes"):
+                properties["fifo"]["properties"][name] = {
+                    "type": "integer", "minimum": 1, "maximum": 16}
         return {"type": "object", "properties": properties,
                 "required": sorted(required), "additionalProperties": False}
     schema = record(TOP_REQUIRED | TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
@@ -252,7 +268,7 @@ def editor_schema():
             for name in timing_fields - {"source"}:
                 timing["properties"][name] = {"type": "integer", "minimum": 0}
             properties[kind]["additionalProperties"]["properties"]["timing"] = timing
-        if kind == "eth":
+        if kind in {"eth", "eth_frames"}:
             properties[kind]["additionalProperties"]["properties"]["address"] = {
                 "type": "array", "minItems": 6, "maxItems": 6,
                 "items": {"type": "integer", "minimum": 0, "maximum": 255}}

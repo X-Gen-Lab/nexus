@@ -404,7 +404,8 @@
       "modes": [
         "irq-bytes",
         "dma-tx",
-        "rx-dma-idle"
+        "rx-dma-idle",
+        "irq-fifo-bytes"
       ],
       "irq": [
         "USART3_IRQn"

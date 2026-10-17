@@ -21,6 +21,9 @@ def includes(result):
     selected = ['#include "stm32u575_uart_gpdma.h"'] if any(
         item.kind == "uart" and item.mode == "dma-tx"
         for item in result.controllers) else []
+    if any(item.kind == "uart" and item.mode == "irq-fifo-bytes"
+           for item in result.controllers):
+        selected.append('#include "stm32u575_uart_fifo.h"')
     return ['#include "stm32u575_provider.h"', *selected, 'void _init(void);',
             'void _fini(void);',
             r'/** \brief C runtime hooks; constructors use .init_array. */',

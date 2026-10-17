@@ -1,17 +1,17 @@
 """Nominal endpoint classes share controllers without interface casts."""
 from dataclasses import replace
 
-DRIVERS = {"spi-transaction": ("spi", "spi_transaction_device"),
-           "i2c-long-endpoint": ("i2c", "i2c_long_device"),
-           "spi-dma-transaction": ("spi", "spi_dma_transaction_device")}
+try:
+    from . import selected_contracts
+except ImportError:
+    import selected_contracts
+
+DRIVERS = selected_contracts.ENDPOINT_DRIVERS
 
 
 def class_name(device):
     """Keep enhanced factory IDs separate from legacy endpoint namespaces."""
-    if device.driver in DRIVERS:
-        return DRIVERS[device.driver][1]
-    return ("usb_endpoint" if device.kind == "usb_device"
-            else device.kind + "_device")
+    return selected_contracts.endpoint_class(device)
 
 
 def face_type(device):
@@ -82,6 +82,7 @@ def dma_construction(item, construction, prefix):
 def emit_traits(result):
     """Optional selected-only endpoint facts use their actual data units."""
     header, source = [], []
+    controllers = {item.id: item for item in result.controllers}
     for driver, (_, namespace) in sorted(DRIVERS.items()):
         instances = [item for item in result.devices if item.driver == driver]
         if not instances:
@@ -106,20 +107,21 @@ def emit_traits(result):
             f'    nx_{namespace}_id_t id);']
         for item in instances:
             name = item.id.replace("-", "_")
+            contract = selected_contracts.describe(
+                controllers[item.controller], item)
             if driver == "i2c-long-endpoint":
-                values = ("7U", "NX_I2C_LONG_MAX_MESSAGE_BYTES",
-                          "NX_I2C_MAX_MESSAGES")
+                values = (contract.fields["address_bits"],
+                          contract.max_transfer_units,
+                          contract.max_messages)
             else:
-                width = "(UINT32_C(1) << 8U) | (UINT32_C(1) << 16U)"
-                if (result.soc_family == "native" and
-                        item.options.model_bytes is not None):
-                    width = "UINT32_C(1) << 8U"
-                if driver == "spi-dma-transaction":
-                    values = (width, "NX_SPI_MAX_SEGMENTS * UINT16_MAX",
-                              "UINT16_MAX", "NX_SPI_MAX_SEGMENTS")
-                else:
-                    bound = "0U" if result.soc_family == "native" else "256U"
-                    values = (width, bound, bound, "NX_SPI_MAX_SEGMENTS")
+                widths = [f"UINT32_C(1) << {bits}U"
+                          for bits in contract.word_bits]
+                width = (widths[0] if len(widths) == 1 else
+                         " | ".join(f"({value})" for value in widths))
+                values = (width, contract.max_total_units,
+                          contract.max_segment_units, contract.max_segments)
+            values = tuple(f"{value}U" if type(value) is int else
+                           "0U" if value is None else value for value in values)
             source += [f"static const {typename}",
                        f"    s_nx_traits_{namespace}_{name} = {{",
                        *[f"    {value}," for value in values], "};"]

@@ -51,7 +51,7 @@ class FamilyDescriptor:
         if self.family in {"stm32f103", "gd32f303"}:
             modules += ("tools/configure/providers/legacy_transport.py",)
         if self.family == "stm32g474":
-            modules += (f"{directory}/coupled.py",)
+            modules += (f"{directory}/coupled.py", f"{directory}/adc_group.py")
         return modules
 
     @property
@@ -92,10 +92,14 @@ _DESCRIPTORS = MappingProxyType({
         ("cmsis_core", "cmsis5"),
         ("cmsis_device_f4", "stm32f4_cmsis"),
         ("hal_driver_f4", "stm32f4_hal")),
-        references="references.json"),
+        references="references.json", owned_payload=(
+            "soc/stm32f407/drivers/ethernet_frames.c",
+            "soc/stm32f407/private/stm32f407_eth_frames.h")),
     "gd32f470": FamilyDescriptor("gd32f470",
         import_lock="vendors/gigadevice/gd32f4xx/source.lock.json",
-        references="references.json"),
+        references="references.json", owned_payload=(
+            "soc/gd32f470/drivers/ethernet_frames.c",
+            "soc/gd32f470/private/gd32f470_eth_frames.h")),
     "gd32f303": FamilyDescriptor("gd32f303", (("cmsis_core", "cmsis5"),),
         import_lock="vendors/gigadevice/gd32f30x/source.lock.json",
         references="references.json", owned_payload=(
@@ -170,15 +174,19 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32h743/drivers/gpio.c", "soc/stm32h743/drivers/uart.c",
             "soc/stm32h743/drivers/uart_dma.c",
             "soc/stm32h743/drivers/uart_receive.c",
+            "soc/stm32h743/drivers/uart_fifo.c",
             "soc/stm32h743/drivers/spi.c", "soc/stm32h743/drivers/pwm.c",
             "soc/stm32h743/drivers/exti.c", "soc/stm32h743/drivers/watchdog.c",
             "soc/stm32h743/drivers/i2c.c", "soc/stm32h743/drivers/adc.c",
             "soc/stm32h743/drivers/flash.c",
+            "soc/stm32h743/drivers/flash_execution.c",
             "soc/stm32h743/memory_init.c",
             "soc/stm32h743/private/memory_init.h",
             "soc/common/i2c_v2.c", "soc/common/i2c_v2.h",
             "soc/stm32h743/private/stm32h743_dma.h",
             "soc/stm32h743/private/stm32h743_uart_receive.h",
+            "soc/stm32h743/private/stm32h743_uart_fifo.h",
+            "soc/stm32h743/private/stm32h743_flash_execution.h",
             "soc/stm32h743/private/stm32h743_system.h",
             "soc/stm32h743/private/stm32h743_clock.h",
             "soc/stm32h743/private/stm32h743_provider.h",
@@ -192,7 +200,9 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32u575/CMakeLists.txt", "soc/stm32u575/system.c",
             "soc/stm32u575/drivers/gpio.c", "soc/stm32u575/drivers/uart.c",
             "soc/stm32u575/drivers/uart_dma.c",
+            "soc/stm32u575/drivers/uart_fifo.c",
             "soc/stm32u575/private/stm32u575_uart_gpdma.h",
+            "soc/stm32u575/private/stm32u575_uart_fifo.h",
             "soc/stm32u575/drivers/watchdog.c",
             "soc/stm32u575/drivers/spi.c",
             "soc/stm32u575/drivers/i2c.c",

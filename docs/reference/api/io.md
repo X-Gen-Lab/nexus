@@ -27,6 +27,14 @@ The Native model controls in `model.h` and `spi_dma_model.h` support host tests.
 :project: nexus
 ```
 
+(adc__group_8h)=
+
+## adc_group.h
+
+```{doxygenfile} adc_group.h
+:project: nexus
+```
+
 (adc__observer_8h)=
 
 ## adc_observer.h
@@ -88,6 +96,14 @@ The Native model controls in `model.h` and `spi_dma_model.h` support host tests.
 ## ethernet.h
 
 ```{doxygenfile} ethernet.h
+:project: nexus
+```
+
+(ethernet__frames_8h)=
+
+## ethernet_frames.h
+
+```{doxygenfile} ethernet_frames.h
 :project: nexus
 ```
 

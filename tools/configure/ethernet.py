@@ -43,14 +43,18 @@ def validate_soc(soc, provider):
 def validate_selection(selection, route, provider, ram_size):
     if not (FIELDS - {"calls_os"}).issubset(selection):
         fail("Ethernet requires exact storage, address, finite deadlines and IRQ")
+    enhanced = route["kind"] == "eth_frames"
     for key in ("tx_count", "rx_count"):
-        # Each chosen normal descriptor alone occupies sixteen bytes. The
-        # actual linker budget additionally checks slots, buffers and state.
-        integer(selection[key], 1, ram_size // 16, "Ethernet " + key)
-    size = integer(selection["rx_storage_bytes"], 1518, 8191,
+        # Descriptor width follows the selected public mechanism. Linked
+        # budgets additionally check slots, buffers and actual state.
+        integer(selection[key], 1, ram_size // (32 if enhanced else 16),
+                "Ethernet " + key)
+    size = integer(selection["rx_storage_bytes"], 64 if enhanced else 1518, 8191,
                    "Ethernet RX storage bytes")
     if size % 4 or selection["rx_count"] * size > ram_size:
         fail("Ethernet RX storage requires aligned rows within reviewed SRAM")
+    if enhanced and selection["rx_count"] * size < 1522:
+        fail("Ethernet SG RX requires whole-frame capacity including FCS")
     for key in ("init_timeout_us", "drain_timeout_us"):
         integer(selection[key], 1, context="Ethernet " + key)
     address = selection["address"]
@@ -71,6 +75,9 @@ def constructor(item, result, prefix):
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     options = item.options
+    enhanced = item.kind == "eth_frames"
+    stem = "eth_frames" if enhanced else "eth"
+    gates = "0x1e000000u" if enhanced else "0x0e000000u"
     pins = item["pins"]
     stm = prefix == "stm32"
     ahb = "RCC->AHB1ENR" if stm else "RCU_AHB1EN"
@@ -78,11 +85,11 @@ def constructor(item, result, prefix):
     syscfg_gate = "RCC_APB2ENR_SYSCFGEN" if stm else "RCU_APB2EN_SYSCFGEN"
     mux = "SYSCFG->PMC" if stm else "SYSCFG_CFG1"
     mux_mask = "((uint32_t)SYSCFG_PMC_MII_RMII_SEL)" if stm else "((uint32_t)SYSCFG_CFG1_ENET_PHY_SEL)"
-    lines = [f"static nx_eth_descriptor_t s_nx_eth_tx_{name}[{options.tx_count}];",
-             f"static nx_eth_descriptor_t s_nx_eth_rx_{name}[{options.rx_count}];",
-             f"static nx_eth_tx_slot_t s_nx_eth_tx_slots_{name}[{options.tx_count}];",
-             f"static nx_eth_rx_slot_t s_nx_eth_rx_slots_{name}[{options.rx_count}];",
-             f"_Alignas(4) static uint8_t s_nx_eth_storage_{name}[{options.rx_count}][{options.rx_storage_bytes}];",
+    lines = [f"static nx_{stem}_descriptor_t s_nx_{stem}_tx_{name}[{options.tx_count}];",
+             f"static nx_{stem}_descriptor_t s_nx_{stem}_rx_{name}[{options.rx_count}];",
+             f"static nx_{stem}_tx_slot_t s_nx_{stem}_tx_slots_{name}[{options.tx_count}];",
+             f"static nx_{stem}_rx_slot_t s_nx_{stem}_rx_slots_{name}[{options.rx_count}];",
+             f"_Alignas(4) static uint8_t s_nx_{stem}_storage_{name}[{options.rx_count}][{options.rx_storage_bytes}];",
              f"static uint16_t s_nx_eth_pin_snapshots_{name}[{len(pins)}];",
              f"static uint16_t s_nx_eth_pin_leases_{name};",
              f"static uint32_t s_nx_eth_mux_saved_{name};",
@@ -91,10 +98,10 @@ def constructor(item, result, prefix):
              "    { 0x20000000u, " + str(131072 if stm else 196608) + "u,",
              "      NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE }", "};",
              f"static const nx_mdio_port_t s_nx_face_mdio_{name} = {{",
-             f"    &nx_eth_mdio_ops, &{state}", "};",
+             f"    &nx_{stem}_mdio_ops, &{state}", "};",
              f"const nx_mdio_port_t* const nx_binding_{name}_mdio = &s_nx_face_mdio_{name};",
              f"static nx_result_t stop_{name}(void) {{",
-             f"    nx_result_t status = nx_eth_port_stop(&s_nx_face_{name});",
+             f"    nx_result_t status = nx_{stem}_port_stop(&s_nx_face_{name});",
              "    if (status != NX_SUCCESS) { return status; }"]
     for index, pin in reversed(list(enumerate(pins))):
         wire = pin["pin"]
@@ -112,15 +119,20 @@ def constructor(item, result, prefix):
               "    return NX_SUCCESS;", "}",
               f"static nx_result_t prepare_{name}(void) {{", "    nx_result_t status;",
               f"    for (size_t i = 0u; i < {options.rx_count}u; ++i) {{",
-              f"        s_nx_eth_rx_slots_{name}[i].data = s_nx_eth_storage_{name}[i];",
-              f"        s_nx_eth_rx_slots_{name}[i].capacity = {options.rx_storage_bytes}u;", "    }",
-              f"    {state} = (nx_eth_mac_t){{",
+              f"        s_nx_{stem}_rx_slots_{name}[i].data = s_nx_{stem}_storage_{name}[i];",
+              f"        s_nx_{stem}_rx_slots_{name}[i].capacity = {options.rx_storage_bytes}u;", "    }",
+              f"    {state} = (nx_{stem}_mac_t){{",
               f"        .registers = {'ETH_BASE' if stm else 'ENET_BASE'}, .hclk_hz = {168000000 if stm else 200000000}u,",
               f"        .regions = s_nx_eth_regions_{name}, .region_count = 1u,",
-              f"        .tx_descriptors = s_nx_eth_tx_{name}, .rx_descriptors = s_nx_eth_rx_{name},",
-              f"        .tx_slots = s_nx_eth_tx_slots_{name}, .rx_slots = s_nx_eth_rx_slots_{name},",
+              f"        .tx_descriptors = s_nx_{stem}_tx_{name}, .rx_descriptors = s_nx_{stem}_rx_{name},",
+              f"        .tx_slots = s_nx_{stem}_tx_slots_{name}, .rx_slots = s_nx_{stem}_rx_slots_{name},",
               f"        .tx_count = {options.tx_count}u, .rx_count = {options.rx_count}u,",
-              f"        .epoch = {state}.epoch, .drain_timeout_us = {options.drain_timeout_us}u,",
+              *([f"        .rx_epoch = {state}.rx_epoch,",
+                 f"        .clock_domain = {options.clock_domain}u,",
+                 f"        .clock_epoch = {state}.clock_epoch,",
+                 f"        .drain_timeout_us = {options.drain_timeout_us}u,"]
+                if enhanced else [
+                    f"        .epoch = {state}.epoch, .drain_timeout_us = {options.drain_timeout_us}u,"]),
               "        .address = { " + ", ".join(str(byte) + "u" for byte in options.address) + " },",
               f"        .irq_policy = {{ {kernel_policy_constant(result)}, {result['irq']['external_count']}u, {result['irq']['priority_bits']}u, {result['irq']['syscall_priority'] or 0}u }},",
               f"        .source = {{ 61, {options.irq.priority}u, 3u }}", "    };"]
@@ -132,18 +144,18 @@ def constructor(item, result, prefix):
                   f"    s_nx_eth_pin_leases_{name} |= {1 << index}u;",
                   f"    status = nx_{prefix}_pin_configure(GPIO{wire[1]}, {wire[2:]}u, 2u, 11u, 0u, false);",
                   "    if (status != NX_SUCCESS) { return status; }"]
-    lines += [f"    NX_PLATFORM_REGISTER_WRITE({apb}, {apb} | {syscfg_gate});", f"    NX_PLATFORM_REGISTER_WRITE({ahb}, {ahb} | 0x0e000000u);", "    nx_arch_dsb();",
-              f"    if (({apb} & {syscfg_gate}) == 0u || ({ahb} & 0x0e000000u) != 0x0e000000u) {{ return NX_ERROR_IO; }}",
+    lines += [f"    NX_PLATFORM_REGISTER_WRITE({apb}, {apb} | {syscfg_gate});", f"    NX_PLATFORM_REGISTER_WRITE({ahb}, {ahb} | {gates});", "    nx_arch_dsb();",
+              f"    if (({apb} & {syscfg_gate}) == 0u || ({ahb} & {gates}) != {gates}) {{ return NX_ERROR_IO; }}",
               f"    s_nx_eth_mux_saved_{name} = {mux} & {mux_mask};",
               f"    s_nx_eth_mux_leased_{name} = true;", f"    NX_PLATFORM_REGISTER_WRITE({mux}, {mux} | {mux_mask});", "    nx_arch_dsb();",
               f"    if (({mux} & {mux_mask}) == 0u) {{ return NX_ERROR_IO; }}",
-              f"    return nx_{prefix}_eth_initialize(&{state},",
+              f"    return nx_{prefix}_{stem}_initialize(&{state},",
               f"        nx_deadline_after(nx_time_now_us(), {options.init_timeout_us}u));", "}",
               f"void {'ETH' if stm else 'ENET'}_IRQHandler(void);",
               "/** \\brief Bounded progress through the selected RMII MAC. */",
-              f"void {'ETH' if stm else 'ENET'}_IRQHandler(void) {{ nx_eth_mac_irq(&{state}); }}"]
+              f"void {'ETH' if stm else 'ENET'}_IRQHandler(void) {{ nx_{stem}_mac_irq(&{state}); }}"]
     return Construction(
-        state_type="nx_eth_mac_t", definitions=lines,
+        state_type=f"nx_{stem}_mac_t", definitions=lines,
         initialize=f"prepare_{name}()", stop=[f"stop_{name}()"],
         retain_on_failed_init=True,
         pin_snapshots={pin["pin"]:
@@ -153,7 +165,22 @@ def constructor(item, result, prefix):
 
 
 def selected(result):
-    return any(item.kind == "eth" for item in result.controllers)
+    return any(item.kind in {"eth", "eth_frames"} for item in result.controllers)
+
+
+def resolve_counter_domains(controllers):
+    """Allocate one assembly namespace for selected physical MAC/PTP counters.
+
+    IRQ/acquire observations use the core clock and never allocate a counter.
+    A future hardware timestamp mechanism must join this same namespace rather
+    than deriving a potentially colliding domain from its public-kind ID.
+    """
+    counters = sorted({("mac-ptp", item["controller"])
+                       for item in controllers if item["kind"] == "eth_frames"})
+    domains = {counter: index + 1 for index, counter in enumerate(counters)}
+    for item in controllers:
+        if item["kind"] == "eth_frames":
+            item["clock_domain"] = domains[("mac-ptp", item["controller"])]
 
 
 def state_declarations(result, prefix):
@@ -173,11 +200,14 @@ def start_resources(result, prefix):
     ahb = "RCC->AHB1ENR" if stm else "RCU_AHB1EN"
     apb = "RCC->APB2ENR" if stm else "RCU_APB2EN"
     gate = "RCC_APB2ENR_SYSCFGEN" if stm else "RCU_APB2EN_SYSCFGEN"
-    lines = [f"    s_nx_eth_clocks_added = ~{ahb} & 0x0e000000u;",
+    mask = ("0x1e000000u" if any(item.kind == "eth_frames" for item in
+                               result.controllers) else "0x0e000000u")
+    lines = [f"    s_nx_eth_clocks_added = ~{ahb} & {mask};",
              f"    s_nx_eth_syscfg_clock_added = ~{apb} & {gate};"]
     if not stm:
         mask = sum(1 << index for index in {ord(pin["pin"][1])-ord('A')
-                   for item in result.controllers if item.kind == "eth"
+                   for item in result.controllers
+                   if item.kind in {"eth", "eth_frames"}
                    for pin in item["pins"]})
         lines.append(f"    s_nx_eth_gpio_clocks_added = ~{ahb} & {mask}u;")
     return lines

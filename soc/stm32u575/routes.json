@@ -42,7 +42,8 @@
       ],
       "modes": [
         "irq-bytes",
-        "dma-tx"
+        "dma-tx",
+        "irq-fifo-bytes"
       ],
       "source": "Official ST Nucleo BSP ed50f1d2d4940e4efe23104027b8008ce79037f5 PA9/PA10 AF7 USART1 VCP; CMSIS U575 IRQ61. UM2861 SB32/SB34ON,SB24/SB26/SB31/SB33OFF; actual wiring unknown.",
       "mode_dma": {

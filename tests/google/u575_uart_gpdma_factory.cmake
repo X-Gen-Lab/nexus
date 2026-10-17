@@ -1,5 +1,5 @@
 # Exact finite USART1 GPDMA fixture; only CPU/MMIO leaves are modeled.
-set(u5_gpdma_factory_input "${NEXUS_SOURCE_DIR}/tests/contracts/u575_assembly/usart1-dma-tx.toml")
+set(u5_gpdma_factory_input "${NEXUS_SOURCE_DIR}/cmake/package/verification/io_evolution/u575-uart-gpdma.toml")
 set(u5_gpdma_factory_bundle "${CMAKE_CURRENT_BINARY_DIR}/u575-uart-gpdma-factory")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32u575/__init__.py"

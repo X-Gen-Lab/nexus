@@ -212,6 +212,37 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
 """
     nodes, edges, startup = [], [], []
     for item in selected:
+        if item["kind"] == "adc_group":
+            owner = item["id"]
+            trigger, adc = owner + ":trigger", owner + ":adc"
+            nodes.append({"id": adc, "owner": owner,
+                          "clock_domain": "controller:ADC1",
+                          "events": ["sample-ready"],
+                          "actions": ["sample", "stop"],
+                          "stop_actions": ["stop"]})
+            if item["trigger"] == "tim6-trgo":
+                nodes.append({"id": trigger, "owner": owner,
+                              "clock_domain": "controller:TIM6",
+                              "events": ["update"], "actions": ["stop"],
+                              "stop_actions": ["stop"]})
+                edges.append({"source": trigger, "event": "update",
+                              "target": adc, "action": "sample",
+                              "route": "TIM6:TRGO:ADC1:" + item["mode"],
+                              "cross_domain": True})
+                startup.append((adc, trigger))
+            if item["mode"] == "regular-sequence-dma":
+                dma = owner + ":dma"
+                nodes.append({"id": dma, "owner": owner,
+                              "clock_domain": "engine:DMA1",
+                              "events": ["block-ready"],
+                              "actions": ["transfer", "stop"],
+                              "stop_actions": ["stop"]})
+                edges.append({"source": adc, "event": "sample-ready",
+                              "target": dma, "action": "transfer",
+                              "route": item["dma"][0],
+                              "cross_domain": True})
+                startup.append((dma, adc))
+            continue
         if item["kind"] == "pwm_adc":
             owner = item["id"]
             trigger, adc, dma = (owner + suffix for suffix in

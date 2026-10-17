@@ -3,11 +3,11 @@ add_library(nexus_io STATIC
     src/gpio.c src/uart.c src/uart_word.c src/spi.c src/spi_transaction.c
     src/spi_dma_transaction.c src/spi_dma_sequence.c src/spi_dma_owner_binding.c
     src/i2c.c src/i2c_long.c src/flash.c
-    src/watchdog.c src/exti.c src/timer.c src/adc.c src/adc_format.c
+    src/watchdog.c src/exti.c src/timer.c src/adc.c src/adc_format.c src/adc_group.c
     src/flash_region.c
     src/dma.c src/stream.c src/wake.c src/i2c_bus_clear.c src/adc_observer.c
     src/uart_rs485.c src/stream_budget.c src/can.c src/can_fd.c
-    src/ethernet.c src/mdio.c
+    src/ethernet.c src/ethernet_frames.c src/mdio.c
     src/usb_device.c src/timer_capture.c src/advanced_pwm.c src/observation.c
     src/pwm_group.c src/pwm_adc.c src/stream_profile.c src/encoder.c)
 target_include_directories(nexus_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -24,7 +24,7 @@ if(NEXUS_SOC_FAMILY STREQUAL "native")
         native/spi.c native/i2c.c
         native/flash.c native/watchdog.c native/exti.c native/timer.c native/adc.c
         native/spi_async.c native/spi_dma_transaction.c native/stream.c
-        native/can.c native/ethernet.c
+        native/can.c native/ethernet.c native/ethernet_frames.c
         native/usb_device.c)
     target_link_libraries(nexus_io_native PUBLIC nexus_io nexus_arch
         PRIVATE nexus_build_options nexus_owned_warnings)
@@ -49,6 +49,16 @@ if(NEXUS_SOC_FAMILY STREQUAL "native")
     target_compile_definitions(nexus_eth_native_engine PRIVATE NX_ETH_NATIVE)
     target_sources(nexus_io_native PRIVATE
         $<TARGET_OBJECTS:nexus_eth_native_engine>)
+    add_library(nexus_eth_frames_native_engine OBJECT src/eth_frames_mac.c)
+    target_include_directories(nexus_eth_frames_native_engine PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/private"
+        "${CMAKE_CURRENT_SOURCE_DIR}/native")
+    target_link_libraries(nexus_eth_frames_native_engine PRIVATE nexus_io nexus_arch
+        nexus_build_options nexus_owned_warnings)
+    target_compile_definitions(nexus_eth_frames_native_engine PRIVATE
+        NX_ETH_FRAMES_NATIVE)
+    target_sources(nexus_io_native PRIVATE
+        $<TARGET_OBJECTS:nexus_eth_frames_native_engine>)
     add_library(nexus_usb_native_engine OBJECT src/usb_device_controller.c)
     target_include_directories(nexus_usb_native_engine PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private"

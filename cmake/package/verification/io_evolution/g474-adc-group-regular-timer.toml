@@ -1,0 +1,29 @@
+# Software reference; physical ADC wiring and HIL are unknown.
+schema = 2
+board_package = "boards/g474-adc-group"
+backend = "baremetal"
+clock = "hse24-pll170"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+
+[adc_group.samples]
+binding = "samples"
+mode = "regular-sequence-dma"
+channels = [2, 1]
+sample_times = [0, 0]
+reference_mv = 3300
+exclusive = true
+# Expected reviewed layout; initialization observes the actual cut.
+silicon_profile = "g474-adc-group-x"
+trigger = "tim6-trgo"
+period_us = 50
+
+[adc_group.samples.irq]
+priority = 5
+calls_os = false

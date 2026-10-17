@@ -6,10 +6,37 @@ except ImportError:
 
 
 DEFAULT = {"data_bits": 8, "parity": "none", "stop_bits": 1, "flow": "none"}
+FIFO_THRESHOLDS = ("eighth", "quarter", "half", "three-quarters",
+                   "seven-eighths")
+
+
+def _fifo(selection, route, provider):
+    profile = selection.get("fifo")
+    if selection["mode"] != "irq-fifo-bytes":
+        if "fifo" in selection:
+            fail("FIFO profile belongs only to the selected FIFO byte mode")
+        return
+    expected = {"stm32h743": ("USART3", 16),
+                "stm32u575": ("USART1", 8)}.get(provider.PREFIX)
+    if expected is None or route["controller"] != expected[0]:
+        fail("FIFO UART requires its exact reviewed controller/provider")
+    fields = {"rx_threshold", "tx_threshold", "rx_budget_bytes",
+              "tx_budget_bytes"}
+    if not isinstance(profile, dict) or set(profile) != fields:
+        fail("FIFO profile requires four exact threshold/budget fields")
+    for key, final in (("rx_threshold", "full"), ("tx_threshold", "empty")):
+        value = profile[key]
+        if not isinstance(value, str) or value not in FIFO_THRESHOLDS + (final,):
+            fail("FIFO " + key + " is not a reviewed named threshold")
+    for key in ("rx_budget_bytes", "tx_budget_bytes"):
+        integer(profile[key], 1, expected[1], "FIFO " + key)
+    if selection["rx_profile"] != "bytes" or "stream" in selection:
+        fail("FIFO UART requires byte ring storage without a stream profile")
 
 
 def validate(selection, route, provider):
     """Do not infer flow-control wiring or reinterpret word data as bytes."""
+    _fifo(selection, route, provider)
     if "irq_probe" in selection:
         if type(selection["irq_probe"]) is not bool:
             fail("UART IRQ probe must be boolean")
@@ -58,6 +85,21 @@ def expression(frame):
     parity = "NX_UART_PARITY_" + frame.parity.upper()
     return ("(nx_uart_format_t){" + str(frame.data_bits) + "U, " + parity +
             ", NX_UART_STOP_" + str(frame.stop_bits) + ", NX_UART_FLOW_NONE}")
+
+
+def fifo_definitions(item):
+    """Emit four selected immutable bytes, never an ordinary state field."""
+    fifo = item.options.fifo
+    if fifo is None:
+        return []
+    rx = (FIFO_THRESHOLDS + ("full",)).index(fifo.rx_threshold)
+    tx = (FIFO_THRESHOLDS + ("empty",)).index(fifo.tx_threshold)
+    name = item.id.replace("-", "_")
+    return [f"static const nx_{item.provider}_uart_fifo_profile_t",
+            f"s_nx_fifo_profile_{name} = {{",
+            f"    .rx_threshold = {rx}u, .tx_threshold = {tx}u,",
+            f"    .rx_budget = {fifo.rx_budget_bytes}u,",
+            f"    .tx_budget = {fifo.tx_budget_bytes}u", "};"]
 
 
 def changed(item):

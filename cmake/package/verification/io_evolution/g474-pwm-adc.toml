@@ -1,5 +1,5 @@
 schema = 2
-board_package = "pwm_adc_board"
+board_package = "boards/g474-pwm-adc"
 backend = "baremetal"
 clock = "hse24-pll170"
 optimization = "Os"

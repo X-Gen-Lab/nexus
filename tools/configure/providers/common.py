@@ -96,6 +96,8 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ("adc_group", "regular-sequence-dma"): ModeTraits(irq=True, rx_dma=True),
+    ("adc_group", "injected-sequence"): ModeTraits(irq=True),
     ("pwm_adc", "finite-regular-dma"): ModeTraits(irq=True, rx_dma=True),
     ("can_fd", "iso-fd-loopback"): ModeTraits(irq=True),
     ("can_fd", "iso-fd-normal"): ModeTraits(irq=True),
@@ -104,6 +106,7 @@ _MODE_TRAITS = MappingProxyType({
     ("timer_capture", "edge-capture"): ModeTraits(irq=True),
     ("advanced_pwm", "complementary-pwm"): ModeTraits(irq=True),
     ("eth", "raw-rmii"): ModeTraits(irq=True, bus_master=True),
+    ("eth_frames", "rmii-vlan-sg-ptp"): ModeTraits(irq=True, bus_master=True),
     ("usb_device", "device-fs"): ModeTraits(irq=True),
     ("can", "classic-irq"): ModeTraits(irq=True),
     ("gpio", "input"): ModeTraits(),
@@ -111,6 +114,7 @@ _MODE_TRAITS = MappingProxyType({
     ("uart", "irq-byte-event"): ModeTraits(irq=True),
     ("uart", "irq-words"): ModeTraits(irq=True),
     ("uart", "irq-bytes"): ModeTraits(irq=True),
+    ("uart", "irq-fifo-bytes"): ModeTraits(irq=True),
     ("uart", "irq-blocks"): ModeTraits(irq=True, block_stream=True),
     ("uart", "dma-tx"): ModeTraits(irq=True, tx_dma=True),
     ("uart", "rx-dma-idle"): ModeTraits(
@@ -255,6 +259,9 @@ def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
     fields = {
+        "adc_group": {"channels", "sample_times", "reference_mv", "exclusive",
+                      "silicon_profile", "trigger", "period_us", "watchdog",
+                      "irq_priority", "calls_os"},
         "pwm_adc": {"tick_hz", "period_ticks", "trigger_ticks", "deadtime_ticks",
                     "channels", "sample_times", "reference_mv", "exclusive",
                     "irq_priority", "calls_os"},
@@ -268,12 +275,15 @@ def validate_selection(selection, route, provider, ram_size):
                          "idle_high", "idle_complement_high", "exclusive", "irq_priority", "calls_os"},
         "eth": {"tx_count", "rx_count", "rx_storage_bytes", "address",
                 "init_timeout_us", "drain_timeout_us", "irq_priority", "calls_os"},
+        "eth_frames": {"tx_count", "rx_count", "rx_storage_bytes", "address",
+                       "init_timeout_us", "drain_timeout_us", "irq_priority",
+                       "calls_os"},
         "usb_device": {"event_capacity", "rx_fifo_words", "vbus_sensing",
                        "poll_limit", "drain_timeout_us", "clock_timeout_us",
                        "irq_priority", "calls_os"},
         "can": {"operation", "event_capacity", "bitrate", "timing", "irq_priority",
                 "calls_os", "drain_timeout_us", "poll_limit", "fifo_order"},
-        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os", "frame", "stream", "irq_probe"},
+        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os", "frame", "stream", "irq_probe", "fifo"},
         "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz", "irq_priority", "calls_os", "timing"}, "flash": set(), "watchdog": set(),
         "exti": {"edge", "event_capacity", "irq_priority", "calls_os"},
         "pwm": {"period_ticks", "duty_ticks", "tick_hz"},
@@ -288,7 +298,7 @@ def validate_selection(selection, route, provider, ram_size):
         except ImportError:
             import timer_advanced
         timer_advanced.validate_selection(selection, route, provider)
-    elif kind == "eth":
+    elif kind in {"eth", "eth_frames"}:
         try:
             from .. import ethernet
         except ImportError:

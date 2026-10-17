@@ -720,7 +720,12 @@
         "clock:ETHMACTX",
         "clock:ETHMACRX",
         "controller:SYSCFG_RMII"
-      ]
+      ],
+      "interfaces": {
+        "eth_frames": [
+          "rmii-vlan-sg-ptp"
+        ]
+      }
     },
     "TIMER3": {
       "kind": "timer_capture",

@@ -1,24 +1,21 @@
 """Generate pure, typed static lookup without registration or construction."""
 
 try:
-    from .providers.common import mode_traits, fail
-    from .providers import maintained
     from .ir import ConfigurationIR
-    from . import io_traits
+    from . import io_traits, selected_contracts
     from . import enhanced_endpoints
     from . import stream_profiles, uart_formats
 except ImportError:
-    from providers.common import mode_traits, fail
-    from providers import maintained
     from ir import ConfigurationIR
     import io_traits
+    import selected_contracts
     import enhanced_endpoints
     import stream_profiles
     import uart_formats
 
 FACTORY_ABI_EPOCH = 1
 
-KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd")
+KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd", "adc_group", "eth_frames")
 
 
 def symbol(name):
@@ -39,7 +36,7 @@ def interface_type(class_name, shape):
 
 
 def public_header(kind):
-    return {"pwm": "timer", "eth": "ethernet",
+    return {"pwm": "timer", "eth": "ethernet", "eth_frames": "ethernet_frames",
             "spi_transaction_device": "spi_transaction",
             "i2c_long_device": "i2c_long",
             "spi_dma_transaction_device": "spi_dma_transaction"}.get(kind, kind)
@@ -73,14 +70,13 @@ def classes(result):
     records.append(("usb_endpoint", "endpoint", [item for item in result.devices
                     if item.kind == "usb_device"]))
     records.append(("mdio", "port", [item for item in result.controllers
-                                    if item.kind == "eth"]))
+                                    if item.kind in {"eth", "eth_frames"}]))
     return records
 
 
 def controller_class(item):
     """Physical UART resource and nominal word face remain distinct facts."""
-    return ("uart_word" if item.mode == "irq-words" else
-            item.interface_kind or item.kind)
+    return selected_contracts.controller_class(item)
 
 
 def emit(result):
@@ -195,69 +191,10 @@ def emit_strong(result):
     return "\n".join(header)
 
 
-def _capability(item, model, endpoint=None):
-    """Describe maintained execution traits, never infer silicon capacity."""
-    kind, mode = item.kind, item.mode
-    traits = mode_traits(kind, mode)
-    flags = ["NX_FACTORY_CAP_MODEL"] if model else []
-    if traits.polling:
-        flags.append("NX_FACTORY_CAP_POLLING")
-    if not model:
-        if traits.irq:
-            flags.append("NX_FACTORY_CAP_IRQ")
-        if traits.tx_dma:
-            flags.append("NX_FACTORY_CAP_TX_DMA")
-        if traits.rx_dma:
-            flags.append("NX_FACTORY_CAP_RX_DMA")
-        if traits.bus_master:
-            flags.append("NX_FACTORY_CAP_BUS_MASTER_DMA")
-    if traits.block_stream:
-        flags.append("NX_FACTORY_CAP_BLOCK_STREAM")
-        if traits.dma and not traits.continuous:
-            flags.append("NX_FACTORY_CAP_STREAM_GAPS")
-    units, unit_bytes, alignment, messages = 0, 0, 1, 0
-    if kind == "uart":
-        unit_bytes = 1
-        if traits.dma:
-            units = 65535
-    elif kind == "spi":
-        unit_bytes = 1
-        if traits.dma:
-            units = 65535
-        elif not model:
-            units = 256
-    elif kind == "i2c":
-        unit_bytes = 1
-        if not model:
-            units = "NX_I2C_MAX_MESSAGE_BYTES"
-            messages = "NX_I2C_MAX_MESSAGES"
-    elif kind == "pwm_adc":
-        units, unit_bytes, alignment = 65535, 2, 2
-    elif kind == "can_fd":
-        units, unit_bytes, messages = 64, 1, 1
-    elif kind == "adc":
-        unit_bytes, alignment = 2, 2
-        count = len(item.options.channels)
-        units = 65535 - 65535 % count if traits.dma else count
-    elif kind == "can":
-        # Each submitted request borrows one frame, not all TX mailboxes.
-        units, unit_bytes, messages = 8, 1, 1
-    elif kind == "eth":
-        units, unit_bytes, alignment, messages = "NX_ETH_FRAME_MAX", 1, 4, 1
-    elif kind == "usb_device":
-        units = endpoint.options.max_packet if endpoint is not None else 64
-        unit_bytes, messages = 1, 1
-    elif kind == "flash":
-        if model:
-            unit_bytes = alignment = 1
-        else:
-            provider = maintained(item.provider)
-            unit_bytes = getattr(provider, "FLASH_PROGRAM_UNIT", None)
-            alignment = getattr(provider, "FLASH_INPUT_ALIGNMENT", None)
-            if any(type(value) is not int or not 1 <= value <= 65535 or
-                   value & (value - 1) for value in (unit_bytes, alignment)):
-                fail("Flash provider requires exact power-of-two units/alignment")
-    return " | ".join(flags) or "0U", units, unit_bytes, alignment, messages
+def _capability(item, model, endpoint=None, *, public_class=None):
+    """Keep the existing optional ABI as a selected-contract projection."""
+    return selected_contracts.capability(item, model, endpoint,
+                                         public_class=public_class)
 
 
 def emit_capabilities(result):
@@ -278,6 +215,7 @@ def emit_capabilities(result):
         ' * \\note Zero units/messages means no bound described, not unlimited.',
         ' * Zero unit_bytes means per-request word width; see typed traits.',
         ' * For I2C, units bounds each message; unit_bytes is the payload unit.',
+        ' * For enhanced SPI, max_messages bounds segments, never I2C messages.',
         ' * For Flash, unit_bytes constrains destination offset and length;',
         ' * buffer_alignment describes caller input, independently of that unit.',
         ' * Board wiring, memory domains and deadlines remain separate contracts.',
@@ -293,20 +231,8 @@ def emit_capabilities(result):
                     if shape == "endpoint" else instance)
             flags, units, size, alignment, messages = _capability(
                 item, result.soc_family == "native",
-                instance if class_name == "usb_endpoint" else None)
-            if class_name == "i2c_long_device":
-                units = "NX_I2C_LONG_MAX_MESSAGE_BYTES"
-            elif class_name == "spi_transaction_device":
-                # Words are 8/16-bit per transaction, not fixed byte units.
-                units = 0 if result.soc_family == "native" else 256
-                size, alignment, messages = 0, 1, "NX_SPI_MAX_SEGMENTS"
-            elif class_name == "uart_word":
-                units, size, alignment = 0, 2, 2
-            elif class_name in {"spi_dma_transaction",
-                                "spi_dma_transaction_device"}:
-                units, size, alignment, messages = 0, 0, 1, "NX_SPI_MAX_SEGMENTS"
-            if class_name == "mdio":
-                flags, units, size, alignment, messages = "NX_FACTORY_CAP_POLLING", 1, 2, 1, 1
+                instance if shape == "endpoint" else None,
+                public_class=class_name)
             # Public C constants are the bounds authority; never recopy values.
             units = f"{units}U" if type(units) is int else units
             messages = f"{messages}U" if type(messages) is int else messages

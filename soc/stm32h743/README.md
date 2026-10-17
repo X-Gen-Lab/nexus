@@ -142,7 +142,8 @@ pin as unlocked input/analog before capturing any fields/latches. A foreign pin
 behind a disabled gate is rejected without pin writes or an unauthorized lease.
 The assembly captures only selected GPIO fields/latches and added clock gates.
 Partial initialization includes the failing instance in reverse cleanup.
-GPIO preloads and observes safe levels before publishing output mode. UART uses
+GPIO preloads and observes safe levels before publishing output mode. Ordinary
+IRQ-byte UART uses
 8N1, PRESC1 and the selected PCLK, no FIFO, actual TEACK/REACK and IRQ readback.
 In IRQ-byte mode its bounded ISR moves at most one TX and one RX byte.
 Requests settle only after actual wire
@@ -208,6 +209,36 @@ are possible, and borrowed blocks are never overwritten. This is neither
 circular DMA nor continuous no-gap reception; no byte-exact loss count is
 inferred. Additional H7 DMA engines, RX continuous/double-buffer modes and
 physical cache coherence remain separate acceptance scopes.
+
+## Optional bounded hardware FIFO bytes
+
+The separate `irq-fifo-bytes` selection uses USART3 PD8/PD9 AF7, 8N1, priority 5
+and the exact `hsi64-fixed-cache-off` 64 MHz profile. It enables the hardware 16-byte RX
+and TX FIFOs; RX can additionally hold one RDR byte. Explicit threshold and
+per-entry RX/TX byte budgets are independent. An IDLE/threshold handler drains
+at most each budget, uses a checked RX-not-empty fallback for a short remaining
+tail, and preserves per-head error ordering. TX space/FIFO-empty never replaces
+wire TC. Cancel/drain and whole stop retain storage until source, vector,
+publisher and UE/ACK withdrawal is proved.
+
+The selected state adds only a const-profile link to the existing UART prefix;
+ordinary UART state/operations and FIFO-disabled DMA modes remain unchanged.
+H743 high-clock profiles, DMA, non-8N1 and flow-control combinations are not
+admitted by this mode. The shared compile-time algorithm reuses pinned official
+LL USART leaves without a second hardware owner. See the
+[FIFO selection and lifecycle contract](../../docs/design/uart-fifo.md).
+Its 45 real-provider and 9 normal-TOML/generated-factory model cases passed,
+along with the selected normal ARM build, resource and retention checks.
+Physical HIL is `not_executed`;
+bounded register accesses are not measured latency or a throughput guarantee.
+
+中文：可选 `irq-fifo-bytes` 仅接入上述 USART3、HSI64 缓存关闭配置和8N1，
+硬件 FIFO 每方向16字节，RX 另有1字节 RDR。阈值与每次中断 RX/TX 字节预算独立；
+短尾通过经读回确认的 RX 非空中断继续排空，错误按当前队首处理。FIFO 空或有空间
+不等于线上 TC；取消和停止仍须证明所有来源、向量、发布者及 UE/ACK 已撤回，才能
+归还存储。普通模式状态与接口不增长，不自动扩展到高频或 DMA。45项外部寄存器
+模型和9项正常生成工厂用例，以及选定 ARM 链接/资源/保留检查已通过；这些结果
+仍不代表实板测量，物理 HIL 为 `not_executed`。
 
 ## Memory and evidence
 
