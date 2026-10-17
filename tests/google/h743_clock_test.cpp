@@ -37,11 +37,12 @@ static void CheckClockSafety(void) {
         g_h743_model.actual_core_hz = 64000000U;
         return;
     }
-    const uint32_t m =
-        (rcc.PLLCKSELR & RCC_PLLCKSELR_DIVM1) >> RCC_PLLCKSELR_DIVM1_Pos;
+    const uint32_t m = (rcc.PLLCKSELR & uint32_t(RCC_PLLCKSELR_DIVM1)) >>
+                       RCC_PLLCKSELR_DIVM1_Pos;
     const uint32_t n = (rcc.PLL1DIVR & RCC_PLL1DIVR_N1) + 1U;
     const uint32_t p =
-        ((rcc.PLL1DIVR & RCC_PLL1DIVR_P1) >> RCC_PLL1DIVR_P1_Pos) + 1U;
+        ((rcc.PLL1DIVR & uint32_t(RCC_PLL1DIVR_P1)) >> RCC_PLL1DIVR_P1_Pos) +
+        1U;
     if (m != 0U)
         g_h743_model.actual_core_hz = uint32_t(uint64_t(64000000U) * n / m / p);
     const uint32_t effective_d1 = g_h743_clock_behavior.delayed_hpre

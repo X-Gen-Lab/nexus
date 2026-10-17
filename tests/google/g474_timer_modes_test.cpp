@@ -55,7 +55,8 @@ extern "C" void nx_arch_irq_restore(nx_arch_irq_state_t previous) {
     incoming_mask = previous.value;
 }
 extern "C" void nx_arch_dsb(void) {
-    std::atomic_thread_fence(std::memory_order_seq_cst);
+    /* Synchronous MMIO model: compiler ordering, no thread publication. */
+    std::atomic_signal_fence(std::memory_order_seq_cst);
 }
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return observation == nullptr ? 700U : observation->Call();

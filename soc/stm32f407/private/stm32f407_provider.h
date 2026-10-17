@@ -211,7 +211,11 @@ nx_result_t nx_stm32_gpio_stop(nx_stm32_gpio_state_t* port, uint32_t inactive);
 /** \brief Initialize authorized pins, preloading BSRR before output mode. */
 nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
                                      uint32_t initial);
-/** \brief Initialize one fixed 8N1 UART; storage must outlive IRQ and stop. */
+/** \brief Initialize one fixed 8N1 UART; storage outlives IRQ and stop.
+ * \param[in,out] port: Fresh zeroed state with selected config filled in.
+ * \note Live or retained ownership rejects reinitialization. Reuse after
+ *       successful stop; never zero state to revoke a live borrow.
+ */
 nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
                                      uint32_t clock_hz);
 /** \brief Cold selected frame is installed before UE and IRQ publication. */

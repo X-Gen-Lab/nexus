@@ -324,6 +324,50 @@ TEST_F(SPIDMAProviderSequence, CancelAfterFirstPhaseRetainsCurrentDmaAndCs) {
     EXPECT_EQ(request.base.transferred, 1U);
     EXPECT_EQ(CS, 1U);
 }
+
+TEST_F(SPIDMAProviderSequence,
+       RejectionPriorityKeepsBusyAheadOfInvalidRetainedLease) {
+    nx_spi_request_t phase{};
+    nx_request_initialize(&phase.base);
+    ASSERT_EQ(nx_request_prepare(&phase.base, 1U), NX_SUCCESS);
+    phase.tx = reinterpret_cast<const uint8_t*>(tx);
+    phase.rx = reinterpret_cast<uint8_t*>(rx);
+    phase.length = 1U;
+    state.spi.active = false;
+    state.endpoint = nullptr;
+    CS = 0xA5A55A5AU;
+    const auto Reject = [&](nx_result_t expected) {
+        EXPECT_EQ(BACKEND.begin(&state, &child, &phase, 16U, 0U, true),
+                  expected);
+        EXPECT_EQ(nx_request_state(&phase.base), NX_REQUEST_READY);
+        EXPECT_EQ(state.active, nullptr);
+        EXPECT_EQ(CS, 0xA5A55A5AU);
+#if defined(NX_SPI_TRANSACTION_STM32)
+        EXPECT_FALSE(nx_arch_irq_is_masked());
+#else
+        EXPECT_EQ(g_gd32_model_mask, 0U);
+#endif
+    };
+    /* Provider lifecycle wins even when physical DMA is still busy. */
+    state.stopping = true;
+    RXCR |= 1U;
+    Reject(NX_ERROR_STATE);
+    state.stopping = false;
+    /* Physical BUSY still wins over lost retained-CS identity and deadline. */
+    Reject(NX_ERROR_BUSY);
+    RXCR &= ~1U;
+    STATUS = TXEMPTY | BUSY;
+    Reject(NX_ERROR_BUSY);
+    STATUS = TXEMPTY;
+    Reject(NX_ERROR_STATE);
+    /* Only a valid retained lease reaches the already expired deadline. */
+    state.spi.active = true;
+    state.endpoint = &child;
+    Reject(NX_ERROR_TIMEOUT);
+    state.spi.active = false;
+    state.endpoint = nullptr;
+}
+
 #if defined(NX_SPI_DMA_OWNER_TEST)
 /** \brief Compose actual family DMA, retained sequence and original owner. */
 class SPIDMAProviderOwner : public SPIDMAProviderSequence {

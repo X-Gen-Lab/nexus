@@ -282,23 +282,26 @@ static nx_result_t start(nx_gd32_spi_dma_endpoint_state_t* device,
         return result;
     }
     uint32_t saved = nx_gd32_critical_enter();
-    if (!state->initialized || state->stopping || state->faulted) {
-        result = NX_ERROR_STATE;
-    } else if (state->active != NULL || (state->spi.active && !retained_cs) ||
-               ((engine(state, true)[0] | engine(state, false)[0]) &
-                DMA_CHXCTL_CHEN) != 0U ||
-               (SPI_STAT(state->spi.controller->registers) & SPI_STAT_TRANS) !=
-                   0U) {
-        result = NX_ERROR_BUSY;
-    } else if (retained_cs &&
-               (!state->spi.active || state->endpoint != device)) {
-        result = NX_ERROR_STATE;
-    } else if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
-        result = NX_ERROR_TIMEOUT;
-    } else {
-        result = admitted
-                     ? nx_request_transition(&request->base, NX_REQUEST_ACTIVE)
-                     : nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+    /* Invalid state/lease defaults to STATE; physical BUSY keeps priority. */
+    result = NX_ERROR_STATE;
+    if (state->initialized && !state->stopping && !state->faulted) {
+        if (state->active != NULL || (state->spi.active && !retained_cs) ||
+            ((engine(state, true)[0] | engine(state, false)[0]) &
+             DMA_CHXCTL_CHEN) != 0U ||
+            (SPI_STAT(state->spi.controller->registers) & SPI_STAT_TRANS) !=
+                0U) {
+            result = NX_ERROR_BUSY;
+        } else if (!retained_cs ||
+                   (state->spi.active && state->endpoint == device)) {
+            if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
+                result = NX_ERROR_TIMEOUT;
+            } else {
+                result = admitted ? nx_request_transition(&request->base,
+                                                          NX_REQUEST_ACTIVE)
+                                  : nx_request_admit(&request->base,
+                                                     NX_REQUEST_ACTIVE);
+            }
+        }
     }
     if (result != NX_SUCCESS) {
         nx_gd32_critical_leave(saved);

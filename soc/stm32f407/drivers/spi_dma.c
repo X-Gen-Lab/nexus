@@ -247,21 +247,24 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
         return result;
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    if (!state->initialized || state->stopping || state->spi.fault) {
-        result = NX_ERROR_STATE;
-    } else if (state->active != NULL || (state->spi.active && !retained_cs) ||
-               ((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
-               (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
-        result = NX_ERROR_BUSY;
-    } else if (retained_cs &&
-               (!state->spi.active || state->endpoint != device)) {
-        result = NX_ERROR_STATE;
-    } else if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
-        result = NX_ERROR_TIMEOUT;
-    } else {
-        result = admitted
-                     ? nx_request_transition(&request->base, NX_REQUEST_ACTIVE)
-                     : nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+    /* Invalid state/lease defaults to STATE; physical BUSY keeps priority. */
+    result = NX_ERROR_STATE;
+    if (state->initialized && !state->stopping && !state->spi.fault) {
+        if (state->active != NULL || (state->spi.active && !retained_cs) ||
+            ((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
+            (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
+            result = NX_ERROR_BUSY;
+        } else if (!retained_cs ||
+                   (state->spi.active && state->endpoint == device)) {
+            if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
+                result = NX_ERROR_TIMEOUT;
+            } else {
+                result = admitted ? nx_request_transition(&request->base,
+                                                          NX_REQUEST_ACTIVE)
+                                  : nx_request_admit(&request->base,
+                                                     NX_REQUEST_ACTIVE);
+            }
+        }
     }
     if (result != NX_SUCCESS) {
         nx_arch_irq_restore(saved);

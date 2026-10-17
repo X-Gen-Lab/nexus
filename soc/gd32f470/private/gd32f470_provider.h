@@ -205,14 +205,16 @@ nx_result_t nx_gd32_gpio_initialize(nx_gd32_gpio_state_t* port,
                                     uint32_t initial, bool output);
 /**
  * \brief           Assemble USART0 PA9/PA10 IRQ 8N1 without hidden storage.
- * \param[out]      port: Fresh storage; one serialized executor.
+ * \param[in,out]   port: Fresh zeroed idle state; one serialized executor.
  * \param[in]       baud: Baud rate between 1526 and 1000000.
  * \param[in]       profile: Byte/event ring or explicit block-only profile.
- * \param[in,out]   storage: Exclusive byte/event array matching profile.
- * \param[in]       capacity: Positive ring count, or NULL/zero for block mode.
+ * \param[in,out]   storage: Exclusive byte/event array, or NULL for blocks.
+ * \param[in]       capacity: Positive ring count, or zero for block mode.
  * \param[in]       priority: NVIC preemption priority 0 through 15.
- * \return          Success or INVALID/BUSY/CONTEXT. Block IRQs start
- * separately.
+ * \return          Success or INVALID/BUSY/CONTEXT/IO. Block IRQs start
+ *                  separately; IO can retain cleanup ownership.
+ * \note            Live or retained state rejects reinitialization. Reuse
+ *                  after successful stop; never zero a live borrow.
  */
 nx_result_t nx_gd32_uart_initialize(nx_gd32_uart_state_t* port, uint32_t baud,
                                     nx_uart_rx_profile_t profile, void* storage,
@@ -490,7 +492,11 @@ nx_result_t nx_gd32_adc_sample(void* context, uint16_t* samples,
                                size_t capacity, nx_time_us_t deadline,
                                size_t* count);
 
-/** \brief Initialize a selected UART after Board AF wiring is prepared. */
+/** \brief Initialize a selected UART after Board AF wiring is prepared.
+ * \param[in,out] port: Fresh zeroed idle or successfully stopped state.
+ * \note Live or retained ownership rejects reinitialization. Failed
+ *       cleanup retains state and storage until stop succeeds.
+ */
 nx_result_t
 nx_gd32_uart_initialize_at(nx_gd32_uart_state_t* port,
                            const nx_gd32_uart_controller_t* controller,
