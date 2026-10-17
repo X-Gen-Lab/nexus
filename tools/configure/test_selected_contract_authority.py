@@ -43,6 +43,8 @@ class SelectedContractAuthorityTests(unittest.TestCase):
              ".mode = NX_STM32G474_FDCAN_NORMAL"),
             ("g474-pwm-adc", {"pwm_adc"},
              "nx_stm32g474_pwm_adc_initialize("),
+            ("g474-pwm-shared", {"pwm"},
+             "nx_stm32g474_pwm_shared_initialize("),
             ("h743-uart-rtscts", {"uart"},
              "nx_stm32h743_uart_rtscts_initialize("),
             ("u575-uart-rtscts", {"uart"},

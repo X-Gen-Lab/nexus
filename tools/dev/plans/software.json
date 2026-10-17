@@ -720,11 +720,29 @@
       "timeout_s": 1800
     },
     {
+      "name": "configure-fixture-io-evolution-g474-pwm-shared",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-pwm-shared"
+      ],
+      "timeout_s": 1800
+    },
+    {
       "name": "build-fixture-io-evolution-g474-pwm-adc",
       "checker": "build",
       "args": [
         "--preset",
         "fixture-io-evolution-g474-pwm-adc"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-g474-pwm-shared",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-pwm-shared"
       ],
       "timeout_s": 1800
     },

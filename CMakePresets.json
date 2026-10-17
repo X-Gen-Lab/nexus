@@ -1109,6 +1109,20 @@
             }
         },
         {
+            "name": "fixture-io-evolution-g474-pwm-shared",
+            "inherits": "fixture-stm32-g474-baremetal-empty",
+            "displayName": "g474-pwm-shared software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-g474-pwm-shared",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/g474-pwm-shared.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": ""
+            }
+        },
+        {
             "name": "fixture-io-evolution-g474-can-fd",
             "inherits": "fixture-stm32-g474-baremetal-empty",
             "displayName": "g474-can-fd software fixture; PCB/HIL unqualified",
@@ -1750,6 +1764,13 @@
         {
             "name": "fixture-io-evolution-g474-pwm-adc",
             "configurePreset": "fixture-io-evolution-g474-pwm-adc",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-g474-pwm-shared",
+            "configurePreset": "fixture-io-evolution-g474-pwm-shared",
             "targets": [
                 "io_evolution_fixture"
             ]

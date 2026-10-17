@@ -162,6 +162,7 @@ python tools/maintenance/capabilities.py --write
 | stm32g474 | TIM1 | pwm_group | coherent-pwm | `tim1-group-pa8-pa9-pa10-comp1-pa1-pa4` | — | `tests/contracts/g474_control_assembly/pwm-group.toml` | `soc/stm32g474/drivers/pwm_group.c` |
 | stm32g474 | TIM1 | pwm_adc | finite-regular-dma | `tim1-adc1-window-pa8-pa9-pa10-pa0-comp1-pa1-pa4` | — | `cmake/package/verification/io_evolution/g474-pwm-adc.toml` | `soc/stm32g474/drivers/pwm_adc.c` |
 | stm32g474 | TIM3 | pwm | fixed-pwm | `tim3-ch1-pa6` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/pwm-freertos.toml`, `tests/contracts/g474_assembly/pwm.toml` | `soc/stm32g474/drivers/pwm.c` |
+| stm32g474 | TIM3 | pwm | shared-fixed-pwm | `tim3-ch1-pa6`, `tim3-ch2-pa7` | `stm32g474re-hse24-reference` | `cmake/package/verification/io_evolution/g474-pwm-shared.toml` | `soc/stm32g474/drivers/pwm_shared.c` |
 | stm32g474 | TIM3 | encoder | quadrature | `tim3-encoder-pa6-pa7` | — | `tests/contracts/g474_control_assembly/encoder.toml` | `soc/stm32g474/drivers/encoder.c` |
 | stm32g474 | TIM4 | pwm | fixed-pwm | `tim4-ch1-pb6` | `stm32g474re-hse24-reference` | `tests/contracts/g474_assembly/pwm-freertos.toml`, `tests/contracts/g474_assembly/pwm.toml` | `soc/stm32g474/drivers/pwm.c` |
 | stm32g474 | TIM5 | timer_capture | edge-capture | `tim5-ch1-pa0` | — | `tests/contracts/g474_control_assembly/timer-capture.toml` | `soc/stm32g474/drivers/timer_capture.c` |

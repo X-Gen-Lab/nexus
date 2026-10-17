@@ -51,7 +51,8 @@ class FamilyDescriptor:
         if self.family in {"stm32f103", "gd32f303"}:
             modules += ("tools/configure/providers/legacy_transport.py",)
         if self.family == "stm32g474":
-            modules += (f"{directory}/coupled.py", f"{directory}/adc_group.py")
+            modules += (f"{directory}/coupled.py", f"{directory}/adc_group.py",
+                        f"{directory}/pwm_shared.py")
         return modules
 
     @property
@@ -151,6 +152,7 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32g474/drivers/exti.c", "soc/stm32g474/drivers/spi.c",
             "soc/stm32g474/drivers/watchdog.c", "soc/stm32g474/drivers/pwm.c",
             "soc/stm32g474/drivers/pwm_group.c",
+            "soc/stm32g474/drivers/pwm_shared.c",
             "soc/stm32g474/drivers/encoder.c",
             "soc/stm32g474/drivers/timer_capture.c",
             "soc/stm32g474/drivers/adc.c", "soc/stm32g474/drivers/adc_stream.c",
@@ -163,6 +165,7 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32g474/private/stm32g474_fdcan.h",
             "soc/stm32g474/private/stm32g474_pwm_adc.h",
             "soc/stm32g474/private/stm32g474_pwm_group.h",
+            "soc/stm32g474/private/stm32g474_pwm_shared.h",
             "soc/stm32g474/private/stm32g474_timer.h",
             "soc/stm32g474/private/stm32g474_system.h",
             "soc/stm32g474/private/stm32g474_provider.h",

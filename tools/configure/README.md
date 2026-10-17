@@ -131,6 +131,17 @@ drains. `mode_resources` in reviewed route facts reserves TIM3/TIMER2 only for
 `trigger-dma` and `trigger-dma-continuous`, rejecting simultaneous PWM use. CPU-only CCM/TCM is excluded from
 immutable DMA domains. Silicon route support does not qualify PCB wiring.
 
+The exact G474 `shared-fixed-pwm` selection keeps two ordinary `[pwm]` instances
+and their existing fields. The complete TIM3 CH1/PA6 and CH2/PA7 AF2 pair must
+agree on tick and period. The resolver derives one immutable physical owner,
+compatible base claims and exclusive lane/pad claims; generation initializes
+and closes that owner once while preserving both original PWM factory IDs.
+Missing members, a different base or another whole-TIM3 personality reject.
+Ordinary `fixed-pwm` remains exclusive. A running peer is joined at its current
+phase, without a coherent group-start promise. The
+[canonical software input](../../cmake/package/verification/io_evolution/g474-pwm-shared.toml)
+does not qualify PCB routing, electrical timing or HIL.
+
 SPI and I2C controller identity is separate from each child endpoint:
 
 <!-- nexus-toml-fragment: endpoint tables extend a complete Board assembly. -->

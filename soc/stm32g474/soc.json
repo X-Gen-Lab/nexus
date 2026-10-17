@@ -648,7 +648,8 @@
     "TIM3": {
       "kind": "pwm",
       "modes": [
-        "fixed-pwm"
+        "fixed-pwm",
+        "shared-fixed-pwm"
       ],
       "irq": [
         "TIM3_IRQn"

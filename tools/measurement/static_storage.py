@@ -12,8 +12,8 @@ from tools.measurement.elf import interval_bytes
 
 CLASSES = (
     ("provider_state", re.compile(
-        r"s_nx_(?:port|endpoint|cs|eth(?:_frames)?_(?:tx|rx)_slots)_"
-        r"[A-Za-z0-9_]+(?:\.[\w.]+)?\Z")),
+        r"(?:s_nx_(?:port|endpoint|cs|eth(?:_frames)?_(?:tx|rx)_slots)_"
+        r"[A-Za-z0-9_]+|s_nx_physical_pwm_shared_tim3)(?:\.[\w.]+)?\Z")),
     ("buffers", re.compile(
         r"s_nx_(?:rx|events|can_events|eth(?:_frames)?_(?:tx|rx|storage))_"
         r"[A-Za-z0-9_]+(?:\.[\w.]+)?\Z")),

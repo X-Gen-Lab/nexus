@@ -46,6 +46,7 @@ _MODES = MappingProxyType({
     ("watchdog", "independent"): "watchdog",
     ("spi", "short-poll"): "spi",
     ("pwm", "fixed-pwm"): "pwm",
+    ("pwm", "shared-fixed-pwm"): "pwm_shared",
     ("pwm_group", "coherent-pwm"): "pwm_group",
     ("pwm_adc", "finite-regular-dma"): "pwm_adc",
     ("can_fd", "iso-fd-loopback"): "fdcan",
@@ -173,6 +174,10 @@ def validate_selection(selection, route):
         if type(selection.get("irq_priority")) is not int or selection["irq_priority"] != 5:
             common.fail("G474 coherent PWM implements IRQ priority5 only")
     elif kind == "pwm":
+        if selection["mode"] == "shared-fixed-pwm":
+            from . import pwm_shared
+            pwm_shared.validate_selection(selection, route)
+            return
         expected = {"TIM3": "PA6", "TIM4": "PB6"}.get(route["controller"])
         if tuple((pin["pin"], pin["function"], pin["af"])
                  for pin in route["pins"]) != ((expected, "ch1", 2),):

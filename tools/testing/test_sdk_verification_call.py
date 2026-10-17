@@ -113,13 +113,13 @@ class SDKConsumerParallelTests(unittest.TestCase):
                      "g474-adc-group-injected-timer", "h743-uart-fifo",
                      "u575-uart-fifo", "f407zg-eth-frames",
                      "gd470-eth-frames", "h743-uart-rtscts",
-                     "u575-uart-rtscts"):
+                     "u575-uart-rtscts", "g474-pwm-shared"):
             file = verification / (name + ".toml")
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text("# canonical installed test input: " + name)
         for name in ("h743-high", "u575-uart-gpdma", "g474-can-fd",
                      "g474-pwm-adc", "g474-adc-group", "uart-fifo",
-                     "ethernet-frames"):
+                     "ethernet-frames", "g474-pwm-shared"):
             file = verification / "consumers" / (name + ".c")
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text("/* installed public smoke: " + name + " */\n")
@@ -202,6 +202,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 if (Path(command[2]).name == "selected " + family + " rtscts build"
                         and self.selected_fault == family + "_rtscts_build"):
                     code = 47
+            if (Path(command[2]).name == "selected g474 shared pwm build"
+                    and self.selected_fault == "shared_pwm_build"):
+                code = 48
         elif any(argument.endswith("retention.py") for argument in command):
             failed = ("selected " in command[command.index("--elf") + 1]
                       and self.selected_fault == "retention")
@@ -219,6 +222,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     Path(command[command.index("--elf") + 1]).parents[1].name ==
                     "selected " + family + " rtscts build" and
                     self.selected_fault == family + "_rtscts_retention")
+            failed = failed or (
+                Path(command[command.index("--elf") + 1]).parents[1].name ==
+                "selected g474 shared pwm build" and
+                self.selected_fault == "shared_pwm_retention")
             report = {"status": "failed" if failed else "passed"}
             if "selected " in command[command.index("--elf") + 1]:
                 import hashlib
@@ -258,21 +265,21 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 "selected g474 adc injected timer", "selected h743 fifo",
                 "selected u575 fifo", "selected f407 frames",
                 "selected gd470 frames", "selected h743 rtscts",
-                "selected u575 rtscts"}
+                "selected u575 rtscts", "selected g474 shared pwm"}
         self.assertEqual({Path(command[2]).name.removesuffix(" build")
                           for command in builds}, expected)
-        self.assertEqual(len(builds), 28)
+        self.assertEqual(len(builds), 29)
         self.assertEqual(sum(len(command) - command.index("--target") - 1
-                             for command in builds), 31)
+                             for command in builds), 32)
         configurations = [command for command in self.commands
                           if command[0] == "cmake" and "-S" in command]
-        self.assertEqual(len(configurations), 28)
+        self.assertEqual(len(configurations), 29)
         for command in configurations:
             self.assertIn("-DNEXUS_EXPECTED_SOURCE_REVISION=" + "a" * 40,
                           command)
         retention = [command for command in self.commands
                      if any(arg.endswith("retention.py") for arg in command)]
-        self.assertEqual(len(retention), 25)
+        self.assertEqual(len(retention), 26)
         native = [command for command in self.commands if len(command) == 1]
         self.assertEqual({Path(command[0]).name for command in native},
                          {"installed_c", "installed_cpp"})
@@ -287,23 +294,23 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(report["physical_status"], "not_executed")
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["1"] * 28)
+                          for command in self.builds()], ["1"] * 29)
 
-    def test_default_retains_three_four_job_and_twenty_five_two_job_builds(self):
+    def test_default_retains_three_four_job_and_twenty_six_two_job_builds(self):
         status, report = self.execute()
         self.assertEqual(status, 0)
         self.assertEqual(report["source_revision"], "a" * 40)
         self.assertEqual(report["source_tree"], "b" * 40)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["4"] * 3 + ["2"] * 25)
+                          for command in self.builds()], ["4"] * 3 + ["2"] * 26)
 
     def test_positive_budget_is_applied_to_every_modern_and_legacy_build(self):
         status, _ = self.execute(("--parallel", "3"))
         self.assertEqual(status, 0)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["3"] * 28)
+                          for command in self.builds()], ["3"] * 29)
 
     def test_selected_inputs_and_public_smokes_come_only_from_installed_sdk(self):
         status, report = self.execute(("--parallel", "1"))
@@ -312,7 +319,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                           if command[0] == "cmake" and "-S" in command
                           and Path(command[command.index("-S") + 1]).name.startswith(
                               "selected ")]
-        self.assertEqual(len(configurations), 15)
+        self.assertEqual(len(configurations), 16)
         inputs = set()
         for command in configurations:
             assembly = Path(next(argument.split("=", 1)[1] for argument in command
@@ -329,7 +336,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
             private_guard = (source / "private_headers.c").read_text()
             for name in ("stm32h7xx.h", "stm32u5xx.h", "stm32g4xx.h",
                          "stm32f4xx.h", "gd32f4xx.h",
-                         "stm32f407_eth_frames.h", "gd32f470_eth_frames.h"):
+                         "stm32f407_eth_frames.h", "gd32f470_eth_frames.h",
+                         "stm32g474_pwm_shared.h"):
                 self.assertIn('__has_include("' + name + '")', private_guard)
             self.assertNotIn(str(ROOT), (source / "CMakeLists.txt").read_text())
         self.assertEqual(inputs, {
@@ -341,8 +349,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
             "g474-adc-group-injected-timer.toml", "h743-uart-fifo.toml",
             "u575-uart-fifo.toml", "f407zg-eth-frames.toml",
             "gd470-eth-frames.toml", "h743-uart-rtscts.toml",
-            "u575-uart-rtscts.toml"})
-        self.assertEqual(len(report["selected_images"]), 15)
+            "u575-uart-rtscts.toml", "g474-pwm-shared.toml"})
+        self.assertEqual(len(report["selected_images"]), 16)
         for image in report["selected_images"]:
             self.assertEqual(set(image["artifacts"]), {"elf", "bin", "map"})
 
@@ -411,7 +419,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "u575-uart-fifo.toml", "consumers/uart-fifo.c",
                          "f407zg-eth-frames.toml", "gd470-eth-frames.toml",
                          "consumers/ethernet-frames.c", "h743-uart-rtscts.toml",
-                         "u575-uart-rtscts.toml"):
+                         "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
+                         "consumers/g474-pwm-shared.c"):
             with self.subTest(relative=relative):
                 file = directory / relative
                 original = file.read_bytes()
@@ -481,6 +490,24 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         self.assertEqual(report["commands"][-1]["exit_code"], 47)
                     else:
                         self.assertIn("retention", report["error"])
+
+    def test_shared_pwm_failure_is_terminal_after_all_preserved_roots(self):
+        for operation in ("build", "retention"):
+            with self.subTest(operation=operation):
+                self.selected_fault = "shared_pwm_" + operation
+                before = len(self.builds())
+                with contextlib.redirect_stderr(io.StringIO()):
+                    status, report = self.execute(("--parallel", "1"))
+                self.assertEqual(status, 1)
+                self.assertEqual(report["status"], "failed")
+                self.assertEqual(len(self.builds()) - before, 29)
+                self.assertEqual(Path(self.builds()[-1][2]).name,
+                                 "selected g474 shared pwm build")
+                self.assertEqual(len(report["selected_images"]), 15)
+                if operation == "build":
+                    self.assertEqual(report["commands"][-1]["exit_code"], 48)
+                else:
+                    self.assertIn("retention", report["error"])
 
     def test_invalid_budget_rejects_before_any_output_or_external_command(self):
         for value in ("0", "-1", "01", "+1", "1.5", "True", "", " 1"):

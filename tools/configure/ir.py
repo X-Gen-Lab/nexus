@@ -294,6 +294,32 @@ class PwmOptions:
 
 
 @dataclass(frozen=True)
+class PwmSharedChannelIR:
+    id: str
+    channel: int
+    pin: str
+    duty_ticks: int
+    inactive: int
+
+
+@dataclass(frozen=True)
+class PwmSharedOwnerIR:
+    provider: str
+    controller: str
+    mode: str
+    kernel_hz: int
+    tick_hz: int
+    period_ticks: int
+    members: tuple[PwmSharedChannelIR, ...]
+
+    @classmethod
+    def from_validated(cls, values):
+        return cls(*(values[key] for key in (
+            "provider", "controller", "mode", "kernel_hz", "tick_hz", "period_ticks")),
+                   tuple(PwmSharedChannelIR(**item) for item in values["members"]))
+
+
+@dataclass(frozen=True)
 class AdcOptions:
     channels: tuple[int, ...]
     sample_times: tuple[int, ...]
@@ -762,6 +788,7 @@ class ConfigurationIR(Record):
     dma_topology: DmaTopologyIR
     clock_plan: ClockPlanIR | None
     values: Mapping
+    pwm_shared_owners: tuple[PwmSharedOwnerIR, ...] = ()
 
     @classmethod
     def from_validated(cls, result):
@@ -798,7 +825,9 @@ class ConfigurationIR(Record):
                    DmaTopologyIR.from_validated(result["dma_topology"]),
                    (ClockPlanIR.from_validated(result["clock_plan"])
                     if result.get("clock_plan") is not None else None),
-                   MappingProxyType(values))
+                   MappingProxyType(values),
+                   tuple(PwmSharedOwnerIR.from_validated(item)
+                         for item in result.get("pwm_shared_owners", ())))
 
     def to_dict(self):
         return thaw(self)

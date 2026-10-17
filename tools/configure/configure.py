@@ -781,7 +781,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 fail("DMA mode has no reviewed DMA route")
             if traits.dma:
                 provider.validate_dma(route, mode, normalize_resource)
-            if route["kind"] != "gpio":
+            shared_pwm = (family == "stm32g474" and route["kind"] == "pwm" and
+                          mode == "shared-fixed-pwm")
+            if route["kind"] != "gpio" and not shared_pwm:
                 claim("controller:" + route["controller"], name, mode, route["id"])
             for pin in route["pins"]:
                 claim("pin:" + pin["pin"], name, mode, route["id"])
@@ -847,6 +849,20 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             and any(item["kind"] == "flash" for item in selected)):
         fail("H743 physical Flash requires the reviewed cache-off timing owner")
     ethernet.resolve_counter_domains(selected)
+    pwm_shared_owners = []
+    pwm_sharing = {}
+    if any(item["kind"] == "pwm" and item["mode"] == "shared-fixed-pwm"
+           for item in selected):
+        if family != "stm32g474":
+            fail("Shared PWM has no maintained physical owner")
+        try:
+            from .providers.stm32g474 import pwm_shared
+        except ImportError:
+            from providers.stm32g474 import pwm_shared
+        pwm_shared_owners = pwm_shared.resolve(
+            selected, bindings, soc, clock, assembly["clock_profile"])
+        physical_claims, pwm_sharing = pwm_shared.resources(pwm_shared_owners)
+        claim_list.extend(physical_claims)
     unique(instance_ids, "controller instance IDs")
     unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
     can_domain = can.resolve_domain(assembly.get("can_domain"), selected,
@@ -1072,7 +1088,12 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     result["factory"] = {"capabilities": factory_options.get("capabilities", False)}
     if clock_plan is not None:
         result["clock_plan"] = clock_plan
-    result["resource_plan"] = resource_graph.resolve(claim_list).to_dict()
+    if pwm_shared_owners:
+        result["pwm_shared_owners"] = pwm_shared_owners
+        result["resource_plan"] = resource_graph.resolve(
+            claim_list, shared=pwm_sharing).to_dict()
+    else:
+        result["resource_plan"] = resource_graph.resolve(claim_list).to_dict()
     result["trigger_plan"] = trigger_graph.resolve_fixed(selected, routes).to_dict()
     for item in selected:
         if item["kind"] == "adc_group" and item["trigger"] == "tim6-trgo":

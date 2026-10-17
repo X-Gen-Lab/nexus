@@ -25,6 +25,8 @@ def includes(result):
         source.append('#include "i2c_v2.h"')
     if any(item.kind == "pwm_group" for item in result.controllers):
         source.append('#include "stm32g474_pwm_group.h"')
+    if result.pwm_shared_owners:
+        source.append('#include "stm32g474_pwm_shared.h"')
     if any(item.kind in {"timer_capture", "encoder"} for item in result.controllers):
         source.append('#include "stm32g474_timer.h"')
     if any(item.kind == "pwm_adc" for item in result.controllers):
@@ -95,6 +97,12 @@ def state_declarations(result):
 
 def start_system(result):
     source = []
+    for owner in result.pwm_shared_owners:
+        timer = owner.controller
+        source += [f'    if ((NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_{timer}EN) != 0u ||',
+                   f'        (NX_G474_READ(&RCC->APB1RSTR1) & RCC_APB1RSTR1_{timer}RST) != 0u ||',
+                   f'        !NX_G474_IRQ_AVAILABLE({timer}_IRQn)) {{',
+                   '        result.primary = NX_ERROR_BUSY; return result;', '    }']
     if any(item.kind == "adc_group" for item in result.controllers):
         from . import adc_group
         source += adc_group.preflight(result)

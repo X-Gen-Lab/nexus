@@ -161,7 +161,9 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
         "consumers/uart-fifo.c", "f407zg-eth-frames.toml",
         "gd470-eth-frames.toml", "boards/f407zg-eth-frames/board.json",
         "boards/gd470-eth-frames/board.json", "consumers/ethernet-frames.c",
-        "h743-uart-rtscts.toml", "u575-uart-rtscts.toml"))
+        "h743-uart-rtscts.toml", "u575-uart-rtscts.toml",
+        "g474-pwm-shared.toml", "boards/g474-pwm-shared/board.json",
+        "consumers/g474-pwm-shared.c"))
 REQUIRED_FILES += ("tools/configure/selected_contracts.py",
                    *IO_EVOLUTION_VERIFICATION_FILES)
 REQUIRED_FILES += ("io/private/uart_fifo_impl.h",)

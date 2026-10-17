@@ -79,7 +79,7 @@ it retains the executor, buffers and controller/CS owners, masks IRQs and calls
 the fault observer; it parks if the observer returns. Idle stop/recovery failures
 retain retryable leases. There are no asynchronous submission or DMA methods.
 
-PWM selects TIM3 CH1 PA6 AF2 or TIM4 CH1 PB6 AF2, each with exclusive ownership
+The ordinary `fixed-pwm` mode selects TIM3 CH1 PA6 AF2 or TIM4 CH1 PB6 AF2, each with exclusive ownership
 of its whole timer. It is edge-aligned, upcounting and active-high, with a fixed
 170 MHz/integer-divisor tick, divisor1..65536, period1..65535 and duty0..period.
 CCR preload stages duty for an update event; period/base changes are rejected.
@@ -91,6 +91,27 @@ Startup uses quiet UG and an inactive GPIO level. Stop proves output/counter
 withdrawal and Board idle; failed private close retains cleanup responsibility.
 Other channels, shared bases, complementary output, capture, break, IRQ and DMA
 are outside this profile.
+
+The separate `shared-fixed-pwm` selection uses exact TIM3 CH1/PA6 and CH2/PA7
+AF2 at the fixed 170 MHz kernel. Two ordinary `nx_pwm_port_t` factory faces
+point through readonly channel references to one physical owner, one immutable
+tick/period configuration and one cold initialization/final close. Both existing
+`[pwm]` declarations must agree on tick and period; no share flag or runtime
+registry is added. The sole normal input is
+[`g474-pwm-shared.toml`](../../cmake/package/verification/io_evolution/g474-pwm-shared.toml).
+Its 1 MHz counter, 1000-tick period, duties 250/750 and PA6-low/PA7-high inactive
+latches are software reference choices, not inspected PCB or electrical facts.
+
+Each shared-channel set changes only its CCR preload. A channel joining a
+running peer adopts the current phase without UG or counter restart; coherent
+group start and a full first pulse are not promised. Channel stop withdraws only
+its own output and establishes its Board inactive GPIO level; only the last
+channel stops CEN. Final physical close may use exclusive reset and must succeed
+before Platform releases either pad snapshot, added clock or System lease.
+Refused reset, inactive-latch or outer restoration retains the relevant cleanup
+responsibility. The pair excludes other whole-TIM3 owners and conflicting
+PA6/PA7 users. It uses no TIM3 IRQ or DMA; physical phase/pulse timing and HIL
+remain unmeasured.
 
 IWDG lookup and Platform startup never enable or feed the watchdog. Enable uses
 the RM0440 non-window sequence and reports DS12288 Table45 full-temperature LSI

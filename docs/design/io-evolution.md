@@ -228,6 +228,22 @@ join producer/DMA access. Declared regular/injected groups and trigger identitie
 describe an already supported mode; they do not start conversion or turn a
 software observation into a sample-aperture timestamp.
 
+The G474 `shared-fixed-pwm` selection gives two ordinary PWM factory faces one
+physical TIM3 owner: CH1/PA6 and CH2/PA7 AF2, with a common fixed 170 MHz kernel,
+tick and period. The two existing declarations derive one cold construction,
+two readonly channel references, compatible base claims and exclusive lane/pad
+claims. There is no authored share flag, runtime registry, timer IRQ or DMA.
+Each set changes only its own CCR preload. A channel joining a running peer
+adopts the current phase without UG or counter restart; independent calls do
+not provide coherent group start or a full first pulse. Channel stop preserves
+the peer and establishes its own declared inactive GPIO level; only the last
+lane stops CEN. The lifecycle caller quiesces both channel users before final
+Platform stop. Physical close precedes outer pin/clock release, retaining
+cleanup responsibility if reset, inactive-level or restoration proof fails.
+The [canonical software reference](../../cmake/package/verification/io_evolution/g474-pwm-shared.toml)
+requires the complete pair and excludes other whole-TIM3 or PA6/PA7 owners.
+Its Board choices do not establish PCB wiring, electrical safety or HIL.
+
 PWM group commit stages one coherent shadow batch; `SUCCESS` does not prove the
 timer already applied it. A partial hardware-write failure must withdraw output
 and retain fault responsibility. Clearing a break does not enable output. The

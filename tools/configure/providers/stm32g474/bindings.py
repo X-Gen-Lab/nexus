@@ -17,6 +17,8 @@ def constructor(item, result, board_bindings, routes, devices):
     item = controller_ir(item, "stm32g474")
     if item.provider != "stm32g474":
         fail("G474 constructor cannot reinterpret a foreign provider decision")
+    if item.kind == "pwm" and item.mode == "shared-fixed-pwm":
+        fail("Shared PWM requires its one typed physical construction")
     if item.kind == "adc_group":
         from . import adc_group
         return adc_group.constructor(item, result, board_bindings[item.binding])

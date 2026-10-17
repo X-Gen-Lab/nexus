@@ -62,7 +62,7 @@ class PackagePinContractTests(unittest.TestCase):
                                       "UART4", "UART5")})
         expected.update({name: ("spi", ["short-poll"], {})
                          for name in ("SPI1", "SPI2")})
-        expected.update({"TIM3": ("pwm", ["fixed-pwm"],
+        expected.update({"TIM3": ("pwm", ["fixed-pwm", "shared-fixed-pwm"],
                                   {"encoder": ["quadrature"]}),
                          "TIM4": ("pwm", ["fixed-pwm"], {}),
                          "TIM1": ("pwm_group", ["coherent-pwm"],

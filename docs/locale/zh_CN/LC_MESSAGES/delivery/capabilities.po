@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 8d109cf977e05c40b0b67582925fcf458bd9bc7a2666650fa1a09b17dcc7a187\n"
+"X-Nexus-Source-SHA256: aa3bfdc094e5de3cf0652d1eaa892fdc40423f8ba7e909a173992c0858dcc87b\n"
 
 msgid "派生能力与接入矩阵"
 msgstr "派生能力与接入矩阵"
@@ -2070,3 +2070,15 @@ msgstr "`cmake/package/verification/io_evolution/u575-uart-rtscts.toml`"
 
 msgid "`soc/stm32u575/drivers/uart_rtscts.c`"
 msgstr "`soc/stm32u575/drivers/uart_rtscts.c`"
+
+msgid "shared-fixed-pwm"
+msgstr "shared-fixed-pwm"
+
+msgid "`tim3-ch1-pa6`, `tim3-ch2-pa7`"
+msgstr "`tim3-ch1-pa6`, `tim3-ch2-pa7`"
+
+msgid "`cmake/package/verification/io_evolution/g474-pwm-shared.toml`"
+msgstr "`cmake/package/verification/io_evolution/g474-pwm-shared.toml`"
+
+msgid "`soc/stm32g474/drivers/pwm_shared.c`"
+msgstr "`soc/stm32g474/drivers/pwm_shared.c`"

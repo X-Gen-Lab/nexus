@@ -30,7 +30,8 @@ SELECTED_CONSUMERS = (
     ("f407 frames", "f407zg-eth-frames", "ethernet-frames"),
     ("gd470 frames", "gd470-eth-frames", "ethernet-frames"),
     ("h743 rtscts", "h743-uart-rtscts", "uart-fifo"),
-    ("u575 rtscts", "u575-uart-rtscts", "uart-fifo"))
+    ("u575 rtscts", "u575-uart-rtscts", "uart-fifo"),
+    ("g474 shared pwm", "g474-pwm-shared", "g474-pwm-shared"))
 
 
 def clean_environment():
@@ -253,6 +254,7 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("stm32g474_fdcan.h") || '
         '__has_include("stm32g474_pwm_adc.h") || '
         '__has_include("stm32g474_adc_group.h") || '
+        '__has_include("stm32g474_pwm_shared.h") || '
         '__has_include("stm32f407_eth_frames.h") || '
         '__has_include("gd32f470_eth_frames.h") || '
         '__has_include("stm32g474_provider.h")\n'

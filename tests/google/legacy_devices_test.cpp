@@ -524,3 +524,68 @@ TEST_F(LegacyFlash, EveryPageNeedsFreshCompletionAfterProvenFlagClear) {
     EXPECT_EQ(1U, pulses);
     EXPECT_EQ(128U, registers.control);
 }
+
+class PwmStateDispatch : public testing::Test {
+  protected:
+    testing::MockFunction<nx_result_t(nx_pwm_state_t*)> provider;
+    nx_pwm_ops_t methods{nullptr, nullptr, nullptr,
+                         [](const void* context, nx_pwm_state_t* output) {
+                             return static_cast<PwmStateDispatch*>(
+                                        const_cast<void*>(context))
+                                 ->provider.Call(output);
+                         }};
+    const nx_pwm_state_t expected{1000U, 250U, 1000000U, true};
+    nx_pwm_port_t face{&methods, this};
+
+    void SetUp() override {
+        ON_CALL(provider, Call(testing::_))
+            .WillByDefault([this](nx_pwm_state_t* output) {
+                /* Copy bytes into valid writable enclosing storage even when
+                 * an incorrect dispatcher admits an overlapping output. */
+                std::memcpy(output, &expected, sizeof(expected));
+                return NX_SUCCESS;
+            });
+    }
+    void ExpectNormalDispatch() {
+        nx_pwm_state_t output{};
+        EXPECT_CALL(provider, Call(&output)).Times(1);
+        EXPECT_EQ(NX_SUCCESS, nx_pwm_port_state(&face, &output));
+        EXPECT_EQ(expected.period_ticks, output.period_ticks);
+        EXPECT_EQ(expected.duty_ticks, output.duty_ticks);
+        EXPECT_EQ(expected.tick_hz, output.tick_hz);
+        EXPECT_EQ(expected.running, output.running);
+        EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&provider));
+    }
+};
+
+TEST_F(PwmStateDispatch, StateOutputCannotOverwriteItsCurrentInterfaceFace) {
+    ExpectNormalDispatch();
+    struct alignas(nx_pwm_state_t) Storage {
+        nx_pwm_port_t face;
+        std::array<uint8_t, sizeof(nx_pwm_state_t)> tail;
+    } storage{face, {}};
+    std::array<uint8_t, sizeof(storage)> before{};
+    std::memcpy(before.data(), &storage, before.size());
+    EXPECT_CALL(provider, Call(testing::_)).Times(0);
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        nx_pwm_port_state(&storage.face,
+                          reinterpret_cast<nx_pwm_state_t*>(&storage.face)));
+    EXPECT_EQ(0, std::memcmp(before.data(), &storage, before.size()));
+}
+
+TEST_F(PwmStateDispatch, StateOutputCannotOverwriteItsCurrentReadonlyMethods) {
+    ExpectNormalDispatch();
+    struct alignas(nx_pwm_state_t) Storage {
+        nx_pwm_ops_t methods;
+        std::array<uint8_t, sizeof(nx_pwm_state_t)> tail;
+    } storage{methods, {}};
+    const nx_pwm_port_t observed{&storage.methods, this};
+    std::array<uint8_t, sizeof(storage)> before{};
+    std::memcpy(before.data(), &storage, before.size());
+    EXPECT_CALL(provider, Call(testing::_)).Times(0);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_pwm_port_state(&observed, reinterpret_cast<nx_pwm_state_t*>(
+                                               &storage.methods)));
+    EXPECT_EQ(0, std::memcmp(before.data(), &storage, before.size()));
+}

@@ -78,11 +78,21 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         timer = [row for row in rows if row["family"] == "stm32g474" and
                  row["controller"] == "TIM3"]
         self.assertEqual({(row["kind"], row["mode"]) for row in timer},
-                         {("pwm", "fixed-pwm"), ("encoder", "quadrature")})
+                         {("pwm", "fixed-pwm"),
+                          ("pwm", "shared-fixed-pwm"),
+                          ("encoder", "quadrature")})
         encoder = next(row for row in timer if row["kind"] == "encoder")
-        pwm = next(row for row in timer if row["kind"] == "pwm")
+        pwm = next(row for row in timer if row["mode"] == "fixed-pwm")
+        shared = next(row for row in timer
+                      if row["mode"] == "shared-fixed-pwm")
         self.assertEqual(encoder["routes"], ["tim3-encoder-pa6-pa7"])
         self.assertEqual(pwm["routes"], ["tim3-ch1-pa6"])
+        self.assertEqual(shared["routes"], ["tim3-ch1-pa6", "tim3-ch2-pa7"])
+        self.assertEqual(shared["exports"],
+                         ["soc/stm32g474/drivers/pwm_shared.c"])
+        self.assertIn("cmake/package/verification/io_evolution/"
+                      "g474-pwm-shared.toml",
+                      shared["fixtures"])
         self.assertEqual(encoder["exports"],
                          ["soc/stm32g474/drivers/encoder.c"])
         self.assertIn("tests/contracts/g474_control_assembly/encoder.toml",

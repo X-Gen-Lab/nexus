@@ -136,14 +136,38 @@ def emit(result):
     source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
     source.extend(provider.state_declarations(result))
     initialize = []
+    initialization_indices = []
     retained_initialization = []
     stop = []
     pin_snapshots = {}
-    for item in selections:
+    shared_members = {member.id: owner for owner in result.pwm_shared_owners
+                      for member in owner.members}
+    physical_constructed = set()
+    if shared_members:
+        try:
+            from .providers.stm32g474 import pwm_shared
+        except ImportError:
+            from providers.stm32g474 import pwm_shared
+    for selection_index, item in enumerate(selections):
         name = symbol(item.id)
         exported_type = interface_type(controller_class(item), "port")
         header += ['/** \\brief Fixed static identity; lifecycle stays explicit. */',
                    f'extern const {exported_type}* const nx_binding_{name};']
+        if item.id in shared_members:
+            owner = shared_members[item.id]
+            physical = pwm_shared.state_symbol(owner)
+            if physical not in physical_constructed:
+                construction = pwm_shared.constructor(owner)
+                source.append(f'static {construction.state_type} {physical};')
+                source.extend(construction.definitions)
+                initialize.append(construction.initialize)
+                initialization_indices.append(selection_index)
+                retained_initialization.append(construction.retain_on_failed_init)
+                stop.extend((len(initialize), expression)
+                            for expression in construction.stop)
+                physical_constructed.add(physical)
+            source.extend(pwm_shared.face(item, owner))
+            continue
         construction = provider.constructor(item, result, result["board_bindings"],
                                             result["routes"], result.devices)
         source += [f'static {construction.state_type} s_nx_port_{name};']
@@ -162,6 +186,7 @@ def emit(result):
                                      construction.pin_snapshots,
                                      pin_snapshots)
         initialize.append(construction.initialize)
+        initialization_indices.append(selection_index)
         retained_initialization.append(construction.retain_on_failed_init)
         stop.extend((len(initialize), expression)
                     for expression in construction.stop)
@@ -189,7 +214,7 @@ def emit(result):
         source.append(f'    if (s_nx_platform_initialized >= {index}u) {{')
         source.append(
             '        nx_platform_diagnostic_phase(diagnostic, cleanup, '
-            f'NX_PLATFORM_PHASE_CONTROLLER, {index - 1}u);')
+            f'NX_PLATFORM_PHASE_CONTROLLER, {initialization_indices[index - 1]}u);')
         for counter, (_, expression) in enumerate(entry for entry in stop if entry[0] == index):
             source += [f'        nx_result_t status_{counter} = {expression};',
                        f'        if (status_{counter} != NX_SUCCESS) {{ return status_{counter}; }}']
@@ -231,7 +256,7 @@ def emit(result):
     for index, expression in enumerate(initialize):
         source.append(
             '    nx_platform_diagnostic_phase(diagnostic, false, '
-            f'NX_PLATFORM_PHASE_CONTROLLER, {index}u);')
+            f'NX_PLATFORM_PHASE_CONTROLLER, {initialization_indices[index]}u);')
         if retained_initialization[index]:
             # Cold failure may retain live hardware; include that instance
             # in reverse cleanup before attempting initialization.

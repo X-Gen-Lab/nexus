@@ -32,7 +32,23 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                     self.assertTrue(sdk.selected(name))
                 self.assertIn((stem + " rtscts", stem + "-uart-rtscts",
                                "uart-fifo"), consumers.SELECTED_CONSUMERS)
-        self.assertEqual(len(consumers.SELECTED_CONSUMERS), 15)
+
+    def test_shared_pwm_reference_is_an_explicit_public_sdk_consumer(self):
+        directory = "cmake/package/verification/io_evolution/"
+        for relative in ("g474-pwm-shared.toml",
+                         "boards/g474-pwm-shared/board.json",
+                         "consumers/g474-pwm-shared.c"):
+            name = directory + relative
+            with self.subTest(name=name):
+                self.assertTrue((ROOT / name).is_file())
+                self.assertIn(name, sdk.REQUIRED_FILES)
+                self.assertTrue(sdk.selected(name))
+        self.assertIn(("g474 shared pwm", "g474-pwm-shared",
+                       "g474-pwm-shared"), consumers.SELECTED_CONSUMERS)
+        self.assertEqual(len(consumers.SELECTED_CONSUMERS), 16)
+        board = json.loads((ROOT / directory /
+                            "boards/g474-pwm-shared/board.json").read_text())
+        self.assertIsNone(board["physical_pcb_revision"])
 
     def test_selected_adc_and_rtscts_sources_are_owned_sdk_requirements(self):
         additions = {
@@ -95,6 +111,9 @@ class DeviceSDKPayloadTests(unittest.TestCase):
             "boards/stm32u575zi_rtscts_reference/board.json",
             "cmake/package/verification/io_evolution/h743-uart-rtscts.toml",
             "cmake/package/verification/io_evolution/u575-uart-rtscts.toml",
+            "cmake/package/verification/io_evolution/g474-pwm-shared.toml",
+            "cmake/package/verification/io_evolution/boards/g474-pwm-shared/board.json",
+            "cmake/package/verification/io_evolution/consumers/g474-pwm-shared.c",
         }
         names.update(
             "vendors/gigadevice/gd32f30x/Firmware/"

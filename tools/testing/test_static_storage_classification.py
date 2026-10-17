@@ -62,6 +62,17 @@ class GeneratedStorageClassificationTests(unittest.TestCase):
         self.assertEqual(report['bytes']['provider_state'], 0)
         self.assertEqual(sum(report['bytes'].values()), 108)
 
+    def test_selected_physical_pwm_owner_is_provider_state_not_other_static(self):
+        report = self.observe((
+            ('s_nx_physical_pwm_shared_tim3', 48, None),
+            ('s_nx_physical_pwm_shared_tim3.lto_priv.7', 48, 0),
+            ('s_nx_physical_pwm_shared_tim4', 12, None),
+            ('s_nx_physical_product_buffer', 16, None),
+            ('product_s_nx_physical_pwm_shared_tim3', 20, None)))
+        self.assertEqual(report['bytes']['provider_state'], 48)
+        self.assertEqual(report['bytes']['other_static'], 48)
+        self.assertEqual(sum(report['bytes'].values()), 96)
+
 
 if __name__ == '__main__':
     unittest.main()

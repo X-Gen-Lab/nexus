@@ -1309,9 +1309,29 @@
         }
       ],
       "modes": [
-        "fixed-pwm"
+        "fixed-pwm",
+        "shared-fixed-pwm"
       ],
       "source": "DS12288 Rev6 Table13 PA6 TIM3_CH1 AF2 and PB6 TIM4_CH1 AF2; RM0440 Rev9 general-purpose TIM3/4 16-bit PWM1 CCR preload and MMS/CEN trigger selection. Silicon software fixture only; no physical loads qualified."
+    },
+    {
+      "id": "tim3-ch2-pa7",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "TIM3",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA7",
+          "function": "ch2",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "shared-fixed-pwm"
+      ],
+      "source": "DS12288 Rev6 Table13 PA7 TIM3_CH2 AF2, also used by the reviewed encoder route; RM0440 Rev9 TIM3 shared fixed base and independent PWM1 channel. Exact two-channel software selection only; no physical load or timing qualification."
     },
     {
       "id": "adc1-in1-pa0",
