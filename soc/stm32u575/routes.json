@@ -2430,6 +2430,40 @@
         "poll-word"
       ],
       "source": "DS13737 Rev10 exactQ package/AF table and RM0456 Rev7. Software reference only; PCB/electrical behavior unobserved."
+    },
+    {
+      "id": "usart1-pa9-pa10-pa11-pa12-rtscts",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "USART1",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PA9",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PA10",
+          "function": "rx",
+          "af": 7
+        },
+        {
+          "pin": "PA11",
+          "function": "cts",
+          "af": 7
+        },
+        {
+          "pin": "PA12",
+          "function": "rts",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-fifo-rtscts-bytes"
+      ],
+      "source": "DS13737 Rev10 Table26 Q-column and Table27 exact STM32U575ZIT6Q PA9/PA10/PA11/PA12 AF7; software silicon reference only, no PCB or peer qualification."
     }
   ]
 }

@@ -1725,6 +1725,24 @@
       "timeout_s": 7200
     },
     {
+      "name": "configure-fixture-io-evolution-h743-uart-rtscts",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-h743-uart-rtscts"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-h743-uart-rtscts",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-h743-uart-rtscts"
+      ],
+      "timeout_s": 7200
+    },
+    {
       "name": "configure-fixture-io-evolution-u575-uart-fifo",
       "checker": "configure",
       "args": [
@@ -1739,6 +1757,24 @@
       "args": [
         "--preset",
         "fixture-io-evolution-u575-uart-fifo"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "configure-fixture-io-evolution-u575-uart-rtscts",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-u575-uart-rtscts"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-u575-uart-rtscts",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-u575-uart-rtscts"
       ],
       "timeout_s": 7200
     },

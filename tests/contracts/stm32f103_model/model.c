@@ -27,11 +27,20 @@ void nx_f103_model_reset(void) {
     g_nx_stm32f103_system.flash = &g_f103_model.flash;
     g_nx_stm32f103_system.timer = &g_f103_model.timer;
 }
+uint32_t nx_f103_model_device_id(void) {
+    ++g_f103_model.device_id_reads;
+    return g_f103_model.device_id;
+}
 bool nx_f103_model_privileged(void) {
     return g_f103_model.privileged;
 }
 uint32_t nx_f103_model_read(volatile uint32_t* reg) {
     ++g_f103_model.reads;
+    if (reg == &g_f103_model.debug.CR) {
+        ++g_f103_model.debug_control_reads;
+        /* ES096 2.2.2: normal software has no debug-register access. */
+        return 0U;
+    }
     if (g_f103_model.hide_timer_when_gated &&
         (uintptr_t)reg >= (uintptr_t)&g_f103_model.timer &&
         (uintptr_t)reg <
@@ -49,6 +58,10 @@ uint32_t nx_f103_model_read(volatile uint32_t* reg) {
 }
 void nx_f103_model_write(volatile uint32_t* reg, uint32_t value) {
     ++g_f103_model.writes;
+    if (reg == &g_f103_model.debug.CR) {
+        ++g_f103_model.debug_control_writes;
+        return;
+    }
     if ((uintptr_t)reg >= (uintptr_t)&g_f103_model.timer &&
         (uintptr_t)reg <
             (uintptr_t)&g_f103_model.timer + sizeof(g_f103_model.timer) &&

@@ -19,7 +19,7 @@ import tomllib
 
 try:
     from . import cpu as cpu_profiles
-    from . import bundle, dependencies, sdk
+    from . import bundle, dependencies, sdk, uart_formats
     from . import resource_graph, trigger_graph, dma_topology
     from .contracts import COMPONENTS
     from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
@@ -32,6 +32,7 @@ try:
 except ImportError:
     import cpu as cpu_profiles
     import bundle
+    import uart_formats
     import dependencies
     import sdk
     import resource_graph
@@ -746,10 +747,12 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 fail(f"Unsupported mode {mode} for {selection['binding']}; "
                      f"allowed: {', '.join(route['modes'])}")
             validate_selection(selection, route, provider, ram["size"])
-            if mode == "irq-fifo-bytes" and assembly["clock_profile"] != (
+            if mode in uart_formats.FIFO_MODES and assembly["clock_profile"] != (
                     "hsi64-fixed-cache-off"
                     if family == "stm32h743" else "msis4"):
                 fail("FIFO UART requires its reviewed fixed clock profile")
+            if mode == uart_formats.RTSCTS_MODE and assembly["backend"] != "baremetal":
+                fail("RTSCTS FIFO UART requires its reviewed baremetal owner")
             for numeric in {"rx_capacity", "baud", "max_hz", "event_capacity",
                             "period_ticks", "sample_cycles", "timeout_ms"} & selection.keys():
                 integer(selection[numeric], 1, context=numeric)

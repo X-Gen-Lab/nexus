@@ -39,6 +39,7 @@ _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart",
     ("uart", "irq-fifo-bytes"): "uart_fifo",
+    ("uart", "irq-fifo-rtscts-bytes"): "uart_rtscts",
     ("uart", "dma-tx"): "uart_gpdma",
     ("watchdog", "independent"): "watchdog",
     ("spi", "short-poll"): "spi", ("i2c", "poll-messages"): "i2c",
@@ -66,10 +67,14 @@ def validate_selection(selection, route):
     mode_implementation(kind, selection["mode"])
     if kind == "uart":
         expected = _SERIAL_PINS.get(route["controller"])
+        if selection["mode"] == "irq-fifo-rtscts-bytes":
+            expected = ((("PA9", "tx", 7), ("PA10", "rx", 7),
+                         ("PA11", "cts", 7), ("PA12", "rts", 7))
+                        if route["controller"] == "USART1" else None)
         actual = tuple((pin["pin"], pin["function"], pin["af"])
                        for pin in route["pins"])
         if expected is None or actual != expected:
-            common.fail("Only reviewed USART1 PA9/PA10 and USART2 PA2/PA3 AF7 are maintained")
+            common.fail("USART requires the exact controller and ordered AF7 pads for its selected mode")
         if selection["mode"] == "dma-tx" and (
                 route["controller"] != "USART1" or
                 selection.get("frame") not in (None, {

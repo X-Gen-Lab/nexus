@@ -42,7 +42,11 @@ class SelectedContractAuthorityTests(unittest.TestCase):
             ("g474-can-fd-normal", {"can_fd"},
              ".mode = NX_STM32G474_FDCAN_NORMAL"),
             ("g474-pwm-adc", {"pwm_adc"},
-             "nx_stm32g474_pwm_adc_initialize("))
+             "nx_stm32g474_pwm_adc_initialize("),
+            ("h743-uart-rtscts", {"uart"},
+             "nx_stm32h743_uart_rtscts_initialize("),
+            ("u575-uart-rtscts", {"uart"},
+             "nx_stm32u575_uart_rtscts_initialize("))
         self.assertEqual({path.stem for path in
                           (configure.ROOT / root).glob("*.toml")},
                          {choice[0] for choice in choices} | {

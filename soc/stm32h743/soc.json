@@ -405,7 +405,8 @@
         "irq-bytes",
         "dma-tx",
         "rx-dma-idle",
-        "irq-fifo-bytes"
+        "irq-fifo-bytes",
+        "irq-fifo-rtscts-bytes"
       ],
       "irq": [
         "USART3_IRQn"
@@ -416,7 +417,9 @@
       "clock_hz": 64000000,
       "pins": [
         "PD8",
-        "PD9"
+        "PD9",
+        "PD11",
+        "PD12"
       ]
     },
     "GPIOE": {

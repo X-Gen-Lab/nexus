@@ -28,7 +28,9 @@ SELECTED_CONSUMERS = (
     ("h743 fifo", "h743-uart-fifo", "uart-fifo"),
     ("u575 fifo", "u575-uart-fifo", "uart-fifo"),
     ("f407 frames", "f407zg-eth-frames", "ethernet-frames"),
-    ("gd470 frames", "gd470-eth-frames", "ethernet-frames"))
+    ("gd470 frames", "gd470-eth-frames", "ethernet-frames"),
+    ("h743 rtscts", "h743-uart-rtscts", "uart-fifo"),
+    ("u575 rtscts", "u575-uart-rtscts", "uart-fifo"))
 
 
 def clean_environment():
@@ -244,8 +246,10 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '#error Vendor SDK leaked into product source\n#endif\n'
         '#if __has_include("stm32h743_clock.h") || '
         '__has_include("stm32h743_provider.h") || '
+        '__has_include("stm32h743_uart_rtscts.h") || '
         '__has_include("stm32u575_uart_gpdma.h") || '
         '__has_include("stm32u575_provider.h") || '
+        '__has_include("stm32u575_uart_rtscts.h") || '
         '__has_include("stm32g474_fdcan.h") || '
         '__has_include("stm32g474_pwm_adc.h") || '
         '__has_include("stm32g474_adc_group.h") || '

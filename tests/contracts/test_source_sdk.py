@@ -20,9 +20,26 @@ from tools.configure.metadata import load_policy
 GIT_FIXTURE_OPTIONS = ("-c", "maintenance.auto=false", "-c", "gc.auto=0",
                        "-c", "maintenance.autoDetach=false",
                        "-c", "gc.autoDetach=false")
+OFFICIAL_F4_VERIFIED_FILES = frozenset({
+    "Inc/Legacy/stm32_hal_legacy.h", "Inc/stm32f4xx_hal_def.h",
+    "Inc/stm32f4xx_hal_eth.h", "Inc/stm32f4xx_ll_adc.h",
+    "Inc/stm32f4xx_ll_gpio.h", "Inc/stm32f4xx_ll_i2c.h",
+    "Inc/stm32f4xx_ll_iwdg.h", "Inc/stm32f4xx_ll_spi.h",
+    "Inc/stm32f4xx_ll_tim.h", "Inc/stm32f4xx_ll_usart.h", "LICENSE.md",
+})
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_official_f4_required_payload_has_the_reviewed_eleven_files(self):
+        lock_path = ROOT / "dependencies/stm32f4-hal.lock.json"
+        lock = json.loads(lock_path.read_text())
+        self.assertEqual(len(OFFICIAL_F4_VERIFIED_FILES), 11)
+        self.assertEqual(set(lock["files"]), OFFICIAL_F4_VERIFIED_FILES)
+        for name in OFFICIAL_F4_VERIFIED_FILES:
+            with self.subTest(name=name):
+                self.assertIn("vendors/st/stm32f4_hal/" + name,
+                              source_sdk.REQUIRED_FILES)
+
     def test_enhanced_ethernet_canonical_inputs_and_public_smoke_are_required(self):
         directory = "cmake/package/verification/io_evolution/"
         required = {directory + name for name in (
@@ -1532,11 +1549,27 @@ class SourceSDKTests(unittest.TestCase):
                    "--cmsis-source", str(self.sdk / "vendors/st/cmsis_device_f4")]
         before = {path.relative_to(self.sdk).as_posix()
                   for path in self.sdk.rglob("*") if path.is_file()}
+        driver = self.sdk / "vendors/st/stm32f4_hal"
+        lock = self.sdk / "dependencies/stm32f4-hal.lock.json"
+        self.assertEqual(set(json.loads(lock.read_text())["files"]),
+                         OFFICIAL_F4_VERIFIED_FILES)
+        checked_paths = [driver / name
+                         for name in sorted(OFFICIAL_F4_VERIFIED_FILES)]
+        checked_paths.extend((lock, self.sdk / source_sdk.MANIFEST))
+
+        def payload_identity():
+            return {path.relative_to(self.sdk).as_posix(): (
+                source_sdk.digest(path.read_bytes()), path.stat().st_mode,
+                path.stat().st_uid, path.stat().st_gid, path.stat().st_mtime_ns)
+                    for path in checked_paths}
+
+        before_payload = payload_identity()
         result = self.run_process(command)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual(json.loads(result.stdout)["verified_files"], 8)
+        self.assertEqual(json.loads(result.stdout)["verified_files"], 11)
         self.assertEqual(json.loads(result.stdout)["source_kind"],
                          "installed_source_sdk")
+        self.assertEqual(payload_identity(), before_payload)
         self.assertEqual({path.relative_to(self.sdk).as_posix()
                           for path in self.sdk.rglob("*") if path.is_file()}, before)
         file = self.sdk / "core/src/time.c"

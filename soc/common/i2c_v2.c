@@ -210,6 +210,14 @@ static nx_result_t transaction_bounded(void* context,
     } else {
         NX_I2C_V2_WRITE(&p->registers->icr, STOPF);
         NX_I2C_V2_WRITE(&p->registers->cr2, 0U);
+        nx_arch_dsb();
+        /* The bus is already drained, so caller buffers may return. Reuse
+         * still requires independent STOPCF and control-clear proof. */
+        if ((NX_I2C_V2_READ(&p->registers->isr) & (STOPF | BUSY)) != 0U ||
+            NX_I2C_V2_READ(&p->registers->cr2) != 0U) {
+            p->fault = true;
+            result = NX_ERROR_IO;
+        }
     }
     p->active = false;
     return result;

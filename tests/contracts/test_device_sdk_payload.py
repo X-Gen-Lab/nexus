@@ -18,6 +18,41 @@ from tools.configure.providers import descriptor
 
 
 class DeviceSDKPayloadTests(unittest.TestCase):
+    def test_rtscts_canonical_inputs_and_boards_are_owned_sdk_requirements(self):
+        for family, stem in (("stm32h743", "h743"),
+                             ("stm32u575", "u575")):
+            board = f"boards/{family}zi_rtscts_reference/board.json"
+            assembly = ("cmake/package/verification/io_evolution/" +
+                        stem + "-uart-rtscts.toml")
+            with self.subTest(family=family):
+                self.assertIn(board, descriptor.maintained(family).owned_payload)
+                for name in (assembly, board):
+                    self.assertTrue((ROOT / name).is_file())
+                    self.assertIn(name, sdk.REQUIRED_FILES)
+                    self.assertTrue(sdk.selected(name))
+                self.assertIn((stem + " rtscts", stem + "-uart-rtscts",
+                               "uart-fifo"), consumers.SELECTED_CONSUMERS)
+        self.assertEqual(len(consumers.SELECTED_CONSUMERS), 15)
+
+    def test_selected_adc_and_rtscts_sources_are_owned_sdk_requirements(self):
+        additions = {
+            "stm32g474": ("drivers/adc_group.c",
+                          "private/stm32g474_adc_group.h"),
+            "stm32h743": ("drivers/uart_rtscts.c",
+                          "private/stm32h743_uart_rtscts.h"),
+            "stm32u575": ("drivers/uart_rtscts.c",
+                          "private/stm32u575_uart_rtscts.h"),
+        }
+        for family, relative in additions.items():
+            payload = set(descriptor.maintained(family).owned_payload)
+            for name in relative:
+                source = f"soc/{family}/{name}"
+                with self.subTest(source=source):
+                    self.assertTrue((ROOT / source).is_file())
+                    self.assertIn(source, payload)
+                    self.assertIn(source, sdk.REQUIRED_FILES)
+                    self.assertTrue(sdk.selected(source))
+
     def test_expanded_soc_ownership_is_complete_and_required_by_sdk(self):
         required = set(sdk.REQUIRED_FILES)
         for family in ("stm32f103", "gd32f303", "stm32g474",
@@ -50,6 +85,16 @@ class DeviceSDKPayloadTests(unittest.TestCase):
             "soc/stm32h743/drivers/adc.c", "soc/stm32h743/drivers/flash.c",
             "soc/stm32u575/secure_batch.c",
             "soc/stm32u575/private/stm32u575_secure_batch.h",
+            "soc/stm32g474/drivers/adc_group.c",
+            "soc/stm32g474/private/stm32g474_adc_group.h",
+            "soc/stm32h743/drivers/uart_rtscts.c",
+            "soc/stm32h743/private/stm32h743_uart_rtscts.h",
+            "soc/stm32u575/drivers/uart_rtscts.c",
+            "soc/stm32u575/private/stm32u575_uart_rtscts.h",
+            "boards/stm32h743zi_rtscts_reference/board.json",
+            "boards/stm32u575zi_rtscts_reference/board.json",
+            "cmake/package/verification/io_evolution/h743-uart-rtscts.toml",
+            "cmake/package/verification/io_evolution/u575-uart-rtscts.toml",
         }
         names.update(
             "vendors/gigadevice/gd32f30x/Firmware/"

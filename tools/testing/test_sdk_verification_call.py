@@ -112,7 +112,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                      "g474-adc-group-injected-software",
                      "g474-adc-group-injected-timer", "h743-uart-fifo",
                      "u575-uart-fifo", "f407zg-eth-frames",
-                     "gd470-eth-frames"):
+                     "gd470-eth-frames", "h743-uart-rtscts",
+                     "u575-uart-rtscts"):
             file = verification / (name + ".toml")
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text("# canonical installed test input: " + name)
@@ -197,6 +198,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
             if (" frames " in Path(command[2]).name and
                     self.selected_fault == "frames_build"):
                 code = 46
+            for family in ("h743", "u575"):
+                if (Path(command[2]).name == "selected " + family + " rtscts build"
+                        and self.selected_fault == family + "_rtscts_build"):
+                    code = 47
         elif any(argument.endswith("retention.py") for argument in command):
             failed = ("selected " in command[command.index("--elf") + 1]
                       and self.selected_fault == "retention")
@@ -209,6 +214,11 @@ class SDKConsumerParallelTests(unittest.TestCase):
             failed = failed or (
                 " frames " in command[command.index("--elf") + 1]
                 and self.selected_fault == "frames_retention")
+            for family in ("h743", "u575"):
+                failed = failed or (
+                    Path(command[command.index("--elf") + 1]).parents[1].name ==
+                    "selected " + family + " rtscts build" and
+                    self.selected_fault == family + "_rtscts_retention")
             report = {"status": "failed" if failed else "passed"}
             if "selected " in command[command.index("--elf") + 1]:
                 import hashlib
@@ -247,21 +257,22 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 "selected g474 adc injected software",
                 "selected g474 adc injected timer", "selected h743 fifo",
                 "selected u575 fifo", "selected f407 frames",
-                "selected gd470 frames"}
+                "selected gd470 frames", "selected h743 rtscts",
+                "selected u575 rtscts"}
         self.assertEqual({Path(command[2]).name.removesuffix(" build")
                           for command in builds}, expected)
-        self.assertEqual(len(builds), 26)
+        self.assertEqual(len(builds), 28)
         self.assertEqual(sum(len(command) - command.index("--target") - 1
-                             for command in builds), 29)
+                             for command in builds), 31)
         configurations = [command for command in self.commands
                           if command[0] == "cmake" and "-S" in command]
-        self.assertEqual(len(configurations), 26)
+        self.assertEqual(len(configurations), 28)
         for command in configurations:
             self.assertIn("-DNEXUS_EXPECTED_SOURCE_REVISION=" + "a" * 40,
                           command)
         retention = [command for command in self.commands
                      if any(arg.endswith("retention.py") for arg in command)]
-        self.assertEqual(len(retention), 23)
+        self.assertEqual(len(retention), 25)
         native = [command for command in self.commands if len(command) == 1]
         self.assertEqual({Path(command[0]).name for command in native},
                          {"installed_c", "installed_cpp"})
@@ -276,23 +287,23 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(report["physical_status"], "not_executed")
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["1"] * 26)
+                          for command in self.builds()], ["1"] * 28)
 
-    def test_default_retains_three_four_job_and_twenty_three_two_job_builds(self):
+    def test_default_retains_three_four_job_and_twenty_five_two_job_builds(self):
         status, report = self.execute()
         self.assertEqual(status, 0)
         self.assertEqual(report["source_revision"], "a" * 40)
         self.assertEqual(report["source_tree"], "b" * 40)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["4"] * 3 + ["2"] * 23)
+                          for command in self.builds()], ["4"] * 3 + ["2"] * 25)
 
     def test_positive_budget_is_applied_to_every_modern_and_legacy_build(self):
         status, _ = self.execute(("--parallel", "3"))
         self.assertEqual(status, 0)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["3"] * 26)
+                          for command in self.builds()], ["3"] * 28)
 
     def test_selected_inputs_and_public_smokes_come_only_from_installed_sdk(self):
         status, report = self.execute(("--parallel", "1"))
@@ -301,7 +312,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                           if command[0] == "cmake" and "-S" in command
                           and Path(command[command.index("-S") + 1]).name.startswith(
                               "selected ")]
-        self.assertEqual(len(configurations), 13)
+        self.assertEqual(len(configurations), 15)
         inputs = set()
         for command in configurations:
             assembly = Path(next(argument.split("=", 1)[1] for argument in command
@@ -329,8 +340,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
             "g474-adc-group-injected-software.toml",
             "g474-adc-group-injected-timer.toml", "h743-uart-fifo.toml",
             "u575-uart-fifo.toml", "f407zg-eth-frames.toml",
-            "gd470-eth-frames.toml"})
-        self.assertEqual(len(report["selected_images"]), 13)
+            "gd470-eth-frames.toml", "h743-uart-rtscts.toml",
+            "u575-uart-rtscts.toml"})
+        self.assertEqual(len(report["selected_images"]), 15)
         for image in report["selected_images"]:
             self.assertEqual(set(image["artifacts"]), {"elf", "bin", "map"})
 
@@ -398,7 +410,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "consumers/g474-adc-group.c", "h743-uart-fifo.toml",
                          "u575-uart-fifo.toml", "consumers/uart-fifo.c",
                          "f407zg-eth-frames.toml", "gd470-eth-frames.toml",
-                         "consumers/ethernet-frames.c"):
+                         "consumers/ethernet-frames.c", "h743-uart-rtscts.toml",
+                         "u575-uart-rtscts.toml"):
             with self.subTest(relative=relative):
                 file = directory / relative
                 original = file.read_bytes()
@@ -425,6 +438,49 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     self.assertEqual(report["commands"][-1]["exit_code"], 46)
                 else:
                     self.assertIn("retention", report["error"])
+
+    def test_rtscts_reuses_the_same_public_byte_smoke_in_both_roots(self):
+        status, report = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 0)
+        expected = (self.sdk / "cmake/package/verification/io_evolution/"
+                    "consumers/uart-fifo.c").read_bytes()
+        for family in ("h743", "u575"):
+            source = self.output / ("selected " + family + " rtscts source")
+            self.assertTrue((source / "main.c").is_file())
+            self.assertEqual((source / "main.c").read_bytes(), expected)
+            self.assertEqual(sum(image["name"] == family + " rtscts"
+                                 for image in report["selected_images"]), 1)
+
+    def test_rtscts_product_probe_rejects_both_real_private_provider_headers(self):
+        directory = self.directory / "private isolation inputs"
+        directory.mkdir()
+        source, _, _ = self.consumer.prepare_selected_consumer(
+            self.prefix, directory, "h743 rtscts", "h743-uart-rtscts",
+            "uart-fifo", lambda command: None, expected_revision="a" * 40)
+        probe = (source / "private_headers.c").read_text()
+        for family in ("stm32h743", "stm32u575"):
+            self.assertIn('__has_include("' + family + '_uart_rtscts.h")',
+                          probe)
+
+    def test_each_rtscts_failure_is_terminal_after_the_preserved_matrix(self):
+        for family, builds in (("h743", 27), ("u575", 28)):
+            for operation in ("build", "retention"):
+                with self.subTest(family=family, operation=operation):
+                    self.selected_fault = family + "_rtscts_" + operation
+                    before = len(self.builds())
+                    with contextlib.redirect_stderr(io.StringIO()):
+                        status, report = self.execute(("--parallel", "1"))
+                    self.assertEqual(status, 1)
+                    self.assertEqual(report["status"], "failed")
+                    self.assertEqual(len(self.builds()) - before, builds)
+                    self.assertEqual(Path(self.builds()[-1][2]).name,
+                                     "selected " + family + " rtscts build")
+                    self.assertFalse(any(image["name"] == family + " rtscts"
+                                         for image in report["selected_images"]))
+                    if operation == "build":
+                        self.assertEqual(report["commands"][-1]["exit_code"], 47)
+                    else:
+                        self.assertIn("retention", report["error"])
 
     def test_invalid_budget_rejects_before_any_output_or_external_command(self):
         for value in ("0", "-1", "01", "+1", "1.5", "True", "", " 1"):

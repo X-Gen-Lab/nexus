@@ -188,10 +188,14 @@ nx_result_t nx_uart_port_read_events(const nx_uart_port_t* port,
  *
  * \param[in]       capacity: Destination capacity in bytes.
  *
- * \param[out]      count: Bytes copied; valid even when OVERFLOW is returned.
+ * \param[out]      count: Bytes copied; valid on OVERFLOW and on a provider IO
+ *                  failure after copying bytes and attempting RX rearm.
  *
  * \return          NX_SUCCESS, EMPTY, OVERFLOW or INVALID/UNSUPPORTED. Byte
  *                  profile reports aggregate loss without invented timestamps.
+ *                  A provider can return IO if RX source rearm fails after
+ *                  copying; count and copied bytes remain valid. Admission
+ *                  closes and retained hardware requires verified stop.
  */
 nx_result_t nx_uart_port_read_bytes(const nx_uart_port_t* port, uint8_t* bytes,
                                     size_t capacity, size_t* count);

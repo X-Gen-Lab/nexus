@@ -450,7 +450,8 @@
       "modes": [
         "irq-bytes",
         "dma-tx",
-        "irq-fifo-bytes"
+        "irq-fifo-bytes",
+        "irq-fifo-rtscts-bytes"
       ],
       "irq": [
         "USART1_IRQn"
@@ -461,7 +462,9 @@
       "clock_hz": 4000000,
       "pins": [
         "PA9",
-        "PA10"
+        "PA10",
+        "PA11",
+        "PA12"
       ]
     },
     "GPIOA": {

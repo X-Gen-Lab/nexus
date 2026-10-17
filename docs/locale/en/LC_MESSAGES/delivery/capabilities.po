@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: dc87f1bd676fae8b4ada153abd88184a0cc4dffb2dcf1fd5d49a3b25b9f30de6\n"
+"X-Nexus-Source-SHA256: 8d109cf977e05c40b0b67582925fcf458bd9bc7a2666650fa1a09b17dcc7a187\n"
 
 msgid "派生能力与接入矩阵"
 msgstr "Derived capabilities and integration matrix"
@@ -2058,3 +2058,30 @@ msgstr "`cmake/package/verification/io_evolution/u575-uart-fifo.toml`"
 
 msgid "`soc/stm32u575/drivers/uart_fifo.c`"
 msgstr "`soc/stm32u575/drivers/uart_fifo.c`"
+
+msgid "irq-fifo-rtscts-bytes"
+msgstr "irq-fifo-rtscts-bytes"
+
+msgid "`usart3-pd8-pd9-pd11-pd12-rtscts`"
+msgstr "`usart3-pd8-pd9-pd11-pd12-rtscts`"
+
+msgid "`stm32h743zi-rtscts-reference`"
+msgstr "`stm32h743zi-rtscts-reference`"
+
+msgid "`cmake/package/verification/io_evolution/h743-uart-rtscts.toml`"
+msgstr "`cmake/package/verification/io_evolution/h743-uart-rtscts.toml`"
+
+msgid "`soc/stm32h743/drivers/uart_rtscts.c`"
+msgstr "`soc/stm32h743/drivers/uart_rtscts.c`"
+
+msgid "`usart1-pa9-pa10-pa11-pa12-rtscts`"
+msgstr "`usart1-pa9-pa10-pa11-pa12-rtscts`"
+
+msgid "`stm32u575zi-rtscts-reference`"
+msgstr "`stm32u575zi-rtscts-reference`"
+
+msgid "`cmake/package/verification/io_evolution/u575-uart-rtscts.toml`"
+msgstr "`cmake/package/verification/io_evolution/u575-uart-rtscts.toml`"
+
+msgid "`soc/stm32u575/drivers/uart_rtscts.c`"
+msgstr "`soc/stm32u575/drivers/uart_rtscts.c`"

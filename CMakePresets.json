@@ -1221,12 +1221,40 @@
             }
         },
         {
+            "name": "fixture-io-evolution-h743-uart-rtscts",
+            "inherits": "stm32-nucleo-h743-baremetal-empty",
+            "displayName": "h743-uart-rtscts software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-h743-uart-rtscts",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/h743-uart-rtscts.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": ""
+            }
+        },
+        {
             "name": "fixture-io-evolution-u575-uart-fifo",
             "inherits": "stm32-nucleo-u575-baremetal-empty",
             "displayName": "u575-uart-fifo software fixture; PCB/HIL unqualified",
             "binaryDir": "${sourceDir}/build/fixture-io-evolution-u575-uart-fifo",
             "cacheVariables": {
                 "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/u575-uart-fifo.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": ""
+            }
+        },
+        {
+            "name": "fixture-io-evolution-u575-uart-rtscts",
+            "inherits": "stm32-nucleo-u575-baremetal-empty",
+            "displayName": "u575-uart-rtscts software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-u575-uart-rtscts",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/u575-uart-rtscts.toml",
                 "NEXUS_BUILD_TESTS": "OFF",
                 "NEXUS_BUILD_WORKLOAD": "OFF",
                 "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
@@ -1783,8 +1811,22 @@
             ]
         },
         {
+            "name": "fixture-io-evolution-h743-uart-rtscts",
+            "configurePreset": "fixture-io-evolution-h743-uart-rtscts",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
             "name": "fixture-io-evolution-u575-uart-fifo",
             "configurePreset": "fixture-io-evolution-u575-uart-fifo",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-u575-uart-rtscts",
+            "configurePreset": "fixture-io-evolution-u575-uart-rtscts",
             "targets": [
                 "io_evolution_fixture"
             ]

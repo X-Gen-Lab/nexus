@@ -115,6 +115,7 @@ _MODE_TRAITS = MappingProxyType({
     ("uart", "irq-words"): ModeTraits(irq=True),
     ("uart", "irq-bytes"): ModeTraits(irq=True),
     ("uart", "irq-fifo-bytes"): ModeTraits(irq=True),
+    ("uart", "irq-fifo-rtscts-bytes"): ModeTraits(irq=True),
     ("uart", "irq-blocks"): ModeTraits(irq=True, block_stream=True),
     ("uart", "dma-tx"): ModeTraits(irq=True, tx_dma=True),
     ("uart", "rx-dma-idle"): ModeTraits(

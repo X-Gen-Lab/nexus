@@ -24,6 +24,9 @@ def includes(result):
     if any(item.kind == "uart" and item.mode == "irq-fifo-bytes"
            for item in result.controllers):
         selected.append('#include "stm32u575_uart_fifo.h"')
+    if any(item.kind == "uart" and item.mode == "irq-fifo-rtscts-bytes"
+           for item in result.controllers):
+        selected.append('#include "stm32u575_uart_rtscts.h"')
     return ['#include "stm32u575_provider.h"', *selected, 'void _init(void);',
             'void _fini(void);',
             r'/** \brief C runtime hooks; constructors use .init_array. */',

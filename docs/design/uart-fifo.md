@@ -14,6 +14,8 @@ FIFO buffering with an explicit bound on each interrupt's byte work. The
 provider uses the existing public UART face, caller-owned TX requests and a
 static RX byte ring. It creates no task, worker, allocation or second owner.
 Threshold batching does not establish physical latency or loss-free throughput.
+The independently selected `irq-fifo-rtscts-bytes` mode adds hardware RTS and
+CTS on an explicit four-pad software-reference route, as described below.
 
 ## Select the exact controller and clock
 
@@ -40,8 +42,8 @@ The extra RDR stage matters: FIFO depth is not the complete RX backlog. The TX
 shifter is also separate. This selection does not change FIFO-disabled ordinary
 UART or DMA modes. F407/F470 and other UART IPs do not inherit FIFO support from
 the public API. H743 high-clock profiles, U575 Secure execution, DMA, block/word
-RX, non-8N1 frames, flow control and low-power/autonomous operation are outside
-this selection.
+RX, non-8N1 frames and low-power/autonomous operation remain outside both FIFO
+selections. Ordinary `irq-fifo-bytes` remains flow-none.
 
 These full inputs use the existing Board routes. The FIFO subsection belongs
 to the same authored assembly and typed IR as all other resources.
@@ -53,6 +55,75 @@ to the same authored assembly and typed IR as all other resources.
 ```{literalinclude} ../../cmake/package/verification/io_evolution/u575-uart-fifo.toml
 :language: toml
 ```
+
+## Select hardware RTS and CTS explicitly
+
+`irq-fifo-rtscts-bytes` retains the same public byte face and selected FIFO
+state layout. Its distinct readonly operations table selects a compile-time
+specialization of the same algorithm. No extra mutable flow flag, per-instance
+clock field, queue, task or worker is added to either FIFO or ordinary UART.
+
+| Selection | H743 software reference | U575 software reference |
+| --- | --- | --- |
+| Exact chip, controller and clock | STM32H743ZIT6, USART3, `hsi64-fixed-cache-off` | STM32U575ZIT6Q, TZEN0, USART1, `msis4` |
+| TX / RX / CTS / RTS, all AF7 | PD8 / PD9 / PD11 / PD12 | PA9 / PA10 / PA11 / PA12 |
+| Software-reference package | `stm32h743zi_rtscts_reference` | `stm32u575zi_rtscts_reference` |
+| First normal selection | Baremetal, priority 5, 115200 baud, 8N1, 64-byte RX ring | Baremetal, priority 5, 115200 baud, 8N1, 64-byte RX ring |
+
+The new mode derives fixed 8N1 with `flow = "rts-cts"`. An omitted frame
+subsection uses that value; an explicit frame must provide all four fields and
+match it exactly. RTS-only, CTS-only, modem notifications, polarity inversion,
+runtime format changes, RS485-DE sharing and FIFO/DMA combinations are not
+selected by it. The existing four FIFO threshold/budget fields remain explicit.
+
+These packages declare silicon package pads and AF numbers. They do not
+establish a Nucleo connector, virtual COM wiring, product PCB or peer electrical
+compatibility. All four pads are exclusive resources; a Board reservation for
+USB, DE or GPIO on either flow pad conflicts with the UART selection. A two-pad
+Board binding cannot silently become a four-pad route.
+
+```{literalinclude} ../../cmake/package/verification/io_evolution/h743-uart-rtscts.toml
+:language: toml
+```
+
+```{literalinclude} ../../cmake/package/verification/io_evolution/u575-uart-rtscts.toml
+:language: toml
+```
+
+Hardware CTS restricts the start of the next serial frame. It does not forbid
+CPU writes into available TDR/FIFO space, and a frame already shifting can
+finish after CTS rises. The ISR CTS flag is the inverse of the physical pin
+level; CTSIE remains disabled. The provider never bypasses CTS to complete a
+cancel or stop. Persistent external blocking can outlast the free-running drain
+allowance: the request becomes `QUARANTINED` and remains borrowed. Only actual
+wire completion and verified withdrawal permit settlement, including after a
+later physical CTS release. Peer recovery policy remains external.
+
+Hardware RTS responds to the hardware receive staging, not a software ring
+watermark. When the software ring becomes full, this specialization stops RDR
+reads and withdraws RX threshold, not-empty, full, IDLE and error sources with
+readback. It keeps the held head and its error flags, UE, RE and RTSE intact.
+The hardware FIFO/RDR can then accumulate data and apply real RTS backpressure.
+A peer that ignores RTS or sends too much after its change can still cause
+overrun; no unconditional loss-free guarantee follows from this design.
+
+A public byte read creates ring space and rearms the selected RX sources with
+readback. If a subthreshold head is held, a not-empty level source permits
+progress without another arrival or IDLE edge. A rearm failure returns
+`NX_ERROR_IO` with the actual copied count and bytes still valid; admission
+closes and the owner retains cleanup responsibility. A closing read never
+reopens the sources. A previously pending vector can produce a bounded extra
+entry after source withdrawal; it cannot consume a held head while paused.
+
+Generated cold assembly snapshots all four pins and the selected clock gates
+before preparing them. TX and RTS GPIO latches are set high before AF mode;
+CTS and RX receive pull-ups. Output type, speed, pull, AF7 and mode fields are
+read back. CTSE/RTSE are programmed only while UE is observed zero and are
+proved before the first enable. Whole stop retains flow while TX is borrowed;
+only after source/vector/publisher joins, UE zero and both ACKs clear may it
+clear flow/FIFO fields and restore the original four-pad snapshots and gates.
+Missing proof retains ownership. GPIO reset levels, inactive AF behavior and
+the physical startup/stop handoff still need actual board validation.
 
 ## Separate thresholds from IRQ budgets
 
@@ -80,8 +151,10 @@ recovery responsibility.
 
 PE, FE and NE describe the current RDR head. Captured flags are acknowledged
 before that head is popped; its bad byte is discarded and the next status is
-read afresh. Overrun and a full software ring record aggregate loss while
-preserving older queued good bytes. `read_bytes` may return copied bytes with
+read afresh. With flow-none, overrun and a full software ring record aggregate
+loss while preserving older queued good bytes; the RTSCTS specialization holds
+a pending head when the ring is full, as described above. `read_bytes` may return
+copied bytes with
 `NX_ERROR_OVERFLOW`; this indication is not an exact missing-character count.
 An empty read returns `NX_ERROR_EMPTY` when no loss is pending.
 
@@ -183,6 +256,14 @@ functions and separate FIFO, RDR and shifter state. Both canonical configuration
 also passed normal ARM configure/build, resource budgets and retention checks
 for one face, one operations table and seven method slots per image.
 
+The separate RTSCTS development validation passed 76 real-provider cases,
+38 per family, and 22 normal-TOML/generated-factory cases, 11 per family, with
+no failures or skips. Both exact four-pad normal configurations also passed
+ARM configure/build. These results establish software behavior and linking for
+the stated reference selections, not peer response, physical handoff, timing
+or a clean reproducible candidate. The existing flow-none arithmetic comparison
+below is not a measured cost comparison for the new RTSCTS selection.
+
 For these two exact `Os` FIFO fixtures, narrowing only bounded intermediate
 arithmetic removed the linked software division helpers. H743 BIN/loaded Flash
 changed from 9216 to 8372 bytes, saving 844 bytes; U575 changed from 8948
@@ -203,5 +284,7 @@ See the [public UART contract](../../io/include/nexus/io/uart.h),
 [shared private algorithm](../../io/private/uart_fifo_impl.h),
 [H743 specialization](../../soc/stm32h743/drivers/uart_fifo.c),
 [U575 specialization](../../soc/stm32u575/drivers/uart_fifo.c),
+[H743 RTSCTS specialization](../../soc/stm32h743/drivers/uart_rtscts.c),
+[U575 RTSCTS specialization](../../soc/stm32u575/drivers/uart_rtscts.c),
 [finite U575 DMA selection](u575-uart-gpdma.md) and
 [current qualification boundaries](../delivery/qualification.md).

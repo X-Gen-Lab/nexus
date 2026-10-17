@@ -48,25 +48,50 @@ static bool task(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
 }
+/** \brief Overflow is never evidence that two control spans are disjoint. */
+static bool overlap(const void* a, size_t as, const void* b, size_t bs) {
+    const uintptr_t first = (uintptr_t)a;
+    const uintptr_t second = (uintptr_t)b;
+    return as > UINTPTR_MAX - first || bs > UINTPTR_MAX - second ||
+           (first < second + bs && second < first + as);
+}
+/** \brief Stopped System state and its MMIO remain owned control storage. */
+static bool system_overlap(const void* value, size_t bytes) {
+    const nx_stm32h743_system_t* s = &g_nx_stm32h743_system;
+    return overlap(value, bytes, s, sizeof(*s)) ||
+           (s->rcc != NULL && overlap(value, bytes, s->rcc, sizeof(*s->rcc))) ||
+           (s->flash != NULL &&
+            overlap(value, bytes, s->flash, sizeof(*s->flash))) ||
+           (s->power != NULL &&
+            overlap(value, bytes, s->power, sizeof(*s->power))) ||
+           (s->timer != NULL &&
+            overlap(value, bytes, s->timer, sizeof(*s->timer))) ||
+           (s->core != NULL &&
+            overlap(value, bytes, s->core, sizeof(*s->core)));
+}
 static bool valid(const nx_stm32h743_flash_state_t* p) {
-    return p != NULL && p->registers != NULL && p->memory != NULL &&
+    return p != NULL && (uintptr_t)p <= UINTPTR_MAX - sizeof(*p) &&
+           !system_overlap(p, sizeof(*p)) && p->registers != NULL &&
+           (uintptr_t)p->registers <= UINTPTR_MAX - sizeof(*p->registers) &&
+           p->memory != NULL &&
            (uintptr_t)p->memory <= UINTPTR_MAX - NX_H743_FLASH_BYTES &&
            (uintptr_t)p->memory % _Alignof(uint32_t) == 0U &&
-           p->poll_limit != 0U;
+           p->poll_limit != 0U &&
+           !overlap(p, sizeof(*p), p->registers, sizeof(*p->registers)) &&
+           !overlap(p, sizeof(*p), (const void*)p->memory, NX_H743_FLASH_BYTES);
 }
 static bool range(uint32_t offset, size_t length) {
     return offset <= NX_H743_FLASH_BYTES &&
            length <= NX_H743_FLASH_BYTES - offset;
-}
-static bool overlap(const void* a, size_t as, const void* b, size_t bs) {
-    return (uintptr_t)a < (uintptr_t)b + bs && (uintptr_t)b < (uintptr_t)a + as;
 }
 static bool external(const nx_stm32h743_flash_state_t* p, const void* value,
                      size_t bytes) {
     return value != NULL && (uintptr_t)value <= UINTPTR_MAX - bytes &&
            !overlap(value, bytes, p, sizeof(*p)) &&
            !overlap(value, bytes, p->registers, sizeof(*p->registers)) &&
-           !overlap(value, bytes, (const void*)p->memory, NX_H743_FLASH_BYTES);
+           !overlap(value, bytes, (const void*)p->memory,
+                    NX_H743_FLASH_BYTES) &&
+           !system_overlap(value, bytes);
 }
 static bool idle(const nx_stm32h743_flash_state_t* p) {
     return !p->active && ((NX_H743_READ(&p->registers->SR1) |

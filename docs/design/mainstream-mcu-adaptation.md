@@ -128,6 +128,12 @@ and CONSUME releases only a terminal job. Tickets never wrap; no NS address
 survives a call. This provides neither a user-buffer loan nor general asynchronous
 or cross-security transport support.
 
+F103 standalone admission checks the CPU-readable factory Flash density,
+not a debug-only device-group or revision value. ES096 Rev15 section2.2.2
+reports zero from normal-software DBGMCU reads; group and revision therefore
+remain unobserved. The configured STM32F103RBT6 declaration and package still
+require separate integration evidence. See the [F103 source boundary](../../soc/stm32f103/README.md).
+
 F103 uses USART2 PA2/PA3 and PA0/PA1 EXTI events. F103 SPI1 and GD303 SPI0 use
 default PA5/PA6/PA7 with explicit PA4 active-low CS, nominal 31.25 kHz..4 MHz,
 eight-bit words, modes 0..3 and at most 256 bytes per finite call. Their SPI

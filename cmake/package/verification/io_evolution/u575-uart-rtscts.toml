@@ -1,0 +1,32 @@
+# Selected FIFO software reference; no measured timing or HIL qualification.
+schema = 2
+board_package = "../../../../boards/stm32u575zi_rtscts_reference"
+backend = "baremetal"
+clock = "msis4"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+
+[uart.console]
+binding = "uart-flow"
+mode = "irq-fifo-rtscts-bytes"
+baud = 115200
+
+[uart.console.rx]
+format = "bytes"
+capacity = 64
+
+[uart.console.irq]
+priority = 5
+calls_os = false
+
+[uart.console.fifo]
+rx_threshold = "half"
+tx_threshold = "half"
+rx_budget_bytes = 2
+tx_budget_bytes = 3

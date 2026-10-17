@@ -21,6 +21,9 @@ def includes(result):
     if any(item.kind == "uart" and item.mode == "irq-fifo-bytes"
            for item in result.controllers):
         source.append('#include "stm32h743_uart_fifo.h"')
+    if any(item.kind == "uart" and item.mode == "irq-fifo-rtscts-bytes"
+           for item in result.controllers):
+        source.append('#include "stm32h743_uart_rtscts.h"')
     if _dma(result):
         source.append('#include "stm32h743_dma.h"')
     if any(item.kind == "uart" and item.mode == "rx-dma-idle"

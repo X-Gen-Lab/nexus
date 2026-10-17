@@ -9,11 +9,12 @@ from ..common import Construction, controller_ir, fail, kernel_policy_constant
 
 def constructor(item, result, board_bindings, routes, devices):
     """Construct only the exact GPIOB/byte USART3 implementation."""
-    from . import validate_selection
+    from . import mode_implementation, validate_selection
     item = controller_ir(item, "stm32h743")
     if item.provider != "stm32h743":
         fail("H743 constructor cannot reinterpret a foreign provider decision")
     validate_selection(item, item)
+    implementation = mode_implementation(item.kind, item.mode)
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
@@ -30,7 +31,8 @@ def constructor(item, result, board_bindings, routes, devices):
         options = item.options
         receive = item.mode == "rx-dma-idle"
         dma = item.mode in ("dma-tx", "rx-dma-idle")
-        fifo = item.mode == "irq-fifo-bytes"
+        fifo = item.mode in uart_formats.FIFO_MODES
+        flow = item.mode == uart_formats.RTSCTS_MODE
         owner = state
         if dma or fifo:
             state += ".uart"
@@ -70,12 +72,13 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.irq = USART3_IRQn;",
                         f"    {state}.profile = {'NX_UART_RX_BLOCKS' if receive else 'NX_UART_RX_BYTES'};",
                         f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
-                        "    nx_result_t status = nx_stm32h743_usart3_pins_prepare();",
+                        "    nx_result_t status = nx_stm32h743_usart3"
+                        + ("_rtscts" if flow else "") + "_pins_prepare();",
                         "    if (status != NX_SUCCESS) { return status; }",
                         ]
         if fifo:
             definitions += [f"    {owner}.fifo = &s_nx_fifo_profile_{name};",
-                            "    return nx_stm32h743_uart_fifo_initialize("
+                            f"    return nx_stm32h743_{implementation}_initialize("
                             f"&{owner}, {clock}u, 1000000u);"]
         elif dma:
             lane = 1 if receive else 0
@@ -90,7 +93,7 @@ def constructor(item, result, board_bindings, routes, devices):
         else:
             definitions += [f"    return nx_stm32h743_uart_initialize(&{state}, {clock}u, 1000000u);"]
         handler = ("uart_receive_uart" if receive else
-                   "uart_dma_uart" if dma else "uart_fifo" if fifo else "uart")
+                   "uart_dma_uart" if dma else implementation if fifo else "uart")
         brief = ("Selected bounded FIFO RX/TX budgets." if fifo else
                  "One selected controller, at most one TX/RX byte.")
         definitions += ["}", "void USART3_IRQHandler(void);",
@@ -276,8 +279,6 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"nx_exti_port_stop(&s_nx_face_{name})"
     else:
         raise ValueError("Unmaintained H743 constructor")
-    from . import mode_implementation
-    implementation = mode_implementation(item.kind, item.mode)
     return Construction(
         state_type=f"nx_stm32h743_{implementation}_state_t",
         definitions=definitions, initialize=f"prepare_{name}()",

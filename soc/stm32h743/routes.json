@@ -229,6 +229,40 @@
         "poll-word"
       ],
       "source": "DS12110 Rev11 exact PA3 ADC1_INP15 and PB8/PB9 AF4; RM0433 Rev9 ADC/I2C and2MiB dual-bank Flash. Source-reviewed software-only fixture; VDDA, supply voltage, I2C pull-ups/rise/fall and external wiring physically unqualified."
+    },
+    {
+      "id": "usart3-pd8-pd9-pd11-pd12-rtscts",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "USART3",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PD8",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PD9",
+          "function": "rx",
+          "af": 7
+        },
+        {
+          "pin": "PD11",
+          "function": "cts",
+          "af": 7
+        },
+        {
+          "pin": "PD12",
+          "function": "rts",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-fifo-rtscts-bytes"
+      ],
+      "source": "DS12110 Rev11 Table10 exact STM32H743ZIT6 LQFP144 PD8/PD9/PD11/PD12 AF7; software silicon reference only, no PCB or peer qualification."
     }
   ]
 }

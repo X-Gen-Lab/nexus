@@ -42,6 +42,7 @@ _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart", ("uart", "dma-tx"): "uart_dma",
     ("uart", "irq-fifo-bytes"): "uart_fifo",
+    ("uart", "irq-fifo-rtscts-bytes"): "uart_rtscts",
     ("uart", "rx-dma-idle"): "uart_receive",
     ("spi", "short-poll"): "spi", ("pwm", "fixed-pwm"): "pwm",
     ("exti", "edge-event"): "exti",
@@ -70,10 +71,12 @@ def validate_selection(selection, route):
     mode_implementation(kind, selection["mode"])
     if kind == "uart":
         expected = (("PD8", "tx", 7), ("PD9", "rx", 7))
+        if selection["mode"] == "irq-fifo-rtscts-bytes":
+            expected += (("PD11", "cts", 7), ("PD12", "rts", 7))
         actual = tuple((pin["pin"], pin["function"], pin["af"])
                        for pin in route["pins"])
         if route["controller"] != "USART3" or actual != expected:
-            common.fail("Only reviewed USART3 PD8/PD9 AF7 is maintained")
+            common.fail("USART3 requires the exact ordered AF7 pads for its selected mode")
         baud = common.integer(selection["baud"], *LIMITS["uart_baud"],
                               "USART baud")
         divisor = (64000000 + baud // 2) // baud

@@ -1,12 +1,12 @@
-# Authored translation; independent semantic review completed.
+# Reviewed Chinese translation of the current UART FIFO contract.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: d55fcbfe08e9780dbe2450ae0d2c8ecfcddaa1415dd1caaa32e93a000614ad90\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 8b5d9fb947703f6f26ae9c45b9d094763c07394352ea8926002c021cdf19d9e9\n"
 
 msgid "Bounded UART hardware FIFO bytes"
 msgstr "有界的 UART 硬件 FIFO 字节收发"
 
-msgid "Select `irq-fifo-bytes` when an exact H743 or U575 assembly needs hardware FIFO buffering with an explicit bound on each interrupt's byte work. The provider uses the existing public UART face, caller-owned TX requests and a static RX byte ring. It creates no task, worker, allocation or second owner. Threshold batching does not establish physical latency or loss-free throughput."
-msgstr "当精确的 H743 或 U575 装配需要硬件 FIFO 缓冲，并要求明确限制每次中断处理的 字节工作量时，可选择 `irq-fifo-bytes`。provider 使用现有公共 UART 接口、调用方 持有的 TX 请求和静态 RX 字节环，不创建任务、worker、动态对象或第二个所有者。 按阈值分批处理不代表已取得物理时延或无丢失吞吐量保证。"
+msgid "Select `irq-fifo-bytes` when an exact H743 or U575 assembly needs hardware FIFO buffering with an explicit bound on each interrupt's byte work. The provider uses the existing public UART face, caller-owned TX requests and a static RX byte ring. It creates no task, worker, allocation or second owner. Threshold batching does not establish physical latency or loss-free throughput. The independently selected `irq-fifo-rtscts-bytes` mode adds hardware RTS and CTS on an explicit four-pad software-reference route, as described below."
+msgstr "当精确的 H743 或 U575 装配需要硬件 FIFO 缓冲，并要求明确限制每次中断处理的字节工作量时，可选择 `irq-fifo-bytes`。provider 使用现有公共 UART 接口、调用方持有的 TX 请求和静态 RX 字节环，不创建任务、worker、动态对象或第二个所有者。按阈值分批处理不代表已取得物理时延或无丢失吞吐量保证。独立选择的 `irq-fifo-rtscts-bytes` 模式在明确的四引脚软件参考路由上增加硬件 RTS 和 CTS，详见下文。"
 
 msgid "Select the exact controller and clock"
 msgstr "选择精确的控制器与时钟"
@@ -95,11 +95,74 @@ msgstr "该夹具中的软件 RX 环"
 msgid "64 bytes"
 msgstr "64字节"
 
-msgid "The extra RDR stage matters: FIFO depth is not the complete RX backlog. The TX shifter is also separate. This selection does not change FIFO-disabled ordinary UART or DMA modes. F407/F470 and other UART IPs do not inherit FIFO support from the public API. H743 high-clock profiles, U575 Secure execution, DMA, block/word RX, non-8N1 frames, flow control and low-power/autonomous operation are outside this selection."
-msgstr "额外的 RDR 级很重要：FIFO 深度并非全部 RX 积压容量，TX 移位器也独立存在。 该选择不改变关闭 FIFO 的普通 UART 或 DMA 模式。F407/F470 和其他 UART IP 不会 因使用相同公共 API 而获得 FIFO 支持。本选择不涵盖 H743 高频配置、U575 Secure 执行、DMA、块/字 RX、非8N1帧、流控以及低功耗/自主运行。"
+msgid "The extra RDR stage matters: FIFO depth is not the complete RX backlog. The TX shifter is also separate. This selection does not change FIFO-disabled ordinary UART or DMA modes. F407/F470 and other UART IPs do not inherit FIFO support from the public API. H743 high-clock profiles, U575 Secure execution, DMA, block/word RX, non-8N1 frames and low-power/autonomous operation remain outside both FIFO selections. Ordinary `irq-fifo-bytes` remains flow-none."
+msgstr "额外的 RDR 级不能忽略：FIFO 深度不等于完整的 RX 积压容量。TX 移位寄存器也是独立的。本选择不改变关闭 FIFO 的普通 UART 或 DMA 模式。F407/F470 和其他 UART IP 不会从公共 API 自动继承 FIFO 支持。H743 高频配置、U575 Secure 执行、DMA、块／字 RX、非 8N1 帧和低功耗／自主运行仍不在这两种 FIFO 选择的范围内。普通 `irq-fifo-bytes` 仍不启用流控。"
 
 msgid "These full inputs use the existing Board routes. The FIFO subsection belongs to the same authored assembly and typed IR as all other resources."
 msgstr "这些完整输入使用现有 Board 路线。FIFO 子节与其他资源来自同一份手写装配配置 和定型 IR。"
+
+msgid "Select hardware RTS and CTS explicitly"
+msgstr "明确选择硬件 RTS 和 CTS"
+
+msgid "`irq-fifo-rtscts-bytes` retains the same public byte face and selected FIFO state layout. Its distinct readonly operations table selects a compile-time specialization of the same algorithm. No extra mutable flow flag, per-instance clock field, queue, task or worker is added to either FIFO or ordinary UART."
+msgstr "`irq-fifo-rtscts-bytes` 保留相同的公共字节接口和选配 FIFO 状态布局。它使用独立的只读方法表，选择同一算法的编译期特化版本，不为 FIFO 或普通 UART 增加可变流控标志、实例时钟字段、队列、任务或 worker。"
+
+msgid "H743 software reference"
+msgstr "H743 软件参考配置"
+
+msgid "U575 software reference"
+msgstr "U575 软件参考配置"
+
+msgid "Exact chip, controller and clock"
+msgstr "精确芯片、控制器与时钟"
+
+msgid "STM32H743ZIT6, USART3, `hsi64-fixed-cache-off`"
+msgstr "STM32H743ZIT6、USART3、`hsi64-fixed-cache-off`"
+
+msgid "STM32U575ZIT6Q, TZEN0, USART1, `msis4`"
+msgstr "STM32U575ZIT6Q、TZEN0、USART1、`msis4`"
+
+msgid "TX / RX / CTS / RTS, all AF7"
+msgstr "TX / RX / CTS / RTS，均为 AF7"
+
+msgid "PD8 / PD9 / PD11 / PD12"
+msgstr "PD8 / PD9 / PD11 / PD12"
+
+msgid "PA9 / PA10 / PA11 / PA12"
+msgstr "PA9 / PA10 / PA11 / PA12"
+
+msgid "Software-reference package"
+msgstr "软件参考包"
+
+msgid "`stm32h743zi_rtscts_reference`"
+msgstr "`stm32h743zi_rtscts_reference`"
+
+msgid "`stm32u575zi_rtscts_reference`"
+msgstr "`stm32u575zi_rtscts_reference`"
+
+msgid "First normal selection"
+msgstr "首批正常选择"
+
+msgid "Baremetal, priority 5, 115200 baud, 8N1, 64-byte RX ring"
+msgstr "裸机、优先级 5、115200 波特、8N1、64 字节 RX 环"
+
+msgid "The new mode derives fixed 8N1 with `flow = \"rts-cts\"`. An omitted frame subsection uses that value; an explicit frame must provide all four fields and match it exactly. RTS-only, CTS-only, modem notifications, polarity inversion, runtime format changes, RS485-DE sharing and FIFO/DMA combinations are not selected by it. The existing four FIFO threshold/budget fields remain explicit."
+msgstr "新模式派生固定的 8N1 帧及 `flow = \"rts-cts\"`。省略 frame 子节时使用该值；显式提供 frame 时，必须包含全部四个字段并与派生值完全一致。该模式不选择仅 RTS、仅 CTS、调制解调器通知、极性反转、运行时格式变更、RS485-DE 共用或 FIFO/DMA 组合。现有四个 FIFO 阈值／预算字段仍需显式提供。"
+
+msgid "These packages declare silicon package pads and AF numbers. They do not establish a Nucleo connector, virtual COM wiring, product PCB or peer electrical compatibility. All four pads are exclusive resources; a Board reservation for USB, DE or GPIO on either flow pad conflicts with the UART selection. A two-pad Board binding cannot silently become a four-pad route."
+msgstr "这些包声明硅片封装引脚和 AF 编号，不建立 Nucleo 连接器、虚拟串口接线、产品 PCB 或对端电气兼容性结论。四个引脚都是独占资源；Board 若已将任一流控引脚保留给 USB、DE 或 GPIO，就与该 UART 选择冲突。双引脚 Board 绑定不会静默变成四引脚路由。"
+
+msgid "Hardware CTS restricts the start of the next serial frame. It does not forbid CPU writes into available TDR/FIFO space, and a frame already shifting can finish after CTS rises. The ISR CTS flag is the inverse of the physical pin level; CTSIE remains disabled. The provider never bypasses CTS to complete a cancel or stop. Persistent external blocking can outlast the free-running drain allowance: the request becomes `QUARANTINED` and remains borrowed. Only actual wire completion and verified withdrawal permit settlement, including after a later physical CTS release. Peer recovery policy remains external."
+msgstr "硬件 CTS 限制下一个串行帧的启动，不禁止 CPU 向仍有空间的 TDR/FIFO 写入。CTS 升高后，已经开始移出的帧仍可结束。ISR 中的 CTS 标志与物理引脚电平相反；CTSIE 保持关闭。provider 不会为了完成取消或停止而绕过 CTS。持续的外部阻塞可能超过自由运行时的排空限额：请求进入 `QUARANTINED`，其存储仍处于借用状态。只有真实的线上完成和经验证的撤回，才允许结算请求；之后物理 CTS 释放时也遵守该要求。对端恢复策略仍由外部负责。"
+
+msgid "Hardware RTS responds to the hardware receive staging, not a software ring watermark. When the software ring becomes full, this specialization stops RDR reads and withdraws RX threshold, not-empty, full, IDLE and error sources with readback. It keeps the held head and its error flags, UE, RE and RTSE intact. The hardware FIFO/RDR can then accumulate data and apply real RTS backpressure. A peer that ignores RTS or sends too much after its change can still cause overrun; no unconditional loss-free guarantee follows from this design."
+msgstr "硬件 RTS 响应硬件接收暂存量，不响应软件环的水位。软件环满时，此特化版本停止读取 RDR，并撤回 RX 阈值、非空、满、IDLE 和错误中断源，随后读回确认。它保留当前头部及其错误标志，并保持 UE、RE 和 RTSE。硬件 FIFO/RDR 随后可继续积累数据，通过真实 RTS 施加背压。对端若忽略 RTS，或在其变化后继续发送过多数据，仍可能导致溢出；此设计不产生无条件的无丢失保证。"
+
+msgid "A public byte read creates ring space and rearms the selected RX sources with readback. If a subthreshold head is held, a not-empty level source permits progress without another arrival or IDLE edge. A rearm failure returns `NX_ERROR_IO` with the actual copied count and bytes still valid; admission closes and the owner retains cleanup responsibility. A closing read never reopens the sources. A previously pending vector can produce a bounded extra entry after source withdrawal; it cannot consume a held head while paused."
+msgstr "公共字节读取释放环空间后，会重新启用选定的 RX 源并读回确认。如果保留的头部尚未达到阈值，非空电平源可在没有新字节或新 IDLE 边沿时推动处理。重新启用失败时返回 `NX_ERROR_IO`，实际已复制的计数和字节仍有效；准入关闭，所有者继续承担清理责任。关闭中的读取不会重新启用这些源。撤回源后，先前挂起的向量可能产生有界的额外入口；暂停时该入口不得消费保留的头部。"
+
+msgid "Generated cold assembly snapshots all four pins and the selected clock gates before preparing them. TX and RTS GPIO latches are set high before AF mode; CTS and RX receive pull-ups. Output type, speed, pull, AF7 and mode fields are read back. CTSE/RTSE are programmed only while UE is observed zero and are proved before the first enable. Whole stop retains flow while TX is borrowed; only after source/vector/publisher joins, UE zero and both ACKs clear may it clear flow/FIFO fields and restore the original four-pad snapshots and gates. Missing proof retains ownership. GPIO reset levels, inactive AF behavior and the physical startup/stop handoff still need actual board validation."
+msgstr "生成的冷装配在准备引脚前，会保存全部四个引脚及选定时钟门控的快照。进入 AF 模式前先将 TX 和 RTS 的 GPIO 锁存值设为高，并为 CTS 和 RX 配置上拉。输出类型、速度、上下拉、AF7 和模式字段都需要读回确认。只有观察到 UE 为零时才编程 CTSE/RTSE，并在首次启用前证明它们正确。整体停止在 TX 仍被借用时保持流控；只有各源和向量已撤离、发布者已退出，UE 为零且两个 ACK 清除后，才能清除流控／FIFO 字段并恢复原始四引脚快照和门控。缺少证明时继续保留所有权。GPIO 复位电平、未启用时的 AF 行为及物理启动／停止交接仍需实板验证。"
 
 msgid "Separate thresholds from IRQ budgets"
 msgstr "区分阈值与 IRQ 预算"
@@ -140,8 +203,8 @@ msgstr "四个字段全部显式填写。正常夹具的阈值为 `half`，RX �
 msgid "Steady RX uses threshold, IDLE and error sources. The handler acknowledges captured IDLE before draining. If its budget ends with data remaining, it enables the level-sensitive RX-not-empty source with readback. Subsequent bounded entries consume the tail without new traffic or a second IDLE. Once empty, the handler withdraws that temporary source with readback. Unchanged masks are not rewritten. A refused required change closes admission and retains recovery responsibility."
 msgstr "稳定接收使用阈值、IDLE 和错误来源。处理程序先确认捕获的 IDLE，再排空数据。 若预算用尽后仍有数据，便启用电平敏感的 RX 非空来源并检查读回；后续有界入口 无需新流量或第二次 IDLE 即可读取短尾。空后以读回证明撤销该临时来源，不重写 未改变的掩码。必要变更被拒绝时关闭准入，并保留恢复责任。"
 
-msgid "PE, FE and NE describe the current RDR head. Captured flags are acknowledged before that head is popped; its bad byte is discarded and the next status is read afresh. Overrun and a full software ring record aggregate loss while preserving older queued good bytes. `read_bytes` may return copied bytes with `NX_ERROR_OVERFLOW`; this indication is not an exact missing-character count. An empty read returns `NX_ERROR_EMPTY` when no loss is pending."
-msgstr "PE、FE 和 NE 描述当前 RDR 队首。先确认捕获标志，再弹出该队首；丢弃对应坏字节， 随后重新读取下一队首状态。硬件溢出和软件环满记录汇总丢失，同时保留较早的 已排队好字节。`read_bytes` 可在复制字节的同时返回 `NX_ERROR_OVERFLOW`；该指示 不是精确的缺失字符数。没有待报告丢失时，空读取返回 `NX_ERROR_EMPTY`。"
+msgid "PE, FE and NE describe the current RDR head. Captured flags are acknowledged before that head is popped; its bad byte is discarded and the next status is read afresh. With flow-none, overrun and a full software ring record aggregate loss while preserving older queued good bytes; the RTSCTS specialization holds a pending head when the ring is full, as described above. `read_bytes` may return copied bytes with `NX_ERROR_OVERFLOW`; this indication is not an exact missing-character count. An empty read returns `NX_ERROR_EMPTY` when no loss is pending."
+msgstr "PE、FE 和 NE 描述当前 RDR 头部。先清除已捕获的标志，再弹出该头部；丢弃坏字节后重新读取下一个状态。不启用流控时，硬件溢出和软件环满会累计丢失状态，同时保留较早排队的有效字节；RTSCTS 特化版本则按上文所述，在环满时保留待处理的头部。`read_bytes` 可在返回已复制字节的同时返回 `NX_ERROR_OVERFLOW`；该指示不等于精确的缺失字符数。没有待报告丢失状态时，空读取返回 `NX_ERROR_EMPTY`。"
 
 msgid "Keep the task and request contract"
 msgstr "保持任务与请求契约"
@@ -206,11 +269,15 @@ msgstr "成功的正常构建须产生 ELF/BIN/map、链接资源和 provider-re
 msgid "Current development validation passed 90 real-provider GoogleTest/GoogleMock cases, 45 per family, and 18 normal-TOML/generated-factory cases, 9 per family: 108 cases with no failures or skips. Models use the pinned official LL threshold functions and separate FIFO, RDR and shifter state. Both canonical configurations also passed normal ARM configure/build, resource budgets and retention checks for one face, one operations table and seven method slots per image."
 msgstr "当前开发验证通过90项真实 provider GoogleTest/GoogleMock，每系列45项，以及18项正常 TOML/生成工厂用例，每系列9项：共108项，无失败或跳过。模型使用锁定的官方 LL 阈值函数，分别表示 FIFO、RDR 和移位器状态。两个规范配置也均通过正常 ARM 配置/构建、资源预算，以及每镜像一个接口、一张方法表和七个方法槽的保留检查。"
 
+msgid "The separate RTSCTS development validation passed 76 real-provider cases, 38 per family, and 22 normal-TOML/generated-factory cases, 11 per family, with no failures or skips. Both exact four-pad normal configurations also passed ARM configure/build. These results establish software behavior and linking for the stated reference selections, not peer response, physical handoff, timing or a clean reproducible candidate. The existing flow-none arithmetic comparison below is not a measured cost comparison for the new RTSCTS selection."
+msgstr "独立的 RTSCTS 开发验证通过了 76 项真实 provider 用例，每个系列 38 项，以及 22 项正常 TOML／生成 factory 用例，每个系列 11 项，均无失败或跳过。两个精确四引脚正常配置也通过了 ARM 配置／构建。这些结果只建立所述参考选择的软件行为和链接证据，不证明对端响应、物理交接、时序或干净且可复现的软件候选。下文既有的无流控算术比较，不是新 RTSCTS 选择的实测成本比较。"
+
 msgid "For these two exact `Os` FIFO fixtures, narrowing only bounded intermediate arithmetic removed the linked software division helpers. H743 BIN/loaded Flash changed from 9216 to 8372 bytes, saving 844 bytes; U575 changed from 8948 to 8016 bytes, saving 932 bytes. Each image's allocated/reserved RAM stayed 2296 bytes, including its 2048-byte main-stack reservation. Absolute deadlines remain 64-bit. These are measured artifact sizes for this selected arithmetic comparison, not a zero-cost FIFO claim, a comparison with ordinary IRQ-byte mode, measured cycles or WCET. They do not establish a clean reproducible software candidate."
 msgstr "对于这两个精确的 `Os` FIFO 夹具，仅缩窄有界中间运算就移除了链接的软件除法辅助函数。H743 BIN/载入 Flash 从9216变为8372字节，节省844字节；U575 从8948变为8016字节，节省932字节。每个镜像的已分配/预留 RAM 保持2296字节，包含2048字节主栈预留。绝对 deadline 仍为64位。这些是该选中算术对比的实际制品大小，不表示 FIFO 零成本、与普通 IRQ 字节模式的比较、实测周期或 WCET，也不建立干净且可复现的软件候选。"
 
 msgid "Physical HIL is `not_executed`. Neither model nor link results establish oscillator accuracy, peer compatibility, U575 noise immunity, physical latency or silicon erratum qualification. RM0433 Rev9 section 48.5.4/table 402 and RM0456 Rev7 section 66.5.5/table 674 define the reviewed FIFO shapes; other chips and modes need their own exact review."
 msgstr "物理 HIL 为 `not_executed`。模型或链接结果均不证明振荡器精度、对端兼容性、U575 抗噪声、物理时延或硅片勘误资格。RM0433 Rev9 第48.5.4节/表402和 RM0456 Rev7 第66.5.5节/表674定义已审查 FIFO 形态；其他芯片和模式需要分别精确审查。"
 
-msgid "See the [public UART contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h), [shared private algorithm](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/private/uart_fifo_impl.h), [H743 specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/drivers/uart_fifo.c), [U575 specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/uart_fifo.c), [finite U575 DMA selection](u575-uart-gpdma.md) and [current qualification boundaries](../delivery/qualification.md)."
-msgstr "参见[公共 UART 契约](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h)、 [共享私有算法](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/private/uart_fifo_impl.h)、 [H743 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/drivers/uart_fifo.c)、 [U575 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/uart_fifo.c)、 [U575 有限 DMA 选择](u575-uart-gpdma.md)和 [当前资格边界](../delivery/qualification.md)。"
+msgid "See the [public UART contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h), [shared private algorithm](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/private/uart_fifo_impl.h), [H743 specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/drivers/uart_fifo.c), [U575 specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/uart_fifo.c), [H743 RTSCTS specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/drivers/uart_rtscts.c), [U575 RTSCTS specialization](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/uart_rtscts.c), [finite U575 DMA selection](u575-uart-gpdma.md) and [current qualification boundaries](../delivery/qualification.md)."
+msgstr "另见[公共 UART 契约](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h), [共享私有算法](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/private/uart_fifo_impl.h), [H743 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/drivers/uart_fifo.c), [U575 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/uart_fifo.c), [H743 RTSCTS 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/drivers/uart_rtscts.c), [U575 RTSCTS 特化](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/uart_rtscts.c), [U575 有限 DMA 选择](u575-uart-gpdma.md)及[当前资格边界](../delivery/qualification.md)."
+

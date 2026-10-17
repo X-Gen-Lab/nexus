@@ -28,7 +28,12 @@ typedef struct nx_watchdog_port nx_watchdog_port_t;
  * \note            A zero minimum and maximum mean the timeout bounds are
  *                  unknown, for example while hardware shadow updates remain
  *                  pending or no oscillator limits have been reviewed. The
- *                  enabled, irreversible and debug_freeze facts remain valid.
+ *                  enabled and irreversible facts remain valid. debug_freeze
+ *                  reports the provider-supported firmware configuration.
+ *                  Providers with CPU-readable debug control observe its
+ *                  setting. A provider without CPU debug-control access
+ *                  supports false only; that value does not observe or
+ *                  describe an external debugger's setting.
  */
 typedef struct {
     uint32_t minimum_timeout_us;
@@ -69,15 +74,18 @@ struct nx_watchdog_port {
  *
  * \param[in]       timeout_us: Requested nominal timeout in maintained range.
  *
- * \param[in]       debug_freeze: Whether debug halting freezes counting.
+ * \param[in]       debug_freeze: Requested CPU-managed debug-freeze setting;
+ *                  external debugger configuration is outside this request.
  *
  * \param[out]      state: Actual timeout bounds and remaining effect,
  *                  including enabled=true when later setup reports failure
  *                  after enabling.
  *
- * \return          Success or INVALID/STATE/IO; never claims enabled hardware
- *                  was disabled during rollback. Existing enable is
- *                  identified.
+ * \return          Success or INVALID/STATE/UNSUPPORTED/IO; never claims
+ *                  enabled hardware was disabled during rollback. Existing
+ *                  enable is identified. A provider without CPU debug-control
+ *                  access rejects true with UNSUPPORTED before activation;
+ *                  it neither queries nor changes external debugger control.
  *
  * \note            Success establishes nominal hardware programming, not a
  *                  guaranteed deadline. Both timeout bounds remain zero when

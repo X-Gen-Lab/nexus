@@ -14,6 +14,10 @@
 #error "FIFO implementation requires one complete concrete specialization"
 #endif
 
+#ifndef NX_UART_FIFO_RTSCTS
+#define NX_UART_FIFO_RTSCTS 0
+#endif
+
 #define FIFO_TX_CR1 ((uint32_t)(USART_CR1_TXEIE | USART_CR1_TCIE))
 #define FIFO_RX_ERRORS                                                         \
     ((uint32_t)(USART_ISR_PE | USART_ISR_FE | USART_ISR_NE | USART_ISR_ORE))
@@ -252,6 +256,58 @@ static void fifo_receive_fault(NX_UART_FIFO_BASE* p) {
     if (p->active != NULL && !p->tx_complete)
         fifo_begin_drain(p, NX_ERROR_IO, nx_time_now_us());
 }
+#if NX_UART_FIFO_RTSCTS
+/** \brief A full software ring must not keep consuming the hardware FIFO. */
+static bool fifo_flow_rx_pause(NX_UART_FIFO_BASE* p) {
+    const uint32_t rx_cr3 = USART_CR3_RXFTIE | USART_CR3_EIE;
+    const uint32_t rx_cr1 =
+        USART_CR1_RXNEIE | USART_CR1_RXFFIE | USART_CR1_PEIE | USART_CR1_IDLEIE;
+    uint32_t previous = NX_UART_FIFO_READ(&p->registers->CR3);
+    uint32_t desired = previous & ~rx_cr3;
+    bool cr3 = previous == desired ||
+               fifo_checked(&p->registers->CR3, desired, rx_cr3);
+    previous = NX_UART_FIFO_READ(&p->registers->CR1);
+    desired = previous & ~rx_cr1;
+    bool cr1 = previous == desired ||
+               fifo_checked(&p->registers->CR1, desired, rx_cr1);
+    if (!cr1 || !cr3)
+        fifo_receive_fault(p);
+    return cr1 && cr3;
+}
+/** \brief A public read reopens a held head without needing another edge. */
+static bool fifo_flow_rx_resume(NX_UART_FIFO_BASE* p) {
+    if (!NX_UART_FIFO_ACCESS_READY()) {
+        p->closing = true;
+        if (p->active != NULL) {
+            if (p->terminal == NX_SUCCESS)
+                p->terminal = NX_ERROR_IO;
+            (void)nx_request_transition(&p->active->base,
+                                        NX_REQUEST_QUARANTINED);
+        }
+        return false;
+    }
+    const uint32_t rx_cr3 = USART_CR3_RXFTIE | USART_CR3_EIE;
+    uint32_t previous = NX_UART_FIFO_READ(&p->registers->CR3);
+    uint32_t desired = previous | rx_cr3;
+    bool cr3 = previous == desired ||
+               fifo_checked(&p->registers->CR3, desired, rx_cr3);
+    previous = NX_UART_FIFO_READ(&p->registers->CR1);
+    desired = previous | USART_CR1_PEIE | USART_CR1_IDLEIE;
+    if ((NX_UART_FIFO_READ(&p->registers->ISR) & NX_UART_FIFO_RX_READY) != 0U)
+        desired |= USART_CR1_RXNEIE;
+    else
+        desired &= ~(uint32_t)USART_CR1_RXNEIE;
+    const uint32_t rx_cr1 =
+        USART_CR1_PEIE | USART_CR1_IDLEIE | USART_CR1_RXNEIE;
+    bool cr1 = previous == desired ||
+               fifo_checked(&p->registers->CR1, desired, rx_cr1);
+    if (!cr1 || !cr3) {
+        fifo_receive_fault(p);
+        (void)fifo_flow_rx_pause(p);
+    }
+    return cr1 && cr3;
+}
+#endif
 void NX_UART_FIFO_IRQ(NX_UART_FIFO_STATE* s) {
     if (s == NULL || !s->uart.initialized)
         return;
@@ -259,9 +315,18 @@ void NX_UART_FIFO_IRQ(NX_UART_FIFO_STATE* s) {
     nx_arch_irq_state_t guard = nx_arch_irq_save();
     nx_time_us_t now = nx_time_now_us();
     uint32_t status = NX_UART_FIFO_READ(&p->registers->ISR);
+#if NX_UART_FIFO_RTSCTS
+    bool rx_paused = p->closing || p->rx_count == p->rx_capacity;
+    if (rx_paused)
+        (void)fifo_flow_rx_pause(p);
+#endif
     /* ACK the captured IDLE before empty/tail observations. A late tail then
      * has either a level fallback or its own subsequent IDLE event. */
-    if ((status & USART_ISR_IDLE) != 0U)
+    if ((status & USART_ISR_IDLE) != 0U
+#if NX_UART_FIFO_RTSCTS
+        && !rx_paused
+#endif
+    )
         NX_UART_FIFO_WRITE(&p->registers->ICR, USART_ICR_IDLECF);
     bool loaded = false;
     if (p->active != NULL && !p->tx_complete) {
@@ -291,6 +356,14 @@ void NX_UART_FIFO_IRQ(NX_UART_FIFO_STATE* s) {
             fifo_observe_tc(p, now);
     }
     for (uint8_t i = 0U; i < s->fifo->rx_budget; ++i) {
+#if NX_UART_FIFO_RTSCTS
+        if (p->closing || p->rx_count == p->rx_capacity) {
+            if (!rx_paused)
+                (void)fifo_flow_rx_pause(p);
+            rx_paused = true;
+            break;
+        }
+#endif
         status = NX_UART_FIFO_READ(&p->registers->ISR);
         const uint32_t errors = status & FIFO_RX_ERRORS;
         if (errors != 0U) {
@@ -316,16 +389,25 @@ void NX_UART_FIFO_IRQ(NX_UART_FIFO_STATE* s) {
             p->rx_count++;
         }
     }
-    status = NX_UART_FIFO_READ(&p->registers->ISR);
-    const uint32_t previous_cr1 = NX_UART_FIFO_READ(&p->registers->CR1);
-    uint32_t cr1 = previous_cr1;
-    if (!p->closing && (status & NX_UART_FIFO_RX_READY) != 0U)
-        cr1 |= USART_CR1_RXNEIE;
-    else
-        cr1 &= ~(uint32_t)USART_CR1_RXNEIE;
-    if (cr1 != previous_cr1 &&
-        !fifo_checked(&p->registers->CR1, cr1, USART_CR1_RXNEIE))
-        fifo_receive_fault(p);
+#if NX_UART_FIFO_RTSCTS
+    if (p->closing || p->rx_count == p->rx_capacity) {
+        if (!rx_paused)
+            (void)fifo_flow_rx_pause(p);
+    } else {
+#endif
+        status = NX_UART_FIFO_READ(&p->registers->ISR);
+        const uint32_t previous_cr1 = NX_UART_FIFO_READ(&p->registers->CR1);
+        uint32_t cr1 = previous_cr1;
+        if (!p->closing && (status & NX_UART_FIFO_RX_READY) != 0U)
+            cr1 |= USART_CR1_RXNEIE;
+        else
+            cr1 &= ~(uint32_t)USART_CR1_RXNEIE;
+        if (cr1 != previous_cr1 &&
+            !fifo_checked(&p->registers->CR1, cr1, USART_CR1_RXNEIE))
+            fifo_receive_fault(p);
+#if NX_UART_FIFO_RTSCTS
+    }
+#endif
     const nx_irq_wake_t* wake = p->wake;
     if (wake != NULL && p->wake_publishers != UINT16_MAX)
         p->wake_publishers++;
@@ -372,10 +454,21 @@ static nx_result_t fifo_read_bytes(void* context, uint8_t* output,
         output[copied++] = byte;
     }
     guard = nx_arch_irq_save();
+#if NX_UART_FIFO_RTSCTS
+    bool resumed =
+        p->closing || p->rx_count == p->rx_capacity || fifo_flow_rx_resume(p);
+#endif
     bool lost = p->rx_loss != 0U;
-    p->rx_loss = 0U;
+#if NX_UART_FIFO_RTSCTS
+    if (resumed)
+#endif
+        p->rx_loss = 0U;
     nx_arch_irq_restore(guard);
     *count = copied;
+#if NX_UART_FIFO_RTSCTS
+    if (!resumed)
+        return NX_ERROR_IO;
+#endif
     return lost ? NX_ERROR_OVERFLOW
                 : (copied != 0U ? NX_SUCCESS : NX_ERROR_EMPTY);
 }
@@ -546,8 +639,14 @@ nx_result_t NX_UART_FIFO_INITIALIZE(NX_UART_FIFO_STATE* s, uint32_t clock,
         return fifo_initialize_failed(s, NX_ERROR_IO);
     NX_UART_FIFO_RX_THRESHOLD(p->registers, s->fifo->rx_threshold);
     NX_UART_FIFO_TX_THRESHOLD(p->registers, s->fifo->tx_threshold);
+#if NX_UART_FIFO_RTSCTS
+    NX_UART_FIFO_HW_FLOW(p->registers);
+#endif
     uint32_t cr3 = ((uint32_t)s->fifo->rx_threshold << USART_CR3_RXFTCFG_Pos) |
                    ((uint32_t)s->fifo->tx_threshold << USART_CR3_TXFTCFG_Pos);
+#if NX_UART_FIFO_RTSCTS
+    cr3 |= USART_CR3_RTSE | USART_CR3_CTSE;
+#endif
     nx_arch_dsb();
     if (NX_UART_FIFO_READ(&p->registers->CR3) != cr3 ||
         !fifo_checked(&p->registers->CR3,

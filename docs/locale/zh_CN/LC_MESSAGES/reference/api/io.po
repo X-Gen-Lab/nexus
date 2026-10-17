@@ -3797,11 +3797,11 @@ msgstr "[inout] 已初始化的字节 profile 端口；只有一个消费者。"
 msgid "[in] Destination capacity in bytes."
 msgstr "[in] 目标容量，单位为字节。"
 
-msgid "[out] Bytes copied; valid even when OVERFLOW is returned."
-msgstr "[out] 已复制字节数；即使返回 OVERFLOW 也有效。"
+msgid "[out] Bytes copied; valid on OVERFLOW and on a provider IO failure after copying bytes and attempting RX rearm."
+msgstr "[out] 已复制的字节数；返回 OVERFLOW 时仍有效；提供者在复制字节并尝试重新启用 RX 后发生 IO 失败时也仍有效。"
 
-msgid "NX_SUCCESS, EMPTY, OVERFLOW or INVALID/UNSUPPORTED. Byte profile reports aggregate loss without invented timestamps."
-msgstr "NX_SUCCESS、EMPTY、OVERFLOW 或 INVALID/UNSUPPORTED。字节 profile 报告累计丢失，不虚构时间戳。"
+msgid "NX_SUCCESS, EMPTY, OVERFLOW or INVALID/UNSUPPORTED. Byte profile reports aggregate loss without invented timestamps. A provider can return IO if RX source rearm fails after copying; count and copied bytes remain valid. Admission closes and retained hardware requires verified stop."
+msgstr "NX_SUCCESS、EMPTY、OVERFLOW 或 INVALID/UNSUPPORTED。字节模式报告累计丢失，不虚构时间戳。提供者若在复制后重新启用 RX 源失败，可以返回 IO；count 和已复制字节仍有效。准入关闭，仍保留责任的硬件必须经验证停止。"
 
 msgid "RX/IRQ and external consumers must quiesce before storage reclamation. No automatic task/notification destruction."
 msgstr "回收存储前，RX/IRQ 和外部消费者必须静止。不自动销毁任务或通知对象。"
@@ -4148,14 +4148,14 @@ msgstr "[inout] 固定 provider；产品拥有喂狗和恢复策略。"
 msgid "[in] Requested nominal timeout in maintained range."
 msgstr "[in] 所请求的标称超时，须处于已维护范围内。"
 
-msgid "[in] Whether debug halting freezes counting."
-msgstr "[in] 调试暂停是否冻结计数。"
+msgid "[in] Requested CPU-managed debug-freeze setting; external debugger configuration is outside this request."
+msgstr "[in] 请求由 CPU 管理的调试冻结设置；外部调试器配置不属于此请求。"
 
 msgid "[out] Actual timeout bounds and remaining effect, including enabled=true when later setup reports failure after enabling."
 msgstr "[out] 实际超时界限及剩余副作用；若启用后后续配置失败，也包括 enabled=true。"
 
-msgid "Success or INVALID/STATE/IO; never claims enabled hardware was disabled during rollback. Existing enable is identified."
-msgstr "成功或 INVALID/STATE/IO；绝不声称已启用硬件在回滚中被禁用。会识别原已启用状态。"
+msgid "Success or INVALID/STATE/UNSUPPORTED/IO; never claims enabled hardware was disabled during rollback. Existing enable is identified. A provider without CPU debug-control access rejects true with UNSUPPORTED before activation; it neither queries nor changes external debugger control."
+msgstr "成功，或返回 INVALID/STATE/UNSUPPORTED/IO；绝不声称回滚禁用了已启用的硬件。已有启用状态会被识别。无法由 CPU 访问调试控制的提供者在激活前以 UNSUPPORTED 拒绝 true；它既不查询，也不改变外部调试器控制。"
 
 msgid "[inout] Fixed enabled provider with one serialized feed owner."
 msgstr "[inout] 固定且已启用的 provider，只有一个串行化喂狗所有者。"
@@ -4178,8 +4178,8 @@ msgstr "不隐式确认、不重启，也不作产品分类。"
 msgid "Bitmask of NX_RESET_*; multiple causes may be reported."
 msgstr "NX_RESET_* 位掩码；可同时报告多个原因。"
 
-msgid "A zero minimum and maximum mean the timeout bounds are unknown, for example while hardware shadow updates remain pending or no oscillator limits have been reviewed. The enabled, irreversible and debug_freeze facts remain valid."
-msgstr "最小值和最大值均为零表示超时界限未知，例如硬件影子更新仍待完成，或尚未审核振荡器界限。enabled、irreversible 和 debug_freeze 事实仍有效。"
+msgid "A zero minimum and maximum mean the timeout bounds are unknown, for example while hardware shadow updates remain pending or no oscillator limits have been reviewed. The enabled and irreversible facts remain valid. debug_freeze reports the provider-supported firmware configuration. Providers with CPU-readable debug control observe its setting. A provider without CPU debug-control access supports false only; that value does not observe or describe an external debugger's setting."
+msgstr "最小值和最大值均为零表示超时边界未知，例如硬件影子寄存器更新尚未完成，或振荡器限制尚未复核。enabled 和 irreversible 事实仍然有效。debug_freeze 报告提供者支持的固件配置。能够由 CPU 读取调试控制的提供者会观察该设置。不具备 CPU 调试控制访问能力的提供者仅支持 false；该值既未观察，也不描述外部调试器的设置。"
 
 msgid "required = targets + spares + ceil(rate*release_delay / (block_units*1000000)); payload is required*block*unit_bytes. Finite math is conservative under the declared FIFO frontier release bound; out-of-order release may still block the next cursor. Latency requires target_delay_us < floor(units_per_block*1000000/units_per_second). This creates no backpressure or hardware qualification."
 msgstr "required = targets + spares + ceil(rate*release_delay / (block_units*1000000))；载荷大小为 required*block*unit_bytes。在所声明的 FIFO 队首释放延迟界限下，此有限算术计算是保守的；乱序释放仍可能阻塞下一个游标。延迟要求 target_delay_us < floor(units_per_block*1000000/units_per_second)。本计算不建立背压，也不构成硬件资格证明。"

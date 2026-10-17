@@ -10,7 +10,10 @@
 #include "nexus/io/flash.h"
 #include "stm32h743_provider.h"
 #include <array>
+#include <cstddef>
+#include <cstring>
 #include <gtest/gtest.h>
+#include <new>
 
 extern "C" const nx_stm32h743_flash_image_t*
 nx_h743_flash_image_admission_model(void) {
@@ -82,4 +85,168 @@ TEST_F(H743FlashImageAdmission, BankTwoIsNotRemovedFromThePublicGeometry) {
     EXPECT_EQ(8U, g_h743_model.flash_store_count);
     EXPECT_EQ(0x5a5a5a5aU, memory[1048576U / sizeof(uint32_t)]);
     EXPECT_FALSE(state.active);
+}
+
+namespace {
+template <typename T> auto ControlBytes(const T& value) {
+    std::array<unsigned char, sizeof(T)> bytes{};
+    std::memcpy(bytes.data(), &value, bytes.size());
+    return bytes;
+}
+} /* namespace */
+TEST_F(H743FlashImageAdmission, ReadCannotOverwriteTheFirstSystemControlByte) {
+    const auto before = ControlBytes(g_nx_stm32h743_system);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_read(&face, 131072U, &g_nx_stm32h743_system, 1U));
+    EXPECT_EQ(
+        0, std::memcmp(before.data(), &g_nx_stm32h743_system, before.size()));
+    EXPECT_EQ(0U, g_h743_model.writes);
+    EXPECT_EQ(0U, g_h743_model.flash_store_count);
+}
+TEST_F(H743FlashImageAdmission, ReadCannotOverwriteTheLastSystemControlByte) {
+    const auto before = ControlBytes(g_nx_stm32h743_system);
+    auto* bytes = reinterpret_cast<unsigned char*>(&g_nx_stm32h743_system);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_read(&face, 131072U,
+                                 bytes + sizeof(g_nx_stm32h743_system) - 1U,
+                                 1U));
+    EXPECT_EQ(
+        0, std::memcmp(before.data(), &g_nx_stm32h743_system, before.size()));
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743FlashImageAdmission, ReadCannotOverwriteTheLiveMonotonicEpoch) {
+    const uint64_t before = g_nx_stm32h743_system.overflow_us;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_read(&face, 131072U,
+                                 &g_nx_stm32h743_system.overflow_us,
+                                 sizeof(g_nx_stm32h743_system.overflow_us)));
+    EXPECT_EQ(before, g_nx_stm32h743_system.overflow_us);
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743FlashImageAdmission, AStoppedSystemIsStillNotAnApplicationBuffer) {
+    g_nx_stm32h743_system.started = false;
+    const uint64_t before = g_nx_stm32h743_system.overflow_us;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_read(&face, 131072U,
+                                 &g_nx_stm32h743_system.overflow_us,
+                                 sizeof(g_nx_stm32h743_system.overflow_us)));
+    EXPECT_EQ(before, g_nx_stm32h743_system.overflow_us);
+    EXPECT_FALSE(g_nx_stm32h743_system.started);
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743FlashImageAdmission, ProgramCannotBorrowSystemControlAsPayload) {
+    const auto before = ControlBytes(g_nx_stm32h743_system);
+    static_assert(sizeof(g_nx_stm32h743_system) >= 32U);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_program(&face, 131072U, &g_nx_stm32h743_system, 32U,
+                                    10000U));
+    EXPECT_EQ(
+        0, std::memcmp(before.data(), &g_nx_stm32h743_system, before.size()));
+    EXPECT_EQ(0U, g_h743_model.writes);
+    EXPECT_EQ(0U, g_h743_model.flash_store_count);
+    EXPECT_FALSE(state.active);
+}
+TEST_F(H743FlashImageAdmission, ProgramCannotBorrowClockRegistersAsPayload) {
+    static_assert(sizeof(g_h743_model.rcc) >= 32U);
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        nx_flash_port_program(&face, 131072U, &g_h743_model.rcc, 32U, 10000U));
+    EXPECT_EQ(0U, g_h743_model.writes);
+    EXPECT_EQ(0U, g_h743_model.flash_store_count);
+    EXPECT_FALSE(state.active);
+}
+TEST_F(H743FlashImageAdmission, ReadCannotWriteTheSystemClockRegisters) {
+    const uint32_t before = g_h743_model.rcc.CR;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_read(&face, 131072U,
+                                 const_cast<uint32_t*>(&g_h743_model.rcc.CR),
+                                 sizeof(uint32_t)));
+    EXPECT_EQ(before, g_h743_model.rcc.CR);
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743FlashImageAdmission, ReadCannotWriteTheSystemPowerRegisters) {
+    const uint32_t before = g_h743_model.power.D3CR;
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        nx_flash_port_read(&face, 131072U,
+                           const_cast<uint32_t*>(&g_h743_model.power.D3CR),
+                           sizeof(uint32_t)));
+    EXPECT_EQ(before, g_h743_model.power.D3CR);
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743FlashImageAdmission, ReadCannotWriteTheSystemTimebaseRegisters) {
+    const uint32_t before = g_h743_model.timer.CNT;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_read(&face, 131072U,
+                                 const_cast<uint32_t*>(&g_h743_model.timer.CNT),
+                                 sizeof(uint32_t)));
+    EXPECT_EQ(before, g_h743_model.timer.CNT);
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743FlashImageAdmission, ReadCannotWriteTheSystemVectorSelector) {
+    const uint32_t before = g_h743_model.core->VTOR;
+    EXPECT_EQ(
+        NX_ERROR_INVALID,
+        nx_flash_port_read(&face, 131072U,
+                           const_cast<uint32_t*>(&g_h743_model.core->VTOR),
+                           sizeof(uint32_t)));
+    EXPECT_EQ(before, g_h743_model.core->VTOR);
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743FlashImageAdmission, ReadCannotUseFlashBackedControllerMetadata) {
+    alignas(nx_stm32h743_flash_state_t) std::array<uint32_t, 524288U> backing{};
+    backing.fill(UINT32_MAX);
+    auto* raw = reinterpret_cast<unsigned char*>(backing.data());
+    auto* intrusive = ::new (raw + 131072U) nx_stm32h743_flash_state_t(state);
+    intrusive->memory = reinterpret_cast<uint8_t*>(backing.data());
+    const nx_flash_port_t invalid_face{&nx_stm32h743_flash_ops, intrusive};
+    uint8_t output = 0x5aU;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_read(&invalid_face, 0U, &output, sizeof(output)));
+    EXPECT_EQ(0x5aU, output);
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743FlashImageAdmission, EraseCannotTargetItsOwnControllerMetadata) {
+    alignas(nx_stm32h743_flash_state_t) std::array<uint32_t, 524288U> backing{};
+    backing.fill(UINT32_MAX);
+    auto* raw = reinterpret_cast<unsigned char*>(backing.data());
+    auto* intrusive = ::new (raw + 131072U) nx_stm32h743_flash_state_t(state);
+    intrusive->memory = reinterpret_cast<uint8_t*>(backing.data());
+    const nx_flash_port_t invalid_face{&nx_stm32h743_flash_ops, intrusive};
+    g_h743_model.physical_flash = intrusive;
+    /* The external device refuses START so an expected bad implementation
+     * cannot destroy its C++ fixture or cause a test-process bus fault. This
+     * does not hide attempted configuration/trigger writes from the oracle. */
+    g_h743_model.hold_flash_start = true;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_erase(&invalid_face, 131072U, 131072U, 10000U));
+    EXPECT_EQ(0U, g_h743_model.writes);
+    EXPECT_EQ(0U, g_h743_model.flash_store_count);
+}
+TEST_F(H743FlashImageAdmission, ExplicitControlBoundariesRemainHalfOpen) {
+    struct AdjacentStorage {
+        unsigned char before[alignof(nx_stm32h743_flash_state_t)];
+        nx_stm32h743_flash_state_t controller;
+        unsigned char after[alignof(nx_stm32h743_flash_state_t)];
+    } storage{};
+    storage.controller = state;
+    const nx_flash_port_t owned_face{&nx_stm32h743_flash_ops,
+                                     &storage.controller};
+    auto* raw = reinterpret_cast<unsigned char*>(&storage);
+    constexpr size_t start = offsetof(AdjacentStorage, controller);
+    constexpr size_t end = start + sizeof(storage.controller);
+    ASSERT_GE(start, 1U);
+    ASSERT_LT(end, sizeof(storage));
+    EXPECT_EQ(NX_SUCCESS,
+              nx_flash_port_read(&owned_face, 131072U, raw + start - 1U, 1U));
+    EXPECT_EQ(NX_SUCCESS,
+              nx_flash_port_read(&owned_face, 131072U, raw + end, 1U));
+    const auto before = ControlBytes(storage.controller);
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_read(&owned_face, 131072U, raw + start - 1U, 2U));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_flash_port_read(&owned_face, 131072U, raw + end - 1U, 2U));
+    EXPECT_EQ(0,
+              std::memcmp(before.data(), &storage.controller, before.size()));
+    EXPECT_EQ(0U, g_h743_model.writes);
 }

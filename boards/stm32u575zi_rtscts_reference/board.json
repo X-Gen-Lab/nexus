@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "stm32u575zi-rtscts-reference",
+  "soc": "STM32U575ZIT6Q",
+  "soc_family": "stm32u575",
+  "source_revision": "Exact package/AF silicon reference only; no asserted PCB connector or peer wiring",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "uart-flow",
+      "controller": "USART1",
+      "route": "usart1-pa9-pa10-pa11-pa12-rtscts"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "No fabricated PCB/net/connector facts; actual electrical route, peer voltage/polarity/reaction delay and reset/AF handoff unobserved.",
+    "No HIL executed; this software-reference package does not qualify a Nucleo VCP path for RTS/CTS.",
+    "RTS and CTS are active-low hardware controls; RTS alone does not guarantee a peer stops before overrun."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32u575zi.pdf",
+      "scope": "DS13737 Rev10 Table26 Q-column and Table27 exact STM32U575ZIT6Q PA9/PA10/PA11/PA12 AF7"
+    }
+  ]
+}

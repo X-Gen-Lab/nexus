@@ -160,7 +160,8 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
         "h743-uart-fifo.toml", "u575-uart-fifo.toml",
         "consumers/uart-fifo.c", "f407zg-eth-frames.toml",
         "gd470-eth-frames.toml", "boards/f407zg-eth-frames/board.json",
-        "boards/gd470-eth-frames/board.json", "consumers/ethernet-frames.c"))
+        "boards/gd470-eth-frames/board.json", "consumers/ethernet-frames.c",
+        "h743-uart-rtscts.toml", "u575-uart-rtscts.toml"))
 REQUIRED_FILES += ("tools/configure/selected_contracts.py",
                    *IO_EVOLUTION_VERIFICATION_FILES)
 REQUIRED_FILES += ("io/private/uart_fifo_impl.h",)
@@ -173,9 +174,7 @@ REQUIRED_FILES += (
 REQUIRED_FILES += (
     "tools/configure/providers/stm32g474/adc_group.py",
     "soc/stm32g474/reviews/adc-group.json",
-    "io/include/nexus/io/adc_group.h", "io/src/adc_group.c",
-    "soc/stm32g474/private/stm32g474_adc_group.h",
-    "soc/stm32g474/drivers/adc_group.c")
+    "io/include/nexus/io/adc_group.h", "io/src/adc_group.c")
 # Required payload identity is separate from CMake's production source graph.
 # Every exposed kernel profile must survive a rehashed omission attempt.
 for _port in ("ARM_CM0", "ARM_CM3", "ARM_CM4F", "ARM_CM7/r0p1",

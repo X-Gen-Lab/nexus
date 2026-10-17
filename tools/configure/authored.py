@@ -149,10 +149,11 @@ def read(path, snapshots, root, fail, obj, integer, text):
 def editor_schema():
     """Expose the same authoring fields for editor completion, not resolution."""
     try:
-        from . import kernel, threadx
+        from . import kernel, threadx, uart_formats
     except ImportError:
         import kernel
         import threadx
+        import uart_formats
 
     def record(fields, required=()):
         properties = {name: {"type": "string"} for name in sorted(fields)}
@@ -259,8 +260,17 @@ def editor_schema():
             properties[kind]["additionalProperties"]["properties"]["filters"] = {
                 "type": "array", "items": filters, "maxItems": 36}
         if kind == "uart":
-            irq = properties[kind]["additionalProperties"]["properties"]["irq"]
+            uart = properties[kind]["additionalProperties"]
+            irq = uart["properties"]["irq"]
             irq["properties"]["probe"] = {"type": "boolean"}
+            uart["properties"]["frame"]["properties"]["flow"] = {"type": "string"}
+            uart["allOf"] = [{
+                "if": {"properties": {"mode": {"const": uart_formats.RTSCTS_MODE}},
+                       "required": ["mode"]},
+                "then": {"properties": {
+                    "frame": {"const": dict(uart_formats.RTSCTS_FRAME)}}},
+                "else": {"properties": {
+                    "frame": {"properties": {"flow": {"const": "none"}}}}}}]
         if kind == "i2c":
             timing_fields = {"kernel_hz_min", "kernel_hz_max", "pclk_hz_min",
                              "bus_hz_min", "rise_ns_max", "fall_ns_max", "source"}

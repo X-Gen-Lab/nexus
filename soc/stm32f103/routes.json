@@ -67,7 +67,7 @@
       "modes": [
         "independent"
       ],
-      "source": "RM0008 IWDG KR/PR/RLR/SR and FLASH_OBR_IWDG_SW; DS5319 Rev20 Table25 LSI 30/40/60 kHz; DBGMCU_CR_DBG_IWDG_STOP. Products own feed and recovery policy."
+      "source": "RM0008 IWDG KR/PR/RLR/SR and FLASH_OBR_IWDG_SW; DS5319 Rev20 Table25 LSI 30/40/60 kHz. ES0962.2.2 excludes CPU DBGMCU_CR access; debug_freeze=false only, true returns UNSUPPORTED before activation. External debugger setup is neither observed nor controlled. Products own feed and recovery policy."
     },
     {
       "id": "exti0-pa0",

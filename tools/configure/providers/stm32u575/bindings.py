@@ -46,11 +46,12 @@ def _gpdma_uart(item, result, state, name, capacity):
 
 def constructor(item, result, board_bindings, routes, devices):
     """Construct the selected exact static provider and cold resource leases."""
-    from . import validate_selection
+    from . import mode_implementation, validate_selection
     item = controller_ir(item, "stm32u575")
     if item.provider != "stm32u575":
         fail("U575 constructor cannot reinterpret a foreign provider decision")
     validate_selection(item, item)
+    implementation = mode_implementation(item.kind, item.mode)
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
@@ -70,7 +71,8 @@ def constructor(item, result, board_bindings, routes, devices):
             raise ValueError("U575 USART requires an explicit bounded byte ring")
         if item.mode == "dma-tx":
             return _gpdma_uart(item, result, state, name, capacity)
-        fifo = item.mode == "irq-fifo-bytes"
+        fifo = item.mode in uart_formats.FIFO_MODES
+        flow = item.mode == uart_formats.RTSCTS_MODE
         owner = state
         if fifo:
             definitions += uart_formats.fifo_definitions(item)
@@ -86,15 +88,16 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.irq = {item.controller}_IRQn;",
                         f"    {state}.profile = NX_UART_RX_BYTES;",
                         f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
-                        f"    nx_result_t status = nx_stm32u575_{item.controller.lower()}_pins_prepare();",
+                        f"    nx_result_t status = nx_stm32u575_{item.controller.lower()}"
+                        + ("_rtscts" if flow else "") + "_pins_prepare();",
                         "    if (status != NX_SUCCESS) { return status; }"]
         if fifo:
             definitions += [f"    {owner}.fifo = &s_nx_fifo_profile_{name};",
-                            "    return nx_stm32u575_uart_fifo_initialize("
+                            f"    return nx_stm32u575_{implementation}_initialize("
                             f"&{owner}, 4000000u, 1000000u);"]
         else:
             definitions += [f"    return nx_stm32u575_uart_initialize(&{state}, 4000000u, 1000000u);"]
-        handler = "uart_fifo" if fifo else "uart"
+        handler = implementation if fifo else "uart"
         brief = ("Selected bounded FIFO RX/TX budgets." if fifo else
                  "One selected controller, at most one TX/RX byte.")
         definitions += ["}", f"void {item.controller}_IRQHandler(void);",
@@ -274,8 +277,6 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"stop_{name}()"
     else:
         raise ValueError("Unmaintained U575 constructor")
-    from . import mode_implementation
-    implementation = mode_implementation(item.kind, item.mode)
     return Construction(
         state_type=("nx_i2c_v2_state_t" if item.kind == "i2c" else
                     f"nx_stm32u575_{implementation}_state_t"),

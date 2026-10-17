@@ -1433,7 +1433,7 @@
                 ]
               },
               "flow": {
-                "const": "none"
+                "type": "string"
               },
               "parity": {
                 "enum": [
@@ -1547,7 +1547,44 @@
           "binding",
           "mode"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "irq-fifo-rtscts-bytes"
+                }
+              },
+              "required": [
+                "mode"
+              ]
+            },
+            "then": {
+              "properties": {
+                "frame": {
+                  "const": {
+                    "data_bits": 8,
+                    "parity": "none",
+                    "stop_bits": 1,
+                    "flow": "rts-cts"
+                  }
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "frame": {
+                  "properties": {
+                    "flow": {
+                      "const": "none"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "usb_device": {

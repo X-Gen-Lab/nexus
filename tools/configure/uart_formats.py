@@ -6,13 +6,16 @@ except ImportError:
 
 
 DEFAULT = {"data_bits": 8, "parity": "none", "stop_bits": 1, "flow": "none"}
+RTSCTS_MODE = "irq-fifo-rtscts-bytes"
+RTSCTS_FRAME = {**DEFAULT, "flow": "rts-cts"}
+FIFO_MODES = ("irq-fifo-bytes", RTSCTS_MODE)
 FIFO_THRESHOLDS = ("eighth", "quarter", "half", "three-quarters",
                    "seven-eighths")
 
 
 def _fifo(selection, route, provider):
     profile = selection.get("fifo")
-    if selection["mode"] != "irq-fifo-bytes":
+    if selection["mode"] not in FIFO_MODES:
         if "fifo" in selection:
             fail("FIFO profile belongs only to the selected FIFO byte mode")
         return
@@ -46,6 +49,9 @@ def validate(selection, route, provider):
     frame = selection.get("frame")
     words = selection["mode"] == "irq-words"
     if frame is None:
+        if selection["mode"] == RTSCTS_MODE:
+            selection["frame"] = dict(RTSCTS_FRAME)
+            return
         if words:
             fail("Word UART requires explicit reviewed 9N1 frame")
         return
@@ -56,6 +62,10 @@ def validate(selection, route, provider):
     if (not isinstance(frame["parity"], str) or
             frame["parity"] not in {"none", "even", "odd"}):
         fail("UART frame parity is unsupported")
+    if selection["mode"] == RTSCTS_MODE:
+        if frame != RTSCTS_FRAME:
+            fail("RTSCTS FIFO mode requires its exact derived 8N1 frame")
+        return
     if frame["flow"] != "none":
         fail("UART flow requires separately reviewed RTS/CTS Board routes")
     if (bits == 7 and frame["parity"] == "none" or

@@ -216,6 +216,10 @@ Cancellation or failure does not justify replaying an acknowledged prefix or
 silently performing bus recovery. The enhanced face and base I2C interface share
 one executor. Timing inputs must include their reviewed clock and electrical
 bounds; a calculation is not a measurement of rise time or clock stretching.
+After physical STOP and bus idle are proved, refused STOP-flag or CR2 cleanup
+reports IO and preserves the actual progress count. The controller retains fault
+responsibility and rejects new admission until explicit recovery; already-drained
+caller storage may return.
 
 ADC decoding reads only consumer-owned or acquired, producer-detached storage.
 It handles one-to-four-byte integer samples without allocating, retaining a
