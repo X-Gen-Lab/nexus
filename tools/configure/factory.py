@@ -4,10 +4,14 @@ try:
     from .providers.common import mode_traits, fail
     from .providers import maintained
     from .ir import ConfigurationIR
+    from . import io_traits
+    from . import enhanced_endpoints
 except ImportError:
     from providers.common import mode_traits, fail
     from providers import maintained
     from ir import ConfigurationIR
+    import io_traits
+    import enhanced_endpoints
 
 FACTORY_ABI_EPOCH = 1
 
@@ -32,7 +36,10 @@ def interface_type(class_name, shape):
 
 
 def public_header(kind):
-    return {"pwm": "timer", "eth": "ethernet"}.get(kind, kind)
+    return {"pwm": "timer", "eth": "ethernet",
+            "spi_transaction_device": "spi_transaction",
+            "i2c_long_device": "i2c_long",
+            "spi_dma_transaction_device": "spi_dma_transaction"}.get(kind, kind)
 
 
 def _typed(result):
@@ -44,14 +51,33 @@ def classes(result):
     """Keep controller and endpoint namespaces independent in every view."""
     result = _typed(result)
     records = [(kind, "port", [item for item in result.controllers
-                              if item.kind == kind]) for kind in KINDS]
+                              if controller_class(item) == kind])
+               for kind in KINDS]
+    for kind in ("uart_word", "spi_dma_transaction"):
+        instances = [item for item in result.controllers
+                     if controller_class(item) == kind]
+        if instances:
+            records.append((kind, "port", instances))
     records += [(kind + "_device", "endpoint", [item for item in result.devices
-                  if item.kind == kind]) for kind in ("spi", "i2c")]
+                  if enhanced_endpoints.class_name(item) == kind + "_device"])
+                for kind in ("spi", "i2c")]
+    for name in ("spi_transaction_device", "i2c_long_device",
+                 "spi_dma_transaction_device"):
+        instances = [item for item in result.devices
+                     if enhanced_endpoints.class_name(item) == name]
+        if instances:
+            records.append((name, "endpoint", instances))
     records.append(("usb_endpoint", "endpoint", [item for item in result.devices
                     if item.kind == "usb_device"]))
     records.append(("mdio", "port", [item for item in result.controllers
                                     if item.kind == "eth"]))
     return records
+
+
+def controller_class(item):
+    """Physical UART resource and nominal word face remain distinct facts."""
+    return ("uart_word" if item.mode == "irq-words" else
+            item.interface_kind or item.kind)
 
 
 def emit(result):
@@ -62,6 +88,10 @@ def emit(result):
               '#ifndef NEXUS_FACTORY_H', '#define NEXUS_FACTORY_H']
     for kind in KINDS:
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
+    for name, _, _ in classes(result):
+        if name in {"spi_transaction_device", "i2c_long_device", "uart_word",
+                    "spi_dma_transaction", "spi_dma_transaction_device"}:
+            header.append(f'#include "nexus/io/{public_header(name)}.h"')
     header.append('#include "nexus/io/mdio.h"')
     header += ['#ifdef __cplusplus', 'extern "C" {', '#endif']
     source = []
@@ -98,6 +128,12 @@ def emit(result):
         cap_header, cap_source = emit_capabilities(result)
         header.extend(cap_header)
         source.extend(cap_source)
+        traits_header, traits_source = io_traits.emit_controllers(result.controllers)
+        header.extend(traits_header)
+        source.extend(traits_source)
+        endpoint_header, endpoint_source = enhanced_endpoints.emit_traits(result)
+        header.extend(endpoint_header)
+        source.extend(endpoint_source)
     header += ['#ifdef __cplusplus', '}', '#endif', '#endif', '']
     return "\n".join(header), "\n".join(source) + "\n"
 
@@ -222,6 +258,7 @@ def emit_capabilities(result):
         '/**',
         ' * \\brief Readonly bounds of the selected provider/mode.',
         ' * \\note Zero units/messages means no bound described, not unlimited.',
+        ' * Zero unit_bytes means per-request word width; see typed traits.',
         ' * For I2C, units bounds each message; unit_bytes is the payload unit.',
         ' * For Flash, unit_bytes constrains destination offset and length;',
         ' * buffer_alignment describes caller input, independently of that unit.',
@@ -239,6 +276,17 @@ def emit_capabilities(result):
             flags, units, size, alignment, messages = _capability(
                 item, result.soc_family == "native",
                 instance if class_name == "usb_endpoint" else None)
+            if class_name == "i2c_long_device":
+                units = "NX_I2C_LONG_MAX_MESSAGE_BYTES"
+            elif class_name == "spi_transaction_device":
+                # Words are 8/16-bit per transaction, not fixed byte units.
+                units = 0 if result.soc_family == "native" else 256
+                size, alignment, messages = 0, 1, "NX_SPI_MAX_SEGMENTS"
+            elif class_name == "uart_word":
+                units, size, alignment = 0, 2, 2
+            elif class_name in {"spi_dma_transaction",
+                                "spi_dma_transaction_device"}:
+                units, size, alignment, messages = 0, 0, 1, "NX_SPI_MAX_SEGMENTS"
             if class_name == "mdio":
                 flags, units, size, alignment, messages = "NX_FACTORY_CAP_POLLING", 1, 2, 1, 1
             # Public C constants are the bounds authority; never recopy values.

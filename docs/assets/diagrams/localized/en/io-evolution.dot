@@ -1,0 +1,67 @@
+// FIG-16 current software mechanisms; selected-provider scope, not HIL.
+// Basis: c4249e98 baseline plus the IO evolution sources linked by
+// docs/design/io-evolution.md. The task ledger owns execution status.
+// Every edge states generation, lookup, call or copied-observation semantics.
+digraph ioEvolution {
+    graph [label="FIG-16 Current I/O assembly and execution\nSoftware mechanisms; exact mode status stays in the ledger",
+           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB,
+           bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.60,
+           newrank=true];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.8];
+    subgraph clusterBuild {
+        label="Build time: one authored assembly";
+        color="#64748b"; fontname="Noto Sans CJK SC";
+        assembly [label="Authored TOML"];
+        facts [label="Reviewed SoC modes and Board routes"];
+        resolver [label="Strict resolver\nResource / trigger / DMA plans"];
+        ir [label="Immutable typed IR"];
+        bundle [label="Atomic generated bundle"];
+        cmake [label="CMake: sole software target graph"];
+        assembly -> resolver [label="selects modes and capacities"];
+        facts -> resolver [label="constrains legal combinations"];
+        resolver -> ir [label="publishes validated facts"];
+        ir -> bundle [label="generates selected objects"];
+        bundle -> cmake [label="provides configuration and sources"];
+    }
+    subgraph clusterRuntime {
+        label="Runtime: caller-owned progress and lifetime";
+        color="#64748b"; fontname="Noto Sans CJK SC";
+        app [label="External application\nScheduling / shutdown owner", fillcolor="#f8fafc"];
+        factory [label="Typed factory\nExisting static identity only"];
+        face [label="Immutable typed face\nShared ops + instance context"];
+        lifecycle [label="Public platform lifecycle\nnx_platform_start / stop"];
+        provider [label="Selected provider\nPrivate state and controller owner"];
+        traits [label="Optional selected traits\nRead-only facts", style="rounded,dashed,filled"];
+        preflight [label="Optional cold silicon preflight\nExplicit source and immutable policy",
+                   style="rounded,dashed,filled"];
+        time [label="Optional timestamp facts\nDomain / epoch / rate / uncertainty",
+              style="rounded,dashed,filled"];
+        app -> factory [label="looks up a typed identity"];
+        factory -> face [label="returns an existing reference"];
+        app -> face [label="calls I/O and service after startup"];
+        face -> provider [label="ops(context, ...)"];
+        app -> lifecycle [label="explicit start / stop calls"];
+        lifecycle -> provider [label="initializes / drains private state"];
+        app -> traits [label="optionally inspects selected facts", style=dashed];
+        app -> preflight [label="cold call / copied admission result",
+                          style=dashed, dir=both];
+        app -> time [label="paired facts / same-domain elapsed result",
+                     style=dashed, dir=both];
+    }
+    hardware [label="Selected controller / IRQ / DMA", fillcolor="#f8fafc"];
+    silicon [label="Explicit silicon identity source", fillcolor="#f8fafc"];
+    bundle -> factory [label="emits lookup code"];
+    bundle -> face [label="emits immutable faces"];
+    bundle -> provider [label="emits private instance state"];
+    bundle -> lifecycle [label="emits lifecycle glue"];
+    bundle -> traits [label="emits only when selected", style=dashed];
+    cmake -> provider [label="selects and links implementation"];
+    // Layout only: keep all build nodes above the runtime view.
+    cmake -> app [style=invis, weight=100];
+    provider -> hardware [label="provider configures / IRQ reports facts", dir=both];
+    preflight -> silicon [label="performs one bounded read", style=dashed];
+}

@@ -40,7 +40,8 @@
         }
       ],
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "irq-words"
       ],
       "source": "Host virtual model; no physical timing"
     },
@@ -97,7 +98,8 @@
         }
       ],
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "irq-words"
       ],
       "source": "Host independent UART model; no physical timing"
     },

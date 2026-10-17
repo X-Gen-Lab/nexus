@@ -12,9 +12,10 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [完整文档优化清单](documentation-improvements.md) | 从同一台账派生的读者清单，不建立第二份状态权威 |
 | [内容与图示标准](documentation-standards.md) | 清晰表达、规范用语、事实/资格、示例、架构图和独立审查约束 |
 | [页面模板](documentation-templates.md) | tutorial/how-to/reference/explanation/status必需问题 |
-| [当前与目标参考图](../assets/diagrams/README.md) | 17 对本地 SVG/DOT：15 类必需图与 2 张补充图；身份与范围由图册清单维护 |
+| [当前与目标参考图](../assets/diagrams/README.md) | 18 对本地 SVG/DOT：16 类主图与 2 张补充图；身份与范围由图册清单维护 |
 | [文档迁移映射](documentation-migration.csv) | 当前正文、工具和相邻 README 的去向；保留原资格与台账身份 |
 | [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
+| [I/O 增量架构](io-evolution.md) | 资源/触发/DMA 计划、可选 traits、硅片准入、数据单位与当前/待实现边界；状态由 IO-01–42 台账维护 |
 | [工程手册](engineering-handbook.md) | 既有格式/注释、工具、自动化、证据与发布 |
 | [构建系统合同](build-system.md) | 配置事务、增量依赖、目标策略、开发入口与交付边界 |
 | [构建系统48项台账](build-system-execution.csv) | 原始退出条件、实现路径与本轮执行证据 |

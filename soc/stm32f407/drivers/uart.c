@@ -6,14 +6,21 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "../../common/uart_control.h"
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_usart.h"
 
-/** \brief Initialize 8N1 and only the selected per-instance RX storage. */
-nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
-                                     uint32_t clock_hz) {
+#ifndef NX_STM32_UART_ENABLE
+#define NX_STM32_UART_ENABLE(registers) LL_USART_Enable(registers)
+#endif
+
+/** \brief Select the complete frame before the first UE and IRQ enable. */
+static inline nx_result_t initialize_frame(nx_stm32_uart_state_t* port,
+                                           uint32_t clock_hz, uint32_t frame,
+                                           uint32_t stop, uint32_t flow) {
     if (port == NULL || port->registers == NULL || port->baud == 0U ||
-        port->baud > clock_hz / 16U || port->initialized ||
+        port->baud > clock_hz / 16U || port->initialized || port->irq < 0 ||
+        port->irq >= 82 ||
         (port->profile != NX_UART_RX_BYTES &&
          port->profile != NX_UART_RX_EVENTS &&
          port->profile != NX_UART_RX_BLOCKS) ||
@@ -22,49 +29,106 @@ nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
              : (port->rx_storage == NULL || port->rx_capacity == 0U))) {
         return NX_ERROR_INVALID;
     }
-    uint32_t divisor = (clock_hz + port->baud / 2U) / port->baud;
-    if (divisor == 0U || divisor > 0xFFFFU) {
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    uint32_t divisor =
+        clock_hz / port->baud +
+        (clock_hz % port->baud >= port->baud / 2U + port->baud % 2U ? 1U : 0U);
+    if (divisor == 0U || divisor > UINT16_MAX) {
         return NX_ERROR_UNSUPPORTED;
     }
-    /* Disabled silicon may still belong to a retained IRQ or DMA publisher. */
-    if ((port->registers->CR1 &
+    if (port->active != NULL || !NX_UART_IRQ_QUIET(port->irq) ||
+        (port->registers->CR1 &
          (USART_CR1_UE | USART_CR1_RXNEIE | USART_CR1_TXEIE | USART_CR1_TCIE |
           USART_CR1_IDLEIE | USART_CR1_PEIE)) != 0U ||
         (port->registers->CR3 &
          (USART_CR3_DMAT | USART_CR3_DMAR | USART_CR3_EIE)) != 0U) {
         return NX_ERROR_BUSY;
     }
-    port->registers->CR1 = 0U;
-    port->registers->CR2 = 0U;
-    port->registers->CR3 =
-        port->profile == NX_UART_RX_BLOCKS ? 0U : (uint32_t)USART_CR3_EIE;
-    /* LL's decimal intermediate truncates selected valid baud divisors.
-     * Keep exact nearest-integer division without a 64-bit helper dependency.
+    /* Existing fields retain a partial cold lease without growing byte state.
      */
-    port->registers->BRR = divisor;
+    port->closing = true;
+    port->initialized = true;
+    port->rx_head = port->rx_tail = port->rx_count = 0U;
+    port->rx_loss = 0U;
+    NX_UART_REG_WRITE(&port->registers->CR1, 0U);
+    nx_arch_dsb();
+    if (port->registers->CR1 != 0U) {
+        goto failed;
+    }
+    uint32_t selected1 = USART_CR1_TE | USART_CR1_RE | frame |
+                         (port->profile == NX_UART_RX_BLOCKS
+                              ? 0U
+                              : (uint32_t)(USART_CR1_RXNEIE | USART_CR1_PEIE));
+    uint32_t selected3 =
+        flow |
+        (port->profile == NX_UART_RX_BLOCKS ? 0U : (uint32_t)USART_CR3_EIE);
+    NX_UART_REG_WRITE(&port->registers->CR2, stop);
+    NX_UART_REG_WRITE(&port->registers->CR3, selected3);
+    NX_UART_REG_WRITE(&port->registers->BRR, divisor);
     (void)port->registers->SR;
     (void)port->registers->DR;
-    port->rx_head = 0U;
-    port->rx_tail = 0U;
-    port->rx_count = 0U;
-    port->rx_loss = 0U;
-    port->active = NULL;
-    port->closing = false;
-    port->initialized = true;
-    /* Exclusive-loop LL setters are not needed under the cold sole-owner
-     * contract. Keep both cold configuration and IRQ gates finite RMW writes.
-     */
-    port->registers->CR1 = USART_CR1_TE | USART_CR1_RE;
-    if (port->profile != NX_UART_RX_BLOCKS) {
-        port->registers->CR1 |= USART_CR1_RXNEIE | USART_CR1_PEIE;
+    NX_UART_REG_WRITE(&port->registers->CR1, selected1);
+    nx_arch_dsb();
+    if (port->registers->CR1 != selected1 || port->registers->CR2 != stop ||
+        port->registers->CR3 != selected3 || port->registers->BRR != divisor) {
+        goto failed;
     }
-    LL_USART_Enable(port->registers);
-#ifndef NEXUS_STM32_MODEL
-    NVIC_SetPriority(port->irq, 5U);
-    NVIC_ClearPendingIRQ(port->irq);
-    NVIC_EnableIRQ(port->irq);
-#endif
+    NX_STM32_UART_ENABLE(port->registers);
+    nx_arch_dsb();
+    if (port->registers->CR1 != (selected1 | USART_CR1_UE)) {
+        goto failed;
+    }
+    NX_UART_IRQ_SET_PRIORITY(port->irq, 5U);
+    NX_UART_IRQ_CLEAR_PENDING(port->irq);
+    NX_UART_IRQ_ENABLE(port->irq);
+    nx_arch_dsb();
+    if (!NX_UART_IRQ_CONFIGURED(port->irq, 5U) ||
+        NX_UART_IRQ_ACTIVE(port->irq) != 0U) {
+        goto failed;
+    }
+    port->closing = false;
     return NX_SUCCESS;
+failed:
+    (void)nx_stm32_uart_stop(port);
+    return NX_ERROR_IO;
+}
+
+/** \brief The legacy constructor keeps its exact eight-bit default frame. */
+nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
+                                     uint32_t clock_hz) {
+    return initialize_frame(port, clock_hz, 0U, 0U, 0U);
+}
+
+/** \brief No UE/NVIC window exposes a temporary default wire format. */
+nx_result_t nx_stm32_uart_initialize_format(nx_stm32_uart_state_t* port,
+                                            uint32_t clock_hz,
+                                            nx_uart_format_t format) {
+    nx_result_t result = nx_uart_format_validate(format);
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    if (format.data_bits == 9U ||
+        (port != NULL && port->profile == NX_UART_RX_BLOCKS)) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    uint32_t frame =
+        (format.data_bits == 8U && format.parity != NX_UART_PARITY_NONE
+             ? USART_CR1_M
+             : 0U) |
+        (format.parity != NX_UART_PARITY_NONE ? USART_CR1_PCE : 0U) |
+        (format.parity == NX_UART_PARITY_ODD ? USART_CR1_PS : 0U);
+    uint32_t stop = format.stop == NX_UART_STOP_2 ? 2U << 12U : 0U;
+    uint32_t flow = ((format.flow == NX_UART_FLOW_RTS ||
+                      format.flow == NX_UART_FLOW_RTS_CTS)
+                         ? USART_CR3_RTSE
+                         : 0U) |
+                    ((format.flow == NX_UART_FLOW_CTS ||
+                      format.flow == NX_UART_FLOW_RTS_CTS)
+                         ? USART_CR3_CTSE
+                         : 0U);
+    return initialize_frame(port, clock_hz, frame, stop, flow);
 }
 
 /** \brief Same side-effect-free rejection checks serve TX and RS485. */
@@ -109,7 +173,8 @@ static nx_result_t start(nx_stm32_uart_state_t* port,
     port->terminal = NX_SUCCESS;
     port->drain_deadline = NX_DEADLINE_NEVER;
     port->registers->SR &= ~(uint32_t)USART_SR_TC;
-    port->registers->CR1 |= USART_CR1_TXEIE;
+    NX_UART_REG_WRITE(&port->registers->CR1,
+                      port->registers->CR1 | (USART_CR1_TXEIE));
     nx_arch_irq_restore(mask);
     return NX_SUCCESS;
 }
@@ -133,7 +198,8 @@ nx_result_t nx_stm32_uart_start_admitted(void* context,
 
 /** \brief Stop loading bytes while preserving the final in-flight TC drain. */
 static void begin_drain(nx_stm32_uart_state_t* port, nx_result_t terminal) {
-    port->registers->CR1 &= ~(uint32_t)USART_CR1_TXEIE;
+    NX_UART_REG_WRITE(&port->registers->CR1,
+                      port->registers->CR1 & (~(uint32_t)USART_CR1_TXEIE));
     port->terminal = terminal;
     (void)nx_request_transition(&port->active->base, NX_REQUEST_DRAINING);
     port->drain_deadline =
@@ -141,7 +207,8 @@ static void begin_drain(nx_stm32_uart_state_t* port, nx_result_t terminal) {
     if (port->tx_position == 0U || (port->registers->SR & USART_SR_TC) != 0U) {
         port->tx_complete = true;
     } else {
-        port->registers->CR1 |= USART_CR1_TCIE;
+        NX_UART_REG_WRITE(&port->registers->CR1,
+                          port->registers->CR1 | (USART_CR1_TCIE));
     }
 }
 
@@ -197,20 +264,25 @@ bool nx_stm32_uart_tx_irq(nx_stm32_uart_state_t* port, uint32_t status) {
     bool notify = false;
     nx_uart_tx_request_t* request = port->active;
     bool wrote_byte = false;
-    if (request != NULL && (status & USART_SR_TXE) != 0U &&
+    if (request != NULL && port->tx_position < request->length &&
+        (status & USART_SR_TXE) != 0U &&
         (port->registers->CR1 & USART_CR1_TXEIE) != 0U) {
         LL_USART_TransmitData8(port->registers,
                                request->data[port->tx_position++]);
         wrote_byte = true;
         if (port->tx_position == request->length) {
-            port->registers->CR1 &= ~(uint32_t)USART_CR1_TXEIE;
-            port->registers->CR1 |= USART_CR1_TCIE;
+            NX_UART_REG_WRITE(&port->registers->CR1,
+                              port->registers->CR1 &
+                                  (~(uint32_t)USART_CR1_TXEIE));
+            NX_UART_REG_WRITE(&port->registers->CR1,
+                              port->registers->CR1 | (USART_CR1_TCIE));
         }
     }
     if (request != NULL && !wrote_byte && (status & USART_SR_TC) != 0U &&
         (port->registers->CR1 & USART_CR1_TCIE) != 0U &&
         (port->registers->CR1 & USART_CR1_TXEIE) == 0U) {
-        port->registers->CR1 &= ~(uint32_t)USART_CR1_TCIE;
+        NX_UART_REG_WRITE(&port->registers->CR1,
+                          port->registers->CR1 & (~(uint32_t)USART_CR1_TCIE));
         if (port->terminal == NX_SUCCESS &&
             nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
             port->terminal = NX_ERROR_TIMEOUT;
@@ -222,7 +294,8 @@ bool nx_stm32_uart_tx_irq(nx_stm32_uart_state_t* port, uint32_t status) {
 }
 
 /** \brief Perform one bounded RX observation and at most one TX byte write. */
-void nx_stm32_uart_irq(nx_stm32_uart_state_t* port) {
+static inline void uart_irq_mask(nx_stm32_uart_state_t* port,
+                                 uint8_t payload_mask) {
     if (port == NULL || !port->initialized) {
         return;
     }
@@ -231,7 +304,7 @@ void nx_stm32_uart_irq(nx_stm32_uart_state_t* port) {
     if ((status & (USART_SR_RXNE | USART_SR_PE | USART_SR_FE | USART_SR_ORE |
                    USART_SR_NE)) != 0U) {
         notify = true;
-        uint8_t byte = LL_USART_ReceiveData8(port->registers);
+        uint8_t byte = LL_USART_ReceiveData8(port->registers) & payload_mask;
         uint32_t flags = rx_flags(status);
         bool has_byte = (status & USART_SR_RXNE) != 0U;
         if (!has_byte) {
@@ -268,6 +341,22 @@ void nx_stm32_uart_irq(nx_stm32_uart_state_t* port) {
     }
 }
 
+/** \brief Default byte IRQ has a constant mask and no format-state cost. */
+void nx_stm32_uart_irq(nx_stm32_uart_state_t* port) {
+    uart_irq_mask(port, UINT8_MAX);
+}
+/** \brief Only selected formatted IRQs inspect the parity payload width. */
+void nx_stm32_uart_format_irq(nx_stm32_uart_state_t* port) {
+    if (port == NULL || port->registers == NULL) {
+        return;
+    }
+    uint32_t frame = port->registers->CR1;
+    uint8_t mask = (frame & (USART_CR1_M | USART_CR1_PCE)) == USART_CR1_PCE
+                       ? 0x7FU
+                       : UINT8_MAX;
+    uart_irq_mask(port, mask);
+}
+
 /** \brief Drain source references before release-publishing the unique result.
  */
 void nx_stm32_uart_service(void* context) {
@@ -294,7 +383,9 @@ void nx_stm32_uart_service(void* context) {
         (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
     }
     if (port->tx_complete) {
-        port->registers->CR1 &= ~(uint32_t)(USART_CR1_TXEIE | USART_CR1_TCIE);
+        NX_UART_REG_WRITE(&port->registers->CR1,
+                          port->registers->CR1 &
+                              (~(uint32_t)(USART_CR1_TXEIE | USART_CR1_TCIE)));
         size_t transferred = port->tx_position;
         nx_result_t terminal = port->terminal;
         port->active = NULL;
@@ -389,25 +480,36 @@ nx_result_t nx_stm32_uart_stop(void* context) {
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    nx_arch_irq_state_t mask = nx_arch_irq_save();
+    if (!port->initialized) {
+        return NX_SUCCESS;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
     port->closing = true;
     if (port->active != NULL) {
         if (nx_request_state(&port->active->base) == NX_REQUEST_ACTIVE &&
             !port->tx_complete) {
             begin_drain(port, NX_ERROR_CANCELLED);
         }
-        nx_arch_irq_restore(mask);
+        nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
-    port->registers->CR1 = 0U;
-    port->registers->CR3 = 0U;
-#ifndef NEXUS_STM32_MODEL
-    NVIC_DisableIRQ(port->irq);
-    NVIC_ClearPendingIRQ(port->irq);
-#endif
+    NX_UART_REG_WRITE(&port->registers->CR1, 0U);
+    NX_UART_REG_WRITE(&port->registers->CR3, 0U);
+    nx_arch_dsb();
+    if (port->registers->CR1 != 0U || port->registers->CR3 != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_BUSY;
+    }
+    NX_UART_IRQ_DISABLE(port->irq);
+    NX_UART_IRQ_CLEAR_PENDING(port->irq);
+    nx_arch_dsb();
+    if (!NX_UART_IRQ_QUIET(port->irq)) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_BUSY;
+    }
     port->wake = NULL;
     port->initialized = false;
-    nx_arch_irq_restore(mask);
+    nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }
 
@@ -470,12 +572,12 @@ nx_result_t nx_stm32_uart_flow_configure(nx_stm32_uart_state_t* state, bool rts,
     uint32_t selected =
         (original & ~(uint32_t)(USART_CR3_RTSE | USART_CR3_CTSE)) |
         (rts ? USART_CR3_RTSE : 0U) | (cts ? USART_CR3_CTSE : 0U);
-    state->registers->CR3 = selected;
+    NX_UART_REG_WRITE(&state->registers->CR3, selected);
     nx_arch_dsb();
     nx_result_t result =
         state->registers->CR3 == selected ? NX_SUCCESS : NX_ERROR_IO;
     if (result != NX_SUCCESS) {
-        state->registers->CR3 = original;
+        NX_UART_REG_WRITE(&state->registers->CR3, original);
         nx_arch_dsb();
     }
     nx_arch_irq_restore(saved);
@@ -486,4 +588,121 @@ nx_result_t nx_stm32_uart_flow_configure(nx_stm32_uart_state_t* state, bool rts,
 nx_result_t nx_stm32_uart_tx_validate(void* context,
                                       const nx_uart_tx_request_t* request) {
     return validate_tx(context, request);
+}
+
+/** \brief Cold format selection keeps default state and hot operations intact.
+ */
+nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
+                                           nx_uart_format_t format) {
+    nx_result_t result = nx_uart_format_validate(format);
+    if (state == NULL || state->registers == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    if (format.data_bits == 9U) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (!state->initialized || state->closing) {
+        return NX_ERROR_STATE;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    if (state->active != NULL || state->rx_count != 0U ||
+        (state->registers->CR3 & (USART_CR3_DMAR | USART_CR3_DMAT)) != 0U ||
+        (state->registers->SR & USART_SR_RXNE) != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_BUSY;
+    }
+    uint32_t old1 = state->registers->CR1;
+    uint32_t old2 = state->registers->CR2;
+    uint32_t old3 = state->registers->CR3;
+    uint32_t frame =
+        (format.data_bits == 8U && format.parity != NX_UART_PARITY_NONE
+             ? USART_CR1_M
+             : 0U) |
+        (format.parity != NX_UART_PARITY_NONE ? USART_CR1_PCE : 0U) |
+        (format.parity == NX_UART_PARITY_ODD ? USART_CR1_PS : 0U);
+    uint32_t selected1 =
+        (old1 & ~(uint32_t)(USART_CR1_M | USART_CR1_PCE | USART_CR1_PS)) |
+        frame;
+    uint32_t selected2 = (old2 & ~(uint32_t)USART_CR2_STOP) |
+                         (format.stop == NX_UART_STOP_2 ? 2U << 12U : 0U);
+    uint32_t selected3 = (old3 & ~(uint32_t)(USART_CR3_RTSE | USART_CR3_CTSE)) |
+                         ((format.flow == NX_UART_FLOW_RTS ||
+                           format.flow == NX_UART_FLOW_RTS_CTS)
+                              ? USART_CR3_RTSE
+                              : 0U) |
+                         ((format.flow == NX_UART_FLOW_CTS ||
+                           format.flow == NX_UART_FLOW_RTS_CTS)
+                              ? USART_CR3_CTSE
+                              : 0U);
+    /* A refused UE withdrawal must not change a live frame. */
+    NX_UART_REG_WRITE(&state->registers->CR1, old1 & ~(uint32_t)USART_CR1_UE);
+    nx_arch_dsb();
+    if ((state->registers->CR1 & USART_CR1_UE) != 0U) {
+        if (state->registers->CR1 != old1) {
+            NX_UART_REG_WRITE(&state->registers->CR1, old1);
+            nx_arch_dsb();
+            if (state->registers->CR1 != old1) {
+                state->closing = true;
+            }
+        }
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_IO;
+    }
+    NX_UART_REG_WRITE(&state->registers->CR2, selected2);
+    NX_UART_REG_WRITE(&state->registers->CR3, selected3);
+    NX_UART_REG_WRITE(&state->registers->CR1,
+                      selected1 & ~(uint32_t)USART_CR1_UE);
+    nx_arch_dsb();
+    bool selected =
+        state->registers->CR1 == (selected1 & ~(uint32_t)USART_CR1_UE) &&
+        state->registers->CR2 == selected2 &&
+        state->registers->CR3 == selected3;
+    if (selected) {
+        NX_UART_REG_WRITE(&state->registers->CR1, selected1);
+        nx_arch_dsb();
+        selected = state->registers->CR1 == selected1 &&
+                   state->registers->CR2 == selected2 &&
+                   state->registers->CR3 == selected3;
+    }
+    if (selected) {
+        result = NX_SUCCESS;
+    } else {
+        result = NX_ERROR_IO;
+        NX_UART_REG_WRITE(&state->registers->CR1,
+                          old1 & ~(uint32_t)USART_CR1_UE);
+        nx_arch_dsb();
+        bool restored = (state->registers->CR1 & USART_CR1_UE) == 0U;
+        if (restored) {
+            NX_UART_REG_WRITE(&state->registers->CR2, old2);
+            NX_UART_REG_WRITE(&state->registers->CR3, old3);
+            NX_UART_REG_WRITE(&state->registers->CR1,
+                              old1 & ~(uint32_t)USART_CR1_UE);
+            nx_arch_dsb();
+            restored =
+                state->registers->CR1 == (old1 & ~(uint32_t)USART_CR1_UE) &&
+                state->registers->CR2 == old2 && state->registers->CR3 == old3;
+        }
+        if (restored) {
+            NX_UART_REG_WRITE(&state->registers->CR1, old1);
+            nx_arch_dsb();
+            restored = state->registers->CR1 == old1 &&
+                       state->registers->CR2 == old2 &&
+                       state->registers->CR3 == old3;
+        }
+        if (!restored) {
+            /* Keep the initialized lease for explicit stop/recovery. */
+            state->closing = true;
+            NX_UART_REG_WRITE(&state->registers->CR1,
+                              old1 & ~(uint32_t)USART_CR1_UE);
+            nx_arch_dsb();
+        }
+    }
+    nx_arch_irq_restore(saved);
+    return result;
 }

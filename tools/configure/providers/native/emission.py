@@ -1,5 +1,9 @@
 """Static provider wiring and family system lifecycle emission."""
 from . import bindings
+try:
+    from ... import enhanced_endpoints
+except ImportError:
+    import enhanced_endpoints
 
 
 def implementation(item):
@@ -14,10 +18,11 @@ def operations(item):
 
 
 def includes(result):
-    del result
     source = []
     source += ['#include "nexus/io/native/model.h"',
                '#include "provider.h"']
+    if any(item.mode == "irq-words" for item in result.controllers):
+        source.append('#include "uart_word_provider.h"')
     return source
 
 
@@ -35,10 +40,10 @@ def instance_declarations(item, result):
                 initializer = f" = {{ .port = &s_nx_port_{name}, .address = {device['address']}u }}"
             if "model_bytes" in device:
                 source.append(f'static uint8_t s_nx_model_{child_name}[{device["model_bytes"]}];')
-            source += [f'static nx_native_{kind}_endpoint_state_t s_nx_endpoint_{child_name}{initializer};',
-                       f'static const nx_{kind}_endpoint_t s_nx_device_face_{child_name} = {{',
-                       f'    &nx_native_{kind}_endpoint_ops, &s_nx_endpoint_{child_name}', '};',
-                       f'const nx_{kind}_endpoint_t* const nx_device_{child_name} = &s_nx_device_face_{child_name};']
+            source += [f'static nx_native_{kind}_endpoint_state_t s_nx_endpoint_{child_name}{initializer};']
+            source += enhanced_endpoints.face(
+                device, f"s_nx_endpoint_{child_name}",
+                f"nx_native_{kind}_endpoint_ops", "native")
     return source
 
 

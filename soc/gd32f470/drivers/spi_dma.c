@@ -10,6 +10,7 @@
 #include "gd32f4xx.h"
 #include "gd32f4xx_dma.h"
 #include "private/system.h"
+#include "spi_dma_sequence.h"
 
 #ifndef NX_GD32_SPI_DMA_CONTROL_DISABLE
 #if defined(NX_GD32_SPI_DMA_DISABLE)
@@ -35,6 +36,10 @@
 #else
 #define NX_GD32_SPI_DMA_FLAGS_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
 #endif
+#endif
+
+#ifndef NX_SPI_DMA_SEQUENCE_ENGINE_READ
+#define NX_SPI_DMA_SEQUENCE_ENGINE_READ(control) (*(control))
 #endif
 
 /** \brief Maintained identity selects one exact pair without new instance RAM.
@@ -193,9 +198,10 @@ configuration(const nx_gd32_spi_dma_endpoint_state_t* device) {
  */
 static nx_result_t validate_buffers(const nx_gd32_spi_dma_state_t* state,
                                     const nx_spi_request_t* request,
-                                    uint8_t memory_flags) {
-    if ((memory_flags & ~(NX_SPI_MEMORY_TX_FIXED | NX_SPI_MEMORY_RX_FIXED)) !=
-        0U) {
+                                    uint8_t memory_flags, uint8_t bits) {
+    if ((bits != 8U && bits != 16U) ||
+        (memory_flags & ~(NX_SPI_MEMORY_TX_FIXED | NX_SPI_MEMORY_RX_FIXED)) !=
+            0U) {
         return NX_ERROR_INVALID;
     }
     if (request == NULL || request->length == 0U || request->length > 65535U) {
@@ -204,19 +210,22 @@ static nx_result_t validate_buffers(const nx_gd32_spi_dma_state_t* state,
     if (request->tx == NULL || request->rx == NULL) {
         return NX_ERROR_UNSUPPORTED;
     }
-    size_t tx_span =
-        (memory_flags & NX_SPI_MEMORY_TX_FIXED) != 0U ? 1U : request->length;
-    size_t rx_span =
-        (memory_flags & NX_SPI_MEMORY_RX_FIXED) != 0U ? 1U : request->length;
+    size_t width = bits / 8U;
+    size_t tx_span = (memory_flags & NX_SPI_MEMORY_TX_FIXED) != 0U
+                         ? width
+                         : request->length * width;
+    size_t rx_span = (memory_flags & NX_SPI_MEMORY_RX_FIXED) != 0U
+                         ? width
+                         : request->length * width;
     nx_result_t result =
         nx_dma_buffer_validate(state->regions, state->region_count, request->tx,
-                               tx_span, 1U, NX_DMA_TO_DEVICE);
+                               tx_span, width, NX_DMA_TO_DEVICE);
     if (result != NX_SUCCESS) {
         return result;
     }
     result =
         nx_dma_buffer_validate(state->regions, state->region_count, request->rx,
-                               rx_span, 1U, NX_DMA_FROM_DEVICE);
+                               rx_span, width, NX_DMA_FROM_DEVICE);
     if (result != NX_SUCCESS) {
         return result;
     }
@@ -230,11 +239,12 @@ static nx_result_t validate_buffers(const nx_gd32_spi_dma_state_t* state,
  */
 static void program(nx_gd32_spi_dma_state_t* state,
                     const nx_spi_request_t* request, bool receive,
-                    uint8_t memory_flags) {
+                    uint8_t memory_flags, uint8_t bits) {
     acknowledge(state, receive);
     uint8_t fixed = receive ? NX_SPI_MEMORY_RX_FIXED : NX_SPI_MEMORY_TX_FIXED;
     uint32_t increment = (memory_flags & fixed) != 0U ? 0U : DMA_CHXCTL_MNAGA;
-    uint32_t control = ((primary(state) ? 2U : 3U) << 25U) | increment |
+    uint32_t control = (bits == 16U ? (1U << 11U) | (1U << 13U) : 0U) |
+                       ((primary(state) ? 2U : 3U) << 25U) | increment |
                        (1U << 17U) | DMA_CHXCTL_FTFIE | DMA_CHXCTL_TAEIE |
                        DMA_CHXCTL_SDEIE | (receive ? 0U : 1U << 6U);
     if (receive) {
@@ -258,7 +268,7 @@ static void program(nx_gd32_spi_dma_state_t* state,
  * interval. */
 static nx_result_t start(nx_gd32_spi_dma_endpoint_state_t* device,
                          nx_spi_request_t* request, bool admitted,
-                         uint8_t memory_flags) {
+                         uint8_t memory_flags, uint8_t bits, bool retained_cs) {
     nx_result_t result = configuration(device);
     if (result != NX_SUCCESS) {
         return result;
@@ -267,19 +277,22 @@ static nx_result_t start(nx_gd32_spi_dma_endpoint_state_t* device,
         return NX_ERROR_CONTEXT;
     }
     nx_gd32_spi_dma_state_t* state = device->dma;
-    result = validate_buffers(state, request, memory_flags);
+    result = validate_buffers(state, request, memory_flags, bits);
     if (result != NX_SUCCESS) {
         return result;
     }
     uint32_t saved = nx_gd32_critical_enter();
     if (!state->initialized || state->stopping || state->faulted) {
         result = NX_ERROR_STATE;
-    } else if (state->active != NULL || state->spi.active ||
+    } else if (state->active != NULL || (state->spi.active && !retained_cs) ||
                ((engine(state, true)[0] | engine(state, false)[0]) &
                 DMA_CHXCTL_CHEN) != 0U ||
                (SPI_STAT(state->spi.controller->registers) & SPI_STAT_TRANS) !=
                    0U) {
         result = NX_ERROR_BUSY;
+    } else if (retained_cs &&
+               (!state->spi.active || state->endpoint != device)) {
+        result = NX_ERROR_STATE;
     } else if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
         result = NX_ERROR_TIMEOUT;
     } else {
@@ -300,11 +313,14 @@ static nx_result_t start(nx_gd32_spi_dma_endpoint_state_t* device,
     state->tx_complete = false;
     state->rx_complete = false;
     state->drain_deadline = NX_DEADLINE_NEVER;
-    SPI_CTL0(state->spi.controller->registers) = device->endpoint.control;
+    SPI_CTL0(state->spi.controller->registers) =
+        device->endpoint.control | (bits == 16U ? SPI_CTL0_FF16 : 0U);
     SPI_CTL1(state->spi.controller->registers) = 0U;
-    program(state, request, true, memory_flags);
-    program(state, request, false, memory_flags);
-    GPIO_BOP(device->endpoint.cs_gpio) = device->endpoint.cs_mask << 16U;
+    program(state, request, true, memory_flags, bits);
+    program(state, request, false, memory_flags, bits);
+    if (!retained_cs) {
+        GPIO_BOP(device->endpoint.cs_gpio) = device->endpoint.cs_mask << 16U;
+    }
     nx_gd32_peripheral_barrier();
     engine(state, true)[0] |= DMA_CHXCTL_CHEN;
     engine(state, false)[0] |= DMA_CHXCTL_CHEN;
@@ -318,13 +334,13 @@ static nx_result_t start(nx_gd32_spi_dma_endpoint_state_t* device,
 /** \brief Rejectable conditions are resolved before the provider creates a
  * loan. */
 static nx_result_t submit(void* context, nx_spi_request_t* request) {
-    return start(context, request, false, 0U);
+    return start(context, request, false, 0U, 8U, false);
 }
 
 /** \brief Copy explicit memory modes only after valid request admission. */
 static nx_result_t submit_memory(void* context, nx_spi_request_t* request,
                                  uint8_t memory_flags) {
-    return start(context, request, false, memory_flags);
+    return start(context, request, false, memory_flags, 8U, false);
 }
 
 /** \brief Transfer an existing adapter loan without second admission. */
@@ -333,7 +349,7 @@ static nx_result_t start_admitted(void* context, nx_spi_request_t* request) {
         nx_request_state(&request->base) != NX_REQUEST_QUEUED) {
         return NX_ERROR_STATE;
     }
-    return start(context, request, true, 0U);
+    return start(context, request, true, 0U, 8U, false);
 }
 
 /** \brief Withdraw both memory sources while preserving CS and all references.
@@ -420,7 +436,7 @@ void nx_gd32_spi_dma_irq(nx_gd32_spi_dma_state_t* state, bool receive) {
 
 /** \brief Two disabled engines, detached IRQs and idle wire precede
  * publication. */
-static void service(void* context) {
+static void service_phase(void* context, bool retained_cs) {
     nx_gd32_spi_dma_state_t* state = context;
     if (state == NULL || nx_gd32_in_isr() || nx_gd32_irq_masked()) {
         return;
@@ -444,24 +460,38 @@ static void service(void* context) {
                nx_deadline_expired(request->base.deadline, now)) {
         begin_drain(state, NX_ERROR_TIMEOUT);
     }
-    bool idle =
-        (status & SPI_STAT_TRANS) == 0U && (status & SPI_STAT_TBE) != 0U;
     bool terminal =
         state->draining || (state->tx_complete && state->rx_complete);
     uint32_t irq_mask = DMA_CHXCTL_FTFIE | DMA_CHXCTL_HTFIE | DMA_CHXCTL_TAEIE |
                         DMA_CHXCTL_SDEIE;
+    /* Disabled readback can coincide with the final peripheral bus beat.
+     * Sequence every engine/IRQ proof before the final wire-idle snapshot. */
+    uint32_t requests = SPI_CTL1(state->spi.controller->registers);
+    uint32_t tx_control =
+        NX_SPI_DMA_SEQUENCE_ENGINE_READ(&engine(state, false)[0]);
+    uint32_t rx_control =
+        NX_SPI_DMA_SEQUENCE_ENGINE_READ(&engine(state, true)[0]);
+    size_t tx_remaining = engine(state, false)[1];
+    size_t rx_remaining = engine(state, true)[1];
+    bool requests_detached =
+        (requests & (SPI_CTL1_DMAREN | SPI_CTL1_DMATEN)) == 0U;
+    nx_gd32_peripheral_barrier();
+    status = SPI_STAT(state->spi.controller->registers);
+    bool idle =
+        (status & SPI_STAT_TRANS) == 0U && (status & SPI_STAT_TBE) != 0U;
     nx_dma_drain_facts_t tx = {
         .length = request->length,
-        .remaining = engine(state, false)[1],
-        .engine_disabled = (engine(state, false)[0] & DMA_CHXCTL_CHEN) == 0U,
-        .irq_detached = (engine(state, false)[0] & irq_mask) == 0U,
+        .remaining = tx_remaining,
+        .engine_disabled = (tx_control & DMA_CHXCTL_CHEN) == 0U,
+        .irq_detached = (tx_control & irq_mask) == 0U,
         .peripheral_idle = idle,
     };
     nx_dma_drain_facts_t rx = tx;
-    rx.remaining = engine(state, true)[1];
-    rx.engine_disabled = (engine(state, true)[0] & DMA_CHXCTL_CHEN) == 0U;
-    rx.irq_detached = (engine(state, true)[0] & irq_mask) == 0U;
-    if (terminal && nx_dma_drain_check(&tx) == NX_SUCCESS &&
+    rx.remaining = rx_remaining;
+    rx.engine_disabled = (rx_control & DMA_CHXCTL_CHEN) == 0U;
+    rx.irq_detached = (rx_control & irq_mask) == 0U;
+    if (terminal && requests_detached &&
+        nx_dma_drain_check(&tx) == NX_SUCCESS &&
         nx_dma_drain_check(&rx) == NX_SUCCESS) {
         SPI_CTL1(state->spi.controller->registers) = 0U;
         SPI_CTL0(state->spi.controller->registers) &= ~(uint32_t)SPI_CTL0_SPIEN;
@@ -470,7 +500,9 @@ static void service(void* context) {
         nx_gd32_peripheral_barrier();
         const nx_gd32_spi_endpoint_state_t* endpoint =
             &state->endpoint->endpoint;
-        GPIO_BOP(endpoint->cs_gpio) = endpoint->cs_mask;
+        if (!retained_cs) {
+            GPIO_BOP(endpoint->cs_gpio) = endpoint->cs_mask;
+        }
         nx_gd32_peripheral_barrier();
         /* Both engines are actually disabled; do not erase a late error. */
         if (state->terminal == NX_SUCCESS &&
@@ -481,8 +513,10 @@ static void service(void* context) {
         size_t count = result == NX_SUCCESS ? request->length : 0U;
         state->faulted = result == NX_ERROR_IO;
         state->active = NULL;
-        state->endpoint = NULL;
-        state->spi.active = false;
+        if (!retained_cs) {
+            state->endpoint = NULL;
+        }
+        state->spi.active = retained_cs;
         nx_request_settle(&request->base, result, count);
     } else {
         if (!state->draining && terminal &&
@@ -498,6 +532,11 @@ static void service(void* context) {
         }
     }
     nx_gd32_critical_leave(saved);
+}
+
+/** \brief Legacy requests release their own complete CS interval. */
+static void service(void* context) {
+    service_phase(context, false);
 }
 
 /** \brief Close admission; retain acquired clocks/vectors until actual drain.
@@ -636,4 +675,106 @@ const nx_spi_endpoint_ops_t nx_gd32_spi_dma_endpoint_ops = {
     .submit_memory = submit_memory,
     .start_admitted = start_admitted,
     .on_port = on_port,
+};
+
+/** \brief Check every segment domain before first DMA acquisition or CS. */
+static nx_result_t
+sequence_validate(void* context, void* child,
+                  const nx_spi_dma_transaction_request_t* request) {
+    nx_gd32_spi_dma_state_t* state = context;
+    nx_gd32_spi_dma_endpoint_state_t* endpoint = child;
+    nx_result_t result = configuration(endpoint);
+    if (result != NX_SUCCESS || endpoint->dma != state) {
+        return result != NX_SUCCESS ? result : NX_ERROR_INVALID;
+    }
+    if (!state->initialized || state->stopping || state->faulted) {
+        return NX_ERROR_STATE;
+    }
+    if (state->active != NULL || state->spi.active ||
+        ((engine(state, true)[0] | engine(state, false)[0]) &
+         DMA_CHXCTL_CHEN) != 0U ||
+        (SPI_STAT(state->spi.controller->registers) & SPI_STAT_TRANS) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    if (state->region_count > SIZE_MAX / sizeof(*state->regions)) {
+        return NX_ERROR_INVALID;
+    }
+    result =
+        nx_spi_dma_sequence_storage_validate(request, state, sizeof(*state));
+    if (result == NX_SUCCESS) {
+        result = nx_spi_dma_sequence_storage_validate(request, endpoint,
+                                                      sizeof(*endpoint));
+    }
+    if (result == NX_SUCCESS) {
+        result = nx_spi_dma_sequence_storage_validate(
+            request, state->regions,
+            state->region_count * sizeof(*state->regions));
+    }
+    if (result == NX_SUCCESS) {
+        result = nx_spi_dma_sequence_storage_validate(
+            request, state->spi.controller, sizeof(*state->spi.controller));
+    }
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    for (size_t i = 0U; i < request->count; ++i) {
+        const nx_spi_dma_segment_t* segment = &request->segments[i];
+        nx_spi_request_t phase = {
+            .tx = segment->tx, .rx = segment->rx, .length = segment->words};
+        result = validate_buffers(state, &phase, segment->memory_flags,
+                                  request->word_bits);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+    }
+    return NX_SUCCESS;
+}
+
+/** \brief Start on exactly the retained physical child without toggling CS. */
+static nx_result_t sequence_begin(void* context, void* child,
+                                  nx_spi_request_t* phase, uint8_t bits,
+                                  uint8_t memory_flags, bool retained_cs) {
+    nx_gd32_spi_dma_endpoint_state_t* endpoint = child;
+    if (endpoint == NULL || endpoint->dma != context) {
+        return NX_ERROR_INVALID;
+    }
+    return start(endpoint, phase, false, memory_flags, bits, retained_cs);
+}
+
+/** \brief Phase settlement preserves the outer CS and complete segment loan. */
+static void sequence_advance(void* context) {
+    service_phase(context, true);
+}
+
+/** \brief Final release requires withdrawn DMA and actual wire idle. */
+static nx_result_t sequence_release(void* context, void* child) {
+    nx_gd32_spi_dma_state_t* state = context;
+    nx_gd32_spi_dma_endpoint_state_t* endpoint = child;
+    if (state == NULL || endpoint == NULL || endpoint->dma != state ||
+        state->endpoint != endpoint) {
+        return NX_ERROR_INVALID;
+    }
+    if (state->active != NULL ||
+        ((engine(state, true)[0] | engine(state, false)[0]) &
+         DMA_CHXCTL_CHEN) != 0U ||
+        (SPI_STAT(state->spi.controller->registers) & SPI_STAT_TRANS) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    nx_gd32_peripheral_barrier();
+    GPIO_BOP(endpoint->endpoint.cs_gpio) = endpoint->endpoint.cs_mask;
+    nx_gd32_peripheral_barrier();
+    state->endpoint = NULL;
+    state->spi.active = false;
+    return NX_SUCCESS;
+}
+
+/** \brief Optional mode alone adds the sequence owner, no legacy state fields.
+ */
+const nx_spi_dma_sequence_backend_t nx_gd32_spi_dma_sequence_backend = {
+    .validate = sequence_validate,
+    .begin = sequence_begin,
+    .advance = sequence_advance,
+    .cancel = cancel,
+    .release = sequence_release,
+    .stop = stop,
 };

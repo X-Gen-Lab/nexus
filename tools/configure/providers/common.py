@@ -29,9 +29,12 @@ class Construction(Mapping):
     retain_on_failed_init: bool
     exports: tuple[str, ...] = ()
     pin_snapshots: Mapping[str, str] = field(default_factory=dict)
+    face_context: str | None = None
+    face_definitions: tuple[str, ...] = ()
 
     _FIELDS = ("state_type", "definitions", "initialize", "stop",
-               "retain_on_failed_init", "exports", "pin_snapshots")
+               "retain_on_failed_init", "exports", "pin_snapshots",
+               "face_context", "face_definitions")
 
     def __post_init__(self):
         if (not isinstance(self.state_type, str) or
@@ -42,7 +45,11 @@ class Construction(Mapping):
             fail("Construction requires an explicit initializer")
         if type(self.retain_on_failed_init) is not bool:
             fail("Construction requires boolean failed-init responsibility")
-        for name in ("definitions", "stop", "exports"):
+        if (self.face_context is not None and
+                re.fullmatch(r"&[A-Za-z_][A-Za-z0-9_]*",
+                             self.face_context) is None):
+            fail("Construction face context requires an explicit static object")
+        for name in ("definitions", "stop", "exports", "face_definitions"):
             values = tuple(getattr(self, name))
             if any(not isinstance(value, str) for value in values):
                 fail(f"Construction {name} requires C source strings")
@@ -97,6 +104,7 @@ _MODE_TRAITS = MappingProxyType({
     ("gpio", "input"): ModeTraits(),
     ("gpio", "output"): ModeTraits(),
     ("uart", "irq-byte-event"): ModeTraits(irq=True),
+    ("uart", "irq-words"): ModeTraits(irq=True),
     ("uart", "irq-bytes"): ModeTraits(irq=True),
     ("uart", "irq-blocks"): ModeTraits(irq=True, block_stream=True),
     ("uart", "dma-tx"): ModeTraits(irq=True, tx_dma=True),
@@ -250,8 +258,8 @@ def validate_selection(selection, route, provider, ram_size):
                        "irq_priority", "calls_os"},
         "can": {"operation", "event_capacity", "bitrate", "timing", "irq_priority",
                 "calls_os", "drain_timeout_us", "poll_limit", "fifo_order"},
-        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os"},
-        "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz", "irq_priority", "calls_os"}, "flash": set(), "watchdog": set(),
+        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os", "frame"},
+        "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz", "irq_priority", "calls_os", "timing"}, "flash": set(), "watchdog": set(),
         "exti": {"edge", "event_capacity", "irq_priority", "calls_os"},
         "pwm": {"period_ticks", "duty_ticks", "tick_hz"},
         "adc": {"channels", "sample_times", "reference_mv", "timeout_ms", "irq_priority", "calls_os"},
@@ -287,7 +295,17 @@ def validate_selection(selection, route, provider, ram_size):
         if not {"baud", "rx_profile", "irq_priority"}.issubset(selection):
             fail("UART requires baud, RX profile and IRQ priority")
         integer(selection["baud"], *provider.LIMITS["uart_baud"], "UART baud")
-        if selection["rx_profile"] == "blocks":
+        try:
+            from .. import uart_formats
+        except ImportError:
+            import uart_formats
+        uart_formats.validate(selection, route, provider)
+        if selection["mode"] == "irq-words":
+            if selection["rx_profile"] != "words":
+                fail("Word UART requires RX words, never byte/event storage")
+            integer(selection.get("rx_capacity"), 1,
+                    min(4096, ram_size // 2), "UART RX word capacity")
+        elif selection["rx_profile"] == "blocks":
             if not mode_traits(kind, selection["mode"]).block_stream:
                 fail("UART RX blocks requires irq-blocks or a reviewed RX-DMA provider")
             if "rx_capacity" in selection:

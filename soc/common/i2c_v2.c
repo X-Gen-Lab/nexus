@@ -122,9 +122,10 @@ static _Noreturn void retain_and_park(nx_i2c_v2_state_t* p) {
     for (;;) {
     }
 }
-static nx_result_t transaction(void* context, nx_i2c_message_t* messages,
-                               size_t count, nx_time_us_t deadline,
-                               size_t* transferred) {
+static nx_result_t transaction_bounded(void* context,
+                                       nx_i2c_message_t* messages, size_t count,
+                                       nx_time_us_t deadline,
+                                       size_t* transferred, bool extended) {
     const nx_i2c_v2_endpoint_state_t* e = context;
     if (!task())
         return NX_ERROR_CONTEXT;
@@ -134,7 +135,9 @@ static nx_result_t transaction(void* context, nx_i2c_message_t* messages,
         !span(messages, count * sizeof(*messages)))
         return NX_ERROR_INVALID;
     nx_i2c_request_t check = {.messages = messages, .count = count};
-    nx_result_t result = nx_i2c_request_validate(&check);
+    nx_result_t result = extended
+                             ? nx_i2c_long_messages_validate(messages, count)
+                             : nx_i2c_request_validate(&check);
     if (result != NX_SUCCESS)
         return result;
     size_t descriptor_bytes = count * sizeof(*messages);
@@ -211,6 +214,23 @@ static nx_result_t transaction(void* context, nx_i2c_message_t* messages,
     p->active = false;
     return result;
 }
+/** \brief The base face retains its existing finite256-byte admission bound.
+ */
+static nx_result_t transaction(void* context, nx_i2c_message_t* messages,
+                               size_t count, nx_time_us_t deadline,
+                               size_t* transferred) {
+    return transaction_bounded(context, messages, count, deadline, transferred,
+                               false);
+}
+/** \brief Reload only NBYTES at TCR; each message retains its one address
+ * phase.
+ */
+static nx_result_t long_transaction(void* context, nx_i2c_message_t* messages,
+                                    size_t count, nx_time_us_t deadline,
+                                    size_t* transferred) {
+    return transaction_bounded(context, messages, count, deadline, transferred,
+                               true);
+}
 static nx_result_t recover(void* context) {
     nx_i2c_v2_state_t* p = context;
     if (!task())
@@ -255,3 +275,5 @@ static bool on_port(const void* context, const nx_i2c_port_t* port) {
 const nx_i2c_ops_t nx_i2c_v2_ops = {.recover = recover, .stop = stop};
 const nx_i2c_endpoint_ops_t nx_i2c_v2_endpoint_ops = {
     .transaction = transaction, .on_port = on_port};
+const nx_i2c_long_ops_t nx_i2c_v2_long_endpoint_ops = {.transaction =
+                                                           long_transaction};

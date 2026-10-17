@@ -86,6 +86,20 @@ TEST_F(H743Dma, ExactSelectedStreamAndMuxAdmitWithoutFallback) {
     EXPECT_NE(0U, registers.CR3 & USART_CR3_DMAT);
 }
 
+class H743DmaRevision : public H743Dma,
+                        public testing::WithParamInterface<uint32_t> {};
+TEST_P(H743DmaRevision, AlternativeUsartProtocolMatchesReviewedRevision) {
+    g_h743_model.silicon_id = (GetParam() << 16U) | 0x450U;
+    Start();
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+    ASSERT_NE(0U, g_h743_dma_stream.CR & DMA_SxCR_EN);
+    /* ES0392 2.20.4: X/V need bit20; the locked ST HAL excludes Y/W. */
+    EXPECT_EQ(GetParam() >= 0x2000U ? DMA_SxCR_TRBUFF : 0U,
+              g_h743_dma_stream.CR & DMA_SxCR_TRBUFF);
+}
+INSTANTIATE_TEST_SUITE_P(ReviewedCuts, H743DmaRevision,
+                         testing::Values(0x1003U, 0x2001U, 0x2003U));
+
 TEST_F(H743Dma, UnpoweredSelectedSram1RejectsBeforeRequestBorrowOrDmaEffects) {
     Start();
     regions[0] = {0x30000000U, 131072U, NX_DMA_MEMORY_READ};

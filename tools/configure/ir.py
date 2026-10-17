@@ -7,6 +7,15 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 
+try:
+    from .resource_graph import ResourcePlanIR
+    from .trigger_graph import TriggerPlanIR
+    from .dma_topology import DmaTopologyIR
+except ImportError:
+    from resource_graph import ResourcePlanIR
+    from trigger_graph import TriggerPlanIR
+    from dma_topology import DmaTopologyIR
+
 
 def freeze(value):
     if isinstance(value, dict):
@@ -165,11 +174,20 @@ class GpioOptions:
 
 
 @dataclass(frozen=True)
+class UartFrameOptions:
+    data_bits: int
+    parity: str
+    stop_bits: int
+    flow: str
+
+
+@dataclass(frozen=True)
 class UartOptions:
     baud: int
     rx_profile: str
     rx_capacity: int | None
     irq: IrqOptions
+    frame: UartFrameOptions | None = None
 
 
 @dataclass(frozen=True)
@@ -179,9 +197,26 @@ class SpiOptions:
 
 
 @dataclass(frozen=True)
+class I2cTimingSelectionIR(Record):
+    timingr: int
+    cr1_filter_bits: int
+    provenance: str
+    physical_qualified: bool
+    source: str
+    values: Mapping
+
+    @classmethod
+    def from_validated(cls, values):
+        return cls(*(values[name] for name in (
+            "timingr", "cr1_filter_bits", "provenance", "physical_qualified",
+            "source")), freeze(values))
+
+
+@dataclass(frozen=True)
 class I2cOptions:
     max_hz: int
     irq: IrqOptions | None
+    timing: I2cTimingSelectionIR | None = None
 
 
 @dataclass(frozen=True)
@@ -340,11 +375,16 @@ def mode_options(values):
         return GpioOptions(values["mask"], values["initial"])
     if kind == "uart":
         return UartOptions(values["baud"], values["rx_profile"],
-                           values.get("rx_capacity"), irq)
+                           values.get("rx_capacity"), irq,
+                           UartFrameOptions(**values["frame"])
+                           if "frame" in values else None)
     if kind == "spi":
         return SpiOptions(values.get("max_hz", 1000000), irq)
     if kind == "i2c":
-        return I2cOptions(values.get("max_hz", 100000), irq)
+        return I2cOptions(values.get("max_hz", 100000), irq,
+                         I2cTimingSelectionIR.from_validated(
+                             values["timing_resolution"])
+                         if "timing_resolution" in values else None)
     if kind == "exti":
         return ExtiOptions(values["edge"], values["event_capacity"], irq)
     if kind == "pwm":
@@ -369,16 +409,34 @@ class ControllerIR(Record):
     provider: str
     options: ControllerOptions
     values: Mapping
+    interface_kind: str | None = None
 
     @classmethod
     def create(cls, values, provider):
         return cls(*(values[key] for key in
                      ("id", "kind", "controller", "binding", "mode")),
-                   provider, mode_options(values), freeze(values))
+                   provider, mode_options(values), freeze(values),
+                   values.get("interface_kind", values["kind"]))
 
 
 @dataclass(frozen=True)
 class SpiEndpointOptions:
+    mode: int
+    max_hz: int
+    cs_binding: str | None
+    model_bytes: int | None
+
+
+@dataclass(frozen=True)
+class SpiTransactionEndpointOptions:
+    mode: int
+    max_hz: int
+    cs_binding: str | None
+    model_bytes: int | None
+
+
+@dataclass(frozen=True)
+class SpiDMATransactionEndpointOptions:
     mode: int
     max_hz: int
     cs_binding: str | None
@@ -392,12 +450,20 @@ class I2cEndpointOptions:
 
 
 @dataclass(frozen=True)
+class I2cLongEndpointOptions:
+    address: int
+    model_bytes: int | None
+
+
+@dataclass(frozen=True)
 class EndpointIR(Record):
     id: str
     controller: str
     driver: str
     kind: str
-    options: SpiEndpointOptions | I2cEndpointOptions | UsbEndpointOptions
+    options: (SpiEndpointOptions | SpiTransactionEndpointOptions |
+              SpiDMATransactionEndpointOptions |
+              I2cEndpointOptions | I2cLongEndpointOptions | UsbEndpointOptions)
     values: Mapping
 
     @classmethod
@@ -406,11 +472,18 @@ class EndpointIR(Record):
                           if item.id == values["controller"])
         kind = controller.kind
         if kind == "spi":
-            options = SpiEndpointOptions(values.get("mode", 0),
+            option_type = {"spi-transaction": SpiTransactionEndpointOptions,
+                           "spi-dma-transaction":
+                               SpiDMATransactionEndpointOptions}.get(
+                                   values["driver"], SpiEndpointOptions)
+            options = option_type(values.get("mode", 0),
                 values.get("max_hz", controller.options.max_hz),
                 values.get("cs_binding"), values.get("model_bytes"))
         elif kind == "i2c":
-            options = I2cEndpointOptions(values["address"], values.get("model_bytes"))
+            option_type = (I2cLongEndpointOptions
+                           if values["driver"] == "i2c-long-endpoint"
+                           else I2cEndpointOptions)
+            options = option_type(values["address"], values.get("model_bytes"))
         elif kind == "usb_device":
             options = UsbEndpointOptions(values["endpoint_index"], *(values[key]
                 for key in ("number", "direction", "transfer", "max_packet",
@@ -454,6 +527,9 @@ class ConfigurationIR(Record):
     memory_budget: MemoryBudgetIR
     factory: FactoryOptions
     can_domain: CanDomainIR | None
+    resource_plan: ResourcePlanIR
+    trigger_plan: TriggerPlanIR
+    dma_topology: DmaTopologyIR
     values: Mapping
 
     @classmethod
@@ -486,6 +562,9 @@ class ConfigurationIR(Record):
                                 tuple(CanFilterIR(**item) for item in
                                       result["can_domain"]["filters"]))
                     if result.get("can_domain") is not None else None),
+                   ResourcePlanIR.from_validated(result["resource_plan"]),
+                   TriggerPlanIR.from_validated(result["trigger_plan"]),
+                   DmaTopologyIR.from_validated(result["dma_topology"]),
                    MappingProxyType(values))
 
     def to_dict(self):

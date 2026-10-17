@@ -8,6 +8,9 @@
  */
 #include "nexus/arch/cache.h"
 #include "stm32h743_dma.h"
+#ifndef NX_H743_SILICON_ID
+#define NX_H743_SILICON_ID() NX_H743_READ(&DBGMCU->IDCODE)
+#endif
 #include <limits.h>
 
 #ifndef NX_H743_IRQ_AVAILABLE
@@ -265,6 +268,11 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
             checked(&s->tx->FCR, 0U, DMA_SxFCR_DMDIS | DMA_SxFCR_FEIE) && valid;
         uint32_t control = DMA_SxCR_MINC | DMA_SxCR_DIR_0 | DMA_SxCR_PL_1 |
                            DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
+        /* ES0392 Rev15 2.20.4: match the locked ST HAL's X/V protocol;
+         * Y/W keeps bit20 reserved. This is not silicon admission. */
+        if ((NX_H743_SILICON_ID() & UINT32_C(0xffff0000)) >=
+            UINT32_C(0x20000000))
+            control |= DMA_SxCR_TRBUFF;
         valid = checked(&s->tx->CR, control, UINT32_MAX) && valid;
         valid = checked(&uart->registers->CR1,
                         NX_H743_READ(&uart->registers->CR1) & ~TX_SOURCES,

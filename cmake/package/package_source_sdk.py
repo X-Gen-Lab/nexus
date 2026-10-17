@@ -226,26 +226,36 @@ REQUIRED_FILES += (
     "soc/common/i2c_v1_async.c", "soc/common/i2c_v1_async.h")
 REQUIRED_FILES += tuple("core/include/nexus/core/" + name + ".h" for name in (
     "fault", "memory", "request", "request_observer", "stack_observation",
-    "status", "time"))
+    "silicon", "status", "time"))
+REQUIRED_FILES += ("core/src/silicon.c", "soc/common/stm32_identity.h")
 REQUIRED_FILES += tuple("io/include/nexus/io/" + name + ".h" for name in (
-    "adc", "adc_observer", "advanced_pwm", "can", "dma", "ethernet",
+    "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "dma",
+    "ethernet",
     "exti", "flash", "gpio", "i2c", "i2c_bus_clear", "mdio", "native/model",
+    "i2c_long", "observation", "pwm_group", "spi_transaction",
+    "spi_dma_transaction", "uart_format", "uart_word",
     "spi", "stream", "stream_budget", "timer", "timer_capture", "uart",
     "uart_rs485", "usb_device", "wake", "watchdog"))
 REQUIRED_FILES += tuple("io/src/" + name + ".c" for name in (
-    "adc", "adc_observer", "advanced_pwm", "can", "can_controller", "dma",
+    "adc", "adc_format", "adc_observer", "advanced_pwm", "can",
+    "can_controller", "dma",
     "eth_mac", "ethernet", "exti", "flash", "flash_region", "gpio", "i2c",
-    "i2c_bus_clear", "mdio", "spi", "stream", "stream_budget", "timer",
+    "i2c_bus_clear", "i2c_long", "mdio", "observation", "pwm_group", "spi",
+    "spi_transaction", "spi_dma_transaction", "spi_dma_sequence", "uart_word",
+    "stream", "stream_budget", "timer",
     "timer_capture", "uart", "uart_rs485", "usb_device",
     "usb_device_controller", "wake", "watchdog"))
 REQUIRED_FILES += tuple("io/private/" + name + ".h" for name in (
     "advanced_pwm_impl", "can_controller", "eth_mac",
+    "spi_dma_sequence",
     "timer_advanced_controller", "timer_capture_impl", "usb_device_controller"))
 REQUIRED_FILES += tuple("io/native/" + name + ".c" for name in (
     "adc", "can", "ethernet", "exti", "flash", "gpio", "i2c", "spi",
-    "spi_async", "stream", "time", "timer", "uart", "usb_device", "watchdog"))
+    "spi_async", "stream", "time", "timer", "uart", "uart_word",
+    "usb_device", "watchdog"))
 REQUIRED_FILES += tuple("io/native/" + name + ".h" for name in (
     "can", "can_access", "ethernet", "ethernet_access", "provider",
+    "uart_word_provider",
     "usb_device", "usb_device_access"))
 for _family in ("stm32f407", "gd32f470"):
     REQUIRED_FILES += tuple("soc/" + _family + "/" + name for name in (
@@ -256,11 +266,18 @@ for _family in ("stm32f407", "gd32f470"):
         "adc", "adc_continuous", "adc_stream", "advanced_pwm", "can",
         "ethernet", "exti", "flash", "gpio", "i2c", "i2c_async", "spi",
         "spi_dma", "timer", "timer_capture", "uart", "uart_dma",
-        "uart_receive", "uart_stream", "usb_device", "watchdog"))
+        "uart_receive", "uart_stream", "uart_word", "usb_device", "watchdog"))
     REQUIRED_FILES += tuple("soc/" + _family + "/private/" + _family + "_"
                             + name + ".h" for name in (
         "can", "dma", "eth", "i2c_async", "lowpower", "provider", "sleep",
-        "timer_advanced", "uart_receive", "usb_clock", "usb_device"))
+        "timer_advanced", "uart_receive", "uart_word", "usb_clock", "usb_device"))
+REQUIRED_FILES += tuple("tools/configure/" + name + ".py" for name in (
+    "resource_graph", "trigger_graph", "dma_topology", "io_traits", "i2c_timing",
+    "enhanced_endpoints", "uart_formats", "i2c_timing_selection"))
+REQUIRED_FILES += (
+    "soc/stm32g474/drivers/pwm_group.c",
+    "soc/stm32g474/private/stm32g474_pwm_group.h",
+    "soc/common/uart_control.h")
 REQUIRED_FILES += (
     "tools/configure/fact_references.py", "tools/configure/preflight.py",
     "tools/configure/gpio_phase.py",

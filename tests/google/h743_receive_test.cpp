@@ -83,6 +83,20 @@ TEST_F(H743Receive, ExactLaneStartsOnlyAfterExplicitStreamBorrow) {
     EXPECT_NE(0U, registers.CR3 & USART_CR3_DMAR);
 }
 
+class H743ReceiveRevision : public H743Receive,
+                            public testing::WithParamInterface<uint32_t> {};
+TEST_P(H743ReceiveRevision, AlternativeUsartProtocolMatchesReviewedRevision) {
+    g_h743_model.silicon_id = (GetParam() << 16U) | 0x450U;
+    Start();
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_rx_start(&port, &stream));
+    ASSERT_NE(0U, g_h743_dma_stream.CR & DMA_SxCR_EN);
+    /* RM0433 bit20 is TRBUFF; ES0392 and the locked HAL scope it by cut. */
+    EXPECT_EQ(GetParam() >= 0x2000U ? DMA_SxCR_TRBUFF : 0U,
+              g_h743_dma_stream.CR & DMA_SxCR_TRBUFF);
+}
+INSTANTIATE_TEST_SUITE_P(ReviewedCuts, H743ReceiveRevision,
+                         testing::Values(0x1003U, 0x2001U, 0x2003U));
+
 TEST_F(H743Receive, UnpoweredSelectedSram1RejectsAllBlocksBeforeTheFirstLoan) {
     Start();
     regions[0] = {0x30000000U, 131072U, NX_DMA_MEMORY_WRITE};

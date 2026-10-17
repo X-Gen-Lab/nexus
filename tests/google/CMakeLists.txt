@@ -48,6 +48,8 @@ function(nexus_google_test name)
 endfunction()
 
 include("${CMAKE_CURRENT_LIST_DIR}/uart_v1_channel_dma.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/uart_formats.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/adc_control.cmake")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/legacy_devices.cmake")
 
@@ -71,6 +73,17 @@ nexus_google_test(nexus_uart_rs485_test SOURCES uart_rs485_test.cpp
     LIBRARIES Nexus::NativeModel Nexus::Arch)
 nexus_google_test(nexus_io_observer_test SOURCES io_observer_test.cpp
     LIBRARIES Nexus::OwnerObserver Nexus::IO)
+nexus_google_test(nexus_io_observation_contract_test
+    SOURCES io_observation_contract_test.cpp
+    LIBRARIES Nexus::IO)
+nexus_google_test(nexus_silicon_admission_test
+    SOURCES silicon_admission_test.cpp
+    LIBRARIES Nexus::Core
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/common")
+nexus_google_test(nexus_spi_dma_transaction_test
+    SOURCES spi_dma_transaction_test.cpp
+    LIBRARIES Nexus::NativeModel Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
 nexus_google_test(nexus_io_state_machine_test SOURCES io_state_machine_test.cpp
     LIBRARIES Nexus::OwnerObserver Nexus::IO Nexus::UARTOwner
         Nexus::SPIAsyncOwner Nexus::NativeModel
@@ -157,6 +170,7 @@ target_compile_options(nexus_stm32_uart_dma_test PRIVATE
 # The host model compiles production register algorithms for two GD controllers.
 set(gd_multi_root "${NEXUS_SOURCE_DIR}/soc/gd32f470")
 set(gd_multi_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
+include("${CMAKE_CURRENT_SOURCE_DIR}/spi_transaction.cmake")
 nexus_google_test(nexus_irq_wake_gd32_test SOURCES irq_wake_gd32_test.cpp
     "${gd_multi_root}/drivers/uart.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
@@ -203,6 +217,8 @@ target_compile_options(nexus_stm32_spi_dma_test PRIVATE
 
 target_sources(nexus_stm32_spi_dma_test PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/spi_dma.c")
+target_include_directories(nexus_stm32_spi_dma_test PRIVATE
+    "${NEXUS_SOURCE_DIR}/io/private")
 
 nexus_google_test(nexus_gd32_uart_dma_test SOURCES gd32_uart_dma_test.cpp
     "${gd_multi_root}/drivers/uart.c" "${gd_multi_root}/drivers/uart_dma.c"
@@ -271,7 +287,8 @@ nexus_google_test(nexus_gd32_spi_dma_test SOURCES gd32_spi_dma_test.cpp
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
     LIBRARIES Nexus::IO
     INCLUDES "${gd_multi_root}" "${gd_multi_root}/private"
-        "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
+        "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
+        "${NEXUS_SOURCE_DIR}/io/private")
 target_include_directories(nexus_gd32_spi_dma_test SYSTEM PRIVATE
     "${gd_multi_vendor}/CMSIS/GD/GD32F4xx/Include"
     "${gd_multi_vendor}/GD32F4xx_standard_peripheral/Include")

@@ -13,9 +13,9 @@ INSTANCE_FIELDS = {
     "can": {"binding", "mode", "operation", "event_capacity", "bitrate",
             "timing", "irq", "drain_timeout_us", "poll_limit", "fifo_order"},
     "gpio": {"binding", "mode"},
-    "uart": {"binding", "mode", "baud", "rx", "irq"},
+    "uart": {"binding", "mode", "baud", "rx", "irq", "frame"},
     "spi": {"binding", "mode", "max_hz", "irq"},
-    "i2c": {"binding", "mode", "max_hz", "irq"},
+    "i2c": {"binding", "mode", "max_hz", "irq", "timing"},
     "flash": {"binding", "mode"},
     "watchdog": {"binding", "mode"},
     "exti": {"binding", "mode", "edge", "event_capacity", "irq"},
@@ -71,7 +71,7 @@ def normalize(data, path, root, fail, obj, integer, text):
             selection["authored_kind"] = kind
             if kind == "uart":
                 obj(selection, {"id", "authored_kind", "binding", "mode", "baud", "rx", "irq"},
-                    (), f"uart.{name}")
+                    {"frame"}, f"uart.{name}")
                 rx = obj(selection.pop("rx"), {"format"}, {"capacity"}, f"uart.{name}.rx")
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"uart.{name}.irq")
                 selection.update(rx_profile=rx["format"], irq_priority=irq["priority"])
@@ -169,7 +169,16 @@ def editor_schema():
             properties["irq"]["properties"]["calls_os"] = {"type": "boolean"}
         if "rx" in fields:
             properties["rx"] = record({"format", "capacity"}, {"format"})
-            properties["rx"]["properties"]["format"]["enum"] = ["bytes", "events", "blocks"]
+            properties["rx"]["properties"]["format"]["enum"] = ["bytes", "events", "blocks", "words"]
+        if "frame" in fields:
+            properties["frame"] = record(
+                {"data_bits", "parity", "stop_bits", "flow"},
+                {"data_bits", "parity", "stop_bits", "flow"})
+            frame = properties["frame"]["properties"]
+            frame["data_bits"] = {"enum": [7, 8, 9]}
+            frame["stop_bits"] = {"enum": [1, 2]}
+            frame["parity"] = {"enum": ["none", "even", "odd"]}
+            frame["flow"] = {"const": "none"}
         return {"type": "object", "properties": properties,
                 "required": sorted(required), "additionalProperties": False}
     schema = record(TOP_REQUIRED | TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
@@ -206,6 +215,13 @@ def editor_schema():
         "additionalProperties": False}
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
+        if kind == "i2c":
+            timing_fields = {"kernel_hz_min", "kernel_hz_max", "pclk_hz_min",
+                             "bus_hz_min", "rise_ns_max", "fall_ns_max", "source"}
+            timing = record(timing_fields, timing_fields)
+            for name in timing_fields - {"source"}:
+                timing["properties"][name] = {"type": "integer", "minimum": 0}
+            properties[kind]["additionalProperties"]["properties"]["timing"] = timing
         if kind == "eth":
             properties[kind]["additionalProperties"]["properties"]["address"] = {
                 "type": "array", "minItems": 6, "maxItems": 6,

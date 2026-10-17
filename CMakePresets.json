@@ -520,6 +520,174 @@
                 "NEXUS_BUILD_TESTS": "OFF"
             },
             "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake"
+        },
+        {
+            "name": "fixture-io-evolution-f407-spi-dma-transaction",
+            "inherits": "stm32-qiming-baremetal",
+            "displayName": "f407-spi-dma-transaction typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-f407-spi-dma-transaction",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_SPI_DMA_TRANSACTION"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-f407-spi-transaction",
+            "inherits": "stm32-qiming-baremetal",
+            "displayName": "f407-spi-transaction typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-f407-spi-transaction",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/f407-spi-transaction.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_SPI_TRANSACTION"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-f407-uart7e2",
+            "inherits": "stm32-qiming-baremetal",
+            "displayName": "f407-uart7e2 typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-f407-uart7e2",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/f407-uart7e2.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": ""
+            }
+        },
+        {
+            "name": "fixture-io-evolution-f407-uart9n1",
+            "inherits": "stm32-qiming-baremetal",
+            "displayName": "f407-uart9n1 typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-f407-uart9n1",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/f407-uart9n1.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_UART_WORD"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-g474-i2c-long-timing",
+            "inherits": "fixture-stm32-g474-baremetal-empty",
+            "displayName": "g474-i2c-long-timing typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-g474-i2c-long-timing",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/g474-i2c-long-timing.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_I2C_LONG"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-gd470-spi-dma-transaction",
+            "inherits": "gd32-liangshan-baremetal",
+            "displayName": "gd470-spi-dma-transaction typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-gd470-spi-dma-transaction",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/gd470-spi-dma-transaction.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_SPI_DMA_TRANSACTION"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-gd470-spi-transaction",
+            "inherits": "gd32-liangshan-baremetal",
+            "displayName": "gd470-spi-transaction typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-gd470-spi-transaction",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/gd470-spi-transaction.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_SPI_TRANSACTION"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-gd470-uart7e2",
+            "inherits": "gd32-liangshan-baremetal",
+            "displayName": "gd470-uart7e2 typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-gd470-uart7e2",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/gd470-uart7e2.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": ""
+            }
+        },
+        {
+            "name": "fixture-io-evolution-gd470-uart9n1",
+            "inherits": "gd32-liangshan-baremetal",
+            "displayName": "gd470-uart9n1 typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-gd470-uart9n1",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/gd470-uart9n1.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_UART_WORD"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-h743-i2c-long-timing",
+            "inherits": "stm32-nucleo-h743-baremetal-empty",
+            "displayName": "h743-i2c-long-timing typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-h743-i2c-long-timing",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/h743-i2c-long-timing.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_I2C_LONG"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-native-uart9n1",
+            "inherits": "native-release",
+            "displayName": "native-uart9n1 typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-native-uart9n1",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/native-uart9n1.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_UART_WORD"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-u575-i2c-long-timing",
+            "inherits": "stm32-nucleo-u575-baremetal-empty",
+            "displayName": "u575-i2c-long-timing typed software fixture; PCB/HIL unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-u575-i2c-long-timing",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tests/contracts/io_evolution_assembly/u575-i2c-long-timing.toml",
+                "NEXUS_BUILD_TESTS": "OFF",
+                "NEXUS_BUILD_WORKLOAD": "OFF",
+                "NEXUS_IO_EVOLUTION_FIXTURE": "ON",
+                "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
+                "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_I2C_LONG"
+            }
         }
     ],
     "buildPresets": [
@@ -698,6 +866,90 @@
         {
             "name": "fixture-stm32-g474-freertos-pwm",
             "configurePreset": "fixture-stm32-g474-freertos-pwm"
+        },
+        {
+            "name": "fixture-io-evolution-f407-spi-dma-transaction",
+            "configurePreset": "fixture-io-evolution-f407-spi-dma-transaction",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-f407-spi-transaction",
+            "configurePreset": "fixture-io-evolution-f407-spi-transaction",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-f407-uart7e2",
+            "configurePreset": "fixture-io-evolution-f407-uart7e2",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-f407-uart9n1",
+            "configurePreset": "fixture-io-evolution-f407-uart9n1",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-g474-i2c-long-timing",
+            "configurePreset": "fixture-io-evolution-g474-i2c-long-timing",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-gd470-spi-dma-transaction",
+            "configurePreset": "fixture-io-evolution-gd470-spi-dma-transaction",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-gd470-spi-transaction",
+            "configurePreset": "fixture-io-evolution-gd470-spi-transaction",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-gd470-uart7e2",
+            "configurePreset": "fixture-io-evolution-gd470-uart7e2",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-gd470-uart9n1",
+            "configurePreset": "fixture-io-evolution-gd470-uart9n1",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-h743-i2c-long-timing",
+            "configurePreset": "fixture-io-evolution-h743-i2c-long-timing",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-native-uart9n1",
+            "configurePreset": "fixture-io-evolution-native-uart9n1",
+            "targets": [
+                "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-u575-i2c-long-timing",
+            "configurePreset": "fixture-io-evolution-u575-i2c-long-timing",
+            "targets": [
+                "io_evolution_fixture"
+            ]
         }
     ],
     "testPresets": [

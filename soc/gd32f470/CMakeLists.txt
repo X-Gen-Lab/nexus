@@ -37,6 +37,9 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth
         list(APPEND gd_sdk_units gpio)
     endif()
     if(kind STREQUAL "uart")
+        if("irq-words" IN_LIST modes)
+            list(APPEND gd_sources drivers/uart_word.c)
+        endif()
         list(APPEND gd_sdk_units usart)
         if("dma-tx" IN_LIST modes OR "dma-duplex" IN_LIST modes
             OR "dma-duplex-continuous" IN_LIST modes)

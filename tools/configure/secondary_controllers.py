@@ -11,11 +11,13 @@ try:
     from .emission import dma_regions
     from .providers.common import Construction, fail, mode_traits
     from .providers import hardware
+    from . import enhanced_endpoints
 except ImportError:
     from gpio_phase import withdraw_pin
     from emission import dma_regions
     from providers.common import Construction, fail, mode_traits
     from providers import hardware
+    import enhanced_endpoints
 
 
 # Assertions for the maintained SDK cold constructors, not Board wiring.
@@ -142,9 +144,8 @@ def _endpoint_faces(item, result, prefix):
             declarations.append(f"static nx_{prefix}_{implementation}_endpoint_state_t {endpoint}{initializer};")
         operations = (f"nx_{prefix}_spi_dma_endpoint_ops" if item.kind == "spi" else
                       "nx_i2c_v1_async_endpoint_ops")
-        declarations += [f"static const nx_{item.kind}_endpoint_t s_nx_device_face_{child} = {{",
-                         f"    &{operations}, &{endpoint}", "};",
-                         f"const nx_{item.kind}_endpoint_t* const nx_device_{child} = &s_nx_device_face_{child};"]
+        declarations += enhanced_endpoints.face(device, endpoint,
+                                                 operations, prefix)
         if item.kind != "i2c":
             pins = (result["routes"][result["board_bindings"][device["cs_binding"]]["route"]]["pins"]
                     if "cs_binding" in device else [pin for pin in item["pins"] if pin["function"] == "cs"])

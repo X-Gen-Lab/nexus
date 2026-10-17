@@ -50,6 +50,7 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('gpio', 'input'): 'gpio',
     ('gpio', 'output'): 'gpio',
     ('uart', 'irq-byte-event'): 'uart',
+    ('uart', 'irq-words'): 'uart_word',
     ('spi', 'short-poll'): 'spi',
     ('i2c', 'poll-messages'): 'i2c',
     ('i2c', 'irq-messages'): 'i2c_async',

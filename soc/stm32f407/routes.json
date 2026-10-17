@@ -107,7 +107,8 @@
         "rx-dma-idle",
         "dma-duplex",
         "rx-dma-continuous",
-        "dma-duplex-continuous"
+        "dma-duplex-continuous",
+        "irq-words"
       ],
       "source": "STM32F405xx/STM32F407xx datasheet DS8626 AF table; RM0090 Rev 21 controller register descriptions",
       "dma": [

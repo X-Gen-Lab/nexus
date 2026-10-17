@@ -47,7 +47,8 @@
         "rx-dma-idle",
         "dma-duplex",
         "rx-dma-continuous",
-        "dma-duplex-continuous"
+        "dma-duplex-continuous",
+        "irq-words"
       ],
       "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
       "dma": [

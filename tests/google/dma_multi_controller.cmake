@@ -22,6 +22,10 @@ foreach(dma_multi_family stm32f407 gd32f470)
                 "${NEXUS_SOURCE_DIR}/soc/gd32f470/private"
                 "${NEXUS_SOURCE_DIR}/soc/${dma_multi_family}/private"
                 "${NEXUS_SOURCE_DIR}/arch/include")
+        if(dma_multi_kind STREQUAL "spi")
+            target_include_directories(${dma_multi_target} PRIVATE
+                "${NEXUS_SOURCE_DIR}/io/private")
+        endif()
         target_compile_options(${dma_multi_target} PRIVATE
             "-include${CMAKE_CURRENT_SOURCE_DIR}/${dma_multi_kind}_multi_controller_model.h"
             "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")

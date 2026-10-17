@@ -20,6 +20,7 @@ import tomllib
 try:
     from . import cpu as cpu_profiles
     from . import bundle, dependencies, sdk
+    from . import resource_graph, trigger_graph, dma_topology
     from .contracts import COMPONENTS
     from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
     from .ir import thaw
@@ -33,6 +34,9 @@ except ImportError:
     import bundle
     import dependencies
     import sdk
+    import resource_graph
+    import trigger_graph
+    import dma_topology
     from contracts import COMPONENTS
     import kernel
     import can
@@ -689,7 +693,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                  "fifo_order", "rx_fifo_words", "vbus_sensing", "clock_timeout_us",
                  "tx_count", "rx_count", "rx_storage_bytes", "address", "init_timeout_us",
                  "filter", "exclusive", "deadtime_ticks", "break_active_high", "idle_high",
-                 "idle_complement_high"}, "controller selection")
+                 "idle_complement_high", "frame"}, "controller selection")
             name = identity(selection["id"], "instance id")
             c_identity(name)
             instance_ids.append(name)
@@ -760,11 +764,21 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 for dma in route_dma(route, mode):
                     claim("dma:" + dma, name, mode, route["id"])
                     claim(provider.dma_irq(dma), name, mode, route["id"])
+            resolved_timing = None
+            if route["kind"] == "i2c":
+                try:
+                    from . import i2c_timing_selection
+                except ImportError:
+                    import i2c_timing_selection
+                resolved_timing = i2c_timing_selection.resolve(
+                    selection, clock, provider)
             selected.append({**selection, "controller": route["controller"],
                              "kind": route["kind"], "route": route["id"],
                              "pins": route["pins"], "initial": binding.get("initial", 0),
                              "mask": binding.get("mask", 0),
                              **({"dma": route_dma(route, mode)} if traits.dma else {}),
+                             **({"timing_resolution": resolved_timing}
+                                if resolved_timing is not None else {}),
                              **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
     unique(instance_ids, "controller instance IDs")
     unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
@@ -807,8 +821,29 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     "I2C device")
                 if provider.MODEL and "model_bytes" not in device:
                     fail("Native I2C device requires explicit model_bytes")
-            if device["driver"] not in {"spi-endpoint", "i2c-endpoint", "bmp280"}:
+            if device["driver"] not in {"spi-endpoint", "i2c-endpoint", "bmp280",
+                                        "spi-transaction", "i2c-long-endpoint",
+                                        "spi-dma-transaction"}:
                 fail(f"Unknown maintained device driver: {device['driver']}")
+            if device["driver"] == "spi-transaction":
+                if controller["kind"] != "spi":
+                    fail("SPI transaction requires its SPI controller")
+                if family not in {"native", "stm32f407", "gd32f470"}:
+                    fail("SPI transaction provider is not maintained")
+                if controller["mode"] != "short-poll":
+                    fail("SPI transaction requires the polling provider mode")
+            if device["driver"] == "i2c-long-endpoint":
+                if (controller["kind"] != "i2c" or family not in
+                        {"stm32g474", "stm32h743", "stm32u575"} or
+                        controller["mode"] != "poll-messages"):
+                    fail("Long I2C requires a maintained polling V2 provider")
+            if device["driver"] == "spi-dma-transaction":
+                allowed = {"stm32f407": ("SPI1", "dma"),
+                           "gd32f470": ("SPI4", "dma-full-duplex")}
+                if (controller["kind"] != "spi" or family not in allowed or
+                        (controller["controller"], controller["mode"]) !=
+                        allowed[family]):
+                    fail("SPI DMA transaction requires a reviewed DMA mode")
             if device["driver"] == "bmp280" and controller["kind"] != "spi":
                 fail("BMP280 currently requires its maintained SPI transport")
             if device["driver"] == "spi-endpoint" and controller["kind"] != "spi":
@@ -858,6 +893,10 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     usb_device.complete_plan(selected, assembly["devices"], claim)
     for controller in selected:
         children = [item for item in assembly["devices"] if item["controller"] == controller["id"]]
+        if any(item["driver"] == "spi-dma-transaction" for item in children):
+            if any(item["driver"] != "spi-dma-transaction" for item in children):
+                fail("SPI DMA sequence requires all endpoints; mixed faces forbidden")
+            controller["interface_kind"] = "spi_dma_transaction"
         if controller["kind"] == "i2c" and not children:
             fail("I2C requires at least one explicit address endpoint")
         if controller["kind"] == "spi" and provider.SPI_REQUIRES_ENDPOINT and not children:
@@ -952,6 +991,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
               "physical_qualified": False,
               "enum_abi": provider.ENUM_ABI}
     result["factory"] = {"capabilities": factory_options.get("capabilities", False)}
+    result["resource_plan"] = resource_graph.resolve(claim_list).to_dict()
+    result["trigger_plan"] = trigger_graph.resolve_fixed(selected, routes).to_dict()
+    result["dma_topology"] = dma_topology.resolve_selected(selected, provider).to_dict()
     if references is not None:
         result["fact_references"] = references
     result["configuration_sha256"] = hashlib.sha256(

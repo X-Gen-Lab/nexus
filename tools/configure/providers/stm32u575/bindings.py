@@ -1,4 +1,8 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
+try:
+    from ... import enhanced_endpoints
+except ImportError:
+    import enhanced_endpoints
 from ..common import Construction, controller_ir, fail, kernel_policy_constant
 
 
@@ -151,6 +155,10 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"nx_exti_port_stop(&s_nx_face_{name})"
     elif item.kind == "i2c":
         clock = f"s_nx_i2c_clock_{name}"
+        initialize = (f"nx_stm32u575_i2c_initialize_timing(&{state}, "
+                      f"0x{item.options.timing.timingr:08x}u)"
+                      if item.options.timing is not None else
+                      f"nx_stm32u575_i2c_initialize(&{state})")
         definitions += [f"static nx_stm32u575_i2c_clock_t {clock};",
                         f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
@@ -162,7 +170,7 @@ def constructor(item, result, board_bindings, routes, devices):
                         "    if (status != NX_SUCCESS) { return status; }",
                         f"    status = nx_stm32u575_i2c_clock_start(&{clock}, &{state});",
                         "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_stm32u575_i2c_initialize(&{state});", "}",
+                        f"    return {initialize};", "}",
                         f"static nx_result_t stop_{name}(void) {{",
                         f"    nx_result_t status = nx_i2c_port_stop(&s_nx_face_{name});",
                         "    if (status != NX_SUCCESS) { return status; }",
@@ -175,8 +183,8 @@ def constructor(item, result, board_bindings, routes, devices):
             if type(address) is not int or not 8 <= address <= 119:
                 fail("U575 I2C requires an explicit nonreserved7bit address")
             definitions += [f"static nx_stm32u575_i2c_endpoint_state_t {endpoint} = {{ &{state}, {address}u }};",
-                            f"static const nx_i2c_endpoint_t s_nx_device_face_{child_name} = {{ &nx_i2c_v2_endpoint_ops, &{endpoint} }};",
-                            f"const nx_i2c_endpoint_t* const nx_device_{child_name} = &s_nx_device_face_{child_name};"]
+                            *enhanced_endpoints.face(child, endpoint,
+                                                     "nx_i2c_v2_endpoint_ops")]
         stop = f"stop_{name}()"
     elif item.kind == "adc":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",

@@ -12,6 +12,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/arch.h"
+#include "nexus/io/spi_transaction.h"
 #include "provider.h"
 
 static nx_native_spi_state_t s_spi = {.fail_after = SIZE_MAX};
@@ -231,3 +232,87 @@ bool nx_native_spi_model_cs_active(const nx_spi_endpoint_t* binding) {
     }
     return nx_native_spi_cs_active_instance(binding->context);
 }
+
+/** \brief Execute real segmented host-device behavior without concatenation. */
+static nx_result_t native_spi_transaction(void* context,
+                                          const nx_spi_segment_t* segments,
+                                          size_t count, uint8_t word_bits,
+                                          nx_time_us_t deadline,
+                                          size_t* transferred) {
+    nx_native_spi_endpoint_state_t* endpoint = context;
+    if (endpoint == NULL || endpoint->port == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    nx_native_spi_state_t* port = endpoint->port;
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    if (!port->opened || port->stopping) {
+        return NX_ERROR_STATE;
+    }
+    if (port->busy || port->active) {
+        return NX_ERROR_BUSY;
+    }
+    if (endpoint->registers != NULL && word_bits != 8U) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    if (nx_deadline_expired(deadline, nx_time_now_us())) {
+        return NX_ERROR_TIMEOUT;
+    }
+    port->active = true;
+    endpoint->cs = true;
+    nx_result_t result = NX_SUCCESS;
+    uint8_t address = 0U;
+    bool read = false;
+    for (size_t phase = 0U; phase < count && result == NX_SUCCESS; ++phase) {
+        const nx_spi_segment_t* segment = &segments[phase];
+        for (size_t word = 0U; word < segment->words; ++word) {
+            if (nx_deadline_expired(deadline, nx_time_now_us())) {
+                result = NX_ERROR_TIMEOUT;
+                break;
+            }
+            if (*transferred == port->fail_after) {
+                result = NX_ERROR_IO;
+                break;
+            }
+            uint16_t value = segment->dummy;
+            if (segment->tx != NULL) {
+                value = word_bits == 8U ? ((const uint8_t*)segment->tx)[word]
+                                        : ((const uint16_t*)segment->tx)[word];
+            }
+            uint16_t received = value;
+            if (endpoint->registers != NULL) {
+                if (*transferred == 0U) {
+                    read = (value & 0x80U) != 0U;
+                    address = (uint8_t)(value & 0x7FU);
+                    received = 0U;
+                } else if (address >= endpoint->register_count) {
+                    result = NX_ERROR_IO;
+                    break;
+                } else if (read) {
+                    received = endpoint->registers[address++];
+                } else {
+                    endpoint->registers[address++] = (uint8_t)value;
+                    received = 0U;
+                }
+            }
+            if (segment->rx != NULL) {
+                if (word_bits == 8U) {
+                    ((uint8_t*)segment->rx)[word] = (uint8_t)received;
+                } else {
+                    ((uint16_t*)segment->rx)[word] = received;
+                }
+            }
+            ++*transferred;
+            (void)nx_native_clock_advance(1U);
+        }
+    }
+    endpoint->cs = false;
+    port->active = false;
+    return result;
+}
+
+/** \brief Opt-in face reuses existing state; legacy face and ops never grow. */
+const nx_spi_transaction_ops_t nx_native_spi_transaction_ops = {
+    .transfer = native_spi_transaction,
+};

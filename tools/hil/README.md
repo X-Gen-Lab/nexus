@@ -250,6 +250,12 @@ audit paths; they do not operate the three boards or establish physical support.
 The first-party `serial_echo.py` adapter opens only the admitted stable
 `/dev/serial/by-id/...` identity. It verifies the character device across open,
 uses `TIOCEXCL`, restores original terminal settings, and configures 115200 8N1.
+Admission requires that exact byte frame without flow control; omitted legacy
+frame metadata retains the defined 8N1 default. A word face, 7E2 or another
+explicit frame is rejected before equipment access. Testing 9N1 requires a
+reviewed nine-bit peer and waveform capture, with any eight-bit diagnostic
+console kept separate from the tested wire. A USB 8N1 echo cannot qualify
+nine-bit data or framing.
 After a bounded quiet drain it sends a random public 32-byte challenge and
 retains exact TX/RX/drain bytes plus host monotonic event timestamps. Partial
 writes/reads share one finite capture deadline. Wrong/incomplete echo, excessive

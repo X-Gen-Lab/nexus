@@ -1,4 +1,8 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
+try:
+    from ... import enhanced_endpoints
+except ImportError:
+    import enhanced_endpoints
 from ..common import Construction, controller_ir, fail, kernel_policy_constant
 
 
@@ -172,6 +176,8 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"nx_stm32h743_pwm_close(&{state})"
     elif item.kind == "i2c":
         timing = "0x70f22727" if result["clock"]["apb1_hz"] == 64000000 else "0x30f22727"
+        if item.options.timing is not None:
+            timing = f"0x{item.options.timing.timingr:08x}"
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
                         f"    {state}.registers = (nx_i2c_v2_registers_t*)(void*)I2C1;",
@@ -190,8 +196,8 @@ def constructor(item, result, board_bindings, routes, devices):
             child_name = child["id"].replace("-", "_")
             endpoint = "s_nx_endpoint_" + child_name
             definitions += [f"static nx_i2c_v2_endpoint_state_t {endpoint} = {{ &{state}, {child['address']}u }};",
-                            f"static const nx_i2c_endpoint_t s_nx_device_face_{child_name} = {{ &nx_i2c_v2_endpoint_ops, &{endpoint} }};",
-                            f"const nx_i2c_endpoint_t* const nx_device_{child_name} = &s_nx_device_face_{child_name};"]
+                            *enhanced_endpoints.face(child, endpoint,
+                                                     "nx_i2c_v2_endpoint_ops")]
         stop = f"nx_i2c_port_stop(&s_nx_face_{name})"
     elif item.kind == "adc":
         supply = board_bindings.get(item.binding, {}).get("supply_mv")

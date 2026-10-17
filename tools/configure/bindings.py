@@ -2,13 +2,15 @@
 try:
     from .providers import maintained
     from .ir import ConfigurationIR
-    from .factory import interface_type, public_header
+    from .factory import interface_type, public_header, controller_class
     from . import gpio_phase
+    from . import enhanced_endpoints
 except ImportError:
     from providers import maintained
     from ir import ConfigurationIR
-    from factory import interface_type, public_header
+    from factory import interface_type, public_header, controller_class
     import gpio_phase
+    import enhanced_endpoints
 
 
 def symbol(name):
@@ -57,7 +59,12 @@ def emit(result):
               ' * \\author          Nexus Team', ' */',
               '#ifndef NEXUS_BINDINGS_H', '#define NEXUS_BINDINGS_H',
               '#include "nexus/core/status.h"']
-    for kind in sorted({item["kind"] for item in selections}):
+    for kind in sorted({controller_class(item) for item in selections}):
+        header.append(f'#include "nexus/io/{public_header(kind)}.h"')
+    for kind in sorted({enhanced_endpoints.class_name(item)
+                        for item in result.devices} &
+                       {"spi_transaction_device", "i2c_long_device",
+                        "spi_dma_transaction_device"}):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
     if any(item.kind == "eth" for item in selections):
         header.append('#include "nexus/io/mdio.h"')
@@ -125,14 +132,17 @@ def emit(result):
     pin_snapshots = {}
     for item in selections:
         name = symbol(item.id)
-        exported_type = interface_type(item.kind, "port")
+        exported_type = interface_type(controller_class(item), "port")
         header += ['/** \\brief Fixed static identity; lifecycle stays explicit. */',
                    f'extern const {exported_type}* const nx_binding_{name};']
         construction = provider.constructor(item, result, result["board_bindings"],
                                             result["routes"], result.devices)
-        source += [f'static {construction.state_type} s_nx_port_{name};',
+        source += [f'static {construction.state_type} s_nx_port_{name};']
+        source.extend(construction.face_definitions)
+        face_context = construction.face_context or f"&s_nx_port_{name}"
+        source += [
                    f'static const {exported_type} s_nx_face_{name} = {{',
-                   f'    &{provider.operations(item)}, &s_nx_port_{name}', '};',
+                   f'    &{provider.operations(item)}, {face_context}', '};',
                    f'const {exported_type}* const nx_binding_{name} = &s_nx_face_{name};']
         source.extend(provider.instance_declarations(item, result))
         source.extend(construction.definitions)
@@ -147,7 +157,7 @@ def emit(result):
                     for expression in construction.stop)
     for device in result.devices:
         kind = device.kind
-        class_name = "usb_endpoint" if kind == "usb_device" else kind + "_device"
+        class_name = enhanced_endpoints.class_name(device)
         header.append(f'extern const {interface_type(class_name, "endpoint")}* const nx_device_{symbol(device.id)};')
     source.extend(provider.shared_irqs(result))
     # All constructor arrays precede their shared cold lease functions.

@@ -1,4 +1,4 @@
-# Authored translation; review state is explicit in catalog metadata.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 69d94a8daf4f8849c0c00aac5baa66efa5230100aebb9711319f517586cf2063\n"
+"X-Nexus-Source-SHA256: 5cb4538275db9683548a655d3fb46939641cbd74210933780bdc85c24fc1de6a\n"
 
 msgid "当前设计与实施台账"
 msgstr "当前设计与实施台账"
@@ -60,8 +60,8 @@ msgstr "tutorial/how-to/reference/explanation/status必需问题"
 msgid "[当前与目标参考图](../assets/diagrams/README.md)"
 msgstr "[当前与目标参考图](../assets/diagrams/README.md)"
 
-msgid "17 对本地 SVG/DOT：15 类必需图与 2 张补充图；身份与范围由图册清单维护"
-msgstr "17 对本地 SVG/DOT：15 类必需图与 2 张补充图；身份与范围由图册清单维护"
+msgid "18 对本地 SVG/DOT：16 类主图与 2 张补充图；身份与范围由图册清单维护"
+msgstr "18 对本地 SVG/DOT：16 类主图与 2 张补充图；身份与范围由图册清单维护"
 
 msgid "{download}`文档迁移映射 <documentation-migration.csv>`"
 msgstr "{download}`文档迁移映射 <documentation-migration.csv>`"
@@ -74,6 +74,12 @@ msgstr "[架构蓝图](next-generation-platform.md)"
 
 msgid "原理、执行、所有权、性能/空间与支持边界"
 msgstr "原理、执行、所有权、性能/空间与支持边界"
+
+msgid "[I/O 增量架构](io-evolution.md)"
+msgstr "[I/O 增量架构](io-evolution.md)"
+
+msgid "资源/触发/DMA 计划、可选 traits、硅片准入、数据单位与当前/待实现边界；状态由 IO-01–42 台账维护"
+msgstr "资源/触发/DMA 计划、可选 traits、硅片准入、数据单位与当前/待实现边界；状态由 IO-01–42 台账维护"
 
 msgid "[工程手册](engineering-handbook.md)"
 msgstr "[工程手册](engineering-handbook.md)"

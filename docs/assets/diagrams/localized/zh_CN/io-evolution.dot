@@ -1,0 +1,67 @@
+// FIG-16 current software mechanisms; selected-provider scope, not HIL.
+// Basis: c4249e98 baseline plus the IO evolution sources linked by
+// docs/design/io-evolution.md. The task ledger owns execution status.
+// Every edge states generation, lookup, call or copied-observation semantics.
+digraph ioEvolution {
+    graph [label="FIG-16 当前 I/O 装配与执行\n软件机制；精确模式状态由台账维护",
+           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB,
+           bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.60,
+           newrank=true];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.8];
+    subgraph clusterBuild {
+        label="构建阶段：一份 authored 装配";
+        color="#64748b"; fontname="Noto Sans CJK SC";
+        assembly [label="Authored TOML"];
+        facts [label="已审 SoC 模式与 Board 路线"];
+        resolver [label="严格解析器\n资源 / 触发 / DMA 计划"];
+        ir [label="不可变 typed IR"];
+        bundle [label="原子生成 bundle"];
+        cmake [label="CMake：唯一软件目标图"];
+        assembly -> resolver [label="选择模式和容量"];
+        facts -> resolver [label="约束合法组合"];
+        resolver -> ir [label="发布已校验事实"];
+        ir -> bundle [label="生成选定对象"];
+        bundle -> cmake [label="提供配置与源码"];
+    }
+    subgraph clusterRuntime {
+        label="运行阶段：调用者负责推进与生命周期";
+        color="#64748b"; fontname="Noto Sans CJK SC";
+        app [label="外部应用\n调度 / 停机所有者", fillcolor="#f8fafc"];
+        factory [label="Typed factory\n仅取得既有静态身份"];
+        face [label="不可变 typed face\n共享 ops + 实例 context"];
+        lifecycle [label="公共平台生命周期\nnx_platform_start / stop"];
+        provider [label="选定 provider\n私有状态与控制器所有者"];
+        traits [label="可选 selected traits\n只读事实", style="rounded,dashed,filled"];
+        preflight [label="可选冷态 silicon preflight\n显式来源与不可变策略",
+                   style="rounded,dashed,filled"];
+        time [label="可选时间戳事实\n域 / epoch / 速率 / 不确定度",
+              style="rounded,dashed,filled"];
+        app -> factory [label="查找 typed 身份"];
+        factory -> face [label="返回既有引用"];
+        app -> face [label="启动后调用 I/O 与 service"];
+        face -> provider [label="ops(context, ...)"];
+        app -> lifecycle [label="显式调用 start / stop"];
+        lifecycle -> provider [label="初始化 / 排空私有状态"];
+        app -> traits [label="可选读取选定事实", style=dashed];
+        app -> preflight [label="冷态调用 / 复制准入结果",
+                          style=dashed, dir=both];
+        app -> time [label="观测配对 / 同域时间差结果",
+                     style=dashed, dir=both];
+    }
+    hardware [label="选定控制器 / IRQ / DMA", fillcolor="#f8fafc"];
+    silicon [label="显式硅片身份来源", fillcolor="#f8fafc"];
+    bundle -> factory [label="生成查找代码"];
+    bundle -> face [label="生成不可变 face"];
+    bundle -> provider [label="生成私有实例状态"];
+    bundle -> lifecycle [label="生成生命周期装配"];
+    bundle -> traits [label="仅显式选入时生成", style=dashed];
+    cmake -> provider [label="选择并链接实现"];
+    // Layout only: keep all build nodes above the runtime view.
+    cmake -> app [style=invis, weight=100];
+    provider -> hardware [label="provider 配置 / IRQ 报告事实", dir=both];
+    preflight -> silicon [label="执行一次有界读取", style=dashed];
+}

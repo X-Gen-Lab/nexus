@@ -27,6 +27,14 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = [f"nx_native_gpio_stop_instance({state}, {initial}u)"]
     elif kind == "uart":
         capacity = item.options.rx_capacity
+        if item.mode == "irq-words":
+            return Construction(
+                state_type="nx_native_uart_word_state_t",
+                definitions=[f"static uint16_t s_nx_rx_{name}[{capacity}];"],
+                initialize=(f"nx_native_uart_word_initialize({state}, "
+                            f"s_nx_rx_{name}, {capacity}u, NULL, 0u)"),
+                stop=[f"nx_uart_word_port_stop({face})"],
+                retain_on_failed_init=False)
         events = item.options.rx_profile == "events"
         data_type = "nx_uart_rx_event_t" if events else "uint8_t"
         profile = "NX_UART_RX_EVENTS" if events else "NX_UART_RX_BYTES"

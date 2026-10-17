@@ -11,6 +11,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from tools.configure.uart_formats import DEFAULT as UART_DEFAULT_FRAME
 from tools.evidence.common import (EvidenceError, atomic_json, fields,
     file_identity, identifier, load_json, reject_secret_fields,
     verify_file_identity)
@@ -154,6 +155,9 @@ def validate_console(fixture: dict, resolved: dict) -> None:
                 controller.get("controller") == fixture["serial"]["controller"]]
     require(len(consoles) == 1, "UART smoke requires exactly one selected fixture console")
     console = consoles[0]
+    require(console.get("mode") != "irq-words" and
+            console.get("frame", UART_DEFAULT_FRAME) == UART_DEFAULT_FRAME,
+            "UART smoke requires an 8N1 byte console without flow control")
     pins = {pin["function"]: pin["pin"] for pin in console["pins"]}
     require(pins.get("tx") == fixture["serial"]["tx"] and
             pins.get("rx") == fixture["serial"]["rx"] and

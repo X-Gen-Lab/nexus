@@ -409,7 +409,8 @@
         "rx-dma-idle",
         "dma-duplex",
         "rx-dma-continuous",
-        "dma-duplex-continuous"
+        "dma-duplex-continuous",
+        "irq-words"
       ],
       "irq": [
         "USART1_IRQn"

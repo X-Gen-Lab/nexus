@@ -21,6 +21,8 @@ def implementation(item):
 def operations(item):
     """Name the actual readonly table; shared algorithms keep one identity."""
     selected = implementation(item)
+    if item.interface_kind == "spi_dma_transaction":
+        return "nx_spi_dma_sequence_port_ops"
     if item.kind == "eth":
         return "nx_eth_mac_ops"
     if item.kind == "can":
@@ -36,6 +38,12 @@ def includes(result):
     selections = result.controllers
     source = []
     source.append('#include "stm32f407_provider.h"')
+    if any(item.mode == "irq-words" for item in selections):
+        source.append('#include "stm32f407_uart_word.h"')
+    if any(item.interface_kind == "spi_dma_transaction" for item in selections):
+        source += ['#include "spi_dma_sequence.h"',
+                   'extern const nx_spi_dma_sequence_backend_t',
+                   '    nx_stm32_spi_dma_sequence_backend;']
     if any(implementation(item) in {"uart_dma", "spi_dma"}
            for item in selections):
         source.append('#include "stm32f407_dma.h"')

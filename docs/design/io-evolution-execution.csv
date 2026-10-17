@@ -1,0 +1,43 @@
+task_id,phase,area,task,implementation_paths,exit_condition,implementation_status,software_status,hardware_status,maintenance_owner
+IO-01,P0,capabilities,Single authority for exact provider and mode support,tools/maintenance/work_packages.py;tools/configure/io_traits.py,Existing catalogue plus selected metadata; document exact boundaries,in_progress,not_qualified,not_executed,Codex
+IO-02,P0,traits,Optional immutable typed I/O traits,tools/configure/io_traits.py;tools/configure/factory.py,Capability switch controls all emitted readonly trait objects,in_progress,not_qualified,not_executed,Codex
+IO-03,P0,silicon,Observed silicon identity and revision admission,core/include/nexus/core/silicon.h;core/src/silicon.c,Exact documents and revision policy; unknown is explicit; factory stays cold,in_progress,not_qualified,not_executed,Codex
+IO-04,P0,lifecycle,Admission cancellation drain epochs and quarantine regression matrix,core/src/request.c;tests/google/io_state_machine_test.cpp,Fresh complete no-skip software gate for this iteration,pending,not_qualified,not_executed,Codex
+IO-05,P0,budgets,Bounded IRQ and service execution observation,core/src/request_observer.c,Optional probes compile out; explicit service and IRQ budgets,pending,not_qualified,not_executed,Codex
+IO-06,P0,stream,Rate block hold-time loss and backpressure budgets,io/src/stream_budget.c,Actual selected-provider configuration validates stream budget,pending,not_qualified,not_executed,Codex
+IO-07,P0,hil,Board fixtures and fault-injection station preparation,tools/hil,Prepare software tooling; physical tests remain not_executed,pending,not_qualified,not_executed,Codex
+IO-08,P0,measurement,Linked resource and runtime cost comparison,tools/measurement,Fresh exact ELF comparison; no inferred physical timing or energy,pending,not_qualified,not_executed,Codex
+IO-09,P1,resources,Hierarchical controller base channel resource claims,tools/configure/resource_graph.py,Compatible shared base plus channels requires one actual hardware owner,in_progress,not_qualified,not_executed,Codex
+IO-10,P1,resources,Physical peripheral identity and mutually exclusive personalities,tools/configure/resource_graph.py,Canonical aliases and personality conflicts rejected,in_progress,not_qualified,not_executed,Codex
+IO-11,P1,events,Typed hardware event graph and startup ordering,tools/configure/trigger_graph.py,Validate event cycles with owned stop gates; emit selected reviewed routes,in_progress,not_qualified,not_executed,Codex
+IO-12,P1,dma,Selected DMA engines lanes requests and reachability,tools/configure/dma_topology.py,Exact provider tuples; reject physical lane collisions,in_progress,not_qualified,not_executed,Codex
+IO-13,P1,dma,Descriptor ownership placement cache and chain cancellation,tools/configure/dma_topology.py,Static validation plus actual linked-list provider drain and loans,in_progress,not_qualified,not_executed,Codex
+IO-14,P1,uart,Explicit line formats flow control and independent nine-bit I/O,io/include/nexus/io/uart_word.h,Native and exact STM32/GD32 register paths; compact byte default,in_progress,not_qualified,not_executed,Codex
+IO-15,P1,uart,Bounded FIFO IRQ service and concurrent stream load,soc,Bounded batch and IRQ latency observations on exact providers,pending,not_qualified,not_executed,Codex
+IO-16,P1,spi,Whole-CS segments dummy cycles and 8/16-bit words,io/include/nexus/io/spi_transaction.h,Native STM32F407 GD32F470 polling then async DMA loan and drain,in_progress,not_qualified,not_executed,Codex
+IO-17,P1,i2c,Kernel-clock timing and long-message reload,soc/common;tools/configure,Reviewed electrical timing inputs; preserve message START and STOP,in_progress,not_qualified,not_executed,Codex
+IO-18,P1,adc,Explicit sample formats groups triggers and provenance,io/include/nexus/io/adc_format.h;io/src/adc_format.c,Integer storage metadata and actual provider group support,in_progress,not_qualified,not_executed,Codex
+IO-19,P1,pwm,Atomic multi-channel shadow commit and break fault handling,io/include/nexus/io/pwm_group.h;soc/stm32g474/drivers/pwm_group.c,Single timer owner; no automatic restart after break,in_progress,not_qualified,not_executed,Codex
+IO-20,P1,capture,Counter widths filters encoders and overcapture,io/include/nexus/io/timer_capture.h,Wrap-safe capture and reviewed encoder modes on real providers,pending,not_qualified,not_executed,Codex
+IO-21,P1,timestamps,Timestamp source domain epoch frequency and uncertainty,io/include/nexus/io/observation.h,Reject incompatible domains and distinguish observation from event time,in_progress,not_qualified,not_executed,Codex
+IO-22,P1,diagnostics,Optional state recovery ownership and checked service entry,io/src/observation.c,Checked dispatch is distinct from I/O progress or settlement,in_progress,not_qualified,not_executed,Codex
+IO-23,P1,memory,Remove unused TX DMA fields from RX-only providers,soc/stm32f407;soc/gd32f470,Fresh linked RAM measurements and duplex lifecycle regression,pending,not_qualified,not_executed,Codex
+IO-24,P1,flash,Busy-bank pulse RAM closure cache ECC and watchdog contract,soc,Uncancellable pulse and complete execution closure verified per profile,pending,not_qualified,not_executed,Codex
+IO-25,P1,providers,Reuse reviewed peripheral IP generations and official HAL/LL,soc/common;tools/configure/providers,Private implementation sharing with exact per-family facts,pending,not_qualified,not_executed,Codex
+IO-26,P1,h743,Cold PLL voltage latency and kernel-clock profiles,soc/stm32h743,Readback rollback and exact reference identity,pending,not_qualified,not_executed,Codex
+IO-27,P1,h743,UART continuous duplex DMA and SPI DMA with cache,soc/stm32h743,Selected SRAM reachability and held-buffer protection,pending,not_qualified,not_executed,Codex
+IO-28,P1,u575,Finite GPDMA provider and USART errata handling,soc/stm32u575,Actual GPDMA drain and exact ES0499 workarounds; TZEN0 first,pending,not_qualified,not_executed,Codex
+IO-29,P1,g474,Synchronous PWM ADC trigger and comparator break reference,soc/stm32g474,Generic control capture mechanisms; product algorithms external,in_progress,not_qualified,not_executed,Codex
+IO-30,P2,power,Optional runtime clock and power transitions,soc;core,Active I/O leases rollback and monotonic deadline continuity,pending,not_qualified,not_executed,Codex
+IO-31,P2,pinctrl,Explicit default sleep safe levels wake and retention,boards;soc,No invented board wiring; selected reviewed state only,pending,not_qualified,not_executed,Codex
+IO-32,P2,u575,LPDMA autonomous Stop2 and LPBAM reference,soc/stm32u575,Selected low-power peripheral SRAM4 and wake/stop ownership,pending,not_qualified,not_executed,Codex
+IO-33,P2,canfd,CAN FD payload timing BRS ESI and message RAM,io;soc,Classic CAN remains compact; exact FDCAN provider required,pending,not_qualified,not_executed,Codex
+IO-34,P2,ethernet,VLAN scatter gather frame loans and hardware timestamps,io;soc,Actual hardware descriptor ownership and truthful global abort,pending,not_qualified,not_executed,Codex
+IO-35,P2,usb,Optional class adapters and exact PHY endpoint capabilities,io;components,Control reset ACK ZLP and device mode before additional USB modes,pending,not_qualified,not_executed,Codex
+IO-36,P2,time,RTC LPTIM alarms wrap backup and reset domains,io;soc,Wall-clock and monotonic domains remain separate,pending,not_qualified,not_executed,Codex
+IO-37,P2,storage,SDMMC and serial memory block command mapped interfaces,io;soc,XIP cache DMA loans and erase ownership are explicit,pending,not_qualified,not_executed,Codex
+IO-38,P2,i3c,Bounded discovery IBI and hot-join caller storage,io;soc,No implicit factory discovery; exact peripheral reference required,pending,not_qualified,not_executed,Codex
+IO-39,P2,security,TrustZone peripheral broker and attribution,core;arch;soc,Principal and memory validation; copied and borrowed data distinct,pending,not_qualified,not_executed,Codex
+IO-40,P2,multicore,AMP resource partition and epoch-safe IPC,core;arch,Unique hardware owner and explicit remote reset/cache contract,pending,not_qualified,not_executed,Codex
+IO-41,P2,audio,I2S SAI PDM framing and continuous DMA loans,io;soc,Frame-slot format and bounded underrun; optional external codec,pending,not_qualified,not_executed,Codex
+IO-42,P2,multimedia,Camera display accelerator planar and strided buffers,io;soc,Frame completion backpressure external memory and 2D DMA ownership,pending,not_qualified,not_executed,Codex
